@@ -52,6 +52,9 @@
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/msgs/msgs.hh"
 
+#include "gazebo/math/SignalStats.hh"
+#include "gazebo/math/Vector3Stats.hh"
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/Server.hh"
 #include "gazebo/util/system.hh"
@@ -251,6 +254,45 @@ namespace gazebo
     /// \param[in] _distortionP2 Distortion coefficient p2.
     /// \param[in] _cx Normalized optical center x, used for distortion.
     /// \param[in] _cy Normalized optical center y, used for distortion.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnCamera(const std::string &_modelName,
+                   const std::string &_cameraName,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   unsigned int _width = 320, unsigned int _height = 240,
+                   double _rate = 25,
+                   const std::string &_noiseType = "",
+                   double _noiseMean = 0.0, double _noiseStdDev = 0.0,
+                   bool _distortion = false, double _distortionK1 = 0.0,
+                   double _distortionK2 = 0.0, double _distortionK3 = 0.0,
+                   double _distortionP1 = 0.0, double _distortionP2 = 0.0,
+                   double _cx = 0.5, double _cy = 0.5)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnCamera(_modelName, _cameraName, _pos.Ign(), _rpy.Ign(),
+                   _width, _height, _rate, _noiseType, _noiseMean,
+                   _noiseStdDev , _distortion , _distortionK1,
+                   _distortionK2, _distortionK3, _distortionP1,
+                   _distortionP2, _cx, _cy);
+           }
+
+    /// \brief Spawn a camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \param[in] _distortionK1 Distortion coefficient k1.
+    /// \param[in] _distortionK2 Distortion coefficient k2.
+    /// \param[in] _distortionK3 Distortion coefficient k3.
+    /// \param[in] _distortionP1 Distortion coefficient P1.
+    /// \param[in] _distortionP2 Distortion coefficient p2.
+    /// \param[in] _cx Normalized optical center x, used for distortion.
+    /// \param[in] _cy Normalized optical center y, used for distortion.
     protected: void SpawnCamera(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos,
@@ -263,6 +305,51 @@ namespace gazebo
                    double _distortionK2 = 0.0, double _distortionK3 = 0.0,
                    double _distortionP1 = 0.0, double _distortionP2 = 0.0,
                    double _cx = 0.5, double _cy = 0.5);
+
+    /// \brief Spawn a wide angle camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _hfov Horizontal field of view.
+    /// \param[in] _lensType Type of lens: gnomonical, stereographic,
+    /// equidistant, equisolid_angle, or orthographic.
+    /// \param[in] _scaleToHfov True to use horizontal field of view as defined,
+    /// otherwise it depends on lens type and custom function.
+    /// \param[in] _cutoffAngle Clip everything outside this angle
+    /// \param[in] _envTextureSize Cubemap environment texture size.
+    /// \param[in] _c1 For "custom" lens type, the c1 coefficient used in the
+    /// mapping function
+    /// \param[in] _c2 For "custom" lens type, the c2 coefficient used in the
+    /// mapping function
+    /// \param[in] _f For "custom" lens type, the focal length used in the
+    /// mapping function
+    /// \param[in] _fun For "custom" lens type, the trigonometirc function used
+    /// in the mapping function
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnWideAngleCamera(const std::string &_modelName,
+                  const std::string &_cameraName,
+                  const math::Vector3 &_pos,
+                  const math::Vector3 &_rpy,
+                  unsigned int _width, unsigned int _height, double _rate,
+                  const double _hfov,
+                  const std::string &_lensType = "stereographic",
+                  const bool _scaleToHfov = true,
+                  const double _cutoffAngle = 3.1415,
+                  const double _envTextureSize = 512,
+                  const double _c1 = 1.05, const double _c2 = 4,
+                  const double _f = 1.0,
+                  const std::string &_fun = "tan")
+                  GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnWideAngleCamera(_modelName, _cameraName, _pos.Ign(),
+               _rpy.Ign(), _width, _height, _rate, _hfov,
+               _lensType, _scaleToHfov, _cutoffAngle,
+               _envTextureSize, _c1, _c2, _f, _fun);
+           }
 
     /// \brief Spawn a wide angle camera.
     /// \param[in] _modelName Name of the model.
@@ -316,6 +403,43 @@ namespace gazebo
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnRaySensor(const std::string &_modelName,
+                   const std::string &_raySensorName,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                   double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
+                   double _minRange = 0.08, double _maxRange = 10,
+                   double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   unsigned int _vSamples = 1, double _hResolution = 1.0,
+                   double _vResolution = 1.0,
+                   const std::string &_noiseType = "", double _noiseMean = 0.0,
+                   double _noiseStdDev = 0.0)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnRaySensor(_modelName, _raySensorName, _pos.Ign(),
+               _rpy.Ign(), _hMinAngle, _hMaxAngle, _vMinAngle,
+               _vMaxAngle, _minRange, _maxRange , _rangeResolution,
+               _samples, _vSamples, _hResolution, _vResolution,
+               _noiseType, _noiseMean, _noiseStdDev);
+           }
+
+    /// \brief Spawn a laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _raySensorName Name of the laser.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _hMinAngle Horizontal min angle
+    /// \param[in] _hMaxAngle Horizontal max angle
+    /// \param[in] _minRange Min range
+    /// \param[in] _maxRange Max range
+    /// \param[in] _rangeResolution Resolution of the scan
+    /// \param[in] _samples Number of samples.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
     protected: void SpawnRaySensor(const std::string &_modelName,
                    const std::string &_raySensorName,
                    const ignition::math::Vector3d &_pos,
@@ -336,12 +460,65 @@ namespace gazebo
     /// \param[in] _minRange Minimum sonar range.
     /// \param[in] _maxRange Maximum sonar range.
     /// \param[in] _radius Sonar cone radius.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: sensors::SonarSensorPtr SpawnSonar(const std::string &_modelName,
+                   const std::string &_sonarName,
+                   const math::Pose &_pose,
+                   const double _minRange,
+                   const double _maxRange,
+                   const double _radius)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           return SpawnSonar(_modelName, _sonarName, _pose.Ign(), _minRange,
+                     _maxRange, _radius);
+           }
+
+    /// \brief Spawn a sonar.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _sonarName Name of the sonar.
+    /// \param[in] _pose Sonar pose.
+    /// \param[in] _minRange Minimum sonar range.
+    /// \param[in] _maxRange Maximum sonar range.
+    /// \param[in] _radius Sonar cone radius.
     protected: sensors::SonarSensorPtr SpawnSonar(const std::string &_modelName,
                    const std::string &_sonarName,
                    const ignition::math::Pose3d &_pose,
                    const double _minRange,
                    const double _maxRange,
                    const double _radius);
+
+    /// \brief Spawn a gpu laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _raySensorName Name of the laser.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _hMinAngle Horizontal min angle
+    /// \param[in] _hMaxAngle Horizontal max angle
+    /// \param[in] _minRange Min range
+    /// \param[in] _maxRange Max range
+    /// \param[in] _rangeResolution Resolution of the scan
+    /// \param[in] _samples Number of samples.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                   const std::string &_raySensorName,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                   double _minRange = 0.08, double _maxRange = 10,
+                   double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   const std::string &_noiseType = "", double _noiseMean = 0.0,
+                   double _noiseStdDev = 0.0)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnGpuRaySensor(_modelName, _raySensorName, _pos.Ign(),
+               _rpy.Ign(), _hMinAngle, _hMaxAngle, _minRange, _maxRange,
+               _rangeResolution, _samples, _noiseType, _noiseMean,
+               _noiseStdDev);
+           }
+
 
     /// \brief Spawn a gpu laser.
     /// \param[in] _modelName Name of the model.
@@ -378,6 +555,31 @@ namespace gazebo
     /// \param[in] _rate Output Hz.
     /// \param[in] _near Near clipping distance
     /// \param[in] _far Far clipping distance
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnDepthCameraSensor(const std::string &_modelName,
+                   const std::string &_cameraName,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   const unsigned int _width = 320,
+                   const unsigned int _height = 240,
+                   const double _rate = 25, const double _near = 0.1,
+                   const double _far = 10)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnDepthCameraSensor(_modelName, _cameraName, _pos.Ign(),
+               _rpy.Ign(), _width, _height, _rate, _near, _far);
+           }
+
+    /// \brief Spawn a depth camera.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _cameraName Name of the camera.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _width Output image width.
+    /// \param[in] _height Output image height.
+    /// \param[in] _rate Output Hz.
+    /// \param[in] _near Near clipping distance
+    /// \param[in] _far Far clipping distance
     protected: void SpawnDepthCameraSensor(const std::string &_modelName,
                    const std::string &_cameraName,
                    const ignition::math::Vector3d &_pos,
@@ -386,6 +588,37 @@ namespace gazebo
                    const unsigned int _height = 240,
                    const double _rate = 25, const double _near = 0.1,
                    const double _far = 10);
+
+    /// \brief Spawn an imu sensor laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _imuSensorName Name of the imu sensor.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \param[in] _accelNoiseMean Acceleration based noise mean.
+    /// \param[in] _accelNoiseStdDev Acceleration based noise standard
+    /// deviation.
+    /// \param[in] _accelBiasMean Acceleration mean bias
+    /// \param[in] _accelBiasStdDev Acceleration standard deviation bias
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnImuSensor(const std::string &_modelName,
+                   const std::string &_imuSensorName,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const std::string &_noiseType = "",
+                   double _rateNoiseMean = 0.0, double _rateNoiseStdDev = 0.0,
+                   double _rateBiasMean = 0.0, double _rateBiasStdDev = 0.0,
+                   double _accelNoiseMean = 0.0, double _accelNoiseStdDev = 0.0,
+                   double _accelBiasMean = 0.0, double _accelBiasStdDev = 0.0)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnImuSensor(_modelName, _imuSensorName, _pos.Ign(),
+               _rpy.Ign(), _noiseType, _rateNoiseMean,
+               _rateNoiseStdDev, _rateBiasMean, _rateBiasStdDev,
+               _accelNoiseMean, _accelNoiseStdDev, _accelBiasMean,
+               _accelBiasStdDev);
+           }
 
     /// \brief Spawn an imu sensor laser.
     /// \param[in] _modelName Name of the model.
@@ -417,12 +650,50 @@ namespace gazebo
     /// \param[in] _pos World position
     /// \param[in] _rpy World rotation in Euler angles
     /// \param[in] _static True to make the model static
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnUnitContactSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const std::string &_collisionType, const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy, bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnUnitContactSensor(_name, _sensorName, _collisionType,
+                      _pos.Ign(), _rpy.Ign(), _static);
+           }
+
+    /// \brief Spawn a contact sensor with the specified collision geometry
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _collisionType Type of collision, box or cylinder
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _static True to make the model static
     protected: void SpawnUnitContactSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);
+
+    /// \brief Spawn an IMU sensor on a link
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _collisionType Type of collision, box or cylinder
+    /// \param[in] _topic Topic to publish IMU data to
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _static True to make the model static
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnUnitImuSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const std::string &_collisionType,
+                   const std::string &_topic, const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy, bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnUnitImuSensor(_name, _sensorName, _collisionType,
+               _topic, _pos.Ign(), _rpy.Ign(), _static);
+           }
 
     /// \brief Spawn an IMU sensor on a link
     /// \param[in] _name Model name
@@ -448,6 +719,28 @@ namespace gazebo
     /// \param[in] _pos World position
     /// \param[in] _rpy World rotation in Euler angles
     /// \param[in] _static True to make the model static
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnUnitAltimeterSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const std::string &_collisionType,
+                   const std::string &_topic,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnUnitAltimeterSensor(_name, _sensorName, _collisionType,
+               _topic, _pos.Ign(), _rpy.Ign(), _static);
+           }
+
+    /// \brief Spawn an altimeter sensor on a link
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _collisionType Type of collision, box or cylinder
+    /// \param[in] _topic Topic to publish altimeter data to
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _static True to make the model static
     protected: void SpawnUnitAltimeterSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const std::string &_collisionType,
@@ -455,6 +748,29 @@ namespace gazebo
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);
+
+    /// \brief Spawn a magnetometer sensor on a link
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _collisionType Type of collision, box or cylinder
+    /// \param[in] _topic Topic to publish magnetometer data to
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _static True to make the model static
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnUnitMagnetometerSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const std::string &_collisionType,
+                   const std::string &_topic,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnUnitMagnetometerSensor(_name, _sensorName,
+               _collisionType, _topic, _pos.Ign(), _rpy.Ign(),
+               _static);
+           }
 
     /// \brief Spawn a magnetometer sensor on a link
     /// \param[in] _name Model name
@@ -489,6 +805,33 @@ namespace gazebo
     /// \param[in] _power Transmission power (dBm)
     /// \param[in] _gain Antenna gain (dBi)
     /// \param[in] _visualize Enable sensor visualization
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   const std::string &_essid,
+                   double _freq,
+                   double _power,
+                   double _gain,
+                   bool _visualize = true)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnWirelessTransmitterSensor(_name, _sensorName,
+               _pos.Ign(), _rpy.Ign(), _essid, _freq, _power,
+               _gain, _visualize);
+           }
+
+    /// \brief Spawn an Wireless transmitter sensor on a link
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _essid Service set identifier (network name)
+    /// \param[in] _freq Frequency of transmission (MHz)
+    /// \param[in] _power Transmission power (dBm)
+    /// \param[in] _gain Antenna gain (dBi)
+    /// \param[in] _visualize Enable sensor visualization
     protected: void SpawnWirelessTransmitterSensor(const std::string &_name,
                    const std::string &_sensorName,
                    const ignition::math::Vector3d &_pos,
@@ -498,6 +841,35 @@ namespace gazebo
                    double _power,
                    double _gain,
                    bool _visualize = true);
+
+    /// \brief Spawn an Wireless receiver sensor on a link
+    /// \param[in] _name Model name
+    /// \param[in] _sensorName Sensor name
+    /// \param[in] _pos World position
+    /// \param[in] _rpy World rotation in Euler angles
+    /// \param[in] _minFreq Minimum frequency to be filtered (MHz)
+    /// \param[in] _maxFreq Maximum frequency to be filtered (MHz)
+    /// \param[in] _power Transmission power (dBm)
+    /// \param[in] _gain Antenna gain (dBi)
+    /// \param[in] _sensitivity Receiver sensitibity (dBm)
+    /// \param[in] _visualize Enable sensor visualization
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnWirelessReceiverSensor(const std::string &_name,
+                   const std::string &_sensorName,
+                   const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy,
+                   double _minFreq,
+                   double _maxFreq,
+                   double _power,
+                   double _gain,
+                   double _sensitivity,
+                   bool _visualize = true)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnWirelessReceiverSensor(_name, _sensorName, _pos.Ign(),
+               _rpy.Ign(), _minFreq, _maxFreq, _power, _gain,
+               _sensitivity, _visualize);
+           }
 
     /// \brief Spawn an Wireless receiver sensor on a link
     /// \param[in] _name Model name
@@ -571,6 +943,46 @@ namespace gazebo
     /// \param[in] _spotOuterAngle Outer angle ("spot" only).
     /// \param[in] _spotFallOff Fall off ("spot" only).
     /// \param[in] _castShadows True to cast shadows.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnLight(const std::string &_name,
+                   const std::string &_type,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const common::Color &_diffuse = common::Color::White,
+                   const common::Color &_specular = common::Color::White,
+                   const math::Vector3 &_direction = -math::Vector3::UnitZ,
+                   double _attenuationRange = 20,
+                   double _attenuationConstant = 0.5,
+                   double _attenuationLinear = 0.01,
+                   double _attenuationQuadratic = 0.001,
+                   double _spotInnerAngle = 0,
+                   double _spotOuterAngle = 0,
+                   double _spotFallOff = 0,
+                   bool _castShadows = true)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnLight(_name, _type, _pos.Ign(), _rpy.Ign(), _diffuse,
+               _specular, _direction.Ign(), _attenuationRange,
+               _attenuationConstant, _attenuationLinear,
+               _attenuationQuadratic, _spotInnerAngle,
+               _spotOuterAngle, _spotFallOff, _castShadows);
+           }
+
+    /// \brief Spawn a light.
+    /// \param[in] _name Name for the light.
+    /// \param[in] _size Type of light - "spot", "directional", or "point".
+    /// \param[in] _pos Position for the light.
+    /// \param[in] _rpy Roll, pitch, yaw for the light.
+    /// \param[in] _diffuse Diffuse color of the light.
+    /// \param[in] _specular Specular color of the light.
+    /// \param[in] _direction Direction of the light ("spot" and "directional").
+    /// \param[in] _attenuationRange Range of attenuation.
+    /// \param[in] _attenuationConstant Constant component of attenuation
+    /// \param[in] _attenuationLinear Linear component of attenuation
+    /// \param[in] _attenuationQuadratic Quadratic component of attenuation
+    /// \param[in] _spotInnerAngle Inner angle ("spot" only).
+    /// \param[in] _spotOuterAngle Outer angle ("spot" only).
+    /// \param[in] _spotFallOff Fall off ("spot" only).
+    /// \param[in] _castShadows True to cast shadows.
     protected: void SpawnLight(const std::string &_name,
                    const std::string &_type,
                    const ignition::math::Vector3d &_pos,
@@ -593,6 +1005,21 @@ namespace gazebo
     /// \param[in] _pos Position for the model.
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnCylinder(const std::string &_name,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnCylinder(_name, _pos.Ign(), _rpy.Ign(), _static);
+           }
+
+
+    /// \brief Spawn a cylinder
+    /// \param[in] _name Name for the model.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _static True to make the model static.
     protected: void SpawnCylinder(const std::string &_name,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
@@ -605,10 +1032,48 @@ namespace gazebo
     /// \param[in] _static True to make the model static.
     /// \param[in] _wait True to wait for the sphere to spawn before
     /// returning.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnSphere(const std::string &_name,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   bool _wait = true, bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnSphere(_name, _pos.Ign(), _rpy.Ign(), _wait,
+               _static);
+           }
+
+    /// \brief Spawn a sphere
+    /// \param[in] _name Name for the model.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _static True to make the model static.
+    /// \param[in] _wait True to wait for the sphere to spawn before
+    /// returning.
     protected: void SpawnSphere(const std::string &_name,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _wait = true, bool _static = false);
+
+    /// \brief Spawn a sphere
+    /// \param[in] _name Name for the model.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _cog Center of gravity.
+    /// \param[in] _radius Sphere radius.
+    /// \param[in] _static True to make the model static.
+    /// \param[in] _wait True to wait for the sphere to spawn before
+    /// returning.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnSphere(const std::string &_name,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const math::Vector3 &_cog, double _radius,
+                   bool _wait = true, bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnSphere(_name, _pos.Ign(), _rpy.Ign(), _cog.Ign(),
+               _radius, _wait, _static);
+           }
+
 
     /// \brief Spawn a sphere
     /// \param[in] _name Name for the model.
@@ -632,11 +1097,46 @@ namespace gazebo
     /// \param[in] _pos Position for the model.
     /// \param[in] _rpy Roll, pitch, yaw for the model.
     /// \param[in] _static True to make the model static.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnBox(const std::string &_name,
+                   const math::Vector3 &_size, const math::Vector3 &_pos,
+                   const math::Vector3 &_rpy, bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnBox(_name, _size.Ign(), _pos.Ign(), _rpy.Ign(),
+               _static);
+           }
+
+
+    /// \brief Spawn a box.
+    /// \param[in] _name Name for the model.
+    /// \param[in] _size Size of the box.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _static True to make the model static.
     protected: void SpawnBox(const std::string &_name,
                    const ignition::math::Vector3d &_size,
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);
+
+    /// \brief Spawn a triangle mesh.
+    /// \param[in] _name Name for the model.
+    /// \param[in] _modelPath Path to the mesh file.
+    /// \param[in] _scale Scaling factor.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _static True to make the model static.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnTrimesh(const std::string &_name,
+                   const std::string &_modelPath, const math::Vector3 &_scale,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnTrimesh(_name, _modelPath, _scale.Ign(), _pos.Ign(),
+               _rpy.Ign(), _static);
+           }
 
     /// \brief Spawn a triangle mesh.
     /// \param[in] _name Name for the model.
@@ -651,6 +1151,21 @@ namespace gazebo
                    const ignition::math::Vector3d &_pos,
                    const ignition::math::Vector3d &_rpy,
                    bool _static = false);
+
+    /// \brief Spawn an empty link.
+    /// \param[in] _name Name for the model.
+    /// \param[in] _pos Position for the model.
+    /// \param[in] _rpy Roll, pitch, yaw for the model.
+    /// \param[in] _static True to make the model static.
+    /// \deprecated See function that accepts ignition::math parameters
+    protected: void SpawnEmptyLink(const std::string &_name,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   bool _static = false)
+                   GAZEBO_DEPRECATED(8.0)
+           {
+           SpawnEmptyLink(_name, _pos.Ign(), _rpy.Ign(), _static);
+           }
+
 
     /// \brief Spawn an empty link.
     /// \param[in] _name Name for the model.
