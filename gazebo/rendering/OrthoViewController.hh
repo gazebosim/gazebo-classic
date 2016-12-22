@@ -68,8 +68,8 @@ namespace gazebo
       /// \param[in] _amount Zoom quantity.
       /// \param[in] _point Position on screen to zoom to
       private: void Zoom(const float _amount,
-        const ignition::math::Vector2i &_point = \
-          ignition::math::Vector2i(0, 0));
+                   const ignition::math::Vector2i &_point =
+                   ignition::math::Vector2i(0, 0));
 
       // Documentation inherited
       public: virtual void Resize(const unsigned int _width,
