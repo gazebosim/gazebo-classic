@@ -621,7 +621,7 @@ void GLWidget::OnMousePressNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
