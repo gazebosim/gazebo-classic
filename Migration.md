@@ -114,6 +114,10 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/MovableText.hh**
+    + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0) 
+    + ***Replacement:*** ignition::math::Box AABB()
+
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
     + ***Replacement:*** double K1() const
