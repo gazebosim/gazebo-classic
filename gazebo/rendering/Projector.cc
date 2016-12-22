@@ -66,9 +66,9 @@ void Projector::Load(const std::string &_name,
 void Projector::Load(const std::string &_name,
                      const ignition::math::Pose3d &_pose,
                      const std::string &_textureName,
-                     double _nearClip,
-                     double _farClip,
-                     double _fov)
+                     const double _nearClip,
+                     const double _farClip,
+                     const double _fov)
 {
   std::string topicName = std::string("~/") + _name;
 

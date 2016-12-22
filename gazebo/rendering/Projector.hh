@@ -68,12 +68,12 @@ namespace gazebo
       /// \param[in] _farClip Far clip distance.
       /// \param[in] _fov Field of view.
       public: void Load(const std::string &_name,
-        const ignition::math::Pose3d &_pose = \
-          ignition::math::Pose3d(0, 0, 0, 0, 0, 0),
-        const std::string &_textureName = "",
-        double _nearClip = 0.25,
-        double _farClip = 15.0,
-        double _fov = M_PI * 0.25);
+                  const ignition::math::Pose3d &_pose =
+                  ignition::math::Pose3d::Zero,
+                  const std::string &_textureName = "",
+                  const double _nearClip = 0.25,
+                  const double _farClip = 15.0,
+                  const double _fov = IGN_PI * 0.25);
 
       /// \brief Load the projector.
       /// \param[in] _name Name of the projector.
@@ -82,13 +82,13 @@ namespace gazebo
       /// \param[in] _nearClip Near clip distance.
       /// \param[in] _farClip Far clip distance.
       /// \param[in] _fov Field of view.
-      /// \deprecated See version that uses an ignition Pose3d object.
+      /// \deprecated See version that uses a ignition::math Pose3d objects.
       public: void Load(const std::string &_name,
                         const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
                         const std::string &_textureName = "",
                         double _nearClip = 0.25,
                         double _farClip = 15.0,
-                        double _fov = M_PI * 0.25);
+                        double _fov = IGN_PI * 0.25) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Load a texture into the projector.
       /// \param[in] _textureName Name of the texture to project.
