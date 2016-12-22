@@ -34,6 +34,10 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** all public methods using gazebo::math
+    + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
