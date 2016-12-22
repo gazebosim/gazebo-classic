@@ -91,7 +91,6 @@ namespace gazebo
 
       /// \brief Get the type of view controller.
       /// \return The view controller type string.
-      /// \deprecated See std::string TypeString() const
       public: std::string GetTypeString() const;
 
       /// \brief Pointer to the camera to control.
