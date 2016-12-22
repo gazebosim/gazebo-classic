@@ -25,6 +25,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
