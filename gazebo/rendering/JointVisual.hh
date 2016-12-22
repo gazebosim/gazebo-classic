@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
@@ -57,7 +59,18 @@ namespace gazebo
       /// joint types that have more than 1 axis.
       /// \param[in] _msg Joint message
       /// \param[in] _pose Pose of the joint visual in world coordinates.
-      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose);
+      /// \deprecated See function that accepts ignition math.
+      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \internal
+      /// \brief Load the joint visual based on a message and an offset pose
+      /// This is currently used internally for creating a second visual for
+      /// joint types that have more than 1 axis.
+      /// \param[in] _msg Joint message
+      /// \param[in] _pose Pose of the joint visual in world coordinates.
+      public: void Load(ConstJointPtr &_msg,
+                        const ignition::math::Pose3d &_worldPose);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -66,7 +79,7 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
       public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
-          bool _useParentFrame, msgs::Joint::Type _type);
+          const bool _useParentFrame, const msgs::Joint::Type _type);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -92,8 +105,8 @@ namespace gazebo
       /// joint frame.
       /// \param[in] _type Type of axis.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
-          const ignition::math::Vector3d &_axis, bool _useParentFrame,
-          msgs::Joint::Type _type);
+          const ignition::math::Vector3d &_axis, const bool _useParentFrame,
+          const msgs::Joint::Type _type);
 
       /// \brief Update an axis' arrow visual.
       /// \param[in] _arrowVisual Arrow visual to be updated.
