@@ -585,7 +585,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
   rendering::VisualPtr vis =
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+    this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
   if (vis && gui::get_entity_id(vis->GetRootVisual()->Name()))
   {
@@ -707,7 +707,7 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane())
@@ -756,7 +756,7 @@ void GLWidget::OnMouseReleaseNormal()
   if (!this->dataPtr->mouseEvent.Dragging())
   {
     rendering::VisualPtr vis =
-      this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+      this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
     if (vis)
     {

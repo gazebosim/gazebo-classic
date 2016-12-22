@@ -262,8 +262,14 @@ bool MovableText::GetShowOnTop() const
 //////////////////////////////////////////////////
 math::Box MovableText::GetAABB(void)
 {
+  return this->AABB();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box MovableText::AABB(void)
+{
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
+  return ignition::math::Box(
       math::Vector3(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),

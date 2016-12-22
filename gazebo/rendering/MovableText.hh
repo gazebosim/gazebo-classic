@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: indepedentCreations@gmail.com
- * Date: 13 Feb 2006
- */
-
-#ifndef _MOVABLETEXT_HH_
-#define _MOVABLETEXT_HH_
+#ifndef GAZEBO_RENDERING_MOVABLETEXT_HH_
+#define GAZEBO_RENDERING_MOVABLETEXT_HH_
 
 #include <string>
 
@@ -149,7 +144,13 @@ namespace gazebo
 
       /// \brief Get the axis aligned bounding box of the text.
       /// \return The axis aligned bounding box.
-      public: math::Box GetAABB();
+      /// \deprecated See ignition::math::Box AABB();
+      public: math::Box GetAABB() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the axis aligned bounding box of the text.
+      /// \return The axis aligned bounding box.
+      /// \deprecated See ignition::math::Box AABB();
+      public: ignition::math::Box AABB();
 
       /// \brief Update the text.
       public: void Update();
