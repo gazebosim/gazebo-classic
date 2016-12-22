@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Map shape
- * Author: Nate Koenig
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -129,7 +125,7 @@ std::string MapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-void MapShape::SetScale(const math::Vector3 &_scale)
+void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
