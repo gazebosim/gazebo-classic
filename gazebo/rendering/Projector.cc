@@ -342,6 +342,12 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 }
 
 /////////////////////////////////////////////////
+void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
+{
+  this->SetPose(_pose.Ign());
+}
+
+/////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetPose(
   const ignition::math::Pose3d &_pose)
 {

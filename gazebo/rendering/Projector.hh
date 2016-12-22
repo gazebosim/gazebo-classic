@@ -131,6 +131,11 @@ namespace gazebo
         public: void SetEnabled(bool _enabled);
         public: void SetUsingShaders(bool _usingShaders);
 
+        /// \deprecated See void SetPose(const ignition::math::Pose3d &_pose)
+        public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
+
+        /// \brief Set the pose of the projector.
+        /// \param[in] _pose New pose of the projector
         public: void SetPose(const ignition::math::Pose3d &_pose);
 
         private: void SetSceneNode();
