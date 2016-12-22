@@ -19,6 +19,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -263,6 +264,12 @@ namespace gazebo
 
       /// \brief Subscribe to the request topic.
       protected: transport::SubscriberPtr requestSub;
+
+      /// \brief Ignition node for communication.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Response publisher.
+      protected: ignition::transport::Node::Publisher responsePubIgn;
 
       /// \brief Mutex to protect the update cycle.
       protected: boost::recursive_mutex *physicsUpdateMutex;

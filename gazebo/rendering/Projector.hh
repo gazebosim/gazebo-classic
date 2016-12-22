@@ -26,6 +26,7 @@
 #include <map>
 #include <list>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -94,6 +95,9 @@ namespace gazebo
       private: VisualPtr visual;
       private: transport::NodePtr node;
       private: transport::SubscriberPtr controlSub;
+
+      /// \brief Ignition transport node.
+      private: ignition::transport::Node nodeIgn;
 
       /// \cond
       /// \class ProjectorFrameListener Projector.hh rendering/rendering.hh

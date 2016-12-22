@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -303,6 +304,15 @@ namespace gazebo
       /// \brief Request publisher.
       protected: transport::PublisherPtr requestPub;
 
+      /// \brief Ignition communication node.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Visual publisher.
+      protected: ignition::transport::Node::Publisher visPubIgn;
+
+      /// \brief Request publisher.
+      protected: ignition::transport::Node::Publisher requestPubIgn;
+
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
@@ -338,6 +348,9 @@ namespace gazebo
 
       /// \brief Pose publisher.
       private: transport::PublisherPtr posePub;
+
+      /// \brief Ignition Pose publisher.
+      private: ignition::transport::Node::Publisher posePubIgn;
 
       /// \brief Pose subscriber.
       private: transport::SubscriberPtr poseSub;

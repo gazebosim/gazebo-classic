@@ -24,6 +24,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
@@ -161,6 +162,12 @@ namespace gazebo
 
       /// \brief Publisher for request response messages.
       private: transport::PublisherPtr responsePub;
+
+      /// \brief Ignition transportation node.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Igniiont publisher for request response messages.
+      private: ignition::transport::Node::Publisher responsePubIgn;
 
       /// \brief File format of the heightmap
       private: std::string fileFormat;

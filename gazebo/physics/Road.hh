@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
@@ -74,6 +75,13 @@ namespace gazebo
 
       /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
+
+      /// \brief Transportation node.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Publisher for road information.
+      private: ignition::transport::Node::Publisher roadPubIgn;
+
     };
     /// \}
   }

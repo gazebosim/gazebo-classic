@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
@@ -107,6 +108,9 @@ namespace gazebo
 
       /// \brief Subscriber to request messages.
       private: transport::SubscriberPtr requestSub;
+
+      /// \brief Node for communication.
+      private: ignition::transport::Node nodeIgn;
 
       /// \brief Name of the active entity.
       private: std::string entityName;

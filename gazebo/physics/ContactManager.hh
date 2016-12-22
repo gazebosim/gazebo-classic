@@ -21,6 +21,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <ignition/transport/Node.hh>
 
 #include <boost/unordered/unordered_set.hpp>
 #include <boost/unordered/unordered_map.hpp>
@@ -42,6 +43,9 @@ namespace gazebo
     {
       /// \brief Contact message publisher
       public: transport::PublisherPtr publisher;
+
+      /// \brief Ignition contact message publisher
+      public: ignition::transport::Node::Publisher publisherIgn;
 
       /// \brief Pointers of collisions monitored by contact manager for
       /// contacts.
@@ -166,6 +170,12 @@ namespace gazebo
 
       /// \brief Contact publisher.
       private: transport::PublisherPtr contactPub;
+
+      /// \brief Ignition node for communication.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Contact publisher.
+      private: ignition::transport::Node::Publisher contactPubIgn;
 
       /// \brief Pointer to the world.
       private: WorldPtr world;
