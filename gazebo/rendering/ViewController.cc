@@ -48,7 +48,7 @@ void ViewController::Init(const math::Vector3 &_focalPoint,
 
 //////////////////////////////////////////////////
 void ViewController::Init(const ignition::math::Vector3d &/*_focalPoint*/,
-    double /*_yaw*/, double /*_pitch*/)
+    const double /*_yaw*/, const double /*_pitch*/)
 {
 }
 
