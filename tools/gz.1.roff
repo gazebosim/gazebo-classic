@@ -116,6 +116,17 @@ option -w, is not specified, the first world found on
 the Gazebo master will be used.
 A model name and joint name are required.
 
+It is recommended to use only one type of command:
+force, position PID, or velocity PID.
+
+Force: Use --force to apply a force.
+
+Position PID: Use --pos-t to specify a target position
+with --pos-p, --pos-i, --pos-d to specify the PID parameters.
+
+Velocity PID: Use --vel-t to specify a target velocity
+with --vel-p, --vel-i, --vel-d to specify the PID parameters.
+
 .sp
 Options:
 .INDENT 0.0
@@ -146,11 +157,11 @@ Delete a model.
 .TP
 .B \-f, \-\-force\fR=\fIarg\fR
 .
-Force to apply to a joint.
+Force to apply to a joint (N).
 .TP
 .B \-\-pos\-t\fR=\fIarg\fR
 .
-Target angle.
+Target angle(rad) for rotation joints or position (m) for linear joints.
 .TP
 .B \-\-pos\-p\fR=\fIarg\fR
 .
@@ -166,7 +177,7 @@ Position differential gain.
 .TP
 .B \-\-vel\-t\fR=\fIarg\fR
 .
-Target speed.
+Target speed (rad/s for rotational joints or m/s for linear joints).
 .TP
 .B \-\-vel\-p\fR=\fIarg\fR
 .

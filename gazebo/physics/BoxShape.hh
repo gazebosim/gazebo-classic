@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Box geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _BOXSHAPE_HH_
-#define _BOXSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BOXSHAPE_HH_
+#define GAZEBO_PHYSICS_BOXSHAPE_HH_
 
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
@@ -50,9 +45,8 @@ namespace gazebo
       /// \param[in] _size Size of each side of the box.
       public: virtual void SetSize(const math::Vector3 &_size);
 
-      /// \brief Set the scale of the box.
-      /// \param[in] _scale Scale of the box.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      // Documentation inherited
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.

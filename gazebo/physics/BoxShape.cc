@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -57,15 +56,15 @@ math::Vector3 BoxShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetScale(const math::Vector3 &_scale)
+void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)
     return;
 
-  this->SetSize((_scale/this->scale)*this->GetSize());
+  this->SetSize((_scale/this->scale)*this->GetSize().Ign());
 
   this->scale = _scale;
 }
