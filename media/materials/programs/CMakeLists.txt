@@ -39,6 +39,4 @@ wide_lens_map_fp.glsl
 wide_lens_map_vs.glsl
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/programs/)
-
 INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/materials/programs/)

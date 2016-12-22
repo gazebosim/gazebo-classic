@@ -31,4 +31,4 @@ set (files
   SkyX_VolClouds.vertex
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/skyx)
+INSTALL(FILES ${files} DESTINATION ${MEDIA_ROOT_DESTINATION}/skyx)
