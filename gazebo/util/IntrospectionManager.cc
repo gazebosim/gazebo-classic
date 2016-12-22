@@ -238,12 +238,16 @@ void IntrospectionManager::Update()
 
     // Publish the update for this filter.
     std::string topicName = this->dataPtr->prefix + "filter/" + filter.first;
-    if (this->dataPtr->filterPubs.find(topicName) ==
-        this->dataPtr->filterPubs.end() ||
-        !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
+
     {
-      gzerr << "Error publishing update for topic [" << topicName << "]"
-            << std::endl;
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+      if (this->dataPtr->filterPubs.find(topicName) ==
+          this->dataPtr->filterPubs.end() ||
+          !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
+      {
+        gzerr << "Error publishing update for topic [" << topicName << "]"
+          << std::endl;
+      }
     }
   }
 
@@ -269,7 +273,11 @@ void IntrospectionManager::NotifyUpdates()
     // Prepare the list of items to be sent.
     this->Items(req, currentItems, result);
 
-    this->dataPtr->itemsUpdatePub.Publish(currentItems);
+    if (!this->dataPtr->itemsUpdatePub.Publish(currentItems))
+    {
+      gzerr << "Failed to publish items on topic[" <<
+        this->dataPtr->itemsUpdatePub.Topic() << "]\n";
+    }
   }
 }
 
