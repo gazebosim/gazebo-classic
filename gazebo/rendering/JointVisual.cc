@@ -155,7 +155,7 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 
 /////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
-    bool _useParentFrame, msgs::Joint::Type _type)
+    const bool _useParentFrame, const msgs::Joint::Type _type)
 {
   ArrowVisualPtr axis;
 
