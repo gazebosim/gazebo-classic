@@ -19,11 +19,13 @@
 
 #include <string>
 
+#include <ignition/math/Box.hh>
+
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/MathTypes.hh"
+#include "gazebo/math/Box.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost

@@ -20,6 +20,8 @@
 #include <string>
 #include <map>
 #include <list>
+
+#include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"

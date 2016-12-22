@@ -112,13 +112,13 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/rendering/MovableText.hh**
-    + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0) 
+    + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
     + ***Replacement:*** ignition::math::Box AABB()
 
 1. **gazebo/physics/Shape.hh**
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
-    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
 
 1. **gazebo/rendering/Distortion.hh**
@@ -142,19 +142,32 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
 
 1. **gazebo/rendering/JointVisual.hh**
+    + ***Deprecation:*** void Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+    + ***Replacement:*** void Load(ConstJointPtr &_msg, const ignition::math::Pose3d &_worldPose)
     + ***Deprecation:*** ArrowVisualPtr CreateAxis(const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Replacement:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type _type)
     + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Replacement:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type _type)
 
 1. **gazebo/rendering/OrbitViewController.hh**
     + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
-    + ***Replacement:*** math::Vector3 GetFocalPoint() const
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
     + ***Deprecation:*** void SetFocalPoint(const math::Vector3 &_fp)
+    + ***Replacement:*** void SetFocalPoint(const ignition::math::Vector3d &_fp)
+    + ***Deprecation:*** math::Vector3 GetFocalPoint() const
+    + ***Replacement:*** ignition::math::Vector3d FocalPoint() const
     + ***Deprecation:*** void TranslateLocal(const math::Vector3 &_vec)
+    + ***Replacement:*** void TranslateLocal(const ignition::math::Vector3d &_vec)
     + ***Deprecation:*** void TranslateGlobal(const math::Vector3 &_vec)
+    + ***Replacement:*** void TranslateGlobal(const ignition::math::Vector3d &_vec)
+
+1. **gazebo/rendering/OrthoViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
 
 1. **gazebo/rendering/Projector.hh**
     + ***Deprecation:*** void Load(const std::string &_name, const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0), const std::string &_textureName = "", double _nearClip = 0.25, double _farClip = 15.0, double _fov = IGN_PI * 0.25)
-    + ***Replacement:*** void Load(const std::string &_name, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero, const std::string &_textureName = "", const double _nearClip = 0.25, const double _farClip = 15.0, const double _fov = IGN_PI * 0.25); 
+    + ***Replacement:*** void Load(const std::string &_name, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero, const std::string &_textureName = "", const double _nearClip = 0.25, const double _farClip = 15.0, const double _fov = IGN_PI * 0.25);
     + ***Deprecation:*** void SetPose(const math::Pose &_pose)
     + ***Replacement:*** void SetPose(const ignition::math::Pose3d &_pose)
 
@@ -168,7 +181,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos) const
     + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos) const
     + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos, std::string &_mod)
-    + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos, std::string &_mod)
+    + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos, std::string &_mod) const
 
 1. **gazebo/rendering/ViewController.hh**
     + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
