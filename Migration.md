@@ -153,6 +153,7 @@ release will remove the deprecated code.
 
 1. **gazebo/rendering/ViewController.hh**
     + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
 
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const

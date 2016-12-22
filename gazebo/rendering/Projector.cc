@@ -111,14 +111,14 @@ void Projector::Load(const std::string &_name,
 /////////////////////////////////////////////////
 void Projector::Load(sdf::ElementPtr _sdf)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->Get<math::Pose>("pose");
+    pose = _sdf->Get<ignition::math::Pose3d>("pose");
 
   if (_sdf->HasElement("texture_name"))
     textureName = _sdf->Get<std::string>("texture_name");
