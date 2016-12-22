@@ -292,4 +292,3 @@ Vector4 &Vector4::operator=(const ignition::math::Vector4d &_v)
   return *this;
 }
 
-
