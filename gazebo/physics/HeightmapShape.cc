@@ -279,7 +279,13 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 //////////////////////////////////////////////////
 math::Vector2i HeightmapShape::GetVertexCount() const
 {
-  return math::Vector2i(this->vertSize, this->vertSize);
+  return this->VertexCount();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector2i HeightmapShape::VertexCount() const
+{
+  return ignition::math::Vector2i(this->vertSize, this->vertSize);
 }
 
 /////////////////////////////////////////////////
