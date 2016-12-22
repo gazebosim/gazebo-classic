@@ -46,6 +46,12 @@ Vector4::Vector4(const double &_x, const double &_y, const double &_z,
 }
 
 //////////////////////////////////////////////////
+Vector4::Vector4(const ignition::math::Vector4d &_v)
+: x(_v.X()), y(_v.Y()), z(_v.Z()), w(_v.W())
+{
+}
+
+//////////////////////////////////////////////////
 Vector4::Vector4(const Vector4 &_pt)
     : x(_pt.x), y(_pt.y), z(_pt.z), w(_pt.w)
 {
@@ -268,6 +274,22 @@ double Vector4::operator[](unsigned int index) const
     default:
       return 0;
   }
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector4d Vector4::Ign() const
+{
+  return ignition::math::Vector4d(this->x, this->y, this->z, this->w);
+}
+
+//////////////////////////////////////////////////
+Vector4 &Vector4::operator=(const ignition::math::Vector4d &_v)
+{
+  this->x = _v.X();
+  this->y = _v.Y();
+  this->z = _v.Z();
+  this->w = _v.W();
+  return *this;
 }
 
 
