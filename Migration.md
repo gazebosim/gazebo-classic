@@ -118,6 +118,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0) 
     + ***Replacement:*** ignition::math::Box AABB()
 
+1. **gazebo/physics/Shape.hh**
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
     + ***Replacement:*** double K1() const

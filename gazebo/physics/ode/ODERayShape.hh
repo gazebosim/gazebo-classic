@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig, Andrew Howard
- * Date: 14 Oct 2009
- */
-
-#ifndef _ODERAYSHAPE_HH_
-#define _ODERAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODERAYSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODERAYSHAPE_HH_
 
 #include <string>
 

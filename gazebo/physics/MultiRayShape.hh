@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MULTIRAYSHAPE_HH_
-#define _MULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
@@ -65,7 +65,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
