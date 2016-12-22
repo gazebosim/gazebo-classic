@@ -730,6 +730,7 @@ void Palette::FillTopics()
   std::string worldName = gui::get_world();
   std::string prefix = "/gazebo/" + worldName;
 
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
   // Populate widget
   for (auto topic : topics)
   {
@@ -752,8 +753,18 @@ void Palette::FillTopics()
       return;
     }
 
-    auto msg = msgs::MsgFactory::NewMsg(msgType);
-    this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
+    std::cout << "MessageType[" << msgType << "]\n";
+    auto msg = gazebo::msgs::MsgFactory::New(msgType);
+    /*if (msg)
+      std::cout << msg->DebugString() << std::endl;
+    else
+      std::cout << "Message is null\n";
+      */
+    if (msg && msg.get())
+    {
+      std::cout << msg->DebugString() << std::endl;
+      this->FillFromMsg(msg.get(), topicItem, topic + "?p=");
+    }
   }
 }
 

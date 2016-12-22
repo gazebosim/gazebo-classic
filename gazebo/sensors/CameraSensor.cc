@@ -75,7 +75,7 @@ std::string CameraSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/image";
-  boost::replace_all(topicName, "::", "/");
+  common::replaceAll(topicName, "::", "/");
 
   return topicName;
 }
@@ -84,8 +84,8 @@ std::string CameraSensor::Topic() const
 std::string CameraSensor::TopicIgn() const
 {
   std::string topicName = this->ScopedName() + "/image";
-  boost::replace_all(topicName, "::", "/");
-  boost::replace_all(topicName, " ", "_");
+  common::replaceAll(topicName, "::", "/");
+  common::replaceAll(topicName, " ", "_");
 
   return topicName;
 }

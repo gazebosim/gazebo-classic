@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MSGFACTORY_HH_
-#define _MSGFACTORY_HH_
+#ifndef GAZEBO_MSGS_MSGFACTORY_HH_
+#define GAZEBO_MSGS_MSGFACTORY_HH_
 
 #include <string>
 #include <map>
@@ -51,6 +51,9 @@ namespace gazebo
       /// \return Pointer to a google protobuf message. Null if the message
       /// type could not be handled.
       public: static boost::shared_ptr<google::protobuf::Message> NewMsg(
+                  const std::string &_msgType);
+
+      public: static std::unique_ptr<google::protobuf::Message> New(
                   const std::string &_msgType);
 
       /// \brief Get all the message types

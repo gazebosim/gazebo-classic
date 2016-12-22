@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <iostream>
 #include "gazebo/msgs/MsgFactory.hh"
 
 using namespace gazebo;
@@ -36,14 +37,44 @@ void MsgFactory::RegisterMsg(const std::string &_msgType,
 boost::shared_ptr<google::protobuf::Message> MsgFactory::NewMsg(
     const std::string &_msgType)
 {
+  printf("A\n");
   boost::shared_ptr<google::protobuf::Message> msg;
 
   // Create a new message if a MsgFactoryFn has been assigned to the message
   // type
 
+  printf("B\n");
   if (msgMap->find(_msgType) != msgMap->end())
-    msg = ((*msgMap)[_msgType]) ();
+  {
+  printf("C\n");
+    return ((*msgMap)[_msgType]) ();
+  }
+  else
+    std::cerr << "INVALID MESSAGE\n";
 
+  printf("D\n");
+  return msg;
+}
+
+/////////////////////////////////////////////////
+std::unique_ptr<google::protobuf::Message> MsgFactory::New(
+    const std::string &_msgType)
+{
+  std::unique_ptr<google::protobuf::Message> msg;
+
+  // Create a new message if a MsgFactoryFn has been assigned to the message
+  // type
+
+  printf("B\n");
+  if (msgMap->find(_msgType) != msgMap->end())
+  {
+  printf("C\n");
+    msg.reset((((*msgMap)[_msgType]) ()).get());
+  }
+  else
+    std::cerr << "INVALID MESSAGE\n";
+
+  printf("D\n");
   return msg;
 }
 
