@@ -133,6 +133,7 @@
     * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
+    * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)
