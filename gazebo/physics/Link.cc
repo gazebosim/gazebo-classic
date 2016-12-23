@@ -731,17 +731,17 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Link::GetBoundingBox() const
+ignition::math::Box Link::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  box.max.Set(0, 0, 0);
+  box.Min().Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
+  box.Max().Set(0, 0, 0);
 
   for (Collision_V::const_iterator iter = this->collisions.begin();
        iter != this->collisions.end(); ++iter)
   {
-    box += (*iter)->GetBoundingBox();
+    box += (*iter)->BoundingBox();
   }
 
   return box;

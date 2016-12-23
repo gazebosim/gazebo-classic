@@ -35,21 +35,22 @@ namespace gazebo
     class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor
-      public: Box();
+      public: Box() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor. This constructor will compute the box's
       /// minumum and maximum corners based on the two arguments.
       /// \param[in] _vec1 One corner of the box
       /// \param[in] _vec2 Another corner of the box
-      public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
+      public: Box(const Vector3 &_vec1, const Vector3 &_vec2)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Ignition math copy constructor
       /// \param[in] _box Ignition box to convert
-      public: Box(const ignition::math::Box &_box);
+      public: Box(const ignition::math::Box &_box) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy
-      public: Box(const Box &_b);
+      public: Box(const Box &_b) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Box();

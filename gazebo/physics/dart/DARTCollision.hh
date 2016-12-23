@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_DARTCOLLISION_HH_
 #define _GAZEBO_DARTCOLLISION_HH_
 
-#include "gazebo/math/Box.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/dart/dart_inc.h"
@@ -73,7 +71,7 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get DART body node.
       /// \return Pointer to the dart BodyNode.

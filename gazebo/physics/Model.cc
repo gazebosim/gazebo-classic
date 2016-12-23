@@ -805,20 +805,20 @@ math::Vector3 Model::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Model::GetBoundingBox() const
+ignition::math::Box Model::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
   for (Link_V::const_iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
-      math::Box linkBox;
-      linkBox = (*iter)->GetBoundingBox();
+      ignition::math::Box linkBox;
+      linkBox = (*iter)->BoundingBox();
       box += linkBox;
     }
   }

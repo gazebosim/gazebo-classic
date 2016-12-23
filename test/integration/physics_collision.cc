@@ -60,13 +60,13 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   // Check bounding box of ground plane
   {
     physics::ModelPtr model = world->ModelByName("ground_plane");
-    math::Box box = model->GetBoundingBox();
-    EXPECT_LT(box.min.x, -g_big);
-    EXPECT_LT(box.min.y, -g_big);
-    EXPECT_LT(box.min.z, -g_big);
-    EXPECT_GT(box.max.x, g_big);
-    EXPECT_GT(box.max.y, g_big);
-    EXPECT_DOUBLE_EQ(box.max.z, 0.0);
+    auto box = model->BoundingBox();
+    EXPECT_LT(box.Min().X(), -g_big);
+    EXPECT_LT(box.Min().Y(), -g_big);
+    EXPECT_LT(box.Min().Z(), -g_big);
+    EXPECT_GT(box.Max().X(), g_big);
+    EXPECT_GT(box.Max().Y(), g_big);
+    EXPECT_DOUBLE_EQ(box.Max().Z(), 0.0);
   }
 }
 

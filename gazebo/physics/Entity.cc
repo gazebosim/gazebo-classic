@@ -186,7 +186,21 @@ math::Pose Entity::GetInitialRelativePose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetBoundingBox() const
 {
-  return math::Box(math::Vector3(0, 0, 0), math::Vector3(1, 1, 1));
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Entity::BoundingBox() const
+{
+  return ignition::math::Box(ignition::math::Vector3d::Zero,
+                             ignition::math::Vector3d::One);
 }
 
 //////////////////////////////////////////////////
@@ -663,21 +677,34 @@ const math::Pose &Entity::GetDirtyPose() const
 //////////////////////////////////////////////////
 math::Box Entity::GetCollisionBoundingBox() const
 {
-  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
-  this->GetCollisionBoundingBoxHelper(base);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->CollisionBoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
+ignition::math::Box Entity::CollisionBoundingBox() const
+{
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
+  return this->CollisionBoundingBoxHelper(base);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
 {
   if (_base->HasType(COLLISION))
-    return boost::dynamic_pointer_cast<Collision>(_base)->GetBoundingBox();
+    return boost::dynamic_pointer_cast<Collision>(_base)->BoundingBox();
 
-  math::Box box;
+  ignition::math::Box box;
 
   for (unsigned int i = 0; i < _base->GetChildCount(); i++)
   {
-    box += this->GetCollisionBoundingBoxHelper(_base->GetChild(i));
+    box += this->CollisionBoundingBoxHelper(_base->GetChild(i));
   }
 
   return box;
@@ -687,11 +714,11 @@ math::Box Entity::GetCollisionBoundingBoxHelper(BasePtr _base) const
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
   EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Box onBox = onEntity->GetCollisionBoundingBox();
+  auto box = this->CollisionBoundingBox();
+  auto onBox = onEntity->CollisionBoundingBox();
 
-  math::Pose p = onEntity->GetWorldPose();
-  p.pos.z = onBox.max.z + box.GetZLength()*0.5;
+  auto p = onEntity->GetWorldPose().Ign();
+  p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
   this->SetWorldPose(p);
 }
 
@@ -703,11 +730,11 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
-  math::Box box = this->GetCollisionBoundingBox();
-  math::Vector3 start = this->GetWorldPose().pos;
-  math::Vector3 end = start;
-  start.z = box.min.z - 0.00001;
-  end.z -= 1000;
+  auto box = this->CollisionBoundingBox();
+  auto start = this->GetWorldPose().pos.Ign();
+  auto end = start;
+  start.Z() = box.Min().Z() - 0.00001;
+  end.Z() -= 1000;
   rayShape->SetPoints(start, end);
   rayShape->GetIntersection(_distBelow, _entityName);
   _distBelow += 0.00001;

@@ -135,7 +135,7 @@ bool LogicalCameraSensor::UpdateImpl(const bool _force)
       // Add the the model to the output if it is in the frustum, and
       // we are not detecting ourselves.
       if (this->dataPtr->modelName != model->GetName() &&
-          this->dataPtr->frustum.Contains(model->GetBoundingBox().Ign()))
+          this->dataPtr->frustum.Contains(model->BoundingBox()))
       {
         // Add new model msg
         msgs::LogicalCameraImage::Model *modelMsg =

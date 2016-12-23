@@ -19,11 +19,12 @@
  * Date: 03 Apr 2007
  */
 
-#ifndef _ENTITY_HH_
-#define _ENTITY_HH_
+#ifndef GAZEBO_PHYSICS_ENTITY_HH_
+#define GAZEBO_PHYSICS_ENTITY_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Box.hh>
 #include <ignition/math/Vector3.hh>
 
 #include <boost/function.hpp>
@@ -101,7 +102,12 @@ namespace gazebo
 
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      /// \deprecated See function that returns ignition math.
+      public: virtual math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the bounding box for the entity.
+      /// \return The bounding box.
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
@@ -221,7 +227,12 @@ namespace gazebo
 
       /// \brief Returns collision bounding box.
       /// \return Collsiion boundin box.
-      public: math::Box GetCollisionBoundingBox() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns collision bounding box.
+      /// \return Collsiion boundin box.
+      public: ignition::math::Box CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.
       /// \param[in] _linear Linear twist.
@@ -248,8 +259,9 @@ namespace gazebo
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
-      /// \return The boundin box for the passed in object.
-      private: math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;
+      /// \return The bounding box for the passed in object.
+      private: ignition::math::Box
+          CollisionBoundingBoxHelper(BasePtr _base) const;
 
       /// \brief Set the world pose for a model.
       /// \param[in] _pose New pose for the entity.

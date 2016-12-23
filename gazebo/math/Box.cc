@@ -17,6 +17,10 @@
 #include <math.h>
 #include "gazebo/math/Box.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 

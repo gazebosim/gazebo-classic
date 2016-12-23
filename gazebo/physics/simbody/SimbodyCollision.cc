@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -63,9 +64,12 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-math::Box SimbodyCollision::GetBoundingBox() const
+ignition::math::Box SimbodyCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
+
+  gzerr << "Simbody does not provide bounding box info.\n";
+
   return result;
 }
 

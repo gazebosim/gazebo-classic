@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const = 0;
+      public: virtual ignition::math::Box BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
