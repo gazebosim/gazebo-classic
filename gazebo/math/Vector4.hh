@@ -24,6 +24,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <ignition/math/Vector4.hh>
+
 #include "gazebo/math/Matrix4.hh"
 #include "gazebo/util/system.hh"
 
@@ -39,7 +41,7 @@ namespace gazebo
     class GZ_MATH_VISIBLE Vector4
     {
       /// \brief Constructor
-      public: Vector4();
+      public: Vector4() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor with component values
       /// \param[in] _x value along x axis
@@ -47,12 +49,16 @@ namespace gazebo
       /// \param[in] _z value along z axis
       /// \param[in] _w value along w axis
       public: Vector4(const double &_x, const double &_y, const double &_z,
-                      const double &_w);
+                      const double &_w) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param[in] _v vector
-      public: Vector4(const Vector4 &_v);
+      public: Vector4(const Vector4 &_v) GAZEBO_DEPRECATED(8.0);
 
+      /// \brief Ignition math copy constructor
+      /// \param[in] _v a vector
+      public: Vector4(const ignition::math::Vector4d &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Vector4();
@@ -79,6 +85,15 @@ namespace gazebo
       /// \param[in] _w value along w axis
       public: void Set(double _x = 0, double _y = 0 , double _z = 0,
                        double _w = 0);
+
+      /// \brief Convert this vector to an ignition::math::Vector4d.
+      /// \return This vector as an ignition::math::Vector4d.
+      public: ignition::math::Vector4d Ign() const;
+
+      /// \brief Assignment operator for ignition math
+      /// \param[in] _v a new value
+      /// \return this
+      public: Vector4 &operator=(const ignition::math::Vector4d &_v);
 
       /// \brief Assignment operator
       /// \param[in] _v the vector
