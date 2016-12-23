@@ -369,7 +369,7 @@ void UndoTest::UndoRotateLight()
   QVERIFY(sunVis->Rotation() == sunInitialRot);
 
   // Move visual
-  auto sunFinalRot = ignition::math::Quaterniond::Identity;
+  auto sunFinalRot = ignition::math::Quaterniond(1, 0, 0);
   sunVis->SetRotation(sunFinalRot);
   QVERIFY(sunVis->Rotation() != sunInitialRot);
   QVERIFY(sunVis->Rotation() == sunFinalRot);
