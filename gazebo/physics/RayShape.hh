@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 14 Oct 2009
-*/
-
-#ifndef _RAYSHAPE_HH_
-#define _RAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_RAYSHAPE_HH_
+#define GAZEBO_PHYSICS_RAYSHAPE_HH_
 
 #include <string>
 
@@ -87,7 +82,7 @@ namespace gazebo
       public: double GetLength() const;
 
       /// \brief Set the scale of the ray
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Update the ray collision.
       public: virtual void Update() = 0;
