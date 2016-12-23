@@ -26,7 +26,6 @@
 #include "gazebo/sensors/CameraSensor.hh"
 
 #include "gazebo/test/ServerFixture.hh"
-#include "scans_cmp.h"
 
 using namespace gazebo;
 class CameraSensorIgnTransport : public ServerFixture
