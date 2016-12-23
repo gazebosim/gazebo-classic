@@ -111,10 +111,16 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/physics/Shape.hh**
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
-    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
+
+1. **gazebo/physics/PlaneShape.hh**
+    + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
+    + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
+    + ***Deprecation:*** math::Vector2d GetSize() const
+    + ***Replacement:*** ignition::math::Vector2d Size() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
@@ -551,6 +557,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public:   gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/Vector2d.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector2d
+    + ***Replacement:*** public: ignition::math::Vector2d
 
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats
