@@ -15,12 +15,10 @@
  *
 */
 #include <mutex>
-#include <functional>
 
 #include <ignition/math/Rand.hh>
 #include <ignition/transport/Node.hh>
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Timer.hh"
