@@ -43,7 +43,7 @@ void CameraGUITest::Heightmap()
   auto camera = gazebo::gui::get_active_camera();
   QVERIFY(camera != nullptr);
 
-  QVERIFY(camera->WorldPose() != camera->DefaultPose().Ign());
+  QVERIFY(camera->WorldPose() != camera->DefaultPose());
 
   QVERIFY(camera->WorldPose() ==
       ignition::math::Pose3d(5, -5, 210, 0, 1.53546, 2.35619));

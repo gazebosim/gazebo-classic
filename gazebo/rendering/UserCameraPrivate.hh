@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_USERCAMERA_PRIVATE_HH_
-#define _GAZEBO_USERCAMERA_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
+#define GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 namespace gazebo
 {
@@ -83,7 +83,7 @@ namespace gazebo
       public: bool stereoEnabled;
 
       /// \brief Default camera pose.
-      public: math::Pose defaultPose;
+      public: ignition::math::Pose3d defaultPose;
     };
   }
 }
