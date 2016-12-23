@@ -216,7 +216,7 @@ namespace gazebo
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
       public: VisualPtr Visual(const ignition::math::Vector2i &_mousePos,
-                  std::string &_mod);
+                  std::string &_mod) const;
 
       /// \brief Get a visual at a mouse position
       /// \param[in] _mousePos 2D position of the mouse in pixels.

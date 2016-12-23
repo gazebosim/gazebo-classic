@@ -675,7 +675,7 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 
 //////////////////////////////////////////////////
 VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
-    std::string &_mod)
+    std::string &_mod) const
 {
   VisualPtr result;
 
