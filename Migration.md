@@ -38,7 +38,11 @@ release will remove the deprecated code.
     + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
     + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`
     + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
-    + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
+    + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d in
+itialRelativePose`
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** all public methods using gazebo::math
+    + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
 
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
