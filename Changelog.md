@@ -5,7 +5,7 @@
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
 1. Added igntition::transport interfaces to header files
-    * [Pull request #2550](https://bitbucket.org/osrf/gazebo/pull-request/2550)
+    * [Pull request #2559](https://bitbucket.org/osrf/gazebo/pull-request/2559)
 
 1. Added ignition transport dependency, and output camera sensor images on
    an ignition transport topic.
