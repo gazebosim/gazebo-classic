@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _PLANESHAPE_HH_
-#define _PLANESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_PLANESHAPE_HH_
+#define GAZEBO_PHYSICS_PLANESHAPE_HH_
 
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/Shape.hh"
@@ -75,7 +70,7 @@ namespace gazebo
 
       /// \brief Set the scale of the plane.
       /// \return _scale Scale to set the plane to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.

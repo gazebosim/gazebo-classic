@@ -126,6 +126,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
 
+1. **gazebo/physics/Shape.hh**
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
     + ***Replacement:*** double K1() const

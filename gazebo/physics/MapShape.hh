@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid collision
- * Author: Nate Koenig
-*/
-
-#ifndef _MAPSHAPE_HH_
-#define _MAPSHAPE_HH_
+#ifndef GAZEBO_PHYSISCS_MAPSHAPE_HH_
+#define GAZEBO_PHYSISCS_MAPSHAPE_HH_
 
 #include <deque>
 #include <string>
@@ -80,7 +76,7 @@ namespace gazebo
 
       /// \brief Set the scale of the map shape.
       /// \param[in] _scale Scale to set the map shape to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.

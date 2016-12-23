@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_POLYLINESHAPE_HH_
-#define _GAZEBO_POLYLINESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_POLYLINESHAPE_HH_
+#define GAZEBO_PHYSICS_POLYLINESHAPE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Set the scale of the polyline.
       /// \param[in] _scale Scale of the polyline.
-      private: virtual void SetScale(const math::Vector3 &_scale);
+      private: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Set the vertices of the polylines. The polylines are assumed
       /// to be closed and non-intersecting. If there is more than one polyline,
