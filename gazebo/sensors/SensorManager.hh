@@ -114,6 +114,10 @@ namespace gazebo
       /// \brief Finalize all the sensors
       public: void Fini();
 
+      /// \brief Get whether there's at least one sensor container running.
+      /// \return True if running.
+      public: bool Running() const;
+
       /// \brief Get all the sensor types
       /// \param[out] All the sensor types.
       public: void GetSensorTypes(std::vector<std::string> &_types) const;
@@ -292,7 +296,8 @@ namespace gazebo
       /// \brief Pointer to the sim time event handler.
       private: SimTimeEventHandler *simTimeEventHandler;
 
-      /// \brief All the worlds that have sensors.
+      /// \brief All the worlds whose sensors have been initialized. This
+      /// includes worlds without sensors.
       private: std::map<std::string, physics::WorldPtr> worlds;
 
       /// \brief Connect to the time reset event.

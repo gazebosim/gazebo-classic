@@ -99,6 +99,17 @@ void SensorManager::Stop()
 }
 
 //////////////////////////////////////////////////
+bool SensorManager::Running() const
+{
+  for (auto const &container : this->sensorContainers)
+  {
+    if (container->Running())
+      return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::Update(bool _force)
 {
   {

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
-#define _GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
+#ifndef GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
+#define GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
 
 #include <string>
 #include <boost/filesystem.hpp>
@@ -83,6 +83,9 @@ namespace gazebo
       /// \brief Initialize to report diagnostics about a world.
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
+
+      /// \brief Finish reporting diagnostics for a world.
+      public: void Fini();
 
       /// \brief Start a new timer instance
       /// \param[in] _name Name of the timer.
