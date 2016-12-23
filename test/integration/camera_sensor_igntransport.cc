@@ -88,7 +88,7 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   timer.Reset();
   timer.Start();
 
-  while (true)
+  for (int i = 0; i < 1000; ++i)
   {
     {
       std::lock_guard<std::mutex> lock(mutex);
