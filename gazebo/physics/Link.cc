@@ -735,7 +735,7 @@ ignition::math::Box Link::BoundingBox() const
 {
   ignition::math::Box box;
 
-  box.Min().Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
+  box.Min().Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
   box.Max().Set(0, 0, 0);
 
   for (Collision_V::const_iterator iter = this->collisions.begin();
