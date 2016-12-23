@@ -43,7 +43,7 @@ boost::shared_ptr<google::protobuf::Message> MsgFactory::NewMsg(
   // type
 
   if (msgMap->find(_msgType) != msgMap->end())
-    return ((*msgMap)[_msgType]) ();
+    msg = ((*msgMap)[_msgType]) ();
 
   return msg;
 }
