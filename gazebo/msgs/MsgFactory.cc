@@ -43,11 +43,7 @@ boost::shared_ptr<google::protobuf::Message> MsgFactory::NewMsg(
   // type
 
   if (msgMap->find(_msgType) != msgMap->end())
-  {
     return ((*msgMap)[_msgType]) ();
-  }
-  else
-    std::cerr << "INVALID MESSAGE\n";
 
   return msg;
 }
