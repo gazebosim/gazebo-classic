@@ -411,6 +411,12 @@ release will remove the deprecated code.
 1. **gazebo/physics/dart/DARTPlaneShape.hh**
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
+    
+1. **gazebo/physics/bullet/BulletTypes.hh**
+    + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
+    + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
+    + ***Deprecation:*** static btVector4 ConvertVector4(const math::Vector4 &_vec)
+    + ***Replacement:*** static btVector4 ConvertVector4dIgn(const ignition::math::Vector4d &_vec)
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()
