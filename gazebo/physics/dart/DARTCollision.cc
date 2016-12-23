@@ -120,7 +120,7 @@ unsigned int DARTCollision::GetCollideBits() const
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
-  ignition::math::Box result;
+  ignition::math::Box result(0, 0, 0, 0, 0, 0);
 
   gzerr << "DART does not provide bounding box info.\n";
 

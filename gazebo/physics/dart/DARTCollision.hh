@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DARTCOLLISION_HH_
-#define _GAZEBO_DARTCOLLISION_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
+#define GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"

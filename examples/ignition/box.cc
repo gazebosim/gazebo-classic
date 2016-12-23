@@ -18,6 +18,10 @@
 #include <gazebo/math/Box.hh>
 #include <ignition/math/Box.hh>
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /////////////////////////////////////////////////
 // Migration from gazebo::math::Box to ignition::math::Box examples
 // See Ignition documentation http://ignitionrobotics.org/libraries/math

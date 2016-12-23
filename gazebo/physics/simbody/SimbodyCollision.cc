@@ -66,7 +66,7 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 //////////////////////////////////////////////////
 ignition::math::Box SimbodyCollision::BoundingBox() const
 {
-  ignition::math::Box result;
+  ignition::math::Box result(0, 0, 0, 0, 0, 0);
 
   gzerr << "Simbody does not provide bounding box info.\n";
 
