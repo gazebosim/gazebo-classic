@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _MSGFACTORY_HH_
-#define _MSGFACTORY_HH_
+#ifndef GAZEBO_MSGS_MSGFACTORY_HH_
+#define GAZEBO_MSGS_MSGFACTORY_HH_
 
 #include <string>
 #include <map>

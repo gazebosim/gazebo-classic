@@ -4,6 +4,10 @@
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
+1. Added ignition transport dependency, and output camera sensor images on
+   an ignition transport topic.
+    * [Pull request #2544](https://bitbucket.org/osrf/gazebo/pull-request/2544)
+
 1. Fix restoring submesh material transparency
     * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
 
