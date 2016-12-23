@@ -65,8 +65,8 @@ TEST_F(BulletTypes, ConvertVector4)
     EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getZ(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getW(), 0, NEAR_TOL);
-    vec2 = physics::BulletTypes::ConvertVector4Ign(bt);
-    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
+    vec2 = physics::BulletTypes::ConvertVector4dIgn(bt);
+    EXPECT_LT((vec-vec2).SquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 
   {
@@ -77,7 +77,7 @@ TEST_F(BulletTypes, ConvertVector4)
     EXPECT_NEAR(bt.getZ(), vec.Z(), NEAR_TOL);
     EXPECT_NEAR(bt.getW(), vec.W(), NEAR_TOL);
     vec2 = physics::BulletTypes::ConvertVector4dIgn(bt);
-    EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
+    EXPECT_LT((vec-vec2).SquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 }
 
