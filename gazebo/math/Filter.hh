@@ -113,7 +113,7 @@ namespace gazebo
   class GZ_MATH_VISIBLE OnePoleQuaternion : public OnePole<math::Quaternion>
   {
     /// \brief Constructor.
-    public: OnePoleQuaternion()
+    public: OnePoleQuaternion() GAZEBO_DEPRECATED(8.0)
     {
       this->SetValue(math::Quaternion(1, 0, 0, 0));
     }
@@ -121,7 +121,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
-    public: OnePoleQuaternion(double _fc, double _fs)
+    public: OnePoleQuaternion(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : OnePole<math::Quaternion>(_fc, _fs)
     {
       this->SetValue(math::Quaternion(1, 0, 0, 0));
@@ -142,7 +142,7 @@ namespace gazebo
   class GZ_MATH_VISIBLE OnePoleVector3 : public OnePole<math::Vector3>
   {
     /// \brief Constructor.
-    public: OnePoleVector3()
+    public: OnePoleVector3() GAZEBO_DEPRECATED(8.0)
     {
       this->SetValue(math::Vector3(0, 0, 0));
     }
@@ -239,7 +239,7 @@ namespace gazebo
   class GZ_MATH_VISIBLE BiQuadVector3 : public BiQuad<math::Vector3>
   {
     /// \brief Constructor.
-    public: BiQuadVector3()
+    public: BiQuadVector3() GAZEBO_DEPRECATED(8.0)
     {
       this->SetValue(math::Vector3(0, 0, 0));
     }
@@ -247,7 +247,7 @@ namespace gazebo
     /// \brief Constructor.
     /// \param[in] _fc Cutoff frequency.
     /// \param[in] _fs Sample rate.
-    public: BiQuadVector3(double _fc, double _fs)
+    public: BiQuadVector3(double _fc, double _fs) GAZEBO_DEPRECATED(8.0)
       : BiQuad<math::Vector3>(_fc, _fs)
     {
       this->SetValue(math::Vector3(0, 0, 0));
