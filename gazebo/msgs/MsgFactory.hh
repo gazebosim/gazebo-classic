@@ -53,9 +53,6 @@ namespace gazebo
       public: static boost::shared_ptr<google::protobuf::Message> NewMsg(
                   const std::string &_msgType);
 
-      public: static std::unique_ptr<google::protobuf::Message> New(
-                  const std::string &_msgType);
-
       /// \brief Get all the message types
       /// \param[out] _types Vector of strings of the message types.
       public: static void GetMsgTypes(std::vector<std::string> &_types);
