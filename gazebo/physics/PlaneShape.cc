@@ -84,7 +84,14 @@ void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
