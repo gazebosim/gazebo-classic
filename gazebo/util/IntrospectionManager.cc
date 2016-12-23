@@ -275,8 +275,8 @@ void IntrospectionManager::NotifyUpdates()
 
     if (!this->dataPtr->itemsUpdatePub.Publish(currentItems))
     {
-      gzerr << "Failed to publish items on topic[" <<
-        this->dataPtr->itemsUpdatePub.Topic() << "]\n";
+      gzerr << "Failed to publish items on topic[/introspection/" <<
+        this->dataPtr->managerId << "/items_update]" << std::endl;
     }
   }
 }
