@@ -88,7 +88,7 @@ namespace gazebo
 
       /// \brief Set the parameters of polyline shape
       /// \param[in] _height Height of the polygon
-      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// \param[in] _vertices std::vector<ignition::math::Vector2d>
       /// containing the vertex information
       private: void SetPolylineShape(const double &_height,
                   const std::vector<std::vector<ignition::math::Vector2d> >
