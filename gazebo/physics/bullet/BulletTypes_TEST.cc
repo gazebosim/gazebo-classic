@@ -60,23 +60,23 @@ TEST_F(BulletTypes, ConvertVector4)
 {
   {
     ignition::math::Vector4d vec, vec2;
-    btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
+    btVector4 bt = physics::BulletTypes::ConvertVector4dIgn(vec);
     EXPECT_NEAR(bt.getX(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getY(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getZ(), 0, NEAR_TOL);
     EXPECT_NEAR(bt.getW(), 0, NEAR_TOL);
-    vec2 = physics::BulletTypes::ConvertVector4(bt);
+    vec2 = physics::BulletTypes::ConvertVector4Ign(bt);
     EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 
   {
     ignition::math::Vector4d vec(100.5, -2.314, 42, 848.8), vec2;
-    btVector4 bt = physics::BulletTypes::ConvertVector4(vec);
+    btVector4 bt = physics::BulletTypes::ConvertVector4dIgn(vec);
     EXPECT_NEAR(bt.getX(), vec.X(), NEAR_TOL);
     EXPECT_NEAR(bt.getY(), vec.Y(), NEAR_TOL);
     EXPECT_NEAR(bt.getZ(), vec.Z(), NEAR_TOL);
     EXPECT_NEAR(bt.getW(), vec.W(), NEAR_TOL);
-    vec2 = physics::BulletTypes::ConvertVector4(bt);
+    vec2 = physics::BulletTypes::ConvertVector4dIgn(bt);
     EXPECT_LT((vec-vec2).GetSquaredLength(), NEAR_TOL*NEAR_TOL);
   }
 }
