@@ -88,7 +88,8 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   timer.Reset();
   timer.Start();
 
-  for (int i = 0; i < 1000; ++i)
+  int i = 0;
+  for (; i < 1000; ++i)
   {
     {
       std::lock_guard<std::mutex> lock(mutex);
@@ -98,6 +99,7 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
 
     common::Time::MSleep(10);
   }
+  EXPECT_LT(i, 1000);
 
   dt = timer.GetElapsed();
   EXPECT_GE(imageCount, kTotalImages);
