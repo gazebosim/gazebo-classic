@@ -29,7 +29,7 @@
 #include <sdf/sdf.hh>
 
 #include <gtest/gtest.h>
-#include <thread>
+#include <boost/thread.hpp>
 #include <mutex>
 #include <boost/filesystem.hpp>
 
@@ -1033,7 +1033,7 @@ namespace gazebo
     /// \param[in] _static True to make the model static.
     /// \deprecated See function that accepts ignition::math parameters
     protected: void SpawnTrimesh(const std::string &_name,
-                   const std::string &_modelPath,const math::Vector3 &_scale,
+                   const std::string &_modelPath, const math::Vector3 &_scale,
                    const math::Vector3 &_pos, const math::Vector3 &_rpy,
                    bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
@@ -1144,7 +1144,7 @@ namespace gazebo
     protected: Server *server;
 
     /// \brief Pointer the thread the runs the server.
-    protected: std::thread *serverThread;
+    protected: boost::thread *serverThread;
 
     /// \brief Pointer to a node for communication.
     protected: transport::NodePtr node;

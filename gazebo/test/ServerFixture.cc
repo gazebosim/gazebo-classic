@@ -190,7 +190,7 @@ void ServerFixture::LoadArgs(const std::string &_args)
     paused = true;
 
   // Create, load, and run the server in its own thread
-  this->serverThread = new std::thread(
+  this->serverThread = new boost::thread(
     std::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
