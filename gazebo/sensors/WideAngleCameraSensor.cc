@@ -148,6 +148,11 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
 
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->TopicIgn(), opts);
+
   sdf::ElementPtr lensSdf =
     this->sdf->GetElement("camera")->GetElement("lens");
 

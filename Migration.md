@@ -111,9 +111,9 @@ release will remove the deprecated code.
 ### Deprecations
 
 1. **gazebo/physics/Shape.hh**
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
-    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
 
 1. **gazebo/rendering/Distortion.hh**
@@ -411,6 +411,12 @@ release will remove the deprecated code.
 1. **gazebo/physics/dart/DARTPlaneShape.hh**
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
+    
+1. **gazebo/physics/bullet/BulletTypes.hh**
+    + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
+    + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
+    + ***Deprecation:*** static btVector4 ConvertVector4(const math::Vector4 &_vec)
+    + ***Replacement:*** static btVector4 ConvertVector4dIgn(const ignition::math::Vector4d &_vec)
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()
@@ -475,10 +481,16 @@ release will remove the deprecated code.
 1. **gazebo/math/Filter.hh**
     + ***Deprecation:*** public:   gazebo::math::BiQuad
     + ***Replacement:*** public: ignition::math::BiQuad
+    + ***Deprecation:*** public:   gazebo::math::BiQuadVector3
+    + ***Replacement:*** public: ignition::math::BiQuadVector3
     + ***Deprecation:*** public:   gazebo::math::Filter
     + ***Replacement:*** public: ignition::math::Filter
     + ***Deprecation:*** public:   gazebo::math::OnePole
     + ***Replacement:*** public: ignition::math::OnePole
+    + ***Deprecation:*** public:   gazebo::math::OnePoleQuaternion
+    + ***Replacement:*** public: ignition::math::OnePoleQuaternion
+    + ***Deprecation:*** public:   gazebo::math::OnePoleVector3
+    + ***Replacement:*** public: ignition::math::OnePoleVector3
 
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
@@ -555,6 +567,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats
     + ***Replacement:*** public: ignition::math::Vector3Stats
+
+1. **gazebo/math/Vector4.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector4
+    + ***Replacement:*** public: ignition::math::Vector4d
 
 ### Deletions
 

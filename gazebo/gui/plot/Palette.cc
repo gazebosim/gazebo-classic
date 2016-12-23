@@ -730,6 +730,7 @@ void Palette::FillTopics()
   std::string worldName = gui::get_world();
   std::string prefix = "/gazebo/" + worldName;
 
+  std::lock_guard<std::mutex> lock(this->dataPtr->modelsMutex);
   // Populate widget
   for (auto topic : topics)
   {
