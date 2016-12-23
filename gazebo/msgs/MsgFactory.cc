@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-#include <iostream>
 #include "gazebo/msgs/MsgFactory.hh"
 
 using namespace gazebo;
