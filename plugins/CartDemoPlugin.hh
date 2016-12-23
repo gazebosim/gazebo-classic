@@ -16,6 +16,7 @@
  */
 #ifndef GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
@@ -41,6 +42,9 @@ namespace gazebo
     private: void OnUpdate();
 
     private: transport::NodePtr node;
+
+    /// \brief Ignition communication node
+    private: ignition::transport::Node nodeIgn;
 
     private: event::ConnectionPtr updateConnection;
 

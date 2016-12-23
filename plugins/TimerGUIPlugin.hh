@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
@@ -113,6 +114,9 @@ namespace gazebo
 
     /// \brief Subscriber to control signals.
     private: transport::SubscriberPtr ctrlSub;
+
+    /// \brief Ignition Node used to establish communication with gzserver.
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief The actual timer
     private: common::Timer timer;

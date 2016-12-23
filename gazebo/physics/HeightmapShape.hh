@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _HEIGHTMAPSHAPE_HH_
-#define _HEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
 
 #include <string>
 #include <vector>
@@ -64,7 +59,7 @@ namespace gazebo
 
       /// \brief Set the scale of the heightmap shape.
       /// \param[in] _scale Scale to set the heightmap shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.

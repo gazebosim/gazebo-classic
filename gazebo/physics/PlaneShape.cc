@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -83,14 +82,15 @@ math::Vector2d PlaneShape::GetSize() const
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetScale(const math::Vector3 &_scale)
+void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
 
   this->scale = _scale;
 
-  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  ignition::math::Vector2d size =
+    this->GetSize().Ign() * ignition::math::Vector2d(_scale.X(), scale.Y());
   this->SetSize(size);
 }
 

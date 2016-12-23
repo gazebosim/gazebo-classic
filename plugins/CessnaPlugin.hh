@@ -22,6 +22,7 @@
 #include <mutex>
 #include <string>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -117,6 +118,12 @@ namespace gazebo
 
     /// \brief Publisher pointer.
     private: transport::PublisherPtr statePub;
+
+    /// \brief Ignition node used for using Gazebo communications.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition Publisher.
+    private: ignition::transport::Node::Publisher statePubIgn;
 
     /// \brief Pointer to the model;
     private: physics::ModelPtr model;

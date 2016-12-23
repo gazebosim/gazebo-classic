@@ -24,6 +24,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
@@ -67,6 +68,12 @@ namespace gazebo
 
     /// \brief Publisher of tactile messages.
     private: transport::PublisherPtr tactilePub;
+
+    /// \brief Ignition transport node used for publishing tactile messages.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher of tactile messages.
+    private: ignition::transport::Node::Publisher tactilePubIgn;
 
     /// \brief World name.
     private: std::string worldName;

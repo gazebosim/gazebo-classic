@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport/Node.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Plugin.hh"
@@ -54,6 +55,8 @@ namespace gazebo
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
+
+    private: ignition::transport::Node nodeIgn;
 
     private: double frontPower, rearPower;
     private: double maxSpeed;

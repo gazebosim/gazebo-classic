@@ -19,6 +19,7 @@
 #define GAZEBO_PLUGINS_HYDRADEMOPLUGIN_HH_
 
 #include <mutex>
+#include <ignition/transport/Node.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -56,6 +57,9 @@ namespace gazebo
 
     /// \brief Subscribe pointer.
     private: transport::SubscriberPtr hydraSub;
+
+    /// \brief Ignition node used for communication.
+    private: ignition::transport::Node nodeIgn;
 
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
