@@ -46,7 +46,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
   QVERIFY(cam != NULL);
 
   // Get camera default pose and check that's the current pose
-  ignition::math::Pose3d defaultPose = cam->DefaultPose().Ign();
+  ignition::math::Pose3d defaultPose = cam->DefaultPose();
   QVERIFY(defaultPose == cam->WorldPose());
 
   // Get the camera distance from the world origin (zoom level)
