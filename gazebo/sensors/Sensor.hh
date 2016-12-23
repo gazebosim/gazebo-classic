@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_SENSOR_HH_
-#define _GAZEBO_SENSORS_SENSOR_HH_
+#ifndef GAZEBO_SENSORS_SENSOR_HH_
+#define GAZEBO_SENSORS_SENSOR_HH_
 
 #include <vector>
 #include <memory>
@@ -24,6 +24,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -246,6 +247,9 @@ namespace gazebo
 
       /// \brief Noise added to sensor data
       protected: std::map<SensorNoiseType, NoisePtr> noises;
+
+      /// \brief Ignition transport node
+      protected: ignition::transport::Node nodeIgn;
 
       /// \internal
       /// \brief Data pointer for private data
