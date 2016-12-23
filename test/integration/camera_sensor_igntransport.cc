@@ -81,7 +81,7 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   // Subscribe to the camera topic
   node.Subscribe(camSensor->TopicIgn(), &OnNewCameraFrame);
 
-  int totalImages = 20;
+  const int kTotalImages = 20;
   common::Timer timer;
 
   common::Time dt = timer.GetElapsed();
@@ -92,7 +92,7 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   {
     {
       std::lock_guard<std::mutex> lock(mutex);
-      if (imageCount >= totalImages || timer.GetElapsed().Double() >= 4)
+      if (imageCount >= kTotalImages || timer.GetElapsed().Double() >= 4)
         break;
     }
 
@@ -100,7 +100,7 @@ TEST_F(CameraSensorIgnTransport, WorldReset)
   }
 
   dt = timer.GetElapsed();
-  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount, kTotalImages);
   EXPECT_GT(dt.Double(), 1.0);
   EXPECT_LT(dt.Double(), 3.0);
 }
