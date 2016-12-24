@@ -815,12 +815,18 @@ math::Pose Link::GetWorldInertialPose() const
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
-  math::Matrix3 moi;
+  return this->WorldInertiaMatrix();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Link::WorldInertiaMatrix() const
+{
+  ignition::math::Matrix3d moi;
   if (this->inertial)
   {
-    math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
-    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+    auto pos = this->inertial->GetPose().Ign().Pos();
+    auto rot = this->GetWorldPose().Ign().Rot().Inverse();
+    moi = this->inertial->MOI(ignition::math::Pose3d(pos, rot));
   }
   return moi;
 }

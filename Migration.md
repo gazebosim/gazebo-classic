@@ -345,12 +345,22 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/physics/Inertial.hh**
+    + ***Deprecation:*** public: math::Matrix3 GetMOI() const
+    + ***Replacement:*** public: ignition::math::Matrix3d MOI() const
+    + ***Deprecation:*** public: math::Matrix3 GetMOI(const math::Pose) const
+    + ***Replacement:*** public: ignition::math::Matrix3d MOI(const ignition::math::Pose3d) const
+    + ***Deprecation:*** public: void SetMOI(const math::Matrix3)
+    + ***Replacement:*** public: void SetMOI(const ignition::math::Matrix3d)
+
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
 1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** public: math::Matrix3 GetWorldInertiaMatrix() const
+    + ***Replacement:*** public: ignition::math::Matrix3d WorldInertiaMatrix() const
     + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.

@@ -206,15 +206,27 @@ math::Vector3 Inertial::GetProductsofInertia() const
 //////////////////////////////////////////////////
 void Inertial::SetMOI(const math::Matrix3 &_moi)
 {
+  this->SetMOI(_moi.Ign());
+}
+
+//////////////////////////////////////////////////
+void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
+{
   /// \TODO: check symmetry of incoming _moi matrix
-  this->principals.Set(_moi[0][0], _moi[1][1], _moi[2][2]);
-  this->products.Set(_moi[0][1], _moi[0][2], _moi[1][2]);
+  this->principals.Set(_moi(0, 0), _moi(1, 1), _moi(2, 2));
+  this->products.Set(_moi(0, 1), _moi(0, 2), _moi(1, 2));
 }
 
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI() const
 {
-  return math::Matrix3(
+  return this->MOI();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Inertial::MOI() const
+{
+  return ignition::math::Matrix3d(
     this->principals.x, this->products.x,   this->products.y,
     this->products.x,   this->principals.y, this->products.z,
     this->products.y,   this->products.z,   this->principals.z);
@@ -270,28 +282,38 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
 {
+  return this->MOI(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Inertial::MOI(
+    const ignition::math::Pose3d &_pose) const
+{
   // get MOI as a Matrix3
-  math::Matrix3 moi = this->GetMOI();
+  ignition::math::Matrix3d moi = this->MOI();
 
   // transform from new _pose to old this->cog, specified in new _pose frame
-  math::Pose new2Old = this->cog - _pose;
+  ignition::math::Pose3d new2Old = this->cog.Ign() - _pose;
 
   // rotate moi into new cog frame
-  moi = new2Old.rot.GetAsMatrix3() * moi *
-        new2Old.rot.GetInverse().GetAsMatrix3();
+  moi = ignition::math::Matrix3d(new2Old.Rot()) * moi *
+        ignition::math::Matrix3d(new2Old.Rot().Inverse());
 
   // parallel axis theorem to get MOI at the new cog location
   // integrating point mass at some offset
-  math::Vector3 offset = new2Old.pos;
-  moi[0][0] += (offset.y * offset.y + offset.z * offset.z) * this->mass;
-  moi[0][1] -= (offset.x * offset.y) * this->mass;
-  moi[0][2] -= (offset.x * offset.z) * this->mass;
-  moi[1][0] -= (offset.y * offset.x) * this->mass;
-  moi[1][1] += (offset.x * offset.x + offset.z * offset.z) * this->mass;
-  moi[1][2] -= (offset.y * offset.z) * this->mass;
-  moi[2][0] -= (offset.z * offset.x) * this->mass;
-  moi[2][1] -= (offset.z * offset.y) * this->mass;
-  moi[2][2] += (offset.x * offset.x + offset.y * offset.y) * this->mass;
+  ignition::math::Vector3d offset = new2Old.Pos();
+  moi(0, 0) += (offset.Y() * offset.Y() + offset.Z() * offset.Z()) *
+    this->mass;
+  moi(0, 1) -= (offset.X() * offset.Y()) * this->mass;
+  moi(0, 2) -= (offset.X() * offset.Z()) * this->mass;
+  moi(1, 0) -= (offset.Y() * offset.X()) * this->mass;
+  moi(1, 1) += (offset.X() * offset.X() + offset.Z() * offset.Z()) *
+    this->mass;
+  moi(1, 2) -= (offset.Y() * offset.Z()) * this->mass;
+  moi(2, 0) -= (offset.Z() * offset.X()) * this->mass;
+  moi(2, 1) -= (offset.Z() * offset.Y()) * this->mass;
+  moi(2, 2) += (offset.X() * offset.X() + offset.Y() * offset.Y()) *
+    this->mass;
 
   return moi;
 }

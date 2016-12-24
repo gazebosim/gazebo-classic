@@ -340,7 +340,14 @@ namespace gazebo
       /// \brief Get the inertia matrix in the world frame.
       /// \return Inertia matrix in world frame, returns matrix
       /// of zeros if link has no inertia.
-      public: math::Matrix3 GetWorldInertiaMatrix() const;
+      /// \deprecated See WorldInertiaMatrix() that uses ignition
+      public: math::Matrix3 GetWorldInertiaMatrix() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
+      public: ignition::math::Matrix3d WorldInertiaMatrix() const;
 
       /// \cond
       /// This is an internal function
