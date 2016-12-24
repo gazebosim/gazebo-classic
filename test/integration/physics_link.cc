@@ -72,12 +72,12 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
     math::Vector3 _offset)
 {
   // Get state before adding force
-  math::Vector3 linearVelWorld0 = _link->GetWorldCoGLinearVel();
-  math::Vector3 angularVelWorld0 = _link->GetWorldAngularVel();
-  math::Pose poseWorld0 = _link->GetWorldPose();
+  auto linearVelWorld0 = _link->GetWorldCoGLinearVel().Ign();
+  auto angularVelWorld0 = _link->GetWorldAngularVel().Ign();
+  auto poseWorld0 = _link->GetWorldPose().Ign();
 
   // Add Link Force
-  if (_offset == math::Vector3::Zero)
+  if (_offset.Ign() == ignition::math::Vector3d::Zero)
     _link->AddLinkForce(_force);
   else
     _link->AddLinkForce(_force, _offset);
@@ -88,33 +88,32 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   int moreThanOneStep = 2;
 
   // Check force and torque (at CoG?) in world frame
-  math::Vector3 forceWorld = poseWorld0.rot.RotateVector(_force);
-  EXPECT_EQ(forceWorld, _link->GetWorldForce());
+  auto forceWorld = poseWorld0.Rot().RotateVector(_force.Ign());
+  EXPECT_EQ(forceWorld, _link->GetWorldForce().Ign());
 
-  math::Vector3 worldOffset = poseWorld0.rot.RotateVector(
-      _offset - _link->GetInertial()->GetCoG());
-  math::Vector3 torqueWorld = worldOffset.Cross(forceWorld);
-  EXPECT_EQ(torqueWorld, _link->GetWorldTorque());
+  auto worldOffset = poseWorld0.Rot().RotateVector(
+      _offset.Ign() - _link->GetInertial()->GetCoG().Ign());
+  auto torqueWorld = worldOffset.Cross(forceWorld);
+  EXPECT_EQ(torqueWorld, _link->GetWorldTorque().Ign());
 
   // Check acceleration in world frame
-  math::Vector3 oneStepLinearAccel =
-      forceWorld/_link->GetInertial()->GetMass();
-  EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel());
+  auto oneStepLinearAccel = forceWorld / _link->GetInertial()->GetMass();
+  EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel().Ign());
 
   // Compute angular accel by multiplying world torque
   // by inverse of world inertia matrix.
   // In this case, the gyroscopic coupling terms are zero
   // since the model is a unit box.
-  math::Vector3 oneStepAngularAccel =
-      _link->GetWorldInertiaMatrix().Inverse() * torqueWorld;
-  EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel());
+  auto oneStepAngularAccel =
+      _link->WorldInertiaMatrix().Inverse() * torqueWorld;
+  EXPECT_EQ(oneStepAngularAccel, _link->GetWorldAngularAccel().Ign());
 
   // Check velocity in world frame
-  math::Vector3 oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
+  auto oneStepLinearVel = linearVelWorld0 + dt*oneStepLinearAccel;
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel().Ign());
 
-  math::Vector3 oneStepAngularVel = angularVelWorld0 + dt*oneStepAngularAccel;
-  EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
+  auto oneStepAngularVel = angularVelWorld0 + dt*oneStepAngularAccel;
+  EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel().Ign());
 
   // Step forward and check again
   _world->Step(moreThanOneStep);
@@ -128,8 +127,8 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
 
   // Check that velocity hasn't changed
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel());
-  EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel());
+  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel().Ign());
+  EXPECT_EQ(oneStepAngularVel, _link->GetWorldAngularVel().Ign());
 
   // Add opposing force in link frame and check that link is back to initial
   // velocity
@@ -141,8 +140,8 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   _world->Step(moreThanOneStep);
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldTorque());
-  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel());
-  EXPECT_EQ(angularVelWorld0, _link->GetWorldAngularVel());
+  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel().Ign());
+  EXPECT_EQ(angularVelWorld0, _link->GetWorldAngularVel().Ign());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldLinearAccel());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldAngularAccel());
 }
@@ -291,10 +290,10 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
   ASSERT_EQ(w0, link->GetWorldAngularVel());
-  ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
+  ASSERT_EQ(I0, link->WorldInertiaMatrix());
 
   // Compute initial angular momentum
-  const auto H0((I0 * w0).Ign());
+  const auto H0((I0 * w0.Ign()));
   ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
   const double H0mag = H0.Length();
 
@@ -468,7 +467,7 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     }
 
     // Expect rotated inertia matrix
-    ignition::math::Matrix3d inertia = link->GetWorldInertiaMatrix();
+    ignition::math::Matrix3d inertia = link->WorldInertiaMatrix();
     if (i == 3)
     {
       EXPECT_NEAR(inertia(0, 0), 80.8333, 1e-4);
