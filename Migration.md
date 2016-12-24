@@ -534,6 +534,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
 
+1. **gazebo/math/Matrix3.hh**
+    + ***Deprecation:*** public:   gazebo::math::Matrix3
+    + ***Replacement:*** public: ignition::math::Matrix3
+
 1. **gazebo/math/Matrix4.hh**
     + ***Deprecation:*** public:   gazebo::math::Matrix4
     + ***Replacement:*** public: ignition::math::Matrix4
