@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"

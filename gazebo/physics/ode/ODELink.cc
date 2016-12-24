@@ -397,10 +397,11 @@ void ODELink::UpdateMass()
 
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   // give ODE un-rotated inertia
-  math::Matrix3 moi = this->inertial->GetMOI(
-    math::Pose(this->inertial->GetCoG(), math::Quaternion()));
-  math::Vector3 principals(moi[0][0], moi[1][1], moi[2][2]);
-  math::Vector3 products(moi[0][1], moi[0][2], moi[1][2]);
+  auto moi = this->inertial->MOI(
+    ignition::math::Pose3d(this->inertial->GetCoG().Ign(),
+                           ignition::math::Quaterniond::Identity));
+  math::Vector3 principals(moi(0, 0), moi(1, 1), moi(2, 2));
+  math::Vector3 products(moi(0, 1), moi(0, 2), moi(1, 2));
 
   dMassSetParameters(&odeMass, this->inertial->GetMass(),
       cog.x, cog.y, cog.z,

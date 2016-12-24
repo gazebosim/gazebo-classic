@@ -123,7 +123,7 @@ Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
   result.cog = result.cog - _frameOffset;
 
   // new MOI after link frame offset
-  result.SetMOI(this->GetMOI(result.cog));
+  result.SetMOI(this->MOI(result.cog.Ign()));
 
   return result;
 }
@@ -268,10 +268,10 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   result.cog.rot = math::Quaternion(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
-  math::Matrix3 Ithis = this->GetMOI(result.cog);
+  auto Ithis = this->MOI(result.cog.Ign());
 
   // compute equivalent I for _inertial at the new CoG
-  math::Matrix3 Iparam = _inertial.GetMOI(result.cog);
+  auto Iparam = _inertial.MOI(result.cog.Ign());
 
   // sum up principals and products now they are at the same location
   result.SetMOI(Ithis + Iparam);
