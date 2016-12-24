@@ -19,6 +19,10 @@
 
 #include "gazebo/math/Matrix3.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Matrix3Test : public ::testing::Test { };

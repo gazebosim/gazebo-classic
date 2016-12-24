@@ -53,9 +53,9 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "isum: \n"
         << isum << "\n";
   gzdbg << "i1 new cg: \n"
-        << i1.MOI(isum.GetPose()) << "\n";
+        << i1.MOI(isum.GetPose().Ign()) << "\n";
   gzdbg << "i2 new cg: \n"
-        << i2.MOI(isum.GetPose()) << "\n";
+        << i2.MOI(isum.GetPose().Ign()) << "\n";
   EXPECT_NEAR(isum.GetPose().pos.z, 2.0/3.0, TOL);
   EXPECT_NEAR(isum.GetIXX(),
     1.0 + 0.1 + 1.0*(2.0/3.0)*(2.0/3.0)
