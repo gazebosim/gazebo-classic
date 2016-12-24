@@ -872,30 +872,31 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       this->HasType(Base::UNIVERSAL_JOINT))
   {
     // Desired angular and linear velocity in world frame for child link
-    math::Vector3 angularVel, linearVel;
+    ignition::math::Vector3d angularVel, linearVel;
     if (this->parentLink)
     {
       // Use parent link velocity as reference (if parent exists)
-      angularVel = this->parentLink->GetWorldAngularVel();
+      angularVel = this->parentLink->WorldAngularVel();
 
       // Get parent linear velocity at joint anchor
       // Passing unit quaternion q ensures that parentOffset will be
       //  interpreted in world frame.
-      math::Quaternion q;
-      math::Vector3 parentOffset =
-        this->GetParentWorldPose().pos - this->parentLink->WorldPose().Pos();
-      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
+      ignition::math::Quaterniond q;
+      ignition::math::Vector3d parentOffset =
+        this->GetParentWorldPose().pos.Ign() -
+        this->parentLink->WorldPose().Pos();
+      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
     }
 
     // Add desired velocity along specified axis
-    angularVel += _velocity * this->GetGlobalAxis(_index);
+    angularVel += _velocity * this->GetGlobalAxis(_index).Ign();
 
     if (this->HasType(Base::UNIVERSAL_JOINT))
     {
       // For multi-axis joints, retain velocity of other axis.
       unsigned int otherIndex = (_index + 1) % 2;
       angularVel += this->GetVelocity(otherIndex)
-                  * this->GetGlobalAxis(otherIndex);
+                  * this->GetGlobalAxis(otherIndex).Ign();
     }
 
     this->childLink->SetAngularVel(angularVel);
@@ -903,8 +904,9 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     // Compute desired linear velocity of the child link based on
     //  offset between the child's CG and the joint anchor
     //  and the desired angular velocity.
-    math::Vector3 childCoGOffset =
-      this->childLink->GetWorldCoGPose().pos - this->GetWorldPose().pos;
+    ignition::math::Vector3d childCoGOffset =
+      this->childLink->GetWorldCoGPose().pos.Ign() -
+      this->GetWorldPose().pos.Ign();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }

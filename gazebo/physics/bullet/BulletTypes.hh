@@ -63,12 +63,31 @@ namespace gazebo
                 return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ());
               }
 
+      /// \brief Convert a bullet btVector3 to an ignition Vector3d.
+      /// \param[in] _bt Bullet Vector3.
+      /// \return Ignition Vector3d.
+      public: static ignition::math::Vector3d ConvertVector3Ign(
+                  const btVector3 &_bt)
+              {
+                return ignition::math::Vector3d(
+                    _bt.getX(), _bt.getY(), _bt.getZ());
+              }
+
       /// \brief Convert a gazebo Vector3 to a bullet btVector3.
       /// \param[in] _vec Gazebo Vector3.
       /// \return Bullet Vector3.
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
               {
                 return btVector3(_vec.x, _vec.y, _vec.z);
+              }
+
+      /// \brief Convert an ignition Vector3d to a bullet btVector3.
+      /// \param[in] _vec Ignition Vector3d.
+      /// \return Bullet Vector3.
+      public: static btVector3 ConvertVector3(
+                  const ignition::math::Vector3d &_vec)
+              {
+                return btVector3(_vec.X(), _vec.Y(), _vec.Z());
               }
 
       /// \brief Convert a bullet btVector4 to a gazebo Vector4.
@@ -117,6 +136,21 @@ namespace gazebo
                 return btVector4(_vec.X(), _vec.Y(), _vec.Z(), _vec.W());
               }
 
+      /// \brief Convert a bullet transform to an ignition math pose.
+      /// \param[in] _bt Bullet pose (btTransform).
+      /// \return Ignition math pose.
+      public: static ignition::math::Pose3d ConvertPoseIgn(
+                  const btTransform &_bt)
+              {
+                ignition::math::Pose3d pose;
+                pose.Pos() = ConvertVector3Ign(_bt.getOrigin());
+                pose.Rot().W() = _bt.getRotation().getW();
+                pose.Rot().X() = _bt.getRotation().getX();
+                pose.Rot().Y() = _bt.getRotation().getY();
+                pose.Rot().Z() = _bt.getRotation().getZ();
+                return pose;
+              }
+
       /// \brief Convert a bullet transform to a gazebo pose.
       /// \param[in] _bt Bullet pose (btTransform).
       /// \return Gazebo pose.
@@ -143,6 +177,21 @@ namespace gazebo
                                                _pose.rot.z, _pose.rot.w));
                 return trans;
               }
+
+      /// \brief Convert an ignition math pose to a bullet transform.
+      /// \param[in] _pose Ignition math pose.
+      /// \return Bullet pose (btTransform).
+      public: static btTransform ConvertPose(
+                  const ignition::math::Pose3d &_pose)
+              {
+                btTransform trans;
+
+                trans.setOrigin(ConvertVector3(_pose.Pos()));
+                trans.setRotation(btQuaternion(_pose.Rot().X(), _pose.Rot().Y(),
+                      _pose.Rot().Z(), _pose.Rot().W()));
+                return trans;
+              }
+
     };
     /// \}
   }

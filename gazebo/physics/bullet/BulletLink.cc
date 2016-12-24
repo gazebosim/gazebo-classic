@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -87,7 +82,7 @@ void BulletLink::Init()
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
   btVector3 fallInertia(0, 0, 0);
-  math::Vector3 cogVec = this->inertial->GetCoG();
+  ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -122,8 +117,8 @@ void BulletLink::Init()
       //       << "] mu[" << hackMu1
       //       << "] mu2[" << hackMu2 << "]\n";
 
-      math::Pose relativePose = collision->GetRelativePose();
-      relativePose.pos -= cogVec;
+      ignition::math::Pose3d relativePose = collision->RelativePose();
+      relativePose.Pos() -= cogVec;
       if (!this->compoundShape)
         this->compoundShape = new btCompoundShape();
       dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(

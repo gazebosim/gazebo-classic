@@ -92,7 +92,7 @@ void ODELink::Init()
   if (this->linkId)
   {
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-    math::Vector3 cogVec = this->inertial->GetCoG();
+    ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
     for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -313,7 +313,7 @@ void ODELink::UpdateCollisionOffsets()
   if (this->linkId)
   {
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-    math::Vector3 cogVec = this->inertial->GetCoG();
+    ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
     for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -322,19 +322,19 @@ void ODELink::UpdateCollisionOffsets()
         if (g->IsPlaceable() && g->GetCollisionId())
         {
           // update pose immediately
-          math::Pose localPose = g->GetRelativePose();
-          localPose.pos -= cogVec;
+          ignition::math::Pose3d localPose = g->RelativePose();
+          localPose.Pos() -= cogVec;
 
           dQuaternion q;
-          q[0] = localPose.rot.w;
-          q[1] = localPose.rot.x;
-          q[2] = localPose.rot.y;
-          q[3] = localPose.rot.z;
+          q[0] = localPose.Rot().W();
+          q[1] = localPose.Rot().X();
+          q[2] = localPose.Rot().Y();
+          q[3] = localPose.Rot().Z();
 
           // Set the pose of the encapsulated collision; this is always relative
           // to the CoM
-          dGeomSetOffsetPosition(g->GetCollisionId(), localPose.pos.x,
-              localPose.pos.y, localPose.pos.z);
+          dGeomSetOffsetPosition(g->GetCollisionId(),
+              localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
           dGeomSetOffsetQuaternion(g->GetCollisionId(), q);
         }
       }

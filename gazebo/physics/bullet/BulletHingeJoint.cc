@@ -259,11 +259,11 @@ void BulletHingeJoint::SetVelocity(unsigned int _index, double _angle)
 double BulletHingeJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GetGlobalAxis(0).Ign();
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+    result += globalAxis.Dot(this->childLink->WorldAngularVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+    result -= globalAxis.Dot(this->parentLink->WorldAngularVel());
   return result;
 }
 

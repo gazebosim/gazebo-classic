@@ -121,7 +121,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     if (this->parentLink)
     {
       X_MP = physics::SimbodyPhysics::Pose2Transform(
-        this->parentLink->GetRelativePose());
+          this->parentLink->RelativePose());
     }
     else
     {
@@ -133,7 +133,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     if (this->childLink)
     {
       X_MC = physics::SimbodyPhysics::Pose2Transform(
-        this->childLink->GetRelativePose());
+        this->childLink->RelativePose());
     }
     else
     {

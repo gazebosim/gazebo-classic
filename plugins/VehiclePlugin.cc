@@ -162,7 +162,7 @@ void VehiclePlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate

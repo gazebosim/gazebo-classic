@@ -140,6 +140,37 @@ itialRelativePose`
     + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
     + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+    + ***Deprecation:*** void SetInitialRelativePose(const math::Pose &_pose)
+    + ***Replacement:*** void SetInitialRelativePose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Pose GetInitialRelativePose() const 
+    + ***Replacement:*** ignition::math::Pose3d InitialRelativePose() const
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void SetRelativePose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
+    + ***Replacement:*** void SetRelativePose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true)
+    + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true) 
+
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeLinearVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldLinearVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeAngularVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeAngularVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldAngularVel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldAngularVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearAccel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d RelativeLinearAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearAccel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldLinearAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeAngularAccel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeAngularAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldAngularAccel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldAngularAccel() const
+    + ***Deprecation:*** math::Box GetCollisionBoundingBox() const
+    + ***Replacement:*** ignition::math::Box CollisionBoundingBox() const
+    + ***Deprecation:*** math::Pose GetRelativePose() const
+    + ***Replacement:*** ignition::math::Pose3d RelativePose() const
 
 1. **gazebo/physics/PlaneShape.hh**
     + ***Deprecation:*** void SetSize(const math::Vector2d &_size)

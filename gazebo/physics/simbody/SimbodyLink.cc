@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
 
@@ -80,7 +75,7 @@ void SimbodyLink::Init()
 
   Link::Init();
 
-  math::Vector3 cogVec = this->inertial->GetCoG();
+  ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
 
   // Set the initial pose of the body
 
@@ -92,8 +87,8 @@ void SimbodyLink::Init()
       SimbodyCollisionPtr collision;
       collision = boost::static_pointer_cast<SimbodyCollision>(*iter);
 
-      math::Pose relativePose = collision->GetRelativePose();
-      relativePose.pos -= cogVec;
+      ignition::math::Pose3d relativePose = collision->RelativePose();
+      relativePose.Pos() -= cogVec;
     }
   }
 

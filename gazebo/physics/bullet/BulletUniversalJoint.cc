@@ -178,11 +178,11 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
   }
 
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(_index);
+  ignition::math::Vector3d globalAxis = this->GetGlobalAxis(_index).Ign();
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+    result += globalAxis.Dot(this->childLink->WorldAngularVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+    result -= globalAxis.Dot(this->parentLink->WorldAngularVel());
   return result;
 }
 

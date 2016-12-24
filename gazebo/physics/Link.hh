@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Link class
- * Author: Nate Koenig
- */
-
-#ifndef _LINK_HH_
-#define _LINK_HH_
+#ifndef GAZEBO_PHYSICS_LINK_HH_
+#define GAZEBO_PHYSICS_LINK_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -268,23 +264,53 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the body.
       /// \return Linear velocity of the body.
-      public: math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearVel() const
+      public: math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the body.
+      /// \return Linear velocity of the body.
+      public: ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the angular velocity of the body.
       /// \return Angular velocity of the body.
-      public: math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularVel() const
+      public: math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the body.
+      /// \return Angular velocity of the body.
+      public: ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the linear acceleration of the body.
       /// \return Linear acceleration of the body.
-      public: math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearAccel() const
+      public: math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the body.
+      /// \return Linear acceleration of the body.
+      public: ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the body in the world frame.
       /// \return Linear acceleration of the body in the world frame.
-      public: math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearAccel() const
+      public: math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the body in the world frame.
+      /// \return Linear acceleration of the body in the world frame.
+      public: ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the body.
       /// \return Angular acceleration of the body.
-      public: math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularAccel() const
+      public: math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the body.
+      /// \return Angular acceleration of the body.
+      public: ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular momentum of the body CoG in the world frame,
       /// which is computed as (I * w), where
@@ -300,7 +326,17 @@ namespace gazebo
       /// L: angular momentum of CoG in world frame
       /// w: angular velocity in world frame
       /// \return Angular acceleration of the body in the world frame.
-      public: math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularAccel() const
+      public: math::Vector3 GetWorldAngularAccel() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the body in the world frame,
+      /// which is computed as (I^-1 * (T - w x L)), where
+      /// I: inertia matrix in world frame
+      /// T: sum of external torques in world frame
+      /// L: angular momentum of CoG in world frame
+      /// w: angular velocity in world frame
+      /// \return Angular acceleration of the body in the world frame.
+      public: ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Get the force applied to the body.
       /// \return Force applied to the body.

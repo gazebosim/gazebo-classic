@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMBODY_PHYSICS_HH
-#define _SIMBODY_PHYSICS_HH
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYPHYSICS_HH
 #include <string>
 
 #include <boost/thread/thread.hpp>
@@ -132,6 +132,15 @@ namespace gazebo
       /// \param[in] _pose Gazeb's math::Pose object
       /// \return Simbody's SimTK::Transform object
       public: static SimTK::Transform Pose2Transform(const math::Pose &_pose);
+
+      /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
+      /// a Simbody Transform. The rotation angles are interpreted as a
+      /// body-fixed sequence, meaning we rotation about x, then about
+      /// the new y, then about the now twice-rotated z.
+      /// \param[in] _pose Gazeb's math::Pose object
+      /// \return Simbody's SimTK::Transform object
+      public: static SimTK::Transform Pose2Transform(
+                  const ignition::math::Pose3d &_pose);
 
       /// \brief Convert a Simbody transform to a pose in x,y,z,
       /// thetax,thetay,thetaz format.

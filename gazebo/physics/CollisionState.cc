@@ -40,7 +40,7 @@ CollisionState::CollisionState(const CollisionPtr _collision)
         _collision->GetWorld()->SimTime(),
         _collision->GetWorld()->Iterations())
 {
-  this->pose = _collision->GetRelativePose();
+  this->pose = _collision->RelativePose();
 }
 
 /////////////////////////////////////////////////

@@ -36,11 +36,14 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
   : State(_link->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _link->WorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->velocity = ignition::math::Pose3d(_link->WorldLinearVel(),
+                   ignition::math::Quaterniond(_link->WorldAngularVel()));
+
+  this->acceleration = ignition::math::Pose3d(_link->WorldLinearAccel(),
+                       ignition::math::Quaterniond(_link->WorldAngularAccel()));
+
+  this->wrench = ignition::math::Pose3d(_link->GetWorldForce().Ign(),
+      ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -49,11 +52,13 @@ LinkState::LinkState(const LinkPtr _link)
           _link->GetWorld()->SimTime(), _link->GetWorld()->Iterations())
 {
   this->pose = _link->WorldPose();
-  this->velocity = math::Pose(_link->GetWorldLinearVel(),
-                   math::Quaternion(_link->GetWorldAngularVel()));
-  this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
-                       math::Quaternion(_link->GetWorldAngularAccel()));
-  this->wrench = math::Pose(_link->GetWorldForce(), math::Quaternion());
+  this->velocity = ignition::math::Pose3d(_link->WorldLinearVel(),
+                   ignition::math::Quaterniond(_link->WorldAngularVel()));
+
+  this->acceleration = ignition::math::Pose3d(_link->WorldLinearAccel(),
+                       ignition::math::Quaterniond(_link->WorldAngularAccel()));
+  this->wrench = ignition::math::Pose3d(_link->GetWorldForce().Ign(),
+      ignition::math::Quaterniond::Zero);
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.
@@ -90,10 +95,8 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
   this->iterations = _iterations;
 
   this->pose = _link->WorldPose();
-  this->velocity.Set(_link->GetWorldLinearVel(),
-                     _link->GetWorldAngularVel());
-  this->acceleration.Set(_link->GetWorldLinearAccel(),
-                         _link->GetWorldAngularAccel());
+  this->velocity.Set(_link->WorldLinearVel(), _link->WorldAngularVel());
+  this->acceleration.Set(_link->WorldLinearAccel(), _link->WorldAngularAccel());
   this->wrench.Set(_link->GetWorldForce(), math::Quaternion());
 }
 
