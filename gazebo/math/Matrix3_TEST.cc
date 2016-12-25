@@ -30,6 +30,7 @@ class Matrix3Test : public ::testing::Test { };
 TEST_F(Matrix3Test, Matrix3)
 {
   {
+    // cppcheck-suppress unassignedVariable
     math::Matrix3 matrix;
     EXPECT_TRUE(matrix == math::Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0));
   }
