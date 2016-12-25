@@ -325,8 +325,9 @@ void UserCamera::SetJoyPoseControl(bool _value)
 }
 
 /////////////////////////////////////////////////
-bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
-                                     double /*_minDist*/, double /*_maxDist*/)
+bool UserCamera::AttachToVisualImpl(VisualPtr _visual,
+    const bool _inheritOrientation,
+    const double /*_minDist*/, const double /*_maxDist*/)
 {
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
@@ -806,7 +807,7 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetClipDist(float _near, float _far)
+void UserCamera::SetClipDist(const float _near, const float _far)
 {
   Camera::SetClipDist(_near, _far);
 
