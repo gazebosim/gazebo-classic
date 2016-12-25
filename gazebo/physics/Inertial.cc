@@ -220,7 +220,14 @@ void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->MOI();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -282,7 +289,14 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->MOI(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
