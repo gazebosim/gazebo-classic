@@ -216,7 +216,7 @@ namespace gazebo
       /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
       /// If _pose is different from pose of the Inertial block, then
       /// the MOI is rotated accordingly, and contributions from changes
-      /// in MOI location location due to point mass is added to the final MOI.
+      /// in MOI location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
       /// \deprecated See MOI(const ignition::math::Pose3d &) const
@@ -228,7 +228,7 @@ namespace gazebo
       /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
       /// If _pose is different from pose of the Inertial block, then
       /// the MOI is rotated accordingly, and contributions from changes
-      /// in MOI location location due to point mass is added to the final MOI.
+      /// in MOI location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
       public: ignition::math::Matrix3d MOI(
