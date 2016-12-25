@@ -92,12 +92,12 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(forceWorld, _link->GetWorldForce().Ign());
 
   auto worldOffset = poseWorld0.Rot().RotateVector(
-      _offset.Ign() - _link->GetInertial()->GetCoG().Ign());
+      _offset.Ign() - _link->GetInertial()->CoG());
   auto torqueWorld = worldOffset.Cross(forceWorld);
   EXPECT_EQ(torqueWorld, _link->GetWorldTorque().Ign());
 
   // Check acceleration in world frame
-  auto oneStepLinearAccel = forceWorld / _link->GetInertial()->GetMass();
+  auto oneStepLinearAccel = forceWorld / _link->GetInertial()->Mass();
   EXPECT_EQ(oneStepLinearAccel, _link->GetWorldLinearAccel().Ign());
 
   // Compute angular accel by multiplying world torque
@@ -210,7 +210,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   model->SetLinkWorldPose(math::Pose(), link);
   math::Pose inertialPose = math::Pose(math::Vector3(1, 5, 8),
       math::Vector3(M_PI/3.0, M_PI*1.5, M_PI/4));
-  link->GetInertial()->SetCoG(inertialPose);
+  link->GetInertial()->SetCoG(inertialPose.Ign());
   EXPECT_EQ(math::Pose(), link->GetWorldPose());
   EXPECT_EQ(inertialPose, link->GetWorldInertialPose());
   this->AddLinkForceTwoWays(world, link, math::Vector3(1, 2, 1));
@@ -220,7 +220,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
                           math::Vector3(0, M_PI/2.0, M_PI/6)), link);
   inertialPose = math::Pose(math::Vector3(0, -5, 10),
       math::Vector3(0, 2.0*M_PI, M_PI/3));
-  link->GetInertial()->SetCoG(inertialPose);
+  link->GetInertial()->SetCoG(inertialPose.Ign());
   this->AddLinkForceTwoWays(world, link, math::Vector3(1, 2, 1),
       math::Vector3(-2, 0.5, 1));
 
@@ -230,7 +230,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
                           math::Vector3(-M_PI/4.5, M_PI/3.0, M_PI*1.2)), link);
   inertialPose = math::Pose(math::Vector3(1, 0, -5.6),
       math::Vector3(M_PI/9, 0, M_PI*3));
-  link->GetInertial()->SetCoG(inertialPose);
+  link->GetInertial()->SetCoG(inertialPose.Ign());
   link->SetLinearVel(math::Vector3(2, -0.1, 5));
   link->SetAngularVel(math::Vector3(-M_PI/10, 0, 0.0001));
   this->AddLinkForceTwoWays(world, link, math::Vector3(-3, 2.5, -15),
@@ -611,7 +611,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
 
     // Calculate expected values
     math::Vector3 forceWorld = forces[i];
-    math::Vector3 worldOffset = forceOffsets[i] - link->GetInertial()->GetCoG();
+    math::Vector3 worldOffset = forceOffsets[i] - link->GetInertial()->CoG();
     math::Vector3 torqueWorld = worldOffset.Cross(forces[i]) + torques[i];
 
     // Wait for message to be received

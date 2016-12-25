@@ -112,7 +112,7 @@ namespace gazebo
                     compoundShape->removeChildShape(shape);
                     math::Pose relativePose =
                         this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    relativePose.pos -= bLink->GetInertial()->CoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

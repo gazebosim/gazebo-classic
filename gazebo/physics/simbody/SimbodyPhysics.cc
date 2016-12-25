@@ -852,11 +852,15 @@ void SimbodyPhysics::CreateMultibodyGraph(
     // gzerr << "debug : " << (*li)->GetName() << "\n";
 
     if (simbodyLink)
-      _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
+    {
+      _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->Mass(),
                       simbodyLink->mustBeBaseLink, (*li).get());
+    }
     else
+    {
       gzerr << "simbodyLink [" << (*li)->GetName()
             << "]is not a SimbodyLinkPtr\n";
+    }
   }
 
   // Step 3: Tell it about all the joints we read from the input file,

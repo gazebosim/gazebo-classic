@@ -78,7 +78,7 @@ void BulletLink::Init()
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  btScalar mass = this->inertial->GetMass();
+  btScalar mass = this->inertial->Mass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
@@ -87,7 +87,7 @@ void BulletLink::Init()
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
   btVector3 fallInertia(0, 0, 0);
-  math::Vector3 cogVec = this->inertial->GetCoG();
+  math::Vector3 cogVec = this->inertial->CoG();
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -137,7 +137,7 @@ void BulletLink::Init()
 
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
+    this->inertial->PrincipalMoments());
   // TODO: inertia products not currently used
   this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
                                    fallInertia.z(), 0, 0, 0);
@@ -237,8 +237,8 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
-    this->rigidLink->setMassProps(this->inertial->GetMass(),
-        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+    this->rigidLink->setMassProps(this->inertial->Mass(),
+        BulletTypes::ConvertVector3(this->inertial->PrincipalMoments()));
   }
 }
 
@@ -396,7 +396,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
 
   math::Pose wPose = this->GetWorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
+  math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->CoG());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
@@ -418,7 +418,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
   math::Pose wPose = this->GetWorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 offsetFromCoG = _q*_offset
-        - wPose.rot*this->inertial->GetCoG();
+        - wPose.rot*this->inertial->CoG();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
