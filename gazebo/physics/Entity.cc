@@ -473,7 +473,9 @@ void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+void Entity::SetWorldPose(const math::Pose &_pose,
+                          const bool _notify,
+                          const bool _publish)
 {
   {
     std::lock_guard<std::mutex> lock(this->GetWorld()->WorldPoseMutex());
