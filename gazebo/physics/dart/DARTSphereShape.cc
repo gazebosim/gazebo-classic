@@ -81,7 +81,6 @@ void DARTSphereShape::SetRadius(double _radius)
 
   SphereShape::SetRadius(_radius);
 
-  this->dataPtr->GetShape()->setSize(
-        Eigen::Vector3d(_radius*2.0, _radius*2.0, _radius*2.0));
+  this->dataPtr->GetShape()->setRadius(_radius);
 }
 
