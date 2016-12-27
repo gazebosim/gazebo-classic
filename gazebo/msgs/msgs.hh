@@ -737,7 +737,7 @@ namespace gazebo
     /// \return The resulting message
     GAZEBO_VISIBLE
     ignition::msgs::Material::ShaderType ConvertIgnMsg(
-        const msgs::Material::ShaderType _type);
+        const msgs::Material::ShaderType &_type);
 
     /// \brief Convert ignition::msgs::Material::ShaderType to
     /// gazebo::msgs::Material::ShaderType
@@ -745,7 +745,7 @@ namespace gazebo
     /// \return The resulting message
     GAZEBO_VISIBLE
     msgs::Material::ShaderType ConvertIgnMsg(
-        const ignition::msgs::Material::ShaderType _type);
+        const ignition::msgs::Material::ShaderType &_type);
 
     /// \brief Convert gazebo::msgs::Material::Script to
     /// ignition::msgs::Material::Script
@@ -753,7 +753,7 @@ namespace gazebo
     /// \return The resulting message
     GAZEBO_VISIBLE
     ignition::msgs::Material::Script ConvertIgnMsg(
-        const msgs::Material::Script _script);
+        const msgs::Material::Script &_script);
 
     /// \brief Convert ignition::msgs::Material::Script to
     /// gazebo::msgs::Material::Script
@@ -761,7 +761,7 @@ namespace gazebo
     /// \return The resulting message
     GAZEBO_VISIBLE
     msgs::Material::Script ConvertIgnMsg(
-        const ignition::msgs::Material::Script _script);
+        const ignition::msgs::Material::Script &_script);
 
     /// \brief Convert gazebo::msgs::Material to ignition::msgs::Material
     /// \param[in] _msg The message to convert

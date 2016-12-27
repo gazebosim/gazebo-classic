@@ -15,7 +15,11 @@
  *
 */
 
+#include <functional>
+#include <list>
+#include <map>
 #include <mutex>
+#include <string>
 
 #include <ignition/msgs.hh>
 #include <ignition/transport/Node.hh>
@@ -134,10 +138,7 @@ void MarkerManagerPrivate::OnPreRender()
   for (auto markerIter = this->markerMsgs.begin();
        markerIter != this->markerMsgs.end();)
   {
-    if (this->ProcessMarkerMsg(*markerIter))
-      this->markerMsgs.erase(markerIter++);
-    else
-      ++markerIter;
+    this->ProcessMarkerMsg(*markerIter);
   }
 
   // Erase any markers that have a lifetime.

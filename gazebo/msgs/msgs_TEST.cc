@@ -3889,7 +3889,7 @@ TEST_F(MsgsTest, ConvertIgnMsgMaterialScript)
   auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
 
   EXPECT_EQ(ignMsg.name(), ignMsg2.name());
-  EXPECT_EQ(ignMsg.uri().size(), 3);
+  ASSERT_EQ(ignMsg2.uri().size(), 3);
 
   for (size_t i = 0; i < 3; ++i)
     EXPECT_EQ(ignMsg.uri(i), ignMsg2.uri(i));

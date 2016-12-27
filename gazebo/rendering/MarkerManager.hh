@@ -17,6 +17,8 @@
 #ifndef GAZEBO_RENDERING_MARKERMANAGER_HH_
 #define GAZEBO_RENDERING_MARKERMANAGER_HH_
 
+#include <memory>
+
 #include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo

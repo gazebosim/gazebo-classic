@@ -3285,7 +3285,7 @@ namespace gazebo
 
     /////////////////////////////////////////////////
     ignition::msgs::Material::ShaderType ConvertIgnMsg(
-        const msgs::Material::ShaderType _type)
+        const msgs::Material::ShaderType &_type)
     {
       auto result = ignition::msgs::Material::VERTEX;
 
@@ -3314,7 +3314,7 @@ namespace gazebo
 
     /////////////////////////////////////////////////
     msgs::Material::ShaderType ConvertIgnMsg(
-        const ignition::msgs::Material::ShaderType _type)
+        const ignition::msgs::Material::ShaderType &_type)
     {
       auto result = msgs::Material::VERTEX;
 
@@ -3343,7 +3343,7 @@ namespace gazebo
 
     /////////////////////////////////////////////////
     ignition::msgs::Material::Script ConvertIgnMsg(
-        const msgs::Material::Script _script)
+        const msgs::Material::Script &_script)
     {
       ignition::msgs::Material::Script result;
 
@@ -3360,7 +3360,7 @@ namespace gazebo
 
     /////////////////////////////////////////////////
     msgs::Material::Script ConvertIgnMsg(
-        const ignition::msgs::Material::Script _script)
+        const ignition::msgs::Material::Script &_script)
     {
       msgs::Material::Script result;
 
