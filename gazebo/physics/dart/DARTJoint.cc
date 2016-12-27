@@ -87,7 +87,7 @@ void DARTJoint::Init()
   GZ_ASSERT(dartChildLink.get() != nullptr, "dartChildLink pointer is null");
   {
     dtTransformChildBodyNode =
-        DARTTypes::ConvPose(dartChildLink->GetWorldPose());
+        DARTTypes::ConvPose(dartChildLink->WorldPose());
     this->dataPtr->dtChildBodyNode = dartChildLink->GetDARTBodyNode();
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
@@ -95,7 +95,7 @@ void DARTJoint::Init()
   if (dartParentLink.get() != nullptr)
   {
     dtTransformParentBodyNode =
-        DARTTypes::ConvPose(dartParentLink->GetWorldPose());
+        DARTTypes::ConvPose(dartParentLink->WorldPose());
   }
 
   dtTransformParentLinkToJoint = dtTransformParentBodyNode.inverse() *

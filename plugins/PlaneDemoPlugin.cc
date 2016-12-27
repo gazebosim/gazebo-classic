@@ -381,7 +381,7 @@ void PlaneDemoPlugin::OnUpdate()
       ti != this->dataPtr->thrusterControls.end(); ++ti)
     {
       // fire up thruster
-      ignition::math::Pose3d pose = ti->link->GetWorldPose().Ign();
+      ignition::math::Pose3d pose = ti->link->WorldPose();
       ti->link->AddForce(pose.Rot().RotateVector(ti->force));
     }
 

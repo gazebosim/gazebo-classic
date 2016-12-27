@@ -58,7 +58,7 @@ void ArrangePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         {
           ObjectPtr object(new Object);
           object->model = model;
-          object->pose = model->GetWorldPose().Ign();
+          object->pose = model->WorldPose();
           this->objects[modelName] = object;
         }
         else

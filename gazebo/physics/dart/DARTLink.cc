@@ -316,7 +316,7 @@ void DARTLink::OnPoseChange()
   if (freeJoint)
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
-    const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->GetWorldPose());
+    const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->WorldPose());
     const Eigen::Isometry3d &T1 = joint->getTransformFromParentBodyNode();
     const Eigen::Isometry3d &InvT2 = joint->getTransformFromChildBodyNode();
     Eigen::Isometry3d P = Eigen::Isometry3d::Identity();
@@ -934,7 +934,7 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
                          this->dataPtr->dtBodyNode->getTransform());
 
   // Set the new pose to this link
-  this->dirtyPose = newPose;
+  this->dirtyPose = newPose.Ign();
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)

@@ -278,7 +278,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   ASSERT_NE(boxModel, nullptr);
 
   ignition::math::Pose3d boxInitPose(0, 0, -207, 0, 0, 0);
-  EXPECT_EQ(boxModel->GetWorldPose().Ign(), boxInitPose);
+  EXPECT_EQ(boxModel->WorldPose(), boxInitPose);
 
   physics::ModelPtr model = GetModel("heightmap");
   ASSERT_NE(model, nullptr);
@@ -304,14 +304,14 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   // let the box fall onto the heightmap and wait for it to rest
   world->Step(1000);
 
-  ignition::math::Pose3d boxRestPose = boxModel->GetWorldPose().Ign();
+  ignition::math::Pose3d boxRestPose = boxModel->WorldPose();
   EXPECT_NE(boxRestPose, boxInitPose);
   EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
 
   // step the world and verify the box is at rest
   world->Step(100);
 
-  ignition::math::Pose3d boxNewRestPose = boxModel->GetWorldPose().Ign();
+  ignition::math::Pose3d boxNewRestPose = boxModel->WorldPose();
   EXPECT_EQ(boxNewRestPose, boxRestPose);
 #else
   // prevent unused variable warning

@@ -34,6 +34,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Entity.hh**
+    + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
+    + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`
+    + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
+    + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
@@ -110,11 +116,27 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+
+1. **gazebo/physics/Entity.hh**
+    + ***Deprecation:*** const math::Pose GetDirtyPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
     + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
+
+1. **gazebo/physics/PlaneShape.hh**
+    + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
+    + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
+    + ***Deprecation:*** math::Vector2d GetSize() const
+    + ***Replacement:*** ignition::math::Vector2d Size() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
@@ -563,6 +585,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Spline.hh**
     + ***Deprecation:*** public:   gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
+
+1. **gazebo/math/Vector2d.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector2d
+    + ***Replacement:*** public: ignition::math::Vector2d
 
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats

@@ -136,7 +136,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     {
       // Get postion in Cartesian gazebo frame
       ignition::math::Pose3d gpsPose = this->pose +
-        this->dataPtr->parentLink->GetWorldPose().Ign();
+        this->dataPtr->parentLink->WorldPose();
 
       // Apply position noise before converting to global frame
       gpsPose.Pos().X(

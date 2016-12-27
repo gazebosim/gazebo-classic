@@ -26,7 +26,7 @@ LightState::LightState(const LightPtr _light, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 : State(_light->GetName(), _realTime, _simTime, _iterations)
 {
-  this->pose = _light->GetWorldPose().Ign();
+  this->pose = _light->WorldPose();
 }
 
 /////////////////////////////////////////////////
@@ -58,7 +58,7 @@ void LightState::Load(const LightPtr _light, const common::Time &_realTime,
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->iterations = _iterations;
-  this->pose = _light->GetWorldPose().Ign();
+  this->pose = _light->WorldPose();
 }
 
 /////////////////////////////////////////////////
