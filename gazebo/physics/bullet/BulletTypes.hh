@@ -191,7 +191,6 @@ namespace gazebo
                       _pose.Rot().Z(), _pose.Rot().W()));
                 return trans;
               }
-
     };
     /// \}
   }
