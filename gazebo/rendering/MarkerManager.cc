@@ -139,6 +139,7 @@ void MarkerManagerPrivate::OnPreRender()
        markerIter != this->markerMsgs.end();)
   {
     this->ProcessMarkerMsg(*markerIter);
+    this->markerMsgs.erase(markerIter++);
   }
 
   // Erase any markers that have a lifetime.
