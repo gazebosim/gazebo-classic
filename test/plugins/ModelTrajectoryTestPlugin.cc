@@ -65,7 +65,7 @@ void ModelTrajectoryTestPlugin::OnUpdate()
 
   {
     // ignore everything else, get position and force only
-    math::Pose pose;
+    ignition::math::Pose3d pose;
     this->model->SetWorldPose(pose);
   }
 }
