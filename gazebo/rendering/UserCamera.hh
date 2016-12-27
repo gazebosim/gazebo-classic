@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
@@ -209,7 +210,7 @@ namespace gazebo
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      /// \deprecated See version that accepts an ignition::math::Vector2i
+      /// \deprecated See version that accepts an ignition::math::Vector3
       /// object
       public: void SetFocalPoint(const math::Vector3 &_pt)
               GAZEBO_DEPRECATED(8.0);

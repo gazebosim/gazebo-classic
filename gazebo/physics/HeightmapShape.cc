@@ -279,7 +279,14 @@ void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 //////////////////////////////////////////////////
 math::Vector2i HeightmapShape::GetVertexCount() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->VertexCount();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
