@@ -132,8 +132,8 @@ namespace gazebo
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
       public: void SetWorldPose(const math::Pose &_pose,
-                                bool _notify = true,
-                                bool _publish = true);
+                                const bool _notify = true,
+                                const bool _publish = true);
 
       /// \brief Get the linear velocity of the entity.
       /// \return A math::Vector3 for the linear velocity.
@@ -271,8 +271,8 @@ namespace gazebo
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseModel(const ignition::math::Pose3d &_pose,
-                                      bool _notify,
-                                      bool _publish);
+                                      const bool _notify,
+                                      const bool _publish);
 
       /// \brief Set the world pose for a canonical Link.
       /// \param[in] _pose New pose for the entity.
@@ -280,14 +280,14 @@ namespace gazebo
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseCanonicalLink(
                    const ignition::math::Pose3d &_pose,
-                   bool _notify, bool _publish);
+                   const bool _notify, const bool _publish);
 
       /// \brief Set the world pose for a common entity.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
       private: void SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
-                   bool _notify, bool _publish);
+                   const bool _notify, const bool _publish);
 
       /// \brief Called when a new pose message arrives.
       /// \param[in] _msg The message to set the pose from.
