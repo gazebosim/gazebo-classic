@@ -76,8 +76,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  // This attribute causes problem with mouse picking in OSX/ogre1.9/qt5
-  // this->setAttribute(Qt::WA_PaintOnScreen, true);
+  // This attribute may cause problem with mouse picking in OSX/ogre1.9/qt5
+  this->setAttribute(Qt::WA_PaintOnScreen, true);
+  this->setAttribute(Qt::WA_NoSystemBackground, true);
+
 
   this->setFocusPolicy(Qt::StrongFocus);
   this->setMouseTracking(true);
@@ -238,7 +240,7 @@ void GLWidget::showEvent(QShowEvent *_event)
     // Get the window handle in a form that OGRE can use.
     std::string winHandle = this->OgreHandle();
 
-    // windowhandle() is available in qt 5.0 only
+    // windowhandle() is available in qt5 only
     double ratio = this->windowHandle()->devicePixelRatio();
 
     // Create the OGRE render window

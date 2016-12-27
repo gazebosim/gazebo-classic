@@ -91,6 +91,10 @@ void QTestFixture::init()
 void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
     bool _serverScene, bool _clientScene)
 {
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
+  this->resMaxPercentChange = 8.0;
+#endif
+
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
       boost::bind(&QTestFixture::RunServer, this,
@@ -163,6 +167,8 @@ void QTestFixture::ProcessEventsAndDraw(QMainWindow *_mainWindow,
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  gazebo::rendering::fini();
+
   if (this->server)
   {
     this->server->Stop();

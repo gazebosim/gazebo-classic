@@ -261,7 +261,7 @@ void MainWindow_TEST::UserCameraFPS()
     std::cerr << "Skipping lower bound FPS check" << std::endl;
     skipFPSTest = true;
   }
-  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  unsigned int iterations = skipFPSTest ? 500 : 5000;
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
@@ -791,6 +791,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 #endif
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   mainWindow->close();
   delete mainWindow;
