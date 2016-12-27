@@ -98,8 +98,8 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
 
   // physics engine has not stepped yet since the boxes were spawned so they
   // should stay overlapped. Verify pose
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
-  EXPECT_EQ(model2->GetWorldPose(), initialPose2);
+  EXPECT_EQ(model->WorldPose(), initialPose);
+  EXPECT_EQ(model2->WorldPose(), initialPose2);
 
   // Step forward, verify time increasing
   world->Step(steps);
@@ -110,8 +110,8 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
   // Note: DART doesn't really mind overlapping models
   if (_physicsEngine != "dart")
   {
-    EXPECT_NE(model->GetWorldPose(), initialPose);
-    EXPECT_NE(model2->GetWorldPose(), initialPose2);
+    EXPECT_NE(model->WorldPose(), initialPose);
+    EXPECT_NE(model2->WorldPose(), initialPose2);
   }
 
   // Create a publisher to reset gzserver
@@ -142,8 +142,8 @@ void WorldControlResetTest::ModelOverlapReset(const std::string &_physicsEngine)
 
   // verify boxes have moved back to initial pose and they are not pushed
   // apart
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
-  EXPECT_EQ(model2->GetWorldPose(), initialPose2);
+  EXPECT_EQ(model->WorldPose(), initialPose);
+  EXPECT_EQ(model2->WorldPose(), initialPose2);
 }
 
 /////////////////////////////////////////////////
@@ -203,12 +203,12 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
   ASSERT_TRUE(model != NULL);
 
   // verify box pose
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model->WorldPose(), initialPose);
 
   // move box to new pose
   ignition::math::Pose3d newPose(4, 5, 0.5, 0, 0, 0);
   model->SetWorldPose(newPose);
-  EXPECT_EQ(model->GetWorldPose(), newPose);
+  EXPECT_EQ(model->WorldPose(), newPose);
 
   // Reset world repeatedly
   for (int i = 0; i < _resets; ++i)
@@ -225,7 +225,7 @@ void WorldResetTest::ModelPose(const std::string &_physicsEngine,
   }
 
   // verify box has moved back to initial pose
-  EXPECT_EQ(model->GetWorldPose(), initialPose);
+  EXPECT_EQ(model->WorldPose(), initialPose);
 }
 
 /////////////////////////////////////////////////
@@ -290,7 +290,7 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
   while (!models.empty())
   {
     physics::ModelPtr m = models.front();
-    modelPoses.push_back(m->GetWorldPose().Ign());
+    modelPoses.push_back(m->WorldPose());
     models.pop_front();
     for (const auto &nested : m->NestedModels())
       models.push_back(nested);
@@ -299,7 +299,7 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
   // move model to new pose
   ignition::math::Pose3d newPose(9, 5, 2.5, 0, 0, 0);
   model->SetWorldPose(newPose);
-  EXPECT_EQ(model->GetWorldPose(), newPose);
+  EXPECT_EQ(model->WorldPose(), newPose);
 
   // Reset world repeatedly
   for (int i = 0; i < _resets; ++i)
@@ -321,7 +321,7 @@ void WorldResetTest::NestedModelPose(const std::string &_physicsEngine,
     while (!models.empty())
     {
       physics::ModelPtr m = models.front();
-      EXPECT_EQ(m->GetWorldPose(), modelPosesCopy.front());
+      EXPECT_EQ(m->WorldPose(), modelPosesCopy.front());
       models.pop_front();
       modelPosesCopy.pop_front();
       for (const auto &nested : m->NestedModels())

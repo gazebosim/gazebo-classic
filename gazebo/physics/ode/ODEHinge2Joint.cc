@@ -97,19 +97,26 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3d globalAxis = _axis.Ign();
   if (this->parentLink)
+  {
     globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+      this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(
+          _axis.Ign());
+  }
 
   if (this->jointId)
   {
     if (_index == 0)
+    {
       dJointSetHinge2Axis1(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
     else
+    {
       dJointSetHinge2Axis2(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

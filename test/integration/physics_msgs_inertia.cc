@@ -179,7 +179,7 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   EXPECT_EQ(inertial->GetCoG().Ign(), newCoG);
 
   world->Step(1000);
-  EXPECT_GT(model->GetWorldPose().rot.GetAsEuler().y, 0.25);
+  EXPECT_GT(model->WorldPose().Rot().Euler().Y(), 0.25);
 }
 
 /////////////////////////////////////////////////
@@ -252,7 +252,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
 
   world->Step(1000);
-  EXPECT_LT(model->GetWorldPose().pos.z, 0.40);
+  EXPECT_LT(model->WorldPose().Pos().Z(), 0.40);
 }
 
 /////////////////////////////////////////////////

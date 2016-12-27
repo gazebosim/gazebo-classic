@@ -74,7 +74,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // Get state before adding force
   math::Vector3 linearVelWorld0 = _link->GetWorldCoGLinearVel();
   math::Vector3 angularVelWorld0 = _link->GetWorldAngularVel();
-  math::Pose poseWorld0 = _link->GetWorldPose();
+  math::Pose poseWorld0 = _link->WorldPose();
 
   // Add Link Force
   if (_offset == math::Vector3::Zero)
@@ -189,20 +189,20 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 
   // Add force at link frame
   gzdbg << "World == link == inertial frames, no offset" << std::endl;
-  EXPECT_EQ(math::Pose(), link->GetWorldPose());
+  EXPECT_EQ(math::Pose(), link->WorldPose());
   EXPECT_EQ(math::Pose(), link->GetWorldInertialPose());
   this->AddLinkForceTwoWays(world, link, math::Vector3(1, 20, 31));
 
   gzdbg << "World != link == inertial frames, no offset" << std::endl;
   model->SetLinkWorldPose(math::Pose(math::Vector3(2, 3, 4),
                           math::Vector3(0, M_PI/2.0, 1)), link);
-  EXPECT_NE(math::Pose(), link->GetWorldPose());
-  EXPECT_EQ(link->GetWorldPose(), link->GetWorldInertialPose());
+  EXPECT_NE(math::Pose(), link->WorldPose());
+  EXPECT_EQ(link->WorldPose(), link->GetWorldInertialPose().Ign());
   this->AddLinkForceTwoWays(world, link, math::Vector3(-1, 10, 5));
 
   gzdbg << "World == link == inertial frames, with offset" << std::endl;
   model->SetLinkWorldPose(math::Pose(), link);
-  EXPECT_EQ(math::Pose(), link->GetWorldPose());
+  EXPECT_EQ(math::Pose(), link->WorldPose());
   EXPECT_EQ(math::Pose(), link->GetWorldInertialPose());
   this->AddLinkForceTwoWays(world, link, math::Vector3(5, 4, 3),
       math::Vector3(-2, 1, 0));
@@ -212,7 +212,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   math::Pose inertialPose = math::Pose(math::Vector3(1, 5, 8),
       math::Vector3(M_PI/3.0, M_PI*1.5, M_PI/4));
   link->GetInertial()->SetCoG(inertialPose);
-  EXPECT_EQ(math::Pose(), link->GetWorldPose());
+  EXPECT_EQ(math::Pose(), link->WorldPose());
   EXPECT_EQ(inertialPose, link->GetWorldInertialPose());
   this->AddLinkForceTwoWays(world, link, math::Vector3(1, 2, 1));
 
@@ -433,8 +433,8 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     auto link = model->GetLink();
     ASSERT_TRUE(link != NULL);
 
-    EXPECT_EQ(model->GetWorldPose(), modelPose);
-    EXPECT_EQ(link->GetWorldPose(), linkPose + modelPose);
+    EXPECT_EQ(model->WorldPose(), modelPose.Ign());
+    EXPECT_EQ(link->WorldPose(), linkPose.Ign() + modelPose.Ign());
     EXPECT_EQ(link->GetWorldInertialPose(),
               inertialPose + linkPose + modelPose);
 
@@ -442,29 +442,27 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     //  expect inertial pose to match model pose
     if (i == 0)
     {
-      EXPECT_EQ(model->GetWorldPose(),
-                link->GetWorldInertialPose());
+      EXPECT_EQ(model->WorldPose(), link->GetWorldInertialPose().Ign());
     }
     // i=1: rotated link pose
     //  expect inertial pose to match link pose
     else if (i == 1)
     {
-      EXPECT_EQ(link->GetWorldPose(),
-                link->GetWorldInertialPose());
+      EXPECT_EQ(link->WorldPose(), link->GetWorldInertialPose().Ign());
     }
     // i=2: offset and rotated inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 2)
     {
-      EXPECT_EQ(link->GetWorldPose().pos,
-                link->GetWorldInertialPose().pos);
+      EXPECT_EQ(link->WorldPose().Pos(),
+                link->GetWorldInertialPose().pos.Ign());
     }
     // i=3: offset inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 3)
     {
-      EXPECT_EQ(link->GetWorldPose().pos + inertialPose.pos,
-                link->GetWorldInertialPose().pos);
+      EXPECT_EQ(link->WorldPose().Pos() + inertialPose.pos.Ign(),
+                link->GetWorldInertialPose().pos.Ign());
     }
 
     // Expect rotated inertia matrix
@@ -681,7 +679,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_EQ(math::Vector3::Zero, link->GetWorldAngularVel());
 
   // check position
-  math::Vector3 pos = link->GetWorldPose().pos;
+  math::Vector3 pos = link->WorldPose().Pos();
   EXPECT_EQ(pos0 + time*vel, pos);
 
   // Set velocity to zero
@@ -710,7 +708,7 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
   EXPECT_NEAR(vel3.z, 0.0, g_tolerance);
 
   // check rotation
-  math::Vector3 rpy = link->GetWorldPose().rot.GetAsEuler();
+  math::Vector3 rpy = link->WorldPose().Rot().Euler();
   EXPECT_NEAR(rpy.x, 0.0, g_tolerance);
   EXPECT_NEAR(rpy.y, vel2.y*dt, g_tolerance);
   EXPECT_NEAR(rpy.z, 0.0, g_tolerance);
