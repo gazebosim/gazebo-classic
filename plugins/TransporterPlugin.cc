@@ -160,7 +160,7 @@ void TransporterPlugin::Update()
       continue;
 
     // Get the model's pose
-    ignition::math::Pose3d modelPose = model->GetWorldPose().Ign();
+    ignition::math::Pose3d modelPose = model->WorldPose();
 
     // Iterate over all pads
     for (auto const &padIter : this->dataPtr->pads)

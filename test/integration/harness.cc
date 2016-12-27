@@ -99,7 +99,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   EXPECT_EQ(model->GetJoint("joint1"), nullptr);
 
   // Now step forward and expect it to fall
-  const auto initialPose = model->GetWorldPose().Ign();
+  const auto initialPose = model->WorldPose();
   const double fallTime = 0.15;
   // subtract one since we already took 1 step after publishing to detach
   world->Step(fallTime / dt - 1);
@@ -108,7 +108,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   EXPECT_NEAR(vel.X(), 0, 2e-3);
   EXPECT_NEAR(vel.Y(), 0, 2e-3);
   EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
-  EXPECT_EQ(model->GetWorldPose().Ign().Pos(),
+  EXPECT_EQ(model->WorldPose().Pos(),
             initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2));
 
   // Send another detach command and take some more world steps

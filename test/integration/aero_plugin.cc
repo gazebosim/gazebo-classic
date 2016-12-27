@@ -106,13 +106,13 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
       physics::JointWrench body_wrench = body_joint->GetForceTorque(0);
       physics::JointWrench wing_1_wrench = wing_1_joint->GetForceTorque(0);
       physics::JointWrench wing_2_wrench = wing_2_joint->GetForceTorque(0);
-      math::Pose wing_1_pose = wing_1->GetWorldPose();
+      math::Pose wing_1_pose = wing_1->WorldPose();
       math::Vector3 wing_1_force =
         wing_1_pose.rot.RotateVector(wing_1_wrench.body2Force);
       math::Vector3 wing_1_torque =
         wing_1_pose.rot.RotateVector(wing_1_wrench.body2Torque);
 
-      math::Pose wing_2_pose = wing_2->GetWorldPose();
+      math::Pose wing_2_pose = wing_2->WorldPose();
       math::Vector3 wing_2_force =
         wing_2_pose.rot.RotateVector(wing_2_wrench.body2Force);
       math::Vector3 wing_2_torque =

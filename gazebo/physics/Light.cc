@@ -71,10 +71,10 @@ void Light::FillMsg(msgs::Light &_msg)
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  if (this->worldPose == math::Pose(_state.Pose()))
+  if (this->worldPose == _state.Pose())
     return;
 
-  this->worldPose = math::Pose(_state.Pose());
+  this->worldPose = _state.Pose();
   this->PublishPose();
 }
 

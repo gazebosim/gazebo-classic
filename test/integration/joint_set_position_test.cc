@@ -517,7 +517,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   std::vector<math::Pose> linkPoses;
   for (physics::Link_V::iterator li = links.begin();
                                  li != links.end(); ++li)
-    linkPoses.push_back((*li)->GetWorldPose());
+    linkPoses.push_back((*li)->WorldPose());
 
   world->SetPaused(true);
   start_time = world->SimTime().Double();
@@ -562,7 +562,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li, ++pi)
     {
-      math::Pose pose = (*li)->GetWorldPose();
+      math::Pose pose = (*li)->WorldPose();
       EXPECT_NEAR(pose.pos.x, pi->pos.x, TOL);
       EXPECT_NEAR(pose.pos.y, pi->pos.y, TOL);
       EXPECT_NEAR(pose.pos.z, pi->pos.z, TOL);

@@ -819,7 +819,7 @@ void World::Update()
 
       for (auto &dirtyEntity : this->dataPtr->dirtyPoses)
       {
-        dirtyEntity->SetWorldPose(dirtyEntity->GetDirtyPose(), false);
+        dirtyEntity->SetWorldPose(dirtyEntity->DirtyPose(), false);
       }
 
       this->dataPtr->dirtyPoses.clear();
@@ -2634,7 +2634,7 @@ void World::ProcessMessages()
         // \todo Change to relative once lights can be attached to links
         msgs::Light lightMsg;
         lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
+        msgs::Set(lightMsg.mutable_pose(), light->WorldPose());
         this->dataPtr->lightPub->Publish(lightMsg);
       }
     }

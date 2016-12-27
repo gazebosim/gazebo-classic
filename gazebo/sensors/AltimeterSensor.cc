@@ -108,7 +108,7 @@ void AltimeterSensor::Load(const std::string &_worldName)
     // Initialise reference altitude
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     this->dataPtr->altMsg.set_vertical_reference((this->pose +
-         this->dataPtr->parentLink->GetWorldPose().Ign()).Pos().Z());
+         this->dataPtr->parentLink->WorldPose()).Pos().Z());
   }
 }
 
@@ -133,8 +133,7 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
   // Get latest pose information
   if (this->dataPtr->parentLink)
   {
-    ignition::math::Pose3d parentPose =
-      this->dataPtr->parentLink->GetWorldPose().Ign();
+    ignition::math::Pose3d parentPose = this->dataPtr->parentLink->WorldPose();
 
     // Get pose in gazebo reference frame
     ignition::math::Pose3d altPose = this->pose + parentPose;
