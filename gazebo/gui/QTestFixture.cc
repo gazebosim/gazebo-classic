@@ -92,7 +92,7 @@ void QTestFixture::Load(const std::string &_worldFilename, bool _paused,
     bool _serverScene, bool _clientScene)
 {
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
-  this->resMaxPercentChange = 8.0;
+  this->resMaxPercentChange *= 2.0;
 #endif
 
   // Create, load, and run the server in its own thread

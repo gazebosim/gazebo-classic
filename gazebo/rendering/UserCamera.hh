@@ -240,6 +240,10 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool SetProjectionType(const std::string &_type);
 
+      // Documentation inherited.
+      public: virtual ignition::math::Vector2i Project(
+          const ignition::math::Vector3d &_pt) const;
+
       /// \brief Set the camera to be attached to a visual.
       ///
       /// This causes the camera to move in relation to the specified visual.

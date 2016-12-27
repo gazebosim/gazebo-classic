@@ -194,6 +194,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
       this->dataPtr->mouseEvent.Pos());
+
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
