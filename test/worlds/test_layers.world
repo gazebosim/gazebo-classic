@@ -7,6 +7,10 @@
       <grid>false</grid>
     </scene>
 
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
     <gui>
       <camera name="user">
         <pose>1 0 .5 0 0 3.1415</pose>

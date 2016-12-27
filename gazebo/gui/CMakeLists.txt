@@ -242,8 +242,6 @@ set (gtest_sources
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_gui)
 
-add_definitions(${QT_DEFINITIONS})
-
 set (gui_headers "" CACHE INTERNAL "gui headers" FORCE)
 foreach (hdr ${headers} ${qt_headers})
   APPEND_TO_CACHED_STRING(gui_headers

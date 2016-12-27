@@ -325,14 +325,15 @@ void RenderEngine::Init()
 //////////////////////////////////////////////////
 void RenderEngine::Fini()
 {
+  // TODO: this was causing a segfault on shutdown
+  // Windows are created on load so clear them even
+  // if render engine is not initialized
+  this->dataPtr->windowManager->Fini();
+
   if (!this->dataPtr->initialized)
     return;
 
   this->dataPtr->connections.clear();
-
-  // TODO: this was causing a segfault on shutdown
-  // Close all the windows first;
-  this->dataPtr->windowManager->Fini();
 
   RTShaderSystem::Instance()->Fini();
 

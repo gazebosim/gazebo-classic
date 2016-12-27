@@ -63,12 +63,16 @@ void WindowManager::Fini()
   // ogre 1.9 crashses when deleting the render window on destruction on osx
   // so detach first before deleting ogre root
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
-  for (auto iter = this->dataPtr->windows.begin();
-      iter != this->dataPtr->windows.end(); iter++)
+  if (!this->dataPtr->windows.empty())
   {
-    auto w = RenderEngine::Instance()->Root()->detachRenderTarget((*iter)->getName());
-    w->setActive(false);
-    w->removeAllViewports();
+    auto root = RenderEngine::Instance()->Root();
+    for (auto iter = this->dataPtr->windows.begin();
+        iter != this->dataPtr->windows.end(); iter++)
+    {
+      auto w = root->detachRenderTarget((*iter)->getName());
+      w->setActive(false);
+      w->removeAllViewports();
+    }
   }
 #endif
   this->dataPtr->windows.clear();
