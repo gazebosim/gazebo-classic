@@ -81,7 +81,7 @@ void DARTModel::Init()
     DARTModelPrivate::BodyNodeBuildData bodyNodeBD;
     bodyNodeBD.dartLink = dartLink;
     bodyNodeBD.properties = dartLink->DARTProperties();
-    bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->GetWorldPose());
+    bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->WorldPose());
     bodyNodeBD.type = dartLink->IsSoftBody() ? "soft" : "";
 
     bodyNodeMap[dartLink->GetName()] = bodyNodeBD;

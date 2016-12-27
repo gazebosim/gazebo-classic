@@ -148,15 +148,15 @@ void ODELink::MoveCallback(dBodyID _id)
   p = dBodyGetPosition(_id);
   r = dBodyGetQuaternion(_id);
 
-  self->dirtyPose.pos.Set(p[0], p[1], p[2]);
-  self->dirtyPose.rot.Set(r[0], r[1], r[2], r[3]);
+  self->dirtyPose.Pos().Set(p[0], p[1], p[2]);
+  self->dirtyPose.Rot().Set(r[0], r[1], r[2], r[3]);
 
   // subtracting cog location from ode pose
   GZ_ASSERT(self->inertial != nullptr, "Inertial pointer is null");
-  math::Vector3 cog = self->dirtyPose.rot.RotateVector(
-      self->inertial->GetCoG());
+  ignition::math::Vector3d cog = self->dirtyPose.Rot().RotateVector(
+      self->inertial->GetCoG().Ign());
 
-  self->dirtyPose.pos -= cog;
+  self->dirtyPose.Pos() -= cog;
 
   // Tell the world that our pose has changed.
   self->world->_AddDirty(self);
@@ -244,22 +244,23 @@ void ODELink::OnPoseChange()
 
   this->SetEnabled(true);
 
-  const math::Pose myPose = this->GetWorldPose();
+  const ignition::math::Pose3d myPose = this->WorldPose();
 
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  math::Vector3 cog = myPose.rot.RotateVector(this->inertial->GetCoG());
+  ignition::math::Vector3d cog =
+    myPose.Rot().RotateVector(this->inertial->GetCoG().Ign());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
-      myPose.pos.x + cog.x,
-      myPose.pos.y + cog.y,
-      myPose.pos.z + cog.z);
+      myPose.Pos().X() + cog.X(),
+      myPose.Pos().Y() + cog.Y(),
+      myPose.Pos().Z() + cog.Z());
 
   dQuaternion q;
-  q[0] = myPose.rot.w;
-  q[1] = myPose.rot.x;
-  q[2] = myPose.rot.y;
-  q[3] = myPose.rot.z;
+  q[0] = myPose.Rot().W();
+  q[1] = myPose.Rot().X();
+  q[2] = myPose.Rot().Y();
+  q[3] = myPose.Rot().Z();
 
   // Set the rotation of the ODE link
   dBodySetQuaternion(this->linkId, q);
@@ -461,13 +462,13 @@ math::Vector3 ODELink::GetWorldLinearVel(const math::Vector3 &_offset,
   if (this->linkId)
   {
     dVector3 dvel;
-    math::Pose wPose = this->GetWorldPose();
+    ignition::math::Pose3d wPose = this->WorldPose();
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-    math::Vector3 offsetFromCoG =
-        wPose.rot.RotateVectorReverse(_q * _offset)
-        - this->inertial->GetCoG();
-    dBodyGetRelPointVel(this->linkId, offsetFromCoG.x, offsetFromCoG.y,
-        offsetFromCoG.z, dvel);
+    ignition::math::Vector3d offsetFromCoG =
+        wPose.Rot().RotateVectorReverse(_q.Ign() * _offset.Ign())
+        - this->inertial->GetCoG().Ign();
+    dBodyGetRelPointVel(this->linkId, offsetFromCoG.X(), offsetFromCoG.Y(),
+        offsetFromCoG.Z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
   }
   else if (!this->IsStatic() && this->initialized)
@@ -632,14 +633,17 @@ void ODELink::AddLinkForce(const math::Vector3 &_force,
   {
     // Force vector represents a direction only, so it should be rotated but
     // not translated
-    math::Vector3 forceWorld = this->GetWorldPose().rot.RotateVector(_force);
+    ignition::math::Vector3d forceWorld =
+      this->WorldPose().Rot().RotateVector(_force.Ign());
+
     // Does this need to be rotated?
-    math::Vector3 offsetCoG = _offset - this->inertial->GetCoG();
+    ignition::math::Vector3d offsetCoG = _offset.Ign() -
+      this->inertial->GetCoG().Ign();
 
     this->SetEnabled(true);
     dBodyAddForceAtRelPos(this->linkId,
-        forceWorld.x, forceWorld.y, forceWorld.z,
-        offsetCoG.x, offsetCoG.y, offsetCoG.z);
+        forceWorld.X(), forceWorld.Y(), forceWorld.Z(),
+        offsetCoG.X(), offsetCoG.Y(), offsetCoG.Z());
   }
   else if (!this->IsStatic())
   {

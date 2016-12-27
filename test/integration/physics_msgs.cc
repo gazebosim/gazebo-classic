@@ -133,7 +133,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(model != NULL);
 
   {
-    math::Pose initialPose = model->GetWorldPose();
+    math::Pose initialPose = model->WorldPose();
     EXPECT_EQ(pos, initialPose.pos);
   }
 
@@ -148,7 +148,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       msgs::Set(msg.mutable_pose(), (*iter).Ign());
       modelPub->Publish(msg);
 
-      while (*iter != model->GetWorldPose())
+      while (*iter != model->WorldPose())
       {
         world->Step(1);
         common::Time::MSleep(1);
@@ -159,7 +159,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       // this change to the test.
       world->Step(10);
 
-      EXPECT_EQ(*iter, model->GetWorldPose());
+      EXPECT_EQ(*iter, model->WorldPose());
     }
   }
 }
@@ -473,7 +473,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     model = world->ModelByName(name);
     EXPECT_TRUE(model != NULL);
 
-    pose1 = model->GetWorldPose();
+    pose1 = model->WorldPose();
     x0 = modelPos[name].x;
     y0 = modelPos[name].y;
 
@@ -534,7 +534,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     {
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       x0 = modelPos[name].x;
       y0 = modelPos[name].y;
       double xTolerance = PHYSICS_TOL;

@@ -115,7 +115,7 @@ void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
   model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
-  EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
+  EXPECT_EQ(pose.pos, model->WorldPose().Pos());
 }
 
 TEST_P(ServerFixtureTest, SpawnSDF)

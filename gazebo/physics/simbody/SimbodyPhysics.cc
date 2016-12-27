@@ -551,8 +551,8 @@ void SimbodyPhysics::UpdateCollision()
               /// arbitrarily based on frames.
               ///
               /// shift forces to link1 frame without rotating it first
-              math::Pose pose1 = link1->GetWorldPose();
-              math::Pose pose2 = link2->GetWorldPose();
+              math::Pose pose1 = link1->WorldPose();
+              math::Pose pose2 = link2->WorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
                 + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
@@ -996,7 +996,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           // GZ_ASSERT(gzOutb, "must be here");
           physics::ModelPtr model = gzOutb->GetParentModel();
           inboard_X_ML =
-            ~SimbodyPhysics::Pose2Transform(model->GetWorldPose());
+            ~SimbodyPhysics::Pose2Transform(model->WorldPose());
         }
         else
           inboard_X_ML =
