@@ -257,11 +257,11 @@ void VehiclePlugin::OnUpdate()
         amt = 15;
 
       ignition::math::Pose3d p =
-          this->joints[ix]->GetChild()->GetWorldPose().Ign();
+          this->joints[ix]->GetChild()->WorldPose();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
       this->chassis->AddForceAtWorldPosition(axis * amt, p.Pos());
 
-      p = this->joints[ix^1]->GetChild()->GetWorldPose().Ign();
+      p = this->joints[ix^1]->GetChild()->WorldPose();
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
       this->chassis->AddForceAtWorldPosition(axis * -amt, p.Pos());
     }

@@ -69,7 +69,7 @@ TEST_F(Dem_TEST, GPS)
 
   // Sensor altitude is the elevation of the terrain + the sensor position.
   EXPECT_NEAR(sensor->Altitude(),
-      elevation + model->GetWorldPose().pos.z, 1);
+      elevation + model->WorldPose().Pos().Z(), 1);
 }
 #endif
 

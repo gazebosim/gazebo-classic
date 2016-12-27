@@ -105,12 +105,16 @@ void Entity::Load(sdf::ElementPtr _sdf)
 
   {
     if (this->parent && this->parentEntity)
-      this->worldPose = this->sdf->Get<math::Pose>("pose") +
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose") +
                         this->parentEntity->worldPose;
+    }
     else
-      this->worldPose = this->sdf->Get<math::Pose>("pose");
+    {
+      this->worldPose = this->sdf->Get<ignition::math::Pose3d>("pose");
+    }
 
-    this->initialRelativePose = this->sdf->Get<math::Pose>("pose");
+    this->initialRelativePose = this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
   if (this->parent)
@@ -174,7 +178,7 @@ bool Entity::IsStatic() const
 //////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const math::Pose &_p)
 {
-  this->initialRelativePose = _p;
+  this->initialRelativePose = _p.Ign();
 }
 
 //////////////////////////////////////////////////
@@ -264,7 +268,7 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->GetWorldPose();
+    return this->worldPose - this->parentEntity->WorldPose();
   }
   else
   {
@@ -277,7 +281,7 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
   if (this->parent && this->parentEntity)
-    this->SetWorldPose(_pose + this->parentEntity->GetWorldPose(), _notify,
+    this->SetWorldPose(_pose + this->parentEntity->WorldPose(), _notify,
                               _publish);
   else
     this->SetWorldPose(_pose, _notify, _publish);
@@ -312,10 +316,11 @@ void Entity::SetWorldTwist(const math::Vector3 &_linear,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
-        bool _publish)
+void Entity::SetWorldPoseModel(
+    const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
-  math::Pose oldModelWorldPose = this->worldPose;
+  ignition::math::Pose3d oldModelWorldPose = this->worldPose;
 
   // initialization: (no children?) set own worldPose
   this->worldPose = _pose;
@@ -383,8 +388,9 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
-        bool _publish)
+void Entity::SetWorldPoseCanonicalLink(
+    const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -401,15 +407,15 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
   }
 
   EntityPtr parentEnt = this->parentEntity;
-  ignition::math::Pose3d relativePose = this->initialRelativePose.Ign();
-  math::Pose updatePose = _pose;
+  ignition::math::Pose3d relativePose = this->initialRelativePose;
+  ignition::math::Pose3d updatePose = _pose;
 
   // recursively update parent model pose based on new canonical link pose
   while (parentEnt && parentEnt->HasType(MODEL))
   {
     // setting parent Model world pose from canonical link world pose
     // where _pose is the canonical link's world pose
-    parentEnt->worldPose = math::Pose(-relativePose) + updatePose;
+    parentEnt->worldPose = ignition::math::Pose3d(-relativePose) + updatePose;
 
     parentEnt->worldPose.Correct();
 
@@ -440,8 +446,8 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 }
 
 //////////////////////////////////////////////////
-void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-        bool /*_publish*/)
+void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool /*_publish*/)
 {
   this->worldPose = _pose;
   this->worldPose.Correct();
@@ -481,11 +487,13 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+void Entity::SetWorldPose(const math::Pose &_pose,
+                          const bool _notify,
+                          const bool _publish)
 {
   {
     std::lock_guard<std::mutex> lock(this->GetWorld()->WorldPoseMutex());
-    (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
+    (*this.*setWorldPoseFunc)(_pose.Ign(), _notify, _publish);
   }
   if (_publish)
     this->PublishPose();
@@ -523,10 +531,10 @@ void Entity::UpdatePhysicsPose(bool _updateChildren)
       {
         // update collision pose
         //   to model's world pose + it's intial relative pose
-        coll->worldPose.pos = this->worldPose.pos +
-          this->worldPose.rot.RotateVector(coll->initialRelativePose.pos);
-        coll->worldPose.rot = this->worldPose.rot *
-          coll->initialRelativePose.rot;
+        coll->worldPose.Pos() = this->worldPose.Pos() +
+          this->worldPose.Rot().RotateVector(coll->initialRelativePose.Pos());
+        coll->worldPose.Rot() = this->worldPose.Rot() *
+          coll->initialRelativePose.Rot();
         coll->OnPoseChange();
       }
       else
@@ -669,7 +677,13 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 }
 
 //////////////////////////////////////////////////
-const math::Pose &Entity::GetDirtyPose() const
+const math::Pose Entity::GetDirtyPose() const
+{
+  return this->DirtyPose();
+}
+
+//////////////////////////////////////////////////
+const ignition::math::Pose3d &Entity::DirtyPose() const
 {
   return this->dirtyPose;
 }
@@ -717,7 +731,7 @@ void Entity::PlaceOnEntity(const std::string &_entityName)
   auto box = this->CollisionBoundingBox();
   auto onBox = onEntity->CollisionBoundingBox();
 
-  auto p = onEntity->GetWorldPose().Ign();
+  auto p = onEntity->WorldPose();
   p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
   this->SetWorldPose(p);
 }
@@ -731,7 +745,7 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
     this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
   auto box = this->CollisionBoundingBox();
-  auto start = this->GetWorldPose().pos.Ign();
+  auto start = this->WorldPose().Pos();
   auto end = start;
   start.Z() = box.Min().Z() - 0.00001;
   end.Z() -= 1000;
@@ -748,7 +762,7 @@ void Entity::PlaceOnNearestEntityBelow()
   this->GetNearestEntityBelow(dist, entityName);
   if (dist > 0.0)
   {
-    math::Pose p = this->GetWorldPose();
+    math::Pose p = this->WorldPose();
     p.pos.z -= dist;
     this->SetWorldPose(p);
   }

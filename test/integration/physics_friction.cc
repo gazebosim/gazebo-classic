@@ -360,7 +360,7 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    math::Vector3 pos = iter->first->GetWorldPose().pos;
+    math::Vector3 pos = iter->first->WorldPose().Pos();
     double cosPosAngle = pos.x / pos.GetLength();
     double sinPosAngle = pos.y / pos.GetLength();
     EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);

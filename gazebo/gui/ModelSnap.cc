@@ -192,7 +192,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
   if (vis && !vis->IsPlane())
   {
@@ -236,7 +236,7 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 {
   this->dataPtr->mouseEvent = _event;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane() &&
