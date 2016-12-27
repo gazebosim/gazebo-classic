@@ -118,7 +118,6 @@ itialRelativePose`
 
 1. **gazebo/rendering/UserCamera.hh**
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
-    + ***Changed:*** `math::Pose3 DefaultPose() const` to `ignition::math::Pose3d DefaultPose() const`
 
 ### Deprecations
 
@@ -242,14 +241,16 @@ itialRelativePose`
 1. **gazebo/rendering/UserCamera.hh**
     + ***Deprecation:*** void SetViewController(const std::string &_type, const math::Vector3 &_pos)
     + ***Replacement:*** void SetViewController(const std::string &_type, const ignition::math::Vector3d &_pos)
-    + ***Deprecation:*** void SetDefaultPose(const math::Pose3d &_pose)
-    + ***Replacement:*** void SetDefaultPose(const ignition::math::Pose3d &_pose)
     + ***Deprecation:*** void SetFocalPoint(const math::Vector3 &_pt)
     + ***Replacement:*** void SetFocalPoint(const ignition::math::Vector3d &_pt)
     + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos) const
     + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos) const
     + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos, std::string &_mod)
     + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos, std::string &_mod) const
+    + ***Deprecation:*** void SetDefaultPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetInitialPose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Pose3 DefaultPose() const
+    + ***Replacement:*** ignition::math::Pose3d InitialPose() const
 
 1. **gazebo/rendering/ViewController.hh**
     + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
