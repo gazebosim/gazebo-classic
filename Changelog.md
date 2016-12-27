@@ -7,6 +7,10 @@
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
+1. Added ignition transport dependency, and output camera sensor images on
+   an ignition transport topic.
+    * [Pull request #2544](https://bitbucket.org/osrf/gazebo/pull-request/2544)
+
 1. Fix restoring submesh material transparency
     * [Pull request #2536](https://bitbucket.org/osrf/gazebo/pull-request/2536)
 
@@ -127,6 +131,7 @@
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
     * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
+    * [Pull request #2556](https://bitbucket.org/osrf/gazebo/pull-request/2556)
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
@@ -134,6 +139,8 @@
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
+    * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
+    * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

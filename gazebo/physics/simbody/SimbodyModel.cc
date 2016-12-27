@@ -60,9 +60,9 @@ void SimbodyModel::Init()
     return;
 
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->GetWorldPose());
+  this->SetInitialRelativePose(this->WorldPose());
 
-  this->SetRelativePose(this->GetWorldPose());
+  this->SetRelativePose(this->WorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();

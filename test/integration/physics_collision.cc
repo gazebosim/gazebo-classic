@@ -142,38 +142,35 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
-    EXPECT_EQ(model->GetWorldPose(), modelPose);
-    EXPECT_EQ(link->GetWorldPose(), linkPose + modelPose);
-    EXPECT_EQ(collision->GetWorldPose(),
-              collisionPose + linkPose + modelPose);
+    EXPECT_EQ(model->WorldPose(), modelPose.Ign());
+    EXPECT_EQ(link->WorldPose(), linkPose.Ign() + modelPose.Ign());
+    EXPECT_EQ(collision->WorldPose(),
+              collisionPose.Ign() + linkPose.Ign() + modelPose.Ign());
 
     // i=0: rotated model pose
     //  expect collision pose to match model pose
     if (i == 0)
     {
-      EXPECT_EQ(model->GetWorldPose(),
-                collision->GetWorldPose());
+      EXPECT_EQ(model->WorldPose(), collision->WorldPose());
     }
     // i=1: rotated link pose
     //  expect collision pose to match link pose
     else if (i == 1)
     {
-      EXPECT_EQ(link->GetWorldPose(),
-                collision->GetWorldPose());
+      EXPECT_EQ(link->WorldPose(), collision->WorldPose());
     }
     // i=2: rotated collision pose
     //  expect collision position to match link position
     else if (i == 2)
     {
-      EXPECT_EQ(link->GetWorldPose().pos,
-                collision->GetWorldPose().pos);
+      EXPECT_EQ(link->WorldPose().Pos(), collision->WorldPose().Pos());
     }
     // i=3: offset collision pose
     //  expect collision postion to match link position plus offset
     else if (i == 3)
     {
-      EXPECT_EQ(link->GetWorldPose().pos + collisionPose.pos,
-                collision->GetWorldPose().pos);
+      EXPECT_EQ(link->WorldPose().Pos() + collisionPose.pos.Ign(),
+                collision->WorldPose().Pos());
     }
 
     auto physics = world->Physics();
@@ -190,11 +187,11 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     // For 0-2, drop and expect box to rest at specific height
     if (i <= 2)
     {
-      EXPECT_NEAR(collision->GetWorldPose().pos.z, dy/2, g_physics_tol);
+      EXPECT_NEAR(collision->WorldPose().Pos().Z(), dy/2, g_physics_tol);
     }
     else
     {
-      EXPECT_NEAR(collision->GetWorldPose().pos.z, dz/2, g_physics_tol);
+      EXPECT_NEAR(collision->WorldPose().Pos().Z(), dz/2, g_physics_tol);
     }
   }
 }
@@ -270,20 +267,20 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
   gzdbg << "Check resting positions" << std::endl;
 
   // link2 of all_collide should have the highest z-coordinate (around 3)
-  EXPECT_NEAR(models["all_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+  EXPECT_NEAR(models["all_collide"]->GetLink("link2")->WorldPose().Pos().Z(),
               2.5, g_physics_tol);
 
   // link2 of some_collide should have a middling z-coordinate (around 2)
-  EXPECT_NEAR(models["some_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+  EXPECT_NEAR(models["some_collide"]->GetLink("link2")->WorldPose().Pos().Z(),
               1.5, g_physics_tol);
 
   // link2 of no_collide should have a low z-coordinate (around 1)
-  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->WorldPose().Pos().Z(),
               0.5, g_physics_tol);
 
   // link2 of explicit_no_collide should have the same z-coordinate as above
-  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
-     models["explicit_no_collide"]->GetLink("link2")->GetWorldPose().pos.z,
+  EXPECT_NEAR(models["no_collide"]->GetLink("link2")->WorldPose().Pos().Z(),
+     models["explicit_no_collide"]->GetLink("link2")->WorldPose().Pos().Z(),
      g_physics_tol);
 
   Unload();

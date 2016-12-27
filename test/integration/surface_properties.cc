@@ -229,11 +229,11 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   EXPECT_NEAR(box3->GetWorldLinearVel().z, 0, 1e-3);
 
   // The first and second boxes should be on the ground plane
-  EXPECT_NEAR(box1->GetWorldPose().pos.z, 0.5, 1e-3);
-  EXPECT_NEAR(box2->GetWorldPose().pos.z, 0.5, 1e-3);
+  EXPECT_NEAR(box1->WorldPose().Pos().Z(), 0.5, 1e-3);
+  EXPECT_NEAR(box2->WorldPose().Pos().Z(), 0.5, 1e-3);
 
   // The third boxs should be ontop of the firs two boxes
-  EXPECT_NEAR(box3->GetWorldPose().pos.z, 1.5, 1e-3);
+  EXPECT_NEAR(box3->WorldPose().Pos().Z(), 1.5, 1e-3);
 
   // Expect 4th box to still be falling
   fallVelocity = g.Z() * world->SimTime().Double();

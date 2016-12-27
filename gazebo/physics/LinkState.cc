@@ -35,7 +35,7 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
                   const common::Time &_simTime, const uint64_t _iterations)
   : State(_link->GetName(), _realTime, _simTime, _iterations)
 {
-  this->pose = _link->GetWorldPose();
+  this->pose = _link->WorldPose();
   this->velocity = math::Pose(_link->GetWorldLinearVel(),
                    math::Quaternion(_link->GetWorldAngularVel()));
   this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
@@ -48,7 +48,7 @@ LinkState::LinkState(const LinkPtr _link)
   : State(_link->GetName(), _link->GetWorld()->RealTime(),
           _link->GetWorld()->SimTime(), _link->GetWorld()->Iterations())
 {
-  this->pose = _link->GetWorldPose();
+  this->pose = _link->WorldPose();
   this->velocity = math::Pose(_link->GetWorldLinearVel(),
                    math::Quaternion(_link->GetWorldAngularVel()));
   this->acceleration = math::Pose(_link->GetWorldLinearAccel(),
@@ -89,7 +89,7 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
   this->simTime = _simTime;
   this->iterations = _iterations;
 
-  this->pose = _link->GetWorldPose();
+  this->pose = _link->WorldPose();
   this->velocity.Set(_link->GetWorldLinearVel(),
                      _link->GetWorldAngularVel());
   this->acceleration.Set(_link->GetWorldLinearAccel(),

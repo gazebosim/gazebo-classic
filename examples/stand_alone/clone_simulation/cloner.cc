@@ -98,4 +98,5 @@ int main(int _argc, char **_argv)
     std::cerr << "kill gzserver returned a non zero value:" << ret << std::endl;
 
   gazebo::shutdown();
+  serverThread.join();
 }

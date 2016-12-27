@@ -349,8 +349,7 @@ void GripperPrivate::HandleAttach()
       if (!this->attached && cc[iter->first])
       {
         ignition::math::Pose3d diff =
-          cc[iter->first]->GetLink()->GetWorldPose().Ign() -
-          this->palmLink->GetWorldPose().Ign();
+          cc[iter->first]->GetLink()->WorldPose() - this->palmLink->WorldPose();
 
         double dd = (diff - this->prevDiff).Pos().SquaredLength();
 

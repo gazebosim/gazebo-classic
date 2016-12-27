@@ -88,7 +88,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
         boost::lexical_cast<std::string>(i * 3 + j));
       physics::ModelPtr model = world->ModelByName(name);
       ASSERT_TRUE(model != NULL);
-      math::Vector3 pos = model->GetWorldPose().pos;
+      math::Vector3 pos = model->WorldPose().Pos();
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
 
       expectedPos.X() += step.X();
@@ -107,66 +107,56 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     // This is not a cloned object, skip it.
     if (model->GetName().find("can1_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(2.5, 2.5, 0),
-        ignition::math::Vector3d(3.5, 3.5, 0.1));
-      EXPECT_GE(model->GetWorldPose().pos.x, 2.5 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.y, 2.5 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.x, 3.5 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, 3.5 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.z, 0.1 + tolerance);
+      EXPECT_GE(model->WorldPose().Pos().X(), 2.5 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Y(), 2.5 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
+      EXPECT_LE(model->WorldPose().Pos().X(), 3.5 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Y(), 3.5 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Z(), 0.1 + tolerance);
     }
     else if (model->GetName().find("can3_clone") != std::string::npos)
     {
-      math::Vector3 centre(-3, 3, 0);
+      ignition::math::Vector3d center(-3, 3, 0);
       double radius = 1.0;
-      EXPECT_LE(model->GetWorldPose().pos.Distance(centre), radius + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Distance(center), radius + tolerance);
     }
     else if (model->GetName().find("can4_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-1, -5, 0),
-        ignition::math::Vector3d(3, -3, .01));
-      EXPECT_GE(model->GetWorldPose().pos.x, -1 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.y, -5 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.x, 3 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, -3 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
+      EXPECT_GE(model->WorldPose().Pos().X(), -1 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Y(), -5 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
+      EXPECT_LE(model->WorldPose().Pos().X(), 3 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Y(), -3 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Z(), 0.01 + tolerance);
     }
     else if (model->GetName().find("can5_clone") != std::string::npos)
     {
-      math::Vector3 centre(-3, -3, 0);
+      ignition::math::Vector3d center(-3, -3, 0);
       double radius = 1.0;
-      EXPECT_LE(model->GetWorldPose().pos.Distance(centre), radius + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Distance(center), radius + tolerance);
     }
     else if (model->GetName().find("can6_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-1, 3.5, 0),
-                            ignition::math::Vector3d(1, 4.5, .01));
-      EXPECT_GE(model->GetWorldPose().pos.x, -1 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.x, 1 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.y, 4, tolerance);
+      EXPECT_GE(model->WorldPose().Pos().X(), -1 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
+      EXPECT_LE(model->WorldPose().Pos().X(), 1 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Z(), 0.01 + tolerance);
+      EXPECT_NEAR(model->WorldPose().Pos().Y(), 4, tolerance);
     }
     else if (model->GetName().find("can7_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-5.5, -2, 0),
-                            ignition::math::Vector3d(-4.5, 0, .01));
-      EXPECT_GE(model->GetWorldPose().pos.y, -2 - tolerance);
-      EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.y, 0 + tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.z, 0.01 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.x, -5, tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Y(), -2 - tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Y(), 0 + tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Z(), 0.01 + tolerance);
+      EXPECT_NEAR(model->WorldPose().Pos().X(), -5, tolerance);
     }
     else if (model->GetName().find("can8_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(3.9, -0.1, 0),
-                            ignition::math::Vector3d(4.1, 0.1, 1.4));
-      EXPECT_GE(model->GetWorldPose().pos.z, 0 - tolerance);
-      EXPECT_LE(model->GetWorldPose().pos.z, 1.4 + tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.x, 4.0, tolerance);
-      EXPECT_NEAR(model->GetWorldPose().pos.y, 0, tolerance);
+      EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
+      EXPECT_LE(model->WorldPose().Pos().Z(), 1.4 + tolerance);
+      EXPECT_NEAR(model->WorldPose().Pos().X(), 4.0, tolerance);
+      EXPECT_NEAR(model->WorldPose().Pos().Y(), 0, tolerance);
     }
   }
 }

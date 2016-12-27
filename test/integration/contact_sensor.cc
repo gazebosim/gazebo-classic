@@ -206,17 +206,17 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
-  auto pose = model->GetWorldPose();
-  pose.pos.x += 0.2;
-  pose.pos.y += 0.2;
+  auto pose = model->WorldPose();
+  pose.Pos().X() += 0.2;
+  pose.Pos().Y() += 0.2;
 
   msgs::Model msg;
   msg.set_name(modelName);
   msg.set_id(model->GetId());
-  msgs::Set(msg.mutable_pose(), pose.Ign());
+  msgs::Set(msg.mutable_pose(), pose);
   modelPub->Publish(msg);
 
-  while (pose != model->GetWorldPose())
+  while (pose != model->WorldPose())
   {
     world->Step(1);
     common::Time::MSleep(1);

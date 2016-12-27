@@ -202,7 +202,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
@@ -210,14 +210,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
-      pose2 = model->GetWorldPose();
+      pose2 = model->WorldPose();
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
 
       // if (physics->GetType()  == "bullet")
       // {
       //   gzerr << "m[" << model->GetName()
-      //         << "] p[" << model->GetWorldPose()
+      //         << "] p[" << model->WorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
@@ -251,12 +251,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   //     model = world->ModelByName("link_offset_box");
   //     gzerr << "m[" << model->GetName()
   //           << "] i[" << i << "/" << steps
-  //           << "] pm[" << model->GetWorldPose()
-  //           << "] pb[" << model->GetLink("body")->GetWorldPose()
+  //           << "] pm[" << model->WorldPose()
+  //           << "] pb[" << model->GetLink("body")->WorldPose()
   //           << "] v[" << model->GetWorldLinearVel()
   //           << "]\n";
 
-  //     if (model->GetWorldPose().pos.z < 0.6)
+  //     if (model->WorldPose().Pos().Z() < 0.6)
   //     {
   //       gzerr << "wait: ";
   //       getchar();
@@ -287,7 +287,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       x0 = modelPos[name].x;
       double posTolerance = PHYSICS_TOL;
 #ifdef HAVE_BULLET
@@ -303,7 +303,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // if (physics->GetType()  == "bullet")
       // {
       //   gzerr << "m[" << model->GetName()
-      //         << "] p[" << model->GetWorldPose()
+      //         << "] p[" << model->WorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
@@ -335,7 +335,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // relative pose of link in linkOffsetPose2
   for (int i = 0; i < 20; ++i)
   {
-    pose1 = model->GetWorldPose();
+    pose1 = model->WorldPose();
     pose2 = linkOffsetPose2 + pose1;
     EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
     EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
@@ -501,7 +501,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.z, z0+radius + g.Z()/2*t*t,
@@ -510,7 +510,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
-      pose2 = model->GetWorldPose();
+      pose2 = model->WorldPose();
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
     }
@@ -598,7 +598,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       EXPECT_NEAR(pose1.pos.z, radius, PHYSICS_TOL);
 
       // expect no pose change for directions with no offset
@@ -845,7 +845,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
       world->Step(1);  // theoretical contact, but
       // gzdbg << "box time [" << world->SimTime().Double()
       //       << "] vel [" << model->GetWorldLinearVel()
-      //       << "] pose [" << model->GetWorldPose()
+      //       << "] pose [" << model->WorldPose()
       //       << "]\n";
     }
 
@@ -853,7 +853,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     // This test expects a linear velocity at the CoG
     math::Vector3 vel = model->GetLink()->GetWorldCoGLinearVel();
-    math::Pose pose = model->GetWorldPose();
+    math::Pose pose = model->WorldPose();
 
     EXPECT_EQ(vel.x, 0.0);
 
@@ -927,7 +927,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (box_model)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
+          math::Pose pose = box_model->WorldPose();
           // gzdbg << "box time [" << world->SimTime().Double()
           //      << "] sim z [" << pose.pos.z
           //      << "] exact z [" << z
@@ -959,7 +959,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (sphere_model)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
+          math::Pose pose = sphere_model->WorldPose();
           // gzdbg << "sphere time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
@@ -992,7 +992,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (cylinder_model)
         {
           math::Vector3 vel = cylinder_model->GetWorldLinearVel();
-          math::Pose pose = cylinder_model->GetWorldPose();
+          math::Pose pose = cylinder_model->WorldPose();
           // gzdbg << "cylinder time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
@@ -1086,7 +1086,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       if (box_model)
       {
         math::Vector3 vel = box_model->GetWorldLinearVel();
-        math::Pose pose = box_model->GetWorldPose();
+        math::Pose pose = box_model->WorldPose();
 
         // gzdbg << "box time [" << t
         //      << "] sim x [" << pose.pos.x
@@ -1121,7 +1121,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       if (sphere_model)
       {
         math::Vector3 vel = sphere_model->GetWorldLinearVel();
-        math::Pose pose = sphere_model->GetWorldPose();
+        math::Pose pose = sphere_model->WorldPose();
         // gzdbg << "sphere time [" << world->SimTime().Double()
         //      << "] sim x [" << pose.pos.x
         //      << "] ideal x [" << x
@@ -1231,7 +1231,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        math::Pose childInWorld = links[i]->WorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
@@ -1255,7 +1255,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose parentInWorld = parent->WorldPose();
             math::Pose childInParent = childInWorld - parentInWorld;
             math::Pose anchorInParent = anchorInChild + childInParent;
             math::Pose anchorInitialInParent =
@@ -1306,7 +1306,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        math::Pose childInWorld = links[i]->WorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
@@ -1330,7 +1330,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose parentInWorld = parent->WorldPose();
             math::Pose childInParent = childInWorld - parentInWorld;
             math::Pose anchorInParent = anchorInChild + childInParent;
             math::Pose anchorInitialInParent =

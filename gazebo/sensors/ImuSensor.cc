@@ -68,7 +68,7 @@ void ImuSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 
   // initialize worldToReference transform as local frame
   this->dataPtr->worldToReference = (this->pose +
-    this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot();
+    this->dataPtr->parentEntity->WorldPose()).Rot();
 
   // CASE 1 : Topic is specified in the sensor itself (should be deprecated!)
   if (this->sdf->HasElement("imu") &&
@@ -293,7 +293,7 @@ void ImuSensor::SetReferencePose()
 {
   // this call sets the current imu pose as the imu's reference pose
   this->SetWorldToReferenceOrientation(
-      (this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign()).Rot());
+      (this->pose + this->dataPtr->parentEntity->WorldPose()).Rot());
 }
 
 //////////////////////////////////////////////////
@@ -351,7 +351,7 @@ bool ImuSensor::UpdateImpl(const bool /*_force*/)
     msgs::Set(this->dataPtr->imuMsg.mutable_stamp(), timestamp);
 
     ignition::math::Pose3d parentEntityPose =
-      this->dataPtr->parentEntity->GetWorldPose().Ign();
+      this->dataPtr->parentEntity->WorldPose();
     ignition::math::Pose3d imuWorldPose = this->pose + parentEntityPose;
 
     // Get the angular velocity
