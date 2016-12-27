@@ -37,6 +37,7 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -54,6 +55,11 @@ namespace po = boost::program_options;
 po::variables_map vm;
 
 boost::property_tree::ptree g_propTree;
+
+// Names of all GUI plugins loaded at start. Parsed from command line arguments.
+std::vector<std::string> plugins_to_load;
+// All GUI plugins loaded at startup.
+std::vector<gazebo::GUIPluginPtr> gui_plugins;
 
 using namespace gazebo;
 
@@ -185,7 +191,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::client::addPlugin(*iter);
+      plugins_to_load.push_back(*iter);
     }
   }
 
@@ -330,6 +336,36 @@ unsigned int gui::get_entity_id(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+void addAndLoadPlugin(const std::string &_filename,
+    std::vector<gazebo::GUIPluginPtr> &_plugins)
+{
+  if (_filename.empty())
+    return;
+
+  GZ_ASSERT(g_app, "QApplication must have been created");
+  GZ_ASSERT(g_main_win, "Main window must have been created");
+
+  gazebo::GUIPluginPtr plugin =
+    gazebo::GUIPlugin::Create(_filename, _filename);
+
+  if (plugin)
+  {
+    if (plugin->GetType() != gazebo::GUI_PLUGIN)
+    {
+      gzerr << "System is attempting to load "
+        << "a plugin, but detected an incorrect plugin type. "
+        << "Plugin filename[" << _filename << "].\n";
+      return;
+    }
+    plugin->setParent(g_main_win);
+    plugin->setVisible(true);
+    plugin->show();
+    _plugins.push_back(plugin);
+  }
+}
+
+
+/////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
 {
   // Initialize the informational logger. This will log warnings, and errors.
@@ -348,6 +384,16 @@ bool gui::run(int _argc, char **_argv)
     return false;
 
   gazebo::gui::init();
+
+  // the plugins have to be created after g_app has been created,
+  // otherwise Qt will complain about no existing QApplication.
+  for (std::vector<std::string>::iterator iter=plugins_to_load.begin();
+       iter != plugins_to_load.end(); ++iter)
+  {
+    // std::cout<<"Loading plugin "<<*iter<<std::endl;
+    addAndLoadPlugin(*iter, gui_plugins);
+  }
+
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
@@ -370,6 +416,9 @@ bool gui::run(int _argc, char **_argv)
 
   delete g_splashScreen;
   delete g_main_win;
+
+  gui_plugins.clear();
+
   gazebo::client::shutdown();
   return true;
 }
