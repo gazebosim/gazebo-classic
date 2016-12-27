@@ -40,6 +40,7 @@ release will remove the deprecated code.
     + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
     + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d in
 itialRelativePose`
+
 1. **gazebo/test/ServerFixture.hh**
     + ***Deprecation:*** all public methods using gazebo::math
     + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
@@ -120,6 +121,16 @@ itialRelativePose`
     + ***Changed:*** `math::Pose3 DefaultPose() const` to `ignition::math::Pose3d DefaultPose() const`
 
 ### Deprecations
+
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+
+1. **gazebo/physics/Entity.hh**
+    + ***Deprecation:*** const math::Pose GetDirtyPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
 
 1. **gazebo/rendering/MovableText.hh**
     + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
