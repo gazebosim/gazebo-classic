@@ -670,7 +670,7 @@ void Actor::Update()
   if (!this->customTrajectoryInfo)
     actorPose.Rot() = modelPose.Rot() * rootRot;
   else
-    actorPose.Rot() = modelPose.Rot() * this->GetWorldPose().Ign().Rot();
+    actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
@@ -693,7 +693,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   ignition::math::Pose3d mainLinkPose;
 
   if (this->customTrajectoryInfo)
-    mainLinkPose.Rot() = this->worldPose.Ign().Rot();
+    mainLinkPose.Rot() = this->worldPose.Rot();
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
@@ -732,7 +732,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
-      auto parentPose = parentLink->GetWorldPose().Ign();
+      auto parentPose = parentLink->WorldPose();
       ignition::math::Matrix4d parentTrans(parentPose);
       transform = parentTrans * transform;
     }
@@ -761,9 +761,9 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   else
   {
     model_pose->mutable_position()->CopyFrom(
-        msgs::Convert(this->worldPose.Ign().Pos()));
+        msgs::Convert(this->worldPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-        msgs::Convert(this->worldPose.Ign().Rot()));
+        msgs::Convert(this->worldPose.Rot()));
   }
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())

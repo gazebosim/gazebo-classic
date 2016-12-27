@@ -68,7 +68,7 @@ void VisualPoseTest::VisualPose()
   // Get box model (physics)
   auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
+  QVERIFY(boxModel->WorldPose() == boxModelVisPose);
 
   // Get box link (physics)
   auto boxLink = boxModel->GetLink("link");

@@ -177,7 +177,7 @@ void LiftDragPlugin::OnUpdate()
     return;
 
   // pose of body
-  ignition::math::Pose3d pose = this->link->GetWorldPose().Ign();
+  ignition::math::Pose3d pose = this->link->WorldPose();
 
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);

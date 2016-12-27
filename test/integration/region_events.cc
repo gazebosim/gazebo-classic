@@ -140,7 +140,7 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
   ASSERT_TRUE(boxModel != NULL);
 
   unsigned int startingCount = GetEventCount();
-  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
+  boxModel->SetWorldPose(regionEventBox->WorldPose());
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
   ASSERT_GT(endingCount, startingCount);
@@ -174,15 +174,15 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
-  math::Pose regionEventBoxPos = regionEventBox->GetWorldPose();
-  math::Pose boxModelPose = boxModel->GetWorldPose();
+  math::Pose regionEventBoxPos = regionEventBox->WorldPose();
+  math::Pose boxModelPose = boxModel->WorldPose();
 
-  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
+  boxModel->SetWorldPose(regionEventBox->WorldPose());
   (void) WaitForNewEvent(GetEventCount(), 10, 100);
 
   unsigned int startingCount = GetEventCount();
   {
-    math::Pose newPose = regionEventBox->GetWorldPose();
+    math::Pose newPose = regionEventBox->WorldPose();
     newPose.pos.x += 5.0;
     newPose.pos.y += 5.0;
     boxModel->SetWorldPose(newPose);

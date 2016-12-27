@@ -38,32 +38,32 @@ TEST_F(TransporterTest, Transport)
   ASSERT_TRUE(boxModel != NULL);
 
   // Make sure the starting location is correct.
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 10.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box onto the auto transport pad
   boxModel->SetWorldPose(math::Pose(100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box transported to the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 0.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0.0, 1e-3);
 
   // Move the box away
   boxModel->SetWorldPose(math::Pose(10, 10, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 10.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box to the manual transporter pad
   boxModel->SetWorldPose(math::Pose(-100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, -100.5, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), -100.5, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0, 1e-3);
 
   // Trigger the transporter
   {
@@ -87,8 +87,8 @@ TEST_F(TransporterTest, Transport)
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box transported to the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0, 1e-3);
 }
 
 /////////////////////////////////////////////////

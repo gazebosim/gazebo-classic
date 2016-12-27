@@ -136,6 +136,7 @@
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
+    * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
     * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
     * [Pull request #2560](https://bitbucket.org/osrf/gazebo/pull-request/2560)
 

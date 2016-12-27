@@ -707,20 +707,22 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
     // convert wrench from child cg location to child link frame
     if (this->childLink)
     {
-      math::Pose childPose = this->childLink->GetWorldPose();
+      ignition::math::Pose3d childPose = this->childLink->WorldPose();
 
       // convert torque from about child CG to joint anchor location
       // cg position specified in child link frame
-      math::Pose cgPose;
+      ignition::math::Pose3d cgPose;
       auto inertial = this->childLink->GetInertial();
       if (inertial)
-        cgPose = inertial->GetPose();
+        cgPose = inertial->GetPose().Ign();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
       // moment arm rotated into world frame (given feedback is in world frame)
-      math::Vector3 childMomentArm = childPose.rot.RotateVector(
-        (this->anchorPose - math::Pose(cgPose.pos, math::Quaternion())).pos);
+      ignition::math::Vector3d childMomentArm = childPose.Rot().RotateVector(
+        (this->anchorPose.Ign() -
+         ignition::math::Pose3d(cgPose.Pos(),
+           ignition::math::Quaterniond::Identity)).Pos());
 
       // gzerr << "anchor [" << anchorPose
       //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
@@ -733,12 +735,12 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       this->wrench.body2Torque += this->wrench.body2Force.Cross(childMomentArm);
 
       // rotate resulting body2Force in world frame into link frame
-      this->wrench.body2Force = childPose.rot.RotateVectorReverse(
-        -this->wrench.body2Force);
+      this->wrench.body2Force = childPose.Rot().RotateVectorReverse(
+        -this->wrench.body2Force.Ign());
 
       // rotate resulting body2Torque in world frame into link frame
-      this->wrench.body2Torque = childPose.rot.RotateVectorReverse(
-        -this->wrench.body2Torque);
+      this->wrench.body2Torque = childPose.Rot().RotateVectorReverse(
+        -this->wrench.body2Torque.Ign());
     }
 
     // convert torque from about parent CG to joint anchor location
@@ -747,11 +749,11 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       // get child pose, or it's the inertial world if childLink is nullptr
       math::Pose childPose;
       if (this->childLink)
-        childPose = this->childLink->GetWorldPose();
+        childPose = this->childLink->WorldPose();
       else
         gzerr << "missing child link, double check model.";
 
-      math::Pose parentPose = this->parentLink->GetWorldPose();
+      math::Pose parentPose = this->parentLink->WorldPose();
 
       // if parent link exists, convert torque from about parent
       // CG to joint anchor location
@@ -810,7 +812,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
         // force/torque are in parent link frame, transform them into
         // child link(world) frame.
-        math::Pose parentToWorldTransform = this->parentLink->GetWorldPose();
+        math::Pose parentToWorldTransform = this->parentLink->WorldPose();
         this->wrench.body1Force =
           parentToWorldTransform.rot.RotateVector(
           this->wrench.body1Force);
@@ -837,7 +839,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
         // force/torque are in child link frame, transform them into
         // parent link frame.  Here, parent link is world, so zero transform.
-        math::Pose childToWorldTransform = this->childLink->GetWorldPose();
+        math::Pose childToWorldTransform = this->childLink->WorldPose();
         this->wrench.body1Force =
           childToWorldTransform.rot.RotateVector(
           this->wrench.body1Force);
