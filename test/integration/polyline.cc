@@ -139,7 +139,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);
-    EXPECT_NEAR(sphere->GetWorldPose().pos.z, 1.5, 1e-2);
+    EXPECT_NEAR(sphere->WorldPose().Pos().Z(), 1.5, 1e-2);
   }
 }
 

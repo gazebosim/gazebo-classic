@@ -127,8 +127,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     {
       // TODO: verify
       // parent frame is at the world frame
-      X_MP = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+      X_MP = ~physics::SimbodyPhysics::Pose2Transform(this->model->WorldPose());
     }
 
     if (this->childLink)
@@ -139,8 +138,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     else
     {
       // TODO: verify
-      X_MC = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+      X_MC = ~physics::SimbodyPhysics::Pose2Transform(this->model->WorldPose());
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;
@@ -270,7 +268,7 @@ void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
 {
   math::Pose parentModelPose;
   if (this->parentLink)
-    parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+    parentModelPose = this->parentLink->GetModel()->WorldPose();
 
   // Set joint axis
   // assuming incoming axis is defined in the model frame, so rotate them

@@ -167,8 +167,8 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_LT(fabs(d_convergence_error), PHYSICS_TOL);
 
     // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
-    double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
-                 box_link->GetWorldPose().pos.x) - minDepth;
+    double d2 = 1.0 - (sphere_link->WorldPose().Pos().X() -
+        box_link->WorldPose().Pos().X()) - minDepth;
 
     EXPECT_FLOAT_EQ(d1, d2);
 

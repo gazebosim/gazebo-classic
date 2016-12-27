@@ -35,7 +35,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 : State(_model->GetName(), _realTime, _simTime, _iterations)
 {
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Copy all the links
@@ -68,7 +68,7 @@ ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->RealTime(),
         _model->GetWorld()->SimTime(), _model->GetWorld()->Iterations())
 {
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Copy all the links
@@ -117,7 +117,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->iterations = _iterations;
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Load all the links

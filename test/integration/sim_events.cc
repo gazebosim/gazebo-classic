@@ -210,11 +210,11 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   physics::ModelPtr elevatorModel = world->ModelByName("elevator");
 
   gzdbg << "Elevator Pose1["
-        << elevatorModel->GetWorldPose().pos << "]\n";
+        << elevatorModel->WorldPose().Pos() << "]\n";
 
   // Make sure the elevator is on the ground level
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 0.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
+  EXPECT_LT(elevatorModel->WorldPose().Pos().Z(), 0.08);
+  EXPECT_GT(elevatorModel->WorldPose().Pos().Z(), 0.07);
 
   // Spawn a box on the second floor, which should call the elevator up.
   this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
@@ -223,12 +223,11 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   // Wait for elevator to move. 10 seconds is more than long enough.
   common::Time::Sleep(10);
 
-  gzdbg << "Elevator Pose2["
-        << elevatorModel->GetWorldPose().pos << "]\n";
+  gzdbg << "Elevator Pose2[" << elevatorModel->WorldPose().Pos() << "]\n";
 
   // Make sure the elevator has moved up to the second floor.
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
+  EXPECT_LT(elevatorModel->WorldPose().Pos().Z(), 3.08);
+  EXPECT_GT(elevatorModel->WorldPose().Pos().Z(), 3.05);
 }
 
 ////////////////////////////////////////////////////////////////////////

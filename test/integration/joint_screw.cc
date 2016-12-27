@@ -330,9 +330,10 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_linear = joint_01->GetAngle(1).Radian();
-    math::Pose pose_01 = link_01->GetWorldPose();
-    EXPECT_EQ(link_00->GetWorldPose(),
-      math::Pose(-angle_00_angular / pitch_00, 0, 2, angle_00_angular, 0, 0));
+    math::Pose pose_01 = link_01->WorldPose();
+    EXPECT_EQ(link_00->WorldPose(),
+      ignition::math::Pose3d(-angle_00_angular / pitch_00, 0, 2,
+        angle_00_angular, 0, 0));
 
     if (_physicsEngine == "simbody")
     {
@@ -377,8 +378,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     ++count;
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
-    math::Pose pose_01 = link_01->GetWorldPose();
+    math::Pose pose_00 = link_00->WorldPose();
+    math::Pose pose_01 = link_01->WorldPose();
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_angular = joint_01->GetAngle(0).Radian();
@@ -427,8 +428,8 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
     ++count;
 
     // check link pose
-    math::Pose pose_00 = link_00->GetWorldPose();
-    math::Pose pose_01 = link_01->GetWorldPose();
+    math::Pose pose_00 = link_00->WorldPose();
+    math::Pose pose_01 = link_01->WorldPose();
     double angle_00_angular = joint_00->GetAngle(0).Radian();
     double angle_00_linear = joint_00->GetAngle(1).Radian();
     double angle_01_angular = joint_01->GetAngle(0).Radian();

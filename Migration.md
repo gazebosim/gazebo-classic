@@ -34,6 +34,12 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/physics/Entity.hh**
+    + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
+    + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`
+    + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
+    + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
@@ -110,11 +116,31 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/rendering/MovableText.hh**
+    + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
+    + ***Replacement:*** ignition::math::Box AABB()
+
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+
+1. **gazebo/physics/Entity.hh**
+    + ***Deprecation:*** const math::Pose GetDirtyPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+
 1. **gazebo/physics/Shape.hh**
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
-    + ***Deprecation:*** math::Vector3 GetScale() const 
+    + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
+
+1. **gazebo/physics/PlaneShape.hh**
+    + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
+    + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
+    + ***Deprecation:*** math::Vector2d GetSize() const
+    + ***Replacement:*** ignition::math::Vector2d Size() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
@@ -135,6 +161,54 @@ release will remove the deprecated code.
 1. **gazebo/rendering/COMVisual.hh**
     + ***Deprecation:*** math::Pose GetInertiaPose() const
     + ***Replacement:*** ignition::math::Pose3d InertiaPose() const
+
+1. **gazebo/rendering/JointVisual.hh**
+    + ***Deprecation:*** void Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+    + ***Replacement:*** void Load(ConstJointPtr &_msg, const ignition::math::Pose3d &_worldPose)
+    + ***Deprecation:*** ArrowVisualPtr CreateAxis(const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Replacement:*** ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type _type)
+    + ***Deprecation:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    + ***Replacement:*** void UpdateAxis(ArrowVisualPtr _arrowVisual, const ignition::math::Vector3d &_axis, const bool _useParentFrame, const msgs::Joint::Type _type)
+
+1. **gazebo/rendering/OrbitViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Deprecation:*** void SetFocalPoint(const math::Vector3 &_fp)
+    + ***Replacement:*** void SetFocalPoint(const ignition::math::Vector3d &_fp)
+    + ***Deprecation:*** math::Vector3 GetFocalPoint() const
+    + ***Replacement:*** ignition::math::Vector3d FocalPoint() const
+    + ***Deprecation:*** void TranslateLocal(const math::Vector3 &_vec)
+    + ***Replacement:*** void TranslateLocal(const ignition::math::Vector3d &_vec)
+    + ***Deprecation:*** void TranslateGlobal(const math::Vector3 &_vec)
+    + ***Replacement:*** void TranslateGlobal(const ignition::math::Vector3d &_vec)
+
+1. **gazebo/rendering/OrthoViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+
+1. **gazebo/rendering/Projector.hh**
+    + ***Deprecation:*** void Load(const std::string &_name, const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0), const std::string &_textureName = "", double _nearClip = 0.25, double _farClip = 15.0, double _fov = IGN_PI * 0.25)
+    + ***Replacement:*** void Load(const std::string &_name, const ignition::math::Pose3d &_pose = ignition::math::Pose3d::Zero, const std::string &_textureName = "", const double _nearClip = 0.25, const double _farClip = 15.0, const double _fov = IGN_PI * 0.25);
+    + ***Deprecation:*** void SetPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetPose(const ignition::math::Pose3d &_pose)
+
+1. **gazebo/rendering/UserCamera.hh**
+    + ***Deprecation:*** void SetViewController(const std::string &_type, const math::Vector3 &_pos)
+    + ***Replacement:*** void SetViewController(const std::string &_type, const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** void SetFocalPoint(const math::Vector3 &_pt)
+    + ***Replacement:*** void SetFocalPoint(const ignition::math::Vector3d &_pt)
+    + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos) const
+    + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos) const
+    + ***Deprecation:*** VisualPtr GetVisual(const math::Vector2i &_mousePos, std::string &_mod)
+    + ***Replacement:*** VisualPtr Visual(const ignition::math::Vector2i &_mousePos, std::string &_mod) const
+    + ***Deprecation:*** void SetDefaultPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetInitialPose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Pose3 DefaultPose() const
+    + ***Replacement:*** ignition::math::Pose3d InitialPose() const
+
+1. **gazebo/rendering/ViewController.hh**
+    + ***Deprecation:*** virtual void Init(const math::Vector3 &_focalPoint, const double _yaw = 0, const double _pitch = 0)
+    + ***Replacement:*** virtual void Init(const ignition::math::Vector3d &_focalPoint, const double _yaw = 0, const double _pitch = 0)
 
 1. **gazebo/physics/Gripper.hh**
     + ***Deprecation:*** std::string GetName() const
@@ -411,6 +485,12 @@ release will remove the deprecated code.
 1. **gazebo/physics/dart/DARTPlaneShape.hh**
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
+    
+1. **gazebo/physics/bullet/BulletTypes.hh**
+    + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
+    + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
+    + ***Deprecation:*** static btVector4 ConvertVector4(const math::Vector4 &_vec)
+    + ***Replacement:*** static btVector4 ConvertVector4dIgn(const ignition::math::Vector4d &_vec)
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()
@@ -475,10 +555,16 @@ release will remove the deprecated code.
 1. **gazebo/math/Filter.hh**
     + ***Deprecation:*** public:   gazebo::math::BiQuad
     + ***Replacement:*** public: ignition::math::BiQuad
+    + ***Deprecation:*** public:   gazebo::math::BiQuadVector3
+    + ***Replacement:*** public: ignition::math::BiQuadVector3
     + ***Deprecation:*** public:   gazebo::math::Filter
     + ***Replacement:*** public: ignition::math::Filter
     + ***Deprecation:*** public:   gazebo::math::OnePole
     + ***Replacement:*** public: ignition::math::OnePole
+    + ***Deprecation:*** public:   gazebo::math::OnePoleQuaternion
+    + ***Replacement:*** public: ignition::math::OnePoleQuaternion
+    + ***Deprecation:*** public:   gazebo::math::OnePoleVector3
+    + ***Replacement:*** public: ignition::math::OnePoleVector3
 
 1. **gazebo/math/Helpers.hh**
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
@@ -552,9 +638,17 @@ release will remove the deprecated code.
     + ***Deprecation:*** public:   gazebo::math::Spline
     + ***Replacement:*** public: ignition::math::Spline
 
+1. **gazebo/math/Vector2d.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector2d
+    + ***Replacement:*** public: ignition::math::Vector2d
+
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats
     + ***Replacement:*** public: ignition::math::Vector3Stats
+
+1. **gazebo/math/Vector4.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector4
+    + ***Replacement:*** public: ignition::math::Vector4d
 
 ### Deletions
 

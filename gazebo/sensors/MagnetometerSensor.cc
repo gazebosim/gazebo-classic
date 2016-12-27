@@ -140,7 +140,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
   {
     // Get pose in gazebo reference frame
     ignition::math::Pose3d magPose =
-      this->pose + this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->pose + this->dataPtr->parentLink->WorldPose();
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =

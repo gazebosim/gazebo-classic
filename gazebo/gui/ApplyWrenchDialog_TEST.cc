@@ -413,7 +413,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       boxForceMousePoint(glWidget->width()/2 + 10, 0);
   while (boxForceMousePoint.Y() < glWidget->height())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(boxForceMousePoint);
+    gazebo::rendering::VisualPtr vis = cam->Visual(boxForceMousePoint);
     if (vis && vis == boxApplyWrenchVis->GetForceVisual())
     {
       found = true;
@@ -477,7 +477,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
                                     glWidget->height()/2 - 10);
   while (mousePoint.X() < glWidget->width())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
+    gazebo::rendering::VisualPtr vis = cam->Visual(mousePoint);
     if (vis && vis == boxApplyWrenchVis->GetTorqueVisual())
     {
       found = true;
@@ -534,7 +534,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   std::string manipState = "";
   while (mousePoint.Y() < glWidget->height())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint, manipState);
+    gazebo::rendering::VisualPtr vis = cam->Visual(mousePoint, manipState);
     if (!vis && manipState == "rot_y")
     {
       mousePoint.Y() += 20;

@@ -1990,7 +1990,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
-      cam->SetDefaultPose(cam_pose);
+      cam->SetInitialPose(cam_pose);
       cam->SetUseSDFPose(true);
     }
 
