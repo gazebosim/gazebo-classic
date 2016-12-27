@@ -209,20 +209,26 @@ void UserCamera::Init()
 //////////////////////////////////////////////////
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
-  this->SetDefaultPose(_pose.Ign());
+  this->SetInitialPose(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetDefaultPose(const ignition::math::Pose3d &_pose)
+void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 {
-  this->dataPtr->defaultPose = _pose;
+  this->dataPtr->initialPose = _pose;
   this->SetWorldPose(_pose);
 }
 
 //////////////////////////////////////////////////
-ignition::math::Pose3d UserCamera::DefaultPose() const
+math::Pose UserCamera::DefaultPose() const
 {
-  return this->dataPtr->defaultPose;
+  return this->InitialPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d UserCamera::InitialPose() const
+{
+  return this->dataPtr->initialPose;
 }
 
 //////////////////////////////////////////////////

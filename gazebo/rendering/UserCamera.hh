@@ -104,19 +104,23 @@ namespace gazebo
       /// \brief Set the default pose in the world coordinate frame and set
       /// that as the current camera world pose.
       /// \param[in] _pose New default pose of the camera.
-      /// \deprecated See version that accepts ignition::math::Pose3d
+      /// \deprecated See SetInitialPose
       public: void SetDefaultPose(const math::Pose &_pose)
               GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Set the default pose in the world coordinate frame and set
+      /// \brief Set the initial pose in the world coordinate frame and set
       /// that as the current camera world pose.
       /// \param[in] _pose New default pose of the camera.
-      /// \deprecated See version that accepts ignition::math::Pose3d
-      public: void SetDefaultPose(const ignition::math::Pose3d &_pose);
+      public: void SetInitialPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the default pose in the world coordinate frame.
       /// \return Default pose of the camera.
-      public: ignition::math::Pose3d DefaultPose() const;
+      /// \deprecated See InitialPose
+      public: math::Pose DefaultPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the initial pose in the world coordinate frame.
+      /// \return Initial pose of the camera.
+      public: ignition::math::Pose3d InitialPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.

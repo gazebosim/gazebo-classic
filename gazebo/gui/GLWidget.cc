@@ -892,7 +892,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   ignition::math::Vector3d lookAt(0, 0, 0);
   auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  this->dataPtr->userCamera->SetDefaultPose(mat.Pose());
+  this->dataPtr->userCamera->SetInitialPose(mat.Pose());
 
   // Update at the camera's update rate
   this->dataPtr->updateTimer->start(

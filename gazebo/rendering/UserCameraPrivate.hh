@@ -82,8 +82,8 @@ namespace gazebo
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
 
-      /// \brief Default camera pose.
-      public: ignition::math::Pose3d defaultPose;
+      /// \brief Initial camera pose.
+      public: ignition::math::Pose3d initialPose;
     };
   }
 }
