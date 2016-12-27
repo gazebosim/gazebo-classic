@@ -98,7 +98,6 @@ namespace gazebo
 
     /// \brief To publish model modify messages.
     private: ignition::transport::Node::Publisher modelModifyPubIgn;
-
   };
 }
 

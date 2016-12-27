@@ -81,7 +81,6 @@ namespace gazebo
 
       /// \brief Publisher for road information.
       private: ignition::transport::Node::Publisher roadPubIgn;
-
     };
     /// \}
   }
