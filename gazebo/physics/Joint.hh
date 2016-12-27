@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_JOINT_HH_
-#define _GAZEBO_JOINT_HH_
+#ifndef GAZEBO_PHYSICS_JOINT_HH_
+#define GAZEBO_PHYSICS_JOINT_HH_
 
 #include <string>
 #include <vector>
@@ -608,7 +608,7 @@ namespace gazebo
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose);
+      private: void LoadImpl(const ignition::math::Pose3d &_pose);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -621,17 +621,17 @@ namespace gazebo
 
       /// \brief Anchor pose.  This is the xyz offset of the joint frame from
       /// child frame specified in the parent link frame
-      protected: math::Vector3 anchorPos;
+      protected: ignition::math::Vector3d anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.
       /// AnchorPose is the transform from child link frame to joint frame
       /// specified in the child link frame.
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
-      protected: math::Pose anchorPose;
+      protected: ignition::math::Pose3d anchorPose;
 
       /// \brief Anchor pose relative to parent link frame.
-      protected: math::Pose parentAnchorPose;
+      protected: ignition::math::Pose3d parentAnchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
@@ -655,10 +655,10 @@ namespace gazebo
       protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
-      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
+      protected: ignition::math::Angle lowerLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position upper limit as specified in SDF
-      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+      protected: ignition::math::Angle upperLimit[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
@@ -683,7 +683,7 @@ namespace gazebo
       private: event::EventT<void ()> jointUpdate;
 
       /// \brief Angle used when the joint is parent of a static model.
-      private: math::Angle staticAngle;
+      private: ignition::math::Angle staticAngle;
 
       /// \brief Joint stop stiffness
       private: double stopStiffness[MAX_JOINT_AXIS];
