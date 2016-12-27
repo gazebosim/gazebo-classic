@@ -769,12 +769,6 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
         ignition::math::Pose3d(cgPose.Pos(),
             ignition::math::Quaterniond::Identity) - (childPose - parentPose);
 
-      // anchor location in parent CG frame
-      // this is the moment arm, but it's in parent CG frame, we need
-      // to convert it into world frame
-      // ignition::math::Pose3d anchorInParendCGFrame = this->anchorPose -
-      //  parentCGInChildLink;
-
       // paretnCGFrame in world frame
       ignition::math::Pose3d parentCGInWorld = cgPose + parentPose;
 

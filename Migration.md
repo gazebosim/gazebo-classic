@@ -132,16 +132,6 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
 
-1. **gazebo/physics/Collision.hh**
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
-
-1. **gazebo/physics/Entity.hh**
-    + ***Deprecation:*** const math::Pose GetDirtyPose() const
-    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
-
 1. **gazebo/physics/PlaneShape.hh**
     + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
     + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
@@ -443,7 +433,7 @@ release will remove the deprecated code.
 1. **gazebo/physics/dart/DARTPlaneShape.hh**
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
-    
+
 1. **gazebo/physics/bullet/BulletTypes.hh**
     + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
     + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
