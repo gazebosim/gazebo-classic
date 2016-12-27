@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -73,24 +72,43 @@ math::Vector3 PlaneShape::GetNormal() const
 //////////////////////////////////////////////////
 void PlaneShape::SetSize(const math::Vector2d &_size)
 {
+  this->SetSize(_size.Ign());
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
+{
   this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector2d>("size");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetScale(const math::Vector3 &_scale)
+ignition::math::Vector2d PlaneShape::Size() const
+{
+  return this->sdf->Get<ignition::math::Vector2d>("size");
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
 
   this->scale = _scale;
 
-  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  auto size = this->Size() * ignition::math::Vector2d(_scale.X(), scale.Y());
   this->SetSize(size);
 }
 
@@ -99,7 +117,7 @@ void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
   msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
-  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////
