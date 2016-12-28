@@ -233,12 +233,12 @@ namespace gazebo
       public: void PlaceOnEntity(const std::string &_entityName);
 
       /// \brief Returns collision bounding box.
-      /// \return Collsiion boundin box.
+      /// \return Collision bounding box.
       /// \deprecated See function that returns ignition math.
       public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns collision bounding box.
-      /// \return Collsiion boundin box.
+      /// \return Collision bounding box.
       public: ignition::math::Box CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.

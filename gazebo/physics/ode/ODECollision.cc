@@ -29,7 +29,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
