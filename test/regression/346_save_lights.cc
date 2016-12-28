@@ -75,13 +75,13 @@ TEST_F(Issue346Test, SaveLights)
     {
       hasSpotLight++;
       EXPECT_TRUE(pose.Pos() == spotLightPos);
-      EXPECT_TRUE(pose.Rot() == spotLightRot);
+      EXPECT_TRUE(pose.Rot().Euler() == spotLightRot);
     }
     else if (name == pointLightName)
     {
       hasPointLight++;
       EXPECT_TRUE(pose.Pos() == pointLightPos);
-      EXPECT_TRUE(pose.Rot() == pointLightRot);
+      EXPECT_TRUE(pose.Rot().Euler() == pointLightRot);
     }
     lightElem = lightElem->GetNextElement("light");
   }
