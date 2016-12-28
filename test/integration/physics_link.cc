@@ -91,7 +91,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // Check force and torque (at CoG?) in world frame
   ignition::math::Vector3d forceWorld = poseWorld0.Rot().RotateVector(
       _force.Ign());
-  EXPECT_EQ(forceWorld, _link->GetWorldForce());
+  EXPECT_EQ(forceWorld, _link->GetWorldForce().Ign());
 
   ignition::math::Vector3d worldOffset = poseWorld0.Rot().RotateVector(
       _offset.Ign() - _link->GetInertial()->GetCoG().Ign());
