@@ -32,7 +32,6 @@ Box::Box()
   this->extent = EXTENT_NULL;
 }
 
-
 //////////////////////////////////////////////////
 Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)
   : extent(EXTENT_FINITE)

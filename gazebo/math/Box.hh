@@ -32,6 +32,7 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
+    // cppcheck-suppress noConstructor
     class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor

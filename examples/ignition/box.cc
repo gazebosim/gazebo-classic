@@ -46,5 +46,9 @@ int main()
   // Set gazebo from ignition
   gzBox = ignBox;
 
+  // Output
+  std::cout << gzBox << std::endl;
+  std::cout << ignBox << std::endl;
+
   return 0;
 }
