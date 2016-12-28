@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -115,7 +114,7 @@ void MultiRayShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::SetScale(const math::Vector3 &_scale)
+void MultiRayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;

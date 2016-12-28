@@ -14,7 +14,12 @@
  * limitations under the License.
  *
 */
+
 #include <ignition/math/Helpers.hh>
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -62,10 +67,17 @@ OrbitViewController::~OrbitViewController()
 void OrbitViewController::Init(const math::Vector3 &_focalPoint,
     const double _yaw, const double _pitch)
 {
+  this->Init(_focalPoint.Ign(), _yaw, _pitch);
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::Init(const ignition::math::Vector3d &_focalPoint,
+    const double _yaw, const double _pitch)
+{
   this->yaw = _yaw;
   this->pitch = _pitch;
 
-  this->focalPoint = _focalPoint.Ign();
+  this->focalPoint = _focalPoint;
   this->distance = this->camera->WorldPosition().Distance(
       this->focalPoint);
 
@@ -290,17 +302,29 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 //////////////////////////////////////////////////
 void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
 {
-  this->camera->SetWorldPosition(
-      this->camera->WorldPose().Pos() +
-      this->camera->WorldPose().Rot() * _vec.Ign());
-  this->UpdateRefVisual();
+  this->TranslateLocal(_vec.Ign());
 }
 
 //////////////////////////////////////////////////
 void OrbitViewController::TranslateGlobal(const math::Vector3 &_vec)
 {
+  this->TranslateGlobal(_vec.Ign());
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::TranslateLocal(const ignition::math::Vector3d &_vec)
+{
   this->camera->SetWorldPosition(
-      this->camera->WorldPose().Pos() + _vec.Ign());
+      this->camera->WorldPose().Pos() +
+      this->camera->WorldPose().Rot() * _vec);
+  this->UpdateRefVisual();
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::TranslateGlobal(const ignition::math::Vector3d &_vec)
+{
+  this->camera->SetWorldPosition(
+      this->camera->WorldPose().Pos() + _vec);
   this->UpdateRefVisual();
 }
 
@@ -313,12 +337,24 @@ void OrbitViewController::SetDistance(float _d)
 //////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
-  this->focalPoint = _fp.Ign();
+  this->SetFocalPoint(_fp.Ign());
+}
+
+//////////////////////////////////////////////////
+void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
+{
+  this->focalPoint = _fp;
   this->refVisual->SetPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
 math::Vector3 OrbitViewController::GetFocalPoint() const
+{
+  return this->FocalPoint();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d OrbitViewController::FocalPoint() const
 {
   return this->focalPoint;
 }

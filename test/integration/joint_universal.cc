@@ -127,13 +127,13 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     gzdbg << "Setting gravity "
           << "gx " << gx << ' '
           << "gy " << gy << ' '
-          << "pose " << jointLower->GetChild()->GetWorldPose()
+          << "pose " << jointLower->GetChild()->WorldPose()
           << std::endl;
     EXPECT_NEAR(des0, jointLower->GetAngle(0).Radian(), 1e-2);
     EXPECT_NEAR(des1, jointLower->GetAngle(1).Radian(), 1e-2);
 
     // Also test expected pose of body, math is approximate
-    math::Vector3 eulerAngles = linkLower->GetWorldPose().rot.GetAsEuler();
+    math::Vector3 eulerAngles = linkLower->WorldPose().Rot().Euler();
     EXPECT_NEAR(des0, eulerAngles.x, 0.05);
     EXPECT_NEAR(des1, eulerAngles.y, 0.05);
   }
@@ -171,10 +171,10 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
 
   // Expect child link velocity to match parent at joint anchor
   {
-    math::Vector3 childOffset = jointLower->GetWorldPose().pos -
-      jointLower->GetChild()->GetWorldPose().pos;
-    math::Vector3 parentOffset = jointLower->GetWorldPose().pos -
-      jointLower->GetParent()->GetWorldPose().pos;
+    auto childOffset = jointLower->GetWorldPose().pos.Ign() -
+      jointLower->GetChild()->WorldPose().Pos();
+    math::Vector3 parentOffset = jointLower->GetWorldPose().pos.Ign() -
+      jointLower->GetParent()->WorldPose().Pos();
     math::Quaternion q;
 
     math::Vector3 childVel =
@@ -360,7 +360,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     world->Step(1);
     // check link pose
     double angle_00_0 = joint_00->GetAngle(0).Radian();
-    math::Pose pose_00 = link_00->GetWorldPose();
+    math::Pose pose_00 = link_00->WorldPose();
     EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
     EXPECT_LT(pose_00.rot.GetAsEuler().x, 0.35);
   }
@@ -376,7 +376,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     world->Step(1);
     // check link pose
     double angle_00_0 = joint_00->GetAngle(0).Radian();
-    math::Pose pose_00 = link_00->GetWorldPose();
+    math::Pose pose_00 = link_00->WorldPose();
     EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
     EXPECT_GT(pose_00.rot.GetAsEuler().x, -0.05);
   }
@@ -397,7 +397,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     world->Step(1);
 
     // check link pose
-    math::Pose pose_01 = link_01->GetWorldPose();
+    math::Pose pose_01 = link_01->WorldPose();
     double angle_00_1 = joint_00->GetAngle(1).Radian();
     double angle_01_1 = joint_01->GetAngle(1).Radian();
 
@@ -416,7 +416,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     world->Step(1);
 
     // check link pose
-    math::Pose pose_01 = link_01->GetWorldPose();
+    math::Pose pose_01 = link_01->WorldPose();
     double angle_00_0 = joint_00->GetAngle(0).Radian();
     double angle_00_1 = joint_00->GetAngle(1).Radian();
     double angle_01_0 = joint_01->GetAngle(0).Radian();

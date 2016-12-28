@@ -583,7 +583,7 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
   rendering::VisualPtr vis =
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+    this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
   if (vis && gui::get_entity_id(vis->GetRootVisual()->Name()))
   {
@@ -619,7 +619,7 @@ void GLWidget::OnMousePressNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
@@ -705,7 +705,7 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane())
@@ -754,7 +754,7 @@ void GLWidget::OnMouseReleaseNormal()
   if (!this->dataPtr->mouseEvent.Dragging())
   {
     rendering::VisualPtr vis =
-      this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+      this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
     if (vis)
     {
@@ -890,7 +890,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   ignition::math::Vector3d lookAt(0, 0, 0);
   auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  this->dataPtr->userCamera->SetDefaultPose(mat.Pose());
+  this->dataPtr->userCamera->SetInitialPose(mat.Pose());
 
   // Update at the camera's update rate
   this->dataPtr->updateTimer->start(

@@ -107,7 +107,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
   // Initialize this->sdf so it can be used for data storage
   this->sdf = this->sdfJoint->Clone();
 
-  this->LoadImpl(_pose);
+  this->LoadImpl(_pose.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -298,11 +298,11 @@ void Joint::Load(sdf::ElementPtr _sdf)
       gzthrow("Couldn't Find Child Link[" + childName  + "]");
   }
 
-  this->LoadImpl(_sdf->Get<math::Pose>("pose"));
+  this->LoadImpl(_sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 /////////////////////////////////////////////////
-void Joint::LoadImpl(const math::Pose &_pose)
+void Joint::LoadImpl(const ignition::math::Pose3d &_pose)
 {
   this->anchorPose = _pose;
 
@@ -319,13 +319,13 @@ void Joint::LoadImpl(const math::Pose &_pose)
 
   // setting anchor relative to gazebo child link frame position
   math::Pose worldPose = this->GetWorldPose();
-  this->anchorPos = worldPose.pos;
+  this->anchorPos = worldPose.pos.Ign();
 
   // Compute anchor pose relative to parent frame.
   if (this->parentLink)
-    this->parentAnchorPose = worldPose - this->parentLink->GetWorldPose();
+    this->parentAnchorPose = worldPose.Ign() - this->parentLink->WorldPose();
   else
-    this->parentAnchorPose = worldPose;
+    this->parentAnchorPose = worldPose.Ign();
 
   if (this->sdf->HasElement("sensor"))
   {
@@ -511,7 +511,7 @@ void Joint::Reset()
   {
     this->SetVelocity(i, 0.0);
   }
-  this->staticAngle.SetFromRadian(0);
+  this->staticAngle.Radian(0);
 }
 
 //////////////////////////////////////////////////
@@ -616,7 +616,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   _msg.set_name(this->GetScopedName());
   _msg.set_id(this->GetId());
 
-  msgs::Set(_msg.mutable_pose(), this->anchorPose.Ign());
+  msgs::Set(_msg.mutable_pose(), this->anchorPose);
   _msg.set_type(this->GetMsgType());
 
   for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
@@ -785,7 +785,7 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         // rotate child (childLink) about anchor point,
 
         // Get Child Link Pose
-        math::Pose childLinkPose = this->childLink->GetWorldPose();
+        math::Pose childLinkPose = this->childLink->WorldPose();
 
         // Compute new child link pose based on position change
         math::Pose newChildLinkPose =
@@ -883,7 +883,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       //  interpreted in world frame.
       math::Quaternion q;
       math::Vector3 parentOffset =
-        this->GetParentWorldPose().pos - this->parentLink->GetWorldPose().pos;
+        this->GetParentWorldPose().pos - this->parentLink->WorldPose().Pos();
       linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
     }
 
@@ -1124,7 +1124,7 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit;
+    this->lowerLimit[_index] = _limit.Ign();
     limitElem->GetElement("lower")->Set(_limit.Radian());
   }
   else if (_index == 1)
@@ -1133,7 +1133,7 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit;
+    this->lowerLimit[_index] = _limit.Ign();
     limitElem->GetElement("lower")->Set(_limit.Radian());
   }
   else
@@ -1161,7 +1161,7 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit;
+    this->upperLimit[_index] = _limit.Ign();
     limitElem->GetElement("upper")->Set(_limit.Radian());
   }
   else if (_index == 1)
@@ -1170,7 +1170,7 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit;
+    this->upperLimit[_index] = _limit.Ign();
     limitElem->GetElement("upper")->Set(_limit.Radian());
   }
   else
@@ -1255,7 +1255,7 @@ math::Pose Joint::GetInitialAnchorPose() const
 math::Pose Joint::GetWorldPose() const
 {
   if (this->childLink)
-    return this->anchorPose + this->childLink->GetWorldPose();
+    return this->anchorPose + this->childLink->WorldPose();
   return this->anchorPose;
 }
 
@@ -1263,7 +1263,7 @@ math::Pose Joint::GetWorldPose() const
 math::Pose Joint::GetParentWorldPose() const
 {
   if (this->parentLink)
-    return this->parentAnchorPose + this->parentLink->GetWorldPose();
+    return this->parentAnchorPose + this->parentLink->WorldPose();
   return this->parentAnchorPose;
 }
 
@@ -1288,10 +1288,10 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
   {
     // Use parent model frame
     if (this->parentLink)
-      return this->parentLink->GetModel()->GetWorldPose().rot;
+      return this->parentLink->GetModel()->WorldPose().Rot();
 
     // Parent model is world, use world frame
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   return this->GetWorldPose().rot;
@@ -1317,7 +1317,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
     math::Pose jointWorldPose = this->GetWorldPose();
     if (this->parentLink)
     {
-      parentModelWorldPose = this->parentLink->GetModel()->GetWorldPose();
+      parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
     }
     return (parentModelWorldPose - jointWorldPose).rot;
   }
@@ -1387,7 +1387,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
   // child link pose
-  math::Pose childLinkPose = this->childLink->GetWorldPose();
+  math::Pose childLinkPose = this->childLink->WorldPose();
 
   // default return to current pose
   math::Pose newRelativePose;

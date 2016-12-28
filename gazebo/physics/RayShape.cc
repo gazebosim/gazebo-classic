@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -88,11 +83,11 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   if (this->collisionParent)
   {
     this->globalStartPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeStartPos);
+      this->collisionParent->WorldPose().CoordPositionAdd(
+        this->relativeStartPos.Ign());
     this->globalEndPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeEndPos);
+      this->collisionParent->WorldPose().CoordPositionAdd(
+        this->relativeEndPos.Ign());
   }
   else
   {
@@ -131,7 +126,7 @@ void RayShape::SetLength(double _len)
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetScale(const math::Vector3 &_scale)
+void RayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;

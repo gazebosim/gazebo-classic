@@ -14,8 +14,8 @@
  * limitations under the License.
  *
  */
-#ifndef _GAZEBO_USER_CMD_MANAGER_HH_
-#define _GAZEBO_USER_CMD_MANAGER_HH_
+#ifndef GAZEBO_PHYSICS_USERCMDMANAGER_HH_
+#define GAZEBO_PHYSICS_USERCMDMANAGER_HH_
 
 #include <string>
 

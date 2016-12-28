@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEPLANESHAPE_HH_
-#define _ODEPLANESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEPLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -46,8 +46,8 @@ namespace gazebo
         ODECollisionPtr oParent;
         oParent =
           boost::dynamic_pointer_cast<ODECollision>(this->collisionParent);
-        math::Pose pose = oParent->GetWorldPose();
-        double altitude = pose.pos.z;
+        ignition::math::Pose3d pose = oParent->WorldPose();
+        double altitude = pose.Pos().Z();
         math::Vector3 n = this->GetNormal();
         if (oParent->GetCollisionId() == nullptr)
           oParent->SetCollision(dCreatePlane(oParent->GetSpaceId(),

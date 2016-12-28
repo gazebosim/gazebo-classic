@@ -69,7 +69,7 @@ TEST_F(GzModel, Spawn)
     ASSERT_TRUE(model != NULL);
 
     // Check the pose of the spawned model
-    math::Pose pose = model->GetWorldPose();
+    math::Pose pose = model->WorldPose();
     math::Vector3 rpy = pose.rot.GetAsEuler();
 
     EXPECT_NEAR(pose.pos.x, 5, 1e-5);
@@ -145,7 +145,8 @@ TEST_F(GzModel, SpawnAndMove)
 
   common::Time::MSleep(1000);
 
-  EXPECT_EQ(model->GetWorldPose(), math::Pose(10, 11, 5, 0.1, 0.2, 0.3));
+  EXPECT_EQ(model->WorldPose(),
+      ignition::math::Pose3d(10, 11, 5, 0.1, 0.2, 0.3));
 }
 
 /////////////////////////////////////////////////

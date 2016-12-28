@@ -65,7 +65,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   math::Pose pose;
   physics::ModelPtr sphere_model = world->ModelByName("sphere");
   if (sphere_model)
-    pose = sphere_model->GetWorldPose();
+    pose = sphere_model->WorldPose();
 
   double z = pose.pos.z;
   double test_duration = 3.0;
@@ -87,7 +87,7 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     if (sphere_model)
     {
       math::Vector3 vel = sphere_model->GetWorldLinearVel();
-      math::Pose pose = sphere_model->GetWorldPose();
+      math::Pose pose = sphere_model->WorldPose();
       if (z > 0.5)
       {
         EXPECT_LT(fabs(vel.z - v), PHYSICS_TOL);
