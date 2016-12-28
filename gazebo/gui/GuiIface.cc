@@ -57,9 +57,9 @@ po::variables_map vm;
 boost::property_tree::ptree g_propTree;
 
 // Names of all GUI plugins loaded at start. Parsed from command line arguments.
-std::vector<std::string> plugins_to_load;
+std::vector<std::string> g_plugins_to_load;
 // All GUI plugins loaded at startup.
-std::vector<gazebo::GUIPluginPtr> gui_plugins;
+std::vector<gazebo::GUIPluginPtr> g_plugins;
 
 using namespace gazebo;
 
@@ -191,7 +191,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      plugins_to_load.push_back(*iter);
+      g_plugins_to_load.push_back(*iter);
     }
   }
 
@@ -216,8 +216,12 @@ namespace gazebo
       // Cleanup model database.
       common::ModelDatabase::Instance()->Fini();
 
+      g_plugins.clear();
+
       gui::clear_active_camera();
+
       rendering::fini();
+
       fflush(stdout);
     }
   }
@@ -387,11 +391,10 @@ bool gui::run(int _argc, char **_argv)
 
   // the plugins have to be created after g_app has been created,
   // otherwise Qt will complain about no existing QApplication.
-  for (std::vector<std::string>::iterator iter=plugins_to_load.begin();
-       iter != plugins_to_load.end(); ++iter)
+  for (std::vector<std::string>::iterator iter = g_plugins_to_load.begin();
+       iter != g_plugins_to_load.end(); ++iter)
   {
-    // std::cout<<"Loading plugin "<<*iter<<std::endl;
-    addAndLoadPlugin(*iter, gui_plugins);
+    addAndLoadPlugin(*iter, g_plugins);
   }
 
 
@@ -417,7 +420,6 @@ bool gui::run(int _argc, char **_argv)
   delete g_splashScreen;
   delete g_main_win;
 
-  gui_plugins.clear();
 
   gazebo::client::shutdown();
   return true;
