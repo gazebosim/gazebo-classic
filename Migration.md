@@ -48,6 +48,10 @@ release will remove the deprecated code.
     + `gazebo::math::Angle upperLimit` replaced with `ignition::math::Angle upperLimit`
     + `gazebo::math::Angle staticAngle` replaced with `ignition::math::Angle staticAngle`
 
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** all public methods using gazebo::math
+    + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.

@@ -19,7 +19,6 @@
 #include <vector>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
-#include "gazebo/math/Vector3.hh"
 
 using namespace gazebo;
 class WorldEnvPopulationTest : public ServerFixture,
@@ -77,9 +76,9 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
 
   // Check elements distributed as a grid.
   double tolerance = 0.25;
-  math::Vector3 initialPos(-0.25, -0.25 / 2.0, 0);
-  math::Vector3 expectedPos(initialPos);
-  math::Vector3 step(0.25, 0.25, 0);
+  ignition::math::Vector3d initialPos(-0.25, -0.25 / 2.0, 0);
+  ignition::math::Vector3d expectedPos(initialPos);
+  ignition::math::Vector3d step(0.25, 0.25, 0);
 
   for (int i = 0; i < 2; ++i)
   {
@@ -92,10 +91,10 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
       math::Vector3 pos = model->WorldPose().Pos();
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
 
-      expectedPos.x += step.x;
+      expectedPos.X() += step.X();
     }
-    expectedPos.x = initialPos.x;
-    expectedPos.y += step.y;
+    expectedPos.X() = initialPos.X();
+    expectedPos.Y() += step.Y();
   }
 
   // Check that the objects are within the expected box.
