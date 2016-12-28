@@ -276,48 +276,72 @@ gz marker [options]
 Add, modify, or delete visual markers.
 
 Option Details
+
 -a, --add: No argument
+
 This option indicates that a marker should be added or modified.
 Use this in conjunction with -t to specify a marker type,
 -i to specify a marker id, -p to specify a parent, -f to specify
 a lifetime for the marker, or -n to specify a namespace.
+
 -n, --namespace: string argument
+
 Namespaces allow markers to be grouped. This option can be used
 the -a and -x command. The default namespace is empty string.
+
 -i, --id: integer argument
+
 Each marker has a unique id. Use this option with the -a command
 to assign an id to a marker. If -i is not specified, a value of
 zero will be used.
+
 -t, --type: string argument
+
 Use this command with -a to specify a marker type. The string
 argument must be one of: sphere, box, cylinder, line_list,
 line_strip, points, sphere, text, triangle_fan, triangle_list,
 triangle_strip.
+
 -p, --parent: string argument
+
 A marker can be attached to an existing visual. Use this command
 with -a to specify a parent visual. By default a marker is not
 attached to a parent visual.
+
 -f, --lifetime: double argument
+
 A marker's lifetime is the number of seconds that it will exist.
 Time starts counting when the marker is created. By default a
 marker has an infite lifetime.
+
 -d, --delete: integer argument
+
 This option will delete a single marker, if a marker exists with
 the specified id. The integer argument is the id of the marker to
 delete.
+
 -x, --delete-all: no argument
+
 Delete all markers.
+
 -l, --list: no argument
+
 List all markers.
+
 -y, --layer: integer argument
+
 Add or move a marker to the specified layer. Use this argument with   the -a argument.
+
 -m, --msg: string argument
+
 Use this option to send a custom marker message. This option will
 override all other command line options. Details about the marker
 message can be found using:
+
 $ ign msg -i ign_msgs.Marker
 
 Example:
+
 $ gz marker -m 'action: ADD_MODIFY, type: SPHERE, id: 2, scale: {x:0.2, y:0.4, z:1.2}'
 
 .sp
