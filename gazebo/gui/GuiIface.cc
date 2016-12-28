@@ -38,6 +38,7 @@
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/RenderWidget.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -219,9 +220,7 @@ namespace gazebo
       g_plugins.clear();
 
       gui::clear_active_camera();
-
       rendering::fini();
-
       fflush(stdout);
     }
   }
@@ -348,6 +347,7 @@ void addAndLoadPlugin(const std::string &_filename,
 
   GZ_ASSERT(g_app, "QApplication must have been created");
   GZ_ASSERT(g_main_win, "Main window must have been created");
+  GZ_ASSERT(g_main_win->RenderWidget(), "Main window's RenderWidget must have been created");
 
   gazebo::GUIPluginPtr plugin =
     gazebo::GUIPlugin::Create(_filename, _filename);
@@ -361,9 +361,9 @@ void addAndLoadPlugin(const std::string &_filename,
         << "Plugin filename[" << _filename << "].\n";
       return;
     }
-    plugin->setParent(g_main_win);
-    plugin->setVisible(true);
-    plugin->show();
+
+    sdf::ElementPtr elem(new sdf::Element()); // create an empty element
+    g_main_win->RenderWidget()->AddPlugin(plugin, elem);
     _plugins.push_back(plugin);
   }
 }
@@ -419,8 +419,6 @@ bool gui::run(int _argc, char **_argv)
 
   delete g_splashScreen;
   delete g_main_win;
-
-
   gazebo::client::shutdown();
   return true;
 }
