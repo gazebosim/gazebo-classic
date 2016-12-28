@@ -149,7 +149,7 @@ void MainWindow_TEST::Selection()
 
   // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
-      cam->GetVisual(glWidgetCenter);
+      cam->Visual(glWidgetCenter);
   QVERIFY(vis != NULL);
   QVERIFY(vis->GetRootVisual()->Name() == "box");
 
@@ -161,7 +161,7 @@ void MainWindow_TEST::Selection()
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
-      cam->GetVisual(ignition::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
   QVERIFY(vis2->GetRootVisual()->Name() == "box");
 
@@ -171,7 +171,7 @@ void MainWindow_TEST::Selection()
   QVERIFY(cam->WorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
-  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis3 = cam->Visual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
@@ -181,13 +181,13 @@ void MainWindow_TEST::Selection()
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
-      cam->GetVisual(ignition::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
   QVERIFY(vis4->GetRootVisual()->Name() == "box");
 
   // hide the box
   vis4->SetVisible(false);
-  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis5 = cam->Visual(glWidgetCenter);
 
   // verify we don't get anything now
   QVERIFY(vis5 == NULL);

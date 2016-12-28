@@ -349,7 +349,7 @@ bool JointMaker::OnMousePress(const common::MouseEvent &_event)
     return false;
 
   // intercept mouse press events when user clicks on the joint hotspot visual
-  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = camera->Visual(_event.Pos());
   if (vis)
   {
     if (this->dataPtr->joints.find(vis->Name()) !=
@@ -374,7 +374,7 @@ bool JointMaker::OnMouseRelease(const common::MouseEvent &_event)
       (this->dataPtr->newJoint && this->dataPtr->newJoint->parent &&
        this->dataPtr->newJoint->child))
   {
-    rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
+    rendering::VisualPtr vis = camera->Visual(_event.Pos());
     if (vis)
     {
       if (this->dataPtr->joints.find(vis->Name()) !=
@@ -643,7 +643,7 @@ bool JointMaker::OnMouseMove(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = camera->Visual(_event.Pos());
 
   // Highlight visual on hover
   if (vis)
@@ -720,7 +720,7 @@ void JointMaker::OpenInspector(const std::string &_jointId)
 bool JointMaker::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   rendering::UserCameraPtr camera = gui::get_active_camera();
-  rendering::VisualPtr vis = camera->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = camera->Visual(_event.Pos());
 
   if (vis)
   {

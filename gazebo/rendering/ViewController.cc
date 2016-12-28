@@ -40,8 +40,15 @@ ViewController::~ViewController()
 }
 
 //////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &/*_focalPoint*/,
-    double /*_yaw*/, double /*_pitch*/)
+void ViewController::Init(const math::Vector3 &_focalPoint,
+    double _yaw, double _pitch)
+{
+  this->Init(_focalPoint.Ign(), _yaw, _pitch);
+}
+
+//////////////////////////////////////////////////
+void ViewController::Init(const ignition::math::Vector3d &/*_focalPoint*/,
+    const double /*_yaw*/, const double /*_pitch*/)
 {
 }
 
