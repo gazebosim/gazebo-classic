@@ -2426,7 +2426,11 @@ namespace gazebo
         }
         if (heightmapGeom.has_sampling())
         {
-          geom->GetElement("sampling")->Set(heightmapGeom.sampling());
+          // check if old version of sdformat is in use
+          if (geom->HasElementDescription("sampling"))
+          {
+            geom->GetElement("sampling")->Set(heightmapGeom.sampling());
+          }
         }
         if (heightmapGeom.has_use_terrain_paging())
         {
