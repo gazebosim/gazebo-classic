@@ -59,14 +59,14 @@ TEST_F(Issue1694Test, WorldAccel)
   world->Step(1);
 
   // Expect box to still be falling
-  CheckAccel(link->GetRelativeLinearAccel(), g);
-  CheckAccel(link->GetWorldLinearAccel(), g);
+  CheckAccel(link->RelativeLinearAccel(), g);
+  CheckAccel(link->WorldLinearAccel(), g);
 
   world->Step(3000);
 
   // The box should be resting on the ground
-  CheckAccel(link->GetRelativeLinearAccel(), math::Vector3());
-  CheckAccel(link->GetWorldLinearAccel(), math::Vector3());
+  CheckAccel(link->RelativeLinearAccel(), ignition::math::Vector3d());
+  CheckAccel(link->WorldLinearAccel(), ignition::math::Vector3d());
 }
 
 /////////////////////////////////////////////////

@@ -41,15 +41,17 @@ TEST_F(Issue1146Test, Reset)
   physics::CollisionPtr coll = link->GetCollision("collision");
   ASSERT_TRUE(coll != NULL);
 
-  EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(-0.5, -0.5, 0), math::Vector3(0.5, 0.5, 1)));
+  EXPECT_EQ(coll->CollisionBoundingBox(),
+      ignition::math::Box(
+        ignition::math::Vector3d(-0.5, -0.5, 0),
+        ignition::math::Vector3d(0.5, 0.5, 1)));
 
   // Move the box
-  model->SetWorldPose(math::Pose(10, 15, 20, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(10, 15, 20, 0, 0, 0));
 
-  EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(9.5, 14.5, 19.5),
-                math::Vector3(10.5, 15.5, 20.5)));
+  EXPECT_EQ(coll->CollisionBoundingBox(),
+      math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
+                ignition::math::Vector3d(10.5, 15.5, 20.5)));
 }
 
 /////////////////////////////////////////////////

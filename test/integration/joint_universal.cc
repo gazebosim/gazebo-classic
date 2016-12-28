@@ -236,7 +236,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   EXPECT_EQ(joint_00->GetAngle(1), 0);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
@@ -248,12 +248,12 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 45deg about x
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
-  EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0.25*IGN_PI, 0, 0));
+  EXPECT_EQ(joint_00->GetAngle(0), 0.25*IGN_PI);
   EXPECT_EQ(joint_00->GetAngle(1), 0);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
+    math::Vector3(0, cos(0.25*IGN_PI), sin(0.25*IGN_PI)));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
@@ -261,9 +261,9 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 45deg about y
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*IGN_PI, 0));
   EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI);
+  EXPECT_EQ(joint_00->GetAngle(1), 0.25*IGN_PI);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
@@ -273,11 +273,12 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 90deg about both x and "rotated y axis" (z)
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_EQ(joint_00->GetAngle(1), 0.5*M_PI);
+  link_00->SetWorldPose(ignition::math::Pose3d(
+        0, 0, 2, 0.5*IGN_PI, 0, 0.5*IGN_PI));
+  EXPECT_EQ(joint_00->GetAngle(1), 0.5*IGN_PI);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+    math::Vector3(0, cos(0.5*IGN_PI), sin(0.5*IGN_PI)));
 
   gzdbg << "joint angles [" << joint_00->GetAngle(0)
         << ", " << joint_00->GetAngle(1)
@@ -292,7 +293,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   }
   else
   {
-    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
+    EXPECT_EQ(joint_00->GetAngle(0), 0.5*IGN_PI);
   }
 }
 

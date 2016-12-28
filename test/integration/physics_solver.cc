@@ -63,9 +63,9 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     physics->SetParam("world_step_solver", _worldSolverType);
   }
   math::Pose pose;
-  physics::ModelPtr sphere_model = world->ModelByName("sphere");
-  if (sphere_model)
-    pose = sphere_model->WorldPose();
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  if (sphereModel)
+    pose = sphereModel->WorldPose();
 
   double z = pose.pos.z;
   double test_duration = 3.0;
@@ -83,11 +83,11 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     z += dt * v;
 
     world->Step(1);
-    physics::ModelPtr sphere_model = world->ModelByName("sphere");
-    if (sphere_model)
+    physics::ModelPtr sphereModel = world->ModelByName("sphere");
+    if (sphereModel)
     {
-      math::Vector3 vel = sphere_model->GetWorldLinearVel();
-      math::Pose pose = sphere_model->WorldPose();
+      ignition::math::Vector3d vel = sphereModel->WorldLinearVel();
+      math::Pose pose = sphereModel->WorldPose();
       if (z > 0.5)
       {
         EXPECT_LT(fabs(vel.z - v), PHYSICS_TOL);

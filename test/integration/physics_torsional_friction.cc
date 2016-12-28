@@ -445,9 +445,9 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
     for (auto sphere : spheres)
     {
       // Get angular acceleration
-      math::Vector3 acc = sphere.model->GetWorldAngularAccel();
-      EXPECT_NEAR(acc.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(acc.y, 0, g_friction_tolerance);
+      ignition::math::Vector3d acc = sphere.model->WorldAngularAccel();
+      EXPECT_NEAR(acc.X(), 0, g_friction_tolerance);
+      EXPECT_NEAR(acc.Y(), 0, g_friction_tolerance);
 
       // Calculate torque due to friction
       double depthAtEquilibrium = sphere.mass * -g.Z() / sphere.kp;
@@ -462,12 +462,12 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
       // Friction is large enough to prevent motion
       if (appliedTorque <= frictionTorque)
       {
-        EXPECT_NEAR(acc.z, 0, g_friction_tolerance);
+        EXPECT_NEAR(acc.Z(), 0, g_friction_tolerance);
       }
       else
       {
         double expectedAcc = (appliedTorque - frictionTorque) / sphere.izz;
-        double relativeError = std::abs(acc.z - expectedAcc) / expectedAcc;
+        double relativeError = std::abs(acc.Z() - expectedAcc) / expectedAcc;
 
         // Less than 1% error
         EXPECT_LT(relativeError, 0.01);

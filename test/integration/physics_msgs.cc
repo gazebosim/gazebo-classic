@@ -365,7 +365,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
         int sleep = 0;
         int maxSleep = 50;
-        while (*iter != link->GetRelativePose() && sleep < maxSleep)
+        while (*iter != link->RelativePose() && sleep < maxSleep)
         {
           world->Step(1);
           common::Time::MSleep(1);
@@ -376,7 +376,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         // this change to the test.
         world->Step(10);
 
-        EXPECT_EQ(*iter, link->GetRelativePose());
+        EXPECT_EQ(*iter, link->RelativePose());
       }
     }
   }

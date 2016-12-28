@@ -265,7 +265,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   world->Step(steps);
 
   // Get global angular velocity of each link
-  math::Vector3 angVel;
+  ignition::math::Vector3d angVel;
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {
@@ -278,10 +278,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
       if (link)
       {
         // Expect stationary base
-        angVel = link->GetWorldAngularVel();
-        EXPECT_NEAR(angVel.x, 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.y, 0, g_tolerance*10);
-        EXPECT_NEAR(angVel.z, 0, g_tolerance*10);
+        angVel = link->WorldAngularVel();
+        EXPECT_NEAR(angVel.X(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Y(), 0, g_tolerance*10);
+        EXPECT_NEAR(angVel.Z(), 0, g_tolerance*10);
       }
       else
       {
@@ -298,10 +298,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         {
           // Expect relative angular velocity of pendulum links to be negative
           // and along x axis.
-          angVel = link->GetRelativeAngularVel().Normalize();
-          EXPECT_NEAR(angVel.x, -1, g_tolerance);
-          EXPECT_NEAR(angVel.y,  0, 2*g_tolerance);
-          EXPECT_NEAR(angVel.z,  0, 2*g_tolerance);
+          angVel = link->RelativeAngularVel().Normalize();
+          EXPECT_NEAR(angVel.X(), -1, g_tolerance);
+          EXPECT_NEAR(angVel.Y(),  0, 2*g_tolerance);
+          EXPECT_NEAR(angVel.Z(),  0, 2*g_tolerance);
         }
         else
         {
@@ -525,9 +525,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          angVel  = joint->GetChild()->GetWorldAngularVel();
-          angVel -= joint->GetParent()->GetWorldAngularVel();
+          ignition::math::Vector3d axis = joint->GetGlobalAxis(0).Ign();
+          angVel  = joint->GetChild()->WorldAngularVel();
+          angVel -= joint->GetParent()-tWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
         }
         // Apply negative torque to lower_joint
@@ -560,9 +560,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
-          angVel  = joint->GetChild()->GetWorldAngularVel();
-          angVel -= joint->GetParent()->GetWorldAngularVel();
+          ignition::math::Vector3d axis = joint->GetGlobalAxis(0).Ign();
+          angVel  = joint->GetChild()->WorldAngularVel();
+          angVel -= joint->GetParent()->WorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
         }
       }

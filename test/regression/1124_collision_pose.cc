@@ -46,7 +46,7 @@ TEST_F(Issue1124Test, SetModelPose)
   // The world->steps are not necessary. There are included to
   // err on the side of caution.
   world->Step(1);
-  model->SetWorldPose(math::Pose(2, 2, 0.5, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(2, 2, 0.5, 0, 0, 0));
   world->Step(1);
 
   EXPECT_EQ(model->WorldPose(), ignition::math::Pose3d(2, 2, 0.5, 0, 0, 0));

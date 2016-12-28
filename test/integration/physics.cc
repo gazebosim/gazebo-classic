@@ -179,7 +179,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   int steps = 2;
   physics::ModelPtr model;
   math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Vector3d vel1, vel2;
 
   double t, x0 = 0;
   // This loop steps the world forward and makes sure that each model falls,
@@ -195,11 +195,11 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       gzdbg << "Check freefall of model " << name << '\n';
       // Step once and check downward z velocity
       world->Step(1);
-      vel1 = model->GetWorldLinearVel();
+      vel1 = model->WorldLinearVel();
       t = world->SimTime().Double();
-      EXPECT_EQ(vel1.x, 0);
-      EXPECT_EQ(vel1.y, 0);
-      EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
+      EXPECT_EQ(vel1.X(), 0);
+      EXPECT_EQ(vel1.Y(), 0);
+      EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->WorldPose();
@@ -211,7 +211,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
       pose2 = model->WorldPose();
-      EXPECT_LT(vel2.z, vel1.z);
+      EXPECT_LT(vel2.z, vel1.Z());
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
 
       // if (physics->GetType()  == "bullet")
@@ -277,14 +277,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
     {
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that velocity is small
-      vel1 = model->GetWorldLinearVel();
+      vel1 = model->WorldLinearVel();
       t = world->SimTime().Double();
-      EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Y(), 0, PHYSICS_TOL);
       if (name == "test_empty")
-        EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       else
-        EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Z(), 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->WorldPose();
@@ -477,7 +477,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   int steps = 2;
   physics::ModelPtr model;
   math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Vector3d vel1, vel2;
 
   double t, x0 = 0, y0 = 0, radius;
   // This loop steps the world forward and makes sure that each model falls,
@@ -494,11 +494,11 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       gzdbg << "Check freefall of model " << modelNames[i] << '\n';
       // Step once and check downward z velocity
       world->Step(1);
-      vel1 = model->GetWorldLinearVel();
+      vel1 = model->WorldLinearVel();
       t = world->SimTime().Double();
-      EXPECT_NEAR(vel1.x, 0, 1e-16);
-      EXPECT_NEAR(vel1.y, 0, 1e-16);
-      EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(), 0, 1e-16);
+      EXPECT_NEAR(vel1.Y(), 0, 1e-16);
+      EXPECT_NEAR(vel1.Z(), g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
       pose1 = model->WorldPose();
@@ -509,9 +509,9 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 
       // Check once more and just make sure they keep falling
       world->Step(steps);
-      vel2 = model->GetWorldLinearVel();
+      vel2 = model->WorldLinearVel();
       pose2 = model->WorldPose();
-      EXPECT_LT(vel2.z, vel1.z);
+      EXPECT_LT(vel2.Z(), vel1.Z());
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
     }
     else
@@ -548,54 +548,56 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
             << modelNames[i] << '\n';
 
       // Check that velocity is small
-      vel1 = model->GetWorldLinearVel();
-      vel2 = model->GetWorldAngularVel();
+      vel1 = model->WorldLinearVel();
+      vel2 = model->WorldAngularVel();
 
       // vertical component of linear and angular velocity should be small
-      EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel2.z, 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Z(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel2.Z(), 0, PHYSICS_TOL);
 
       // expect small values for directions with no offset
       if (cog.X() == 0)
       {
-        EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
-        EXPECT_NEAR(vel2.y, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.X(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.Y(), 0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT(vel1.x*cog.X(), 0.2*cog.X()*cog.X());
-        EXPECT_GT(vel2.y*cog.X(), 0.2*cog.X()*cog.X());
+        EXPECT_GT(vel1.X()*cog.X(), 0.2*cog.X()*cog.X());
+        EXPECT_GT(vel2.Y()*cog.X(), 0.2*cog.X()*cog.X());
       }
 
       if (cog.Y() == 0)
       {
-        EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
-        EXPECT_NEAR(vel2.x, 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel1.Y(), 0, PHYSICS_TOL);
+        EXPECT_NEAR(vel2.X(), 0, PHYSICS_TOL);
       }
       else
       {
-        EXPECT_GT(vel1.y*cog.Y(),  0.2*cog.Y()*cog.Y());
-        EXPECT_LT(vel2.x*cog.Y(), -0.2*cog.Y()*cog.Y());
+        EXPECT_GT(vel1.Y()*cog.Y(),  0.2*cog.Y()*cog.Y());
+        EXPECT_LT(vel2.X()*cog.Y(), -0.2*cog.Y()*cog.Y());
       }
 
       // Expect roll without slip
-      EXPECT_NEAR(vel1.x,  vel2.y*radius, PHYSICS_TOL);
-      EXPECT_NEAR(vel1.y, -vel2.x*radius, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.X(),  vel2.y*radius, PHYSICS_TOL);
+      EXPECT_NEAR(vel1.Y(), -vel2.x*radius, PHYSICS_TOL);
 
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
-      math::Vector3 vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0));
-      EXPECT_NEAR(vel3.x, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel3.y, 0, PHYSICS_TOL);
-      EXPECT_NEAR(vel3.z, 0, PHYSICS_TOL);
+      ignition::math::Vector3 vel3d = model->GetLink()->WorldLinearVel(
+          ignition::math::Vector3d(0, 0, -radius),
+          ignition::math::Quaterniond(0, 0, 0));
+      EXPECT_NEAR(vel3.X(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.Y(), 0, PHYSICS_TOL);
+      EXPECT_NEAR(vel3.Z(), 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
-      math::Vector3 vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0));
-      EXPECT_NEAR(vel4.y, 2*vel1.y, PHYSICS_TOL);
-      EXPECT_NEAR(vel4.x, 2*vel1.x, PHYSICS_TOL);
-      EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
+      ignition::math::Vector3d vel4 = model->GetLink()->WorldLinearVel(
+          ignition::math::Vector3d(0, 0, radius),
+          ignition::math::Quaterniond(0, 0, 0));
+      EXPECT_NEAR(vel4.Y(), 2*vel1.Y(), PHYSICS_TOL);
+      EXPECT_NEAR(vel4.X(), 2*vel1.X(), PHYSICS_TOL);
+      EXPECT_NEAR(vel4.Z(), 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
       pose1 = model->WorldPose();

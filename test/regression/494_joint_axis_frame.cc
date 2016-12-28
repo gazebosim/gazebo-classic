@@ -199,18 +199,20 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
 
     // Also verify that relative body motions match expected joint behavior
-    math::Vector3 childVelocity, parentVelocity;
+    ignition::math::Vector3d childVelocity, parentVelocity;
     {
       physics::LinkPtr child = _joint->GetChild();
       if (child)
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
               || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          childVelocity = child->GetWorldAngularVel();
+        {
+          childVelocity = child->WorldAngularVel();
+        }
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
         {
-          childVelocity = child->GetWorldLinearVel();
+          childVelocity = child->WorldLinearVel();
         }
       }
     }
@@ -219,12 +221,14 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       if (parent)
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
-              || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          parentVelocity = parent->GetWorldAngularVel();
-        else if (_joint->HasType(physics::Base::SLIDER_JOINT)
-              || _joint->HasType(physics::Base::SCREW_JOINT))
+            || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
         {
-          parentVelocity = parent->GetWorldLinearVel();
+          parentVelocity = parent->WorldAngularVel();
+        }
+        else if (_joint->HasType(physics::Base::SLIDER_JOINT)
+            || _joint->HasType(physics::Base::SCREW_JOINT))
+        {
+          parentVelocity = parent->WorldLinearVel();
         }
       }
     }

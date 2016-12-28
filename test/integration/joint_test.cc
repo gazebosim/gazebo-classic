@@ -277,12 +277,12 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       cyclesPrismatic++;
       velPrismatic = -1.0;
     }
-    if (-linkRevolute->GetRelativeAngularVel().y > vT && velRevolute < -vT)
+    if (-linkRevolute->RelativeAngularVel().Y() > vT && velRevolute < -vT)
     {
       cyclesRevolute++;
       velRevolute = 1.0;
     }
-    else if (-linkRevolute->GetRelativeAngularVel().y < -vT && velRevolute > vT)
+    else if (-linkRevolute->RelativeAngularVel().Y() < -vT && velRevolute > vT)
     {
       cyclesRevolute++;
       velRevolute = -1.0;
@@ -331,7 +331,7 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
       cyclesPrismatic2++;
       velPrismatic2 = -1.0;
     }
-    if (-linkRevolute2->GetRelativeAngularVel().y > vT && velRevolute2 < -vT)
+    if (-linkRevolute2->RelativeAngularVel().Y() > vT && velRevolute2 < -vT)
     {
       cyclesRevolute2++;
       velRevolute2 = 1.0;

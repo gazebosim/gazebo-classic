@@ -122,7 +122,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     physics::ModelPtr model = world->ModelByName(modelName);
 
     prevTime = laser->LastUpdateTime();
-    model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
+    model->SetWorldPose(ignition::math::Pose3d(0, 0, 1.0, 0, M_PI*0.5, 0));
 
     double diffMax, diffSum, diffAvg;
 
@@ -255,10 +255,12 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond(0, 0, 0)));
   world->ModelByName(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
+      ignition::math::Quaterniond(0, 0, 0)));
   world->Step(1);
   raySensor->Update(true);
 
