@@ -308,6 +308,7 @@ void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
   _result = true;
+  _rep.clear_marker();
 
   // Create the list of markers
   for (Marker_M::const_iterator mIter = this->markers.begin();
