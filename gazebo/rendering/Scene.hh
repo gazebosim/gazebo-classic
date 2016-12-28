@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_RENDERING_SCENE_HH_
-#define _GAZEBO_RENDERING_SCENE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_HH_
+#define GAZEBO_RENDERING_SCENE_HH_
 
 #include <memory>
 #include <string>

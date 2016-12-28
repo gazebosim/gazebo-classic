@@ -44,11 +44,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Vector2i;
-  }
-
   namespace common
   {
     class Image;

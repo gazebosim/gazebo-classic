@@ -146,9 +146,9 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
@@ -178,9 +178,9 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_EQ(shape->GetHeight(x, y), 10.0);
     }
