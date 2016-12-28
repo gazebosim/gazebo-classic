@@ -40,6 +40,14 @@ release will remove the deprecated code.
     + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
     + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
 
+1. **gazebo/physics/Joint.hh**
+    + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
+    + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
+    + `gazebo::math::Pose parentAnchorPose` replaced with `ignition::math::Pose3d parentAnchorPose`
+    + `gazebo::math::Angle lowerLimit` replaced with `ignition::math::Angle lowerLimit`
+    + `gazebo::math::Angle upperLimit` replaced with `ignition::math::Angle upperLimit`
+    + `gazebo::math::Angle staticAngle` replaced with `ignition::math::Angle staticAngle`
+
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
@@ -485,7 +493,7 @@ release will remove the deprecated code.
 1. **gazebo/physics/dart/DARTPlaneShape.hh**
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
-    
+
 1. **gazebo/physics/bullet/BulletTypes.hh**
     + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
     + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
