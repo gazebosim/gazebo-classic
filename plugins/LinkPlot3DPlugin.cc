@@ -175,7 +175,7 @@ void LinkPlot3DPlugin::OnUpdate()
   // Process each plot
   for (auto &plot : this->dataPtr->plots)
   {
-    auto point = (plot.pose + plot.link->GetWorldPose().Ign()).Pos();
+    auto point = (plot.pose + plot.link->WorldPose()).Pos();
 
     // Only add points if the distance is past a threshold.
     if (point.Distance(plot.prevPoint) > 0.05)
