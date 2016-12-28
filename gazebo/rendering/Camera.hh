@@ -101,6 +101,18 @@ namespace gazebo
       /// \brief Load the camera with default parameters
       public: virtual void Load();
 
+      /// \brief Updates the camera intrinsics
+      /// \param[in] _intrinsicsFx Horizontal focal length (in pixels)
+      /// \param[in] _intrinsicsFy Vertical focal length (in pixels)
+      /// \param[in] _intrinsicsCx X coordinate of principal point in pixels
+      /// \param[in] _intrinsicsCy Y coordinate of principal point in pixels
+      /// \param[in] _intrinsicsS Skew coefficient defining the angle between
+      ///            the x and y pixel axes
+      public: void UpdateCameraIntrinsics(
+          const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+          const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+          const double _cameraIntrinsicsS);
+
       /// \brief Load the camera intrinsics parameters from the sdf
       public: virtual void LoadCameraIntrinsics();
 

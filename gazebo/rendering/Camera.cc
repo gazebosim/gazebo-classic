@@ -203,27 +203,41 @@ void Camera::LoadCameraIntrinsics()
     if (sdfLens->HasElement("intrinsics"))
     {
       sdf::ElementPtr sdfIntrinsics = sdfLens->GetElement("intrinsics");
-      double intrinsicsFx = sdfIntrinsics->Get<double>("fx");
-      double intrinsicsFy = sdfIntrinsics->Get<double>("fy");
-      double intrinsicsCx = sdfIntrinsics->Get<double>("cx");
-      double intrinsicsCy = sdfIntrinsics->Get<double>("cy");
-      double intrinsicsS = sdfIntrinsics->Get<double>("s");
-      double clipNear = 0.5;
-      double clipFar = 2.5;
-
-      sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
-      if (clipElem)
-      {
-        clipNear = clipElem->Get<double>("near");
-        clipFar = clipElem->Get<double>("far");
-      }
-
-      this->cameraProjectiveMatrix = BuildProjectiveMatrix(
-        this->imageWidth, this->imageHeight, intrinsicsFx, intrinsicsFy,
-        intrinsicsCx, intrinsicsCy, intrinsicsS, clipNear, clipFar);
-      this->cameraUsingIntrinsics = true;
+      UpdateCameraIntrinsics(
+          sdfIntrinsics->Get<double>("fx"),
+          sdfIntrinsics->Get<double>("fy"),
+          sdfIntrinsics->Get<double>("cx"),
+          sdfIntrinsics->Get<double>("cy"),
+          sdfIntrinsics->Get<double>("s"));
     }
   }
+}
+
+//////////////////////////////////////////////////
+void Camera::UpdateCameraIntrinsics(
+    const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+    const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+    const double _cameraIntrinsicsS)
+{
+  double clipNear = 0.5;
+  double clipFar = 2.5;
+
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  if (clipElem)
+  {
+    clipNear = clipElem->Get<double>("near");
+    clipFar = clipElem->Get<double>("far");
+  }
+
+  this->cameraProjectiveMatrix = BuildProjectiveMatrix(
+    this->imageWidth, this->imageHeight, _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+    _cameraIntrinsicsCx, _cameraIntrinsicsCy, _cameraIntrinsicsS, clipNear, clipFar);
+
+  if (this->camera != NULL)
+    this->camera->setCustomProjectionMatrix(true,
+        Conversions::Convert(cameraProjectiveMatrix));
+
+  this->cameraUsingIntrinsics = true;
 }
 
 //////////////////////////////////////////////////
