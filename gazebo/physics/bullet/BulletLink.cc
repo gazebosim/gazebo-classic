@@ -164,7 +164,7 @@ void BulletLink::Init()
 
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
-  // math::Vector3 size = this->GetBoundingBox().GetSize();
+  // auto size = this->BoundingBox().Size();
   // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
   if (mass <= 0.0)

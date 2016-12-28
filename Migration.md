@@ -135,12 +135,22 @@ release will remove the deprecated code.
 1. **gazebo/physics/Collision.hh**
     + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/Entity.hh**
     + ***Deprecation:*** const math::Pose GetDirtyPose() const
     + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
     + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** math::Box GetCollisionBoundingBox() const
+    + ***Replacement:*** ignition::math::Box CollisionBoundingBox() const
+
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
@@ -448,6 +458,8 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/MultiRayShape.hh**
     + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
@@ -623,6 +635,10 @@ release will remove the deprecated code.
     + ***Replacement:*** public: unsigned int ignition::math::roundUpPowerOfTwo(unsigned int)
     + ***Deprecation:*** public: T   gazebo::math::variance(const std::vector<T> &)
     + ***Replacement:*** public: T ignition::math::variance(const std::vector<T> &)
+
+1. **gazebo/math/Box.hh**
+    + ***Deprecation:*** public:   gazebo::math::Box
+    + ***Replacement:*** public: ignition::math::Box
 
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public:   gazebo::math::Kmeans
