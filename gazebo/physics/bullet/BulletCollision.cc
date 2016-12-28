@@ -97,26 +97,27 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-math::Box BulletCollision::GetBoundingBox() const
+ignition::math::Box BulletCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
-                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
+    result = ignition::math::Box(
+        ignition::math::Vector3d(btMin.x(), btMin.y(), btMin.z()),
+        ignition::math::Vector3d(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->GetShapeType() & PLANE_SHAPE)
     {
       PlaneShapePtr plane =
         boost::dynamic_pointer_cast<PlaneShape>(this->shape);
-      math::Vector3 normal = plane->GetNormal();
-      if (normal == math::Vector3::UnitZ)
+      auto normal = plane->GetNormal().Ign();
+      if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented
-        result.max.z =  0.0;
+        result.Max().Z() =  0.0;
       }
     }
   }

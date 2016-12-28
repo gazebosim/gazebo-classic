@@ -266,14 +266,27 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+math::Box MovableText::GetAABB()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->AABB();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box MovableText::AABB()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
-      math::Vector3(this->aabb->getMinimum().x,
+  return ignition::math::Box(
+      ignition::math::Vector3d(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),
-      math::Vector3(this->aabb->getMaximum().x,
+      ignition::math::Vector3d(this->aabb->getMaximum().x,
                     this->aabb->getMaximum().y,
                     this->aabb->getMaximum().z));
 }

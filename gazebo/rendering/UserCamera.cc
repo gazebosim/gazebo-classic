@@ -15,9 +15,9 @@
  *
 */
 #include <boost/bind.hpp>
-#include "gazebo/rendering/ogre_gazebo.h"
+#include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Pose.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -209,14 +209,26 @@ void UserCamera::Init()
 //////////////////////////////////////////////////
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
-  this->dataPtr->defaultPose = _pose;
-  this->SetWorldPose(_pose.Ign());
+  this->SetInitialPose(_pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
+{
+  this->dataPtr->initialPose = _pose;
+  this->SetWorldPose(_pose);
 }
 
 //////////////////////////////////////////////////
 math::Pose UserCamera::DefaultPose() const
 {
-  return this->dataPtr->defaultPose;
+  return this->InitialPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d UserCamera::InitialPose() const
+{
+  return this->dataPtr->initialPose;
 }
 
 //////////////////////////////////////////////////
@@ -396,7 +408,7 @@ void UserCamera::SetViewController(const std::string &_type)
     if (vc == "orbit")
     {
       this->dataPtr->viewController->Init(
-          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->FocalPoint(),
           this->dataPtr->orbitViewController->Yaw(),
           this->dataPtr->orbitViewController->Pitch());
     }
@@ -422,6 +434,13 @@ void UserCamera::SetViewController(const std::string &_type)
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
+{
+  this->SetViewController(_type, _pos.Ign());
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetViewController(const std::string &_type,
+                                   const ignition::math::Vector3d &_pos)
 {
   if (_type.empty() ||
       this->dataPtr->viewController->GetTypeString() == _type)
@@ -604,7 +623,7 @@ void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
       this->WorldPose().Pos().Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
+      this->dataPtr->orbitViewController->FocalPoint()));
 }
 
 //////////////////////////////////////////////////
@@ -657,13 +676,21 @@ void UserCamera::EnableViewController(bool _value) const
 VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
                                 std::string &_mod)
 {
+  return this->Visual(_mousePos.Ign(), _mod);
+}
+
+//////////////////////////////////////////////////
+VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
+    std::string &_mod) const
+{
   VisualPtr result;
 
   if (!this->dataPtr->selectionBuffer)
     return result;
 
   Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(
+        _mousePos.X(), _mousePos.Y());
 
   _mod = "";
   if (entity)
@@ -708,16 +735,29 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 //////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
 {
+  this->SetFocalPoint(_pt.Ign());
+}
+
+//////////////////////////////////////////////////
+void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
+{
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
 VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
 {
+  return this->Visual(_mousePos.Ign());
+}
+
+//////////////////////////////////////////////////
+VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos) const
+{
   VisualPtr result;
 
   Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+    this->dataPtr->selectionBuffer->OnSelectionClick(
+        _mousePos.X(), _mousePos.Y());
 
   if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {

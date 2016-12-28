@@ -30,6 +30,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -340,7 +341,14 @@ namespace gazebo
       /// \brief Get the inertia matrix in the world frame.
       /// \return Inertia matrix in world frame, returns matrix
       /// of zeros if link has no inertia.
-      public: math::Matrix3 GetWorldInertiaMatrix() const;
+      /// \deprecated See WorldInertiaMatrix() that uses ignition
+      public: math::Matrix3 GetWorldInertiaMatrix() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the inertia matrix in the world frame.
+      /// \return Inertia matrix in world frame, returns matrix
+      /// of zeros if link has no inertia.
+      public: ignition::math::Matrix3d WorldInertiaMatrix() const;
 
       /// \cond
       /// This is an internal function
@@ -367,7 +375,7 @@ namespace gazebo
       /// \brief Get the bounding box for the link and all the child
       /// elements.
       /// \return The link's bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the linear damping factor.
       /// \param[in] _damping Linear damping factor.

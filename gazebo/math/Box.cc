@@ -17,6 +17,10 @@
 #include <math.h>
 #include "gazebo/math/Box.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 
@@ -27,7 +31,6 @@ Box::Box()
   this->max.Set(0, 0, 0);
   this->extent = EXTENT_NULL;
 }
-
 
 //////////////////////////////////////////////////
 Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)

@@ -2076,7 +2076,14 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
