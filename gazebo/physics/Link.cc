@@ -702,14 +702,14 @@ math::Vector3 Link::GetWorldAngularAccel() const
   // L: angular momentum of CoG in world frame
   // w: angular velocity in world frame
   // return I^-1 * (T - w x L)
-  return this->GetWorldInertiaMatrix().Inverse() * (this->GetWorldTorque()
-    - this->GetWorldAngularVel().Cross(this->GetWorldAngularMomentum()));
+  return this->WorldInertiaMatrix().Inverse() * (this->GetWorldTorque()
+    - this->GetWorldAngularVel().Cross(this->GetWorldAngularMomentum())).Ign();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
 {
-  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
+  return this->WorldInertiaMatrix() * this->GetWorldAngularVel().Ign();
 }
 
 //////////////////////////////////////////////////
@@ -817,12 +817,25 @@ math::Pose Link::GetWorldInertialPose() const
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
-  math::Matrix3 moi;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldInertiaMatrix();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Link::WorldInertiaMatrix() const
+{
+  ignition::math::Matrix3d moi;
   if (this->inertial)
   {
-    math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->WorldPose().Rot().Inverse();
-    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+    auto pos = this->inertial->GetPose().Ign().Pos();
+    auto rot = this->WorldPose().Rot().Inverse();
+    moi = this->inertial->MOI(ignition::math::Pose3d(pos, rot));
   }
   return moi;
 }
@@ -1494,8 +1507,8 @@ double Link::GetWorldEnergyKinetic() const
   // compute angular kinetic energy
   // E = 1/2 w^T I w
   {
-    math::Vector3 w = this->GetWorldAngularVel();
-    math::Matrix3 I = this->GetWorldInertiaMatrix();
+    auto w = this->GetWorldAngularVel().Ign();
+    auto I = this->WorldInertiaMatrix();
     energy += 0.5 * w.Dot(I * w);
   }
 
