@@ -1,6 +1,9 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+1. Use ignition math with ServerFixture
+    * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
+
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
@@ -13,6 +16,11 @@
 
 1. Updated `gz_log` tool to use `ignition::math`.
     * [Pull request #2532](https://bitbucket.org/osrf/gazebo/pull-request/2532)
+
+1. Updated the following rendering classes to use `ignition::math`:
+   `FPSViewController`, `JointVisual`, `OculusCamera`, `OrbitViewController`,
+   `OrthoViewController`, `Projector`, `UserCamera`, `ViewController`.
+    * [Pull request #2551](https://bitbucket.org/osrf/gazebo/pull-request/2551)
 
 1. Update examples to use ign-math.
     * [Pull request #2539](https://bitbucket.org/osrf/gazebo/pull-request/2539)
