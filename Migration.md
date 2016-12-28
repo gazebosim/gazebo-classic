@@ -148,6 +148,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
 
+1. **gazebo/physics/HeightmapShape.hh**
+    + ***Deprecation:*** math::Vector2i GetVertexCount() const
+    + ***Replacement:*** ignition::math::Vector2i VertexCount() const
+
 1. **gazebo/physics/PlaneShape.hh**
     + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
     + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
@@ -653,6 +657,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Vector2d.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector2d
     + ***Replacement:*** public: ignition::math::Vector2d
+
+1. **gazebo/math/Vector2i.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector2i
+    + ***Replacement:*** public: ignition::math::Vector2i
 
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats
