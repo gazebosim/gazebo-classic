@@ -175,6 +175,12 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
+const std::string &MovableText::GetText() const
+{
+  return this->text;
+}
+
+//////////////////////////////////////////////////
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);

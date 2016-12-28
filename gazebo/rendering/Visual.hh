@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef GAZEBO_RENDERING_VISUAL_HH_
 #define GAZEBO_RENDERING_VISUAL_HH_
 
@@ -29,6 +28,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/msgs/MessageTypes.hh>
 
 #include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
@@ -700,6 +700,10 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Set the layer this visual belongs to.
+      /// \param[in] _layer Index of the layer.
+      public: void SetLayer(const int32_t _layer);
+
       /// \brief Get type of visual.
       /// \return Visual type.
       public: Visual::VisualType GetType() const;
@@ -736,6 +740,11 @@ namespace gazebo
       public: static msgs::Visual::Type ConvertVisualType(
           const Visual::VisualType &_type);
 
+      /// \brief Fill an ignition::msgs::Material message based on this
+      /// visual's material properties.
+      /// \param[out] _msg Ignition message to fill.
+      public: void FillMaterialMsg(ignition::msgs::Material &_msg) const;
+
       /// \internal
       /// \brief Constructor used by inherited classes
       /// \param[in] _dataPtr Pointer to private data.
@@ -757,6 +766,10 @@ namespace gazebo
       protected: Visual(VisualPrivate &_dataPtr,
                         const std::string &_name, ScenePtr _scene,
                         bool _useRTShader = true);
+
+      /// \brief Process a material message.
+      /// \param[in] _msg The ignition material message.
+      protected: void ProcessMaterialMsg(const ignition::msgs::Material &_msg);
 
       /// \brief Helper function for initializing the visual with a scene as
       /// its parent.
