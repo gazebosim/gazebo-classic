@@ -7,6 +7,10 @@
       <grid>false</grid>
     </scene>
 
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
     <!-- place user camera -->
     <gui>
       <camera name="user_camera">
