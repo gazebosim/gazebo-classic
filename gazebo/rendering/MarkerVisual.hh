@@ -18,7 +18,6 @@
 #define GAZEBO_RENDERING_MARKERVISUAL_HH_
 
 #include <string>
-#include <memory>
 
 #include <ignition/msgs.hh>
 

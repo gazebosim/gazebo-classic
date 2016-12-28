@@ -28,6 +28,44 @@ namespace gazebo
 
   /// \brief A plugin that traces the trajectory of a link in the rendering
   /// scene.
+  ///
+  /// The plugin takes the following elements:
+  ///
+  /// * <frequency>: Frequency in Hertz in which to update the plot
+  /// * <plot>: One plot element per link to be plotted in this model. It takes
+  ///           the following sub elements:
+  ///     * <link>: Link scoped name.
+  ///     * <pose>: Pose of point to plot, expressed in the link frame.
+  ///     * <material>: Material for the 3D line.
+  ///
+  /// Example from plot3d.world:
+  ///
+  ///    <plugin name='3dplot' filename='libLinkPlot3DPlugin.so'>
+  ///
+  ///      <!-- Update at 10 Hz -->
+  ///      <frequency>10</frequency>
+  ///
+  ///      <!-- Upper link plot -->
+  ///      <plot>
+  ///        <link>double_pendulum_with_base::upper_link</link>
+  ///
+  ///        <!-- Point 1m in +Z axis in link frame -->
+  ///        <pose>0 0 1 0 0 0</pose>
+  ///
+  ///        <material>Gazebo/Red</material>
+  ///      </plot>
+  ///
+  ///      <!-- Upper link plot -->
+  ///      <plot>
+  ///        <link>double_pendulum_with_base::lower_link</link>
+  ///
+  ///        <!-- Point 1m in +Z axis in link frame -->
+  ///        <pose>0 0 1 0 0 0</pose>
+  ///
+  ///        <material>Gazebo/Blue</material>
+  ///      </plot>
+  ///
+  ///    </plugin>
   class GAZEBO_VISIBLE LinkPlot3DPlugin : public ModelPlugin
   {
     /// \brief Constructor.

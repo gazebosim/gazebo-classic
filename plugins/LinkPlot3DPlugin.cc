@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include <ignition/msgs.hh>
 #include <ignition/transport.hh>
 

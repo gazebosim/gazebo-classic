@@ -16,19 +16,30 @@
       </include>
 
       <plugin name='3dplot' filename='libLinkPlot3DPlugin.so'>
+
+        <!-- Update at 10 Hz -->
         <frequency>10</frequency>
 
+        <!-- Upper link plot -->
         <plot>
           <link>double_pendulum_with_base::upper_link</link>
+
+          <!-- Point 1m in +Z axis in link frame -->
           <pose>0 0 1 0 0 0</pose>
+
           <material>Gazebo/Red</material>
         </plot>
 
+        <!-- Upper link plot -->
         <plot>
           <link>double_pendulum_with_base::lower_link</link>
+
+          <!-- Point 1m in +Z axis in link frame -->
           <pose>0 0 1 0 0 0</pose>
+
           <material>Gazebo/Blue</material>
         </plot>
+
       </plugin>
     </model>
   </world>

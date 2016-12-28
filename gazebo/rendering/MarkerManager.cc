@@ -306,6 +306,7 @@ void MarkerManagerPrivate::OnMarkerMsg(const ignition::msgs::Marker &_req)
 /////////////////////////////////////////////////
 void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
   _result = true;
 
   // Create the list of markers
