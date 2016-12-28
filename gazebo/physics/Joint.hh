@@ -25,6 +25,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
