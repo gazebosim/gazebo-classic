@@ -26,5 +26,8 @@ class Marker_TEST : public QTestFixture
 
   /// \brief Test adding and removing markers.
   private slots: void AddRemove();
+
+  /// \brief Test corner cases.
+  private slots: void CornerCases();
 };
 #endif

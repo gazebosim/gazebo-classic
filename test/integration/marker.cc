@@ -358,5 +358,179 @@ void Marker_TEST::AddRemove()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void Marker_TEST::CornerCases()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty_bright.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+
+  cam->SetCaptureData(true);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  QVERIFY(scene != nullptr);
+
+  // Create our node for communication
+  ignition::transport::Node node;
+
+  std::string markerTopic = "/marker";
+  std::string listTopic = "/marker/list";
+
+  // Advertise to topics
+  node.Advertise<ignition::msgs::Marker>(markerTopic);
+  node.Advertise<ignition::msgs::Marker_V>(listTopic);
+
+  // Create marker without namespace or id
+  {
+    auto visCount = scene->VisualCount();
+
+    ignition::msgs::Marker markerMsg;
+    markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
+    markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+
+    QVERIFY(node.Request(markerTopic, markerMsg));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Visual was added
+    QCOMPARE(scene->VisualCount(), visCount + 1);
+  }
+
+  // Check topic list
+  {
+    ignition::msgs::Marker_V rep;
+    bool result;
+
+    QVERIFY(node.Request(listTopic, 5000u, rep, result));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    QCOMPARE(rep.marker().size(), 1);
+
+    QVERIFY(rep.marker(0).has_ns());
+    QVERIFY(rep.marker(0).ns() == "");
+
+    QVERIFY(rep.marker(0).has_id());
+    QVERIFY(rep.marker(0).id() > 0);
+
+    QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);
+  }
+
+  // Attempt to clear inexistent namespace
+  {
+    auto visCount = scene->VisualCount();
+
+    ignition::msgs::Marker markerMsg;
+    markerMsg.set_ns("bad_namespace");
+    markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
+
+    QVERIFY(node.Request(markerTopic, markerMsg));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // No visuals were removed
+    QCOMPARE(scene->VisualCount(), visCount);
+  }
+
+  // Clear all namespaces, by specifying no namespace
+  {
+    auto visCount = scene->VisualCount();
+
+    ignition::msgs::Marker markerMsg;
+    markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
+
+    QVERIFY(node.Request(markerTopic, markerMsg));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Marker was removed
+    QCOMPARE(scene->VisualCount(), visCount - 1);
+  }
+
+  // Check topic list
+  {
+    ignition::msgs::Marker_V rep;
+    bool result;
+
+    QVERIFY(node.Request(listTopic, 5000u, rep, result));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    QCOMPARE(rep.marker().size(), 0);
+  }
+
+  // Create marker with namespace but no id
+  {
+    auto visCount = scene->VisualCount();
+
+    ignition::msgs::Marker markerMsg;
+    markerMsg.set_ns("the_namespace");
+    markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
+    markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+
+    QVERIFY(node.Request(markerTopic, markerMsg));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // Visual was added
+    QCOMPARE(scene->VisualCount(), visCount + 1);
+  }
+
+  // Check topic list
+  {
+    ignition::msgs::Marker_V rep;
+    bool result;
+
+    QVERIFY(node.Request(listTopic, 5000u, rep, result));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    QCOMPARE(rep.marker().size(), 1);
+
+    QVERIFY(rep.marker(0).has_ns());
+    QVERIFY(rep.marker(0).ns() == "the_namespace");
+
+    QVERIFY(rep.marker(0).has_id());
+    QVERIFY(rep.marker(0).id() > 0);
+
+    QVERIFY(rep.marker(0).type() == ignition::msgs::Marker::SPHERE);
+  }
+
+  // Try to delete inexistent marker
+  {
+    auto visCount = scene->VisualCount();
+
+    ignition::msgs::Marker markerMsg;
+    markerMsg.set_ns("the_namespace");
+    markerMsg.set_id(0);
+    markerMsg.set_action(ignition::msgs::Marker::DELETE_MARKER);
+
+    QVERIFY(node.Request(markerTopic, markerMsg));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // No markers were removed
+    QCOMPARE(scene->VisualCount(), visCount);
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(Marker_TEST)

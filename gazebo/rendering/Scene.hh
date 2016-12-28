@@ -92,7 +92,6 @@ namespace gazebo
     ///   * Response mssage type: ign_msgs.StringMsg
     ///   * Purpose: Add, modify, or delete a visualization marker.
     /// 1. /marker/list
-    ///   * Request message type: ign_msgs.StringMsg (can be empty string)
     ///   * Response mssage type: ign_msgs.Marker_V
     ///   * Purpose: Get the list of markers.
     ///
