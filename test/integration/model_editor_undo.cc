@@ -900,11 +900,14 @@ void ModelEditorUndoTest::LinkTranslation()
 /////////////////////////////////////////////////
 void ModelEditorUndoTest::LinkScaling()
 {
+gzdbg << "LinkScaling" << std::endl;
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
+gzdbg << "LinkScaling" << std::endl;
 
   // Load a world with simple shapes
   this->Load("worlds/shapes.world", false, false, false);
+gzdbg << "LinkScaling" << std::endl;
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
@@ -912,19 +915,26 @@ void ModelEditorUndoTest::LinkScaling()
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
+gzdbg << "LinkScaling" << std::endl;
 
   this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
+gzdbg << "LinkScaling" << std::endl;
   auto cam = gazebo::gui::get_active_camera();
+gzdbg << "LinkScaling" << std::endl;
   QVERIFY(cam != nullptr);
+gzdbg << "LinkScaling" << std::endl;
   auto scene = cam->GetScene();
+gzdbg << "LinkScaling" << std::endl;
   QVERIFY(scene != nullptr);
+gzdbg << "LinkScaling" << std::endl;
 
   // Enter the model editor to edit the box model
   QVERIFY(gazebo::gui::g_editModelAct != nullptr);
   gazebo::gui::g_editModelAct->trigger();
   gazebo::gui::Events::editModel("box");
+gzdbg << "LinkScaling" << std::endl;
 
   // Check undo/redo are disabled
   QVERIFY(gazebo::gui::g_undoAct != nullptr);
@@ -935,60 +945,88 @@ void ModelEditorUndoTest::LinkScaling()
   QVERIFY(!gazebo::gui::g_undoHistoryAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
   QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+gzdbg << "LinkScaling" << std::endl;
 
   // Get visual and collision initial scales
   std::string linkName = "ModelPreview_1::link";
+gzdbg << "LinkScaling" << std::endl;
   auto linkVis = scene->GetVisual(linkName + "::visual");
+gzdbg << "LinkScaling" << std::endl;
   QVERIFY(linkVis != nullptr);
+gzdbg << "LinkScaling" << std::endl;
   auto linkCol = scene->GetVisual(linkName + "::collision");
+gzdbg << "LinkScaling" << std::endl;
   QVERIFY(linkCol != nullptr);
+gzdbg << "LinkScaling" << std::endl;
 
   auto initialVisScale = linkVis->Scale();
   auto initialColScale = linkCol->Scale();
+gzdbg << "LinkScaling" << std::endl;
 
   // Move camera closer to model so we can easily click on it
   cam->SetWorldPose(ignition::math::Pose3d(1.37, 0, 0.73, 0, 0.26, 3.1));
+gzdbg << "LinkScaling" << std::endl;
 
   // Trigger scale mode
   QVERIFY(gazebo::gui::g_scaleAct);
+gzdbg << "LinkScaling" << std::endl;
   QVERIFY(!gazebo::gui::g_scaleAct->isChecked());
+gzdbg << "LinkScaling" << std::endl;
   gazebo::gui::g_scaleAct->trigger();
+gzdbg << "LinkScaling" << std::endl;
 
   this->ProcessEventsAndDraw(mainWindow);
+gzdbg << "LinkScaling" << std::endl;
 
   // Select link
   gazebo::common::MouseEvent mouseEvent;
+gzdbg << "LinkScaling" << std::endl;
   mouseEvent.SetType(gazebo::common::MouseEvent::PRESS);
+gzdbg << "LinkScaling" << std::endl;
   mouseEvent.SetButton(gazebo::common::MouseEvent::LEFT);
+gzdbg << "LinkScaling" << std::endl;
   mouseEvent.SetPos(mainWindow->width()/2.0, mainWindow->height()/2.0);
+gzdbg << "LinkScaling" << std::endl;
   gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+gzdbg << "LinkScaling" << std::endl;
   gazebo::gui::ModelManipulator::Instance()->OnMouseReleaseEvent(mouseEvent);
+gzdbg << "LinkScaling" << std::endl;
   gazebo::gui::ModelManipulator::Instance()->OnMousePressEvent(mouseEvent);
+gzdbg << "LinkScaling" << std::endl;
 
   // Scale on X axis
   gazebo::common::KeyEvent keyEvent;
   keyEvent.key = Qt::Key_X;
   gazebo::gui::ModelManipulator::Instance()->OnKeyPressEvent(keyEvent);
+gzdbg << "LinkScaling" << std::endl;
 
   // Drag to scale
   mouseEvent.SetType(gazebo::common::MouseEvent::MOVE);
+gzdbg << "LinkScaling" << std::endl;
   mouseEvent.SetDragging(true);
+gzdbg << "LinkScaling" << std::endl;
   mouseEvent.SetPos(mainWindow->width()/3.0, mainWindow->height()/3.0);
+gzdbg << "LinkScaling" << std::endl;
   gazebo::gui::ModelManipulator::Instance()->OnMouseMoveEvent(mouseEvent);
+gzdbg << "LinkScaling" << std::endl;
 
   // Release scaling
   gazebo::gui::MouseEventHandler::Instance()->HandleRelease(mouseEvent);
+gzdbg << "LinkScaling" << std::endl;
 
   this->ProcessEventsAndDraw(mainWindow);
+gzdbg << "LinkScaling" << std::endl;
 
   // Undo -> Redo a few times
   for (unsigned int j = 0; j < 3; ++j)
   {
+gzdbg << "LinkScaling" << std::endl;
     // Check undo is enabled
     QVERIFY(gazebo::gui::g_undoAct->isEnabled());
     QVERIFY(gazebo::gui::g_undoHistoryAct->isEnabled());
     QVERIFY(!gazebo::gui::g_redoAct->isEnabled());
     QVERIFY(!gazebo::gui::g_redoHistoryAct->isEnabled());
+gzdbg << "LinkScaling" << std::endl;
 
     // Check visual and collision scales have changed
     QVERIFY(linkVis->Scale() != initialVisScale);
