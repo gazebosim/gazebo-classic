@@ -149,6 +149,9 @@ RenderWidget::RenderWidget(QWidget *_parent)
 /////////////////////////////////////////////////
 RenderWidget::~RenderWidget()
 {
+  // clear the plugins before the widgets are deleted
+  this->plugins.clear();
+
   delete this->glWidget;
   this->glWidget = NULL;
 

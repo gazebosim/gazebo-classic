@@ -59,8 +59,6 @@ boost::property_tree::ptree g_propTree;
 
 // Names of all GUI plugins loaded at start. Parsed from command line arguments.
 std::vector<std::string> g_plugins_to_load;
-// All GUI plugins loaded at startup.
-std::vector<gazebo::GUIPluginPtr> g_plugins;
 
 using namespace gazebo;
 
@@ -217,8 +215,6 @@ namespace gazebo
       // Cleanup model database.
       common::ModelDatabase::Instance()->Fini();
 
-      g_plugins.clear();
-
       gui::clear_active_camera();
       rendering::fini();
       fflush(stdout);
@@ -339,8 +335,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void addAndLoadPlugin(const std::string &_filename,
-    std::vector<gazebo::GUIPluginPtr> &_plugins)
+void addAndLoadPlugin(const std::string &_filename)
 {
   if (_filename.empty())
     return;
@@ -364,7 +359,6 @@ void addAndLoadPlugin(const std::string &_filename,
 
     sdf::ElementPtr elem(new sdf::Element()); // create an empty element
     g_main_win->RenderWidget()->AddPlugin(plugin, elem);
-    _plugins.push_back(plugin);
   }
 }
 
@@ -394,7 +388,7 @@ bool gui::run(int _argc, char **_argv)
   for (std::vector<std::string>::iterator iter = g_plugins_to_load.begin();
        iter != g_plugins_to_load.end(); ++iter)
   {
-    addAndLoadPlugin(*iter, g_plugins);
+    addAndLoadPlugin(*iter);
   }
 
 
