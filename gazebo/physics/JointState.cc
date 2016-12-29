@@ -206,8 +206,8 @@ JointState JointState::operator+(const JointState &_state) const
   /// same set of angles as *this.
   int i = 0;
   for (std::vector<ignition::math::Angle>::const_iterator iterA =
-       this->angles.begin(), iterB = _state.angles.begin(); 
-       iterA != this->angles.end() && iterB != _state.angles.end(); ++iterA, 
+       this->angles.begin(), iterB = _state.angles.begin();
+       iterA != this->angles.end() && iterB != _state.angles.end(); ++iterA,
        ++iterB, ++i)
   {
     result.angles.push_back((*iterA) + (*iterB));
