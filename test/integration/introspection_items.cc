@@ -174,7 +174,7 @@ void IntrospectionItemsTest::JointItems(physics::JointPtr _joint)
 {
   auto jointUri = _joint->URI();
 
-  for (size_t i = 0; i < _joint->GetAngleCount(); ++i)
+  for (size_t i = 0; i < _joint->DOF(); ++i)
   {
     std::vector<std::string> queries;
     queries.push_back("axis/" + std::to_string(i) + "/double/position");

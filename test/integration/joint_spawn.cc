@@ -98,7 +98,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
     EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }
@@ -123,7 +123,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
     EXPECT_TRUE(parent == NULL);
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }
@@ -152,7 +152,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     ASSERT_TRUE(parent != NULL);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
-    for (unsigned int i = 0; i < joint->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
     }

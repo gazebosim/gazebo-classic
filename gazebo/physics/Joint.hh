@@ -361,7 +361,12 @@ namespace gazebo
 
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.
-      public: virtual unsigned int GetAngleCount() const = 0;
+      /// \deprecated See DOF()
+      public: virtual unsigned int GetAngleCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of degrees of freedom for this joint.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int DOF() const = 0;
 
       /// \brief The child links of this joint are updated based on desired
       /// position.  And all the links connected to the child link of this joint

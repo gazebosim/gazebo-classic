@@ -93,12 +93,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
 
     // initializa both axis, \todo: make cfm, erp per axis
     this->stopERP = elem->GetElement("limit")->Get<double>("erp");
-    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < this->DOF(); ++i)
       this->SetParam("stop_erp", i, this->stopERP);
 
     // initializa both axis, \todo: make cfm, erp per axis
     this->stopCFM = elem->GetElement("limit")->Get<double>("cfm");
-    for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+    for (unsigned int i = 0; i < this->DOF(); ++i)
       this->SetParam("stop_cfm", i, this->stopCFM);
 
     if (elem->HasElement("suspension"))
@@ -872,15 +872,15 @@ void ODEJoint::UseImplicitSpringDamper(const bool _implicit)
 void ODEJoint::ApplyImplicitStiffnessDamping()
 {
   // check if we are violating joint limits
-  if (this->GetAngleCount() > 2)
+  if (this->DOF() > 2)
   {
-     gzerr << "Incompatible joint type, GetAngleCount() = "
-           << this->GetAngleCount() << " > 2\n";
+     gzerr << "Incompatible joint type, DOF() = "
+           << this->DOF() << " > 2\n";
      return;
   }
 
   double dt = this->GetWorld()->Physics()->GetMaxStepSize();
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     double angle = this->GetAngle(i).Radian();
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
@@ -1010,7 +1010,7 @@ void ODEJoint::CFMERPToKpKd(const double _dt,
 //////////////////////////////////////////////////
 void ODEJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -1018,8 +1018,8 @@ void ODEJoint::SetDamping(unsigned int _index, double _damping)
   else
   {
      gzerr << "ODEJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -1027,7 +1027,7 @@ void ODEJoint::SetDamping(unsigned int _index, double _damping)
 //////////////////////////////////////////////////
 void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -1035,8 +1035,8 @@ void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
   else
   {
      gzerr << "ODEJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -1045,7 +1045,7 @@ void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
 void ODEJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -1054,15 +1054,15 @@ void ODEJoint::SetStiffnessDamping(unsigned int _index,
     /// reset state of implicit damping state machine.
     if (this->useImplicitSpringDamper)
     {
-      if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+      if (static_cast<unsigned int>(_index) < this->DOF())
       {
         this->implicitDampingState[_index] = ODEJoint::NONE;
       }
       else
       {
          gzerr << "Incompatible joint type, index[" << _index
-               << "] is out of bounds (GetAngleCount() = "
-               << this->GetAngleCount() << ").\n";
+               << "] is out of bounds (DOF() = "
+               << this->DOF() << ").\n";
          return;
       }
     }
@@ -1145,7 +1145,7 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
@@ -1165,7 +1165,7 @@ void ODEJoint::SaveForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double ODEJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -1189,7 +1189,7 @@ void ODEJoint::ApplyStiffnessDamping()
 //////////////////////////////////////////////////
 void ODEJoint::ApplyExplicitStiffnessDamping()
 {
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     // Take absolute value of dissipationCoefficient, since negative values of
     // dissipationCoefficient are used for adaptive damping to

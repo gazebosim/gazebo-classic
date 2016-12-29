@@ -306,7 +306,7 @@ void SimbodyJoint::SetForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double SimbodyJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -323,7 +323,7 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
@@ -386,7 +386,7 @@ void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -394,8 +394,8 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
   else
   {
      gzerr << "SimbodyJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -403,7 +403,7 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 //////////////////////////////////////////////////
 void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -411,8 +411,8 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
   else
   {
      gzerr << "SimbodyJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -421,7 +421,7 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -487,7 +487,7 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetHighStop(_index, _angle);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -523,7 +523,7 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   Joint::SetLowStop(_index, _angle);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -558,7 +558,7 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
@@ -577,7 +577,7 @@ math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    gzerr << "Should not be here in code, DOF > 2?\n";
     /// \TODO: should return NaN
     return math::Angle(0.0);
   }
@@ -586,7 +586,7 @@ math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
 //////////////////////////////////////////////////
 math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
@@ -605,7 +605,7 @@ math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    gzerr << "Should not be here in code, DOF > 2?\n";
     /// \TODO: should return NaN
     return math::Angle(0.0);
   }

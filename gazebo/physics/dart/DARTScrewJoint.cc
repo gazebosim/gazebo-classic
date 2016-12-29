@@ -90,7 +90,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
         reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
@@ -122,7 +122,7 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     return;
   }
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
         reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
@@ -186,7 +186,7 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
     gzerr << "Invalid index[" << _index << "]\n";
 
   this->SetThreadPitch(_threadPitch);
@@ -215,7 +215,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
     gzerr << "Invalid index[" << _index << "]\n";
 
   return this->GetThreadPitch();
@@ -246,7 +246,7 @@ double DARTScrewJoint::GetThreadPitch()
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -286,7 +286,7 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
                               unsigned int _index,
                               const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;

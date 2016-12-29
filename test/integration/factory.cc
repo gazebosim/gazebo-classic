@@ -738,8 +738,8 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   {
     physics::JointPtr joint = joints[i];
     physics::JointPtr jointClone = jointClones[i];
-    EXPECT_EQ(joint->GetAngleCount(), jointClone->GetAngleCount());
-    for (unsigned j = 0; j < joint->GetAngleCount(); ++j)
+    EXPECT_EQ(joint->DOF(), jointClone->DOF());
+    for (unsigned j = 0; j < joint->DOF(); ++j)
     {
       EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
       EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));

@@ -51,7 +51,7 @@ void SimbodyScrewJoint::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -76,7 +76,7 @@ double SimbodyScrewJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
       SimTK::MobilizerUIndex(_index), _rate);
@@ -133,7 +133,7 @@ void SimbodyScrewJoint::SetThreadPitch(double /*_threadPitch*/)
 //////////////////////////////////////////////////
 void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-  if (_index < this->GetAngleCount() &&
+  if (_index < this->DOF() &&
       this->physicsInitialized)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -145,7 +145,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < this->GetAngleCount())
+      _index < this->DOF())
   {
     if (!this->mobod.isEmptyHandle())
     {
@@ -170,7 +170,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    if (_index >= this->GetAngleCount())
+    if (_index >= this->DOF())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -192,7 +192,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -298,7 +298,7 @@ bool SimbodyScrewJoint::SetHighStop(
 {
   Joint::SetHighStop(_index, _angle);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -375,7 +375,7 @@ bool SimbodyScrewJoint::SetLowStop(
 {
   Joint::SetLowStop(_index, _angle);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -450,7 +450,7 @@ bool SimbodyScrewJoint::SetLowStop(
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
@@ -481,7 +481,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    gzerr << "Should not be here in code, DOF > 2?\n";
     /// \TODO: should return NaN
     return math::Angle(0.0);
   }
@@ -490,7 +490,7 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
 //////////////////////////////////////////////////
 math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
@@ -521,7 +521,7 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
+    gzerr << "Should not be here in code, DOF > 2?\n";
     /// \TODO: should return NaN
     return math::Angle(0.0);
   }

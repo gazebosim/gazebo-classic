@@ -125,7 +125,7 @@ void Joint::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  for (unsigned int index = 0; index < this->GetAngleCount(); ++index)
+  for (unsigned int index = 0; index < this->DOF(); ++index)
   {
     std::string axisName;
     if (index == 0)
@@ -370,7 +370,7 @@ void Joint::Init()
   // Set the anchor vector
   this->SetAnchor(0, this->anchorPos);
 
-  if (this->GetAngleCount() >= 1 && this->sdf->HasElement("axis"))
+  if (this->DOF() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
     this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
@@ -387,7 +387,7 @@ void Joint::Init()
     }
   }
 
-  if (this->GetAngleCount() >= 2 && this->sdf->HasElement("axis2"))
+  if (this->DOF() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
     this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
@@ -447,7 +447,7 @@ math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetEffortLimit(unsigned int _index, double _effort)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->effortLimit[_index] = _effort;
     return;
@@ -459,7 +459,7 @@ void Joint::SetEffortLimit(unsigned int _index, double _effort)
 //////////////////////////////////////////////////
 void Joint::SetVelocityLimit(unsigned int _index, double _velocity)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->velocityLimit[_index] = _velocity;
     return;
@@ -474,7 +474,7 @@ void Joint::SetVelocityLimit(unsigned int _index, double _velocity)
 //////////////////////////////////////////////////
 double Joint::GetEffortLimit(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     return this->effortLimit[_index];
 
   gzerr << "GetEffortLimit index[" << _index << "] out of range\n";
@@ -484,7 +484,7 @@ double Joint::GetEffortLimit(unsigned int _index)
 //////////////////////////////////////////////////
 double Joint::GetVelocityLimit(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     return this->velocityLimit[_index];
 
   gzerr << "GetVelocityLimit index[" << _index << "] out of range\n";
@@ -507,7 +507,7 @@ void Joint::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Joint::Reset()
 {
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     this->SetVelocity(i, 0.0);
   }
@@ -619,7 +619,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
   msgs::Set(_msg.mutable_pose(), this->anchorPose);
   _msg.set_type(this->GetMsgType());
 
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     _msg.add_angle(this->GetAngle(i).Radian());
     msgs::Axis *axis;
@@ -727,12 +727,12 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 {
   // check if index is within bounds
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Joint axis index ["
           << _index
-          << "] larger than angle count ["
-          << this->GetAngleCount()
+          << "] larger than DOF count ["
+          << this->DOF()
           << "]."
           << std::endl;
     return false;
@@ -845,12 +845,12 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
 bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
 {
   // check if index is within bounds
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Joint axis index ["
           << _index
-          << "] larger than angle count ["
-          << this->GetAngleCount()
+          << "] larger than DOF count ["
+          << this->DOF()
           << "]."
           << std::endl;
     return false;
@@ -942,7 +942,7 @@ void Joint::SetState(const JointState &_state)
 //////////////////////////////////////////////////
 double Joint::CheckAndTruncateForce(unsigned int _index, double _effort)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Calling Joint::SetForce with an index ["
           << _index << "] out of range\n";
@@ -1019,7 +1019,7 @@ double Joint::GetInertiaRatio(const unsigned int _index) const
 {
   if (this->parentLink && this->childLink)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       // joint axis in global frame
       math::Vector3 axis = this->GetGlobalAxis(_index);
@@ -1045,7 +1045,7 @@ double Joint::GetInertiaRatio(const unsigned int _index) const
 //////////////////////////////////////////////////
 double Joint::GetDamping(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->dissipationCoefficient[_index];
   }
@@ -1060,7 +1060,7 @@ double Joint::GetDamping(unsigned int _index)
 //////////////////////////////////////////////////
 double Joint::GetStiffness(unsigned int _index)
 {
-  if (static_cast<unsigned int>(_index) < this->GetAngleCount())
+  if (static_cast<unsigned int>(_index) < this->DOF())
   {
     return this->stiffnessCoefficient[_index];
   }
@@ -1075,7 +1075,7 @@ double Joint::GetStiffness(unsigned int _index)
 //////////////////////////////////////////////////
 double Joint::GetSpringReferencePosition(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->springReferencePosition[_index];
   }
@@ -1090,7 +1090,7 @@ double Joint::GetSpringReferencePosition(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle Joint::GetLowerLimit(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     return this->lowerLimit[_index];
 
   gzwarn << "requesting lower limit of joint index out of bound\n";
@@ -1100,7 +1100,7 @@ math::Angle Joint::GetLowerLimit(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle Joint::GetUpperLimit(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     return this->upperLimit[_index];
 
   gzwarn << "requesting upper limit of joint index out of bound\n";
@@ -1110,10 +1110,10 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "SetLowerLimit for index [" << _index
-          << "] out of bounds [" << this->GetAngleCount()
+          << "] out of bounds [" << this->DOF()
           << "]\n";
     return;
   }
@@ -1147,10 +1147,10 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 //////////////////////////////////////////////////
 void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "SetUpperLimit for index [" << _index
-          << "] out of bounds [" << this->GetAngleCount()
+          << "] out of bounds [" << this->DOF()
           << "]\n";
     return;
   }
@@ -1190,7 +1190,7 @@ void Joint::SetProvideFeedback(bool _enable)
 //////////////////////////////////////////////////
 void Joint::SetStopStiffness(unsigned int _index, double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stopStiffness[_index] = _stiffness;
   }
@@ -1204,7 +1204,7 @@ void Joint::SetStopStiffness(unsigned int _index, double _stiffness)
 //////////////////////////////////////////////////
 void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stopDissipation[_index] = _dissipation;
   }
@@ -1218,7 +1218,7 @@ void Joint::SetStopDissipation(unsigned int _index, double _dissipation)
 //////////////////////////////////////////////////
 double Joint::GetStopStiffness(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->stopStiffness[_index];
   }
@@ -1233,7 +1233,7 @@ double Joint::GetStopStiffness(unsigned int _index) const
 //////////////////////////////////////////////////
 double Joint::GetStopDissipation(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->stopDissipation[_index];
   }
@@ -1276,7 +1276,7 @@ math::Pose Joint::GetAnchorErrorPose() const
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << std::endl;
@@ -1300,7 +1300,7 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
           << " returning identity rotation." << std::endl;
@@ -1330,7 +1330,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 //////////////////////////////////////////////////
 double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Get spring potential error, _index[" << _index
           << "] out of range" << std::endl;
@@ -1472,7 +1472,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
 /////////////////////////////////////////////////
 void Joint::RegisterIntrospectionItems()
 {
-  for (size_t i = 0; i < this->GetAngleCount(); ++i)
+  for (size_t i = 0; i < this->DOF(); ++i)
   {
     this->RegisterIntrospectionPosition(i);
     this->RegisterIntrospectionVelocity(i);
@@ -1510,4 +1510,10 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
   this->introspectionItems.push_back(uri);
   gazebo::util::IntrospectionManager::Instance()->Register
       <double>(uri.Str(), f);
+}
+
+/////////////////////////////////////////////////
+unsigned int Joint::GetAngleCount() const
+{
+  return this->DOF();
 }

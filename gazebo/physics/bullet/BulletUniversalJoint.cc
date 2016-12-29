@@ -153,7 +153,7 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
   // but bullet uses a body-fixed frame
   if (!this->bulletUniversal)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       // this hasn't been initialized yet, store axis in initialWorldAxis
       math::Quaternion axisFrame = this->GetAxisFrame(_index);
@@ -171,7 +171,7 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
 //////////////////////////////////////////////////
 double BulletUniversalJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint axis index[" << _index << "], returning 0.\n";
     return 0;
@@ -363,7 +363,7 @@ math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
 //////////////////////////////////////////////////
 math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint axis index[" << _index << "]\n";
     return math::Vector3::Zero;
@@ -421,7 +421,7 @@ bool BulletUniversalJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -434,7 +434,7 @@ bool BulletUniversalJoint::SetParam(const std::string &_key,
 double BulletUniversalJoint::GetParam(const std::string &_key,
                                       unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;

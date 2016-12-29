@@ -70,7 +70,7 @@ void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 double SimbodyUniversalJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -98,7 +98,7 @@ double SimbodyUniversalJoint::GetVelocity(unsigned int _index) const
 void SimbodyUniversalJoint::SetVelocity(unsigned int _index,
     double _rate)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -116,7 +116,7 @@ void SimbodyUniversalJoint::SetVelocity(unsigned int _index,
 void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
     double _torque)
 {
-  if (_index < this->GetAngleCount() && this->physicsInitialized)
+  if (_index < this->DOF() && this->physicsInitialized)
   {
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -130,7 +130,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < this->GetAngleCount())
+      _index < this->DOF())
   {
     if (!this->mobod.isEmptyHandle())
     {
@@ -160,7 +160,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
       }
       else
       {
-        gzerr << "GetGlobalAxis: internal error, GetAngleCount < 0.\n";
+        gzerr << "GetGlobalAxis: internal error, DOF < 0.\n";
         return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
       }
     }
@@ -176,7 +176,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
   }
   else
   {
-    if (_index >= this->GetAngleCount())
+    if (_index >= this->DOF())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -197,7 +197,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
 //////////////////////////////////////////////////
 math::Angle SimbodyUniversalJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)

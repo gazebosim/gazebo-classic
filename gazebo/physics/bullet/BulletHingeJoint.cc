@@ -383,7 +383,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -426,7 +426,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;

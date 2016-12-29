@@ -47,7 +47,7 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 1;}
 
       /// \brief Load joint

@@ -191,15 +191,15 @@ void DARTJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void DARTJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
                               _damping);
   }
   else
   {
-    gzerr << "Index[" << _index << "] is out of bounds (GetAngleCount() = "
-          << this->GetAngleCount() << ").\n";
+    gzerr << "Index[" << _index << "] is out of bounds (DOF() = "
+          << this->DOF() << ").\n";
     return;
   }
 }
@@ -207,7 +207,7 @@ void DARTJoint::SetDamping(unsigned int _index, double _damping)
 //////////////////////////////////////////////////
 void DARTJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -215,8 +215,8 @@ void DARTJoint::SetStiffness(unsigned int _index, const double _stiffness)
   else
   {
      gzerr << "DARTJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -225,7 +225,7 @@ void DARTJoint::SetStiffness(unsigned int _index, const double _stiffness)
 void DARTJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -277,7 +277,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -298,7 +298,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -319,7 +319,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 math::Angle DARTJoint::GetHighStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return math::Angle();
@@ -337,7 +337,7 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
 //////////////////////////////////////////////////
 math::Angle DARTJoint::GetLowStop(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return math::Angle();
@@ -452,7 +452,7 @@ math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                          const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
     gzerr << "Invalid index[" << _index << "]\n";
 
   if (!this->dataPtr->IsInitialized())
@@ -499,7 +499,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -595,7 +595,7 @@ void DARTJoint::SetForce(unsigned int _index, double _force)
 /////////////////////////////////////////////////
 double DARTJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->dataPtr->forceApplied[_index];
   }
@@ -657,7 +657,7 @@ void DARTJoint::SaveForce(unsigned int _index, double _force)
 
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->dataPtr->forceAppliedTime < this->GetWorld()->SimTime())
     {

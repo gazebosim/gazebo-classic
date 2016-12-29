@@ -335,7 +335,7 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid axis index [" << _index << "]" << std::endl;
     return math::Angle();
@@ -361,7 +361,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -413,7 +413,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;

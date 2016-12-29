@@ -211,7 +211,7 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     this->dataPtr->dtJoint->setVelocity(_index, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";

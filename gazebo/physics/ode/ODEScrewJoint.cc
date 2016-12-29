@@ -142,7 +142,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
   math::Angle result;
   if (this->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       if (_index == 0)
         result = dJointGetScrewAngle(this->jointId);
@@ -153,7 +153,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
     {
       gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->DOF() << ").\n";
     }
   }
   else
@@ -169,7 +169,7 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
 
   if (this->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       if (_index == 0)
         result = dJointGetScrewAngleRate(this->jointId);
@@ -180,7 +180,7 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
     {
       gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->DOF() << ").\n";
     }
   }
   else

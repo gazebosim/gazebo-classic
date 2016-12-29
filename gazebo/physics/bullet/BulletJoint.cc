@@ -393,7 +393,7 @@ void BulletJoint::SetupJointFeedback()
 //////////////////////////////////////////////////
 void BulletJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -401,8 +401,8 @@ void BulletJoint::SetDamping(unsigned int _index, double _damping)
   else
   {
      gzerr << "BulletJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -410,7 +410,7 @@ void BulletJoint::SetDamping(unsigned int _index, double _damping)
 //////////////////////////////////////////////////
 void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -418,8 +418,8 @@ void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
   else
   {
      gzerr << "BulletJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -428,7 +428,7 @@ void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
 void BulletJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -478,7 +478,7 @@ void BulletJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
@@ -498,7 +498,7 @@ void BulletJoint::SaveForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double BulletJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -513,7 +513,7 @@ double BulletJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void BulletJoint::ApplyStiffnessDamping()
 {
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     // Take absolute value of dissipationCoefficient, since negative values of
     // dissipationCoefficient are used for adaptive damping to

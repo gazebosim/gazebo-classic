@@ -80,7 +80,7 @@ class FakeJoint : public physics::Joint
   public: virtual physics::JointWrench GetForceTorque(unsigned int)
           {return physics::JointWrench();}
 
-  public: virtual unsigned int GetAngleCount() const
+  public: virtual unsigned int DOF() const
           {return 0;}
 
   public: virtual math::Vector3 GetLinkForce(unsigned int) const
