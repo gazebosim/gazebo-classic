@@ -105,14 +105,14 @@ void ODEBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double ODEBallJoint::UpperLimit(const unsigned int /*_index*/)
+double ODEBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   gzerr << "ODEBallJoint::UpperLimit not implemented" << std::endl;
   return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-double ODEBallJoint::LowerLimit(const unsigned int /*_index*/)
+double ODEBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   gzerr << "ODEBallJoint::LowerLimit not implemented" << std::endl;
   return ignition::math::NAN_D;

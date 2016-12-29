@@ -449,7 +449,7 @@ bool SimbodyScrewJoint::SetLowStop(
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::UpperLimit(const unsigned int _index)
+double SimbodyScrewJoint::UpperLimit(const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
@@ -463,7 +463,8 @@ double SimbodyScrewJoint::UpperLimit(const unsigned int _index)
   }
   else if (_index == 1)
   {
-    double tp = this->GetThreadPitch();
+    /// \todo Make GetThreadPitch const
+    double tp = const_cast<SimbodyScrewJoint *>(this)->GetThreadPitch();
     if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"
@@ -487,7 +488,7 @@ double SimbodyScrewJoint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double SimbodyScrewJoint::LowerLimit(const unsigned int _index)
+double SimbodyScrewJoint::LowerLimit(const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
@@ -501,7 +502,7 @@ double SimbodyScrewJoint::LowerLimit(const unsigned int _index)
   }
   else if (_index == 1)
   {
-    double tp = this->GetThreadPitch();
+    double tp = const_cast<SimbodyScrewJoint *>(this)->GetThreadPitch();
     if (ignition::math::equal(tp, 0.0))
     {
       gzerr << "thread pitch should not be zero (joint is a slider?)"

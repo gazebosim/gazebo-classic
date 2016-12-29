@@ -93,10 +93,10 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

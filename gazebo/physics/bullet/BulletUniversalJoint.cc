@@ -324,7 +324,7 @@ bool BulletUniversalJoint::SetLowStop(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::UpperLimit(const unsigned int _index)
+double BulletUniversalJoint::UpperLimit(const unsigned int _index) const
 {
   double result = ignition::math::NAN_D;
 
@@ -346,7 +346,7 @@ double BulletUniversalJoint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double BulletUniversalJoint::LowerLimit(const unsigned int _index)
+double BulletUniversalJoint::LowerLimit(const unsigned int _index) const
 {
   double result = ignition::math::NAN_D;
 

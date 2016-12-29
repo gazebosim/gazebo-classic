@@ -339,7 +339,7 @@ bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/)
+double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)
@@ -350,7 +350,7 @@ double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/)
+double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)

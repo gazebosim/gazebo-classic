@@ -62,10 +62,10 @@ class FakeJoint : public physics::Joint
   public: virtual math::Vector3 GetAnchor(unsigned int) const
           {return math::Vector3::Zero;}
 
-  public: virtual double UpperLimit(unsigned int)
+  public: virtual double UpperLimit(unsigned int) const
           {return 0.0;}
 
-  public: virtual double LowerLimit(unsigned int)
+  public: virtual double LowerLimit(unsigned int) const
           {return 0.0;}
 
   public: virtual void SetVelocity(unsigned int, double)

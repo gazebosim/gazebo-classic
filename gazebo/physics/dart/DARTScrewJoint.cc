@@ -390,7 +390,7 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-double DARTScrewJoint::UpperLimit(const unsigned int _index)
+double DARTScrewJoint::UpperLimit(const unsigned int _index) const
 {
   switch (_index)
   {
@@ -413,7 +413,7 @@ double DARTScrewJoint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double DARTScrewJoint::LowerLimit(const unsigned int _index)
+double DARTScrewJoint::LowerLimit(const unsigned int _index) const
 {
   switch (_index)
   {

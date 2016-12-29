@@ -94,14 +94,14 @@ void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double SimbodyBallJoint::UpperLimit(const unsigned int /*_index*/)
+double SimbodyBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyBallJoint::UpperLimit not implemented" << std::endl;
   return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-double SimbodyBallJoint::LowerLimit(const unsigned int /*_index*/)
+double SimbodyBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyBallJoint::LowerLimit not implemented" << std::endl;
   return ignition::math::NAN_D;

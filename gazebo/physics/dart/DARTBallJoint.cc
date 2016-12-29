@@ -108,14 +108,14 @@ void DARTBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double DARTBallJoint::UpperLimit(const unsigned int /*_index*/)
+double DARTBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   gzerr << "DARTBallJoint::UpperLimit not implemented" << std::endl;
   return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-double DARTBallJoint::LowerLimit(const unsigned int /*_index*/)
+double DARTBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   gzerr << "DARTBallJoint::LowerLimit not implemented" << std::endl;
   return ignition::math::NAN_D;

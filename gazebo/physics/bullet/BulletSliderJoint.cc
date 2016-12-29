@@ -297,7 +297,7 @@ bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/)
+double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletSlider)
@@ -308,7 +308,7 @@ double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/)
 }
 
 //////////////////////////////////////////////////
-double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/)
+double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletSlider)

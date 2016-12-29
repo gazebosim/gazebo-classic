@@ -556,7 +556,7 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::UpperLimit(const unsigned int _index)
+double SimbodyJoint::UpperLimit(const unsigned int _index) const
 {
   /// \todo Simbody is getting the limit from SDF, maybe it should use the base
   /// class Joint::UpperLimit.
@@ -584,7 +584,7 @@ double SimbodyJoint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double SimbodyJoint::LowerLimit(const unsigned int _index)
+double SimbodyJoint::LowerLimit(const unsigned int _index) const
 {
   /// \todo Simbody is getting the limit from SDF, maybe it should use the base
   /// class Joint::LowerLimit.

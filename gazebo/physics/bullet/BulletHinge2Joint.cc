@@ -179,7 +179,7 @@ bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::UpperLimit(const unsigned int _index)
+double BulletHinge2Joint::UpperLimit(const unsigned int _index) const
 {
   if (!this->bulletHinge2)
   {
@@ -201,7 +201,7 @@ double BulletHinge2Joint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double BulletHinge2Joint::LowerLimit(const unsigned int _index)
+double BulletHinge2Joint::LowerLimit(const unsigned int _index) const
 {
   if (!this->bulletHinge2)
   {

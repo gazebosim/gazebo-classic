@@ -233,14 +233,14 @@ void BulletBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-double BulletBallJoint::UpperLimit(const unsigned int /*_index*/)
+double BulletBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   gzerr << "BulletBallJoint::UpperLimit not implemented" << std::endl;
   return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-double BulletBallJoint::LowerLimit(const unsigned int /*_index*/)
+double BulletBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   gzerr << "BulletBallJoint::LowerLimit not implemented" << std::endl;
   return ignition::math::NAN_D;

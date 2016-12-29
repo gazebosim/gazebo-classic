@@ -86,10 +86,10 @@ namespace gazebo
                                    const math::Vector3 &_axis);
 
       // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index) const;
 
       /// \brief bullet ball constraint
       private: btPoint2PointConstraint *bulletBall;

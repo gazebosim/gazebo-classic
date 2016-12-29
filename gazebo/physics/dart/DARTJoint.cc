@@ -317,7 +317,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-double DARTJoint::UpperLimit(const unsigned int _index)
+double DARTJoint::UpperLimit(const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
@@ -335,7 +335,7 @@ double DARTJoint::UpperLimit(const unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-double DARTJoint::LowerLimit(const unsigned int _index)
+double DARTJoint::LowerLimit(const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
