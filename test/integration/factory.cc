@@ -741,8 +741,8 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     EXPECT_EQ(joint->DOF(), jointClone->DOF());
     for (unsigned j = 0; j < joint->DOF(); ++j)
     {
-      EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
-      EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));
+      EXPECT_EQ(joint->UpperLimit(j), jointClone->UpperLimit(j));
+      EXPECT_EQ(joint->LowerLimit(j), jointClone->LowerLimit(j));
       EXPECT_EQ(joint->GetEffortLimit(j), jointClone->GetEffortLimit(j));
       EXPECT_EQ(joint->GetVelocityLimit(j), jointClone->GetVelocityLimit(j));
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));

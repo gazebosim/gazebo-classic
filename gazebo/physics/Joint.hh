@@ -80,10 +80,10 @@ namespace gazebo
                 /// \brief Velocity.
                 VEL,
 
-                /// \brief High stop angle.
+                /// \brief Upper joint limit.
                 HI_STOP,
 
-                /// \brief Low stop angle.
+                /// \brief Lower joint limit.
                 LO_STOP
               };
 
@@ -470,17 +470,33 @@ namespace gazebo
       /// \return ratio of child MOI to parent MOI.
       public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
-      /// \brief:  get the joint upper limit
+      /// \brief:  get the joint lower limit
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Lower limit of the axis.
-      public: math::Angle GetLowerLimit(unsigned int _index) const;
+      /// \deprecated See LowerLimit, which returns double.
+      public: math::Angle GetLowerLimit(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
-      /// \brief:  get the joint lower limit
+      /// \brief Get the joint's lower limit. For rotational axes, the value
+      /// is in radians, for prismatic axes it is in meters.
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Lower limit of the axis.
+      public: double LowerLimit(unsigned int _index = 0) const;
+
+      /// \brief:  get the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetUpperLimit(unsigned int _index) const;
+      /// \deprecated See UpperLimit, which returns double.
+      public: math::Angle GetUpperLimit(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the joint's upper limit. For rotational axes, the value
+      /// is in radians, for prismatic axes it is in meters.
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Lower limit of the axis.
+      public: double UpperLimit(const unsigned int _index = 0) const;
 
       /// \brief:  set the joint lower limit
       /// (replaces SetLowStop and SetHighStop)

@@ -1086,21 +1086,33 @@ double Joint::GetSpringReferencePosition(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle Joint::GetLowerLimit(unsigned int _index) const
 {
+  return math::Angle(this->LowerLimit(_index));
+}
+
+//////////////////////////////////////////////////
+double Joint::LowerLimit(const unsigned int _index) const
+{
   if (_index < this->DOF())
     return this->lowerLimit[_index];
 
   gzwarn << "requesting lower limit of joint index out of bound\n";
-  return math::Angle();
+  return 0;
 }
 
 //////////////////////////////////////////////////
 math::Angle Joint::GetUpperLimit(unsigned int _index) const
 {
+  return math::Angle(this->UpperLimit(_index));
+}
+
+//////////////////////////////////////////////////
+double Joint::UpperLimit(const unsigned int _index) const
+{
   if (_index < this->DOF())
     return this->upperLimit[_index];
 
   gzwarn << "requesting upper limit of joint index out of bound\n";
-  return math::Angle();
+  return 0;
 }
 
 //////////////////////////////////////////////////

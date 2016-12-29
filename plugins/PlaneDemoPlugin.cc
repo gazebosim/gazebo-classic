@@ -289,8 +289,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
         // initialize to joint limits
-        jc.maxVal = joint->GetUpperLimit(0).Radian();
-        jc.minVal = joint->GetLowerLimit(0).Radian();
+        jc.maxVal = joint->UpperLimit(0);
+        jc.minVal = joint->LowerLimit(0);
         // overwrite if user specified limits
         if (controlPtr->HasElement("max_val"))
           jc.maxVal = controlPtr->Get<double>("max_val");

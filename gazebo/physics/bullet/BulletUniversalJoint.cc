@@ -121,12 +121,12 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
-  // Get{Upp|Low}erLimit gets the original sdf values
+  // {Upp|Low}erLimit gets the original sdf values
   // Set{High|Low}Stop translates to bullet's axis definitions
-  this->SetHighStop(0, this->GetUpperLimit(0));
-  this->SetHighStop(1, this->GetUpperLimit(1));
-  this->SetLowStop(0, this->GetLowerLimit(0));
-  this->SetLowStop(1, this->GetLowerLimit(1));
+  this->SetHighStop(0, this->UpperLimit(0));
+  this->SetHighStop(1, this->UpperLimit(1));
+  this->SetLowStop(0, this->LowerLimit(0));
+  this->SetLowStop(1, this->LowerLimit(1));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
