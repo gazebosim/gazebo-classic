@@ -339,27 +339,24 @@ bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
+double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/)
 {
-  math::Angle result;
-
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
-
+    gzerr << "Joint must be created before getting upper limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
+double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/)
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
     gzerr << "Joint must be created before getting low stop\n";
-
   return result;
 }
 

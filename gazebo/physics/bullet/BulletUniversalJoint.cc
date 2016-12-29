@@ -124,12 +124,12 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
-  // {Upp|Low}erLimit gets the original sdf values
+  // {ppp|low}erLimit keeps the original sdf values
   // Set{High|Low}Stop translates to bullet's axis definitions
-  this->SetHighStop(0, this->UpperLimit(0));
-  this->SetHighStop(1, this->UpperLimit(1));
-  this->SetLowStop(0, this->LowerLimit(0));
-  this->SetLowStop(1, this->LowerLimit(1));
+  this->SetHighStop(0, this->upperLimit[0]);
+  this->SetHighStop(1, this->upperLimit[1]);
+  this->SetLowStop(0, this->lowerLimit[0]);
+  this->SetLowStop(1, this->lowerLimit[1]);
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
@@ -259,13 +259,13 @@ bool BulletUniversalJoint::SetHighStop(unsigned int _index,
     if (_index == 1)
     {
       this->bulletUniversal->setLowerLimit(
-        this->angleOffset[0] - angle, -this->GetHighStop(0).Radian());
+        this->angleOffset[0] - angle, -this->UpperLimit(0));
       return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setLowerLimit(
-        -this->GetHighStop(1).Radian(), this->angleOffset[1] - angle);
+        -this->UpperLimit(1), this->angleOffset[1] - angle);
       return true;
     }
     else
@@ -301,13 +301,13 @@ bool BulletUniversalJoint::SetLowStop(unsigned int _index,
     if (_index == 1)
     {
       this->bulletUniversal->setUpperLimit(
-        this->angleOffset[0] - angle, -this->GetLowStop(0).Radian());
+        this->angleOffset[0] - angle, -this->LowerLimit(0));
       return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setUpperLimit(
-        -this->GetLowStop(1).Radian(), this->angleOffset[1] - angle);
+        -this->LowerLimit(1), this->angleOffset[1] - angle);
       return true;
     }
     else
@@ -324,41 +324,45 @@ bool BulletUniversalJoint::SetLowStop(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetHighStop(unsigned int _index)
+double BulletUniversalJoint::UpperLimit(const unsigned int _index)
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->bulletUniversal)
   {
     btScalar limit1, limit2;
     this->bulletUniversal->getLowerLimit(limit1, limit2);
     if (_index == 1)
-      result.SetFromRadian(-limit1);
+      result = -limit1;
     else if (_index == 0)
-      result.SetFromRadian(-limit2);
+      result = -limit2;
     else
       gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
+  else
+    gzerr << "Joint must be created before getting upper limit\n";
 
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetLowStop(unsigned int _index)
+double BulletUniversalJoint::LowerLimit(const unsigned int _index)
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->bulletUniversal)
   {
     btScalar limit1, limit2;
     this->bulletUniversal->getUpperLimit(limit1, limit2);
     if (_index == 1)
-      result.SetFromRadian(-limit1);
+      result = -limit1;
     else if (_index == 0)
-      result.SetFromRadian(-limit2);
+      result = -limit2;
     else
       gzerr << "Invalid axis index[" << _index << "]" << std::endl;
   }
+  else
+    gzerr << "Joint must be created before getting lower limit\n";
 
   return result;
 }

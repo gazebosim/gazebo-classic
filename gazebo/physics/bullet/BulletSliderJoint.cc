@@ -297,24 +297,24 @@ bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
+double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/)
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzlog << "Joint must be created before getting high stop\n";
+    gzerr << "Joint must be created before getting upper limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
+double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/)
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzlog << "Joint must be created before getting low stop\n";
+    gzerr << "Joint must be created before getting lower limit\n";
   return result;
 }
 

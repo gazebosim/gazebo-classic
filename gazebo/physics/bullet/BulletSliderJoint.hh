@@ -67,10 +67,10 @@ namespace gazebo
                   const math::Angle &_angle);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index);
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

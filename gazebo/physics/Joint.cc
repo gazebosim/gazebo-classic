@@ -542,11 +542,11 @@ double Joint::GetParam(const std::string &_key, unsigned int _index)
 {
   if (_key == "hi_stop")
   {
-    return this->GetHighStop(_index).Radian();
+    return this->UpperLimit(_index);
   }
   else if (_key == "lo_stop")
   {
-    return this->GetLowStop(_index).Radian();
+    return this->LowerLimit(_index);
   }
   gzerr << "GetParam unrecognized parameter ["
         << _key
@@ -631,8 +631,8 @@ void Joint::FillMsg(msgs::Joint &_msg)
       break;
 
     msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
-    axis->set_limit_lower(this->GetLowStop(i).Radian());
-    axis->set_limit_upper(this->GetHighStop(i).Radian());
+    axis->set_limit_lower(this->LowerLimit(i));
+    axis->set_limit_upper(this->UpperLimit(i));
     axis->set_limit_effort(this->GetEffortLimit(i));
     axis->set_limit_velocity(this->GetVelocityLimit(i));
     axis->set_damping(this->GetDamping(i));
@@ -700,10 +700,23 @@ bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
+math::Angle Joint::GetHighStop(unsigned int _index)
+{
+  return this->UpperLimit(_index);
+}
+
+
+//////////////////////////////////////////////////
 bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
   this->SetLowerLimit(_index, _angle.Radian());
   return true;
+}
+
+//////////////////////////////////////////////////
+math::Angle Joint::GetLowStop(unsigned int _index)
+{
+  return this->LowerLimit(_index);
 }
 
 //////////////////////////////////////////////////
@@ -750,8 +763,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   }
 
   // truncate position by joint limits
-  double lower = this->GetLowStop(_index).Radian();
-  double upper = this->GetHighStop(_index).Radian();
+  double lower = this->LowerLimit(_index);
+  double upper = this->UpperLimit(_index);
   if (lower < upper)
     _position = ignition::math::clamp(_position, lower, upper);
   else

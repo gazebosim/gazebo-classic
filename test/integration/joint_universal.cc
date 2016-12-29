@@ -72,10 +72,10 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   ASSERT_TRUE(linkLower != NULL);
 
   // check joint limits from sdf
-  EXPECT_NEAR(1.4, jointLower->GetHighStop(0).Radian(), g_tolerance);
-  EXPECT_NEAR(1.27, jointLower->GetHighStop(1).Radian(), g_tolerance);
-  EXPECT_NEAR(-1.4, jointLower->GetLowStop(0).Radian(), g_tolerance);
-  EXPECT_NEAR(-1.27, jointLower->GetLowStop(1).Radian(), g_tolerance);
+  EXPECT_NEAR(1.4, jointLower->UpperLimit(0), g_tolerance);
+  EXPECT_NEAR(1.27, jointLower->UpperLimit(1), g_tolerance);
+  EXPECT_NEAR(-1.4, jointLower->LowerLimit(0), g_tolerance);
+  EXPECT_NEAR(-1.27, jointLower->LowerLimit(1), g_tolerance);
 
   // freeze upper joint
   jointUpper->SetHighStop(0, 1e-6);
@@ -92,10 +92,10 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   jointLower->SetHighStop(1, hi1);
   jointLower->SetLowStop(0, lo0);
   jointLower->SetLowStop(1, lo1);
-  EXPECT_NEAR(hi0, jointLower->GetHighStop(0).Radian(), g_tolerance);
-  EXPECT_NEAR(hi1, jointLower->GetHighStop(1).Radian(), g_tolerance);
-  EXPECT_NEAR(lo0, jointLower->GetLowStop(0).Radian(), g_tolerance);
-  EXPECT_NEAR(lo1, jointLower->GetLowStop(1).Radian(), g_tolerance);
+  EXPECT_NEAR(hi0, jointLower->UpperLimit(0), g_tolerance);
+  EXPECT_NEAR(hi1, jointLower->UpperLimit(1), g_tolerance);
+  EXPECT_NEAR(lo0, jointLower->LowerLimit(0), g_tolerance);
+  EXPECT_NEAR(lo1, jointLower->LowerLimit(1), g_tolerance);
 
   for (int i = 0; i < 4; ++i)
   {

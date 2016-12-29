@@ -94,17 +94,17 @@ void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetHighStop(unsigned int /*_index*/)
+double SimbodyBallJoint::UpperLimit(const unsigned int /*_index*/)
 {
-  gzerr << "SimbodyBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "SimbodyBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetLowStop(unsigned int /*_index*/)
+double SimbodyBallJoint::LowerLimit(const unsigned int /*_index*/)
 {
-  gzerr << "SimbodyBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "SimbodyBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

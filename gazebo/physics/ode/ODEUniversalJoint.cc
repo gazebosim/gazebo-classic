@@ -342,11 +342,11 @@ double ODEUniversalJoint::GetParam(
     }
     else if (_key == "hi_stop")
     {
-      return this->GetHighStop(_index).Radian();
+      return this->UpperLimit(_index);
     }
     else if (_key == "lo_stop")
     {
-      return this->GetLowStop(_index).Radian();
+      return this->LowerLimit(_index);
     }
     else
     {

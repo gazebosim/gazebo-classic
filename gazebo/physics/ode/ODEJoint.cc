@@ -322,18 +322,6 @@ bool ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEJoint::GetHighStop(unsigned int _index)
-{
-  return this->UpperLimit(_index);
-}
-
-//////////////////////////////////////////////////
-math::Angle ODEJoint::GetLowStop(unsigned int _index)
-{
-  return this->LowerLimit(_index);
-}
-
-//////////////////////////////////////////////////
 math::Vector3 ODEJoint::GetLinkForce(unsigned int _index) const
 {
   math::Vector3 result;

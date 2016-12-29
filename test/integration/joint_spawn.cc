@@ -416,12 +416,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     unsigned int steps = 100;
     double vel = 1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    double limit = steps * dt * vel * 0.5;
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
     EXPECT_LT(_joint->Position(_index), limit.Radian() + g_tolerance);
-    EXPECT_EQ(_joint->GetHighStop(_index), limit);
+    EXPECT_EQ(_joint->UpperLimit(_index), limit);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
       EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);
@@ -437,12 +437,12 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     unsigned int steps = 100;
     double vel = -1.0;
-    math::Angle limit = math::Angle(steps * dt * vel * 0.5);
+    double limit = steps * dt * vel * 0.5;
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
     EXPECT_GT(_joint->Position(_index), limit.Radian() - g_tolerance);
-    EXPECT_EQ(_joint->GetLowStop(_index), limit);
+    EXPECT_EQ(_joint->LowerLimit(_index), limit);
     {
       boost::any value = _joint->GetParam("lo_stop", _index);
       EXPECT_NEAR(boost::any_cast<double>(value), limit.Radian(), g_tolerance);

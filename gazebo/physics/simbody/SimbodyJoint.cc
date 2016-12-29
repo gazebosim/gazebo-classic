@@ -495,7 +495,7 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->GetLowStop(_index).Radian(), _angle.Radian());
+          this->LowerLimit(_index), _angle.Radian());
       }
       else
       {
@@ -532,7 +532,7 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
           _angle.Radian(),
-          this->GetHighStop(_index).Radian());
+          this->UpperLimit(_index));
       }
       else
       {
@@ -556,57 +556,57 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+double SimbodyJoint::UpperLimit(const unsigned int _index)
 {
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::UpperLimit.
   if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else
   {
     gzerr << "Should not be here in code, DOF > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+double SimbodyJoint::LowerLimit(const unsigned int _index)
 {
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::LowerLimit.
   if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else
   {
     gzerr << "Should not be here in code, DOF > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
 }

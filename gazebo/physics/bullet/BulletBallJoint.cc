@@ -233,15 +233,15 @@ void BulletBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+double BulletBallJoint::UpperLimit(const unsigned int /*_index*/)
 {
-  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+double BulletBallJoint::LowerLimit(const unsigned int /*_index*/)
 {
-  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }

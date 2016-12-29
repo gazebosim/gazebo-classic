@@ -576,18 +576,6 @@ double BulletJoint::GetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletJoint::GetHighStop(unsigned int _index)
-{
-  return this->UpperLimit(_index);
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletJoint::GetLowStop(unsigned int _index)
-{
-  return this->LowerLimit(_index);
-}
-
-//////////////////////////////////////////////////
 bool BulletJoint::SetPosition(unsigned int _index, double _position)
 {
   return Joint::SetPositionMaximal(_index, _position);

@@ -166,17 +166,17 @@ void VehiclePlugin::Init()
   this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate
-  double steeringRange = this->steeringJoint->GetHighStop(0).Radian() -
-                         this->steeringJoint->GetLowStop(0).Radian();
+  double steeringRange = this->steeringJoint->UpperLimit(0) -
+                         this->steeringJoint->LowerLimit(0);
 
   // Compute the angle ratio between the steering wheel and the tires
   this->steeringRatio = steeringRange / this->tireAngleRange;
 
   // Maximum gas is the upper limit of the gas joint
-  this->maxGas = this->gasJoint->GetHighStop(0).Radian();
+  this->maxGas = this->gasJoint->UpperLimit(0);
 
   // Maximum brake is the upper limit of the gas joint
-  this->maxBrake = this->gasJoint->GetHighStop(0).Radian();
+  this->maxBrake = this->gasJoint->UpperLimit(0);
 
   printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
 }

@@ -316,7 +316,7 @@ bool SimbodyScrewJoint::SetHighStop(
         // angular limit is specified
         this->limitForce[0].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->GetLowStop(_index).Radian(), _angle.Radian());
+          this->LowerLimit(_index), _angle.Radian());
       }
       else if (_index == 1)
       {
@@ -336,7 +336,7 @@ bool SimbodyScrewJoint::SetHighStop(
           double upper = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
-            this->GetLowStop(_index).Radian(), upper);
+            this->LowerLimit(_index), upper);
         }
         else
         {
@@ -347,7 +347,7 @@ bool SimbodyScrewJoint::SetHighStop(
           double lower = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
-            lower, this->GetHighStop(_index).Radian());
+            lower, this->UpperLimit(_index));
         }
       }
       else
@@ -394,7 +394,7 @@ bool SimbodyScrewJoint::SetLowStop(
         this->limitForce[0].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
           _angle.Radian(),
-          this->GetHighStop(_index).Radian());
+          this->UpperLimit(_index));
       }
       else if (_index == 1)
       {
@@ -414,7 +414,7 @@ bool SimbodyScrewJoint::SetLowStop(
           double lower = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
-            lower, this->GetHighStop(_index).Radian());
+            lower, this->UpperLimit(_index));
         }
         else
         {
@@ -425,7 +425,7 @@ bool SimbodyScrewJoint::SetLowStop(
           double upper = _angle.Radian() / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
-            this->GetHighStop(_index).Radian(), upper);
+            this->UpperLimit(_index), upper);
         }
       }
       else
@@ -449,18 +449,17 @@ bool SimbodyScrewJoint::SetLowStop(
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
+double SimbodyScrewJoint::UpperLimit(const unsigned int _index)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->UpperLimit(0));
+    return this->UpperLimit(0);
   }
   else if (_index == 1)
   {
@@ -473,34 +472,32 @@ math::Angle SimbodyScrewJoint::GetHighStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return math::Angle(this->UpperLimit(0) / tp);
+      return this->UpperLimit(0) / tp;
     }
     else
     {
-      return math::Angle(this->LowerLimit(0) / tp);
+      return this->LowerLimit(0) / tp;
     }
   }
   else
   {
     gzerr << "Should not be here in code, DOF > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
+double SimbodyScrewJoint::LowerLimit(const unsigned int _index)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->LowerLimit(0));
+    return this->LowerLimit(0);
   }
   else if (_index == 1)
   {
@@ -513,17 +510,16 @@ math::Angle SimbodyScrewJoint::GetLowStop(unsigned int _index)
     }
     if (tp > 0)
     {
-      return math::Angle(this->LowerLimit(0) / tp);
+      return this->LowerLimit(0) / tp;
     }
     else
     {
-      return math::Angle(this->UpperLimit(0) / tp);
+      return this->UpperLimit(0) / tp;
     }
   }
   else
   {
     gzerr << "Should not be here in code, DOF > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
 }

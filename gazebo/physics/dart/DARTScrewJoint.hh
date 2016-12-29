@@ -93,10 +93,10 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _vel);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);

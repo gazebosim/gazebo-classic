@@ -105,17 +105,17 @@ void ODEBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetHighStop(unsigned int /*_index*/)
+double ODEBallJoint::UpperLimit(const unsigned int /*_index*/)
 {
-  gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "ODEBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetLowStop(unsigned int /*_index*/)
+double ODEBallJoint::LowerLimit(const unsigned int /*_index*/)
 {
-  gzerr << "ODEBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "ODEBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

@@ -179,12 +179,12 @@ bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
+double BulletHinge2Joint::UpperLimit(const unsigned int _index)
 {
   if (!this->bulletHinge2)
   {
     gzerr << "Joint must be created first.\n";
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
 #ifndef LIBBULLET_VERSION_GT_282
@@ -196,17 +196,17 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
   if (motor)
     return motor->m_hiLimit;
 
-  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  gzerr << "Unable to get upper limit for axis _index[" << _index << "]\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
+double BulletHinge2Joint::LowerLimit(const unsigned int _index)
 {
   if (!this->bulletHinge2)
   {
-    gzerr << "BulletHinge2Joint::bulletHigne2 not created yet, returning 0.\n";
-    return math::Angle(0.0);
+    gzerr << "Joint must be created first.\n";
+    return ignition::math::NAN_D;
   }
 
 #ifndef LIBBULLET_VERSION_GT_282
@@ -218,8 +218,8 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
   if (motor)
     return motor->m_loLimit;
 
-  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  gzerr << "Unable to get lower limit for axis _index[" << _index << "]\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

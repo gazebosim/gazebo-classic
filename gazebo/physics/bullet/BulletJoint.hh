@@ -104,12 +104,6 @@ namespace gazebo
                                           unsigned int _index);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
-
-      // Documentation inherited.
       public: virtual void SetProvideFeedback(bool _enable);
 
       // Documentation inherited.

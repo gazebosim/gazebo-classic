@@ -287,7 +287,7 @@ bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   {
     this->dataPtr->Cache(
           "HighStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle));
+          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle.Radian()));
     return true;
   }
 
@@ -308,7 +308,7 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   {
     this->dataPtr->Cache(
           "LowStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle));
+          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle.Radian()));
     return true;
   }
 
@@ -317,17 +317,17 @@ bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetHighStop(unsigned int _index)
+double DARTJoint::UpperLimit(const unsigned int _index)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Angle>(
+    return this->dataPtr->GetCached<double>(
           "HighStop" + std::to_string(_index));
   }
 
@@ -335,17 +335,17 @@ math::Angle DARTJoint::GetHighStop(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTJoint::GetLowStop(unsigned int _index)
+double DARTJoint::LowerLimit(const unsigned int _index)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Angle>(
+    return this->dataPtr->GetCached<double>(
           "LowStop" + std::to_string(_index));
   }
 

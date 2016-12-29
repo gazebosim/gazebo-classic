@@ -390,47 +390,47 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
+double DARTScrewJoint::UpperLimit(const unsigned int _index)
 {
   switch (_index)
   {
-  case 0:
-    if (!this->dataPtr->IsInitialized())
-    {
-      return this->dataPtr->GetCached<math::Angle>(
-            "HighStop" + std::to_string(_index));
-    }
+    case 0:
+      if (!this->dataPtr->IsInitialized())
+      {
+        return this->dataPtr->GetCached<double>(
+              "HighStop" + std::to_string(_index));
+      }
 
-    return this->dataPtr->dtJoint->getPositionUpperLimit(0);
-  case 1:
-    gzerr << "DARTScrewJoint::GetHighStop: Not implemented for index[1].\n";
-    break;
-  default:
-    gzerr << "Invalid index[" << _index << "]\n";
+      return this->dataPtr->dtJoint->getPositionUpperLimit(0);
+    case 1:
+      gzerr << "DARTScrewJoint::UpperLimit: Not implemented for index[1].\n";
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
+double DARTScrewJoint::LowerLimit(const unsigned int _index)
 {
   switch (_index)
   {
-  case 0:
-    if (!this->dataPtr->IsInitialized())
-    {
-      return this->dataPtr->GetCached<math::Angle>(
-            "LowStop" + std::to_string(_index));
-    }
+    case 0:
+      if (!this->dataPtr->IsInitialized())
+      {
+        return this->dataPtr->GetCached<double>(
+              "LowStop" + std::to_string(_index));
+      }
 
-    return this->dataPtr->dtJoint->getPositionLowerLimit(0);
-  case 1:
-    gzerr << "DARTScrewJoint::GetLowStop: Not implemented for index[1].\n";
-    break;
-  default:
-    gzerr << "Invalid index[" << _index << "]\n";
+      return this->dataPtr->dtJoint->getPositionLowerLimit(0);
+    case 1:
+      gzerr << "DARTScrewJoint::LowerLimit: Not implemented for index[1].\n";
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::NAN_D;
 }

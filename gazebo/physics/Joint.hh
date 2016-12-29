@@ -260,7 +260,9 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(unsigned int _index) = 0;
+      /// \deprecated See UpperLimit, which returns double.
+      public: virtual math::Angle GetHighStop(unsigned int _index)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -268,7 +270,9 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(unsigned int _index) = 0;
+      /// \deprecated See LowerLimit, which returns double.
+      public: virtual math::Angle GetLowStop(unsigned int _index)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -503,7 +507,7 @@ namespace gazebo
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \return Lower limit of the axis.
-      public: double LowerLimit(unsigned int _index = 0) const;
+      public: virtual double LowerLimit(unsigned int _index = 0) const;
 
       /// \brief:  get the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
@@ -517,7 +521,7 @@ namespace gazebo
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \return Lower limit of the axis.
-      public: double UpperLimit(const unsigned int _index = 0) const;
+      public: virtual double UpperLimit(const unsigned int _index = 0) const;
 
       /// \brief:  set the joint lower limit
       /// (replaces SetLowStop and SetHighStop)
@@ -531,7 +535,8 @@ namespace gazebo
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetLowerLimit(const unsigned int _index, const double _limit);
+      public: void SetLowerLimit(const unsigned int _index,
+                                 const double _limit);
 
       /// \brief:  set the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
@@ -545,7 +550,8 @@ namespace gazebo
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetUpperLimit(const unsigned int _index, const double _limit);
+      public: void SetUpperLimit(const unsigned int _index,
+                                 const double _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.
