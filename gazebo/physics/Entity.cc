@@ -736,8 +736,8 @@ math::Box Entity::GetCollisionBoundingBox() const
 //////////////////////////////////////////////////
 ignition::math::Box Entity::CollisionBoundingBox() const
 {
-  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this()); return
-  this->CollisionBoundingBoxHelper(base);
+  BasePtr base = boost::const_pointer_cast<Base>(shared_from_this());
+  return this->CollisionBoundingBoxHelper(base);
 }
 
 //////////////////////////////////////////////////

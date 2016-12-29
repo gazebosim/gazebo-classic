@@ -137,7 +137,7 @@ namespace gazebo
       /// a Simbody Transform. The rotation angles are interpreted as a
       /// body-fixed sequence, meaning we rotation about x, then about
       /// the new y, then about the now twice-rotated z.
-      /// \param[in] _pose Gazeb's math::Pose object
+      /// \param[in] _pose Gazebo's math::Pose object
       /// \return Simbody's SimTK::Transform object
       public: static SimTK::Transform Pose2Transform(
                   const ignition::math::Pose3d &_pose);
