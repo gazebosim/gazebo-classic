@@ -77,7 +77,7 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   // This attribute may cause problem with mouse picking in OSX/ogre1.9/qt5
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
+  // this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
 
 
