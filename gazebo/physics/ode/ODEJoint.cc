@@ -1005,7 +1005,7 @@ void ODEJoint::SetDamping(unsigned int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetStiffness(unsigned int _index, double _stiffness)
+void ODEJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
   if (_index < this->DOF())
   {

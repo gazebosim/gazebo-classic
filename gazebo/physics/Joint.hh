@@ -25,6 +25,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
@@ -191,7 +192,7 @@ namespace gazebo
       /// \param[in] _stiffness Spring stiffness value for the axis.
       /// \TODO: rename to SetSpringStiffness()
       public: virtual void SetStiffness(unsigned int _index,
-                                        double _stiffness) = 0;
+                                        const double _stiffness) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
