@@ -381,9 +381,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, this->upperLimit[0].Radian());
-      this->SetLowStop(0, this->lowerLimit[0].Radian());
-      this->SetHighStop(0, this->upperLimit[0].Radian());
+      this->SetHighStop(0, this->upperLimit[0]);
+      this->SetLowStop(0, this->lowerLimit[0]);
+      this->SetHighStop(0, this->upperLimit[0]);
     }
   }
 
@@ -398,9 +398,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(1, this->upperLimit[1].Radian());
-      this->SetLowStop(1, this->lowerLimit[1].Radian());
-      this->SetHighStop(1, this->upperLimit[1].Radian());
+      this->SetHighStop(1, this->upperLimit[1]);
+      this->SetLowStop(1, this->lowerLimit[1]);
+      this->SetHighStop(1, this->upperLimit[1]);
     }
   }
 
@@ -511,7 +511,7 @@ void Joint::Reset()
   {
     this->SetVelocity(i, 0.0);
   }
-  this->staticAngle.Radian(0);
+  this->staticPosition = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -681,7 +681,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
 math::Angle Joint::GetAngle(unsigned int _index) const
 {
   if (this->model->IsStatic())
-    return this->staticAngle;
+    return this->staticPosition;
   else
     return this->GetAngleImpl(_index);
 }
@@ -712,13 +712,13 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
   {
     if (this->model->IsStatic())
     {
-      this->staticAngle = _position;
+      this->staticPosition = _position;
     }
   }
   else
   {
-    gzwarn << "model not setup yet, setting staticAngle.\n";
-    this->staticAngle = _position;
+    gzwarn << "model not setup yet, setting staticPosition.\n";
+    this->staticPosition = _position;
   }
   return true;
 }
@@ -1124,7 +1124,7 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit.Ign();
+    this->lowerLimit[_index] = _limit.Radian();
     limitElem->GetElement("lower")->Set(_limit.Radian());
   }
   else if (_index == 1)
@@ -1133,7 +1133,7 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit.Ign();
+    this->lowerLimit[_index] = _limit.Radian();
     limitElem->GetElement("lower")->Set(_limit.Radian());
   }
   else
@@ -1161,7 +1161,7 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit.Ign();
+    this->upperLimit[_index] = _limit.Radian();
     limitElem->GetElement("upper")->Set(_limit.Radian());
   }
   else if (_index == 1)
@@ -1170,7 +1170,7 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit.Ign();
+    this->upperLimit[_index] = _limit.Radian();
     limitElem->GetElement("upper")->Set(_limit.Radian());
   }
   else

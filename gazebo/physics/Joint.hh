@@ -660,10 +660,10 @@ namespace gazebo
       protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
-      protected: ignition::math::Angle lowerLimit[MAX_JOINT_AXIS];
+      protected: double lowerLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position upper limit as specified in SDF
-      protected: ignition::math::Angle upperLimit[MAX_JOINT_AXIS];
+      protected: double upperLimit[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
@@ -687,8 +687,8 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief Angle used when the joint is parent of a static model.
-      private: ignition::math::Angle staticAngle;
+      /// \brief Position used when the joint is parent of a static model.
+      private: double staticPosition;
 
       /// \brief Joint stop stiffness
       private: double stopStiffness[MAX_JOINT_AXIS];

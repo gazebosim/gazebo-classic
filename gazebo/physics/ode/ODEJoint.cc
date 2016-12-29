@@ -888,8 +888,8 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
 
     if ((ignition::math::equal(this->dissipationCoefficient[i], 0.0) &&
          ignition::math::equal(this->stiffnessCoefficient[i], 0.0)) ||
-        angle >= this->upperLimit[i].Radian() ||
-        angle <= this->lowerLimit[i].Radian())
+        angle >= this->upperLimit[i] ||
+        angle <= this->lowerLimit[i])
     {
       if (this->implicitDampingState[i] != ODEJoint::JOINT_LIMIT)
       {
@@ -898,9 +898,9 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         // and recover joint limits
         this->SetParam("stop_erp", i, this->stopERP);
         this->SetParam("stop_cfm", i, this->stopCFM);
-        this->SetParam("hi_stop", i, this->upperLimit[i].Radian());
-        this->SetParam("lo_stop", i, this->lowerLimit[i].Radian());
-        this->SetParam("hi_stop", i, this->upperLimit[i].Radian());
+        this->SetParam("hi_stop", i, this->upperLimit[i]);
+        this->SetParam("lo_stop", i, this->lowerLimit[i]);
+        this->SetParam("hi_stop", i, this->upperLimit[i]);
         this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
       }
       /* test to see if we can reduce jitter at joint limits
