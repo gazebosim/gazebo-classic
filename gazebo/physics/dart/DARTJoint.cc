@@ -275,45 +275,39 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
-    return false;
   }
 
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "HighStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle.Radian()));
-    return true;
+          boost::bind(&DARTJoint::SetUpperLimit, this, _index, _limit));
   }
 
-  this->dataPtr->dtJoint->setPositionUpperLimit(_index, _angle.Radian());
-  return true;
+  this->dataPtr->dtJoint->setPositionUpperLimit(_index, _limit);
 }
 
 //////////////////////////////////////////////////
-bool DARTJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
-    return false;
   }
 
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "LowStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetHighStop, this, _index, _angle.Radian()));
-    return true;
+          boost::bind(&DARTJoint::SetLowerLimit, this, _index, _limit));
   }
 
-  this->dataPtr->dtJoint->setPositionLowerLimit(_index, _angle.Radian());
-  return true;
+  this->dataPtr->dtJoint->setPositionLowerLimit(_index, _limit);
 }
 
 //////////////////////////////////////////////////
@@ -468,11 +462,11 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
   {
     if (_key == "hi_stop")
     {
-      this->SetHighStop(_index, boost::any_cast<double>(_value));
+      this->SetUpperLimit(_index, boost::any_cast<double>(_value));
     }
     else if (_key == "lo_stop")
     {
-      this->SetLowStop(_index, boost::any_cast<double>(_value));
+      this->SetLowerLimit(_index, boost::any_cast<double>(_value));
     }
     else if (_key == "friction")
     {

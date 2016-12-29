@@ -197,21 +197,19 @@ void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &/*_angle*/)
+void BulletFixedJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "SetHighStop that is not valid for joints of type fixed.\n";
-  return false;
+         << "SetUpperLimit that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &/*_angle*/)
+void BulletFixedJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "SetLowStop that is not valid for joints of type fixed.\n";
-  return false;
+         << "SetLowerLimit that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////

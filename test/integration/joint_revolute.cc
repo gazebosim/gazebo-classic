@@ -396,8 +396,8 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          joint->SetLowStop(0, math::Angle(-0.1));
-          joint->SetHighStop(0, math::Angle(0.1));
+          joint->SetLowerLimit(0, -0.1);
+          joint->SetUpperLimit(0, 0.1);
         }
         else
         {
@@ -475,8 +475,8 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         // Simbody and DART will not easily detach joints,
         // consider freezing joint limit instead
         // auto curAngle = joint->Position(0u);
-        // joint->SetLowStop(0, curAngle);
-        // joint->SetHighStop(0, curAngle);
+        // joint->SetLowerLimit(0, curAngle);
+        // joint->SetUpperLimit(0, curAngle);
       }
       else
       {

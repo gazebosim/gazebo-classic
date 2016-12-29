@@ -125,11 +125,11 @@ void BulletUniversalJoint::Init()
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
   // {ppp|low}erLimit keeps the original sdf values
-  // Set{High|Low}Stop translates to bullet's axis definitions
-  this->SetHighStop(0, this->upperLimit[0]);
-  this->SetHighStop(1, this->upperLimit[1]);
-  this->SetLowStop(0, this->lowerLimit[0]);
-  this->SetLowStop(1, this->lowerLimit[1]);
+  // Set{Upper|Lower}Limit translates to bullet's axis definitions
+  this->SetUpperLimit(0, this->upperLimit[0]);
+  this->SetUpperLimit(1, this->upperLimit[1]);
+  this->SetLowerLimit(0, this->lowerLimit[0]);
+  this->SetLowerLimit(1, this->lowerLimit[1]);
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is null");
@@ -240,86 +240,78 @@ void BulletUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletUniversalJoint::SetHighStop(unsigned int _index,
-    const math::Angle &_angle)
+void BulletUniversalJoint::SetUpperLimit(const unsigned int _index,
+    const double _limit)
 {
   // bullet does not handle joint angles near [-pi/2, +pi/2]
   // so artificially truncate it and let users know
-  double angle = _angle.Radian();
+  double angle = _limit;
   if (angle < -M_PI/2.1 || angle > M_PI/2.1)
   {
     angle = ignition::math::clamp(angle, -M_PI/2.1, M_PI/2.1);
-    gzwarn << "Truncating joint limit [" << _angle.Radian()
+    gzwarn << "Truncating joint limit [" << _limit
            << "] to [" << angle << "] due to issue #1113.\n";
   }
 
-  Joint::SetHighStop(_index, angle);
+  Joint::SetUpperLimit(_index, angle);
   if (this->bulletUniversal)
   {
     if (_index == 1)
     {
       this->bulletUniversal->setLowerLimit(
         this->angleOffset[0] - angle, -this->UpperLimit(0));
-      return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setLowerLimit(
         -this->UpperLimit(1), this->angleOffset[1] - angle);
-      return true;
     }
     else
     {
       gzerr << "Invalid axis index [" << _index << "].\n";
-      return false;
     }
   }
   else
   {
     gzerr << "bulletUniversal not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletUniversalJoint::SetLowStop(unsigned int _index,
-    const math::Angle &_angle)
+void BulletUniversalJoint::SetLowerLimit(const unsigned int _index,
+    const double _limit)
 {
   // bullet does not handle joint angles near [-pi/2, +pi/2]
   // so artificially truncate it and let users know
-  double angle = _angle.Radian();
+  double angle = _limit;
   if (angle < -M_PI/2.1 || angle > M_PI/2.1)
   {
     angle = ignition::math::clamp(angle, -M_PI/2.1, M_PI/2.1);
-    gzwarn << "Truncating joint limit [" << _angle.Radian()
+    gzwarn << "Truncating joint limit [" << _limit
            << "] to [" << angle << "] due to issue #1113.\n";
   }
 
-  Joint::SetLowStop(_index, angle);
+  Joint::SetLowerLimit(_index, angle);
   if (this->bulletUniversal)
   {
     if (_index == 1)
     {
       this->bulletUniversal->setUpperLimit(
         this->angleOffset[0] - angle, -this->LowerLimit(0));
-      return true;
     }
     else if (_index == 0)
     {
       this->bulletUniversal->setUpperLimit(
         -this->LowerLimit(1), this->angleOffset[1] - angle);
-      return true;
     }
     else
     {
       gzerr << "Invalid axis index [" << _index << "].\n";
-      return false;
     }
   }
   else
   {
     gzerr << "bulletUniversal not yet created.\n";
-    return false;
   }
 }
 

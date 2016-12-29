@@ -218,16 +218,16 @@ void VehiclePlugin::OnUpdate()
   this->joints[3]->SetForce(1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
-  this->joints[0]->SetLowStop(0, wheelAngle);
-  this->joints[0]->SetHighStop(0, wheelAngle);
-  this->joints[0]->SetLowStop(0, wheelAngle);
-  this->joints[0]->SetHighStop(0, wheelAngle);
+  this->joints[0]->SetLowerLimit(0, wheelAngle);
+  this->joints[0]->SetUpperLimit(0, wheelAngle);
+  this->joints[0]->SetLowerLimit(0, wheelAngle);
+  this->joints[0]->SetUpperLimit(0, wheelAngle);
 
   // Set the front-right wheel angle
-  this->joints[1]->SetHighStop(0, wheelAngle);
-  this->joints[1]->SetLowStop(0, wheelAngle);
-  this->joints[1]->SetHighStop(0, wheelAngle);
-  this->joints[1]->SetLowStop(0, wheelAngle);
+  this->joints[1]->SetUpperLimit(0, wheelAngle);
+  this->joints[1]->SetLowerLimit(0, wheelAngle);
+  this->joints[1]->SetUpperLimit(0, wheelAngle);
+  this->joints[1]->SetLowerLimit(0, wheelAngle);
 
   // Get the current velocity of the car
   this->velocity = this->chassis->GetWorldLinearVel().Ign();

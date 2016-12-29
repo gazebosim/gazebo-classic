@@ -245,14 +245,16 @@ namespace gazebo
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
+      /// \deprecated See SetUpperLimit, which takes double.
       public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
+      /// \deprecated See SetLowerLimit, which takes double.
       public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the high stop of an axis(index).
       /// This function is replaced by GetUpperLimit(unsigned int).

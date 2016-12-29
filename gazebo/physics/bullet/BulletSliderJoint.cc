@@ -263,36 +263,32 @@ void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
-                                    const math::Angle &_angle)
+void BulletSliderJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetHighStop(0, _angle);
+  Joint::SetUpperLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setUpperLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setUpperLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
-                                   const math::Angle &_angle)
+void BulletSliderJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetLowStop(0, _angle);
+  Joint::SetLowerLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setLowerLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setLowerLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 

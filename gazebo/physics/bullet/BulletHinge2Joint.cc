@@ -147,34 +147,32 @@ void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+void BulletHinge2Joint::SetUpperLimit(const unsigned int /*_index*/,
+    const double _limit)
 {
+  /// \todo Shouldn't index be taken into account for a hinge2 joint?
   if (this->bulletHinge2)
   {
-    this->bulletHinge2->setUpperLimit(_angle.Radian());
-    return true;
+    this->bulletHinge2->setUpperLimit(_limit);
   }
   else
   {
     gzerr << "Joint must be created first.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+void BulletHinge2Joint::SetLowerLimit(const unsigned int /*_index*/,
+    const double _limit)
 {
+  /// \todo Shouldn't index be taken into account for a hinge2 joint?
   if (this->bulletHinge2)
   {
-    this->bulletHinge2->setLowerLimit(_angle.Radian());
-    return true;
+    this->bulletHinge2->setLowerLimit(_limit);
   }
   else
   {
     gzerr << "Joint must be created first.\n";
-    return false;
   }
 }
 

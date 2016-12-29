@@ -59,12 +59,14 @@ namespace gazebo
                   const double _damping);
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
+      using Joint::SetUpperLimit;
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
+      using Joint::SetLowerLimit;
 
       // Documentation inherited.
       public: virtual double UpperLimit(const unsigned int _index) const;

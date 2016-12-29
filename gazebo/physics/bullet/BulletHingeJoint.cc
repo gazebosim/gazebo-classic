@@ -297,44 +297,40 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &_angle)
+void BulletHingeJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double _limit)
 {
-  Joint::SetHighStop(0, _angle);
+  Joint::SetUpperLimit(0, _limit);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
     this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
-                                this->angleOffset + _angle.Radian());
-    return true;
+                                this->angleOffset + _limit);
   }
   else
   {
     gzerr << "bulletHinge not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &_angle)
+void BulletHingeJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double _limit)
 {
-  Joint::SetLowStop(0, _angle);
+  Joint::SetLowerLimit(0, _limit);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
+    this->bulletHinge->setLimit(this->angleOffset + _limit,
                                 this->bulletHinge->getUpperLimit());
-    return true;
   }
   else
   {
     gzerr << "bulletHinge not yet created.\n";
-    return false;
   }
 }
 

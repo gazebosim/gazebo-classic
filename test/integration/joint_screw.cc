@@ -316,7 +316,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
 
   // set new upper limit for joint_00
-  joint_00->SetHighStop(0, 0.3);
+  joint_00->SetUpperLimit(0, 0.3);
   bool once = false;
   int count = 0;
   int maxCount = 5000;
@@ -363,10 +363,10 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
 
 
   // lock joint at this location by setting lower limit here too
-  joint_00->SetLowStop(0, 0.3);
+  joint_00->SetLowerLimit(0, 0.3);
 
   // set joint_01 upper limit to 1.0
-  joint_01->SetHighStop(0, 1.0);
+  joint_01->SetUpperLimit(0, 1.0);
 
   // push joint_01 until limit is reached
   once = false;
@@ -461,7 +461,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   gzdbg << "took [" << count << "] steps.\n";
 
   // continue pushing for 1000 steps to make sure there is no overshoot
-  joint_01->SetLowStop(0, -1.0);
+  joint_01->SetLowerLimit(0, -1.0);
   for (unsigned int i = 0; i < 1000; ++i)
   {
     joint_01->SetForce(0, -0.1);

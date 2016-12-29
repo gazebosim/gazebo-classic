@@ -108,18 +108,16 @@ double SimbodyBallJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void SimbodyBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
-  gzerr << "SimbodyBallJoint::SetHighStop not implemented" << std::endl;
-  return false;
+  gzerr << "SimbodyBallJoint::SetUpperLimit not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+void SimbodyBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
-  gzerr << "SimbodyBallJoint::SetLowStop not implemented" << std::endl;
-  return false;
+  gzerr << "SimbodyBallJoint::SetLowerLimit not implemented" << std::endl;
 }
 

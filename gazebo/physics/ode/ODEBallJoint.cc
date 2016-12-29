@@ -119,17 +119,15 @@ double ODEBallJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-bool ODEBallJoint::SetHighStop(unsigned int /*_index*/,
-                               const math::Angle &/*_angle*/)
+void ODEBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                 const double /*_limit*/)
 {
-  gzerr << "ODEBallJoint::SetHighStop not implemented" << std::endl;
-  return false;
+  gzerr << "ODEBallJoint::SetUpperLimit not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-bool ODEBallJoint::SetLowStop(unsigned int /*_index*/,
-                              const math::Angle &/*_angle*/)
+void ODEBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                 const double /*_limit*/)
 {
-  gzerr << "ODEBallJoint::SetLowStop not implemented" << std::endl;
-  return false;
+  gzerr << "ODEBallJoint::SetLowerLimit not implemented" << std::endl;
 }

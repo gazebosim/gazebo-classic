@@ -381,9 +381,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(0, this->upperLimit[0]);
-      this->SetLowStop(0, this->lowerLimit[0]);
-      this->SetHighStop(0, this->upperLimit[0]);
+      this->SetUpperLimit(0, this->upperLimit[0]);
+      this->SetLowerLimit(0, this->lowerLimit[0]);
+      this->SetUpperLimit(0, this->upperLimit[0]);
     }
   }
 
@@ -398,9 +398,9 @@ void Joint::Init()
       // Perform this three step ordering to ensure the
       // parameters  are set properly.
       // This is taken from the ODE wiki.
-      this->SetHighStop(1, this->upperLimit[1]);
-      this->SetLowStop(1, this->lowerLimit[1]);
-      this->SetHighStop(1, this->upperLimit[1]);
+      this->SetUpperLimit(1, this->upperLimit[1]);
+      this->SetLowerLimit(1, this->lowerLimit[1]);
+      this->SetUpperLimit(1, this->upperLimit[1]);
     }
   }
 

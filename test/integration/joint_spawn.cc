@@ -407,7 +407,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     }
   }
 
-  // SetHighStop
+  // SetUpperLimit
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
@@ -417,7 +417,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     unsigned int steps = 100;
     double vel = 1.0;
     double limit = steps * dt * vel * 0.5;
-    _joint->SetHighStop(_index, limit);
+    _joint->SetUpperLimit(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
     EXPECT_LT(_joint->Position(_index), limit.Radian() + g_tolerance);
@@ -428,7 +428,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     }
   }
 
-  // SetLowStop
+  // SetLowerLimit
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
@@ -438,7 +438,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     unsigned int steps = 100;
     double vel = -1.0;
     double limit = steps * dt * vel * 0.5;
-    _joint->SetLowStop(_index, limit);
+    _joint->SetLowerLimit(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
     EXPECT_GT(_joint->Position(_index), limit.Radian() - g_tolerance);

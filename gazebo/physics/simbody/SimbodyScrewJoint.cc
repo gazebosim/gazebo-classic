@@ -294,10 +294,10 @@ double SimbodyScrewJoint::GetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-bool SimbodyScrewJoint::SetHighStop(
-  unsigned int _index, const math::Angle &_angle)
+void SimbodyScrewJoint::SetUpperLimit(const unsigned int _index,
+                                      const double _limit)
 {
-  Joint::SetHighStop(_index, _angle);
+  Joint::SetUpperLimit(_index, _limit);
 
   if (_index < this->DOF())
   {
@@ -307,8 +307,8 @@ bool SimbodyScrewJoint::SetHighStop(
       if (this->limitForce[_index].isEmptyHandle())
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetHighStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetUpperLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
 
       if (_index == 0)
@@ -316,7 +316,7 @@ bool SimbodyScrewJoint::SetHighStop(
         // angular limit is specified
         this->limitForce[0].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->LowerLimit(_index), _angle.Radian());
+          this->LowerLimit(_index), _limit);
       }
       else if (_index == 1)
       {
@@ -327,24 +327,24 @@ bool SimbodyScrewJoint::SetHighStop(
                 << " using thread pitch = 1.0e6\n";
           tp = 1.0e6;
         }
-        // onlye angular limiting force element is added for
+        // only angular limiting force element is added for
         // screw joints in SimbodyPhysics.cc
         if (tp > 0)
         {
-          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // incoming _limit is the linear dof, which is angle / thread_pitch.
           // convert linear limit to angular limit
-          double upper = _angle.Radian() / tp;
+          double upper = _limit / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
             this->LowerLimit(_index), upper);
         }
         else
         {
-          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // incoming _limit is the linear dof, which is angle / thread_pitch.
           // convert linear limit to angular limit
           // tp is negative, this is actually upper linear limit, or the
           // lower angular limit.
-          double lower = _angle.Radian() / tp;
+          double lower = _limit / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
             lower, this->UpperLimit(_index));
@@ -353,28 +353,24 @@ bool SimbodyScrewJoint::SetHighStop(
       else
       {
         gzerr << "Should never be here. Joint index invalid limit not set.\n";
-        return false;
       }
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
-      return false;
+      gzerr << "SetUpperLimit: State not initialized, SetUpperLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetHighStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetUpperLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyScrewJoint::SetLowStop(
-  unsigned int _index, const math::Angle &_angle)
+void SimbodyScrewJoint::SetLowerLimit(const unsigned int _index,
+                                      const double _limit)
 {
-  Joint::SetLowStop(_index, _angle);
+  Joint::SetLowerLimit(_index, _limit);
 
   if (_index < this->DOF())
   {
@@ -384,8 +380,8 @@ bool SimbodyScrewJoint::SetLowStop(
       if (this->limitForce[_index].isEmptyHandle())
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetHighStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetLowerLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
 
       if (_index == 0)
@@ -393,7 +389,7 @@ bool SimbodyScrewJoint::SetLowStop(
         // angular limit is specified
         this->limitForce[0].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          _angle.Radian(),
+          _limit,
           this->UpperLimit(_index));
       }
       else if (_index == 1)
@@ -409,20 +405,20 @@ bool SimbodyScrewJoint::SetLowStop(
         // screw joints in SimbodyPhysics.cc
         if (tp > 0)
         {
-          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // incoming _limit is the linear dof, which is angle / thread_pitch.
           // convert linear limit to angular limit
-          double lower = _angle.Radian() / tp;
+          double lower = _limit / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
             lower, this->UpperLimit(_index));
         }
         else
         {
-          // incoming _angle is the linear dof, which is _angle / thread_pitch.
+          // incoming _limit is the linear dof, which is angle / thread_pitch.
           // convert linear limit to angular limit
           // tp is negative, this is actually lower linear limit, or the
           // upper angular limit.
-          double upper = _angle.Radian() / tp;
+          double upper = _limit / tp;
           this->limitForce[0].setBounds(
             this->simbodyPhysics->integ->updAdvancedState(),
             this->UpperLimit(_index), upper);
@@ -431,21 +427,17 @@ bool SimbodyScrewJoint::SetLowStop(
       else
       {
         gzerr << "Should never be here. Joint index invalid limit not set.\n";
-        return false;
       }
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-      return false;
+      gzerr << "SetLowerLimit: State not initialized, SetLowerLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetLowStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetLowerLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////

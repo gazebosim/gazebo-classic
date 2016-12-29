@@ -122,17 +122,15 @@ double DARTBallJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-bool DARTBallJoint::SetHighStop(unsigned int /*_index*/,
-                                const math::Angle &/*_angle*/)
+void DARTBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                  const double /*_limit*/)
 {
-  gzerr << "DARTBallJoint::SetHighStop not implemented" << std::endl;
-  return false;
+  gzerr << "DARTBallJoint::SetUpperLimit not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-bool DARTBallJoint::SetLowStop(unsigned int /*_index*/,
-                               const math::Angle &/*_angle*/)
+void DARTBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                  const double /*_limit*/)
 {
-  gzerr << "DARTBallJoint::SetLowStop not implemented" << std::endl;
-  return false;
+  gzerr << "DARTBallJoint::SetLowerLimit not implemented" << std::endl;
 }

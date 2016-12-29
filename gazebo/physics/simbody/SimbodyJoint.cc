@@ -483,9 +483,10 @@ double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetUpperLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetHighStop(_index, _angle);
+  Joint::SetUpperLimit(_index, _limit);
 
   if (_index < this->DOF())
   {
@@ -495,33 +496,31 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->LowerLimit(_index), _angle.Radian());
+          this->LowerLimit(_index), _limit);
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetHighStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetUpperLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
-      return false;
+      gzerr << "SetUpperLimit: State not initialized, SetUpperLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetHighStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetUpperLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetLowerLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetLowStop(_index, _angle);
+  Joint::SetLowerLimit(_index, _limit);
 
   if (_index < this->DOF())
   {
@@ -531,28 +530,24 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          _angle.Radian(),
-          this->UpperLimit(_index));
+          _limit, this->UpperLimit(_index));
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetLowStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetLowerLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-      return false;
+      gzerr << "SetLowerLimit: State not initialized, SetLowerLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetLowStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetLowerLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////

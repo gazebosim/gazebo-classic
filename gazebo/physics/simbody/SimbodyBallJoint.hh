@@ -73,12 +73,12 @@ namespace gazebo
       public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);
