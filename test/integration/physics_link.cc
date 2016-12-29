@@ -108,7 +108,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // In this case, the gyroscopic coupling terms are zero
   // since the model is a unit box.
   ignition::math::Vector3d oneStepAngularAccel =
-      _link->GetWorldInertiaMatrix().Inverse().Ign() * torqueWorld;
+      _link->WorldInertiaMatrix().Inverse() * torqueWorld;
   EXPECT_EQ(oneStepAngularAccel, _link->WorldAngularAccel());
 
   // Check velocity in world frame
@@ -282,9 +282,8 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   const double Ixx = 0.80833333;
   const double Iyy = 0.68333333;
   const double Izz = 0.14166667;
-  const math::Matrix3 I0(Ixx, 0.0, 0.0
-                       , 0.0, Iyy, 0.0
-                       , 0.0, 0.0, Izz);
+  const ignition::math::Matrix3d I0(
+      Ixx, 0.0, 0.0 , 0.0, Iyy, 0.0 , 0.0, 0.0, Izz);
 
   // Since Ixx > Iyy > Izz,
   // angular velocity with large y component
@@ -296,10 +295,10 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
   ASSERT_EQ(w0, link->WorldAngularVel());
-  ASSERT_EQ(I0, link->GetWorldInertiaMatrix());
+  ASSERT_EQ(I0, link->WorldInertiaMatrix());
 
   // Compute initial angular momentum
-  const auto H0((I0 * w0).Ign());
+  const auto H0((I0 * w0));
   ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
   const double H0mag = H0.Length();
 
@@ -471,28 +470,28 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
     }
 
     // Expect rotated inertia matrix
-    math::Matrix3 inertia = link->GetWorldInertiaMatrix();
+    ignition::math::Matrix3d inertia = link->WorldInertiaMatrix();
     if (i == 3)
     {
-      EXPECT_NEAR(inertia[0][0], 80.8333, 1e-4);
-      EXPECT_NEAR(inertia[1][1], 68.3333, 1e-4);
-      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
+      EXPECT_NEAR(inertia(0, 0), 80.8333, 1e-4);
+      EXPECT_NEAR(inertia(1, 1), 68.3333, 1e-4);
+      EXPECT_NEAR(inertia(2, 2), 14.1667, 1e-4);
       for (int row = 0; row < 3; ++row)
         for (int col = 0; col < 3; ++col)
           if (row != col)
-            EXPECT_NEAR(inertia[row][col], 0.0, g_tolerance);
+            EXPECT_NEAR(inertia(row, col), 0.0, g_tolerance);
     }
     else
     {
-      EXPECT_NEAR(inertia[0][0], 71.4583, 1e-4);
-      EXPECT_NEAR(inertia[1][1], 77.7083, 1e-4);
-      EXPECT_NEAR(inertia[2][2], 14.1667, 1e-4);
-      EXPECT_NEAR(inertia[0][1],  5.4126, 1e-4);
-      EXPECT_NEAR(inertia[1][0],  5.4126, 1e-4);
-      EXPECT_NEAR(inertia[0][2], 0, g_tolerance);
-      EXPECT_NEAR(inertia[2][0], 0, g_tolerance);
-      EXPECT_NEAR(inertia[1][2], 0, g_tolerance);
-      EXPECT_NEAR(inertia[2][1], 0, g_tolerance);
+      EXPECT_NEAR(inertia(0, 0), 71.4583, 1e-4);
+      EXPECT_NEAR(inertia(1, 1), 77.7083, 1e-4);
+      EXPECT_NEAR(inertia(2, 2), 14.1667, 1e-4);
+      EXPECT_NEAR(inertia(0, 1),  5.4126, 1e-4);
+      EXPECT_NEAR(inertia(1, 0),  5.4126, 1e-4);
+      EXPECT_NEAR(inertia(0, 2), 0, g_tolerance);
+      EXPECT_NEAR(inertia(2, 0), 0, g_tolerance);
+      EXPECT_NEAR(inertia(1, 2), 0, g_tolerance);
+      EXPECT_NEAR(inertia(2, 1), 0, g_tolerance);
     }
 
     // For 0-2, apply torque and expect equivalent response

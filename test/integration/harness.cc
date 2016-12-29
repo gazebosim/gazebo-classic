@@ -104,7 +104,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   // subtract one since we already took 1 step after publishing to detach
   world->Step(fallTime / dt - 1);
 
-  const auto vel = model->GetWorldLinearVel().Ign();
+  const auto vel = model->WorldLinearVel();
   EXPECT_NEAR(vel.X(), 0, 2e-3);
   EXPECT_NEAR(vel.Y(), 0, 2e-3);
   EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);

@@ -735,7 +735,7 @@ ignition::math::Vector3d Link::WorldAngularAccel() const
   // L: angular momentum of CoG in world frame
   // w: angular velocity in world frame
   // return I^-1 * (T - w x L)
-  return this->WorldInertiaMatrix().Inverse().Ign() *
+  return this->WorldInertiaMatrix().Inverse() *
     (this->GetWorldTorque().Ign() -
      this->WorldAngularVel().Cross(this->GetWorldAngularMomentum().Ign()));
 }
@@ -743,7 +743,7 @@ ignition::math::Vector3d Link::WorldAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
 {
-  return this->WorldInertiaMatrix() * this->GetWorldAngularVel().Ign();
+  return this->WorldInertiaMatrix() * this->WorldAngularVel();
 }
 
 //////////////////////////////////////////////////
@@ -767,17 +767,17 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Link::GetBoundingBox() const
+ignition::math::Box Link::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  box.max.Set(0, 0, 0);
+  box.Min().Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
+  box.Max().Set(0, 0, 0);
 
   for (Collision_V::const_iterator iter = this->collisions.begin();
        iter != this->collisions.end(); ++iter)
   {
-    box += (*iter)->GetBoundingBox();
+    box += (*iter)->BoundingBox();
   }
 
   return box;
@@ -851,7 +851,13 @@ math::Pose Link::GetWorldInertialPose() const
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
-  math::Matrix3 moi;
+  return this->WorldInertiaMatrix();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Link::WorldInertiaMatrix() const
+{
+  ignition::math::Matrix3d moi;
   if (this->inertial)
   {
     ignition::math::Vector3d pos = this->inertial->GetPose().pos.Ign();

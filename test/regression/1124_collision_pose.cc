@@ -80,7 +80,7 @@ TEST_F(Issue1124Test, SetLinkPose)
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->WorldPose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
-  link->SetWorldPose(math::Pose(-4, 5, 0.5, 0, 0, 0));
+  link->SetWorldPose(ignition::math::Pose3d(-4, 5, 0.5, 0, 0, 0));
 
   // The new pose should be centered a the new model location
   EXPECT_EQ(coll->WorldPose(), ignition::math::Pose3d(-4, 5, 0.5, 0, 0, 0));
