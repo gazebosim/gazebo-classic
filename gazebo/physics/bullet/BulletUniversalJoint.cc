@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -117,7 +120,7 @@ void BulletUniversalJoint::Init()
   this->constraint = this->bulletUniversal;
 
   // Set angleOffset based on hinge angle at joint creation.
-  // GetAngleImpl will report angles relative to this offset.
+  // PositionImpl will report angles relative to this offset.
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
@@ -397,9 +400,9 @@ math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletUniversalJoint::GetAngleImpl(unsigned int _index) const
+double BulletUniversalJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->bulletUniversal)
   {

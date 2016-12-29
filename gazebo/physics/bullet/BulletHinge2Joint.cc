@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -228,13 +230,14 @@ math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletHinge2Joint::PositionImpl(const unsigned int /*_index*/) const
 {
   if (!this->bulletHinge2)
   {
     gzerr << "Joint must be created first.\n";
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
+  /// \todo Return angle according to index
   return this->bulletHinge2->getAngle1();
 }

@@ -689,7 +689,7 @@ double Joint::Position(const unsigned int _index) const
   if (this->model->IsStatic())
     return this->staticPosition;
   else
-    return this->GetAngleImpl(_index).Radian();
+    return this->PositionImpl(_index);
 }
 
 //////////////////////////////////////////////////
@@ -1541,4 +1541,10 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
 unsigned int Joint::GetAngleCount() const
 {
   return this->DOF();
+}
+
+/////////////////////////////////////////////////
+math::Angle Joint::GetAngleImpl(unsigned int _index) const
+{
+  return this->PositionImpl(_index);
 }

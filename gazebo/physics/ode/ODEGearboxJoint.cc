@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -128,10 +129,10 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEGearboxJoint::GetAngleImpl(unsigned int /*index*/) const
+double ODEGearboxJoint::PositionImpl(const unsigned int /*index*/) const
 {
   gzlog << "GetAngle not implemented for gearbox\n";
-  return math::Angle(0);
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

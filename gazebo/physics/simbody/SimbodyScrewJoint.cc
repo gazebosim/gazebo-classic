@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -190,7 +191,7 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
+double SimbodyScrewJoint::PositionImpl(const unsigned int _index) const
 {
   if (_index < this->DOF())
   {
@@ -202,35 +203,35 @@ math::Angle SimbodyScrewJoint::GetAngleImpl(unsigned int _index) const
         // simbody screw joint only has one dof
         // _index=0: angular dof
         // _index=1: linear dof
-        math::Angle angle(this->mobod.getOneQ(
-          this->simbodyPhysics->integ->getState(), 0));
+        double position = this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), 0);
         if (_index == 1)
         {
           // return linear position
           // thread pitch units rad/m
-          angle /= math::Angle(this->threadPitch);
+          position /= this->threadPitch;
         }
-        return angle;
+        return position;
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::NAN_D;
       }
     }
     else
     {
-      gzdbg << "SimbodyScrewJoint::GetAngleImpl() simbody not yet initialized, "
+      gzdbg << "SimbodyScrewJoint::PositionImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return 0.0;
     }
   }
   else
   {
-    gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    gzerr << "Invalid index[" << _index << "]\n";
+    return ignition::math::NAN_D;
   }
 }
 

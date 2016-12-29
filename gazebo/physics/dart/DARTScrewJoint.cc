@@ -17,6 +17,7 @@
 
 #include <string>
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -341,26 +342,24 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
+double DARTScrewJoint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Angle>("Angle");
+    return this->dataPtr->GetCached<double>("Angle");
 
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
     // angular position
-    const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
     // linear position
     const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(-radianAngle /
-                         const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
-    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
+    result = -radianAngle / const_cast<DARTScrewJoint*>(this)->GetThreadPitch();
+    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As a
     // workaround, we use const_cast here until #1686 is resolved.
   }
   else

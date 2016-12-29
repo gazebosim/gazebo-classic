@@ -18,6 +18,8 @@
 #include <limits>
 #include <string>
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -558,9 +560,9 @@ math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletScrewJoint::GetAngleImpl(unsigned int _index) const
+double BulletScrewJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletScrew)
   {
     if (_index == 0)

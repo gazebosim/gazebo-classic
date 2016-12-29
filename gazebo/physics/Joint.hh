@@ -368,6 +368,10 @@ namespace gazebo
       ///
       /// For static models, it returns the static joint position.
       ///
+      /// It returns ignition::math::NAN_D in case the position can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
       /// Subclasses can't override this method. See PositionImpl instead.
       ///
       /// \param[in] _index Index of the axis, defaults to 0.
@@ -625,8 +629,19 @@ namespace gazebo
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
+      /// \deprecated See PositionImpl, which takes double.
       protected: virtual math::Angle GetAngleImpl(
-                     unsigned int _index) const = 0;
+                     unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Helper function to get the position of an axis.
+      ///
+      /// Subclasses must override this.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Position of the axis.
+      /// \sa Position
+      protected: virtual double PositionImpl(const unsigned int _index = 0)
+          const = 0;
 
       /// \brief internal helper to find all links connected to the child link
       /// branching out from the children of the child link and any parent

@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 
@@ -153,7 +155,7 @@ math::Vector3 SimbodySliderJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
+double SimbodySliderJoint::PositionImpl(const unsigned int _index) const
 {
   if (_index < this->DOF())
   {
@@ -161,27 +163,27 @@ math::Angle SimbodySliderJoint::GetAngleImpl(unsigned int _index) const
     {
       if (!this->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
-          this->simbodyPhysics->integ->getState(), _index));
+        return this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), _index);
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::NAN_D;
       }
     }
     else
     {
-      gzdbg << "Simbody::GetAngleImpl() simbody not yet initialized, "
+      gzdbg << "Simbody::PositionImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return 0.0;
     }
   }
   else
   {
-    gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    gzerr << "Invalid index[" << _index << "]\n";
+    return ignition::math::NAN_D;
   }
 }

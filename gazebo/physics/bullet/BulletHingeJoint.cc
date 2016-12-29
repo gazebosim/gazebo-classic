@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -160,8 +163,8 @@ void BulletHingeJoint::Init()
   this->constraint = this->bulletHinge;
 
   // Set angleOffset based on hinge angle at joint creation.
-  // GetAngleImpl will report angles relative to this offset.
-  this->angleOffset = this->GetAngleImpl(0).Radian();
+  // PositionImpl will report angles relative to this offset.
+  this->angleOffset = this->PositionImpl(0);
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
@@ -227,9 +230,9 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletHingeJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
   {
 #ifdef LIBBULLET_VERSION_GT_282

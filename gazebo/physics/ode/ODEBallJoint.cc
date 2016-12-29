@@ -19,6 +19,8 @@
  * Date: k13 Oct 2009
  */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
@@ -89,9 +91,10 @@ double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double ODEBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  return math::Angle(0);
+  gzerr << "ODEBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

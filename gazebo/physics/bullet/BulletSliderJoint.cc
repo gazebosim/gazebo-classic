@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -333,12 +336,12 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
+double BulletSliderJoint::PositionImpl(const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid axis index [" << _index << "]" << std::endl;
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
   // The getLinearPos function seems to be off by one time-step
@@ -349,11 +352,11 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
-  math::Vector3 offset = this->GetWorldPose().pos
-                 - this->GetParentWorldPose().pos;
-  math::Vector3 axis = this->GetGlobalAxis(_index);
-  math::Pose poseParent = this->GetWorldPose();
-  return math::Angle(axis.Dot(offset));
+  auto offset = this->GetWorldPose().pos
+              - this->GetParentWorldPose().pos;
+  auto axis = this->GetGlobalAxis(_index);
+  auto poseParent = this->GetWorldPose();
+  return axis.Dot(offset);
 }
 
 //////////////////////////////////////////////////

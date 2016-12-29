@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
@@ -150,25 +152,22 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
+double DARTUniversalJoint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Angle>(
-          "Angle" + std::to_string(_index));
+    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
   }
 
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(1);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(1);
   }
   else
   {

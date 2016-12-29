@@ -104,9 +104,8 @@ class FakeJoint : public physics::Joint
   public: virtual double GetParam(const std::string &, unsigned int)
           {return 0.0;}
 
-  protected: virtual math::Angle GetAngleImpl(
-                 unsigned int) const
-          {return math::Angle::Zero;}
+  protected: virtual double PositionImpl(unsigned int) const
+          {return 0.0;}
 };
 
 /////////////////////////////////////////////////

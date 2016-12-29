@@ -15,6 +15,7 @@
  *
 */
 #include <string>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -123,9 +124,9 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
+double ODEUniversalJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->jointId)
   {
@@ -135,7 +136,7 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
     else if (_index == UniversalJoint::AXIS_PARENT)
       result = dJointGetUniversalAngle2(this->jointId);
     else
-      gzerr << "Joint index out of bounds.\n";
+      gzerr << "Invalid index[" << _index << "]\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
@@ -86,10 +88,10 @@ double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double DARTBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "DARTBallJoint::GetAngleImpl not implemented" << std::endl;
-  return math::Angle(0);
+  gzerr << "DARTBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

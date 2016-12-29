@@ -81,7 +81,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
@@ -98,7 +98,7 @@ namespace gazebo
       /// \brief Pointer to bullet hinge constraint.
       private: btHingeConstraint *bulletHinge;
 
-      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// \brief Offset angle used in PositionImpl, so that angles are reported
       ///        relative to the initial configuration.
       private: double angleOffset;
 

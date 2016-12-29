@@ -20,6 +20,7 @@
  */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include <string>
 
@@ -137,9 +138,9 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
+double ODEScrewJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->jointId)
   {
     if (_index < this->DOF())
@@ -151,7 +152,7 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
     }
     else
     {
-      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+      gzwarn << "ODEScrewJoint::PositionImpl(" << _index
              << "): invalid index exceeds allowed range("
              << this->DOF() << ").\n";
     }
@@ -178,7 +179,7 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
     }
     else
     {
-      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+      gzwarn << "ODEScrewJoint::PositionImpl(" << _index
              << "): invalid index exceeds allowed range("
              << this->DOF() << ").\n";
     }
