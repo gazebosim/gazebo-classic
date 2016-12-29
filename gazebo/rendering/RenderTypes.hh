@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _RENDERTYPES_HH_
-#define _RENDERTYPES_HH_
+#ifndef GAZEBO_RENDERING_RENDERTYPES_HH_
+#define GAZEBO_RENDERING_RENDERTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 #include "gazebo/gazebo_config.h"

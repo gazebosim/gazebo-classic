@@ -69,6 +69,33 @@ namespace gazebo
     /// \class Scene Scene.hh rendering/rendering.hh
     /// \brief Representation of an entire scene graph.
     ///
+    /// ## Visualization Markers
+    /// Visualization markers are shapes and meshes that have no kinematic
+    /// or dynamic properties. Their primary use is to visually augment the
+    /// rendering scene.
+    ///
+    /// See `gazebo/examples/stand_alone/marker` for an example program that
+    /// manipulates visualization markers.
+    ///
+    /// The `gz marker` command line tool can also be used to manipulate
+    /// visualization markers. For more information use:
+    ///
+    ///    $ gz marker -h
+    ///
+    /// ### Visualization marker services
+    /// The following [Ignition Transport](
+    /// http://ignitionrobotics.org/libraries/transport) services
+    /// can be use to create,
+    /// modify, delete, and list visualization markers.
+    ///
+    /// 1. /marker
+    ///   * Request message type: ign_msgs.Marker
+    ///   * Response mssage type: ign_msgs.StringMsg
+    ///   * Purpose: Add, modify, or delete a visualization marker.
+    /// 1. /marker/list
+    ///   * Response mssage type: ign_msgs.Marker_V
+    ///   * Purpose: Get the list of markers.
+    ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class GZ_RENDERING_VISIBLE Scene :
       public boost::enable_shared_from_this<Scene>
@@ -504,6 +531,19 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Return whether a layer is on or off. A negative layer
+      /// is always active.
+      /// \param[in] _layer Index of the layer to check.
+      /// \return True if the layer is active, false otherwise. True is also
+      /// returned if _layer is negative.
+      public: bool LayerState(const int32_t _layer) const;
+
+      /// \brief Return true if the layer exits.
+      /// \param[in] _layer Index of the layer to check for existance.
+      /// \return True if the layer exists, otherwise false. All negative
+      /// value of _layer return true.
+      public: bool HasLayer(const int32_t _layer) const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
@@ -670,6 +710,10 @@ namespace gazebo
       /// visual.
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
+
+      /// \brief Receive messages from the world_stats topic
+      /// \param[in] _msg The world stats message
+      private: void OnStatsMsg(ConstWorldStatisticsPtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.
