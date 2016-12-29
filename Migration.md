@@ -168,6 +168,30 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Vector2d GetSize() const
     + ***Replacement:*** ignition::math::Vector2d Size() const
 
+1. **gazebo/physics/CollisionState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
+
+1. **gazebo/physics/JointState.hh**
+    + ***Deprecation:*** math::Angle GetAngle(unsigned int _axis) const
+    + ***Replacement:*** ignition::math::Angle Angle(unsigned int _axis) const
+    + ***Deprecation:*** const std::vector<math::Angle> GetAngles() const
+    + ***Replacement:*** const std::vector<ignition::math::Angle> &Angles() const
+
+1. **gazebo/physics/LinkState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
+    + ***Deprecation:*** const math::Pose GetVelocity() const
+    + ***Replacement:*** const ignition::math::Pose3d &Velocity() const
+    + ***Deprecation:*** const math::Pose GetAcceleration() const
+    + ***Replacement:*** const ignition::math::Pose3d &Acceleration() const
+    + ***Deprecation:*** const math::Pose GetWrench() const
+    + ***Replacement:*** const ignition::math::Pose3d &Wrench() const
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
+
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
     + ***Replacement:*** double K1() const
