@@ -166,7 +166,7 @@ namespace gazebo
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the number of joints.
       /// \return Get the number of joints.

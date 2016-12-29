@@ -162,7 +162,7 @@ void VehiclePlugin::Init()
   // This assumes that the largest dimension of the wheel is the diameter
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->joints[0]->GetChild());
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate
@@ -257,11 +257,11 @@ void VehiclePlugin::OnUpdate()
         amt = 15;
 
       ignition::math::Pose3d p =
-          this->joints[ix]->GetChild()->GetWorldPose().Ign();
+          this->joints[ix]->GetChild()->WorldPose();
       this->joints[ix]->GetChild()->AddForce(axis * -amt);
       this->chassis->AddForceAtWorldPosition(axis * amt, p.Pos());
 
-      p = this->joints[ix^1]->GetChild()->GetWorldPose().Ign();
+      p = this->joints[ix^1]->GetChild()->WorldPose();
       this->joints[ix^1]->GetChild()->AddForce(axis * amt);
       this->chassis->AddForceAtWorldPosition(axis * -amt, p.Pos());
     }

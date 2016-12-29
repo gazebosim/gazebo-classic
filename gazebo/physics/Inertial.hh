@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INERTIAL_HH_
-#define _INERTIAL_HH_
+#ifndef GAZEBO_PHYSICS_INERTIAL_HH_
+#define GAZEBO_PHYSICS_INERTIAL_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -26,12 +26,14 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Matrix3.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Matrix3.hh"
+
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -214,11 +216,23 @@ namespace gazebo
       /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
       /// If _pose is different from pose of the Inertial block, then
       /// the MOI is rotated accordingly, and contributions from changes
-      /// in MOI location location due to point mass is added to the final MOI.
+      /// in MOI location due to point mass is added to the final MOI.
       /// \param[in] _pose location in Link local frame
       /// \return equivalent inertia at _pose
+      /// \deprecated See MOI(const ignition::math::Pose3d &) const
       public: math::Matrix3 GetMOI(const math::Pose &_pose)
-        const;
+        const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the equivalent inertia from a point in local Link frame
+      /// If you specify MOI(this->GetPose()), you should get
+      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
+      /// If _pose is different from pose of the Inertial block, then
+      /// the MOI is rotated accordingly, and contributions from changes
+      /// in MOI location due to point mass is added to the final MOI.
+      /// \param[in] _pose location in Link local frame
+      /// \return equivalent inertia at _pose
+      public: ignition::math::Matrix3d MOI(
+                  const ignition::math::Pose3d &_pose) const;
 
       /// \brief Get equivalent Inertia values with the Link frame offset,
       /// while holding the Pose of CoG constant in the world frame.
@@ -246,11 +260,21 @@ namespace gazebo
 
       /// \brief returns Moments of Inertia as a Matrix3
       /// \return Moments of Inertia as a Matrix3
-      public: math::Matrix3 GetMOI() const;
+      /// \deprecated See MOI() const
+      public: math::Matrix3 GetMOI() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief returns Moments of Inertia as a Matrix3
+      /// \return Moments of Inertia as a Matrix3
+      public: ignition::math::Matrix3d MOI() const;
 
       /// \brief Sets Moments of Inertia (MOI) from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3
-      public: void SetMOI(const math::Matrix3 &_moi);
+      /// \deprecated See version that accepts ignition math parameters
+      public: void SetMOI(const math::Matrix3 &_moi) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Sets Moments of Inertia (MOI) from a Matrix3
+      /// \param[in] Moments of Inertia as a Matrix3
+      public: void SetMOI(const ignition::math::Matrix3d &_moi);
 
       /// \brief Mass the object. Default is 1.0.
       private: double mass;

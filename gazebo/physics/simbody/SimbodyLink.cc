@@ -221,7 +221,7 @@ void SimbodyLink::OnPoseChange()
       /// the inboard joint is a free joint to the ground for now.
       this->masterMobod.setQToFitTransform(
          this->simbodyPhysics->integ->updAdvancedState(),
-         SimbodyPhysics::Pose2Transform(this->GetWorldPose()));
+         SimbodyPhysics::Pose2Transform(this->WorldPose()));
     }
     else
     {
@@ -620,5 +620,5 @@ bool SimbodyLink::GetEnabled() const
 /////////////////////////////////////////////////
 void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
 {
-  this->dirtyPose = _pose;
+  this->dirtyPose = _pose.Ign();
 }

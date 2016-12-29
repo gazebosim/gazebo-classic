@@ -90,7 +90,8 @@ void BulletUniversalJoint::Init()
     this->bulletUniversal = new gzBtUniversalConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),
-        btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
+        btVector3(this->anchorPos.X(), this->anchorPos.Y(),
+                  this->anchorPos.Z()),
         btVector3(axis1.x, axis1.y, axis1.z),
         btVector3(axis2.x, axis2.y, axis2.z));
   }
@@ -98,7 +99,8 @@ void BulletUniversalJoint::Init()
   {
     this->bulletUniversal = new gzBtUniversalConstraint(
         *bulletParentLink->GetBulletLink(),
-        btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
+        btVector3(this->anchorPos.X(), this->anchorPos.Y(),
+                  this->anchorPos.Z()),
         btVector3(axis1.x, axis1.y, axis1.z),
         btVector3(axis2.x, axis2.y, axis2.z));
   }
@@ -106,7 +108,8 @@ void BulletUniversalJoint::Init()
   {
     this->bulletUniversal = new gzBtUniversalConstraint(
         *bulletChildLink->GetBulletLink(),
-        btVector3(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z),
+        btVector3(this->anchorPos.X(), this->anchorPos.Y(),
+                  this->anchorPos.Z()),
         btVector3(axis1.x, axis1.y, axis1.z),
         btVector3(axis2.x, axis2.y, axis2.z));
   }

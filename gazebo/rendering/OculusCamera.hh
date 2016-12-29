@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_OCULUS_CAMERA_HH_
-#define _GAZEBO_OCULUS_CAMERA_HH_
+#ifndef GAZEBO_OCULUS_CAMERA_HH_
+#define GAZEBO_OCULUS_CAMERA_HH_
 
 #include <string>
 

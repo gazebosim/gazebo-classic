@@ -805,22 +805,17 @@ math::Vector3 Model::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Model::GetBoundingBox() const
+ignition::math::Box Model::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (const auto &iter : this->links)
   {
-    if (*iter)
-    {
-      math::Box linkBox;
-      linkBox = (*iter)->GetBoundingBox();
-      box += linkBox;
-    }
+    if (iter)
+      box += iter->BoundingBox();
   }
 
   return box;
@@ -1290,7 +1285,7 @@ void Model::OnPoseChange()
   math::Pose p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
-    p = this->GetWorldPose();
+    p = this->WorldPose();
     p += this->attachedModelsOffset[i];
     this->attachedModels[i]->SetWorldPose(p, true);
   }
@@ -1395,8 +1390,8 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 /////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 {
-  math::Pose linkPose = _link->GetWorldPose();
-  math::Pose currentModelPose = this->GetWorldPose();
+  math::Pose linkPose = _link->WorldPose();
+  math::Pose currentModelPose = this->WorldPose();
   math::Pose linkRelPose = currentModelPose - linkPose;
   math::Pose targetModelPose =  linkRelPose * _pose;
   this->SetWorldPose(targetModelPose);
@@ -1614,7 +1609,7 @@ void Model::RegisterIntrospectionItems()
   // Callbacks.
   auto fModelPose = [this]()
   {
-    return this->GetWorldPose().Ign();
+    return this->WorldPose();
   };
 
   auto fModelLinVel = [this]()
