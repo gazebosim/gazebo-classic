@@ -416,7 +416,7 @@ CollisionState Collision::GetState()
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetRelativePose(_state.GetPose().Ign());
+  this->SetRelativePose(_state.Pose());
 }
 
 /////////////////////////////////////////////////

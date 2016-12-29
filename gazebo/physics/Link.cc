@@ -1119,13 +1119,13 @@ void Link::OnPoseChange()
 //////////////////////////////////////////////////
 void Link::SetState(const LinkState &_state)
 {
-  this->SetWorldPose(_state.GetPose().Ign());
-  this->SetLinearVel(_state.GetVelocity().pos);
-  this->SetAngularVel(_state.GetVelocity().rot.GetAsEuler());
-  this->SetLinearAccel(_state.GetAcceleration().pos);
-  this->SetAngularAccel(_state.GetAcceleration().rot.GetAsEuler());
-  this->SetForce(_state.GetWrench().pos);
-  this->SetTorque(_state.GetWrench().rot.GetAsEuler());
+  this->SetWorldPose(_state.Pose());
+  this->SetLinearVel(_state.Velocity().Pos());
+  this->SetAngularVel(_state.Velocity().Rot().Euler());
+  this->SetLinearAccel(_state.Acceleration().Pos());
+  this->SetAngularAccel(_state.Acceleration().Rot().Euler());
+  this->SetForce(_state.Wrench().Pos());
+  this->SetTorque(_state.Wrench().Rot().Euler());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)

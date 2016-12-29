@@ -934,7 +934,7 @@ bool Actor::GetSelfCollide() const
 }
 
 /////////////////////////////////////////////////
-void Actor::SetWindMode(bool /*_enable*/)
+void Actor::SetWindMode(const bool /*_enable*/)
 {
   // Actors don't support wind mode
 }

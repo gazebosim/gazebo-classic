@@ -1354,7 +1354,7 @@ void Model::OnPoseChange()
 //////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
-  this->SetWorldPose(_state.GetPose().Ign(), true);
+  this->SetWorldPose(_state.Pose(), true);
   this->SetScale(_state.Scale(), true);
 
   LinkState_M linkStates = _state.GetLinkStates();

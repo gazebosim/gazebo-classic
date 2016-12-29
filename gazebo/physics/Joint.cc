@@ -937,7 +937,7 @@ void Joint::SetState(const JointState &_state)
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
   {
     this->SetVelocity(i, 0.0);
-    this->SetPosition(i, _state.GetAngle(i).Radian());
+    this->SetPosition(i, _state.Angle(i).Radian());
   }
 }
 
