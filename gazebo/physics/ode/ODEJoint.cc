@@ -324,13 +324,13 @@ bool ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 math::Angle ODEJoint::GetHighStop(unsigned int _index)
 {
-  return this->GetUpperLimit(_index);
+  return this->UpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
 math::Angle ODEJoint::GetLowStop(unsigned int _index)
 {
-  return this->GetLowerLimit(_index);
+  return this->LowerLimit(_index);
 }
 
 //////////////////////////////////////////////////
@@ -882,7 +882,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
   double dt = this->GetWorld()->Physics()->GetMaxStepSize();
   for (unsigned int i = 0; i < this->DOF(); ++i)
   {
-    double angle = this->GetAngle(i).Radian();
+    double angle = this->Position(i);
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     angle += dAngle;
 
@@ -911,7 +911,7 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         double dampingForce = -fabs(this->dissipationCoefficient[i])
           * this->GetVelocity(i);
         double springForce = this->stiffnessCoefficient[i]
-          * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+          * (this->springReferencePosition[i] - this->Position(i));
         this->SetForceImpl(i, dampingForce + springForce);
       }
       */
@@ -1198,7 +1198,7 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
-      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+      * (this->springReferencePosition[i] - this->Position(i));
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);

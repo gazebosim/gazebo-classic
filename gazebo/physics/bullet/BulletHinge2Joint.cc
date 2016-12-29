@@ -114,18 +114,6 @@ math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
-{
-  if (!this->bulletHinge2)
-  {
-    gzerr << "Joint must be created first.\n";
-    return math::Angle();
-  }
-
-  return this->bulletHinge2->getAngle1();
-}
-
-//////////////////////////////////////////////////
 double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GetVelocity not implemented" << std::endl;
@@ -242,6 +230,11 @@ math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 math::Angle BulletHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
 {
-  gzerr << "BulletHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  if (!this->bulletHinge2)
+  {
+    gzerr << "Joint must be created first.\n";
+    return math::Angle();
+  }
+
+  return this->bulletHinge2->getAngle1();
 }

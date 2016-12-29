@@ -37,7 +37,7 @@ JointState::JointState(JointPtr _joint, const common::Time &_realTime,
 {
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->DOF(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+    this->angles.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////
@@ -47,7 +47,7 @@ JointState::JointState(JointPtr _joint)
 {
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->DOF(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+    this->angles.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////
@@ -74,7 +74,7 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
 
   // Set the joint angles.
   for (unsigned int i = 0; i < _joint->DOF(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+    this->angles.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////

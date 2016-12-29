@@ -129,8 +129,8 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
           << "gy " << gy << ' '
           << "pose " << jointLower->GetChild()->WorldPose()
           << std::endl;
-    EXPECT_NEAR(des0, jointLower->GetAngle(0).Radian(), 1e-2);
-    EXPECT_NEAR(des1, jointLower->GetAngle(1).Radian(), 1e-2);
+    EXPECT_NEAR(des0, jointLower->Position(0), 1e-2);
+    EXPECT_NEAR(des1, jointLower->Position(1), 1e-2);
 
     // Also test expected pose of body, math is approximate
     math::Vector3 eulerAngles = linkLower->WorldPose().Rot().Euler();
@@ -232,55 +232,55 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
 
   // both initial angles should be zero
-  EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0);
+  EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
 
   // move child link to it's initial location
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
-  EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0);
+  EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
-        << ", " << joint_00->GetAngle(1)
+  gzdbg << "joint angles [" << joint_00->Position(0)
+        << ", " << joint_00->Position(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about x
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
-  EXPECT_EQ(joint_00->GetAngle(0), 0.25*M_PI);
-  EXPECT_EQ(joint_00->GetAngle(1), 0);
+  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
-        << ", " << joint_00->GetAngle(1)
+  gzdbg << "joint angles [" << joint_00->Position(0)
+        << ", " << joint_00->Position(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about y
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
-  EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0.25*M_PI);
+  EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0.25*M_PI, g_tolerance);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
-        << ", " << joint_00->GetAngle(1)
+  gzdbg << "joint angles [" << joint_00->Position(0)
+        << ", " << joint_00->Position(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
 
   // move child link 90deg about both x and "rotated y axis" (z)
   link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_EQ(joint_00->GetAngle(1), 0.5*M_PI);
+  EXPECT_NEAR(joint_00->Position(1), 0.5*M_PI, g_tolerance);
   EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
   EXPECT_EQ(joint_00->GetGlobalAxis(1),
     math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
 
-  gzdbg << "joint angles [" << joint_00->GetAngle(0)
-        << ", " << joint_00->GetAngle(1)
+  gzdbg << "joint angles [" << joint_00->Position(0)
+        << ", " << joint_00->Position(1)
         << "] axis1 [" << joint_00->GetGlobalAxis(0)
         << "] axis2 [" << joint_00->GetGlobalAxis(1)
         << "]\n";
@@ -292,7 +292,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   }
   else
   {
-    EXPECT_EQ(joint_00->GetAngle(0), 0.5*M_PI);
+    EXPECT_NEAR(joint_00->Position(0), 0.5*M_PI, g_tolerance);
   }
 }
 
@@ -345,21 +345,21 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   physics::JointPtr joint_01 = model_1->GetJoint("joint_01");
 
   // both initial angles should be zero
-  EXPECT_EQ(joint_00->GetAngle(0), 0);
-  EXPECT_EQ(joint_00->GetAngle(1), 0);
+  EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
 
   // set new upper limit for joint_00
   joint_00->SetHighStop(0, 0.3);
   // push joint_00 till it hits new upper limit
   int count = 0;
-  while (joint_00->GetAngle(0) < 0.4 && count < 1220)
+  while (joint_00->Position(0) < 0.4 && count < 1220)
   {
     count++;
 
     joint_00->SetForce(0, 0.1);
     world->Step(1);
     // check link pose
-    double angle_00_0 = joint_00->GetAngle(0).Radian();
+    double angle_00_0 = joint_00->Position(0);
     math::Pose pose_00 = link_00->WorldPose();
     EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
     EXPECT_LT(pose_00.rot.GetAsEuler().x, 0.35);
@@ -368,14 +368,14 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   // push it back to 0 then lock
   joint_00->SetLowStop(0, 0.0);
   count = 0;
-  while (joint_00->GetAngle(0) > 0.1 && count < 1220)
+  while (joint_00->Position(0) > 0.1 && count < 1220)
   {
     count++;
 
     joint_00->SetForce(0, -0.1);
     world->Step(1);
     // check link pose
-    double angle_00_0 = joint_00->GetAngle(0).Radian();
+    double angle_00_0 = joint_00->Position(0);
     math::Pose pose_00 = link_00->WorldPose();
     EXPECT_NEAR(pose_00.rot.GetAsEuler().x, angle_00_0, 1e-8);
     EXPECT_GT(pose_00.rot.GetAsEuler().x, -0.05);
@@ -389,7 +389,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   joint_01->SetHighStop(1, 2.0);
   // push joint_01 until limit is reached
   count = 0;
-  while (joint_01->GetAngle(1) < 2.1 && count < 2700)
+  while (joint_01->Position(1) < 2.1 && count < 2700)
   {
     count++;
 
@@ -398,8 +398,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
 
     // check link pose
     math::Pose pose_01 = link_01->WorldPose();
-    double angle_00_1 = joint_00->GetAngle(1).Radian();
-    double angle_01_1 = joint_01->GetAngle(1).Radian();
+    double angle_00_1 = joint_00->Position(1);
+    double angle_01_1 = joint_01->Position(1);
 
     EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-8);
     EXPECT_LT(pose_01.rot.GetAsEuler().y, 2.05);
@@ -408,7 +408,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   // push joint_01 the other way until -1 is reached
   joint_01->SetLowStop(1, -1.0);
   count = 0;
-  while (joint_01->GetAngle(1) > -1.1 && count < 2100)
+  while (joint_01->Position(1) > -1.1 && count < 2100)
   {
     count++;
 
@@ -417,10 +417,10 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
 
     // check link pose
     math::Pose pose_01 = link_01->WorldPose();
-    double angle_00_0 = joint_00->GetAngle(0).Radian();
-    double angle_00_1 = joint_00->GetAngle(1).Radian();
-    double angle_01_0 = joint_01->GetAngle(0).Radian();
-    double angle_01_1 = joint_01->GetAngle(1).Radian();
+    double angle_00_0 = joint_00->Position(0);
+    double angle_00_1 = joint_00->Position(1);
+    double angle_01_0 = joint_01->Position(0);
+    double angle_01_1 = joint_01->Position(1);
 
     EXPECT_NEAR(pose_01.rot.GetAsEuler().x, angle_00_0 + angle_01_0, 1e-6);
     EXPECT_NEAR(pose_01.rot.GetAsEuler().y, angle_00_1 + angle_01_1, 1e-6);

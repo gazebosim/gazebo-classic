@@ -333,7 +333,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         else
           cmdMin = -1000.0;
         jc.pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
-        jc.cmd = joint->GetAngle(0).Radian();
+        jc.cmd = joint->Position(0);
         jc.pid.SetCmd(jc.cmd);
         this->dataPtr->jointControls.push_back(jc);
       }
@@ -390,7 +390,7 @@ void PlaneDemoPlugin::OnUpdate()
         ji != this->dataPtr->jointControls.end(); ++ji)
     {
       // spin up joint control
-      double pos = ji->joint->GetAngle(0).Radian();
+      double pos = ji->joint->Position(0);
       double error = pos - ji->cmd;
       double force = ji->pid.Update(error,
           curTime - this->dataPtr->lastUpdateTime);
@@ -469,7 +469,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else if (static_cast<int>(ch) == ji->decKey)
@@ -478,7 +478,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
@@ -486,7 +486,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = 0;
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else

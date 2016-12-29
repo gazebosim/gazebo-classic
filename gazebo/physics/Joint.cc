@@ -621,7 +621,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
 
   for (unsigned int i = 0; i < this->DOF(); ++i)
   {
-    _msg.add_angle(this->GetAngle(i).Radian());
+    _msg.add_angle(this->Position(i));
     msgs::Axis *axis;
     if (i == 0)
       axis = _msg.mutable_axis1();
@@ -680,10 +680,16 @@ void Joint::FillMsg(msgs::Joint &_msg)
 //////////////////////////////////////////////////
 math::Angle Joint::GetAngle(unsigned int _index) const
 {
+  return this->Position(_index);
+}
+
+//////////////////////////////////////////////////
+double Joint::Position(const unsigned int _index) const
+{
   if (this->model->IsStatic())
     return this->staticPosition;
   else
-    return this->GetAngleImpl(_index);
+    return this->GetAngleImpl(_index).Radian();
 }
 
 //////////////////////////////////////////////////
@@ -1360,7 +1366,7 @@ double Joint::GetWorldEnergyPotentialSpring(unsigned int _index) const
   // compute potential energy due to spring compression
   // 1/2 k x^2
   double k = this->stiffnessCoefficient[_index];
-  double x = this->GetAngle(_index).Radian() -
+  double x = this->Position(_index) -
     this->springReferencePosition[_index];
   return 0.5 * k * x * x;
 }
@@ -1431,7 +1437,7 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   }
 
   // delta-position along an axis
-  double dposition = _position - this->GetAngle(_index).Radian();
+  double dposition = _position - this->Position(_index);
 
   if (this->HasType(Base::HINGE_JOINT) ||
       this->HasType(Base::UNIVERSAL_JOINT))
@@ -1504,8 +1510,7 @@ void Joint::RegisterIntrospectionPosition(const unsigned int _index)
 {
   auto f = [this, _index]()
   {
-    // For prismatic axes, Radian -> meters
-    return this->GetAngle(_index).Ign().Radian();
+    return this->Position(_index);
   };
 
   common::URI uri(this->URI());

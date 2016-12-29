@@ -65,9 +65,6 @@ namespace gazebo
       public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: math::Angle GetAngle(unsigned int _index) const;
-
-      // Documentation inherited.
       public: double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.

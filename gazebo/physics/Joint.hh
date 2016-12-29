@@ -354,10 +354,27 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Get the angle of rotation of an axis(index)
+      /// \brief Get the angle of rotation of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      public: math::Angle GetAngle(unsigned int _index) const;
+      /// \deprecated See Position(), which returns a double.
+      public: math::Angle GetAngle(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the position of an axis according to its index.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// For static models, it returns the static joint position.
+      ///
+      /// Subclasses can't override this method. See PositionImpl instead.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Current position of the axis.
+      /// \sa PositionImpl
+      public: virtual double Position(const unsigned int _index = 0) const
+          final;
 
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.

@@ -87,38 +87,38 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   gzdbg << "-------------------Test 1 (y)-------------------\n";
   physics->SetGravity(math::Vector3(0, 10, 0));
   world->Step(100);
-  EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
-  EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0048295899143964149, 1e-5);
-  EXPECT_NEAR(joint_1->GetAngle(1).Radian(), 0.0, 1e-6);
+  EXPECT_NEAR(joint_0->Position(0), 0.0, 1e-6);
+  EXPECT_NEAR(joint_1->Position(0), 0.0048295899143964149, 1e-5);
+  EXPECT_NEAR(joint_1->Position(1), 0.0, 1e-6);
   gzdbg << "time [" << world->SimTime().Double()
-        << "] j0 [" << joint_0->GetAngle(0).Radian()
-        << "] j1(0) [" << joint_1->GetAngle(0).Radian()
-        << "] j1(1) [" << joint_1->GetAngle(1).Radian()
+        << "] j0 [" << joint_0->Position(0)
+        << "] j1(0) [" << joint_1->Position(0)
+        << "] j1(1) [" << joint_1->Position(1)
         << "]\n";
 
   gzdbg << "-------------------Test 2 (x)-------------------\n";
   physics->SetGravity(math::Vector3(10, 0, 0));
   world->Step(100);
-  EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 1e-6);
-  EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.0050046318305403403, 1e-5);
+  EXPECT_NEAR(joint_0->Position(0), 0.0, 1e-6);
+  EXPECT_NEAR(joint_1->Position(0), 0.0050046318305403403, 1e-5);
   // The following expectation fails
-  // EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.0048293115636619532, 1e-5);
+  // EXPECT_NEAR(joint_1->Position(1), -0.0048293115636619532, 1e-5);
   gzdbg << "time [" << world->SimTime().Double()
-        << "] j0 [" << joint_0->GetAngle(0).Radian()
-        << "] j1(0) [" << joint_1->GetAngle(0).Radian()
-        << "] j1(1) [" << joint_1->GetAngle(1).Radian()
+        << "] j0 [" << joint_0->Position(0)
+        << "] j1(0) [" << joint_1->Position(0)
+        << "] j1(1) [" << joint_1->Position(1)
         << "]\n";
 
   gzdbg << "-------------------Test 3 (joint limit)-------------------\n";
   physics->SetGravity(math::Vector3(1000, 1000, 0));
   world->Step(1000);
-  EXPECT_NEAR(joint_0->GetAngle(0).Radian(), 0.0, 0.001);
-  EXPECT_NEAR(joint_1->GetAngle(0).Radian(), 0.7, 0.001);
-  EXPECT_NEAR(joint_1->GetAngle(1).Radian(), -0.7, 0.001);
+  EXPECT_NEAR(joint_0->Position(0), 0.0, 0.001);
+  EXPECT_NEAR(joint_1->Position(0), 0.7, 0.001);
+  EXPECT_NEAR(joint_1->Position(1), -0.7, 0.001);
   gzdbg << "time [" << world->SimTime().Double()
-        << "] j0 [" << joint_0->GetAngle(0).Radian()
-        << "] j1(0) [" << joint_1->GetAngle(0).Radian()
-        << "] j1(1) [" << joint_1->GetAngle(1).Radian()
+        << "] j0 [" << joint_0->Position(0)
+        << "] j1(0) [" << joint_1->Position(0)
+        << "] j1(1) [" << joint_1->Position(1)
         << "]\n";
 }
 

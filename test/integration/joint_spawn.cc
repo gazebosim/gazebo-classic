@@ -318,32 +318,32 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set positive force
-    double angleStart = _joint->GetAngle(_index).Radian();
+    double angleStart = _joint->Position(_index);
     _joint->SetForce(_index, 5);
     world->Step(1);
     EXPECT_GT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), angleStart);
+    EXPECT_GT(_joint->Position(_index), angleStart);
   }
 
   // Test SetForce with negative value
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set negative force
-    double angleStart = _joint->GetAngle(_index).Radian();
+    double angleStart = _joint->Position(_index);
     _joint->SetForce(_index, -5);
     world->Step(1);
     EXPECT_LT(_joint->GetVelocity(_index), 0.0);
     world->Step(1);
-    EXPECT_LT(_joint->GetAngle(_index).Radian(), angleStart);
+    EXPECT_LT(_joint->Position(_index), angleStart);
   }
 
   // Test Coloumb friction
@@ -366,7 +366,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     // set friction to 1.0
@@ -383,7 +383,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // Expect no motion
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
 
     for (unsigned int i = 0; i < 500; ++i)
     {
@@ -394,7 +394,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
 
     // Expect motion
     EXPECT_GT(_joint->GetVelocity(_index), 0.2 * friction);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), 0.05 * friction);
+    EXPECT_GT(_joint->Position(_index), 0.05 * friction);
 
     // DART has problem with joint friction and joint limits
     // https://github.com/dartsim/dart/issues/317
@@ -411,7 +411,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     unsigned int steps = 100;
@@ -420,7 +420,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetHighStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_LT(_joint->GetAngle(_index).Radian(), limit.Radian() + g_tolerance);
+    EXPECT_LT(_joint->Position(_index), limit.Radian() + g_tolerance);
     EXPECT_EQ(_joint->GetHighStop(_index), limit);
     {
       boost::any value = _joint->GetParam("hi_stop", _index);
@@ -432,7 +432,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
   {
     // reset world and expect joint to be stopped at home position
     world->Reset();
-    EXPECT_NEAR(_joint->GetAngle(_index).Radian(), 0.0, g_tolerance);
+    EXPECT_NEAR(_joint->Position(_index), 0.0, g_tolerance);
     EXPECT_NEAR(_joint->GetVelocity(_index), 0.0, g_tolerance);
 
     unsigned int steps = 100;
@@ -441,7 +441,7 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
     _joint->SetLowStop(_index, limit);
     _joint->SetVelocity(_index, vel);
     world->Step(steps);
-    EXPECT_GT(_joint->GetAngle(_index).Radian(), limit.Radian() - g_tolerance);
+    EXPECT_GT(_joint->Position(_index), limit.Radian() - g_tolerance);
     EXPECT_EQ(_joint->GetLowStop(_index), limit);
     {
       boost::any value = _joint->GetParam("lo_stop", _index);

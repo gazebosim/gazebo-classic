@@ -522,7 +522,7 @@ void BulletJoint::ApplyStiffnessDamping()
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
-      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+      * (this->springReferencePosition[i] - this->Position(i));
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);
@@ -578,13 +578,13 @@ double BulletJoint::GetParam(const std::string &_key,
 //////////////////////////////////////////////////
 math::Angle BulletJoint::GetHighStop(unsigned int _index)
 {
-  return this->GetUpperLimit(_index);
+  return this->UpperLimit(_index);
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletJoint::GetLowStop(unsigned int _index)
 {
-  return this->GetLowerLimit(_index);
+  return this->LowerLimit(_index);
 }
 
 //////////////////////////////////////////////////

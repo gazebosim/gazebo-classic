@@ -185,15 +185,15 @@ void VehiclePlugin::Init()
 void VehiclePlugin::OnUpdate()
 {
   // Get the normalized gas and brake amount
-  double gas = this->gasJoint->GetAngle(0).Radian() / this->maxGas;
-  double brake = this->brakeJoint->GetAngle(0).Radian() / this->maxBrake;
+  double gas = this->gasJoint->Position(0) / this->maxGas;
+  double brake = this->brakeJoint->Position(0) / this->maxBrake;
 
   // A little force to push back on the pedals
   this->gasJoint->SetForce(0, -0.1);
   this->brakeJoint->SetForce(0, -0.1);
 
   // Get the steering angle
-  double steeringAngle = this->steeringJoint->GetAngle(0).Radian();
+  double steeringAngle = this->steeringJoint->Position(0);
 
   // Compute the angle of the front wheels.
   double wheelAngle = steeringAngle / this->steeringRatio;
