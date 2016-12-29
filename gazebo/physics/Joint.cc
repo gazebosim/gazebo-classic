@@ -988,14 +988,14 @@ double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
-    math::Matrix3 pm = this->parentLink->GetWorldInertiaMatrix();
-    math::Matrix3 cm = this->childLink->GetWorldInertiaMatrix();
+    ignition::math::Matrix3d pm = this->parentLink->WorldInertiaMatrix();
+    ignition::math::Matrix3d cm = this->childLink->WorldInertiaMatrix();
 
     // matrix times axis
-    math::Vector3 pia = pm * _axis;
-    math::Vector3 cia = cm * _axis;
-    double piam = pia.GetLength();
-    double ciam = cia.GetLength();
+    ignition::math::Vector3d pia = pm * _axis.Ign();
+    ignition::math::Vector3d cia = cm * _axis.Ign();
+    double piam = pia.Length();
+    double ciam = cia.Length();
 
     // return ratio of child MOI to parent MOI.
     if (!ignition::math::equal(piam, 0.0))

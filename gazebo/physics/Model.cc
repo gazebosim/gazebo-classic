@@ -856,7 +856,14 @@ ignition::math::Vector3d Model::WorldAngularAccel() const
 //////////////////////////////////////////////////
 math::Box Model::GetBoundingBox() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
