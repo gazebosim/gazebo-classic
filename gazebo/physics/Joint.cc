@@ -689,18 +689,14 @@ math::Angle Joint::GetAngle(unsigned int _index) const
 //////////////////////////////////////////////////
 bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
-  this->SetUpperLimit(_index, _angle);
-  // switch below to return this->SetUpperLimit when we implement
-  // issue #1108
+  this->SetUpperLimit(_index, _angle.Radian());
   return true;
 }
 
 //////////////////////////////////////////////////
 bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
-  this->SetLowerLimit(_index, _angle);
-  // switch below to return this->SetLowerLimit when we implement
-  // issue #1108
+  this->SetLowerLimit(_index, _angle.Radian());
   return true;
 }
 
@@ -1110,6 +1106,12 @@ math::Angle Joint::GetUpperLimit(unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 {
+  this->SetLowerLimit(_index, _limit.Radian());
+}
+
+//////////////////////////////////////////////////
+void Joint::SetLowerLimit(const unsigned int _index, const double _limit)
+{
   if (_index >= this->DOF())
   {
     gzerr << "SetLowerLimit for index [" << _index
@@ -1124,8 +1126,8 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit.Radian();
-    limitElem->GetElement("lower")->Set(_limit.Radian());
+    this->lowerLimit[_index] = _limit;
+    limitElem->GetElement("lower")->Set(_limit);
   }
   else if (_index == 1)
   {
@@ -1133,8 +1135,8 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store lower joint limits
-    this->lowerLimit[_index] = _limit.Radian();
-    limitElem->GetElement("lower")->Set(_limit.Radian());
+    this->lowerLimit[_index] = _limit;
+    limitElem->GetElement("lower")->Set(_limit);
   }
   else
   {
@@ -1146,6 +1148,12 @@ void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 
 //////////////////////////////////////////////////
 void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
+{
+  this->SetUpperLimit(_index, _limit.Radian());
+}
+
+//////////////////////////////////////////////////
+void Joint::SetUpperLimit(const unsigned int _index, const double _limit)
 {
   if (_index >= this->DOF())
   {
@@ -1161,8 +1169,8 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit.Radian();
-    limitElem->GetElement("upper")->Set(_limit.Radian());
+    this->upperLimit[_index] = _limit;
+    limitElem->GetElement("upper")->Set(_limit);
   }
   else if (_index == 1)
   {
@@ -1170,8 +1178,8 @@ void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
     sdf::ElementPtr limitElem = axisElem->GetElement("limit");
 
     // store upper joint limits
-    this->upperLimit[_index] = _limit.Radian();
-    limitElem->GetElement("upper")->Set(_limit.Radian());
+    this->upperLimit[_index] = _limit;
+    limitElem->GetElement("upper")->Set(_limit);
   }
   else
   {
