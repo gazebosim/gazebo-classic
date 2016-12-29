@@ -357,7 +357,10 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   // Move box out of range
   world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond::Identity));
+
   world->Step(1);
   raySensor->Update(true);
 

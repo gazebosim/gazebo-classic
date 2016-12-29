@@ -87,11 +87,11 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     if (sphereModel)
     {
       ignition::math::Vector3d vel = sphereModel->WorldLinearVel();
-      math::Pose pose = sphereModel->WorldPose();
+      ignition::math::Pose3d pose = sphereModel->WorldPose();
       if (z > 0.5)
       {
-        EXPECT_LT(fabs(vel.z - v), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - z), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z() - v), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - z), PHYSICS_TOL);
       }
 
       // After contact with ground, and no bounce back
@@ -105,8 +105,8 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
                 << std::endl;
           break;
         }
-        EXPECT_LT(fabs(vel.z), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - 0.5), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z()), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - 0.5), PHYSICS_TOL);
       }
     }
   }

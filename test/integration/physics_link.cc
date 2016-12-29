@@ -96,7 +96,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   ignition::math::Vector3d worldOffset = poseWorld0.Rot().RotateVector(
       _offset.Ign() - _link->GetInertial()->GetCoG().Ign());
   ignition::math::Vector3d torqueWorld = worldOffset.Cross(forceWorld);
-  EXPECT_EQ(torqueWorld, _link->GetWorldTorque());
+  EXPECT_EQ(torqueWorld, _link->GetWorldTorque().Ign());
 
   // Check acceleration in world frame
   ignition::math::Vector3d oneStepLinearAccel =
@@ -145,7 +145,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   _world->Step(moreThanOneStep);
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldForce());
   EXPECT_EQ(math::Vector3::Zero, _link->GetWorldTorque());
-  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel());
+  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel().Ign());
   EXPECT_EQ(angularVelWorld0, _link->WorldAngularVel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldLinearAccel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldAngularAccel());

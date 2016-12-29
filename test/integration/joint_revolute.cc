@@ -527,7 +527,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           double jointVel = joint->GetVelocity(0);
           ignition::math::Vector3d axis = joint->GetGlobalAxis(0).Ign();
           angVel  = joint->GetChild()->WorldAngularVel();
-          angVel -= joint->GetParent()-tWorldAngularVel();
+          angVel -= joint->GetParent()->WorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
         }
         // Apply negative torque to lower_joint

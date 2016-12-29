@@ -463,7 +463,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
     double velMag = g.Y() * sinAngle * t;
-    math::Vector3 vel = iter->first->GetWorldLinearVel();
+    math::Vector3 vel = iter->first->WorldLinearVel();
     EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
     EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
   }

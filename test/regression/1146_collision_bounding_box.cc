@@ -50,7 +50,7 @@ TEST_F(Issue1146Test, Reset)
   model->SetWorldPose(ignition::math::Pose3d(10, 15, 20, 0, 0, 0));
 
   EXPECT_EQ(coll->CollisionBoundingBox(),
-      math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
+      ignition::math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
                 ignition::math::Vector3d(10.5, 15.5, 20.5)));
 }
 

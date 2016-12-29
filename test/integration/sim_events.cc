@@ -182,7 +182,7 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   EXPECT_TRUE(can1 != NULL);
 
   unsigned int countBefore1 = GetEventCount();
-  can1->SetWorldPose(ignition::math::Posed(0, 5, 0, 0, 0, 0));
+  can1->SetWorldPose(ignition::math::Pose3d(0, 5, 0, 0, 0, 0));
   unsigned int countAfter1 = WaitForNewEvent(countBefore1, 10, 100);
   EXPECT_GT(countAfter1, countBefore1);
 

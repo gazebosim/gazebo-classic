@@ -377,14 +377,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->WorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->WorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
   double test_duration = world->SimTime().Double() - start_time;

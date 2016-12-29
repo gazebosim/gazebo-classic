@@ -514,7 +514,7 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
 
   // drop from some height
-  model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   // +1sec: should have hit the ground
   world->Step(1000);
   // +4sec: should destabilize without patch for issue #1159
@@ -523,15 +523,13 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   for (int n = 0; n < 1000; ++n)
   {
     world->Step(1);
-    math::Vector3 vel_angular = link_00->GetWorldLinearVel();
-    math::Vector3 vel_linear = link_00->GetWorldAngularVel();
+    ignition::math::Vector3d velAngular = link_00->WorldLinearVel();
+    ignition::math::Vector3d velLinear = link_00->WorldAngularVel();
 
-    EXPECT_LT(vel_angular.GetLength(), 0.1);
-    EXPECT_LT(vel_linear.GetLength(), 0.1);
+    EXPECT_LT(velAngular.Length(), 0.1);
+    EXPECT_LT(velLinear.Length(), 0.1);
 
-    gzlog <<   "va [" << vel_angular
-          << "] vl [" << vel_linear
-          << "]\n";
+    gzlog << "va [" << velAngular << "] vl [" << velLinear << "]\n";
   }
 }
 
