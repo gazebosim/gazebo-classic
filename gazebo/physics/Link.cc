@@ -735,7 +735,7 @@ ignition::math::Vector3d Link::WorldAngularAccel() const
   // L: angular momentum of CoG in world frame
   // w: angular velocity in world frame
   // return I^-1 * (T - w x L)
-  return this->GetWorldInertiaMatrix().Inverse().Ign() *
+  return this->WorldInertiaMatrix().Inverse().Ign() *
     (this->GetWorldTorque().Ign() -
      this->WorldAngularVel().Cross(this->GetWorldAngularMomentum().Ign()));
 }
@@ -743,7 +743,7 @@ ignition::math::Vector3d Link::WorldAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
 {
-  return this->GetWorldInertiaMatrix() * this->WorldAngularVel();
+  return this->WorldInertiaMatrix() * this->GetWorldAngularVel().Ign();
 }
 
 //////////////////////////////////////////////////
@@ -854,9 +854,9 @@ math::Matrix3 Link::GetWorldInertiaMatrix() const
   math::Matrix3 moi;
   if (this->inertial)
   {
-    math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->WorldPose().Rot().Inverse();
-    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+    ignition::math::Vector3d pos = this->inertial->GetPose().pos.Ign();
+    ignition::math::Quaterniond rot = this->WorldPose().Rot().Inverse();
+    moi = this->inertial->MOI(ignition::math::Pose3d(pos, rot));
   }
   return moi;
 }
@@ -1529,7 +1529,7 @@ double Link::GetWorldEnergyKinetic() const
   // E = 1/2 w^T I w
   {
     ignition::math::Vector3d w = this->WorldAngularVel();
-    ignition::math::Matrix3d inertia = this->GetWorldInertiaMatrix().Ign();
+    ignition::math::Matrix3d inertia = this->WorldInertiaMatrix();
     energy += 0.5 * w.Dot(inertia * w);
   }
 

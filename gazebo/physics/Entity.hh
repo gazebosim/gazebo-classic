@@ -19,8 +19,9 @@
 
 #include <string>
 #include <vector>
-#include <ignition/math/Vector3.hh>
+#include <ignition/math/Box.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -311,7 +312,7 @@ namespace gazebo
       public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns collision bounding box.
-      /// \return Collsiion boundin box.
+      /// \return Collsion bounding box.
       public: ignition::math::Box CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.

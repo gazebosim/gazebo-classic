@@ -39,6 +39,10 @@
 1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
     * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
 
+1. Added VisualMarkers to the rendering engine. Visual markers support
+   programmatic rendering of various shapes in a scene.
+    * [Pull request 2541](https://bitbucket.org/osrf/gazebo/pull-request/2541)
+
 1. Support version 5 of the DART Physics Engine.
     * [Pull request #2459](https://bitbucket.org/osrf/gazebo/pull-request/2459)
 
@@ -134,6 +138,7 @@
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
+    * [Pull request #2564](https://bitbucket.org/osrf/gazebo/pull-request/2564)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
     * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
     * [Pull request #2556](https://bitbucket.org/osrf/gazebo/pull-request/2556)
@@ -141,12 +146,13 @@
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
     * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
+    * [Pull request #2565](https://bitbucket.org/osrf/gazebo/pull-request/2565)
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
     * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
-    * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
     * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
+    * [Pull request #2560](https://bitbucket.org/osrf/gazebo/pull-request/2560)
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
     * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
 

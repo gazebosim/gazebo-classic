@@ -78,7 +78,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   ignition::math::Pose3d poseWorld0 = _link->WorldPose();
 
   // Add Link Force
-  if (_offset == math::Vector3::Zero)
+  if (_offset.Ign() == ignition::math::Vector3d::Zero)
     _link->AddLinkForce(_force);
   else
     _link->AddLinkForce(_force, _offset);

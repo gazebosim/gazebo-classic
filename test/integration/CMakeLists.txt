@@ -175,6 +175,7 @@ set(qt_tests
   camera_gui.cc
   collada_visualization.cc
   insert_model.cc
+  marker.cc
   model_editor.cc
   model_editor_undo.cc
   model_manipulation.cc

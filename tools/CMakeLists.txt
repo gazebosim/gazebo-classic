@@ -40,7 +40,7 @@ gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gaze
 
 add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
 
-add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 
 if (WIN32)
   # Force multiple definitions since there is a collision with sdformat GetAsEuler() function
@@ -56,6 +56,7 @@ target_link_libraries(gz
  gazebo_sensors
  ${QT_LIBRARIES}
  ${Boost_LIBRARIES}
+ ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (UNIX)

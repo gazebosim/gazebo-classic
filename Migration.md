@@ -40,10 +40,6 @@ release will remove the deprecated code.
     + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
     + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
 
-1. **gazebo/test/ServerFixture.hh**
-    + ***Deprecation:*** all public methods using gazebo::math
-    + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
-
 1. **gazebo/physics/Joint.hh**
     + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
     + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
@@ -51,6 +47,10 @@ release will remove the deprecated code.
     + `gazebo::math::Angle lowerLimit` replaced with `ignition::math::Angle lowerLimit`
     + `gazebo::math::Angle upperLimit` replaced with `ignition::math::Angle upperLimit`
     + `gazebo::math::Angle staticAngle` replaced with `ignition::math::Angle staticAngle`
+
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** all public methods using gazebo::math
+    + ***Replacement:*** same signatures for methods just replacing gazebo::math by ignition::math
 
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
@@ -128,19 +128,19 @@ release will remove the deprecated code.
 
 ### Deprecations
 
-1. **gazebo/physics/Collision.hh**
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
-
-1. **gazebo/physics/Entity.hh**
-    + ***Deprecation:*** const math::Pose GetDirtyPose() const
-    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
-
 1. **gazebo/rendering/MovableText.hh**
     + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
     + ***Replacement:*** ignition::math::Box AABB()
+
+1. **gazebo/physics/Collision.hh**
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
@@ -148,9 +148,9 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Vector3 GetScale() const
     + ***Replacement:*** ignition::math::Vector3d Scale() const
 
-1. **gazebo/physics/Collision.hh**
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+1. **gazebo/physics/HeightmapShape.hh**
+    + ***Deprecation:*** math::Vector2i GetVertexCount() const
+    + ***Replacement:*** ignition::math::Vector2i VertexCount() const
 
 1. **gazebo/physics/Entity.hh**
     + ***Deprecation:*** const math::Pose GetDirtyPose() const
@@ -167,7 +167,6 @@ release will remove the deprecated code.
     + ***Replacement:*** void SetRelativePose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true)
     + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
     + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true) 
-
     + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearVel() const
     + ***Replacement:*** virtual ignition::math::Vector3d RelativeLinearVel() const
     + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel() const
@@ -466,15 +465,27 @@ release will remove the deprecated code.
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
+1. **gazebo/physics/Inertial.hh**
+    + ***Deprecation:*** public: math::Matrix3 GetMOI() const
+    + ***Replacement:*** public: ignition::math::Matrix3d MOI() const
+    + ***Deprecation:*** public: math::Matrix3 GetMOI(const math::Pose) const
+    + ***Replacement:*** public: ignition::math::Matrix3d MOI(const ignition::math::Pose3d) const
+    + ***Deprecation:*** public: void SetMOI(const math::Matrix3)
+    + ***Replacement:*** public: void SetMOI(const ignition::math::Matrix3d)
+
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
 
 1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** public: math::Matrix3 GetWorldInertiaMatrix() const
+    + ***Replacement:*** public: ignition::math::Matrix3d WorldInertiaMatrix() const
     + ***Deprecation:*** public: void Link::DisconnectEnabled(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/MultiRayShape.hh**
     + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
@@ -651,9 +662,17 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: T   gazebo::math::variance(const std::vector<T> &)
     + ***Replacement:*** public: T ignition::math::variance(const std::vector<T> &)
 
+1. **gazebo/math/Box.hh**
+    + ***Deprecation:*** public:   gazebo::math::Box
+    + ***Replacement:*** public: ignition::math::Box
+
 1. **gazebo/math/Kmeans.hh**
     + ***Deprecation:*** public:   gazebo::math::Kmeans
     + ***Replacement:*** public: ignition::math::Kmeans
+
+1. **gazebo/math/Matrix3.hh**
+    + ***Deprecation:*** public:   gazebo::math::Matrix3
+    + ***Replacement:*** public: ignition::math::Matrix3
 
 1. **gazebo/math/Matrix4.hh**
     + ***Deprecation:*** public:   gazebo::math::Matrix4
@@ -694,6 +713,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Vector2d.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector2d
     + ***Replacement:*** public: ignition::math::Vector2d
+
+1. **gazebo/math/Vector2i.hh**
+    + ***Deprecation:*** public:   gazebo::math::Vector2i
+    + ***Replacement:*** public: ignition::math::Vector2i
 
 1. **gazebo/math/Vector3Stats.hh**
     + ***Deprecation:*** public:   gazebo::math::Vector3Stats

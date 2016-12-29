@@ -18,9 +18,9 @@
 #define GAZEBO_RENDERING_ORTHOVIEWCONTROLLER_HH_
 
 #include <string>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/rendering/ViewController.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

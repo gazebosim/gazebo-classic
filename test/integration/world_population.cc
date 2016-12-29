@@ -107,8 +107,6 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     // This is not a cloned object, skip it.
     if (model->GetName().find("can1_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(2.5, 2.5, 0),
-        ignition::math::Vector3d(3.5, 3.5, 0.1));
       EXPECT_GE(model->WorldPose().Pos().X(), 2.5 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Y(), 2.5 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
@@ -124,8 +122,6 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can4_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-1, -5, 0),
-        ignition::math::Vector3d(3, -3, .01));
       EXPECT_GE(model->WorldPose().Pos().X(), -1 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Y(), -5 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
@@ -141,8 +137,6 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can6_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-1, 3.5, 0),
-                            ignition::math::Vector3d(1, 4.5, .01));
       EXPECT_GE(model->WorldPose().Pos().X(), -1 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
       EXPECT_LE(model->WorldPose().Pos().X(), 1 + tolerance);
@@ -151,8 +145,6 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can7_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(-5.5, -2, 0),
-                            ignition::math::Vector3d(-4.5, 0, .01));
       EXPECT_GE(model->WorldPose().Pos().Y(), -2 - tolerance);
       EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
       EXPECT_LE(model->WorldPose().Pos().Y(), 0 + tolerance);
@@ -161,8 +153,6 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
     }
     else if (model->GetName().find("can8_clone") != std::string::npos)
     {
-      ignition::math::Box boundingBox(ignition::math::Vector3d(3.9, -0.1, 0),
-                            ignition::math::Vector3d(4.1, 0.1, 1.4));
       EXPECT_GE(model->WorldPose().Pos().Z(), 0 - tolerance);
       EXPECT_LE(model->WorldPose().Pos().Z(), 1.4 + tolerance);
       EXPECT_NEAR(model->WorldPose().Pos().X(), 4.0, tolerance);
