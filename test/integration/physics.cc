@@ -315,7 +315,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
 
       if (name == "test_empty")
       {
-        EXPECT_NEAR(pose1.Pos().X(), z0+g.Z()/2*t*t,
+        EXPECT_NEAR(pose1.Pos().Z(), z0+g.Z()/2*t*t,
             fabs((z0+g.Z()/2*t*t)*PHYSICS_TOL));
       }
       else
@@ -1149,11 +1149,11 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
         }
       }
 
-      // // integrate here to see when the collision should happen
+      // integrate here to see when the collision should happen
       // double impulse = dt*f;
       // if (i == 0)
       //    v = v + impulse;
-      // // inelastic col. w/ eqal mass.
+      // inelastic col. w/ eqal mass.
       // else if (t >= 1.0)
       //   v = dt*f/ 2.0;
       // x = x + dt * v;
