@@ -44,9 +44,9 @@ release will remove the deprecated code.
     + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
     + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
     + `gazebo::math::Pose parentAnchorPose` replaced with `ignition::math::Pose3d parentAnchorPose`
-    + `gazebo::math::Angle lowerLimit` replaced with `ignition::math::Angle lowerLimit`
-    + `gazebo::math::Angle upperLimit` replaced with `ignition::math::Angle upperLimit`
-    + `gazebo::math::Angle staticAngle` replaced with `ignition::math::Angle staticAngle`
+    + `gazebo::math::Angle lowerLimit` replaced with `double lowerLimit`
+    + `gazebo::math::Angle upperLimit` replaced with `double upperLimit`
+    + `gazebo::math::Angle staticAngle` replaced with `double staticAngle`
 
 1. **gazebo/test/ServerFixture.hh**
     + ***Deprecation:*** all public methods using gazebo::math
@@ -151,6 +151,30 @@ release will remove the deprecated code.
 1. **gazebo/physics/Model.hh**
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** virtual unsigned int GetAngleCount() const = 0
+    + ***Replacement:*** virtual unsigned int DOF() const = 0
+    + ***Deprecation:*** math::Angle GetAngle(unsigned int _index) const
+    + ***Replacement:*** virtual double Position(const unsigned int _index = 0) const final
+    + ***Deprecation:*** virtual math::Angle GetAngleImpl(unsigned int _index) const = 0
+    + ***Replacement:*** virtual double PositionImpl(const unsigned int _index = 0) const = 0
+    + ***Deprecation:*** bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement:*** virtual void SetUpperLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** void SetUpperLimit(unsigned int _index, math::Angle _limit)
+    + ***Replacement:*** virtual void SetUpperLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement:*** virtual oid SetLowerLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** void SetLowerLimit(unsigned int _index, math::Angle _limit)
+    + ***Replacement:*** virtual oid SetLowerLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** virtual math::Angle GetHighStop(unsigned int _index) = 0
+    + ***Replacement:*** virtual double UpperLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** math::Angle GetUpperLimit(unsigned int _index) const
+    + ***Replacement:*** virtual double UpperLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** virtual math::Angle GetLowStop(unsigned int _index) = 0
+    + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** math::Angle GetLowerLimit(unsigned int _index) const
+    + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
 
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
