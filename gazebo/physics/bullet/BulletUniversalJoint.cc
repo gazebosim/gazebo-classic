@@ -124,7 +124,7 @@ void BulletUniversalJoint::Init()
   this->angleOffset[0] = this->bulletUniversal->getAngle2();
   this->angleOffset[1] = this->bulletUniversal->getAngle1();
 
-  // {ppp|low}erLimit keeps the original sdf values
+  // {Upp|Low}erLimit keeps the original sdf values
   // Set{Upper|Lower}Limit translates to bullet's axis definitions
   this->SetUpperLimit(0, this->upperLimit[0]);
   this->SetUpperLimit(1, this->upperLimit[1]);
