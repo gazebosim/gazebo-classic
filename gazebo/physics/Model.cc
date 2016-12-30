@@ -805,22 +805,17 @@ math::Vector3 Model::GetWorldAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Model::GetBoundingBox() const
+ignition::math::Box Model::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+  box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (const auto &iter : this->links)
   {
-    if (*iter)
-    {
-      math::Box linkBox;
-      linkBox = (*iter)->GetBoundingBox();
-      box += linkBox;
-    }
+    if (iter)
+      box += iter->BoundingBox();
   }
 
   return box;
@@ -1299,7 +1294,7 @@ void Model::OnPoseChange()
 //////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
-  this->SetWorldPose(_state.GetPose(), true);
+  this->SetWorldPose(_state.Pose(), true);
   this->SetScale(_state.Scale(), true);
 
   LinkState_M linkStates = _state.GetLinkStates();

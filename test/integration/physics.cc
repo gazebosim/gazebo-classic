@@ -652,7 +652,7 @@ TEST_F(PhysicsTest, EmptyStates)
 
   // Model state
   auto modelState = modelStates["box"];
-  EXPECT_EQ(ignition::math::Pose3d::Zero, modelState.GetPose().Ign());
+  EXPECT_EQ(ignition::math::Pose3d::Zero, modelState.Pose());
 }
 
 //////////////////////////////////////////////////
@@ -668,7 +668,7 @@ TEST_F(PhysicsTest, StateChange)
 
   auto oldModelState = oldWorldState.GetModelState("box");
   ignition::math::Pose3d oldPose(0, 0, 0.5, 0, 0, 0);
-  EXPECT_EQ(oldPose, oldModelState.GetPose().Ign());
+  EXPECT_EQ(oldPose, oldModelState.Pose());
 
   // Move the box
   world->SetPaused(true);
@@ -683,7 +683,7 @@ TEST_F(PhysicsTest, StateChange)
   EXPECT_EQ(4u, newWorldState.GetModelStateCount());
 
   auto newModelState = newWorldState.GetModelState("box");
-  EXPECT_EQ(newPose, newModelState.GetPose().Ign());
+  EXPECT_EQ(newPose, newModelState.Pose());
 
   // Reset world state, and check for correctness
   world->SetState(oldWorldState);
@@ -692,7 +692,7 @@ TEST_F(PhysicsTest, StateChange)
   EXPECT_EQ(4u, resetWorldState.GetModelStateCount());
 
   auto resetModelState = resetWorldState.GetModelState("box");
-  EXPECT_EQ(oldPose, resetModelState.GetPose().Ign());
+  EXPECT_EQ(oldPose, resetModelState.Pose());
 }
 
 //////////////////////////////////////////////////

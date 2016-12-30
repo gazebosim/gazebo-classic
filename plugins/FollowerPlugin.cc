@@ -163,7 +163,7 @@ void FollowerPlugin::Init()
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->dataPtr->leftJoint->GetChild());
 
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->dataPtr->wheelRadius = bb.Size().Max() * 0.5;
 }

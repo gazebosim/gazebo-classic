@@ -29,7 +29,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -175,7 +174,7 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-math::Box ODECollision::GetBoundingBox() const
+ignition::math::Box ODECollision::BoundingBox() const
 {
   dReal aabb[6];
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -183,8 +182,9 @@ math::Box ODECollision::GetBoundingBox() const
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  math::Box box(math::Vector3(aabb[0], aabb[2], aabb[4]),
-                math::Vector3(aabb[1], aabb[3], aabb[5]));
+  ignition::math::Box box(
+      ignition::math::Vector3d(aabb[0], aabb[2], aabb[4]),
+      ignition::math::Vector3d(aabb[1], aabb[3], aabb[5]));
 
   return box;
 }

@@ -408,7 +408,7 @@ void BulletJoint::SetDamping(unsigned int _index, double _damping)
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
+void BulletJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
   if (_index < this->GetAngleCount())
   {

@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
@@ -62,7 +63,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(const float _near, const float _far);
       using Camera::SetClipDist;
 
       /// \brief Generic load function
@@ -223,7 +224,7 @@ namespace gazebo
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      /// \deprecated See version that accepts an ignition::math::Vector2i
+      /// \deprecated See version that accepts an ignition::math::Vector3
       /// object
       public: void SetFocalPoint(const math::Vector3 &_pt)
               GAZEBO_DEPRECATED(8.0);
@@ -304,8 +305,8 @@ namespace gazebo
       /// visual.
       /// \return True if successfully attach to the visual.
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
-                     bool _inheritOrientation, double _minDist = 0,
-                     double _maxDist = 0);
+                     const bool _inheritOrientation, const double _minDist = 0,
+                     const double _maxDist = 0);
       using Camera::AttachToVisualImpl;
 
       // Documentation inherited.

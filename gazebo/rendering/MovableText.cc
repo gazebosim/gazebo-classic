@@ -175,6 +175,12 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
+const std::string &MovableText::GetText() const
+{
+  return this->text;
+}
+
+//////////////////////////////////////////////////
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -260,13 +266,20 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+math::Box MovableText::GetAABB()
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->AABB();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-ignition::math::Box MovableText::AABB(void)
+ignition::math::Box MovableText::AABB()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return ignition::math::Box(

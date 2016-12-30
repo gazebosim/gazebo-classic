@@ -19,12 +19,11 @@
  * Date: 13 Feb 2006
  */
 
-#ifndef _BULLET_COLLISION_HH_
-#define _BULLET_COLLISION_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETCOLLISION_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETCOLLISION_HH_
 
 #include <string>
 
-#include "gazebo/math/Box.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -71,8 +70,8 @@ namespace gazebo
       /// \return The bits
       public: virtual unsigned int GetCollideBits() const;
 
-      /// \brief Get the bounding box, defined by the physics engine
-      public: virtual math::Box GetBoundingBox() const;
+      // Documentation inherited
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the collision shape
       /// \param[in] _shape Collision shape
