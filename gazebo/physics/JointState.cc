@@ -146,7 +146,7 @@ bool JointState::IsZero() const
   for (std::vector<ignition::math::Angle>::const_iterator iter =
        this->angles.begin(); iter != this->angles.end() && result; ++iter)
   {
-    result = result && (*iter) == ignition::math::Angle::Zero;
+    result = result && (*iter).Radian() == 0.0;
   }
 
   return result;
