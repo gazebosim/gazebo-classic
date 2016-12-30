@@ -79,7 +79,7 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
       public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
-          const bool _useParentFrame, const msgs::Joint::Type _type);
+          const bool _useParentFrame, const msgs::Joint::Type &_type);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -106,7 +106,7 @@ namespace gazebo
       /// \param[in] _type Type of axis.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
           const ignition::math::Vector3d &_axis, const bool _useParentFrame,
-          const msgs::Joint::Type _type);
+          const msgs::Joint::Type &_type);
 
       /// \brief Update an axis' arrow visual.
       /// \param[in] _arrowVisual Arrow visual to be updated.
