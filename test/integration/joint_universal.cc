@@ -82,6 +82,12 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
   jointUpper->SetUpperLimit(1, 1e-6);
   jointUpper->SetLowerLimit(0, -1e-6);
   jointUpper->SetLowerLimit(1, -1e-6);
+  EXPECT_NEAR(0.0, jointUpper->UpperLimit(0), g_tolerance);
+  EXPECT_NEAR(0.0, jointUpper->UpperLimit(1), g_tolerance);
+  EXPECT_NEAR(0.0, jointUpper->LowerLimit(0), g_tolerance);
+  EXPECT_NEAR(0.0, jointUpper->LowerLimit(1), g_tolerance);
+  EXPECT_NEAR(0.0, jointUpper->Position(0), g_tolerance);
+  EXPECT_NEAR(0.0, jointUpper->Position(1), g_tolerance);
 
   // set asymmetric limits on lower joints
   double hi0 =  0.4;
@@ -110,7 +116,7 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
     double gy = pow(-1, i % 2) * gravityMag;
 
     // Set gravity to push horizontally
-    physics->SetGravity(math::Vector3(gx, gy, 0));
+    physics->SetGravity(ignition::math::Vector3d(gx, gy, 0));
     world->Step(1000);
 
     // jointLower: axis[0] = {1, 0, 0}
@@ -129,13 +135,15 @@ void JointTestUniversal::Limits(const std::string &_physicsEngine)
           << "gy " << gy << ' '
           << "pose " << jointLower->GetChild()->WorldPose()
           << std::endl;
+    EXPECT_NEAR(0.0, jointUpper->Position(0), g_tolerance);
+    EXPECT_NEAR(0.0, jointUpper->Position(1), g_tolerance);
     EXPECT_NEAR(des0, jointLower->Position(0), 1e-2);
     EXPECT_NEAR(des1, jointLower->Position(1), 1e-2);
 
     // Also test expected pose of body, math is approximate
-    math::Vector3 eulerAngles = linkLower->WorldPose().Rot().Euler();
-    EXPECT_NEAR(des0, eulerAngles.x, 0.05);
-    EXPECT_NEAR(des1, eulerAngles.y, 0.05);
+    auto eulerAngles = linkLower->WorldPose().Rot().Euler();
+    EXPECT_NEAR(des0, eulerAngles.X(), 0.05);
+    EXPECT_NEAR(des1, eulerAngles.Y(), 0.05);
   }
 }
 

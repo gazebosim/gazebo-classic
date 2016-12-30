@@ -214,7 +214,7 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 
 //////////////////////////////////////////////////
 void ODEUniversalJoint::SetUpperLimit(const unsigned int _index,
-                                    const double _limit)
+                                      const double _limit)
 {
   // Overload because we switched axis orders
   Joint::SetUpperLimit(_index, _limit);
@@ -222,8 +222,10 @@ void ODEUniversalJoint::SetUpperLimit(const unsigned int _index,
   {
     case UniversalJoint::AXIS_CHILD:
       this->SetParam(dParamHiStop, _limit);
+      break;
     case UniversalJoint::AXIS_PARENT:
       this->SetParam(dParamHiStop2, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -239,8 +241,10 @@ void ODEUniversalJoint::SetLowerLimit(const unsigned int _index,
   {
     case UniversalJoint::AXIS_CHILD:
       this->SetParam(dParamLoStop, _limit);
+      break;
     case UniversalJoint::AXIS_PARENT:
       this->SetParam(dParamLoStop2, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
   };

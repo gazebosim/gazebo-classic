@@ -227,6 +227,6 @@ double SimbodyUniversalJoint::PositionImpl(const unsigned int _index) const
   else
   {
     gzerr << "Invalid index[" << _index << "]\n";
-    return SimTK::NaN;
+    return ignition::math::NAN_D;
   }
 }

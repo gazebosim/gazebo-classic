@@ -403,6 +403,7 @@ void BulletScrewJoint::SetUpperLimit(const unsigned int _index,
   if (!this->bulletScrew)
   {
     gzerr << "bulletScrew not created yet.\n";
+    return;
   }
 
   if (_index == 0)
@@ -473,6 +474,7 @@ void BulletScrewJoint::SetLowerLimit(const unsigned int _index,
   if (!this->bulletScrew)
   {
     gzerr << "bulletScrew not created yet.\n";
+    return;
   }
 
   // bulletScrew axial rotation is backward

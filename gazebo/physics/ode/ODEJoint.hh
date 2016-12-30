@@ -206,12 +206,10 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetUpperLimit(const unsigned int _index,
                                          const double _limit);
-      using Joint::SetUpperLimit;
 
       // Documentation inherited.
       public: virtual void SetLowerLimit(const unsigned int _index,
                                          const double _limit);
-      using Joint::SetLowerLimit;
 
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;

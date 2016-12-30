@@ -520,8 +520,15 @@ namespace gazebo
       public: math::Angle GetUpperLimit(unsigned int _index) const
           GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get the joint's upper limit. For rotational axes, the value
-      /// is in radians, for prismatic axes it is in meters.
+      /// \brief Get the joint's upper limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the limit can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \return Lower limit of the axis.
       public: virtual double UpperLimit(const unsigned int _index = 0) const;
@@ -534,12 +541,19 @@ namespace gazebo
       public: void SetLowerLimit(unsigned int _index, math::Angle _limit)
           GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Set the joint's lower limit. For rotational axes, the value
-      /// is in radians, for prismatic axes it is in meters.
+      /// \brief Set the joint's lower limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the limit can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetLowerLimit(const unsigned int _index,
-                                 const double _limit);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       /// \brief:  set the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
@@ -553,8 +567,8 @@ namespace gazebo
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetUpperLimit(const unsigned int _index,
-                                 const double _limit);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.

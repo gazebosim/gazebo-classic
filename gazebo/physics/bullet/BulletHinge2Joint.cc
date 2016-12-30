@@ -230,12 +230,13 @@ math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 //////////////////////////////////////////////////
 double BulletHinge2Joint::PositionImpl(const unsigned int /*_index*/) const
 {
+  /// \todo Copied from old BulletHinge2Joint::GetAngle, but it probably should
+  /// return the value according to the index
   if (!this->bulletHinge2)
   {
     gzerr << "Joint must be created first.\n";
     return ignition::math::NAN_D;
   }
 
-  /// \todo Return angle according to index
   return this->bulletHinge2->getAngle1();
 }

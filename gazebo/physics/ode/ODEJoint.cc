@@ -287,10 +287,13 @@ void ODEJoint::SetUpperLimit(const unsigned int _index, const double _limit)
   {
     case 0:
       this->SetParam(dParamHiStop, _limit);
+      break;
     case 1:
       this->SetParam(dParamHiStop2, _limit);
+      break;
     case 2:
       this->SetParam(dParamHiStop3, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
   };
@@ -304,10 +307,13 @@ void ODEJoint::SetLowerLimit(const unsigned int _index, const double _limit)
   {
     case 0:
       this->SetParam(dParamLoStop, _limit);
+      break;
     case 1:
       this->SetParam(dParamLoStop2, _limit);
+      break;
     case 2:
       this->SetParam(dParamLoStop3, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
   };

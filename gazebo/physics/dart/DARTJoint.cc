@@ -280,6 +280,7 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
+    return;
   }
 
   if (!this->dataPtr->IsInitialized())
@@ -287,6 +288,7 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
     this->dataPtr->Cache(
           "HighStop" + std::to_string(_index),
           boost::bind(&DARTJoint::SetUpperLimit, this, _index, _limit));
+    return;
   }
 
   this->dataPtr->dtJoint->setPositionUpperLimit(_index, _limit);
@@ -298,6 +300,7 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
   if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
+    return;
   }
 
   if (!this->dataPtr->IsInitialized())
@@ -305,6 +308,7 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
     this->dataPtr->Cache(
           "LowStop" + std::to_string(_index),
           boost::bind(&DARTJoint::SetLowerLimit, this, _index, _limit));
+    return;
   }
 
   this->dataPtr->dtJoint->setPositionLowerLimit(_index, _limit);

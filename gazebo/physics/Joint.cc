@@ -1115,7 +1115,7 @@ double Joint::LowerLimit(const unsigned int _index) const
     return this->lowerLimit[_index];
 
   gzwarn << "requesting lower limit of joint index out of bound\n";
-  return 0;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -1131,7 +1131,7 @@ double Joint::UpperLimit(const unsigned int _index) const
     return this->upperLimit[_index];
 
   gzwarn << "requesting upper limit of joint index out of bound\n";
-  return 0;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

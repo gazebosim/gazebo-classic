@@ -309,6 +309,7 @@ void SimbodyScrewJoint::SetUpperLimit(const unsigned int _index,
         gzerr << "child link is null, force element not initialized, "
               << "SetUpperLimit failed. Please file a report on issue "
               << "tracker.\n";
+        return;
       }
 
       if (_index == 0)
@@ -382,6 +383,7 @@ void SimbodyScrewJoint::SetLowerLimit(const unsigned int _index,
         gzerr << "child link is null, force element not initialized, "
               << "SetLowerLimit failed. Please file a report on issue "
               << "tracker.\n";
+        return;
       }
 
       if (_index == 0)
@@ -451,7 +453,7 @@ double SimbodyScrewJoint::UpperLimit(const unsigned int _index) const
   }
   else if (_index == 0)
   {
-    return this->UpperLimit(0);
+    return SimbodyJoint::UpperLimit(0);
   }
   else if (_index == 1)
   {
@@ -490,7 +492,7 @@ double SimbodyScrewJoint::LowerLimit(const unsigned int _index) const
   }
   else if (_index == 0)
   {
-    return this->LowerLimit(0);
+    return SimbodyJoint::LowerLimit(0);
   }
   else if (_index == 1)
   {
