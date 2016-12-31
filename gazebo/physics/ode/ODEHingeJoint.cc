@@ -20,6 +20,7 @@
  */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -118,9 +119,9 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHingeJoint::GetAngleImpl(unsigned int /*index*/) const
+double ODEHingeJoint::PositionImpl(const unsigned int /*index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->jointId)
     result = dJointGetHingeAngle(this->jointId);
   else

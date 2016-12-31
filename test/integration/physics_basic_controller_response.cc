@@ -113,9 +113,9 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   // for (int j = 0; j < 1000; ++j) //  for debug
   for (int i = 0; i < steps; ++i)
   {
-    double pos1 = joint1->GetAngle(0).Radian();
-    double pos2 = joint2->GetAngle(0).Radian();
-    double pos3 = joint3->GetAngle(0).Radian();
+    double pos1 = joint1->Position(0);
+    double pos2 = joint2->Position(0);
+    double pos3 = joint3->Position(0);
     double error1 = pos1 - cmdPos;
     double error2 = pos2 - cmdPos;
     double error3 = pos3 - cmdPos;
@@ -128,10 +128,10 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
     EXPECT_DOUBLE_EQ(world->SimTime().Double(), t0 + dt * i);
     EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
     EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint3->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->Position(0),
+                joint2->Position(0), TOL);
+    EXPECT_NEAR(joint1->Position(0),
+                joint3->Position(0), TOL);
     world->Step(1);
   }
 }

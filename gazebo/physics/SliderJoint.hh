@@ -52,7 +52,7 @@ namespace gazebo
               {T::Load(_sdf);}
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 1;}
     };
     /// \}
