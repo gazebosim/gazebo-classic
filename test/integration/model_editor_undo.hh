@@ -48,18 +48,18 @@ class ModelEditorUndoTest : public QTestFixture
   /// \brief Test undo/redo link translation.
   private slots: void LinkTranslation();
 
+  /// \brief Test undo/redo link scaling.
+  private slots: void LinkScaling();
+
   /// \brief Test undo/redo nested model align.
   private slots: void NestedModelAlign();
 
-  /// \brief Test undo/redo link scaling.
-  private slots: void LinkScaling();
+  /// \brief Test undo/redo model plugin insertion.
+  private slots: void ModelPluginInsertion();
 
   /// \brief Helper callback to trigger the delete action on the context
   /// menu after the menu, which is modal, has been opened.
   private slots: void TriggerDelete();
-
-  /// \brief Test undo/redo model plugin insertion.
-  private slots: void ModelPluginInsertion();
 };
 
 #endif
