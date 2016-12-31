@@ -15,6 +15,7 @@
  *
  */
 
+#include <ignition/math/Angle.hh>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Link.hh"
