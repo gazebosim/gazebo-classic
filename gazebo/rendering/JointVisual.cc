@@ -155,7 +155,7 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 
 /////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
-    const bool _useParentFrame, const msgs::Joint::Type _type)
+    const bool _useParentFrame, const msgs::Joint::Type &_type)
 {
   ArrowVisualPtr axis;
 
@@ -182,7 +182,7 @@ void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const ignition::math::Vector3d &_axis,
     const bool _useParentFrame,
-    const msgs::Joint::Type _type)
+    const msgs::Joint::Type &_type)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
