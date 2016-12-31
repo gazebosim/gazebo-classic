@@ -104,14 +104,22 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
@@ -120,10 +128,13 @@ endforeach ()
 foreach (src ${GUIplugins})
   QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} gazebo_gui
-                               libgazebo
-			       ${ogre_libraries}
-			       ${QT_LIBRARIES})
+  target_link_libraries(${src}
+    gazebo_gui
+    libgazebo
+		${ogre_libraries}
+		${QT_LIBRARIES}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()

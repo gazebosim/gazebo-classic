@@ -207,6 +207,7 @@ target_link_libraries(gazebo_rendering
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (HAVE_OCULUS)
