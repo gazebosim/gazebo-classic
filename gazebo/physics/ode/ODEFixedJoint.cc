@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -80,11 +81,11 @@ void ODEFixedJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEFixedJoint::GetAngleImpl(unsigned int /*index*/) const
+double ODEFixedJoint::PositionImpl(const unsigned int /*index*/) const
 {
   gzwarn << "ODEFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

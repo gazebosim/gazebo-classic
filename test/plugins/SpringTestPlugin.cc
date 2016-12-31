@@ -67,7 +67,7 @@ void SpringTestPlugin::ExplicitUpdate()
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
-  double pos = this->jointExplicit->GetAngle(0).Radian();
+  double pos = this->jointExplicit->Position(0);
   double vel = this->jointExplicit->GetVelocity(0);
   double force = -this->kpExplicit * pos
                  -this->kdExplicit * vel;

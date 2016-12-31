@@ -93,7 +93,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       // in parent and child links, preventing joint from being destroyed.
       joint->Load(parentLink, childLink, anchor);
       // joint->SetAnchor(0, anchor);
-      joint->SetLowStop(0, lower);
+      joint->SetLowerLimit(0, lower);
 
       if (parentLink)
         joint->SetName(parentLink->GetName() + std::string("_") +

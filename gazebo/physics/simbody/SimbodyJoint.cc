@@ -306,7 +306,7 @@ void SimbodyJoint::SetForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double SimbodyJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -323,7 +323,7 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
@@ -386,7 +386,7 @@ void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -394,8 +394,8 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
   else
   {
      gzerr << "SimbodyJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -403,7 +403,7 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 //////////////////////////////////////////////////
 void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -411,8 +411,8 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
   else
   {
      gzerr << "SimbodyJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -421,7 +421,7 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -483,11 +483,12 @@ double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetUpperLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetHighStop(_index, _angle);
+  Joint::SetUpperLimit(_index, _limit);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -495,35 +496,33 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->GetLowStop(_index).Radian(), _angle.Radian());
+          this->LowerLimit(_index), _limit);
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetHighStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetUpperLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
-      return false;
+      gzerr << "SetUpperLimit: State not initialized, SetUpperLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetHighStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetUpperLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetLowerLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetLowStop(_index, _angle);
+  Joint::SetLowerLimit(_index, _limit);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -531,82 +530,78 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          _angle.Radian(),
-          this->GetHighStop(_index).Radian());
+          _limit, this->UpperLimit(_index));
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetLowStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetLowerLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-      return false;
+      gzerr << "SetLowerLimit: State not initialized, SetLowerLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetLowStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetLowerLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+double SimbodyJoint::UpperLimit(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::UpperLimit.
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    gzerr << "Should not be here in code, DOF > 2?\n";
+    return ignition::math::NAN_D;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+double SimbodyJoint::LowerLimit(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::LowerLimit.
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    gzerr << "Should not be here in code, DOF > 2?\n";
+    return ignition::math::NAN_D;
   }
 }

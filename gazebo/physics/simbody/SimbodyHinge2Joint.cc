@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -96,8 +98,8 @@ math::Vector3 SimbodyHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+double SimbodyHinge2Joint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  gzerr << "SimbodyHinge2Joint::PositionImpl not implemented\n";
+  return ignition::math::NAN_D;
 }

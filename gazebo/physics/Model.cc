@@ -1544,7 +1544,7 @@ double Model::GetWorldEnergyPotential() const
   for (Joint_V::const_iterator iter = this->joints.begin();
     iter != this->joints.end(); ++iter)
   {
-    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    for (unsigned int j = 0; j < (*iter)->DOF(); ++j)
     {
       e += (*iter)->GetWorldEnergyPotentialSpring(j);
     }

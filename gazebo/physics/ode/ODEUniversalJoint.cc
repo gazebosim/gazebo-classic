@@ -15,6 +15,7 @@
  *
 */
 #include <string>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -123,9 +124,9 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
+double ODEUniversalJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->jointId)
   {
@@ -135,7 +136,7 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
     else if (_index == UniversalJoint::AXIS_PARENT)
       result = dJointGetUniversalAngle2(this->jointId);
     else
-      gzerr << "Joint index out of bounds.\n";
+      gzerr << "Invalid index[" << _index << "]\n";
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
@@ -212,42 +213,40 @@ void ODEUniversalJoint::SetParam(unsigned int _parameter, double _value)
 }
 
 //////////////////////////////////////////////////
-bool ODEUniversalJoint::SetHighStop(
-  unsigned int _index, const math::Angle &_angle)
+void ODEUniversalJoint::SetUpperLimit(const unsigned int _index,
+                                      const double _limit)
 {
   // Overload because we switched axis orders
-  Joint::SetHighStop(_index, _angle);
+  Joint::SetUpperLimit(_index, _limit);
   switch (_index)
   {
     case UniversalJoint::AXIS_CHILD:
-      this->SetParam(dParamHiStop, _angle.Radian());
-      return true;
+      this->SetParam(dParamHiStop, _limit);
+      break;
     case UniversalJoint::AXIS_PARENT:
-      this->SetParam(dParamHiStop2, _angle.Radian());
-      return true;
+      this->SetParam(dParamHiStop2, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      return false;
   };
 }
 
 //////////////////////////////////////////////////
-bool ODEUniversalJoint::SetLowStop(
-  unsigned int _index, const math::Angle &_angle)
+void ODEUniversalJoint::SetLowerLimit(const unsigned int _index,
+                                      const double _limit)
 {
   // Overload because we switched axis orders
-  Joint::SetLowStop(_index, _angle);
+  Joint::SetLowerLimit(_index, _limit);
   switch (_index)
   {
     case UniversalJoint::AXIS_CHILD:
-      this->SetParam(dParamLoStop, _angle.Radian());
-      return true;
+      this->SetParam(dParamLoStop, _limit);
+      break;
     case UniversalJoint::AXIS_PARENT:
-      this->SetParam(dParamLoStop2, _angle.Radian());
-      return true;
+      this->SetParam(dParamLoStop2, _limit);
+      break;
     default:
       gzerr << "Invalid index[" << _index << "]\n";
-      return false;
   };
 }
 
@@ -341,11 +340,11 @@ double ODEUniversalJoint::GetParam(
     }
     else if (_key == "hi_stop")
     {
-      return this->GetHighStop(_index).Radian();
+      return this->UpperLimit(_index);
     }
     else if (_key == "lo_stop")
     {
-      return this->GetLowStop(_index).Radian();
+      return this->LowerLimit(_index);
     }
     else
     {

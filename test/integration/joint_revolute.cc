@@ -141,7 +141,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
       world->Step(stepSize);
       EXPECT_NEAR(joint->GetVelocity(0), vel, g_tolerance);
       double time = world->SimTime().Double();
-      angleErrorMax.InsertData(joint->GetAngle(0).Radian() - time*vel);
+      angleErrorMax.InsertData(joint->Position(0) - time*vel);
     }
 #ifndef LIBBULLET_VERSION_GT_282
     if (_physicsEngine == "bullet")
@@ -339,7 +339,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         if (joint)
         {
           // Get first joint angle
-          angle1 = joint->GetAngle(0).Radian();
+          angle1 = joint->Position(0);
 
           // Get joint velocity and assume it is not too small
           jointVel1 = joint->GetVelocity(0);
@@ -349,7 +349,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           world->Step(1);
 
           // Expect angle change in direction of joint velocity
-          angle2 = joint->GetAngle(0).Radian();
+          angle2 = joint->Position(0);
           EXPECT_GT(
             (angle2 - angle1) * ignition::math::clamp(jointVel1*1e4, -1.0, 1.0)
             , 0);
@@ -359,7 +359,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
           // Take 1 step and measure the last angle, expect decrease
           world->Step(1);
-          angle3 = joint->GetAngle(0).Radian();
+          angle3 = joint->Position(0);
           EXPECT_GT(
             (angle3 - angle2) * ignition::math::clamp(jointVel2*1e4, -1.0, 1.0)
             , 0);
@@ -396,8 +396,8 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          joint->SetLowStop(0, math::Angle(-0.1));
-          joint->SetHighStop(0, math::Angle(0.1));
+          joint->SetLowerLimit(0, -0.1);
+          joint->SetUpperLimit(0, 0.1);
         }
         else
         {
@@ -432,7 +432,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          EXPECT_NEAR(joint->GetAngle(0).Radian(), 0, 0.11);
+          EXPECT_NEAR(joint->Position(0), 0, 0.11);
         }
         else
         {
@@ -474,9 +474,9 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint->Detach();
         // Simbody and DART will not easily detach joints,
         // consider freezing joint limit instead
-        // math::Angle curAngle = joint->GetAngle(0u);
-        // joint->SetLowStop(0, curAngle);
-        // joint->SetHighStop(0, curAngle);
+        // auto curAngle = joint->Position(0u);
+        // joint->SetLowerLimit(0, curAngle);
+        // joint->SetUpperLimit(0, curAngle);
       }
       else
       {
@@ -667,7 +667,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).Radian();
+        double actual_theta = joint->Position(0);
         // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta
@@ -718,7 +718,7 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
         double integ_theta = (
           PendulumAngle(g, l, 1.57079633, 0.0, world->SimTime().Double(),
           0.000001) - 1.5707963);
-        double actual_theta = joint->GetAngle(0).Radian();
+        double actual_theta = joint->Position(0);
         // gzdbg << "time [" << world->SimTime().Double()
         //       << "] exact [" << integ_theta
         //       << "] actual [" << actual_theta

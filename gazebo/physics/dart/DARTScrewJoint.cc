@@ -17,6 +17,7 @@
 
 #include <string>
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -90,7 +91,7 @@ math::Vector3 DARTScrewJoint::GetGlobalAxis(unsigned int _index) const
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
         reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
@@ -122,7 +123,7 @@ void DARTScrewJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     return;
   }
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
         reinterpret_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
@@ -186,7 +187,7 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 void DARTScrewJoint::SetThreadPitch(unsigned int _index, double _threadPitch)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
     gzerr << "Invalid index[" << _index << "]\n";
 
   this->SetThreadPitch(_threadPitch);
@@ -215,7 +216,7 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
     gzerr << "Invalid index[" << _index << "]\n";
 
   return this->GetThreadPitch();
@@ -246,7 +247,7 @@ double DARTScrewJoint::GetThreadPitch()
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -286,7 +287,7 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
                               unsigned int _index,
                               const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index[" << _index << "]\n";
     return false;
@@ -341,26 +342,24 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetAngleImpl(unsigned int _index) const
+double DARTScrewJoint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Angle>("Angle");
+    return this->dataPtr->GetCached<double>("Angle");
 
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
     // angular position
-    const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
     // linear position
     const double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(-radianAngle /
-                         const_cast<DARTScrewJoint*>(this)->GetThreadPitch());
-    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As an
+    result = -radianAngle / const_cast<DARTScrewJoint*>(this)->GetThreadPitch();
+    // TODO: The ScrewJoint::GetThreadPitch() function is not const. As a
     // workaround, we use const_cast here until #1686 is resolved.
   }
   else
@@ -391,47 +390,47 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetHighStop(unsigned int _index)
+double DARTScrewJoint::UpperLimit(const unsigned int _index) const
 {
   switch (_index)
   {
-  case 0:
-    if (!this->dataPtr->IsInitialized())
-    {
-      return this->dataPtr->GetCached<math::Angle>(
-            "HighStop" + std::to_string(_index));
-    }
+    case 0:
+      if (!this->dataPtr->IsInitialized())
+      {
+        return this->dataPtr->GetCached<double>(
+              "HighStop" + std::to_string(_index));
+      }
 
-    return this->dataPtr->dtJoint->getPositionUpperLimit(0);
-  case 1:
-    gzerr << "DARTScrewJoint::GetHighStop: Not implemented for index[1].\n";
-    break;
-  default:
-    gzerr << "Invalid index[" << _index << "]\n";
+      return this->dataPtr->dtJoint->getPositionUpperLimit(0);
+    case 1:
+      gzerr << "DARTScrewJoint::UpperLimit: Not implemented for index[1].\n";
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTScrewJoint::GetLowStop(unsigned int _index)
+double DARTScrewJoint::LowerLimit(const unsigned int _index) const
 {
   switch (_index)
   {
-  case 0:
-    if (!this->dataPtr->IsInitialized())
-    {
-      return this->dataPtr->GetCached<math::Angle>(
-            "LowStop" + std::to_string(_index));
-    }
+    case 0:
+      if (!this->dataPtr->IsInitialized())
+      {
+        return this->dataPtr->GetCached<double>(
+              "LowStop" + std::to_string(_index));
+      }
 
-    return this->dataPtr->dtJoint->getPositionLowerLimit(0);
-  case 1:
-    gzerr << "DARTScrewJoint::GetLowStop: Not implemented for index[1].\n";
-    break;
-  default:
-    gzerr << "Invalid index[" << _index << "]\n";
+      return this->dataPtr->dtJoint->getPositionLowerLimit(0);
+    case 1:
+      gzerr << "DARTScrewJoint::LowerLimit: Not implemented for index[1].\n";
+      break;
+    default:
+      gzerr << "Invalid index[" << _index << "]\n";
   };
 
-  return math::Angle();
+  return ignition::math::NAN_D;
 }

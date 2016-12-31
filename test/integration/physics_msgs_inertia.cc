@@ -357,7 +357,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;
@@ -439,7 +439,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;

@@ -166,17 +166,17 @@ void VehiclePlugin::Init()
   this->wheelRadius = bb.Size().Max() * 0.5;
 
   // The total range the steering wheel can rotate
-  double steeringRange = this->steeringJoint->GetHighStop(0).Radian() -
-                         this->steeringJoint->GetLowStop(0).Radian();
+  double steeringRange = this->steeringJoint->UpperLimit(0) -
+                         this->steeringJoint->LowerLimit(0);
 
   // Compute the angle ratio between the steering wheel and the tires
   this->steeringRatio = steeringRange / this->tireAngleRange;
 
   // Maximum gas is the upper limit of the gas joint
-  this->maxGas = this->gasJoint->GetHighStop(0).Radian();
+  this->maxGas = this->gasJoint->UpperLimit(0);
 
   // Maximum brake is the upper limit of the gas joint
-  this->maxBrake = this->gasJoint->GetHighStop(0).Radian();
+  this->maxBrake = this->gasJoint->UpperLimit(0);
 
   printf("SteeringRation[%f] MaxGa[%f]\n", this->steeringRatio, this->maxGas);
 }
@@ -185,15 +185,15 @@ void VehiclePlugin::Init()
 void VehiclePlugin::OnUpdate()
 {
   // Get the normalized gas and brake amount
-  double gas = this->gasJoint->GetAngle(0).Radian() / this->maxGas;
-  double brake = this->brakeJoint->GetAngle(0).Radian() / this->maxBrake;
+  double gas = this->gasJoint->Position(0) / this->maxGas;
+  double brake = this->brakeJoint->Position(0) / this->maxBrake;
 
   // A little force to push back on the pedals
   this->gasJoint->SetForce(0, -0.1);
   this->brakeJoint->SetForce(0, -0.1);
 
   // Get the steering angle
-  double steeringAngle = this->steeringJoint->GetAngle(0).Radian();
+  double steeringAngle = this->steeringJoint->Position(0);
 
   // Compute the angle of the front wheels.
   double wheelAngle = steeringAngle / this->steeringRatio;
@@ -218,16 +218,16 @@ void VehiclePlugin::OnUpdate()
   this->joints[3]->SetForce(1, (gas + brake) * this->rearPower);
 
   // Set the front-left wheel angle
-  this->joints[0]->SetLowStop(0, wheelAngle);
-  this->joints[0]->SetHighStop(0, wheelAngle);
-  this->joints[0]->SetLowStop(0, wheelAngle);
-  this->joints[0]->SetHighStop(0, wheelAngle);
+  this->joints[0]->SetLowerLimit(0, wheelAngle);
+  this->joints[0]->SetUpperLimit(0, wheelAngle);
+  this->joints[0]->SetLowerLimit(0, wheelAngle);
+  this->joints[0]->SetUpperLimit(0, wheelAngle);
 
   // Set the front-right wheel angle
-  this->joints[1]->SetHighStop(0, wheelAngle);
-  this->joints[1]->SetLowStop(0, wheelAngle);
-  this->joints[1]->SetHighStop(0, wheelAngle);
-  this->joints[1]->SetLowStop(0, wheelAngle);
+  this->joints[1]->SetUpperLimit(0, wheelAngle);
+  this->joints[1]->SetLowerLimit(0, wheelAngle);
+  this->joints[1]->SetUpperLimit(0, wheelAngle);
+  this->joints[1]->SetLowerLimit(0, wheelAngle);
 
   // Get the current velocity of the car
   this->velocity = this->chassis->GetWorldLinearVel().Ign();

@@ -211,8 +211,8 @@ void JointEventSource::Update()
   bool oldState = this->isTriggered;
   double value = 0;
 
-  double position = this->joint->GetAngle(0).Radian();
-  ignition::math::Angle a = this->joint->GetAngle(0).Ign();
+  double position = this->joint->Position(0);
+  ignition::math::Angle a = this->joint->Position(0);
   // get a value between -PI and PI
   a.Normalize();
   double angle = a.Radian();

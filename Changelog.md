@@ -36,6 +36,11 @@
 1. Updated COMVisual class to use `ignition::math`.
     * [Pull request #2528](https://bitbucket.org/osrf/gazebo/pull-request/2528)
 
+1. Deprecate angle API from physics::Joint, in favor of using doubles
+    * [Pull request #2568](https://bitbucket.org/osrf/gazebo/pull-request/2568)
+    * [Issue #553](https://bitbucket.org/osrf/gazebo/issues/553)
+    * [Issue #1108](https://bitbucket.org/osrf/gazebo/issues/1108)
+
 1. PIMPL-ize `gazebo/physics/Gripper` and use ignition-math.
     * [Pull request #2523](https://bitbucket.org/osrf/gazebo/pull-request/2523)
 
