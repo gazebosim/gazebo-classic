@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -163,11 +166,11 @@ void BulletFixedJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletFixedJoint::PositionImpl(const unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -194,21 +197,19 @@ void BulletFixedJoint::SetForceImpl(unsigned int /*_index*/, double /*_effort*/)
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &/*_angle*/)
+void BulletFixedJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "SetHighStop that is not valid for joints of type fixed.\n";
-  return false;
+         << "SetUpperLimit that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////
-bool BulletFixedJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &/*_angle*/)
+void BulletFixedJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
   gzwarn << "BulletFixedJoint: called method "
-         << "SetLowStop that is not valid for joints of type fixed.\n";
-  return false;
+         << "SetLowerLimit that is not valid for joints of type fixed.\n";
 }
 
 //////////////////////////////////////////////////

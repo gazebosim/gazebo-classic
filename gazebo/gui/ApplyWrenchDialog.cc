@@ -968,7 +968,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
   this->dataPtr->draggingTool = false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (vis)
@@ -998,7 +998,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (!vis || _event.Dragging())
@@ -1125,7 +1125,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
   // Highlight hovered tools
   else
   {
-    userCamera->GetVisual(_event.Pos(), this->dataPtr->manipState);
+    userCamera->Visual(_event.Pos(), this->dataPtr->manipState);
 
     if (this->dataPtr->manipState == "rot_z" ||
         this->dataPtr->manipState == "rot_y")

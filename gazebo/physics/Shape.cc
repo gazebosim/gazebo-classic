@@ -70,7 +70,7 @@ double Shape::ComputeVolume() const
          << " bounding box approximation" << std::endl;
 
   ignition::math::Vector3d size =
-    this->collisionParent->GetBoundingBox().GetSize().Ign();
+    this->collisionParent->BoundingBox().Size();
   return size.X() * size.Y() * size.Z();
 }
 

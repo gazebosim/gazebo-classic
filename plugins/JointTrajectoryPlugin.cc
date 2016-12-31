@@ -66,8 +66,8 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 //                       math::Quaternion(1, 0, 0, 0));
 //   this->joint->Load(physics::LinkPtr(), _link, pose);
 //   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-//   this->joint->SetHighStop(0, 0);
-//   this->joint->SetLowStop(0, 0);
+//   this->joint->SetUpperLimit(0, 0);
+//   this->joint->SetLowerLimit(0, 0);
 //   this->joint->SetAnchor(0, pose.pos);
 //   this->joint->Init();
 // }

@@ -266,8 +266,15 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(), _pose.Ign(),
       _axis.Ign(), _local);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -678,7 +685,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr vis;
   std::string manipState;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseStart,
+      = this->dataPtr->userCamera->Visual(this->dataPtr->mouseStart,
       manipState);
 
   this->dataPtr->selectionObj->SetState(manipState);
@@ -877,7 +884,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
   else
   {
     std::string manipState;
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
+    this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos(),
         manipState);
     this->dataPtr->selectionObj->SetState(manipState);
 
@@ -885,7 +892,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
     {
-      rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+      rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
           this->dataPtr->mouseEvent.Pos());
 
       if (vis && !vis->IsPlane())
@@ -926,7 +933,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       rendering::VisualPtr vis =
-        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+        this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
       if (vis && vis->IsPlane())
       {
         this->dataPtr->selectionObj->SetMode(

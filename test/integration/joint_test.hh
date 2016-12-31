@@ -73,7 +73,7 @@ class JointTest : public ServerFixture,
     /// \brief Constructor.
     public: SpawnJointOptions() : worldChild(false), worldParent(false),
               wait(common::Time(99, 0)),
-              noLinkPose(false), axis(math::Vector3(1, 0, 0)),
+              noLinkPose(false), axis(ignition::math::Vector3d(1, 0, 0)),
               useParentModelFrame(false)
             {
             }

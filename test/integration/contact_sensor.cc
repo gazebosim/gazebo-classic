@@ -189,8 +189,8 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   const std::string modelName("sphere");
-  const math::Vector3 pos(0, 0, 1.8);
-  const math::Vector3 v30;
+  const ignition::math::Vector3d pos(0, 0, 1.8);
+  const ignition::math::Vector3d v30;
   const double radius = 0.5;
   SpawnSphere(modelName, pos, v30, v30, radius);
 
@@ -326,27 +326,27 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   std::string modelName01 = "contactModel01";
   std::string contactSensorName01 = "contactSensor01";
-  math::Pose modelPose01(0, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose3d modelPose01(0, 0, 0.5, 0, 0, 0);
 
   std::string modelName02 = "contactModel02";
   std::string contactSensorName02 = "contactSensor02";
-  math::Pose modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose3d modelPose02(0, 2, 0.5, 0, M_PI/2.0, 0);
 
   std::string sphereName01 = "sphere01";
-  math::Pose spherePose01(0, 0, 1.5, 0, 0, 0);
+  ignition::math::Pose3d spherePose01(0, 0, 1.5, 0, 0, 0);
 
   std::string sphereName02 = "sphere02";
-  math::Pose spherePose02(0, 2, 1.5, 0, 0, 0);
+  ignition::math::Pose3d spherePose02(0, 2, 1.5, 0, 0, 0);
 
   // spawn two contact sensors
   SpawnUnitContactSensor(modelName01, contactSensorName01,
-      "box", modelPose01.pos, modelPose01.rot.GetAsEuler());
+      "box", modelPose01.Pos(), modelPose01.Rot().Euler());
   SpawnUnitContactSensor(modelName02, contactSensorName02,
-      "box", modelPose02.pos, modelPose02.rot.GetAsEuler());
+      "box", modelPose02.Pos(), modelPose02.Rot().Euler());
 
   // spawn two spheres, each sphere rests on top of one contact sensor
-  SpawnSphere(sphereName01, spherePose01.pos, spherePose01.rot.GetAsEuler());
-  SpawnSphere(sphereName02, spherePose02.pos, spherePose02.rot.GetAsEuler());
+  SpawnSphere(sphereName01, spherePose01.Pos(), spherePose01.Rot().Euler());
+  SpawnSphere(sphereName02, spherePose02.Pos(), spherePose02.Rot().Euler());
 
   sensors::SensorPtr sensor01 = sensors::get_sensor(contactSensorName01);
   sensors::ContactSensorPtr contactSensor01 =
@@ -562,15 +562,15 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";
-  math::Pose modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
+  ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
 
   std::string cylinderName = "cylinder";
-  math::Pose cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
+  ignition::math::Pose3d cylinderPose(0, 0, 0.5, 0, M_PI/2.0, 0);
 
   SpawnUnitContactSensor(modelName, contactSensorName,
-      "cylinder", modelPose.pos, modelPose.rot.GetAsEuler());
+      "cylinder", modelPose.Pos(), modelPose.Rot().Euler());
 
-  SpawnCylinder(cylinderName, cylinderPose.pos, cylinderPose.rot.GetAsEuler());
+  SpawnCylinder(cylinderName, cylinderPose.Pos(), cylinderPose.Rot().Euler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(contactSensorName);
   sensors::ContactSensorPtr contactSensor =

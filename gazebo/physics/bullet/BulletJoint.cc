@@ -243,7 +243,7 @@ void BulletJoint::CacheForceTorque()
     // childMomentArm: from child CG to joint location in child link frame
     // moment arm rotated into world frame (given feedback is in world frame)
     ignition::math::Vector3d childMomentArm = childPose.Rot().RotateVector(
-      (this->anchorPose.Ign() -
+      (this->anchorPose -
        ignition::math::Pose3d(cgPose.Pos(),
          ignition::math::Quaterniond::Identity)).Pos());
 
@@ -270,33 +270,31 @@ void BulletJoint::CacheForceTorque()
   if (this->parentLink)
   {
     // get child pose, or it's the inertial world if childLink is nullptr
-    math::Pose childPose;
+    ignition::math::Pose3d childPose;
     if (this->childLink)
       childPose = this->childLink->WorldPose();
 
-    math::Pose parentPose = this->parentLink->WorldPose();
+    ignition::math::Pose3d parentPose = this->parentLink->WorldPose();
 
     // if parent link exists, convert torque from about parent
     // CG to joint anchor location
 
     // parent cg specified in parent link frame
-    math::Pose cgPose = this->parentLink->GetInertial()->GetPose();
+    ignition::math::Pose3d cgPose =
+      this->parentLink->GetInertial()->GetPose().Ign();
 
     // get parent CG pose in child link frame
-    math::Pose parentCGInChildLink =
-      math::Pose(cgPose.pos, math::Quaternion()) - (childPose - parentPose);
-
-    // anchor location in parent CG frame
-    // this is the moment arm, but it's in parent CG frame, we need
-    // to convert it into world frame
-    math::Pose anchorInParendCGFrame = this->anchorPose - parentCGInChildLink;
+    ignition::math::Pose3d parentCGInChildLink =
+      ignition::math::Pose3d(cgPose.Pos(),
+          ignition::math::Quaterniond::Identity) - (childPose - parentPose);
 
     // paretnCGFrame in world frame
-    math::Pose parentCGInWorld = cgPose + parentPose;
+    ignition::math::Pose3d parentCGInWorld = cgPose + parentPose;
 
     // rotate momeent arms into world frame
-    math::Vector3 parentMomentArm = parentCGInWorld.rot.RotateVector(
-      (this->anchorPose - parentCGInChildLink).pos);
+    ignition::math::Vector3d parentMomentArm =
+      parentCGInWorld.Rot().RotateVector(
+          (this->anchorPose - parentCGInChildLink).Pos());
 
     // gzerr << "anchor [" << this->anchorPose
     //       << "] pcginc[" << parentCGInChildLink
@@ -308,15 +306,16 @@ void BulletJoint::CacheForceTorque()
     //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
     //       << "]\n";
 
-    this->wrench.body1Torque += this->wrench.body1Force.Cross(parentMomentArm);
+    this->wrench.body1Torque += this->wrench.body1Force.Ign().Cross(
+        parentMomentArm);
 
     // rotate resulting body1Force in world frame into link frame
-    this->wrench.body1Force = parentPose.rot.RotateVectorReverse(
-      -this->wrench.body1Force);
+    this->wrench.body1Force = parentPose.Rot().RotateVectorReverse(
+      -this->wrench.body1Force.Ign());
 
     // rotate resulting body1Torque in world frame into link frame
-    this->wrench.body1Torque = parentPose.rot.RotateVectorReverse(
-      -this->wrench.body1Torque);
+    this->wrench.body1Torque = parentPose.Rot().RotateVectorReverse(
+      -this->wrench.body1Torque.Ign());
 
     if (!this->childLink)
     {
@@ -394,7 +393,7 @@ void BulletJoint::SetupJointFeedback()
 //////////////////////////////////////////////////
 void BulletJoint::SetDamping(unsigned int _index, double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -402,16 +401,16 @@ void BulletJoint::SetDamping(unsigned int _index, double _damping)
   else
   {
      gzerr << "BulletJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
+void BulletJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -419,8 +418,8 @@ void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
   else
   {
      gzerr << "BulletJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -429,7 +428,7 @@ void BulletJoint::SetStiffness(unsigned int _index, double _stiffness)
 void BulletJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -479,7 +478,7 @@ void BulletJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
@@ -499,7 +498,7 @@ void BulletJoint::SaveForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double BulletJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -514,7 +513,7 @@ double BulletJoint::GetForce(unsigned int _index)
 //////////////////////////////////////////////////
 void BulletJoint::ApplyStiffnessDamping()
 {
-  for (unsigned int i = 0; i < this->GetAngleCount(); ++i)
+  for (unsigned int i = 0; i < this->DOF(); ++i)
   {
     // Take absolute value of dissipationCoefficient, since negative values of
     // dissipationCoefficient are used for adaptive damping to
@@ -523,7 +522,7 @@ void BulletJoint::ApplyStiffnessDamping()
       * this->GetVelocity(i);
 
     double springForce = this->stiffnessCoefficient[i]
-      * (this->springReferencePosition[i] - this->GetAngle(i).Radian());
+      * (this->springReferencePosition[i] - this->Position(i));
 
     // do not change forceApplied if setting internal damping forces
     this->SetForceImpl(i, dampingForce + springForce);
@@ -574,18 +573,6 @@ double BulletJoint::GetParam(const std::string &_key,
     unsigned int _index)
 {
   return Joint::GetParam(_key, _index);
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletJoint::GetHighStop(unsigned int _index)
-{
-  return this->GetUpperLimit(_index);
-}
-
-//////////////////////////////////////////////////
-math::Angle BulletJoint::GetLowStop(unsigned int _index)
-{
-  return this->GetLowerLimit(_index);
 }
 
 //////////////////////////////////////////////////

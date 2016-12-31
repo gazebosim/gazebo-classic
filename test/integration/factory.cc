@@ -28,6 +28,9 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
+
+const double g_tolerance = 1e-4;
+
 class FactoryTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
@@ -115,9 +118,9 @@ void FactoryTest::Box(const std::string &_physicsEngine)
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
         ignition::math::Quaterniond(0, 0, 0));
-    SpawnBox(name.str(), math::Vector3(1, 1, 1), setPose.Pos(),
+    SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
+    testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
@@ -141,7 +144,7 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
         ignition::math::Quaterniond(0, 0, 0));
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
+    testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
@@ -166,7 +169,7 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
         ignition::math::Vector3d(0, 0, i+0.5),
         ignition::math::Quaterniond(0, 0, 0));
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
+    testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
@@ -674,7 +677,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   this->WaitUntilEntitySpawn(cloneName, 100, 100);
 
   EXPECT_TRUE(this->HasEntity(cloneName));
-  testPose = GetEntityPose(cloneName).Ign();
+  testPose = EntityPose(cloneName);
   EXPECT_TRUE(testPose.Pos().Equal(clonePose.Pos(), 0.1));
 
   // Verify properties of the pr2 clone with the original model.
@@ -738,11 +741,11 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   {
     physics::JointPtr joint = joints[i];
     physics::JointPtr jointClone = jointClones[i];
-    EXPECT_EQ(joint->GetAngleCount(), jointClone->GetAngleCount());
-    for (unsigned j = 0; j < joint->GetAngleCount(); ++j)
+    EXPECT_EQ(joint->DOF(), jointClone->DOF());
+    for (unsigned j = 0; j < joint->DOF(); ++j)
     {
-      EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
-      EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));
+      EXPECT_NEAR(joint->UpperLimit(j), jointClone->UpperLimit(j), g_tolerance);
+      EXPECT_NEAR(joint->LowerLimit(j), jointClone->LowerLimit(j), g_tolerance);
       EXPECT_EQ(joint->GetEffortLimit(j), jointClone->GetEffortLimit(j));
       EXPECT_EQ(joint->GetVelocityLimit(j), jointClone->GetVelocityLimit(j));
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
