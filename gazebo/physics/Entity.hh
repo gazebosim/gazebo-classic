@@ -307,8 +307,8 @@ namespace gazebo
       public: void PlaceOnEntity(const std::string &_entityName);
 
       /// \brief Returns collision bounding box.
-      /// \return Collsiion boundin box.
-      /// \deprecated See ignition::math::Box tCollisionBoundingBox() const
+      /// \return Collsiion bounding box.
+      /// \deprecated See ignition::math::Box CollisionBoundingBox() const
       public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns collision bounding box.
