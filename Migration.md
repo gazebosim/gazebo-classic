@@ -200,7 +200,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Angle GetAngle(unsigned int _axis) const
     + ***Replacement:*** double Position(const unsigned int _axis = 0) const
     + ***Deprecation:*** const std::vector<math::Angle> GetAngles() const
-    + ***Replacement:*** const std::vector<ignition::math::Angle> &Angles() const
+    + ***Replacement:*** const std::vector<double> &Positions() const
 
 1. **gazebo/physics/LinkState.hh**
     + ***Deprecation:*** const math::Pose &GetPose() const
@@ -513,6 +513,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
+    + ***Deprecation:*** math::Angle GetMinAngle() const
+    + ***Replacement:*** ignition::math::Angle MinAngle() const
+    + ***Deprecation:*** math::Angle GetMaxAngle() const
+    + ***Replacement:*** ignition::math::Angle MaxAngle() const
+    + ***Deprecation:*** math::Angle GetVerticalMinAngle() const
+    + ***Replacement:*** ignition::math::Angle VerticalMinAngle() const
+    + ***Deprecation:*** math::Angle GetVerticalMaxAngle() const
+    + ***Replacement:*** ignition::math::Angle VerticalMaxAngle() const
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
@@ -703,6 +711,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Plane.hh**
     + ***Deprecation:*** public:   gazebo::math::Plane
     + ***Replacement:*** public: ignition::math::Plane
+
+1. **gazebo/math/Angle.hh**
+    + ***Deprecation:*** public:   gazebo::math::Angle
+    + ***Replacement:*** public: ignition::math::Angle
 
 1. **gazebo/math/Rand.hh**
     + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)

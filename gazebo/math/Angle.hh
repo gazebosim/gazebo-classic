@@ -150,13 +150,12 @@ namespace gazebo
     /// \brief Assignment operator
     /// \param[in] _angle Radians
     /// \return The new angle
-    public: Angle &operator=(const double &_angle) GAZEBO_DEPRECATED(8.0);
+    public: Angle &operator=(const double &_angle);
 
     /// \brief Assignment operator
     /// \param[in] _angle ignition::math::Angle to copy
     /// \return The new angle
-    public: Angle &operator=(const ignition::math::Angle &_angle)
-        GAZEBO_DEPRECATED(8.0);
+    public: Angle &operator=(const ignition::math::Angle &_angle);
 
     /// \brief Equality operator, result = this == _angle
     /// \param[in] _angle Angle to check for equality
