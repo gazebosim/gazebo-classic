@@ -348,7 +348,7 @@ ignition::math::Angle MultiRayShape::VerticalMaxAngle() const
   if (this->vertElem)
     return this->vertElem->Get<double>("max_angle");
   else
-    return ignition::math::Zero;
+    return ignition::math::Angle::Zero;
 }
 
 
