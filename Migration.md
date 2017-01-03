@@ -198,7 +198,7 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/JointState.hh**
     + ***Deprecation:*** math::Angle GetAngle(unsigned int _axis) const
-    + ***Replacement:*** ignition::math::Angle Angle(unsigned int _axis) const
+    + ***Replacement:*** double Position(const unsigned int _axis = 0) const
     + ***Deprecation:*** const std::vector<math::Angle> GetAngles() const
     + ***Replacement:*** const std::vector<ignition::math::Angle> &Angles() const
 

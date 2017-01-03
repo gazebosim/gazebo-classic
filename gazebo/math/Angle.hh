@@ -64,19 +64,19 @@ namespace gazebo
     public: static const Angle TwoPi;
 
     /// \brief Constructor
-    public: Angle();
+    public: Angle() GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy Constructor
     /// \param[in] _radian Radians
-    public: Angle(double _radian);
+    public: Angle(double _radian) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy constructor
     /// \param[in] _angle Angle to copy
-    public: Angle(const Angle &_angle);
+    public: Angle(const Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Ignition copy constructor
     /// \param[in] _angle Ignition angle to copy
-    public: Angle(const ignition::math::Angle &_angle);
+    public: Angle(const ignition::math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Destructor
     public: virtual ~Angle();
@@ -150,12 +150,13 @@ namespace gazebo
     /// \brief Assignment operator
     /// \param[in] _angle Radians
     /// \return The new angle
-    public: Angle &operator=(const double &_angle);
+    public: Angle &operator=(const double &_angle) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Assignment operator
     /// \param[in] _angle ignition::math::Angle to copy
     /// \return The new angle
-    public: Angle &operator=(const ignition::math::Angle &_angle);
+    public: Angle &operator=(const ignition::math::Angle &_angle)
+        GAZEBO_DEPRECATED(8.0);
 
     /// \brief Equality operator, result = this == _angle
     /// \param[in] _angle Angle to check for equality

@@ -399,7 +399,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   double r1 = 0.5, r2 = 1.5;
   ignition::math::Vector3d v30(ignition::math::Vector3d::Zero);
   ignition::math::Vector3d cog;
-  math::Angle angle;
+  ignition::math::Angle angle;
 
   std::vector<std::string> modelNames;
   std::vector<double> x0s;

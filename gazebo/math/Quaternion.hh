@@ -31,6 +31,10 @@
 #include "gazebo/math/Matrix4.hh"
 #include "gazebo/util/system.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   namespace math
