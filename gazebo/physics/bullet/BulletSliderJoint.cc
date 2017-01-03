@@ -62,8 +62,8 @@ void BulletSliderJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3d axis = this->initialWorldAxis;
+  if (axis == ignition::math::Vector3d::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
@@ -71,8 +71,8 @@ void BulletSliderJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose3d pose;
   btTransform frameParent, frameChild;
   btVector3 axis2, axis3;
 
@@ -85,39 +85,39 @@ void BulletSliderJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->parentLink->GetWorldCoGPose().Ign();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
+    pivotParent -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
-    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), axis2, axis3);
     frameParent.getBasis().setValue(
-      axisParent.x, axis2.x(), axis3.x(),
-      axisParent.y, axis2.y(), axis3.y(),
-      axisParent.z, axis2.z(), axis3.z());
+      axisParent.X(), axis2.x(), axis3.x(),
+      axisParent.Y(), axis2.y(), axis3.y(),
+      axisParent.Z(), axis2.z(), axis3.z());
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->childLink->GetWorldCoGPose().Ign();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
+    pivotChild -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
-    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), axis2, axis3);
     frameChild.getBasis().setValue(
-      axisChild.x, axis2.x(), axis3.x(),
-      axisChild.y, axis2.y(), axis3.y(),
-      axisChild.z, axis2.z(), axis3.z());
+      axisChild.X(), axis2.x(), axis3.x(),
+      axisChild.Y(), axis2.y(), axis3.y(),
+      axisChild.Z(), axis2.z(), axis3.z());
   }
 
   // If both links exist, then create a joint between the two links.
@@ -194,11 +194,11 @@ void BulletSliderJoint::Init()
 double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GlobalAxis(0);
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+    result += globalAxis.Dot(this->childLink->GetWorldLinearVel().Ign());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
+    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel().Ign());
   return result;
 }
 
@@ -209,15 +209,15 @@ void BulletSliderJoint::SetVelocity(unsigned int _index, double _angle)
 }
 
 //////////////////////////////////////////////////
-void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+void BulletSliderJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
+    auto axisFrame = this->GetAxisFrame(0).Ign();
     this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
@@ -315,9 +315,9 @@ double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletSliderJoint::GlobalAxis(unsigned int /*_index*/) const
 {
-  math::Vector3 result = this->initialWorldAxis;
+  ignition::math::Vector3d result = this->initialWorldAxis;
 
   if (this->bulletSlider)
   {
@@ -325,7 +325,7 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec);
+    result = BulletTypes::ConvertVector3(vec).Ign();
   }
 
   return result;
@@ -348,9 +348,9 @@ double BulletSliderJoint::PositionImpl(const unsigned int _index) const
   //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
-  auto offset = this->GetWorldPose().pos
-              - this->GetParentWorldPose().pos;
-  auto axis = this->GetGlobalAxis(_index);
+  auto offset = this->GetWorldPose().Ign().Pos()
+              - this->GetParentWorldPose().Ign().Pos();
+  auto axis = this->GlobalAxis(_index);
   auto poseParent = this->GetWorldPose();
   return axis.Dot(offset);
 }

@@ -182,8 +182,8 @@ void DARTJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void DARTJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 &/*_anchor*/)
+void DARTJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   // nothing to do here for DART.
 }
@@ -351,12 +351,12 @@ double DARTJoint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::LinkForce(unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
 
-  math::Vector3 result;
+  ignition::math::Vector3d result;
 
   if (!this->dataPtr->dtJoint)
   {
@@ -400,12 +400,12 @@ math::Vector3 DARTJoint::GetLinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTJoint::GetLinkTorque(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::LinkTorque(unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
 
-  math::Vector3 result;
+  ignition::math::Vector3d result;
 
   if (!this->dataPtr->dtJoint)
   {

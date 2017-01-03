@@ -21,6 +21,8 @@
 #include <vector>
 
 #include <boost/any.hpp>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
@@ -99,8 +101,16 @@ namespace gazebo
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
       /// \param[in] _pose Pose containing Joint Anchor offset from child link.
+      /// \deprecated See function that takes ignition math.
       public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Pose &_pose);
+                        const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set pose, parent and child links of a physics::Joint
+      /// \param[in] _parent Parent link.
+      /// \param[in] _child Child link.
+      /// \param[in] _pose Pose containing Joint Anchor offset from child link.
+      public: void Load(LinkPtr _parent, LinkPtr _child,
+                        const ignition::math::Pose3d &_pose);
 
       /// \brief Load physics::Joint from a SDF sdf::Element.
       /// \param[in] _sdf SDF values to load from.
@@ -157,8 +167,17 @@ namespace gazebo
       /// \param[in] _index Index of the axis to set.
       /// \param[in] _axis Vector in local joint frame of axis direction
       ///                  (must have length greater than zero).
+      /// \deprecated See function that takes ignition math.
       public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis) = 0;
+                  const math::Vector3 &_axis) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the axis of rotation where axis is specified in local
+      /// joint frame.
+      /// \param[in] _index Index of the axis to set.
+      /// \param[in] _axis Vector in local joint frame of axis direction
+      ///                  (must have length greater than zero).
+      public: virtual void SetAxis(const unsigned int _index,
+                                   const ignition::math::Vector3d &_axis) = 0;
 
       /// \brief Set the joint damping.
       /// \param[in] _index Index of the axis to set, currently ignored, to be
@@ -224,24 +243,54 @@ namespace gazebo
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
-      public: math::Vector3 GetLocalAxis(unsigned int _index) const;
+      /// \deprecated See LocalAxis()
+      public: math::Vector3 GetLocalAxis(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the axis of rotation.
+      /// \param[in] _index Index of the axis to get.
+      /// \return Axis value for the provided index.
+      public: ignition::math::Vector3d LocalAxis(const unsigned int _index)
+          const;
 
       /// \brief Get the axis of rotation in global cooridnate frame.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
+      /// \deprecated See GlobalAxis()
       public: virtual math::Vector3 GetGlobalAxis(
+                  unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the axis of rotation in global cooridnate frame.
+      /// \param[in] _index Index of the axis to get.
+      /// \return Axis value for the provided index.
+      public: virtual ignition::math::Vector3d GlobalAxis(
                   unsigned int _index) const = 0;
 
       /// \brief Set the anchor point.
       /// \param[in] _index Indx of the axis.
       /// \param[in] _anchor Anchor value.
+      /// \deprecated See function that takes ignition math.
       public: virtual void SetAnchor(unsigned int _index,
-                                     const math::Vector3 &_anchor) = 0;
+          const math::Vector3 &_anchor) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the anchor point.
+      /// \param[in] _index Indx of the axis.
+      /// \param[in] _anchor Anchor value.
+      public: virtual void SetAnchor(const unsigned int _index,
+          const ignition::math::Vector3d &_anchor) = 0;
 
       /// \brief Get the anchor point.
       /// \param[in] _index Index of the axis.
       /// \return Anchor value for the axis.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const = 0;
+      /// \deprecated See function that returns ignition math.
+      public: virtual math::Vector3 GetAnchor(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the anchor point.
+      /// \param[in] _index Index of the axis.
+      /// \return Anchor value for the axis.
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const = 0;
 
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
@@ -431,7 +480,18 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const = 0;
+      /// \deprecated See function that returns ignition math.
+      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the forces applied to the center of mass of a physics::Link
+      /// due to the existence of this Joint.
+      /// Note that the unit of force should be consistent with the rest
+      /// of the simulation scales.
+      /// \param[in] index The index of the link(0 or 1).
+      /// \return Force applied to the link.
+      public: virtual ignition::math::Vector3d LinkForce(
+          const unsigned int _index) const = 0;
 
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -439,8 +499,18 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1)
       /// \return Torque applied to the link.
+      /// \deprecated See function that returns ignition math.
       public: virtual math::Vector3 GetLinkTorque(
-                  unsigned int _index) const = 0;
+                  unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the torque applied to the center of mass of a physics::Link
+      /// due to the existence of this Joint.
+      /// Note that the unit of torque should be consistent with the rest
+      /// of the simulation scales.
+      /// \param[in] index The index of the link(0 or 1)
+      /// \return Torque applied to the link.
+      public: virtual ignition::math::Vector3d LinkTorque(
+          const unsigned int _index) const = 0;
 
       /// \brief Set a non-generic parameter for the joint.
       /// replaces SetAttribute(Attribute, int, double)
@@ -496,7 +566,20 @@ namespace gazebo
       /// iterative LCP methods.
       /// \param[in] _axis axis in world frame for which MOI ratio is computed.
       /// \return ratio of child MOI to parent MOI.
-      public: double GetInertiaRatio(const math::Vector3 &_axis) const;
+      /// \deprecated See function that takes ignition math.
+      public: double GetInertiaRatio(const math::Vector3 &_axis) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
+      /// specified in the world frame.
+      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// If MOI_parent is zero, this funciton will return 0.
+      /// The moment of inertia ratio along constrained directions of a joint
+      /// has an impact on the performance of Projected Gauss Seidel (PGS)
+      /// iterative LCP methods.
+      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
+      /// \return ratio of child MOI to parent MOI.
+      public: double InertiaRatio(const ignition::math::Vector3d &_axis) const;
 
       /// \brief:  get the joint lower limit
       /// (replaces GetLowStop and GetHighStop)

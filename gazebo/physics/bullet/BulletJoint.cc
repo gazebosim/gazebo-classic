@@ -185,13 +185,13 @@ void BulletJoint::CacheForceTorque()
   // if cached, GetForceTorque should use this value
   // this->wrench
   this->wrench.body2Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyA);
+                      this->feedback->m_appliedForceBodyA).Ign();
   this->wrench.body2Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyA);
+                      this->feedback->m_appliedTorqueBodyA).Ign();
   this->wrench.body1Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyB);
+                      this->feedback->m_appliedForceBodyB).Ign();
   this->wrench.body1Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyB);
+                      this->feedback->m_appliedTorqueBodyB).Ign();
   // gzerr << "   " << this->GetName()
   //       << " : " << this->wrench.body1Force
   //       << " : " << this->wrench.body1Torque
@@ -204,12 +204,12 @@ void BulletJoint::CacheForceTorque()
   if (this->HasType(physics::Base::HINGE_JOINT))
   {
     // rotate force into child link frame
-    // GetLocalAxis is the axis specified in parent link frame!!!
+    // LocalAxis is the axis specified in parent link frame!!!
     wrenchAppliedWorld.body2Torque =
-      this->GetForce(0u) * this->GetLocalAxis(0u);
+      this->GetForce(0u) * this->LocalAxis(0u);
 
     // gzerr << "body2Torque [" << wrenchAppliedWorld.body2Torque
-    //       << "] axis [" << this->GetLocalAxis(0u)
+    //       << "] axis [" << this->LocalAxis(0u)
     //       << "]\n";
 
     wrenchAppliedWorld.body1Torque = -wrenchAppliedWorld.body2Torque;
@@ -218,7 +218,7 @@ void BulletJoint::CacheForceTorque()
   {
     // rotate force into child link frame
     wrenchAppliedWorld.body2Force =
-      this->GetForce(0u) * this->GetLocalAxis(0u);
+      this->GetForce(0u) * this->LocalAxis(0u);
     wrenchAppliedWorld.body1Force = -wrenchAppliedWorld.body2Force;
   }
   else
@@ -248,7 +248,7 @@ void BulletJoint::CacheForceTorque()
          ignition::math::Quaterniond::Identity)).Pos());
 
     // gzerr << "anchor [" << anchorPose
-    //       << "] iarm[" << this->childLink->GetInertial()->GetPose().pos
+    //       << "] iarm[" << this->childLink->GetInertial()->GetPose().Pos()
     //       << "] childMomentArm[" << childMomentArm
     //       << "] f1[" << this->wrench.body2Force
     //       << "] t1[" << this->wrench.body2Torque
@@ -259,11 +259,11 @@ void BulletJoint::CacheForceTorque()
 
     // rotate resulting body2Force in world frame into link frame
     this->wrench.body2Force = childPose.Rot().RotateVectorReverse(
-      -this->wrench.body2Force.Ign());
+      -this->wrench.body2Force);
 
     // rotate resulting body2Torque in world frame into link frame
     this->wrench.body2Torque = childPose.Rot().RotateVectorReverse(
-      -this->wrench.body2Torque.Ign());
+      -this->wrench.body2Torque);
   }
 
   // convert torque from about parent CG to joint anchor location
@@ -306,16 +306,16 @@ void BulletJoint::CacheForceTorque()
     //       << "] fxp[" << this->wrench.body1Force.Cross(parentMomentArm)
     //       << "]\n";
 
-    this->wrench.body1Torque += this->wrench.body1Force.Ign().Cross(
+    this->wrench.body1Torque += this->wrench.body1Force.Cross(
         parentMomentArm);
 
     // rotate resulting body1Force in world frame into link frame
     this->wrench.body1Force = parentPose.Rot().RotateVectorReverse(
-      -this->wrench.body1Force.Ign());
+      -this->wrench.body1Force);
 
     // rotate resulting body1Torque in world frame into link frame
     this->wrench.body1Torque = parentPose.Rot().RotateVectorReverse(
-      -this->wrench.body1Torque.Ign());
+      -this->wrench.body1Torque);
 
     if (!this->childLink)
     {
@@ -325,12 +325,12 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in parent link frame, transform them into
       // child link(world) frame.
-      math::Pose parentToWorldTransform = this->parentLink->WorldPose();
+      ignition::math::Pose3d parentToWorldTransform = this->parentLink->WorldPose();
       this->wrench.body1Force =
-        parentToWorldTransform.rot.RotateVector(
+        parentToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
       this->wrench.body1Torque =
-        parentToWorldTransform.rot.RotateVector(
+        parentToWorldTransform.Rot().RotateVector(
         this->wrench.body1Torque);
     }
   }
@@ -350,12 +350,12 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in child link frame, transform them into
       // parent link frame.  Here, parent link is world, so zero transform.
-      math::Pose childToWorldTransform = this->childLink->WorldPose();
+      ignition::math::Pose3d childToWorldTransform = this->childLink->WorldPose();
       this->wrench.body1Force =
-        childToWorldTransform.rot.RotateVector(
+        childToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
       this->wrench.body1Torque =
-        childToWorldTransform.rot.RotateVector(
+        childToWorldTransform.Rot().RotateVector(
         this->wrench.body1Torque);
     }
   }
@@ -532,31 +532,31 @@ void BulletJoint::ApplyStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-void BulletJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+void BulletJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d & /*_anchor*/)
 {
   // nothing to do here for bullet.
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::Anchor(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkForce(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkTorque(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////

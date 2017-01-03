@@ -59,7 +59,7 @@ namespace gazebo
       public: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double PositionImpl(const unsigned int _index) const;

@@ -47,8 +47,8 @@ namespace gazebo
       public: virtual ~SimbodySliderJoint();
 
       // Documentation inherited.
-      public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+      public: virtual void SetAxis(const unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _rate);
@@ -57,7 +57,7 @@ namespace gazebo
       public: virtual double GetVelocity(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double PositionImpl(const unsigned int _index) const;

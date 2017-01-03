@@ -72,11 +72,11 @@ void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyFixedJoint::GetGlobalAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyFixedJoint::GlobalAxis(unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////

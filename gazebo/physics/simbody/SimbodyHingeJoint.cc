@@ -49,8 +49,8 @@ void SimbodyHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void SimbodyHingeJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void SimbodyHingeJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Simbody seems to handle setAxis improperly. It readjust all the pivot
   // points
@@ -108,7 +108,7 @@ void SimbodyHingeJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
@@ -123,7 +123,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
       SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
         this->simbodyPhysics->integ->getState(), X_OM.z()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W);
+      return SimbodyPhysics::Vec3ToVector3(z_W).Ign();
     }
     else
     {
@@ -131,8 +131,8 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->GetAxisFrame(_index).Ign().RotateVector(
+        this->LocalAxis(_index));
     }
   }
   else
@@ -140,17 +140,17 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
     if (_index >= this->DOF())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
-      gzdbg << "GetGlobalAxis() sibmody physics engine not initialized yet, "
+      gzdbg << "GlobalAxis() sibmody physics engine not initialized yet, "
             << "use local axis and initial pose to compute "
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->GetAxisFrame(_index).Ign().RotateVector(
+        this->LocalAxis(_index));
     }
   }
 }

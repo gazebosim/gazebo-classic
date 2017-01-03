@@ -51,10 +51,10 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -76,8 +76,8 @@ namespace gazebo
       // Documentation inherited.
       public: virtual double LowerLimit(const unsigned int _index) const;
 
-      // Documentation inherited. \sa Joint::GetGlobalAxis
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      // Documentation inherited. \sa Joint::GlobalAxis
+      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double PositionImpl(const unsigned int _index) const;
@@ -103,7 +103,7 @@ namespace gazebo
 
       /// \brief Initial value of joint axis, expressed as unit vector
       /// in world frame.
-      private: math::Vector3 initialWorldAxis[2];
+      private: ignition::math::Vector3d initialWorldAxis[2];
     };
     /// \}
   }

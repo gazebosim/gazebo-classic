@@ -237,7 +237,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          math::Vector3 axis = joint->GlobalAxis(0);
           EXPECT_NEAR(axis.x, (*axisIter).x, g_tolerance);
           EXPECT_NEAR(axis.y, (*axisIter).y, g_tolerance);
           EXPECT_NEAR(axis.z, (*axisIter).z, g_tolerance);
@@ -525,7 +525,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          math::Vector3 axis = joint->GlobalAxis(0);
           angVel  = joint->GetChild()->GetWorldAngularVel();
           angVel -= joint->GetParent()->GetWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);
@@ -560,7 +560,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
           // of child and parent, along global axis
           // jointVel == DOT(angVelChild - angVelParent, axis)
           double jointVel = joint->GetVelocity(0);
-          math::Vector3 axis = joint->GetGlobalAxis(0);
+          math::Vector3 axis = joint->GlobalAxis(0);
           angVel  = joint->GetChild()->GetWorldAngularVel();
           angVel -= joint->GetParent()->GetWorldAngularVel();
           EXPECT_NEAR(jointVel, axis.Dot(angVel), g_tolerance);

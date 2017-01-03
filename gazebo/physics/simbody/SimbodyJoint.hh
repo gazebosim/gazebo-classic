@@ -58,8 +58,8 @@ namespace gazebo
       public: virtual void Detach();
 
       // Documentation inherited.
-      public: virtual void SetAnchor(unsigned int _index,
-                  const gazebo::math::Vector3 &_anchor);
+      public: virtual void SetAnchor(const unsigned int _index,
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited.
       public: virtual void SetDamping(unsigned int _index,
@@ -74,13 +74,13 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
@@ -104,8 +104,8 @@ namespace gazebo
       public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual void SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis);
+      public: virtual void SetAxis(const unsigned int _index,
+                                   const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual JointWrench GetForceTorque(unsigned int _index);

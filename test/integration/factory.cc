@@ -751,7 +751,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
       EXPECT_EQ(joint->GetStopDissipation(j),
           jointClone->GetStopDissipation(j));
-      EXPECT_EQ(joint->GetLocalAxis(j), jointClone->GetLocalAxis(j));
+      EXPECT_EQ(joint->LocalAxis(j), jointClone->LocalAxis(j));
       EXPECT_EQ(joint->GetDamping(j), jointClone->GetDamping(j));
     }
   }
