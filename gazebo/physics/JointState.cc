@@ -196,8 +196,8 @@ JointState JointState::operator-(const JointState &_state) const
   int i = 0;
   for (std::vector<double>::const_iterator iterA =
        this->positions.begin(), iterB = _state.positions.begin();
-       iterA != this->positions.end() && iterB != _state.positions.end(); ++iterA,
-       ++iterB, ++i)
+       iterA != this->positions.end() &&
+       iterB != _state.positions.end(); ++iterA, ++iterB, ++i)
   {
     result.positions.push_back((*iterA) - (*iterB));
   }
@@ -219,8 +219,8 @@ JointState JointState::operator+(const JointState &_state) const
   int i = 0;
   for (std::vector<double>::const_iterator iterA =
        this->positions.begin(), iterB = _state.positions.begin();
-       iterA != this->positions.end() && iterB != _state.positions.end(); ++iterA,
-       ++iterB, ++i)
+       iterA != this->positions.end() &&
+       iterB != _state.positions.end(); ++iterA, ++iterB, ++i)
   {
     result.positions.push_back((*iterA) + (*iterB));
   }

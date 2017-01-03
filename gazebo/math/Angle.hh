@@ -49,6 +49,7 @@ namespace gazebo
 
   /// \class Angle Angle.hh math/gzmath.hh
   /// \brief An angle and related functions.
+  // cppcheck-suppress noConstructor
   class GZ_MATH_VISIBLE Angle
   {
     /// \brief math::Angle(0)
