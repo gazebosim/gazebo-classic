@@ -111,21 +111,47 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
-      public: void SetLinearVel(const math::Vector3 &_vel);
+      /// \deprecated See verion that accepts an ignition math object.
+      public: void SetLinearVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the linear velocity of the model, and all its links.
+      /// \param[in] _vel The new linear velocity.
+      public: void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular velocity of the model, and all its links.
       /// \param[in] _vel The new angular velocity.
-      public: void SetAngularVel(const math::Vector3 &_vel);
+      /// \deprecated See verion that accepts an ignition math object.
+      public: void SetAngularVel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the angular velocity of the model, and all its links.
+      /// \param[in] _vel The new angular velocity.
+      public: void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
-      public: void SetLinearAccel(const math::Vector3 &_vel);
+      /// \deprecated See verion that accepts an ignition math object.
+      public: void SetLinearAccel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the linear acceleration of the model, and all its
+      /// links.
+      /// \param[in] _vel The new linear acceleration.
+      public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
-      public: void SetAngularAccel(const math::Vector3 &_vel);
+      /// \deprecated See verion that accepts an ignition math object.
+      public: void SetAngularAccel(const math::Vector3 &_vel)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the angular acceleration of the model, and all its
+      /// links.
+      /// \param[in] _vel The new angular acceleration
+      public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
 
       /// \brief Get the linear velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
@@ -338,7 +364,26 @@ namespace gazebo
       ///
       /// \param[in] _model Pointer to the static model.
       /// \param[in] _offset Offset, relative to this Model, to place _model.
-      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void AttachStaticModel(ModelPtr &_model, math::Pose _offset)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Attach a static model to this model
+      ///
+      /// This function takes as input a static Model, which is a Model that
+      /// has been marked as static (no physics simulation), and attaches it
+      /// to this Model with a given offset.
+      ///
+      /// This function is useful when you want to simulate a grasp of a
+      /// static object, or move a static object around using a dynamic
+      /// model.
+      ///
+      /// If you are in doubt, do not use this function.
+      ///
+      /// \param[in] _model Pointer to the static model.
+      /// \param[in] _offset Offset, relative to this Model, to place _model.
+      public: void AttachStaticModel(ModelPtr &_model,
+                  ignition::math::Pose3d _offset);
 
       /// \brief Detach a static model from this model.
       /// \param[in] _model Name of an attached static model to remove.
@@ -373,8 +418,18 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _linkName Name of the link to set.
+      /// \deprecated See version that accepts an ignition::math object.
       public: void SetLinkWorldPose(const math::Pose &_pose,
-                                    std::string _linkName);
+                  std::string _linkName) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the Pose of the entire Model by specifying
+      /// desired Pose of a Link within the Model.  Doing so, keeps
+      /// the configuration of the Model unchanged, i.e. all Joint angles
+      /// are unchanged.
+      /// \param[in] _pose Pose to set the link to.
+      /// \param[in] _linkName Name of the link to set.
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
+                  std::string _linkName);
 
       /// \brief Set the Pose of the entire Model by specifying
       /// desired Pose of a Link within the Model.  Doing so, keeps
@@ -382,7 +437,17 @@ namespace gazebo
       /// are unchanged.
       /// \param[in] _pose Pose to set the link to.
       /// \param[in] _link Pointer to the link to set.
+      /// \deprecated See version that accepts an ignition::math object.
       public: void SetLinkWorldPose(const math::Pose &_pose,
+                  const LinkPtr &_link) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the Pose of the entire Model by specifying
+      /// desired Pose of a Link within the Model.  Doing so, keeps
+      /// the configuration of the Model unchanged, i.e. all Joint angles
+      /// are unchanged.
+      /// \param[in] _pose Pose to set the link to.
+      /// \param[in] _link Pointer to the link to set.
+      public: void SetLinkWorldPose(const ignition::math::Pose3d &_pose,
                                     const LinkPtr &_link);
 
       /// \brief Allow the model the auto disable. This is ignored if the
@@ -538,7 +603,7 @@ namespace gazebo
       protected: std::vector<ModelPtr> attachedModels;
 
       /// used by Model::AttachStaticModel
-      protected: std::vector<math::Pose> attachedModelsOffset;
+      protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief Publisher for joint info.
       protected: transport::PublisherPtr jointPub;

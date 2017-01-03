@@ -181,10 +181,12 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond::Identity));
   world->ModelByName(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
+      ignition::math::Quaterniond(0, 0, 0)));
 
   // wait for a few more laser scans
   i = 0;
