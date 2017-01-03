@@ -924,7 +924,8 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
       v = v + dt * g;
       z = z + dt * v;
 
-      world->Step(1);  // theoretical contact, but
+      // theoretical contact, but
+      world->Step(1);
       {
         physics::ModelPtr boxModel = world->ModelByName("box");
         if (boxModel)
@@ -943,7 +944,8 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
           else
           {
-            EXPECT_LT(fabs(vel.Z()), 0.0101);  // sometimes -0.01, why?
+            // sometimes -0.01, why?
+            EXPECT_LT(fabs(vel.Z()), 0.0101);
             if (_physicsEngine == "dart")
             {
               // DART needs more tolerance until supports 'correction for
@@ -1039,7 +1041,7 @@ TEST_F(PhysicsTest, DropStuffDART)
 {
   DropStuff("dart");
 }
-#endif  // HAVE_DART
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
@@ -1084,7 +1086,8 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       }
 #endif
 
-      world->Step(1);  // theoretical contact, but
+      // theoretical contact, but
+      world->Step(1);
 
       if (boxModel)
       {
@@ -1161,9 +1164,14 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       // integrate here to see when the collision should happen
       double vold = v;
       if (i == 0)
+      {
         v = vold + dt* (f / m);
+      }
       else if (t >= 1.0)
-        v = dt*f/ 2.0;  // inelastic col. w/ eqal mass.
+      {
+        // inelastic col. w/ eqal mass.
+        v = dt*f/ 2.0;
+      }
       x = x + dt * (v + vold) / 2.0;
     }
   }

@@ -685,7 +685,7 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearVel(_vel);
+      (*iter)->SetLinearVel(_vel.Ign());
     }
   }
 }
@@ -699,7 +699,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularVel(_vel);
+      (*iter)->SetAngularVel(_vel.Ign());
     }
   }
 }
@@ -713,7 +713,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearAccel(_accel);
+      (*iter)->SetLinearAccel(_accel.Ign());
     }
   }
 }
@@ -727,7 +727,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularAccel(_accel);
+      (*iter)->SetAngularAccel(_accel.Ign());
     }
   }
 }
@@ -757,7 +757,10 @@ math::Vector3 Model::GetWorldLinearVel() const
 ignition::math::Vector3d Model::WorldLinearVel() const
 {
   if (this->GetLink("canonical"))
+  {
+    printf("Canonical\n");
     return this->GetLink("canonical")->WorldLinearVel();
+  }
   else
     return ignition::math::Vector3d::Zero;
 }

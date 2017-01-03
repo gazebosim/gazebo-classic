@@ -135,7 +135,8 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     gzdbg << "pose" << T.matrix() << std::endl;
     if (softCollElem->HasElement("pose"))
     {
-      T = DARTTypes::ConvPose(softCollElem->Get<math::Pose>("pose"));
+      T = DARTTypes::ConvPose(
+          softCollElem->Get<ignition::math::Pose3d>("pose"));
     }
 
     // geometry
@@ -143,7 +144,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     {
       sdf::ElementPtr boxEle = softGeomElem->GetElement("box");
       Eigen::Vector3d size =
-          DARTTypes::ConvVec3(boxEle->Get<math::Vector3>("size"));
+          DARTTypes::ConvVec3(boxEle->Get<ignition::math::Vector3d>("size"));
       softProperties = dart::dynamics::SoftBodyNodeHelper::makeBoxProperties(
             size, T, fleshMassFraction, boneAttachment, stiffness, damping);
     }
@@ -151,7 +152,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 //    {
 //      sdf::ElementPtr ellipsoidEle = geomElem->GetElement("ellipsoid");
 //      Eigen::Vector3d size
-//          = DARTTypes::ConvVec3(ellipsoidEle->Get<math::Vector3>("size"));
+//          = DARTTypes::ConvVec3(ellipsoidEle->Get<ignition::math::Vector3d>("size"));
 //      double nSlices = ellipsoidEle->Get<double>("num_slices");
 //      double nStacks = ellipsoidEle->Get<double>("num_stacks");
 //      dart::dynamics::SoftBodyNodeHelper::setEllipsoid(
@@ -223,7 +224,7 @@ void DARTLink::Init()
   this->visuals;
 
   // COG offset
-  math::Vector3 cog = this->inertial->GetCoG();
+  ignition::math::Vector3d cog = this->inertial->GetCoG().Ign();
   this->dataPtr->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
 
   // Gravity mode
@@ -356,7 +357,7 @@ bool DARTLink::GetEnabled() const
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetLinearVel(const math::Vector3 &_vel)
+void DARTLink::SetLinearVel(const ignition::math::Vector3d &_vel)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -423,7 +424,7 @@ void DARTLink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetAngularVel(const math::Vector3 &_vel)
+void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -494,7 +495,7 @@ void DARTLink::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetForce(const math::Vector3 &_force)
+void DARTLink::SetForce(const ignition::math::Vector3d &_force)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -508,7 +509,7 @@ void DARTLink::SetForce(const math::Vector3 &_force)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::SetTorque(const math::Vector3 &_torque)
+void DARTLink::SetTorque(const ignition::math::Vector3d &_torque)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -522,7 +523,7 @@ void DARTLink::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddForce(const math::Vector3 &_force)
+void DARTLink::AddForce(const ignition::math::Vector3d &_force)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -535,7 +536,7 @@ void DARTLink::AddForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeForce(const math::Vector3 &_force)
+void DARTLink::AddRelativeForce(const ignition::math::Vector3d &_force)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -551,8 +552,8 @@ void DARTLink::AddRelativeForce(const math::Vector3 &_force)
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
-                                        const math::Vector3 &_pos)
+void DARTLink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
+                                        const ignition::math::Vector3d &_pos)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -568,8 +569,8 @@ void DARTLink::AddForceAtWorldPosition(const math::Vector3 &_force,
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
-                                          const math::Vector3 &_relpos)
+void DARTLink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
+                                          const ignition::math::Vector3d &_relpos)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -586,15 +587,15 @@ void DARTLink::AddForceAtRelativePosition(const math::Vector3 &_force,
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddLinkForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
+void DARTLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_offset*/)
 {
   gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
         << std::endl;
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddTorque(const math::Vector3 &_torque)
+void DARTLink::AddTorque(const ignition::math::Vector3d &_torque)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -607,7 +608,7 @@ void DARTLink::AddTorque(const math::Vector3 &_torque)
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddRelativeTorque(const math::Vector3 &_torque)
+void DARTLink::AddRelativeTorque(const ignition::math::Vector3d &_torque)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -621,24 +622,25 @@ void DARTLink::AddRelativeTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldLinearVel(const math::Vector3 &_offset) const
+ignition::math::Vector3d DARTLink::WorldLinearVel(
+    const ignition::math::Vector3d &_offset) const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldLinearVel");
+    return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldLinearVel");
 
   Eigen::Vector3d linVel = this->dataPtr->dtBodyNode->getLinearVelocity(
         DARTTypes::ConvVec3(_offset));
 
-  return DARTTypes::ConvVec3(linVel);
+  return DARTTypes::ConvVec3Ign(linVel);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldLinearVel(
-    const gazebo::math::Vector3 &_offset,
-    const gazebo::math::Quaternion &_q) const
+ignition::math::Vector3d DARTLink::WorldLinearVel(
+    const ignition::math::Vector3d &_offset,
+    const ignition::math::Quaterniond &_q) const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldLinearVel");
+    return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldLinearVel");
 
   Eigen::Matrix3d R1 = Eigen::Matrix3d(DARTTypes::ConvQuat(_q));
   Eigen::Vector3d worldOffset = R1 * DARTTypes::ConvVec3(_offset);
@@ -648,49 +650,55 @@ math::Vector3 DARTLink::GetWorldLinearVel(
   Eigen::Vector3d linVel =
       this->dataPtr->dtBodyNode->getLinearVelocity(bodyOffset);
 
-  return DARTTypes::ConvVec3(linVel);
+  return DARTTypes::ConvVec3Ign(linVel);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldCoGLinearVel() const
+ignition::math::Vector3d DARTLink::WorldCoGLinearVel() const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldCoGLinearVel");
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+        "WorldCoGLinearVel");
+  }
 
   Eigen::Vector3d linVel = this->dataPtr->dtBodyNode->getCOMLinearVelocity();
 
-  return DARTTypes::ConvVec3(linVel);
+  return DARTTypes::ConvVec3Ign(linVel);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldAngularVel() const
+ignition::math::Vector3d DARTLink::WorldAngularVel() const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldAngularVel");
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+        "WorldAngularVel");
+  }
 
   Eigen::Vector3d angVel = this->dataPtr->dtBodyNode->getAngularVelocity();
 
-  return DARTTypes::ConvVec3(angVel);
+  return DARTTypes::ConvVec3Ign(angVel);
 }
 
 /////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldForce() const
+ignition::math::Vector3d DARTLink::WorldForce() const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldForce");
+    return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldForce");
 
   Eigen::Vector6d F = this->dataPtr->dtBodyNode->getExternalForceGlobal();
-  return DARTTypes::ConvVec3(F.tail<3>());
+  return DARTTypes::ConvVec3Ign(F.tail<3>());
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTLink::GetWorldTorque() const
+ignition::math::Vector3d DARTLink::WorldTorque() const
 {
   if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<math::Vector3>("WorldTorque");
+    return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldTorque");
 
   // TODO: Need verification
-  math::Vector3 torque;
+  ignition::math::Vector3d torque;
 
   Eigen::Isometry3d W = this->dataPtr->dtBodyNode->getTransform();
   Eigen::Matrix6d G   = this->dataPtr->dtBodyNode->getSpatialInertia();
@@ -698,7 +706,7 @@ math::Vector3 DARTLink::GetWorldTorque() const
   Eigen::VectorXd dV  = this->dataPtr->dtBodyNode->getSpatialAcceleration();
   Eigen::Vector6d F   = G * dV - dart::math::dad(V, G * V);
 
-  torque = DARTTypes::ConvVec3(W.linear() * F.head<3>());
+  torque = DARTTypes::ConvVec3Ign(W.linear() * F.head<3>());
 
   return torque;
 }
@@ -930,11 +938,11 @@ void DARTLink::updateDirtyPoseFromDARTTransformation()
 
   // Step 1: get dart body's transformation
   // Step 2: set gazebo link's pose using the transformation
-  math::Pose newPose = DARTTypes::ConvPose(
-                         this->dataPtr->dtBodyNode->getTransform());
+  ignition::math::Pose3d newPose = DARTTypes::ConvPoseIgn(
+      this->dataPtr->dtBodyNode->getTransform());
 
   // Set the new pose to this link
-  this->dirtyPose = newPose.Ign();
+  this->dirtyPose = newPose;
 
   // Set the new pose to the world
   // (Below method can be changed in gazebo code)

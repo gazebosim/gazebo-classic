@@ -681,7 +681,7 @@ void ArduCopterPlugin::SendState() const
   // or...
   // Get model velocity in NED frame
   ignition::math::Vector3d velGazeboWorldFrame =
-    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+    this->dataPtr->model->GetLink()->WorldLinearVel();
   ignition::math::Vector3d velNEDFrame =
     gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();

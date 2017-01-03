@@ -40,8 +40,7 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
                      _link->WorldAngularVel());
   this->acceleration.Set(_link->WorldLinearAccel(),
                          _link->WorldAngularAccel());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -54,8 +53,7 @@ LinkState::LinkState(const LinkPtr _link)
                      _link->WorldAngularVel());
   this->acceleration.Set(_link->WorldLinearAccel(),
                          _link->WorldAngularAccel());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.
@@ -96,8 +94,7 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
                      _link->WorldAngularVel());
   this->acceleration.Set(_link->WorldLinearAccel(),
                          _link->WorldAngularAccel());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////

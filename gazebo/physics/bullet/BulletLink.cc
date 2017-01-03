@@ -297,7 +297,7 @@ void BulletLink::SetSelfCollide(bool _collide)
     gzthrow("requires BulletCollision");
 
   btTransform trans;
-  math::Pose relativePose = _collision->GetRelativePose();
+  ignition::math::Pose3d relativePose = _collision->GetRelativePose();
   trans = BulletTypes::ConvertPose(relativePose);
 
   bcollision->SetCompoundShapeIndex(this->compoundShape->getNumChildShapes());
@@ -321,7 +321,7 @@ void BulletLink::OnPoseChange()
 
   // this->SetEnabled(true);
 
-  const math::Pose myPose = this->GetWorldCoGPose();
+  const ignition::math::Pose3d myPose = this->WorldCoGPose();
 
   this->rigidLink->setCenterOfMassTransform(
     BulletTypes::ConvertPose(myPose));
@@ -350,7 +350,7 @@ void BulletLink::SetEnabled(bool /*_enable*/) const
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetLinearVel(const math::Vector3 &_vel)
+void BulletLink::SetLinearVel(const ignition::math::Vector3d &_vel)
 {
   if (!this->rigidLink)
   {
@@ -363,65 +363,68 @@ void BulletLink::SetLinearVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldCoGLinearVel() const
+ignition::math::Vector3d BulletLink::WorldCoGLinearVel() const
 {
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldLinearVel returns "
-          << math::Vector3(0, 0, 0) << " by default." << std::endl;
-    return math::Vector3(0, 0, 0);
+          << ignition::math::Vector3d::Zero << " by default." << std::endl;
+    return ignition::math::Vector3d::Zero;
   }
 
   btVector3 vel = this->rigidLink->getLinearVelocity();
 
-  return BulletTypes::ConvertVector3(vel);
+  return BulletTypes::ConvertVector3Ign(vel);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
+ignition::math::Vector3d BulletLink::WorldLinearVel(
+    const ignition::math::Vector3d &_offset) const
 {
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldLinearVel returns "
-          << math::Vector3(0, 0, 0) << " by default." << std::endl;
-    return math::Vector3(0, 0, 0);
+          << ignition::math::Vector3d::Zero << " by default." << std::endl;
+    return ignition::math::Vector3d::Zero;
   }
 
-  math::Pose wPose = this->WorldPose();
+  ignition::math::Pose3d wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
+  ignition::math::Vector3d offsetFromCoG = wPose.Rot()*
+    (_offset - this->inertial->GetCoG().Ign());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
-  return BulletTypes::ConvertVector3(vel);
+  return BulletTypes::ConvertVector3Ign(vel);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
-                                            const math::Quaternion &_q) const
+ignition::math::Vector3d BulletLink::WorldLinearVel(
+    const ignition::math::Vector3d &_offset,
+    const ignition::math::Quaterniond &_q) const
 {
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldLinearVel returns "
-          << math::Vector3(0, 0, 0) << " by default." << std::endl;
-    return math::Vector3(0, 0, 0);
+          << ignition::math::Vector3d::Zero << " by default." << std::endl;
+    return ignition::math::Vector3d::Zero;
   }
 
-  math::Pose wPose = this->WorldPose();
+  ignition::math::Pose3d wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  math::Vector3 offsetFromCoG = _q*_offset
-        - wPose.rot*this->inertial->GetCoG();
+  ignition::math::Vector3d offsetFromCoG = _q*_offset
+        - wPose.Rot()*this->inertial->GetCoG().Ign();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
-  return BulletTypes::ConvertVector3(vel);
+  return BulletTypes::ConvertVector3Ign(vel);
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetAngularVel(const math::Vector3 &_vel)
+void BulletLink::SetAngularVel(const ignition::math::Vector3d &_vel)
 {
   if (!this->rigidLink)
   {
@@ -434,46 +437,46 @@ void BulletLink::SetAngularVel(const math::Vector3 &_vel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldAngularVel() const
+ignition::math::Vector3d BulletLink::WorldAngularVel() const
 {
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
           << " does not exist, GetWorldAngularVel returns "
-          << math::Vector3(0, 0, 0) << " by default." << std::endl;
-    return math::Vector3(0, 0, 0);
+          << ignition::math::Vector3d::Zero << " by default." << std::endl;
+    return ignition::math::Vector3d::Zero;
   }
 
   btVector3 vel = this->rigidLink->getAngularVelocity();
 
-  return BulletTypes::ConvertVector3(vel);
+  return BulletTypes::ConvertVector3Ign(vel);
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetForce(const math::Vector3 &_force)
+void BulletLink::SetForce(const ignition::math::Vector3d &_force)
 {
   if (!this->rigidLink)
     return;
 
   this->rigidLink->applyCentralForce(
-    btVector3(_force.x, _force.y, _force.z));
+    btVector3(_force.X(), _force.Y(), _force.Z()));
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldForce() const
+ignition::math::Vector3d BulletLink::WorldForce() const
 {
   if (!this->rigidLink)
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d(0, 0, 0);
 
   btVector3 btVec;
 
   btVec = this->rigidLink->getTotalForce();
 
-  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
+  return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
 }
 
 //////////////////////////////////////////////////
-void BulletLink::SetTorque(const math::Vector3 &_torque)
+void BulletLink::SetTorque(const ignition::math::Vector3d &_torque)
 {
   if (!this->rigidLink)
   {
@@ -486,19 +489,15 @@ void BulletLink::SetTorque(const math::Vector3 &_torque)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletLink::GetWorldTorque() const
+ignition::math::Vector3d BulletLink::WorldTorque() const
 {
-  /*
-  if (!this->rigidLink)
-    return math::Vector3(0, 0, 0);
+  // if (!this->rigidLink)
+  //   return ignition::math::Vector3d(0, 0, 0);
+  // btmath::Vector3 btVec;
+  // btVec = this->rigidLink->getTotalTorque();
+  // return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
 
-  btmath::Vector3 btVec;
-
-  btVec = this->rigidLink->getTotalTorque();
-
-  return math::Vector3(btVec.x(), btVec.y(), btVec.z());
-  */
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -555,71 +554,71 @@ void BulletLink::SetAngularDamping(double _damping)
 }
 
 //////////////////////////////////////////////////
-/*void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
-    const math::Pose &_newPose)
-{
-  std::map<std::string, Collision*>::iterator iter;
-  unsigned int i;
-
-  for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
-       ++iter, ++i)
-  {
-    if (iter->second == _collision)
-      break;
-  }
-
-  if (i < this->collisions.size())
-  {
-    // Set the pose of the _collision in Bullet
-    this->compoundShape->updateChildTransform(i,
-        BulletTypes::ConvertPose(_newPose));
-  }
-}*/
+// void BulletLink::SetCollisionRelativePose(BulletCollision *_collision,
+//     const ignition::math::Pose3d &_newPose)
+// {
+//   std::map<std::string, Collision*>::iterator iter;
+//   unsigned int i;
+//
+//   for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
+//        ++iter, ++i)
+//   {
+//     if (iter->second == _collision)
+//       break;
+//   }
+//
+//   if (i < this->collisions.size())
+//   {
+//     // Set the pose of the _collision in Bullet
+//     this->compoundShape->updateChildTransform(i,
+//         BulletTypes::ConvertPose(_newPose));
+//   }
+// }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForce(const math::Vector3 &/*_force*/)
+void BulletLink::AddForce(const ignition::math::Vector3d &/*_force*/)
 {
   gzlog << "BulletLink::AddForce not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddRelativeForce(const math::Vector3 &/*_force*/)
+void BulletLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
 {
   gzlog << "BulletLink::AddRelativeForce not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtWorldPosition(const math::Vector3 &/*_force*/,
-                                         const math::Vector3 &/*_pos*/)
+void BulletLink::AddForceAtWorldPosition(const ignition::math::Vector3d &/*_force*/,
+                                         const ignition::math::Vector3d &/*_pos*/)
 {
   gzlog << "BulletLink::AddForceAtWorldPosition not yet implemented."
         << std::endl;
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtRelativePosition(const math::Vector3 &/*_force*/,
-                  const math::Vector3 &/*_relpos*/)
+void BulletLink::AddForceAtRelativePosition(const ignition::math::Vector3d &/*_force*/,
+                  const ignition::math::Vector3d &/*_relpos*/)
 {
   gzlog << "BulletLink::AddForceAtRelativePosition not yet implemented."
         << std::endl;
 }
 
 //////////////////////////////////////////////////
-void BulletLink::AddLinkForce(const math::Vector3 &/*_force*/,
-    const math::Vector3 &/*_offset*/)
+void BulletLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_offset*/)
 {
   gzlog << "BulletLink::AddLinkForce not yet implemented (#1476)."
         << std::endl;
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddTorque(const math::Vector3 &/*_torque*/)
+void BulletLink::AddTorque(const ignition::math::Vector3d &/*_torque*/)
 {
   gzlog << "BulletLink::AddTorque not yet implemented." << std::endl;
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddRelativeTorque(const math::Vector3 &/*_torque*/)
+void BulletLink::AddRelativeTorque(const ignition::math::Vector3d &/*_torque*/)
 {
   gzlog << "BulletLink::AddRelativeTorque not yet implemented." << std::endl;
 }

@@ -331,12 +331,12 @@ void Link::Reset()
 //////////////////////////////////////////////////
 void Link::ResetPhysicsStates()
 {
-  this->SetAngularVel(math::Vector3(0, 0, 0));
-  this->SetLinearVel(math::Vector3(0, 0, 0));
-  this->SetAngularAccel(math::Vector3(0, 0, 0));
-  this->SetLinearAccel(math::Vector3(0, 0, 0));
-  this->SetForce(math::Vector3(0, 0, 0));
-  this->SetTorque(math::Vector3(0, 0, 0));
+  this->SetAngularVel(ignition::math::Vector3d::Zero);
+  this->SetLinearVel(ignition::math::Vector3d::Zero);
+  this->SetAngularAccel(ignition::math::Vector3d::Zero);
+  this->SetLinearAccel(ignition::math::Vector3d::Zero);
+  this->SetForce(ignition::math::Vector3d::Zero);
+  this->SetTorque(ignition::math::Vector3d::Zero);
 }
 
 //////////////////////////////////////////////////
@@ -642,12 +642,24 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 //////////////////////////////////////////////////
 void Link::SetLinearAccel(const math::Vector3 &_accel)
 {
+  this->SetLinearAccel(_accel.Ign());
+}
+
+//////////////////////////////////////////////////
+void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
+{
   this->SetEnabled(true);
   this->linearAccel = _accel;
 }
 
 //////////////////////////////////////////////////
 void Link::SetAngularAccel(const math::Vector3 &_accel)
+{
+  this->SetAngularAccel(_accel.Ign());
+}
+
+//////////////////////////////////////////////////
+void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
 {
   this->SetEnabled(true);
   this->angularAccel = _accel;
@@ -656,8 +668,14 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldCoGPose() const
 {
-  math::Pose pose = this->WorldPose();
-  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+  return this->WorldCoGPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Link::WorldCoGPose() const
+{
+  ignition::math::Pose3d pose = this->WorldPose();
+  pose.Pos() += pose.Rot().RotateVector(this->inertial->GetCoG().Ign());
   return pose;
 }
 
@@ -694,7 +712,7 @@ math::Vector3 Link::GetRelativeLinearAccel() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Link::RelativeLinearAccel() const
 {
-  return this->GetRelativeForce().Ign() / this->inertial->GetMass();
+  return this->RelativeForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
@@ -706,7 +724,7 @@ math::Vector3 Link::GetWorldLinearAccel() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Link::WorldLinearAccel() const
 {
-  return this->GetWorldForce().Ign() / this->inertial->GetMass();
+  return this->WorldForce() / this->inertial->GetMass();
 }
 
 //////////////////////////////////////////////////
@@ -736,12 +754,18 @@ ignition::math::Vector3d Link::WorldAngularAccel() const
   // w: angular velocity in world frame
   // return I^-1 * (T - w x L)
   return this->WorldInertiaMatrix().Inverse() *
-    (this->GetWorldTorque().Ign() -
-     this->WorldAngularVel().Cross(this->GetWorldAngularMomentum().Ign()));
+    (this->WorldTorque() -
+     this->WorldAngularVel().Cross(this->WorldAngularMomentum()));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
+{
+  return this->WorldAngularMomentum();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldAngularMomentum() const
 {
   return this->WorldInertiaMatrix() * this->WorldAngularVel();
 }
@@ -749,15 +773,25 @@ math::Vector3 Link::GetWorldAngularMomentum() const
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeForce() const
 {
-  return this->WorldPose().Rot().RotateVectorReverse(
-      this->GetWorldForce().Ign());
+  return this->RelativeForce();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeForce() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldForce());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeTorque() const
 {
-  return this->WorldPose().Rot().RotateVectorReverse(
-      this->GetWorldTorque().Ign());
+  return this->RelativeTorque();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeTorque() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldTorque());
 }
 
 //////////////////////////////////////////////////
@@ -842,9 +876,15 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldInertialPose() const
 {
-  math::Pose inertialPose;
+  return this->WorldInertialPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Link::WorldInertialPose() const
+{
+  ignition::math::Pose3d inertialPose;
   if (this->inertial)
-    inertialPose = this->inertial->GetPose();
+    inertialPose = this->inertial->GetPose().Ign();
   return inertialPose + this->WorldPose();
 }
 
@@ -1078,6 +1118,13 @@ std::string Link::GetSensorName(unsigned int _i) const
 //////////////////////////////////////////////////
 void Link::AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
 {
+  this->AttachStaticModel(_model, _offset.Ign());
+}
+
+//////////////////////////////////////////////////
+void Link::AttachStaticModel(ModelPtr &_model,
+    const ignition::math::Pose3d &_offset)
+{
   if (!_model->IsStatic())
   {
     gzerr << "AttachStaticModel requires a static model\n";
@@ -1116,8 +1163,8 @@ void Link::OnPoseChange()
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     p = this->WorldPose();
-    p.Pos() += this->attachedModelsOffset[i].pos.Ign();
-    p.Rot() = p.Rot() * this->attachedModelsOffset[i].rot.Ign();
+    p.Pos() += this->attachedModelsOffset[i].Pos();
+    p.Rot() = p.Rot() * this->attachedModelsOffset[i].Rot();
 
     this->attachedModels[i]->SetWorldPose(p, true);
   }
@@ -1400,6 +1447,12 @@ void Link::RemoveCollision(const std::string &_name)
 /////////////////////////////////////////////////
 void Link::SetScale(const math::Vector3 &_scale)
 {
+  this->SetScale(_scale.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetScale(const ignition::math::Vector3d &_scale)
+{
   Base_V::const_iterator biter;
   for (biter = this->children.begin(); biter != this->children.end(); ++biter)
   {
@@ -1412,11 +1465,11 @@ void Link::SetScale(const math::Vector3 &_scale)
   // update the visual sdf to ensure cloning and saving has the correct values.
   this->UpdateVisualGeomSDF(_scale);
 
-  this->scale = _scale.Ign();
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
+void Link::UpdateVisualGeomSDF(const ignition::math::Vector3d &_scale)
 {
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -1428,8 +1481,8 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
 
       if (geomElem->HasElement("box"))
       {
-        math::Vector3 size =
-            geomElem->GetElement("box")->Get<math::Vector3>("size");
+        ignition::math::Vector3d size =
+            geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
         geomElem->GetElement("box")->GetElement("size")->Set(
             _scale/this->scale*size);
       }
@@ -1437,7 +1490,7 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
       {
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("sphere")->Get<double>("radius");
-        double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+        double newRadius = _scale.Max();
         double oldRadius = std::max(this->scale.Z(),
             std::max(this->scale.X(), this->scale.Y()));
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
@@ -1447,14 +1500,14 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
       {
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
-        double newRadius = std::max(_scale.x, _scale.y);
+        double newRadius = std::max(_scale.X(), _scale.Y());
         double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
         double length = geomElem->GetElement("cylinder")->Get<double>("length");
         geomElem->GetElement("cylinder")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            _scale.z/this->scale.Z()*length);
+            _scale.Z()/this->scale.Z()*length);
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
@@ -1521,7 +1574,7 @@ double Link::GetWorldEnergyPotential() const
   // E = -m g^T z
   double m = this->GetInertial()->GetMass();
   auto g = this->GetWorld()->Gravity();
-  math::Vector3 z = this->GetWorldCoGPose().pos;
+  math::Vector3 z = this->WorldCoGPose().Pos();
   return -m * g.Dot(z.Ign());
 }
 
@@ -1534,7 +1587,7 @@ double Link::GetWorldEnergyKinetic() const
   // E = 1/2 m v^T v
   {
     double m = this->GetInertial()->GetMass();
-    math::Vector3 v = this->GetWorldCoGLinearVel();
+    ignition::math::Vector3d v = this->WorldCoGLinearVel();
     energy += 0.5 * m * v.Dot(v);
   }
 
@@ -1559,10 +1612,18 @@ double Link::GetWorldEnergy() const
 void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
                      const math::Pose &_worldReferenceFrameDst)
 {
+  this->MoveFrame(_worldReferenceFrameSrc.Ign(), _worldReferenceFrameDst.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::MoveFrame(const ignition::math::Pose3d &_worldReferenceFrameSrc,
+                     const ignition::math::Pose3d &_worldReferenceFrameDst)
+{
   ignition::math::Pose3d targetWorldPose = (this->WorldPose() -
-      _worldReferenceFrameSrc.Ign()) + _worldReferenceFrameDst.Ign();
+      _worldReferenceFrameSrc) + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+  this->SetWorldTwist(ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////
@@ -1749,7 +1810,7 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
     return;
   }
 
-  math::Vector3 pos = math::Vector3::Zero;
+  ignition::math::Vector3d pos;
   if (_msg.has_force_offset())
   {
     pos = msgs::ConvertIgn(_msg.force_offset());
@@ -1838,4 +1899,116 @@ void Link::RegisterIntrospectionItems()
   this->introspectionItems.push_back(angAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angAccURI.Str(), fLinkAngAcc);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel() const
+{
+  return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldLinearVel() const
+{
+  return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset) const
+{
+  return this->WorldLinearVel(_offset.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset,
+    const math::Quaternion &_q) const
+{
+  return this->WorldLinearVel(_offset.Ign(), _q.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldCoGLinearVel() const
+{
+  return this->WorldCoGLinearVel();
+}
+
+/////////////////////////////////////////////////
+void Link::SetLinearVel(const math::Vector3 &_vel)
+{
+  this->SetLinearVel(_vel.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetAngularVel(const math::Vector3 &_vel)
+{
+  this->SetAngularVel(_vel.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetForce(const math::Vector3 &_force)
+{
+  this->SetForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::SetTorque(const math::Vector3 &_torque)
+{
+  this->SetTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForce(const math::Vector3 &_force)
+{
+  this->AddForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeForce(const math::Vector3 &_force)
+{
+  this->AddRelativeForce(_force.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtWorldPosition(const math::Vector3 &_force,
+    const math::Vector3 &_pos)
+{
+  this->AddForceAtWorldPosition(_force.Ign(), _pos.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtRelativePosition(const math::Vector3 &_force,
+    const math::Vector3 &_relPos)
+{
+  this->AddForceAtRelativePosition(_force.Ign(), _relPos.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+  this->AddLinkForce(_force.Ign(), _offset.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddTorque(const math::Vector3 &_torque)
+{
+  this->AddTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeTorque(const math::Vector3 &_torque)
+{
+  this->AddRelativeTorque(_torque.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldForce() const
+{
+  return this->WorldForce();
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldTorque() const
+{
+  return this->WorldTorque();
 }

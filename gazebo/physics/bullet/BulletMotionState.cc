@@ -46,7 +46,7 @@ BulletMotionState::~BulletMotionState()
 void BulletMotionState::getWorldTransform(btTransform &_cogWorldTrans) const
 {
   _cogWorldTrans =
-    BulletTypes::ConvertPose(this->link->GetWorldInertialPose());
+    BulletTypes::ConvertPose(this->link->WorldInertialPose());
 }
 
 //////////////////////////////////////////////////
@@ -65,7 +65,7 @@ void BulletMotionState::setWorldTransform(const btTransform &/*_cogWorldTrans*/)
   }
   else
   {
-    pose = bulletLink->GetWorldCoGPose().Ign();
+    pose = bulletLink->WorldCoGPose();
   }
 
   // transform pose from cg location to link location

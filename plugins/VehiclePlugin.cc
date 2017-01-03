@@ -230,7 +230,7 @@ void VehiclePlugin::OnUpdate()
   this->joints[1]->SetLowerLimit(0, wheelAngle);
 
   // Get the current velocity of the car
-  this->velocity = this->chassis->GetWorldLinearVel().Ign();
+  this->velocity = this->chassis->WorldLinearVel();
 
   //  aerodynamics
   this->chassis->AddForce(

@@ -165,7 +165,7 @@ void BulletScrewJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->parentLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of parent.
@@ -184,7 +184,7 @@ void BulletScrewJoint::Init()
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->childLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of child.
@@ -282,21 +282,21 @@ void BulletScrewJoint::Init()
 double BulletScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GetGlobalAxis(0).Ign();
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+    result += globalAxis.Dot(this->childLink->WorldLinearVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
+    result -= globalAxis.Dot(this->parentLink->WorldLinearVel());
   return result;
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  math::Vector3 desiredVel;
+  ignition::math::Vector3d desiredVel;
   if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldLinearVel();
-  desiredVel += _vel * this->GetGlobalAxis(_index);
+    desiredVel = this->parentLink->WorldLinearVel();
+  desiredVel += _vel * this->GetGlobalAxis(_index).Ign();
   if (this->childLink)
     this->childLink->SetLinearVel(desiredVel);
 }
