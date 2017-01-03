@@ -59,7 +59,6 @@ release will remove the deprecated code.
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
 
->>>>>>> other
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
     + ***Replacement:*** public: bool Contains(const ignition::math::Vector3d &_p) const
