@@ -63,6 +63,9 @@ MeshManager::MeshManager()
       ignition::math::Vector2d(0.014, 0.014));
   this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector2d(1, 1));
+  // Note: axis_box is added and currently only used by SelectionObj in
+  // replacement of unit_box to avoid a weird ogre 1.9 problem in
+  // UNIT_Projection_TEST on OSX
   this->CreateBox("axis_box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector2d(1, 1));
 
