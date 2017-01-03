@@ -36,8 +36,8 @@ JointState::JointState(JointPtr _joint, const common::Time &_realTime,
 : State(_joint->GetName(), _realTime, _simTime, _iterations)
 {
   // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i).Ign());
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->angles.push_back(ignition::math::Angle(_joint->Position(i)));
 }
 
 /////////////////////////////////////////////////
@@ -46,8 +46,8 @@ JointState::JointState(JointPtr _joint)
         _joint->GetWorld()->SimTime(), _joint->GetWorld()->Iterations())
 {
   // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i).Ign());
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->angles.push_back(ignition::math::Angle(_joint->Position(i)));
 }
 
 /////////////////////////////////////////////////
@@ -73,8 +73,8 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
   this->wallTime = common::Time::GetWallTime();
 
   // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i).Ign());
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->angles.push_back(ignition::math::Angle(_joint->Position(i)));
 }
 
 /////////////////////////////////////////////////

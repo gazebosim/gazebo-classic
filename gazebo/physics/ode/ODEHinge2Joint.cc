@@ -19,6 +19,8 @@
  * Date: 21 May 2003
  */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -136,12 +138,13 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
+double ODEHinge2Joint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->jointId)
   {
+    /// \todo Return position of axis 1
     if (_index == 0)
       result = dJointGetHinge2Angle1(this->jointId);
   }

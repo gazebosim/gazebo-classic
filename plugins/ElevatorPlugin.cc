@@ -402,7 +402,7 @@ bool ElevatorPluginPrivate::DoorController::Update(
 
   double errorTarget = this->target == OPEN ? 1.0 : 0.0;
 
-  double doorError = this->doorJoint->GetAngle(0).Radian() -
+  double doorError = this->doorJoint->Position() -
     errorTarget;
 
   double doorForce = this->doorPID.Update(doorError,
@@ -451,7 +451,7 @@ bool ElevatorPluginPrivate::LiftController::Update(
     return false;
   }
 
-  double error = this->liftJoint->GetAngle(0).Radian() -
+  double error = this->liftJoint->Position() -
     (this->floor * this->floorHeight);
 
   double force = this->liftPID.Update(error, _info.simTime - this->prevSimTime);

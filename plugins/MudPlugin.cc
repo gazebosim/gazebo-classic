@@ -307,8 +307,8 @@ void MudPlugin::OnUpdate()
               (*iterJoint)->SetParam("stop_erp", 0, erp);
               (*iterJoint)->SetParam("stop_cfm", 0, cfm);
             }
-            (*iterJoint)->SetHighStop(0, 0.0);
-            (*iterJoint)->SetLowStop(0, 0.0);
+            (*iterJoint)->SetUpperLimit(0, 0.0);
+            (*iterJoint)->SetLowerLimit(0, 0.0);
 
             (*iterJoint)->Init();
           }

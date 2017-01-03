@@ -19,6 +19,7 @@
  * Date: 21 May 2003
  */
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -66,9 +67,9 @@ math::Vector3 ODESliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
+double ODESliderJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->jointId)
     result = dJointGetSliderPosition(this->jointId);
   else
