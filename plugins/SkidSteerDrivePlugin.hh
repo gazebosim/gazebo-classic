@@ -62,9 +62,6 @@ namespace gazebo
     /// \brief Gazebo topic subscriber
     private: transport::SubscriberPtr velSub;
 
-    /// \brief Ignition node for subscriber
-    private: ignition::transport::Node nodeIgn;
-
     /// \brief Pointer to the model which this plugin is attached
     private: physics::ModelPtr model;
 
@@ -76,6 +73,12 @@ namespace gazebo
 
     /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for subscriber
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

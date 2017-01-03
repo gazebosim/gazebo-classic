@@ -131,6 +131,9 @@ namespace gazebo
     /// \brief Subscribe to keyboard messages.
     private: transport::SubscriberPtr keyboardSub;
 
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
     /// \brief Ignition node for communication.
     private: ignition::transport::Node nodeIgn;
   };

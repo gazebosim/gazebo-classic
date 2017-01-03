@@ -56,8 +56,6 @@ namespace gazebo
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
 
-    private: ignition::transport::Node nodeIgn;
-
     private: double frontPower, rearPower;
     private: double maxSpeed;
     private: double wheelRadius;
@@ -68,6 +66,12 @@ namespace gazebo
 
     private: double aeroLoad;
     private: double swayForce;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Transport Node for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

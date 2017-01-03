@@ -93,6 +93,9 @@ namespace gazebo
     /// \brief To publish model modify messages.
     private: transport::PublisherPtr modelModifyPub;
 
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
     /// \brief Node for communication.
     private: ignition::transport::Node nodeIgn;
 

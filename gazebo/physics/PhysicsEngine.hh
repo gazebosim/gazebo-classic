@@ -265,12 +265,6 @@ namespace gazebo
       /// \brief Subscribe to the request topic.
       protected: transport::SubscriberPtr requestSub;
 
-      /// \brief Ignition node for communication.
-      protected: ignition::transport::Node nodeIgn;
-
-      /// \brief Response publisher.
-      protected: ignition::transport::Node::Publisher responsePubIgn;
-
       /// \brief Mutex to protect the update cycle.
       protected: boost::recursive_mutex *physicsUpdateMutex;
 
@@ -286,6 +280,15 @@ namespace gazebo
 
       /// \brief Real time update rate.
       protected: double maxStepSize;
+
+      // Place ignition::tranport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Response publisher.
+      protected: ignition::transport::Node::Publisher responsePubIgn;
     };
     /// \}
   }

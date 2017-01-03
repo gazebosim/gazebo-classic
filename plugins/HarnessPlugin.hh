@@ -131,6 +131,9 @@ namespace gazebo
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
     /// \brief Ignition Communication node
     private: ignition::transport::Node nodeIgn;
   };

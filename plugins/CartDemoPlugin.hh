@@ -43,9 +43,6 @@ namespace gazebo
 
     private: transport::NodePtr node;
 
-    /// \brief Ignition communication node
-    private: ignition::transport::Node nodeIgn;
-
     private: event::ConnectionPtr updateConnection;
 
     private: physics::ModelPtr model;
@@ -57,6 +54,12 @@ namespace gazebo
     private: double jointMaxEfforts[NUM_JOINTS];
 
     private: common::Time prevUpdateTime;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition communication node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

@@ -285,9 +285,6 @@ namespace gazebo
     /// \brief Node for communication
     public: transport::NodePtr node;
 
-    /// \brief Ignition node for communication
-    public: ignition::transport::Node nodeIgn;
-
     /// \brief Used to subscribe to command message. This will call the
     /// OnElevator function when a message arrives.
     public: transport::SubscriberPtr elevatorSub;
@@ -306,6 +303,12 @@ namespace gazebo
 
     /// \brief Time to hold the door in the open state.
     public: common::Time doorWaitTime;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

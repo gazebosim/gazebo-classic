@@ -75,11 +75,14 @@ namespace gazebo
     /// \brief Subscriber to the activation topic.
     public: transport::SubscriberPtr activationSub;
 
-    /// \brief Ignition node for communication.
-    public: ignition::transport::Node nodeIgn;
-
     /// \brief Mutex to protect pad data.
     public: std::mutex padMutex;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

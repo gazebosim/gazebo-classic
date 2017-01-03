@@ -332,15 +332,6 @@ namespace gazebo
       /// \brief Request publisher.
       protected: transport::PublisherPtr requestPub;
 
-      /// \brief Ignition communication node.
-      protected: ignition::transport::Node nodeIgn;
-
-      /// \brief Visual publisher.
-      protected: ignition::transport::Node::Publisher visPubIgn;
-
-      /// \brief Request publisher.
-      protected: ignition::transport::Node::Publisher requestPubIgn;
-
       /// \brief Visual message container.
       protected: msgs::Visual *visualMsg;
 
@@ -377,9 +368,6 @@ namespace gazebo
       /// \brief Pose publisher.
       private: transport::PublisherPtr posePub;
 
-      /// \brief Ignition Pose publisher.
-      private: ignition::transport::Node::Publisher posePubIgn;
-
       /// \brief Pose subscriber.
       private: transport::SubscriberPtr poseSub;
 
@@ -389,6 +377,21 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
                    const bool, const bool);
+
+      // Place ignition::tranport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition communication node.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Visual publisher.
+      protected: ignition::transport::Node::Publisher visPubIgn;
+
+      /// \brief Request publisher.
+      protected: ignition::transport::Node::Publisher requestPubIgn;
+
+      /// \brief Ignition Pose publisher.
+      private: ignition::transport::Node::Publisher posePubIgn;
     };
     /// \}
   }

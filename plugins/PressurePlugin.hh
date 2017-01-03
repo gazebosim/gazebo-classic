@@ -69,12 +69,6 @@ namespace gazebo
     /// \brief Publisher of tactile messages.
     private: transport::PublisherPtr tactilePub;
 
-    /// \brief Ignition transport node used for publishing tactile messages.
-    private: ignition::transport::Node nodeIgn;
-
-    /// \brief Ignition publisher of tactile messages.
-    private: ignition::transport::Node::Publisher tactilePubIgn;
-
     /// \brief World name.
     private: std::string worldName;
 
@@ -83,6 +77,15 @@ namespace gazebo
 
     /// \brief Parent sensor collision names.
     private: std::map<std::string, double> collisionNamesToArea;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for publishing tactile messages.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher of tactile messages.
+    private: ignition::transport::Node::Publisher tactilePubIgn;
   };
 }
 #endif

@@ -58,9 +58,6 @@ namespace gazebo
     /// \brief Subscribe pointer.
     private: transport::SubscriberPtr hydraSub;
 
-    /// \brief Ignition node used for communication.
-    private: ignition::transport::Node nodeIgn;
-
     /// \brief Pointer to the update event connection
     private: event::ConnectionPtr updateConnection;
 
@@ -69,6 +66,12 @@ namespace gazebo
 
     /// \brief Store the last message from hydra.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node used for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

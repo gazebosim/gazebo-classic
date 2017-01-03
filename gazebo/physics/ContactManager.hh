@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _CONTACTMANAGER_HH_
-#define _CONTACTMANAGER_HH_
+#ifndef GAZEBO_PHYSICS_CONTACTMANAGER_HH_
+#define GAZEBO_PHYSICS_CONTACTMANAGER_HH_
 
 #include <vector>
 #include <string>
@@ -44,9 +44,6 @@ namespace gazebo
       /// \brief Contact message publisher
       public: transport::PublisherPtr publisher;
 
-      /// \brief Ignition contact message publisher
-      public: ignition::transport::Node::Publisher publisherIgn;
-
       /// \brief Pointers of collisions monitored by contact manager for
       /// contacts.
       public: boost::unordered_set<Collision *> collisions;
@@ -58,6 +55,12 @@ namespace gazebo
 
       /// \brief A list of contacts associated to the collisions.
       public: std::vector<Contact *> contacts;
+
+      // Place ignition::tranport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition contact message publisher
+      public: ignition::transport::Node::Publisher publisherIgn;
     };
 
     /// \addtogroup gazebo_physics
@@ -171,12 +174,6 @@ namespace gazebo
       /// \brief Contact publisher.
       private: transport::PublisherPtr contactPub;
 
-      /// \brief Ignition node for communication.
-      private: ignition::transport::Node nodeIgn;
-
-      /// \brief Contact publisher.
-      private: ignition::transport::Node::Publisher contactPubIgn;
-
       /// \brief Pointer to the world.
       private: WorldPtr world;
 
@@ -187,6 +184,15 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of custom publishers.
       private: boost::recursive_mutex *customMutex;
+
+      // Place ignition::tranport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Contact publisher.
+      private: ignition::transport::Node::Publisher contactPubIgn;
     };
     /// \}
   }

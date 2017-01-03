@@ -119,12 +119,6 @@ namespace gazebo
     /// \brief Publisher pointer.
     private: transport::PublisherPtr statePub;
 
-    /// \brief Ignition node used for using Gazebo communications.
-    private: ignition::transport::Node nodeIgn;
-
-    /// \brief Ignition Publisher.
-    private: ignition::transport::Node::Publisher statePubIgn;
-
     /// \brief Pointer to the model;
     private: physics::ModelPtr model;
 
@@ -148,6 +142,15 @@ namespace gazebo
 
     /// \brief Controller update mutex.
     private: std::mutex mutex;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node used for using Gazebo communications.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition Publisher.
+    private: ignition::transport::Node::Publisher statePubIgn;
   };
 }
 #endif

@@ -53,10 +53,6 @@ namespace gazebo
     /// \brief Subscriber to contact sensor messages.
     private: transport::SubscriberPtr contactSub;
 
-    /// \brief Ignition transport node used for subscribing to
-    /// contact sensor messages.
-    private: ignition::transport::Node nodeIgn;
-
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
 
@@ -113,6 +109,13 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for subscribing to
+    /// contact sensor messages.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

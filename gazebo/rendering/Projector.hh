@@ -109,9 +109,6 @@ namespace gazebo
       private: transport::NodePtr node;
       private: transport::SubscriberPtr controlSub;
 
-      /// \brief Ignition transport node.
-      private: ignition::transport::Node nodeIgn;
-
       /// \cond
       /// \class ProjectorFrameListener Projector.hh rendering/rendering.hh
       /// \brief Frame listener, used to add projection materials when new
@@ -179,6 +176,12 @@ namespace gazebo
 
       /// \brief The projection frame listener.
       private: ProjectorFrameListener projector;
+
+      // Place ignition::tranport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition transport node.
+      private: ignition::transport::Node nodeIgn;
     };
     /// \}
   }

@@ -39,9 +39,6 @@ namespace gazebo
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
 
-    /// \brief Ignition transport node
-    private: ignition::transport::Node nodeIgn;
-
     private: physics::ModelPtr model;
     private: physics::JointPtr leftJoint, rightJoint;
     private: event::ConnectionPtr updateConnection;
@@ -51,6 +48,12 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

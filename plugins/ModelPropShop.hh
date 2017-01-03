@@ -63,15 +63,6 @@ namespace gazebo
     /// \brief Publisher used to spawn the model.
     private: transport::PublisherPtr factoryPub;
 
-    /// \brief Ignition node for communication.
-    private: ignition::transport::Node nodeIgn;
-
-    /// \brief Ignition publisher used to stop the server.
-    private: ignition::transport::Node::Publisher pubIgn;
-
-    /// \brief Ignition publisher used to spawn the model.
-    private: ignition::transport::Node::Publisher factoryPubIgn;
-
     /// \brief Pointer to the scene.
     private: rendering::ScenePtr scene;
 
@@ -89,6 +80,18 @@ namespace gazebo
 
     /// \brief Path in which to save the output images.
     private: boost::filesystem::path savePath;
+
+    // Place ignition::tranport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher used to stop the server.
+    private: ignition::transport::Node::Publisher pubIgn;
+
+    /// \brief Ignition publisher used to spawn the model.
+    private: ignition::transport::Node::Publisher factoryPubIgn;
   };
 }
 
