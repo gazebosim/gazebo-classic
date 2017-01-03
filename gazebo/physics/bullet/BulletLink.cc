@@ -164,7 +164,7 @@ void BulletLink::Init()
 
   // Setup motion clamping to prevent objects from moving too fast.
   // this->rigidLink->setCcdMotionThreshold(1);
-  // math::Vector3 size = this->GetBoundingBox().GetSize();
+  // auto size = this->BoundingBox().Size();
   // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
   if (mass <= 0.0)
@@ -394,7 +394,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset) const
     return math::Vector3(0, 0, 0);
   }
 
-  math::Pose wPose = this->GetWorldPose();
+  math::Pose wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 offsetFromCoG = wPose.rot*(_offset - this->inertial->GetCoG());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
@@ -415,7 +415,7 @@ math::Vector3 BulletLink::GetWorldLinearVel(const math::Vector3 &_offset,
     return math::Vector3(0, 0, 0);
   }
 
-  math::Pose wPose = this->GetWorldPose();
+  math::Pose wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   math::Vector3 offsetFromCoG = _q*_offset
         - wPose.rot*this->inertial->GetCoG();

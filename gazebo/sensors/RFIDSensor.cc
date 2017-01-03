@@ -127,7 +127,7 @@ bool RFIDSensor::UpdateImpl(const bool /*_force*/)
   if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
+    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);
   }
 
@@ -156,7 +156,7 @@ bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var
   ignition::math::Vector3d v;
-  v = _pose.Pos() - this->dataPtr->entity->GetWorldPose().Ign().Pos();
+  v = _pose.Pos() - this->dataPtr->entity->WorldPose().Pos();
 
   // std::cout << v.GetLength() << std::endl;
 

@@ -41,15 +41,16 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _x value along x
       /// \param[in] _y value along y
-      public: Vector2i(const int &_x, const int &_y);
+      public: Vector2i(const int &_x, const int &_y) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param[in] _pt a point
-      public: Vector2i(const Vector2i &_pt);
+      public: Vector2i(const Vector2i &_pt) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor for ignition math
       /// \param[in] _pt a point
-      public: Vector2i(const ignition::math::Vector2i &_pt);
+      public: Vector2i(const ignition::math::Vector2i &_pt)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Vector2i();

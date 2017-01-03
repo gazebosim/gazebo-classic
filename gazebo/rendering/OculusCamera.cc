@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -24,8 +25,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Events.hh"
-
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/selection_buffer/SelectionBuffer.hh"
@@ -307,10 +306,10 @@ bool OculusCamera::AttachToVisualImpl(VisualPtr _visual,
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
-    math::Pose origPose = this->WorldPose();
+    ignition::math::Pose3d origPose = this->WorldPose();
     double yaw = _visual->WorldPose().Rot().Euler().Z();
 
-    double zDiff = origPose.pos.z - _visual->WorldPose().Pos().Z();
+    double zDiff = origPose.Pos().Z() - _visual->WorldPose().Pos().Z();
     double pitch = 0;
 
     if (fabs(zDiff) > 1e-3)

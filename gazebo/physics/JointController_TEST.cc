@@ -62,11 +62,11 @@ class FakeJoint : public physics::Joint
   public: virtual math::Vector3 GetAnchor(unsigned int) const
           {return math::Vector3::Zero;}
 
-  public: virtual math::Angle GetHighStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual double UpperLimit(unsigned int) const
+          {return 0.0;}
 
-  public: virtual math::Angle GetLowStop(unsigned int)
-          {return math::Angle::Zero;}
+  public: virtual double LowerLimit(unsigned int) const
+          {return 0.0;}
 
   public: virtual void SetVelocity(unsigned int, double)
           {}
@@ -80,7 +80,7 @@ class FakeJoint : public physics::Joint
   public: virtual physics::JointWrench GetForceTorque(unsigned int)
           {return physics::JointWrench();}
 
-  public: virtual unsigned int GetAngleCount() const
+  public: virtual unsigned int DOF() const
           {return 0;}
 
   public: virtual math::Vector3 GetLinkForce(unsigned int) const
@@ -104,9 +104,8 @@ class FakeJoint : public physics::Joint
   public: virtual double GetParam(const std::string &, unsigned int)
           {return 0.0;}
 
-  protected: virtual math::Angle GetAngleImpl(
-                 unsigned int) const
-          {return math::Angle::Zero;}
+  protected: virtual double PositionImpl(unsigned int) const
+          {return 0.0;}
 };
 
 /////////////////////////////////////////////////

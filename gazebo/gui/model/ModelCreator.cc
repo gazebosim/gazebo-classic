@@ -2012,7 +2012,7 @@ bool ModelCreator::OnMousePress(const common::MouseEvent &_event)
     return true;
   }
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos());
   if (vis)
   {
     if (!vis->IsPlane() && gui::get_entity_id(vis->GetRootVisual()->Name()))
@@ -2142,7 +2142,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     return false;
 
   // mouse selection and context menu events
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos());
   if (vis)
   {
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
@@ -2381,7 +2381,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 
   if (!this->dataPtr->mouseVisual)
   {
-    rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos());
+    rendering::VisualPtr vis = userCamera->Visual(_event.Pos());
     if (vis && !vis->IsPlane())
     {
       rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
@@ -2435,7 +2435,7 @@ bool ModelCreator::OnMouseMove(const common::MouseEvent &_event)
 bool ModelCreator::OnMouseDoubleClick(const common::MouseEvent &_event)
 {
   // open the link inspector on double click
-  rendering::VisualPtr vis = gui::get_active_camera()->GetVisual(_event.Pos());
+  rendering::VisualPtr vis = gui::get_active_camera()->Visual(_event.Pos());
   if (!vis)
     return false;
 

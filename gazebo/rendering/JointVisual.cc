@@ -123,6 +123,13 @@ void JointVisual::Load(ConstJointPtr &_msg)
 /////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 {
+  this->Load(_msg, _worldPose.Ign());
+}
+
+/////////////////////////////////////////////////
+void JointVisual::Load(ConstJointPtr &_msg,
+    const ignition::math::Pose3d &_worldPose)
+{
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
@@ -133,7 +140,7 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
-  this->SetWorldPose(_worldPose.Ign());
+  this->SetWorldPose(_worldPose);
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -142,6 +149,13 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
 /////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
     bool _useParentFrame, msgs::Joint::Type _type)
+{
+  return this->CreateAxis(_axis.Ign(), _useParentFrame, _type);
+}
+
+/////////////////////////////////////////////////
+ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame, const msgs::Joint::Type &_type)
 {
   ArrowVisualPtr axis;
 
@@ -161,11 +175,20 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
     const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
 {
+  this->UpdateAxis(_arrowVisual, _axis.Ign(), _useParentFrame, _type);
+}
+
+/////////////////////////////////////////////////
+void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
+    const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame,
+    const msgs::Joint::Type &_type)
+{
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   // Get rotation to axis vector
-  ignition::math::Vector3d axisDir = _axis.Ign();
+  ignition::math::Vector3d axisDir = _axis;
   ignition::math::Vector3d u = axisDir.Normalize();
   ignition::math::Vector3d v = ignition::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);

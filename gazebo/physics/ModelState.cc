@@ -35,7 +35,7 @@ ModelState::ModelState(const ModelPtr _model, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 : State(_model->GetName(), _realTime, _simTime, _iterations)
 {
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Copy all the links
@@ -68,7 +68,7 @@ ModelState::ModelState(const ModelPtr _model)
 : State(_model->GetName(), _model->GetWorld()->RealTime(),
         _model->GetWorld()->SimTime(), _model->GetWorld()->Iterations())
 {
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Copy all the links
@@ -117,7 +117,7 @@ void ModelState::Load(const ModelPtr _model, const common::Time &_realTime,
   this->realTime = _realTime;
   this->simTime = _simTime;
   this->iterations = _iterations;
-  this->pose = _model->GetWorldPose();
+  this->pose = _model->WorldPose();
   this->scale = _model->Scale();
 
   // Load all the links
@@ -165,7 +165,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -219,7 +219,13 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose &ModelState::GetPose() const
+const math::Pose ModelState::GetPose() const
+{
+  return this->Pose();
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &ModelState::Pose() const
 {
   return this->pose;
 }
@@ -252,7 +258,7 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero &&
+  return result && this->pose == ignition::math::Pose3d::Zero &&
       this->scale == ignition::math::Vector3d::Zero;
 }
 
@@ -439,8 +445,8 @@ ModelState ModelState::operator-(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
   result.scale = this->scale - _state.scale;
 
   // Insert the link state diffs.
@@ -514,8 +520,8 @@ ModelState ModelState::operator+(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
   result.scale = this->scale + _state.scale;
 
   // Insert the link state diffs.

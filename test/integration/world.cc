@@ -75,7 +75,7 @@ void beforePhysicsUpdate(const common::UpdateInfo &_updateInfo)
   physics::LinkPtr link = sphereModel->GetLink("link");
   ASSERT_TRUE(link != NULL);
 
-  g_poseBeforeUpdate = link->GetWorldPose().Ign();
+  g_poseBeforeUpdate = link->WorldPose();
 }
 
 /// \brief Callback for WorldUpdateEnd event, just records it's been called.
@@ -108,7 +108,8 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
   EXPECT_EQ(world->ModelCount(), 0u);
 
   // Now spawn something, and the model count should increase
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d(0, 0, 0));
   EXPECT_EQ(world->ModelCount(), 1u);
 }
 
@@ -133,7 +134,8 @@ TEST_F(WorldTest, Clear)
 
   EXPECT_EQ(world->ModelCount(), 0u);
 
-  SpawnSphere("sphere", math::Vector3(0, 0, 1), math::Vector3(0, 0, 0));
+  SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
+      ignition::math::Vector3d(0, 0, 0));
 
   EXPECT_EQ(world->ModelCount(), 1u);
 }
@@ -160,7 +162,7 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
   // get initial pose and velocity of a box
   auto model = world->ModelByName("box_01_model");
   ASSERT_TRUE(model != NULL);
-  auto initialPose = model->GetWorldPose().Ign();
+  auto initialPose = model->WorldPose();
   auto initialVelocity = model->GetWorldLinearVel().Ign();
   EXPECT_EQ(ignition::math::Vector3d::Zero, initialVelocity);
 
@@ -171,7 +173,7 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
   auto velocity = model->GetWorldLinearVel().Ign();
   auto expectedPosition = initialPose.Pos() + 0.5*(dt*steps) * expectedVelocity;
   EXPECT_GT(velocity.Z(), 0.95*expectedVelocity.Z());
-  EXPECT_GT(model->GetWorldPose().Ign().Pos().Z(), 0.95*expectedPosition.Z());
+  EXPECT_GT(model->WorldPose().Pos().Z(), 0.95*expectedPosition.Z());
 
   // set gravity back to zero
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -518,7 +520,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
   world->Step(10);
 
   // initial pose of the link
-  ignition::math::Pose3d initialPose = link->GetWorldPose().Ign();
+  ignition::math::Pose3d initialPose = link->WorldPose();
 
   // connect to the world events
   event::ConnectionPtr worldUpdateBeginEventConnection =
@@ -544,7 +546,7 @@ TEST_F(WorldTest, CheckWorldEventsWork)
     world->Step(1);
 
     // pose after the physics update
-    ignition::math::Pose3d poseAfterUpdate = link->GetWorldPose().Ign();
+    ignition::math::Pose3d poseAfterUpdate = link->WorldPose();
 
     // initial pose and pose before physics update should be the same
     EXPECT_EQ(initialPose.Pos(), g_poseBeforeUpdate.Pos());

@@ -19,6 +19,8 @@
  * Date: k13 Oct 2009
  */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/ode/ODEBallJoint.hh"
@@ -89,9 +91,10 @@ double ODEBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double ODEBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  return math::Angle(0);
+  gzerr << "ODEBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -102,31 +105,29 @@ void ODEBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetHighStop(unsigned int /*_index*/)
+double ODEBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "ODEBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "ODEBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEBallJoint::GetLowStop(unsigned int /*_index*/)
+double ODEBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "ODEBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "ODEBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-bool ODEBallJoint::SetHighStop(unsigned int /*_index*/,
-                               const math::Angle &/*_angle*/)
+void ODEBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                 const double /*_limit*/)
 {
-  gzerr << "ODEBallJoint::SetHighStop not implemented" << std::endl;
-  return false;
+  gzerr << "ODEBallJoint::SetUpperLimit not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-bool ODEBallJoint::SetLowStop(unsigned int /*_index*/,
-                              const math::Angle &/*_angle*/)
+void ODEBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                 const double /*_limit*/)
 {
-  gzerr << "ODEBallJoint::SetLowStop not implemented" << std::endl;
-  return false;
+  gzerr << "ODEBallJoint::SetLowerLimit not implemented" << std::endl;
 }

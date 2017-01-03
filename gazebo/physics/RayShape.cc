@@ -83,11 +83,11 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   if (this->collisionParent)
   {
     this->globalStartPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeStartPos);
+      this->collisionParent->WorldPose().CoordPositionAdd(
+        this->relativeStartPos.Ign());
     this->globalEndPos =
-      this->collisionParent->GetWorldPose().CoordPositionAdd(
-        this->relativeEndPos);
+      this->collisionParent->WorldPose().CoordPositionAdd(
+        this->relativeEndPos.Ign());
   }
   else
   {

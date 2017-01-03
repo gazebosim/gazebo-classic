@@ -14,15 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_USERCAMERA_HH_
-#define _GAZEBO_USERCAMERA_HH_
+#ifndef GAZEBO_RENDERING_USERCAMERA_HH_
+#define GAZEBO_RENDERING_USERCAMERA_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector2i.hh"
-
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -62,7 +63,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(const float _near, const float _far);
       using Camera::SetClipDist;
 
       /// \brief Generic load function
@@ -93,6 +94,8 @@ namespace gazebo
       public: void Fini();
 
       // Documentation inherited.
+      /// \deprecated See verison that accepts an ignition::math::Pose3d
+      /// object.
       public: virtual void SetWorldPose(const math::Pose &_pose)
               GAZEBO_DEPRECATED(8.0);
 
@@ -102,11 +105,23 @@ namespace gazebo
       /// \brief Set the default pose in the world coordinate frame and set
       /// that as the current camera world pose.
       /// \param[in] _pose New default pose of the camera.
-      public: void SetDefaultPose(const math::Pose &_pose);
+      /// \deprecated See SetInitialPose
+      public: void SetDefaultPose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the initial pose in the world coordinate frame and set
+      /// that as the current camera world pose.
+      /// \param[in] _pose New default pose of the camera.
+      public: void SetInitialPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the default pose in the world coordinate frame.
       /// \return Default pose of the camera.
-      public: math::Pose DefaultPose() const;
+      /// \deprecated See InitialPose
+      public: math::Pose DefaultPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the initial pose in the world coordinate frame.
+      /// \return Initial pose of the camera.
+      public: ignition::math::Pose3d InitialPose() const;
 
       /// \brief Handle a mouse event.
       /// \param[in] _evt The mouse event.
@@ -128,7 +143,15 @@ namespace gazebo
       /// \param[in] _type The type of view controller: "orbit", "fps"
       /// \param[in] _pos The initial pose of the camera.
       public: void SetViewController(const std::string &_type,
-                                     const math::Vector3 &_pos);
+                                     const ignition::math::Vector3d &_pos);
+
+
+      /// \brief Set view controller
+      /// \param[in] _type The type of view controller: "orbit", "fps"
+      /// \param[in] _pos The initial pose of the camera.
+      /// \deprecated See function that uses ignition::math::Vector3d
+      public: void SetViewController(const std::string &_type,
+                            const math::Vector3 &_pos) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get current view controller type.
       /// \return Type of the current view controller: "orbit", "fps"
@@ -173,16 +196,42 @@ namespace gazebo
       /// \param[in] _mousePos The position of the mouse in screen coordinates
       /// \param[out] _mod Used for object manipulation
       /// \return The selected entity, or NULL
+      /// \deprecated See version that accepts an ignition::math::Vector2i
+      /// object
       public: VisualPtr GetVisual(const math::Vector2i &_mousePos,
-                                  std::string &_mod);
+                  std::string &_mod) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a visual at a mouse position
       /// \param[in] _mousePos 2D position of the mouse in pixels.
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const;
+      /// \deprecated See version that accepts an ignition::math::Vector2i
+      /// object
+      public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the point the camera should orbit around.
       /// \param[in] _pt The focal point
-      public: void SetFocalPoint(const math::Vector3 &_pt);
+      /// \deprecated See version that accepts an ignition::math::Vector3
+      /// object
+      public: void SetFocalPoint(const math::Vector3 &_pt)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get an entity at a pixel location using a camera. Used for
+      /// mouse picking.
+      /// \param[in] _mousePos The position of the mouse in screen coordinates
+      /// \param[out] _mod Used for object manipulation
+      /// \return The selected entity, or NULL
+      public: VisualPtr Visual(const ignition::math::Vector2i &_mousePos,
+                  std::string &_mod) const;
+
+      /// \brief Get a visual at a mouse position
+      /// \param[in] _mousePos 2D position of the mouse in pixels.
+      /// \return The selected entity, or NULL
+      public: VisualPtr Visual(
+                  const ignition::math::Vector2i &_mousePos) const;
+
+      /// \brief Set the point the camera should orbit around.
+      /// \param[in] _pt The focal point
+      public: void SetFocalPoint(const ignition::math::Vector3d &_pt);
 
       // Documentation inherited
       public: virtual unsigned int GetImageWidth() const;
@@ -238,8 +287,8 @@ namespace gazebo
       /// visual.
       /// \return True if successfully attach to the visual.
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
-                     bool _inheritOrientation, double _minDist = 0,
-                     double _maxDist = 0);
+                     const bool _inheritOrientation, const double _minDist = 0,
+                     const double _maxDist = 0);
       using Camera::AttachToVisualImpl;
 
       // Documentation inherited.

@@ -59,18 +59,18 @@ namespace gazebo
                   const double _damping);
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;
@@ -82,7 +82,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

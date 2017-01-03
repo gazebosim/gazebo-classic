@@ -156,8 +156,8 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->GetWorldPose();
-    math::Pose body2Pose = link2->GetWorldPose();
+    math::Pose body1Pose = link1->WorldPose();
+    math::Pose body2Pose = link2->WorldPose();
     math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
     math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
     math::Vector3 localForce1;

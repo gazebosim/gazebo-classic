@@ -19,6 +19,10 @@
 
 #include "gazebo/math/Box.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class BoxTest : public ::testing::Test { };

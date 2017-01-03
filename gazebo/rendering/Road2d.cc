@@ -184,9 +184,9 @@ void RoadSegment::Load(msgs::Road _msg)
 
   ignition::math::Vector3d pA, pB, tangent;
 
-  math::Box bounds;
-  bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
+  ignition::math::Box bounds;
+  bounds.Min().Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
+  bounds.Max().Set(IGN_DBL_MIN, IGN_DBL_MIN, IGN_DBL_MIN);
 
   // length for each texture tile, same as road width as texture is square
   // (if texture size should change or made custom in a future version
@@ -250,11 +250,11 @@ void RoadSegment::Load(msgs::Road _msg)
     pB.X() -= cos(theta) * w;
     pB.Y() -= sin(theta) * w;
 
-    bounds.min.SetToMin(pA);
-    bounds.min.SetToMin(pB);
+    bounds.Min().Min(pA);
+    bounds.Min().Min(pB);
 
-    bounds.max.SetToMax(pA);
-    bounds.max.SetToMax(pB);
+    bounds.Max().Max(pA);
+    bounds.Max().Max(pB);
 
     // Position
     *vertices++ = pA.X();
@@ -293,8 +293,8 @@ void RoadSegment::Load(msgs::Road _msg)
   vBuf->unlock();
   iBuf->unlock();
 
-  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.min.Ign()),
-                   Conversions::Convert(bounds.max.Ign())));
+  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.Min()),
+                   Conversions::Convert(bounds.Max())));
 
   if (_msg.has_material())
   {

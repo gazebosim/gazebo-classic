@@ -139,7 +139,7 @@ void JointController::Update()
            iter != this->dataPtr->positions.end(); ++iter)
       {
         double cmd = this->dataPtr->posPids[iter->first].Update(
-            this->dataPtr->joints[iter->first]->GetAngle(0).Radian() -
+            this->dataPtr->joints[iter->first]->Position(0) -
             iter->second, stepTime);
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
@@ -171,7 +171,7 @@ void JointController::Update()
           this->dataPtr->positions.end())
       {
         this->dataPtr->positions[iter->first] =
-          iter->second->GetAngle(0).Radian();
+          iter->second->Position(0);
       }
     }
     this->SetJointPositions(this->dataPtr->positions);

@@ -438,13 +438,13 @@ void ODEPhysics::UpdatePhysics()
 
         // set force torque in link frame
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(f1.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(f2.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(t1.Ign());
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(t2.Ign());
       }
     }
   }
@@ -1114,7 +1114,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   if (fd != ignition::math::Vector3d::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd = _collision1->GetWorldPose().rot.Ign().RotateVector(fd);
+    fd = _collision1->WorldPose().Rot().RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -1131,7 +1131,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
         surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd2 = _collision2->GetWorldPose().rot.Ign().RotateVector(fd2);
+    fd2 = _collision2->WorldPose().Rot().RotateVector(fd2);
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
@@ -1350,7 +1350,7 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->GetWorldPose();
+    math::Pose pose = link->WorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
     math::Vector3 dpos(pos[0], pos[1], pos[2]);
@@ -1373,7 +1373,7 @@ void ODEPhysics::DebugPrint() const
     {
       ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
 
-      pose = coll->GetWorldPose();
+      pose = coll->WorldPose();
       const dReal *gpos = dGeomGetPosition(g);
       const dReal *grot = dGeomGetRotation(g);
       dpos.Set(gpos[0], gpos[1], gpos[2]);
