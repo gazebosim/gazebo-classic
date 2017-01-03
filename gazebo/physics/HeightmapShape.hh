@@ -178,7 +178,7 @@ namespace gazebo
       private: common::Dem dem;
       #endif
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Ignition transportation node.

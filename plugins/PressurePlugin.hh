@@ -78,7 +78,7 @@ namespace gazebo
     /// \brief Parent sensor collision names.
     private: std::map<std::string, double> collisionNamesToArea;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition transport node used for publishing tactile messages.

@@ -143,7 +143,7 @@ namespace gazebo
     /// \brief Controller update mutex.
     private: std::mutex mutex;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition node used for using Gazebo communications.

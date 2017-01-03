@@ -56,7 +56,7 @@ namespace gazebo
       /// \brief A list of contacts associated to the collisions.
       public: std::vector<Contact *> contacts;
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Ignition contact message publisher
@@ -185,7 +185,7 @@ namespace gazebo
       /// \brief Mutex to protect the list of custom publishers.
       private: boost::recursive_mutex *customMutex;
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Ignition node for communication.

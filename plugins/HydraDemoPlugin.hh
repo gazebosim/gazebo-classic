@@ -67,7 +67,7 @@ namespace gazebo
     /// \brief Store the last message from hydra.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition node used for communication.

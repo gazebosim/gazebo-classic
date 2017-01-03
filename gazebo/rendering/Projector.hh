@@ -177,7 +177,7 @@ namespace gazebo
       /// \brief The projection frame listener.
       private: ProjectorFrameListener projector;
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Ignition transport node.

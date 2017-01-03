@@ -74,7 +74,7 @@ namespace gazebo
     /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition node for subscriber

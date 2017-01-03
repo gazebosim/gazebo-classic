@@ -144,7 +144,7 @@ namespace gazebo
     /// bottom. Only needed for negative positions.
     private: int posY;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition Node used to establish communication with gzserver.

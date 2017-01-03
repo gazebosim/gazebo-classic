@@ -378,7 +378,7 @@ namespace gazebo
       private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
                    const bool, const bool);
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Ignition communication node.

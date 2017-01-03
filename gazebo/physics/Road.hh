@@ -76,7 +76,7 @@ namespace gazebo
       /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
 
-      // Place ignition::tranport objects at the end of this file to
+      // Place ignition::transport objects at the end of this file to
       // guarantee they are destructed first.
 
       /// \brief Transportation node.

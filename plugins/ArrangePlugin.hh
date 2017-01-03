@@ -108,7 +108,7 @@ namespace gazebo
     /// \brief Subscriber for listening to changing arrangements.
     protected: transport::SubscriberPtr sub;
 
-    // Place ignition::tranport objects at the end of this file to
+    // Place ignition::transport objects at the end of this file to
     // guarantee they are destructed first.
 
     /// \brief Ignition node for Gazebo transport.
