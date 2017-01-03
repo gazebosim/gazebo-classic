@@ -35,7 +35,7 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
 @set IGNITION-MSGS_PATH=%cd%\..\..\ign-msgs\build\install\%build_type%
 @set IGNITION-TRANSPORT_PATH=%cd%\..\..\ign-transport\build\install\%build_type%
-@set IGNITION-TRANSPORT_CMAKE_PREFIX_PATH=%IGNITION-TRANSPORT_PATH%\lib\cmake\ignition-transport1
+@set IGNITION-TRANSPORT_CMAKE_PREFIX_PATH=%IGNITION-TRANSPORT_PATH%\lib\cmake\ignition-transport3
 
 @set TBB_PATH=%cd%\..\..\tbb43_20141023oss
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
