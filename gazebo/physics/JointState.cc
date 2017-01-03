@@ -85,7 +85,7 @@ void JointState::Load(const sdf::ElementPtr _elem)
 
   // Set the positions
   this->positions.clear();
-  if (_elem->HasElement("position"))
+  if (_elem->HasElement("angle"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("angle");
     while (childElem)
