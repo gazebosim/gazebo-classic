@@ -492,7 +492,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   if (this->audioSink)
   {
     this->audioSink->SetPose(this->WorldPose());
-    this->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
+    this->audioSink->SetVelocity(this->WorldLinearVel());
   }
 
   // Update all the audio sources
@@ -500,7 +500,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
       this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
   {
     (*iter)->SetPose(this->WorldPose());
-    (*iter)->SetVelocity(this->GetWorldLinearVel().Ign());
+    (*iter)->SetVelocity(this->WorldLinearVel());
   }
 #endif
 
