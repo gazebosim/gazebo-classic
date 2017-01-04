@@ -52,7 +52,7 @@ ignition::math::Vector3d ODEFixedJoint::Anchor(
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "Anchor that is not valid for joints of type fixed.\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ ignition::math::Vector3d ODEFixedJoint::GlobalAxis(
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GlobalAxis that is not valid for joints of type fixed.\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
