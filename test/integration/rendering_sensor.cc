@@ -111,7 +111,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   double rangeResolution = 0.02;
   unsigned int samples = 640;
   ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.1),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   SpawnGpuRaySensor(modelName3, raySensorName, testPose.Pos(),
       testPose.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,

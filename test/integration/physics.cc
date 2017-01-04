@@ -589,14 +589,14 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // Expect small linear velocity at contact point
       ignition::math::Vector3d vel3 = model->GetLink()->WorldLinearVel(
           ignition::math::Vector3d(0, 0, -radius),
-          ignition::math::Quaterniond(0, 0, 0));
+          ignition::math::Quaterniond::Identity);
       EXPECT_NEAR(vel3.X(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Y(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Z(), 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
       ignition::math::Vector3d vel4 = model->GetLink()->WorldLinearVel(
           ignition::math::Vector3d(0, 0, radius),
-          ignition::math::Quaterniond(0, 0, 0));
+          ignition::math::Quaterniond::Identity);
       EXPECT_NEAR(vel4.Y(), 2*vel1.Y(), PHYSICS_TOL);
       EXPECT_NEAR(vel4.X(), 2*vel1.X(), PHYSICS_TOL);
       EXPECT_NEAR(vel4.Z(), 0, PHYSICS_TOL);
@@ -918,7 +918,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
     // world->Step(100);  // integration error requires few more steps
 
     int steps = test_duration/dt;
-    bool post_contact_correction = false;
+    bool postContactCorrection = false;
 
     for (int i = 0; i < steps; ++i)
     {
@@ -939,7 +939,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //      << "] exact z [" << z
           //      << "] sim vz [" << vel.Z()
           //      << "] exact vz [" << v << "]\n";
-          if (z > 0.5 || !post_contact_correction)
+          if (z > 0.5 || !postContactCorrection)
           {
             EXPECT_LT(fabs(vel.Z() - v) , 0.0001);
             EXPECT_LT(fabs(pose.Pos().Z() - z) , 0.0001);
@@ -972,7 +972,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.Z()
           //       << "] exact vz [" << v << "]\n";
-          if (z > 0.5 || !post_contact_correction)
+          if (z > 0.5 || !postContactCorrection)
           {
             EXPECT_LT(fabs(vel.Z() - v), 0.0001);
             EXPECT_LT(fabs(pose.Pos().Z() - z), 0.0001);
@@ -1005,7 +1005,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           //       << "] exact z [" << z
           //       << "] sim vz [" << vel.Z()
           //       << "] exact vz [" << v << "]\n";
-          if (z > 0.5 || !post_contact_correction)
+          if (z > 0.5 || !postContactCorrection)
           {
             EXPECT_LT(fabs(vel.Z() - v), 0.0001);
             EXPECT_LT(fabs(pose.Pos().Z() - z), 0.0001);
@@ -1027,7 +1027,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
           }
         }
       }
-      if (z < 0.5) post_contact_correction = true;
+      if (z < 0.5) postContactCorrection = true;
     }
   }
 }

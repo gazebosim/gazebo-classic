@@ -692,9 +692,9 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   double updateRate = 10;
 
   ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   ignition::math::Pose3d testPose2(ignition::math::Vector3d(0, 2, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   SpawnCamera(modelName, cameraName, testPose.Pos(),
       testPose.Rot().Euler(), width, height, updateRate);
   SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
@@ -702,7 +702,7 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 
   // Spawn a box in front of the cameras
   SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1),
-      ignition::math::Vector3d(4, 1, 0.5), ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d(4, 1, 0.5), ignition::math::Vector3d::Zero);
 
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =

@@ -426,7 +426,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     double mass = models[k]->GetLink()->GetInertial()->GetMass();
     expectedForce = models[k]->GetLink()->WorldCoGPose().Rot().Inverse()
         * ignition::math::Vector3d(0, 0, (gravityZ * mass));
-    expectedTorque = ignition::math::Vector3d(0, 0, 0);
+    expectedTorque = ignition::math::Vector3d::Zero;
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
