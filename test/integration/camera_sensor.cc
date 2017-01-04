@@ -77,7 +77,7 @@ TEST_F(CameraSensor, WorldReset)
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(
       ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -147,7 +147,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(
       ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   std::string sensorScopedName =
@@ -240,7 +240,7 @@ TEST_F(CameraSensor, CheckThrottle)
   unsigned int height = 240;  // 106 fps
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -291,7 +291,7 @@ TEST_F(CameraSensor, FillMsg)
   unsigned int height = 240;
   double updateRate = 0;
   ignition::math::Pose3d setPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -357,7 +357,7 @@ TEST_F(CameraSensor, UnlimitedTest)
   unsigned int height = 240;
   double updateRate = 0;
   ignition::math::Pose3d setPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -411,7 +411,7 @@ TEST_F(CameraSensor, MultiSenseHigh)
   unsigned int height = 1088;
   double updateRate = 25;
   math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -466,7 +466,7 @@ TEST_F(CameraSensor, MultiSenseLow)
   unsigned int height = 544;
   double updateRate = 25;
   math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -520,7 +520,7 @@ TEST_F(CameraSensor, CheckNoise)
   double noiseMean = 0.1;
   double noiseStdDev = 0.01;
   ignition::math::Pose3d setPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   SpawnCamera(modelNameNoisy, cameraNameNoisy, setPose.Pos(),
@@ -589,7 +589,7 @@ TEST_F(CameraSensor, CheckDistortion)
   double updateRate = 10;
 
   ignition::math::Pose3d setPose(ignition::math::Vector3d(-5, 0, 5),
-      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
   // spawn a camera with barrel distortion

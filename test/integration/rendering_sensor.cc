@@ -76,7 +76,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   unsigned int height = 800;
   double updateRate = 30;
   ignition::math::Pose3d camPose(ignition::math::Vector3d(-5, 0, 5),
-                     ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+                     ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, camPose.Pos(),
       camPose.Rot().Euler(), width, height, updateRate);
 
@@ -90,7 +90,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   std::string modelName2 = "camera_model2";
   std::string cameraName2 = "camera_sensor2";
   ignition::math::Pose3d camPose2(ignition::math::Vector3d(5, 0, 5),
-                      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+                      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName2, cameraName2, camPose2.Pos(),
       camPose2.Rot().Euler(), width, height, updateRate);
 

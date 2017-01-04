@@ -27,17 +27,17 @@ class Issue1694Test : public ServerFixture
   /// \brief Check acceleration value.
   /// \param[in] _accel Acceleration to check.
   /// \param[in] _expected Expected value.
-  public: static void CheckAccel(const math::Vector3 &_accel,
-                                 const math::Vector3 &_expected);
+  public: static void CheckAccel(const ignition::math::Vector3d &_accel,
+                                 const ignition::math::Vector3d &_expected);
 };
 
 /////////////////////////////////////////////////
-void Issue1694Test::CheckAccel(const math::Vector3 &_accel,
-                               const math::Vector3 &_expected)
+void Issue1694Test::CheckAccel(const ignition::math::Vector3d &_accel,
+                               const ignition::math::Vector3d &_expected)
 {
-  EXPECT_NEAR(_accel.x, _expected.x, g_tolerance);
-  EXPECT_NEAR(_accel.y, _expected.y, g_tolerance);
-  EXPECT_NEAR(_accel.z, _expected.z, g_tolerance);
+  EXPECT_NEAR(_accel.X(), _expected.X(), g_tolerance);
+  EXPECT_NEAR(_accel.Y(), _expected.Y(), g_tolerance);
+  EXPECT_NEAR(_accel.Z(), _expected.Z(), g_tolerance);
 }
 
 /////////////////////////////////////////////////
@@ -65,8 +65,10 @@ TEST_F(Issue1694Test, WorldAccel)
   world->Step(3000);
 
   // The box should be resting on the ground
-  CheckAccel(link->RelativeLinearAccel(), ignition::math::Vector3d());
-  CheckAccel(link->WorldLinearAccel(), ignition::math::Vector3d());
+  CheckAccel(link->RelativeLinearAccel(),
+      ignition::math::Vector3d::Zero);
+  CheckAccel(link->WorldLinearAccel(),
+      ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////
