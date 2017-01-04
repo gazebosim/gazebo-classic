@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Rand.hh"
@@ -44,8 +45,8 @@ TEST_F(RandTest, Rand)
   EXPECT_GE(i, 1);
 
   i = math::Rand::GetIntNormal(2, 3);
-  EXPECT_LE(i, GZ_INT32_MAX);
-  EXPECT_GE(i, -GZ_INT32_MAX);
+  EXPECT_LE(i, ignition::math::MAX_I32);
+  EXPECT_GE(i, -ignition::math::MAX_I32);
 
   // Test setting the random number seed
   {

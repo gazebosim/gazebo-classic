@@ -16,6 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Vector2d.hh"
 
@@ -53,8 +54,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-// Note: The value of GZ_UINT32_MAX is reserved as a flag.
-uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
+// Note: The value of ignition::math::MAX_UI32 is reserved as a flag.
+uint32_t VisualPrivate::visualIdCount = ignition::math::MAX_UI32 - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
