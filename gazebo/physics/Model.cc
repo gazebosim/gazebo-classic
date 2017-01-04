@@ -691,7 +691,7 @@ void Model::SetLinearVel(const ignition::math::Vector3d &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearVel(_vel.Ign());
+      (*iter)->SetLinearVel(_vel);
     }
   }
 }
@@ -711,7 +711,7 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularVel(_vel.Ign());
+      (*iter)->SetAngularVel(_vel);
     }
   }
 }
@@ -731,7 +731,7 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearAccel(_accel.Ign());
+      (*iter)->SetLinearAccel(_accel);
     }
   }
 }
@@ -751,7 +751,7 @@ void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularAccel(_accel.Ign());
+      (*iter)->SetAngularAccel(_accel);
     }
   }
 }
