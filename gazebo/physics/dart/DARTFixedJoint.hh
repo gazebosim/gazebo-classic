@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_DARTFIXEDJOINT_HH_
 #define _GAZEBO_DARTFIXEDJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/FixedJoint.hh"

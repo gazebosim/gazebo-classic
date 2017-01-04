@@ -22,7 +22,6 @@
 #ifndef _HINGEJOINT_HH_
 #define _HINGEJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
