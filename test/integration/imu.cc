@@ -22,7 +22,7 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
-#define IMU_TOL 1e-5
+#define IMU_TOL 8e-5
 
 using namespace gazebo;
 class ImuTest : public ServerFixture,
