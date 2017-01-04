@@ -104,18 +104,18 @@ void ODEUniversalJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(_index);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  auto axisFrame = this->AxisFrame(_index);
+  auto globalAxis = axisFrame.RotateVector(_axis.Ign());
 
   if (this->jointId)
   {
     // flipping axis 1 and 2 around
     if (_index == UniversalJoint::AXIS_CHILD)
       dJointSetUniversalAxis1(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
     else if (_index == UniversalJoint::AXIS_PARENT)
       dJointSetUniversalAxis2(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
     else
       gzerr << "Joint index out of bounds.\n";
   }

@@ -111,18 +111,18 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(_index);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  auto axisFrame = this->AxisFrame(_index);
+  auto globalAxis = axisFrame.RotateVector(_axis.Ign());
 
   if (_index == 0)
   {
-    dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
-      globalAxis.z);
+    dJointSetGearboxAxis1(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else if (_index == 1)
   {
-    dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
-      globalAxis.z);
+    dJointSetGearboxAxis2(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else
     gzerr << "index [" << _index << "] out of range\n";

@@ -159,8 +159,8 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
     if (_index < this->DOF())
     {
       // this hasn't been initialized yet, store axis in initialWorldAxis
-      math::Quaternion axisFrame = this->GetAxisFrame(_index);
-      this->initialWorldAxis[_index] = axisFrame.RotateVector(_axis);
+      auto axisFrame = this->AxisFrame(_index);
+      this->initialWorldAxis[_index] = axisFrame.RotateVector(_axis.Ign());
     }
     else
       gzerr << "Invalid axis index[" << _index << "]\n";

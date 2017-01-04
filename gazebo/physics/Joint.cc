@@ -318,14 +318,14 @@ void Joint::LoadImpl(const ignition::math::Pose3d &_pose)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
-  math::Pose worldPose = this->GetWorldPose();
-  this->anchorPos = worldPose.pos.Ign();
+  auto worldPose = this->WorldPose();
+  this->anchorPos = worldPose.Pos();
 
   // Compute anchor pose relative to parent frame.
   if (this->parentLink)
-    this->parentAnchorPose = worldPose.Ign() - this->parentLink->WorldPose();
+    this->parentAnchorPose = worldPose - this->parentLink->WorldPose();
   else
-    this->parentAnchorPose = worldPose.Ign();
+    this->parentAnchorPose = worldPose;
 
   if (this->sdf->HasElement("sensor"))
   {
@@ -800,11 +800,11 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         // rotate child (childLink) about anchor point,
 
         // Get Child Link Pose
-        math::Pose childLinkPose = this->childLink->WorldPose();
+        auto childLinkPose = this->childLink->WorldPose();
 
         // Compute new child link pose based on position change
-        math::Pose newChildLinkPose =
-          this->ComputeChildLinkPose(_index, _position);
+        auto newChildLinkPose =
+          this->ChildLinkPose(_index, _position);
 
         // debug
         // gzerr << "child link pose0 [" << childLinkPose
@@ -896,9 +896,9 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       // Get parent linear velocity at joint anchor
       // Passing unit quaternion q ensures that parentOffset will be
       //  interpreted in world frame.
-      math::Quaternion q;
-      math::Vector3 parentOffset =
-        this->GetParentWorldPose().pos - this->parentLink->WorldPose().Pos();
+      ignition::math::Quaterniond q;
+      auto parentOffset =
+        this->ParentWorldPose().Pos() - this->parentLink->WorldPose().Pos();
       linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
     }
 
@@ -918,8 +918,8 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     // Compute desired linear velocity of the child link based on
     //  offset between the child's CG and the joint anchor
     //  and the desired angular velocity.
-    math::Vector3 childCoGOffset =
-      this->childLink->GetWorldCoGPose().pos - this->GetWorldPose().pos;
+    auto childCoGOffset =
+      this->childLink->GetWorldCoGPose().Ign().Pos() - this->WorldPose().Pos();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }
@@ -1287,11 +1287,23 @@ double Joint::GetStopDissipation(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Pose Joint::GetInitialAnchorPose() const
 {
+  return this->InitialAnchorPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::InitialAnchorPose() const
+{
   return this->anchorPose;
 }
 
 //////////////////////////////////////////////////
 math::Pose Joint::GetWorldPose() const
+{
+  return this->WorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::WorldPose() const
 {
   if (this->childLink)
     return this->anchorPose + this->childLink->WorldPose();
@@ -1301,6 +1313,12 @@ math::Pose Joint::GetWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetParentWorldPose() const
 {
+  return this->ParentWorldPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::ParentWorldPose() const
+{
   if (this->parentLink)
     return this->parentAnchorPose + this->parentLink->WorldPose();
   return this->parentAnchorPose;
@@ -1309,17 +1327,29 @@ math::Pose Joint::GetParentWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetAnchorErrorPose() const
 {
-  return this->GetWorldPose() - this->GetParentWorldPose();
+  return this->AnchorErrorPose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::AnchorErrorPose() const
+{
+  return this->WorldPose() - this->ParentWorldPose();
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 {
+  return this->AxisFrame(_index);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
+{
   if (_index >= this->DOF())
   {
-    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+    gzerr << "AxisFrame error, _index[" << _index << "] out of range"
           << std::endl;
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1333,17 +1363,24 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
     return ignition::math::Quaterniond::Identity;
   }
 
-  return this->GetWorldPose().rot;
+  return this->WorldPose().Rot();
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 {
+  return this->AxisFrameOffset(_index);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Joint::AxisFrameOffset(
+    const unsigned int _index) const
+{
   if (_index >= this->DOF())
   {
-    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+    gzerr << "AxisFrameOffset error, _index[" << _index << "] out of range"
           << " returning identity rotation." << std::endl;
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1352,18 +1389,18 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
     // axis is defined in parent model frame, so return the rotation
     // from joint frame to parent model frame, or
     // world frame in absence of parent link.
-    math::Pose parentModelWorldPose;
-    math::Pose jointWorldPose = this->GetWorldPose();
+    ignition::math::Pose3d parentModelWorldPose;
+    auto jointWorldPose = this->WorldPose();
     if (this->parentLink)
     {
       parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
     }
-    return (parentModelWorldPose - jointWorldPose).rot;
+    return (parentModelWorldPose - jointWorldPose).Rot();
   }
 
   // axis is defined in the joint frame, so
   // return the rotation from joint frame to joint frame.
-  return math::Quaternion();
+  return ignition::math::Quaterniond::Identity;
 }
 
 //////////////////////////////////////////////////
@@ -1425,28 +1462,35 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
+  return this->ChildLinkPose(_index, _position);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
+    const double _position)
+{
   // child link pose
-  math::Pose childLinkPose = this->childLink->WorldPose();
+  auto childLinkPose = this->childLink->WorldPose();
 
   // default return to current pose
-  math::Pose newRelativePose;
-  math::Pose newWorldPose = childLinkPose;
+  ignition::math::Pose3d newRelativePose;
+  auto newWorldPose = childLinkPose;
 
   // get anchor and axis of the joint
-  math::Vector3 anchor;
-  math::Vector3 axis;
+  ignition::math::Vector3d anchor;
+  ignition::math::Vector3d axis;
 
   if (this->model->IsStatic())
   {
     /// \TODO: we want to get axis in global frame, but GetGlobalAxis
     /// not implemented for static models yet.
-    axis = childLinkPose.rot.RotateVector(this->GetLocalAxis(_index));
-    anchor = childLinkPose.pos;
+    axis = childLinkPose.Rot().RotateVector(this->GetLocalAxis(_index).Ign());
+    anchor = childLinkPose.Pos();
   }
   else
   {
-    anchor = this->GetAnchor(_index);
-    axis = this->GetGlobalAxis(_index);
+    anchor = this->GetAnchor(_index).Ign();
+    axis = this->GetGlobalAxis(_index).Ign();
   }
 
   // delta-position along an axis
@@ -1456,19 +1500,19 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
       this->HasType(Base::UNIVERSAL_JOINT))
   {
     // relative to anchor point
-    math::Pose relativePose(childLinkPose.pos - anchor,
-                            childLinkPose.rot);
+    ignition::math::Pose3d relativePose(childLinkPose.Pos() - anchor,
+                                        childLinkPose.Rot());
 
     // take axis rotation and turn it into a quaternion
-    math::Quaternion rotation(axis, dposition);
+    ignition::math::Quaterniond rotation(axis, dposition);
 
     // rotate relative pose by rotation
 
-    newRelativePose.pos = rotation.RotateVector(relativePose.pos);
-    newRelativePose.rot = rotation * relativePose.rot;
+    newRelativePose.Pos() = rotation.RotateVector(relativePose.Pos());
+    newRelativePose.Rot() = rotation * relativePose.Rot();
 
-    newWorldPose =
-      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+    newWorldPose = ignition::math::Pose3d(newRelativePose.Pos() + anchor,
+        newRelativePose.Rot());
 
     // \TODO: ideally we want to set this according to
     // Joint Trajectory velocity and use time step since last update.
@@ -1481,15 +1525,15 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
   else if (this->HasType(Base::SLIDER_JOINT))
   {
     // relative to anchor point
-    math::Pose relativePose(childLinkPose.pos - anchor,
-                            childLinkPose.rot);
+    ignition::math::Pose3d relativePose(childLinkPose.Pos() - anchor,
+                            childLinkPose.Rot());
 
     // slide relative pose by dposition along axis
-    newRelativePose.pos = relativePose.pos + axis * dposition;
-    newRelativePose.rot = relativePose.rot;
+    newRelativePose.Pos() = relativePose.Pos() + axis * dposition;
+    newRelativePose.Rot() = relativePose.Rot();
 
-    newWorldPose =
-      math::Pose(newRelativePose.pos + anchor, newRelativePose.rot);
+    newWorldPose = ignition::math::Pose3d(newRelativePose.Pos() + anchor,
+        newRelativePose.Rot());
 
     /// \TODO: ideally we want to set this according to Joint Trajectory
     /// velocity and use time step since last update.

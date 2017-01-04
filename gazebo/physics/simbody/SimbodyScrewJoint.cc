@@ -165,8 +165,8 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->AxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index).Ign());
     }
   }
   else
@@ -184,8 +184,8 @@ math::Vector3 SimbodyScrewJoint::GetGlobalAxis(unsigned int _index) const
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index));
+      return this->AxisFrame(_index).RotateVector(
+        this->GetLocalAxis(_index).Ign());
     }
   }
 }

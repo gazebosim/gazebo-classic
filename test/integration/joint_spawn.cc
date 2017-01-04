@@ -200,8 +200,8 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
   EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
   EXPECT_TRUE(childPose.pos == parentPose.pos);
-  EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-  EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+  EXPECT_EQ(joint->WorldPose().Pos(), joint->ParentWorldPose().Pos());
+  EXPECT_EQ(joint->AnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -260,8 +260,8 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     world->Step(100);
     math::Pose afterPose = link->WorldPose();
     EXPECT_TRUE(initialPose.pos == afterPose.pos);
-    EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
-    EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
+    EXPECT_EQ(joint->WorldPose().Pos(), joint->ParentWorldPose().Pos());
+    EXPECT_EQ(joint->AnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
   }
 }
 

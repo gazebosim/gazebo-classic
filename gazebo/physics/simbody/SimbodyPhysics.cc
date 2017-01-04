@@ -1042,8 +1042,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0).Ign())));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
@@ -1096,12 +1096,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
-        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT).Ign())));
+        /// \TODO: check if this is right, or AxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD).Ign())));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -1161,13 +1161,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // flip transform based on isReversed flag.
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0).Ign())));
 
-        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->AxisFrameOffset(0).GetAsEuler()
         //       << "] ["
-        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
-        //          gzJoint->GetLocalAxis(0)) << "]\n";
+        //       << gzJoint->AxisFrameOffset(0).RotateVector(
+        //          gzJoint->GetLocalAxis(0).Ign()) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -1207,8 +1207,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "prismatic")
       {
         UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->GetLocalAxis(0).Ign())));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);

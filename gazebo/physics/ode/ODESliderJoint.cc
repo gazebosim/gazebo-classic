@@ -105,13 +105,13 @@ void ODESliderJoint::SetAxis(unsigned int /*index*/, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   // ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(0);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  auto axisFrame = this->AxisFrame(0);
+  auto globalAxis = axisFrame.RotateVector(_axis.Ign());
 
   if (this->jointId)
   {
     dJointSetSliderAxis(this->jointId,
-                        globalAxis.x, globalAxis.y, globalAxis.z);
+                        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

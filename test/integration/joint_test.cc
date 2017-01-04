@@ -70,8 +70,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
+  ignition::math::Pose3d anchor;
+  ignition::math::Vector3d axis(1, 0, 0);
   double lower = -M_PI;
 
   double residentLast = 0, shareLast = 0;

@@ -126,7 +126,7 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
   }
 
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-      this->GetAxisFrameOffset(_index).RotateVector(_axis));
+      this->AxisFrameOffset(_index).RotateVector(_axis.Ign()));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
       = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
   dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;

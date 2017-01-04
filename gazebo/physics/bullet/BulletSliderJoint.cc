@@ -217,8 +217,8 @@ void BulletSliderJoint::SetAxis(unsigned int /*_index*/,
   if (!this->bulletSlider)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    math::Quaternion axisFrame = this->GetAxisFrame(0);
-    this->initialWorldAxis = axisFrame.RotateVector(_axis);
+    auto axisFrame = this->AxisFrame(0);
+    this->initialWorldAxis = axisFrame.RotateVector(_axis.Ign());
   }
   else
   {
@@ -348,10 +348,10 @@ double BulletSliderJoint::PositionImpl(const unsigned int _index) const
   //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
-  auto offset = this->GetWorldPose().pos
-              - this->GetParentWorldPose().pos;
+  auto offset = this->WorldPose().Pos()
+              - this->ParentWorldPose().Pos();
   auto axis = this->GetGlobalAxis(_index);
-  auto poseParent = this->GetWorldPose();
+  auto poseParent = this->WorldPose();
   return axis.Dot(offset);
 }
 

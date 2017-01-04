@@ -199,7 +199,7 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   ASSERT_TRUE(joint != NULL);
 
   ignition::math::Vector3d com = link->GetWorldCoGPose().pos.Ign();
-  ignition::math::Vector3d jointOrigin = joint->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d jointOrigin = joint->WorldPose().Pos();
 
   // do a simulation step to get a meaningful measure
   _world->Step(1);

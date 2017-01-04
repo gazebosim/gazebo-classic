@@ -323,8 +323,8 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     // Compute distance from cg to joint anchor
     auto linkPose = link->GetWorldCoGPose();
-    auto jointPose = joint->GetWorldPose();
-    auto jointToCoG = linkPose.pos - jointPose.pos;
+    auto jointPose = joint->WorldPose();
+    auto jointToCoG = linkPose.pos - jointPose.Pos();
     double length = jointToCoG.GetLength();
     EXPECT_NEAR(length, 0.05, 1e-6);
     pendulumLengths.push_back(length);
