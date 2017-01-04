@@ -174,7 +174,7 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   yaw.Normalize();
 
   // Rotate in place, instead of jumping.
-  if (std::abs(yaw.Radian()) > GZ_DTOR(10))
+  if (std::abs(yaw.Radian()) > IGN_DTOR(10))
   {
     pose.Rot() = ignition::math::Quaterniond(1.5707, 0, rpy.Z()+
         yaw.Radian()*0.001);
