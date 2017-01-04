@@ -254,11 +254,37 @@ double MultiRayShape::GetScanResolution() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMinAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->MinAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::MinAngle() const
+{
   return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMaxAngle() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->MaxAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::MaxAngle() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -284,20 +310,47 @@ double MultiRayShape::GetVerticalScanResolution() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->VerticalMinAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::VerticalMinAngle() const
+{
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->VerticalMaxAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::VerticalMaxAngle() const
+{
   if (this->vertElem)
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
+
 
 //////////////////////////////////////////////////
 void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)

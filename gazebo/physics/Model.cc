@@ -782,7 +782,6 @@ ignition::math::Vector3d Model::WorldLinearVel() const
 {
   if (this->GetLink("canonical"))
   {
-    printf("Canonical\n");
     return this->GetLink("canonical")->WorldLinearVel();
   }
   else

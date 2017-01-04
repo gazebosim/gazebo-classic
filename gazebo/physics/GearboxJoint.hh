@@ -26,7 +26,6 @@
 
 #include <string>
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
