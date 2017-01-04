@@ -122,7 +122,7 @@ ignition::math::Vector3d BulletScrewJoint::Anchor(
     const unsigned int /*index*/) const
 {
   gzerr << "BulletScrewJoint::Anchor not implemented, return 0 vector.\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
