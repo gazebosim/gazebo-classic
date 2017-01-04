@@ -72,7 +72,7 @@ ignition::math::Vector3d SimbodyBallJoint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
