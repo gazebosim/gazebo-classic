@@ -399,7 +399,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   double r1 = 0.5, r2 = 1.5;
   ignition::math::Vector3d v30(ignition::math::Vector3d::Zero);
   ignition::math::Vector3d cog;
-  math::Angle angle;
+  ignition::math::Angle angle;
 
   std::vector<std::string> modelNames;
   std::vector<double> x0s;
@@ -453,7 +453,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   x0s.push_back(0);
   y0s.push_back(8);
   radii.push_back(r2);
-  angle.SetFromDegree(45);
+  angle.Degree(45);
   cogs.push_back(ignition::math::Vector3d(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
@@ -462,7 +462,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   x0s.push_back(0);
   y0s.push_back(-8);
   radii.push_back(r2);
-  angle.SetFromDegree(-30);
+  angle.Degree(-30);
   cogs.push_back(ignition::math::Vector3d(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 

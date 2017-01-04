@@ -209,7 +209,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         if (axis >= _state.GetAngleCount())
           continue;
 
-        ignition::math::Angle angle = _state.Angle(axis);
+        auto angle = _state.Position(axis);
 
         if (this->xmlOutput)
         {
@@ -268,7 +268,7 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
     else
     {
       if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
-        result << std::fixed << iter->second.Angle(0);
+        result << std::fixed << iter->second.Position(0);
       else
         result << std::fixed << iter->second;
     }

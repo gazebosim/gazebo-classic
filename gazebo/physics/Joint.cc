@@ -693,7 +693,14 @@ void Joint::FillMsg(msgs::Joint &_msg)
 //////////////////////////////////////////////////
 math::Angle Joint::GetAngle(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Position(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -715,7 +722,14 @@ bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 math::Angle Joint::GetHighStop(unsigned int _index)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->UpperLimit(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 
@@ -729,7 +743,14 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 //////////////////////////////////////////////////
 math::Angle Joint::GetLowStop(unsigned int _index)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LowerLimit(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -964,7 +985,7 @@ void Joint::SetState(const JointState &_state)
   for (unsigned int i = 0; i < _state.GetAngleCount(); ++i)
   {
     this->SetVelocity(i, 0.0);
-    this->SetPosition(i, _state.Angle(i).Radian());
+    this->SetPosition(i, _state.Position(i));
   }
 }
 
@@ -1125,7 +1146,14 @@ double Joint::GetSpringReferencePosition(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle Joint::GetLowerLimit(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Angle(this->LowerLimit(_index));
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1141,7 +1169,14 @@ double Joint::LowerLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 math::Angle Joint::GetUpperLimit(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Angle(this->UpperLimit(_index));
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1157,7 +1192,14 @@ double Joint::UpperLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetLowerLimit(_index, _limit.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1200,7 +1242,14 @@ void Joint::SetLowerLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetUpperLimit(_index, _limit.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1579,7 +1628,14 @@ unsigned int Joint::GetAngleCount() const
 /////////////////////////////////////////////////
 math::Angle Joint::GetAngleImpl(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->PositionImpl(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

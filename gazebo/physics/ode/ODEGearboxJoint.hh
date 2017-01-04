@@ -18,7 +18,6 @@
 #ifndef _ODEGEARBOXJOINT_HH_
 #define _ODEGEARBOXJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/GearboxJoint.hh"

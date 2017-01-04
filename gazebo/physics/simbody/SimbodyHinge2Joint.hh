@@ -18,7 +18,6 @@
 #ifndef _SIMBODY_HINGE2JOINT_HH_
 #define _SIMBODY_HINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"

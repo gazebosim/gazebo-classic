@@ -18,7 +18,6 @@
 #ifndef _SIMBODY_SLIDERJOINT_HH_
 #define _SIMBODY_SLIDERJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/SliderJoint.hh"
