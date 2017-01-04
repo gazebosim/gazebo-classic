@@ -25,7 +25,6 @@
 #cmakedefine HAVE_DART 1
 #cmakedefine INCLUDE_RTSHADER 1
 #cmakedefine HAVE_GTS 1
-#cmakedefine HAVE_QWT 1
 #cmakedefine ENABLE_DIAGNOSTICS 1
 #cmakedefine HAVE_GDAL 1
 #cmakedefine HAVE_USB 1

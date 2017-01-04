@@ -249,7 +249,7 @@ void GLWidget::showEvent(QShowEvent *_event)
       rendering::RenderEngine::Instance()->GetWindowManager()->
         CreateWindow(winHandle, this->width(), this->height(), ratio);
 
-      // Attach the user camera to the window
+    // Attach the user camera to the window
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->dataPtr->windowId, this->dataPtr->userCamera);
 
