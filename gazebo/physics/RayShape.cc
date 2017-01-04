@@ -30,8 +30,6 @@
 
 #include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/math/Helpers.hh"
-
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/RayShape.hh"
