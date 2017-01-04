@@ -267,14 +267,14 @@ namespace gazebo
                   unsigned int _index) const = 0;
 
       /// \brief Set the anchor point.
-      /// \param[in] _index Indx of the axis.
+      /// \param[in] _index Index of the axis.
       /// \param[in] _anchor Anchor value.
       /// \deprecated See function that takes ignition math.
       public: virtual void SetAnchor(unsigned int _index,
           const math::Vector3 &_anchor) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the anchor point.
-      /// \param[in] _index Indx of the axis.
+      /// \param[in] _index Index of the axis.
       /// \param[in] _anchor Anchor value.
       public: virtual void SetAnchor(const unsigned int _index,
           const ignition::math::Vector3d &_anchor) = 0;
@@ -549,7 +549,7 @@ namespace gazebo
       public: virtual void FillMsg(msgs::Joint &_msg);
 
       /// \brief Computes moment of inertia (MOI) across a specified joint axis.
-      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// The ratio is given in the form of MOI_child / MOI_parent.
       /// If MOI_parent is zero, this funciton will return 0.
       /// The inertia ratio for each joint axis indicates the sensitivity
       /// of the joint to actuation torques.
@@ -559,7 +559,7 @@ namespace gazebo
 
       /// \brief Computes moment of inertia (MOI) across an arbitrary axis
       /// specified in the world frame.
-      /// The ratio is given in the form of MOI_chidl / MOI_parent.
+      /// The ratio is given in the form of MOI_child / MOI_parent.
       /// If MOI_parent is zero, this funciton will return 0.
       /// The moment of inertia ratio along constrained directions of a joint
       /// has an impact on the performance of Projected Gauss Seidel (PGS)
