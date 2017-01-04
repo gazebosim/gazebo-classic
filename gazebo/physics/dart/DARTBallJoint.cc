@@ -74,7 +74,7 @@ ignition::math::Vector3d DARTBallJoint::Anchor(
 ignition::math::Vector3d DARTBallJoint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
