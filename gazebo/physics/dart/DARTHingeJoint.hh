@@ -18,7 +18,6 @@
 #ifndef _GAZEBO_DARTHINGEJOINT_HH_
 #define _GAZEBO_DARTHINGEJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/HingeJoint.hh"
@@ -59,7 +58,7 @@ namespace gazebo
                   const math::Vector3 &_axis);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _vel);

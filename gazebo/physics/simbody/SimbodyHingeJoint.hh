@@ -20,7 +20,6 @@
 
 #include <vector>
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
@@ -66,7 +65,7 @@ namespace gazebo
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

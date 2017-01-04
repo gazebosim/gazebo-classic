@@ -106,7 +106,7 @@ void InRegionEventSource::Update()
   if (!this->region)
     return;
 
-  ignition::math::Vector3d point = this->model->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d point = this->model->WorldPose().Pos();
   bool oldState = this->isInside;
   bool currentState = this->region->Contains(point);
 

@@ -152,6 +152,7 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  camera_sensor_igntransport.cc
   depth_camera.cc
   factory.cc
   fiducial.cc
@@ -174,6 +175,7 @@ set(qt_tests
   camera_gui.cc
   collada_visualization.cc
   insert_model.cc
+  marker.cc
   model_editor.cc
   model_editor_undo.cc
   model_manipulation.cc

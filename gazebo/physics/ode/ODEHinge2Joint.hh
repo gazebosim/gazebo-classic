@@ -22,7 +22,6 @@
 #ifndef _ODEHINGE2JOINT_HH_
 #define _ODEHINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/Hinge2Joint.hh"
@@ -65,7 +64,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

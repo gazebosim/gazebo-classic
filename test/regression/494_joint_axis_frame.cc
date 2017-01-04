@@ -35,7 +35,7 @@ class Issue494Test : public JointTest
   /// \param[in] _joint Joint to check.
   /// \param[in] _axis Expected axis vector in global frame.
   public: void CheckJointProperties(physics::JointPtr _joint,
-                                    const math::Vector3 &_axis);
+                                    const ignition::math::Vector3d &_axis);
 };
 
 
@@ -54,7 +54,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   SpawnJointOptions opt;
   opt.type = _jointType;
@@ -111,13 +111,13 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
       if (opt.worldParent)
       {
         gzdbg << "  where parent is world.\n";
-        this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
+        this->CheckJointProperties(jointUseParentModelFrame, opt.axis.Ign());
       }
       else
       {
         gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(jointUseParentModelFrame,
-          math::Vector3(cos(Am), sin(Am), 0));
+          ignition::math::Vector3d(cos(Am), sin(Am), 0));
       }
     }
 
@@ -132,13 +132,13 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
       {
         gzdbg << "  where parent is world.\n";
         this->CheckJointProperties(joint,
-          math::Vector3(cos(Aj), sin(Aj), 0));
+          ignition::math::Vector3d(cos(Aj), sin(Aj), 0));
       }
       else
       {
         gzdbg << "  where parent is another link (not world).\n";
         this->CheckJointProperties(joint,
-          math::Vector3(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
+          ignition::math::Vector3d(cos(Am+Al+Aj), sin(Am+Al+Aj), 0));
       }
     }
   }
@@ -146,7 +146,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
 
 /////////////////////////////////////////////////
 void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
-                                        const math::Vector3 &_axis)
+                                        const ignition::math::Vector3d &_axis)
 {
   physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world != NULL);
@@ -154,14 +154,14 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   ASSERT_TRUE(physics != NULL);
 
   // Check that Joint::GetGlobalAxis matches _axis
-  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0));
+  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0).Ign());
 
   // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
-  math::Vector3 axisLocalFrame = _joint->GetLocalAxis(0);
+  auto axisLocalFrame = _joint->GetLocalAxis(0);
   {
     // rotate axis into global frame
-    math::Vector3 axisGlobalFrame =
+    auto axisGlobalFrame =
       _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
     // Test GetAxisFrame: check that axis in global frame is
     // computed correctly.
@@ -169,10 +169,10 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   }
   {
     // rotate axis into joint frame
-    math::Vector3 axisJointFrame =
+    auto axisJointFrame =
       _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
     // roate axis specified in global frame into joint frame
-    math::Vector3 axisJointFrame2 =
+    auto axisJointFrame2 =
       _joint->GetWorldPose().rot.RotateVectorReverse(_axis);
     EXPECT_EQ(axisJointFrame, axisJointFrame2);
   }
@@ -199,18 +199,18 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
     EXPECT_NEAR(_joint->GetVelocity(0), vel, g_tolerance);
 
     // Also verify that relative body motions match expected joint behavior
-    math::Vector3 childVelocity, parentVelocity;
+    ignition::math::Vector3d childVelocity, parentVelocity;
     {
       physics::LinkPtr child = _joint->GetChild();
       if (child)
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
               || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          childVelocity = child->GetWorldAngularVel();
+          childVelocity = child->GetWorldAngularVel().Ign();
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
         {
-          childVelocity = child->GetWorldLinearVel();
+          childVelocity = child->GetWorldLinearVel().Ign();
         }
       }
     }
@@ -220,11 +220,11 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
               || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          parentVelocity = parent->GetWorldAngularVel();
+          parentVelocity = parent->GetWorldAngularVel().Ign();
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
         {
-          parentVelocity = parent->GetWorldLinearVel();
+          parentVelocity = parent->GetWorldLinearVel().Ign();
         }
       }
     }

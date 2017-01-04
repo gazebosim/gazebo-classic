@@ -40,6 +40,7 @@ int main()
 
   // Set gazebo from ignition
   gzAngle = ignAngle;
+  std::cout << gzAngle << std::endl;
 
   return 0;
 }

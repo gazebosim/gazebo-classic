@@ -20,6 +20,7 @@
  */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include <string>
 
@@ -118,24 +119,31 @@ void ODEScrewJoint::SetAxis(unsigned int /*_index*/, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3d globalAxis = _axis.Ign();
   if (this->parentLink)
-    globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+  {
+    globalAxis = this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(
+        _axis.Ign());
+  }
 
   if (this->jointId)
-    dJointSetScrewAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  {
+    dJointSetScrewAxis(this->jointId,
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+  }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+  }
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
+double ODEScrewJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       if (_index == 0)
         result = dJointGetScrewAngle(this->jointId);
@@ -144,9 +152,9 @@ math::Angle ODEScrewJoint::GetAngleImpl(unsigned int _index) const
     }
     else
     {
-      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+      gzwarn << "ODEScrewJoint::PositionImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->DOF() << ").\n";
     }
   }
   else
@@ -162,7 +170,7 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
 
   if (this->jointId)
   {
-    if (_index < this->GetAngleCount())
+    if (_index < this->DOF())
     {
       if (_index == 0)
         result = dJointGetScrewAngleRate(this->jointId);
@@ -171,9 +179,9 @@ double ODEScrewJoint::GetVelocity(unsigned int _index) const
     }
     else
     {
-      gzwarn << "ODEScrewJoint::GetAngleImpl(" << _index
+      gzwarn << "ODEScrewJoint::PositionImpl(" << _index
              << "): invalid index exceeds allowed range("
-             << this->GetAngleCount() << ").\n";
+             << this->DOF() << ").\n";
     }
   }
   else

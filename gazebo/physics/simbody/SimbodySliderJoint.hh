@@ -18,7 +18,6 @@
 #ifndef _SIMBODY_SLIDERJOINT_HH_
 #define _SIMBODY_SLIDERJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/SliderJoint.hh"
@@ -60,7 +59,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void Load(sdf::ElementPtr _sdf);

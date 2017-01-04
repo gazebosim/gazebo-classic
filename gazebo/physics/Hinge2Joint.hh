@@ -24,7 +24,6 @@
 
 #include <sdf/sdf.hh>
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
@@ -51,7 +50,7 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 2;}
 
       /// \brief Load the joint.

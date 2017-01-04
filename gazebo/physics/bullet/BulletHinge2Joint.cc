@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -71,7 +73,8 @@ void BulletHinge2Joint::Init()
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
-  btVector3 banchor(this->anchorPos.x, this->anchorPos.y, this->anchorPos.z);
+  btVector3 banchor(this->anchorPos.X(), this->anchorPos.Y(),
+                    this->anchorPos.Z());
   btVector3 baxis1(axis1.x, axis1.y, axis1.z);
   btVector3 baxis2(axis2.x, axis2.y, axis2.z);
 
@@ -113,18 +116,6 @@ math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngle(unsigned int /*_index*/) const
-{
-  if (!this->bulletHinge2)
-  {
-    gzerr << "Joint must be created first.\n";
-    return math::Angle();
-  }
-
-  return this->bulletHinge2->getAngle1();
-}
-
-//////////////////////////////////////////////////
 double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GetVelocity not implemented" << std::endl;
@@ -156,44 +147,42 @@ void BulletHinge2Joint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-bool BulletHinge2Joint::SetHighStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+void BulletHinge2Joint::SetUpperLimit(const unsigned int /*_index*/,
+    const double _limit)
 {
+  /// \todo Shouldn't index be taken into account for a hinge2 joint?
   if (this->bulletHinge2)
   {
-    this->bulletHinge2->setUpperLimit(_angle.Radian());
-    return true;
+    this->bulletHinge2->setUpperLimit(_limit);
   }
   else
   {
     gzerr << "Joint must be created first.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletHinge2Joint::SetLowStop(unsigned int /*_index*/,
-    const math::Angle &_angle)
+void BulletHinge2Joint::SetLowerLimit(const unsigned int /*_index*/,
+    const double _limit)
 {
+  /// \todo Shouldn't index be taken into account for a hinge2 joint?
   if (this->bulletHinge2)
   {
-    this->bulletHinge2->setLowerLimit(_angle.Radian());
-    return true;
+    this->bulletHinge2->setLowerLimit(_limit);
   }
   else
   {
     gzerr << "Joint must be created first.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
+double BulletHinge2Joint::UpperLimit(const unsigned int _index) const
 {
   if (!this->bulletHinge2)
   {
     gzerr << "Joint must be created first.\n";
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
 #ifndef LIBBULLET_VERSION_GT_282
@@ -205,17 +194,17 @@ math::Angle BulletHinge2Joint::GetHighStop(unsigned int _index)
   if (motor)
     return motor->m_hiLimit;
 
-  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  gzerr << "Unable to get upper limit for axis _index[" << _index << "]\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
+double BulletHinge2Joint::LowerLimit(const unsigned int _index) const
 {
   if (!this->bulletHinge2)
   {
-    gzerr << "BulletHinge2Joint::bulletHigne2 not created yet, returning 0.\n";
-    return math::Angle(0.0);
+    gzerr << "Joint must be created first.\n";
+    return ignition::math::NAN_D;
   }
 
 #ifndef LIBBULLET_VERSION_GT_282
@@ -227,8 +216,8 @@ math::Angle BulletHinge2Joint::GetLowStop(unsigned int _index)
   if (motor)
     return motor->m_loLimit;
 
-  gzerr << "Unable to get high stop for axis _index[" << _index << "]\n";
-  return 0;
+  gzerr << "Unable to get lower limit for axis _index[" << _index << "]\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -239,8 +228,15 @@ math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHinge2Joint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletHinge2Joint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "BulletHinge2Joint::GetAngleImpl not implemented\n";
-  return math::Angle();
+  /// \todo Copied from old BulletHinge2Joint::GetAngle, but it probably should
+  /// return the value according to the index
+  if (!this->bulletHinge2)
+  {
+    gzerr << "Joint must be created first.\n";
+    return ignition::math::NAN_D;
+  }
+
+  return this->bulletHinge2->getAngle1();
 }

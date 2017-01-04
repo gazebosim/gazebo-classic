@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -59,7 +61,7 @@ void SimbodyHingeJoint::SetAxis(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetVelocity(unsigned int _index, double _rate)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->mobod.setOneU(
       this->simbodyPhysics->integ->updAdvancedState(),
@@ -74,7 +76,7 @@ void SimbodyHingeJoint::SetVelocity(unsigned int _index, double _rate)
 //////////////////////////////////////////////////
 double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
@@ -99,7 +101,7 @@ double SimbodyHingeJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void SimbodyHingeJoint::SetForceImpl(unsigned int _index, double _torque)
 {
-  if (_index < this->GetAngleCount() && this->physicsInitialized)
+  if (_index < this->DOF() && this->physicsInitialized)
     this->simbodyPhysics->discreteForces.setOneMobilityForce(
       this->simbodyPhysics->integ->updAdvancedState(),
       this->mobod, SimTK::MobilizerUIndex(_index), _torque);
@@ -110,7 +112,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&
-      _index < this->GetAngleCount())
+      _index < this->DOF())
   {
     if (!this->mobod.isEmptyHandle())
     {
@@ -135,7 +137,7 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
   }
   else
   {
-    if (_index >= this->GetAngleCount())
+    if (_index >= this->DOF())
     {
       gzerr << "index out of bound\n";
       return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
@@ -154,37 +156,37 @@ math::Vector3 SimbodyHingeJoint::GetGlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyHingeJoint::GetAngleImpl(unsigned int _index) const
+double SimbodyHingeJoint::PositionImpl(const unsigned int _index) const
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized &&
         this->simbodyPhysics->simbodyPhysicsInitialized)
     {
       if (!this->mobod.isEmptyHandle())
       {
-        return math::Angle(this->mobod.getOneQ(
-          this->simbodyPhysics->integ->getState(), _index));
+        return this->mobod.getOneQ(
+          this->simbodyPhysics->integ->getState(), _index);
       }
       else
       {
         gzerr << "Joint mobod not initialized correctly.  Please file"
               << " a report on issue tracker.\n";
-        return math::Angle(0.0);
+        return ignition::math::NAN_D;
       }
     }
     else
     {
-      gzdbg << "GetAngleImpl() simbody not yet initialized, "
+      gzdbg << "PositionImpl() simbody not yet initialized, "
             << "initial angle should be zero until <initial_angle> "
             << "is implemented.\n";
-      return math::Angle(0.0);
+      return 0.0;
     }
   }
   else
   {
-    gzerr << "index out of bound\n";
-    return math::Angle(SimTK::NaN);
+    gzerr << "Invalid index[" << _index << "]\n";
+    return ignition::math::NAN_D;
   }
 }
 

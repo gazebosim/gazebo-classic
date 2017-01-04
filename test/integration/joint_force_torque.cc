@@ -120,10 +120,10 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_01.body2Torque.y, -wrench_01.body1Torque.y);
     EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z, -wrench_01.body1Torque.z);
 
-    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+    gzlog << "link_1 pose [" << link_1->WorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
           << "]\n";
-    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+    gzlog << "link_2 pose [" << link_2->WorldPose()
           << "] velocity [" << link_2->GetWorldLinearVel()
           << "]\n";
     gzlog << "joint_01 force torque : "
@@ -153,10 +153,10 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_12.body2Torque.y, -wrench_12.body1Torque.y);
     EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z, -wrench_12.body1Torque.z);
 
-    gzlog << "link_1 pose [" << link_1->GetWorldPose()
+    gzlog << "link_1 pose [" << link_1->WorldPose()
           << "] velocity [" << link_1->GetWorldLinearVel()
           << "]\n";
-    gzlog << "link_2 pose [" << link_2->GetWorldPose()
+    gzlog << "link_2 pose [" << link_2->WorldPose()
           << "] velocity [" << link_2->GetWorldLinearVel()
           << "]\n";
     gzlog << "joint_12 force torque : "
@@ -268,8 +268,8 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
           << " / -750 -450 0"
           << "]\n";
 
-    gzlog << "joint angle1[" << std::setprecision(17) << joint_01->GetAngle(0)
-          << "] angle2[" << joint_12->GetAngle(0) << "]\n";
+    gzlog << "joint angle1[" << std::setprecision(17) << joint_01->Position(0)
+          << "] angle2[" << joint_12->Position(0) << "]\n";
 
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
@@ -369,8 +369,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   for (unsigned int i = 0; i < 3388; ++i)
   {
     // pd control
-    double j1State = joint_01->GetAngle(0u).Radian();
-    double j2State = joint_12->GetAngle(0u).Radian();
+    double j1State = joint_01->Position(0);
+    double j2State = joint_12->Position(0);
     double p1Error = target1 - j1State;
     double p2Error = target2 - j2State;
     double effort1 = kp1 * p1Error;
@@ -437,8 +437,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
             << "] torque2 [" << wrench_12.body2Torque
             << "]\n";
     }
-    gzlog << "angles[" << i << "] 1[" << joint_01->GetAngle(0)
-          << "] 2[" << joint_12->GetAngle(0)
+    gzlog << "angles[" << i << "] 1[" << joint_01->Position(0)
+          << "] 2[" << joint_12->Position(0)
           << "]\n";
   }
 }
@@ -497,8 +497,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
     for (unsigned int i = 0; i < 3388; ++i)
     {
       // pd control
-      double j1State = joint_01->GetAngle(0u).Radian();
-      double j2State = joint_12->GetAngle(0u).Radian();
+      double j1State = joint_01->Position(0);
+      double j2State = joint_12->Position(0);
       double p1Error = target1 - j1State;
       double p2Error = target2 - j2State;
       double effort1 = kp1 * p1Error;

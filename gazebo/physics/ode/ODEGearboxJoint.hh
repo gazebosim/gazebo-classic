@@ -18,7 +18,6 @@
 #ifndef _ODEGEARBOXJOINT_HH_
 #define _ODEGEARBOXJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/GearboxJoint.hh"
@@ -68,7 +67,7 @@ namespace gazebo
       public: virtual void SetGearboxRatio(double _gearRatio);
 
       // Documentation inherited
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetVelocity(unsigned int _index, double _angle);

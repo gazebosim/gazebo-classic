@@ -98,7 +98,7 @@ namespace gazebo
 
       /// \brief Get the bounding box for this collision.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const = 0;
+      public: virtual ignition::math::Box BoundingBox() const = 0;
 
       /// \brief Get the shape type.
       /// \return The shape type.
@@ -189,7 +189,12 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const math::Pose &GetWorldPose() const;
+      /// \deprecated See const ignition::math::Pose3d &WorldPose() const
+      public: virtual const math::Pose GetWorldPose() const
+              GAZEBO_DEPRECATED(8.0);
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
 
       /// \brief Helper function used to create a collision visual message.
       /// \return Visual message for a collision.

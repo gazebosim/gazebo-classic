@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Heightmap shape
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _HEIGHTMAPSHAPE_HH_
-#define _HEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_HEIGHTMAPSHAPE_HH_
 
 #include <string>
 #include <vector>
+
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
@@ -63,7 +60,7 @@ namespace gazebo
 
       /// \brief Set the scale of the heightmap shape.
       /// \param[in] _scale Scale to set the heightmap shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the URI of the heightmap image.
       /// \return The heightmap image URI.
@@ -81,7 +78,14 @@ namespace gazebo
       /// image used to load the heightmap.
       /// \return math::Vector2i, result.x = width,
       /// result.y = length/height.
-      public: math::Vector2i GetVertexCount() const;
+      /// \deprecated Use function that returns ignition math.
+      public: math::Vector2i GetVertexCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the number of vertices, which equals the size of the
+      /// image used to load the heightmap.
+      /// \return ignition::math::Vector2i, result.X() == width,
+      /// result.Y() == length/height.
+      public: ignition::math::Vector2i VertexCount() const;
 
       /// \brief Get a height at a position.
       /// \param[in] _x X position.

@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all physical entities
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
-#ifndef _ENTITY_HH_
-#define _ENTITY_HH_
+#ifndef GAZEBO_PHYSICS_ENTITY_HH_
+#define GAZEBO_PHYSICS_ENTITY_HH_
 
 #include <string>
 #include <vector>
+#include <ignition/math/Box.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
 #include <boost/function.hpp>
@@ -101,12 +98,28 @@ namespace gazebo
 
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
-      public: virtual math::Box GetBoundingBox() const;
+      /// \deprecated See function that returns ignition math.
+      public: virtual math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Return the bounding box for the entity.
+      /// \return The bounding box.
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the absolute pose of the entity.
       /// \return The absolute pose of the entity.
-      public: inline virtual const math::Pose &GetWorldPose() const
-              {return this->worldPose;}
+      /// \deprecated See const ignition::math::Pose3d &WorldPose() const
+      public: inline virtual const math::Pose GetWorldPose() const
+              GAZEBO_DEPRECATED(8.0)
+      {
+        return this->worldPose;
+      }
+
+      /// \brief Get the absolute pose of the entity.
+      /// \return The absolute pose of the entity.
+      public: inline virtual const ignition::math::Pose3d &WorldPose() const
+      {
+        return this->worldPose;
+      }
 
       /// \brief Get the pose of the entity relative to its parent.
       /// \return The pose of the entity relative to its parent.
@@ -125,8 +138,8 @@ namespace gazebo
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
       public: void SetWorldPose(const math::Pose &_pose,
-                                bool _notify = true,
-                                bool _publish = true);
+                                const bool _notify = true,
+                                const bool _publish = true);
 
       /// \brief Get the linear velocity of the entity.
       /// \return A math::Vector3 for the linear velocity.
@@ -220,8 +233,13 @@ namespace gazebo
       public: void PlaceOnEntity(const std::string &_entityName);
 
       /// \brief Returns collision bounding box.
-      /// \return Collsiion boundin box.
-      public: math::Box GetCollisionBoundingBox() const;
+      /// \return Collision bounding box.
+      /// \deprecated See function that returns ignition math.
+      public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns collision bounding box.
+      /// \return Collision bounding box.
+      public: ignition::math::Box CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.
       /// \param[in] _linear Linear twist.
@@ -237,7 +255,15 @@ namespace gazebo
       /// The dirty pose is the pose set by the physics engine before it's
       /// value is propagated to the rest of the simulator.
       /// \return The dirty pose of the entity.
-      public: const math::Pose &GetDirtyPose() const;
+      /// \deprecated See const ignition::math::Pose3d GetDirtyPose() const
+      public: const math::Pose GetDirtyPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns Entity#dirtyPose.
+      ///
+      /// The dirty pose is the pose set by the physics engine before it's
+      /// value is propagated to the rest of the simulator.
+      /// \return The dirty pose of the entity.
+      public: const ignition::math::Pose3d &DirtyPose() const;
 
       /// \brief This function is called when the entity's
       /// (or one of its parents) pose of the parent has changed.
@@ -248,30 +274,32 @@ namespace gazebo
 
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
-      /// \return The boundin box for the passed in object.
-      private: math::Box GetCollisionBoundingBoxHelper(BasePtr _base) const;
+      /// \return The bounding box for the passed in object.
+      private: ignition::math::Box
+          CollisionBoundingBoxHelper(BasePtr _base) const;
 
       /// \brief Set the world pose for a model.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseModel(const math::Pose &_pose,
-                                      bool _notify,
-                                      bool _publish);
+      private: void SetWorldPoseModel(const ignition::math::Pose3d &_pose,
+                                      const bool _notify,
+                                      const bool _publish);
 
       /// \brief Set the world pose for a canonical Link.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseCanonicalLink(const math::Pose &_pose,
-                                              bool _notify, bool _publish);
+      private: void SetWorldPoseCanonicalLink(
+                   const ignition::math::Pose3d &_pose,
+                   const bool _notify, const bool _publish);
 
       /// \brief Set the world pose for a common entity.
       /// \param[in] _pose New pose for the entity.
       /// \param[in] _notify True to notify children of the pose update.
       /// \param[in] _publish True to publish the pose.
-      private: void SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
-                                        bool _publish);
+      private: void SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
+                   const bool _notify, const bool _publish);
 
       /// \brief Called when a new pose message arrives.
       /// \param[in] _msg The message to set the pose from.
@@ -292,7 +320,7 @@ namespace gazebo
       protected: EntityPtr parentEntity;
 
       /// \brief World pose of the entity.
-      protected: mutable math::Pose worldPose;
+      protected: mutable ignition::math::Pose3d worldPose;
 
       /// \brief Communication node.
       protected: transport::NodePtr node;
@@ -313,7 +341,7 @@ namespace gazebo
       protected: common::Time prevAnimationTime;
 
       /// \brief Start pose of an animation.
-      protected: math::Pose animationStartPose;
+      protected: ignition::math::Pose3d animationStartPose;
 
       /// \brief All our event connections.
       protected: std::vector<event::ConnectionPtr> connections;
@@ -322,7 +350,7 @@ namespace gazebo
       protected: event::ConnectionPtr animationConnection;
 
       /// \brief The pose set by a physics engine.
-      protected: math::Pose dirtyPose;
+      protected: ignition::math::Pose3d dirtyPose;
 
       /// \brief Scale of the entity
       protected: ignition::math::Vector3d scale;
@@ -334,7 +362,7 @@ namespace gazebo
       private: bool isCanonicalLink;
 
       /// \brief The initial pose of the entity.
-      private: math::Pose initialRelativePose;
+      private: ignition::math::Pose3d initialRelativePose;
 
       /// \brief Pose publisher.
       private: transport::PublisherPtr posePub;
@@ -346,7 +374,8 @@ namespace gazebo
       private: boost::function<void()> onAnimationComplete;
 
       /// \brief The function used to to set the world pose.
-      private: void (Entity::*setWorldPoseFunc)(const math::Pose &, bool, bool);
+      private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
+                   const bool, const bool);
     };
     /// \}
   }

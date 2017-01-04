@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -88,11 +89,11 @@ void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+double DARTFixedJoint::PositionImpl(const unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

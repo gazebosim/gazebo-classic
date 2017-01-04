@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -160,8 +163,8 @@ void BulletHingeJoint::Init()
   this->constraint = this->bulletHinge;
 
   // Set angleOffset based on hinge angle at joint creation.
-  // GetAngleImpl will report angles relative to this offset.
-  this->angleOffset = this->GetAngleImpl(0).Radian();
+  // PositionImpl will report angles relative to this offset.
+  this->angleOffset = this->PositionImpl(0);
 
   // Apply joint angle limits here.
   // TODO: velocity and effort limits.
@@ -227,9 +230,9 @@ void BulletHingeJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletHingeJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
   {
 #ifdef LIBBULLET_VERSION_GT_282
@@ -294,69 +297,62 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
-                      const math::Angle &_angle)
+void BulletHingeJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double _limit)
 {
-  Joint::SetHighStop(0, _angle);
+  Joint::SetUpperLimit(0, _limit);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
     this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
-                                this->angleOffset + _angle.Radian());
-    return true;
+                                this->angleOffset + _limit);
   }
   else
   {
     gzerr << "bulletHinge not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
-                     const math::Angle &_angle)
+void BulletHingeJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double _limit)
 {
-  Joint::SetLowStop(0, _angle);
+  Joint::SetLowerLimit(0, _limit);
   if (this->bulletHinge)
   {
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
+    this->bulletHinge->setLimit(this->angleOffset + _limit,
                                 this->bulletHinge->getUpperLimit());
-    return true;
   }
   else
   {
     gzerr << "bulletHinge not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
+double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
-
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzerr << "Joint must be created before getting high stop\n";
-
+    gzerr << "Joint must be created before getting upper limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
+double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
     gzerr << "Joint must be created before getting low stop\n";
-
   return result;
 }
 
@@ -383,7 +379,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -426,7 +422,7 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 double BulletHingeJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;

@@ -237,11 +237,11 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   ignition::math::Vector3d tauWorld = mass*(com-jointOrigin).Cross(g);
 
   ignition::math::Pose3d parentPose;
-  ignition::math::Pose3d childPose = link->GetWorldPose().Ign();
+  ignition::math::Pose3d childPose = link->WorldPose();
 
   if (!opt.parentIsWorld)
   {
-    parentPose = link->GetParentJointsLinks()[0]->GetWorldPose().Ign();
+    parentPose = link->GetParentJointsLinks()[0]->WorldPose();
   }
 
   ignition::math::Vector3d body1ForceExpected =

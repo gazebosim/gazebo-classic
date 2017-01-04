@@ -125,12 +125,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // See issue #513. Uncomment test when issue is resolved.
   // modelPos["test_trimesh"] = math::Vector3(16, 0, z0);
 
-  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
-  SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
-      math::Vector3::Zero);
-  SpawnEmptyLink("test_empty", modelPos["test_empty"], math::Vector3::Zero);
+  SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1),
+      modelPos["test_box"].Ign(), ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"].Ign(),
+      ignition::math::Vector3d::Zero);
+  SpawnCylinder("test_cylinder", modelPos["test_cylinder"].Ign(),
+      ignition::math::Vector3d::Zero);
+  SpawnEmptyLink("test_empty", modelPos["test_empty"].Ign(),
+      ignition::math::Vector3d::Zero);
 
   std::ostringstream linkOffsetStream;
   math::Pose linkOffsetPose1(0, 0, z0, 0, 0, 0);
@@ -200,7 +202,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       x0 = modelPos[name].x;
       EXPECT_EQ(pose1.pos.x, x0);
       EXPECT_EQ(pose1.pos.y, 0);
@@ -208,14 +210,14 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
-      pose2 = model->GetWorldPose();
+      pose2 = model->WorldPose();
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
 
       // if (physics->GetType()  == "bullet")
       // {
       //   gzerr << "m[" << model->GetName()
-      //         << "] p[" << model->GetWorldPose()
+      //         << "] p[" << model->WorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
@@ -249,12 +251,12 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   //     model = world->ModelByName("link_offset_box");
   //     gzerr << "m[" << model->GetName()
   //           << "] i[" << i << "/" << steps
-  //           << "] pm[" << model->GetWorldPose()
-  //           << "] pb[" << model->GetLink("body")->GetWorldPose()
+  //           << "] pm[" << model->WorldPose()
+  //           << "] pb[" << model->GetLink("body")->WorldPose()
   //           << "] v[" << model->GetWorldLinearVel()
   //           << "]\n";
 
-  //     if (model->GetWorldPose().pos.z < 0.6)
+  //     if (model->WorldPose().Pos().Z() < 0.6)
   //     {
   //       gzerr << "wait: ";
   //       getchar();
@@ -285,7 +287,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
         EXPECT_NEAR(vel1.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       x0 = modelPos[name].x;
       double posTolerance = PHYSICS_TOL;
 #ifdef HAVE_BULLET
@@ -301,7 +303,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
       // if (physics->GetType()  == "bullet")
       // {
       //   gzerr << "m[" << model->GetName()
-      //         << "] p[" << model->GetWorldPose()
+      //         << "] p[" << model->WorldPose()
       //         << "] v[" << model->GetWorldLinearVel()
       //         << "]\n";
 
@@ -333,7 +335,7 @@ void PhysicsTest::SpawnDrop(const std::string &_physicsEngine)
   // relative pose of link in linkOffsetPose2
   for (int i = 0; i < 20; ++i)
   {
-    pose1 = model->GetWorldPose();
+    pose1 = model->WorldPose();
     pose2 = linkOffsetPose2 + pose1;
     EXPECT_NEAR(pose2.pos.x, linkOffsetPose2.pos.x, PHYSICS_TOL);
     EXPECT_NEAR(pose2.pos.y, linkOffsetPose2.pos.y, PHYSICS_TOL);
@@ -395,15 +397,15 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   // spawn some spheres and check to see that they start falling
   double z0 = 3;
   double r1 = 0.5, r2 = 1.5;
-  math::Vector3 v30 = math::Vector3::Zero;
-  math::Vector3 cog;
-  math::Angle angle;
+  ignition::math::Vector3d v30(ignition::math::Vector3d::Zero);
+  ignition::math::Vector3d cog;
+  ignition::math::Angle angle;
 
   std::vector<std::string> modelNames;
   std::vector<double> x0s;
   std::vector<double> y0s;
   std::vector<double> radii;
-  std::vector<math::Vector3> cogs;
+  std::vector<ignition::math::Vector3d> cogs;
 
   // sphere1 and sphere2 have c.g. at center of sphere, different sizes
   modelNames.push_back("small_centered_sphere");
@@ -423,36 +425,36 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   x0s.push_back(8);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, 0, -r1));
+  cogs.push_back(ignition::math::Vector3d(0, 0, -r1));
 
   // sphere4 has c.g. above the center
   modelNames.push_back("raised_cog_sphere");
   x0s.push_back(-4);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, 0, r1));
+  cogs.push_back(ignition::math::Vector3d(0, 0, r1));
 
   // sphere5 has c.g. to the side along y axis; it will roll
   modelNames.push_back("cog_y_offset_sphere");
   x0s.push_back(-8);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(0, r1, 0));
+  cogs.push_back(ignition::math::Vector3d(0, r1, 0));
 
   // sphere6 has c.g. to the side along x axis; it will roll
   modelNames.push_back("cog_x_offset_sphere");
   x0s.push_back(15);
   y0s.push_back(0);
   radii.push_back(r2);
-  cogs.push_back(math::Vector3(r1, 0, 0));
+  cogs.push_back(ignition::math::Vector3d(r1, 0, 0));
 
   // sphere7 has c.g. to the side diagonally; it will roll
   modelNames.push_back("cog_xy_45deg_offset_sphere");
   x0s.push_back(0);
   y0s.push_back(8);
   radii.push_back(r2);
-  angle.SetFromDegree(45);
-  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+  angle.Degree(45);
+  cogs.push_back(ignition::math::Vector3d(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
   // sphere8 has c.g. to the side diagonally; it will roll
@@ -460,14 +462,15 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
   x0s.push_back(0);
   y0s.push_back(-8);
   radii.push_back(r2);
-  angle.SetFromDegree(-30);
-  cogs.push_back(math::Vector3(r1*cos(angle.Radian()),
+  angle.Degree(-30);
+  cogs.push_back(ignition::math::Vector3d(r1*cos(angle.Radian()),
                                r1*sin(angle.Radian()), 0));
 
   unsigned int i;
   for (i = 0; i < modelNames.size(); ++i)
   {
-    SpawnSphere(modelNames[i], math::Vector3(x0s[i], y0s[i], z0+radii[i]),
+    SpawnSphere(modelNames[i],
+                ignition::math::Vector3d(x0s[i], y0s[i], z0+radii[i]),
                 v30, cogs[i], radii[i]);
   }
 
@@ -498,7 +501,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       EXPECT_NEAR(vel1.z, g.Z()*t, -g.Z()*t*PHYSICS_TOL);
       // Need to step at least twice to check decreasing z position
       world->Step(steps - 1);
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL*PHYSICS_TOL);
       EXPECT_NEAR(pose1.pos.z, z0+radius + g.Z()/2*t*t,
@@ -507,7 +510,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // Check once more and just make sure they keep falling
       world->Step(steps);
       vel2 = model->GetWorldLinearVel();
-      pose2 = model->GetWorldPose();
+      pose2 = model->WorldPose();
       EXPECT_LT(vel2.z, vel1.z);
       EXPECT_LT(pose2.pos.z, pose1.pos.z);
     }
@@ -553,7 +556,7 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       EXPECT_NEAR(vel2.z, 0, PHYSICS_TOL);
 
       // expect small values for directions with no offset
-      if (cog.x == 0)
+      if (cog.X() == 0)
       {
         EXPECT_NEAR(vel1.x, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel2.y, 0, PHYSICS_TOL);
@@ -561,19 +564,19 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT(vel1.x*cog.x, 0.2*cog.x*cog.x);
-        EXPECT_GT(vel2.y*cog.x, 0.2*cog.x*cog.x);
+        EXPECT_GT(vel1.x*cog.X(), 0.2*cog.X()*cog.X());
+        EXPECT_GT(vel2.y*cog.X(), 0.2*cog.X()*cog.X());
       }
 
-      if (cog.y == 0)
+      if (cog.Y() == 0)
       {
         EXPECT_NEAR(vel1.y, 0, PHYSICS_TOL);
         EXPECT_NEAR(vel2.x, 0, PHYSICS_TOL);
       }
       else
       {
-        EXPECT_GT(vel1.y*cog.y,  0.2*cog.y*cog.y);
-        EXPECT_LT(vel2.x*cog.y, -0.2*cog.y*cog.y);
+        EXPECT_GT(vel1.y*cog.Y(),  0.2*cog.Y()*cog.Y());
+        EXPECT_LT(vel2.x*cog.Y(), -0.2*cog.Y()*cog.Y());
       }
 
       // Expect roll without slip
@@ -595,29 +598,29 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
       EXPECT_NEAR(vel4.z, 0, PHYSICS_TOL);
 
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
+      pose1 = model->WorldPose();
       EXPECT_NEAR(pose1.pos.z, radius, PHYSICS_TOL);
 
       // expect no pose change for directions with no offset
-      if (cog.x == 0)
+      if (cog.X() == 0)
       {
         EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT((pose1.pos.x-x0) * cog.x, cog.x * cog.x);
+        EXPECT_GT((pose1.pos.x-x0) * cog.X(), cog.X() * cog.X());
       }
 
       // expect no pose change for directions with no offset
-      if (cog.y == 0)
+      if (cog.Y() == 0)
       {
         EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
       }
       // expect rolling in direction of cog offset
       else
       {
-        EXPECT_GT((pose1.pos.y-y0) * cog.y, cog.y * cog.y);
+        EXPECT_GT((pose1.pos.y-y0) * cog.Y(), cog.Y() * cog.Y());
       }
     }
     else
@@ -649,7 +652,7 @@ TEST_F(PhysicsTest, EmptyStates)
 
   // Model state
   auto modelState = modelStates["box"];
-  EXPECT_EQ(ignition::math::Pose3d::Zero, modelState.GetPose().Ign());
+  EXPECT_EQ(ignition::math::Pose3d::Zero, modelState.Pose());
 }
 
 //////////////////////////////////////////////////
@@ -665,7 +668,7 @@ TEST_F(PhysicsTest, StateChange)
 
   auto oldModelState = oldWorldState.GetModelState("box");
   ignition::math::Pose3d oldPose(0, 0, 0.5, 0, 0, 0);
-  EXPECT_EQ(oldPose, oldModelState.GetPose().Ign());
+  EXPECT_EQ(oldPose, oldModelState.Pose());
 
   // Move the box
   world->SetPaused(true);
@@ -680,7 +683,7 @@ TEST_F(PhysicsTest, StateChange)
   EXPECT_EQ(4u, newWorldState.GetModelStateCount());
 
   auto newModelState = newWorldState.GetModelState("box");
-  EXPECT_EQ(newPose, newModelState.GetPose().Ign());
+  EXPECT_EQ(newPose, newModelState.Pose());
 
   // Reset world state, and check for correctness
   world->SetState(oldWorldState);
@@ -689,7 +692,7 @@ TEST_F(PhysicsTest, StateChange)
   EXPECT_EQ(4u, resetWorldState.GetModelStateCount());
 
   auto resetModelState = resetWorldState.GetModelState("box");
-  EXPECT_EQ(oldPose, resetModelState.GetPose().Ign());
+  EXPECT_EQ(oldPose, resetModelState.Pose());
 }
 
 //////////////////////////////////////////////////
@@ -842,7 +845,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
       world->Step(1);  // theoretical contact, but
       // gzdbg << "box time [" << world->SimTime().Double()
       //       << "] vel [" << model->GetWorldLinearVel()
-      //       << "] pose [" << model->GetWorldPose()
+      //       << "] pose [" << model->WorldPose()
       //       << "]\n";
     }
 
@@ -850,7 +853,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     // This test expects a linear velocity at the CoG
     math::Vector3 vel = model->GetLink()->GetWorldCoGLinearVel();
-    math::Pose pose = model->GetWorldPose();
+    math::Pose pose = model->WorldPose();
 
     EXPECT_EQ(vel.x, 0.0);
 
@@ -924,7 +927,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (box_model)
         {
           math::Vector3 vel = box_model->GetWorldLinearVel();
-          math::Pose pose = box_model->GetWorldPose();
+          math::Pose pose = box_model->WorldPose();
           // gzdbg << "box time [" << world->SimTime().Double()
           //      << "] sim z [" << pose.pos.z
           //      << "] exact z [" << z
@@ -956,7 +959,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (sphere_model)
         {
           math::Vector3 vel = sphere_model->GetWorldLinearVel();
-          math::Pose pose = sphere_model->GetWorldPose();
+          math::Pose pose = sphere_model->WorldPose();
           // gzdbg << "sphere time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
@@ -989,7 +992,7 @@ void PhysicsTest::DropStuff(const std::string &_physicsEngine)
         if (cylinder_model)
         {
           math::Vector3 vel = cylinder_model->GetWorldLinearVel();
-          math::Pose pose = cylinder_model->GetWorldPose();
+          math::Pose pose = cylinder_model->WorldPose();
           // gzdbg << "cylinder time [" << world->SimTime().Double()
           //       << "] sim z [" << pose.pos.z
           //       << "] exact z [" << z
@@ -1083,7 +1086,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       if (box_model)
       {
         math::Vector3 vel = box_model->GetWorldLinearVel();
-        math::Pose pose = box_model->GetWorldPose();
+        math::Pose pose = box_model->WorldPose();
 
         // gzdbg << "box time [" << t
         //      << "] sim x [" << pose.pos.x
@@ -1118,7 +1121,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
       if (sphere_model)
       {
         math::Vector3 vel = sphere_model->GetWorldLinearVel();
-        math::Pose pose = sphere_model->GetWorldPose();
+        math::Pose pose = sphere_model->WorldPose();
         // gzdbg << "sphere time [" << world->SimTime().Double()
         //      << "] sim x [" << pose.pos.x
         //      << "] ideal x [" << x
@@ -1228,7 +1231,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        math::Pose childInWorld = links[i]->WorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
@@ -1252,7 +1255,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose parentInWorld = parent->WorldPose();
             math::Pose childInParent = childInWorld - parentInWorld;
             math::Pose anchorInParent = anchorInChild + childInParent;
             math::Pose anchorInitialInParent =
@@ -1303,7 +1306,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
       physics::Link_V links = model->GetLinks();
       for (unsigned int i = 0; i < links.size(); ++i)
       {
-        math::Pose childInWorld = links[i]->GetWorldPose();
+        math::Pose childInWorld = links[i]->WorldPose();
 
         physics::Joint_V parentJoints = links[i]->GetParentJoints();
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
@@ -1327,7 +1330,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
               links[i]->GetInitialRelativePose() -  // rel to model
               parent->GetInitialRelativePose();  // rel to model
 
-            math::Pose parentInWorld = parent->GetWorldPose();
+            math::Pose parentInWorld = parent->WorldPose();
             math::Pose childInParent = childInWorld - parentInWorld;
             math::Pose anchorInParent = anchorInChild + childInParent;
             math::Pose anchorInitialInParent =

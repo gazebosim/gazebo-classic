@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
-#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
@@ -30,6 +30,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/MarkerManager.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -223,6 +224,9 @@ namespace gazebo
       /// \brief Subscribe to scene topic
       public: transport::SubscriberPtr sceneSub;
 
+      /// \brief Subscribe to world_stats topic
+      public: transport::SubscriberPtr statsSub;
+
       /// \brief Subscribe to the request topic
       public: transport::SubscriberPtr requestSub;
 
@@ -334,11 +338,21 @@ namespace gazebo
       /// scene, we update this time accordingly.
       public: common::Time sceneSimTimePosesApplied;
 
+      /// \brief Sim time according to world_stats
+      public: common::Time sceneSimTime;
+
       /// \brief Keeps track of the visual ID for contact visualization.
       public: uint32_t contactVisId;
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Manager of marker visuals
+      public: MarkerManager markerManager;
+
+      /// \brief State of each layer where key is the layer id, and value is
+      /// the layer's visibility.
+      public: std::map<int32_t, bool> layerState;
     };
   }
 }

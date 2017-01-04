@@ -19,6 +19,8 @@
  * Date: 21 May 2003
  */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -163,15 +165,15 @@ math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double BulletBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
-  return math::Angle();
+  gzerr << "BulletBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void BulletBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                    const double /*_angle*/)
 {
   if (this->bulletBall)
   {
@@ -181,12 +183,10 @@ bool BulletBallJoint::SetHighStop(unsigned int /*_index*/,
     // this->bulletBall->setLimit(this->btBall->getLowerLimit(),
     //                         _angle.Radian());
     gzerr << "BulletBallJoint limits not implemented" << std::endl;
-    return false;
   }
   else
   {
     gzerr << "bulletBall does not yet exist" << std::endl;
-    return false;
   }
 }
 
@@ -197,8 +197,8 @@ void BulletBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                    const double /*_angle*/)
 {
   if (this->bulletBall)
   {
@@ -208,12 +208,10 @@ bool BulletBallJoint::SetLowStop(unsigned int /*_index*/,
     // this->bulletBall->setLimit(-_angle.Radian(),
     //                         this->bulletBall->getUpperLimit());
     gzerr << "BulletBallJoint limits not implemented" << std::endl;
-    return false;
   }
   else
   {
     gzerr << "bulletBall does not yet exist" << std::endl;
-    return false;
   }
 }
 
@@ -231,15 +229,15 @@ void BulletBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetHighStop(unsigned int /*_index*/)
+double BulletBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "BulletBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletBallJoint::GetLowStop(unsigned int /*_index*/)
+double BulletBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "BulletBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "BulletBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }

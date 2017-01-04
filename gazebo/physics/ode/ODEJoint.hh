@@ -204,18 +204,12 @@ namespace gazebo
       private: bool useImplicitSpringDamper;
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
-
-      // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;

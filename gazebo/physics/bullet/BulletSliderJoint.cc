@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -260,58 +263,54 @@ void BulletSliderJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetHighStop(unsigned int /*_index*/,
-                                    const math::Angle &_angle)
+void BulletSliderJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetHighStop(0, _angle);
+  Joint::SetUpperLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setUpperLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setUpperLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-bool BulletSliderJoint::SetLowStop(unsigned int /*_index*/,
-                                   const math::Angle &_angle)
+void BulletSliderJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                      const double _limit)
 {
-  Joint::SetLowStop(0, _angle);
+  Joint::SetLowerLimit(0, _limit);
   if (this->bulletSlider)
   {
-    this->bulletSlider->setLowerLinLimit(_angle.Radian());
-    return true;
+    this->bulletSlider->setLowerLinLimit(_limit);
   }
   else
   {
     gzlog << "bulletSlider not yet created.\n";
-    return false;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetHighStop(unsigned int /*_index*/)
+double BulletSliderJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getUpperLinLimit();
   else
-    gzlog << "Joint must be created before getting high stop\n";
+    gzerr << "Joint must be created before getting upper limit\n";
   return result;
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetLowStop(unsigned int /*_index*/)
+double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->bulletSlider)
     result = this->bulletSlider->getLowerLinLimit();
   else
-    gzlog << "Joint must be created before getting low stop\n";
+    gzerr << "Joint must be created before getting lower limit\n";
   return result;
 }
 
@@ -333,12 +332,12 @@ math::Vector3 BulletSliderJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
+double BulletSliderJoint::PositionImpl(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid axis index [" << _index << "]" << std::endl;
-    return math::Angle();
+    return ignition::math::NAN_D;
   }
 
   // The getLinearPos function seems to be off by one time-step
@@ -349,11 +348,11 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   //   gzlog << "bulletSlider does not exist, returning default position\n";
 
   // Compute slider angle from gazebo's cached poses instead
-  math::Vector3 offset = this->GetWorldPose().pos
-                 - this->GetParentWorldPose().pos;
-  math::Vector3 axis = this->GetGlobalAxis(_index);
-  math::Pose poseParent = this->GetWorldPose();
-  return math::Angle(axis.Dot(offset));
+  auto offset = this->GetWorldPose().pos
+              - this->GetParentWorldPose().pos;
+  auto axis = this->GetGlobalAxis(_index);
+  auto poseParent = this->GetWorldPose();
+  return axis.Dot(offset);
 }
 
 //////////////////////////////////////////////////
@@ -361,7 +360,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
     unsigned int _index,
     const boost::any &_value)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return false;
@@ -413,7 +412,7 @@ bool BulletSliderJoint::SetParam(const std::string &_key,
 //////////////////////////////////////////////////
 double BulletSliderJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->GetAngleCount())
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid index [" << _index << "]" << std::endl;
     return 0;

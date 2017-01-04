@@ -66,8 +66,7 @@ void WirelessTransceiver::Load(const std::string &_worldName)
 
   GZ_ASSERT(this->parentEntity.lock() != nullptr, "parentEntity is null");
 
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose + this->parentEntity.lock()->WorldPose();
 
   if (!this->sdf->HasElement("transceiver"))
   {

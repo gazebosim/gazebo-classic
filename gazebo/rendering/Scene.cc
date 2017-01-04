@@ -40,6 +40,7 @@
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
+#include "gazebo/rendering/MarkerVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -137,6 +138,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       rendering::Events::ConnectToggleLayer(
         std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
 
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe("~/world_stats",
+                                          &Scene::OnStatsMsg, this);
+
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -214,6 +218,7 @@ void Scene::Clear()
   this->dataPtr->jointSub.reset();
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
+  this->dataPtr->statsSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
@@ -382,6 +387,13 @@ void Scene::Init()
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  // Initialize the marker manager
+  if (!this->dataPtr->markerManager.Init(this))
+  {
+    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+      << "will not work.\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -2732,7 +2744,10 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::SimTime() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  return this->dataPtr->sceneSimTimePosesApplied;
+  // Return the most recent sim time.
+  return
+    this->dataPtr->sceneSimTime > this->dataPtr->sceneSimTimePosesApplied ?
+    this->dataPtr->sceneSimTime : this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
@@ -3449,8 +3464,36 @@ void Scene::RemoveProjectors()
 /////////////////////////////////////////////////
 void Scene::ToggleLayer(const int32_t _layer)
 {
+  if (this->HasLayer(_layer))
+    this->dataPtr->layerState[_layer] = !this->dataPtr->layerState[_layer];
+  else
+    this->dataPtr->layerState[_layer] = false;
+
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+bool Scene::LayerState(const int32_t _layer) const
+{
+  if (_layer >= 0 && this->HasLayer(_layer))
+    return this->dataPtr->layerState[_layer];
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::HasLayer(const int32_t _layer) const
+{
+  return _layer < 0 ||
+    this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
+}
+
+/////////////////////////////////////////////////
+void Scene::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->sceneSimTime = msgs::Convert(_msg->sim_time());
 }

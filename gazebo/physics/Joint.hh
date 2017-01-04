@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_JOINT_HH_
-#define _GAZEBO_JOINT_HH_
+#ifndef GAZEBO_PHYSICS_JOINT_HH_
+#define GAZEBO_PHYSICS_JOINT_HH_
 
 #include <string>
 #include <vector>
@@ -25,6 +25,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/math/Angle.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
@@ -80,10 +81,10 @@ namespace gazebo
                 /// \brief Velocity.
                 VEL,
 
-                /// \brief High stop angle.
+                /// \brief Upper joint limit.
                 HI_STOP,
 
-                /// \brief Low stop angle.
+                /// \brief Lower joint limit.
                 LO_STOP
               };
 
@@ -191,7 +192,7 @@ namespace gazebo
       /// \param[in] _stiffness Spring stiffness value for the axis.
       /// \TODO: rename to SetSpringStiffness()
       public: virtual void SetStiffness(unsigned int _index,
-                                        double _stiffness) = 0;
+                                        const double _stiffness) = 0;
 
       /// \brief Returns the current joint spring stiffness coefficient.
       /// \param[in] _index Index of the axis to get, currently ignored, to be
@@ -245,14 +246,16 @@ namespace gazebo
       /// \brief Set the high stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle High stop angle.
+      /// \deprecated See SetUpperLimit, which takes double.
       public: virtual bool SetHighStop(unsigned int _index,
-                                       const math::Angle &_angle);
+          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the low stop of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \param[in] _angle Low stop angle.
+      /// \deprecated See SetLowerLimit, which takes double.
       public: virtual bool SetLowStop(unsigned int _index,
-                                      const math::Angle &_angle);
+          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the high stop of an axis(index).
       /// This function is replaced by GetUpperLimit(unsigned int).
@@ -260,7 +263,9 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the high stop value.
-      public: virtual math::Angle GetHighStop(unsigned int _index) = 0;
+      /// \deprecated See UpperLimit, which returns double.
+      public: virtual math::Angle GetHighStop(unsigned int _index)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the low stop of an axis(index).
       /// This function is replaced by GetLowerLimit(unsigned int).
@@ -268,7 +273,9 @@ namespace gazebo
       /// use GetAttribute(hi_stop, _index)
       /// \param[in] _index Index of the axis.
       /// \return Angle of the low stop value.
-      public: virtual math::Angle GetLowStop(unsigned int _index) = 0;
+      /// \deprecated See LowerLimit, which returns double.
+      public: virtual math::Angle GetLowStop(unsigned int _index)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -354,14 +361,40 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Get the angle of rotation of an axis(index)
+      /// \brief Get the angle of rotation of an axis(index).
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
-      public: math::Angle GetAngle(unsigned int _index) const;
+      /// \deprecated See Position(), which returns a double.
+      public: math::Angle GetAngle(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the position of an axis according to its index.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// For static models, it returns the static joint position.
+      ///
+      /// It returns ignition::math::NAN_D in case the position can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
+      /// Subclasses can't override this method. See PositionImpl instead.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Current position of the axis.
+      /// \sa PositionImpl
+      public: virtual double Position(const unsigned int _index = 0) const
+          final;
 
       /// \brief Get the angle count.
       /// \return The number of DOF for the joint.
-      public: virtual unsigned int GetAngleCount() const = 0;
+      /// \deprecated See DOF()
+      public: virtual unsigned int GetAngleCount() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the number of degrees of freedom for this joint.
+      /// \return The number of DOF for the joint.
+      public: virtual unsigned int DOF() const = 0;
 
       /// \brief The child links of this joint are updated based on desired
       /// position.  And all the links connected to the child link of this joint
@@ -465,29 +498,77 @@ namespace gazebo
       /// \return ratio of child MOI to parent MOI.
       public: double GetInertiaRatio(const math::Vector3 &_axis) const;
 
-      /// \brief:  get the joint upper limit
+      /// \brief:  get the joint lower limit
       /// (replaces GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Lower limit of the axis.
-      public: math::Angle GetLowerLimit(unsigned int _index) const;
+      /// \deprecated See LowerLimit, which returns double.
+      public: math::Angle GetLowerLimit(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
-      /// \brief:  get the joint lower limit
+      /// \brief Get the joint's lower limit. For rotational axes, the value
+      /// is in radians, for prismatic axes it is in meters.
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Lower limit of the axis.
+      public: virtual double LowerLimit(unsigned int _index = 0) const;
+
+      /// \brief:  get the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \return Upper limit of the axis.
-      public: math::Angle GetUpperLimit(unsigned int _index) const;
+      /// \deprecated See UpperLimit, which returns double.
+      public: math::Angle GetUpperLimit(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
-      /// \brief:  set the joint upper limit
+      /// \brief Get the joint's upper limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the limit can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Lower limit of the axis.
+      public: virtual double UpperLimit(const unsigned int _index = 0) const;
+
+      /// \brief:  set the joint lower limit
       /// (replaces SetLowStop and SetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
-      public: void SetLowerLimit(unsigned int _index, math::Angle _limit);
+      /// \deprecated See SetLowerLimit which takes double.
+      public: void SetLowerLimit(unsigned int _index, math::Angle _limit)
+          GAZEBO_DEPRECATED(8.0);
 
-      /// \brief:  set the joint lower limit
+      /// \brief Set the joint's lower limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the limit can't be
+      /// obtained. For instance, if the index is invalid, if the joint is
+      /// fixed, etc.
+      ///
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _limit Lower limit of the axis.
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
+
+      /// \brief:  set the joint upper limit
       /// (replacee GetLowStop and GetHighStop)
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
-      public: void SetUpperLimit(unsigned int _index, math::Angle _limit);
+      /// \deprecated See SetUpperLimit which takes double.
+      public: void SetUpperLimit(unsigned int _index, math::Angle _limit)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the joint's upper limit. For rotational axes, the value
+      /// is in radians, for prismatic axes it is in meters.
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \param[in] _limit Lower limit of the axis.
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       /// \brief Set whether the joint should generate feedback.
       /// \param[in] _enable True to enable joint feedback.
@@ -571,8 +652,19 @@ namespace gazebo
       /// \brief Get the angle of an axis helper function.
       /// \param[in] _index Index of the axis.
       /// \return Angle of the axis.
+      /// \deprecated See PositionImpl, which takes double.
       protected: virtual math::Angle GetAngleImpl(
-                     unsigned int _index) const = 0;
+                     unsigned int _index) const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Helper function to get the position of an axis.
+      ///
+      /// Subclasses must override this.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Position of the axis.
+      /// \sa Position
+      protected: virtual double PositionImpl(const unsigned int _index = 0)
+          const = 0;
 
       /// \brief internal helper to find all links connected to the child link
       /// branching out from the children of the child link and any parent
@@ -608,7 +700,7 @@ namespace gazebo
 
       /// \brief Helper function to load a joint.
       /// \param[in] _pose Pose of the anchor.
-      private: void LoadImpl(const math::Pose &_pose);
+      private: void LoadImpl(const ignition::math::Pose3d &_pose);
 
       /// \brief The first link this joint connects to
       protected: LinkPtr childLink;
@@ -621,17 +713,17 @@ namespace gazebo
 
       /// \brief Anchor pose.  This is the xyz offset of the joint frame from
       /// child frame specified in the parent link frame
-      protected: math::Vector3 anchorPos;
+      protected: ignition::math::Vector3d anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.
       /// AnchorPose is the transform from child link frame to joint frame
       /// specified in the child link frame.
       /// AnchorPos is more relevant in normal usage, but sometimes,
       /// we do need this (e.g. GetForceTorque and joint visualization).
-      protected: math::Pose anchorPose;
+      protected: ignition::math::Pose3d anchorPose;
 
       /// \brief Anchor pose relative to parent link frame.
-      protected: math::Pose parentAnchorPose;
+      protected: ignition::math::Pose3d parentAnchorPose;
 
       /// \brief Anchor link.
       protected: LinkPtr anchorLink;
@@ -655,10 +747,10 @@ namespace gazebo
       protected: double velocityLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position lower limit as specified in SDF
-      protected: math::Angle lowerLimit[MAX_JOINT_AXIS];
+      protected: double lowerLimit[MAX_JOINT_AXIS];
 
       /// \brief Store Joint position upper limit as specified in SDF
-      protected: math::Angle upperLimit[MAX_JOINT_AXIS];
+      protected: double upperLimit[MAX_JOINT_AXIS];
 
       /// \brief Cache Joint force torque values in case physics engine
       /// clears them at the end of update step.
@@ -682,8 +774,8 @@ namespace gazebo
       /// \brief Joint update event.
       private: event::EventT<void ()> jointUpdate;
 
-      /// \brief Angle used when the joint is parent of a static model.
-      private: math::Angle staticAngle;
+      /// \brief Position used when the joint is parent of a static model.
+      private: double staticPosition;
 
       /// \brief Joint stop stiffness
       private: double stopStiffness[MAX_JOINT_AXIS];

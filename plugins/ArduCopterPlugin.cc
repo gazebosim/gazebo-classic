@@ -389,7 +389,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "samplingRate",
           rotor.samplingRate, rotor.samplingRate);
 
-      // use gazebo::math::Filter
+      // use ignition::math::Filter
       rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
 
       // initialize filter to zero value
@@ -650,7 +650,7 @@ void ArduCopterPlugin::SendState() const
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
   ignition::math::Pose3d worldToModel = gazeboToNED +
-    this->dataPtr->model->GetWorldPose().Ign();
+    this->dataPtr->model->WorldPose();
 
   // get transform from world NED to Model frame
   ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;

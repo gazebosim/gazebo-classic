@@ -167,7 +167,7 @@ namespace gazebo
       /// \param [in] _enabled Whether this is affected by wind, will be
       /// false for actors regardless of the input.
       /// \sa GetWindMode()
-      public: virtual void SetWindMode(bool _enabled);
+      public: virtual void SetWindMode(const bool _enabled);
 
       /// \brief Add inertia for a sphere.
       /// \param[in] _linkSdf The link to add the inertia to.

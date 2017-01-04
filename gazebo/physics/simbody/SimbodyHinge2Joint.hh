@@ -18,7 +18,6 @@
 #ifndef _SIMBODY_HINGE2JOINT_HH_
 #define _SIMBODY_HINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
@@ -67,7 +66,7 @@ namespace gazebo
       public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
 
       // Documentation inherited
-      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual double PositionImpl(const unsigned int _index) const;
 
       /// \brief Set the torque
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

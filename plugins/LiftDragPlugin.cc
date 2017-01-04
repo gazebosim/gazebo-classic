@@ -177,7 +177,7 @@ void LiftDragPlugin::OnUpdate()
     return;
 
   // pose of body
-  ignition::math::Pose3d pose = this->link->GetWorldPose().Ign();
+  ignition::math::Pose3d pose = this->link->WorldPose();
 
   // rotate forward and upward vectors into inertial frame
   ignition::math::Vector3d forwardI = pose.Rot().RotateVector(this->forward);
@@ -285,7 +285,7 @@ void LiftDragPlugin::OnUpdate()
   // modify cl per control joint value
   if (this->controlJoint)
   {
-    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+    double controlAngle = this->controlJoint->Position(0);
     cl = cl + this->controlJointRadToCL * controlAngle;
     /// \TODO: also change cm and cd
   }

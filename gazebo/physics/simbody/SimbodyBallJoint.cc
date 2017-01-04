@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -72,10 +74,10 @@ math::Vector3 SimbodyBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetAngleImpl(unsigned int /*_index*/) const
+double SimbodyBallJoint::PositionImpl(const unsigned int /*_index*/) const
 {
-  gzerr << "Not implemented\n";
-  return math::Angle();
+  gzerr << "SimbodyBallJoint::PositionImpl not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -92,32 +94,30 @@ void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetHighStop(unsigned int /*_index*/)
+double SimbodyBallJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyBallJoint::GetHighStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "SimbodyBallJoint::UpperLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyBallJoint::GetLowStop(unsigned int /*_index*/)
+double SimbodyBallJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  gzerr << "SimbodyBallJoint::GetLowStop not implemented" << std::endl;
-  return math::Angle();
+  gzerr << "SimbodyBallJoint::LowerLimit not implemented" << std::endl;
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetHighStop(unsigned int /*_index*/,
-                                   const math::Angle &/*_angle*/)
+void SimbodyBallJoint::SetUpperLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
-  gzerr << "SimbodyBallJoint::SetHighStop not implemented" << std::endl;
-  return false;
+  gzerr << "SimbodyBallJoint::SetUpperLimit not implemented" << std::endl;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyBallJoint::SetLowStop(unsigned int /*_index*/,
-                                  const math::Angle &/*_angle*/)
+void SimbodyBallJoint::SetLowerLimit(const unsigned int /*_index*/,
+                                     const double /*_limit*/)
 {
-  gzerr << "SimbodyBallJoint::SetLowStop not implemented" << std::endl;
-  return false;
+  gzerr << "SimbodyBallJoint::SetLowerLimit not implemented" << std::endl;
 }
 
