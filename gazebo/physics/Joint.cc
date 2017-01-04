@@ -842,7 +842,7 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose.Ign(), newChildLinkPose.Ign());
 
             // debug
             // gzerr << "moved " << (*li)->GetName()
