@@ -661,6 +661,28 @@ release will remove the deprecated code.
     + ***Replacement:*** public: ignition::math::OnePoleVector3
 
 1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** GZ_DBL_INF
+    + ***Replacement:*** ignition::math::INF_D
+    + ***Deprecation:*** GZ_DBL_MIN
+    + ***Replacement:*** ignition::math::MIN_D
+    + ***Deprecation:*** GZ_DBL_MAX
+    + ***Replacement:*** ignition::math::MAX_D
+    + ***Deprecation:*** GZ_FLT_MIN
+    + ***Replacement:*** ignition::math::MIN_F
+    + ***Deprecation:*** GZ_FLT_MAX
+    + ***Replacement:*** ignition::math::MAX_F
+    + ***Deprecation:*** GZ_INT32_MIN
+    + ***Replacement:*** ignition::math::MIN_I32
+    + ***Deprecation:*** GZ_INT32_MAX
+    + ***Replacement:*** ignition::math::MAX_I32
+    + ***Deprecation:*** GZ_UINT32_MIN
+    + ***Replacement:*** ignition::math::MIN_UI32
+    + ***Deprecation:*** GZ_UINT32_MAX
+    + ***Replacement:*** ignition::math::MAX_UI32
+    + ***Deprecation:*** static const double gazebo::math::NAN_D
+    + ***Replacement:*** static const double ignition::math::NAN_D
+    + ***Deprecation:*** static const int gazebo::math::NAN_I
+    + ***Replacement:*** static const int ignition::math::NAN_I
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
     + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)
