@@ -96,7 +96,7 @@ ignition::math::Vector3d SimbodyHinge2Joint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GlobalAxis not implemented\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
