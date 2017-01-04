@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/sensors/sensors.hh"
 
@@ -151,7 +152,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_NEAR(raySensor->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->Range(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), ignition::math::INF_D);
 
   // Verify ray sensor 2 range readings
   // listen to new laser frames
@@ -176,8 +177,8 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
 
   // Only box01 should be visible to ray sensor 2
   EXPECT_NEAR(raySensor2->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
-  EXPECT_DOUBLE_EQ(raySensor2->Range(0), GZ_DBL_INF);
-  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor2->Range(0), ignition::math::INF_D);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), ignition::math::INF_D);
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
@@ -198,10 +199,10 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_LT(i, 300);
 
   for (int i = 0; i < raySensor->RayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), ignition::math::INF_D);
 
   for (int i = 0; i < raySensor->RayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor2->Range(i), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor2->Range(i), ignition::math::INF_D);
 
   c.reset();
   c2.reset();
@@ -348,7 +349,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   EXPECT_NEAR(raySensor->RangeMax(), maxRange, LASER_TOL);
 
   for (int i = 0; i < raySensor->RayCount(); ++i)
-    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), ignition::math::INF_D);
 
   // Move laser model very close to terrain, it should now returns range values
   // that are less than half the max range

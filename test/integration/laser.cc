@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/test/ServerFixture.hh"
@@ -83,7 +84,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
 
   for (int i = 0; i < laser->RangeCount(); ++i)
   {
-    EXPECT_DOUBLE_EQ(GZ_DBL_INF, laser->Range(i));
+    EXPECT_DOUBLE_EQ(ignition::math::INF_D, laser->Range(i));
   }
 
   // Spawn a box and test for proper laser scan
@@ -251,7 +252,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   EXPECT_NEAR(raySensor->Range(mid), expectedRangeAtMidPoint, LASER_TOL);
   EXPECT_NEAR(raySensor->Range(0), expectedRangeAtMidPoint, LASER_TOL);
 
-  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
+  EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), ignition::math::INF_D);
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
@@ -264,7 +265,7 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   for (int i = 0; i < raySensor->RayCount(); ++i)
   {
-    EXPECT_DOUBLE_EQ(raySensor->Range(i), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i), ignition::math::INF_D);
   }
 }
 
@@ -349,8 +350,9 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
     angleStep += vAngleStep;
 
-    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), GZ_DBL_INF);
-    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1), GZ_DBL_INF);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), ignition::math::INF_D);
+    EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1),
+                     ignition::math::INF_D);
   }
 
   // Move box out of range
@@ -364,7 +366,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
     for (int i = 0; i < raySensor->RayCount(); ++i)
     {
       EXPECT_DOUBLE_EQ(raySensor->Range(j*raySensor->RayCount() + i),
-          GZ_DBL_INF);
+          ignition::math::INF_D);
     }
   }
 }
