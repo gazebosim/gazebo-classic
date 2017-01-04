@@ -106,9 +106,9 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     // Expect constant torque to give quadratic response in position
     {
       // Expected max joint angle (quatratic in time)
-      math::Angle maxAngle(0.5 * torque * stepTime*stepTime / inertia);
+      double maxAngle = 0.5 * torque * stepTime*stepTime / inertia;
       // Verify that the joint should make more than 1 revolution
-      EXPECT_GT(maxAngle.Radian(), 1.25 * 2 * IGN_PI);
+      EXPECT_GT(maxAngle, 1.25 * 2 * IGN_PI);
     }
 
     // compute joint velocity analytically with constant torque
@@ -121,8 +121,8 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
       world->Step(1);
       EXPECT_NEAR(joint->GetVelocity(0), vel, 2e-2);
       double time = world->SimTime().Double();
-      math::Angle angle(0.5 * torque * time*time / inertia);
-      EXPECT_NEAR(joint->Position(0), angle.Radian(), g_tolerance);
+      double angle = 0.5 * torque * time*time / inertia;
+      EXPECT_NEAR(joint->Position(0), angle, g_tolerance);
     }
     std::cout << "Final time:  " << world->SimTime().Double() << std::endl;
     std::cout << "Final angle: " << joint->Position(0) << std::endl;

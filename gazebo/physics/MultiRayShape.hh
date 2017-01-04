@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Angle.hh"
@@ -104,11 +105,21 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetMinAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the minimum angle.
+      /// \return Minimum angle of ray scan.
+      public: ignition::math::Angle MinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetMaxAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the maximum angle.
+      /// \return Maximum angle of ray scan.
+      public: ignition::math::Angle MaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -120,11 +131,21 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetVerticalMinAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the vertical min angle.
+      /// \return Vertical min angle.
+      public: ignition::math::Angle VerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetVerticalMaxAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the vertical max angle.
+      /// \return Vertical max angle.
+      public: ignition::math::Angle VerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();

@@ -149,7 +149,7 @@ void RaySensor::Fini()
 ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetMinAngle().Ign();
+    return this->dataPtr->laserShape->MinAngle();
   else
     return -1;
 }
@@ -159,8 +159,7 @@ ignition::math::Angle RaySensor::AngleMax() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetMaxAngle().Radian());
+    return this->dataPtr->laserShape->MaxAngle();
   }
   else
     return -1;
@@ -245,8 +244,7 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMinAngle().Radian());
+    return this->dataPtr->laserShape->VerticalMinAngle();
   }
   else
     return -1;
@@ -257,8 +255,7 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMaxAngle().Radian());
+    return this->dataPtr->laserShape->VerticalMaxAngle();
   }
   else
     return -1;
