@@ -121,10 +121,10 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_01.body2Torque.z, -wrench_01.body1Torque.z);
 
     gzlog << "link_1 pose [" << link_1->WorldPose()
-          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "] velocity [" << link_1->WorldLinearVel()
           << "]\n";
     gzlog << "link_2 pose [" << link_2->WorldPose()
-          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "] velocity [" << link_2->WorldLinearVel()
           << "]\n";
     gzlog << "joint_01 force torque : "
           << "force1 [" << wrench_01.body1Force
@@ -154,10 +154,10 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
     EXPECT_DOUBLE_EQ(wrench_12.body2Torque.z, -wrench_12.body1Torque.z);
 
     gzlog << "link_1 pose [" << link_1->WorldPose()
-          << "] velocity [" << link_1->GetWorldLinearVel()
+          << "] velocity [" << link_1->WorldLinearVel()
           << "]\n";
     gzlog << "link_2 pose [" << link_2->WorldPose()
-          << "] velocity [" << link_2->GetWorldLinearVel()
+          << "] velocity [" << link_2->WorldLinearVel()
           << "]\n";
     gzlog << "joint_12 force torque : "
           << "force1 [" << wrench_12.body1Force

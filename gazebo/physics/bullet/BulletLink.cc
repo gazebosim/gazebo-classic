@@ -560,7 +560,8 @@ void BulletLink::SetAngularDamping(double _damping)
 //   std::map<std::string, Collision*>::iterator iter;
 //   unsigned int i;
 //
-//   for (iter = this->collisions.begin(), i = 0; iter != this->collisions.end();
+//   for (iter = this->collisions.begin(), i = 0;
+//        iter != this->collisions.end();
 //        ++iter, ++i)
 //   {
 //     if (iter->second == _collision)
@@ -588,8 +589,9 @@ void BulletLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtWorldPosition(const ignition::math::Vector3d &/*_force*/,
-                                         const ignition::math::Vector3d &/*_pos*/)
+void BulletLink::AddForceAtWorldPosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_pos*/)
 {
   gzlog << "BulletLink::AddForceAtWorldPosition not yet implemented."
         << std::endl;

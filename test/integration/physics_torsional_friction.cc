@@ -340,7 +340,8 @@ void PhysicsTorsionalFrictionTest::CoefficientTest(
     double appliedTorque = 1000;
     for (auto sphere : spheres)
     {
-      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+      sphere.link->AddRelativeTorque(
+          ignition::math::Vector3d(0, 0, appliedTorque));
     }
 
     world->Step(1);
@@ -435,7 +436,8 @@ void PhysicsTorsionalFrictionTest::RadiusTest(
     double appliedTorque = 1000;
     for (auto sphere : spheres)
     {
-      sphere.link->AddRelativeTorque(math::Vector3(0, 0, appliedTorque));
+      sphere.link->AddRelativeTorque(
+          ignition::math::Vector3d(0, 0, appliedTorque));
     }
 
     world->Step(1);

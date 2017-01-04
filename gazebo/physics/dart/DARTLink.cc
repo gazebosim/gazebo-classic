@@ -152,7 +152,8 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 //    {
 //      sdf::ElementPtr ellipsoidEle = geomElem->GetElement("ellipsoid");
 //      Eigen::Vector3d size
-//          = DARTTypes::ConvVec3(ellipsoidEle->Get<ignition::math::Vector3d>("size"));
+//          = DARTTypes::ConvVec3(ellipsoidEle->Get<
+//          ignition::math::Vector3d>("size"));
 //      double nSlices = ellipsoidEle->Get<double>("num_slices");
 //      double nStacks = ellipsoidEle->Get<double>("num_stacks");
 //      dart::dynamics::SoftBodyNodeHelper::setEllipsoid(
@@ -569,8 +570,9 @@ void DARTLink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
 }
 
 /////////////////////////////////////////////////
-void DARTLink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
-                                          const ignition::math::Vector3d &_relpos)
+void DARTLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_relpos)
 {
   if (!this->dataPtr->IsInitialized())
   {

@@ -176,17 +176,17 @@ void SimbodyLink::SetSelfCollide(bool /*_collide*/)
 }
 
 //////////////////////////////////////////////////
-//void SimbodyLink::AttachCollision(Collision *_collision)
-//{
-//  Link::AttachCollision(_collision);
+// void SimbodyLink::AttachCollision(Collision *_collision)
+// {
+//   Link::AttachCollision(_collision);
 //
-//  SimbodyCollision *bcollision = dynamic_cast<SimbodyCollision*>(_collision);
+//   SimbodyCollision *bcollision = dynamic_cast<SimbodyCollision*>(_collision);
 //
-//  if (_collision == nullptr)
-//    gzthrow("requires SimbodyCollision");
+//   if (_collision == nullptr)
+//     gzthrow("requires SimbodyCollision");
 //
-//    ignition::math::Pose3d relativePose = _collision->GetRelativePose();
-//}
+//     ignition::math::Pose3d relativePose = _collision->GetRelativePose();
+// }
 
 //////////////////////////////////////////////////
 /// changed
@@ -511,15 +511,17 @@ void SimbodyLink::AddRelativeForce(const ignition::math::Vector3d &/*_force*/)
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtWorldPosition(const ignition::math::Vector3d &/*_force*/,
-                                         const ignition::math::Vector3d &/*_pos*/)
+void SimbodyLink::AddForceAtWorldPosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_pos*/)
 {
   gzerr << "Not implemented.\n";
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::AddForceAtRelativePosition(const ignition::math::Vector3d &/*_force*/,
-                  const ignition::math::Vector3d &/*_relpos*/)
+void SimbodyLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_relpos*/)
 {
   gzerr << "Not implemented.\n";
 }

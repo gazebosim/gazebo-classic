@@ -587,14 +587,16 @@ void PhysicsTest::SpawnDropCoGOffset(const std::string &_physicsEngine)
 
       // Use GetWorldLinearVel with global offset to check roll without slip
       // Expect small linear velocity at contact point
-      ignition::math::Vector3d vel3 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, -radius), math::Quaternion(0, 0, 0)).Ign();
+      ignition::math::Vector3d vel3 = model->GetLink()->WorldLinearVel(
+          ignition::math::Vector3d(0, 0, -radius),
+          ignition::math::Quaterniond(0, 0, 0));
       EXPECT_NEAR(vel3.X(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Y(), 0, PHYSICS_TOL);
       EXPECT_NEAR(vel3.Z(), 0, PHYSICS_TOL);
       // Expect speed at top of sphere to be double the speed at center
-      ignition::math::Vector3d vel4 = model->GetLink()->GetWorldLinearVel(
-          math::Vector3(0, 0, radius), math::Quaternion(0, 0, 0)).Ign();
+      ignition::math::Vector3d vel4 = model->GetLink()->WorldLinearVel(
+          ignition::math::Vector3d(0, 0, radius),
+          ignition::math::Quaterniond(0, 0, 0));
       EXPECT_NEAR(vel4.Y(), 2*vel1.Y(), PHYSICS_TOL);
       EXPECT_NEAR(vel4.X(), 2*vel1.X(), PHYSICS_TOL);
       EXPECT_NEAR(vel4.Z(), 0, PHYSICS_TOL);
@@ -855,7 +857,7 @@ void PhysicsTest::JointDampingTest(const std::string &_physicsEngine)
 
     // This test expects a linear velocity at the CoG
     ignition::math::Vector3d vel =
-      model->GetLink()->GetWorldCoGLinearVel().Ign();
+      model->GetLink()->WorldCoGLinearVel();
     ignition::math::Pose3d pose = model->WorldPose();
 
     EXPECT_EQ(vel.X(), 0.0);
@@ -1103,7 +1105,8 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
 
         if (i == 0)
         {
-          boxModel->GetLink("link")->SetForce(math::Vector3(f, 0, 0));
+          boxModel->GetLink("link")->SetForce(
+              ignition::math::Vector3d(f, 0, 0));
           // The following has been failing since pull request #1284,
           // so it has been disabled.
           // See bitbucket.org/osrf/gazebo/issue/1394

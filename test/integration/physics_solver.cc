@@ -90,7 +90,6 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
       ignition::math::Pose3d pose = sphereModel->WorldPose();
       if (z > 0.5)
       {
-        std::cout << "Vel[" << vel << "]\n";
         EXPECT_LT(fabs(vel.Z() - v), PHYSICS_TOL);
         EXPECT_LT(fabs(pose.Pos().Z() - z), PHYSICS_TOL);
       }

@@ -108,7 +108,7 @@ TEST_F(Issue1124Test, MovingPose)
 
   // Move the model by adding a force. This will exercise the physics engine
   // pose change callbacks.
-  link->AddForce(math::Vector3(100, 0, 0.0));
+  link->AddForce(ignition::math::Vector3d(100, 0, 0.0));
   world->Step(5000);
 
   EXPECT_GT(model->WorldPose().Pos().X(), 1.0);

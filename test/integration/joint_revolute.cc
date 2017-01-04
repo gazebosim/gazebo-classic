@@ -617,10 +617,10 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
 
   {
     // check velocity / energy
-    math::Vector3 vel = link->GetWorldLinearVel();
-    math::Pose pos = link->WorldPose();
-    double pe = g * m * pos.pos.z;
-    double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+    ignition::math::Vector3d vel = link->WorldLinearVel();
+    ignition::math::Pose3d pos = link->WorldPose();
+    double pe = g * m * pos.Pos().Z();
+    double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
     e_start = pe + ke;
     // gzdbg << "total energy [" << e_start
     //       << "] pe[" << pe
@@ -642,10 +642,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->WorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() +
+            vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
@@ -693,10 +694,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->WorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() +
+            vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
