@@ -598,8 +598,9 @@ void BulletLink::AddForceAtWorldPosition(
 }
 
 /////////////////////////////////////////////////
-void BulletLink::AddForceAtRelativePosition(const ignition::math::Vector3d &/*_force*/,
-                  const ignition::math::Vector3d &/*_relpos*/)
+void BulletLink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &/*_force*/,
+    const ignition::math::Vector3d &/*_relpos*/)
 {
   gzlog << "BulletLink::AddForceAtRelativePosition not yet implemented."
         << std::endl;
