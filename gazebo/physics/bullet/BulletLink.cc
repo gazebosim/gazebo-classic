@@ -368,7 +368,7 @@ ignition::math::Vector3d BulletLink::WorldCoGLinearVel() const
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
-          << " does not exist, GetWorldLinearVel returns "
+          << " does not exist, WorldLinearVel returns "
           << ignition::math::Vector3d::Zero << " by default." << std::endl;
     return ignition::math::Vector3d::Zero;
   }
@@ -385,7 +385,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
-          << " does not exist, GetWorldLinearVel returns "
+          << " does not exist, WorldLinearVel returns "
           << ignition::math::Vector3d::Zero << " by default." << std::endl;
     return ignition::math::Vector3d::Zero;
   }
@@ -408,7 +408,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
-          << " does not exist, GetWorldLinearVel returns "
+          << " does not exist, WorldLinearVel returns "
           << ignition::math::Vector3d::Zero << " by default." << std::endl;
     return ignition::math::Vector3d::Zero;
   }
@@ -442,7 +442,7 @@ ignition::math::Vector3d BulletLink::WorldAngularVel() const
   if (!this->rigidLink)
   {
     gzlog << "Bullet rigid body for link [" << this->GetName() << "]"
-          << " does not exist, GetWorldAngularVel returns "
+          << " does not exist, WorldAngularVel returns "
           << ignition::math::Vector3d::Zero << " by default." << std::endl;
     return ignition::math::Vector3d::Zero;
   }
