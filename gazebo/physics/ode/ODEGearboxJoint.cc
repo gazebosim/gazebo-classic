@@ -83,7 +83,8 @@ void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -101,7 +102,8 @@ ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEGearboxJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -173,7 +175,8 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEGearboxJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEGearboxJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzlog << "ODEGearboxJoint::Anchor not implemented.\n";
   return ignition::math::Vector3d::Zero;

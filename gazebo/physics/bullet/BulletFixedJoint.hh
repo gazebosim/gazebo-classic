@@ -69,7 +69,8 @@ namespace gazebo
                                          const double _limit);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double PositionImpl(const unsigned int _index) const;

@@ -42,7 +42,8 @@ ODEBallJoint::~ODEBallJoint()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEBallJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -74,7 +75,8 @@ void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEBallJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }

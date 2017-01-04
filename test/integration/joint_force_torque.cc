@@ -391,12 +391,18 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
       EXPECT_NEAR(wrench_01.body1Torque.Y(), -175.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.Z(),    0.0, TOL_CONT);
 
-      EXPECT_NEAR(wrench_01.body2Force.X(),  -wrench_01.body1Force.X(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.Y(),  -wrench_01.body1Force.Y(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.Z(),  -wrench_01.body1Force.Z(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.X(), -wrench_01.body1Torque.X(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.Y(), -wrench_01.body1Torque.Y(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.Z(), -wrench_01.body1Torque.Z(), TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.X(), -wrench_01.body1Force.X(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Y(), -wrench_01.body1Force.Y(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Z(), -wrench_01.body1Force.Z(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.X(), -wrench_01.body1Torque.X(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Y(), -wrench_01.body1Torque.Y(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Z(), -wrench_01.body1Torque.Z(),
+          TOL_CONT);
 
       gzlog << "joint_01 force torque : "
             << "step [" << i
@@ -520,12 +526,18 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
       EXPECT_NEAR(wrench_01.body1Torque.Y(), -175.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Torque.Z(),    0.0, TOL_CONT);
 
-      EXPECT_NEAR(wrench_01.body2Force.X(),  -wrench_01.body1Force.X(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.Y(),  -wrench_01.body1Force.Y(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Force.Z(),  -wrench_01.body1Force.Z(),  TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.X(), -wrench_01.body1Torque.X(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.Y(), -wrench_01.body1Torque.Y(), TOL_CONT);
-      EXPECT_NEAR(wrench_01.body2Torque.Z(), -wrench_01.body1Torque.Z(), TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.X(), -wrench_01.body1Force.X(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Y(), -wrench_01.body1Force.Y(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Force.Z(), -wrench_01.body1Force.Z(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.X(), -wrench_01.body1Torque.X(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Y(), -wrench_01.body1Torque.Y(),
+          TOL_CONT);
+      EXPECT_NEAR(wrench_01.body2Torque.Z(), -wrench_01.body1Torque.Z(),
+          TOL_CONT);
 
       gzlog << "joint_01 force torque : "
             << "step [" << i

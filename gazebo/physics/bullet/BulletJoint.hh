@@ -84,15 +84,18 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       /// \brief Get the anchor point
-      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual ignition::math::Vector3d LinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(
+          const unsigned int _index) const;
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
-      public: virtual ignition::math::Vector3d LinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

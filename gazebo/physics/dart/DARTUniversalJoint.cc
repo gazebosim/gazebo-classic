@@ -54,7 +54,8 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTUniversalJoint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -70,7 +71,8 @@ ignition::math::Vector3d DARTUniversalJoint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {

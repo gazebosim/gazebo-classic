@@ -52,7 +52,8 @@ void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEHingeJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEHingeJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   dVector3 result;
 
@@ -84,7 +85,8 @@ void ODEHingeJoint::SetAnchor(const unsigned int /*index*/,
 
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEHingeJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEHingeJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -114,7 +116,10 @@ void ODEHingeJoint::SetAxis(const unsigned int _index,
   auto globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
-    dJointSetHingeAxis(this->jointId, globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+  {
+    dJointSetHingeAxis(this->jointId, globalAxis.X(), globalAxis.Y(),
+        globalAxis.Z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }

@@ -315,7 +315,8 @@ double BulletSliderJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletSliderJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletSliderJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   ignition::math::Vector3d result = this->initialWorldAxis;
 

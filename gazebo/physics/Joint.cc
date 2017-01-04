@@ -910,8 +910,8 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       // Passing unit quaternion q ensures that parentOffset will be
       //  interpreted in world frame.
       math::Quaternion q;
-      auto parentOffset =
-        this->GetParentWorldPose().Ign().Pos() - this->parentLink->WorldPose().Pos();
+      auto parentOffset = this->GetParentWorldPose().Ign().Pos() -
+                          this->parentLink->WorldPose().Pos();
       linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
     }
 
@@ -1487,8 +1487,8 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     newRelativePose.Pos() = rotation.RotateVector(relativePose.Pos());
     newRelativePose.Rot() = rotation * relativePose.Rot();
 
-    newWorldPose =
-      ignition::math::Pose3d(newRelativePose.Pos() + anchor, newRelativePose.Rot());
+    newWorldPose = ignition::math::Pose3d(newRelativePose.Pos() + anchor,
+        newRelativePose.Rot());
 
     // \TODO: ideally we want to set this according to
     // Joint Trajectory velocity and use time step since last update.
@@ -1508,8 +1508,8 @@ math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
     newRelativePose.Pos() = relativePose.Pos() + axis * dposition;
     newRelativePose.Rot() = relativePose.Rot();
 
-    newWorldPose =
-      ignition::math::Pose3d(newRelativePose.Pos() + anchor, newRelativePose.Rot());
+    newWorldPose = ignition::math::Pose3d(newRelativePose.Pos() + anchor,
+        newRelativePose.Rot());
 
     /// \TODO: ideally we want to set this according to Joint Trajectory
     /// velocity and use time step since last update.

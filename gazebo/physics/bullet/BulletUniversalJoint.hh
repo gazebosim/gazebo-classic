@@ -51,10 +51,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: void SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis);
+      public: void SetAxis(const unsigned int _index,
+          const ignition::math::Vector3d &_axis);
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -77,7 +79,8 @@ namespace gazebo
       public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited. \sa Joint::GlobalAxis
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double PositionImpl(const unsigned int _index) const;

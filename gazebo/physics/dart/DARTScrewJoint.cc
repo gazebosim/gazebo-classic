@@ -65,7 +65,8 @@ void DARTScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTScrewJoint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTScrewJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -81,7 +82,8 @@ ignition::math::Vector3d DARTScrewJoint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTScrewJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTScrewJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -113,7 +115,8 @@ ignition::math::Vector3d DARTScrewJoint::GlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTScrewJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTScrewJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {

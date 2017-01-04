@@ -66,10 +66,10 @@ void BulletHinge2Joint::Init()
     gzthrow("BulletHinge2Joint cannot be connected to the world (child)");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
-  ignition::math::Vector3d axis1 = axis1Elem->Get<ignition::math::Vector3d>("xyz");
+  auto axis1 = axis1Elem->Get<ignition::math::Vector3d>("xyz");
 
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
-  ignition::math::Vector3d axis2 = axis2Elem->Get<ignition::math::Vector3d>("xyz");
+  auto axis2 = axis2Elem->Get<ignition::math::Vector3d>("xyz");
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
@@ -97,13 +97,14 @@ void BulletHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHinge2Joint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletHinge2Joint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
+math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   if (!this->bulletHinge2)
   {
@@ -221,7 +222,8 @@ double BulletHinge2Joint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHinge2Joint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHinge2Joint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GlobalAxis not implemented\n";
   return ignition::math::Vector3d();

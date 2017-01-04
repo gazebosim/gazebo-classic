@@ -41,7 +41,8 @@ ODEUniversalJoint::~ODEUniversalJoint()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEUniversalJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEUniversalJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -63,13 +64,17 @@ void ODEUniversalJoint::SetAnchor(const unsigned int /*index*/,
   if (this->parentLink) this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetUniversalAnchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
+  {
+    dJointSetUniversalAnchor(this->jointId, _anchor.X(), _anchor.Y(),
+        _anchor.Z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEUniversalJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -96,7 +101,8 @@ ignition::math::Vector3d ODEUniversalJoint::GlobalAxis(unsigned int _index) cons
 }
 
 //////////////////////////////////////////////////
-void ODEUniversalJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEUniversalJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);

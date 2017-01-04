@@ -47,15 +47,16 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyUniversalJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
+math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
-  return ignition::math::Vector3d();
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////

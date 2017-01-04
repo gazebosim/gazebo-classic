@@ -55,7 +55,8 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTSliderJoint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTSliderJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -71,7 +72,8 @@ ignition::math::Vector3d DARTSliderJoint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTSliderJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTSliderJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -101,7 +103,8 @@ ignition::math::Vector3d DARTSliderJoint::GlobalAxis(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTSliderJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {

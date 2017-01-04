@@ -54,7 +54,8 @@ void DARTBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTBallJoint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTBallJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -70,7 +71,8 @@ ignition::math::Vector3d DARTBallJoint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTBallJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }

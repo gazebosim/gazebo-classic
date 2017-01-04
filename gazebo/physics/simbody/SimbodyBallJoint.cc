@@ -48,7 +48,8 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyBallJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -67,7 +68,8 @@ double SimbodyBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyBallJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return ignition::math::Vector3d();

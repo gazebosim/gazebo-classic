@@ -55,7 +55,8 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHinge2Joint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -71,7 +72,8 @@ ignition::math::Vector3d DARTHinge2Joint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void DARTHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -118,7 +120,8 @@ void DARTHinge2Joint::SetAxis(const unsigned int _index, const ignition::math::V
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {

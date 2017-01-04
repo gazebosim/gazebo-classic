@@ -55,7 +55,8 @@ void DARTFixedJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTFixedJoint::Anchor(unsigned int _index) const
+ignition::math::Vector3d DARTFixedJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -71,7 +72,8 @@ ignition::math::Vector3d DARTFixedJoint::Anchor(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTFixedJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
          << "GlobalAxis that is not valid for joints of type fixed.\n";

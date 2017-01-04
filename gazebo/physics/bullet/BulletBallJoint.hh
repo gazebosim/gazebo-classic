@@ -22,6 +22,8 @@
 #ifndef _BULLETBALLJOINT_HH_
 #define _BULLETBALLJOINT_HH_
 
+#include "gazebo/math/Vector3.hh"
+
 #include "gazebo/physics/BallJoint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"
@@ -53,10 +55,11 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetAxis(unsigned int _index) const;
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -76,7 +79,8 @@ namespace gazebo
       public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);

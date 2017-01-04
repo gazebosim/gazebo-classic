@@ -142,7 +142,8 @@ void SimbodyScrewJoint::SetForceImpl(unsigned int _index, double _torque)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (this->simbodyPhysics &&
       this->simbodyPhysics->simbodyPhysicsStepped &&

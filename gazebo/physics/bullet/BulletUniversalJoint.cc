@@ -143,7 +143,8 @@ void BulletUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletUniversalJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletUniversalJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
@@ -360,7 +361,8 @@ double BulletUniversalJoint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletUniversalJoint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d BulletUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {

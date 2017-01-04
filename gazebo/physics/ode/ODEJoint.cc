@@ -320,7 +320,8 @@ void ODEJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEJoint::LinkForce(unsigned int _index) const
+ignition::math::Vector3d ODEJoint::LinkForce(
+          const unsigned int _index) const
 {
   ignition::math::Vector3d result;
 
@@ -343,7 +344,8 @@ ignition::math::Vector3d ODEJoint::LinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEJoint::LinkTorque(unsigned int _index) const
+ignition::math::Vector3d ODEJoint::LinkTorque(
+          const unsigned int _index) const
 {
   ignition::math::Vector3d result;
 
@@ -371,7 +373,8 @@ ignition::math::Vector3d ODEJoint::LinkTorque(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void ODEJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   // record axis in sdf element
   if (_index == 0)
@@ -795,7 +798,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
         // force/torque are in parent link frame, transform them into
         // child link(world) frame.
-        ignition::math::Pose3d parentToWorldTransform = this->parentLink->WorldPose();
+        auto parentToWorldTransform = this->parentLink->WorldPose();
         this->wrench.body1Force =
           parentToWorldTransform.Rot().RotateVector(
           this->wrench.body1Force);
@@ -822,7 +825,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
 
         // force/torque are in child link frame, transform them into
         // parent link frame.  Here, parent link is world, so zero transform.
-        ignition::math::Pose3d childToWorldTransform = this->childLink->WorldPose();
+        auto childToWorldTransform = this->childLink->WorldPose();
         this->wrench.body1Force =
           childToWorldTransform.Rot().RotateVector(
           this->wrench.body1Force);

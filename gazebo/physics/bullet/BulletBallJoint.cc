@@ -139,7 +139,8 @@ void BulletBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletBallJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -158,7 +159,8 @@ double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector3d BulletBallJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
   return ignition::math::Vector3d();
@@ -216,7 +218,7 @@ void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletBallJoint::GetAxis(unsigned int /*_index*/) const
+math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
 {
   return ignition::math::Vector3d();
 }

@@ -49,16 +49,17 @@ void SimbodyHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
+math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
 {
   gzerr << "Not implemented";
-  return ignition::math::Vector3d();
+  return math::Vector3();
 }
 
 //////////////////////////////////////////////////
@@ -91,7 +92,8 @@ void SimbodyHinge2Joint::SetForceImpl(
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyHinge2Joint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyHinge2Joint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "SimbodyHinge2Joint::GlobalAxis not implemented\n";
   return ignition::math::Vector3d();

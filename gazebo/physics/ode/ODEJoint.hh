@@ -212,10 +212,12 @@ namespace gazebo
                                          const double _limit);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d LinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d LinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,

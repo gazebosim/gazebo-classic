@@ -44,11 +44,12 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited.
-      public: ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GetAxis(unsigned int /*_index*/) const
-              {return ignition::math::Vector3d();}
+      public: virtual math::Vector3 GetAxis(unsigned int /*_index*/) const
+              {return math::Vector3();}
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);
@@ -60,7 +61,8 @@ namespace gazebo
       public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,

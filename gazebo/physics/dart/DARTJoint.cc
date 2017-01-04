@@ -351,7 +351,8 @@ double DARTJoint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTJoint::LinkForce(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::LinkForce(
+          const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
     return ignition::math::Vector3d::Zero;
@@ -400,7 +401,8 @@ ignition::math::Vector3d DARTJoint::LinkForce(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTJoint::LinkTorque(unsigned int _index) const
+ignition::math::Vector3d DARTJoint::LinkTorque(
+          const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
     return ignition::math::Vector3d::Zero;

@@ -118,7 +118,8 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletScrewJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletScrewJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   gzerr << "BulletScrewJoint::Anchor not implemented, return 0 vector.\n";
   return ignition::math::Vector3d();
@@ -537,7 +538,8 @@ void BulletScrewJoint::SetLowerLimit(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletScrewJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletScrewJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   ignition::math::Vector3d result = this->initialWorldAxis;
   if (this->bulletScrew)

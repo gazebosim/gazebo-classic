@@ -213,7 +213,8 @@ void BulletFixedJoint::SetLowerLimit(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletFixedJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "BulletFixedJoint: called method "
          << "GlobalAxis that is not valid for joints of type fixed.\n";

@@ -55,7 +55,8 @@ void ODEScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEScrewJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEScrewJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   dVector3 result;
   // initialize to 0
@@ -92,7 +93,8 @@ void ODEScrewJoint::SetAnchor(const unsigned int /*index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEScrewJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEScrewJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
 
@@ -108,7 +110,8 @@ ignition::math::Vector3d ODEScrewJoint::GlobalAxis(unsigned int /*_index*/) cons
 }
 
 //////////////////////////////////////////////////
-void ODEScrewJoint::SetAxis(const unsigned int /*_index*/, const ignition::math::Vector3d &_axis)
+void ODEScrewJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);

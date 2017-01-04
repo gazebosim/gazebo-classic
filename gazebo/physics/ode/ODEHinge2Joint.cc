@@ -52,7 +52,8 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEHinge2Joint::Anchor(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -88,7 +89,8 @@ void ODEHinge2Joint::SetAnchor(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis)
+void ODEHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -125,7 +127,8 @@ void ODEHinge2Joint::SetAxis(const unsigned int _index, const ignition::math::Ve
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEHinge2Joint::GlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 

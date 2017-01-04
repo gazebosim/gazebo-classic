@@ -74,13 +74,16 @@ namespace gazebo
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d LinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual ignition::math::Vector3d LinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

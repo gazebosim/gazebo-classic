@@ -56,15 +56,15 @@ namespace gazebo
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
+        {
+          T::Load(_sdf);
 
-                this->SetAxis(0,
-                    _sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
+          this->SetAxis(0,
+              _sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
-                this->SetAxis(1,
-                    _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
-              }
+          this->SetAxis(1,
+              _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
+        }
     };
     /// \}
   }

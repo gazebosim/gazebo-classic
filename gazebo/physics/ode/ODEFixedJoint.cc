@@ -47,7 +47,8 @@ void ODEFixedJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEFixedJoint::Anchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEFixedJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "Anchor that is not valid for joints of type fixed.\n";
@@ -65,7 +66,8 @@ void ODEFixedJoint::SetAnchor(const unsigned int /*index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d ODEFixedJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
          << "GlobalAxis that is not valid for joints of type fixed.\n";

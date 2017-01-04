@@ -264,7 +264,8 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(const unsigned int _index, const ignition::math::Vector3d &/*_axis*/)
+void SimbodyJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
@@ -448,21 +449,24 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyJoint::LinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkForce(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d SimbodyJoint::LinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkTorque(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
   return ignition::math::Vector3d();

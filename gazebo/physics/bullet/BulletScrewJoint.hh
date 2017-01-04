@@ -54,7 +54,8 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAnchor(const unsigned int _index,
@@ -66,7 +67,8 @@ namespace gazebo
       /// \brief Set the axis of motion
       /// \param[in] _index Axis index.
       /// \param[in] _axis Axis value.
-      public: void SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis);
+      public: void SetAxis(const unsigned int _index,
+          const ignition::math::Vector3d &_axis);
 
       // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -101,7 +103,8 @@ namespace gazebo
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,

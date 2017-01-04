@@ -325,7 +325,7 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in parent link frame, transform them into
       // child link(world) frame.
-      ignition::math::Pose3d parentToWorldTransform = this->parentLink->WorldPose();
+      auto parentToWorldTransform = this->parentLink->WorldPose();
       this->wrench.body1Force =
         parentToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
@@ -350,7 +350,7 @@ void BulletJoint::CacheForceTorque()
 
       // force/torque are in child link frame, transform them into
       // parent link frame.  Here, parent link is world, so zero transform.
-      ignition::math::Pose3d childToWorldTransform = this->childLink->WorldPose();
+      auto childToWorldTransform = this->childLink->WorldPose();
       this->wrench.body1Force =
         childToWorldTransform.Rot().RotateVector(
         this->wrench.body1Force);
@@ -539,21 +539,24 @@ void BulletJoint::SetAnchor(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletJoint::LinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkForce(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletJoint::LinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletJoint::LinkTorque(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
   return ignition::math::Vector3d();

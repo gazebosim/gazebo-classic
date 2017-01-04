@@ -45,14 +45,16 @@ namespace gazebo
       public: virtual ~ODEUniversalJoint();
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAnchor(const unsigned int _index,
                   const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d GlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(const unsigned int _index,

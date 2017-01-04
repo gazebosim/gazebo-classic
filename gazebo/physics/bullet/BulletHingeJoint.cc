@@ -196,7 +196,8 @@ void BulletHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHingeJoint::Anchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   btTransform trans = this->bulletHinge->getAFrame();
   trans.getOrigin() +=
@@ -357,7 +358,8 @@ double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d BulletHingeJoint::GlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHingeJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   ignition::math::Vector3d result = this->initialWorldAxis;
 
