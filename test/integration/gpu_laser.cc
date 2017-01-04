@@ -180,11 +180,12 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
   EXPECT_DOUBLE_EQ(raySensor->Range(samples-1), GZ_DBL_INF);
 
   // Move all boxes out of range
-  world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
-  world->ModelByName(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+  world->ModelByName(box01)->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(maxRange + 1, 0, 0),
+      ignition::math::Quaterniond::Identity));
+  world->ModelByName(box02)->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(0, -(maxRange + 1), 0),
+      ignition::math::Quaterniond::Identity));
 
   // wait for a few more laser scans
   i = 0;
@@ -355,8 +356,9 @@ TEST_F(GPURaySensorTest, Heightmap)
   std::string gpuLaserModelName = "gpu_laser";
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->ModelByName(gpuLaserModelName)->SetWorldPose(
-      math::Pose(math::Vector3(13.2, 0, 0.035), math::Quaternion(0, 0, 0)));
+  world->ModelByName(gpuLaserModelName)->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(13.2, 0, 0.035),
+      ignition::math::Quaterniond::Identity));
 
   // wait for a few laser scans
   i = 0;
