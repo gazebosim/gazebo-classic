@@ -163,7 +163,7 @@ ignition::math::Vector3d BulletBallJoint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -220,7 +220,7 @@ void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
 {
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
