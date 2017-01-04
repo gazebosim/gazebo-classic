@@ -226,7 +226,7 @@ ignition::math::Vector3d BulletHinge2Joint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GlobalAxis not implemented\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
