@@ -69,10 +69,10 @@ void JointTestRevolute::PendulumEnergy(const std::string &_physicsEngine)
     SpawnJointOptions opt;
     opt.type = "revolute";
     opt.worldParent = true;
-    double Am = M_PI / 4;
-    opt.modelPose.rot.SetFromEuler(0, 0, Am);
-    opt.childLinkPose.pos.z = 3.0;
-    opt.jointPose.pos.y = 1.5;
+    double Am = IGN_PI / 4;
+    opt.modelPose.Rot().Euler(0, 0, Am);
+    opt.childLinkPose.Pos().Z() = 3.0;
+    opt.jointPose.Pos().Y() = 1.5;
     opt.axis.Set(1, 0, 0);
 
     gzdbg << "SpawnJoint " << opt.type << " child world" << std::endl;
@@ -123,13 +123,13 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
     // angle should reach 3 pi rad.
-    double vel = 2*M_PI;
+    double vel = 2*IGN_PI;
     unsigned int stepSize = 50;
     unsigned int stepCount = 30;
     double dt = physics->GetMaxStepSize();
 
     // Verify that the joint should make more than 1 revolution
-    EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * M_PI);
+    EXPECT_GT(vel * stepSize * stepCount * dt, 1.25 * 2 * IGN_PI);
 
     joint->SetVelocity(0, vel);
 
@@ -617,10 +617,10 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
 
   {
     // check velocity / energy
-    math::Vector3 vel = link->GetWorldLinearVel();
-    math::Pose pos = link->WorldPose();
-    double pe = g * m * pos.pos.z;
-    double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+    ignition::math::Vector3d vel = link->WorldLinearVel();
+    ignition::math::Pose3d pos = link->WorldPose();
+    double pe = g * m * pos.Pos().Z();
+    double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() + vel.Z()*vel.Z());
     e_start = pe + ke;
     // gzdbg << "total energy [" << e_start
     //       << "] pe[" << pe
@@ -642,10 +642,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->WorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() +
+            vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);
@@ -693,10 +694,11 @@ void JointTestRevolute::SimplePendulum(const std::string &_physicsEngine)
       world->Step(2000);
       {
         // check velocity / energy
-        math::Vector3 vel = link->GetWorldLinearVel();
-        math::Pose pos = link->WorldPose();
-        double pe = g * m * pos.pos.z;
-        double ke = 0.5 * m * (vel.x*vel.x + vel.y*vel.y + vel.z*vel.z);
+        ignition::math::Vector3d vel = link->WorldLinearVel();
+        ignition::math::Pose3d pos = link->WorldPose();
+        double pe = g * m * pos.Pos().Z();
+        double ke = 0.5 * m * (vel.X()*vel.X() + vel.Y()*vel.Y() +
+            vel.Z()*vel.Z());
         double e = pe + ke;
         double e_tol = 3.0*static_cast<double>(i+1)
           / static_cast<double>(steps);

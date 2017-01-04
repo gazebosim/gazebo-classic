@@ -94,11 +94,11 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < 2400; ++i)
   {
     world->Step(1);
-    body->AddForce(math::Vector3(-1, 0, 0));
+    body->AddForce(ignition::math::Vector3d(-1, 0, 0));
 
     if (i > 2385)
     {
-      double v = body->GetWorldLinearVel().x;
+      double v = body->WorldLinearVel().X();
       double q = 0.5 * rho * v * v;
       double cl = cla * a0 * q * area;
       double cd = cda * a0 * q * area;
@@ -117,7 +117,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
         wing_2_pose.rot.RotateVector(wing_2_wrench.body2Force);
       math::Vector3 wing_2_torque =
         wing_2_pose.rot.RotateVector(wing_2_wrench.body2Torque);
-      gzdbg << "body velocity [" << body->GetWorldLinearVel()
+      gzdbg << "body velocity [" << body->WorldLinearVel()
             << "] cl [" << cl
             << "] cd [" << cd
             << "] body force [" << body_wrench.body2Force

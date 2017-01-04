@@ -900,7 +900,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       ignition::math::Vector3d parentOffset =
         this->GetParentWorldPose().pos.Ign() -
         this->parentLink->WorldPose().Pos();
-      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
+      linearVel = this->parentLink->WorldLinearVel(parentOffset, q);
     }
 
     // Add desired velocity along specified axis
@@ -920,19 +920,19 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     //  offset between the child's CG and the joint anchor
     //  and the desired angular velocity.
     ignition::math::Vector3d childCoGOffset =
-      this->childLink->GetWorldCoGPose().pos.Ign() -
+      this->childLink->WorldCoGPose().Pos() -
       this->GetWorldPose().pos.Ign();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }
   else if (this->HasType(Base::SLIDER_JOINT))
   {
-    math::Vector3 desiredVel;
+    ignition::math::Vector3d desiredVel;
     if (this->parentLink)
     {
-      desiredVel = this->parentLink->GetWorldLinearVel();
+      desiredVel = this->parentLink->WorldLinearVel();
     }
-    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    desiredVel += _velocity * this->GetGlobalAxis(_index).Ign();
     this->childLink->SetLinearVel(desiredVel);
   }
   else

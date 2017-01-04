@@ -181,17 +181,18 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
   {
     auto childOffset = jointLower->GetWorldPose().pos.Ign() -
       jointLower->GetChild()->WorldPose().Pos();
-    math::Vector3 parentOffset = jointLower->GetWorldPose().pos.Ign() -
+    ignition::math::Vector3d parentOffset =
+      jointLower->GetWorldPose().pos.Ign() -
       jointLower->GetParent()->WorldPose().Pos();
-    math::Quaternion q;
+    ignition::math::Quaterniond q;
 
-    math::Vector3 childVel =
-      jointLower->GetChild()->GetWorldLinearVel(childOffset, q);
-    math::Vector3 parentVel =
-      jointLower->GetParent()->GetWorldLinearVel(parentOffset, q);
-    EXPECT_NEAR(childVel.x, parentVel.x, g_tolerance);
-    EXPECT_NEAR(childVel.y, parentVel.y, g_tolerance);
-    EXPECT_NEAR(childVel.z, parentVel.z, g_tolerance);
+    ignition::math::Vector3d childVel =
+      jointLower->GetChild()->WorldLinearVel(childOffset, q);
+    ignition::math::Vector3d parentVel =
+      jointLower->GetParent()->WorldLinearVel(parentOffset, q);
+    EXPECT_NEAR(childVel.X(), parentVel.X(), g_tolerance);
+    EXPECT_NEAR(childVel.Y(), parentVel.Y(), g_tolerance);
+    EXPECT_NEAR(childVel.Z(), parentVel.Z(), g_tolerance);
   }
 }
 

@@ -85,7 +85,7 @@ void BulletSliderJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->parentLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of parent.
@@ -104,7 +104,7 @@ void BulletSliderJoint::Init()
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->childLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
     // Rotate pivot offset and axis into body-fixed frame of child.
@@ -194,11 +194,11 @@ void BulletSliderJoint::Init()
 double BulletSliderJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GetGlobalAxis(0).Ign();
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+    result += globalAxis.Dot(this->childLink->WorldLinearVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
+    result -= globalAxis.Dot(this->parentLink->WorldLinearVel());
   return result;
 }
 

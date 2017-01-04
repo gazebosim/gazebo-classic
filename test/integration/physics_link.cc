@@ -72,8 +72,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
     ignition::math::Vector3d _offset)
 {
   // Get state before adding force
-  ignition::math::Vector3d linearVelWorld0 =
-    _link->GetWorldCoGLinearVel().Ign();
+  ignition::math::Vector3d linearVelWorld0 = _link->WorldCoGLinearVel();
   ignition::math::Vector3d angularVelWorld0 = _link->WorldAngularVel();
   ignition::math::Pose3d poseWorld0 = _link->WorldPose();
 
@@ -90,12 +89,12 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
 
   // Check force and torque (at CoG?) in world frame
   ignition::math::Vector3d forceWorld = poseWorld0.Rot().RotateVector(_force);
-  EXPECT_EQ(forceWorld, _link->GetWorldForce().Ign());
+  EXPECT_EQ(forceWorld, _link->WorldForce());
 
   ignition::math::Vector3d worldOffset = poseWorld0.Rot().RotateVector(
       _offset - _link->GetInertial()->GetCoG().Ign());
   ignition::math::Vector3d torqueWorld = worldOffset.Cross(forceWorld);
-  EXPECT_EQ(torqueWorld, _link->GetWorldTorque().Ign());
+  EXPECT_EQ(torqueWorld, _link->WorldTorque());
 
   // Check acceleration in world frame
   ignition::math::Vector3d oneStepLinearAccel =
@@ -113,7 +112,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   // Check velocity in world frame
   ignition::math::Vector3d oneStepLinearVel = linearVelWorld0 +
     dt*oneStepLinearAccel;
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel().Ign());
+  EXPECT_EQ(oneStepLinearVel, _link->WorldCoGLinearVel());
 
   ignition::math::Vector3d oneStepAngularVel = angularVelWorld0 +
     dt*oneStepAngularAccel;
@@ -123,15 +122,15 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   _world->Step(moreThanOneStep);
 
   // Check that force and torque are zero
-  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->GetWorldForce().Ign());
-  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->GetWorldTorque().Ign());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldForce());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldTorque());
 
   // Check that acceleration is zero
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldLinearAccel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldAngularAccel());
 
   // Check that velocity hasn't changed
-  EXPECT_EQ(oneStepLinearVel, _link->GetWorldCoGLinearVel().Ign());
+  EXPECT_EQ(oneStepLinearVel, _link->WorldCoGLinearVel());
   EXPECT_EQ(oneStepAngularVel, _link->WorldAngularVel());
 
   // Add opposing force in link frame and check that link is back to initial
@@ -142,9 +141,9 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
     _link->AddLinkForce(-_force, _offset);
 
   _world->Step(moreThanOneStep);
-  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->GetWorldForce().Ign());
-  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->GetWorldTorque().Ign());
-  EXPECT_EQ(linearVelWorld0, _link->GetWorldCoGLinearVel().Ign());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldForce());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldTorque());
+  EXPECT_EQ(linearVelWorld0, _link->WorldCoGLinearVel());
   EXPECT_EQ(angularVelWorld0, _link->WorldAngularVel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldLinearAccel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldAngularAccel());
@@ -194,21 +193,21 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   // Add force at link frame
   gzdbg << "World == link == inertial frames, no offset" << std::endl;
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
-  EXPECT_EQ(ignition::math::Pose3d::Zero, link->GetWorldInertialPose().Ign());
+  EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldInertialPose());
   this->AddLinkForceTwoWays(world, link, ignition::math::Vector3d(1, 20, 31));
 
   gzdbg << "World != link == inertial frames, no offset" << std::endl;
   model->SetLinkWorldPose(ignition::math::Pose3d(
         ignition::math::Vector3d(2, 3, 4),
         ignition::math::Vector3d(0, IGN_PI/2.0, 1)), link);
-  EXPECT_NE(ignition::math::Pose3d(), link->WorldPose());
-  EXPECT_EQ(link->WorldPose(), link->GetWorldInertialPose().Ign());
+  EXPECT_NE(ignition::math::Pose3d::Zero, link->WorldPose());
+  EXPECT_EQ(link->WorldPose(), link->WorldInertialPose());
   this->AddLinkForceTwoWays(world, link, ignition::math::Vector3d(-1, 10, 5));
 
   gzdbg << "World == link == inertial frames, with offset" << std::endl;
   model->SetLinkWorldPose(ignition::math::Pose3d::Zero, link);
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
-  EXPECT_EQ(ignition::math::Pose3d::Zero, link->GetWorldInertialPose().Ign());
+  EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldInertialPose());
   this->AddLinkForceTwoWays(world, link, ignition::math::Vector3d(5, 4, 3),
       ignition::math::Vector3d(-2, 1, 0));
 
@@ -219,16 +218,14 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       ignition::math::Vector3d(IGN_PI/3.0, IGN_PI*1.5, IGN_PI/4));
   link->GetInertial()->SetCoG(inertialPose);
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
-  EXPECT_EQ(inertialPose, link->GetWorldInertialPose().Ign());
+  EXPECT_EQ(inertialPose, link->WorldInertialPose());
   this->AddLinkForceTwoWays(world, link, ignition::math::Vector3d(1, 2, 1));
 
   gzdbg << "World != link != inertial frames, with offset" << std::endl;
-  model->SetLinkWorldPose(
-      ignition::math::Pose3d(
+  model->SetLinkWorldPose(ignition::math::Pose3d(
         ignition::math::Vector3d(5, 10, -4),
         ignition::math::Vector3d(0, IGN_PI/2.0, IGN_PI/6)), link);
-  inertialPose = ignition::math::Pose3d(
-      ignition::math::Vector3d(0, -5, 10),
+  inertialPose = ignition::math::Pose3d(ignition::math::Vector3d(0, -5, 10),
       ignition::math::Vector3d(0, 2.0*IGN_PI, IGN_PI/3));
   link->GetInertial()->SetCoG(inertialPose);
   this->AddLinkForceTwoWays(world, link, ignition::math::Vector3d(1, 2, 1),
@@ -304,7 +301,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
 
   // Compute initial angular momentum
   const auto H0((I0 * w0));
-  ASSERT_EQ(H0, link->GetWorldAngularMomentum().Ign());
+  ASSERT_EQ(H0, link->WorldAngularMomentum());
   const double H0mag = H0.Length();
 
   ignition::math::Vector3Stats angularMomentumError;
@@ -314,7 +311,7 @@ void PhysicsLinkTest::GetWorldAngularMomentum(const std::string &_physicsEngine)
   for (int i = 0; i < steps; ++i)
   {
     world->Step(1);
-    auto H = link->GetWorldAngularMomentum().Ign();
+    auto H = link->WorldAngularMomentum();
     angularMomentumError.InsertData((H - H0) / H0mag);
   }
   EXPECT_LT(angularMomentumError.Mag().Map()[stat], g_tolerance * 10);
@@ -444,34 +441,33 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 
     EXPECT_EQ(model->WorldPose(), modelPose);
     EXPECT_EQ(link->WorldPose(), linkPose + modelPose);
-    EXPECT_EQ(link->GetWorldInertialPose(),
-              inertialPose + linkPose + modelPose);
+    EXPECT_EQ(link->WorldInertialPose(), inertialPose + linkPose + modelPose);
 
     // i=0: rotated model pose
     //  expect inertial pose to match model pose
     if (i == 0)
     {
-      EXPECT_EQ(model->WorldPose(), link->GetWorldInertialPose().Ign());
+      EXPECT_EQ(model->WorldPose(), link->WorldInertialPose());
     }
     // i=1: rotated link pose
     //  expect inertial pose to match link pose
     else if (i == 1)
     {
-      EXPECT_EQ(link->WorldPose(), link->GetWorldInertialPose().Ign());
+      EXPECT_EQ(link->WorldPose(), link->WorldInertialPose());
     }
     // i=2: offset and rotated inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 2)
     {
       EXPECT_EQ(link->WorldPose().Pos(),
-                link->GetWorldInertialPose().Ign().Pos());
+                link->WorldInertialPose().Pos());
     }
     // i=3: offset inertial pose
     //  expect inertial pose to differ from link pose
     else if (i == 3)
     {
       EXPECT_EQ(link->WorldPose().Pos() + inertialPose.Pos(),
-                link->GetWorldInertialPose().Ign().Pos());
+                link->WorldInertialPose().Pos());
     }
 
     // Expect rotated inertia matrix
@@ -562,8 +558,8 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldAngularVel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldLinearAccel());
   EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldAngularAccel());
-  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldForce().Ign());
-  EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldTorque().Ign());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldForce());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldTorque());
 
   // Publish wrench message
   std::string topicName = "~/" + link->GetScopedName() + "/wrench";
@@ -626,16 +622,16 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
       worldOffset.Cross(forces[i]) + torques[i];
 
     // Wait for message to be received
-    while (link->GetWorldForce() != forceWorld ||
-           link->GetWorldTorque() != torqueWorld)
+    while (link->WorldForce() != forceWorld ||
+           link->WorldTorque() != torqueWorld)
     {
       world->Step(1);
       common::Time::MSleep(1);
     }
 
     // Check force and torque (at CoG?) in world frame
-    EXPECT_EQ(link->GetWorldForce(), forceWorld);
-    EXPECT_EQ(link->GetWorldTorque(), torqueWorld);
+    EXPECT_EQ(link->WorldForce(), forceWorld);
+    EXPECT_EQ(link->WorldTorque(), torqueWorld);
 
     // Reset link's physics states
     link->ResetPhysicsStates();
@@ -646,8 +642,8 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
     EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldAngularVel());
     EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldLinearAccel());
     EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldAngularAccel());
-    EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldForce().Ign());
-    EXPECT_EQ(ignition::math::Vector3d::Zero, link->GetWorldTorque().Ign());
+    EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldForce());
+    EXPECT_EQ(ignition::math::Vector3d::Zero, link->WorldTorque());
   }
 }
 
@@ -714,8 +710,8 @@ void PhysicsLinkTest::SetVelocity(const std::string &_physicsEngine)
 
   // test linear velocity at specific point in space
   ignition::math::Vector3d offset(0, 0, -0.5);
-  ignition::math::Vector3d vel3 = link->GetWorldLinearVel(offset,
-      ignition::math::Quaterniond::Identity).Ign();
+  ignition::math::Vector3d vel3 = link->WorldLinearVel(offset,
+      ignition::math::Quaterniond::Identity);
   EXPECT_NEAR(vel3.X(), 0.0, g_tolerance);
   EXPECT_NEAR(vel3.Y(), 1.0, g_tolerance);
   EXPECT_NEAR(vel3.Z(), 0.0, g_tolerance);

@@ -89,37 +89,37 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
   {
     // Use msgs::AddBoxLink
     msgs::Model msgModel;
-    math::Pose modelPose, linkPose, collisionPose;
+    ignition::math::Pose3d modelPose, linkPose, collisionPose;
 
     msgModel.set_name(this->GetUniqueString("model"));
     msgs::AddBoxLink(msgModel, mass, ignition::math::Vector3d(dx, dy, dz));
-    modelPose.pos.x = i * dz * 5;
-    modelPose.pos.z = dz;
+    modelPose.Pos().X() = i * dz * 5;
+    modelPose.Pos().Z() = dz;
     double z0 = dz - dy/2;
 
     // i=0: rotated model pose
     //  expect collision pose to match model pose
     if (i == 0)
     {
-      modelPose.rot.SetFromEuler(angle, 0.0, 0.0);
+      modelPose.Rot().Euler(angle, 0.0, 0.0);
     }
     // i=1: rotated link pose
     //  expect collision pose to match link pose
     else if (i == 1)
     {
-      linkPose.rot.SetFromEuler(angle, 0.0, 0.0);
+      linkPose.Rot().Euler(angle, 0.0, 0.0);
     }
     // i=2: rotated collision pose
     //  expect collision pose to differ from link pose
     else if (i == 2)
     {
-      collisionPose.rot.SetFromEuler(angle, 0.0, 0.0);
+      collisionPose.Rot().Euler(angle, 0.0, 0.0);
     }
     // i=3: offset collision pose
     //  expect collision pose to differ from link pose
     else if (i == 3)
     {
-      collisionPose.pos.Set(0, 0, dz);
+      collisionPose.Pos().Set(0, 0, dz);
       z0 = 1.5 * dz;
     }
 
@@ -127,9 +127,9 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
       auto msgLink = msgModel.mutable_link(0);
       auto msgCollision = msgLink->mutable_collision(0);
 
-      msgs::Set(msgModel.mutable_pose(), modelPose.Ign());
-      msgs::Set(msgLink->mutable_pose(), linkPose.Ign());
-      msgs::Set(msgCollision->mutable_pose(), collisionPose.Ign());
+      msgs::Set(msgModel.mutable_pose(), modelPose);
+      msgs::Set(msgLink->mutable_pose(), linkPose);
+      msgs::Set(msgCollision->mutable_pose(), collisionPose);
     }
 
     auto model = this->SpawnModel(msgModel);
@@ -142,10 +142,9 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
-    EXPECT_EQ(model->WorldPose(), modelPose.Ign());
-    EXPECT_EQ(link->WorldPose(), linkPose.Ign() + modelPose.Ign());
-    EXPECT_EQ(collision->WorldPose(),
-              collisionPose.Ign() + linkPose.Ign() + modelPose.Ign());
+    EXPECT_EQ(model->WorldPose(), modelPose);
+    EXPECT_EQ(link->WorldPose(), linkPose + modelPose);
+    EXPECT_EQ(collision->WorldPose(), collisionPose + linkPose + modelPose);
 
     // i=0: rotated model pose
     //  expect collision pose to match model pose
@@ -169,7 +168,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     //  expect collision postion to match link position plus offset
     else if (i == 3)
     {
-      EXPECT_EQ(link->WorldPose().Pos() + collisionPose.pos.Ign(),
+      EXPECT_EQ(link->WorldPose().Pos() + collisionPose.Pos(),
                 collision->WorldPose().Pos());
     }
 
@@ -245,7 +244,7 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
     {
       ASSERT_TRUE(link != NULL);
       gzdbg << "Check falling: " << link->GetScopedName() << std::endl;
-      EXPECT_LT(link->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+      EXPECT_LT(link->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
     }
   }
 
@@ -260,7 +259,7 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
     {
       ASSERT_TRUE(link != NULL);
       gzdbg << "Check resting: " << link->GetScopedName() << std::endl;
-      EXPECT_NEAR(link->GetWorldLinearVel().z, 0, g_physics_tol);
+      EXPECT_NEAR(link->WorldLinearVel().Z(), 0, g_physics_tol);
     }
   }
 

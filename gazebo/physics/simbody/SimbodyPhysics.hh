@@ -125,6 +125,12 @@ namespace gazebo
       /// \return Gazeb's math::Vector3 object
       public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v);
 
+      /// \brief Convert SimTK::Vec3 to ignition::math::Vector3d
+      /// \param[in] _v Simbody's SimTK::Vec3 object
+      /// \return ignition::math::Vector3d object
+      public: static ignition::math::Vector3d Vec3ToVector3Ign(
+                  const SimTK::Vec3 &_v);
+
       /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
       /// a Simbody Transform. The rotation angles are interpreted as a
       /// body-fixed sequence, meaning we rotation about x, then about
