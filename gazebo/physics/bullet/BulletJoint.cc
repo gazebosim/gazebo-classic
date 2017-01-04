@@ -543,7 +543,7 @@ ignition::math::Vector3d BulletJoint::Anchor(
     const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -551,7 +551,7 @@ ignition::math::Vector3d BulletJoint::LinkForce(
           const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -559,7 +559,7 @@ ignition::math::Vector3d BulletJoint::LinkTorque(
           const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Bullet\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
