@@ -453,7 +453,7 @@ ignition::math::Vector3d SimbodyJoint::Anchor(
     const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -461,7 +461,7 @@ ignition::math::Vector3d SimbodyJoint::LinkForce(
           const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -469,7 +469,7 @@ ignition::math::Vector3d SimbodyJoint::LinkTorque(
           const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
