@@ -111,7 +111,7 @@ namespace gazebo
 
       /// \brief Set the linear velocity of the model, and all its links.
       /// \param[in] _vel The new linear velocity.
-      /// \deprecated See verion that accepts an ignition math object.
+      /// \deprecated See version that accepts an ignition math object.
       public: void SetLinearVel(const math::Vector3 &_vel)
               GAZEBO_DEPRECATED(8.0);
 
@@ -121,7 +121,7 @@ namespace gazebo
 
       /// \brief Set the angular velocity of the model, and all its links.
       /// \param[in] _vel The new angular velocity.
-      /// \deprecated See verion that accepts an ignition math object.
+      /// \deprecated See version that accepts an ignition math object.
       public: void SetAngularVel(const math::Vector3 &_vel)
               GAZEBO_DEPRECATED(8.0);
 
@@ -132,7 +132,7 @@ namespace gazebo
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
-      /// \deprecated See verion that accepts an ignition math object.
+      /// \deprecated See version that accepts an ignition math object.
       public: void SetLinearAccel(const math::Vector3 &_vel)
               GAZEBO_DEPRECATED(8.0);
 
@@ -144,7 +144,7 @@ namespace gazebo
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
-      /// \deprecated See verion that accepts an ignition math object.
+      /// \deprecated See version that accepts an ignition math object.
       public: void SetAngularAccel(const math::Vector3 &_vel)
               GAZEBO_DEPRECATED(8.0);
 

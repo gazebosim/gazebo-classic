@@ -186,7 +186,7 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
         ignition::math::Quaterniond::Identity));
   world->ModelByName(box02)->SetWorldPose(
       ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // wait for a few more laser scans
   i = 0;
