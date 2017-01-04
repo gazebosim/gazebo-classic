@@ -153,12 +153,12 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
-  // Check that Joint::GetGlobalAxis matches _axis
-  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0).Ign());
+  // Check that Joint::GlobalAxis matches _axis
+  EXPECT_EQ(_axis, _joint->GlobalAxis(0));
 
-  // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // test LocalAxis, GetAxisFrame, and GetAxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
-  auto axisLocalFrame = _joint->GetLocalAxis(0);
+  auto axisLocalFrame = _joint->LocalAxis(0);
   {
     // rotate axis into global frame
     auto axisGlobalFrame =

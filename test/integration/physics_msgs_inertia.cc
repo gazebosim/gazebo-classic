@@ -330,7 +330,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     pendulumLengths.push_back(length);
 
     double angle =
-      asin(jointToCoG.Cross(g).Dot(joint->GetGlobalAxis(0)) / length / 9.8);
+      asin(jointToCoG.Cross(g).Dot(joint->GlobalAxis(0)) / length / 9.8);
     EXPECT_NEAR(angle, -M_PI / 10, 1e-5);
     initialAngles.push_back(angle);
 

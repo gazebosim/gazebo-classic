@@ -77,8 +77,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
 
   // This assumes that front and rear wheel spacing is identical
-  this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(
-                          this->joints[LEFT_FRONT]->GetAnchor(0));
+  this->wheelSeparation = this->joints[RIGHT_FRONT]->Anchor(0).Distance(
+                          this->joints[LEFT_FRONT]->Anchor(0));
 
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
