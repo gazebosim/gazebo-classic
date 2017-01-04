@@ -218,5 +218,5 @@ ignition::math::Vector3d BulletFixedJoint::GlobalAxis(
 {
   gzwarn << "BulletFixedJoint: called method "
          << "GlobalAxis that is not valid for joints of type fixed.\n";
-  return ignition::math::Vector3d();
+  return ignition::math::Vector3d::Zero;
 }
