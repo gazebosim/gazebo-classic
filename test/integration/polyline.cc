@@ -135,7 +135,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // through the polyline
   {
     SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
-        ignition::math::Vector3d(0, 0, 0));
+        ignition::math::Vector3d::Zero);
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);

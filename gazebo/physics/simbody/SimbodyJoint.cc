@@ -106,13 +106,13 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d childPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+    childPose = _sdf->GetElement("child")->Get<ignition::math::Pose3d>("pose");
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
-  math::Pose parentPose;
+  ignition::math::Pose3d parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
     this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
@@ -220,14 +220,14 @@ void SimbodyJoint::CacheForceTorque()
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.
   this->wrench.body1Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+    -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody).Ign();
   this->wrench.body1Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody).Ign();
 
   this->wrench.body2Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+    -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody).Ign();
   this->wrench.body2Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody).Ign();
 }
 
 //////////////////////////////////////////////////
@@ -264,9 +264,10 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
+void SimbodyJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &/*_axis*/)
 {
-  math::Pose parentModelPose;
+  ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
     parentModelPose = this->parentLink->GetModel()->WorldPose();
 
@@ -274,8 +275,8 @@ void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+  ignition::math::Vector3d axis = parentModelPose.Rot().RotateVector(
+    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
@@ -376,8 +377,8 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+void SimbodyJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d & /*_anchor*/)
 {
   gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
@@ -448,24 +449,27 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkForce(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkTorque(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////

@@ -164,7 +164,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -194,12 +194,12 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about x
@@ -212,12 +212,12 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   link_01->SetWorldPose(pose_01);
   EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "]\n";
 
@@ -234,12 +234,12 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
   EXPECT_NEAR(joint_01->Position(0), 0.3*IGN_PI, g_tolerance);
   EXPECT_NEAR(joint_01->Position(1), -0.3*IGN_PI/pitch_01, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "] pitch_01 [" << pitch_01
         << "]\n";
@@ -253,12 +253,12 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
   EXPECT_NEAR(joint_01->Position(0), 0.3*IGN_PI, g_tolerance);
   EXPECT_NEAR(joint_01->Position(1), -0.3*IGN_PI/pitch_01, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "] pitch_01 [" << pitch_01
         << "]\n";
@@ -291,7 +291,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);

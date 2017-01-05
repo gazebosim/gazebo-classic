@@ -54,7 +54,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   SpawnJointOptions opt;
   opt.type = _jointType;
@@ -153,16 +153,16 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
-  // Check that Joint::GetGlobalAxis matches _axis
-  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0).Ign());
+  // Check that Joint::GlobalAxis matches _axis
+  EXPECT_EQ(_axis, _joint->GlobalAxis(0));
 
-  // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // test LocalAxis, GetAxisFrame, and GetAxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
-  ignition::math::Vector3d axisLocalFrame = _joint->GetLocalAxis(0).Ign();
+  ignition::math::Vector3d axisLocalFrame = _joint->LocalAxis(0);
   {
     // rotate axis into global frame
     ignition::math::Vector3d axisGlobalFrame =
-      _joint->GetAxisFrame(0).RotateVector(axisLocalFrame).Ign();
+      _joint->GetAxisFrame(0).Ign().RotateVector(axisLocalFrame);
     // Test GetAxisFrame: check that axis in global frame is
     // computed correctly.
     EXPECT_EQ(axisGlobalFrame, _axis);
@@ -170,7 +170,7 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   {
     // rotate axis into joint frame
     ignition::math::Vector3d axisJointFrame =
-      _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame).Ign();
+      _joint->GetAxisFrameOffset(0).Ign().RotateVector(axisLocalFrame);
     // roate axis specified in global frame into joint frame
     ignition::math::Vector3d axisJointFrame2 =
       _joint->GetWorldPose().Ign().Rot().RotateVectorReverse(_axis);
@@ -226,7 +226,7 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
           parentVelocity = parent->WorldAngularVel();
         }
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
-            || _joint->HasType(physics::Base::SCREW_JOINT))
+              || _joint->HasType(physics::Base::SCREW_JOINT))
         {
           parentVelocity = parent->WorldLinearVel();
         }

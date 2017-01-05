@@ -70,8 +70,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
+  ignition::math::Pose3d anchor;
+  ignition::math::Vector3d axis(1, 0, 0);
   double lower = -M_PI;
 
   double residentLast = 0, shareLast = 0;
@@ -168,8 +168,10 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(ignition::math::Vector3d::UnitX), 3125,
+        1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(ignition::math::Vector3d::UnitY), 87.50,
+        1e-2);
   }
 }
 

@@ -218,7 +218,7 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
 
   // Spawn a box on the second floor, which should call the elevator up.
   this->SpawnBox("_my_test_box_", ignition::math::Vector3d(0.5, 0.5, 0.5),
-      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d::Zero);
 
   // Wait for elevator to move. 10 seconds is more than long enough.
   common::Time::Sleep(10);

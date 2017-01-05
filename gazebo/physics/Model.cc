@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Pose3.hh>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
@@ -900,13 +901,12 @@ ignition::math::Box Model::BoundingBox() const
   box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
   box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  for (const auto &iter : this->links)
   {
-    if (*iter)
+    if (iter)
     {
       ignition::math::Box linkBox;
-      linkBox = (*iter)->BoundingBox();
+      linkBox = iter->BoundingBox();
       box += linkBox;
     }
   }
@@ -1633,7 +1633,7 @@ gazebo::physics::JointPtr Model::CreateJoint(
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
-  joint->Load(_parent, _child, gazebo::math::Pose());
+  joint->Load(_parent, _child, ignition::math::Pose3d::Zero);
   this->joints.push_back(joint);
   return joint;
 }

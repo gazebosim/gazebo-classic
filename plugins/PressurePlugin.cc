@@ -144,11 +144,11 @@ void PressurePlugin::OnUpdate()
       {
         // TODO: determine whether body1Force or body2Force should be used.
         normalForce = iter2->second.normals[i].x *
-                      iter2->second.wrench[i].body1Force.x +
+                      iter2->second.wrench[i].body1Force.X() +
                       iter2->second.normals[i].y *
-                      iter2->second.wrench[i].body1Force.y +
+                      iter2->second.wrench[i].body1Force.Y() +
                       iter2->second.normals[i].z *
-                      iter2->second.wrench[i].body1Force.z;
+                      iter2->second.wrench[i].body1Force.Z();
         normalForceSum += normalForce;
       }
     }

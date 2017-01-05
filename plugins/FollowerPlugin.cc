@@ -157,8 +157,8 @@ void FollowerPlugin::Init()
     return;
 
   this->dataPtr->wheelSeparation =
-      this->dataPtr->leftJoint->GetAnchor(0).Distance(
-      this->dataPtr->rightJoint->GetAnchor(0));
+      this->dataPtr->leftJoint->Anchor(0).Distance(
+      this->dataPtr->rightJoint->Anchor(0));
 
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->dataPtr->leftJoint->GetChild());

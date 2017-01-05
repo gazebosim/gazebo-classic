@@ -791,7 +791,8 @@ namespace gazebo
       /// reference frame specified in world coordinates.
       /// \deprecated See version that accepts ignition math objects.
       public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
-                        const math::Pose &_worldReferenceFrameDst);
+                  const math::Pose &_worldReferenceFrameDst)
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Move Link given source and target frames specified in
       /// world coordinates. Assuming link's relative pose to

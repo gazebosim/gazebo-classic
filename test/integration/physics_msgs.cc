@@ -70,7 +70,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
-  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d::Zero);
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
   gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
