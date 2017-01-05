@@ -845,6 +845,12 @@ release will remove the deprecated code.
 1. **gazebo/math/Angle.hh**
     + ***Deprecation:*** public:   gazebo::math::Angle
     + ***Replacement:*** public: ignition::math::Angle
+    + ***Deprecation:*** GZ_DTOR
+    + ***Replacement:*** IGN_DTOR
+    + ***Deprecation:*** GZ_RTOD
+    + ***Replacement:*** IGN_RTOD
+    + ***Deprecation:*** GZ_NORMALIZE
+    + ***Replacement:*** IGN_NORMALIZE
 
 1. **gazebo/math/Rand.hh**
     + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)
