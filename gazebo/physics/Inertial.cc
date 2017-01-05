@@ -25,20 +25,21 @@ using namespace physics;
 /// \brief Private Inertial data
 class gazebo::physics::InertialPrivate
 {
-  /// \brief Mass the object. Default is 1.0.
+  /// \brief Mass of the object in kg. Default is 1.0.
   public: double mass;
 
   /// \brief Center of gravity in the Link frame.
   /// Default is (0.0 0.0 0.0  0.0 0.0 0.0)
   public: ignition::math::Pose3d cog;
 
-  /// \brief Principal moments of inertia. Default is (1.0 1.0 1.0)
+  /// \brief Principal moments of inertia in kg*m^2. Default is (1.0 1.0 1.0).
   /// These Moments of Inertia are specified in the local Inertial frame.
+  /// Where principals.X() is Ixx, principals.Y() is Iyy, principals.Z() is Izz.
   public: ignition::math::Vector3d principals;
 
-  /// \brief Product moments of inertia. Default is (0.0 0.0 0.0)
+  /// \brief Product moments of inertia in kg*m^2. Default is (0.0 0.0 0.0).
   /// These MOI off-diagonals are specified in the local Inertial frame.
-  /// Where products.x is Ixy, products.y is Ixz and products.z is Iyz.
+  /// Where products.X() is Ixy, products.Y() is Ixz and products.Z() is Iyz.
   public: ignition::math::Vector3d products;
 
   /// \brief Our SDF values.
