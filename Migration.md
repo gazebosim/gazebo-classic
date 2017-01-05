@@ -143,8 +143,6 @@ release will remove the deprecated code.
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
-    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
 
 1. **gazebo/physics/Model.hh**
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const

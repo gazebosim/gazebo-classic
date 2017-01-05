@@ -200,13 +200,7 @@ ShapePtr Collision::GetShape() const
 //////////////////////////////////////////////////
 void Collision::SetScale(const math::Vector3 &_scale)
 {
-  this->SetScale(_scale.Ign());
-}
-
-//////////////////////////////////////////////////
-void Collision::SetScale(const ignition::math::Vector3d &_scale)
-{
-  this->shape->SetScale(_scale);
+  this->shape->SetScale(_scale.Ign());
 }
 
 //////////////////////////////////////////////////
