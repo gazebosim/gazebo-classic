@@ -140,6 +140,7 @@
 1. Deprecate gazebo::math
     * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2574](https://bitbucket.org/osrf/gazebo/pull-request/2574)
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2567](https://bitbucket.org/osrf/gazebo/pull-request/2567)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
@@ -156,14 +157,14 @@
     * [Pull request #2565](https://bitbucket.org/osrf/gazebo/pull-request/2565)
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
-    * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
     * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
     * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
     * [Pull request #2560](https://bitbucket.org/osrf/gazebo/pull-request/2560)
     * [Pull request #2575](https://bitbucket.org/osrf/gazebo/pull-request/2575)
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
-    * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+    * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
+    * [Pull request #2577](https://bitbucket.org/osrf/gazebo/pull-request/2577)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

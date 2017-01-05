@@ -34,6 +34,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/gui/**
+    + Dropped support for Qt4 and migrated the gui library to use Qt5.
+
 1. **gazebo/physics/RayShape.hh**
     + Changed `math::Vector3 relativeStartPos` to `ignition::math::Vector3d relativeStartPos`
     + Changed `math::Vector3 relativeEndPos` to `ignition::math::Vector3d relativeEndPos`
@@ -185,6 +188,18 @@ release will remove the deprecated code.
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** math::Pose GetInitialAnchorPose() const
+    + ***Replacement:*** ignition::math::Pose3d InitialAnchorPose() const
+    + ***Deprecation:*** math::Pose GetWorldPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldPose() const
+    + ***Deprecation:*** math::Pose GetAnchorErrorPose() const
+    + ***Replacement:*** ignition::math::Pose3d AnchorErrorPose() const
+    + ***Deprecation:*** math::Quaternion GetAxisFrame(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Quaterniond AxisFrame(const unsigned int _index) const
+    + ***Deprecation:*** math::Quaternion GetAxisFrameOffset(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Quaterniond AxisFrameOffset(const unsigned int _index) const
+    + ***Deprecation:*** math::Pose ComputeChildLinkPose(unsigned int _index, double _position)
+    + ***Replacement:*** ignition::math::Pose3d ChildLinkPose(const unsigned int _index, const double _position)
     + ***Deprecation:*** virtual unsigned int GetAngleCount() const = 0
     + ***Replacement:*** virtual unsigned int DOF() const = 0
     + ***Deprecation:*** math::Angle GetAngle(unsigned int _index) const
@@ -821,6 +836,28 @@ release will remove the deprecated code.
     + ***Replacement:*** public: ignition::math::OnePoleVector3
 
 1. **gazebo/math/Helpers.hh**
+    + ***Deprecation:*** GZ_DBL_INF
+    + ***Replacement:*** ignition::math::INF_D
+    + ***Deprecation:*** GZ_DBL_MIN
+    + ***Replacement:*** ignition::math::MIN_D
+    + ***Deprecation:*** GZ_DBL_MAX
+    + ***Replacement:*** ignition::math::MAX_D
+    + ***Deprecation:*** GZ_FLT_MIN
+    + ***Replacement:*** ignition::math::MIN_F
+    + ***Deprecation:*** GZ_FLT_MAX
+    + ***Replacement:*** ignition::math::MAX_F
+    + ***Deprecation:*** GZ_INT32_MIN
+    + ***Replacement:*** ignition::math::MIN_I32
+    + ***Deprecation:*** GZ_INT32_MAX
+    + ***Replacement:*** ignition::math::MAX_I32
+    + ***Deprecation:*** GZ_UINT32_MIN
+    + ***Replacement:*** ignition::math::MIN_UI32
+    + ***Deprecation:*** GZ_UINT32_MAX
+    + ***Replacement:*** ignition::math::MAX_UI32
+    + ***Deprecation:*** static const double gazebo::math::NAN_D
+    + ***Replacement:*** static const double ignition::math::NAN_D
+    + ***Deprecation:*** static const int gazebo::math::NAN_I
+    + ***Replacement:*** static const int ignition::math::NAN_I
     + ***Deprecation:*** public: T   gazebo::math::clamp(T, T, T)
     + ***Replacement:*** public: T ignition::math::clamp(T, T, T)
     + ***Deprecation:*** public: bool   gazebo::math::equal(T, T, T)

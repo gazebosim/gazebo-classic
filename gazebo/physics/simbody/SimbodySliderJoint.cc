@@ -129,8 +129,8 @@ ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).RotateVector(
-        this->LocalAxis(_index)).Ign();
+      return this->AxisFrame(_index).RotateVector(
+        this->LocalAxis(_index));
     }
   }
   else
@@ -149,8 +149,8 @@ ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
 
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).RotateVector(
-        this->LocalAxis(_index)).Ign();
+      return this->AxisFrame(_index).RotateVector(
+        this->LocalAxis(_index));
     }
   }
 }

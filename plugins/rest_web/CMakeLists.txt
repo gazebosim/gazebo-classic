@@ -33,19 +33,12 @@ set (qt_headers
     RestUiLoginDialog.hh
 )
 
-include ( ${QT_USE_FILE} )
-
-add_definitions(${QT_DEFINITIONS})
-
-QT4_WRAP_CPP(headers_MOC ${qt_headers})
-
-
+add_definitions(${Qt5Core_DEFINITIONS})
 
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
-  )
-
-
+  ${Qt5Core_INCLUDE_DIRS}
+)
 
 add_library(RestWebPlugin SHARED ${server_src} )
 target_link_libraries(RestWebPlugin ${GAZEBO_libraries} gazebo_msgs)

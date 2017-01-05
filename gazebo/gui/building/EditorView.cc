@@ -188,7 +188,8 @@ void EditorView::contextMenuEvent(QContextMenuEvent *_event)
     return;
   }
 
-  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  QGraphicsItem *item = this->scene()->itemAt(
+      this->mapToScene(_event->pos()), QTransform());
   if (item && item != this->levels[this->currentLevel]->backgroundPixmap)
   {
     _event->ignore();
@@ -251,7 +252,7 @@ void EditorView::mousePressEvent(QMouseEvent *_event)
       && this->drawMode != TEXTURE && (_event->button() != Qt::RightButton))
   {
     QGraphicsItem *mouseItem =
-        this->scene()->itemAt(this->mapToScene(_event->pos()));
+        this->scene()->itemAt(this->mapToScene(_event->pos()), QTransform());
     if (mouseItem && !mouseItem->isSelected())
     {
       EditorItem *editorItem = dynamic_cast<EditorItem*>(mouseItem);
@@ -478,6 +479,7 @@ void EditorView::mouseMoveEvent(QMouseEvent *_event)
                                        absPositionOnWall.y());
           editorItem->SetPositionOnWall(positionLength /
               wallSegmentItem->line().length());
+          editorItem->SetRotation(editorItem->Rotation());
         }
         return;
       }
@@ -600,7 +602,7 @@ void EditorView::mouseDoubleClickEvent(QMouseEvent *_event)
   }
   else
   {
-    if (!this->scene()->itemAt(this->mapToScene(_event->pos())))
+    if (!this->scene()->itemAt(this->mapToScene(_event->pos()), QTransform()))
       this->OnOpenLevelInspector();
   }
 

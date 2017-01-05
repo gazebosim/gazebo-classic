@@ -97,7 +97,6 @@ if (VALID_DISPLAY)
      string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
      string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
-     QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
       if (BUILD_TESTING)
         add_executable(${BINARY_NAME}
@@ -123,8 +122,7 @@ if (VALID_DISPLAY)
       # libraries as dependencies
       libgazebo
       gazebo_gui
-      ${QT_QTTEST_LIBRARY}
-      ${QT_LIBRARIES}
+      ${Qt5Test_LIBRARIES}
       )
 
     # QTest need and extra -o parameter to write logging information to a file

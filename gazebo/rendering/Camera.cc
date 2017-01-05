@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -313,7 +314,7 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       bool result = false;
 
-      if (msg.id() < GZ_UINT32_MAX)
+      if (msg.id() < ignition::math::MAX_UI32)
         result = this->AttachToVisualImpl(msg.id(),
             msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
       else
@@ -1487,7 +1488,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
   else
   {
     gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
-    track.set_id(GZ_UINT32_MAX);
+    track.set_id(ignition::math::MAX_UI32);
   }
 
   track.set_name(_visualName);

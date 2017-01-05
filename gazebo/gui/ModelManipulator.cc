@@ -1017,7 +1017,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1044,7 +1044,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (!this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
