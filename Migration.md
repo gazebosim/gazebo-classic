@@ -665,6 +665,20 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: static math::Vector3 Convert(const Ogre::Vector3 &)
     + ***Replacement:*** public: static ignition::math::Vector3d ConvertIgn(const Ogre::Vector3 &)
 
+1. **gazebo/physics/simbody/SimbodyPhysics.hh**
+    + ***Deprecation:*** public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q)
+    + ***Replacement:*** public: static SimTK::Quaternion QuadToQuad(const ignition::math::Quaterniond &_q);
+    + ***Deprecation:*** public: static math::Quaternion QuadToQuad(const SimTK::Quaternion &_q)
+    + ***Replacement:*** public: static ignition::math::Quaterniond QuadToQuadIgn(
+    + ***Deprecation:*** public: static math::Pose Transform2Pose(const SimTK::Transform &_xAB)
+    + ***Replacement:*** public: static ignition::math::Pose3d Transform2Pose3d(const SimTK::Transform &_xAB);
+
+1. **gazebo/physics/dart/DARTTypes.hh**
+    + ***Deprecation:*** public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
+    + ***Replacement:*** public: static Eigen::Quaterniond ConvQuat(const ignition::math::Quaterniond &_quat)
+    + ***Deprecation:*** public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
+    + ***Replacement:*** public: static ignition::math::Quaterniond ConvQuatIgn(const Eigen::Quaterniond &_quat)
+
 1. **gazebo/physics/dart/DARTCollision.hh**
     + ***Deprecation:*** public: dart::dynamics::Shape *GetDARTCollisionShape() const
     + ***Replacement:*** public: dart::dynamics::ShapePtr DARTCollisionShape() const
@@ -852,6 +866,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Matrix4.hh**
     + ***Deprecation:*** public:   gazebo::math::Matrix4
     + ***Replacement:*** public: ignition::math::Matrix4
+
+1. **gazebo/math/Quaternion.hh**
+    + ***Deprecation:*** public:   gazebo::math::Quaternion
+    + ***Replacement:*** public: ignition::math::Quaterniond
 
 1. **gazebo/math/Plane.hh**
     + ***Deprecation:*** public:   gazebo::math::Plane

@@ -272,7 +272,7 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
     result.mass;
 
   // make a decision on the new orientation, set it to identity
-  result.cog.rot = math::Quaternion(1, 0, 0, 0);
+  result.cog.rot = ignition::math::Quaterniond(1, 0, 0, 0);
 
   // compute equivalent I for (*this) at the new CoG
   auto Ithis = this->MOI(result.cog.Ign());

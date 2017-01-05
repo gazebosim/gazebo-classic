@@ -56,31 +56,33 @@ namespace gazebo
     /// \param[in] _y Y param
     /// \param[in] _z Z param
     public: Quaternion(const double &_w, const double &_x, const double &_y,
-                        const double &_z);
+                        const double &_z) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Constructor from Euler angles in radians
     /// \param[in] _roll  roll
     /// \param[in] _pitch pitch
     /// \param[in] _yaw   yaw
     public: Quaternion(const double &_roll, const double &_pitch,
-                        const double &_yaw);
+                        const double &_yaw) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Constructor from axis angle
     /// \param[in] _axis the rotation axis
     /// \param[in] _angle the rotation angle in radians
-    public: Quaternion(const Vector3 &_axis, const double &_angle);
+    public: Quaternion(const Vector3 &_axis, const double &_angle)
+        GAZEBO_DEPRECATED(8.0);
 
     /// \brief Constructor
     /// \param[in] _rpy euler angles
-    public: Quaternion(const Vector3 &_rpy);
+    public: Quaternion(const Vector3 &_rpy) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy constructor
     /// \param[in] _qt Quaternion to copy
-    public: Quaternion(const Quaternion &_qt);
+    public: Quaternion(const Quaternion &_qt) GAZEBO_DEPRECATED(8.0);
 
     /// \brief Copy constructor for ignition::math::Quaterniond
     /// \param[in] _qt Ignition math quaterniond to copy
-    public: Quaternion(const ignition::math::Quaterniond &_qt);
+    public: Quaternion(const ignition::math::Quaterniond &_qt)
+        GAZEBO_DEPRECATED(8.0);
 
     /// \brief Destructor
     public: ~Quaternion();
@@ -318,11 +320,11 @@ namespace gazebo
 
     /// \brief Get the quaternion as a 3x3 matrix
     /// \return The 3x3 matrix form of the quaternion
-    public: Matrix3 GetAsMatrix3() const;
+    public: Matrix3 GetAsMatrix3() const GAZEBO_DEPRECATED(8.0);
 
     /// \brief Get the quaternion as a 4x4 matrix
     /// \return a 4x4 matrix
-    public: Matrix4 GetAsMatrix4() const;
+    public: Matrix4 GetAsMatrix4() const GAZEBO_DEPRECATED(8.0);
 
     /// \brief Return the X axis
     /// \return the X axis of the vector
@@ -399,15 +401,8 @@ namespace gazebo
                 const gazebo::math::Quaternion &_q)
     {
       Vector3 v(_q.GetAsEuler());
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
       _out << precision(v.x, 6) << " " << precision(v.y, 6) << " "
            << precision(v.z, 6);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
       return _out;
     }
 
@@ -418,13 +413,13 @@ namespace gazebo
     public: friend std::istream &operator>>(std::istream &_in,
                                              gazebo::math::Quaternion &_q)
     {
-      Angle roll, pitch, yaw;
+      double roll, pitch, yaw;
 
       // Skip white spaces
       _in.setf(std::ios_base::skipws);
       _in >> roll >> pitch >> yaw;
 
-      _q.SetFromEuler(Vector3(*roll, *pitch, *yaw));
+      _q.SetFromEuler(Vector3(roll, pitch, yaw));
 
       return _in;
     }

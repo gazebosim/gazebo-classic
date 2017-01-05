@@ -568,7 +568,7 @@ void SimbodyPhysics::UpdateCollision()
               /// my gazebo way of rotating frames for now, to replace with
               /// clean simbody function calls.
               /// rotation from link2 to link1 frame specified in link2 frame
-              math::Quaternion rot21 = (pose1 - pose2).rot;
+              ignition::math::Quaterniond rot21 = (pose1 - pose2).Rot();
               t1cg = SimbodyPhysics::Vector3ToVec3(
                 rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(t1cg)));
               f1cg = SimbodyPhysics::Vector3ToVec3(
@@ -685,7 +685,7 @@ void SimbodyPhysics::UpdatePhysics()
     {
       physics::SimbodyLinkPtr simbodyLink =
         boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
-      math::Pose pose = SimbodyPhysics::Transform2Pose(
+      auto pose = SimbodyPhysics::Transform2Pose3d(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dataPtr->dirtyPoses.push_back(
@@ -1552,9 +1552,30 @@ SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
 }
 
 /////////////////////////////////////////////////
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(
+    const ignition::math::Quaterniond &_q)
+{
+  return SimTK::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
+}
+
+/////////////////////////////////////////////////
 math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Quaterniond SimbodyPhysics::QuadToQuadIgn(
+    const SimTK::Quaternion &_q)
+{
+  return ignition::math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
 }
 
 /////////////////////////////////////////////////
@@ -1595,10 +1616,18 @@ SimTK::Transform SimbodyPhysics::Pose2Transform(
 /////////////////////////////////////////////////
 math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
 {
+  return Transform2Pose3d(_xAB);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d SimbodyPhysics::Transform2Pose3d(
+    const SimTK::Transform &_xAB)
+{
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
-  return math::Pose(math::Vector3(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
-    math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
+  return ignition::math::Pose3d(
+       ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
+       ignition::math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////

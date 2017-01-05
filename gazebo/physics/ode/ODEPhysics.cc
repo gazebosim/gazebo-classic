@@ -1350,18 +1350,18 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->WorldPose();
+    ignition::math::Pose3d pose = link->WorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
-    math::Vector3 dpos(pos[0], pos[1], pos[2]);
-    math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
+    ignition::math::Vector3d dpos(pos[0], pos[1], pos[2]);
+    ignition::math::Quaterniond drot(rot[0], rot[1], rot[2], rot[3]);
 
     std::cout << "Body[" << link->GetScopedName() << "]\n";
     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
-    if (pose.pos != dpos)
-      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
-    if (pose.rot != drot)
-      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
+    if (pose.Pos() != dpos)
+      std::cout << "    Incorrect world pos[" << pose.Pos() << "]\n";
+    if (pose.Rot() != drot)
+      std::cout << "    Incorrect world rot[" << pose.Rot() << "]\n";
 
     dMass mass;
     dBodyGetMass(b, &mass);
@@ -1382,10 +1382,10 @@ void ODEPhysics::DebugPrint() const
       std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
       std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
 
-      if (pose.pos != dpos)
-        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
-      if (pose.rot != drot)
-        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
+      if (pose.Pos() != dpos)
+        std::cout << "      Incorrect world pos[" << pose.Pos() << "]\n";
+      if (pose.Rot() != drot)
+        std::cout << "      Incorrect world rot[" << pose.Rot() << "]\n";
 
       g = dBodyGetNextGeom(g);
     }

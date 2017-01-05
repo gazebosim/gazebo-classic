@@ -50,9 +50,9 @@ MultiRayShape::~MultiRayShape()
 //////////////////////////////////////////////////
 void MultiRayShape::Init()
 {
-  math::Vector3 start, end, axis;
+  ignition::math::Vector3d start, end, axis;
   double yawAngle, pitchAngle;
-  math::Quaternion ray;
+  ignition::math::Quaterniond ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
@@ -102,11 +102,12 @@ void MultiRayShape::Init()
 
       // since we're rotating a unit x vector, a pitch rotation will now be
       // around the negative y axis
-      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ray.Euler(ignition::math::Vector3d(0.0, -pitchAngle, yawAngle));
+      axis = this->offset.Ign().Rot() * ray *
+          ignition::math::Vector3d(1.0, 0.0, 0.0);
 
-      start = (axis * this->minRange) + this->offset.pos;
-      end = (axis * this->maxRange) + this->offset.pos;
+      start = (axis * this->minRange) + this->offset.Ign().Pos();
+      end = (axis * this->maxRange) + this->offset.Ign().Pos();
 
       this->AddRay(start, end);
     }

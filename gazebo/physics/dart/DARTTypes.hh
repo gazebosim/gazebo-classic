@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+
 #ifndef GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 #define GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 
@@ -85,14 +86,33 @@ namespace gazebo
 
         /// \brief
       public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
+          GAZEBO_DEPRECATED(8.0)
         {
             return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
         }
 
+      /// \brief Convert ignition quaternion to eigen quaternion.
+      /// \param[in] _quat Ignition object.
+      /// \return Equivalent eigen object.
+      public: static Eigen::Quaterniond ConvQuat(
+          const ignition::math::Quaterniond &_quat)
+        {
+            return Eigen::Quaterniond(_quat.W(), _quat.X(), _quat.Y(), _quat.Z());
+        }
+
         /// \brief
       public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
+          GAZEBO_DEPRECATED(8.0)
         {
+
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
             return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
         }
 
       /// \brief Convert eigen quaternion to ignition quaternion.
@@ -105,7 +125,6 @@ namespace gazebo
             _quat.w(), _quat.x(), _quat.y(), _quat.z());
       }
 
-
         /// \brief
       public: static Eigen::Isometry3d ConvPose(const math::Pose &_pose)
         {
@@ -116,7 +135,7 @@ namespace gazebo
             Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
 
             res.translation() = ConvVec3(_pose.pos);
-            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
+            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.Ign().Rot()));
 
             return res;
         }
@@ -126,7 +145,7 @@ namespace gazebo
         {
             math::Pose pose;
             pose.pos = ConvVec3(_T.translation());
-            pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
+            pose.rot = ConvQuatIgn(Eigen::Quaterniond(_T.linear()));
             return pose;
         }
 

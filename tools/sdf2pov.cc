@@ -75,11 +75,11 @@ bool parse(int argc, char **argv)
 gazebo::math::Vector3 Convert(const gazebo::math::Vector3 &_vec)
 {
   gazebo::math::Vector3 result;
-  gazebo::math::Quaternion rot1(0, M_PI*.5, 0);
-  gazebo::math::Quaternion rot2(0, -M_PI*.5, 0);
+  ignition::math::Quaterniond rot1(0, M_PI*.5, 0);
+  ignition::math::Quaterniond rot2(0, -M_PI*.5, 0);
 
-  result = rot1.RotateVector(_vec);
-  result = rot2.RotateVector(result);
+  result = rot1.RotateVector(_vec.Ign());
+  result = rot2.RotateVector(result.Ign());
 
   return result;
 }

@@ -1825,7 +1825,14 @@ ignition::math::Vector3d Visual::Position() const
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Rotation();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
