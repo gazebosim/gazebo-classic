@@ -97,14 +97,13 @@ namespace gazebo
       public: static Eigen::Quaterniond ConvQuat(
           const ignition::math::Quaterniond &_quat)
         {
-            return Eigen::Quaterniond(_quat.W(), _quat.X(), _quat.Y(), _quat.Z());
+          return Eigen::Quaterniond(_quat.W(), _quat.X(), _quat.Y(), _quat.Z());
         }
 
         /// \brief
       public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
           GAZEBO_DEPRECATED(8.0)
         {
-
 #ifndef _WIN32
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
