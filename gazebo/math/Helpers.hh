@@ -37,7 +37,7 @@
 #define GZ_DBL_INF gazebo::math::INF_D
 
 /// \brief Float maximum value
-#define GZ_FLT_MAX gazebo::math::MIN_F
+#define GZ_FLT_MAX gazebo::math::MAX_F
 
 /// \brief Float minimum value
 #define GZ_FLT_MIN gazebo::math::MIN_F
