@@ -167,7 +167,8 @@ Inertial Inertial::operator()(
   result.SetCoG(result.CoG() - _frameOffset);
 
   // new MOI after link frame offset
-  result.SetMOI(this->MOI(result.CoG()));
+  result.SetMOI(this->MOI(ignition::math::Pose3d(result.CoG(),
+          ignition::math::Quaterniond::Identity)));
 
   return result;
 }
@@ -363,7 +364,7 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   ignition::math::Matrix3d Ithis = this->MOI(result.dataPtr->cog);
 
   // compute equivalent I for _inertial at the new CoG
-  ignition::math::Matrix3d Iparam = _inertial.MOI(result.dataPtr->cog.Pos());
+  ignition::math::Matrix3d Iparam = _inertial.MOI(result.dataPtr->cog);
 
   // sum up principals and products now they are at the same location
   result.SetMOI(Ithis + Iparam);
