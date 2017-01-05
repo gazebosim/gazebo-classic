@@ -201,14 +201,14 @@ release will remove the deprecated code.
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
     + ***Deprecation:*** void SetInitialRelativePose(const math::Pose &_pose)
     + ***Replacement:*** void SetInitialRelativePose(const ignition::math::Pose3d &_pose)
-    + ***Deprecation:*** math::Pose GetInitialRelativePose() const 
+    + ***Deprecation:*** math::Pose GetInitialRelativePose() const
     + ***Replacement:*** ignition::math::Pose3d InitialRelativePose() const
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
     + ***Deprecation:*** void SetRelativePose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
     + ***Replacement:*** void SetRelativePose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true)
     + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
-    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true) 
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true)
     + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearVel() const
     + ***Replacement:*** virtual ignition::math::Vector3d RelativeLinearVel() const
     + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel() const
@@ -565,7 +565,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** virtual void SetForce(const math::Vector3 &_force)
     + ***Replacement:*** virtual void SetForce(const ignition::math::Vector3d &_force)
     + ***Deprecation:*** virtual void SetTorque(const math::Vector3 &_torque)
-    + ***Replacement:***virtual void SetTorque(const ignition::math::Vector3d &_torque) 
+    + ***Replacement:***virtual void SetTorque(const ignition::math::Vector3d &_torque)
     + ***Deprecation:*** virtual void AddForce(const math::Vector3 &_force)
     + ***Replacement:*** virtual void AddForce(const ignition::math::Vector3d &_force)
     + ***Deprecation:*** virtual void AddRelativeForce(const math::Vector3 &_force)
@@ -587,7 +587,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel(const math::Vector3 &_offset) const
     + ***Replacement:*** virtual ignition::math::Vector3d WorldLinearVel(const ignition::math::Vector3d &_offset) const
     + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel(const math::Vector3 &_offset, const math::Quaternion &_q) const
-    + ***Replacement:***  virtual ignition::math::Vector3d WorldLinearVel(const ignition::math::Vector3d &_offset, const ignition::math::Quaterniond &_q) const 
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldLinearVel(const ignition::math::Vector3d &_offset, const ignition::math::Quaterniond &_q) const
     + ***Deprecation:*** virtual math::Vector3 GetWorldCoGLinearVel() const
     + ***Replacement:*** virtual ignition::math::Vector3d WorldCoGLinearVel() const
     + ***Deprecation:*** math::Vector3 GetRelativeLinearVel() const
@@ -614,7 +614,7 @@ release will remove the deprecated code.
     + ***Replacement:*** virtual ignition::math::Vector3d WorldTorque() const
     + ***Deprecation:*** math::Pose GetWorldInertialPose() const
     + ***Replacement:*** ignition::math::Pose3d WorldInertialPose() const
-    + ***Deprecation:*** void AttachStaticModel(ModelPtr &_model, const math::Pose &_offset) 
+    + ***Deprecation:*** void AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
     + ***Replacement:*** void AttachStaticModel(ModelPtr &_model, const ignition::math::Pose3d &_offset)
 
 1. **gazebo/physics/MultiRayShape.hh**
