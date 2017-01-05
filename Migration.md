@@ -143,6 +143,18 @@ release will remove the deprecated code.
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
 1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** math::Pose GetInitialAnchorPose() const
+    + ***Replacement:*** ignition::math::Pose3d InitialAnchorPose() const
+    + ***Deprecation:*** math::Pose GetWorldPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldPose() const
+    + ***Deprecation:*** math::Pose GetAnchorErrorPose() const
+    + ***Replacement:*** ignition::math::Pose3d AnchorErrorPose() const
+    + ***Deprecation:*** math::Quaternion GetAxisFrame(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Quaterniond AxisFrame(const unsigned int _index) const
+    + ***Deprecation:*** math::Quaternion GetAxisFrameOffset(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Quaterniond AxisFrameOffset(const unsigned int _index) const
+    + ***Deprecation:*** math::Pose ComputeChildLinkPose(unsigned int _index, double _position)
+    + ***Replacement:*** ignition::math::Pose3d ChildLinkPose(const unsigned int _index, const double _position)
     + ***Deprecation:*** virtual unsigned int GetAngleCount() const = 0
     + ***Replacement:*** virtual unsigned int DOF() const = 0
     + ***Deprecation:*** math::Angle GetAngle(unsigned int _index) const

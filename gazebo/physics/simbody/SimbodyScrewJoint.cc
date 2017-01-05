@@ -166,7 +166,7 @@ ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }
@@ -185,7 +185,7 @@ ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }

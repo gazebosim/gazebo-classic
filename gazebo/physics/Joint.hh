@@ -683,34 +683,73 @@ namespace gazebo
       /// \brief Get initial Anchor Pose specified by model
       /// <joint><pose>...</pose></joint>
       /// \return Joint::anchorPose, initial joint anchor pose.
-      public: math::Pose GetInitialAnchorPose() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Pose GetInitialAnchorPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get initial Anchor Pose specified by model
+      /// <joint><pose>...</pose></joint>
+      /// \return Joint::anchorPose, initial joint anchor pose.
+      public: ignition::math::Pose3d InitialAnchorPose() const;
 
       /// \brief Get pose of joint frame relative to world frame.
       /// Note that the joint frame is defined with a fixed offset from
       /// the child link frame.
       /// \return Pose of joint frame relative to world frame.
-      public: math::Pose GetWorldPose() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get pose of joint frame relative to world frame.
+      /// Note that the joint frame is defined with a fixed offset from
+      /// the child link frame.
+      /// \return Pose of joint frame relative to world frame.
+      public: ignition::math::Pose3d WorldPose() const;
 
       /// \brief Get anchor pose on parent link relative to world frame.
       /// When there is zero joint error, this should match the value
       /// returned by Joint::GetWorldPose() for the constrained degrees
       /// of freedom.
       /// \return Anchor pose on parent link in world frame.
-      public: math::Pose GetParentWorldPose() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Pose GetParentWorldPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get anchor pose on parent link relative to world frame.
+      /// When there is zero joint error, this should match the value
+      /// returned by Joint::WorldPose() for the constrained degrees
+      /// of freedom.
+      /// \return Anchor pose on parent link in world frame.
+      public: ignition::math::Pose3d ParentWorldPose() const;
 
       /// \brief Get pose offset between anchor pose on child and parent,
       /// expressed in the parent link frame. This can be used to compute
       /// the bilateral constraint error.
       /// \return Pose offset between anchor pose on child and parent,
       /// in parent link frame.
-      public: math::Pose GetAnchorErrorPose() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Pose GetAnchorErrorPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get pose offset between anchor pose on child and parent,
+      /// expressed in the parent link frame. This can be used to compute
+      /// the bilateral constraint error.
+      /// \return Pose offset between anchor pose on child and parent,
+      /// in parent link frame.
+      public: ignition::math::Pose3d AnchorErrorPose() const;
 
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
       /// is used to determine the appropriate frame.
       /// \param[in] _index joint axis index.
       /// \return Orientation of axis frame relative to world frame.
-      public: math::Quaternion GetAxisFrame(unsigned int _index) const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Quaternion GetAxisFrame(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get orientation of reference frame for specified axis,
+      /// relative to world frame. The value of axisParentModelFrame
+      /// is used to determine the appropriate frame.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to world frame.
+      public: ignition::math::Quaterniond AxisFrame(
+          const unsigned int _index) const;
 
       /// \brief Get orientation of joint axis reference frame
       /// relative to joint frame. This should always return identity unless
@@ -724,7 +763,24 @@ namespace gazebo
       /// \return Orientation of axis frame relative to joint frame.
       /// If supplied _index is out of range, or use_parent_model_frame
       /// is not true, this function returns identity rotation quaternion.
-      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get orientation of joint axis reference frame
+      /// relative to joint frame. This should always return identity unless
+      /// flag use_parent_model_frame is true in sdf 1.5 or using sdf 1.4-,
+      /// i.e. bug described in issue #494 is present.
+      /// In addition, if use_parent_model_frame is true, and the parent
+      /// link of the joint is world, the axis is defined in the world frame.
+      /// The value of axisParentModelFrame is used to determine the
+      /// appropriate frame internally.
+      /// \param[in] _index joint axis index.
+      /// \return Orientation of axis frame relative to joint frame.
+      /// If supplied _index is out of range, or use_parent_model_frame
+      /// is not true, this function returns identity rotation quaternion.
+      public: ignition::math::Quaterniond AxisFrameOffset(
+          const unsigned int _index) const;
 
       /// \brief Returns this joint's spring potential energy,
       /// based on the reference position of the spring.
@@ -767,8 +823,17 @@ namespace gazebo
       /// \param[in] _index axis index
       /// \param[in] _position new joint position
       /// \return new child link pose at new joint position.
+      /// \deprecated See function that returns ignition math.
       protected: math::Pose ComputeChildLinkPose(unsigned int _index,
-          double _position);
+          double _position) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief internal function to help us compute child link pose
+      /// if a joint position change is applied.
+      /// \param[in] _index axis index
+      /// \param[in] _position new joint position
+      /// \return new child link pose at new joint position.
+      protected: ignition::math::Pose3d ChildLinkPose(
+          const unsigned int _index, const double _position);
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
