@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Pose3.hh>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
@@ -246,7 +247,8 @@ void Model::LoadJoints()
 void Model::Init()
 {
   // Record the model's initial pose (for reseting)
-  math::Pose initPose = this->sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d initPose =
+    this->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetInitialRelativePose(initPose);
   this->SetRelativePose(initPose);
 
@@ -684,7 +686,7 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearVel(_vel);
+      (*iter)->SetLinearVel(_vel.Ign());
     }
   }
 }
@@ -698,7 +700,7 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularVel(_vel);
+      (*iter)->SetAngularVel(_vel.Ign());
     }
   }
 }
@@ -712,7 +714,7 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearAccel(_accel);
+      (*iter)->SetLinearAccel(_accel.Ign());
     }
   }
 }
@@ -726,7 +728,7 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularAccel(_accel);
+      (*iter)->SetAngularAccel(_accel.Ign());
     }
   }
 }
@@ -734,91 +736,153 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
+  return this->RelativeLinearVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::RelativeLinearVel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeLinearVel();
+    return this->GetLink("canonical")->RelativeLinearVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
+  return this->WorldLinearVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::WorldLinearVel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldLinearVel();
+  {
+    return this->GetLink("canonical")->WorldLinearVel();
+  }
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
+  return this->RelativeAngularVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::RelativeAngularVel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeAngularVel();
+    return this->GetLink("canonical")->RelativeAngularVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
+  return this->WorldAngularVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::WorldAngularVel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldAngularVel();
+    return this->GetLink("canonical")->WorldAngularVel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
+  return this->RelativeLinearAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::RelativeLinearAccel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeLinearAccel();
+    return this->GetLink("canonical")->RelativeLinearAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
+  return this->WorldLinearAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::WorldLinearAccel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldLinearAccel();
+    return this->GetLink("canonical")->WorldLinearAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
+  return this->RelativeAngularAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::RelativeAngularAccel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetRelativeAngularAccel();
+    return this->GetLink("canonical")->RelativeAngularAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
+  return this->WorldAngularAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Model::WorldAngularAccel() const
+{
   if (this->GetLink("canonical"))
-    return this->GetLink("canonical")->GetWorldAngularAccel();
+    return this->GetLink("canonical")->WorldAngularAccel();
   else
-    return math::Vector3(0, 0, 0);
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Box Model::GetBoundingBox() const
 {
-  math::Box box;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
 
-  box.min.Set(FLT_MAX, FLT_MAX, FLT_MAX);
-  box.max.Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+//////////////////////////////////////////////////
+ignition::math::Box Model::BoundingBox() const
+{
+  ignition::math::Box box;
 
-  for (Link_V::const_iterator iter = this->links.begin();
-       iter != this->links.end(); ++iter)
+  box.Min().Set(FLT_MAX, FLT_MAX, FLT_MAX);
+  box.Max().Set(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+  for (const auto &iter : this->links)
   {
-    if (*iter)
+    if (iter)
     {
-      math::Box linkBox;
-      linkBox = (*iter)->GetBoundingBox();
+      ignition::math::Box linkBox;
+      linkBox = iter->BoundingBox();
       box += linkBox;
     }
   }
@@ -1157,7 +1221,7 @@ void Model::SetLaserRetro(const float _retro)
 //////////////////////////////////////////////////
 void Model::FillMsg(msgs::Model &_msg)
 {
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  ignition::math::Pose3d relPose = this->RelativePose();
 
   _msg.set_name(this->GetScopedName());
   _msg.set_is_static(this->IsStatic());
@@ -1287,11 +1351,11 @@ void Model::DetachStaticModel(const std::string &_modelName)
 //////////////////////////////////////////////////
 void Model::OnPoseChange()
 {
-  math::Pose p;
+  ignition::math::Pose3d p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
-    p = this->GetWorldPose();
-    p += this->attachedModelsOffset[i];
+    p = this->WorldPose();
+    p += this->attachedModelsOffset[i].Ign();
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
@@ -1299,7 +1363,7 @@ void Model::OnPoseChange()
 //////////////////////////////////////////////////
 void Model::SetState(const ModelState &_state)
 {
-  this->SetWorldPose(_state.GetPose(), true);
+  this->SetWorldPose(_state.Pose(), true);
   this->SetScale(_state.Scale(), true);
 
   LinkState_M linkStates = _state.GetLinkStates();
@@ -1395,10 +1459,10 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 /////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 {
-  math::Pose linkPose = _link->GetWorldPose();
-  math::Pose currentModelPose = this->GetWorldPose();
-  math::Pose linkRelPose = currentModelPose - linkPose;
-  math::Pose targetModelPose =  linkRelPose * _pose;
+  ignition::math::Pose3d linkPose = _link->WorldPose();
+  ignition::math::Pose3d currentModelPose = this->WorldPose();
+  ignition::math::Pose3d linkRelPose = currentModelPose - linkPose;
+  ignition::math::Pose3d targetModelPose =  linkRelPose * _pose.Ign();
   this->SetWorldPose(targetModelPose);
 }
 
@@ -1482,7 +1546,7 @@ double Model::GetWorldEnergyPotential() const
   for (Joint_V::const_iterator iter = this->joints.begin();
     iter != this->joints.end(); ++iter)
   {
-    for (unsigned int j = 0; j < (*iter)->GetAngleCount(); ++j)
+    for (unsigned int j = 0; j < (*iter)->DOF(); ++j)
     {
       e += (*iter)->GetWorldEnergyPotentialSpring(j);
     }
@@ -1525,7 +1589,7 @@ gazebo::physics::JointPtr Model::CreateJoint(
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
-  joint->Load(_parent, _child, gazebo::math::Pose());
+  joint->Load(_parent, _child, ignition::math::Pose3d::Zero);
   this->joints.push_back(joint);
   return joint;
 }
@@ -1614,27 +1678,27 @@ void Model::RegisterIntrospectionItems()
   // Callbacks.
   auto fModelPose = [this]()
   {
-    return this->GetWorldPose().Ign();
+    return this->WorldPose();
   };
 
   auto fModelLinVel = [this]()
   {
-    return this->GetWorldLinearVel().Ign();
+    return this->WorldLinearVel();
   };
 
   auto fModelAngVel = [this]()
   {
-    return this->GetWorldAngularVel().Ign();
+    return this->WorldAngularVel();
   };
 
   auto fModelLinAcc = [this]()
   {
-    return this->GetWorldLinearAccel().Ign();
+    return this->WorldLinearAccel();
   };
 
   auto fModelAngAcc = [this]()
   {
-    return this->GetWorldAngularAccel().Ign();
+    return this->WorldAngularAccel();
   };
 
   // Register items.

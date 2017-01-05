@@ -139,7 +139,7 @@ class gazebo::physics::GripperPrivate
 };
 
 /////////////////////////////////////////////////
-Gripper::Gripper(ModelPtr _model)
+Gripper::Gripper(ModelPtr _model) : dataPtr(new GripperPrivate)
 {
   this->dataPtr->model = _model;
   this->dataPtr->world = this->dataPtr->model->GetWorld();
@@ -349,8 +349,7 @@ void GripperPrivate::HandleAttach()
       if (!this->attached && cc[iter->first])
       {
         ignition::math::Pose3d diff =
-          cc[iter->first]->GetLink()->GetWorldPose().Ign() -
-          this->palmLink->GetWorldPose().Ign();
+          cc[iter->first]->GetLink()->WorldPose() - this->palmLink->WorldPose();
 
         double dd = (diff - this->prevDiff).Pos().SquaredLength();
 
@@ -406,7 +405,7 @@ void GripperPrivate::OnContacts(ConstContactsPtr &_msg)
 void GripperPrivate::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
-    this->diffs[i] = GZ_DBL_MAX;
+    this->diffs[i] = ignition::math::MAX_D;
 }
 
 

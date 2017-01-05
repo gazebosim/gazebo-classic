@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <functional>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
@@ -68,6 +69,13 @@ void RenderingFixture::SetUp()
 {
   // start rendering in test thread
   rendering::load();
+}
+
+/////////////////////////////////////////////////
+void RenderingFixture::Unload()
+{
+  rendering::fini();
+  ServerFixture::Unload();
 }
 
 /////////////////////////////////////////////////
@@ -190,7 +198,7 @@ void ServerFixture::LoadArgs(const std::string &_args)
 
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-    boost::bind(&ServerFixture::RunServer, this, params));
+    std::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -340,19 +348,25 @@ double ServerFixture::GetPercentRealTime() const
 /////////////////////////////////////////////////
 void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
-
 /////////////////////////////////////////////////
 math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  return this->EntityPose(_name);
+}
 
-  std::map<std::string, math::Pose>::iterator iter;
+/////////////////////////////////////////////////
+ignition::math::Pose3d ServerFixture::EntityPose(
+    const std::string &_name)
+{
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
+
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   EXPECT_TRUE(iter != this->poses.end());
   return iter->second;
@@ -361,8 +375,8 @@ math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 /////////////////////////////////////////////////
 bool ServerFixture::HasEntity(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
-  std::map<std::string, math::Pose>::iterator iter;
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   return iter != this->poses.end();
 }
@@ -561,7 +575,8 @@ physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     unsigned int _width, unsigned int _height, double _rate,
     const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
     bool _distortion, double _distortionK1, double _distortionK2,
@@ -691,7 +706,7 @@ void ServerFixture::SpawnWideAngleCamera(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
@@ -805,7 +820,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
@@ -912,7 +927,7 @@ void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     const std::string &_imuSensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     const std::string &_noiseType,
     double _rateNoiseMean, double _rateNoiseStdDev,
     double _rateBiasMean, double _rateBiasStdDev,
@@ -1010,8 +1025,9 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     const std::string &_sensorName,
-    const std::string &_collisionType, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_collisionType,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1070,8 +1086,9 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
 void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1240,8 +1257,8 @@ void ServerFixture::launchTimeoutFailure(const char *_logMsg,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     const std::string &_essid,
     double _freq,
     double _power,
@@ -1282,8 +1299,8 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     double _minFreq,
     double _maxFreq,
     double _power,
@@ -1391,10 +1408,11 @@ void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnLight(const std::string &_name,
     const std::string &_type,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     const common::Color &_diffuse,
     const common::Color &_specular,
-    const math::Vector3 &_direction,
+    const ignition::math::Vector3d &_direction,
     double _attenuationRange,
     double _attenuationConstant,
     double _attenuationLinear,
@@ -1455,7 +1473,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1463,8 +1481,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1484,7 +1502,7 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1519,8 +1537,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    const math::Vector3 &_cog, double _radius,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    const ignition::math::Vector3d &_cog, double _radius,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1528,14 +1546,14 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
   msgs::Set(link->mutable_inertial()->mutable_pose(),
-            ignition::math::Pose3d(_cog.Ign(),
+            ignition::math::Pose3d(_cog,
               ignition::math::Quaterniond()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1552,17 +1570,17 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnBox(const std::string &_name,
-    const math::Vector3 &_size, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
-  msgs::AddBoxLink(model, 1.0, _size.Ign());
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
+  msgs::AddBoxLink(model, 1.0, _size);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
@@ -1581,8 +1599,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnTrimesh(const std::string &_name,
-    const std::string &_modelPath, const math::Vector3 &_scale,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const std::string &_modelPath, const ignition::math::Vector3d &_scale,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1620,7 +1638,7 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnEmptyLink(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1628,8 +1646,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 

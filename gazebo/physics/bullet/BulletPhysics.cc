@@ -18,6 +18,8 @@
 #include <algorithm>
 #include <string>
 
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -56,7 +58,6 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -155,8 +156,8 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->GetWorldPose();
-    math::Pose body2Pose = link2->GetWorldPose();
+    math::Pose body1Pose = link1->WorldPose();
+    math::Pose body2Pose = link2->WorldPose();
     math::Vector3 cg1Pos = link1->GetInertial()->Pose().Pos();
     math::Vector3 cg2Pos = link2->GetInertial()->Pose().Pos();
     math::Vector3 localForce1;
@@ -196,13 +197,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
-          contactFeedback->wrench[j].body1Force = localForce1;
-          contactFeedback->wrench[j].body1Torque = localTorque1;
+          contactFeedback->wrench[j].body1Force = localForce1.Ign();
+          contactFeedback->wrench[j].body1Torque = localTorque1.Ign();
         }
         if (!link2->IsStatic())
         {
-          contactFeedback->wrench[j].body2Force = localForce2;
-          contactFeedback->wrench[j].body2Torque = localTorque2;
+          contactFeedback->wrench[j].body2Force = localForce2.Ign();
+          contactFeedback->wrench[j].body2Torque = localTorque2.Ign();
         }
         contactFeedback->count++;
       }
@@ -279,7 +280,7 @@ BulletPhysics::BulletPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 
   btGImpactCollisionAlgorithm::registerAlgorithm(dispatcher);
 }

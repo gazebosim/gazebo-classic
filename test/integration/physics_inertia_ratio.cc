@@ -21,8 +21,6 @@
 
 #include <ignition/math/Vector3Stats.hh>
 
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -72,8 +70,8 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
     world->Step(1);
 
     // Get statistics on link rotations
-    upperAngles.InsertData(upperLink->GetWorldPose().Ign().Rot().Euler());
-    lowerAngles.InsertData(lowerLink->GetWorldPose().Ign().Rot().Euler());
+    upperAngles.InsertData(upperLink->WorldPose().Rot().Euler());
+    lowerAngles.InsertData(lowerLink->WorldPose().Rot().Euler());
   }
 
   // Expect out of plane angles to fall within limits

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_BULLETBOXSHAPE_HH_
-#define _GAZEBO_BULLETBOXSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETBOXSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETBOXSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -51,7 +51,7 @@ namespace gazebo
                   return;
                 }
                 math::Vector3 size = _size;
-                if (math::equal(size.x, 0.0))
+                if (ignition::math::equal(size.x, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
@@ -59,12 +59,12 @@ namespace gazebo
                   gzwarn << "Setting box shape's x to zero \n";
                   size.x = 1e-4;
                 }
-                if (math::equal(size.y, 0.0))
+                if (ignition::math::equal(size.y, 0.0))
                 {
                   gzwarn << "Setting box shape's y to zero \n";
                   size.y = 1e-4;
                 }
-                if (math::equal(size.z, 0.0))
+                if (ignition::math::equal(size.z, 0.0))
                 {
                   gzwarn << "Setting box shape's z to zero \n";
                   size.z = 1e-4;
@@ -107,9 +107,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->CoG();
+                    ignition::math::Pose3d relativePose =
+                        this->collisionParent->RelativePose();
+                    relativePose.Pos() -= bLink->GetInertial()->CoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

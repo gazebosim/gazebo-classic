@@ -70,9 +70,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  math::Pose anchor;
-  math::Vector3 axis(1, 0, 0);
-  double upper = M_PI;
+  ignition::math::Pose3d anchor;
+  ignition::math::Vector3d axis(1, 0, 0);
   double lower = -M_PI;
 
   double residentLast = 0, shareLast = 0;
@@ -94,9 +93,7 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
       // in parent and child links, preventing joint from being destroyed.
       joint->Load(parentLink, childLink, anchor);
       // joint->SetAnchor(0, anchor);
-      joint->SetAxis(0, axis);
-      joint->SetHighStop(0, upper);
-      joint->SetLowStop(0, lower);
+      joint->SetLowerLimit(0, lower);
 
       if (parentLink)
         joint->SetName(parentLink->GetName() + std::string("_") +
@@ -171,8 +168,10 @@ void JointTest::GetInertiaRatio(const std::string &_physicsEngine)
     ASSERT_TRUE(joint != NULL);
 
     EXPECT_NEAR(joint->GetInertiaRatio(0), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitX), 3125, 1e-2);
-    EXPECT_NEAR(joint->GetInertiaRatio(math::Vector3::UnitY), 87.50, 1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(ignition::math::Vector3d::UnitX), 3125,
+        1e-2);
+    EXPECT_NEAR(joint->InertiaRatio(ignition::math::Vector3d::UnitY), 87.50,
+        1e-2);
   }
 }
 
@@ -270,77 +269,77 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
     world->Step(1);
 
     // count up and down cycles
-    if (linkPrismatic->GetWorldLinearVel().z > vT && velPrismatic < -vT)
+    if (linkPrismatic->WorldLinearVel().Z() > vT && velPrismatic < -vT)
     {
       cyclesPrismatic++;
       velPrismatic = 1.0;
     }
-    else if (linkPrismatic->GetWorldLinearVel().z < -vT && velPrismatic > vT)
+    else if (linkPrismatic->WorldLinearVel().Z() < -vT && velPrismatic > vT)
     {
       cyclesPrismatic++;
       velPrismatic = -1.0;
     }
-    if (-linkRevolute->GetRelativeAngularVel().y > vT && velRevolute < -vT)
+    if (-linkRevolute->RelativeAngularVel().Y() > vT && velRevolute < -vT)
     {
       cyclesRevolute++;
       velRevolute = 1.0;
     }
-    else if (-linkRevolute->GetRelativeAngularVel().y < -vT && velRevolute > vT)
+    else if (-linkRevolute->RelativeAngularVel().Y() < -vT && velRevolute > vT)
     {
       cyclesRevolute++;
       velRevolute = -1.0;
     }
-    if (linkPluginExplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginExplicit->WorldLinearVel().Z() > vT &&
         velPluginExplicit < -vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = 1.0;
     }
-    else if (linkPluginExplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginExplicit->WorldLinearVel().Z() < -vT &&
              velPluginExplicit > vT)
     {
       cyclesPluginExplicit++;
       velPluginExplicit = -1.0;
     }
-    if (linkPluginImplicit->GetWorldLinearVel().z > vT &&
+    if (linkPluginImplicit->WorldLinearVel().Z() > vT &&
              velPluginImplicit < -vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = 1.0;
     }
-    else if (linkPluginImplicit->GetWorldLinearVel().z < -vT &&
+    else if (linkPluginImplicit->WorldLinearVel().Z() < -vT &&
              velPluginImplicit > vT)
     {
       cyclesPluginImplicit++;
       velPluginImplicit = -1.0;
     }
-    if (linkContact->GetWorldLinearVel().z > vT && velContact < -vT)
+    if (linkContact->WorldLinearVel().Z() > vT && velContact < -vT)
     {
       cyclesContact++;
       velContact = 1.0;
     }
-    else if (linkContact->GetWorldLinearVel().z < -vT && velContact > vT)
+    else if (linkContact->WorldLinearVel().Z() < -vT && velContact > vT)
     {
       cyclesContact++;
       velContact = -1.0;
     }
-    if (linkPrismatic2->GetWorldLinearVel().z > vT && velPrismatic2 < -vT)
+    if (linkPrismatic2->WorldLinearVel().Z() > vT && velPrismatic2 < -vT)
     {
       cyclesPrismatic2++;
       velPrismatic2 = 1.0;
     }
-    else if (linkPrismatic2->GetWorldLinearVel().z < -vT && velPrismatic2 > vT)
+    else if (linkPrismatic2->WorldLinearVel().Z() < -vT && velPrismatic2 > vT)
     {
       cyclesPrismatic2++;
       velPrismatic2 = -1.0;
     }
-    if (-linkRevolute2->GetRelativeAngularVel().y > vT && velRevolute2 < -vT)
+    if (-linkRevolute2->RelativeAngularVel().Y() > vT && velRevolute2 < -vT)
     {
       cyclesRevolute2++;
       velRevolute2 = 1.0;
     }
-    else if (-linkRevolute2->GetRelativeAngularVel().y < -vT &&
-             velRevolute2 > vT)
+    else if (-linkRevolute2->RelativeAngularVel().Y() < -vT &&
+        velRevolute2 > vT)
     {
       cyclesRevolute2++;
       velRevolute2 = -1.0;
@@ -419,10 +418,13 @@ void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Spawn two boxes
-  SpawnBox("box1", math::Vector3(1, 1, 1), math::Vector3(1, 0, 0.5),
-      math::Vector3::Zero, false);
-  SpawnBox("box2", math::Vector3(1, 1, 1), math::Vector3(-1, 0, 0.5),
-      math::Vector3::Zero, false);
+  SpawnBox("box1", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+  SpawnBox("box2", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(-1, 0, 0.5),
+      ignition::math::Vector3d::Zero, false);
+
   physics::ModelPtr model  = world->ModelByName("box1");
   physics::ModelPtr model2 = world->ModelByName("box2");
   ASSERT_TRUE(model  != NULL);

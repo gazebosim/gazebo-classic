@@ -179,7 +179,7 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   EXPECT_EQ(inertial->CoG(), newCoG);
 
   world->Step(1000);
-  EXPECT_GT(model->GetWorldPose().rot.GetAsEuler().y, 0.25);
+  EXPECT_GT(model->WorldPose().Rot().Euler().Y(), 0.25);
 }
 
 /////////////////////////////////////////////////
@@ -243,7 +243,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
-  while (!math::equal(newMass, inertial->Mass()))
+  while (!ignition::math::equal(newMass, inertial->Mass()))
   {
     world->Step(1);
     common::Time::MSleep(1);
@@ -252,7 +252,7 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(inertial->Mass(), msgInertial->mass());
 
   world->Step(1000);
-  EXPECT_LT(model->GetWorldPose().pos.z, 0.40);
+  EXPECT_LT(model->WorldPose().Pos().Z(), 0.40);
 }
 
 /////////////////////////////////////////////////
@@ -322,15 +322,16 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     joints.push_back(joint);
 
     // Compute distance from cg to joint anchor
-    auto linkPose = link->GetWorldCoGPose();
-    auto jointPose = joint->GetWorldPose();
-    auto jointToCoG = linkPose.pos - jointPose.pos;
-    double length = jointToCoG.GetLength();
+    auto linkPose = link->WorldCoGPose();
+    auto jointPose = joint->WorldPose();
+    auto jointToCoG = linkPose.Pos() - jointPose.Pos();
+    double length = jointToCoG.Length();
     EXPECT_NEAR(length, 0.05, 1e-6);
     pendulumLengths.push_back(length);
 
     double angle =
-      asin(jointToCoG.Cross(g).Dot(joint->GetGlobalAxis(0)) / length / 9.8);
+      asin(jointToCoG.Cross(g).Dot(
+            joint->GlobalAxis(0)) / length / 9.8);
     EXPECT_NEAR(angle, -M_PI / 10, 1e-5);
     initialAngles.push_back(angle);
 
@@ -357,7 +358,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;
@@ -439,7 +440,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;

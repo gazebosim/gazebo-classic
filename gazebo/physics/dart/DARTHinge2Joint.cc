@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -53,11 +55,12 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
 
@@ -65,11 +68,12 @@ math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int _index) const
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3(worldOrigin).Ign();
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -116,11 +120,12 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Axis" + std::to_string(_index));
   }
 
@@ -159,29 +164,26 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/
   // joint-axis-reference-frame-doesnt-match
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3(globalAxis).Ign();
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTHinge2Joint::GetAngleImpl(unsigned int _index) const
+double DARTHinge2Joint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Angle>(
-          "Angle" + std::to_string(_index));
+    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
   }
 
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(1);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(1);
   }
   else
   {

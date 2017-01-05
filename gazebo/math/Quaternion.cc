@@ -19,6 +19,7 @@
  * Date: 03 Apr 2007
  */
 #include <math.h>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Quaternion.hh"
 
@@ -629,7 +630,7 @@ Quaternion Quaternion::Integrate(const Vector3 &_angularVelocity,
   Vector3 theta = _angularVelocity * _deltaT * 0.5;
   double thetaMagSq = theta.GetSquaredLength();
   double s;
-  if (thetaMagSq * thetaMagSq / 24.0 < GZ_DBL_MIN)
+  if (thetaMagSq * thetaMagSq / 24.0 < ignition::math::MIN_D)
   {
     deltaQ.w = 1.0 - thetaMagSq / 2.0;
     s = 1.0 - thetaMagSq / 6.0;

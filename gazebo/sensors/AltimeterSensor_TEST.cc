@@ -175,8 +175,7 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   altSensor->Update(true);
 
   // Get the link's angular velocity
-  ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+  ignition::math::Vector3d avel = model->GetLink("link")->RelativeAngularVel();
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod.
@@ -217,14 +216,12 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
   altSensor->Update(true);
 
   // Angular velocity of the rod
-  ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+  ignition::math::Vector3d avel = model->GetLink("link")->RelativeAngularVel();
 
   // Linear velocity of the rod at the location that is attached to
   // the prismatic joint.
   ignition::math::Vector3d lvel =
-    model->GetLink("link")->GetWorldLinearVel(
-        ignition::math::Vector3d(0, -5, 0)).Ign();
+    model->GetLink("link")->WorldLinearVel(ignition::math::Vector3d(0, -5, 0));
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod + the rod's linear velocity.

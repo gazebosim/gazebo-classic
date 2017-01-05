@@ -64,17 +64,17 @@ void Light::FillMsg(msgs::Light &_msg)
 
   _msg.set_name(this->GetScopedName());
 
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  ignition::math::Pose3d relPose = this->RelativePose();
   msgs::Set(_msg.mutable_pose(), relPose);
 }
 
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  if (this->worldPose == math::Pose(_state.Pose()))
+  if (this->worldPose == _state.Pose())
     return;
 
-  this->worldPose = math::Pose(_state.Pose());
+  this->worldPose = _state.Pose();
   this->PublishPose();
 }
 

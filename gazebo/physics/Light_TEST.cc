@@ -73,7 +73,7 @@ TEST_F(LightTest, LightMsg)
   lightPtr->ProcessMsg(lightMsg);
 
   // Check pose
-  EXPECT_EQ(lightPtr->GetWorldPose(), pose);
+  EXPECT_EQ(lightPtr->WorldPose(), pose);
 
   // Get message
   msgs::Light newLightMsg;

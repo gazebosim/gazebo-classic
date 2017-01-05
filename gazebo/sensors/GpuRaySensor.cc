@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -590,7 +591,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -617,11 +618,11 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
       {
-        range = GZ_DBL_INF;
+        range = ignition::math::INF_D;
       }
       else if (range <= this->RangeMin())
       {
-        range = -GZ_DBL_INF;
+        range = -ignition::math::INF_D;
       }
       else if (this->noises.find(GPU_RAY_NOISE) !=
                this->noises.end())

@@ -14,10 +14,8 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: a test for setting joint angles
- * Author: John Hsu
- */
+
+#include <functional>
 
 #include <plugins/JointTrajectoryPlugin.hh>
 
@@ -42,7 +40,7 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   this->model = _parent;
   this->world = this->model->GetWorld();
 
-  // this->world->Physics()->SetGravity(math::Vector3(0,0,0));
+  // this->world->Physics()->SetGravity(ignition::math::Vector3(0,0,0));
 
   for (physics::Joint_V::const_iterator j = this->model->GetJoints().begin();
                         j != this->model->GetJoints().end(); ++j)
@@ -52,7 +50,8 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&JointTrajectoryPlugin::UpdateStates, this, _1));
+      std::bind(&JointTrajectoryPlugin::UpdateStates, this,
+      std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
@@ -62,13 +61,13 @@ void JointTrajectoryPlugin::Load(physics::ModelPtr _parent,
 //       this->model);
 //
 //   this->joint->SetModel(this->model);
-//   math::Pose pose = _link->GetWorldPose();
-//   // math::Pose  pose(math::Vector3(0, 0, 0.2),
-//                       math::Quaternion(1, 0, 0, 0));
+//   auto pose = _link->GetWorldPose();
+//   // ignition::math::Pose  pose(ignition::math::Vector3d(0, 0, 0.2),
+//                       ignition::math::Quaterniond(1, 0, 0, 0));
 //   this->joint->Load(physics::LinkPtr(), _link, pose);
-//   this->joint->SetAxis(0, math::Vector3(0, 0, 0));
-//   this->joint->SetHighStop(0, 0);
-//   this->joint->SetLowStop(0, 0);
+//   this->joint->SetAxis(0, ignition::math::Vector3d(0, 0, 0));
+//   this->joint->SetUpperLimit(0, 0);
+//   this->joint->SetLowerLimit(0, 0);
 //   this->joint->SetAnchor(0, pose.pos);
 //   this->joint->Init();
 // }

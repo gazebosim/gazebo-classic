@@ -149,9 +149,9 @@ void MainWindow_TEST::Selection()
 
   // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
-      cam->GetVisual(glWidgetCenter);
+      cam->Visual(glWidgetCenter);
   QVERIFY(vis != NULL);
-  QVERIFY(vis->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis->GetRootVisual()->Name() == "box");
 
   // move camera to look at the box
   ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
@@ -161,9 +161,9 @@ void MainWindow_TEST::Selection()
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
-      cam->GetVisual(ignition::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
-  QVERIFY(vis2->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis2->GetRootVisual()->Name() == "box");
 
   // look upwards
   ignition::math::Quaterniond pitch90(ignition::math::Vector3d(0, -1.57, 0));
@@ -171,7 +171,7 @@ void MainWindow_TEST::Selection()
   QVERIFY(cam->WorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
-  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis3 = cam->Visual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
@@ -181,13 +181,13 @@ void MainWindow_TEST::Selection()
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
-      cam->GetVisual(ignition::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
-  QVERIFY(vis4->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis4->GetRootVisual()->Name() == "box");
 
   // hide the box
   vis4->SetVisible(false);
-  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis5 = cam->Visual(glWidgetCenter);
 
   // verify we don't get anything now
   QVERIFY(vis5 == NULL);
@@ -261,7 +261,7 @@ void MainWindow_TEST::UserCameraFPS()
     std::cerr << "Skipping lower bound FPS check" << std::endl;
     skipFPSTest = true;
   }
-  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  unsigned int iterations = skipFPSTest ? 500 : 5000;
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
@@ -575,10 +575,6 @@ void MainWindow_TEST::UserCameraJoystick()
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->Name(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
@@ -789,6 +785,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_plotAct);
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   mainWindow->close();
   delete mainWindow;

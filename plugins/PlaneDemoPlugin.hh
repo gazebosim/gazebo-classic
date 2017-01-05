@@ -17,6 +17,7 @@
 #ifndef GAZEBO_PLUGINS_PLANEDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_PLANEDEMOPLUGIN_HH_
 
+#include <memory>
 
 #include "gazebo/common/common.hh"
 #include "gazebo/physics/physics.hh"

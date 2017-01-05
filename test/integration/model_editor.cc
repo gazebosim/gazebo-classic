@@ -147,7 +147,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
 
   // Insert another link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_BOX);
@@ -161,7 +161,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(box->GetWorldPose() == boxPose);
+  QVERIFY(box->WorldPose() == boxPose);
 
   // Add a revolute joint
   gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
@@ -173,7 +173,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // Save all changes
@@ -184,9 +184,9 @@ void ModelEditorTest::SaveModelPose()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify pose again
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
-  QVERIFY(box->GetWorldPose() == boxPose);
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
+  QVERIFY(box->WorldPose() == boxPose);
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
@@ -239,7 +239,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
 
   // add a sphere link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_SPHERE);
@@ -253,7 +253,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(sphere->GetWorldPose() == spherePose);
+  QVERIFY(sphere->WorldPose() == spherePose);
 
   // a box nested model
   double mass = 1.0;
@@ -278,7 +278,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(boxModelVis->GetWorldPose() == boxPose);
+  QVERIFY(boxModelVis->WorldPose() == boxPose);
 
   // Add a revolute joint between cylinder link and box nested model
   jointMaker->AddJoint(gazebo::gui::JointMaker::JOINT_HINGE);
@@ -289,7 +289,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify joint hotspot pose
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // get the joint inspector and populate it with data
@@ -327,7 +327,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify the joint hotspot visual pose is also updated
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (spherePose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
@@ -391,6 +391,68 @@ void ModelEditorTest::ShowCollisions()
   modelCreator->ShowCollisions(true);
   QVERIFY(newLinkCol->GetVisible());
   QVERIFY(newNestedCol->GetVisible());
+
+  delete modelCreator;
+  modelCreator = nullptr;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorTest::ShowVisuals()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Create a model creator
+  auto modelCreator = new gazebo::gui::ModelCreator();
+  QVERIFY(modelCreator != nullptr);
+
+  // add a cylinder link
+  modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
+  auto newLinkVis = scene->GetVisual("ModelPreview_0_0::link_0::visual");
+  QVERIFY(newLinkVis != nullptr);
+  QVERIFY(newLinkVis->GetVisible());
+
+  // a box nested model
+  gazebo::msgs::Model model;
+  model.set_name("box_model");
+  gazebo::msgs::AddBoxLink(model, 1.0, ignition::math::Vector3d::One);
+  auto boxModelSDF = gazebo::msgs::ModelToSDF(model);
+  modelCreator->AddModel(boxModelSDF);
+
+  auto newNestedVis = scene->GetVisual(
+      "ModelPreview_0_0::box_model::link_1::visual");
+  QVERIFY(newNestedVis != nullptr);
+  QVERIFY(newNestedVis->GetVisible());
+
+  // Hide visuals
+  modelCreator->ShowVisuals(false);
+  QVERIFY(!newLinkVis->GetVisible());
+  QVERIFY(!newNestedVis->GetVisible());
+
+  // Show visuals
+  modelCreator->ShowVisuals(true);
+  QVERIFY(newLinkVis->GetVisible());
+  QVERIFY(newNestedVis->GetVisible());
 
   delete modelCreator;
   modelCreator = nullptr;

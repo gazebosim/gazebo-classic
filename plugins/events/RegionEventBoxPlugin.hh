@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_REGION_EVENT_BOX_PLUGIN_HH_
-#define _GAZEBO_REGION_EVENT_BOX_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_REGIONEVENTBOXPLUGIN_HH_
+#define GAZEBO_PLUGINS_REGIONEVENTBOXPLUGIN_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get

@@ -20,7 +20,6 @@
 
 #include <vector>
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/FixedJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
@@ -59,10 +58,11 @@ namespace gazebo
       public: virtual void SetForceImpl(unsigned int _index, double _torque);
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
     };
     /// \}
   }

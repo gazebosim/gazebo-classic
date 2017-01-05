@@ -98,18 +98,18 @@ void ODERayShape::Update()
       boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
     this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
+          this->relativeStartPos.Ign());
 
     this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
+          this->relativeEndPos.Ign());
   }
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
         this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,

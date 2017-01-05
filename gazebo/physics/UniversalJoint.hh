@@ -53,7 +53,7 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 2;}
 
       /// \brief Load a UniversalJoint.
@@ -66,7 +66,7 @@ namespace gazebo
                 this->SetAxis(0,
                     this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
                 this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    this->sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
                     */
               }
 

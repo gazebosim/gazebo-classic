@@ -819,7 +819,7 @@ void World::Update()
 
       for (auto &dirtyEntity : this->dataPtr->dirtyPoses)
       {
-        dirtyEntity->SetWorldPose(dirtyEntity->GetDirtyPose(), false);
+        dirtyEntity->SetWorldPose(dirtyEntity->DirtyPose(), false);
       }
 
       this->dataPtr->dirtyPoses.clear();
@@ -1330,10 +1330,18 @@ void World::Reset()
 
     // \todo: The following is deprecated, but we're keeping it until other
     // gazebo math functionality is removed.
+
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     math::Rand::SetSeed(math::Rand::GetSeed());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
 
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
-    this->dataPtr->physicsEngine->SetSeed(math::Rand::GetSeed());
+    this->dataPtr->physicsEngine->SetSeed(ignition::math::Rand::Seed());
 
     this->ResetTime();
     this->ResetEntities(Base::BASE);
@@ -1492,7 +1500,14 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_seed())
   {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     math::Rand::SetSeed(_data->seed());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
     ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
@@ -2523,7 +2538,7 @@ void World::ProcessMessages()
             // Publish the model's relative pose
             poseMsg->set_name(m->GetScopedName());
             poseMsg->set_id(m->GetId());
-            msgs::Set(poseMsg, m->GetRelativePose().Ign());
+            msgs::Set(poseMsg, m->RelativePose());
 
             // Publish each of the model's child links relative poses
             Link_V links = m->GetLinks();
@@ -2532,7 +2547,7 @@ void World::ProcessMessages()
               poseMsg = msg.add_pose();
               poseMsg->set_name(link->GetScopedName());
               poseMsg->set_id(link->GetId());
-              msgs::Set(poseMsg, link->GetRelativePose().Ign());
+              msgs::Set(poseMsg, link->RelativePose());
             }
 
             // add all nested models to the queue
@@ -2619,7 +2634,7 @@ void World::ProcessMessages()
         // \todo Change to relative once lights can be attached to links
         msgs::Light lightMsg;
         lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
+        msgs::Set(lightMsg.mutable_pose(), light->WorldPose());
         this->dataPtr->lightPub->Publish(lightMsg);
       }
     }

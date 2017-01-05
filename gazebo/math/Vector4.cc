@@ -24,6 +24,10 @@
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Vector4.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 
@@ -38,6 +42,12 @@ Vector4::Vector4()
 Vector4::Vector4(const double &_x, const double &_y, const double &_z,
                  const double &_w)
     : x(_x), y(_y), z(_z), w(_w)
+{
+}
+
+//////////////////////////////////////////////////
+Vector4::Vector4(const ignition::math::Vector4d &_v)
+: x(_v.X()), y(_v.Y()), z(_v.Z()), w(_v.W())
 {
 }
 
@@ -266,4 +276,19 @@ double Vector4::operator[](unsigned int index) const
   }
 }
 
+//////////////////////////////////////////////////
+ignition::math::Vector4d Vector4::Ign() const
+{
+  return ignition::math::Vector4d(this->x, this->y, this->z, this->w);
+}
+
+//////////////////////////////////////////////////
+Vector4 &Vector4::operator=(const ignition::math::Vector4d &_v)
+{
+  this->x = _v.X();
+  this->y = _v.Y();
+  this->z = _v.Z();
+  this->w = _v.W();
+  return *this;
+}
 

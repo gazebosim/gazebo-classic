@@ -20,8 +20,10 @@
 #include <Winsock2.h>
 #endif
 
+#include <functional>
 #include <sstream>
-#include <gazebo/math/Vector2d.hh>
+#include <ignition/math/Vector2.hh>
+
 #include <gazebo/msgs/msgs.hh>
 #include "TimerGUIPlugin.hh"
 
@@ -148,7 +150,7 @@ TimerGUIPlugin::TimerGUIPlugin()
 
   // Connect to the PreRender Gazebo signal
   this->connections.push_back(event::Events::ConnectPreRender(
-                              boost::bind(&TimerGUIPlugin::PreRender, this)));
+                              std::bind(&TimerGUIPlugin::PreRender, this)));
 
   // Initialize variables
   this->posX = 0;
@@ -193,87 +195,88 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   }
 
   // Size this widget
-  math::Vector2d s;
+  ignition::math::Vector2d s;
   if (_elem->HasElement("size"))
   {
-    s = _elem->Get<math::Vector2d>("size");
+    s = _elem->Get<ignition::math::Vector2d>("size");
   }
 
   // Minumum horizontal size
-  s.x = std::max(s.x, 150.0);
+  s.X() = std::max(s.X(), 150.0);
 
   // Minimum vertical size according to the elements present
   if (hasStartButton && hasResetButton)
-    s.y = std::max(s.y, 120.0);
+    s.Y() = std::max(s.Y(), 120.0);
   else if (hasStartButton || hasResetButton)
-    s.y = std::max(s.y, 80.0);
+    s.Y() = std::max(s.Y(), 80.0);
   else
-    s.y = std::max(s.y, 30.0);
+    s.Y() = std::max(s.Y(), 30.0);
 
-  this->resize(s.x, s.y);
+  this->resize(s.X(), s.Y());
 
   // Position this widget
   if (_elem->HasElement("pos"))
   {
-    math::Vector2d p = _elem->Get<math::Vector2d>("pos");
+    ignition::math::Vector2d p = _elem->Get<ignition::math::Vector2d>("pos");
 
     // Negative positions are counted from the ends
     // If there are negative positions, we need to filter window resize
     // events to reposition the timer
-    if (p.x < 0 || p.y < 0)
+    if (p.X() < 0 || p.Y() < 0)
     {
       this->parent()->installEventFilter(this);
     }
 
-    if (p.x < 0)
+    if (p.X() < 0)
     {
       if (this->parent())
       {
-        this->posX = p.x - s.x;
-        p.x = static_cast<QWidget *>(this->parent())->width() + this->posX;
+        this->posX = p.X() - s.X();
+        p.X() = static_cast<QWidget *>(this->parent())->width() + this->posX;
       }
       else
       {
         gzwarn << "Couldn't get parent, setting position x to zero" <<
             std::endl;
-        p.x = 0;
+        p.X() = 0;
       }
     }
 
-    if (p.y < 0)
+    if (p.Y() < 0)
     {
       if (this->parent())
       {
-        this->posY = p.y - s.y;
-        p.y = static_cast<QWidget *>(this->parent())->height() + this->posY;
+        this->posY = p.Y() - s.Y();
+        p.Y() = static_cast<QWidget *>(this->parent())->height() + this->posY;
       }
       else
       {
         gzwarn << "Couldn't get parent, setting position y to zero" <<
             std::endl;
-        p.y = 0;
+        p.Y() = 0;
       }
     }
 
     // Check for x position greater than parent width
-    if (this->parent() && p.x > static_cast<QWidget *>(this->parent())->width())
+    if (this->parent() && p.X() >
+        static_cast<QWidget *>(this->parent())->width())
     {
       gzwarn << "GUI widget x pos > parent width, "
         << "clamping to parent width - this widget's width.\n";
-      p.x = static_cast<QWidget *>(this->parent())->width() - this->width();
+      p.X() = static_cast<QWidget *>(this->parent())->width() - this->width();
     }
 
     // Check for y position greater than parent height
     if (this->parent() &&
-        p.y > static_cast<QWidget *>(this->parent())->height())
+        p.Y() > static_cast<QWidget *>(this->parent())->height())
     {
       gzwarn << "GUI widget y pos > parent height, "
         << "clamping to parent height - this widget's height.\n";
-      p.y = static_cast<QWidget *>(this->parent())->height() -
+      p.Y() = static_cast<QWidget *>(this->parent())->height() -
           this->height();
     }
 
-    this->move(p.x, p.y);
+    this->move(p.X(), p.Y());
   }
   else
   {
@@ -316,7 +319,7 @@ common::Time TimerGUIPlugin::GetCurrentTime() const
 /////////////////////////////////////////////////
 void TimerGUIPlugin::PreRender()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->SetTime(QString::fromStdString(
       this->timer.GetElapsed().FormattedString(
       common::Time::FormatOption::HOURS)));
@@ -338,7 +341,7 @@ void TimerGUIPlugin::OnTimerCtrl(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Start()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->timer.Start();
 
   this->SetStartStopButton("Stop");
@@ -347,7 +350,7 @@ void TimerGUIPlugin::Start()
 /////////////////////////////////////////////////
 void TimerGUIPlugin::Stop()
 {
-  boost::mutex::scoped_lock lock(this->timerMutex);
+  std::lock_guard<std::mutex> lock(this->timerMutex);
   this->timer.Stop();
 
   this->SetStartStopButton("Start");
@@ -373,7 +376,7 @@ void TimerGUIPlugin::Reset()
   // stop before resetting
   this->Stop();
   {
-    boost::mutex::scoped_lock lock(this->timerMutex);
+    std::lock_guard<std::mutex> lock(this->timerMutex);
     this->timer.Reset();
   }
 }

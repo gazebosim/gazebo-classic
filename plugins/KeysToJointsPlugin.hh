@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/Node.hh>
@@ -30,6 +31,7 @@ namespace gazebo
   struct KeyInfo
   {
     /// \brief Key ASCII value (reference: http://ascii.cl/)
+    // cppcheck-suppress unusedStructMember
     int key;
 
     /// \brief Pointer to the joint controlled by this key.
@@ -40,6 +42,7 @@ namespace gazebo
 
     /// \brief Increments for position, absolute values for velocity and
     /// force.
+    // cppcheck-suppress unusedStructMember
     double scale;
   };
 
@@ -127,6 +130,12 @@ namespace gazebo
 
     /// \brief Subscribe to keyboard messages.
     private: transport::SubscriberPtr keyboardSub;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

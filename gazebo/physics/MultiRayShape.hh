@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _MULTIRAYSHAPE_HH_
-#define _MULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Angle.hh"
@@ -65,7 +66,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -104,11 +105,21 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetMinAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the minimum angle.
+      /// \return Minimum angle of ray scan.
+      public: ignition::math::Angle MinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetMaxAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the maximum angle.
+      /// \return Maximum angle of ray scan.
+      public: ignition::math::Angle MaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -120,11 +131,21 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetVerticalMinAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the vertical min angle.
+      /// \return Vertical min angle.
+      public: ignition::math::Angle VerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      /// \deprecated See function that returns ignition math.
+      public: math::Angle GetVerticalMaxAngle() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the vertical max angle.
+      /// \return Vertical max angle.
+      public: ignition::math::Angle VerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();

@@ -139,8 +139,8 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   // Expect torso to lift at least 1 mm/s
   gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
   gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
-  gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
+  gzdbg << "link  " << link->WorldLinearVel() << std::endl;
+  EXPECT_GT(link->WorldLinearVel().Z(), 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////

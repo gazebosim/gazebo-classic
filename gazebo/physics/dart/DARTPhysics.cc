@@ -162,8 +162,8 @@ void DARTPhysics::UpdateCollision()
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = dartLink1->GetWorldPose();
-    math::Pose body2Pose = dartLink2->GetWorldPose();
+    math::Pose body1Pose = dartLink1->WorldPose();
+    math::Pose body2Pose = dartLink2->WorldPose();
     math::Vector3 localForce1;
     math::Vector3 localForce2;
     math::Vector3 localTorque1;
@@ -196,14 +196,14 @@ void DARTPhysics::UpdateCollision()
 
     if (!dartLink1->IsStatic())
     {
-      contactFeedback->wrench[0].body1Force = localForce1;
-      contactFeedback->wrench[0].body1Torque = localTorque1;
+      contactFeedback->wrench[0].body1Force = localForce1.Ign();
+      contactFeedback->wrench[0].body1Torque = localTorque1.Ign();
     }
 
     if (!dartLink2->IsStatic())
     {
-      contactFeedback->wrench[0].body2Force = localForce2;
-      contactFeedback->wrench[0].body2Torque = localTorque2;
+      contactFeedback->wrench[0].body2Force = localForce2.Ign();
+      contactFeedback->wrench[0].body2Torque = localTorque2.Ign();
     }
 
     ++contactFeedback->count;

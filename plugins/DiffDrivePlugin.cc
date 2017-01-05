@@ -15,6 +15,10 @@
  *
 */
 
+#include <functional>
+
+#include <ignition/math/Box.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/DiffDrivePlugin.hh"
@@ -63,21 +67,21 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
           << _sdf->GetElement("right_joint")->Get<std::string>() << "]\n";
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&DiffDrivePlugin::OnUpdate, this));
+          std::bind(&DiffDrivePlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Init()
 {
-  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
-      this->rightJoint->GetAnchor(0));
+  this->wheelSeparation = this->leftJoint->Anchor(0).Distance(
+      this->rightJoint->Anchor(0));
 
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
-  math::Box bb = parent->GetBoundingBox();
+  ignition::math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
-  this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+  this->wheelRadius = bb.Size().Max() * 0.5;
 }
 
 /////////////////////////////////////////////////

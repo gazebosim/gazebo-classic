@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Cylinder shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETCYLINDERSHAPE_HH_
-#define _BULLETCYLINDERSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -60,7 +55,7 @@ namespace gazebo
                   gzerr << "Cylinder shape does not support negative length\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
@@ -68,7 +63,7 @@ namespace gazebo
                   gzwarn << "Setting cylinder shape's radius to zero \n";
                   _radius = 1e-4;
                 }
-                if (math::equal(_length, 0.0))
+                if (ignition::math::equal(_length, 0.0))
                 {
                   gzwarn << "Setting cylinder shape's length to zero \n";
                   _length = 1e-4;
@@ -110,9 +105,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->CoG();
+                    ignition::math::Pose3d relativePose =
+                        this->collisionParent->RelativePose();
+                    relativePose.Pos() -= bLink->GetInertial()->CoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

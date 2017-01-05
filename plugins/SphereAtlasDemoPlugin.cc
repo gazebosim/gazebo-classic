@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "plugins/SphereAtlasDemoPlugin.hh"
 
@@ -156,7 +158,7 @@ void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
+          std::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -183,7 +185,7 @@ void SphereAtlasDemoPlugin::OnUpdate()
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
   {
-    double p = this->joints[j]->GetAngle(0).Radian();
+    double p = this->joints[j]->Position(0);
     double target = 0;
     double perror = target - p;
     double derror = (perror - this->qp[j])/dt;

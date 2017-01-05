@@ -203,14 +203,14 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->WorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->WorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
   double test_duration = world->SimTime().Double() - start_time;
@@ -377,14 +377,14 @@ void JointKinematicTest::SetJointPositionThreadedTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li)
     {
-      math::Vector3 linVel = (*li)->GetWorldLinearVel();
-      math::Vector3 angVel = (*li)->GetWorldAngularVel();
-      EXPECT_NEAR(linVel.x, 0, TOL);
-      EXPECT_NEAR(linVel.y, 0, TOL);
-      EXPECT_NEAR(linVel.z, 0, TOL);
-      EXPECT_NEAR(angVel.x, 0, TOL);
-      EXPECT_NEAR(angVel.y, 0, TOL);
-      EXPECT_NEAR(angVel.z, 0, TOL);
+      ignition::math::Vector3d linVel = (*li)->WorldLinearVel();
+      ignition::math::Vector3d angVel = (*li)->WorldAngularVel();
+      EXPECT_NEAR(linVel.X(), 0, TOL);
+      EXPECT_NEAR(linVel.Y(), 0, TOL);
+      EXPECT_NEAR(linVel.Z(), 0, TOL);
+      EXPECT_NEAR(angVel.X(), 0, TOL);
+      EXPECT_NEAR(angVel.Y(), 0, TOL);
+      EXPECT_NEAR(angVel.Z(), 0, TOL);
     }
   }
   double test_duration = world->SimTime().Double() - start_time;
@@ -517,7 +517,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   std::vector<math::Pose> linkPoses;
   for (physics::Link_V::iterator li = links.begin();
                                  li != links.end(); ++li)
-    linkPoses.push_back((*li)->GetWorldPose());
+    linkPoses.push_back((*li)->WorldPose());
 
   world->SetPaused(true);
   start_time = world->SimTime().Double();
@@ -562,7 +562,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li, ++pi)
     {
-      math::Pose pose = (*li)->GetWorldPose();
+      math::Pose pose = (*li)->WorldPose();
       EXPECT_NEAR(pose.pos.x, pi->pos.x, TOL);
       EXPECT_NEAR(pose.pos.y, pi->pos.y, TOL);
       EXPECT_NEAR(pose.pos.z, pi->pos.z, TOL);

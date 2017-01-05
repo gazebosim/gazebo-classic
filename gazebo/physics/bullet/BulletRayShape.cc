@@ -66,11 +66,11 @@ void BulletRayShape::Update()
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != nullptr, "Bullet link is null");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+    this->globalStartPos = link->WorldPose().CoordPositionAdd(
+          this->relativeStartPos.Ign());
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+    this->globalEndPos = link->WorldPose().CoordPositionAdd(
+          this->relativeEndPos.Ign());
   }
 
   btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
@@ -111,11 +111,11 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != nullptr, "Bullet link is null");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeStartPos);
+    this->globalStartPos = link->WorldPose().CoordPositionAdd(
+          this->relativeStartPos.Ign());
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
-          this->relativeEndPos);
+    this->globalEndPos = link->WorldPose().CoordPositionAdd(
+          this->relativeEndPos.Ign());
   }
 
   if (this->physicsEngine)

@@ -15,14 +15,15 @@
  *
 */
 
-#ifndef _GAZEBO_ELEVATOR_PLUGIN_PRIVATE_HH_
-#define _GAZEBO_ELEVATOR_PLUGIN_PRIVATE_HH_
+#ifndef GAZEBO_PLUGINS_ELEVATORPLUGINPRIVATE_HH_
+#define GAZEBO_PLUGINS_ELEVATORPLUGINPRIVATE_HH_
 
 #include <list>
 #include <mutex>
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
@@ -302,6 +303,12 @@ namespace gazebo
 
     /// \brief Time to hold the door in the open state.
     public: common::Time doorWaitTime;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

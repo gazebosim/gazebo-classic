@@ -14,21 +14,38 @@
  * limitations under the License.
  *
 */
-/* Desc: Center of Mass Visualization Class
- * Author: Nate Koenig
- */
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/COMVisualPrivate.hh"
 #include "gazebo/rendering/COMVisual.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
 
 using namespace gazebo;
 using namespace rendering;
+
+namespace gazebo
+{
+  namespace rendering
+  {
+    /// \brief Private data for the COM Visual class
+    class COMVisualPrivate : public VisualPrivate
+    {
+      /// \brief Lines that make the cross marking the center of mass.
+      public: DynamicLines *crossLines;
+
+      /// \brief Inertia pose in link frame.
+      public: ignition::math::Pose3d inertiaPose;
+
+      /// \brief Parent link name.
+      public: std::string linkName;
+
+      /// \brief Link mass.
+      public: double mass;
+    };
+  }
+}
 
 /////////////////////////////////////////////////
 COMVisual::COMVisual(const std::string &_name, VisualPtr _vis)
@@ -60,7 +77,7 @@ void COMVisual::Load(sdf::ElementPtr _elem)
     if (_elem->GetElement("inertial")->HasElement("pose"))
     {
       dPtr->inertiaPose =
-          _elem->GetElement("inertial")->Get<math::Pose>("pose");
+          _elem->GetElement("inertial")->Get<ignition::math::Pose3d>("pose");
     }
     else if (_elem->GetElement("inertial")->HasElement("mass"))
     {
@@ -80,15 +97,7 @@ void COMVisual::Load(ConstLinkPtr &_msg)
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
-  math::Vector3 xyz(_msg->inertial().pose().position().x(),
-                    _msg->inertial().pose().position().y(),
-                    _msg->inertial().pose().position().z());
-  math::Quaternion q(_msg->inertial().pose().orientation().w(),
-                     _msg->inertial().pose().orientation().x(),
-                     _msg->inertial().pose().orientation().y(),
-                     _msg->inertial().pose().orientation().z());
-
-  dPtr->inertiaPose = math::Pose(xyz, q);
+  dPtr->inertiaPose = msgs::ConvertIgn(_msg->inertial().pose());
 
   dPtr->mass = _msg->inertial().mass();
   dPtr->linkName = _msg->name();
@@ -117,13 +126,13 @@ void COMVisual::Load()
 
   // Get the link's bounding box
   VisualPtr vis = this->GetScene()->GetVisual(dPtr->linkName);
-  math::Box box;
+  ignition::math::Box box;
 
   if (vis)
-    box = vis->GetBoundingBox();
+    box = vis->BoundingBox();
 
   VisualPtr sphereVis(
-      new Visual(this->GetName()+"_SPHERE_", shared_from_this(), false));
+      new Visual(this->Name()+"_SPHERE_", shared_from_this(), false));
   sphereVis->Load();
 
   // Mass indicator: equivalent sphere with density of lead
@@ -132,8 +141,8 @@ void COMVisual::Load()
 
   sphereVis->SetScale(ignition::math::Vector3d(
       sphereRadius*2, sphereRadius*2, sphereRadius*2));
-  sphereVis->SetPosition(dPtr->inertiaPose.pos.Ign());
-  sphereVis->SetRotation(dPtr->inertiaPose.rot.Ign());
+  sphereVis->SetPosition(dPtr->inertiaPose.Pos());
+  sphereVis->SetRotation(dPtr->inertiaPose.Rot());
 
   Ogre::SceneNode *sphereNode = sphereVis->GetSceneNode();
   sphereNode->setInheritScale(false);
@@ -143,18 +152,27 @@ void COMVisual::Load()
   sphereVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
   // CoM position indicator
-  ignition::math::Vector3d p1(0, 0, box.min.z - dPtr->inertiaPose.pos.z);
-  ignition::math::Vector3d p2(0, 0, box.max.z - dPtr->inertiaPose.pos.z);
-  ignition::math::Vector3d p3(0, box.min.y - dPtr->inertiaPose.pos.y, 0);
-  ignition::math::Vector3d p4(0, box.max.y - dPtr->inertiaPose.pos.y, 0);
-  ignition::math::Vector3d p5(box.min.x - dPtr->inertiaPose.pos.x, 0, 0);
-  ignition::math::Vector3d p6(box.max.x - dPtr->inertiaPose.pos.x, 0, 0);
-  p1 += dPtr->inertiaPose.pos.Ign();
-  p2 += dPtr->inertiaPose.pos.Ign();
-  p3 += dPtr->inertiaPose.pos.Ign();
-  p4 += dPtr->inertiaPose.pos.Ign();
-  p5 += dPtr->inertiaPose.pos.Ign();
-  p6 += dPtr->inertiaPose.pos.Ign();
+  ignition::math::Vector3d p1(0, 0,
+      box.Min().Z() - dPtr->inertiaPose.Pos().Z());
+  ignition::math::Vector3d p2(0, 0,
+      box.Max().Z() - dPtr->inertiaPose.Pos().Z());
+
+  ignition::math::Vector3d p3(0,
+      box.Min().Y() - dPtr->inertiaPose.Pos().Y(), 0);
+  ignition::math::Vector3d p4(0,
+      box.Max().Y() - dPtr->inertiaPose.Pos().Y(), 0);
+
+  ignition::math::Vector3d p5(
+      box.Min().X() - dPtr->inertiaPose.Pos().X(), 0, 0);
+  ignition::math::Vector3d p6(
+      box.Max().X() - dPtr->inertiaPose.Pos().X(), 0, 0);
+
+  p1 += dPtr->inertiaPose.Pos();
+  p2 += dPtr->inertiaPose.Pos();
+  p3 += dPtr->inertiaPose.Pos();
+  p4 += dPtr->inertiaPose.Pos();
+  p5 += dPtr->inertiaPose.Pos();
+  p6 += dPtr->inertiaPose.Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -170,6 +188,12 @@ void COMVisual::Load()
 
 /////////////////////////////////////////////////
 math::Pose COMVisual::GetInertiaPose() const
+{
+  return this->InertiaPose();
+}
+
+/////////////////////////////////////////////////
+ignition::math::Pose3d COMVisual::InertiaPose() const
 {
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);

@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -313,7 +314,7 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       bool result = false;
 
-      if (msg.id() < GZ_UINT32_MAX)
+      if (msg.id() < ignition::math::MAX_UI32)
         result = this->AttachToVisualImpl(msg.id(),
             msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
       else
@@ -368,8 +369,7 @@ void Camera::Update()
   {
     double scaling = 0;
     ignition::math::Vector3d direction =
-      this->dataPtr->trackedVisual->GetWorldPose().pos.Ign() -
-                              this->WorldPose().Pos();
+      this->dataPtr->trackedVisual->WorldPose().Pos() - this->WorldPose().Pos();
 
     if (!this->dataPtr->trackIsStatic)
     {
@@ -385,7 +385,7 @@ void Camera::Update()
         if (this->dataPtr->trackInheritYaw)
         {
           double yaw =
-              this->dataPtr->trackedVisual->GetWorldPose().Ign().Rot().Yaw();
+              this->dataPtr->trackedVisual->WorldPose().Rot().Yaw();
           ignition::math::Quaterniond rot =
               ignition::math::Quaterniond(0.0, 0.0, yaw);
           direction += rot.RotateVector(this->dataPtr->trackPos);
@@ -1488,7 +1488,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
   else
   {
     gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
-    track.set_id(GZ_UINT32_MAX);
+    track.set_id(ignition::math::MAX_UI32);
   }
 
   track.set_name(_visualName);
@@ -1614,7 +1614,7 @@ bool Camera::IsVisible(VisualPtr _visual)
 {
   if (this->camera && _visual)
   {
-    ignition::math::Box bbox = _visual->GetBoundingBox().Ign();
+    ignition::math::Box bbox = _visual->BoundingBox();
     Ogre::AxisAlignedBox box;
     box.setMinimum(bbox.Min().X(), bbox.Min().Y(), bbox.Min().Z());
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
@@ -1823,14 +1823,11 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
   }
 }
 

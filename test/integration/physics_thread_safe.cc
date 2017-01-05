@@ -87,11 +87,12 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   {
     // Call these functions repeatedly
     // Test passes if it doesn't abort early
-    math::Vector3 vel = link->GetWorldLinearVel();
-    vel += link->GetWorldLinearVel(math::Vector3());
-    vel += link->GetWorldLinearVel(math::Vector3(), math::Quaternion());
-    vel += link->GetWorldCoGLinearVel();
-    vel += link->GetWorldAngularVel();
+    ignition::math::Vector3d vel = link->WorldLinearVel();
+    vel += link->WorldLinearVel(ignition::math::Vector3d::Zero);
+    vel += link->WorldLinearVel(ignition::math::Vector3d::Zero,
+        ignition::math::Quaterniond::Identity);
+    vel += link->WorldCoGLinearVel();
+    vel += link->WorldAngularVel();
   }
 }
 

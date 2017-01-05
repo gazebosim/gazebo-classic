@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include <ignition/math/Rand.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
@@ -35,7 +38,6 @@ RandomVelocityPlugin::RandomVelocityPlugin()
 /////////////////////////////////////////////////
 RandomVelocityPlugin::~RandomVelocityPlugin()
 {
-  delete this->dataPtr;
 }
 
 /////////////////////////////////////////////////

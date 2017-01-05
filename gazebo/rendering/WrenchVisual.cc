@@ -79,21 +79,21 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   this->InsertMesh("unit_cone");
 
   dPtr->coneXVis.reset(
-      new Visual(this->GetName()+"__WRENCH_X_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_X_CONE__", shared_from_this(),
       false));
   dPtr->coneXVis->Load();
   dPtr->coneXVis->AttachMesh("unit_cone");
   dPtr->coneXVis->SetMaterial("__GAZEBO_TRANS_RED_MATERIAL__");
 
   dPtr->coneYVis.reset(
-      new Visual(this->GetName()+"__WRENCH_Y_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_Y_CONE__", shared_from_this(),
       false));
   dPtr->coneYVis->Load();
   dPtr->coneYVis->AttachMesh("unit_cone");
   dPtr->coneYVis->SetMaterial("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   dPtr->coneZVis.reset(
-      new Visual(this->GetName()+"__WRENCH_Z_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_Z_CONE__", shared_from_this(),
       false));
   dPtr->coneZVis->Load();
   dPtr->coneZVis->AttachMesh("unit_cone");
@@ -113,7 +113,7 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   dPtr->coneZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
 
   VisualPtr lineVis(
-      new Visual(this->GetName()+"__WRENCH_FORCE_NODE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_FORCE_NODE__", shared_from_this(),
       false));
 
   dPtr->forceLine = lineVis->CreateDynamicLine(RENDERING_LINE_LIST);

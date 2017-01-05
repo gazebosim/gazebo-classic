@@ -295,7 +295,14 @@ void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->MOI();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -367,15 +374,14 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 //////////////////////////////////////////////////
 math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->MOI(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
-ignition::math::Matrix3d Inertial::MOI(
-    const ignition::math::Vector3d &_pos) const
-{
-  return this->MOI(ignition::math::Pose3d(_pos,
-        ignition::math::Quaterniond::Identity));
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -391,7 +397,7 @@ ignition::math::Matrix3d Inertial::MOI(
 
   // rotate moi into new cog frame
   moi = ignition::math::Matrix3d(new2Old.Rot()) * moi *
-    ignition::math::Matrix3d(new2Old.Rot().Inverse());
+        ignition::math::Matrix3d(new2Old.Rot().Inverse());
 
   // parallel axis theorem to get MOI at the new cog location
   // integrating point mass at some offset

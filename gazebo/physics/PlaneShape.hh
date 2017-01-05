@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
+#ifndef GAZEBO_PHYSICS_PLANESHAPE_HH_
+#define GAZEBO_PHYSICS_PLANESHAPE_HH_
 
-#ifndef _PLANESHAPE_HH_
-#define _PLANESHAPE_HH_
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/Shape.hh"
@@ -67,15 +64,26 @@ namespace gazebo
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.
-      public: void SetSize(const math::Vector2d &_size);
+      /// \deprecated Use function which accepts ignition math.
+      public: void SetSize(const math::Vector2d &_size)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the size.
+      /// \param[in] _size 2D size of the plane.
+      public: void SetSize(const ignition::math::Vector2d &_size);
 
       /// \brief Get the size.
       /// \return Size of the plane.
-      public: math::Vector2d GetSize() const;
+      /// \deprecated Use function which returns ignition math.
+      public: math::Vector2d GetSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the size.
+      /// \return Size of the plane.
+      public: ignition::math::Vector2d Size() const;
 
       /// \brief Set the scale of the plane.
       /// \return _scale Scale to set the plane to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.

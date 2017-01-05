@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -40,6 +41,7 @@
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
+#include "gazebo/rendering/MarkerVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -104,7 +106,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->dataPtr->contactVisId = GZ_UINT32_MAX;
+  this->dataPtr->contactVisId = ignition::math::MAX_UI32;
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
@@ -136,6 +138,9 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectToggleLayer(
         std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
+
+  this->dataPtr->statsSub = this->dataPtr->node->Subscribe("~/world_stats",
+                                          &Scene::OnStatsMsg, this);
 
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
@@ -214,6 +219,7 @@ void Scene::Clear()
   this->dataPtr->jointSub.reset();
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
+  this->dataPtr->statsSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
@@ -382,6 +388,13 @@ void Scene::Init()
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  // Initialize the marker manager
+  if (!this->dataPtr->markerManager.Init(this))
+  {
+    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+      << "will not work.\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -735,7 +748,7 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
   for (iter = this->dataPtr->visuals.begin();
       iter != this->dataPtr->visuals.end(); ++iter)
   {
-    if (iter->second->GetName() == _name)
+    if (iter->second->Name() == _name)
       break;
   }
 
@@ -747,7 +760,7 @@ VisualPtr Scene::GetVisual(const std::string &_name) const
     for (iter = this->dataPtr->visuals.begin();
         iter != this->dataPtr->visuals.end(); ++iter)
     {
-      if (iter->second->GetName() == otherName)
+      if (iter->second->Name() == otherName)
         break;
     }
 
@@ -824,7 +837,7 @@ VisualPtr Scene::ModelVisualAt(CameraPtr _camera,
 {
   VisualPtr vis = this->VisualAt(_camera, _mousePos);
   if (vis)
-    vis = this->GetVisual(vis->GetName().substr(0, vis->GetName().find("::")));
+    vis = this->GetVisual(vis->Name().substr(0, vis->Name().find("::")));
 
   return vis;
 }
@@ -837,9 +850,10 @@ void Scene::SnapVisualToNearestBelow(const std::string &_visualName)
 
   if (vis && visBelow)
   {
-    math::Vector3 pos = vis->GetWorldPose().pos;
-    double dz = vis->GetBoundingBox().min.z - visBelow->GetBoundingBox().max.z;
-    pos.z -= dz;
+    auto pos = vis->WorldPose().Pos();
+    double dz = vis->BoundingBox().Min().Z() -
+      visBelow->BoundingBox().Max().Z();
+    pos.Z() -= dz;
     vis->SetWorldPosition(pos);
   }
 }
@@ -853,16 +867,16 @@ VisualPtr Scene::VisualBelow(const std::string &_visualName)
   if (vis)
   {
     std::vector<VisualPtr> below;
-    this->VisualsBelowPoint(vis->GetWorldPose().pos.Ign(), below);
+    this->VisualsBelowPoint(vis->WorldPose().Pos(), below);
 
     double maxZ = -10000;
 
     for (uint32_t i = 0; i < below.size(); ++i)
     {
-      if (below[i]->GetName().find(vis->GetName()) != 0
-          && below[i]->GetBoundingBox().max.z > maxZ)
+      if (below[i]->Name().find(vis->Name()) != 0
+          && below[i]->BoundingBox().Max().Z() > maxZ)
       {
-        maxZ = below[i]->GetBoundingBox().max.z;
+        maxZ = below[i]->BoundingBox().Max().Z();
         result = below[i];
       }
     }
@@ -1000,14 +1014,12 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
                                   const ignition::math::Vector2i &_mousePos,
                                   const bool _ignoreSelectionObj)
 {
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setRay(mouseRay);
 
@@ -1093,16 +1105,13 @@ bool Scene::FirstContact(CameraPtr _camera,
                          ignition::math::Vector3d &_position)
 {
   bool valid = false;
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = ignition::math::Vector3d::Zero;
 
-  // Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setSortByDistance(true);
   this->dataPtr->raySceneQuery->setRay(mouseRay);
@@ -2714,7 +2723,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   visual->SetType(_type);
 
   this->dataPtr->visuals[visual->GetId()] = visual;
-  if (visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  if (visual->Name().find("__SKELETON_VISUAL__") != std::string::npos)
   {
     visual->SetVisible(false);
     visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
@@ -2731,7 +2740,10 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::SimTime() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  return this->dataPtr->sceneSimTimePosesApplied;
+  // Return the most recent sim time.
+  return
+    this->dataPtr->sceneSimTime > this->dataPtr->sceneSimTimePosesApplied ?
+    this->dataPtr->sceneSimTime : this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
@@ -3070,7 +3082,7 @@ void Scene::AddVisual(VisualPtr _vis)
   if (this->dataPtr->visuals.find(_vis->GetId()) !=
       this->dataPtr->visuals.end())
   {
-    gzwarn << "Duplicate visuals detected[" << _vis->GetName() << "]\n";
+    gzwarn << "Duplicate visuals detected[" << _vis->Name() << "]\n";
   }
 
   this->dataPtr->visuals[_vis->GetId()] = _vis;
@@ -3090,8 +3102,8 @@ void Scene::RemoveVisual(uint32_t _id)
     {
       // Check to see if the projector is a child of the visual that is
       // being removed.
-      if (piter->second->GetParent()->GetRootVisual()->GetName() ==
-          vis->GetRootVisual()->GetName())
+      if (piter->second->GetParent()->GetRootVisual()->Name() ==
+          vis->GetRootVisual()->Name())
       {
         delete piter->second;
         this->dataPtr->projectors.erase(piter++);
@@ -3196,7 +3208,7 @@ Heightmap *Scene::GetHeightmap() const
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->Name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_msg);
   comVis->SetVisible(this->dataPtr->showCOMs);
@@ -3206,7 +3218,7 @@ void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
-  COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
+  COMVisualPtr comVis(new COMVisual(_linkVisual->Name() + "_COM_VISUAL__",
                                     _linkVisual));
   comVis->Load(_elem);
   comVis->SetVisible(false);
@@ -3216,7 +3228,7 @@ void Scene::CreateCOMVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->Name() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_msg);
   inertiaVis->SetVisible(this->dataPtr->showInertias);
@@ -3226,7 +3238,7 @@ void Scene::CreateInertiaVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 {
-  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->GetName() +
+  InertiaVisualPtr inertiaVis(new InertiaVisual(_linkVisual->Name() +
       "_INERTIA_VISUAL__", _linkVisual));
   inertiaVis->Load(_elem);
   inertiaVis->SetVisible(false);
@@ -3236,7 +3248,7 @@ void Scene::CreateInertiaVisual(sdf::ElementPtr _elem, VisualPtr _linkVisual)
 /////////////////////////////////////////////////
 void Scene::CreateLinkFrameVisual(ConstLinkPtr &/*_msg*/, VisualPtr _linkVisual)
 {
-  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->GetName() +
+  LinkFrameVisualPtr linkFrameVis(new LinkFrameVisual(_linkVisual->Name() +
       "_LINK_FRAME_VISUAL__", _linkVisual));
   linkFrameVis->Load();
   linkFrameVis->SetVisible(this->dataPtr->showLinkFrames);
@@ -3354,7 +3366,7 @@ void Scene::ShowContacts(const bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->dataPtr->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->dataPtr->contactVisId == ignition::math::MAX_UI32 && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->dataPtr->worldVisual, "~/physics/contacts"));
@@ -3448,8 +3460,36 @@ void Scene::RemoveProjectors()
 /////////////////////////////////////////////////
 void Scene::ToggleLayer(const int32_t _layer)
 {
+  if (this->HasLayer(_layer))
+    this->dataPtr->layerState[_layer] = !this->dataPtr->layerState[_layer];
+  else
+    this->dataPtr->layerState[_layer] = false;
+
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+bool Scene::LayerState(const int32_t _layer) const
+{
+  if (_layer >= 0 && this->HasLayer(_layer))
+    return this->dataPtr->layerState[_layer];
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::HasLayer(const int32_t _layer) const
+{
+  return _layer < 0 ||
+    this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
+}
+
+/////////////////////////////////////////////////
+void Scene::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->sceneSimTime = msgs::Convert(_msg->sim_time());
 }

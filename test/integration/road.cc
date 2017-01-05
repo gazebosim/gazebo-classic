@@ -92,7 +92,7 @@ void RoadTest::RoadVisual()
   msg.set_name(roadName);
   msg.set_width(8);
   msgs::Vector3d *pt01Msg = msg.add_point();
-  msgs::Set(pt01Msg, ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(pt01Msg, ignition::math::Vector3d::Zero);
   msgs::Vector3d *pt02Msg = msg.add_point();
   msgs::Set(pt02Msg, ignition::math::Vector3d(0, 5, 0));
   msgs::Vector3d *pt03Msg = msg.add_point();
@@ -117,7 +117,7 @@ void RoadTest::RoadVisual()
     sleep++;
   }
   ASSERT_TRUE(roadVis != nullptr);
-  EXPECT_EQ(roadVis->GetName(), roadName);
+  EXPECT_EQ(roadVis->Name(), roadName);
 }
 
 /////////////////////////////////////////////////

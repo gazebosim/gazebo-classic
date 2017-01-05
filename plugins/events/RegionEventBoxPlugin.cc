@@ -65,7 +65,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   this->boxSize = boxEl->Get<ignition::math::Vector3d>("size");
   this->boxScale = ignition::math::Vector3d::One;
-  this->boxPose = this->model->GetWorldPose().Ign();
+  this->boxPose = this->model->WorldPose();
   this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
   if (_sdf->HasElement("event"))
@@ -84,7 +84,8 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RegionEventBoxPlugin::OnUpdate, this, _1));
+      std::bind(&RegionEventBoxPlugin::OnUpdate, this,
+      std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
@@ -105,9 +106,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
   // due to user interaction via the gui, if so update region dimensions
   {
     std::lock_guard<std::mutex> lock(this->receiveMutex);
-    if (this->boxPose != this->model->GetWorldPose().Ign())
+    if (this->boxPose != this->model->WorldPose())
     {
-      this->boxPose = this->model->GetWorldPose().Ign();
+      this->boxPose = this->model->WorldPose();
       this->hasStaleSizeAndPose = true;
     }
 
@@ -130,7 +131,7 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
     auto it = this->insiders.find(m->GetName());
 
-    if (this->PointInRegion(m->GetWorldPose().pos.Ign(), this->box,
+    if (this->PointInRegion(m->WorldPose().Pos(), this->box,
         this->boxPose))
     {
       if (it == this->insiders.end())

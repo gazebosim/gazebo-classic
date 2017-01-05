@@ -93,7 +93,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d::Zero);
   EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
@@ -146,9 +146,9 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_NEAR(shape->GetHeight(x, y), 10.0, 1e-4);
     }
@@ -178,9 +178,9 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
   int x, y;
-  for (y = 0; y < shape->GetVertexCount().y; ++y)
+  for (y = 0; y < shape->VertexCount().Y(); ++y)
   {
-    for (x = 0; x < shape->GetVertexCount().x; ++x)
+    for (x = 0; x < shape->VertexCount().X(); ++x)
     {
       EXPECT_EQ(shape->GetHeight(x, y), 10.0);
     }
@@ -278,7 +278,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   ASSERT_NE(boxModel, nullptr);
 
   ignition::math::Pose3d boxInitPose(0, 0, -207, 0, 0, 0);
-  EXPECT_EQ(boxModel->GetWorldPose().Ign(), boxInitPose);
+  EXPECT_EQ(boxModel->WorldPose(), boxInitPose);
 
   physics::ModelPtr model = GetModel("heightmap");
   ASSERT_NE(model, nullptr);
@@ -293,7 +293,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   ASSERT_NE(shape, nullptr);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d::Zero);
 
   double maxHeight = shape->GetMaxHeight();
   double minHeight = shape->GetMinHeight();
@@ -304,14 +304,14 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   // let the box fall onto the heightmap and wait for it to rest
   world->Step(1000);
 
-  ignition::math::Pose3d boxRestPose = boxModel->GetWorldPose().Ign();
+  ignition::math::Pose3d boxRestPose = boxModel->WorldPose();
   EXPECT_NE(boxRestPose, boxInitPose);
   EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
 
   // step the world and verify the box is at rest
   world->Step(100);
 
-  ignition::math::Pose3d boxNewRestPose = boxModel->GetWorldPose().Ign();
+  ignition::math::Pose3d boxNewRestPose = boxModel->WorldPose();
   EXPECT_EQ(boxNewRestPose, boxRestPose);
 #else
   // prevent unused variable warning
@@ -363,7 +363,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d::Zero);
   EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;

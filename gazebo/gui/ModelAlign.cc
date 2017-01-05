@@ -225,10 +225,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
     this->dataPtr->targetVis = this->dataPtr->selectedVisuals.back();
   }
 
-  auto targetWorldPose = this->dataPtr->targetVis->GetWorldPose().Ign();
-  auto targetBbox = this->dataPtr->targetVis->GetBoundingBox().Ign();
-  targetBbox.Min() *= this->dataPtr->targetVis->GetScale().Ign();
-  targetBbox.Max() *= this->dataPtr->targetVis->GetScale().Ign();
+  auto targetWorldPose = this->dataPtr->targetVis->WorldPose();
+  auto targetBbox = this->dataPtr->targetVis->BoundingBox();
+  targetBbox.Min() *= this->dataPtr->targetVis->Scale();
+  targetBbox.Max() *= this->dataPtr->targetVis->Scale();
 
   std::vector<ignition::math::Vector3d> targetVertices;
   this->Transform(targetBbox, targetWorldPose, targetVertices);
@@ -242,10 +242,10 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   {
     rendering::VisualPtr vis = this->dataPtr->selectedVisuals[i];
 
-    auto worldPose = vis->GetWorldPose().Ign();
-    auto bbox = vis->GetBoundingBox().Ign();
-    bbox.Min() *= vis->GetScale().Ign();
-    bbox.Max() *= vis->GetScale().Ign();
+    auto worldPose = vis->WorldPose();
+    auto bbox = vis->BoundingBox();
+    bbox.Min() *= vis->Scale();
+    bbox.Max() *= vis->Scale();
 
     std::vector<ignition::math::Vector3d> vertices;
     this->Transform(bbox, worldPose, vertices);
@@ -282,28 +282,28 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       if (this->dataPtr->originalVisualPose.find(vis) ==
           this->dataPtr->originalVisualPose.end())
       {
-        this->dataPtr->originalVisualPose[vis] = vis->GetWorldPose().Ign();
+        this->dataPtr->originalVisualPose[vis] = vis->WorldPose();
         this->SetHighlighted(vis, true);
       }
       // prevent the visual pose from being updated by the server
       if (this->dataPtr->scene)
-        this->dataPtr->scene->SelectVisual(vis->GetName(), "move");
+        this->dataPtr->scene->SelectVisual(vis->Name(), "move");
     }
 
     if (_axis == "x")
     {
       trans.Y() = trans.Z() = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
     else if (_axis == "y")
     {
       trans.X() = trans.Z() = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
     else if (_axis == "z")
     {
       trans.X() = trans.Y() = 0;
-      vis->SetWorldPosition(vis->GetWorldPose().pos + trans);
+      vis->SetWorldPosition(vis->WorldPose().Pos() + trans);
     }
 
     if (_publish)
@@ -314,7 +314,7 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
   {
     msgs::UserCmd userCmdMsg;
     userCmdMsg.set_description(
-        "Align to [" + this->dataPtr->targetVis->GetName() + "]");
+        "Align to [" + this->dataPtr->targetVis->Name() + "]");
     userCmdMsg.set_type(msgs::UserCmd::MOVING);
 
     for (const auto &vis : visualsToPublish)
@@ -324,18 +324,18 @@ void ModelAlign::AlignVisuals(std::vector<rendering::VisualPtr> _visuals,
       {
         msgs::Model msg;
 
-        auto id = gui::get_entity_id(vis->GetName());
+        auto id = gui::get_entity_id(vis->Name());
         if (id)
           msg.set_id(id);
 
-        msg.set_name(vis->GetName());
-        msgs::Set(msg.mutable_pose(), vis->GetWorldPose().Ign());
+        msg.set_name(vis->Name());
+        msgs::Set(msg.mutable_pose(), vis->WorldPose());
 
         auto modelMsg = userCmdMsg.add_model();
         modelMsg->CopyFrom(msg);
       }
 
-      Events::moveEntity(vis->GetName(), vis->GetWorldPose().Ign(), true);
+      Events::moveEntity(vis->Name(), vis->WorldPose(), true);
     }
 
     this->dataPtr->userCmdPub->Publish(userCmdMsg);

@@ -51,7 +51,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
   {
     model = world->ModelByName(*iter);
     ASSERT_TRUE(model != NULL);
-    pos = model->GetWorldPose().pos;
+    pos = model->WorldPose().Pos();
     pos.z += 10;
 
     entity = world->EntityBelowPoint(pos.Ign());

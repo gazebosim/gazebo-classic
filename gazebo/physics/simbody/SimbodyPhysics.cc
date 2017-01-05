@@ -551,8 +551,8 @@ void SimbodyPhysics::UpdateCollision()
               /// arbitrarily based on frames.
               ///
               /// shift forces to link1 frame without rotating it first
-              math::Pose pose1 = link1->GetWorldPose();
-              math::Pose pose2 = link2->GetWorldPose();
+              math::Pose pose1 = link1->WorldPose();
+              math::Pose pose2 = link2->WorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
                 + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
@@ -899,7 +899,7 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->world->Gravity().Length(), 0.0))
+  if (!ignition::math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
       SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
@@ -1000,14 +1000,14 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
           // GZ_ASSERT(gzOutb, "must be here");
           physics::ModelPtr model = gzOutb->GetParentModel();
           inboard_X_ML =
-            ~SimbodyPhysics::Pose2Transform(model->GetWorldPose());
+            ~SimbodyPhysics::Pose2Transform(model->WorldPose());
         }
         else
           inboard_X_ML =
-            SimbodyPhysics::Pose2Transform(gzInb->GetRelativePose());
+            SimbodyPhysics::Pose2Transform(gzInb->RelativePose());
 
         SimTK::Transform outboard_X_ML =
-          SimbodyPhysics::Pose2Transform(gzOutb->GetRelativePose());
+          SimbodyPhysics::Pose2Transform(gzOutb->RelativePose());
 
         // defX_ML link frame specified in model frame
         freeJoint.setDefaultTransform(~inboard_X_ML*outboard_X_ML);
@@ -1046,13 +1046,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
 
-        if (math::equal(pitch, 0.0))
+        if (ignition::math::equal(pitch, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using pitch = 1.0e6\n";
@@ -1072,8 +1072,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1100,12 +1100,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
-        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or AxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -1122,8 +1122,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         for (unsigned int nj = 0; nj < 2; ++nj)
         {
-          double low = gzJoint->GetLowerLimit(nj).Radian();
-          double high = gzJoint->GetUpperLimit(nj).Radian();
+          double low = gzJoint->LowerLimit(nj);
+          double high = gzJoint->UpperLimit(nj);
 
           // initialize stop stiffness and dissipation from joint parameters
           gzJoint->limitForce[nj] =
@@ -1165,13 +1165,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // flip transform based on isReversed flag.
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
-        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->AxisFrameOffset(0).Euler()
         //       << "] ["
-        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
-        //          gzJoint->GetLocalAxis(0)) << "]\n";
+        //       << gzJoint->AxisFrameOffset(0).RotateVector(
+        //          gzJoint->LocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -1183,8 +1183,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1211,8 +1211,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "prismatic")
       {
         UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -1224,8 +1224,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = sliderJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1419,7 +1419,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
                              ci !=  collisions.end(); ++ci)
   {
     Transform X_LC =
-      SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
+      SimbodyPhysics::Pose2Transform((*ci)->RelativePose());
 
     // use pointer to store CollisionGeometry
     SimbodyCollisionPtr sc =
@@ -1574,11 +1574,24 @@ math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3Ign(const SimTK::Vec3 &_v)
+{
+  return ignition::math::Vector3d(_v[0], _v[1], _v[2]);
+}
+
+/////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::Pose2Transform(const math::Pose &_pose)
 {
-  SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
-                   _pose.rot.z);
-  SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  return Pose2Transform(_pose.Ign());
+}
+
+/////////////////////////////////////////////////
+SimTK::Transform SimbodyPhysics::Pose2Transform(
+    const ignition::math::Pose3d &_pose)
+{
+  SimTK::Quaternion q(_pose.Rot().W(), _pose.Rot().X(), _pose.Rot().Y(),
+                   _pose.Rot().Z());
+  SimTK::Vec3 v(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
 }

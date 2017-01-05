@@ -19,11 +19,9 @@
  * Date: 21 May 2003
  */
 
-#ifndef _HINGEJOINT_HH_
-#define _HINGEJOINT_HH_
+#ifndef GAZEBO_PHYSICS_HINGEJOINT_HH_
+#define GAZEBO_PHYSICS_HINGEJOINT_HH_
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,7 +45,7 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 1;}
 
       /// \brief Load joint

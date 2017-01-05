@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include <sstream>
 #include <vector>
 
@@ -85,7 +86,7 @@ MainWindowExampleWidget::MainWindowExampleWidget()
       &MainWindowExampleWidget::OnStats, this);
 
   this->connections.push_back(gui::Events::ConnectMainWindowReady(
-              boost::bind(&MainWindowExampleWidget::PauseWorld, this)));
+              std::bind(&MainWindowExampleWidget::PauseWorld, this)));
 }
 
 /////////////////////////////////////////////////

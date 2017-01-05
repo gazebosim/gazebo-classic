@@ -44,18 +44,10 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Oculus"));
 
-  this->renderFrame = new QFrame;
-  this->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->renderFrame->show();
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-  QVBoxLayout *renderLayout = new QVBoxLayout;
-  renderLayout->addWidget(this->renderFrame);
-  renderLayout->setContentsMargins(0, 0, 0, 0);
-
-  this->setLayout(renderLayout);
   this->attachCameraThread = nullptr;
 }
 
@@ -179,23 +171,5 @@ void OculusWindow::showEvent(QShowEvent *_event)
 //////////////////////////////////////////////////
 std::string OculusWindow::GetOgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(WIN32) || defined(__APPLE__)
-  ogreHandle = boost::lexical_cast<std::string>(this->winId());
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  ogreHandle = boost::lexical_cast<std::string>(
-      reinterpret_cast<uint64_t>(info.display()));
-  ogreHandle += ":";
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint32_t>(info.screen()));
-  ogreHandle += ":";
-  assert(q_parent);
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint64_t>(q_parent->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }

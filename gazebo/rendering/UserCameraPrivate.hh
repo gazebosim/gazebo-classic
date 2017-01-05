@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_USERCAMERA_PRIVATE_HH_
-#define _GAZEBO_USERCAMERA_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
+#define GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 namespace gazebo
 {
@@ -82,8 +82,11 @@ namespace gazebo
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
 
-      /// \brief Default camera pose.
-      public: math::Pose defaultPose;
+      /// \brief Ratio of screen point to pixel.
+      public: double devicePixelRatio = 1.0;
+
+      /// \brief Initial camera pose.
+      public: ignition::math::Pose3d initialPose;
     };
   }
 }
