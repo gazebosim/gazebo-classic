@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Specification of a contact
- * Author: Nate Koenig
- * Date: 10 Nov 2009
- */
-
-#ifndef _CONTACT_HH_
-#define _CONTACT_HH_
+#ifndef GAZEBO_PHYSICS_CONTACT_HH_
+#define GAZEBO_PHYSICS_CONTACT_HH_
 
 #include <vector>
 #include <string>
@@ -97,10 +92,10 @@ namespace gazebo
       public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
-      public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3d positions[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force normals.
-      public: math::Vector3 normals[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3d normals[MAX_CONTACT_JOINTS];
 
       /// \brief Array of contact depths
       public: double depths[MAX_CONTACT_JOINTS];

@@ -113,7 +113,7 @@ ignition::math::Box BulletCollision::BoundingBox() const
     {
       PlaneShapePtr plane =
         boost::dynamic_pointer_cast<PlaneShape>(this->shape);
-      auto normal = plane->GetNormal().Ign();
+      auto normal = plane->Normal();
       if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented

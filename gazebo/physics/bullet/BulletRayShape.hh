@@ -56,8 +56,8 @@ namespace gazebo
       ///        the body
       /// \param posStart Start position, relative the body
       /// \param posEnd End position, relative to the body
-      public: void SetPoints(const math::Vector3 &_posStart,
-                             const math::Vector3 &_posEnd);
+      public: void SetPoints(const ignition::math::Vector3d &_posStart,
+                             const ignition::math::Vector3d &_posEnd);
 
       /// \brief Pointer to the Bullet physics engine
       private: BulletPhysicsPtr physicsEngine;

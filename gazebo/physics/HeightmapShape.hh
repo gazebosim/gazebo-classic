@@ -68,11 +68,21 @@ namespace gazebo
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
-      public: math::Vector3 GetSize() const;
+      /// \deprecated See ignition::math::Vector3d Size() const
+      public: math::Vector3 GetSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the size in meters.
+      /// \return The size in meters.
+      public: ignition::math::Vector3d Size() const;
 
       /// \brief Get the origin in world coordinate frame.
       /// \return The origin in world coordinate frame.
-      public: math::Vector3 GetPos() const;
+      /// \deprecated See ignition::math::Vector3d Pos() const
+      public: math::Vector3 GetPos() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the origin in world coordinate frame.
+      /// \return The origin in world coordinate frame.
+      public: ignition::math::Vector3d Pos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
@@ -170,7 +180,7 @@ namespace gazebo
       private: std::string fileFormat;
 
       /// \brief Terrain size
-      private: math::Vector3 heightmapSize;
+      private: ignition::math::Vector3d heightmapSize;
 
       #ifdef HAVE_GDAL
       /// \brief DEM used to generate the heights.

@@ -140,8 +140,14 @@ void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MapShape::GetScale() const
 {
+  return this->Scale();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d MapShape::Scale() const
+{
   double mapScale = this->sdf->Get<double>("scale");
-  return math::Vector3(mapScale, mapScale, mapScale);
+  return ignition::math::Vector3d(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////

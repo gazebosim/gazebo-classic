@@ -192,8 +192,8 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         localTorque2 = body2Pose.rot.RotateVectorReverse(
             BulletTypes::ConvertVector3(torqueB));
 
-        contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
-        contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
+        contactFeedback->positions[j] = BulletTypes::ConvertVector3Ign(ptB);
+        contactFeedback->normals[j] = BulletTypes::ConvertVector3Ign(normalOnB);
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
