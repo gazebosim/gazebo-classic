@@ -53,6 +53,7 @@ sdf::ElementPtr gazebo::physics::InertialPrivate::sdfInertial;
 
 //////////////////////////////////////////////////
 Inertial::Inertial()
+  : dataPtr(new InertialPrivate)
 {
   this->dataPtr->mass = 1;
   this->dataPtr->principals.Set(1, 1, 1);
