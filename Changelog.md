@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2016-xx-xx)
 
+1. Don't use qt4 webkit for HotkeyDialog
+    * [Pull request 2584](https://bitbucket.org/osrf/gazebo/pull-request/2584)
+
 1. Support configuring heightmap sampling level
     * [Pull request 2519](https://bitbucket.org/osrf/gazebo/pull-request/2519)
 
