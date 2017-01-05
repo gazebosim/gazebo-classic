@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -105,7 +106,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->dataPtr->contactVisId = GZ_UINT32_MAX;
+  this->dataPtr->contactVisId = ignition::math::MAX_UI32;
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
@@ -3365,7 +3366,7 @@ void Scene::ShowContacts(const bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->dataPtr->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->dataPtr->contactVisId == ignition::math::MAX_UI32 && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->dataPtr->worldVisual, "~/physics/contacts"));
