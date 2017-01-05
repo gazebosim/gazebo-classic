@@ -108,12 +108,32 @@ void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
 //////////////////////////////////////////////////
 void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
+  ignition::math::Vector3d pa, pb;
+  this->RelativePoints(pa, pb);
+  _posA = pa;
+  _posB = pb;
+}
+
+//////////////////////////////////////////////////
+void RayShape::RelativePoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
+{
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
 void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+{
+  ignition::math::Vector3d pa, pb;
+  this->GlobalPoints(pa, pb);
+  _posA = pa;
+  _posB = pb;
+}
+
+//////////////////////////////////////////////////
+void RayShape::GlobalPoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;
