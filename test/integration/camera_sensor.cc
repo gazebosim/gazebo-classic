@@ -286,7 +286,7 @@ TEST_F(CameraSensor, TopicName)
   std::string modelName = "prefix::camera_model";
   std::string cameraName = "camera_sensor";
   unsigned int width  = 320;
-  unsigned int height = 240;  // 106 fps
+  unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
@@ -299,7 +299,6 @@ TEST_F(CameraSensor, TopicName)
   EXPECT_NE(camSensor->Topic().find("prefix/camera_model/body/camera_sensor"),
       std::string::npos);
 }
-
 
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, FillMsg)
