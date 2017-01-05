@@ -338,9 +338,6 @@ namespace gazebo
       /// scene, we update this time accordingly.
       public: common::Time sceneSimTimePosesApplied;
 
-      /// \brief Sim time according to world_stats
-      public: common::Time sceneSimTime;
-
       /// \brief Keeps track of the visual ID for contact visualization.
       public: uint32_t contactVisId;
 

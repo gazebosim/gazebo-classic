@@ -67,6 +67,9 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \param[out] _result True on success.
   public: void OnList(ignition::msgs::Marker_V &_rep, bool &_result);
 
+  /// \brief Privous sim time received
+  public: common::Time lastSceneSimTime;
+
   /// \brief Mutex to protect message list.
   public: std::mutex mutex;
 
@@ -142,6 +145,7 @@ void MarkerManagerPrivate::OnPreRender()
     this->markerMsgs.erase(markerIter++);
   }
 
+  common::Time simTime = this->scene->SimTime();
   // Erase any markers that have a lifetime.
   for (auto mit = this->markers.begin();
        mit != this->markers.end();)
@@ -149,9 +153,11 @@ void MarkerManagerPrivate::OnPreRender()
     for (auto it = mit->second.cbegin();
          it != mit->second.cend();)
     {
-      // Erase a marker if it has a lifetime and it's expired.
+      // Erase a marker if it has a lifetime and it's expired,
+      // or if the world has reset
       if (it->second->Lifetime() != common::Time::Zero &&
-          it->second->Lifetime() <= this->scene->SimTime())
+          (it->second->Lifetime() <= simTime ||
+          simTime < this->lastSceneSimTime))
       {
         it->second->Fini();
         this->scene->RemoveVisual(it->second);
@@ -167,6 +173,7 @@ void MarkerManagerPrivate::OnPreRender()
     else
       ++mit;
   }
+  this->lastSceneSimTime = simTime;
 }
 
 //////////////////////////////////////////////////
