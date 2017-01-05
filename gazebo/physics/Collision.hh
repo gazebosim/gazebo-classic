@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Collision class
- * Author: Nate Koenig
- * Date: 13 Feb 2006
- */
-
-#ifndef _COLLISION_HH_
-#define _COLLISION_HH_
+#ifndef GAZEBO_PHYSICS_COLLISION_HH_
+#define GAZEBO_PHYSICS_COLLISION_HH_
 
 #include <string>
 #include <vector>
@@ -119,38 +114,89 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearVel() const
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the collision.
+      /// \return The linear velocity relative to the parent model.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the collision in the world
       /// frame.
       /// \return The linear velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearVel() const
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the collision in the world
+      /// frame.
+      /// \return The linear velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the collision.
       /// \return The angular velocity of the collision.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularVel() const
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the collision.
+      /// \return The angular velocity of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the collision in the world frame.
       /// \return The angular velocity of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularVel() const
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the collision in the world frame.
+      /// \return The angular velocity of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the collision.
       /// \return The linear acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearAccel() const
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the collision.
+      /// \return The linear acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the collision in the world
       /// frame.
       /// \return The linear acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearAccel() const
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the collision in the world
+      /// frame.
+      /// \return The linear acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the collision.
       /// \return The angular acceleration of the collision.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularAccel() const
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the collision.
+      /// \return The angular acceleration of the collision.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the collision in the
       /// world frame.
       /// \return The angular acceleration of the collision in the world frame.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularAccel() const
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the collision in the
+      /// world frame.
+      /// \return The angular acceleration of the collision in the world frame.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Get the collision state.
       /// \return The collision state.

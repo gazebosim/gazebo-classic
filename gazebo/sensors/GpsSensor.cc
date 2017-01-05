@@ -160,8 +160,7 @@ bool GpsSensor::UpdateImpl(const bool /*_force*/)
     // Measure velocity and apply noise
     {
       ignition::math::Vector3d gpsVelocity =
-        this->dataPtr->parentLink->GetWorldLinearVel(
-            this->pose.Pos()).Ign();
+        this->dataPtr->parentLink->WorldLinearVel(this->pose.Pos());
 
       // Convert to global frame
       gpsVelocity =

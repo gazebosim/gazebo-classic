@@ -36,12 +36,11 @@ LinkState::LinkState(const LinkPtr _link, const common::Time &_realTime,
   : State(_link->GetName(), _realTime, _simTime, _iterations)
 {
   this->pose = _link->WorldPose();
-  this->velocity.Set(_link->GetWorldLinearVel().Ign(),
-                     _link->GetWorldAngularVel().Ign());
-  this->acceleration.Set(_link->GetWorldLinearAccel().Ign(),
-                         _link->GetWorldAngularAccel().Ign());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->velocity.Set(_link->WorldLinearVel(),
+                     _link->WorldAngularVel());
+  this->acceleration.Set(_link->WorldLinearAccel(),
+                         _link->WorldAngularAccel());
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -50,12 +49,11 @@ LinkState::LinkState(const LinkPtr _link)
           _link->GetWorld()->SimTime(), _link->GetWorld()->Iterations())
 {
   this->pose = _link->WorldPose();
-  this->velocity.Set(_link->GetWorldLinearVel().Ign(),
-                     _link->GetWorldAngularVel().Ign());
-  this->acceleration.Set(_link->GetWorldLinearAccel().Ign(),
-                         _link->GetWorldAngularAccel().Ign());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->velocity.Set(_link->WorldLinearVel(),
+                     _link->WorldAngularVel());
+  this->acceleration.Set(_link->WorldLinearAccel(),
+                         _link->WorldAngularAccel());
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 
   // Disabling CollisionStates to improve performance. This information is
   // probably not required.
@@ -92,12 +90,11 @@ void LinkState::Load(const LinkPtr _link, const common::Time &_realTime,
   this->iterations = _iterations;
 
   this->pose = _link->WorldPose();
-  this->velocity.Set(_link->GetWorldLinearVel().Ign(),
-                     _link->GetWorldAngularVel().Ign());
-  this->acceleration.Set(_link->GetWorldLinearAccel().Ign(),
-                         _link->GetWorldAngularAccel().Ign());
-  this->wrench.Set(_link->GetWorldForce().Ign(),
-                   ignition::math::Quaterniond::Identity);
+  this->velocity.Set(_link->WorldLinearVel(),
+                     _link->WorldAngularVel());
+  this->acceleration.Set(_link->WorldLinearAccel(),
+                         _link->WorldAngularAccel());
+  this->wrench.Set(_link->WorldForce(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////

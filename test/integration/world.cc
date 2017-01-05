@@ -109,7 +109,7 @@ void WorldTest::ClearEmptyWorld(const std::string &_physicsEngine)
 
   // Now spawn something, and the model count should increase
   SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d::Zero);
   EXPECT_EQ(world->ModelCount(), 1u);
 }
 
@@ -135,7 +135,7 @@ TEST_F(WorldTest, Clear)
   EXPECT_EQ(world->ModelCount(), 0u);
 
   SpawnSphere("sphere", ignition::math::Vector3d(0, 0, 1),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d::Zero);
 
   EXPECT_EQ(world->ModelCount(), 1u);
 }
@@ -163,14 +163,14 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
   auto model = world->ModelByName("box_01_model");
   ASSERT_TRUE(model != NULL);
   auto initialPose = model->WorldPose();
-  auto initialVelocity = model->GetWorldLinearVel().Ign();
+  auto initialVelocity = model->WorldLinearVel();
   EXPECT_EQ(ignition::math::Vector3d::Zero, initialVelocity);
 
   // step simulation and verify that box moves upwards
   const int steps = 100;
   world->Step(steps);
   auto expectedVelocity = dt * steps * gravity;
-  auto velocity = model->GetWorldLinearVel().Ign();
+  auto velocity = model->WorldLinearVel();
   auto expectedPosition = initialPose.Pos() + 0.5*(dt*steps) * expectedVelocity;
   EXPECT_GT(velocity.Z(), 0.95*expectedVelocity.Z());
   EXPECT_GT(model->WorldPose().Pos().Z(), 0.95*expectedPosition.Z());
@@ -181,7 +181,7 @@ void WorldTest::Gravity(const std::string &_physicsEngine)
 
   // step simulation and verify that velocity stays constant
   world->Step(steps);
-  EXPECT_EQ(velocity, model->GetWorldLinearVel().Ign());
+  EXPECT_EQ(velocity, model->WorldLinearVel());
 }
 
 /////////////////////////////////////////////////

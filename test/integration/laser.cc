@@ -60,7 +60,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   double rangeResolution = 0.01;
   unsigned int samples = 640;
   ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
       testPose.Rot().Euler(), hMinAngle, hMaxAngle, 0, 0,
@@ -91,7 +91,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
   {
     SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1),
         ignition::math::Vector3d(2, 0, 0.5),
-        ignition::math::Vector3d(0, 0, 0));
+        ignition::math::Vector3d::Zero);
     common::Time::MSleep(1000);
 
     laser->Update(true);
@@ -123,7 +123,7 @@ void LaserTest::Stationary_EmptyWorld(const std::string &_physicsEngine)
     physics::ModelPtr model = world->ModelByName(modelName);
 
     prevTime = laser->LastUpdateTime();
-    model->SetWorldPose(math::Pose(0, 0, 1.0, 0, M_PI*0.5, 0));
+    model->SetWorldPose(ignition::math::Pose3d(0, 0, 1.0, 0, M_PI*0.5, 0));
 
     double diffMax, diffSum, diffAvg;
 
@@ -196,8 +196,8 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 320;
-  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0),
-      ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d::Zero,
+      ignition::math::Quaterniond::Identity);
   if (_physicsEngine == "bullet" && LIBBULLET_VERSION >= 2.82)
   {
     testPose.Pos().Z() = 0.1;
@@ -214,14 +214,14 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   // box in front of ray sensor
   ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
-                                   ignition::math::Quaterniond(0, 0, 0));
+                                   ignition::math::Quaterniond::Identity);
   // box on the right of ray sensor
   ignition::math::Pose3d box02Pose(ignition::math::Vector3d(0, -1, 0.5),
-                                   ignition::math::Quaterniond(0, 0, 0));
+                                   ignition::math::Quaterniond::Identity);
   // box on the left of the ray sensor but out of range
   ignition::math::Pose3d box03Pose(
       ignition::math::Vector3d(0, maxRange + 1, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
       box01Pose.Rot().Euler());
@@ -256,10 +256,12 @@ void LaserTest::LaserUnitBox(const std::string &_physicsEngine)
 
   // Move all boxes out of range
   world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond::Identity));
   world->ModelByName(box02)->SetWorldPose(
-      math::Pose(math::Vector3(0, -(maxRange + 1), 0),
-      math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(0, -(maxRange + 1), 0),
+      ignition::math::Quaterniond::Identity));
   world->Step(1);
   raySensor->Update(true);
 
@@ -310,7 +312,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
   unsigned int vSamples = 3;
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
   ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
       testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
@@ -320,7 +322,7 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   // box in front of ray sensor
   ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
-                                   ignition::math::Quaterniond(0, 0, 0));
+                                   ignition::math::Quaterniond::Identity);
   SpawnBox(box01, ignition::math::Vector3d(1, 1, 1), box01Pose.Pos(),
       box01Pose.Rot().Euler());
 
@@ -357,7 +359,10 @@ void LaserTest::LaserVertical(const std::string &_physicsEngine)
 
   // Move box out of range
   world->ModelByName(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(
+        ignition::math::Vector3d(maxRange + 1, 0, 0),
+        ignition::math::Quaterniond::Identity));
+
   world->Step(1);
   raySensor->Update(true);
 
@@ -569,8 +574,8 @@ void LaserTest::LaserUnitNoise(const std::string &_physicsEngine)
   // would be removed by clamp(minRange,maxRange).
   double noiseMean = -1.0;
   double noiseStdDev = 0.01;
-  ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0),
-      ignition::math::Quaterniond(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d::Zero,
+      ignition::math::Quaterniond::Identity);
 
   SpawnRaySensor(modelName, raySensorName, testPose.Pos(),
       testPose.Rot().Euler(), hMinAngle, hMaxAngle, 0, 0,

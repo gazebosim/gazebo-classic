@@ -173,11 +173,11 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     jntWrench->set_body_2_id(this->collision2->GetId());
 
     msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
 
     wrenchMsg =  jntWrench->mutable_body_2_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
   }
 }

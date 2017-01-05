@@ -61,9 +61,9 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
   double Am = M_PI / 11;
   double Al = M_PI / 12;
   double Aj = M_PI / 13;
-  opt.modelPose.rot.SetFromEuler(0, 0, Am);
-  opt.childLinkPose.rot.SetFromEuler(0, 0, Al);
-  opt.jointPose.rot.SetFromEuler(0, 0, Aj);
+  opt.modelPose.Rot().Euler(0, 0, Am);
+  opt.childLinkPose.Rot().Euler(0, 0, Al);
+  opt.jointPose.Rot().Euler(0, 0, Aj);
   opt.axis.Set(1, 0, 0);
 
   // i = 0: joint between child link and parent link
@@ -111,7 +111,7 @@ void Issue494Test::CheckAxisFrame(const std::string &_physicsEngine,
       if (opt.worldParent)
       {
         gzdbg << "  where parent is world.\n";
-        this->CheckJointProperties(jointUseParentModelFrame, opt.axis.Ign());
+        this->CheckJointProperties(jointUseParentModelFrame, opt.axis);
       }
       else
       {
@@ -153,27 +153,27 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
-  // Check that Joint::GetGlobalAxis matches _axis
-  EXPECT_EQ(_axis, _joint->GetGlobalAxis(0).Ign());
+  // Check that Joint::GlobalAxis matches _axis
+  EXPECT_EQ(_axis, _joint->GlobalAxis(0));
 
-  // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // test LocalAxis, GetAxisFrame, and GetAxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
-  auto axisLocalFrame = _joint->GetLocalAxis(0);
+  ignition::math::Vector3d axisLocalFrame = _joint->LocalAxis(0);
   {
     // rotate axis into global frame
-    auto axisGlobalFrame =
-      _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
+    ignition::math::Vector3d axisGlobalFrame =
+      _joint->GetAxisFrame(0).Ign().RotateVector(axisLocalFrame);
     // Test GetAxisFrame: check that axis in global frame is
     // computed correctly.
     EXPECT_EQ(axisGlobalFrame, _axis);
   }
   {
     // rotate axis into joint frame
-    auto axisJointFrame =
-      _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
+    ignition::math::Vector3d axisJointFrame =
+      _joint->GetAxisFrameOffset(0).Ign().RotateVector(axisLocalFrame);
     // roate axis specified in global frame into joint frame
-    auto axisJointFrame2 =
-      _joint->GetWorldPose().rot.RotateVectorReverse(_axis);
+    ignition::math::Vector3d axisJointFrame2 =
+      _joint->GetWorldPose().Ign().Rot().RotateVectorReverse(_axis);
     EXPECT_EQ(axisJointFrame, axisJointFrame2);
   }
 
@@ -206,11 +206,13 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
               || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          childVelocity = child->GetWorldAngularVel().Ign();
+        {
+          childVelocity = child->WorldAngularVel();
+        }
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
         {
-          childVelocity = child->GetWorldLinearVel().Ign();
+          childVelocity = child->WorldLinearVel();
         }
       }
     }
@@ -219,12 +221,14 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
       if (parent)
       {
         if (_joint->HasType(physics::Base::HINGE_JOINT)
-              || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
-          parentVelocity = parent->GetWorldAngularVel().Ign();
+            || _joint->HasType(physics::Base::UNIVERSAL_JOINT))
+        {
+          parentVelocity = parent->WorldAngularVel();
+        }
         else if (_joint->HasType(physics::Base::SLIDER_JOINT)
               || _joint->HasType(physics::Base::SCREW_JOINT))
         {
-          parentVelocity = parent->GetWorldLinearVel().Ign();
+          parentVelocity = parent->WorldLinearVel();
         }
       }
     }

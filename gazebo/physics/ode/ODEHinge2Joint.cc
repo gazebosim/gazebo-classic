@@ -52,7 +52,8 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -66,15 +67,15 @@ math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
   else
   {
     gzerr << "ODE Joint ID is invalid\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+void ODEHinge2Joint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -82,13 +83,14 @@ void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetHinge2Anchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -99,12 +101,12 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  ignition::math::Vector3d globalAxis = _axis.Ign();
+  ignition::math::Vector3d globalAxis = _axis;
   if (this->parentLink)
   {
     globalAxis =
       this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(
-          _axis.Ign());
+          _axis);
   }
 
   if (this->jointId)
@@ -125,7 +127,8 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -134,7 +137,7 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
   else
     dJointGetHinge2Axis2(this->jointId, result);
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////

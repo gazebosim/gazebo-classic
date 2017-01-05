@@ -72,8 +72,8 @@ namespace gazebo
       public: virtual void Detach();
 
       /// \brief Set the anchor point
-      public: virtual void SetAnchor(unsigned int /*_index*/,
-                                     const gazebo::math::Vector3 &/*_anchor*/);
+      public: virtual void SetAnchor(const unsigned int /*_index*/,
+          const ignition::math::Vector3d &/*_anchor*/);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
@@ -101,10 +101,12 @@ namespace gazebo
       public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkForce(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetLinkTorque(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d LinkTorque(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,

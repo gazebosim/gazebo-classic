@@ -64,7 +64,7 @@ void Light::FillMsg(msgs::Light &_msg)
 
   _msg.set_name(this->GetScopedName());
 
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  ignition::math::Pose3d relPose = this->RelativePose();
   msgs::Set(_msg.mutable_pose(), relPose);
 }
 

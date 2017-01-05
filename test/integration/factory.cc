@@ -15,7 +15,6 @@
  *
 */
 #include <string.h>
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -79,7 +78,7 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
   }
@@ -117,7 +116,7 @@ void FactoryTest::Box(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
     testPose = EntityPose(name.str());
@@ -142,7 +141,7 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_sphere_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
@@ -167,7 +166,7 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
     name << "test_cylinder_" << i;
     setPose.Set(
         ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
@@ -667,7 +666,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   msgs::Factory msg;
   ignition::math::Pose3d clonePose;
   clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   msgs::Set(msg.mutable_pose(), clonePose);
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
@@ -751,7 +750,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
       EXPECT_EQ(joint->GetStopDissipation(j),
           jointClone->GetStopDissipation(j));
-      EXPECT_EQ(joint->GetLocalAxis(j), jointClone->GetLocalAxis(j));
+      EXPECT_EQ(joint->LocalAxis(j), jointClone->LocalAxis(j));
       EXPECT_EQ(joint->GetDamping(j), jointClone->GetDamping(j));
     }
   }

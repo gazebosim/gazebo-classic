@@ -58,25 +58,25 @@ void BulletUniversalJoint::Init()
   BulletLinkPtr bulletParentLink =
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
-  math::Vector3 axis1 = this->initialWorldAxis[0];
-  math::Vector3 axis2 = this->initialWorldAxis[1];
+  ignition::math::Vector3d axis1 = this->initialWorldAxis[0];
+  ignition::math::Vector3d axis2 = this->initialWorldAxis[1];
 
   // Check that axis1 and axis2 are orthogonal unit vectors
-  if (ignition::math::equal(axis1.GetLength(), 0.0))
+  if (ignition::math::equal(axis1.Length(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis1 must have non-zero length, aborting"
           << std::endl;
     return;
   }
-  if (ignition::math::equal(axis2.GetLength(), 0.0))
+  if (ignition::math::equal(axis2.Length(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis2 must have non-zero length, aborting"
           << std::endl;
     return;
   }
-  if (ignition::math::equal(axis1.Cross(axis2).GetLength(), 0.0))
+  if (ignition::math::equal(axis1.Cross(axis2).Length(), 0.0))
   {
     gzerr << "Joint [" << this->GetScopedName()
           << "] axis1 and axis2 must not be parallel, aborting"
@@ -95,8 +95,8 @@ void BulletUniversalJoint::Init()
         *bulletChildLink->GetBulletLink(),
         btVector3(this->anchorPos.X(), this->anchorPos.Y(),
                   this->anchorPos.Z()),
-        btVector3(axis1.x, axis1.y, axis1.z),
-        btVector3(axis2.x, axis2.y, axis2.z));
+        btVector3(axis1.X(), axis1.Y(), axis1.Z()),
+        btVector3(axis2.X(), axis2.Y(), axis2.Z()));
   }
   else if (bulletParentLink)
   {
@@ -104,8 +104,8 @@ void BulletUniversalJoint::Init()
         *bulletParentLink->GetBulletLink(),
         btVector3(this->anchorPos.X(), this->anchorPos.Y(),
                   this->anchorPos.Z()),
-        btVector3(axis1.x, axis1.y, axis1.z),
-        btVector3(axis2.x, axis2.y, axis2.z));
+        btVector3(axis1.X(), axis1.Y(), axis1.Z()),
+        btVector3(axis2.X(), axis2.Y(), axis2.Z()));
   }
   else if (bulletChildLink)
   {
@@ -113,8 +113,8 @@ void BulletUniversalJoint::Init()
         *bulletChildLink->GetBulletLink(),
         btVector3(this->anchorPos.X(), this->anchorPos.Y(),
                   this->anchorPos.Z()),
-        btVector3(axis1.x, axis1.y, axis1.z),
-        btVector3(axis2.x, axis2.y, axis2.z));
+        btVector3(axis1.X(), axis1.Y(), axis1.Z()),
+        btVector3(axis2.X(), axis2.Y(), axis2.Z()));
   }
 
   this->constraint = this->bulletUniversal;
@@ -143,14 +143,15 @@ void BulletUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletUniversalJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletUniversalJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
 
 //////////////////////////////////////////////////
-void BulletUniversalJoint::SetAxis(unsigned int _index,
-                                   const math::Vector3 &_axis)
+void BulletUniversalJoint::SetAxis(const unsigned int _index,
+                                   const ignition::math::Vector3d &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -159,7 +160,7 @@ void BulletUniversalJoint::SetAxis(unsigned int _index,
     if (_index < this->DOF())
     {
       // this hasn't been initialized yet, store axis in initialWorldAxis
-      math::Quaternion axisFrame = this->GetAxisFrame(_index);
+      auto axisFrame = this->GetAxisFrame(_index).Ign();
       this->initialWorldAxis[_index] = axisFrame.RotateVector(_axis);
     }
     else
@@ -181,11 +182,11 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
   }
 
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(_index);
+  ignition::math::Vector3d globalAxis = this->GlobalAxis(_index);
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldAngularVel());
+    result += globalAxis.Dot(this->childLink->WorldAngularVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel());
+    result -= globalAxis.Dot(this->parentLink->WorldAngularVel());
   return result;
 }
 
@@ -360,15 +361,16 @@ double BulletUniversalJoint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d BulletUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (_index >= this->DOF())
   {
     gzerr << "Invalid joint axis index[" << _index << "]\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  math::Vector3 result = this->initialWorldAxis[_index];
+  ignition::math::Vector3d result = this->initialWorldAxis[_index];
 
   if (this->bulletUniversal)
   {
@@ -378,7 +380,7 @@ math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
         getRigidBodyA().getCenterOfMassTransform().getBasis() *
         this->bulletUniversal->getFrameOffsetA().getBasis().getColumn(2);
 
-      result = BulletTypes::ConvertVector3(vec);
+      result = BulletTypes::ConvertVector3(vec).Ign();
     }
     else if (_index == 1)
     {
@@ -386,7 +388,7 @@ math::Vector3 BulletUniversalJoint::GetGlobalAxis(unsigned int _index) const
         getRigidBodyB().getCenterOfMassTransform().getBasis() *
         this->bulletUniversal->getFrameOffsetB().getBasis().getColumn(1);
 
-      result = BulletTypes::ConvertVector3(vec);
+      result = BulletTypes::ConvertVector3(vec).Ign();
     }
     else
       gzerr << "Invalid axis index[" << _index << "]\n";
