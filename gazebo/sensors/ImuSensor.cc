@@ -218,7 +218,7 @@ void ImuSensor::Load(const std::string &_worldName)
   // next, account for vel in world frame of the imu
   // given the imu frame is offset from link frame, and link is rotating
   this->dataPtr->lastImuWorldLinearVel =
-      this->dataPtr->parentEntity->GetWorldLinearVel(this->pose.Pos()).Ign();
+      this->dataPtr->parentEntity->WorldLinearVel(this->pose.Pos());
 }
 
 //////////////////////////////////////////////////

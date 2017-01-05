@@ -185,10 +185,10 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
       jointLower->GetParent()->WorldPose().Pos();
     ignition::math::Quaterniond q;
 
-    auto childVel =
-      jointLower->GetChild()->GetWorldLinearVel(childOffset, q).Ign();
-    auto parentVel =
-      jointLower->GetParent()->GetWorldLinearVel(parentOffset, q).Ign();
+    ignition::math::Vector3d childVel =
+      jointLower->GetChild()->WorldLinearVel(childOffset, q);
+    ignition::math::Vector3d parentVel =
+      jointLower->GetParent()->WorldLinearVel(parentOffset, q);
     EXPECT_NEAR(childVel.X(), parentVel.X(), g_tolerance);
     EXPECT_NEAR(childVel.Y(), parentVel.Y(), g_tolerance);
     EXPECT_NEAR(childVel.Z(), parentVel.Z(), g_tolerance);
@@ -244,7 +244,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
   EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
@@ -256,12 +256,12 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 45deg about x
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
-  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0.25*IGN_PI, 0, 0));
+  EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
   EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
   EXPECT_EQ(joint_00->GlobalAxis(1),
-    ignition::math::Vector3d(0, cos(0.25*M_PI), sin(0.25*M_PI)));
+    ignition::math::Vector3d(0, cos(0.25*IGN_PI), sin(0.25*IGN_PI)));
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
         << "] axis1 [" << joint_00->GlobalAxis(0)
@@ -269,9 +269,9 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 45deg about y
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*IGN_PI, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
-  EXPECT_NEAR(joint_00->Position(1), 0.25*M_PI, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), 0.25*IGN_PI, g_tolerance);
   EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
   EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitY);
   gzdbg << "joint angles [" << joint_00->Position(0)
@@ -281,11 +281,12 @@ void JointTestUniversal::UniversalJointSetWorldPose(
         << "]\n";
 
   // move child link 90deg about both x and "rotated y axis" (z)
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_NEAR(joint_00->Position(1), 0.5*M_PI, g_tolerance);
+  link_00->SetWorldPose(ignition::math::Pose3d(
+        0, 0, 2, 0.5*IGN_PI, 0, 0.5*IGN_PI));
+  EXPECT_NEAR(joint_00->Position(1), 0.5*IGN_PI, g_tolerance);;
   EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
   EXPECT_EQ(joint_00->GlobalAxis(1),
-    ignition::math::Vector3d(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+    ignition::math::Vector3d(0, cos(0.5*IGN_PI), sin(0.5*IGN_PI)));
 
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
@@ -300,7 +301,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   }
   else
   {
-    EXPECT_NEAR(joint_00->Position(0), 0.5*M_PI, g_tolerance);
+    EXPECT_NEAR(joint_00->Position(0), 0.5*IGN_PI, g_tolerance);
   }
 }
 

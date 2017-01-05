@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Base class for all models
- * Author: Nathan Koenig and Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _MODEL_HH_
-#define _MODEL_HH_
+#ifndef GAZEBO_PHYSICS_MODEL_HH_
+#define GAZEBO_PHYSICS_MODEL_HH_
 
 #include <string>
 #include <map>
@@ -134,35 +129,97 @@ namespace gazebo
 
       /// \brief Get the linear velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearVel() const
+      public: virtual math::Vector3 GetRelativeLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0
+      /// if the model has no body.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearVel() const
+      public: virtual math::Vector3 GetWorldLinearVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularVel() const
+      public: virtual math::Vector3 GetRelativeAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
+      /// has no body.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularVel() const
+      public: virtual math::Vector3 GetWorldAngularVel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the entity in the world frame.
+      /// \return ignition::math::Vector3, set to 0, 0, 0 if the model
+      /// has no body.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeLinearAccel() const
+      public: virtual math::Vector3 GetRelativeLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
+      /// has no body.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldLinearAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldLinearAccel() const
+      public: virtual math::Vector3 GetWorldLinearAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetRelativeAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d RelativeAngularAccel() const
+      public: virtual math::Vector3 GetRelativeAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the entity.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model
+      /// has no body.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
-      public: virtual math::Vector3 GetWorldAngularAccel() const;
+      /// \deprecated See ignition::math::Vector3d WorldAngularAccel() const
+      public: virtual math::Vector3 GetWorldAngularAccel() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the entity in the world frame.
+      /// \return ignition::math::Vector3d, set to 0, 0, 0 if the model has
+      /// no body.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
+
+      /// \brief Get the size of the bounding box.
+      /// \return The bounding box.
+      /// \deprecated See ignition::math::Box BoundingBox() const
+      public: virtual math::Box GetBoundingBox() const
+              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the size of the bounding box.
       /// \return The bounding box.

@@ -184,9 +184,9 @@ double BulletUniversalJoint::GetVelocity(unsigned int _index) const
   double result = 0;
   ignition::math::Vector3d globalAxis = this->GlobalAxis(_index);
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldAngularVel().Ign());
+    result += globalAxis.Dot(this->childLink->WorldAngularVel());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldAngularVel().Ign());
+    result -= globalAxis.Dot(this->parentLink->WorldAngularVel());
   return result;
 }
 

@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A joint state
- * Author: Nate Koenig
- */
-
 #ifndef GAZEBO_PHYSICS_JOINTSTATE_HH_
 #define GAZEBO_PHYSICS_JOINTSTATE_HH_
 

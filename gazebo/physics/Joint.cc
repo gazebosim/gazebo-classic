@@ -925,15 +925,15 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     if (this->parentLink)
     {
       // Use parent link velocity as reference (if parent exists)
-      angularVel = this->parentLink->GetWorldAngularVel().Ign();
+      angularVel = this->parentLink->WorldAngularVel();
 
       // Get parent linear velocity at joint anchor
       // Passing unit quaternion q ensures that parentOffset will be
       //  interpreted in world frame.
       ignition::math::Quaterniond q;
-      auto parentOffset =
+      ignition::math::Vector3d parentOffset =
         this->ParentWorldPose().Pos() - this->parentLink->WorldPose().Pos();
-      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
+      linearVel = this->parentLink->WorldLinearVel(parentOffset, q);
     }
 
     // Add desired velocity along specified axis
@@ -952,8 +952,9 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     // Compute desired linear velocity of the child link based on
     //  offset between the child's CG and the joint anchor
     //  and the desired angular velocity.
-    auto childCoGOffset =
-      this->childLink->GetWorldCoGPose().Ign().Pos() - this->WorldPose().Pos();
+    ignition::math::Vector3d childCoGOffset =
+      this->childLink->WorldCoGPose().Pos() -
+      this->WorldPose().Pos();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }
@@ -962,7 +963,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     ignition::math::Vector3d desiredVel;
     if (this->parentLink)
     {
-      desiredVel = this->parentLink->GetWorldLinearVel().Ign();
+      desiredVel = this->parentLink->WorldLinearVel();
     }
     desiredVel += _velocity * this->GlobalAxis(_index);
     this->childLink->SetLinearVel(desiredVel);

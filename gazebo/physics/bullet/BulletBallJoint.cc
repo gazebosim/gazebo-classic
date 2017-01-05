@@ -77,7 +77,7 @@ void BulletBallJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose().Ign();
+    pose = this->parentLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of parent.
@@ -87,7 +87,7 @@ void BulletBallJoint::Init()
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose().Ign();
+    pose = this->childLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of child.
