@@ -712,7 +712,8 @@ void LogPlayView::DrawTimeline()
 void LogPlayView::mousePressEvent(QMouseEvent *_event)
 {
   QGraphicsItem *mouseItem =
-      this->scene()->itemAt(this->mapToScene(_event->pos()));
+      this->scene()->itemAt(this->mapToScene(_event->pos()),
+                            this->transform());
 
   if (mouseItem == this->dataPtr->currentTimeItem)
   {
@@ -728,7 +729,8 @@ void LogPlayView::mouseMoveEvent(QMouseEvent *_event)
   if (this->scene()->selectedItems().isEmpty())
   {
     QGraphicsItem *mouseItem =
-        this->scene()->itemAt(this->mapToScene(_event->pos()));
+        this->scene()->itemAt(this->mapToScene(_event->pos()),
+            this->transform());
 
     // Change cursor when hovering over current time item
     if (mouseItem == this->dataPtr->currentTimeItem)

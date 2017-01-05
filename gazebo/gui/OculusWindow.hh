@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #ifndef GAZEBO_GUI_OCULUS_WINDOW_HH_
 #define GAZEBO_GUI_OCULUS_WINDOW_HH_
 

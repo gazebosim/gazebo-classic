@@ -34,6 +34,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/gui/**
+    + Dropped support for Qt4 and migrated the gui library to use Qt5.
+
 1. **gazebo/physics/Entity.hh**
     + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
     + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`

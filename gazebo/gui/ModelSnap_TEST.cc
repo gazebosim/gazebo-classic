@@ -83,7 +83,7 @@ void ModelSnap_TEST::Highlight()
 
   cam->SetCaptureData(true);
 
-  this->ProcessEventsAndDraw(mainWindow);
+  this->ProcessEventsAndDraw(mainWindow, 20);
 
   QVERIFY(!FindRedColor(cam));
 
@@ -112,8 +112,9 @@ void ModelSnap_TEST::Highlight()
       cam->Project(model03Vis->WorldPose().Pos() +
       ignition::math::Vector3d(0.5, 0, 0));
 
-  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
-      QPoint(spherePt.X(), spherePt.Y()));
+  QPoint moveTo(spherePt.X(), spherePt.Y());
+  QTest::mouseMove(glWidget, moveTo, 100);
+  QTest::mouseRelease(glWidget, Qt::LeftButton, 0, moveTo);
 
   this->ProcessEventsAndDraw(mainWindow);
 
