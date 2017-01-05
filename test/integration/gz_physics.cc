@@ -34,7 +34,7 @@ TEST_F(GzPhysics, Gravity)
   // Spawn a box that will eventually float up.
   SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector3d(0, 0, .5),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d::Zero);
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

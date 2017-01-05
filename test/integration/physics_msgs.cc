@@ -70,7 +70,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
-  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d::Zero);
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
   gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
@@ -133,8 +133,8 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(model != NULL);
 
   {
-    math::Pose initialPose = model->WorldPose();
-    EXPECT_EQ(pos, initialPose.pos.Ign());
+    ignition::math::Pose3d initialPose = model->WorldPose();
+    EXPECT_EQ(pos, initialPose.Pos());
   }
 
   {
@@ -365,7 +365,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
         int sleep = 0;
         int maxSleep = 50;
-        while (*iter != link->GetRelativePose() && sleep < maxSleep)
+        while (*iter != link->RelativePose() && sleep < maxSleep)
         {
           world->Step(1);
           common::Time::MSleep(1);
@@ -376,7 +376,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         // this change to the test.
         world->Step(10);
 
-        EXPECT_EQ(*iter, link->GetRelativePose());
+        EXPECT_EQ(*iter, link->RelativePose());
       }
     }
   }

@@ -117,7 +117,7 @@ void TrackVisualTest::TrackVisual()
   QVERIFY(false == cam->TrackUseModelFrame());
   cam->SetTrackInheritYaw(false);
   QVERIFY(false == cam->TrackInheritYaw());
-  auto camPosition = ignition::math::Vector3d(0, 0, 0);
+  auto camPosition = ignition::math::Vector3d::Zero;
   cam->SetTrackPosition(camPosition);
   QVERIFY(camPosition == cam->TrackPosition());
   double minDistance = 1;

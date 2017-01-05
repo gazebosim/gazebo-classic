@@ -179,19 +179,19 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
 
   // Expect child link velocity to match parent at joint anchor
   {
-    auto childOffset = jointLower->GetWorldPose().pos.Ign() -
+    auto childOffset = jointLower->WorldPose().Pos() -
       jointLower->GetChild()->WorldPose().Pos();
-    math::Vector3 parentOffset = jointLower->GetWorldPose().pos.Ign() -
+    auto parentOffset = jointLower->WorldPose().Pos() -
       jointLower->GetParent()->WorldPose().Pos();
-    math::Quaternion q;
+    ignition::math::Quaterniond q;
 
-    math::Vector3 childVel =
-      jointLower->GetChild()->GetWorldLinearVel(childOffset, q);
-    math::Vector3 parentVel =
-      jointLower->GetParent()->GetWorldLinearVel(parentOffset, q);
-    EXPECT_NEAR(childVel.x, parentVel.x, g_tolerance);
-    EXPECT_NEAR(childVel.y, parentVel.y, g_tolerance);
-    EXPECT_NEAR(childVel.z, parentVel.z, g_tolerance);
+    ignition::math::Vector3d childVel =
+      jointLower->GetChild()->WorldLinearVel(childOffset, q);
+    ignition::math::Vector3d parentVel =
+      jointLower->GetParent()->WorldLinearVel(parentOffset, q);
+    EXPECT_NEAR(childVel.X(), parentVel.X(), g_tolerance);
+    EXPECT_NEAR(childVel.Y(), parentVel.Y(), g_tolerance);
+    EXPECT_NEAR(childVel.Z(), parentVel.Z(), g_tolerance);
   }
 }
 
@@ -217,7 +217,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -244,53 +244,54 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitY);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about x
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.25*M_PI, 0, 0));
-  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0.25*IGN_PI, 0, 0));
+  EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.25*M_PI), sin(0.25*M_PI)));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1),
+    ignition::math::Vector3d(0, cos(0.25*IGN_PI), sin(0.25*IGN_PI)));
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about y
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*IGN_PI, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
-  EXPECT_NEAR(joint_00->Position(1), 0.25*M_PI, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(0, 1, 0));
+  EXPECT_NEAR(joint_00->Position(1), 0.25*IGN_PI, g_tolerance);
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitY);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   // move child link 90deg about both x and "rotated y axis" (z)
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0.5*M_PI, 0, 0.5*M_PI));
-  EXPECT_NEAR(joint_00->Position(1), 0.5*M_PI, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1),
-    math::Vector3(0, cos(0.5*M_PI), sin(0.5*M_PI)));
+  link_00->SetWorldPose(ignition::math::Pose3d(
+        0, 0, 2, 0.5*IGN_PI, 0, 0.5*IGN_PI));
+  EXPECT_NEAR(joint_00->Position(1), 0.5*IGN_PI, g_tolerance);;
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1),
+    ignition::math::Vector3d(0, cos(0.5*IGN_PI), sin(0.5*IGN_PI)));
 
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   if (_physicsEngine == "bullet")
@@ -300,7 +301,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   }
   else
   {
-    EXPECT_NEAR(joint_00->Position(0), 0.5*M_PI, g_tolerance);
+    EXPECT_NEAR(joint_00->Position(0), 0.5*IGN_PI, g_tolerance);
   }
 }
 
@@ -330,7 +331,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);

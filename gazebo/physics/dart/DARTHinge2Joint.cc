@@ -55,11 +55,12 @@ void DARTHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
 
@@ -67,11 +68,12 @@ math::Vector3 DARTHinge2Joint::GetAnchor(unsigned int _index) const
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3(worldOrigin).Ign();
 }
 
 //////////////////////////////////////////////////
-void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -118,11 +120,12 @@ void DARTHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Axis" + std::to_string(_index));
   }
 
@@ -161,7 +164,7 @@ math::Vector3 DARTHinge2Joint::GetGlobalAxis(unsigned int _index) const
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/
   // joint-axis-reference-frame-doesnt-match
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3(globalAxis).Ign();
 }
 
 //////////////////////////////////////////////////

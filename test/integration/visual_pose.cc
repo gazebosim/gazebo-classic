@@ -73,7 +73,7 @@ void VisualPoseTest::VisualPose()
   // Get box link (physics)
   auto boxLink = boxModel->GetLink("link");
   QVERIFY(boxLink != NULL);
-  QVERIFY(boxLink->GetRelativePose().Ign() == boxLinkVisPose);
+  QVERIFY(boxLink->RelativePose() == boxLinkVisPose);
 
   // Get box visual id (physics)
   uint32_t boxVisualId;
@@ -94,8 +94,8 @@ void VisualPoseTest::VisualPose()
   // Check that only visual pose changed (physics)
   QVERIFY(boxLink->VisualPose(boxVisualId, boxVisualPose));
   QVERIFY(boxVisualPose == newVisualPose);
-  QVERIFY(boxLinkVisPose == boxLink->GetRelativePose().Ign());
-  QVERIFY(boxModelVisPose == boxModel->GetRelativePose().Ign());
+  QVERIFY(boxLinkVisPose == boxLink->RelativePose());
+  QVERIFY(boxModelVisPose == boxModel->RelativePose());
 
   // Check that only visual pose changed (rendering)
   QVERIFY(newVisualPose == boxVisualVis->Pose());

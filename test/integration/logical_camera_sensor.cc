@@ -96,7 +96,7 @@ TEST_F(LogicalCameraSensor, Box)
   EXPECT_EQ(cam->Image().model(1).name(), "spawn_box");
 
   // Rotate the model, which should move "spawn_box" out of the frustum
-  cameraModel->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 1.5707));
+  cameraModel->SetWorldPose(ignition::math::Pose3d(0, 0, 0, 0, 0, 1.5707));
   cam->Update(true);
   ASSERT_EQ(cam->Image().model_size(), 1);
 }

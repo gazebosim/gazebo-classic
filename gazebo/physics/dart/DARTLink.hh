@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_DARTLINK_HH_
-#define _GAZEBO_DARTLINK_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTLINK_HH_
+#define GAZEBO_PHYSICS_DART_DARTLINK_HH_
 
 #include <vector>
 
@@ -64,62 +63,68 @@ namespace gazebo
       public: virtual bool GetEnabled() const;
 
       // Documentation inherited
-      public: virtual void SetLinearVel(const math::Vector3 &_vel);
+      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited
-      public: virtual void SetAngularVel(const math::Vector3 &_vel);
+      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited
-      public: virtual void SetForce(const math::Vector3 &_force);
+      public: virtual void SetForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited
-      public: virtual void SetTorque(const math::Vector3 &_torque);
+      public: virtual void SetTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
-      public: virtual void AddForce(const math::Vector3 &_force);
+      public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited
-      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+      public: virtual void AddRelativeForce(
+                  const ignition::math::Vector3d &_force);
 
       // Documentation inherited
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                                                   const math::Vector3 &_pos);
+      public: virtual void AddForceAtWorldPosition(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_pos);
 
       // Documentation inherited
       public: virtual void AddForceAtRelativePosition(
-          const math::Vector3 &_force,
-          const math::Vector3 &_relpos);
+          const ignition::math::Vector3d &_force,
+          const ignition::math::Vector3d &_relpos);
 
       // Documentation inherited
-      public: virtual void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero);
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                  ignition::math::Vector3d::Zero);
 
       // Documentation inherited
-      public: virtual void AddTorque(const math::Vector3 &_torque);
+      public: virtual void AddTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
-      public: virtual void AddRelativeTorque(const math::Vector3& _torque);
+      public: virtual void AddRelativeTorque(
+                  const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3& _offset = math::Vector3(0, 0, 0)) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+          const ignition::math::Vector3d &_offset =
+          ignition::math::Vector3d::Zero) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel(
-          const math::Vector3 &_offset,
-          const math::Quaternion &_q) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+          const ignition::math::Vector3d &_offset,
+          const ignition::math::Quaterniond &_q) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldCoGLinearVel() const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldForce() const;
+      public: virtual ignition::math::Vector3d WorldForce() const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldTorque() const;
+      public: virtual ignition::math::Vector3d WorldTorque() const;
 
       // Documentation inherited
       public: virtual void SetGravityMode(bool _mode);

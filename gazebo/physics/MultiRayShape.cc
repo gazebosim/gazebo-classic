@@ -87,7 +87,7 @@ void MultiRayShape::Init()
   this->minRange = this->rangeElem->Get<double>("min");
   this->maxRange = this->rangeElem->Get<double>("max");
 
-  this->offset = this->collisionParent->GetRelativePose();
+  this->offset = this->collisionParent->RelativePose();
 
   // Create an array of ray collisions
   for (unsigned int j = 0; j < (unsigned int)vertSamples; ++j)

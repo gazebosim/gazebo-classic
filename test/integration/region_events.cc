@@ -182,9 +182,9 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
 
   unsigned int startingCount = GetEventCount();
   {
-    math::Pose newPose = regionEventBox->WorldPose();
-    newPose.pos.x += 5.0;
-    newPose.pos.y += 5.0;
+    ignition::math::Pose3d newPose = regionEventBox->WorldPose();
+    newPose.Pos().X() += 5.0;
+    newPose.Pos().Y() += 5.0;
     boxModel->SetWorldPose(newPose);
   }
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);

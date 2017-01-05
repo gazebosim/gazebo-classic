@@ -108,7 +108,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
       // Expected max joint angle (quatratic in time)
       double maxAngle = 0.5 * torque * stepTime*stepTime / inertia;
       // Verify that the joint should make more than 1 revolution
-      EXPECT_GT(maxAngle, 1.25 * 2 * M_PI);
+      EXPECT_GT(maxAngle, 1.25 * 2 * IGN_PI);
     }
 
     // compute joint velocity analytically with constant torque
@@ -164,7 +164,7 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -191,51 +191,55 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   EXPECT_NEAR(joint_00->Position(1), 0.0, g_tolerance);
 
   // move child link to it's initial location
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0, 0));
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0, 0));
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "]\n";
 
   // move child link 45deg about x
   double pitch_00 = joint_00->GetParam("thread_pitch", 0);
-  math::Pose pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
-  math::Pose pose_01 = math::Pose(0, 0, -1, 0, 0, 0) + pose_00;
+  ignition::math::Pose3d pose_00 = ignition::math::Pose3d(
+      -0.25*IGN_PI/pitch_00, 0, 2, 0.25*IGN_PI, 0, 0);
+  ignition::math::Pose3d pose_01 = ignition::math::Pose3d(
+      0, 0, -1, 0, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
-  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
-  EXPECT_NEAR(joint_00->Position(1), -0.25*M_PI/pitch_00, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "]\n";
 
   // move child link 45deg about y
   double pitch_01 = joint_01->GetParam("thread_pitch", 0);
-  link_00->SetWorldPose(math::Pose(0, 0, 2, 0, 0.25*M_PI, 0));
-  pose_00 = math::Pose(-0.25*M_PI/pitch_00, 0, 2, 0.25*M_PI, 0, 0);
-  pose_01 = math::Pose(-0.3*M_PI/pitch_01, 0, -1, 0.3*M_PI, 0, 0) + pose_00;
+  link_00->SetWorldPose(ignition::math::Pose3d(0, 0, 2, 0, 0.25*IGN_PI, 0));
+  pose_00 = ignition::math::Pose3d(
+      -0.25*IGN_PI/pitch_00, 0, 2, 0.25*IGN_PI, 0, 0);
+  pose_01 = ignition::math::Pose3d(
+      -0.3*IGN_PI/pitch_01, 0, -1, 0.3*IGN_PI, 0, 0) + pose_00;
   link_00->SetWorldPose(pose_00);
   link_01->SetWorldPose(pose_01);
-  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
-  EXPECT_NEAR(joint_00->Position(1), -0.25*M_PI/pitch_00, g_tolerance);
-  EXPECT_NEAR(joint_01->Position(0), 0.3*M_PI, g_tolerance);
-  EXPECT_NEAR(joint_01->Position(1), -0.3*M_PI/pitch_01, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(0), 0.3*IGN_PI, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(1), -0.3*IGN_PI/pitch_01, g_tolerance);
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "] pitch_01 [" << pitch_01
         << "]\n";
@@ -245,16 +249,16 @@ void JointTestScrew::ScrewJointSetWorldPose(const std::string &_physicsEngine)
   world->Step(10);
 
   // move child link 90deg about both x and "rotated y axis" (z)
-  EXPECT_NEAR(joint_00->Position(0), 0.25*M_PI, g_tolerance);
-  EXPECT_NEAR(joint_00->Position(1), -0.25*M_PI/pitch_00, g_tolerance);
-  EXPECT_NEAR(joint_01->Position(0), 0.3*M_PI, g_tolerance);
-  EXPECT_NEAR(joint_01->Position(1), -0.3*M_PI/pitch_01, g_tolerance);
-  EXPECT_EQ(joint_00->GetGlobalAxis(0), math::Vector3(1, 0, 0));
-  EXPECT_EQ(joint_00->GetGlobalAxis(1), math::Vector3(1, 0, 0));
+  EXPECT_NEAR(joint_00->Position(0), 0.25*IGN_PI, g_tolerance);
+  EXPECT_NEAR(joint_00->Position(1), -0.25*IGN_PI/pitch_00, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(0), 0.3*IGN_PI, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(1), -0.3*IGN_PI/pitch_01, g_tolerance);
+  EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint_00->GlobalAxis(1), ignition::math::Vector3d::UnitX);
   gzdbg << "joint angles [" << joint_00->Position(0)
         << ", " << joint_00->Position(1)
-        << "] axis1 [" << joint_00->GetGlobalAxis(0)
-        << "] axis2 [" << joint_00->GetGlobalAxis(1)
+        << "] axis1 [" << joint_00->GlobalAxis(0)
+        << "] axis2 [" << joint_00->GlobalAxis(1)
         << "] pitch_00 [" << pitch_00
         << "] pitch_01 [" << pitch_01
         << "]\n";
@@ -287,7 +291,7 @@ void JointTestScrew::ScrewJointForce(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -510,7 +514,7 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   physics::LinkPtr link_00 = model->GetLink("torso_lift_link");
 
   // drop from some height
-  model->SetWorldPose(math::Pose(0, 0, 0.5, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
   // +1sec: should have hit the ground
   world->Step(1000);
   // +4sec: should destabilize without patch for issue #1159
@@ -519,15 +523,13 @@ void JointTestScrew::ScrewJointLimitForce(const std::string &_physicsEngine)
   for (int n = 0; n < 1000; ++n)
   {
     world->Step(1);
-    math::Vector3 vel_angular = link_00->GetWorldLinearVel();
-    math::Vector3 vel_linear = link_00->GetWorldAngularVel();
+    ignition::math::Vector3d velAngular = link_00->WorldLinearVel();
+    ignition::math::Vector3d velLinear = link_00->WorldAngularVel();
 
-    EXPECT_LT(vel_angular.GetLength(), 0.1);
-    EXPECT_LT(vel_linear.GetLength(), 0.1);
+    EXPECT_LT(velAngular.Length(), 0.1);
+    EXPECT_LT(velLinear.Length(), 0.1);
 
-    gzlog <<   "va [" << vel_angular
-          << "] vl [" << vel_linear
-          << "]\n";
+    gzlog << "va [" << velAngular << "] vl [" << velLinear << "]\n";
   }
 }
 

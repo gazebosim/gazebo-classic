@@ -196,14 +196,14 @@ void DARTPhysics::UpdateCollision()
 
     if (!dartLink1->IsStatic())
     {
-      contactFeedback->wrench[0].body1Force = localForce1;
-      contactFeedback->wrench[0].body1Torque = localTorque1;
+      contactFeedback->wrench[0].body1Force = localForce1.Ign();
+      contactFeedback->wrench[0].body1Torque = localTorque1.Ign();
     }
 
     if (!dartLink2->IsStatic())
     {
-      contactFeedback->wrench[0].body2Force = localForce2;
-      contactFeedback->wrench[0].body2Torque = localTorque2;
+      contactFeedback->wrench[0].body2Force = localForce2.Ign();
+      contactFeedback->wrench[0].body2Torque = localTorque2.Ign();
     }
 
     ++contactFeedback->count;

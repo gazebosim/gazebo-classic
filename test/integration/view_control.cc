@@ -92,7 +92,7 @@ void ViewControlTest::MouseZoomSimulation()
 
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-1.5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
@@ -160,7 +160,7 @@ void ViewControlTest::MouseZoomModelEditor()
 
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-1.5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
