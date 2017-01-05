@@ -72,6 +72,7 @@ Inertial::Inertial()
 
 //////////////////////////////////////////////////
 Inertial::Inertial(const double _m)
+  : dataPtr(new InertialPrivate)
 {
   this->dataPtr->sdf.reset(new sdf::Element);
   initFile("inertial.sdf", this->dataPtr->sdf);
@@ -84,6 +85,7 @@ Inertial::Inertial(const double _m)
 
 //////////////////////////////////////////////////
 Inertial::Inertial(const Inertial &_inertial)
+  : dataPtr(new InertialPrivate)
 {
   this->dataPtr->sdf.reset(new sdf::Element);
   initFile("inertial.sdf", this->dataPtr->sdf);
