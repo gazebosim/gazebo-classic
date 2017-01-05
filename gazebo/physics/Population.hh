@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_POPULATION_HH_
-#define _GAZEBO_POPULATION_HH_
+#ifndef GAZEBO_PHYSICS_POPULATION_HH_
+#define GAZEBO_PHYSICS_POPULATION_HH_
 
 #include <string>
 #include <vector>
