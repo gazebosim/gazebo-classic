@@ -25,17 +25,17 @@
 /// \brief Macro that converts radians to degrees
 /// \param[in] radians
 /// \return degrees
-#define GZ_RTOD(r) ((r) * 180 / M_PI)
+#define GZ_RTOD(r) gazebo::math::Angle::RadiansToDegrees(r)
 
 /// \brief Converts degrees to radians
 /// \param[in] degrees
 /// \return radians
-#define GZ_DTOR(d) ((d) * M_PI / 180)
+#define GZ_DTOR(d) gazebo::math::Angle::DegreesToRadians(d)
 
 /// \brief Macro tha normalizes an angle in the range -Pi to Pi
 /// \param[in] angle
 /// \return the angle, in range
-#define GZ_NORMALIZE(a) (atan2(sin(a), cos(a)))
+#define GZ_NORMALIZE(a) gazebo::math::Angle::Normalize(a)
 
 namespace gazebo
 {
@@ -197,6 +197,33 @@ namespace gazebo
     {
       _out << _a.Radian();
       return _out;
+    }
+
+    /// \brief Converts degrees to radians
+    /// \param[in] degrees
+    /// \return radians
+    public: static double DegreesToRadians(const double _d)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return _d * M_PI / 180;
+    }
+
+    /// \brief Converts radians to degrees
+    /// \param[in] radians
+    /// \return degrees
+    public: static double RadiansToDegrees(const double _r)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return _r * 180 / M_PI;
+    }
+
+    /// \brief Macro that normalizes an angle in the range -Pi to Pi
+    /// \param[in] angle
+    /// \return the angle, in range
+    public: static double Normalize(const double _a)
+        GAZEBO_DEPRECATED(8.0)
+    {
+      return atan2(sin(_a), cos(_a));
     }
 
     /// \brief Stream extraction operator. Assumes input is in degrees
