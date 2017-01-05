@@ -171,5 +171,5 @@ void OculusWindow::showEvent(QShowEvent *_event)
 //////////////////////////////////////////////////
 std::string OculusWindow::GetOgreHandle() const
 {
-  return std::to_string(reinterpret_cast<uint64_t>(this->winId()));
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }
