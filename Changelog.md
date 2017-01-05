@@ -2,7 +2,7 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 1. Support ignition math3 and ignition math2
-    * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+    * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
 
 1. Use ignition math with ServerFixture
     * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
