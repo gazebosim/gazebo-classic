@@ -43,6 +43,9 @@ release will remove the deprecated code.
     + `gazebo::math::Pose dirtyPose` replaced with `ignition::math::Pose3d dirtyPose`
     + `gazebo::math::Pose initialRelativePose` replaced with `ignition::math::Pose3d initialRelativePose`
 
+1. **gazebo/physics/Model.hh**
+    + Changed `std::vector<math::Pose> attachedModelsOffset` to `std::vector<ignition::math::Pose3d> attachedModelsOffset`.
+
 1. **gazebo/physics/Joint.hh**
     + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
     + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
@@ -144,6 +147,23 @@ release will remove the deprecated code.
 1. **gazebo/physics/Model.hh**
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void SetLinearVel(const math::Vector3 &_vel)
+    + ***Replacement:*** void SetLinearVel(const ignition::math::Vector3d &_vel)
+    + ***Deprecation:*** void SetAngularVel(const math::Vector3 &_vel)
+    + ***Replacement:*** void SetAngularVel(const ignition::math::Vector3d &_vel)
+    + ***Deprecation:*** void SetLinearAccel(const math::Vector3 &_vel)
+    + ***Replacement:*** void SetLinearAccel(const ignition::math::Vector3d &_vel)
+
+    + ***Deprecation:*** void SetAngularAccel(const math::Vector3 &_vel)
+    + ***Replacement:*** void SetAngularAccel(const ignition::math::Vector3d &_vel)
+    + ***Deprecation:*** void AttachStaticModel(ModelPtr &_model, math::Pose _offset)
+    + ***Replacement:*** void AttachStaticModel(ModelPtr &_model, ignition::math::Pose3d _offset)
+
+    + ***Deprecation:*** void SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
+    + ***Replacement:*** void SetLinkWorldPose(const ignition::math::Pose3d &_pose, std::string _linkName)
+
+    + ***Deprecation:*** void SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
+    + ***Replacement:*** void SetLinkWorldPose(const ignition::math::Pose3d &_pose, const LinkPtr &_link)
 
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation:*** math::Pose GetInitialAnchorPose() const
