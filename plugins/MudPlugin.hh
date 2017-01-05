@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -108,6 +109,13 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for subscribing to
+    /// contact sensor messages.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

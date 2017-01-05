@@ -22,6 +22,7 @@
 #include <ignition/math/Box.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -460,6 +461,21 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
                    const bool, const bool);
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition communication node.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Visual publisher.
+      protected: ignition::transport::Node::Publisher visPubIgn;
+
+      /// \brief Request publisher.
+      protected: ignition::transport::Node::Publisher requestPubIgn;
+
+      /// \brief Ignition Pose publisher.
+      private: ignition::transport::Node::Publisher posePubIgn;
     };
     /// \}
   }

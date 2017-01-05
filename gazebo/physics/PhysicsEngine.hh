@@ -19,6 +19,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -279,6 +280,15 @@ namespace gazebo
 
       /// \brief Real time update rate.
       protected: double maxStepSize;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Response publisher.
+      protected: ignition::transport::Node::Publisher responsePubIgn;
     };
     /// \}
   }

@@ -23,6 +23,7 @@
 
 #include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -175,6 +176,12 @@ namespace gazebo
 
       /// \brief The projection frame listener.
       private: ProjectorFrameListener projector;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition transport node.
+      private: ignition::transport::Node nodeIgn;
     };
     /// \}
   }

@@ -22,6 +22,7 @@
 #include <mutex>
 #include <string>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -141,6 +142,15 @@ namespace gazebo
 
     /// \brief Controller update mutex.
     private: std::mutex mutex;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node used for using Gazebo communications.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition Publisher.
+    private: ignition::transport::Node::Publisher statePubIgn;
   };
 }
 #endif

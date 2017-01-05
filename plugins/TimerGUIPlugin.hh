@@ -20,6 +20,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
@@ -142,6 +143,12 @@ namespace gazebo
     /// \brief Number of pixels from the timer's top and the window's
     /// bottom. Only needed for negative positions.
     private: int posY;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Node used to establish communication with gzserver.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 
