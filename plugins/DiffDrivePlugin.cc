@@ -73,8 +73,8 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Init()
 {
-  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
-      this->rightJoint->GetAnchor(0));
+  this->wheelSeparation = this->leftJoint->Anchor(0).Distance(
+      this->rightJoint->Anchor(0));
 
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());

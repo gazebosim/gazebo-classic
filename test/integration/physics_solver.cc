@@ -63,9 +63,9 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     physics->SetParam("world_step_solver", _worldSolverType);
   }
   math::Pose pose;
-  physics::ModelPtr sphere_model = world->ModelByName("sphere");
-  if (sphere_model)
-    pose = sphere_model->WorldPose();
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  if (sphereModel)
+    pose = sphereModel->WorldPose();
 
   double z = pose.pos.z;
   double test_duration = 3.0;
@@ -83,15 +83,15 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     z += dt * v;
 
     world->Step(1);
-    physics::ModelPtr sphere_model = world->ModelByName("sphere");
-    if (sphere_model)
+    physics::ModelPtr sphereModel = world->ModelByName("sphere");
+    if (sphereModel)
     {
-      math::Vector3 vel = sphere_model->GetWorldLinearVel();
-      math::Pose pose = sphere_model->WorldPose();
+      ignition::math::Vector3d vel = sphereModel->WorldLinearVel();
+      ignition::math::Pose3d pose = sphereModel->WorldPose();
       if (z > 0.5)
       {
-        EXPECT_LT(fabs(vel.z - v), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - z), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z() - v), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - z), PHYSICS_TOL);
       }
 
       // After contact with ground, and no bounce back
@@ -105,8 +105,8 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
                 << std::endl;
           break;
         }
-        EXPECT_LT(fabs(vel.z), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - 0.5), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z()), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - 0.5), PHYSICS_TOL);
       }
     }
   }

@@ -15,7 +15,6 @@
  *
 */
 #include <string.h>
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -28,6 +27,9 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
+
+const double g_tolerance = 1e-4;
+
 class FactoryTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
@@ -76,7 +78,7 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
   }
@@ -114,7 +116,7 @@ void FactoryTest::Box(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
     testPose = EntityPose(name.str());
@@ -139,7 +141,7 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_sphere_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
@@ -164,7 +166,7 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
     name << "test_cylinder_" << i;
     setPose.Set(
         ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
     testPose = EntityPose(name.str());
     EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
@@ -664,7 +666,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   msgs::Factory msg;
   ignition::math::Pose3d clonePose;
   clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   msgs::Set(msg.mutable_pose(), clonePose);
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
@@ -738,17 +740,17 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   {
     physics::JointPtr joint = joints[i];
     physics::JointPtr jointClone = jointClones[i];
-    EXPECT_EQ(joint->GetAngleCount(), jointClone->GetAngleCount());
-    for (unsigned j = 0; j < joint->GetAngleCount(); ++j)
+    EXPECT_EQ(joint->DOF(), jointClone->DOF());
+    for (unsigned j = 0; j < joint->DOF(); ++j)
     {
-      EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
-      EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));
+      EXPECT_NEAR(joint->UpperLimit(j), jointClone->UpperLimit(j), g_tolerance);
+      EXPECT_NEAR(joint->LowerLimit(j), jointClone->LowerLimit(j), g_tolerance);
       EXPECT_EQ(joint->GetEffortLimit(j), jointClone->GetEffortLimit(j));
       EXPECT_EQ(joint->GetVelocityLimit(j), jointClone->GetVelocityLimit(j));
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
       EXPECT_EQ(joint->GetStopDissipation(j),
           jointClone->GetStopDissipation(j));
-      EXPECT_EQ(joint->GetLocalAxis(j), jointClone->GetLocalAxis(j));
+      EXPECT_EQ(joint->LocalAxis(j), jointClone->LocalAxis(j));
       EXPECT_EQ(joint->GetDamping(j), jointClone->GetDamping(j));
     }
   }
@@ -771,7 +773,7 @@ TEST_P(FactoryTest, Clone)
 
   math::Pose setPose, testPose;
   Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
+  setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
       setPose.rot.GetAsEuler());
 

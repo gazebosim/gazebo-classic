@@ -81,7 +81,7 @@ void DepthCameraSensorTest::DepthUnitBox()
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  world->Physics()->SetGravity(ignition::math::Vector3d(0, 0, 0));
+  world->Physics()->SetGravity(ignition::math::Vector3d::Zero);
 
   // box in front of depth sensor
   ignition::math::Pose3d box01Pose(3, 0, 0.50, 0, 0, 0);

@@ -2538,7 +2538,7 @@ void World::ProcessMessages()
             // Publish the model's relative pose
             poseMsg->set_name(m->GetScopedName());
             poseMsg->set_id(m->GetId());
-            msgs::Set(poseMsg, m->GetRelativePose().Ign());
+            msgs::Set(poseMsg, m->RelativePose());
 
             // Publish each of the model's child links relative poses
             Link_V links = m->GetLinks();
@@ -2547,7 +2547,7 @@ void World::ProcessMessages()
               poseMsg = msg.add_pose();
               poseMsg->set_name(link->GetScopedName());
               poseMsg->set_id(link->GetId());
-              msgs::Set(poseMsg, link->GetRelativePose().Ign());
+              msgs::Set(poseMsg, link->RelativePose());
             }
 
             // add all nested models to the queue

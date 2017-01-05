@@ -167,7 +167,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: DARTPhysicsPrivate *dataPtr;
+      private: DARTPhysicsPrivate *dataPtr = nullptr;
     };
 
   /// \}

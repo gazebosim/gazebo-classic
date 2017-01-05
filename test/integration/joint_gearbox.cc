@@ -76,14 +76,14 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
       if (i%1000 == 0)
         gzdbg << "gearbox time [" << world->SimTime().Double()
               << "] vel [" << joint1->GetVelocity(0)
-              << "] pose [" << joint1->GetAngle(0).Radian()
+              << "] pose [" << joint1->Position(0)
               << "] vel [" << joint3->GetVelocity(0)
-              << "] pose [" << joint3->GetAngle(0).Radian()
+              << "] pose [" << joint3->Position(0)
               << "]\n";
       EXPECT_NEAR(joint1->GetVelocity(0), 0, TOL);
       EXPECT_NEAR(joint3->GetVelocity(0), 0, TOL);
-      EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, TOL);
-      EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, TOL);
+      EXPECT_NEAR(joint1->Position(0), 0, TOL);
+      EXPECT_NEAR(joint3->Position(0), 0, TOL);
     }
 
     // slight imbalance
@@ -95,18 +95,18 @@ void ODEGearboxJoint_TEST::GearboxTest(const std::string &_physicsEngine)
       if (i%1000 == 0)
         gzdbg << "gearbox time [" << world->SimTime().Double()
               << "] vel [" << joint1->GetVelocity(0)
-              << "] pose [" << joint1->GetAngle(0).Radian()
+              << "] pose [" << joint1->Position(0)
               << "] vel [" << joint3->GetVelocity(0)
-              << "] pose [" << joint3->GetAngle(0).Radian()
+              << "] pose [" << joint3->Position(0)
               << "]\n";
       EXPECT_GT(joint1->GetVelocity(0), 0);
       EXPECT_GT(joint3->GetVelocity(0), 0);
-      EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
-      EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
+      EXPECT_GT(joint1->Position(0), 0);
+      EXPECT_GT(joint3->Position(0), 0);
       EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
         TOL);
-      EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
-                 -joint3->GetAngle(0).Radian(), TOL);
+      EXPECT_NEAR(joint1->Position(0)*gearboxRatio,
+                 -joint3->Position(0), TOL);
     }
   }
 }
@@ -151,14 +151,14 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->SimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
+            << "] pose [" << joint1->Position(0)
             << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
+            << "] pose [" << joint3->Position(0)
             << "]\n";
     EXPECT_NEAR(joint1->GetVelocity(0), 0, TOL);
     EXPECT_NEAR(joint3->GetVelocity(0), 0, TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(), 0, TOL);
-    EXPECT_NEAR(joint3->GetAngle(0).Radian(), 0, TOL);
+    EXPECT_NEAR(joint1->Position(0), 0, TOL);
+    EXPECT_NEAR(joint3->Position(0), 0, TOL);
   }
 
   // slight imbalance
@@ -170,18 +170,18 @@ void ODEGearboxJoint_TEST::SetGearboxRatio(const std::string &_physicsEngine)
     if (i%1000 == 0)
       gzdbg << "gearbox time [" << world->SimTime().Double()
             << "] vel [" << joint1->GetVelocity(0)
-            << "] pose [" << joint1->GetAngle(0).Radian()
+            << "] pose [" << joint1->Position(0)
             << "] vel [" << joint3->GetVelocity(0)
-            << "] pose [" << joint3->GetAngle(0).Radian()
+            << "] pose [" << joint3->Position(0)
             << "]\n";
     EXPECT_GT(joint1->GetVelocity(0), 0);
     EXPECT_GT(joint3->GetVelocity(0), 0);
-    EXPECT_GT(joint1->GetAngle(0).Radian(), 0);
-    EXPECT_GT(joint3->GetAngle(0).Radian(), 0);
+    EXPECT_GT(joint1->Position(0), 0);
+    EXPECT_GT(joint3->Position(0), 0);
     EXPECT_NEAR(joint1->GetVelocity(0)*gearboxRatio, -joint3->GetVelocity(0),
       TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian()*gearboxRatio,
-               -joint3->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->Position(0)*gearboxRatio,
+               -joint3->Position(0), TOL);
   }
 }
 

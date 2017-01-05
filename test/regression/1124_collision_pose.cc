@@ -46,7 +46,7 @@ TEST_F(Issue1124Test, SetModelPose)
   // The world->steps are not necessary. There are included to
   // err on the side of caution.
   world->Step(1);
-  model->SetWorldPose(math::Pose(2, 2, 0.5, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(2, 2, 0.5, 0, 0, 0));
   world->Step(1);
 
   EXPECT_EQ(model->WorldPose(), ignition::math::Pose3d(2, 2, 0.5, 0, 0, 0));
@@ -80,7 +80,7 @@ TEST_F(Issue1124Test, SetLinkPose)
   // The start pose should be centered at the origin
   EXPECT_EQ(coll->WorldPose(), ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
 
-  link->SetWorldPose(math::Pose(-4, 5, 0.5, 0, 0, 0));
+  link->SetWorldPose(ignition::math::Pose3d(-4, 5, 0.5, 0, 0, 0));
 
   // The new pose should be centered a the new model location
   EXPECT_EQ(coll->WorldPose(), ignition::math::Pose3d(-4, 5, 0.5, 0, 0, 0));
@@ -108,7 +108,7 @@ TEST_F(Issue1124Test, MovingPose)
 
   // Move the model by adding a force. This will exercise the physics engine
   // pose change callbacks.
-  link->AddForce(math::Vector3(100, 0, 0.0));
+  link->AddForce(ignition::math::Vector3d(100, 0, 0.0));
   world->Step(5000);
 
   EXPECT_GT(model->WorldPose().Pos().X(), 1.0);

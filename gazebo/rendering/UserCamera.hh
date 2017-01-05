@@ -63,7 +63,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual void SetClipDist(float _near, float _far);
+      public: virtual void SetClipDist(const float _near, const float _far);
       using Camera::SetClipDist;
 
       /// \brief Generic load function
@@ -287,8 +287,8 @@ namespace gazebo
       /// visual.
       /// \return True if successfully attach to the visual.
       protected: virtual bool AttachToVisualImpl(VisualPtr _visual,
-                     bool _inheritOrientation, double _minDist = 0,
-                     double _maxDist = 0);
+                     const bool _inheritOrientation, const double _minDist = 0,
+                     const double _maxDist = 0);
       using Camera::AttachToVisualImpl;
 
       // Documentation inherited.

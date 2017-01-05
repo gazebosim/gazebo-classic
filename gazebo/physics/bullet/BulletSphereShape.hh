@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Sphere collisionetry
- * Author: Nate Koenig
- * Date: 21 May 2009
- */
-
-#ifndef _BULLETSPHERESHAPE_HH_
-#define _BULLETSPHERESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETSPHERESHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETSPHERESHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletCollision.hh"
@@ -99,9 +94,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    ignition::math::Pose3d relativePose =
+                        this->collisionParent->RelativePose();
+                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

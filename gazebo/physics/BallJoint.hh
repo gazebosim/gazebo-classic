@@ -52,7 +52,7 @@ namespace gazebo
               }
 
       /// \internal
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {
                 return 0;
               }

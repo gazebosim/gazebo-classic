@@ -164,7 +164,7 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  ignition::math::Vector3d vel = this->link->GetWorldLinearVel(this->cp).Ign();
+  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp);
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
 
@@ -285,7 +285,7 @@ void LiftDragPlugin::OnUpdate()
   // modify cl per control joint value
   if (this->controlJoint)
   {
-    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+    double controlAngle = this->controlJoint->Position(0);
     cl = cl + this->controlJointRadToCL * controlAngle;
     /// \TODO: also change cm and cd
   }

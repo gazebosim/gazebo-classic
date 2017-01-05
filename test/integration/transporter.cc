@@ -42,7 +42,7 @@ TEST_F(TransporterTest, Transport)
   EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box onto the auto transport pad
-  boxModel->SetWorldPose(math::Pose(100.5, 0, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box transported to the correct location
@@ -50,7 +50,7 @@ TEST_F(TransporterTest, Transport)
   EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0.0, 1e-3);
 
   // Move the box away
-  boxModel->SetWorldPose(math::Pose(10, 10, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(10, 10, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
@@ -58,7 +58,7 @@ TEST_F(TransporterTest, Transport)
   EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box to the manual transporter pad
-  boxModel->SetWorldPose(math::Pose(-100.5, 0, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(-100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location

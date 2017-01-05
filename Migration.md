@@ -44,9 +44,9 @@ release will remove the deprecated code.
     + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
     + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
     + `gazebo::math::Pose parentAnchorPose` replaced with `ignition::math::Pose3d parentAnchorPose`
-    + `gazebo::math::Angle lowerLimit` replaced with `ignition::math::Angle lowerLimit`
-    + `gazebo::math::Angle upperLimit` replaced with `ignition::math::Angle upperLimit`
-    + `gazebo::math::Angle staticAngle` replaced with `ignition::math::Angle staticAngle`
+    + `gazebo::math::Angle lowerLimit` replaced with `double lowerLimit`
+    + `gazebo::math::Angle upperLimit` replaced with `double upperLimit`
+    + `gazebo::math::Angle staticAngle` replaced with `double staticAngle`
 
 1. **gazebo/test/ServerFixture.hh**
     + ***Deprecation:*** all public methods using gazebo::math
@@ -138,19 +138,51 @@ release will remove the deprecated code.
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
 
-1. **gazebo/physics/Entity.hh**
-    + ***Deprecation:*** const math::Pose GetDirtyPose() const
-    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
-    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
-    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
-    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
-    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
-    + ***Deprecation:*** math::Box GetCollisionBoundingBox() const
-    + ***Replacement:*** ignition::math::Box CollisionBoundingBox() const
-
 1. **gazebo/physics/Model.hh**
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+
+1. **gazebo/physics/Joint.hh**
+    + ***Deprecation:*** virtual unsigned int GetAngleCount() const = 0
+    + ***Replacement:*** virtual unsigned int DOF() const = 0
+    + ***Deprecation:*** math::Angle GetAngle(unsigned int _index) const
+    + ***Replacement:*** virtual double Position(const unsigned int _index = 0) const final
+    + ***Deprecation:*** virtual math::Angle GetAngleImpl(unsigned int _index) const = 0
+    + ***Replacement:*** virtual double PositionImpl(const unsigned int _index = 0) const = 0
+    + ***Deprecation:*** bool SetHighStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement:*** virtual void SetUpperLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** void SetUpperLimit(unsigned int _index, math::Angle _limit)
+    + ***Replacement:*** virtual void SetUpperLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** bool SetLowStop(unsigned int _index, const math::Angle &_angle)
+    + ***Replacement:*** virtual oid SetLowerLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** void SetLowerLimit(unsigned int _index, math::Angle _limit)
+    + ***Replacement:*** virtual oid SetLowerLimit(const unsigned int _index, const double _limit)
+    + ***Deprecation:*** virtual math::Angle GetHighStop(unsigned int _index) = 0
+    + ***Replacement:*** virtual double UpperLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** math::Angle GetUpperLimit(unsigned int _index) const
+    + ***Replacement:*** virtual double UpperLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** virtual math::Angle GetLowStop(unsigned int _index) = 0
+    + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** math::Angle GetLowerLimit(unsigned int _index) const
+    + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** void Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+    + ***Replacement:*** void Load(LinkPtr _parent, LinkPtr _child, const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** void SetAxis(unsigned int _index, const math::Vector3 &_axis) = 0
+    + ***Replacement:*** void SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis) = 0
+    + ***Deprecation:*** math::Vector3 GetLocalAxis(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Vector3d LocalAxis(const unsigned int _index) const
+    + ***Deprecation:*** math::Vector3 GetGlobalAxis(unsigned int _index)
+    + ***Replacement:*** ignition::math::Vector3d GlobalAxis(unsigned int _index) const
+    + ***Deprecation:*** void SetAnchor(unsigned int _index, const math::Vector3 &_anchor) = 0
+    + ***Replacement:*** void SetAnchor(const unsigned int _index, const ignition::math::Vector3d &_anchor) = 0
+    + ***Deprecation:*** math::Vector3 GetAnchor(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d Anchor(const unsigned int _index) const = 0
+    + ***Deprecation:*** math::Vector3 GetLinkForce(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d LinkForce(const unsigned int _index) const = 0
+    + ***Deprecation:*** math::Vector3 GetLinkTorque(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d LinkTorque(const unsigned int _index) const = 0
+    + ***Deprecation:*** double GetInertiaRatio(const math::Vector3 &_axis) const
+    + ***Replacement:*** double InertiaRatio(const ignition::math::Vector3d &_axis) const
 
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
@@ -162,11 +194,71 @@ release will remove the deprecated code.
     + ***Deprecation:*** math::Vector2i GetVertexCount() const
     + ***Replacement:*** ignition::math::Vector2i VertexCount() const
 
+1. **gazebo/physics/Entity.hh**
+    + ***Deprecation:*** const math::Pose GetDirtyPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &DirtyPose() const
+    + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
+    + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
+    + ***Deprecation:*** void SetInitialRelativePose(const math::Pose &_pose)
+    + ***Replacement:*** void SetInitialRelativePose(const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** math::Pose GetInitialRelativePose() const 
+    + ***Replacement:*** ignition::math::Pose3d InitialRelativePose() const
+    + ***Deprecation:*** virtual math::Box GetBoundingBox() const
+    + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void SetRelativePose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
+    + ***Replacement:*** void SetRelativePose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true)
+    + ***Deprecation:*** void SetWorldPose(const math::Pose &_pose, bool _notify = true, bool _publish = true)
+    + ***Replacement:*** void SetWorldPose(const ignition::math::Pose3d &_pose, const bool _notify = true, const bool _publish = true) 
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeLinearVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldLinearVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeAngularVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeAngularVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldAngularVel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldAngularVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeLinearAccel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d RelativeLinearAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearAccel() const
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldLinearAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetRelativeAngularAccel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d RelativeAngularAccel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldAngularAccel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldAngularAccel() const
+    + ***Deprecation:*** math::Box GetCollisionBoundingBox() const
+    + ***Replacement:*** ignition::math::Box CollisionBoundingBox() const
+    + ***Deprecation:*** math::Pose GetRelativePose() const
+    + ***Replacement:*** ignition::math::Pose3d RelativePose() const
+
 1. **gazebo/physics/PlaneShape.hh**
     + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
     + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
     + ***Deprecation:*** math::Vector2d GetSize() const
     + ***Replacement:*** ignition::math::Vector2d Size() const
+
+1. **gazebo/physics/CollisionState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
+
+1. **gazebo/physics/JointState.hh**
+    + ***Deprecation:*** math::Angle GetAngle(unsigned int _axis) const
+    + ***Replacement:*** double Position(const unsigned int _axis = 0) const
+    + ***Deprecation:*** const std::vector<math::Angle> GetAngles() const
+    + ***Replacement:*** const std::vector<double> &Positions() const
+
+1. **gazebo/physics/LinkState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
+    + ***Deprecation:*** const math::Pose GetVelocity() const
+    + ***Replacement:*** const ignition::math::Pose3d &Velocity() const
+    + ***Deprecation:*** const math::Pose GetAcceleration() const
+    + ***Replacement:*** const ignition::math::Pose3d &Acceleration() const
+    + ***Deprecation:*** const math::Pose GetWrench() const
+    + ***Replacement:*** const ignition::math::Pose3d &Wrench() const
+
+1. **gazebo/physics/ModelState.hh**
+    + ***Deprecation:*** const math::Pose &GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d &Pose() const
 
 1. **gazebo/rendering/Distortion.hh**
     + ***Deprecation:*** double GetK1() const
@@ -460,11 +552,83 @@ release will remove the deprecated code.
     reset() on its smart pointer.
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
+    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** virtual void SetLinearVel(const math::Vector3 &_vel)
+    + ***Replacement:*** virtual void SetLinearVel(const ignition::math::Vector3d &_vel)
+    + ***Deprecation:*** virtual void SetAngularVel(const math::Vector3 &_vel)
+    + ***Replacement:*** virtual void SetAngularVel(const ignition::math::Vector3d &_vel)
+    + ***Deprecation:*** void SetLinearAccel(const math::Vector3 &_accel)
+    + ***Replacement:*** void SetLinearAccel(const ignition::math::Vector3d &_accel)
+    + ***Deprecation:*** void SetAngularAccel(const math::Vector3 &_accel)
+    + ***Replacement:*** void SetAngularAccel(const ignition::math::Vector3d &_accel)
+    + ***Deprecation:*** virtual void SetForce(const math::Vector3 &_force)
+    + ***Replacement:*** virtual void SetForce(const ignition::math::Vector3d &_force)
+    + ***Deprecation:*** virtual void SetTorque(const math::Vector3 &_torque)
+    + ***Replacement:***virtual void SetTorque(const ignition::math::Vector3d &_torque) 
+    + ***Deprecation:*** virtual void AddForce(const math::Vector3 &_force)
+    + ***Replacement:*** virtual void AddForce(const ignition::math::Vector3d &_force)
+    + ***Deprecation:*** virtual void AddRelativeForce(const math::Vector3 &_force)
+    + ***Replacement:*** virtual void AddRelativeForce(const ignition::math::Vector3d &_force)
+    + ***Deprecation:*** virtual void AddForceAtWorldPosition(const math::Vector3 &_force, const math::Vector3 &_pos)
+    + ***Replacement:*** virtual void AddForceAtWorldPosition(const ignition::math::Vector3d &_force, const ignition::math::Vector3d &_pos)
+    + ***Deprecation:*** virtual void AddForceAtRelativePosition( const math::Vector3 &_force, const math::Vector3 &_relPos)
+    + ***Replacement:*** virtual void AddForceAtRelativePosition(const ignition::math::Vector3d &_force, const ignition::math::Vector3d &_relPos)
+    + ***Deprecation:*** virtual void AddLinkForce(const math::Vector3 &_force, const math::Vector3 &_offset = math::Vector3::Zero)
+    + ***Replacement:*** virtual void AddLinkForce(const ignition::math::Vector3d &_force, const ignition::math::Vector3d &_offset = ignition::math::Vector3d::Zero)
+    + ***Deprecation:*** virtual void AddTorque(const math::Vector3 &_torque)
+    + ***Replacement:*** virtual void AddTorque(const ignition::math::Vector3d &_torque)
+    + ***Deprecation:*** virtual void AddRelativeTorque(const math::Vector3 &_torque)
+    + ***Replacement:*** virtual void AddRelativeTorque(const ignition::math::Vector3d &_torque)
+    + ***Deprecation:*** math::Pose GetWorldCoGPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldCoGPose() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldLinearVel() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel(const math::Vector3 &_offset) const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldLinearVel(const ignition::math::Vector3d &_offset) const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldLinearVel(const math::Vector3 &_offset, const math::Quaternion &_q) const
+    + ***Replacement:***  virtual ignition::math::Vector3d WorldLinearVel(const ignition::math::Vector3d &_offset, const ignition::math::Quaterniond &_q) const 
+    + ***Deprecation:*** virtual math::Vector3 GetWorldCoGLinearVel() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldCoGLinearVel() const
+    + ***Deprecation:*** math::Vector3 GetRelativeLinearVel() const
+    + ***Replacement:*** ignition::math::Vector3d RelativeLinearVel() const
+    + ***Deprecation:*** math::Vector3 GetRelativeAngularVel() const
+    + ***Replacement:*** ignition::math::Vector3d RelativeAngularVel() const
+    + ***Deprecation:*** math::Vector3 GetRelativeLinearAccel() const
+    + ***Replacement:*** ignition::math::Vector3d RelativeLinearAccel() const
+    + ***Deprecation:*** math::Vector3 GetWorldLinearAccel() const
+    + ***Replacement:*** ignition::math::Vector3d WorldLinearAccel() const
+    + ***Deprecation:*** math::Vector3 GetRelativeAngularAccel() const
+    + ***Replacement:*** ignition::math::Vector3d RelativeAngularAccel() const
+    + ***Deprecation:*** math::Vector3 GetWorldAngularMomentum() const
+    + ***Replacement:*** ignition::math::Vector3d WorldAngularMomentum() const
+    + ***Deprecation:*** math::Vector3 GetWorldAngularAccel() const
+    + ***Replacement:*** ignition::math::Vector3d WorldAngularAccel() const
+    + ***Deprecation:*** math::Vector3 GetRelativeForce()
+    + ***Replacement:*** ignition::math::Vector3d RelativeForce() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldForce() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldForce() const
+    + ***Deprecation:*** math::Vector3 GetRelativeTorque() const
+    + ***Replacement:*** ignition::math::Vector3d RelativeTorque() const
+    + ***Deprecation:*** virtual math::Vector3 GetWorldTorque() const
+    + ***Replacement:*** virtual ignition::math::Vector3d WorldTorque() const
+    + ***Deprecation:*** math::Pose GetWorldInertialPose() const
+    + ***Replacement:*** ignition::math::Pose3d WorldInertialPose() const
+    + ***Deprecation:*** void AttachStaticModel(ModelPtr &_model, const math::Pose &_offset) 
+    + ***Replacement:*** void AttachStaticModel(ModelPtr &_model, const ignition::math::Pose3d &_offset)
 
 1. **gazebo/physics/MultiRayShape.hh**
     + ***Deprecation:*** public: void MultiRayShape::DisconnectNewLaserScans(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling
     reset() on its smart pointer.
+    + ***Deprecation:*** math::Angle GetMinAngle() const
+    + ***Replacement:*** ignition::math::Angle MinAngle() const
+    + ***Deprecation:*** math::Angle GetMaxAngle() const
+    + ***Replacement:*** ignition::math::Angle MaxAngle() const
+    + ***Deprecation:*** math::Angle GetVerticalMinAngle() const
+    + ***Replacement:*** ignition::math::Angle VerticalMinAngle() const
+    + ***Deprecation:*** math::Angle GetVerticalMaxAngle() const
+    + ***Replacement:*** ignition::math::Angle VerticalMaxAngle() const
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
@@ -655,6 +819,10 @@ release will remove the deprecated code.
 1. **gazebo/math/Plane.hh**
     + ***Deprecation:*** public:   gazebo::math::Plane
     + ***Replacement:*** public: ignition::math::Plane
+
+1. **gazebo/math/Angle.hh**
+    + ***Deprecation:*** public:   gazebo::math::Angle
+    + ***Replacement:*** public: ignition::math::Angle
 
 1. **gazebo/math/Rand.hh**
     + ***Deprecation:*** public: static double   gazebo::math::GetDblNormal(double, double)

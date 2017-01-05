@@ -70,7 +70,7 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     if (!isPlaneShape)
     {
       this->dataPtr->dtCollisionShape->setLocalTransform(
-            DARTTypes::ConvPose(this->GetRelativePose()));
+            DARTTypes::ConvPose(this->RelativePose()));
     }
   }
 }

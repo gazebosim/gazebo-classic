@@ -59,7 +59,7 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
   ASSERT_NE(joint, nullptr);
 
   // Trigger key to increase position
-  double target = joint->GetAngle(0).Radian() + 0.05;
+  double target = joint->Position(0) + 0.05;
 
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
@@ -68,25 +68,25 @@ void KeysToJoints::Position(const std::string &_physicsEngine)
 
   int maxSleep = 50;
   int sleep = 0;
-  while (joint->GetAngle(0).Radian() < target && sleep < maxSleep)
+  while (joint->Position(0) < target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_GT(joint->GetAngle(0).Radian(), target);
+  EXPECT_GT(joint->Position(0), target);
 
   // Trigger key to decrease position
-  target = joint->GetAngle(0).Radian() - 0.05;
+  target = joint->Position(0) - 0.05;
   msg.set_int_value(117);
   keyboardPub->Publish(msg);
 
   sleep = 0;
-  while (joint->GetAngle(0).Radian() > target && sleep < maxSleep)
+  while (joint->Position(0) > target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_LT(joint->GetAngle(0).Radian(), target);
+  EXPECT_LT(joint->Position(0), target);
 }
 
 TEST_P(KeysToJoints, Position)
@@ -180,7 +180,7 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
   ASSERT_NE(joint, nullptr);
 
   // Trigger key to push in positive direction
-  double target = joint->GetAngle(0).Radian() + 0.1;
+  double target = joint->Position(0) + 0.1;
 
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
@@ -196,12 +196,12 @@ void KeysToJoints::Force(const std::string &_physicsEngine)
 
   int maxSleep = 50;
   int sleep = 0;
-  while (joint->GetAngle(0).Radian() < target && sleep < maxSleep)
+  while (joint->Position(0) < target && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_GT(joint->GetAngle(0).Radian(), target);
+  EXPECT_GT(joint->Position(0), target);
 
   // Trigger key to stop
   if (_physicsEngine == "dart")
@@ -267,8 +267,8 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
   ASSERT_NE(joint3, nullptr);
 
   // Trigger a single key which increases joint2 and decreases joint3
-  double target2 = joint2->GetAngle(0).Radian() + 0.05;
-  double target3 = joint3->GetAngle(0).Radian() - 0.05;
+  double target2 = joint2->Position(0) + 0.05;
+  double target3 = joint3->Position(0) - 0.05;
 
   msgs::Any msg;
   msg.set_type(msgs::Any_ValueType_INT32);
@@ -277,14 +277,14 @@ void KeysToJoints::MultipleJoints(const std::string &_physicsEngine)
 
   int maxSleep = 50;
   int sleep = 0;
-  while (joint2->GetAngle(0).Radian() < target2 &&
-         joint3->GetAngle(0).Radian() > target3 && sleep < maxSleep)
+  while (joint2->Position(0) < target2 &&
+         joint3->Position(0) > target3 && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     ++sleep;
   }
-  EXPECT_GT(joint2->GetAngle(0).Radian(), target2);
-  EXPECT_LT(joint3->GetAngle(0).Radian(), target3);
+  EXPECT_GT(joint2->Position(0), target2);
+  EXPECT_LT(joint3->Position(0), target3);
 }
 
 TEST_P(KeysToJoints, MultipleJoints)
