@@ -47,7 +47,7 @@ release will remove the deprecated code.
     + Changed `std::vector<math::Pose> attachedModelsOffset` to `std::vector<ignition::math::Pose3d> attachedModelsOffset`.
 
 1. **gazebo/physics/Joint.hh**
-    + `gazebo::math::Vector3d anchorPos` replaced with `ignition::math::Vector3d anchorPos`
+    + `gazebo::math::Vector3 anchorPos` replaced with `ignition::math::Vector3d anchorPos`
     + `gazebo::math::Pose anchorPose` replaced with `ignition::math::Pose3d anchorPose`
     + `gazebo::math::Pose parentAnchorPose` replaced with `ignition::math::Pose3d parentAnchorPose`
     + `gazebo::math::Angle lowerLimit` replaced with `double lowerLimit`
@@ -61,6 +61,11 @@ release will remove the deprecated code.
 1. **physics/SurfaceParams.hh**
     + Changed the type of `FrictionPyramid::direction1` from
     `gazebo::math::Vector3` to `ignition::math::Vector3d`.
+
+1. **gazebo/physics/Population.hh**
+    + `gazebo::math::Vector3 size` replaced with `ignition::math::Vector3d size`
+    + `gazebo::math::Vector3 step` replaced with `ignition::math::Vector3d step`
+    + `gazebo::math::Pose pose` replaced with `ignition::math::Pose3d pose`
 
 1. **plugins/events/Region.hh**
     + ***Deprecation:*** public: bool Contains(const math::Vector3 &_p) const
@@ -137,6 +142,10 @@ release will remove the deprecated code.
 1. **gazebo/rendering/MovableText.hh**
     + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
     + ***Replacement:*** ignition::math::Box AABB()
+
+1. **gazebo/physics/Road.hh**
+    + ***Deprecation:*** const std::vector<math::Vector3> &GetPoints() const
+    + ***Replacement:*** const std::vector<ignition::math::Vector3d> &Points() const
 
 1. **gazebo/physics/Collision.hh**
     + ***Deprecation:*** inline virtual const math::Pose GetWorldPose() const
