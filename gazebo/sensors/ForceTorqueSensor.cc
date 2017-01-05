@@ -114,7 +114,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
             "parentJoint should be defined by single argument Load()");
   ignition::math::Quaterniond rotationChildSensor =
     (this->pose +
-     this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
+     this->dataPtr->parentJoint->InitialAnchorPose()).Rot();
 
   this->dataPtr->rotationSensorChild =
     ignition::math::Matrix3d(rotationChildSensor.Inverse());

@@ -121,7 +121,7 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
 
     Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
-        this->GetAxisFrameOffset(0).RotateVector(_axis));
+        this->AxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartAxis = dartTransfJointLeftToParentLink.linear() * dartAxis;

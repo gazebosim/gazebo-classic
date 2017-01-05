@@ -29,7 +29,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);
