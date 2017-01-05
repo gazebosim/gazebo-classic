@@ -1253,7 +1253,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
         {
           // anchor position in world frame
           ignition::math::Vector3d anchorPos =
-            parentJoints[j]->GetAnchor(0).Ign();
+            parentJoints[j]->Anchor(0);
 
           // anchor pose in child link frame
           ignition::math::Pose3d anchorInChild =
@@ -1337,7 +1337,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
         {
           // anchor position in world frame
           ignition::math::Vector3d anchorPos =
-            parentJoints[j]->GetAnchor(0).Ign();
+            parentJoints[j]->Anchor(0);
 
           // anchor pose in child link frame
           ignition::math::Pose3d anchorInChild =

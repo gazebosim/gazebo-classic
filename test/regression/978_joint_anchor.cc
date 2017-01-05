@@ -72,7 +72,7 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
 
     // Check anchor location
-    EXPECT_EQ(joint->GetAnchor(0).Ign(), opt.modelPose.Pos());
+    EXPECT_EQ(joint->Anchor(0), opt.modelPose.Pos());
   }
 }
 

@@ -165,6 +165,24 @@ release will remove the deprecated code.
     + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
     + ***Deprecation:*** math::Angle GetLowerLimit(unsigned int _index) const
     + ***Replacement:*** virtual double LowerLimit(const unsigned int _index = 0) const
+    + ***Deprecation:*** void Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
+    + ***Replacement:*** void Load(LinkPtr _parent, LinkPtr _child, const ignition::math::Pose3d &_pose)
+    + ***Deprecation:*** void SetAxis(unsigned int _index, const math::Vector3 &_axis) = 0
+    + ***Replacement:*** void SetAxis(const unsigned int _index, const ignition::math::Vector3d &_axis) = 0
+    + ***Deprecation:*** math::Vector3 GetLocalAxis(unsigned int _index) const
+    + ***Replacement:*** ignition::math::Vector3d LocalAxis(const unsigned int _index) const
+    + ***Deprecation:*** math::Vector3 GetGlobalAxis(unsigned int _index)
+    + ***Replacement:*** ignition::math::Vector3d GlobalAxis(unsigned int _index) const
+    + ***Deprecation:*** void SetAnchor(unsigned int _index, const math::Vector3 &_anchor) = 0
+    + ***Replacement:*** void SetAnchor(const unsigned int _index, const ignition::math::Vector3d &_anchor) = 0
+    + ***Deprecation:*** math::Vector3 GetAnchor(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d Anchor(const unsigned int _index) const = 0
+    + ***Deprecation:*** math::Vector3 GetLinkForce(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d LinkForce(const unsigned int _index) const = 0
+    + ***Deprecation:*** math::Vector3 GetLinkTorque(unsigned int _index) const = 0
+    + ***Replacement:*** ignition::math::Vector3d LinkTorque(const unsigned int _index) const = 0
+    + ***Deprecation:*** double GetInertiaRatio(const math::Vector3 &_axis) const
+    + ***Replacement:*** double InertiaRatio(const ignition::math::Vector3d &_axis) const
 
 1. **gazebo/physics/Shape.hh**
     + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
