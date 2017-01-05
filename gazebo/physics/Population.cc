@@ -29,7 +29,6 @@
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/Population.hh"
 #include "gazebo/physics/PopulationPrivate.hh"
 #include "gazebo/physics/World.hh"

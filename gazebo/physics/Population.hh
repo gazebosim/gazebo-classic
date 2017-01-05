@@ -20,12 +20,11 @@
 #include <string>
 #include <vector>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 #include <boost/shared_ptr.hpp>
 #include <boost/scoped_ptr.hpp>
 #include <sdf/sdf.hh>
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/util/system.hh"
 

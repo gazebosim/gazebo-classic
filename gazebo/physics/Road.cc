@@ -117,8 +117,9 @@ void Road::Init()
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Vector3> &Road::GetPoints() const
+const std::vector<math::Vector3> Road::GetPoints() const
 {
+
   std::vector<math::Vector3> result;
   for (const auto pt : this->points)
     result.push_back(pt);

@@ -60,7 +60,7 @@ namespace gazebo
       /// \brief Get the point that define the road.
       /// \return The vector of points that define the road.
       /// \deprecated See Points()
-      public: const std::vector<math::Vector3> &GetPoints() const
+      public: const std::vector<math::Vector3> GetPoints() const
           GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the points that define the road.
