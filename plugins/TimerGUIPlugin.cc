@@ -202,7 +202,7 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   }
 
   // Minumum horizontal size
-  s.X() = std::max(s.X(), 150.0);
+  s.X() = std::max(s.X(), 200.0);
 
   // Minimum vertical size according to the elements present
   if (hasStartButton && hasResetButton)
@@ -283,8 +283,8 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     int xPos, yPos;
     if (this->parent())
     {
-      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() -
-          10;
+      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() +
+          100;
     }
     else
       xPos = 600;

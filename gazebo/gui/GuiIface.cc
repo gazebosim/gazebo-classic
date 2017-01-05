@@ -334,34 +334,6 @@ unsigned int gui::get_entity_id(const std::string &_name)
     return 0;
 }
 
-/////////////////////////////////////////////////
-void addAndLoadPlugin(const std::string &_filename)
-{
-  if (_filename.empty())
-    return;
-
-  GZ_ASSERT(g_app, "QApplication must have been created");
-  GZ_ASSERT(g_main_win, "Main window must have been created");
-  GZ_ASSERT(g_main_win->RenderWidget(), "Main window's RenderWidget must have been created");
-
-  gazebo::GUIPluginPtr plugin =
-    gazebo::GUIPlugin::Create(_filename, _filename);
-
-  if (plugin)
-  {
-    if (plugin->GetType() != gazebo::GUI_PLUGIN)
-    {
-      gzerr << "System is attempting to load "
-        << "a plugin, but detected an incorrect plugin type. "
-        << "Plugin filename[" << _filename << "].\n";
-      return;
-    }
-
-    sdf::ElementPtr elem(new sdf::Element()); // create an empty element
-    g_main_win->RenderWidget()->AddPlugin(plugin, elem);
-  }
-}
-
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
@@ -385,12 +357,14 @@ bool gui::run(int _argc, char **_argv)
 
   // the plugins have to be created after g_app has been created,
   // otherwise Qt will complain about no existing QApplication.
-  for (std::vector<std::string>::iterator iter = g_plugins_to_load.begin();
-       iter != g_plugins_to_load.end(); ++iter)
-  {
-    addAndLoadPlugin(*iter);
-  }
+  GZ_ASSERT(g_app, "QApplication must have been created");
 
+  gazebo::gui::MainWindow *mainWindow = gazebo::gui::get_main_window();
+
+  GZ_ASSERT(mainWindow, "Main Window has to be available!");
+  GZ_ASSERT(mainWindow->RenderWidget(), "Main window's RenderWidget must have been created");
+
+  mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
