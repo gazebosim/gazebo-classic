@@ -57,7 +57,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
   gazebo::msgs::Set(msg.mutable_position(),
       ignition::math::Vector3d(0.2, 0, 0));
   gazebo::msgs::Set(msg.mutable_orientation(),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   velPub->Publish(msg);
 
   math::Pose startPose, endPose;

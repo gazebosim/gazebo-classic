@@ -55,11 +55,12 @@ void DARTFixedJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTFixedJoint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d DARTFixedJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
 
@@ -67,21 +68,22 @@ math::Vector3 DARTFixedJoint::GetAnchor(unsigned int _index) const
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3(worldOrigin).Ign();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
 
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
-                             const math::Vector3& /*_axis*/)
+void DARTFixedJoint::SetAxis(const unsigned int /*_index*/,
+                             const ignition::math::Vector3d& /*_axis*/)
 {
   gzwarn << "DARTFixedJoint: called method "
          << "SetAxis that is not valid for joints of type fixed.\n";

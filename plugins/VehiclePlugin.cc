@@ -230,7 +230,7 @@ void VehiclePlugin::OnUpdate()
   this->joints[1]->SetLowerLimit(0, wheelAngle);
 
   // Get the current velocity of the car
-  this->velocity = this->chassis->GetWorldLinearVel().Ign();
+  this->velocity = this->chassis->WorldLinearVel();
 
   //  aerodynamics
   this->chassis->AddForce(
@@ -244,10 +244,10 @@ void VehiclePlugin::OnUpdate()
 
   for (int ix = 0; ix < 4; ++ix)
   {
-    hingePoint = this->joints[ix]->GetAnchor(0).Ign();
-    bodyPoint = this->joints[ix]->GetAnchor(1).Ign();
+    hingePoint = this->joints[ix]->Anchor(0);
+    bodyPoint = this->joints[ix]->Anchor(1);
 
-    axis = this->joints[ix]->GetGlobalAxis(0).Round().Ign();
+    axis = this->joints[ix]->GlobalAxis(0).Round();
     double displacement = (bodyPoint - hingePoint).Dot(axis);
 
     float amt = displacement * this->swayForce;

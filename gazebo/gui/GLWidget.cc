@@ -73,24 +73,18 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
   this, SLOT(update()));
 
-  this->setFocusPolicy(Qt::StrongFocus);
-
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
+  // Setting the attribute below to true improves performance but may cause test
+  // failures on OSX/ogre1.9/qt5
+  // this->setAttribute(Qt::WA_PaintOnScreen, true);
+  this->setAttribute(Qt::WA_NoSystemBackground, true);
 
-  this->dataPtr->renderFrame = new QFrame;
-  this->dataPtr->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->dataPtr->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->dataPtr->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->dataPtr->renderFrame->show();
 
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(this->dataPtr->renderFrame);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(mainLayout);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -127,9 +121,6 @@ GLWidget::GLWidget(QWidget *_parent)
         std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5)));
-
-  this->dataPtr->renderFrame->setMouseTracking(true);
-  this->setMouseTracking(true);
 
   this->dataPtr->entityMaker = NULL;
 
@@ -242,23 +233,28 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
-  // These two functions are most applicable for Linux.
+  // This function is most applicable for Linux.
   QApplication::flush();
-  QApplication::syncX();
 
   if (this->dataPtr->windowId <=0)
   {
     // Get the window handle in a form that OGRE can use.
     std::string winHandle = this->OgreHandle();
 
+    // windowhandle() is available in qt5 only
+    double ratio = this->windowHandle()->devicePixelRatio();
+
     // Create the OGRE render window
     this->dataPtr->windowId =
       rendering::RenderEngine::Instance()->GetWindowManager()->
-        CreateWindow(winHandle, this->width(), this->height());
+        CreateWindow(winHandle, this->width(), this->height(), ratio);
 
     // Attach the user camera to the window
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->dataPtr->windowId, this->dataPtr->userCamera);
+
+    // for retina displays on osx
+    this->dataPtr->userCamera->SetDevicePixelRatio(ratio);
   }
 
   // Let QT continue processing the show event.
@@ -450,11 +446,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier)
+    && (_event->key() != Qt::Key_Control) ? true : false;
   this->dataPtr->keyEvent.shift =
-    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier)
+    && (_event->key() != Qt::Key_Shift) ? true : false;
   this->dataPtr->keyEvent.alt =
-    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier)
+    && (_event->key() != Qt::Key_Alt) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -925,25 +924,7 @@ rendering::UserCameraPtr GLWidget::Camera() const
 //////////////////////////////////////////////////
 std::string GLWidget::OgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(this->winId());
-#elif defined(WIN32)
-  ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
-  GZ_ASSERT(q_parent, "q_parent is null");
-
-  ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
-    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
-    std::to_string(static_cast<uint64_t>(q_parent->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }
 
 /////////////////////////////////////////////////

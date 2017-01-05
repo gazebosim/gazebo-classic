@@ -118,7 +118,6 @@ void InertiaVisual::Load(const ignition::math::Pose3d &_pose,
   boxVis->Load();
 
   // Inertia indicator: equivalent box of uniform density
-  boxVis->InsertMesh("unit_box");
   boxVis->AttachMesh("unit_box");
 
   boxVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);

@@ -65,8 +65,8 @@ void BulletBallJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild;
+  ignition::math::Pose3d pose;
 
   // Initialize pivots to anchorPos, which is expressed in the
   // world coordinate frame.
@@ -77,21 +77,21 @@ void BulletBallJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->parentLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
+    pivotParent -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->childLink->WorldCoGPose();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
+    pivotChild -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
   }
 
   // If both links exist, then create a joint between the two links.
@@ -139,7 +139,8 @@ void BulletBallJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -158,10 +159,11 @@ double BulletBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -218,12 +220,12 @@ void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
 {
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void BulletBallJoint::SetAxis(unsigned int /*_index*/,
-                        const math::Vector3 &/*_axis*/)
+void BulletBallJoint::SetAxis(const unsigned int /*_index*/,
+                        const ignition::math::Vector3d &/*_axis*/)
 {
   gzerr << "BulletBallJoint::SetAxis not implemented" << std::endl;
 }

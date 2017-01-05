@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: External interfaces for Gazebo
- * Author: Nate Koenig
- * Date: 03 Apr 2007
- */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -127,7 +122,7 @@ void Entity::Load(sdf::ElementPtr _sdf)
     this->visualMsg->set_parent_name(this->world->Name());
     this->visualMsg->set_parent_id(0);
   }
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+  msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
 
   if (this->HasType(Base::MODEL))
     this->visualMsg->set_type(msgs::Visual::MODEL);
@@ -178,11 +173,23 @@ bool Entity::IsStatic() const
 //////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const math::Pose &_p)
 {
-  this->initialRelativePose = _p.Ign();
+  this->SetInitialRelativePose(_p.Ign());
+}
+
+//////////////////////////////////////////////////
+void Entity::SetInitialRelativePose(const ignition::math::Pose3d &_p)
+{
+  this->initialRelativePose = _p;
 }
 
 //////////////////////////////////////////////////
 math::Pose Entity::GetInitialRelativePose() const
+{
+  return this->InitialRelativePose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Entity::InitialRelativePose() const
 {
   return this->initialRelativePose;
 }
@@ -203,8 +210,8 @@ math::Box Entity::GetBoundingBox() const
 //////////////////////////////////////////////////
 ignition::math::Box Entity::BoundingBox() const
 {
-  return ignition::math::Box(ignition::math::Vector3d::Zero,
-                             ignition::math::Vector3d::One);
+  return ignition::math::Box(
+      ignition::math::Vector3d::Zero, ignition::math::Vector3d::One);
 }
 
 //////////////////////////////////////////////////
@@ -258,6 +265,12 @@ void Entity::PublishPose()
 //////////////////////////////////////////////////
 math::Pose Entity::GetRelativePose() const
 {
+  return this->RelativePose();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Entity::RelativePose() const
+{
   // We return the initialRelativePose for COLLISION objects because they
   // cannot move relative to their parent link.
   // \todo Look into storing relative poses for all objects instead of world
@@ -280,6 +293,13 @@ math::Pose Entity::GetRelativePose() const
 void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
+  this->SetRelativePose(_pose.Ign(), _notify, _publish);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetRelativePose(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
+{
   if (this->parent && this->parentEntity)
     this->SetWorldPose(_pose + this->parentEntity->WorldPose(), _notify,
                               _publish);
@@ -290,6 +310,13 @@ void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
 //////////////////////////////////////////////////
 void Entity::SetWorldTwist(const math::Vector3 &_linear,
     const math::Vector3 &_angular, bool _updateChildren)
+{
+  return this->SetWorldTwist(_linear.Ign(), _angular.Ign(), _updateChildren);
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldTwist(const ignition::math::Vector3d &_linear,
+    const ignition::math::Vector3d &_angular, const bool _updateChildren)
 {
   if (this->HasType(LINK) || this->HasType(MODEL))
   {
@@ -426,7 +453,7 @@ void Entity::SetWorldPoseCanonicalLink(
       this->parentEntity->PublishPose();
 
     updatePose = parentEnt->worldPose;
-    relativePose = parentEnt->GetInitialRelativePose().Ign();
+    relativePose = parentEnt->InitialRelativePose();
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
@@ -487,16 +514,21 @@ void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
 //    MWP  - Model World Pose
 //    CBRP - Canonical Body Relative (to Model) Pose
 //
-void Entity::SetWorldPose(const math::Pose &_pose,
-                          const bool _notify,
-                          const bool _publish)
+void Entity::SetWorldPose(const ignition::math::Pose3d &_pose,
+    const bool _notify, const bool _publish)
 {
   {
     std::lock_guard<std::mutex> lock(this->GetWorld()->WorldPoseMutex());
-    (*this.*setWorldPoseFunc)(_pose.Ign(), _notify, _publish);
+    (*this.*setWorldPoseFunc)(_pose, _notify, _publish);
   }
   if (_publish)
     this->PublishPose();
+}
+
+//////////////////////////////////////////////////
+void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
+{
+  this->SetWorldPose(_pose.Ign(), _notify, _publish);
 }
 
 //////////////////////////////////////////////////
@@ -640,12 +672,12 @@ void Entity::UpdateParameters(sdf::ElementPtr _sdf)
 {
   Base::UpdateParameters(_sdf);
 
-  math::Pose parentPose;
+  ignition::math::Pose3d parentPose;
   if (this->parent && this->parentEntity)
     parentPose = this->parentEntity->worldPose;
 
-  math::Pose newPose = _sdf->Get<math::Pose>("pose");
-  if (newPose != this->GetRelativePose())
+  ignition::math::Pose3d newPose = _sdf->Get<ignition::math::Pose3d>("pose");
+  if (newPose != this->RelativePose())
   {
     this->SetRelativePose(newPose);
   }
@@ -659,9 +691,9 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
   this->animation->AddTime((_info.simTime - this->prevAnimationTime).Double());
   this->animation->GetInterpolatedKeyFrame(kf);
 
-  math::Pose offset;
-  offset.pos = kf.Translation();
-  offset.rot = kf.Rotation();
+  ignition::math::Pose3d offset;
+  offset.Pos() = kf.Translation();
+  offset.Rot() = kf.Rotation();
 
   this->SetWorldPose(offset);
   this->prevAnimationTime = _info.simTime;
@@ -728,10 +760,10 @@ ignition::math::Box Entity::CollisionBoundingBoxHelper(BasePtr _base) const
 void Entity::PlaceOnEntity(const std::string &_entityName)
 {
   EntityPtr onEntity = this->GetWorld()->EntityByName(_entityName);
-  auto box = this->CollisionBoundingBox();
-  auto onBox = onEntity->CollisionBoundingBox();
+  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::Box onBox = onEntity->CollisionBoundingBox();
 
-  auto p = onEntity->WorldPose();
+  ignition::math::Pose3d p = onEntity->WorldPose();
   p.Pos().Z() = onBox.Max().Z() + box.ZLength()*0.5;
   this->SetWorldPose(p);
 }
@@ -744,9 +776,9 @@ void Entity::GetNearestEntityBelow(double &_distBelow,
   RayShapePtr rayShape = boost::dynamic_pointer_cast<RayShape>(
     this->GetWorld()->Physics()->CreateShape("ray", CollisionPtr()));
 
-  auto box = this->CollisionBoundingBox();
-  auto start = this->WorldPose().Pos();
-  auto end = start;
+  ignition::math::Box box = this->CollisionBoundingBox();
+  ignition::math::Vector3d start = this->WorldPose().Pos();
+  ignition::math::Vector3d end = start;
   start.Z() = box.Min().Z() - 0.00001;
   end.Z() -= 1000;
   rayShape->SetPoints(start, end);
@@ -762,8 +794,104 @@ void Entity::PlaceOnNearestEntityBelow()
   this->GetNearestEntityBelow(dist, entityName);
   if (dist > 0.0)
   {
-    math::Pose p = this->WorldPose();
-    p.pos.z -= dist;
+    ignition::math::Pose3d p = this->WorldPose();
+    p.Pos().Z() -= dist;
     this->SetWorldPose(p);
   }
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeLinearVel() const
+{
+  return this->RelativeLinearVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeLinearVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldLinearVel() const
+{
+  return this->WorldLinearVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldLinearVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeAngularVel() const
+{
+  return this->RelativeAngularVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeAngularVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldAngularVel() const
+{
+  return this->WorldAngularVel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldAngularVel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeLinearAccel() const
+{
+  return this->RelativeLinearAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeLinearAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldLinearAccel() const
+{
+  return this->WorldLinearAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldLinearAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetRelativeAngularAccel() const
+{
+  return this->RelativeAngularAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::RelativeAngularAccel() const
+{
+  return ignition::math::Vector3d::Zero;
+}
+
+//////////////////////////////////////////////////
+math::Vector3 Entity::GetWorldAngularAccel() const
+{
+  return this->WorldAngularAccel();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Entity::WorldAngularAccel() const
+{
+  return ignition::math::Vector3d::Zero;
 }

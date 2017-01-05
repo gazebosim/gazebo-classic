@@ -47,16 +47,17 @@ void ODEFixedJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEFixedJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEFixedJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetAnchor that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+         << "Anchor that is not valid for joints of type fixed.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &/*_anchor*/)
+void ODEFixedJoint::SetAnchor(const unsigned int /*index*/,
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -65,16 +66,17 @@ void ODEFixedJoint::SetAnchor(unsigned int /*index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEFixedJoint::SetAxis(unsigned int /*_index*/,
-                            const math::Vector3 &/*_axis*/)
+void ODEFixedJoint::SetAxis(const unsigned int /*_index*/,
+                            const ignition::math::Vector3d &/*_axis*/)
 {
   gzwarn << "ODEFixedJoint: called method "
          << "SetAxis that is not valid for joints of type fixed.\n";

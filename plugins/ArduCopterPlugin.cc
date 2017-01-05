@@ -389,7 +389,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "samplingRate",
           rotor.samplingRate, rotor.samplingRate);
 
-      // use gazebo::math::Filter
+      // use ignition::math::Filter
       rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
 
       // initialize filter to zero value
@@ -681,7 +681,7 @@ void ArduCopterPlugin::SendState() const
   // or...
   // Get model velocity in NED frame
   ignition::math::Vector3d velGazeboWorldFrame =
-    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+    this->dataPtr->model->GetLink()->WorldLinearVel();
   ignition::math::Vector3d velNEDFrame =
     gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();

@@ -197,13 +197,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
-          contactFeedback->wrench[j].body1Force = localForce1;
-          contactFeedback->wrench[j].body1Torque = localTorque1;
+          contactFeedback->wrench[j].body1Force = localForce1.Ign();
+          contactFeedback->wrench[j].body1Torque = localTorque1.Ign();
         }
         if (!link2->IsStatic())
         {
-          contactFeedback->wrench[j].body2Force = localForce2;
-          contactFeedback->wrench[j].body2Torque = localTorque2;
+          contactFeedback->wrench[j].body2Force = localForce2.Ign();
+          contactFeedback->wrench[j].body2Torque = localTorque2.Ign();
         }
         contactFeedback->count++;
       }

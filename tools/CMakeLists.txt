@@ -1,4 +1,3 @@
-include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(
@@ -6,6 +5,7 @@ include_directories(
   ${tinyxml2_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -14,6 +14,7 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
   ${IGNITION-MATH_LIBRARY_DIRS}
 )
+set (CMAKE_AUTOMOC ON)
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
@@ -54,7 +55,8 @@ target_link_libraries(gz
  gazebo_gui
  gazebo_physics
  gazebo_sensors
- ${QT_LIBRARIES}
+ ${Qt5Core_LIBRARIES}
+ ${Qt5Widgets_LIBRARIES}
  ${Boost_LIBRARIES}
  ${IGNITION-TRANSPORT_LIBRARIES}
 )

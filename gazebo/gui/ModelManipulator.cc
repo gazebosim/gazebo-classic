@@ -1017,7 +1017,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1044,7 +1044,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (!this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1075,7 +1075,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(yaw - snap) < GZ_DTOR(10))
+      if (fabs(yaw - snap) < IGN_DTOR(10))
         yaw = snap;
     }
 
@@ -1091,7 +1091,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(pitch - snap) < GZ_DTOR(10))
+      if (fabs(pitch - snap) < IGN_DTOR(10))
         pitch = snap;
     }
 
@@ -1109,7 +1109,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(roll - snap) < GZ_DTOR(10))
+      if (fabs(roll - snap) < IGN_DTOR(10))
         roll = snap;
     }
 

@@ -26,11 +26,10 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
-
-#include "gazebo/math/Helpers.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -46,7 +45,7 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = ignition::math::MAX_D;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -58,7 +57,7 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = ignition::math::MAX_D;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 

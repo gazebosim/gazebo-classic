@@ -51,8 +51,9 @@ namespace gazebo
                                   ignition::math::Vector3d &_size,
                                   const double _mass);
 
-    // private: void MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-    //                           math::Vector3 &_size, double _mass);
+    // private: void MakeCylinder(const std::string &_name,
+    //    ignition::math::Vector3d &_pos,
+    //    ignition::math::Vector3d &_size, double _mass);
 
     private: class Obj
              {

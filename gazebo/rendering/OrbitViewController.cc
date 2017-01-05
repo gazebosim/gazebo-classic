@@ -164,6 +164,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     return;
 
   ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
+  drag *= this->camera->DevicePixelRatio();
 
   ignition::math::Vector3d directionVec(0, 0, 0);
 
@@ -409,7 +410,7 @@ void OrbitViewController::UpdateRefVisual()
 
   // Update the size of the referenve visual based on the distance to the
   // focal point.
-  double scale = this->distance * atan(GZ_DTOR(1.0));
+  double scale = this->distance * atan(IGN_DTOR(1.0));
   this->refVisual->SetScale(
       ignition::math::Vector3d(scale, scale, scale * 0.5));
 }

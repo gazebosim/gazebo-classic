@@ -308,7 +308,7 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
-  float max = GZ_FLT_MIN;
+  float max = ignition::math::MIN_F;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -321,7 +321,7 @@ float HeightmapShape::GetMaxHeight() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMinHeight() const
 {
-  float min = GZ_FLT_MAX;
+  float min = ignition::math::MAX_F;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)

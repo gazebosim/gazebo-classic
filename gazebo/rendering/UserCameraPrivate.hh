@@ -82,6 +82,9 @@ namespace gazebo
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
 
+      /// \brief Ratio of screen point to pixel.
+      public: double devicePixelRatio = 1.0;
+
       /// \brief Initial camera pose.
       public: ignition::math::Pose3d initialPose;
     };
