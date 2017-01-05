@@ -128,7 +128,7 @@ void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
   msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 

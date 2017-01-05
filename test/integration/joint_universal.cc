@@ -283,7 +283,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
   // move child link 90deg about both x and "rotated y axis" (z)
   link_00->SetWorldPose(ignition::math::Pose3d(
         0, 0, 2, 0.5*IGN_PI, 0, 0.5*IGN_PI));
-  EXPECT_NEAR(joint_00->Position(1), 0.5*IGN_PI, g_tolerance);;
+  EXPECT_NEAR(joint_00->Position(1), 0.5*IGN_PI, g_tolerance);
   EXPECT_EQ(joint_00->GlobalAxis(0), ignition::math::Vector3d::UnitX);
   EXPECT_EQ(joint_00->GlobalAxis(1),
     ignition::math::Vector3d(0, cos(0.5*IGN_PI), sin(0.5*IGN_PI)));
