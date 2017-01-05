@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport/Node.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Plugin.hh"
@@ -65,6 +66,12 @@ namespace gazebo
 
     private: double aeroLoad;
     private: double swayForce;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Transport Node for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

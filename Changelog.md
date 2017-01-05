@@ -7,6 +7,9 @@
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
 
+1. Added igntition::transport interfaces to header files
+    * [Pull request #2559](https://bitbucket.org/osrf/gazebo/pull-request/2559)
+
 1. Added ignition transport dependency, and output camera sensor images on
    an ignition transport topic.
     * [Pull request #2544](https://bitbucket.org/osrf/gazebo/pull-request/2544)
@@ -140,6 +143,7 @@
 1. Deprecate gazebo::math
     * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2579](https://bitbucket.org/osrf/gazebo/pull-request/2579)
     * [Pull request #2574](https://bitbucket.org/osrf/gazebo/pull-request/2574)
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2567](https://bitbucket.org/osrf/gazebo/pull-request/2567)
@@ -165,6 +169,8 @@
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
     * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
     * [Pull request #2577](https://bitbucket.org/osrf/gazebo/pull-request/2577)
+    * [Pull request #2566](https://bitbucket.org/osrf/gazebo/pull-request/2566)
+    * [Pull request #2578](https://bitbucket.org/osrf/gazebo/pull-request/2578)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

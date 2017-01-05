@@ -106,14 +106,22 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
@@ -126,7 +134,9 @@ foreach (src ${GUIplugins})
                         gazebo_gui
                         ${ogre_libraries}
                         ${Qt5Core_LIBRARIES}
-                        ${Qt5Widgets_LIBRARIES})
+                        ${Qt5Widgets_LIBRARIES}
+                        ${IGNITION-TRANSPORT_LIBRARIES}
+)
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()

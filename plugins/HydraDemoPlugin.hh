@@ -19,6 +19,7 @@
 #define GAZEBO_PLUGINS_HYDRADEMOPLUGIN_HH_
 
 #include <mutex>
+#include <ignition/transport/Node.hh>
 #include "gazebo/physics/physics.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
@@ -65,6 +66,12 @@ namespace gazebo
 
     /// \brief Store the last message from hydra.
     private: boost::shared_ptr<const gazebo::msgs::Hydra> hydraMsgPtr;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node used for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

@@ -209,6 +209,7 @@ target_link_libraries(gazebo_gui
   ${tinyxml_LIBRARIES}
   ${QWT_LIBRARY}
   ${IGNITION-MSGS_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (UNIX)

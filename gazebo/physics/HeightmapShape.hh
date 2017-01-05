@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include <ignition/math/Vector2.hh>
 
@@ -186,6 +187,15 @@ namespace gazebo
       /// \brief DEM used to generate the heights.
       private: common::Dem dem;
       #endif
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition transportation node.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Igniiont publisher for request response messages.
+      private: ignition::transport::Node::Publisher responsePubIgn;
     };
     /// \}
   }

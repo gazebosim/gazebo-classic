@@ -16,6 +16,7 @@
  */
 #ifndef GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
 #define GAZEBO_PLUGINS_CARTDEMOPLUGIN_HH_
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
@@ -53,6 +54,12 @@ namespace gazebo
     private: double jointMaxEfforts[NUM_JOINTS];
 
     private: common::Time prevUpdateTime;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition communication node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif
