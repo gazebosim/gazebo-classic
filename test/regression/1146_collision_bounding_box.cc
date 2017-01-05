@@ -15,9 +15,9 @@
  *
 */
 
-#include "gazebo/test/ServerFixture.hh"
 #include <ignition/math/Box.hh>
 #include <ignition/math/Vector3.hh>
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
