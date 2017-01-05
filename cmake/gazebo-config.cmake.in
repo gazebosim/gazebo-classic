@@ -169,7 +169,14 @@ list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
   ${OGRE_Paging_LIBRARIES})
 
 # Find Ignition Math
-find_package(ignition-math3 REQUIRED)
+find_package(ignition-math3 QUIET)
+if (NOT ignition-math3_FOUND)
+  find_package(ignition-math2 2.7 QUIET)
+  if (NOT ignition-math2_FOUND)
+    message (FATAL_ERROR "Missing: Ignition math (libignition-math3-dev or libignition-math2-dev)")
+  endif()
+endif()
+
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MATH_LIBRARIES})
