@@ -66,17 +66,17 @@ void BulletHinge2Joint::Init()
     gzthrow("BulletHinge2Joint cannot be connected to the world (child)");
 
   sdf::ElementPtr axis1Elem = this->sdf->GetElement("axis");
-  math::Vector3 axis1 = axis1Elem->Get<math::Vector3>("xyz");
+  auto axis1 = axis1Elem->Get<ignition::math::Vector3d>("xyz");
 
   sdf::ElementPtr axis2Elem = this->sdf->GetElement("axis2");
-  math::Vector3 axis2 = axis2Elem->Get<math::Vector3>("xyz");
+  auto axis2 = axis2Elem->Get<ignition::math::Vector3d>("xyz");
 
   // TODO: should check that axis1 and axis2 are orthogonal unit vectors
 
   btVector3 banchor(this->anchorPos.X(), this->anchorPos.Y(),
                     this->anchorPos.Z());
-  btVector3 baxis1(axis1.x, axis1.y, axis1.z);
-  btVector3 baxis2(axis2.x, axis2.y, axis2.z);
+  btVector3 baxis1(axis1.X(), axis1.Y(), axis1.Z());
+  btVector3 baxis2(axis2.X(), axis2.Y(), axis2.Z());
 
   this->bulletHinge2 = new btHinge2Constraint(
       *bulletParentLink->GetBulletLink(),
@@ -97,7 +97,8 @@ void BulletHinge2Joint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletHinge2Joint::Anchor(
+    const unsigned int /*index*/) const
 {
   return this->anchorPos;
 }
@@ -108,11 +109,11 @@ math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
   if (!this->bulletHinge2)
   {
     gzerr << "Joint must be created first.\n";
-    return math::Vector3();
+    return ignition::math::Vector3d();
   }
 
   btVector3 vec = this->bulletHinge2->getAxis1();
-  return math::Vector3(vec.getX(), vec.getY(), vec.getZ());
+  return ignition::math::Vector3d(vec.getX(), vec.getY(), vec.getZ());
 }
 
 //////////////////////////////////////////////////
@@ -129,12 +130,12 @@ void BulletHinge2Joint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
 }
 
 //////////////////////////////////////////////////
-void BulletHinge2Joint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &/*_axis*/)
+void BulletHinge2Joint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &/*_axis*/)
 {
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3 vec(_axis.x, _axis.y, _axis.z);
+  /*btmath::Vector3d vec(_axis.X(), _axis.Y(), _axis.Z());
   ((btHingeConstraint*)this->btHinge)->setAxis(vec);
   */
 }
@@ -221,10 +222,11 @@ double BulletHinge2Joint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletHinge2Joint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
-  gzerr << "BulletHinge2Joint::GetGlobalAxis not implemented\n";
-  return math::Vector3();
+  gzerr << "BulletHinge2Joint::GlobalAxis not implemented\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////

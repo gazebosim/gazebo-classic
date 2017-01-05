@@ -54,11 +54,12 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
 
@@ -66,15 +67,16 @@ math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int _index) const
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3(worldOrigin).Ign();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Axis" + std::to_string(_index));
   }
 
@@ -110,12 +112,12 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3(globalAxis).Ign();
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAxis(unsigned int _index,
-    const math::Vector3 &_axis)
+void DARTUniversalJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -126,7 +128,7 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
   }
 
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-      this->AxisFrameOffset(_index).RotateVector(_axis.Ign()));
+      this->AxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
       = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
   dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;

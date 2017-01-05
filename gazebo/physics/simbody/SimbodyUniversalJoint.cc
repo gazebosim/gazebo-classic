@@ -47,7 +47,8 @@ void SimbodyUniversalJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyUniversalJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -59,8 +60,8 @@ math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyUniversalJoint::SetAxis(unsigned int /*_index*/,
-                                   const math::Vector3 &/*_axis*/)
+void SimbodyUniversalJoint::SetAxis(const unsigned int /*_index*/,
+                                   const ignition::math::Vector3d &/*_axis*/)
 {
   /// Universal Joint are built in SimbodyPhysics.cc, so this init block
   /// actually does nothing.
@@ -127,7 +128,7 @@ void SimbodyUniversalJoint::SetForceImpl(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
+ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
     unsigned int _index) const
 {
   if (this->simbodyPhysics &&
@@ -146,7 +147,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
           this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_IF.x()));
 
-        return SimbodyPhysics::Vec3ToVector3(x_W);
+        return SimbodyPhysics::Vec3ToVector3(x_W).Ign();
       }
       else if (_index == UniversalJoint::AXIS_CHILD)
       {
@@ -158,12 +159,12 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
           this->mobod.expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_OM.y()));
 
-        return SimbodyPhysics::Vec3ToVector3(y_W);
+        return SimbodyPhysics::Vec3ToVector3(y_W).Ign();
       }
       else
       {
-        gzerr << "GetGlobalAxis: internal error, DOF < 0.\n";
-        return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+        gzerr << "GlobalAxis: internal error, DOF < 0.\n";
+        return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
       }
     }
     else
@@ -173,7 +174,7 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
       return this->AxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index).Ign());
+        this->LocalAxis(_index));
     }
   }
   else
@@ -181,17 +182,17 @@ math::Vector3 SimbodyUniversalJoint::GetGlobalAxis(
     if (_index >= this->DOF())
     {
       gzerr << "index out of bound\n";
-      return math::Vector3(SimTK::NaN, SimTK::NaN, SimTK::NaN);
+      return ignition::math::Vector3d(SimTK::NaN, SimTK::NaN, SimTK::NaN);
     }
     else
     {
-      gzdbg << "GetGlobalAxis() sibmody physics engine not yet initialized, "
+      gzdbg << "GlobalAxis() sibmody physics engine not yet initialized, "
             << "use local axis and initial pose to compute "
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
       return this->AxisFrame(_index).RotateVector(
-        this->GetLocalAxis(_index).Ign());
+        this->LocalAxis(_index));
     }
   }
 }

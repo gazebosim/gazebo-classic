@@ -16,6 +16,8 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/math/Vector3.hh"
@@ -40,7 +42,7 @@ class FakeJoint : public physics::Joint
   public: virtual bool AreConnected(physics::LinkPtr, physics::LinkPtr) const
           {return true;}
 
-  public: virtual void SetAxis(unsigned int, const math::Vector3 &)
+  public: virtual void SetAxis(unsigned int, const ignition::math::Vector3d &)
           {}
 
   public: virtual void SetDamping(unsigned int, double)
@@ -53,14 +55,15 @@ class FakeJoint : public physics::Joint
   public: virtual void SetStiffness(unsigned int , double)
           {}
 
-  public: virtual math::Vector3 GetGlobalAxis(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d GlobalAxis(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual void SetAnchor(unsigned int, const math::Vector3 &)
+  public: virtual void SetAnchor(const unsigned int,
+          const ignition::math::Vector3d &)
           {}
 
-  public: virtual math::Vector3 GetAnchor(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d Anchor(unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
   public: virtual double UpperLimit(unsigned int) const
           {return 0.0;}
@@ -83,11 +86,11 @@ class FakeJoint : public physics::Joint
   public: virtual unsigned int DOF() const
           {return 0;}
 
-  public: virtual math::Vector3 GetLinkForce(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d LinkForce(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
-  public: virtual math::Vector3 GetLinkTorque(unsigned int) const
-          {return math::Vector3::Zero;}
+  public: virtual ignition::math::Vector3d LinkTorque(const unsigned int) const
+          {return ignition::math::Vector3d::Zero;}
 
   public: virtual void SetAttribute(const std::string &, unsigned int,
               const boost::any &)

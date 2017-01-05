@@ -87,6 +87,13 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
+  this->Load(_parent, _child, _pose.Ign());
+}
+
+//////////////////////////////////////////////////
+void Joint::Load(LinkPtr _parent, LinkPtr _child,
+                 const ignition::math::Pose3d &_pose)
+{
   if (_parent)
   {
     this->world = _parent->GetWorld();
@@ -107,7 +114,7 @@ void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
   // Initialize this->sdf so it can be used for data storage
   this->sdf = this->sdfJoint->Clone();
 
-  this->LoadImpl(_pose.Ign());
+  this->LoadImpl(_pose);
 }
 
 //////////////////////////////////////////////////
@@ -373,7 +380,7 @@ void Joint::Init()
   if (this->DOF() >= 1 && this->sdf->HasElement("axis"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis");
-    this->SetAxis(0, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(0, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -390,7 +397,7 @@ void Joint::Init()
   if (this->DOF() >= 2 && this->sdf->HasElement("axis2"))
   {
     sdf::ElementPtr axisElem = this->sdf->GetElement("axis2");
-    this->SetAxis(1, axisElem->Get<math::Vector3>("xyz"));
+    this->SetAxis(1, axisElem->Get<ignition::math::Vector3d>("xyz"));
     if (axisElem->HasElement("limit"))
     {
       sdf::ElementPtr limitElem = axisElem->GetElement("limit");
@@ -433,13 +440,19 @@ void Joint::Fini()
 //////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
-  math::Vector3 vec;
+  return this->LocalAxis(_index);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Joint::LocalAxis(const unsigned int _index) const
+{
+  ignition::math::Vector3d vec;
 
   if (_index == 0 && this->sdf->HasElement("axis"))
-    vec = this->sdf->GetElement("axis")->Get<math::Vector3>("xyz");
+    vec = this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz");
   else if (this->sdf->HasElement("axis2"))
-    vec = this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz");
-  // vec = this->childLink->GetWorldPose().rot.RotateVectorReverse(vec);
+    vec = this->sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz");
+  // vec = this->childLink->GetWorldPose().Rot().RotateVectorReverse(vec);
   // vec.Round();
   return vec;
 }
@@ -630,7 +643,7 @@ void Joint::FillMsg(msgs::Joint &_msg)
     else
       break;
 
-    msgs::Set(axis->mutable_xyz(), this->GetLocalAxis(i).Ign());
+    msgs::Set(axis->mutable_xyz(), this->LocalAxis(i));
     axis->set_limit_lower(this->LowerLimit(i));
     axis->set_limit_upper(this->UpperLimit(i));
     axis->set_limit_effort(this->GetEffortLimit(i));
@@ -824,7 +837,7 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         auto childLinkPose = this->childLink->WorldPose();
 
         // Compute new child link pose based on position change
-        auto newChildLinkPose =
+        ignition::math::Pose3d newChildLinkPose =
           this->ChildLinkPose(_index, _position);
 
         // debug
@@ -908,11 +921,11 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       this->HasType(Base::UNIVERSAL_JOINT))
   {
     // Desired angular and linear velocity in world frame for child link
-    math::Vector3 angularVel, linearVel;
+    ignition::math::Vector3d angularVel, linearVel;
     if (this->parentLink)
     {
       // Use parent link velocity as reference (if parent exists)
-      angularVel = this->parentLink->GetWorldAngularVel();
+      angularVel = this->parentLink->GetWorldAngularVel().Ign();
 
       // Get parent linear velocity at joint anchor
       // Passing unit quaternion q ensures that parentOffset will be
@@ -920,18 +933,18 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       ignition::math::Quaterniond q;
       auto parentOffset =
         this->ParentWorldPose().Pos() - this->parentLink->WorldPose().Pos();
-      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q);
+      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
     }
 
     // Add desired velocity along specified axis
-    angularVel += _velocity * this->GetGlobalAxis(_index);
+    angularVel += _velocity * this->GlobalAxis(_index);
 
     if (this->HasType(Base::UNIVERSAL_JOINT))
     {
       // For multi-axis joints, retain velocity of other axis.
       unsigned int otherIndex = (_index + 1) % 2;
       angularVel += this->GetVelocity(otherIndex)
-                  * this->GetGlobalAxis(otherIndex);
+                  * this->GlobalAxis(otherIndex);
     }
 
     this->childLink->SetAngularVel(angularVel);
@@ -946,12 +959,12 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
   }
   else if (this->HasType(Base::SLIDER_JOINT))
   {
-    math::Vector3 desiredVel;
+    ignition::math::Vector3d desiredVel;
     if (this->parentLink)
     {
-      desiredVel = this->parentLink->GetWorldLinearVel();
+      desiredVel = this->parentLink->GetWorldLinearVel().Ign();
     }
-    desiredVel += _velocity * this->GetGlobalAxis(_index);
+    desiredVel += _velocity * this->GlobalAxis(_index);
     this->childLink->SetLinearVel(desiredVel);
   }
   else
@@ -1017,8 +1030,14 @@ void Joint::ApplyStiffnessDamping()
         << "physics engines.\n";
 }
 
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
+{
+  return this->InertiaRatio(_axis.Ign());
+}
+
+//////////////////////////////////////////////////
+double Joint::InertiaRatio(const ignition::math::Vector3d &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
@@ -1026,8 +1045,8 @@ double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
     auto cm = this->childLink->WorldInertiaMatrix();
 
     // matrix times axis
-    ignition::math::Vector3d pia = pm * _axis.Ign();
-    ignition::math::Vector3d cia = cm * _axis.Ign();
+    ignition::math::Vector3d pia = pm * _axis;
+    ignition::math::Vector3d cia = cm * _axis;
     double piam = pia.Length();
     double ciam = cia.Length();
 
@@ -1058,10 +1077,10 @@ double Joint::GetInertiaRatio(const unsigned int _index) const
     if (_index < this->DOF())
     {
       // joint axis in global frame
-      math::Vector3 axis = this->GetGlobalAxis(_index);
+      ignition::math::Vector3d axis = this->GlobalAxis(_index);
 
       // compute ratio about axis
-      return this->GetInertiaRatio(axis);
+      return this->InertiaRatio(axis);
     }
     else
     {
@@ -1523,7 +1542,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
 
   // default return to current pose
   ignition::math::Pose3d newRelativePose;
-  auto newWorldPose = childLinkPose;
+  ignition::math::Pose3d newWorldPose = childLinkPose;
 
   // get anchor and axis of the joint
   ignition::math::Vector3d anchor;
@@ -1531,15 +1550,15 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
 
   if (this->model->IsStatic())
   {
-    /// \TODO: we want to get axis in global frame, but GetGlobalAxis
+    /// \TODO: we want to get axis in global frame, but GlobalAxis
     /// not implemented for static models yet.
-    axis = childLinkPose.Rot().RotateVector(this->GetLocalAxis(_index).Ign());
+    axis = childLinkPose.Rot().RotateVector(this->LocalAxis(_index));
     anchor = childLinkPose.Pos();
   }
   else
   {
-    anchor = this->GetAnchor(_index).Ign();
-    axis = this->GetGlobalAxis(_index).Ign();
+    anchor = this->Anchor(_index);
+    axis = this->GlobalAxis(_index);
   }
 
   // delta-position along an axis
@@ -1550,7 +1569,7 @@ ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
   {
     // relative to anchor point
     ignition::math::Pose3d relativePose(childLinkPose.Pos() - anchor,
-                                        childLinkPose.Rot());
+                            childLinkPose.Rot());
 
     // take axis rotation and turn it into a quaternion
     ignition::math::Quaterniond rotation(axis, dposition);
@@ -1660,4 +1679,40 @@ math::Angle Joint::GetAngleImpl(unsigned int _index) const
 #ifndef _WIN32
   #pragma GCC diagnostic pop
 #endif
+}
+
+/////////////////////////////////////////////////
+void Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+{
+  this->SetAxis(_index, _axis.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Joint::GetGlobalAxis(unsigned int _index) const
+{
+  return this->GlobalAxis(_index);
+}
+
+/////////////////////////////////////////////////
+void Joint::SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
+{
+  this->SetAnchor(_index, _anchor.Ign());
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Joint::GetAnchor(unsigned int _index) const
+{
+  return this->Anchor(_index);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Joint::GetLinkForce(unsigned int _index) const
+{
+  return this->LinkForce(_index);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Joint::GetLinkTorque(const unsigned int _index) const
+{
+  return this->LinkTorque(_index);
 }

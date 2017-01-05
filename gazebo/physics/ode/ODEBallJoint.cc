@@ -42,7 +42,8 @@ ODEBallJoint::~ODEBallJoint()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
@@ -50,19 +51,19 @@ math::Vector3 ODEBallJoint::GetAnchor(unsigned int /*_index*/) const
   else
   {
     gzerr << "ODE Joint ID is invalid\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+void ODEBallJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->jointId)
-    dJointSetBallAnchor(jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetBallAnchor(jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
@@ -74,9 +75,10 @@ void ODEBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
-  return math::Vector3();
+  return ignition::math::Vector3d();
 }
 
 //////////////////////////////////////////////////
@@ -98,8 +100,8 @@ double ODEBallJoint::PositionImpl(const unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
-void ODEBallJoint::SetAxis(unsigned int /*_index*/,
-                            const math::Vector3 &/*_axis*/)
+void ODEBallJoint::SetAxis(const unsigned int /*_index*/,
+                            const ignition::math::Vector3d &/*_axis*/)
 {
   gzerr << "ODEBallJoint::SetAxis not implemented" << std::endl;
 }

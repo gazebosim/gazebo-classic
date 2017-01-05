@@ -1237,7 +1237,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
         {
           // anchor position in world frame
-          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+          math::Vector3 anchorPos = parentJoints[j]->Anchor(0);
 
           // anchor pose in child link frame
           math::Pose anchorInChild =
@@ -1312,7 +1312,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
         for (unsigned int j = 0; j < parentJoints.size(); ++j)
         {
           // anchor position in world frame
-          math::Vector3 anchorPos = parentJoints[j]->GetAnchor(0);
+          math::Vector3 anchorPos = parentJoints[j]->Anchor(0);
 
           // anchor pose in child link frame
           math::Pose anchorInChild =

@@ -118,15 +118,16 @@ void BulletScrewJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletScrewJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d BulletScrewJoint::Anchor(
+    const unsigned int /*index*/) const
 {
-  gzerr << "BulletScrewJoint::GetAnchor not implemented, return 0 vector.\n";
-  return math::Vector3();
+  gzerr << "BulletScrewJoint::Anchor not implemented, return 0 vector.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &/*_anchor*/)
+void BulletScrewJoint::SetAnchor(const unsigned int /*index*/,
+    const ignition::math::Vector3d &/*_anchor*/)
 {
   gzerr << "BulletScrewJoint::SetAnchor not implemented.\n";
 }
@@ -142,8 +143,8 @@ void BulletScrewJoint::Init()
     boost::static_pointer_cast<BulletLink>(this->parentLink);
 
   // Get axis unit vector (expressed in world frame).
-  math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  ignition::math::Vector3d axis = this->initialWorldAxis;
+  if (axis == ignition::math::Vector3d::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
@@ -151,8 +152,8 @@ void BulletScrewJoint::Init()
 
   // Local variables used to compute pivots and axes in body-fixed frames
   // for the parent and child links.
-  math::Vector3 pivotParent, pivotChild, axisParent, axisChild;
-  math::Pose pose;
+  ignition::math::Vector3d pivotParent, pivotChild, axisParent, axisChild;
+  ignition::math::Pose3d pose;
   btTransform frameParent, frameChild;
   btVector3 axis2, axis3;
 
@@ -165,39 +166,39 @@ void BulletScrewJoint::Init()
   if (this->parentLink)
   {
     // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    pose = this->parentLink->GetWorldCoGPose().Ign();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotParent -= pose.pos;
+    pivotParent -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of parent.
-    pivotParent = pose.rot.RotateVectorReverse(pivotParent);
+    pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
-    axisParent = pose.rot.RotateVectorReverse(axis);
+    axisParent = pose.Rot().RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisParent), axis2, axis3);
     frameParent.getBasis().setValue(
-      axisParent.x, axis2.x(), axis3.x(),
-      axisParent.y, axis2.y(), axis3.y(),
-      axisParent.z, axis2.z(), axis3.z());
+      axisParent.X(), axis2.x(), axis3.x(),
+      axisParent.Y(), axis2.y(), axis3.y(),
+      axisParent.Z(), axis2.z(), axis3.z());
   }
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
     // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    pose = this->childLink->GetWorldCoGPose().Ign();
     // Subtract CoG position from anchor position, both in world frame.
-    pivotChild -= pose.pos;
+    pivotChild -= pose.Pos();
     // Rotate pivot offset and axis into body-fixed frame of child.
-    pivotChild = pose.rot.RotateVectorReverse(pivotChild);
+    pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
-    axisChild = pose.rot.RotateVectorReverse(axis);
+    axisChild = pose.Rot().RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();
     // The following math is based on btHingeConstraint.cpp:95-115
     btPlaneSpace1(BulletTypes::ConvertVector3(axisChild), axis2, axis3);
     frameChild.getBasis().setValue(
-      axisChild.x, axis2.x(), axis3.x(),
-      axisChild.y, axis2.y(), axis3.y(),
-      axisChild.z, axis2.z(), axis3.z());
+      axisChild.X(), axis2.x(), axis3.x(),
+      axisChild.Y(), axis2.y(), axis3.y(),
+      axisChild.Z(), axis2.z(), axis3.z());
   }
 
   // If both links exist, then create a joint between the two links.
@@ -282,28 +283,28 @@ void BulletScrewJoint::Init()
 double BulletScrewJoint::GetVelocity(unsigned int /*_index*/) const
 {
   double result = 0;
-  math::Vector3 globalAxis = this->GetGlobalAxis(0);
+  ignition::math::Vector3d globalAxis = this->GlobalAxis(0);
   if (this->childLink)
-    result += globalAxis.Dot(this->childLink->GetWorldLinearVel());
+    result += globalAxis.Dot(this->childLink->GetWorldLinearVel().Ign());
   if (this->parentLink)
-    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel());
+    result -= globalAxis.Dot(this->parentLink->GetWorldLinearVel().Ign());
   return result;
 }
 
 //////////////////////////////////////////////////
 void BulletScrewJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  math::Vector3 desiredVel;
+  ignition::math::Vector3d desiredVel;
   if (this->parentLink)
-    desiredVel = this->parentLink->GetWorldLinearVel();
-  desiredVel += _vel * this->GetGlobalAxis(_index);
+    desiredVel = this->parentLink->GetWorldLinearVel().Ign();
+  desiredVel += _vel * this->GlobalAxis(_index);
   if (this->childLink)
     this->childLink->SetLinearVel(desiredVel);
 }
 
 //////////////////////////////////////////////////
-void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
-    const math::Vector3 &_axis)
+void BulletScrewJoint::SetAxis(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_axis)
 {
   // Note that _axis is given in a world frame,
   // but bullet uses a body-fixed frame
@@ -311,7 +312,7 @@ void BulletScrewJoint::SetAxis(unsigned int /*_index*/,
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
     auto axisFrame = this->AxisFrame(0);
-    this->initialWorldAxis = axisFrame.RotateVector(_axis.Ign());
+    this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
   {
@@ -537,16 +538,17 @@ void BulletScrewJoint::SetLowerLimit(const unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletScrewJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d BulletScrewJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
-  math::Vector3 result = this->initialWorldAxis;
+  ignition::math::Vector3d result = this->initialWorldAxis;
   if (this->bulletScrew)
   {
     // bullet uses x-axis for slider
     btVector3 vec =
       this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec);
+    result = BulletTypes::ConvertVector3(vec).Ign();
   }
   else
     gzwarn << "bulletScrew does not exist, returning fake axis\n";

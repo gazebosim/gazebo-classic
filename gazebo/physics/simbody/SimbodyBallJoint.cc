@@ -48,7 +48,8 @@ void SimbodyBallJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyBallJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   return this->anchorPos;
 }
@@ -67,10 +68,11 @@ double SimbodyBallJoint::GetVelocity(unsigned int /*_index*/) const
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyBallJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyBallJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implemented\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
@@ -87,8 +89,8 @@ void SimbodyBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyBallJoint::SetAxis(unsigned int /*_index*/,
-                               const math::Vector3 &/*_axis*/)
+void SimbodyBallJoint::SetAxis(const unsigned int /*_index*/,
+                               const ignition::math::Vector3d &/*_axis*/)
 {
   gzerr << "SimbodyBallJoint::SetAxis not implemented" << std::endl;
 }

@@ -83,7 +83,8 @@ void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -94,14 +95,15 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else
   {
     gzerr << "index [" << _index << "] out of range\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEGearboxJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -112,7 +114,7 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 
   /// ODE needs global axis
   auto axisFrame = this->AxisFrame(_index);
-  auto globalAxis = axisFrame.RotateVector(_axis.Ign());
+  auto globalAxis = axisFrame.RotateVector(_axis);
 
   if (_index == 0)
   {
@@ -173,15 +175,16 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEGearboxJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
-  gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";
-  return math::Vector3::Zero;
+  gzlog << "ODEGearboxJoint::Anchor not implemented.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAnchor(unsigned int /*_index*/,
-  const math::Vector3 &/*_anchor*/)
+void ODEGearboxJoint::SetAnchor(const unsigned int /*_index*/,
+  const ignition::math::Vector3d &/*_anchor*/)
 {
   gzlog << "ODEGearboxJoint::SetAnchor not implemented.\n";
 }

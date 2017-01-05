@@ -1043,7 +1043,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0).Ign())));
+            gzJoint->LocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
@@ -1097,11 +1097,11 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
           gzJoint->AxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT).Ign())));
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
         /// \TODO: check if this is right, or AxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
           gzJoint->AxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD).Ign())));
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -1162,12 +1162,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0).Ign())));
+            gzJoint->LocalAxis(0))));
 
-        // gzerr << "[" << gzJoint->AxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->AxisFrameOffset(0).Euler()
         //       << "] ["
         //       << gzJoint->AxisFrameOffset(0).RotateVector(
-        //          gzJoint->GetLocalAxis(0).Ign()) << "]\n";
+        //          gzJoint->LocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -1208,7 +1208,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
             gzJoint->AxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0).Ign())));
+            gzJoint->LocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);

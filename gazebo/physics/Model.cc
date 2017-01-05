@@ -28,6 +28,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Pose3.hh>
 #include <ignition/msgs/plugin_v.pb.h>
 #include <sstream>
 
@@ -1520,7 +1521,7 @@ gazebo::physics::JointPtr Model::CreateJoint(
   joint->SetName(_name);
   joint->Attach(_parent, _child);
   // need to call Joint::Load to clone Joint::sdfJoint into Joint::sdf
-  joint->Load(_parent, _child, gazebo::math::Pose());
+  joint->Load(_parent, _child, ignition::math::Pose3d::Zero);
   this->joints.push_back(joint);
   return joint;
 }
