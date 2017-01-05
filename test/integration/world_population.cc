@@ -88,7 +88,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
         boost::lexical_cast<std::string>(i * 3 + j));
       physics::ModelPtr model = world->ModelByName(name);
       ASSERT_TRUE(model != NULL);
-      math::Vector3 pos = model->WorldPose().Pos();
+      auto pos = model->WorldPose().Pos();
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
 
       expectedPos.X() += step.X();
