@@ -110,7 +110,7 @@ void ODEUniversalJoint::SetAxis(const unsigned int _index,
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  auto axisFrame = this->GetAxisFrame(_index).Ign();
+  auto axisFrame = this->AxisFrame(_index);
   auto globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)

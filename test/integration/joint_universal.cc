@@ -179,10 +179,9 @@ void JointTestUniversal::SetVelocity(const std::string &_physicsEngine)
 
   // Expect child link velocity to match parent at joint anchor
   {
-    auto childOffset = jointLower->GetWorldPose().pos.Ign() -
+    auto childOffset = jointLower->WorldPose().Pos() -
       jointLower->GetChild()->WorldPose().Pos();
-    ignition::math::Vector3d parentOffset =
-      jointLower->GetWorldPose().pos.Ign() -
+    auto parentOffset = jointLower->WorldPose().Pos() -
       jointLower->GetParent()->WorldPose().Pos();
     ignition::math::Quaterniond q;
 

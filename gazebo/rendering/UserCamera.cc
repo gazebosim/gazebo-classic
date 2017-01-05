@@ -627,6 +627,33 @@ void UserCamera::OnMoveToVisualComplete()
       this->dataPtr->orbitViewController->FocalPoint()));
 }
 
+
+//////////////////////////////////////////////////
+void UserCamera::SetDevicePixelRatio(const double _ratio)
+{
+  this->dataPtr->devicePixelRatio = _ratio;
+}
+
+//////////////////////////////////////////////////
+double UserCamera::DevicePixelRatio() const
+{
+  return this->dataPtr->devicePixelRatio;
+}
+
+
+//////////////////////////////////////////////////
+void UserCamera::CameraToViewportRay(const int _screenx,
+    const int _screeny,
+    ignition::math::Vector3d &_origin,
+    ignition::math::Vector3d &_dir) const
+{
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  int screenx = ratio * _screenx;
+  int screeny = ratio * _screeny;
+
+  Camera::CameraToViewportRay(screenx, screeny, _origin, _dir);
+}
+
 //////////////////////////////////////////////////
 void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
@@ -689,9 +716,12 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
   if (!this->dataPtr->selectionBuffer)
     return result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(
-        _mousePos.X(), _mousePos.Y());
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(
+      ratio * _mousePos.X(), ratio * _mousePos.Y());
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   _mod = "";
   if (entity)
@@ -756,9 +786,12 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(
-        _mousePos.X(), _mousePos.Y());
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(
+      ratio * _mousePos.X(), ratio * _mousePos.Y());
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {
@@ -909,4 +942,12 @@ bool UserCamera::SetProjectionType(const std::string &_type)
     this->SetViewController(this->dataPtr->prevViewControllerName);
 
   return Camera::SetProjectionType(_type);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i UserCamera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  auto pt = Camera::Project(_pt);
+  return pt / this->dataPtr->devicePixelRatio;
 }
