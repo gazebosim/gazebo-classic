@@ -158,11 +158,11 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
 
   // test GetLocalAxis, GetAxisFrame, and GetAxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
-  ignition::math::Vector3d axisLocalFrame = _joint->GetLocalAxis(0);
+  ignition::math::Vector3d axisLocalFrame = _joint->GetLocalAxis(0).Ign();
   {
     // rotate axis into global frame
     ignition::math::Vector3d axisGlobalFrame =
-      _joint->GetAxisFrame(0).RotateVector(axisLocalFrame);
+      _joint->GetAxisFrame(0).Ign().RotateVector(axisLocalFrame);
     // Test GetAxisFrame: check that axis in global frame is
     // computed correctly.
     EXPECT_EQ(axisGlobalFrame, _axis);
@@ -170,7 +170,7 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   {
     // rotate axis into joint frame
     ignition::math::Vector3d axisJointFrame =
-      _joint->GetAxisFrameOffset(0).RotateVector(axisLocalFrame);
+      _joint->GetAxisFrameOffset(0).Ign().RotateVector(axisLocalFrame);
     // roate axis specified in global frame into joint frame
     ignition::math::Vector3d axisJointFrame2 =
       _joint->GetWorldPose().Ign().Rot().RotateVectorReverse(_axis);
