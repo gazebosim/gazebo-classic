@@ -185,21 +185,22 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   ASSERT_TRUE(child != NULL);
   ASSERT_TRUE(parent != NULL);
 
-  math::Vector3 pos(10, 10, 10);
-  math::Vector3 vel(10, 10, 10);
-  parent->SetWorldPose(math::Pose(pos, math::Quaternion()));
+  ignition::math::Vector3d pos(10, 10, 10);
+  ignition::math::Vector3d vel(10, 10, 10);
+  parent->SetWorldPose(ignition::math::Pose3d(pos,
+        ignition::math::Quaterniond::Identity));
   for (unsigned int i = 0; i < 10; ++i)
   {
     parent->SetLinearVel(vel);
     world->Step(10);
   }
   world->Step(50);
-  math::Pose childPose = child->WorldPose();
-  math::Pose parentPose = parent->WorldPose();
-  EXPECT_TRUE(parentPose.pos != pos);
-  EXPECT_TRUE(parentPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos != math::Vector3::Zero);
-  EXPECT_TRUE(childPose.pos == parentPose.pos);
+  ignition::math::Pose3d childPose = child->WorldPose();
+  ignition::math::Pose3d parentPose = parent->WorldPose();
+  EXPECT_TRUE(parentPose.Pos() != pos);
+  EXPECT_TRUE(parentPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() != ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(childPose.Pos() == parentPose.Pos());
   EXPECT_EQ(joint->GetWorldPose().pos, joint->GetParentWorldPose().pos);
   EXPECT_EQ(joint->GetAnchorErrorPose().pos, math::Vector3::Zero);
 }

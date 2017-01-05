@@ -139,8 +139,7 @@ bool AltimeterSensor::UpdateImpl(const bool /*_force*/)
     ignition::math::Pose3d altPose = this->pose + parentPose;
 
     ignition::math::Vector3d altVel =
-      this->dataPtr->parentLink->GetWorldLinearVel(
-          this->pose.Pos()).Ign();
+      this->dataPtr->parentLink->WorldLinearVel(this->pose.Pos());
 
     // Apply noise to the position and velocity
     if (this->noises.find(ALTIMETER_POSITION_NOISE_METERS) !=

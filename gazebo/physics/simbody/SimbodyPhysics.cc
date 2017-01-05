@@ -1000,10 +1000,10 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         }
         else
           inboard_X_ML =
-            SimbodyPhysics::Pose2Transform(gzInb->GetRelativePose());
+            SimbodyPhysics::Pose2Transform(gzInb->RelativePose());
 
         SimTK::Transform outboard_X_ML =
-          SimbodyPhysics::Pose2Transform(gzOutb->GetRelativePose());
+          SimbodyPhysics::Pose2Transform(gzOutb->RelativePose());
 
         // defX_ML link frame specified in model frame
         freeJoint.setDefaultTransform(~inboard_X_ML*outboard_X_ML);
@@ -1415,7 +1415,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
                              ci !=  collisions.end(); ++ci)
   {
     Transform X_LC =
-      SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
+      SimbodyPhysics::Pose2Transform((*ci)->RelativePose());
 
     // use pointer to store CollisionGeometry
     SimbodyCollisionPtr sc =
@@ -1570,11 +1570,24 @@ math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
 }
 
 /////////////////////////////////////////////////
+ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3Ign(const SimTK::Vec3 &_v)
+{
+  return ignition::math::Vector3d(_v[0], _v[1], _v[2]);
+}
+
+/////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::Pose2Transform(const math::Pose &_pose)
 {
-  SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
-                   _pose.rot.z);
-  SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  return Pose2Transform(_pose.Ign());
+}
+
+/////////////////////////////////////////////////
+SimTK::Transform SimbodyPhysics::Pose2Transform(
+    const ignition::math::Pose3d &_pose)
+{
+  SimTK::Quaternion q(_pose.Rot().W(), _pose.Rot().X(), _pose.Rot().Y(),
+                   _pose.Rot().Z());
+  SimTK::Vec3 v(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
 }

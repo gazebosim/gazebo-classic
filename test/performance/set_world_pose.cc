@@ -31,7 +31,7 @@ TEST_F(SetWorldPoseTest, Stress)
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
-  math::Pose pose(1, 2, 3, 0, 0, 0);
+  ignition::math::Pose3d pose(1, 2, 3, 0, 0, 0);
 
   common::Time startTime = common::Time::GetWallTime();
   for (unsigned int i = 0; i < 10000000; ++i)

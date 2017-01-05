@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Cylinder shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETCYLINDERSHAPE_HH_
-#define _BULLETCYLINDERSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETCYLINDERSHAPE_HH_
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletLink.hh"
@@ -110,9 +105,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    ignition::math::Pose3d relativePose =
+                        this->collisionParent->RelativePose();
+                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

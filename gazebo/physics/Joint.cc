@@ -925,15 +925,16 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     if (this->parentLink)
     {
       // Use parent link velocity as reference (if parent exists)
-      angularVel = this->parentLink->GetWorldAngularVel().Ign();
+      angularVel = this->parentLink->WorldAngularVel();
 
       // Get parent linear velocity at joint anchor
       // Passing unit quaternion q ensures that parentOffset will be
       //  interpreted in world frame.
-      math::Quaternion q;
-      auto parentOffset = this->GetParentWorldPose().Ign().Pos() -
-                          this->parentLink->WorldPose().Pos();
-      linearVel = this->parentLink->GetWorldLinearVel(parentOffset, q).Ign();
+      ignition::math::Quaterniond q;
+      ignition::math::Vector3d parentOffset =
+        this->GetParentWorldPose().pos.Ign() -
+        this->parentLink->WorldPose().Pos();
+      linearVel = this->parentLink->WorldLinearVel(parentOffset, q);
     }
 
     // Add desired velocity along specified axis
@@ -953,8 +954,8 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     //  offset between the child's CG and the joint anchor
     //  and the desired angular velocity.
     ignition::math::Vector3d childCoGOffset =
-      this->childLink->GetWorldCoGPose().Ign().Pos() -
-      this->GetWorldPose().Ign().Pos();
+      this->childLink->WorldCoGPose().Pos() -
+      this->GetWorldPose().pos.Ign();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }
@@ -963,7 +964,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     ignition::math::Vector3d desiredVel;
     if (this->parentLink)
     {
-      desiredVel = this->parentLink->GetWorldLinearVel().Ign();
+      desiredVel = this->parentLink->WorldLinearVel();
     }
     desiredVel += _velocity * this->GlobalAxis(_index);
     this->childLink->SetLinearVel(desiredVel);
@@ -1042,8 +1043,8 @@ double Joint::InertiaRatio(const ignition::math::Vector3d &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
-    auto pm = this->parentLink->WorldInertiaMatrix();
-    auto cm = this->childLink->WorldInertiaMatrix();
+    ignition::math::Matrix3d pm = this->parentLink->WorldInertiaMatrix();
+    ignition::math::Matrix3d cm = this->childLink->WorldInertiaMatrix();
 
     // matrix times axis
     ignition::math::Vector3d pia = pm * _axis;

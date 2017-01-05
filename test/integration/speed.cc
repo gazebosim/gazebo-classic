@@ -56,7 +56,7 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
   {
     pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -96,7 +96,7 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   {
     pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
   common::Time::MSleep(2000);
 

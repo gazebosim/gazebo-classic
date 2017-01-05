@@ -339,8 +339,8 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
       nestedModelJoint->GetJointLink(1)->GetName() == "link_02");
   EXPECT_EQ(nestedModelJoint->GetMsgType(), msgs::Joint::PRISMATIC);
   EXPECT_EQ(nestedModelJoint->LocalAxis(0), ignition::math::Vector3d::UnitZ);
-  EXPECT_EQ(nestedModelJoint->LowerLimit(0), -0.2);
-  EXPECT_EQ(nestedModelJoint->UpperLimit(0), 0.5);
+  EXPECT_NEAR(nestedModelJoint->LowerLimit(0), -0.2, 1e-3);
+  EXPECT_NEAR(nestedModelJoint->UpperLimit(0), 0.5, 1e-3);
 }
 
 /////////////////////////////////////////////////
