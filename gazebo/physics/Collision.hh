@@ -110,7 +110,12 @@ namespace gazebo
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See SetScale(const ignition::math::Vector3d &_scale)
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.
