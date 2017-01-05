@@ -19,13 +19,11 @@
 
 #include <memory>
 #include <string>
-#include <QItemDelegate>
-#include <QObject>
-#include <QWidget>
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

@@ -1262,7 +1262,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 
           // initial anchor pose in child link frame
           ignition::math::Pose3d anchorInitialInChild =
-            parentJoints[j]->GetInitialAnchorPose().Ign();
+            parentJoints[j]->InitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)
@@ -1346,7 +1346,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 
           // initial anchor pose in child link frame
           ignition::math::Pose3d anchorInitialInChild =
-            parentJoints[j]->GetInitialAnchorPose().Ign();
+            parentJoints[j]->InitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)

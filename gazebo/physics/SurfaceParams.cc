@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -171,7 +172,7 @@ void FrictionPyramid::SetMu(unsigned int _index, double _mu)
   GZ_ASSERT(_index < 3, "Invalid _index to SetMu");
   if (_mu < 0)
   {
-    this->mu[_index] = GZ_FLT_MAX;
+    this->mu[_index] = ignition::math::MAX_F;
   }
   else
   {
