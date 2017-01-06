@@ -346,7 +346,7 @@ void LiftDragPlugin::OnUpdate()
 
   // moment arm from cg to cp in inertial plane
   ignition::math::Vector3d momentArm = pose.Rot().RotateVector(
-    this->cp - this->link->GetInertial()->GetCoG().Ign());
+    this->cp - this->link->GetInertial()->CoG());
   // gzerr << this->cp << " : " << this->link->GetInertial()->GetCoG() << "\n";
 
   // force and torque about cg in inertial frame

@@ -630,6 +630,37 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: void SetMOI(const math::Matrix3)
     + ***Replacement:*** public: void SetMOI(const ignition::math::Matrix3d)
 
+    + ***Deprecation:*** double GetMass() const
+    + ***Replacement:*** double Mass() const
+    + ***Deprecation:*** void SetCoG(const math::Vector3 &_center)
+    + ***Replacement:*** void SetCoG(const ignition::math::Vector3d &_center)
+    + ***Deprecation:*** void SetCoG(const math::Pose &_c)
+    + ***Replacement:*** void SetCoG(const ignition::math::Pose3d &_c)
+    + ***Deprecation:*** math::Vector3 GetCoG() const
+    + ***Replacement:*** const ignition::math::Vector3d &CoG() const
+    + ***Deprecation:*** const math::Pose GetPose() const
+    + ***Replacement:*** const ignition::math::Pose3d Pose() const
+    + ***Deprecation:*** math::Vector3 GetPrincipalMoments() const
+    + ***Replacement:*** ignition::math::Vector3d PrincipalMoments() const
+    + ***Deprecation:*** math::Vector3 GetProductsofInertia() const
+    + ***Replacement:*** ignition::math::Vector3d ProductsOfInertia() const
+    + ***Deprecation:*** double GetIXX() const
+    + ***Replacement:*** double IXX() const
+    + ***Deprecation:*** double GetIYY() const
+    + ***Replacement:*** double IYY() const
+    + ***Deprecation:*** double GetIZZ() const
+    + ***Replacement:*** double IZZ() const
+    + ***Deprecation:*** double GetIXY() const
+    + ***Replacement:*** double IXY() const
+    + ***Deprecation:*** double GetIXZ() const
+    + ***Replacement:*** double IXZ() const
+    + ***Deprecation:*** double GetIYZ() const
+    + ***Replacement:*** double IYZ() const
+    + ***Deprecation:*** void Rotate(const math::Quaternion &_rot)
+    + ***Replacement:*** void Rotate(const ignition::math::Quaterniond &_rot)
+    + ***Deprecation:*** Inertial GetInertial(const math::Pose &_frameOffset) const
+    + ***Replacement:*** Inertial operator()(const ignition::math::Pose3d &_frameOffset) const
+
 1. **gazebo/physics/Joint.hh**
     + ***Deprecation:*** public: void Joint::DisconnectJointUpdate(ConnectionPtr);
     + ***Replacement:*** Delete the Connection object, perhaps by calling

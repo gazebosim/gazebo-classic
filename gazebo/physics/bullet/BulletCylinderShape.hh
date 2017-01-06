@@ -107,7 +107,7 @@ namespace gazebo
                     compoundShape->removeChildShape(shape);
                     ignition::math::Pose3d relativePose =
                         this->collisionParent->RelativePose();
-                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
+                    relativePose.Pos() -= bLink->GetInertial()->CoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }
