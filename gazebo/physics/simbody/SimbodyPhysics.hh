@@ -108,6 +108,13 @@ namespace gazebo
       /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
       /// \param[in] _q Gazeb's math::Quaternion object
       /// \return Simbody's SimTK::Quaternion object
+      /// \deprecated See function which accepts ignition math.
+      public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Convert gazebo::math::Quaternion to SimTK::Quaternion
+      /// \param[in] _q Gazeb's math::Quaternion object
+      /// \return Simbody's SimTK::Quaternion object
       public: static SimTK::Quaternion QuadToQuad(const math::Quaternion &_q);
 
       /// \brief Convert SimTK::Quaternion to gazebo::math::Quaternion

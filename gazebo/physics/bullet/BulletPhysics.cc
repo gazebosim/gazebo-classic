@@ -184,16 +184,16 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
         // Convert from world to link frame
         localForce1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(force));
+            BulletTypes::ConvertVector3Ign(force));
         localForce2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(-force));
+            BulletTypes::ConvertVector3Ign(-force));
         localTorque1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueA));
+            BulletTypes::ConvertVector3Ign(torqueA));
         localTorque2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueB));
+            BulletTypes::ConvertVector3Ign(torqueB));
 
-        contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
-        contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
+        contactFeedback->positions[j] = BulletTypes::ConvertVector3Ign(ptB);
+        contactFeedback->normals[j] = BulletTypes::ConvertVector3Ign(normalOnB);
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
@@ -787,7 +787,7 @@ void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
 {
   this->world->SetGravitySDF(_gravity.Ign());
   this->dynamicsWorld->setGravity(
-    BulletTypes::ConvertVector3(_gravity));
+    BulletTypes::ConvertVector3(_gravity.Ign()));
 }
 
 //////////////////////////////////////////////////
