@@ -678,12 +678,6 @@ void Model::ResetPhysicsStates()
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearVel(const math::Vector3 &_vel)
-{
-  this->SetLinearVel(_vel.Ign());
-}
-
-//////////////////////////////////////////////////
 void Model::SetLinearVel(const ignition::math::Vector3d &_vel)
 {
   for (Link_V::iterator iter = this->links.begin();
@@ -695,12 +689,6 @@ void Model::SetLinearVel(const ignition::math::Vector3d &_vel)
       (*iter)->SetLinearVel(_vel);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void Model::SetAngularVel(const math::Vector3 &_vel)
-{
-  this->SetAngularVel(_vel.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -718,12 +706,6 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
 }
 
 //////////////////////////////////////////////////
-void Model::SetLinearAccel(const math::Vector3 &_accel)
-{
-  this->SetLinearAccel(_accel.Ign());
-}
-
-//////////////////////////////////////////////////
 void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
 {
   for (Link_V::iterator iter = this->links.begin();
@@ -735,12 +717,6 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
       (*iter)->SetLinearAccel(_accel);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void Model::SetAngularAccel(const math::Vector3 &_accel)
-{
-  this->SetAngularAccel(_accel.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -758,24 +734,12 @@ void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeLinearVel() const
-{
-  return this->RelativeLinearVel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeLinearVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->RelativeLinearVel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Model::GetWorldLinearVel() const
-{
-  return this->WorldLinearVel();
 }
 
 //////////////////////////////////////////////////
@@ -790,24 +754,12 @@ ignition::math::Vector3d Model::WorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeAngularVel() const
-{
-  return this->RelativeAngularVel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeAngularVel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->RelativeAngularVel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Model::GetWorldAngularVel() const
-{
-  return this->WorldAngularVel();
 }
 
 //////////////////////////////////////////////////
@@ -821,24 +773,12 @@ ignition::math::Vector3d Model::WorldAngularVel() const
 
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeLinearAccel() const
-{
-  return this->RelativeLinearAccel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeLinearAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->RelativeLinearAccel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Model::GetWorldLinearAccel() const
-{
-  return this->WorldLinearAccel();
 }
 
 //////////////////////////////////////////////////
@@ -851,12 +791,6 @@ ignition::math::Vector3d Model::WorldLinearAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetRelativeAngularAccel() const
-{
-  return this->RelativeAngularAccel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::RelativeAngularAccel() const
 {
   if (this->GetLink("canonical"))
@@ -866,31 +800,12 @@ ignition::math::Vector3d Model::RelativeAngularAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Model::GetWorldAngularAccel() const
-{
-  return this->WorldAngularAccel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Model::WorldAngularAccel() const
 {
   if (this->GetLink("canonical"))
     return this->GetLink("canonical")->WorldAngularAccel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Box Model::GetBoundingBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->BoundingBox();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1346,12 +1261,6 @@ void Model::StopAnimation()
 }
 
 //////////////////////////////////////////////////
-void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
-{
-  this->AttachStaticModel(_model, _offset.Ign());
-}
-
-//////////////////////////////////////////////////
 void Model::AttachStaticModel(ModelPtr &_model, ignition::math::Pose3d _offset)
 {
   if (!_model->IsStatic())
@@ -1475,12 +1384,6 @@ void Model::SetEnabled(bool _enabled)
 }
 
 /////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
-{
-  this->SetLinkWorldPose(_pose.Ign(), _linkName);
-}
-
-/////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose,
     std::string _linkName)
 {
@@ -1491,12 +1394,6 @@ void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose,
   else
     gzerr << "Setting Model Pose by specifying Link failed:"
           << " Link[" << _linkName << "] not found.\n";
-}
-
-/////////////////////////////////////////////////
-void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
-{
-  this->SetLinkWorldPose(_pose.Ign(), _link);
 }
 
 /////////////////////////////////////////////////

@@ -218,12 +218,6 @@ void BulletBallJoint::SetLowerLimit(const unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletBallJoint::GetAxis(unsigned int /*_index*/) const
-{
-  return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
 void BulletBallJoint::SetAxis(const unsigned int /*_index*/,
                         const ignition::math::Vector3d &/*_axis*/)
 {

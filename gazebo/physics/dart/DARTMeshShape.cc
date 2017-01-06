@@ -31,13 +31,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTMeshShape::DARTMeshShape(CollisionPtr _parent)
-  : MeshShape(_parent),
-    dataPtr(new DARTMeshShapePrivate())
-{
-}
-
-//////////////////////////////////////////////////
 DARTMeshShape::DARTMeshShape(DARTCollisionPtr _parent)
   : MeshShape(_parent),
     dataPtr(new DARTMeshShapePrivate())

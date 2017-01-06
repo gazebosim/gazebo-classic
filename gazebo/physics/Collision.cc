@@ -204,24 +204,12 @@ void Collision::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearVel() const
-{
-  return this->RelativeLinearVel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Collision::RelativeLinearVel() const
 {
   if (this->link)
     return this->link->RelativeLinearVel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearVel() const
-{
-  return this->WorldLinearVel();
 }
 
 //////////////////////////////////////////////////
@@ -234,24 +222,12 @@ ignition::math::Vector3d Collision::WorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularVel() const
-{
-  return this->RelativeAngularVel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Collision::RelativeAngularVel() const
 {
   if (this->link)
     return this->link->RelativeAngularVel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularVel() const
-{
-  return this->WorldAngularVel();
 }
 
 //////////////////////////////////////////////////
@@ -264,24 +240,12 @@ ignition::math::Vector3d Collision::WorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearAccel() const
-{
-  return this->RelativeLinearAccel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Collision::RelativeLinearAccel() const
 {
   if (this->link)
     return this->link->RelativeLinearAccel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearAccel() const
-{
-  return this->WorldLinearAccel();
 }
 
 //////////////////////////////////////////////////
@@ -294,24 +258,12 @@ ignition::math::Vector3d Collision::WorldLinearAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularAccel() const
-{
-  return this->RelativeAngularAccel();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Collision::RelativeAngularAccel() const
 {
   if (this->link)
     return this->link->RelativeAngularAccel();
   else
     return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularAccel() const
-{
-  return this->WorldAngularAccel();
 }
 
 //////////////////////////////////////////////////
@@ -430,12 +382,6 @@ void Collision::SetMaxContacts(unsigned int _maxContacts)
 unsigned int Collision::GetMaxContacts()
 {
   return this->maxContacts;
-}
-
-/////////////////////////////////////////////////
-const math::Pose Collision::GetWorldPose() const
-{
-  return this->WorldPose();
 }
 
 /////////////////////////////////////////////////

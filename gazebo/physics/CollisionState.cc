@@ -70,12 +70,6 @@ void CollisionState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose CollisionState::GetPose() const
-{
-  return this->pose;
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &CollisionState::Pose() const
 {
   return this->pose;

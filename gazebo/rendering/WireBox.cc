@@ -23,19 +23,6 @@ using namespace gazebo;
 using namespace rendering;
 
 /////////////////////////////////////////////////
-WireBox::WireBox(VisualPtr _parent, const math::Box &_box)
-  : dataPtr(new WireBoxPrivate)
-{
-  this->dataPtr->parent = _parent;
-  this->dataPtr->lines = new DynamicLines(RENDERING_LINE_LIST);
-  this->dataPtr->lines->setMaterial("BaseWhiteNoLighting");
-  this->dataPtr->parent->AttachObject(this->dataPtr->lines);
-  this->dataPtr->lines->setVisibilityFlags(GZ_VISIBILITY_GUI);
-
-  this->Init(_box.Ign());
-}
-
-/////////////////////////////////////////////////
 WireBox::WireBox(VisualPtr _parent, const ignition::math::Box &_box)
   : dataPtr(new WireBoxPrivate)
 {
@@ -52,12 +39,6 @@ WireBox::WireBox(VisualPtr _parent, const ignition::math::Box &_box)
 WireBox::~WireBox()
 {
   delete this->dataPtr->lines;
-}
-
-/////////////////////////////////////////////////
-void WireBox::Init(const math::Box &_box)
-{
-  this->Init(_box.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -127,28 +108,9 @@ void WireBox::SetVisible(bool _visible)
 }
 
 /////////////////////////////////////////////////
-bool WireBox::GetVisible() const
-{
-  return this->Visible();
-}
-
-/////////////////////////////////////////////////
 bool WireBox::Visible() const
 {
   return this->dataPtr->lines->isVisible();
-}
-
-/////////////////////////////////////////////////
-math::Box WireBox::GetBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Box();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

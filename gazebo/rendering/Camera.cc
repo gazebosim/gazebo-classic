@@ -582,13 +582,6 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
-{
-  this->SetWorldPosition(_pose.pos.Ign());
-  this->SetWorldRotation(_pose.rot.Ign());
-}
-
-//////////////////////////////////////////////////
 void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
@@ -1910,12 +1903,6 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
     unsigned int, const std::string &)> _subscriber)
 {
   return this->newImageFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
-{
-  this->newImageFrame.Disconnect(_c->Id());
 }
 
 /////////////////////////////////////////////////

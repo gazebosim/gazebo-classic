@@ -354,11 +354,6 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
-/////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
-{
-  return this->EntityPose(_name);
-}
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d ServerFixture::EntityPose(

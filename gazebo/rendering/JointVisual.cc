@@ -121,12 +121,6 @@ void JointVisual::Load(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
-{
-  this->Load(_msg, _worldPose.Ign());
-}
-
-/////////////////////////////////////////////////
 void JointVisual::Load(ConstJointPtr &_msg,
     const ignition::math::Pose3d &_worldPose)
 {
@@ -147,13 +141,6 @@ void JointVisual::Load(ConstJointPtr &_msg,
 }
 
 /////////////////////////////////////////////////
-ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
-    bool _useParentFrame, msgs::Joint::Type _type)
-{
-  return this->CreateAxis(_axis.Ign(), _useParentFrame, _type);
-}
-
-/////////////////////////////////////////////////
 ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
     const bool _useParentFrame, const msgs::Joint::Type &_type)
 {
@@ -169,13 +156,6 @@ ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
   this->UpdateAxis(axis, _axis, _useParentFrame, _type);
 
   return axis;
-}
-
-/////////////////////////////////////////////////
-void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
-    const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
-{
-  this->UpdateAxis(_arrowVisual, _axis.Ign(), _useParentFrame, _type);
 }
 
 /////////////////////////////////////////////////

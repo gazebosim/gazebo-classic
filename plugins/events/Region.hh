@@ -22,7 +22,6 @@
 #include <memory>
 
 #include <sdf/sdf.hh>
-#include <gazebo/math/Vector3.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Box.hh>
 
@@ -40,12 +39,6 @@ namespace gazebo
     /// \brief Load from a world file (inside a SimEvent plugin element)
     /// \param[in] _sdf The <region> element
     public: void Load(const sdf::ElementPtr &_sdf);
-
-    /// \brief Check if a point lies inside the region
-    /// \param[in] _p Point to check
-    /// \return True if point is in region
-    /// \deprecated See function that accepts an ignition::math object
-    public: bool Contains(const math::Vector3 &_p) const GAZEBO_DEPRECATED(8.0);
 
     /// \brief Check if a point lies inside the region
     /// \param[in] _p Point to check

@@ -959,12 +959,6 @@ DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTLink::GetDARTWorld(void) const
-{
-  return this->GetDARTPhysics()->DARTWorld().get();
-}
-
-//////////////////////////////////////////////////
 dart::simulation::WorldPtr DARTLink::DARTWorld(void) const
 {
   return this->GetDARTPhysics()->DARTWorld();

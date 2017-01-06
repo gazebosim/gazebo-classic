@@ -19,7 +19,6 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -64,18 +63,7 @@ namespace gazebo
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.
-      /// \deprecated Use function which accepts ignition math.
-      public: void SetSize(const math::Vector2d &_size)
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the size.
-      /// \param[in] _size 2D size of the plane.
       public: void SetSize(const ignition::math::Vector2d &_size);
-
-      /// \brief Get the size.
-      /// \return Size of the plane.
-      /// \deprecated Use function which returns ignition math.
-      public: math::Vector2d GetSize() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the size.
       /// \return Size of the plane.

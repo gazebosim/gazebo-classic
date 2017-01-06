@@ -204,12 +204,6 @@ math::Vector3 Inertial::GetProductsofInertia() const
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetMOI(const math::Matrix3 &_moi)
-{
-  this->SetMOI(_moi.Ign());
-}
-
-//////////////////////////////////////////////////
 void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
 {
   /// \TODO: check symmetry of incoming _moi matrix
@@ -217,18 +211,6 @@ void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
   this->products.Set(_moi(0, 1), _moi(0, 2), _moi(1, 2));
 }
 
-//////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MOI();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
 
 //////////////////////////////////////////////////
 ignition::math::Matrix3d Inertial::MOI() const
@@ -284,19 +266,6 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
   result.SetMOI(Ithis + Iparam);
 
   return result;
-}
-
-//////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MOI(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

@@ -54,12 +54,6 @@ ignition::math::Vector3d SimbodyUniversalJoint::Anchor(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
-{
-  return math::Vector3();
-}
-
-//////////////////////////////////////////////////
 void SimbodyUniversalJoint::SetAxis(const unsigned int /*_index*/,
                                    const ignition::math::Vector3d &/*_axis*/)
 {

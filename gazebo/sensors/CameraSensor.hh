@@ -75,7 +75,6 @@ namespace gazebo
 
       /// \brief Gets the width of the image in pixels.
       /// \return The image width in pixels.
-      /// \deprecated See ImageWidth()
       public: unsigned int ImageWidth() const;
 
       /// \brief Gets the height of the image in pixels.

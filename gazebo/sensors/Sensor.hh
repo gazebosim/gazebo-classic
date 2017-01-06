@@ -131,7 +131,6 @@ namespace gazebo
 
       /// \brief Return last measurement time.
       /// \return Time of last measurement.
-      /// \deprecated See LastMeasurementTime() function.
       public: common::Time LastMeasurementTime() const;
 
       /// \brief Return true if user requests the sensor to be visualized
@@ -158,13 +157,6 @@ namespace gazebo
       /// \sa Sensor::DisconnectUpdated
       public: event::ConnectionPtr ConnectUpdated(
                   std::function<void()> _subscriber);
-
-      /// \brief Disconnect from a the updated signal.
-      /// \param[in] _c The connection to disconnect
-      /// \sa Sensor::ConnectUpdated
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectUpdated(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.

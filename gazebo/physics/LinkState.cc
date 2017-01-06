@@ -129,21 +129,9 @@ void LinkState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose LinkState::GetPose() const
-{
-  return this->Pose();
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &LinkState::Pose() const
 {
   return this->pose;
-}
-
-/////////////////////////////////////////////////
-const math::Pose LinkState::GetVelocity() const
-{
-  return this->Velocity();
 }
 
 /////////////////////////////////////////////////
@@ -153,21 +141,9 @@ const ignition::math::Pose3d &LinkState::Velocity() const
 }
 
 /////////////////////////////////////////////////
-const math::Pose LinkState::GetAcceleration() const
-{
-  return this->Acceleration();
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &LinkState::Acceleration() const
 {
   return this->acceleration;
-}
-
-/////////////////////////////////////////////////
-const math::Pose LinkState::GetWrench() const
-{
-  return this->Wrench();
 }
 
 /////////////////////////////////////////////////

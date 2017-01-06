@@ -219,12 +219,6 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose ModelState::GetPose() const
-{
-  return this->Pose();
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &ModelState::Pose() const
 {
   return this->pose;

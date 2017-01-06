@@ -105,17 +105,7 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      /// \deprecated See function that returns ignition math.
-      public: math::Angle GetMinAngle() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the minimum angle.
-      /// \return Minimum angle of ray scan.
       public: ignition::math::Angle MinAngle() const;
-
-      /// \brief Get the maximum angle.
-      /// \return Maximum angle of ray scan.
-      /// \deprecated See function that returns ignition math.
-      public: math::Angle GetMaxAngle() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
@@ -131,17 +121,7 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      /// \deprecated See function that returns ignition math.
-      public: math::Angle GetVerticalMinAngle() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the vertical min angle.
-      /// \return Vertical min angle.
       public: ignition::math::Angle VerticalMinAngle() const;
-
-      /// \brief Get the vertical max angle.
-      /// \return Vertical max angle.
-      /// \deprecated See function that returns ignition math.
-      public: math::Angle GetVerticalMaxAngle() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
@@ -169,13 +149,6 @@ namespace gazebo
       public: template<typename T>
               event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
               {return this->newLaserScans.Connect(_subscriber);}
-
-      /// \brief Disconnect from the new laser scans signal.
-      /// \param[in] _conn Connection to remove.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0)
-              {this->newLaserScans.Disconnect(_conn->Id());}
 
       /// \brief Method for updating the rays. This function is normally
       /// called automatically, such as when a laser sensor is updated.

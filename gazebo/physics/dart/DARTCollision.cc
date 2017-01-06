@@ -134,26 +134,11 @@ dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape */*_shape*/,
-                                          bool _placeable)
-{
-  gzerr << "Deprecated. Use SetDARTCollisionShape(ShapePtr, bool) instead.\n";
-
-  Collision::SetCollision(_placeable);
-}
-
-//////////////////////////////////////////////////
 void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
   this->dataPtr->dtCollisionShape = _shape;
-}
-
-//////////////////////////////////////////////////
-dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
-{
-  return this->DARTCollisionShape().get();
 }
 
 //////////////////////////////////////////////////

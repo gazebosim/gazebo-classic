@@ -437,12 +437,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTPhysics::GetDARTWorld() const
-{
-  return this->DARTWorld().get();
-}
-
-//////////////////////////////////////////////////
 dart::simulation::WorldPtr DARTPhysics::DARTWorld() const
 {
   return this->dataPtr->dtWorld;

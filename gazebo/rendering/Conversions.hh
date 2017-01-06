@@ -17,14 +17,13 @@
 #ifndef GAZEBO_RENDERING_CONVERSIONS_HH_
 #define GAZEBO_RENDERING_CONVERSIONS_HH_
 
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -50,20 +49,6 @@ namespace gazebo
       /// \return Gazebo color value
       public: static common::Color Convert(const Ogre::ColourValue &_clr);
 
-      /// \brief return Ogre Vector from Gazebo Vector3
-      /// \deprecated See Convert(const ignition::math::Vector3d &)
-      /// \param[in] _v Gazebo vector
-      /// \return Ogre vector
-      public: static Ogre::Vector3 Convert(const math::Vector3 &_v)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief return gazebo Vector from ogre Vector3
-      /// \deprecated See ConvertIgn()
-      /// \param[in] _v Ogre vector
-      /// \return Gazebo vector
-      public: static math::Vector3 Convert(const Ogre::Vector3 &_v)
-              GAZEBO_DEPRECATED(8.0);
-
       /// \brief Return ignition::math::Vector3d from Ogre Vector3.
       /// \param[in] _v Ogre Vector3
       /// \return Ignition math Vector3d
@@ -74,20 +59,6 @@ namespace gazebo
       /// \param[in] _v Ignition math Vector3d
       /// \return Ogre Vector3
       public: static Ogre::Vector3 Convert(const ignition::math::Vector3d &_v);
-
-      /// \brief Gazebo quaternion to Ogre quaternion
-      /// \deprecated See Convert(const ignition::math::Quaterniond &)
-      /// \param[in] _v Gazebo quaternion
-      /// \return Ogre quaternion
-      public: static Ogre::Quaternion Convert(const math::Quaternion &_v)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Ogre quaternion to Gazebo quaternion
-      /// \deprecated See ConvertIgn()
-      /// \param[in] _v Ogre quaternion
-      /// \return Gazebo quaternion
-      public: static math::Quaternion Convert(const Ogre::Quaternion &_v)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Ogre quaternion to ignition::math::Quaterniond
       /// \param[in] _q Ogre quaternion

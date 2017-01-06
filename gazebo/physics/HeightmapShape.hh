@@ -77,13 +77,6 @@ namespace gazebo
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
-      /// \return math::Vector2i, result.x = width,
-      /// result.y = length/height.
-      /// \deprecated Use function that returns ignition math.
-      public: math::Vector2i GetVertexCount() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Return the number of vertices, which equals the size of the
-      /// image used to load the heightmap.
       /// \return ignition::math::Vector2i, result.X() == width,
       /// result.Y() == length/height.
       public: ignition::math::Vector2i VertexCount() const;

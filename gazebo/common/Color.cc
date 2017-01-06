@@ -175,12 +175,6 @@ ignition::math::Vector3d Color::HSV() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Color::GetAsYUV() const
-{
-  return this->YUV();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Color::YUV() const
 {
   ignition::math::Vector3d yuv;

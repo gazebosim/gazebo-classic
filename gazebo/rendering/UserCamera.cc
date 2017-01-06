@@ -207,12 +207,6 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetDefaultPose(const math::Pose &_pose)
-{
-  this->SetInitialPose(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 {
   this->dataPtr->initialPose = _pose;
@@ -220,22 +214,9 @@ void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 }
 
 //////////////////////////////////////////////////
-math::Pose UserCamera::DefaultPose() const
-{
-  return this->InitialPose();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d UserCamera::InitialPose() const
 {
   return this->dataPtr->initialPose;
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
-{
-  Camera::SetWorldPose(_pose.Ign());
-  this->dataPtr->viewController->Init();
 }
 
 //////////////////////////////////////////////////
@@ -430,13 +411,6 @@ void UserCamera::SetViewController(const std::string &_type)
     gzerr << "Invalid view controller type[" << _type << "]. "
       << "The view controller is not changed.\n";
   }
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &_type,
-                                   const math::Vector3 &_pos)
-{
-  this->SetViewController(_type, _pos.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -701,13 +675,6 @@ void UserCamera::EnableViewController(bool _value) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
-                                std::string &_mod)
-{
-  return this->Visual(_mousePos.Ign(), _mod);
-}
-
-//////////////////////////////////////////////////
 VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
     std::string &_mod) const
 {
@@ -764,21 +731,9 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
-{
-  this->SetFocalPoint(_pt.Ign());
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
 {
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
-}
-
-//////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
-{
-  return this->Visual(_mousePos.Ign());
 }
 
 //////////////////////////////////////////////////

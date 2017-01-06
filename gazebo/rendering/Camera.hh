@@ -163,12 +163,6 @@ namespace gazebo
       public: ignition::math::Quaterniond WorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      /// \param[in] _pose The new math::Pose of the camera
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: virtual void SetWorldPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the global pose of the camera
       /// \param[in] _pose The new ignition::math::Pose3d of the camera
       public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
@@ -506,12 +500,6 @@ namespace gazebo
       public: event::ConnectionPtr ConnectNewImageFrame(
           std::function<void (const unsigned char *, unsigned int, unsigned int,
           unsigned int, const std::string &)> _subscriber);
-
-      /// \brief Disconnect from an image frame
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer

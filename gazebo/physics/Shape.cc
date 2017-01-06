@@ -47,12 +47,6 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Shape::GetScale() const
-{
-  return this->Scale();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Shape::Scale() const
 {
   return this->scale;
@@ -74,8 +68,3 @@ double Shape::ComputeVolume() const
   return size.X() * size.Y() * size.Z();
 }
 
-//////////////////////////////////////////////////
-void Shape::SetScale(const math::Vector3 &_scale)
-{
-  return this->SetScale(_scale.Ign());
-}

@@ -212,18 +212,6 @@ namespace gazebo
       public: void ProcessMsg(const msgs::Inertial &_msg);
 
       /// \brief Get the equivalent inertia from a point in local Link frame
-      /// If you specify GetMOI(this->GetPose()), you should get
-      /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
-      /// If _pose is different from pose of the Inertial block, then
-      /// the MOI is rotated accordingly, and contributions from changes
-      /// in MOI location due to point mass is added to the final MOI.
-      /// \param[in] _pose location in Link local frame
-      /// \return equivalent inertia at _pose
-      /// \deprecated See MOI(const ignition::math::Pose3d &) const
-      public: math::Matrix3 GetMOI(const math::Pose &_pose)
-        const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the equivalent inertia from a point in local Link frame
       /// If you specify MOI(this->GetPose()), you should get
       /// back the Moment of Inertia (MOI) exactly as specified in the SDF.
       /// If _pose is different from pose of the Inertial block, then
@@ -260,17 +248,7 @@ namespace gazebo
 
       /// \brief returns Moments of Inertia as a Matrix3
       /// \return Moments of Inertia as a Matrix3
-      /// \deprecated See MOI() const
-      public: math::Matrix3 GetMOI() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief returns Moments of Inertia as a Matrix3
-      /// \return Moments of Inertia as a Matrix3
       public: ignition::math::Matrix3d MOI() const;
-
-      /// \brief Sets Moments of Inertia (MOI) from a Matrix3
-      /// \param[in] Moments of Inertia as a Matrix3
-      /// \deprecated See version that accepts ignition math parameters
-      public: void SetMOI(const math::Matrix3 &_moi) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Sets Moments of Inertia (MOI) from a Matrix3
       /// \param[in] Moments of Inertia as a Matrix3

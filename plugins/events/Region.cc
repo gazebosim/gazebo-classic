@@ -21,12 +21,6 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////
-bool Region::Contains(const math::Vector3 &_p) const
-{
-  return Contains(_p.Ign());
-}
-
-/////////////////////////////////////////////
 bool Region::Contains(const ignition::math::Vector3d &_p) const
 {
   for (auto v: this->boxes)

@@ -53,8 +53,8 @@ void callbackDisconnect()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-  g_event.Disconnect(g_conn);
-  g_event.Disconnect(g_conn2);
+  g_event.Disconnect(g_conn->Id());
+  g_event.Disconnect(g_conn2->Id());
 #ifndef _WIN32
 #pragma GCC diagnostic pop
 #endif

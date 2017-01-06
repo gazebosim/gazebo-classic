@@ -246,12 +246,6 @@ void Gripper::Init()
 }
 
 /////////////////////////////////////////////////
-std::string Gripper::GetName() const
-{
-  return this->Name();
-}
-
-/////////////////////////////////////////////////
 std::string Gripper::Name() const
 {
   return this->dataPtr->name;

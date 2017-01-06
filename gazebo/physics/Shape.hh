@@ -56,18 +56,7 @@ namespace gazebo
 
       /// \brief Set the scale of the shape.
       /// \param[in] _scale Scale to set the shape to.
-      //// \deprecated See version that accepts an ignition math object.
-      public: virtual void SetScale(const math::Vector3 &_scale)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the scale of the shape.
-      /// \param[in] _scale Scale to set the shape to.
       public: virtual void SetScale(const ignition::math::Vector3d &_scale) = 0;
-
-      /// \brief Get the scale of the shape.
-      /// \return Scale of the shape.
-      /// \deprecated See ignition::math::Vector3d Scale() const
-      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the scale of the shape.
       /// \return Scale of the shape.

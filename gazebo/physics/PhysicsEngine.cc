@@ -122,18 +122,6 @@ PhysicsEngine::~PhysicsEngine()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 PhysicsEngine::GetGravity() const
-{
-  return this->world->Gravity();
-}
-
-//////////////////////////////////////////////////
-ignition::math::Vector3d PhysicsEngine::MagneticField() const
-{
-  return this->world->MagneticField();
-}
-
-//////////////////////////////////////////////////
 CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
                                             const std::string &_linkName)
 {
@@ -246,38 +234,6 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
-      this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
-    }
-    else if (_key == "magnetic_field")
-    {
-      boost::any copy = _value;
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
       this->world->SetMagneticField(
           boost::any_cast<ignition::math::Vector3d>(copy));
     }

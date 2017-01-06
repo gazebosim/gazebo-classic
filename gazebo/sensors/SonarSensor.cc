@@ -358,9 +358,3 @@ event::ConnectionPtr SonarSensor::ConnectUpdate(
   return this->dataPtr->update.Connect(_subscriber);
 }
 
-//////////////////////////////////////////////////
-void SonarSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
-{
-  this->dataPtr->update.Disconnect(_conn->Id());
-}
-

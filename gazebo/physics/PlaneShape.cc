@@ -70,28 +70,9 @@ math::Vector3 PlaneShape::GetNormal() const
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetSize(const math::Vector2d &_size)
-{
-  this->SetSize(_size.Ign());
-}
-
-//////////////////////////////////////////////////
 void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
-}
-
-//////////////////////////////////////////////////
-math::Vector2d PlaneShape::GetSize() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Size();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

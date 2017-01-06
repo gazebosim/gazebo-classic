@@ -22,7 +22,6 @@
 
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector4.hh"
 #include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
@@ -90,23 +89,6 @@ namespace gazebo
                 return btVector3(_vec.X(), _vec.Y(), _vec.Z());
               }
 
-      /// \brief Convert a bullet btVector4 to a gazebo Vector4.
-      /// \param[in] _bt Bullet Vector4.
-      /// \return Gazebo Vector4.
-      /// \deprecated Use ConvertVector4dIgn instead.
-      public: static math::Vector4 ConvertVector4(const btVector4 &_bt)
-          GAZEBO_DEPRECATED(8.0)
-              {
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-                return ConvertVector4dIgn(_bt);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-              }
-
       /// \brief Convert a bullet btVector4 to an ignition math Vector4d.
       /// \param[in] _bt Bullet Vector4.
       /// \return Ignition math vector 4d.
@@ -115,16 +97,6 @@ namespace gazebo
               {
                 return ignition::math::Vector4d(_bt.getX(), _bt.getY(),
                                                 _bt.getZ(), _bt.getW());
-              }
-
-      /// \brief Convert a gazebo Vector4 to a bullet btVector4.
-      /// \param[in] _vec Gazebo Vector4.
-      /// \return Bullet Vector4.
-      /// \deprecated Use ConvertVector4dIgn instead
-      public: static btVector4 ConvertVector4(const math::Vector4 &_vec)
-          GAZEBO_DEPRECATED(8.0)
-              {
-                return ConvertVector4dIgn(_vec.Ign());
               }
 
       /// \brief Convert an ignition math Vector4d to a bullet btVector4.
