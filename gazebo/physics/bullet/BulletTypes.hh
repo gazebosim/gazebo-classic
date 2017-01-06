@@ -58,7 +58,9 @@ namespace gazebo
       /// \brief Convert a bullet btVector3 to a gazebo Vector3.
       /// \param[in] _bt Bullet Vector3.
       /// \return Gazebo Vector3.
+      /// \deprecated See ConvertVector3Ign
       public: static math::Vector3 ConvertVector3(const btVector3 &_bt)
+          GAZEBO_DEPRECATED(8.0)
               {
                 return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ());
               }
@@ -76,7 +78,9 @@ namespace gazebo
       /// \brief Convert a gazebo Vector3 to a bullet btVector3.
       /// \param[in] _vec Gazebo Vector3.
       /// \return Bullet Vector3.
+      /// \deprecated See function which accepts ignition math.
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
+          GAZEBO_DEPRECATED(8.0)
               {
                 return btVector3(_vec.x, _vec.y, _vec.z);
               }
@@ -154,28 +158,21 @@ namespace gazebo
       /// \brief Convert a bullet transform to a gazebo pose.
       /// \param[in] _bt Bullet pose (btTransform).
       /// \return Gazebo pose.
+      /// \deprecated See ConvertPoseIgn
       public: static math::Pose ConvertPose(const btTransform &_bt)
+          GAZEBO_DEPRECATED(8.0)
               {
-                math::Pose pose;
-                pose.pos = ConvertVector3(_bt.getOrigin());
-                pose.rot.w = _bt.getRotation().getW();
-                pose.rot.x = _bt.getRotation().getX();
-                pose.rot.y = _bt.getRotation().getY();
-                pose.rot.z = _bt.getRotation().getZ();
-                return pose;
+                return ConvertPoseIgn(_bt);
               }
 
       /// \brief Convert a gazebo pose to a bullet transform.
       /// \param[in] _pose Gazebo pose.
       /// \return Bullet pose (btTransform).
+      /// \deprecated See function which accepts ignition math.
       public: static btTransform ConvertPose(const math::Pose &_pose)
+          GAZEBO_DEPRECATED(8.0)
               {
-                btTransform trans;
-
-                trans.setOrigin(ConvertVector3(_pose.pos));
-                trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                               _pose.rot.z, _pose.rot.w));
-                return trans;
+                return ConvertPose(_pose.Ign());
               }
 
       /// \brief Convert an ignition math pose to a bullet transform.

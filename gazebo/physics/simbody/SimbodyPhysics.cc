@@ -551,10 +551,10 @@ void SimbodyPhysics::UpdateCollision()
               /// arbitrarily based on frames.
               ///
               /// shift forces to link1 frame without rotating it first
-              math::Pose pose1 = link1->WorldPose();
-              math::Pose pose2 = link2->WorldPose();
+              auto pose1 = link1->WorldPose();
+              auto pose2 = link2->WorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
-                + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
+                + SimbodyPhysics::Vector3ToVec3(pose1.Pos() - pose2.Pos());
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
 
               /// get torque and force components
@@ -685,7 +685,7 @@ void SimbodyPhysics::UpdatePhysics()
     {
       physics::SimbodyLinkPtr simbodyLink =
         boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
-      auto pose = SimbodyPhysics::Transform2Pose3d(
+      auto pose = SimbodyPhysics::Transform2PoseIgn(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dataPtr->dirtyPoses.push_back(
@@ -806,10 +806,10 @@ void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
     if (this->simbodyPhysicsInitialized && this->world->ModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
-         SimbodyPhysics::Vector3ToVec3(_gravity));
+         SimbodyPhysics::Vector3ToVec3(_gravity.Ign()));
     else
       this->gravity.setDefaultGravityVector(
-        SimbodyPhysics::Vector3ToVec3(_gravity));
+        SimbodyPhysics::Vector3ToVec3(_gravity.Ign()));
   }
 }
 
@@ -1432,7 +1432,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal().Ign());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1500,7 +1500,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
           (boost::dynamic_pointer_cast<physics::BoxShape>(
-          (*ci)->GetShape()))->GetSize())/2;
+          (*ci)->GetShape()))->GetSize().Ign())/2;
 
         /// \TODO: harcoded resolution, make collision resolution
         /// an adjustable parameter (#980)
@@ -1548,7 +1548,7 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 /////////////////////////////////////////////////
 SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
 {
-  return SimTK::Quaternion(_q.w, _q.x, _q.y, _q.z);
+  return QuadToQuad(_q.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -1565,7 +1565,7 @@ math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-  return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
+  return QuadToQuadIgn(_q);
 #ifndef _WIN32
   #pragma GCC diagnostic pop
 #endif
@@ -1581,13 +1581,20 @@ ignition::math::Quaterniond SimbodyPhysics::QuadToQuadIgn(
 /////////////////////////////////////////////////
 SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
 {
-  return SimTK::Vec3(_v.x, _v.y, _v.z);
+  return Vector3ToVec3(_v.Ign());
+}
+
+/////////////////////////////////////////////////
+SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(
+    const ignition::math::Vector3d &_v)
+{
+  return SimTK::Vec3(_v.X(), _v.Y(), _v.Z());
 }
 
 /////////////////////////////////////////////////
 math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
 {
-  return math::Vector3(_v[0], _v[1], _v[2]);
+  return Vec3ToVector3Ign(_v);
 }
 
 /////////////////////////////////////////////////
@@ -1616,11 +1623,11 @@ SimTK::Transform SimbodyPhysics::Pose2Transform(
 /////////////////////////////////////////////////
 math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
 {
-  return Transform2Pose3d(_xAB);
+  return Transform2PoseIgn(_xAB);
 }
 
 /////////////////////////////////////////////////
-ignition::math::Pose3d SimbodyPhysics::Transform2Pose3d(
+ignition::math::Pose3d SimbodyPhysics::Transform2PoseIgn(
     const SimTK::Transform &_xAB)
 {
   SimTK::Quaternion q(_xAB.R());
@@ -1633,7 +1640,7 @@ ignition::math::Pose3d SimbodyPhysics::Transform2Pose3d(
 /////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
-  const math::Pose pose = _element->Get<math::Pose>("pose");
+  const auto pose = _element->Get<ignition::math::Pose3d>("pose");
   return Pose2Transform(pose);
 }
 

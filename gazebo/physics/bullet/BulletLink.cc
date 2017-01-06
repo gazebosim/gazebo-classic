@@ -132,7 +132,7 @@ void BulletLink::Init()
 
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
+    this->inertial->GetPrincipalMoments().Ign());
   // TODO: inertia products not currently used
   this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
                                    fallInertia.z(), 0, 0, 0);
@@ -233,7 +233,8 @@ void BulletLink::UpdateMass()
   if (this->rigidLink && this->inertial)
   {
     this->rigidLink->setMassProps(this->inertial->GetMass(),
-        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+        BulletTypes::ConvertVector3(
+        this->inertial->GetPrincipalMoments().Ign()));
   }
 }
 

@@ -190,8 +190,8 @@ void DARTPhysics::UpdateCollision()
     localTorque2 = body2Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3Ign(torqueB));
 
-    contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
-    contactFeedback->normals[0] = DARTTypes::ConvVec3(dtContact.normal);
+    contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
+    contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);
     contactFeedback->depths[0] = dtContact.penetrationDepth;
 
     if (!dartLink1->IsStatic())

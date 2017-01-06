@@ -134,12 +134,22 @@ namespace gazebo
       /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
       /// \param[in] _v Gazeb's math::Vector3 object
       /// \return Simbody's SimTK::Vec3 object
-      public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v);
+      /// \deprecated See function which accepts an ignition math object.
+      public: static SimTK::Vec3 Vector3ToVec3(const math::Vector3 &_v)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Convert gazebo::math::Vector3 to SimTK::Vec3
+      /// \param[in] _v Gazeb's math::Vector3 object
+      /// \return Simbody's SimTK::Vec3 object
+      public: static SimTK::Vec3 Vector3ToVec3(
+          const ignition::math::Vector3d &_v);
 
       /// \brief Convert SimTK::Vec3 to gazebo::math::Vector3
       /// \param[in] _v Simbody's SimTK::Vec3 object
       /// \return Gazeb's math::Vector3 object
-      public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v);
+      /// \deprecated See Vec3ToVector3Ign
+      public: static math::Vector3 Vec3ToVector3(const SimTK::Vec3 &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Convert SimTK::Vec3 to ignition::math::Vector3d
       /// \param[in] _v Simbody's SimTK::Vec3 object
@@ -153,7 +163,9 @@ namespace gazebo
       /// the new y, then about the now twice-rotated z.
       /// \param[in] _pose Gazeb's math::Pose object
       /// \return Simbody's SimTK::Transform object
-      public: static SimTK::Transform Pose2Transform(const math::Pose &_pose);
+      /// \deprecated See function which accepts an ignition math object.
+      public: static SimTK::Transform Pose2Transform(const math::Pose &_pose)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Convert the given pose in x,y,z,thetax,thetay,thetaz format to
       /// a Simbody Transform. The rotation angles are interpreted as a
@@ -168,7 +180,7 @@ namespace gazebo
       /// thetax,thetay,thetaz format.
       /// \param[in] _xAB Simbody's SimTK::Transform object
       /// \return Gazeb's math::Pose object
-      /// \deprecated See Transform2Pose3d
+      /// \deprecated See Transform2PoseIgn
       public: static math::Pose Transform2Pose(const SimTK::Transform &_xAB)
           GAZEBO_DEPRECATED(8.0);
 
@@ -176,7 +188,7 @@ namespace gazebo
       /// thetax,thetay,thetaz format.
       /// \param[in] _xAB Simbody's SimTK::Transform object
       /// \return ignition::math::Pose3d object
-      public: static ignition::math::Pose3d Transform2Pose3d(
+      public: static ignition::math::Pose3d Transform2PoseIgn(
           const SimTK::Transform &_xAB);
 
       /// \brief If the given element contains a <pose> element, return it as a

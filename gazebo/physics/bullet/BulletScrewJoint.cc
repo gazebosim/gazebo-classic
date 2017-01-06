@@ -548,7 +548,7 @@ ignition::math::Vector3d BulletScrewJoint::GlobalAxis(
     btVector3 vec =
       this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec).Ign();
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
   else
     gzwarn << "bulletScrew does not exist, returning fake axis\n";
