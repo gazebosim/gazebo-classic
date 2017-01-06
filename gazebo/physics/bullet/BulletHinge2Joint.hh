@@ -61,8 +61,9 @@ namespace gazebo
       public: virtual void SetAxis(const unsigned int _index,
                   const ignition::math::Vector3d &_axis);
 
-      // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
+      // Function not implemented, will be removed in Gazebo 9.
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       public: double GetVelocity(unsigned int _index) const;

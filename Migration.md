@@ -273,6 +273,8 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Box CollisionBoundingBox() const
     + ***Deprecation:*** math::Pose GetRelativePose() const
     + ***Replacement:*** ignition::math::Pose3d RelativePose() const
+    + ***Deprecation:*** void SetWorldTwist(const math::Vector3 &_linear, const math::Vector3 &_angular, bool _updateChildren = true)
+    + ***Replacement:*** void SetWorldTwist(const ignition::math::Vector3d &_linear, const ignition::math::Vector3d &_angular, const bool _updateChildren = true)
 
 1. **gazebo/physics/PlaneShape.hh**
     + ***Deprecation:*** void SetSize(const math::Vector2d &_size)
@@ -737,6 +739,30 @@ release will remove the deprecated code.
     + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
     + ***Deprecation:*** static btVector4 ConvertVector4(const math::Vector4 &_vec)
     + ***Replacement:*** static btVector4 ConvertVector4dIgn(const ignition::math::Vector4d &_vec)
+
+1. **gazebo/physics/bullet/BulletBallJoint.hh**
+    + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
+    + ***Replacement:*** Use Joint::LocalAxis or Joint::GlobalAxis
+
+1. **gazebo/physics/bullet/BulletHinge2Joint.hh**
+    + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
+    + ***Replacement:*** Use Joint::LocalAxis or Joint::GlobalAxis
+
+1. **gazebo/physics/simbody/SimbodyBallJoint.hh**
+    + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
+    + ***Replacement:*** Use Joint::LocalAxis or Joint::GlobalAxis
+
+1. **gazebo/physics/simbody/SimbodyHinge2Joint.hh**
+    + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
+    + ***Replacement:*** Use Joint::LocalAxis or Joint::GlobalAxis
+
+1. **gazebo/physics/simbody/SimbodyUniversalJoint.hh**
+    + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
+    + ***Replacement:*** Use Joint::LocalAxis or Joint::GlobalAxis
+
+1. **gazebo/physics/simbody/SimbodyLink.hh**
+    + ***Deprecation:*** void SetDirtyPose(const math::Pose &_pose)
+    + ***Replacement:*** void SetDirtyPose(const ignition::math::Pose3d &_pose)
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()
