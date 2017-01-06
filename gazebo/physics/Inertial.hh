@@ -249,7 +249,7 @@ namespace gazebo
       public: void SetIXZ(const double _v);
 
       /// \brief Set IYZ
-      /// \param[in] _v IYX value
+      /// \param[in] _v IYZ value
       public: void SetIYZ(const double _v);
 
       /// \brief Rotate this mass.
