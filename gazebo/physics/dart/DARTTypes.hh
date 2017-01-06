@@ -99,7 +99,14 @@ namespace gazebo
       public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
           GAZEBO_DEPRECATED(8.0)
       {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return ConvQuat(_quat.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
       }
 
       /// \brief Convert ignition quaternion to eigen quaternion.
@@ -115,7 +122,14 @@ namespace gazebo
       public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
           GAZEBO_DEPRECATED(8.0)
       {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return ConvQuatIgn(_quat);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
       }
 
       /// \brief Convert eigen quaternion to ignition quaternion.
