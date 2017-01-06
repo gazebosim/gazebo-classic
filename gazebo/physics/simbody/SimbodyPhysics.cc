@@ -687,7 +687,7 @@ void SimbodyPhysics::UpdatePhysics()
         boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
       auto pose = SimbodyPhysics::Transform2PoseIgn(
         simbodyLink->masterMobod.getBodyTransform(s));
-      simbodyLink->SetDirtyPose(pose);
+      simbodyLink->SetDirtyPose(pose.Ign());
       this->world->dataPtr->dirtyPoses.push_back(
         boost::static_pointer_cast<Entity>(*lx).get());
     }

@@ -62,12 +62,12 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
   }
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   physics::ModelPtr sphereModel = world->ModelByName("sphere");
   if (sphereModel)
     pose = sphereModel->WorldPose();
 
-  double z = pose.pos.z;
+  double z = pose.Pos().Z();
   double test_duration = 3.0;
 
   // Dynamic duration includes the bounce back

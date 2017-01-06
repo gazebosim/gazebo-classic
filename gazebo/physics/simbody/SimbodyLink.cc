@@ -614,5 +614,11 @@ bool SimbodyLink::GetEnabled() const
 /////////////////////////////////////////////////
 void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
 {
-  this->dirtyPose = _pose.Ign();
+  this->SetDirtyPose(_pose.Ign());
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::SetDirtyPose(const ignition::math::Pose3d &_pose)
+{
+  this->dirtyPose = _pose;
 }

@@ -60,7 +60,7 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
       ignition::math::Quaterniond::Identity);
   velPub->Publish(msg);
 
-  math::Pose startPose, endPose;
+  ignition::math::Pose3d startPose, endPose;
   startPose = this->poses["pioneer2dx"];
 
   common::Time startTime = this->simTime;
@@ -82,10 +82,10 @@ void Pioneer2dx::StraightLine(const std::string &_physicsEngine)
 
   double dist = (currTime - startTime).Double() * 0.2;
   std::cout << "Dist[" << dist << "]\n";
-  std::cout << "EndPose.x[" << endPose.pos.x << "]\n";
-  EXPECT_LT(fabs(endPose.pos.x - dist), 0.1);
-  EXPECT_LT(fabs(endPose.pos.y), 0.5);
-  EXPECT_LT(fabs(endPose.pos.z), 0.01);
+  std::cout << "EndPose.X()[" << endPose.Pos().X() << "]\n";
+  EXPECT_LT(fabs(endPose.Pos().X() - dist), 0.1);
+  EXPECT_LT(fabs(endPose.Pos().Y()), 0.5);
+  EXPECT_LT(fabs(endPose.Pos().Z()), 0.01);
 }
 
 

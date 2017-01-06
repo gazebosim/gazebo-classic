@@ -156,14 +156,14 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   // Check that Joint::GlobalAxis matches _axis
   EXPECT_EQ(_axis, _joint->GlobalAxis(0));
 
-  // test LocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // test LocalAxis, AxisFrame, and AxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
   ignition::math::Vector3d axisLocalFrame = _joint->LocalAxis(0);
   {
     // rotate axis into global frame
     ignition::math::Vector3d axisGlobalFrame =
       _joint->AxisFrame(0).RotateVector(axisLocalFrame);
-    // Test GetAxisFrame: check that axis in global frame is
+    // Test AxisFrame: check that axis in global frame is
     // computed correctly.
     EXPECT_EQ(axisGlobalFrame, _axis);
   }

@@ -257,10 +257,10 @@ void JointSpawningTest::SpawnJointRotationalWorld(
       link = joint->GetParent();
     ASSERT_TRUE(link != NULL);
 
-    math::Pose initialPose = link->WorldPose();
+    auto initialPose = link->WorldPose();
     world->Step(100);
-    math::Pose afterPose = link->WorldPose();
-    EXPECT_TRUE(initialPose.pos == afterPose.pos);
+    auto afterPose = link->WorldPose();
+    EXPECT_TRUE(initialPose.Pos() == afterPose.Pos());
     EXPECT_EQ(joint->WorldPose().Pos(), joint->ParentWorldPose().Pos());
     EXPECT_EQ(joint->AnchorErrorPose().Pos(), ignition::math::Vector3d::Zero);
   }

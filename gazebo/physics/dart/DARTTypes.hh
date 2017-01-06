@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 #define GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 
@@ -70,7 +69,7 @@ namespace gazebo
         return ConvVec3(_vec3.Ign());
       }
 
-      /// \brief Convert ignition math vector3d tp eigen vector3d.
+      /// \brief Convert ignition math vector3d to eigen vector3d.
       /// \param[in] _vec3 Ignition math equalivent object.
       /// \return Eigen vector3 to convert.
       public: static Eigen::Vector3d ConvVec3(
