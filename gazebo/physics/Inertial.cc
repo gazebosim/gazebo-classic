@@ -266,7 +266,7 @@ math::Vector3 Inertial::GetPrincipalMoments() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Inertial::PrincipalMoments() const
+const ignition::math::Vector3d &Inertial::PrincipalMoments() const
 {
   return this->dataPtr->principals;
 }
@@ -278,7 +278,7 @@ math::Vector3 Inertial::GetProductsofInertia() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d Inertial::ProductsOfInertia() const
+const ignition::math::Vector3d &Inertial::ProductsOfInertia() const
 {
   return this->dataPtr->products;
 }
@@ -580,7 +580,7 @@ const math::Pose Inertial::GetPose() const
 }
 
 //////////////////////////////////////////////////
-const ignition::math::Pose3d Inertial::Pose() const
+ignition::math::Pose3d Inertial::Pose() const
 {
   return ignition::math::Pose3d(this->dataPtr->cog);
 }

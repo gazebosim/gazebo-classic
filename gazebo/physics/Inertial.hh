@@ -24,6 +24,7 @@
 #endif
 
 #include <string>
+#include <memory>
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Vector3.hh>
@@ -152,7 +153,7 @@ namespace gazebo
       /// \brief Get the pose about which the mass and inertia matrix is
       /// specified in the Link frame.
       /// \return The inertial pose.
-      public: const ignition::math::Pose3d Pose() const;
+      public: ignition::math::Pose3d Pose() const;
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
@@ -161,7 +162,7 @@ namespace gazebo
 
       /// \brief Get the principal moments of inertia (Ixx, Iyy, Izz).
       /// \return The principal moments.
-      public: ignition::math::Vector3d PrincipalMoments() const;
+      public: const ignition::math::Vector3d &PrincipalMoments() const;
 
       /// \brief Get the products of inertia (Ixy, Ixz, Iyz).
       /// \return The products of inertia.
@@ -170,7 +171,7 @@ namespace gazebo
 
       /// \brief Get the products of inertia (Ixy, Ixz, Iyz).
       /// \return The products of inertia.
-      public: ignition::math::Vector3d ProductsOfInertia() const;
+      public: const ignition::math::Vector3d &ProductsOfInertia() const;
 
       /// \brief Get IXX
       /// \return IXX value
