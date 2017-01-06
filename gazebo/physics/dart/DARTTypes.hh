@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifndef GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 #define GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 
