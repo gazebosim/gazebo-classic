@@ -219,12 +219,12 @@ namespace gazebo
       /// \return IXZ value
       public: double IXZ() const;
 
-      /// \brief Get IXZ
+      /// \brief Get IYZ
       /// \return IYZ value
       /// \deprecated See IYZ() const
       public: double GetIYZ() const GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Get IXZ
+      /// \brief Get IYZ
       /// \return IYZ value
       public: double IYZ() const;
 
