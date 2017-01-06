@@ -551,8 +551,8 @@ void SimbodyPhysics::UpdateCollision()
               /// arbitrarily based on frames.
               ///
               /// shift forces to link1 frame without rotating it first
-              auto pose1 = link1->WorldPose();
-              auto pose2 = link2->WorldPose();
+              ignition::math::Pose3d pose1 = link1->WorldPose();
+              ignition::math::Pose3d pose2 = link2->WorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
                 + SimbodyPhysics::Vector3ToVec3(pose1.Pos() - pose2.Pos());
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
@@ -561,32 +561,33 @@ void SimbodyPhysics::UpdateCollision()
               SimTK::Vec3 t1cg = s1cg[0];
               SimTK::Vec3 f1cg = s1cg[1];
 
-              /* actually don't need to do this? confirm that
-                 everything is in the world frame!
-              /// \TODO: rotate it into link 1 frame, there must be
-              /// a clean way to do this in simbody...
-              /// my gazebo way of rotating frames for now, to replace with
-              /// clean simbody function calls.
-              /// rotation from link2 to link1 frame specified in link2 frame
-              ignition::math::Quaterniond rot21 = (pose1 - pose2).Rot();
-              t1cg = SimbodyPhysics::Vector3ToVec3(
-                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(t1cg)));
-              f1cg = SimbodyPhysics::Vector3ToVec3(
-                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(f1cg)));
+              // actually don't need to do this? confirm that
+              //    everything is in the world frame!
+              // /// \TODO: rotate it into link 1 frame, there must be
+              // /// a clean way to do this in simbody...
+              // /// my gazebo way of rotating frames for now, to replace with
+              // /// clean simbody function calls.
+              // /// rotation from link2 to link1 frame specified in link2 frame
+              // math::Quaternion rot21 = (pose1 - pose2).rot;
+              // t1cg = SimbodyPhysics::Vector3ToVec3(
+              //   rot21.RotateVectorReverse(
+              //   SimbodyPhysics::Vec3ToVector3(t1cg)));
+              // f1cg = SimbodyPhysics::Vector3ToVec3(
+              //   rot21.RotateVectorReverse(
+              //   SimbodyPhysics::Vec3ToVector3(f1cg)));
 
-              gzerr << "numc: " << j << "\n";
-              gzerr << "count: " << count << "\n";
-              gzerr << "index: " << i << "\n";
-              gzerr << "offset 2: " << detail.getContactPoint() << "\n";
-              gzerr << "s2: " << s2 << "\n";
-              gzerr << "s2cg: " << s2cg << "\n";
-              gzerr << "f2cg: " << f2cg << "\n";
-              gzerr << "t2cg: " << t2cg << "\n";
-              gzerr << "offset 1: " << detail.getContactPoint() << "\n";
-              gzerr << "s1cg: " << s1cg << "\n";
-              gzerr << "f1cg: " << f1cg << "\n";
-              gzerr << "t1cg: " << t1cg << "\n";
-              */
+              // gzerr << "numc: " << j << "\n";
+              // gzerr << "count: " << count << "\n";
+              // gzerr << "index: " << i << "\n";
+              // gzerr << "offset 2: " << detail.getContactPoint() << "\n";
+              // gzerr << "s2: " << s2 << "\n";
+              // gzerr << "s2cg: " << s2cg << "\n";
+              // gzerr << "f2cg: " << f2cg << "\n";
+              // gzerr << "t2cg: " << t2cg << "\n";
+              // gzerr << "offset 1: " << detail.getContactPoint() << "\n";
+              // gzerr << "s1cg: " << s1cg << "\n";
+              // gzerr << "f1cg: " << f1cg << "\n";
+              // gzerr << "t1cg: " << t1cg << "\n";
 
               // copy.
               contactFeedback->wrench[count].body1Force.Set(
@@ -1436,7 +1437,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal().Ign());
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->Normal());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1504,7 +1505,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
           (boost::dynamic_pointer_cast<physics::BoxShape>(
-          (*ci)->GetShape()))->GetSize().Ign())/2;
+          (*ci)->GetShape()))->Size())/2;
 
         /// \TODO: harcoded resolution, make collision resolution
         /// an adjustable parameter (#980)

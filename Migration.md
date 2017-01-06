@@ -37,6 +37,19 @@ release will remove the deprecated code.
 1. **gazebo/gui/**
     + Dropped support for Qt4 and migrated the gui library to use Qt5.
 
+1. **gazebo/physics/RayShape.hh**
+    + Changed `math::Vector3 relativeStartPos` to `ignition::math::Vector3d relativeStartPos`
+    + Changed `math::Vector3 relativeEndPos` to `ignition::math::Vector3d relativeEndPos`
+    + Changed `math::Vector3 globalStartPos` to `ignition::math::Vector3d globalStartPos`
+    + Changed `math::Vector3 globalEndPos` to `ignition::math::Vector3d globalEndPos`
+
+1. **gazebo/physics/MultiRayShape.hh**
+    + Changed `protected: math::Pose offset;` to `protected: ignition::math::Pose3d offset;`
+
+1. **gazebo/physics/Contact.hh**
+    + Changed `math::Vector3 positions[MAX_CONTACT_JOINTS]` to `ignition::math::Vector3d positions[MAX_CONTACT_JOINTS]`
+    + Changed `math::Vector3 normals[MAX_CONTACT_JOINTS]` to `ignition::math::Vector3d normals[MAX_CONTACT_JOINTS]`
+
 1. **gazebo/physics/Entity.hh**
     + `gazebo::math::Pose worldPose` replaced with `ignition::math::Pose3d worldPose`
     + `gazebo::math::Pose animationStartPose` replaced with `ignition::math::Pose3d animationStartPose`
@@ -139,8 +152,30 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/RayShape.hh**
+    + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
+    + ***Replacement:*** void SetPoints(const ignition::math::Vector3d &_posStart, const ignition::math::Vector3d &_posEnd)
+    + ***Deprecation:*** virtual void GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB) 
+    + ***Replacement:*** virtual void RelativePoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
+    + ***Deprecation:*** virtual void GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+    + ***Replacement:*** virtual void GlobalPoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
+
+1. **gazebo/physics/MeshShape.hh**
+    + ***Deprecation:*** math::Vector3 GetSize() const
+    + ***Replacement:*** ignition::math::Vector3d Size() const
+
+1. **gazebo/physics/MapShape.hh**
+    + ***Deprecation:*** math::Vector3 GetScale() const
+    + ***Replacement:*** ignition::math::Vector3d Scale() const
+
+1. **gazebo/physics/BoxShape.hh**
+    + ***Deprecation:*** void SetSize(const math::Vector3 &_size)
+    + ***Replacement:*** void SetSize(const ignition::math::Vector3d &_size)
+    + ***Deprecation:*** math::Vector3 GetSize() const
+    + ***Replacement:*** ignition::math::Vector3d Size() const
+
 1. **gazebo/rendering/MovableText.hh**
-    + ***Deprecation:*** math::Box GetAABB() GAZEBO_DEPRECATED(8.0)
+    + ***Deprecation:*** math::Box GetAABB()
     + ***Replacement:*** ignition::math::Box AABB()
 
 1. **gazebo/physics/Road.hh**
@@ -152,6 +187,8 @@ release will remove the deprecated code.
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
 
 1. **gazebo/physics/Model.hh**
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
@@ -237,6 +274,10 @@ release will remove the deprecated code.
 1. **gazebo/physics/HeightmapShape.hh**
     + ***Deprecation:*** math::Vector2i GetVertexCount() const
     + ***Replacement:*** ignition::math::Vector2i VertexCount() const
+    + ***Deprecation:*** math::Vector3 GetSize() const 
+    + ***Replacement:*** ignition::math::Vector3d Size() const
+    + ***Deprecation:*** math::Vector3 GetPos() const
+    + ***Replacement:*** ignition::math::Vector3d Pos() const
 
 1. **gazebo/physics/Entity.hh**
     + ***Deprecation:*** const math::Pose GetDirtyPose() const
@@ -281,6 +322,10 @@ release will remove the deprecated code.
     + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
     + ***Deprecation:*** math::Vector2d GetSize() const
     + ***Replacement:*** ignition::math::Vector2d Size() const
+    + ***Deprecation:*** math::Vector3 GetNormal() const 
+    + ***Replacement:*** ignition::math::Vector3d Normal() const
+    + ***Deprecation:*** void SetAltitude(const math::Vector3 &_pos)
+    + ***Replacement:*** void SetAltitude(const ignition::math::Vector3d &_pos)
 
 1. **gazebo/physics/CollisionState.hh**
     + ***Deprecation:*** const math::Pose &GetPose() const
@@ -706,6 +751,8 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Angle VerticalMinAngle() const
     + ***Deprecation:*** math::Angle GetVerticalMaxAngle() const
     + ***Replacement:*** ignition::math::Angle VerticalMaxAngle() const
+    + ***Deprecation:*** void AddRay(const math::Vector3 &_start, const math::Vector3 &_end)
+    + ***Replacement:*** void AddRay(const ignition::math::Vector3d &_start, const ignition::math::Vector3d &_end)
 
 1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const

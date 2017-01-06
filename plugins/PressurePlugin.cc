@@ -91,7 +91,7 @@ void PressurePlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
               boost::dynamic_pointer_cast<physics::BoxShape>(shape);
             if (box)
             {
-              ignition::math::Vector3d size = box->GetSize().Ign();
+              ignition::math::Vector3d size = box->Size();
               std::vector<double> sizeVector;
               sizeVector.push_back(size.X());
               sizeVector.push_back(size.Y());
@@ -143,11 +143,11 @@ void PressurePlugin::OnUpdate()
       for (int i = 0; i < iter2->second.count; ++i)
       {
         // TODO: determine whether body1Force or body2Force should be used.
-        normalForce = iter2->second.normals[i].x *
+        normalForce = iter2->second.normals[i].X() *
                       iter2->second.wrench[i].body1Force.X() +
-                      iter2->second.normals[i].y *
+                      iter2->second.normals[i].Y() *
                       iter2->second.wrench[i].body1Force.Y() +
-                      iter2->second.normals[i].z *
+                      iter2->second.normals[i].Z() *
                       iter2->second.wrench[i].body1Force.Z();
         normalForceSum += normalForce;
       }
