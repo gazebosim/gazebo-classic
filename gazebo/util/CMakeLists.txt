@@ -85,6 +85,7 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
+  ${IGNITION-MATH_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
   ${IGNITION-MSGS_LIBRARIES}
 )
