@@ -19,13 +19,12 @@
 
 #include <vector>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision

@@ -14,13 +14,9 @@
  * limitations under the License.
  *
 */
-/* Desc: A ray
- * Author: Nate Koenig
- * Date: 24 May 2009
- */
 
-#ifndef _BULLETRAYGEOM_HH_
-#define _BULLETRAYGEOM_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETRAYSHAPE_HH_
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
