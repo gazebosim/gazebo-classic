@@ -67,7 +67,7 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \param[out] _result True on success.
   public: void OnList(ignition::msgs::Marker_V &_rep, bool &_result);
 
-  /// \brief Privous sim time received
+  /// \brief Previous sim time received
   public: common::Time lastSceneSimTime;
 
   /// \brief Mutex to protect message list.
