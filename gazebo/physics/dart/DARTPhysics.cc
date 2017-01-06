@@ -352,11 +352,11 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
   this->dataPtr->dtWorld->setGravity(
-    Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+    Eigen::Vector3d(_gravity.X(), _gravity.Y(), _gravity.Z()));
 }
 
 //////////////////////////////////////////////////

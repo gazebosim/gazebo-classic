@@ -144,8 +144,14 @@ namespace gazebo
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
+      /// \deprecated See function that accepts an ignition math object.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+          const gazebo::math::Vector3 &_gravity) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: virtual void SetGravity(
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \brief Return the magnetic field vector.
       /// \deprecated See World::MagneticField() const

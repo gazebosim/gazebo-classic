@@ -72,12 +72,12 @@ void DARTMeshShape::Init()
   {
     this->dataPtr->dartMesh->Init(this->submesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
     this->dataPtr->dartMesh->Init(this->mesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

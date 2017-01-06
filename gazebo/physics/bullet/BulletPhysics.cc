@@ -57,7 +57,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/bullet/BulletPhysics.hh"
 #include "gazebo/physics/bullet/BulletSurfaceParams.hh"
@@ -783,11 +782,11 @@ void BulletPhysics::SetWorldCFM(double _cfm)
 }
 
 //////////////////////////////////////////////////
-void BulletPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void BulletPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
   this->dynamicsWorld->setGravity(
-    BulletTypes::ConvertVector3(_gravity.Ign()));
+    BulletTypes::ConvertVector3(_gravity));
 }
 
 //////////////////////////////////////////////////
