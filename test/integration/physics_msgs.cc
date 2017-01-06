@@ -461,7 +461,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   int steps = 2;
   physics::ModelPtr model;
-  math::Pose pose1, pose2;
+  ignition::math::Pose3d pose1, pose2;
   ignition::math::Vector3d vel1, vel2;
   double x0, y0;
 
@@ -480,9 +480,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     x0 = modelPos[name].X();
     y0 = modelPos[name].Y();
 
-    EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.z, z0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Z(), z0, PHYSICS_TOL);
   }
 
   // resize model to half of it's size
@@ -552,9 +552,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         }
       }
 #endif
-      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
-      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
-      EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().X(), x0, xTolerance);
+      EXPECT_NEAR(pose1.Pos().Y(), y0, yTolerance);
+      EXPECT_NEAR(pose1.Pos().Z(), 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
     {
@@ -647,7 +647,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (visualGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (visualGeomElem->HasElement("sphere"))
@@ -674,7 +674,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (collisionGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("sphere"))
@@ -710,8 +710,8 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  math::Pose pose(0, 0, 0, 0, 0, 0);
-  math::Vector3 boxSize(1, 1, 1);
+  ignition::math::Pose3d pose(0, 0, 0, 0, 0, 0);
+  ignition::math::Vector3d boxSize(1, 1, 1);
   sdfStream << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='box_test'>"
     << "<allow_auto_disable>false</allow_auto_disable>"
@@ -777,7 +777,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize);
   }
 }
 

@@ -514,7 +514,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     EXPECT_TRUE((*ji)  != NULL);
   }
 
-  std::vector<math::Pose> linkPoses;
+  std::vector<ignition::math::Pose3d> linkPoses;
   for (physics::Link_V::iterator li = links.begin();
                                  li != links.end(); ++li)
     linkPoses.push_back((*li)->WorldPose());
@@ -558,18 +558,18 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
     //       << " - " << last_update_wall_time
     //       << " >= " << (1.0/pub_rate) << "\n";
 
-    std::vector<math::Pose>::iterator pi = linkPoses.begin();
+    auto pi = linkPoses.begin();
     for (physics::Link_V::iterator li = links.begin();
                                    li != links.end(); ++li, ++pi)
     {
-      math::Pose pose = (*li)->WorldPose();
-      EXPECT_NEAR(pose.pos.x, pi->pos.x, TOL);
-      EXPECT_NEAR(pose.pos.y, pi->pos.y, TOL);
-      EXPECT_NEAR(pose.pos.z, pi->pos.z, TOL);
-      EXPECT_NEAR(pose.rot.w, pi->rot.w, TOL);
-      EXPECT_NEAR(pose.rot.x, pi->rot.x, TOL);
-      EXPECT_NEAR(pose.rot.y, pi->rot.y, TOL);
-      EXPECT_NEAR(pose.rot.z, pi->rot.z, TOL);
+      auto pose = (*li)->WorldPose();
+      EXPECT_NEAR(pose.Pos().X(), pi->Pos().X(), TOL);
+      EXPECT_NEAR(pose.Pos().Y(), pi->Pos().Y(), TOL);
+      EXPECT_NEAR(pose.Pos().Z(), pi->Pos().Z(), TOL);
+      EXPECT_NEAR(pose.Rot().W(), pi->Rot().W(), TOL);
+      EXPECT_NEAR(pose.Rot().X(), pi->Rot().X(), TOL);
+      EXPECT_NEAR(pose.Rot().Y(), pi->Rot().Y(), TOL);
+      EXPECT_NEAR(pose.Rot().Z(), pi->Rot().Z(), TOL);
     }
   }
 
