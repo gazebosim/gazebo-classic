@@ -432,7 +432,8 @@ TEST_F(CameraSensor, MultiSenseHigh)
 //    common::Time::MSleep(10);
 //  common::Time dt = timer.GetElapsed();
 //  double rate = static_cast<double>(total_images)/dt.Double();
-//  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+//  gzdbg << "timer [" << dt.Double() << "] seconds rate ["
+//        << rate << "] fps\n";
 //  c.reset();
 //  EXPECT_GT(rate, 24.0);
 //  EXPECT_LT(rate, 25.0);
@@ -487,7 +488,8 @@ TEST_F(CameraSensor, MultiSenseLow)
 //    common::Time::MSleep(10);
 //  common::Time dt = timer.GetElapsed();
 //  double rate = static_cast<double>(total_images)/dt.Double();
-//  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
+//  gzdbg << "timer [" << dt.Double() << "] seconds rate ["
+//        << rate << "] fps\n";
 //  c.reset();
 //  EXPECT_GT(rate, 24.0);
 //  EXPECT_LT(rate, 25.0);
