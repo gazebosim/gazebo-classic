@@ -142,6 +142,7 @@
 
 1. Deprecate gazebo::math
     * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
+    * [Pull request #2586](https://bitbucket.org/osrf/gazebo/pull-request/2586)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
     * [Pull request #2579](https://bitbucket.org/osrf/gazebo/pull-request/2579)
     * [Pull request #2574](https://bitbucket.org/osrf/gazebo/pull-request/2574)
@@ -150,6 +151,7 @@
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2564](https://bitbucket.org/osrf/gazebo/pull-request/2564)
+    * [Pull request #2591](https://bitbucket.org/osrf/gazebo/pull-request/2591)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
     * [Pull request #2570](https://bitbucket.org/osrf/gazebo/pull-request/2570)
     * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
@@ -165,6 +167,7 @@
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
     * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
     * [Pull request #2560](https://bitbucket.org/osrf/gazebo/pull-request/2560)
+    * [Pull request #2585](https://bitbucket.org/osrf/gazebo/pull-request/2585)
     * [Pull request #2575](https://bitbucket.org/osrf/gazebo/pull-request/2575)
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
     * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)

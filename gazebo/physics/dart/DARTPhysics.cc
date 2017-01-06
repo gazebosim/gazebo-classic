@@ -182,13 +182,13 @@ void DARTPhysics::UpdateCollision()
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(force));
+        DARTTypes::ConvVec3Ign(force));
     localForce2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(-force));
+        DARTTypes::ConvVec3Ign(-force));
     localTorque1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueA));
+        DARTTypes::ConvVec3Ign(torqueA));
     localTorque2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueB));
+        DARTTypes::ConvVec3Ign(torqueB));
 
     contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
     contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);

@@ -67,7 +67,7 @@ ignition::math::Vector3d DARTUniversalJoint::Anchor(
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin).Ign();
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +112,7 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis).Ign();
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////

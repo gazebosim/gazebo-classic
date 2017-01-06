@@ -293,7 +293,7 @@ void DARTLink::UpdateMass()
     this->dataPtr->dtBodyNode->setMomentOfInertia(
         Ixxyyzz[0], Ixxyyzz[1], Ixxyyzz[2],
         Ixyxzyz[0], Ixyxzyz[1], Ixyxzyz[2]);
-    auto cog = DARTTypes::ConvVec3(this->inertial->GetCoG());
+    auto cog = DARTTypes::ConvVec3(this->inertial->GetCoG().Ign());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
   }
 }

@@ -69,17 +69,17 @@ TEST_F(GzModel, Spawn)
     ASSERT_TRUE(model != NULL);
 
     // Check the pose of the spawned model
-    math::Pose pose = model->WorldPose();
-    math::Vector3 rpy = pose.rot.GetAsEuler();
+    auto pose = model->WorldPose();
+    auto rpy = pose.Rot().Euler();
 
-    EXPECT_NEAR(pose.pos.x, 5, 1e-5);
-    EXPECT_NEAR(pose.pos.y, 2, 1e-5);
-    EXPECT_LT(pose.pos.z, 9000.0);
-    EXPECT_GT(pose.pos.z, 8900.0);
+    EXPECT_NEAR(pose.Pos().X(), 5, 1e-5);
+    EXPECT_NEAR(pose.Pos().Y(), 2, 1e-5);
+    EXPECT_LT(pose.Pos().Z(), 9000.0);
+    EXPECT_GT(pose.Pos().Z(), 8900.0);
 
-    EXPECT_NEAR(rpy.x, 0.1, 1e-5);
-    EXPECT_NEAR(rpy.y, 0.2, 1e-5);
-    EXPECT_NEAR(rpy.z, 0.3, 1e-5);
+    EXPECT_NEAR(rpy.X(), 0.1, 1e-5);
+    EXPECT_NEAR(rpy.Y(), 0.2, 1e-5);
+    EXPECT_NEAR(rpy.Z(), 0.3, 1e-5);
   }
 }
 
