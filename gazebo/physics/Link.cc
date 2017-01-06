@@ -1573,8 +1573,8 @@ double Link::GetWorldEnergyPotential() const
   // E = -m g^T z
   double m = this->GetInertial()->Mass();
   auto g = this->GetWorld()->Gravity();
-  math::Vector3 z = this->WorldCoGPose().Pos();
-  return -m * g.Dot(z.Ign());
+  auto z = this->WorldCoGPose().Pos();
+  return -m * g.Dot(z);
 }
 
 /////////////////////////////////////////////////
