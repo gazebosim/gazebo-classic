@@ -141,11 +141,9 @@ namespace gazebo
 
         /// \brief
       public: static math::Pose ConvPose(const Eigen::Isometry3d &_T)
+        GAZEBO_DEPRECATED(8.0)
         {
-            math::Pose pose;
-            pose.pos = ConvVec3(_T.translation());
-            pose.rot = ConvQuatIgn(Eigen::Quaterniond(_T.linear()));
-            return pose;
+          return ConvPoseIgn(_T);
         }
 
       /// \brief Convert eigen iosmetry3d to ignition math pose3d.

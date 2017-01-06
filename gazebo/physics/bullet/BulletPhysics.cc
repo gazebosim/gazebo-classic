@@ -156,10 +156,10 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->WorldPose();
-    math::Pose body2Pose = link2->WorldPose();
+    auto body1Pose = link1->WorldPose();
+    auto body2Pose = link2->WorldPose();
     math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
+    auto cg2Pos = link2->GetInertial()->GetPose().pos;
     math::Vector3 localForce1;
     math::Vector3 localForce2;
     math::Vector3 localTorque1;
@@ -183,14 +183,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         // Convert from world to link frame
-        localForce1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(force));
-        localForce2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(-force));
-        localTorque1 = body1Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueA));
-        localTorque2 = body2Pose.rot.RotateVectorReverse(
-            BulletTypes::ConvertVector3(torqueB));
+        localForce1 = body1Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(force));
+        localForce2 = body2Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(-force));
+        localTorque1 = body1Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(torqueA));
+        localTorque2 = body2Pose.Rot().RotateVectorReverse(
+            BulletTypes::ConvertVector3Ign(torqueB));
 
         contactFeedback->positions[j] = BulletTypes::ConvertVector3(ptB);
         contactFeedback->normals[j] = BulletTypes::ConvertVector3(normalOnB);
