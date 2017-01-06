@@ -71,8 +71,8 @@ class PhysicsTorsionalFrictionTest : public ServerFixture,
       auto inertial = link->GetInertial();
       EXPECT_TRUE(inertial != NULL);
 
-      this->mass = inertial->GetMass();
-      this->izz = inertial->GetIZZ();
+      this->mass = inertial->Mass();
+      this->izz = inertial->IZZ();
 
       this->error.InsertStatistic("maxAbs");
     }

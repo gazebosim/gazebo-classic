@@ -93,7 +93,7 @@ void JointTestScrew::WrapAngle(const std::string &_physicsEngine)
     EXPECT_NEAR(threadPitch, joint->GetParam("thread_pitch", 0), g_tolerance);
     {
       physics::LinkPtr child = joint->GetChild();
-      EXPECT_NEAR(mass, child->GetInertial()->GetMass(), g_tolerance);
+      EXPECT_NEAR(mass, child->GetInertial()->Mass(), g_tolerance);
     }
     /// \TODO: verify momentOfInertia
 

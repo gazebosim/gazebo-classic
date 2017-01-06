@@ -50,7 +50,12 @@ namespace gazebo
 
       /// \brief Get the size of the triangle mesh.
       /// \return The size of the triangle mesh.
-      public: virtual math::Vector3 GetSize() const;
+      /// \deprecated See ignition::math::Vector3d Size() const
+      public: virtual math::Vector3 GetSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the size of the triangle mesh.
+      /// \return The size of the triangle mesh.
+      public: virtual ignition::math::Vector3d Size() const;
 
       /// \brief Get the URI of the mesh data.
       /// \return The URI of the mesh data.
@@ -64,7 +69,6 @@ namespace gazebo
       public: void SetMesh(const std::string &_uri,
                            const std::string &_submesh = "",
                            bool _center = false);
-
 
       /// \brief Set the scaling factor.
       /// \param[in] _scale Scaling factor.

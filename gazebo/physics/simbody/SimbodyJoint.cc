@@ -220,14 +220,14 @@ void SimbodyJoint::CacheForceTorque()
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.
   this->wrench.body1Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody).Ign();
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnParentBody);
   this->wrench.body1Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody).Ign();
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnParentBody);
 
   this->wrench.body2Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody).Ign();
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnChildBody);
   this->wrench.body2Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody).Ign();
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnChildBody);
 }
 
 //////////////////////////////////////////////////
