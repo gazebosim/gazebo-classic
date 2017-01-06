@@ -159,11 +159,6 @@ release will remove the deprecated code.
     + ***Replacement:*** virtual void RelativePoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
     + ***Deprecation:*** virtual void GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
     + ***Replacement:*** virtual void GlobalPoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
-    + ***Deprecation:*** 
-    + ***Replacement:*** 
-
-    + ***Deprecation:*** 
-    + ***Replacement:*** 
 
 1. **gazebo/physics/MeshShape.hh**
     + ***Deprecation:*** math::Vector3 GetSize() const
