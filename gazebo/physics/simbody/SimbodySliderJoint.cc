@@ -121,7 +121,7 @@ ignition::math::Vector3d SimbodySliderJoint::GlobalAxis(
       SimTK::Vec3 x_W(this->mobod.expressVectorInGroundFrame(
         this->simbodyPhysics->integ->getState(), X_OM.x()));
 
-      return SimbodyPhysics::Vec3ToVector3(x_W).Ign();
+      return SimbodyPhysics::Vec3ToVector3Ign(x_W);
     }
     else
     {

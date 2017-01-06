@@ -20,7 +20,6 @@
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
@@ -40,19 +39,19 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(this->sdf->Get<ignition::math::Vector3d>("size"));
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetSize(const math::Vector3 &_size)
+void BoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BoxShape::GetSize() const
+ignition::math::Vector3d BoxShape::Size() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->sdf->Get<ignition::math::Vector3d>("size");
 }
 
 //////////////////////////////////////////////////
@@ -64,7 +63,7 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
   if (_scale == this->scale)
     return;
 
-  this->SetSize((_scale/this->scale)*this->GetSize().Ign());
+  this->SetSize((_scale/this->scale)*this->Size());
 
   this->scale = _scale;
 }
@@ -73,7 +72,7 @@ void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 void BoxShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
-  msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////
@@ -85,5 +84,5 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 double BoxShape::ComputeVolume() const
 {
-  return IGN_BOX_VOLUME_V(this->GetSize().Ign());
+  return IGN_BOX_VOLUME_V(this->Size());
 }

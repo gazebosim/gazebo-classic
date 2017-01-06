@@ -18,6 +18,7 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
@@ -182,16 +183,16 @@ void DARTPhysics::UpdateCollision()
 
     // Convert from world to link frame
     localForce1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(force));
+        DARTTypes::ConvVec3Ign(force));
     localForce2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(-force));
+        DARTTypes::ConvVec3Ign(-force));
     localTorque1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueA));
+        DARTTypes::ConvVec3Ign(torqueA));
     localTorque2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueB));
+        DARTTypes::ConvVec3Ign(torqueB));
 
-    contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
-    contactFeedback->normals[0] = DARTTypes::ConvVec3(dtContact.normal);
+    contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
+    contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);
     contactFeedback->depths[0] = dtContact.penetrationDepth;
 
     if (!dartLink1->IsStatic())

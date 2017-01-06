@@ -25,6 +25,7 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"

@@ -326,7 +326,7 @@ ignition::math::Vector3d BulletSliderJoint::GlobalAxis(
     btVector3 vec =
       this->bulletSlider->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletSlider->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec).Ign();
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
 
   return result;

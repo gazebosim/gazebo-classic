@@ -31,7 +31,6 @@
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/transport/transport.hh"
@@ -94,13 +93,13 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     this->dem = *demData;
     if (this->sdf->HasElement("size"))
     {
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
     }
     else
     {
-      this->heightmapSize.x = this->dem.GetWorldWidth();
-      this->heightmapSize.y = this->dem.GetWorldHeight();
-      this->heightmapSize.z = this->dem.GetMaxElevation() -
+      this->heightmapSize.X() = this->dem.GetWorldWidth();
+      this->heightmapSize.Y() = this->dem.GetWorldHeight();
+      this->heightmapSize.Z() = this->dem.GetMaxElevation() -
           this->dem.GetMinElevation();
     }
 
@@ -136,7 +135,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     if (imageData)
     {
       this->img = *imageData;
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
       return 0;
     }
   }
@@ -190,7 +189,7 @@ void HeightmapShape::Init()
 
   this->subSampling = 2;
 
-  ignition::math::Vector3d terrainSize = this->GetSize().Ign();
+  ignition::math::Vector3d terrainSize = this->Size();
 
   // sampling size along image width and height
   this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
@@ -214,7 +213,7 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize().Ign(), this->scale, this->flipY, this->heights);
+      this->Size(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -233,15 +232,15 @@ std::string HeightmapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetSize() const
+ignition::math::Vector3d HeightmapShape::Size() const
 {
   return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetPos() const
+ignition::math::Vector3d HeightmapShape::Pos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+  return this->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -252,8 +251,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_width(this->vertSize);
   _msg.mutable_heightmap()->set_height(this->vertSize);
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
   _msg.mutable_heightmap()->set_filename(this->GetURI());
 }
 

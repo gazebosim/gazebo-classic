@@ -92,13 +92,13 @@ void PhysicsLinkTest::AddLinkForceTwoWays(physics::WorldPtr _world,
   EXPECT_EQ(forceWorld, _link->WorldForce());
 
   ignition::math::Vector3d worldOffset = poseWorld0.Rot().RotateVector(
-      _offset - _link->GetInertial()->GetCoG().Ign());
+      _offset - _link->GetInertial()->CoG());
   ignition::math::Vector3d torqueWorld = worldOffset.Cross(forceWorld);
   EXPECT_EQ(torqueWorld, _link->WorldTorque());
 
   // Check acceleration in world frame
   ignition::math::Vector3d oneStepLinearAccel =
-      forceWorld/_link->GetInertial()->GetMass();
+      forceWorld/_link->GetInertial()->Mass();
   EXPECT_EQ(oneStepLinearAccel, _link->WorldLinearAccel());
 
   // Compute angular accel by multiplying world torque
@@ -617,7 +617,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
     // Calculate expected values
     ignition::math::Vector3d forceWorld = forces[i];
     ignition::math::Vector3d worldOffset =
-      forceOffsets[i] - link->GetInertial()->GetCoG().Ign();
+      forceOffsets[i] - link->GetInertial()->CoG();
     ignition::math::Vector3d torqueWorld =
       worldOffset.Cross(forces[i]) + torques[i];
 

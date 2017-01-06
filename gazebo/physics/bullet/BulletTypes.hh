@@ -21,8 +21,6 @@
 #include <ignition/math/Vector4.hh>
 
 #include "gazebo/physics/bullet/bullet_math_inc.h"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 /// \file
@@ -54,14 +52,6 @@ namespace gazebo
     /// \brief A set of functions for converting between the math types used
     ///        by gazebo and bullet.
     class GZ_PHYSICS_VISIBLE BulletTypes {
-      /// \brief Convert a bullet btVector3 to a gazebo Vector3.
-      /// \param[in] _bt Bullet Vector3.
-      /// \return Gazebo Vector3.
-      public: static math::Vector3 ConvertVector3(const btVector3 &_bt)
-              {
-                return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ());
-              }
-
       /// \brief Convert a bullet btVector3 to an ignition Vector3d.
       /// \param[in] _bt Bullet Vector3.
       /// \return Ignition Vector3d.
@@ -70,14 +60,6 @@ namespace gazebo
               {
                 return ignition::math::Vector3d(
                     _bt.getX(), _bt.getY(), _bt.getZ());
-              }
-
-      /// \brief Convert a gazebo Vector3 to a bullet btVector3.
-      /// \param[in] _vec Gazebo Vector3.
-      /// \return Bullet Vector3.
-      public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
-              {
-                return btVector3(_vec.x, _vec.y, _vec.z);
               }
 
       /// \brief Convert an ignition Vector3d to a bullet btVector3.
@@ -121,33 +103,6 @@ namespace gazebo
                 pose.Rot().Y() = _bt.getRotation().getY();
                 pose.Rot().Z() = _bt.getRotation().getZ();
                 return pose;
-              }
-
-      /// \brief Convert a bullet transform to a gazebo pose.
-      /// \param[in] _bt Bullet pose (btTransform).
-      /// \return Gazebo pose.
-      public: static math::Pose ConvertPose(const btTransform &_bt)
-              {
-                math::Pose pose;
-                pose.pos = ConvertVector3(_bt.getOrigin());
-                pose.rot.w = _bt.getRotation().getW();
-                pose.rot.x = _bt.getRotation().getX();
-                pose.rot.y = _bt.getRotation().getY();
-                pose.rot.z = _bt.getRotation().getZ();
-                return pose;
-              }
-
-      /// \brief Convert a gazebo pose to a bullet transform.
-      /// \param[in] _pose Gazebo pose.
-      /// \return Bullet pose (btTransform).
-      public: static btTransform ConvertPose(const math::Pose &_pose)
-              {
-                btTransform trans;
-
-                trans.setOrigin(ConvertVector3(_pose.pos));
-                trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                               _pose.rot.z, _pose.rot.w));
-                return trans;
               }
 
       /// \brief Convert an ignition math pose to a bullet transform.

@@ -80,7 +80,7 @@ namespace gazebo
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      public: virtual math::Vector3 GetScale() const;
+      public: virtual ignition::math::Vector3d Scale() const;
 
       /// \brief Returns image threshold for this geometry.
       /// All regions in image with value larger than MapShape::scale

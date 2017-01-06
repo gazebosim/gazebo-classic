@@ -17,8 +17,6 @@
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
@@ -46,7 +44,7 @@ namespace gazebo
       public: virtual ~ODEBoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
+      public: virtual void SetSize(const ignition::math::Vector3d &_size)
       {
         BoxShape::SetSize(_size);
 
@@ -55,10 +53,15 @@ namespace gazebo
             this->collisionParent);
 
         if (oParent->GetCollisionId() == nullptr)
-          oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
+        {
+          oParent->SetCollision(
+              dCreateBox(0, _size.X(), _size.Y(), _size.Z()), true);
+        }
         else
+        {
           dGeomBoxSetLengths(oParent->GetCollisionId(),
-                             _size.x, _size.y, _size.z);
+              _size.X(), _size.Y(), _size.Z());
+        }
       }
     };
     /// \}

@@ -26,7 +26,6 @@
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Dem.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
@@ -69,11 +68,11 @@ namespace gazebo
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
-      public: math::Vector3 GetSize() const;
+      public: ignition::math::Vector3d Size() const;
 
       /// \brief Get the origin in world coordinate frame.
       /// \return The origin in world coordinate frame.
-      public: math::Vector3 GetPos() const;
+      public: ignition::math::Vector3d Pos() const;
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.
@@ -164,7 +163,7 @@ namespace gazebo
       private: std::string fileFormat;
 
       /// \brief Terrain size
-      private: math::Vector3 heightmapSize;
+      private: ignition::math::Vector3d heightmapSize;
 
       #ifdef HAVE_GDAL
       /// \brief DEM used to generate the heights.

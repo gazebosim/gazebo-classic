@@ -19,6 +19,7 @@
 #define _GAZEBO_BULLETMESH_HH_
 
 #include "gazebo/physics/bullet/BulletTypes.hh"
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

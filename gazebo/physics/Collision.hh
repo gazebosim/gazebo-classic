@@ -21,7 +21,6 @@
 #include <vector>
 
 #include "gazebo/common/Event.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/CollisionState.hh"
@@ -111,7 +110,7 @@ namespace gazebo
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.

@@ -18,6 +18,7 @@
 #ifndef _GAZEBO_ODEMESH_HH_
 #define _GAZEBO_ODEMESH_HH_
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 #include "gazebo/physics/ode/ode_inc.h"
 #include "gazebo/physics/MeshShape.hh"

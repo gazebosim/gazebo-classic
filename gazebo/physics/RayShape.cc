@@ -71,10 +71,10 @@ RayShape::~RayShape()
 }
 
 //////////////////////////////////////////////////
-void RayShape::SetPoints(const math::Vector3 &_posStart,
-                         const math::Vector3 &_posEnd)
+void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                         const ignition::math::Vector3d &_posEnd)
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
 
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
@@ -83,10 +83,9 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   {
     this->globalStartPos =
       this->collisionParent->WorldPose().CoordPositionAdd(
-        this->relativeStartPos.Ign());
+        this->relativeStartPos);
     this->globalEndPos =
-      this->collisionParent->WorldPose().CoordPositionAdd(
-        this->relativeEndPos.Ign());
+      this->collisionParent->WorldPose().CoordPositionAdd(this->relativeEndPos);
   }
   else
   {
@@ -100,14 +99,16 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
+void RayShape::RelativePoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
 {
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
-void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+void RayShape::GlobalPoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;
@@ -118,7 +119,7 @@ void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
 
-  math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  ignition::math::Vector3d dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
@@ -189,13 +190,13 @@ double RayShape::ComputeVolume() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::Start() const
 {
-  return this->relativeStartPos.Ign();
+  return this->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::End() const
 {
-  return this->relativeEndPos.Ign();
+  return this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////

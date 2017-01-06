@@ -141,7 +141,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
           this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_IF.x()));
 
-        return SimbodyPhysics::Vec3ToVector3(x_W).Ign();
+        return SimbodyPhysics::Vec3ToVector3Ign(x_W);
       }
       else if (_index == UniversalJoint::AXIS_CHILD)
       {
@@ -153,7 +153,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
           this->mobod.expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_OM.y()));
 
-        return SimbodyPhysics::Vec3ToVector3(y_W).Ign();
+        return SimbodyPhysics::Vec3ToVector3Ign(y_W);
       }
       else
       {

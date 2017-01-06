@@ -19,6 +19,7 @@
 
 #include <ignition/math/Vector2.hh>
 
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -51,7 +52,7 @@ namespace gazebo
 
       /// \brief Set the altitude of the plane.
       /// \param[in] _pos Position of the plane.
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
@@ -59,7 +60,7 @@ namespace gazebo
 
       /// \brief Get the plane normal.
       /// \return The plane normal.
-      public: math::Vector3 GetNormal() const;
+      public: ignition::math::Vector3d Normal() const;
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.
