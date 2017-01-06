@@ -370,7 +370,7 @@ ignition::math::Vector3d BulletHingeJoint::GlobalAxis(
     btVector3 vec =
       bulletHinge->getRigidBodyA().getCenterOfMassTransform().getBasis() *
       bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
-    result = BulletTypes::ConvertVector3(vec).Ign();
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
 
   return result;

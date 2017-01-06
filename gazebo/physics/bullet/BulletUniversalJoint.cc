@@ -380,7 +380,7 @@ ignition::math::Vector3d BulletUniversalJoint::GlobalAxis(
         getRigidBodyA().getCenterOfMassTransform().getBasis() *
         this->bulletUniversal->getFrameOffsetA().getBasis().getColumn(2);
 
-      result = BulletTypes::ConvertVector3(vec).Ign();
+      result = BulletTypes::ConvertVector3Ign(vec);
     }
     else if (_index == 1)
     {
@@ -388,7 +388,7 @@ ignition::math::Vector3d BulletUniversalJoint::GlobalAxis(
         getRigidBodyB().getCenterOfMassTransform().getBasis() *
         this->bulletUniversal->getFrameOffsetB().getBasis().getColumn(1);
 
-      result = BulletTypes::ConvertVector3(vec).Ign();
+      result = BulletTypes::ConvertVector3Ign(vec);
     }
     else
       gzerr << "Invalid axis index[" << _index << "]\n";

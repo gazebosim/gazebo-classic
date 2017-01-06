@@ -561,7 +561,7 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
   {
     const SimTK::Real mass = this->inertial->GetMass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
-      this->inertial->GetPose());
+      this->inertial->GetPose().Ign());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
     if (ignition::math::equal(mass, 0.0))
