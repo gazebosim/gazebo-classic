@@ -103,11 +103,10 @@ void MultiRayShape::Init()
       // since we're rotating a unit x vector, a pitch rotation will now be
       // around the negative y axis
       ray.Euler(ignition::math::Vector3d(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.Ign().Rot() * ray *
-          ignition::math::Vector3d(1.0, 0.0, 0.0);
+      axis = this->offset.Rot() * ray * ignition::math::Vector3d::UnitX;
 
-      start = (axis * this->minRange) + this->offset.Ign().Pos();
-      end = (axis * this->maxRange) + this->offset.Ign().Pos();
+      start = (axis * this->minRange) + this->offset.Pos();
+      end = (axis * this->maxRange) + this->offset.Pos();
 
       this->AddRay(start, end);
     }
@@ -211,8 +210,15 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
-                           const math::Vector3 &/*_end*/)
+void MultiRayShape::AddRay(const math::Vector3 &_start,
+                           const math::Vector3 &_end)
+{
+  this->AddRay(_start.Ign(), _end.Ign());
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::AddRay(const ignition::math::Vector3d &/*_start*/,
+                           const ignition::math::Vector3d &/*_end*/)
 {
   // msgs::Vector3d *pt = NULL;
 

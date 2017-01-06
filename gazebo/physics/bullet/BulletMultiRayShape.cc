@@ -53,8 +53,8 @@ void BulletMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void BulletMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void BulletMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 
