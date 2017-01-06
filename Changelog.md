@@ -173,6 +173,7 @@
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
     * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
     * [Pull request #2577](https://bitbucket.org/osrf/gazebo/pull-request/2577)
+    * [Pull request #2581](https://bitbucket.org/osrf/gazebo/pull-request/2581)
     * [Pull request #2566](https://bitbucket.org/osrf/gazebo/pull-request/2566)
     * [Pull request #2578](https://bitbucket.org/osrf/gazebo/pull-request/2578)
 

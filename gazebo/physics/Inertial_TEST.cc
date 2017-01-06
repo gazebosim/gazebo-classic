@@ -34,8 +34,8 @@ TEST_F(Inertial_TEST, InertialOperators)
   physics::Inertial i2;
   i1.SetMass(1.0);
   i2.SetMass(2.0);
-  i1.SetCoG(math::Pose(0, 0, 0, 0, 0, 0));
-  i2.SetCoG(math::Pose(0, 0, 1, 0, 0, 0));
+  i1.SetCoG(ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
+  i2.SetCoG(ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
 
   i1.SetIXX(0.1);
   i1.SetIYY(0.2);
@@ -53,27 +53,28 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "isum: \n"
         << isum << "\n";
   gzdbg << "i1 new cg: \n"
-        << i1.MOI(isum.GetPose().Ign()) << "\n";
+        << i1.MOI(isum.Pose()) << "\n";
   gzdbg << "i2 new cg: \n"
-        << i2.MOI(isum.GetPose().Ign()) << "\n";
-  EXPECT_NEAR(isum.GetPose().pos.z, 2.0/3.0, TOL);
-  EXPECT_NEAR(isum.GetIXX(),
+        << i2.MOI(isum.Pose()) << "\n";
+  EXPECT_NEAR(isum.Pose().Pos().Z(), 2.0/3.0, TOL);
+  EXPECT_NEAR(isum.IXX(),
     1.0 + 0.1 + 1.0*(2.0/3.0)*(2.0/3.0)
               + 2.0*(1-2.0/3.0)*(1-2.0/3.0), TOL);
-  EXPECT_NEAR(isum.GetIYY(),
+  EXPECT_NEAR(isum.IYY(),
     2.0 + 0.2 + 1.0*(2.0/3.0)*(2.0/3.0)
               + 2.0*(1-2.0/3.0)*(1-2.0/3.0), TOL);
-  EXPECT_NEAR(isum.GetIZZ(), 3.0 + 0.3, TOL);
+  EXPECT_NEAR(isum.IZZ(), 3.0 + 0.3, TOL);
 
   // Test GetInertial(offset)
-  physics::Inertial i1Offset = i1.GetInertial(math::Pose(0, 0, 0, 0, 0, 0));
+  physics::Inertial i1Offset = i1(ignition::math::Pose3d::Zero);
   EXPECT_TRUE(i1.MOI() == i1Offset.MOI());
-  EXPECT_TRUE(i1.GetPose() == i1Offset.GetPose());
-  i1Offset = i1.GetInertial(math::Pose(1, 0, 0, 0, 0, 0));
-  EXPECT_EQ(i1.MOI(
-        ignition::math::Pose3d(1, 0, 0, 0, 0, 0)), i1Offset.MOI());
-  gzdbg << i1.GetPose() << " : " <<  i1Offset.GetPose() << "\n";
-  EXPECT_TRUE(i1.GetPose() == math::Pose(1, 0, 0, 0, 0, 0)+i1Offset.GetPose());
+  EXPECT_TRUE(i1.Pose() == i1Offset.Pose());
+  i1Offset = i1(ignition::math::Pose3d(1, 0, 0, 0, 0, 0));
+  EXPECT_TRUE(i1.MOI(
+        ignition::math::Pose3d(1, 0, 0, 0, 0, 0)) == i1Offset.MOI());
+  gzdbg << i1.Pose() << " : " <<  i1Offset.Pose() << "\n";
+  EXPECT_TRUE(i1.Pose() == ignition::math::Pose3d(1, 0, 0, 0, 0, 0)+
+      i1Offset.Pose());
 
   // Test MOI
   ignition::math::Matrix3d i11 =
@@ -84,9 +85,9 @@ TEST_F(Inertial_TEST, InertialOperators)
   // Get i2 from origin of link
   physics::Inertial i3;
   i3.SetMOI(i2.MOI(ignition::math::Pose3d()));
-  EXPECT_NEAR(i3.GetIXX(), 1 + 2, TOL);
-  EXPECT_NEAR(i3.GetIYY(), 2 + 2, TOL);
-  EXPECT_NEAR(i3.GetIZZ(), 3, TOL);
+  EXPECT_NEAR(i3.IXX(), 1 + 2, TOL);
+  EXPECT_NEAR(i3.IYY(), 2 + 2, TOL);
+  EXPECT_NEAR(i3.IZZ(), 3, TOL);
 
   gzdbg << "i2:\n" << i2 << "\n";
   gzdbg << "R:\n" << ignition::math::Matrix3d(
@@ -94,9 +95,9 @@ TEST_F(Inertial_TEST, InertialOperators)
   gzdbg << "I:\n" << i2.MOI() << "\n";
   i2.SetMOI(i2.MOI(ignition::math::Pose3d(0, 0, 1, 0, 0, 0.5*IGN_PI)));
   gzdbg << "i2:\n" << i2 << "\n";
-  EXPECT_NEAR(i2.GetIXX(), 2, TOL);
-  EXPECT_NEAR(i2.GetIYY(), 1, TOL);
-  EXPECT_NEAR(i2.GetIZZ(), 3, TOL);
+  EXPECT_NEAR(i2.IXX(), 2, TOL);
+  EXPECT_NEAR(i2.IYY(), 1, TOL);
+  EXPECT_NEAR(i2.IZZ(), 3, TOL);
 }
 
 int main(int argc, char **argv)

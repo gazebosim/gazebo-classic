@@ -158,8 +158,8 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     auto body1Pose = link1->WorldPose();
     auto body2Pose = link2->WorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    auto cg2Pos = link2->GetInertial()->GetPose().pos;
+    auto cg1Pos = link1->GetInertial()->Pose().Pos();
+    auto cg2Pos = link2->GetInertial()->Pose().Pos();
     math::Vector3 localForce1;
     math::Vector3 localForce2;
     math::Vector3 localTorque1;

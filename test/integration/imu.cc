@@ -507,7 +507,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // expected velocity calculation
   // kg*m^2
-  const double iyy = ballFloatingLink2->GetInertial()->GetPrincipalMoments().y;
+  const double iyy = ballFloatingLink2->GetInertial()->PrincipalMoments().Y();
   EXPECT_NEAR(iyy, 0.1, 1e-6);
 
   // sec

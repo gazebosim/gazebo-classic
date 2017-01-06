@@ -237,7 +237,7 @@ void BulletJoint::CacheForceTorque()
     // convert torque from about child CG to joint anchor location
     // cg position specified in child link frame
     ignition::math::Pose3d cgPose =
-      this->childLink->GetInertial()->GetPose().Ign();
+      this->childLink->GetInertial()->Pose();
 
     // anchorPose location of joint in child frame
     // childMomentArm: from child CG to joint location in child link frame
@@ -281,7 +281,7 @@ void BulletJoint::CacheForceTorque()
 
     // parent cg specified in parent link frame
     ignition::math::Pose3d cgPose =
-      this->parentLink->GetInertial()->GetPose().Ign();
+      this->parentLink->GetInertial()->Pose();
 
     // get parent CG pose in child link frame
     ignition::math::Pose3d parentCGInChildLink =
