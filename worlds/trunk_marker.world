@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="plot_pendulum">
+      <include>
+        <uri>model://double_pendulum_with_base</uri>
+      </include>
+
+      <plugin name='trunk' filename='libTrunkPlugin.so'/>
+
+    </model>
+  </world>
+</sdf>
