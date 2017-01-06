@@ -184,14 +184,14 @@ void BulletJoint::CacheForceTorque()
   // caching force torque for the joint
   // if cached, GetForceTorque should use this value
   // this->wrench
-  this->wrench.body2Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyA).Ign();
-  this->wrench.body2Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyA).Ign();
-  this->wrench.body1Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyB).Ign();
-  this->wrench.body1Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyB).Ign();
+  this->wrench.body2Force = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedForceBodyA);
+  this->wrench.body2Torque = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedTorqueBodyA);
+  this->wrench.body1Force = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedForceBodyB);
+  this->wrench.body1Torque = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedTorqueBodyB);
   // gzerr << "   " << this->GetName()
   //       << " : " << this->wrench.body1Force
   //       << " : " << this->wrench.body1Torque

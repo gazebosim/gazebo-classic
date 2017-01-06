@@ -76,5 +76,5 @@ void DARTBoxShape::SetSize(const math::Vector3 &_size)
 
   BoxShape::SetSize(size);
 
-  this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size));
+  this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size.Ign()));
 }

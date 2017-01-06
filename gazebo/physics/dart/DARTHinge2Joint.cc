@@ -68,7 +68,7 @@ ignition::math::Vector3d DARTHinge2Joint::Anchor(
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin).Ign();
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
@@ -164,7 +164,7 @@ ignition::math::Vector3d DARTHinge2Joint::GlobalAxis(
   // TODO: Issue #494
   // See: https://bitbucket.org/osrf/gazebo/issue/494/
   // joint-axis-reference-frame-doesnt-match
-  return DARTTypes::ConvVec3(globalAxis).Ign();
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
