@@ -79,6 +79,7 @@ namespace gazebo
       public: void Reset();
 
       /// \brief Set the mass.
+      /// \param[in] _m Mass value in kilograms.
       public: void SetMass(const double _m);
 
       /// \brief Get the mass
@@ -86,7 +87,7 @@ namespace gazebo
       public: double GetMass() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the mass
-      /// \deprecated See Mass() const
+      /// \return The mass in kilograms
       public: double Mass() const;
 
       /// \brief Set the mass matrix.
@@ -248,7 +249,7 @@ namespace gazebo
       public: void SetIXZ(const double _v);
 
       /// \brief Set IYZ
-      /// \param[in] _v IXX value
+      /// \param[in] _v IYX value
       public: void SetIYZ(const double _v);
 
       /// \brief Rotate this mass.
@@ -365,7 +366,7 @@ namespace gazebo
       public: void SetMOI(const math::Matrix3 &_moi) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Sets Moments of Inertia (MOI) from a Matrix3
-      /// \param[in] Moments of Inertia as a Matrix3
+      /// \param[in] _moi Moments of Inertia as a Matrix3
       public: void SetMOI(const ignition::math::Matrix3d &_moi);
 
       /// \internal
