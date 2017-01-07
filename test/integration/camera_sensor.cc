@@ -270,6 +270,37 @@ TEST_F(CameraSensor, CheckThrottle)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, TopicName)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn model with name similar to a nested model
+  std::string modelName = "prefix::camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  EXPECT_NE(camSensor->Topic().find("prefix/camera_model/body/camera_sensor"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, FillMsg)
 {
   Load("worlds/empty_test.world");
