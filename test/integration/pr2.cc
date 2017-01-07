@@ -69,7 +69,7 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
     common::Time::MSleep(100);
 
   physics::get_world("default")->Physics()->SetGravity(
-      math::Vector3(-0.5, 0, -0.1));
+      ignition::math::Vector3d(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;

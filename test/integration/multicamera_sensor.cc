@@ -217,9 +217,9 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
                          diffMax, diffSum, diffAvg);
 
       // use below to construct test for rotated2 left camera offset
-      // math::Quaternion a(1.2, 1.3, 1.4);
-      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
-
+      // ignition::math::Quaterniond a(1.2, 1.3, 1.4);
+      // gzerr << "test: " << a.RotateVector(
+      // ignition::math::Vector3d::UnitY) << "\n";
       // We expect that there will be some non-zero difference between the two
       // images.
       EXPECT_GT(diffSum, 100u);

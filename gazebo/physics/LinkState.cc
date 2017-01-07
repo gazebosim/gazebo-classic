@@ -226,7 +226,7 @@ bool LinkState::IsZero() const
   //   result = result && (*iter).IsZero();
   // }
 
-  // return result && this->pose == math::Pose3d::Zero;
+  // return result && this->pose == ignition::math::Pose3d::Zero;
 
   return this->pose == ignition::math::Pose3d::Zero;
 }

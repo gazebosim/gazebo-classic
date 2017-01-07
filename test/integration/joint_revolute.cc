@@ -113,7 +113,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     std::string jointType = "revolute";
@@ -452,7 +452,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {

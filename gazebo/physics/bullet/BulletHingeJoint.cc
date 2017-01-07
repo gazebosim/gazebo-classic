@@ -225,7 +225,7 @@ void BulletHingeJoint::SetAxis(const unsigned int /*_index*/,
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3d vec(_axis.X(), _axis.Y(), _axis.Z());
+  /*btVector3 vec(_axis.X(), _axis.Y(), _axis.Z());
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
 }

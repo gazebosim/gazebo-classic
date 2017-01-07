@@ -771,9 +771,9 @@ TEST_P(FactoryTest, Clone)
       rendering::RenderEngine::NONE)
     return;
 
-  math::Pose setPose, testPose;
+  ignition::math::Pose3d setPose, testPose;
   Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
+  setPose.Set(ignition::math::Vector3d(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
       setPose.rot.GetAsEuler());
 

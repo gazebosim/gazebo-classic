@@ -410,8 +410,8 @@ TEST_F(CameraSensor, MultiSenseHigh)
   unsigned int width  = 2048;
   unsigned int height = 1088;
   double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -465,8 +465,8 @@ TEST_F(CameraSensor, MultiSenseLow)
   unsigned int width  = 1024;
   unsigned int height = 544;
   double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);

@@ -155,14 +155,14 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = link1->WorldPose();
-    math::Pose body2Pose = link2->WorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->Pose().Pos();
-    math::Vector3 cg2Pos = link2->GetInertial()->Pose().Pos();
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    auto body1Pose = link1->WorldPose();
+    auto body2Pose = link2->WorldPose();
+    auto cg1Pos = link1->GetInertial()->Pose().Pos();
+    auto cg2Pos = link2->GetInertial()->Pose().Pos();
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
@@ -182,13 +182,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         btVector3 torqueB = (ptB-rbB->getCenterOfMassPosition()).cross(-force);
 
         // Convert from world to link frame
-        localForce1 = body1Pose.rot.RotateVectorReverse(
+        localForce1 = body1Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3Ign(force));
-        localForce2 = body2Pose.rot.RotateVectorReverse(
+        localForce2 = body2Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3Ign(-force));
-        localTorque1 = body1Pose.rot.RotateVectorReverse(
+        localTorque1 = body1Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3Ign(torqueA));
-        localTorque2 = body2Pose.rot.RotateVectorReverse(
+        localTorque2 = body2Pose.Rot().RotateVectorReverse(
             BulletTypes::ConvertVector3Ign(torqueB));
 
         contactFeedback->positions[j] = BulletTypes::ConvertVector3Ign(ptB);
@@ -196,13 +196,13 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
         contactFeedback->depths[j] = -pt.getDistance();
         if (!link1->IsStatic())
         {
-          contactFeedback->wrench[j].body1Force = localForce1.Ign();
-          contactFeedback->wrench[j].body1Torque = localTorque1.Ign();
+          contactFeedback->wrench[j].body1Force = localForce1;
+          contactFeedback->wrench[j].body1Torque = localTorque1;
         }
         if (!link2->IsStatic())
         {
-          contactFeedback->wrench[j].body2Force = localForce2.Ign();
-          contactFeedback->wrench[j].body2Torque = localTorque2.Ign();
+          contactFeedback->wrench[j].body2Force = localForce2;
+          contactFeedback->wrench[j].body2Torque = localTorque2;
         }
         contactFeedback->count++;
       }
