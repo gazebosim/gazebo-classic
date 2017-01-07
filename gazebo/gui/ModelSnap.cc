@@ -374,6 +374,10 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
 
   this->SnapTransform(triangleSrc, triangleDest, _poseSrc.Ign(), trans, rot);
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _trans = trans;
   _rot = rot;
 #ifndef _WIN32

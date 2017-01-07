@@ -588,8 +588,7 @@ void Camera::SetWorldPose(const math::Pose &_pose)
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-  this->SetWorldPosition(_pose.pos.Ign());
-  this->SetWorldRotation(_pose.rot.Ign());
+  this->SetWorldPose(_pose.Ign());
 #ifndef _WIN32
   #pragma GCC diagnostic pop
 #endif
