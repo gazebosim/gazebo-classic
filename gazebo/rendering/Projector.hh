@@ -81,12 +81,19 @@ namespace gazebo
       /// \param[in] _farClip Far clip distance.
       /// \param[in] _fov Field of view.
       /// \deprecated See version that uses a ignition::math Pose3d objects.
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       public: void Load(const std::string &_name,
                         const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
                         const std::string &_textureName = "",
                         double _nearClip = 0.25,
                         double _farClip = 15.0,
                         double _fov = IGN_PI * 0.25) GAZEBO_DEPRECATED(8.0);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
       /// \brief Load a texture into the projector.
       /// \param[in] _textureName Name of the texture to project.

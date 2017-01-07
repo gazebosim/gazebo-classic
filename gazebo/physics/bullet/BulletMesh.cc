@@ -40,7 +40,14 @@ void BulletMesh::Init(const common::SubMesh *_subMesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_subMesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -69,7 +76,14 @@ void BulletMesh::Init(const common::Mesh *_mesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_mesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

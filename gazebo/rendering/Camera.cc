@@ -584,8 +584,15 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 //////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldPosition(_pose.pos.Ign());
   this->SetWorldRotation(_pose.rot.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

@@ -791,7 +791,14 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetScale(_scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -891,7 +898,14 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Scale();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1767,7 +1781,14 @@ bool Visual::GetVisible() const
 //////////////////////////////////////////////////
 void Visual::SetPosition(const math::Vector3 &_pos)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPosition(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1782,7 +1803,14 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetRotation(_rot.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1798,7 +1826,14 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1811,7 +1846,14 @@ void Visual::SetPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Position();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1825,7 +1867,14 @@ ignition::math::Vector3d Visual::Position() const
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Rotation();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1839,7 +1888,14 @@ ignition::math::Quaterniond Visual::Rotation() const
 //////////////////////////////////////////////////
 math::Pose Visual::GetPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Pose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1860,7 +1916,14 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1873,7 +1936,14 @@ void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldPosition(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1887,7 +1957,14 @@ void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldRotation(_q.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1901,7 +1978,14 @@ void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 //////////////////////////////////////////////////
 math::Pose Visual::GetWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2885,7 +2969,14 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   std::vector<ignition::math::Pose3d> pts;
   for (auto const &pt : _pts)
   {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     pts.push_back(pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   }
 
   this->MoveToPositions(pts, _time, _onComplete);
@@ -2944,7 +3035,14 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
 //////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->MoveToPosition(_pose.Ign(), _time);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

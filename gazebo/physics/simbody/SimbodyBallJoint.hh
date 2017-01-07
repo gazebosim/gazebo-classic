@@ -49,7 +49,17 @@ namespace gazebo
 
       // Function not implemented, will be removed in Gazebo 9.
       public: virtual math::Vector3 GetAxis(unsigned int /*_index*/) const
-          GAZEBO_DEPRECATED(8.0) {return math::Vector3();}
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return math::Vector3();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
       // Documentation inherited.
       public: virtual void SetVelocity(unsigned int _index, double _angle);

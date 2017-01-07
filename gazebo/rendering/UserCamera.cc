@@ -209,7 +209,14 @@ void UserCamera::Init()
 //////////////////////////////////////////////////
 void UserCamera::SetDefaultPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetInitialPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -222,7 +229,14 @@ void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 math::Pose UserCamera::DefaultPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->InitialPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -234,8 +248,14 @@ ignition::math::Pose3d UserCamera::InitialPose() const
 //////////////////////////////////////////////////
 void UserCamera::SetWorldPose(const math::Pose &_pose)
 {
-  Camera::SetWorldPose(_pose.Ign());
-  this->dataPtr->viewController->Init();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetWorldPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -436,7 +456,14 @@ void UserCamera::SetViewController(const std::string &_type)
 void UserCamera::SetViewController(const std::string &_type,
                                    const math::Vector3 &_pos)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetViewController(_type, _pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -766,7 +793,14 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
 //////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetFocalPoint(_pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
