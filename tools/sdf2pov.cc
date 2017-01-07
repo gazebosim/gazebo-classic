@@ -84,7 +84,8 @@ ignition::math::Vector3d Convert(const ignition::math::Vector3d &_vec)
   return result;
 }
 
-void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
+void ProcessMesh(sdf::ElementPtr _elem,
+    const ignition::math::Pose3d &_pose)
 {
   const gazebo::common::Mesh *mesh;
 
@@ -201,7 +202,7 @@ void ProcessMesh(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
 
 void ProcessLight(sdf::ElementPtr _elem)
 {
-  gazebo::math::Pose pose;
+  ignition::math::Pose3d pose;
   gazebo::common::Color diffuse, specular;
 
   pose = _elem->GetOrCreateElement("origin")->GetValuePose("pose");
@@ -245,7 +246,7 @@ void ProcessLight(sdf::ElementPtr _elem)
   {
     ignition::math::Vector3d dir =
       _elem->GetElement("direction")->GetValueVector3("xyz");
-    gazebo::math::Plane plane(ignition::math::Vector3d(0, 0, 1));
+    ignition::math::Plane plane(ignition::math::Vector3d(0, 0, 1));
 
     double d = plane.Distance(pose.pos, dir);
     double t;
@@ -293,7 +294,7 @@ void ProcessScene(sdf::ElementPtr _elem)
   printf("} }\n");
 }
 
-void ProcessGeometry(sdf::ElementPtr _elem, const gazebo::math::Pose &_pose)
+void ProcessGeometry(sdf::ElementPtr _elem, const ignition::math::Pose3d &_pose)
 {
   if (_elem->HasElement("plane"))
   {
@@ -380,7 +381,7 @@ int main(int argc, char **argv)
 
   sdf::ElementPtr root = sdf->Root();
 
-  gazebo::math::Pose modelPose, linkPose, visualPose;
+  ignition::math::Pose3d modelPose, linkPose, visualPose;
 
   sdf::ElementPtr worldElem = root->GetElement("world");
   while (worldElem)
