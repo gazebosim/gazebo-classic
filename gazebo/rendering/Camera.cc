@@ -584,8 +584,7 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 //////////////////////////////////////////////////
 void Camera::SetWorldPose(const math::Pose &_pose)
 {
-  this->SetWorldPosition(_pose.pos.Ign());
-  this->SetWorldRotation(_pose.rot.Ign());
+  this->SetWorldPose(_pose.Ign());
 }
 
 //////////////////////////////////////////////////

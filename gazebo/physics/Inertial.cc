@@ -325,7 +325,14 @@ ignition::math::Matrix3d Inertial::MOI() const
 //////////////////////////////////////////////////
 void Inertial::Rotate(const math::Quaternion &_rot)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Rotate(_rot.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

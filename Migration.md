@@ -1022,6 +1022,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** public:   gazebo::math::Matrix4
     + ***Replacement:*** public: ignition::math::Matrix4
 
+1. **gazebo/math/Quaternion.hh**
+    + ***Deprecation:*** public:   gazebo::math::Quaternion
+    + ***Replacement:*** public: ignition::math::Quaterniond
+
 1. **gazebo/math/Plane.hh**
     + ***Deprecation:*** public:   gazebo::math::Plane
     + ***Replacement:*** public: ignition::math::Plane

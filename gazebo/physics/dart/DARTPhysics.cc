@@ -162,8 +162,8 @@ void DARTPhysics::UpdateCollision()
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = dartLink1->WorldPose();
-    math::Pose body2Pose = dartLink2->WorldPose();
+    auto body1Pose = dartLink1->WorldPose();
+    auto body2Pose = dartLink2->WorldPose();
     math::Vector3 localForce1;
     math::Vector3 localForce2;
     math::Vector3 localTorque1;
@@ -181,13 +181,13 @@ void DARTPhysics::UpdateCollision()
          dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
-    localForce1 = body1Pose.rot.RotateVectorReverse(
+    localForce1 = body1Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3Ign(force));
-    localForce2 = body2Pose.rot.RotateVectorReverse(
+    localForce2 = body2Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3Ign(-force));
-    localTorque1 = body1Pose.rot.RotateVectorReverse(
+    localTorque1 = body1Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3Ign(torqueA));
-    localTorque2 = body2Pose.rot.RotateVectorReverse(
+    localTorque2 = body2Pose.Rot().RotateVectorReverse(
         DARTTypes::ConvVec3Ign(torqueB));
 
     contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
