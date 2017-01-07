@@ -1553,7 +1553,14 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 /////////////////////////////////////////////////
 SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return QuadToQuad(_q.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1566,7 +1573,14 @@ SimTK::Quaternion SimbodyPhysics::QuadToQuad(
 /////////////////////////////////////////////////
 math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return QuadToQuadIgn(_q);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

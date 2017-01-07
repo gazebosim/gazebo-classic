@@ -1352,7 +1352,7 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    auto pose = link->WorldPose();
+    ignition::math::Pose3d pose = link->WorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
     ignition::math::Vector3d dpos(pos[0], pos[1], pos[2]);

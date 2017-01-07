@@ -127,7 +127,7 @@ namespace gazebo
     GAZEBO_VISIBLE
     msgs::Any ConvertAny(const ignition::math::Pose3d &_p);
 
-    /// \brief Convert an ignition::math::Quaternion to a msgs::Any
+    /// \brief Convert an ignition::math::Quaterniond to a msgs::Any
     /// \param[in] _q The quaternion to convert.
     /// \return A msgs::Any object.
     GAZEBO_VISIBLE
@@ -233,7 +233,7 @@ namespace gazebo
 
     /// \brief Convert a msgs::Quaternion to an ignition::math::Quaternion
     /// \param[in] _q The quaternion to convert
-    /// \return An ignition::math::Quaternion object
+    /// \return An ignition::math::Quaterniond object
     GAZEBO_VISIBLE
     ignition::math::Quaterniond ConvertIgn(const msgs::Quaternion &_q);
 
