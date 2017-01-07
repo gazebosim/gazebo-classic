@@ -34,7 +34,7 @@ HotkeyDialog::HotkeyDialog(QWidget *_parent)
 }
 
 /////////////////////////////////////////////////
-void HotkeyDialog::OnLinkClicked(QUrl _url)
+void HotkeyDialog::OnLinkClicked(QUrl /*_url*/)
 {
 }
 
