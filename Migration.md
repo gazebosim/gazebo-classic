@@ -155,7 +155,7 @@ release will remove the deprecated code.
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
     + ***Replacement:*** void SetPoints(const ignition::math::Vector3d &_posStart, const ignition::math::Vector3d &_posEnd)
-    + ***Deprecation:*** virtual void GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB) 
+    + ***Deprecation:*** virtual void GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
     + ***Replacement:*** virtual void RelativePoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
     + ***Deprecation:*** virtual void GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
     + ***Replacement:*** virtual void GlobalPoints(ignition::math::Vector3d &_posA, ignition::math::Vector3d &_posB)
@@ -187,7 +187,7 @@ release will remove the deprecated code.
     + ***Replacement:*** inline virtual const ignition::math::Pose3d &WorldPose() const
     + ***Deprecation:*** virtual math::Box GetBoundingBox() const
     + ***Replacement:*** virtual ignition::math::Box BoundingBox() const
-    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale) 
+    + ***Deprecation:*** void SetScale(const math::Vector3 &_scale)
     + ***Replacement:*** void SetScale(const ignition::math::Vector3d &_scale)
 
 1. **gazebo/physics/Model.hh**
@@ -274,7 +274,7 @@ release will remove the deprecated code.
 1. **gazebo/physics/HeightmapShape.hh**
     + ***Deprecation:*** math::Vector2i GetVertexCount() const
     + ***Replacement:*** ignition::math::Vector2i VertexCount() const
-    + ***Deprecation:*** math::Vector3 GetSize() const 
+    + ***Deprecation:*** math::Vector3 GetSize() const
     + ***Replacement:*** ignition::math::Vector3d Size() const
     + ***Deprecation:*** math::Vector3 GetPos() const
     + ***Replacement:*** ignition::math::Vector3d Pos() const
@@ -322,7 +322,9 @@ release will remove the deprecated code.
     + ***Replacement:*** void SetSize(const ignition::math::Vector2d &_size)
     + ***Deprecation:*** math::Vector2d GetSize() const
     + ***Replacement:*** ignition::math::Vector2d Size() const
-    + ***Deprecation:*** math::Vector3 GetNormal() const 
+    + ***Deprecation:*** void SetNormal(const math::Vector3 &_norm)
+    + ***Replacement:*** void SetNormal(const ignition::math::Vector3d &_norm)
+    + ***Deprecation:*** math::Vector3 GetNormal() const
     + ***Replacement:*** ignition::math::Vector3d Normal() const
     + ***Deprecation:*** void SetAltitude(const math::Vector3 &_pos)
     + ***Replacement:*** void SetAltitude(const ignition::math::Vector3d &_pos)
@@ -755,6 +757,10 @@ release will remove the deprecated code.
     + ***Replacement:*** void AddRay(const ignition::math::Vector3d &_start, const ignition::math::Vector3d &_end)
 
 1. **gazebo/physics/PhysicsEngine.hh**
+    + ***Deprecation:*** virtual void SetGravity(const gazebo::math::Vector3 &_gravity) = 0
+    + ***Replacement:*** virtual void SetGravity(const ignition::math::Vector3d &_gravity) = 0
+
+1. **gazebo/physics/PhysicsEngine.hh**
     + ***Deprecation:*** public: math::Vector3 GetGravity const
 1. **gazebo/physics/World.hh**
     + ***Replacement:*** public: ignition::math::Vector3 Gravity const
@@ -818,6 +824,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: dart::simulation::World *GetDARTWorld() const
     + ***Replacement:*** public: dart::simulation::WorldPtr DARTWorld() const
 
+1. **gazebo/physics/dart/DARTMesh.hh**
+    + ***Deprecation:*** void Init(const common::SubMesh *_subMesh, DARTCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::SubMesh *_subMesh, DARTCollisionPtr _collision, const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** void Init(const common::Mesh *_mesh, DARTCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::Mesh *_mesh, DARTCollisionPtr _collision, const ignition::math::Vector3d &_scale)
+
 1. **gazebo/physics/dart/DARTMeshShape.hh**
     + ***Deprecation:*** public: DARTMeshShape(CollisionPtr)
     + ***Replacement:*** public: DARTMeshShape(DARTCollisionPtr)
@@ -840,6 +852,12 @@ release will remove the deprecated code.
     + ***Deprecation:*** public: DARTPlaneShape(CollisionPtr)
     + ***Replacement:*** public: DARTPlaneShape(DARTCollisionPtr)
 
+1. **gazebo/physics/ode/ODEMesh.hh**
+    + ***Deprecation:*** void Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision, const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** void Init(const common::Mesh *_mesh, ODECollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::Mesh *_mesh, ODECollisionPtr _collision, const ignition::math::Vector3d &_scale)
+
 1. **gazebo/physics/bullet/BulletTypes.hh**
     + ***Deprecation:*** static math::Vector4 ConvertVector4(const btVector4 &_bt)
     + ***Replacement:*** static ignition::math::Vector4d ConvertVector4dIgn(const btVector4 &_bt)
@@ -853,6 +871,12 @@ release will remove the deprecated code.
     + ***Replacement:*** static ignition::math::Pose3d ConvertPoseIgn(const btTransform &_bt)
     + ***Deprecation:*** static math::Pose ConvertPose(const btTransform &_bt)
     + ***Replacement:*** static btTransform ConvertPose(const math::Pose &_pose)
+
+1. **gazebo/physics/bullet/BulletBallJoint.hh**
+    + ***Deprecation:*** void Init(const common::SubMesh *_subMesh, BulletCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::SubMesh *_subMesh, BulletCollisionPtr _collision, const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** void Init(const common::Mesh *_mesh, BulletCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::Mesh *_mesh, BulletCollisionPtr _collision, const math::Vector3 &_scale)
 
 1. **gazebo/physics/bullet/BulletBallJoint.hh**
     + ***Deprecation:*** virtual math::Vector3 GetAxis(unsigned int _index) const
@@ -877,6 +901,12 @@ release will remove the deprecated code.
 1. **gazebo/physics/simbody/SimbodyLink.hh**
     + ***Deprecation:*** void SetDirtyPose(const math::Pose &_pose)
     + ***Replacement:*** void SetDirtyPose(const ignition::math::Pose3d &_pose)
+
+1. **gazebo/physics/simbody/SimbodyMesh.hh**
+    + ***Deprecation:*** void Init(const common::SubMesh *_subMesh, SimbodyCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::SubMesh *_subMesh, SimbodyCollisionPtr _collision, const ignition::math::Vector3d &_scale)
+    + ***Deprecation:*** void Init(const common::Mesh *_mesh, SimbodyCollisionPtr _collision, const math::Vector3 &_scale)
+    + ***Replacement:*** void Init(const common::Mesh *_mesh, SimbodyCollisionPtr _collision, const ignition::math::Vector3d &_scale)
 
 1. **gazebo/rendering/Grid.hh**
     + ***Deprecation:*** public: Ogre::SceneNode *GetSceneNode()

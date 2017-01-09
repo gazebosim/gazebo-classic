@@ -88,7 +88,7 @@ void JointKinematicTest::SetJointPositionTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -265,7 +265,7 @@ void JointKinematicTest::SetJointPositionThreadedTest(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -443,7 +443,7 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);

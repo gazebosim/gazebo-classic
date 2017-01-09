@@ -65,6 +65,12 @@ void PlaneShape::SetAltitude(const ignition::math::Vector3d &/*_pos*/)
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const math::Vector3 &_norm)
 {
+  this->SetNormal(_norm.Ign());
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
+{
   this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
 }

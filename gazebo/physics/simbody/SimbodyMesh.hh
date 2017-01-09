@@ -15,8 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_SIMBODYMESH_HH_
-#define _GAZEBO_SIMBODYMESH_HH_
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYMESH_HH_
+
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/simbody/SimbodyTypes.hh"
@@ -43,9 +45,27 @@ namespace gazebo
       /// \param[in] _subMesh Pointer to the submesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
+      /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::SubMesh *_subMesh,
                       SimbodyCollisionPtr _collision,
-                      const math::Vector3 &_scale);
+                      const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Create a mesh collision shape using a submesh.
+      /// \param[in] _subMesh Pointer to the submesh.
+      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _scale Scaling factor.
+      public: void Init(const common::SubMesh *_subMesh,
+                      SimbodyCollisionPtr _collision,
+                      const ignition::math::Vector3d &_scale);
+
+      /// \brief Create a mesh collision shape using a mesh.
+      /// \param[in] _mesh Pointer to the mesh.
+      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _scale Scaling factor.
+      /// \deprecated See function which accepts an ignition math object.
+      public: void Init(const common::Mesh *_mesh,
+                      SimbodyCollisionPtr _collision,
+                      const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
@@ -53,7 +73,7 @@ namespace gazebo
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::Mesh *_mesh,
                       SimbodyCollisionPtr _collision,
-                      const math::Vector3 &_scale);
+                      const ignition::math::Vector3d &_scale);
 
       /// \brief Helper function to create the collision shape.
       /// \param[in] _vertices Array of vertices.
@@ -64,7 +84,7 @@ namespace gazebo
       private: void CreateMesh(float *_vertices, int *_indices,
                    unsigned int _numVertices, unsigned int _numIndices,
                    SimbodyCollisionPtr _collision,
-                   const math::Vector3 &_scale);
+                   const ignition::math::Vector3d &_scale);
     };
     /// \}
   }

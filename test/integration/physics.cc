@@ -1213,7 +1213,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   int i = 0;
   while (!this->HasEntity("sphere_atlas") && i < 20)

@@ -249,13 +249,13 @@ void BulletLink::SetGravityMode(bool _mode)
 
   if (_mode == false)
     this->rigidLink->setGravity(btVector3(0, 0, 0));
-    // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
+    // this->rigidLink->setMassProps(btScalar(0), btVector3(0, 0, 0));
   else
   {
     auto g = this->world->Gravity();
     this->rigidLink->setGravity(btVector3(g.X(), g.Y(), g.Z()));
     /*btScalar btMass = this->mass.GetAsDouble();
-    btmath::Vector3 fallInertia(0, 0, 0);
+    btVector3 fallInertia(0, 0, 0);
 
     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
     this->rigidLink->setMassProps(btMass, fallInertia);
@@ -493,7 +493,7 @@ ignition::math::Vector3d BulletLink::WorldTorque() const
 {
   // if (!this->rigidLink)
   //   return ignition::math::Vector3d(0, 0, 0);
-  // btmath::Vector3 btVec;
+  // btVector3 btVec;
   // btVec = this->rigidLink->getTotalTorque();
   // return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
 
