@@ -158,11 +158,11 @@ void Material::Update(const gazebo::common::Material *_mat)
   float transparency = _mat->GetTransparency();
 
   // use transparency value if specified otherwise use diffuse alpha value
-  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
-  diffuse.a = alpha;
+  //double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
+  //diffuse.a = alpha;
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
   pass->setAmbient(ambient.r, ambient.g, ambient.b);
-  pass->setDepthWriteEnabled(_mat->GetDepthWrite());
+  //pass->setDepthWriteEnabled(_mat->GetDepthWrite());
 
   if (diffuse.a < 1.0)
   {
@@ -174,7 +174,7 @@ void Material::Update(const gazebo::common::Material *_mat)
   pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
   pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
   pass->setShininess(_mat->GetShininess());
-  pass->setLightingEnabled(_mat->GetLighting());
+  //pass->setLightingEnabled(_mat->GetLighting());
 
   // Only add the texture unit if it's not present in the material
   if (!_mat->GetTextureImage().empty() &&

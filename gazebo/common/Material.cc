@@ -71,6 +71,10 @@ std::string Material::GetName() const
 void Material::SetTextureImage(const std::string &_tex)
 {
   this->texImage = _tex;
+  if (!boost::filesystem::exists(this->texImage))
+  {
+    gzerr << "Unable to find texture[" << _tex << "]\n";
+  }
 }
 
 //////////////////////////////////////////////////
