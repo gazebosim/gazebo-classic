@@ -25,6 +25,8 @@
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Events.hh"
+#include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/Node.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/MarkerVisual.hh"
@@ -67,8 +69,12 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \param[out] _result True on success.
   public: void OnList(ignition::msgs::Marker_V &_rep, bool &_result);
 
+  /// \brief Receive messages from the world_stats topic
+  /// \param[in] _msg The world stats message
+  public: void OnStatsMsg(ConstWorldStatisticsPtr &_msg);
+
   /// \brief Previous sim time received
-  public: common::Time lastSceneSimTime;
+  public: common::Time lastSimTime;
 
   /// \brief Mutex to protect message list.
   public: std::mutex mutex;
@@ -85,8 +91,17 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \brief Ignition node
   public: ignition::transport::Node node;
 
+  /// \brief Ignition node
+  public: transport::NodePtr gznode;
+
   /// \brief Connect to the prerender signal
   public: event::ConnectionPtr preRenderConnection;
+
+  /// \brief Sim time according to world_stats
+  public: common::Time simTime;
+
+  /// \brief Subscribe to world_stats topic
+  public: transport::SubscriberPtr statsSub;
 };
 
 /////////////////////////////////////////////////
@@ -98,6 +113,8 @@ MarkerManager::MarkerManager()
 /////////////////////////////////////////////////
 MarkerManager::~MarkerManager()
 {
+  this->dataPtr->statsSub.reset();
+  this->dataPtr->gznode.reset();
 }
 
 /////////////////////////////////////////////////
@@ -125,6 +142,13 @@ bool MarkerManager::Init(Scene *_scene)
     gzerr << "Unable to advertise to the /marker service.\n";
   }
 
+
+  this->dataPtr->gznode = transport::NodePtr(new transport::Node());
+      this->dataPtr->gznode->Init();
+
+  this->dataPtr->statsSub = this->dataPtr->gznode->Subscribe("~/world_stats",
+			&MarkerManagerPrivate::OnStatsMsg, this->dataPtr.get());
+
   // Process markers on PreRender
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&MarkerManagerPrivate::OnPreRender, this->dataPtr.get()));
@@ -145,7 +169,6 @@ void MarkerManagerPrivate::OnPreRender()
     this->markerMsgs.erase(markerIter++);
   }
 
-  common::Time simTime = this->scene->SimTime();
   // Erase any markers that have a lifetime.
   for (auto mit = this->markers.begin();
        mit != this->markers.end();)
@@ -156,8 +179,8 @@ void MarkerManagerPrivate::OnPreRender()
       // Erase a marker if it has a lifetime and it's expired,
       // or if the world has reset
       if (it->second->Lifetime() != common::Time::Zero &&
-          (it->second->Lifetime() <= simTime ||
-          simTime < this->lastSceneSimTime))
+          (it->second->Lifetime() <= this->simTime ||
+          this->simTime < this->lastSimTime))
       {
         it->second->Fini();
         this->scene->RemoveVisual(it->second);
@@ -173,7 +196,7 @@ void MarkerManagerPrivate::OnPreRender()
     else
       ++mit;
   }
-  this->lastSceneSimTime = simTime;
+  this->lastSimTime = this->simTime;
 }
 
 //////////////////////////////////////////////////
@@ -330,4 +353,11 @@ void MarkerManagerPrivate::OnList(ignition::msgs::Marker_V &_rep, bool &_result)
       iter->second->FillMsg(*markerMsg);
     }
   }
+}
+
+/////////////////////////////////////////////////
+void MarkerManagerPrivate::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+  this->simTime = msgs::Convert(_msg->sim_time());
 }

@@ -224,9 +224,6 @@ namespace gazebo
       /// \brief Subscribe to scene topic
       public: transport::SubscriberPtr sceneSub;
 
-      /// \brief Subscribe to world_stats topic
-      public: transport::SubscriberPtr statsSub;
-
       /// \brief Subscribe to the request topic
       public: transport::SubscriberPtr requestSub;
 

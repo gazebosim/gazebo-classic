@@ -22,7 +22,17 @@
 
 #include "test_config.h"
 
-/////////////////////////////////////////////////
+std::mutex mutex;
+gazebo::common::Time simTime;
+
+/////////u////////////////////////////////////////
+void SimTimeCallback(ConstWorldStatisticsPtr  &_msg)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  simTime = gazebo::msgs::Convert(_msg->sim_time());
+}
+
+/////////u////////////////////////////////////////
 void Marker_TEST::AddRemove()
 {
   this->resMaxPercentChange = 5.0;
@@ -353,6 +363,63 @@ void Marker_TEST::AddRemove()
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_5") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_6") == nullptr);
   QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_7") != nullptr);
+
+  // Delete everything
+  gzmsg << "Delete everything" << std::endl;
+  markerMsg.set_action(ignition::msgs::Marker::DELETE_ALL);
+  QVERIFY(node.Request(topicName, markerMsg));
+  this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_7") == nullptr);
+
+  // test lifetime
+  // first get current sim time
+  gazebo::transport::NodePtr gznode(new gazebo::transport::Node());
+  gznode->Init();
+  auto sub = gznode->Subscribe("~/world_stats", SimTimeCallback);
+  for (unsigned int i = 0; i < 5; ++i)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (simTime == gazebo::common::Time::Zero)
+      gazebo::common::Time::MSleep(300);
+    else
+      break;
+  }
+  sub.reset();
+  gznode.reset();
+  QVERIFY(simTime != gazebo::common::Time::Zero);
+
+  // spawn sphere with lifetime
+  markerMsg.set_ns("default");
+  markerMsg.set_id(8);
+  markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
+  markerMsg.set_type(ignition::msgs::Marker::SPHERE);
+  markerMsg.clear_point();
+  // 2 sec life time
+  int sec = 5;
+  gazebo::common::Time lifeTime = simTime +
+      gazebo::common::Time(sec, 0);
+  ignition::msgs::Time *sphereLifeTime = markerMsg.mutable_lifetime();
+  sphereLifeTime->set_sec(lifeTime.sec);
+  sphereLifeTime->set_nsec(lifeTime.nsec);
+
+  gzmsg << "Add sphere with life time" << std::endl;
+  QVERIFY(node.Request(topicName, markerMsg));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(scene->GetVisual("__GZ_MARKER_VISUAL_default_8") != nullptr);
+
+  // sphere should be gone after life time is ended.
+  for (int i = 0; i < 30; ++i)
+  {
+    vis = scene->GetVisual("__GZ_MARKER_VISUAL_default_8");
+    if (!vis)
+      break;
+    this->ProcessEventsAndDraw(mainWindow, 10, 30);
+  }
+  QVERIFY(vis == nullptr);
+
 
   mainWindow->close();
   delete mainWindow;
