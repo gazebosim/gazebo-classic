@@ -65,11 +65,13 @@ namespace gazebo
       /// \param[in] _x value along x
       /// \param[in] _y value along y
       /// \param[in] _z value along z
-      public: Vector3(const double &_x, const double &_y, const double &_z) GAZEBO_DEPRECATED(8.0);
+      public: Vector3(const double &_x, const double &_y, const double &_z)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Ignition math copy constructor
       /// \param[in] _v a vector
-      public: Vector3(const ignition::math::Vector3d &_v) GAZEBO_DEPRECATED(8.0);
+      public: Vector3(const ignition::math::Vector3d &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param[in] _v a vector
@@ -92,7 +94,8 @@ namespace gazebo
       /// \param[in] _y value along y
       /// \param[in] _z value along z
       /// \return the distance
-      public: double Distance(double _x, double _y, double _z) const GAZEBO_DEPRECATED(8.0);
+      public: double Distance(double _x, double _y, double _z) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns the length (magnitude) of the vector
       /// \ return the length
@@ -118,7 +121,8 @@ namespace gazebo
       /// \param[in] _x value along x
       /// \param[in] _y value along y
       /// \param[in] _z value aling z
-      public: inline void Set(double _x = 0, double _y = 0 , double _z = 0) GAZEBO_DEPRECATED(8.0)
+      public: inline void Set(double _x = 0, double _y = 0 , double _z = 0)
+          GAZEBO_DEPRECATED(8.0)
               {
                 this->x = _x;
                 this->y = _y;
@@ -147,13 +151,15 @@ namespace gazebo
       /// \param[in] _v3 third vertex
       /// \return the normal
       public: static Vector3 GetNormal(const Vector3 &_v1, const Vector3 &_v2,
-                                       const Vector3 &_v3) GAZEBO_DEPRECATED(8.0);
+                                       const Vector3 &_v3)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get distance to a line
       /// \param[in] _pt1 first point on the line
       /// \param[in] _pt2 second point on the line
       /// \return the minimum distance from this point to the line
-      public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2) GAZEBO_DEPRECATED(8.0);
+      public: double GetDistToLine(const Vector3 &_pt1, const Vector3 &_pt2)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set this vector's components to the maximum of itself and the
       ///        passed in vector
@@ -180,7 +186,8 @@ namespace gazebo
       /// \brief Assignment operator for ignition math
       /// \param[in] _v a new value
       /// \return this
-      public: Vector3 &operator=(const ignition::math::Vector3d &_v) GAZEBO_DEPRECATED(8.0);
+      public: Vector3 &operator=(const ignition::math::Vector3d &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Assignment operator
       /// \param[in] _v a new value
@@ -199,7 +206,8 @@ namespace gazebo
 
       /// \brief Addition assignment operator
       /// \param[in] _v vector to add
-      public: const Vector3 &operator+=(const Vector3 &_v) GAZEBO_DEPRECATED(8.0);
+      public: const Vector3 &operator+=(const Vector3 &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Negation operator
       /// \return negative of this vector
@@ -211,7 +219,8 @@ namespace gazebo
       /// \brief Subtraction operators
       /// \param[in] _pt a vector to substract
       /// \return a vector
-      public: inline Vector3 operator-(const Vector3 &_pt) const GAZEBO_DEPRECATED(8.0)
+      public: inline Vector3 operator-(const Vector3 &_pt) const
+          GAZEBO_DEPRECATED(8.0)
               {
                 return Vector3(this->x - _pt.x,
                                this->y - _pt.y,
@@ -220,19 +229,22 @@ namespace gazebo
 
       /// \brief Subtraction operators
       /// \param[in] _pt subtrahend
-      public: const Vector3 &operator-=(const Vector3 &_pt) GAZEBO_DEPRECATED(8.0);
+      public: const Vector3 &operator-=(const Vector3 &_pt)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Division operator
       /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
-      public: const Vector3 operator/(const Vector3 &_pt) const GAZEBO_DEPRECATED(8.0);
+      public: const Vector3 operator/(const Vector3 &_pt) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Division assignment operator
       /// \brief[in] _pt the vector divisor
       /// \remarks this is an element wise division
       /// \return a vector
-      public: const Vector3 &operator/=(const Vector3 &_pt) GAZEBO_DEPRECATED(8.0);
+      public: const Vector3 &operator/=(const Vector3 &_pt)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Division operator
       /// \remarks this is an element wise division
@@ -253,14 +265,16 @@ namespace gazebo
       /// \remarks this is an element wise multiplication, not a cross product
       /// \param[in] _v a vector
       /// \return this
-      public: const Vector3 &operator*=(const Vector3 &_v) GAZEBO_DEPRECATED(8.0);
+      public: const Vector3 &operator*=(const Vector3 &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Multiplication operators
       /// \param[in] _s the scaling factor
       /// \param[in] _v input vector
       /// \return a scaled vector
       public: friend inline Vector3 operator*(double _s,
-                                              const Vector3 &_v) GAZEBO_DEPRECATED(8.0)
+                                              const Vector3 &_v)
+          GAZEBO_DEPRECATED(8.0)
       { return Vector3(_v.x * _s, _v.y * _s, _v.z * _s); }
 
       /// \brief Multiplication operators
@@ -301,7 +315,8 @@ namespace gazebo
               }
 
       /// \brief [] operator
-      public: double operator[](unsigned int index) const GAZEBO_DEPRECATED(8.0);
+      public: double operator[](unsigned int index) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Round all values to _precision decimal places
       /// \param[in] _precision the decimal places
@@ -327,7 +342,8 @@ namespace gazebo
       /// \param _pt Vector3 to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                              const gazebo::math::Vector3 &_pt) GAZEBO_DEPRECATED(8.0)
+                                              const gazebo::math::Vector3 &_pt)
+          GAZEBO_DEPRECATED(8.0)
       {
         _out << precision(_pt.x, 6) << " " << precision(_pt.y, 6) << " "
              << precision(_pt.z, 6);
@@ -339,7 +355,8 @@ namespace gazebo
       /// \param _pt vector3 to read values into
       /// \return the stream
       public: friend std::istream &operator>>(std::istream &_in,
-                                              gazebo::math::Vector3 &_pt) GAZEBO_DEPRECATED(8.0)
+                                              gazebo::math::Vector3 &_pt)
+          GAZEBO_DEPRECATED(8.0)
       {
         // Skip white spaces
         _in.setf(std::ios_base::skipws);

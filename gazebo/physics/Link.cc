@@ -2015,7 +2015,14 @@ void Link::RegisterIntrospectionItems()
 /////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -2054,7 +2061,14 @@ math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset,
 /////////////////////////////////////////////////
 math::Vector3 Link::GetWorldCoGLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldCoGLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -2206,11 +2220,25 @@ void Link::AddRelativeTorque(const math::Vector3 &_torque)
 /////////////////////////////////////////////////
 math::Vector3 Link::GetWorldForce() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldForce();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Link::GetWorldTorque() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldTorque();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

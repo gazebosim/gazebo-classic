@@ -50,7 +50,8 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _pos A position
       /// \param[in] _rot A rotation
-      public: Pose(const Vector3 &_pos, const Quaternion &_rot) GAZEBO_DEPRECATED(8.0);
+      public: Pose(const Vector3 &_pos, const Quaternion &_rot)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor
       /// \param[in] _x x position in meters.
@@ -60,7 +61,8 @@ namespace gazebo
       /// \param[in] _pitch Pitch (rotation about y-axis) in radians.
       /// \param[in] _yaw Yaw (rotation about z-axis) in radians.
       public: Pose(double _x, double _y, double _z,
-                   double _roll, double _pitch, double _yaw) GAZEBO_DEPRECATED(8.0);
+                   double _roll, double _pitch, double _yaw)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param[in] _pose Pose to copy
@@ -76,12 +78,14 @@ namespace gazebo
       /// \brief Set the pose from a Vector3 and a Quaternion
       /// \param[in] _pos The position.
       /// \param[in] _rot The rotation.
-      public: void Set(const Vector3 &_pos, const Quaternion &_rot) GAZEBO_DEPRECATED(8.0);
+      public: void Set(const Vector3 &_pos, const Quaternion &_rot)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the pose from  pos and rpy vectors
       /// \param[in] _pos The position.
       /// \param[in] _rpy The rotation expressed as Euler angles.
-      public: void Set(const Vector3 &_pos, const Vector3 &_rpy) GAZEBO_DEPRECATED(8.0);
+      public: void Set(const Vector3 &_pos, const Vector3 &_rpy)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the pose from a six tuple.
       /// \param[in] _x x position in meters.
@@ -91,7 +95,8 @@ namespace gazebo
       /// \param[in] _pitch Pitch (rotation about y-axis) in radians.
       /// \param[in] _yaw Pitch (rotation about z-axis) in radians.
       public: void Set(double _x, double _y, double _z,
-                       double _roll, double _pitch, double _yaw) GAZEBO_DEPRECATED(8.0);
+                       double _roll, double _pitch, double _yaw)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief See if a pose is finite (e.g., not nan)
       public: bool IsFinite() const GAZEBO_DEPRECATED(8.0);
@@ -135,7 +140,8 @@ namespace gazebo
       /// B - A is the transform from P to Q in frame P
       /// \param[in] _pose Pose to subtract from this one
       /// \return The resulting pose
-      public: inline Pose operator-(const Pose &_pose) const GAZEBO_DEPRECATED(8.0)
+      public: inline Pose operator-(const Pose &_pose) const
+          GAZEBO_DEPRECATED(8.0)
               {
                 return Pose(this->CoordPositionSub(_pose),
                             this->CoordRotationSub(_pose.rot));
@@ -168,22 +174,26 @@ namespace gazebo
 
       /// \brief Equal operator for ignition math
       /// \param[in] _pose Pose to copy
-      public: Pose &operator=(const ignition::math::Pose3d &_pose) GAZEBO_DEPRECATED(8.0);
+      public: Pose &operator=(const ignition::math::Pose3d &_pose)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Add one point to a vector: result = this + pos
       /// \param[in] _pos Position to add to this pose
       /// \return the resulting position
-      public: Vector3 CoordPositionAdd(const Vector3 &_pos) const GAZEBO_DEPRECATED(8.0);
+      public: Vector3 CoordPositionAdd(const Vector3 &_pos) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Add one point to another: result = this + pose
       /// \param[in] _pose The Pose to add
       /// \return The resulting position
-      public: Vector3 CoordPositionAdd(const Pose &_pose) const GAZEBO_DEPRECATED(8.0);
+      public: Vector3 CoordPositionAdd(const Pose &_pose) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Subtract one position from another: result = this - pose
       /// \param[in] _pose Pose to subtract
       /// \return The resulting position
-      public: inline Vector3 CoordPositionSub(const Pose &_pose) const GAZEBO_DEPRECATED(8.0)
+      public: inline Vector3 CoordPositionSub(const Pose &_pose) const
+          GAZEBO_DEPRECATED(8.0)
               {
                 Quaternion tmp(0.0,
                     this->pos.x - _pose.pos.x,
@@ -197,12 +207,14 @@ namespace gazebo
       /// \brief Add one rotation to another: result =  this->rot + rot
       /// \param[in] _rot Rotation to add
       /// \return The resulting rotation
-      public: Quaternion CoordRotationAdd(const Quaternion &_rot) const GAZEBO_DEPRECATED(8.0);
+      public: Quaternion CoordRotationAdd(const Quaternion &_rot) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Subtract one rotation from another: result = this->rot - rot
       /// \param[in] _rot The rotation to subtract
       /// \return The resulting rotation
-      public: inline Quaternion CoordRotationSub(const Quaternion &_rot) const GAZEBO_DEPRECATED(8.0)
+      public: inline Quaternion CoordRotationSub(const Quaternion &_rot) const
+          GAZEBO_DEPRECATED(8.0)
               {
                 Quaternion result(_rot.GetInverse() * this->rot);
                 result.Normalize();
@@ -220,7 +232,8 @@ namespace gazebo
       /// \brief Rotate vector part of a pose about the origin
       /// \param[in] _rot rotation
       /// \return the rotated pose
-      public: Pose RotatePositionAboutOrigin(const Quaternion &_rot) const GAZEBO_DEPRECATED(8.0);
+      public: Pose RotatePositionAboutOrigin(const Quaternion &_rot) const
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Round all values to _precision decimal places
       /// \param[in] _precision
@@ -235,7 +248,8 @@ namespace gazebo
       /// \param[in] _pose pose to output
       /// \return the stream
       public: friend std::ostream &operator<<(std::ostream &_out,
-                                              const gazebo::math::Pose &_pose) GAZEBO_DEPRECATED(8.0)
+                                              const gazebo::math::Pose &_pose)
+          GAZEBO_DEPRECATED(8.0)
               {
                 _out << _pose.pos << " " << _pose.rot;
                 return _out;

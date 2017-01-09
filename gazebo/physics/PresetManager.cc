@@ -614,7 +614,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
       }
       else if (elem->GetValue()->IsType<sdf::Vector3>())
       {
-        math::Vector3 v;
+        ignition::math::Vector3d v;
         if (CastAnyValue(value, v))
         {
           gzdbg << "Vector3: " << v << std::endl;
