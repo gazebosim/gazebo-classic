@@ -142,12 +142,11 @@ bool MarkerManager::Init(Scene *_scene)
     gzerr << "Unable to advertise to the /marker service.\n";
   }
 
-
   this->dataPtr->gznode = transport::NodePtr(new transport::Node());
       this->dataPtr->gznode->Init();
 
   this->dataPtr->statsSub = this->dataPtr->gznode->Subscribe("~/world_stats",
-			&MarkerManagerPrivate::OnStatsMsg, this->dataPtr.get());
+      &MarkerManagerPrivate::OnStatsMsg, this->dataPtr.get());
 
   // Process markers on PreRender
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
