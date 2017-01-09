@@ -58,7 +58,7 @@ namespace gazebo
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
 
