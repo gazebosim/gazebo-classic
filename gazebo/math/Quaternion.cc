@@ -519,30 +519,6 @@ Quaternion Quaternion::operator-() const
 }
 
 //////////////////////////////////////////////////
-Matrix3 Quaternion::GetAsMatrix3() const
-{
-  Quaternion q = *this;
-  q.Normalize();
-  return Matrix3(1 - 2*q.y*q.y - 2 *q.z*q.z,
-                 2 * q.x*q.y - 2*q.z*q.w,
-                 2 * q.x * q.z + 2 * q.y * q.w,
-                 2 * q.x * q.y + 2 * q.z * q.w,
-                 1 - 2*q.x*q.x - 2 * q.z*q.z,
-                 2 * q.y * q.z - 2 * q.x * q.w,
-                 2 * q.x * q.z - 2 * q.y * q.w,
-                 2 * q.y * q.z + 2 * q.x * q.w,
-                 1 - 2 * q.x*q.x - 2 * q.y*q.y);
-}
-
-//////////////////////////////////////////////////
-Matrix4 Quaternion::GetAsMatrix4() const
-{
-  Matrix4 result(Matrix4::IDENTITY);
-  result = this->GetAsMatrix3();
-  return result;
-}
-
-//////////////////////////////////////////////////
 void Quaternion::Round(int _precision)
 {
 #ifndef _WIN32

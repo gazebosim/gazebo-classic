@@ -1851,7 +1851,6 @@ Ogre::SceneNode * Visual::GetSceneNode() const
   return this->dataPtr->sceneNode;
 }
 
-
 //////////////////////////////////////////////////
 bool Visual::IsStatic() const
 {

@@ -1905,7 +1905,7 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
   return this->newImageFrame.Connect(_subscriber);
 }
 
-/////////////////////////////////////////////////
+//////////////////////////////////////////////////
 VisualPtr Camera::TrackedVisual() const
 {
   return this->dataPtr->trackedVisual;

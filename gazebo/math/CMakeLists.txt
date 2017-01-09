@@ -1,21 +1,15 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
 set (sources
-  Angle.cc
   Helpers.cc
-  Matrix3.cc
-  Matrix4.cc
   Pose.cc
   Quaternion.cc
   Vector3.cc
 )
 
 set (headers
-  Angle.hh
   Helpers.hh
   MathTypes.hh
-  Matrix3.hh
-  Matrix4.hh
   Pose.hh
   Quaternion.hh
   Vector3.hh

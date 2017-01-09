@@ -34,6 +34,7 @@
 
 #include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
+#include "gazebo/math/Quaternion.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Assert.hh"

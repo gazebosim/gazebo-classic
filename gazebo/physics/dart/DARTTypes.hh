@@ -18,11 +18,10 @@
 #define GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
-#include <ignition/math/Pose3.hh>
-#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
 

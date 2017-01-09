@@ -16,6 +16,7 @@
 */
 #include <string.h>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
