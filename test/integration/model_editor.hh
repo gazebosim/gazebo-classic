@@ -38,6 +38,9 @@ class ModelEditorTest : public QTestFixture
   /// \brief Test showing and hiding visuals.
   private slots: void ShowVisuals();
 
+  /// \brief Test showing and hiding link frames.
+  private slots: void ShowLinkFrames();
+
   /// \brief Test pose of model links and joints before and after saving
   private slots: void SaveModelPose();
 };

@@ -163,6 +163,22 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
     return;
   }
 
+  this->subSampling = 2u;
+  if (this->sdf->HasElement("sampling"))
+  {
+    unsigned int s = this->sdf->Get<unsigned int>("sampling");
+    if (s == 0u || s & (s - 1u))
+    {
+      gzerr << "Heightmap sampling value must be a power of 2. "
+            << "The default value of 2 will be used instead." << std::endl;
+      this->subSampling = 2;
+    }
+    else
+    {
+      this->subSampling = static_cast<int>(s);
+    }
+  }
+
   // Check if the geometry of the terrain data matches Ogre constrains
   if (this->heightmapData->GetWidth() != this->heightmapData->GetHeight() ||
       !ignition::math::isPowerOfTwo(this->heightmapData->GetWidth() - 1))
@@ -188,12 +204,11 @@ void HeightmapShape::Init()
       &HeightmapShape::OnRequest, this, true);
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 2;
-
   ignition::math::Vector3d terrainSize = this->Size();
 
   // sampling size along image width and height
-  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
+  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)
+      - this->subSampling + 1;
   this->scale.X() = terrainSize.X() / this->vertSize;
   this->scale.Y() = terrainSize.Y() / this->vertSize;
 
@@ -267,6 +282,8 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
   msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
   _msg.mutable_heightmap()->set_filename(this->GetURI());
+  _msg.mutable_heightmap()->set_sampling(
+      static_cast<unsigned int>(this->subSampling));
 }
 
 //////////////////////////////////////////////////
