@@ -703,7 +703,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       ignition::math::Pose3d cgPose;
       auto inertial = this->childLink->GetInertial();
       if (inertial)
-        cgPose = inertial->GetPose().Ign();
+        cgPose = inertial->Pose();
 
       // anchorPose location of joint in child frame
       // childMomentArm: from child CG to joint location in child link frame
@@ -751,7 +751,7 @@ JointWrench ODEJoint::GetForceTorque(unsigned int /*_index*/)
       ignition::math::Pose3d cgPose;
       auto inertial = this->parentLink->GetInertial();
       if (inertial)
-        cgPose = inertial->GetPose().Ign();
+        cgPose = inertial->Pose();
 
       // get parent CG pose in child link frame
       ignition::math::Pose3d parentCGInChildLink =

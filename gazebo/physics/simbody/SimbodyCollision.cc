@@ -47,7 +47,7 @@ void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // auto pose = this->RelativePose();
   // SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
 
   // bbody->SetCollisionRelativePose(this, pose);
