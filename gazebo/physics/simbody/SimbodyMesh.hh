@@ -54,7 +54,6 @@ namespace gazebo
       /// \param[in] _subMesh Pointer to the submesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
-      /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::SubMesh *_subMesh,
                       SimbodyCollisionPtr _collision,
                       const ignition::math::Vector3d &_scale);
@@ -72,7 +71,6 @@ namespace gazebo
       /// \param[in] _mesh Pointer to the mesh.
       /// \param[in] _collision Pointer to the collsion object.
       /// \param[in] _scale Scaling factor.
-      /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::Mesh *_mesh,
                       SimbodyCollisionPtr _collision,
                       const ignition::math::Vector3d &_scale);
