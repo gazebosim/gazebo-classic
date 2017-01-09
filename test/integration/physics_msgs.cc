@@ -124,10 +124,14 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
-  poses.push_back(ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
@@ -331,10 +335,14 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
   poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
-  poses.push_back(ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
   physics::ModelPtr model = world->ModelByName(name);
