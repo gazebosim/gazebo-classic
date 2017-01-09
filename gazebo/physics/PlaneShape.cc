@@ -60,7 +60,7 @@ void PlaneShape::SetAltitude(const math::Vector3 &_pos)
 #endif
   this->SetAltitude(_pos.Ign());
 #ifndef _WIN32
- #pragma GCC diagnostic pop
+  #pragma GCC diagnostic pop
 #endif
 }
 
@@ -78,7 +78,7 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 #endif
   this->SetNormal(_norm.Ign());
 #ifndef _WIN32
- #pragma GCC diagnostic pop
+  #pragma GCC diagnostic pop
 #endif
 }
 
@@ -117,7 +117,7 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 #endif
   this->SetSize(_size.Ign());
 #ifndef _WIN32
- #pragma GCC diagnostic pop
+  #pragma GCC diagnostic pop
 #endif
 }
 
