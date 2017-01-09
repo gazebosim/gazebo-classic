@@ -42,7 +42,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a submesh.
       /// \param[in] _subMesh Pointer to the submesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::SubMesh *_subMesh,
@@ -51,7 +51,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a submesh.
       /// \param[in] _subMesh Pointer to the submesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::SubMesh *_subMesh,
                       BulletCollisionPtr _collision,
@@ -59,7 +59,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::Mesh *_mesh,
@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::Mesh *_mesh,
                       BulletCollisionPtr _collision,
@@ -79,7 +79,7 @@ namespace gazebo
       /// \param[in] _indices Array of indices.
       /// \param[in] _numVertices Number of vertices.
       /// \param[in] _numIndices Number of indices.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       private: void CreateMesh(float *_vertices, int *_indices,
                    unsigned int _numVertices, unsigned int _numIndices,

@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a submesh.
       /// \param[in] _subMesh Pointer to the submesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::SubMesh *_subMesh,
@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a submesh.
       /// \param[in] _subMesh Pointer to the submesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::SubMesh *_subMesh,
                       ODECollisionPtr _collision,
@@ -60,7 +60,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       /// \deprecated See function which accepts an ignition math object.
       public: void Init(const common::Mesh *_mesh,
@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Create a mesh collision shape using a mesh.
       /// \param[in] _mesh Pointer to the mesh.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       /// \param[in] _scale Scaling factor.
       public: void Init(const common::Mesh *_mesh,
                       ODECollisionPtr _collision,
@@ -81,7 +81,7 @@ namespace gazebo
       /// \brief Helper function to create the collision shape.
       /// \param[in] _numVertices Number of vertices.
       /// \param[in] _numIndices Number of indices.
-      /// \param[in] _collision Pointer to the collsion object.
+      /// \param[in] _collision Pointer to the collision object.
       private: void CreateMesh(unsigned int _numVertices,
                    unsigned int _numIndices, ODECollisionPtr _collision,
                    const ignition::math::Vector3d &_scale);
