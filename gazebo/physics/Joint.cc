@@ -1408,7 +1408,14 @@ ignition::math::Pose3d Joint::AnchorErrorPose() const
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->AxisFrame(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1438,7 +1445,14 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->AxisFrameOffset(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

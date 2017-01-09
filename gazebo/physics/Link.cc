@@ -1922,7 +1922,14 @@ math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset) const
 math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset,
     const math::Quaternion &_q) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearVel(_offset.Ign(), _q.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
