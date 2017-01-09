@@ -25,14 +25,14 @@
 std::mutex mutex;
 gazebo::common::Time simTime;
 
-/////////u////////////////////////////////////////
+/////////////////////////////////////////////////
 void SimTimeCallback(ConstWorldStatisticsPtr  &_msg)
 {
   std::lock_guard<std::mutex> lock(mutex);
   simTime = gazebo::msgs::Convert(_msg->sim_time());
 }
 
-/////////u////////////////////////////////////////
+/////////////////////////////////////////////////
 void Marker_TEST::AddRemove()
 {
   this->resMaxPercentChange = 5.0;
