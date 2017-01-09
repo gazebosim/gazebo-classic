@@ -96,7 +96,7 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the stored model pose.
-      /// \return The ignition::math::Pose3d of the Model.
+      /// \return The gazebo::math::Pose of the Model.
       /// \deprecated See function that returns ign-math.
       public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
 
