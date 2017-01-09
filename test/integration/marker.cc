@@ -395,7 +395,7 @@ void Marker_TEST::AddRemove()
   markerMsg.set_action(ignition::msgs::Marker::ADD_MODIFY);
   markerMsg.set_type(ignition::msgs::Marker::SPHERE);
   markerMsg.clear_point();
-  // 2 sec life time
+  // 5 sec life time
   int sec = 5;
   gazebo::common::Time lifeTime = simTime +
       gazebo::common::Time(sec, 0);
