@@ -65,7 +65,14 @@ Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
 //////////////////////////////////////////////////
 math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

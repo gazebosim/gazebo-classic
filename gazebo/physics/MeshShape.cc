@@ -111,7 +111,13 @@ void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MeshShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("scale");
+  return this->Size();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d MeshShape::Size() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("scale");
 }
 
 //////////////////////////////////////////////////
@@ -122,8 +128,7 @@ std::string MeshShape::GetMeshURI() const
 
 //////////////////////////////////////////////////
 void MeshShape::SetMesh(const std::string &_uri,
-                           const std::string &_submesh,
-                           bool _center)
+    const std::string &_submesh, bool _center)
 {
   this->sdf->GetElement("uri")->Set(_uri);
 

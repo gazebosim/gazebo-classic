@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: A link state
- * Author: Nate Koenig
- */
-
 #ifndef GAZEBO_PHYSICS_LINKSTATE_HH_
 #define GAZEBO_PHYSICS_LINKSTATE_HH_
 

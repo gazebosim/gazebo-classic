@@ -324,7 +324,8 @@ namespace gazebo
       /// \deprecated See version that accepts ignition math objects.
       public: void SetWorldTwist(const math::Vector3 &_linear,
                                  const math::Vector3 &_angular,
-                                 bool _updateChildren = true);
+                                 bool _updateChildren = true)
+                                 GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set angular and linear rates of an physics::Entity.
       /// \param[in] _linear Linear twist.

@@ -184,14 +184,14 @@ void BulletJoint::CacheForceTorque()
   // caching force torque for the joint
   // if cached, GetForceTorque should use this value
   // this->wrench
-  this->wrench.body2Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyA).Ign();
-  this->wrench.body2Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyA).Ign();
-  this->wrench.body1Force = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedForceBodyB).Ign();
-  this->wrench.body1Torque = BulletTypes::ConvertVector3(
-                      this->feedback->m_appliedTorqueBodyB).Ign();
+  this->wrench.body2Force = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedForceBodyA);
+  this->wrench.body2Torque = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedTorqueBodyA);
+  this->wrench.body1Force = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedForceBodyB);
+  this->wrench.body1Torque = BulletTypes::ConvertVector3Ign(
+                      this->feedback->m_appliedTorqueBodyB);
   // gzerr << "   " << this->GetName()
   //       << " : " << this->wrench.body1Force
   //       << " : " << this->wrench.body1Torque
@@ -237,7 +237,7 @@ void BulletJoint::CacheForceTorque()
     // convert torque from about child CG to joint anchor location
     // cg position specified in child link frame
     ignition::math::Pose3d cgPose =
-      this->childLink->GetInertial()->GetPose().Ign();
+      this->childLink->GetInertial()->Pose();
 
     // anchorPose location of joint in child frame
     // childMomentArm: from child CG to joint location in child link frame
@@ -281,7 +281,7 @@ void BulletJoint::CacheForceTorque()
 
     // parent cg specified in parent link frame
     ignition::math::Pose3d cgPose =
-      this->parentLink->GetInertial()->GetPose().Ign();
+      this->parentLink->GetInertial()->Pose();
 
     // get parent CG pose in child link frame
     ignition::math::Pose3d parentCGInChildLink =

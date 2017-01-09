@@ -174,9 +174,6 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
-  math::Pose regionEventBoxPos = regionEventBox->WorldPose();
-  math::Pose boxModelPose = boxModel->WorldPose();
-
   boxModel->SetWorldPose(regionEventBox->WorldPose());
   (void) WaitForNewEvent(GetEventCount(), 10, 100);
 

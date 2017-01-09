@@ -68,7 +68,7 @@ ignition::math::Vector3d DARTFixedJoint::Anchor(
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin).Ign();
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
