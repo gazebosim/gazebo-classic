@@ -1877,7 +1877,7 @@ void ModelCreator::OnDelete(const std::string &_entity)
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Delete [" + link->second->Name() + "]", MEUserCmd::DELETING_LINK);
     cmd->SetSDF(this->GenerateLinkSDF(link->second));
-    cmd->SetScopedName(link->second->linkVisual->Name());
+    cmd->SetScopedName(link->second->LinkVisual()->Name());
 
     // Then delete link
     this->RemoveLinkImpl(_entity);
@@ -2065,7 +2065,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
           "Insert [" + link->Name() + "]",
           MEUserCmd::INSERTING_LINK);
       cmd->SetSDF(this->GenerateLinkSDF(link));
-      cmd->SetScopedName(link->linkVisual->Name());
+      cmd->SetScopedName(link->LinkVisual()->Name());
     }
     else
     {
@@ -2100,7 +2100,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Scale [" + link.first->Name() + "]", MEUserCmd::SCALING_LINK);
-    cmd->SetScopedName(link.first->linkVisual->Name());
+    cmd->SetScopedName(link.first->LinkVisual()->Name());
     cmd->SetScaleChange(link.first->Scales(), link.second);
 
     // Update data and inspector
@@ -2116,7 +2116,7 @@ bool ModelCreator::OnMouseRelease(const common::MouseEvent &_event)
     // Register command
     auto cmd = this->dataPtr->userCmdManager->NewCmd(
         "Move [" + link.first->Name() + "]", MEUserCmd::MOVING_LINK);
-    cmd->SetScopedName(link.first->linkVisual->Name());
+    cmd->SetScopedName(link.first->LinkVisual()->Name());
     cmd->SetPoseChange(link.first->Pose(), link.second);
 
     // Update data and inspector
@@ -3258,7 +3258,7 @@ void ModelCreator::OnRequestLinkScale(const std::string &_name,
     return;
   }
 
-  auto linkVis = link->second->linkVisual;
+  auto linkVis = link->second->LinkVisual();
 
   // Go through all child visuals (visuals and collisions)
   for (unsigned int i = 0; i < linkVis->GetChildCount(); ++i)
@@ -3287,7 +3287,7 @@ void ModelCreator::OnRequestLinkMove(const std::string &_name,
   if (link == this->dataPtr->allLinks.end())
     return;
 
-  link->second->linkVisual->SetPose(_pose);
+  link->second->LinkVisual()->SetPose(_pose);
   link->second->SetPose(_pose);
 }
 
