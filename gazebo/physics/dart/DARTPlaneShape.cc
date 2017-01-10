@@ -57,7 +57,7 @@ void DARTPlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void DARTPlaneShape::SetAltitude(const math::Vector3 &_pos)
+void DARTPlaneShape::SetAltitude(const ignition::math::Vector3d &_pos)
 {
   PlaneShape::SetAltitude(_pos);
 }

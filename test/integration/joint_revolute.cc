@@ -113,7 +113,7 @@ void JointTestRevolute::WrapAngle(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     std::string jointType = "revolute";
@@ -193,15 +193,15 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   // Global axis
   double sqrt1_2 = sqrt(2.0) / 2.0;
-  std::vector<math::Vector3> globalAxes;
-  globalAxes.push_back(math::Vector3(1, 0, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, 1, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(-1, 0, 0));
-  globalAxes.push_back(math::Vector3(-sqrt1_2, -sqrt1_2, 0));
-  globalAxes.push_back(math::Vector3(0, -1, 0));
-  globalAxes.push_back(math::Vector3(sqrt1_2, -sqrt1_2, 0));
+  std::vector<ignition::math::Vector3d> globalAxes;
+  globalAxes.push_back(ignition::math::Vector3d(1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3d(sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(0, 1, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-sqrt1_2, sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-1, 0, 0));
+  globalAxes.push_back(ignition::math::Vector3d(-sqrt1_2, -sqrt1_2, 0));
+  globalAxes.push_back(ignition::math::Vector3d(0, -1, 0));
+  globalAxes.push_back(ignition::math::Vector3d(sqrt1_2, -sqrt1_2, 0));
 
   // Link names
   std::vector<std::string> linkNames;
@@ -220,7 +220,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   double energy0 = 1.0;
   // Check global axes before simulation starts
-  std::vector<math::Vector3>::iterator axisIter;
+  std::vector<ignition::math::Vector3d>::iterator axisIter;
   axisIter = globalAxes.begin();
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
@@ -237,10 +237,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
         joint = model->GetJoint(*jointIter);
         if (joint)
         {
-          math::Vector3 axis = joint->GlobalAxis(0);
-          EXPECT_NEAR(axis.x, (*axisIter).x, g_tolerance);
-          EXPECT_NEAR(axis.y, (*axisIter).y, g_tolerance);
-          EXPECT_NEAR(axis.z, (*axisIter).z, g_tolerance);
+          auto axis = joint->GlobalAxis(0);
+          EXPECT_NEAR(axis.X(), (*axisIter).X(), g_tolerance);
+          EXPECT_NEAR(axis.Y(), (*axisIter).Y(), g_tolerance);
+          EXPECT_NEAR(axis.Z(), (*axisIter).Z(), g_tolerance);
         }
         else
         {
@@ -452,7 +452,7 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
   // Reset world again, disable gravity, detach upper_joint
   // Then apply torque at lower_joint and verify motion
   world->Reset();
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
   for (modelIter  = modelNames.begin();
        modelIter != modelNames.end(); ++modelIter)
   {

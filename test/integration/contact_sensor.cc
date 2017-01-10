@@ -387,7 +387,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   models.push_back(contactModel02);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts01;
   msgs::Contacts contacts02;
@@ -423,7 +423,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   // Run the test once for each contact sensor
   for (unsigned int k = 0; k < contacts.size(); ++k)
   {
-    double mass = models[k]->GetLink()->GetInertial()->GetMass();
+    double mass = models[k]->GetLink()->GetInertial()->Mass();
     expectedForce = models[k]->GetLink()->WorldCoGPose().Rot().Inverse()
         * ignition::math::Vector3d(0, 0, (gravityZ * mass));
     expectedTorque = ignition::math::Vector3d::Zero;
@@ -594,7 +594,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts;
 
@@ -636,7 +636,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
     {
       FAIL();
     }
-    math::Vector3 actualTorque;
+    ignition::math::Vector3d actualTorque;
 
     // loop through all contact points between the two collisions
     for (int j = 0; j < contacts.contact(i).position_size(); ++j)
@@ -646,20 +646,20 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
       if (body1)
       {
-        actualTorque.x =
+        actualTorque.X() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().x();
-        actualTorque.y =
+        actualTorque.Y() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().y();
-        actualTorque.z =
+        actualTorque.Z() =
           contacts.contact(i).wrench(j).body_1_wrench().torque().z();
       }
       else
       {
-        actualTorque.x =
+        actualTorque.X() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().x();
-        actualTorque.y =
+        actualTorque.Y() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().y();
-        actualTorque.z =
+        actualTorque.Z() =
           contacts.contact(i).wrench(j).body_2_wrench().torque().z();
       }
 
@@ -668,11 +668,11 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
       {
         // contact sensor should have positive x torque and relatively large
         // compared to y and z
-        EXPECT_GT(actualTorque.x, 0);
-        EXPECT_GT(actualTorque.x, fabs(actualTorque.y));
-        EXPECT_GT(actualTorque.x, fabs(actualTorque.z));
-        // EXPECT_LT(fabs(actualTorque.y), tol);
-        // EXPECT_LT(fabs(actualTorque.z), tol);
+        EXPECT_GT(actualTorque.X(), 0);
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Y()));
+        EXPECT_GT(actualTorque.X(), fabs(actualTorque.Z()));
+        // EXPECT_LT(fabs(actualTorque.Y()), tol);
+        // EXPECT_LT(fabs(actualTorque.Z()), tol);
       }
     }
   }

@@ -225,7 +225,7 @@ void BulletHingeJoint::SetAxis(const unsigned int /*_index*/,
 
   // Bullet seems to handle setAxis improperly. It readjust all the pivot
   // points
-  /*btmath::Vector3d vec(_axis.X(), _axis.Y(), _axis.Z());
+  /*btVector3 vec(_axis.X(), _axis.Y(), _axis.Z());
   ((btHingeConstraint*)this->bulletHinge)->setAxis(vec);
   */
 }
@@ -370,7 +370,7 @@ ignition::math::Vector3d BulletHingeJoint::GlobalAxis(
     btVector3 vec =
       bulletHinge->getRigidBodyA().getCenterOfMassTransform().getBasis() *
       bulletHinge->getFrameOffsetA().getBasis().getColumn(2);
-    result = BulletTypes::ConvertVector3(vec).Ign();
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
 
   return result;

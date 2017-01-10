@@ -186,8 +186,15 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
+      /// \deprecated See version that accepts ignition math objects.
       public: virtual void AddRay(const math::Vector3 &_start,
-                                  const math::Vector3 &_end);
+                  const math::Vector3 &_end) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Add a ray to the collision.
+      /// \param[in] _start Start of the ray.
+      /// \param[in] _end End of the ray.
+      public: virtual void AddRay(const ignition::math::Vector3d &_start,
+                                  const ignition::math::Vector3d &_end);
 
       /// \brief Set the points of a ray.
       /// \param[in] _rayIndex Index of the ray to set.
@@ -213,7 +220,7 @@ namespace gazebo
       protected: std::vector<RayShapePtr> rays;
 
       /// \brief Pose offset of all the rays.
-      protected: math::Pose offset;
+      protected: ignition::math::Pose3d offset;
 
       /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;

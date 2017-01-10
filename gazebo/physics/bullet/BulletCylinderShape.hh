@@ -77,16 +77,17 @@ namespace gazebo
                 btCollisionShape *shape = bParent->GetCollisionShape();
                 if (!shape)
                 {
-                  this->initialSize = math::Vector3(_radius, _radius, _length);
+                  this->initialSize =
+                      ignition::math::Vector3d(_radius, _radius, _length);
                   bParent->SetCollisionShape(new btCylinderShapeZ(
                       btVector3(_radius, _radius, _length * 0.5)));
                 }
                 else
                 {
                   btVector3 cylinderScale;
-                  cylinderScale.setX(_radius / this->initialSize.x);
-                  cylinderScale.setY(_radius / this->initialSize.y);
-                  cylinderScale.setZ(_length / this->initialSize.z);
+                  cylinderScale.setX(_radius / this->initialSize.X());
+                  cylinderScale.setY(_radius / this->initialSize.Y());
+                  cylinderScale.setZ(_length / this->initialSize.Z());
 
                   shape->setLocalScaling(cylinderScale);
 
@@ -107,7 +108,7 @@ namespace gazebo
                     compoundShape->removeChildShape(shape);
                     ignition::math::Pose3d relativePose =
                         this->collisionParent->RelativePose();
-                    relativePose.Pos() -= bLink->GetInertial()->GetCoG().Ign();
+                    relativePose.Pos() -= bLink->GetInertial()->CoG();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }
@@ -115,7 +116,7 @@ namespace gazebo
               }
 
       /// \brief Initial size of cylinder.
-      private: math::Vector3 initialSize;
+      private: ignition::math::Vector3d initialSize;
     };
     /// \}
   }

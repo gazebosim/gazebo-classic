@@ -52,12 +52,24 @@ void PlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
+void PlaneShape::SetAltitude(const math::Vector3 &_pos)
+{
+  this->SetAltitude(_pos.Ign());
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetAltitude(const ignition::math::Vector3d &/*_pos*/)
 {
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const math::Vector3 &_norm)
+{
+  this->SetNormal(_norm.Ign());
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
 {
   this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
@@ -66,7 +78,13 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->Get<math::Vector3>("normal");
+  return this->Normal();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PlaneShape::Normal() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("normal");
 }
 
 //////////////////////////////////////////////////
@@ -116,7 +134,7 @@ void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
   msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 

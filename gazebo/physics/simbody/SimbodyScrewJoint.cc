@@ -158,7 +158,7 @@ ignition::math::Vector3d SimbodyScrewJoint::GlobalAxis(
       SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
         this->simbodyPhysics->integ->getState(), X_OM.z()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W).Ign();
+      return SimbodyPhysics::Vec3ToVector3Ign(z_W);
     }
     else
     {

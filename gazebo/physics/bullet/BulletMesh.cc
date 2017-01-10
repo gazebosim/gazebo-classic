@@ -40,6 +40,14 @@ void BulletMesh::Init(const common::SubMesh *_subMesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
+  this->Init(_subMesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void BulletMesh::Init(const common::SubMesh *_subMesh,
+                      BulletCollisionPtr _collision,
+                      const ignition::math::Vector3d &_scale)
+{
   float *vertices = nullptr;
   int *indices = nullptr;
 
@@ -61,6 +69,14 @@ void BulletMesh::Init(const common::Mesh *_mesh,
                       BulletCollisionPtr _collision,
                       const math::Vector3 &_scale)
 {
+  this->Init(_mesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
+void BulletMesh::Init(const common::Mesh *_mesh,
+                      BulletCollisionPtr _collision,
+                      const ignition::math::Vector3d &_scale)
+{
   float *vertices = nullptr;
   int *indices = nullptr;
 
@@ -80,16 +96,16 @@ void BulletMesh::Init(const common::Mesh *_mesh,
 /////////////////////////////////////////////////
 void BulletMesh::CreateMesh(float *_vertices, int *_indices,
     unsigned int _numVertices, unsigned int _numIndices,
-    BulletCollisionPtr _collision, const math::Vector3 &_scale)
+    BulletCollisionPtr _collision, const ignition::math::Vector3d &_scale)
 {
   btTriangleMesh *mTriMesh = new btTriangleMesh();
 
   // Scale the vertex data
   for (unsigned int j = 0;  j < _numVertices; ++j)
   {
-    _vertices[j*3+0] = _vertices[j*3+0] * _scale.x;
-    _vertices[j*3+1] = _vertices[j*3+1] * _scale.y;
-    _vertices[j*3+2] = _vertices[j*3+2] * _scale.z;
+    _vertices[j*3+0] = _vertices[j*3+0] * _scale.X();
+    _vertices[j*3+1] = _vertices[j*3+1] * _scale.Y();
+    _vertices[j*3+2] = _vertices[j*3+2] * _scale.Z();
   }
 
   // Create the Bullet trimesh

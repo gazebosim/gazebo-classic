@@ -73,7 +73,7 @@ void BulletLink::Init()
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-  btScalar mass = this->inertial->GetMass();
+  btScalar mass = this->inertial->Mass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
@@ -82,7 +82,7 @@ void BulletLink::Init()
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
   btVector3 fallInertia(0, 0, 0);
-  ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
+  ignition::math::Vector3d cogVec = this->inertial->CoG();
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -132,7 +132,7 @@ void BulletLink::Init()
 
   // this->compoundShape->calculateLocalInertia(mass, fallInertia);
   fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
+    this->inertial->PrincipalMoments());
   // TODO: inertia products not currently used
   this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
                                    fallInertia.z(), 0, 0, 0);
@@ -232,8 +232,8 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
-    this->rigidLink->setMassProps(this->inertial->GetMass(),
-        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
+    this->rigidLink->setMassProps(this->inertial->Mass(),
+        BulletTypes::ConvertVector3(this->inertial->PrincipalMoments()));
   }
 }
 
@@ -249,13 +249,13 @@ void BulletLink::SetGravityMode(bool _mode)
 
   if (_mode == false)
     this->rigidLink->setGravity(btVector3(0, 0, 0));
-    // this->rigidLink->setMassProps(btScalar(0), btmath::Vector3(0, 0, 0));
+    // this->rigidLink->setMassProps(btScalar(0), btVector3(0, 0, 0));
   else
   {
     auto g = this->world->Gravity();
     this->rigidLink->setGravity(btVector3(g.X(), g.Y(), g.Z()));
     /*btScalar btMass = this->mass.GetAsDouble();
-    btmath::Vector3 fallInertia(0, 0, 0);
+    btVector3 fallInertia(0, 0, 0);
 
     this->compoundShape->calculateLocalInertia(btMass, fallInertia);
     this->rigidLink->setMassProps(btMass, fallInertia);
@@ -393,7 +393,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   ignition::math::Pose3d wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d offsetFromCoG = wPose.Rot()*
-    (_offset - this->inertial->GetCoG().Ign());
+    (_offset - this->inertial->CoG());
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
@@ -416,7 +416,7 @@ ignition::math::Vector3d BulletLink::WorldLinearVel(
   ignition::math::Pose3d wPose = this->WorldPose();
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d offsetFromCoG = _q*_offset
-        - wPose.Rot()*this->inertial->GetCoG().Ign();
+        - wPose.Rot()*this->inertial->CoG();
   btVector3 vel = this->rigidLink->getVelocityInLocalPoint(
       BulletTypes::ConvertVector3(offsetFromCoG));
 
@@ -493,7 +493,7 @@ ignition::math::Vector3d BulletLink::WorldTorque() const
 {
   // if (!this->rigidLink)
   //   return ignition::math::Vector3d(0, 0, 0);
-  // btmath::Vector3 btVec;
+  // btVector3 btVec;
   // btVec = this->rigidLink->getTotalTorque();
   // return ignition::math::Vector3d(btVec.x(), btVec.y(), btVec.z());
 
