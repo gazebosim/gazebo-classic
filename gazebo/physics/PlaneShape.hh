@@ -62,7 +62,12 @@ namespace gazebo
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
-      public: void SetNormal(const math::Vector3 &_norm);
+      /// \deprecated See function which accepts an ignition math object.
+      public: void SetNormal(const math::Vector3 &_norm) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the normal.
+      /// \param[in] _norm Plane normal.
+      public: void SetNormal(const ignition::math::Vector3d &_norm);
 
       /// \brief Get the plane normal.
       /// \return The plane normal.

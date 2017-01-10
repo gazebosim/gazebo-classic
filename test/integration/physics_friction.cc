@@ -360,9 +360,9 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    math::Vector3 pos = iter->first->WorldPose().Pos();
-    double cosPosAngle = pos.x / pos.GetLength();
-    double sinPosAngle = pos.y / pos.GetLength();
+    ignition::math::Vector3d pos = iter->first->WorldPose().Pos();
+    double cosPosAngle = pos.X() / pos.Length();
+    double sinPosAngle = pos.Y() / pos.Length();
     EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
     EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
   }
@@ -463,9 +463,9 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
     double velMag = g.Y() * sinAngle * t;
-    math::Vector3 vel = iter->first->WorldLinearVel();
-    EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
-    EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
+    ignition::math::Vector3d vel = iter->first->WorldLinearVel();
+    EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
+    EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
   }
 }
 

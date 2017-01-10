@@ -37,17 +37,33 @@ SimbodyMesh::~SimbodyMesh()
 }
 
 //////////////////////////////////////////////////
+void SimbodyMesh::Init(const common::SubMesh * _subMesh,
+                      SimbodyCollisionPtr _collision,
+                      const math::Vector3 & _scale)
+{
+  this->Init(_subMesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
 void SimbodyMesh::Init(const common::SubMesh * /*_subMesh*/,
                       SimbodyCollisionPtr /*_collision*/,
-                      const math::Vector3 & /*_scale*/)
+                      const ignition::math::Vector3d & /*_scale*/)
 {
   gzerr << "SimbodyMesh is not supported\n";
 }
 
 //////////////////////////////////////////////////
+void SimbodyMesh::Init(const common::Mesh *_mesh,
+                       SimbodyCollisionPtr _collision,
+                       const math::Vector3 &_scale)
+{
+  this->Init(_mesh, _collision, _scale.Ign());
+}
+
+//////////////////////////////////////////////////
 void SimbodyMesh::Init(const common::Mesh * /*_mesh*/,
                        SimbodyCollisionPtr /*_collision*/,
-                       const math::Vector3 &/*_scale*/)
+                       const ignition::math::Vector3d &/*_scale*/)
 {
   gzerr << "SimbodyMesh is not supported\n";
 }
@@ -56,6 +72,6 @@ void SimbodyMesh::Init(const common::Mesh * /*_mesh*/,
 void SimbodyMesh::CreateMesh(float * /*_vertices*/, int * /*_indices*/,
     unsigned int /*_numVertices*/, unsigned int /*_numIndices*/,
     SimbodyCollisionPtr /*_collision*/,
-    const math::Vector3 & /*_scale*/)
+    const ignition::math::Vector3d & /*_scale*/)
 {
 }
