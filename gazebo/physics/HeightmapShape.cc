@@ -235,7 +235,14 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -247,7 +254,14 @@ ignition::math::Vector3d HeightmapShape::Size() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Pos();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

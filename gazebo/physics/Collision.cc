@@ -200,7 +200,14 @@ ShapePtr Collision::GetShape() const
 //////////////////////////////////////////////////
 void Collision::SetScale(const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetScale(_scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -212,7 +219,14 @@ void Collision::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -227,7 +241,14 @@ ignition::math::Vector3d Collision::RelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -242,7 +263,14 @@ ignition::math::Vector3d Collision::WorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -257,7 +285,14 @@ ignition::math::Vector3d Collision::RelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -272,7 +307,14 @@ ignition::math::Vector3d Collision::WorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeLinearAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -287,7 +329,14 @@ ignition::math::Vector3d Collision::RelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldLinearAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -302,7 +351,14 @@ ignition::math::Vector3d Collision::WorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetRelativeAngularAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -317,7 +373,14 @@ ignition::math::Vector3d Collision::RelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Collision::GetWorldAngularAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -441,7 +504,14 @@ unsigned int Collision::GetMaxContacts()
 /////////////////////////////////////////////////
 const math::Pose Collision::GetWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

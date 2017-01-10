@@ -62,7 +62,14 @@ namespace gazebo
       public: static math::Vector3 ConvertVector3(const btVector3 &_bt)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert a bullet btVector3 to an ignition Vector3d.
@@ -82,7 +89,14 @@ namespace gazebo
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return btVector3(_vec.x, _vec.y, _vec.z);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition Vector3d to a bullet btVector3.
@@ -128,7 +142,14 @@ namespace gazebo
       public: static btVector4 ConvertVector4(const math::Vector4 &_vec)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return ConvertVector4dIgn(_vec.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition math Vector4d to a bullet btVector4.
@@ -162,7 +183,14 @@ namespace gazebo
       public: static math::Pose ConvertPose(const btTransform &_bt)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return ConvertPoseIgn(_bt);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert a gazebo pose to a bullet transform.
@@ -172,7 +200,14 @@ namespace gazebo
       public: static btTransform ConvertPose(const math::Pose &_pose)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return ConvertPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition math pose to a bullet transform.

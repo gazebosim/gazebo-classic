@@ -43,7 +43,14 @@ ViewController::~ViewController()
 void ViewController::Init(const math::Vector3 &_focalPoint,
     double _yaw, double _pitch)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_focalPoint.Ign(), _yaw, _pitch);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

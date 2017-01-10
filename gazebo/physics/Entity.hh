@@ -123,7 +123,14 @@ namespace gazebo
       public: inline virtual const math::Pose GetWorldPose() const
               GAZEBO_DEPRECATED(8.0)
       {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return this->worldPose;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
       }
 
       /// \brief Get the absolute pose of the entity.
