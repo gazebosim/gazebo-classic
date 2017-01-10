@@ -207,28 +207,6 @@ LinkData::~LinkData()
 }
 
 /////////////////////////////////////////////////
-rendering::VisualPtr LinkData::LinkVisual() const
-{
-  return this->linkVisual;
-}
-
-/////////////////////////////////////////////////
-void LinkData::SetLinkVisual(rendering::VisualPtr _linkVisual)
-{
-  this->linkVisual = _linkVisual;
-
-  if (!this->linkFrameVis)
-  {
-    rendering::LinkFrameVisualPtr vis(new rendering::LinkFrameVisual(
-        _linkVisual->GetName() + "_LINK_FRAME_VISUAL__", _linkVisual));
-    vis->Load();
-    vis->SetVisible(this->showLinkFrame);
-
-    this->linkFrameVis = vis;
-  }
-}
-
-/////////////////////////////////////////////////
 std::string LinkData::Name() const
 {
   return this->linkSDF->Get<std::string>("name");
@@ -1049,9 +1027,19 @@ double LinkData::ComputeVolume() const
 }
 
 /////////////////////////////////////////////////
-void LinkData::SetLinkVisual(const rendering::VisualPtr _visual)
+void LinkData::SetLinkVisual(const rendering::VisualPtr _linkVisual)
 {
-  this->linkVisual = _visual;
+  this->linkVisual = _linkVisual;
+
+  if (!this->linkFrameVis)
+  {
+    rendering::LinkFrameVisualPtr vis(new rendering::LinkFrameVisual(
+        _linkVisual->Name() + "_LINK_FRAME_VISUAL__", _linkVisual));
+    vis->Load();
+    vis->SetVisible(this->showLinkFrame);
+
+    this->linkFrameVis = vis;
+  }
 }
 
 /////////////////////////////////////////////////

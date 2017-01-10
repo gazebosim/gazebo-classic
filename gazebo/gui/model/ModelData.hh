@@ -101,14 +101,6 @@ namespace gazebo
       /// \brief Destructor
       public: ~LinkData();
 
-      /// \brief Get the link visual.
-      /// \return Link visual pointer.
-      public: rendering::VisualPtr LinkVisual() const;
-
-      /// \brief Set the link visual.
-      /// \param[in] Link visual pointer.
-      public: void SetLinkVisual(rendering::VisualPtr _linkVisual);
-
       /// \brief Get the name of the link.
       /// \return Name of link.
       public: std::string Name() const;
