@@ -63,7 +63,7 @@ namespace gazebo
 
                 /*
                 this->SetAxis(0,
-                    this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
+                    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d("xyz"));
                 this->SetAxis(1,
                     this->sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
                     */

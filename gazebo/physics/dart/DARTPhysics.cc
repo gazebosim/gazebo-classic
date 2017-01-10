@@ -18,8 +18,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -165,10 +163,10 @@ void DARTPhysics::UpdateCollision()
 
     auto body1Pose = dartLink1->WorldPose();
     auto body2Pose = dartLink2->WorldPose();
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     // calculate force in world frame
     Eigen::Vector3d force = dtContact.force;
@@ -197,14 +195,14 @@ void DARTPhysics::UpdateCollision()
 
     if (!dartLink1->IsStatic())
     {
-      contactFeedback->wrench[0].body1Force = localForce1.Ign();
-      contactFeedback->wrench[0].body1Torque = localTorque1.Ign();
+      contactFeedback->wrench[0].body1Force = localForce1;
+      contactFeedback->wrench[0].body1Torque = localTorque1;
     }
 
     if (!dartLink2->IsStatic())
     {
-      contactFeedback->wrench[0].body2Force = localForce2.Ign();
-      contactFeedback->wrench[0].body2Torque = localTorque2.Ign();
+      contactFeedback->wrench[0].body2Force = localForce2;
+      contactFeedback->wrench[0].body2Torque = localTorque2;
     }
 
     ++contactFeedback->count;
@@ -353,11 +351,11 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
   this->dataPtr->dtWorld->setGravity(
-    Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+    Eigen::Vector3d(_gravity.X(), _gravity.Y(), _gravity.Z()));
 }
 
 //////////////////////////////////////////////////

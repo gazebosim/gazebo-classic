@@ -39,8 +39,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -417,7 +415,7 @@ void ODEPhysics::UpdatePhysics()
     (*(this->dataPtr->physicsStepFunc))
       (this->dataPtr->worldId, this->maxStepSize);
 
-    math::Vector3 f1, f2, t1, t2;
+    ignition::math::Vector3d f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->dataPtr->jointFeedbackIndex; ++i)
@@ -439,13 +437,13 @@ void ODEPhysics::UpdatePhysics()
 
         // set force torque in link frame
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
-             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(f1.Ign());
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(f1);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
-             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(f2.Ign());
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(f2);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
-             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(t1.Ign());
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(t1);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
-             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(t2.Ign());
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(t2);
       }
     }
   }
@@ -932,10 +930,11 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
-  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
+  this->world->SetGravitySDF(_gravity);
+  dWorldSetGravity(this->dataPtr->worldId, _gravity.X(), _gravity.Y(),
+      _gravity.Z());
 }
 
 //////////////////////////////////////////////////
@@ -1136,7 +1135,8 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
-    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    /// if (fd2 != ignition::math::Vector3d::Zero &&
+    ///       fd != ignition::math::Vector3d::Zero &&
     ///       _collision1->surface->mu1 > _collision2->surface->mu1)
     ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
     ///         << " comparing mu1 from both surfaces, and use fdir1"

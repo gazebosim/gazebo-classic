@@ -25,7 +25,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
@@ -47,8 +46,8 @@ namespace gazebo
           dtJoint(nullptr),
           dtChildBodyNode(nullptr)
       {
-        mDefaultValues["Axis0"] = math::Vector3::UnitX;
-        mDefaultValues["Axis1"] = math::Vector3::UnitY;
+        mDefaultValues["Axis0"] = ignition::math::Vector3d::UnitX;
+        mDefaultValues["Axis1"] = ignition::math::Vector3d::UnitY;
       }
 
       /// \brief Default destructor

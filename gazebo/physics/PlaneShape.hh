@@ -19,7 +19,6 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Shape.hh"
 #include "gazebo/util/system.hh"
 
@@ -56,7 +55,7 @@ namespace gazebo
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
-      public: void SetNormal(const math::Vector3 &_norm);
+      public: void SetNormal(const ignition::math::Vector3d &_norm);
 
       /// \brief Get the plane normal.
       /// \return The plane normal.

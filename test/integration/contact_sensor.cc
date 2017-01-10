@@ -387,7 +387,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   models.push_back(contactModel02);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts01;
   msgs::Contacts contacts02;
@@ -594,7 +594,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   ASSERT_TRUE(contactModel != NULL);
 
   double gravityZ = -9.8;
-  physics->SetGravity(math::Vector3(0, 0, gravityZ));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, gravityZ));
 
   msgs::Contacts contacts;
 

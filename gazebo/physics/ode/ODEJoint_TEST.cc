@@ -46,7 +46,7 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), "ode");
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -85,7 +85,7 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
   }
 
   gzdbg << "-------------------Test 1 (y)-------------------\n";
-  physics->SetGravity(math::Vector3(0, 10, 0));
+  physics->SetGravity(ignition::math::Vector3d(0, 10, 0));
   world->Step(100);
   EXPECT_NEAR(joint_0->Position(0), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->Position(0), 0.0048295899143964149, 1e-5);
@@ -97,7 +97,7 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
         << "]\n";
 
   gzdbg << "-------------------Test 2 (x)-------------------\n";
-  physics->SetGravity(math::Vector3(10, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d(10, 0, 0));
   world->Step(100);
   EXPECT_NEAR(joint_0->Position(0), 0.0, 1e-6);
   EXPECT_NEAR(joint_1->Position(0), 0.0050046318305403403, 1e-5);
@@ -110,7 +110,7 @@ TEST_F(ODEJoint_TEST, ImplicitDamping)
         << "]\n";
 
   gzdbg << "-------------------Test 3 (joint limit)-------------------\n";
-  physics->SetGravity(math::Vector3(1000, 1000, 0));
+  physics->SetGravity(ignition::math::Vector3d(1000, 1000, 0));
   world->Step(1000);
   EXPECT_NEAR(joint_0->Position(0), 0.0, 0.001);
   EXPECT_NEAR(joint_1->Position(0), 0.7, 0.001);

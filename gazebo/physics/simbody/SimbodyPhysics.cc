@@ -54,7 +54,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -799,18 +798,18 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void SimbodyPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
     if (this->simbodyPhysicsInitialized && this->world->ModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
-         SimbodyPhysics::Vector3ToVec3(_gravity.Ign()));
+         SimbodyPhysics::Vector3ToVec3(_gravity));
     else
       this->gravity.setDefaultGravityVector(
-        SimbodyPhysics::Vector3ToVec3(_gravity.Ign()));
+        SimbodyPhysics::Vector3ToVec3(_gravity));
   }
 }
 
