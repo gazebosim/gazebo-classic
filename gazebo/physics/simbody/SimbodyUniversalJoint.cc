@@ -56,7 +56,14 @@ ignition::math::Vector3d SimbodyUniversalJoint::Anchor(
 //////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Vector3();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

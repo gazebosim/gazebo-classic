@@ -45,8 +45,15 @@ void ImageHeightmap::FillHeightMap(int _subSampling,
     const math::Vector3 &_scale, bool _flipY,
     std::vector<float> &_heights)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
       _flipY, _heights);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

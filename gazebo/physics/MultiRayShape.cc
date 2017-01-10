@@ -213,7 +213,14 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 void MultiRayShape::AddRay(const math::Vector3 &_start,
                            const math::Vector3 &_end)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->AddRay(_start.Ign(), _end.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

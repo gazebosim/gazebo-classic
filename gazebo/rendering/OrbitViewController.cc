@@ -67,7 +67,14 @@ OrbitViewController::~OrbitViewController()
 void OrbitViewController::Init(const math::Vector3 &_focalPoint,
     const double _yaw, const double _pitch)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_focalPoint.Ign(), _yaw, _pitch);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -302,13 +309,27 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 //////////////////////////////////////////////////
 void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->TranslateLocal(_vec.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
 void OrbitViewController::TranslateGlobal(const math::Vector3 &_vec)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->TranslateGlobal(_vec.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -337,7 +358,14 @@ void OrbitViewController::SetDistance(float _d)
 //////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetFocalPoint(_fp.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -350,7 +378,14 @@ void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
 //////////////////////////////////////////////////
 math::Vector3 OrbitViewController::GetFocalPoint() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->FocalPoint();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

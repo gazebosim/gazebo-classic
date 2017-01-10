@@ -83,7 +83,14 @@ void ODEMesh::Update()
 void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_subMesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -111,7 +118,14 @@ void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
 void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Init(_mesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

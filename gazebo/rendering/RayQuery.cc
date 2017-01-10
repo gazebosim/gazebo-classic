@@ -53,11 +53,18 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 
   auto result = this->SelectMeshTriangle(_x, _y, _visual, intersect, triangle);
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _intersect = intersect;
   _vertices.clear();
   _vertices.push_back(triangle[0]);
   _vertices.push_back(triangle[1]);
   _vertices.push_back(triangle[2]);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
   return result;
 }

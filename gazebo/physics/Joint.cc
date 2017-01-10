@@ -87,7 +87,14 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Load(_parent, _child, _pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -440,7 +447,14 @@ void Joint::Fini()
 //////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LocalAxis(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -715,7 +729,14 @@ double Joint::Position(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetUpperLimit(_index, _angle.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   return true;
 }
 
@@ -736,7 +757,14 @@ math::Angle Joint::GetHighStop(unsigned int _index)
 //////////////////////////////////////////////////
 bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetLowerLimit(_index, _angle.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   return true;
 }
 
@@ -1034,7 +1062,14 @@ void Joint::ApplyStiffnessDamping()
 /////////////////////////////////////////////////
 double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->InertiaRatio(_axis.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1356,7 +1391,14 @@ double Joint::GetStopDissipation(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Pose Joint::GetInitialAnchorPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->InitialAnchorPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1368,7 +1410,14 @@ ignition::math::Pose3d Joint::InitialAnchorPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1382,7 +1431,14 @@ ignition::math::Pose3d Joint::WorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetParentWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->ParentWorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1396,7 +1452,14 @@ ignition::math::Pose3d Joint::ParentWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetAnchorErrorPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->AnchorErrorPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1545,7 +1608,14 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->ChildLinkPose(_index, _position);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1699,35 +1769,77 @@ math::Angle Joint::GetAngleImpl(unsigned int _index) const
 /////////////////////////////////////////////////
 void Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetAxis(_index, _axis.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetGlobalAxis(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->GlobalAxis(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 void Joint::SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetAnchor(_index, _anchor.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetAnchor(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Anchor(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetLinkForce(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LinkForce(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetLinkTorque(const unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LinkTorque(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

@@ -150,7 +150,14 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return (*this)(_frameOffset.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -221,7 +228,14 @@ void Inertial::SetCoG(const double _cx, const double _cy, const double _cz)
 //////////////////////////////////////////////////
 void Inertial::SetCoG(const math::Vector3 &_c)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->SetCoG(_c.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -241,7 +255,14 @@ void Inertial::SetCoG(const double _cx, const double _cy, const double _cz,
 //////////////////////////////////////////////////
 void Inertial::SetCoG(const math::Pose &_c)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetCoG(_c.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -262,7 +283,14 @@ void Inertial::SetInertiaMatrix(
 //////////////////////////////////////////////////
 math::Vector3 Inertial::GetPrincipalMoments() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->PrincipalMoments();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -274,7 +302,14 @@ const ignition::math::Vector3d &Inertial::PrincipalMoments() const
 //////////////////////////////////////////////////
 math::Vector3 Inertial::GetProductsofInertia() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->ProductsOfInertia();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -571,7 +606,14 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
 //////////////////////////////////////////////////
 math::Vector3 Inertial::GetCoG() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->CoG();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -583,7 +625,14 @@ const ignition::math::Vector3d &Inertial::CoG() const
 //////////////////////////////////////////////////
 const math::Pose Inertial::GetPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Pose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

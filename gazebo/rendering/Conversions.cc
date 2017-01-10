@@ -41,7 +41,14 @@ Ogre::Vector3 Conversions::Convert(const math::Vector3 &_v)
 //////////////////////////////////////////////////
 math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Vector3(_v.x, _v.y, _v.z);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
