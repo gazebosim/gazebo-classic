@@ -46,8 +46,8 @@ namespace gazebo
           dtJoint(nullptr),
           dtChildBodyNode(nullptr)
       {
-        mDefaultValues["Axis0"] = math::Vector3::UnitX;
-        mDefaultValues["Axis1"] = math::Vector3::UnitY;
+        mDefaultValues["Axis0"] = ignition::math::Vector3d::UnitX;
+        mDefaultValues["Axis1"] = ignition::math::Vector3d::UnitY;
       }
 
       /// \brief Default destructor

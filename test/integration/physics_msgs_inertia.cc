@@ -63,13 +63,13 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
   const double mass = inertial->Mass();
-  const math::Vector3 cog = inertial->CoG();
-  const math::Vector3 Ixxyyzz = inertial->PrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->ProductsOfInertia();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*ignition::math::Vector3d::One);
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
   msgs::Model msg;
@@ -144,13 +144,13 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
   const double mass = inertial->Mass();
-  const math::Vector3 cog = inertial->CoG();
-  const math::Vector3 Ixxyyzz = inertial->PrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->ProductsOfInertia();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 120);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, math::Vector3(2.564, 360.064, 362.5));
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, ignition::math::Vector3d(2.564, 360.064, 362.5));
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new center of mass
   msgs::Model msg;
@@ -218,13 +218,13 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
   const double mass = inertial->Mass();
-  const math::Vector3 cog = inertial->CoG();
-  const math::Vector3 Ixxyyzz = inertial->PrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->ProductsOfInertia();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*ignition::math::Vector3d::One);
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
   msgs::Model msg;
@@ -389,8 +389,8 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != NULL);
-    const math::Vector3 Ixxyyzz = inertial->PrincipalMoments();
-    const math::Vector3 Ixyxzyz = inertial->ProductsOfInertia();
+    const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+    const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
 
     // new inertial values
     msgs::Model msg;

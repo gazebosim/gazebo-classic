@@ -68,7 +68,7 @@ TEST_F(GzJoint, PositionPID)
   // Disable gravity to simplify PID control
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // Get a pointer to the model
   physics::ModelPtr model = world->ModelByName("model");

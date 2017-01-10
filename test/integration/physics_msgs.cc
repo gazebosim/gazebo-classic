@@ -119,15 +119,19 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     this->node->Advertise<msgs::Model>("~/model/modify");
 
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
@@ -142,10 +146,10 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    for (std::vector<math::Pose>::iterator iter = poses.begin();
+    for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), (*iter).Ign());
+      msgs::Set(msg.mutable_pose(), (*iter));
       modelPub->Publish(msg);
 
       while (*iter != model->WorldPose())
@@ -326,15 +330,19 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
   double z0 = 5;
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
   physics::ModelPtr model = world->ModelByName(name);
@@ -349,7 +357,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
       if (link->IsCanonicalLink())
         continue;
 
-      for (std::vector<math::Pose>::iterator iter = poses.begin();
+      for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
            iter != poses.end(); ++iter)
       {
         msgs::Model msg;
@@ -360,7 +368,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
+        msgs::Set(linkMsg->mutable_pose(), (*iter));
         modelPub->Publish(msg);
 
         int sleep = 0;

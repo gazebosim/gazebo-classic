@@ -144,6 +144,7 @@
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
 
 1. Deprecate gazebo::math
+    * [Pull request #2594](https://bitbucket.org/osrf/gazebo/pull-request/2594)
     * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
     * [Pull request #2586](https://bitbucket.org/osrf/gazebo/pull-request/2586)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
