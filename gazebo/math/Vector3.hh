@@ -299,7 +299,7 @@ namespace gazebo
       /// \return true if each component is equal withing a
       /// default tolerence (1e-6), false otherwise
       /// Note: not explicitly deprecated on purpose, because gtest catches it
-      public: bool operator!=(const Vector3 &_v);
+      public: bool operator!=(const Vector3 &_v) const;
 
       /// \brief See if a point is finite (e.g., not nan)
       public: bool IsFinite() const GAZEBO_DEPRECATED(8.0);
