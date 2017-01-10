@@ -1,6 +1,7 @@
-## gazebo 8
+## Gazebo 8
 
-## gazebo 8.x.x (2017-xx-xx)
+## Gazebo 8.x.x (2017-xx-xx)
+
 1. Depend on ignition math3
     * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
 
