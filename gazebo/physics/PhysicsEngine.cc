@@ -354,3 +354,9 @@ WorldPtr PhysicsEngine::World() const
 {
   return this->world;
 }
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetGravity(const math::Vector3 &_gravity)
+{
+  return this->SetGravity(_gravity.Ign());
+}

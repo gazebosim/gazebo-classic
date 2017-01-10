@@ -131,7 +131,7 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   Collision::SetCollision(_placeable);
   this->collisionShape = _shape;
 
-  // btmath::Vector3 vec;
+  // btVector3 vec;
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);

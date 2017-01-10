@@ -82,7 +82,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;

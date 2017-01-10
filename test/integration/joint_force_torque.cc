@@ -78,7 +78,7 @@ void JointForceTorqueTest::ForceTorque1(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -187,7 +187,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -210,7 +210,7 @@ void JointForceTorqueTest::ForceTorque2(const std::string &_physicsEngine)
   physics::JointPtr joint_12 = model_1->GetJoint("joint_12");
 
   // perturbe joints so top link topples over, then remeasure
-  physics->SetGravity(math::Vector3(-30, 10, -50));
+  physics->SetGravity(ignition::math::Vector3d(-30, 10, -50));
   // tune joint stop properties
   joint_01->SetParam("stop_erp", 0, 0.02);
   joint_12->SetParam("stop_erp", 0, 0.02);
@@ -341,7 +341,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
@@ -472,7 +472,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, -50));
+  physics->SetGravity(ignition::math::Vector3d(0, 0, -50));
 
   // simulate 1 step
   world->Step(1);
