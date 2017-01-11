@@ -96,16 +96,10 @@ namespace gazebo
                 double yV2 = yScaleMap.s2();
 
                 // transform to work in widget coordinates
-                if (xScaleMap.transformation())
-                {
-                  xV1 = xScaleMap.transform(xV1);
-                  xV2 = xScaleMap.transform(xV2);
-                }
-                if (yScaleMap.transformation())
-                {
-                  yV1 = yScaleMap.transform(yV1);
-                  yV2 = yScaleMap.transform(yV2);
-                }
+                xV1 = xScaleMap.transform(xV1);
+                xV2 = xScaleMap.transform(xV2);
+                yV1 = yScaleMap.transform(yV1);
+                yV2 = yScaleMap.transform(yV2);
 
                 // zoom in at mouse point
                 // 1. center the canvas at mouse point
@@ -133,16 +127,10 @@ namespace gazebo
                 yV2 = zoomPos.y() + yHalfHeightScaled - trans.y();
 
                 // transform back to canvas coordinates
-                if (xScaleMap.transformation())
-                {
-                  xV1 = xScaleMap.invTransform(xV1);
-                  xV2 = xScaleMap.invTransform(xV2);
-                }
-                if (yScaleMap.transformation())
-                {
-                  yV1 = yScaleMap.invTransform(yV1);
-                  yV2 = yScaleMap.invTransform(yV2);
-                }
+                xV1 = xScaleMap.invTransform(xV1);
+                xV2 = xScaleMap.invTransform(xV2);
+                yV1 = yScaleMap.invTransform(yV1);
+                yV2 = yScaleMap.invTransform(yV2);
 
                 // zoom by setting axis scale
                 plt->setAxisScale(QwtPlot::xBottom, xV1, xV2);

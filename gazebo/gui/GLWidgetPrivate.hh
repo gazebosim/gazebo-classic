@@ -114,6 +114,9 @@ namespace gazebo
 
       /// \brief Timer used to update the render window.
       public: QTimer *updateTimer = nullptr;
+
+      /// \brief Time when the last wheel event was processed
+      public: common::Time lastWheelEventTime;
     };
   }
 }
