@@ -91,7 +91,7 @@ class gazebo::rendering::MarkerManagerPrivate
   /// \brief Ignition node
   public: ignition::transport::Node node;
 
-  /// \brief Ignition node
+  /// \brief Gazebo transport node
   public: transport::NodePtr gznode;
 
   /// \brief Connect to the prerender signal
