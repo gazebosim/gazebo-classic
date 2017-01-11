@@ -157,7 +157,6 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
 gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
-  gazebo_math
   gazebo_common
   gazebo_util
   gazebo_ode

@@ -345,7 +345,6 @@ void Visual::Load()
 {
   std::ostringstream stream;
   ignition::math::Pose3d pose;
-  Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
   if (this->dataPtr->parent)
@@ -391,10 +390,6 @@ void Visual::Load()
   // Set the pose of the scene node
   this->SetPose(pose);
   this->dataPtr->initialRelativePose = pose;
-
-  // Get the size of the mesh
-  if (obj)
-    meshSize = obj->getBoundingBox().getSize();
 
   // Keep transparency to set after setting material
   double sdfTransparency = -1;
