@@ -1,6 +1,10 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Depend on ignition math3
+    * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
+
 1. Use ignition math with ServerFixture
     * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
 
