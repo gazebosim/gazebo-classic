@@ -143,7 +143,7 @@ bool MarkerManager::Init(Scene *_scene)
   }
 
   this->dataPtr->gznode = transport::NodePtr(new transport::Node());
-      this->dataPtr->gznode->Init();
+  this->dataPtr->gznode->Init();
 
   this->dataPtr->statsSub = this->dataPtr->gznode->Subscribe("~/world_stats",
       &MarkerManagerPrivate::OnStatsMsg, this->dataPtr.get());
