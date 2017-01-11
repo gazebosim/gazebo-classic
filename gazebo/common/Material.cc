@@ -182,7 +182,7 @@ void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 }
 
 //////////////////////////////////////////////////
-void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor)
+void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor) const
 {
   _srcFactor = this->srcBlendFactor;
   _dstFactor = this->dstBlendFactor;
