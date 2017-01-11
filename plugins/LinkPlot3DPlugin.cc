@@ -166,6 +166,15 @@ void LinkPlot3DPlugin::OnUpdate()
 {
   auto currentTime = this->dataPtr->world->SimTime();
 
+  // check for world reset
+  if (currentTime < this->dataPtr->prevTime)
+  {
+    this->dataPtr->prevTime = currentTime;
+    for (auto &plot : this->dataPtr->plots)
+      plot.msg.mutable_point()->Clear();
+    return;
+  }
+
   // Throttle update
   if ((currentTime - this->dataPtr->prevTime).Double() < this->dataPtr->period)
     return;
