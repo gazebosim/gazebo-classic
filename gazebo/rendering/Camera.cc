@@ -582,19 +582,6 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
@@ -1919,12 +1906,6 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 }
 
 //////////////////////////////////////////////////
-void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
-{
-  this->newImageFrame.Disconnect(_c->Id());
-}
-
-/////////////////////////////////////////////////
 VisualPtr Camera::TrackedVisual() const
 {
   return this->dataPtr->trackedVisual;

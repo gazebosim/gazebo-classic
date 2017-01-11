@@ -33,25 +33,6 @@ common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
 }
 
 //////////////////////////////////////////////////
-Ogre::Vector3 Conversions::Convert(const math::Vector3 &_v)
-{
-  return Ogre::Vector3(_v.x, _v.y, _v.z);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Conversions::Convert(const Ogre::Vector3 &_v)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Vector3(_v.x, _v.y, _v.z);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
 {
   return ignition::math::Vector3d(_v.x, _v.y, _v.z);
@@ -61,25 +42,6 @@ ignition::math::Vector3d Conversions::ConvertIgn(const Ogre::Vector3 &_v)
 Ogre::Vector3 Conversions::Convert(const ignition::math::Vector3d &_v)
 {
   return Ogre::Vector3(_v.X(), _v.Y(), _v.Z());
-}
-
-//////////////////////////////////////////////////
-Ogre::Quaternion Conversions::Convert(const math::Quaternion &_v)
-{
-  return Ogre::Quaternion(_v.w, _v.x, _v.y, _v.z);
-}
-
-//////////////////////////////////////////////////
-math::Quaternion Conversions::Convert(const Ogre::Quaternion &_v)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Quaternion(_v.w, _v.x, _v.y, _v.z);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
