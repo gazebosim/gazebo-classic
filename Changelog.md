@@ -1,6 +1,6 @@
 ## Gazebo 5.0
 
-### Gazebo 5.x.x
+### Gazebo 5.4.0 (2017-01-11)
 
 1. Check FSAA support when creating camera render textures
     * [Pull request 2442](https://bitbucket.org/osrf/gazebo/pull-request/2442)
