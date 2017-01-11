@@ -48,9 +48,3 @@ EventT<void (std::string)> Events::removeSensor;
 
 EventT<void (sdf::ElementPtr, const std::string &,
     const std::string &, const uint32_t)> Events::createSensor;
-
-/////////////////////////////////////////////////
-void Events::DisconnectWorldUpdateBegin(ConnectionPtr _subscriber)
-{
-  worldUpdateBegin.Disconnect(_subscriber->Id());
-}
