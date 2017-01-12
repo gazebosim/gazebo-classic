@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <sstream>
 #include <boost/bind.hpp>
 
 #include <ignition/math/Vector2.hh>
