@@ -2579,7 +2579,7 @@ bool ConfigWidget::UpdateVector3dWidget(ConfigChildWidget *_widget,
   }
   else
   {
-    gzerr << "Error updating Vector3 Config widget" << std::endl;
+    gzerr << "Error updating Vector3d Config widget" << std::endl;
   }
   return false;
 }
@@ -2829,7 +2829,7 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
   }
   else
   {
-    gzerr << "Error getting value from Vector3 Config widget" << std::endl;
+    gzerr << "Error getting value from Vector3d Config widget" << std::endl;
   }
   return value;
 }
