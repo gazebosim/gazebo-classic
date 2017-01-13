@@ -27,11 +27,6 @@
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Vector3;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering

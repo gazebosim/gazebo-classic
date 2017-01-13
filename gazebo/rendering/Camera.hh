@@ -60,11 +60,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Pose;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
