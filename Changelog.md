@@ -1,5 +1,11 @@
 ## Gazebo 7
 
+## Gazebo 7.X.X (20XX-XX-XX)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
 ## Gazebo 7.5.0 (2017-01-11)
 
 1. Remove qt4 webkit in gazebo7 (used for HotkeyDialog).
