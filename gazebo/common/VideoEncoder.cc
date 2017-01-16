@@ -708,7 +708,7 @@ bool VideoEncoder::AddFrame(const unsigned char *_frame,
     }
   }
 
-  av_packet_unref(&avPacket);
+  av_packet_unref(avPacket);
 #endif
   return true;
 }
