@@ -260,9 +260,9 @@
 
 ## Gazebo 7
 
-## Gazebo 7.x.x (2016-xx-xx)
+## Gazebo 7.5.0 (2017-01-11)
 
-1. Don't use qt4 webkit for HotkeyDialog
+1. Remove qt4 webkit in gazebo7 (used for HotkeyDialog).
     * [Pull request 2584](https://bitbucket.org/osrf/gazebo/pull-request/2584)
 
 1. Support configuring heightmap sampling level
