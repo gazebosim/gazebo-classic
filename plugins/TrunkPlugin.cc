@@ -93,12 +93,37 @@ void TrunkPlugin::OnUpdate()
   matMsg->mutable_script()->set_name(mat);
 
   ignition::math::Vector3d point;
+  double a,b;
+  for(uint i = 0; i < 100; i++) {
+    a = ((double) rand() / (RAND_MAX)) * 10.0;
+    b = ((double) rand() / (RAND_MAX)) * 10.0;
+    point.Set(a, b, 0.01);
+    ignition::msgs::Set(markerMsg.add_point(), point);
+    a = ((double) rand() / (RAND_MAX)) * 10.0;
+    b = ((double) rand() / (RAND_MAX)) * 10.0;
+    point.Set(a, b, 0.01);
+    ignition::msgs::Set(markerMsg.add_point(), point);
+    a = ((double) rand() / (RAND_MAX)) * 10.0;
+    b = ((double) rand() / (RAND_MAX)) * 10.0;
+    point.Set(a, b, 0.01);
+    ignition::msgs::Set(markerMsg.add_point(), point);
+  }
+
+  bool result;
+  ignition::msgs::StringMsg strMsg;
+  this->dataPtr->node.Request(
+        "/marker", markerMsg,
+        10000,
+        strMsg,
+        result);
+  std::cerr << "result: " << result << std::endl;
+  /* ignition::math::Vector3d point;
   point.Set(0, 0, 0.01);
   ignition::msgs::Set(markerMsg.add_point(), point);
   point.Set(1, 0, 0.01);
   ignition::msgs::Set(markerMsg.add_point(), point);
   point.Set(0, 1, 0.01);
-  ignition::msgs::Set(markerMsg.add_point(), point);
+  ignition::msgs::Set(markerMsg.add_point(), point);*/
 
   this->dataPtr->node.Request("/marker", markerMsg);
 
