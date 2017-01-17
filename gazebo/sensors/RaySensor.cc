@@ -478,11 +478,11 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
       {
-        range = IGN_DBL_INF;
+        range = ignition::math::INF_D;
       }
       else if (range <= this->RangeMin())
       {
-        range = -IGN_DBL_INF;
+        range = -ignition::math::INF_D;
       }
       else if (this->noises.find(RAY_NOISE) !=
                this->noises.end())

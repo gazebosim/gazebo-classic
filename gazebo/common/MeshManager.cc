@@ -391,11 +391,11 @@ void MeshManager::CreatePlane(const std::string &_name,
         vec.X() = (x * xSpace) - halfWidth;
         vec.Y() = (y * ySpace) - halfHeight;
         vec.Z() = -z;
-        vec = xform.TransformAffine(vec);
+        xform.TransformAffine(vec, vec);
         subMesh->AddVertex(vec);
 
         // Compute the normal
-        vec = xform.TransformAffine(norm);
+        xform.TransformAffine(norm, vec);
         subMesh->AddNormal(vec);
 
         // Compute the texture coordinate

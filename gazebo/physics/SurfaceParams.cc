@@ -26,7 +26,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
   : patchRadius(0.0)
-  , surfaceRadius(IGN_DBL_MAX)
+  , surfaceRadius(ignition::math::MAX_D)
   , usePatchRadius(1)
   , poissonsRatio(0.3)
   , elasticModulus(0)

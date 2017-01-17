@@ -168,11 +168,11 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (this->dataPtr->depthBuffer[i] >= this->camera->FarClip())
       {
-        this->dataPtr->depthBuffer[i] = IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = ignition::math::INF_D;
       }
       else if (this->dataPtr->depthBuffer[i] <= this->camera->NearClip())
       {
-        this->dataPtr->depthBuffer[i] = -IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = -ignition::math::INF_D;
       }
     }
     msg.mutable_image()->set_data(this->dataPtr->depthBuffer, depthBufferSize);
