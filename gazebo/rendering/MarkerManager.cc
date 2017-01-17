@@ -224,7 +224,8 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
     if (nsIter != this->markers.end())
     {
       while (nsIter->second.find(id) != nsIter->second.end())
-        id = ignition::math::Rand::IntUniform(ignition::math::MIN_UI32, ignition::math::MAX_UI32);
+        id = ignition::math::Rand::IntUniform(ignition::math::MIN_UI32,
+                                              ignition::math::MAX_UI32);
     }
   }
 

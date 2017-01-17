@@ -80,8 +80,8 @@ namespace gazebo
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return
       /// \return ignition::math::Vector3d value of the point. A vector of
-      /// [ignition::math::INF_D, ignition::math::INF_D, ignition::math::INF_D] is returned when then the
-      /// _index is out of bounds.
+      /// [ignition::math::INF_D, ignition::math::INF_D, ignition::math::INF_D]
+      /// is returned when then the _index is out of bounds.
       /// ignition::math::INF_D==std::numeric_limits<double>::infinity()
       public: ignition::math::Vector3d Point(const unsigned int _index) const;
 

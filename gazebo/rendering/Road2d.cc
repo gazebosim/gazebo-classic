@@ -185,8 +185,10 @@ void RoadSegment::Load(msgs::Road _msg)
   ignition::math::Vector3d pA, pB, tangent;
 
   ignition::math::Box bounds;
-  bounds.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D, ignition::math::MAX_D);
-  bounds.Max().Set(ignition::math::MIN_D, ignition::math::MIN_D, ignition::math::MIN_D);
+  bounds.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
+                   ignition::math::MAX_D);
+  bounds.Max().Set(ignition::math::MIN_D, ignition::math::MIN_D,
+                   ignition::math::MIN_D);
 
   // length for each texture tile, same as road width as texture is square
   // (if texture size should change or made custom in a future version
