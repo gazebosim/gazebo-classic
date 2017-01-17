@@ -1,3 +1,10 @@
+## Gazebo 9
+
+## Gazebo 9.x.x (2018-xx-xx)
+
+1. Remove Gazebo 8 deprecations
+    * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
