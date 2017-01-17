@@ -1,6 +1,6 @@
 ## Gazebo 6.0
 
-### Gazebo 6.X.X (201X-XX-XX)
+### Gazebo 6.7.0 (201X-01-12)
 
 1. Add vector3 and quaternion rendering conversions
     * [Pull request 2276](https://bitbucket.org/osrf/gazebo/pull-request/2276)
