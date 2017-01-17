@@ -4,10 +4,15 @@
 
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
+    * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
 
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Depend on ignition math3
+    * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
+
 1. Use ignition math with ServerFixture
     * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
 
