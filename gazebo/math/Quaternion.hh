@@ -292,8 +292,8 @@ namespace gazebo
     /// \brief Not equal to operator
     /// \param[in] _qt Quaternion for comparison
     /// \return True if not equal
-    public: bool operator!=(const Quaternion &_qt) const
-        GAZEBO_DEPRECATED(8.0);
+    /// Note: not explicitly deprecated on purpose, because gtest catches it
+    public: bool operator!=(const Quaternion &_qt) const;
 
     /// \brief Unary minus operator
     /// \return negates each component of the quaternion

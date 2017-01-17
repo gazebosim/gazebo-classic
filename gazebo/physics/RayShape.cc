@@ -74,7 +74,14 @@ RayShape::~RayShape()
 void RayShape::SetPoints(const math::Vector3 &_posStart,
                          const math::Vector3 &_posEnd)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -110,8 +117,15 @@ void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
   ignition::math::Vector3d pa, pb;
   this->RelativePoints(pa, pb);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _posA = pa;
   _posB = pb;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -127,8 +141,15 @@ void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
   ignition::math::Vector3d pa, pb;
   this->GlobalPoints(pa, pb);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _posA = pa;
   _posB = pb;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

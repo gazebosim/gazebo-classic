@@ -140,7 +140,14 @@ void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MapShape::GetScale() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Scale();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

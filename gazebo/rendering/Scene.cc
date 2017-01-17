@@ -139,9 +139,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       rendering::Events::ConnectToggleLayer(
         std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
 
-  this->dataPtr->statsSub = this->dataPtr->node->Subscribe("~/world_stats",
-                                          &Scene::OnStatsMsg, this);
-
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
   this->dataPtr->visSub =
@@ -219,7 +216,6 @@ void Scene::Clear()
   this->dataPtr->jointSub.reset();
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
-  this->dataPtr->statsSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
@@ -2740,10 +2736,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::SimTime() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  // Return the most recent sim time.
-  return
-    this->dataPtr->sceneSimTime > this->dataPtr->sceneSimTimePosesApplied ?
-    this->dataPtr->sceneSimTime : this->dataPtr->sceneSimTimePosesApplied;
+  return this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
@@ -3485,11 +3478,4 @@ bool Scene::HasLayer(const int32_t _layer) const
 {
   return _layer < 0 ||
     this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
-}
-
-/////////////////////////////////////////////////
-void Scene::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
-{
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->sceneSimTime = msgs::Convert(_msg->sim_time());
 }

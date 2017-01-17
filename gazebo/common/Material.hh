@@ -126,7 +126,7 @@ namespace gazebo
       /// \brief Get the blend factors
       /// \param[in] _srcFactor Source factor is returned in this variable
       /// \param[in] _dstFactor Destination factor is returned in this variable
-      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
+      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor) const;
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode

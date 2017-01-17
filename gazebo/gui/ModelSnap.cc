@@ -308,6 +308,10 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
     const std::vector<math::Vector3> &_triangleDest,
     rendering::VisualPtr _visualSrc)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   ignition::math::Triangle3d triangleSrc(
       _triangleSrc[0].Ign(),
       _triangleSrc[1].Ign(),
@@ -319,6 +323,9 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
       _triangleDest[2].Ign());
 
   this->Snap(triangleSrc, triangleDest, _visualSrc);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -348,6 +355,10 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
     const math::Pose &_poseSrc, math::Vector3 &_trans,
     math::Quaternion &_rot)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   ignition::math::Triangle3d triangleSrc(
       _triangleSrc[0].Ign(),
       _triangleSrc[1].Ign(),

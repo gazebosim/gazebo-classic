@@ -642,16 +642,24 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->dataPtr->scene)
     return;
 
-  if (_event->delta() > 0)
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), -1);
-  }
-  else
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), 1);
-  }
+  // QTBUG-46461 - fast rotation of mouse wheel produces wrong angle delta
+  // so limit wheel event to our update rate
+  common::Time eventTime = common::Time::GetWallTime();
+  double dt = (eventTime - this->dataPtr->lastWheelEventTime).Double();
+  if (dt < this->dataPtr->updateTimer->interval()*1e-3)
+    return;
+  this->dataPtr->lastWheelEventTime = eventTime;
+
+  int scrollY = 0;
+  int delta = _event->delta();
+
+  if (delta > 0)
+    scrollY = -1;
+  else if (delta < 0)
+    scrollY = 1;
+
+  this->dataPtr->mouseEvent.SetScroll(
+      this->dataPtr->mouseEvent.Scroll().X(), scrollY);
 
   this->dataPtr->mouseEvent.SetType(common::MouseEvent::SCROLL);
 

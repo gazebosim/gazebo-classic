@@ -59,7 +59,14 @@ void Projector::Load(const std::string &_name,
                      double _farClip,
                      double _fov)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Load(_name, _pose.Ign(), _textureName, _nearClip, _farClip, _fov);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -344,7 +351,14 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
