@@ -246,12 +246,6 @@ namespace gazebo
         std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
 
-      /// \brief Disconnect Laser Frame.
-      /// \param[in,out] _conn Connection pointer to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
-
       // Documentation inherited
       public: virtual bool IsActive() const;
 

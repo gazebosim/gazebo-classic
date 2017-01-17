@@ -21,7 +21,6 @@
 #include <memory>
 #include <ignition/math/Box.hh>
 
-#include "gazebo/math/Box.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -41,23 +40,11 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.
       /// \param[in] _parent Parent visual of the box.
-      /// \deprecated See function that takes ignition::math
-      public: explicit WireBox(VisualPtr _parent, const math::Box &_box)
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Constructor
-      /// \param[in] _box Dimension of the box to draw.
-      /// \param[in] _parent Parent visual of the box.
       public: explicit WireBox(VisualPtr _parent,
           const ignition::math::Box &_box);
 
       /// \brief Destructor.
       public: ~WireBox();
-
-      /// \brief Builds the wireframe line list.
-      /// \param[in] _box Box to build a wireframe from.
-      /// \deprecated See function that takes ignition::math
-      public: void Init(const math::Box &_box) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Builds the wireframe line list.
       /// \param[in] _box Box to build a wireframe from.
@@ -69,17 +56,7 @@ namespace gazebo
 
       /// \brief Get the visibility of the box.
       /// \return True if the box is visual.
-      /// \deprecated See Visible()
-      public: bool GetVisible() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the visibility of the box.
-      /// \return True if the box is visual.
       public: bool Visible() const;
-
-      /// \brief Get the wireframe box.
-      /// \return The wireframe box.
-      /// \deprecated See function that returns ignition::math
-      public: math::Box GetBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the wireframe box.
       /// \return The wireframe box.
