@@ -2057,22 +2057,57 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
     double srcFactor = 0;
     double dstFactor = 0;
 
+    // Calculatee alpha based on opaque mode.
+    // Equations are extracted from collada spec
+    // Make sure to update the final transparency value
+    // final mat transparency = 1 - srcFactor = dstFactor
     if (opaqueStr == "RGB_ZERO")
     {
-      dstFactor = color.r * _mat->GetTransparency();
-      srcFactor = 1.0 - color.r * _mat->GetTransparency();
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.r +
+                        0.715160 * color.g +
+                        0.0702169 * color.b;
+      // result.a = fb.a * (lumiance(transparent.rgb) * transparency) + mat.a *
+      // (1.0f - luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = luminance * _mat->GetTransparency();
+      srcFactor = 1.0 - luminance * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "RGB_ONE")
+    {
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.r +
+                        0.715160 * color.g +
+                        0.0702169 * color.b;
+
+      // result.a = fb.a * (1.0f - lumiance(transparent.rgb) * transparency) +
+      // mat.a * (luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - luminance * _mat->GetTransparency();
+      srcFactor = luminance * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "A_ONE")
     {
-      // From collada spec:
       // result.a = fb.a * (1.0f - transparent.a * transparency) + mat.a *
       // (transparent.a * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
       // mat corresponds to material before transparency (texel)
       dstFactor = 1.0 - color.a * _mat->GetTransparency();
       srcFactor = color.a * _mat->GetTransparency();
-      // also make sure to update the final transparency value
-      // final mat transparency = 1 - srcFactor = dstFactor
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "A_ZERO")
+    {
+      // result.a = fb.a * (transparent.a * transparency) + mat.a *
+      // (1.0f - transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = color.a * _mat->GetTransparency();
+      srcFactor = 1.0 - color.a * _mat->GetTransparency();
       _mat->SetTransparency(dstFactor);
     }
 
