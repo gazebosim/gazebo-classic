@@ -2066,7 +2066,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
       // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
       float luminance = 0.212671 * color.r +
                         0.715160 * color.g +
-                        0.0702169 * color.b;
+                        0.072169 * color.b;
       // result.a = fb.a * (lumiance(transparent.rgb) * transparency) + mat.a *
       // (1.0f - luminance(transparent.rgb) * transparency)
       // where fb corresponds to the framebuffer (existing pixel) and
@@ -2080,7 +2080,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
       // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
       float luminance = 0.212671 * color.r +
                         0.715160 * color.g +
-                        0.0702169 * color.b;
+                        0.072169 * color.b;
 
       // result.a = fb.a * (1.0f - lumiance(transparent.rgb) * transparency) +
       // mat.a * (luminance(transparent.rgb) * transparency)
