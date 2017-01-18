@@ -38,5 +38,5 @@ message HeightmapGeom
   optional string filename         = 10;
 
   // sample level
-  optional uint32 sampling          = 11;
+  optional uint32 sampling         = 11;
 }
