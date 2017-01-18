@@ -57,7 +57,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // simulate 1 step
   world->Step(1);
@@ -106,17 +106,17 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
       physics::JointWrench body_wrench = body_joint->GetForceTorque(0);
       physics::JointWrench wing_1_wrench = wing_1_joint->GetForceTorque(0);
       physics::JointWrench wing_2_wrench = wing_2_joint->GetForceTorque(0);
-      math::Pose wing_1_pose = wing_1->WorldPose();
-      math::Vector3 wing_1_force =
-        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Force);
-      math::Vector3 wing_1_torque =
-        wing_1_pose.rot.RotateVector(wing_1_wrench.body2Torque);
+      auto wing_1_pose = wing_1->WorldPose();
+      auto wing_1_force =
+        wing_1_pose.Rot().RotateVector(wing_1_wrench.body2Force);
+      auto wing_1_torque =
+        wing_1_pose.Rot().RotateVector(wing_1_wrench.body2Torque);
 
-      math::Pose wing_2_pose = wing_2->WorldPose();
-      math::Vector3 wing_2_force =
-        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Force);
-      math::Vector3 wing_2_torque =
-        wing_2_pose.rot.RotateVector(wing_2_wrench.body2Torque);
+      auto wing_2_pose = wing_2->WorldPose();
+      auto wing_2_force =
+        wing_2_pose.Rot().RotateVector(wing_2_wrench.body2Force);
+      auto wing_2_torque =
+        wing_2_pose.Rot().RotateVector(wing_2_wrench.body2Torque);
       gzdbg << "body velocity [" << body->WorldLinearVel()
             << "] cl [" << cl
             << "] cd [" << cd
@@ -128,7 +128,7 @@ void JointLiftDragPluginTest::LiftDragPlugin1(const std::string &_physicsEngine)
             << "] wing_2 torque [" << wing_2_torque
             << "]\n";
 
-      EXPECT_NEAR(wing_1_force.z, cl * cos(dihedral), TOL);
+      EXPECT_NEAR(wing_1_force.Z(), cl * cos(dihedral), TOL);
     }
   }
 }

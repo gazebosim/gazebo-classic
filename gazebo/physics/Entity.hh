@@ -22,6 +22,7 @@
 #include <ignition/math/Box.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -122,7 +123,14 @@ namespace gazebo
       public: inline virtual const math::Pose GetWorldPose() const
               GAZEBO_DEPRECATED(8.0)
       {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return this->worldPose;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
       }
 
       /// \brief Get the absolute pose of the entity.
@@ -323,7 +331,8 @@ namespace gazebo
       /// \deprecated See version that accepts ignition math objects.
       public: void SetWorldTwist(const math::Vector3 &_linear,
                                  const math::Vector3 &_angular,
-                                 bool _updateChildren = true);
+                                 bool _updateChildren = true)
+                                 GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set angular and linear rates of an physics::Entity.
       /// \param[in] _linear Linear twist.
@@ -460,6 +469,21 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
                    const bool, const bool);
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition communication node.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Visual publisher.
+      protected: ignition::transport::Node::Publisher visPubIgn;
+
+      /// \brief Request publisher.
+      protected: ignition::transport::Node::Publisher requestPubIgn;
+
+      /// \brief Ignition Pose publisher.
+      private: ignition::transport::Node::Publisher posePubIgn;
     };
     /// \}
   }

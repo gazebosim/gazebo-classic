@@ -72,6 +72,13 @@ void RenderingFixture::SetUp()
 }
 
 /////////////////////////////////////////////////
+void RenderingFixture::Unload()
+{
+  rendering::fini();
+  ServerFixture::Unload();
+}
+
+/////////////////////////////////////////////////
 ServerFixture::ServerFixture()
 {
   this->server = NULL;
@@ -350,7 +357,14 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 /////////////////////////////////////////////////
 math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->EntityPose(_name);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

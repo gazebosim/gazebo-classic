@@ -187,12 +187,6 @@ void COMVisual::Load()
 }
 
 /////////////////////////////////////////////////
-math::Pose COMVisual::GetInertiaPose() const
-{
-  return this->InertiaPose();
-}
-
-/////////////////////////////////////////////////
 ignition::math::Pose3d COMVisual::InertiaPose() const
 {
   COMVisualPrivate *dPtr =

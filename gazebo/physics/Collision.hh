@@ -58,7 +58,7 @@ namespace gazebo
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
 
@@ -110,7 +110,12 @@ namespace gazebo
 
       /// \brief Set the scale of the collision.
       /// \param[in] _scale Scale to set the collision to.
-      public: void SetScale(const math::Vector3 &_scale);
+      /// \deprecated See version that accepts an ignition math object.
+      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the scale of the collision.
+      /// \param[in] _scale Scale to set the collision to.
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get the linear velocity of the collision.
       /// \return The linear velocity relative to the parent model.

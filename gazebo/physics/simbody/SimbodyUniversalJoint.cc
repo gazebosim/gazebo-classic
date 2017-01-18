@@ -56,7 +56,14 @@ ignition::math::Vector3d SimbodyUniversalJoint::Anchor(
 //////////////////////////////////////////////////
 math::Vector3 SimbodyUniversalJoint::GetAxis(unsigned int /*_index*/) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return math::Vector3();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -147,7 +154,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
           this->mobod.getParentMobilizedBody().expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_IF.x()));
 
-        return SimbodyPhysics::Vec3ToVector3(x_W).Ign();
+        return SimbodyPhysics::Vec3ToVector3Ign(x_W);
       }
       else if (_index == UniversalJoint::AXIS_CHILD)
       {
@@ -159,7 +166,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
           this->mobod.expressVectorInGroundFrame(
           this->simbodyPhysics->integ->getState(), X_OM.y()));
 
-        return SimbodyPhysics::Vec3ToVector3(y_W).Ign();
+        return SimbodyPhysics::Vec3ToVector3Ign(y_W);
       }
       else
       {
@@ -173,7 +180,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }
@@ -191,7 +198,7 @@ ignition::math::Vector3d SimbodyUniversalJoint::GlobalAxis(
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }

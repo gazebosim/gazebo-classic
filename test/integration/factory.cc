@@ -725,12 +725,12 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     // Check inertial
     physics::InertialPtr inertial = link->GetInertial();
     physics::InertialPtr inertialClone = linkClone->GetInertial();
-    EXPECT_EQ(inertial->GetMass(), inertialClone->GetMass());
-    EXPECT_EQ(inertial->GetCoG(), inertialClone->GetCoG());
-    EXPECT_EQ(inertial->GetPrincipalMoments(),
-        inertialClone->GetPrincipalMoments());
-    EXPECT_EQ(inertial->GetProductsofInertia(),
-        inertialClone->GetProductsofInertia());
+    EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
+    EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
+    EXPECT_EQ(inertial->PrincipalMoments(),
+        inertialClone->PrincipalMoments());
+    EXPECT_EQ(inertial->ProductsOfInertia(),
+        inertialClone->ProductsOfInertia());
   }
 
   // Check joints
@@ -766,34 +766,33 @@ TEST_P(FactoryTest, Clone)
 // camera images. Need a better way to evaluate rendered content.
 // TEST_F(FactoryTest, Camera)
 // {
-/*
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-    return;
-
-  math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
-  SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
-      setPose.rot.GetAsEuler());
-
-  unsigned char *img = NULL;
-  unsigned int width;
-  unsigned int height;
-  GetFrame("camera_sensor2", &img, width, height);
-  ASSERT_EQ(width, static_cast<unsigned int>(320));
-  ASSERT_EQ(height, static_cast<unsigned int>(240));
-
-  unsigned int diffMax = 0;
-  unsigned int diffSum = 0;
-  double diffAvg = 0;
-  ImageCompare(&img, &empty_world_camera1,
-      width, height, 3, diffMax, diffSum, diffAvg);
-  // PrintImage("empty_world_camera1", &img, width, height, 3);
-  ASSERT_LT(diffSum, static_cast<unsigned int>(100));
-  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
-  ASSERT_EQ(0.0, diffAvg);
-  */
+//  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+//      rendering::RenderEngine::NONE)
+//    return;
+//
+//  math::Pose setPose, testPose;
+//  Load("worlds/empty.world");
+//  setPose.Set(ignition::math::Vector3d(-5, 0, 5),
+//              ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+//  SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
+//      setPose.rot.GetAsEuler());
+//
+//  unsigned char *img = NULL;
+//  unsigned int width;
+//  unsigned int height;
+//  GetFrame("camera_sensor2", &img, width, height);
+//  ASSERT_EQ(width, static_cast<unsigned int>(320));
+//  ASSERT_EQ(height, static_cast<unsigned int>(240));
+//
+//  unsigned int diffMax = 0;
+//  unsigned int diffSum = 0;
+//  double diffAvg = 0;
+//  ImageCompare(&img, &empty_world_camera1,
+//      width, height, 3, diffMax, diffSum, diffAvg);
+//  // PrintImage("empty_world_camera1", &img, width, height, 3);
+//  ASSERT_LT(diffSum, static_cast<unsigned int>(100));
+//  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
+//  ASSERT_EQ(0.0, diffAvg);
 // }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);

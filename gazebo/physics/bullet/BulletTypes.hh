@@ -58,9 +58,18 @@ namespace gazebo
       /// \brief Convert a bullet btVector3 to a gazebo Vector3.
       /// \param[in] _bt Bullet Vector3.
       /// \return Gazebo Vector3.
+      /// \deprecated See ConvertVector3Ign
       public: static math::Vector3 ConvertVector3(const btVector3 &_bt)
+          GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return math::Vector3(_bt.getX(), _bt.getY(), _bt.getZ());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert a bullet btVector3 to an ignition Vector3d.
@@ -76,9 +85,18 @@ namespace gazebo
       /// \brief Convert a gazebo Vector3 to a bullet btVector3.
       /// \param[in] _vec Gazebo Vector3.
       /// \return Bullet Vector3.
+      /// \deprecated See function which accepts ignition math.
       public: static btVector3 ConvertVector3(const math::Vector3 &_vec)
+          GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return btVector3(_vec.x, _vec.y, _vec.z);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition Vector3d to a bullet btVector3.
@@ -124,7 +142,14 @@ namespace gazebo
       public: static btVector4 ConvertVector4(const math::Vector4 &_vec)
           GAZEBO_DEPRECATED(8.0)
               {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
                 return ConvertVector4dIgn(_vec.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition math Vector4d to a bullet btVector4.
@@ -154,28 +179,35 @@ namespace gazebo
       /// \brief Convert a bullet transform to a gazebo pose.
       /// \param[in] _bt Bullet pose (btTransform).
       /// \return Gazebo pose.
+      /// \deprecated See ConvertPoseIgn
       public: static math::Pose ConvertPose(const btTransform &_bt)
+          GAZEBO_DEPRECATED(8.0)
               {
-                math::Pose pose;
-                pose.pos = ConvertVector3(_bt.getOrigin());
-                pose.rot.w = _bt.getRotation().getW();
-                pose.rot.x = _bt.getRotation().getX();
-                pose.rot.y = _bt.getRotation().getY();
-                pose.rot.z = _bt.getRotation().getZ();
-                return pose;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+                return ConvertPoseIgn(_bt);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert a gazebo pose to a bullet transform.
       /// \param[in] _pose Gazebo pose.
       /// \return Bullet pose (btTransform).
+      /// \deprecated See function which accepts ignition math.
       public: static btTransform ConvertPose(const math::Pose &_pose)
+          GAZEBO_DEPRECATED(8.0)
               {
-                btTransform trans;
-
-                trans.setOrigin(ConvertVector3(_pose.pos));
-                trans.setRotation(btQuaternion(_pose.rot.x, _pose.rot.y,
-                                               _pose.rot.z, _pose.rot.w));
-                return trans;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+                return ConvertPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
               }
 
       /// \brief Convert an ignition math pose to a bullet transform.

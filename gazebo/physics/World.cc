@@ -2218,7 +2218,14 @@ void World::ProcessFactoryMsgs()
 //////////////////////////////////////////////////
 ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->ModelBelowPoint(_pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2236,7 +2243,14 @@ ModelPtr World::ModelBelowPoint(const ignition::math::Vector3d &_pt) const
 //////////////////////////////////////////////////
 EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->EntityBelowPoint(_pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

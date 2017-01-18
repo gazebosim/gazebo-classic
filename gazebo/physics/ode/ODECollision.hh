@@ -52,7 +52,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
       /// \param[in] _collisionId ODE id of the collision object.
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(dGeomID _collisionId, bool _placeable);

@@ -92,7 +92,7 @@ void ODELink::Init()
   if (this->linkId)
   {
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-    ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
+    ignition::math::Vector3d cogVec = this->inertial->CoG();
     for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -154,7 +154,7 @@ void ODELink::MoveCallback(dBodyID _id)
   // subtracting cog location from ode pose
   GZ_ASSERT(self->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d cog = self->dirtyPose.Rot().RotateVector(
-      self->inertial->GetCoG().Ign());
+      self->inertial->CoG());
 
   self->dirtyPose.Pos() -= cog;
 
@@ -248,7 +248,7 @@ void ODELink::OnPoseChange()
 
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   ignition::math::Vector3d cog =
-    myPose.Rot().RotateVector(this->inertial->GetCoG().Ign());
+    myPose.Rot().RotateVector(this->inertial->CoG());
 
   // adding cog location for ode pose
   dBodySetPosition(this->linkId,
@@ -313,7 +313,7 @@ void ODELink::UpdateCollisionOffsets()
   if (this->linkId)
   {
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
-    ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
+    ignition::math::Vector3d cogVec = this->inertial->CoG();
     for (auto const &child : this->children)
     {
       if (child->HasType(Base::COLLISION))
@@ -399,17 +399,17 @@ void ODELink::UpdateMass()
   GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
   // give ODE un-rotated inertia
   auto moi = this->inertial->MOI(
-    ignition::math::Pose3d(this->inertial->GetCoG().Ign(),
+    ignition::math::Pose3d(this->inertial->CoG(),
                            ignition::math::Quaterniond::Identity));
   ignition::math::Vector3d principals(moi(0, 0), moi(1, 1), moi(2, 2));
   ignition::math::Vector3d products(moi(0, 1), moi(0, 2), moi(1, 2));
 
-  dMassSetParameters(&odeMass, this->inertial->GetMass(),
+  dMassSetParameters(&odeMass, this->inertial->Mass(),
       cog.X(), cog.Y(), cog.Z(),
       principals.X(), principals.Y(), principals.Z(),
       products.X(), products.Y(), products.Z());
 
-  if (this->inertial->GetMass() > 0)
+  if (this->inertial->Mass() > 0)
     dBodySetMass(this->linkId, &odeMass);
   else
     gzthrow("Setting custom link " + this->GetScopedName() + "mass to zero!");
@@ -442,7 +442,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
     dVector3 dvel;
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     ignition::math::Vector3d offsetFromCoG = _offset -
-      this->inertial->GetCoG().Ign();
+      this->inertial->CoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.X(), offsetFromCoG.Y(),
         offsetFromCoG.Z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
@@ -470,7 +470,7 @@ ignition::math::Vector3d ODELink::WorldLinearVel(
     GZ_ASSERT(this->inertial != nullptr, "Inertial pointer is null");
     ignition::math::Vector3d offsetFromCoG =
         wPose.Rot().RotateVectorReverse(_q * _offset)
-        - this->inertial->GetCoG().Ign();
+        - this->inertial->CoG();
     dBodyGetRelPointVel(this->linkId, offsetFromCoG.X(), offsetFromCoG.Y(),
         offsetFromCoG.Z(), dvel);
     vel.Set(dvel[0], dvel[1], dvel[2]);
@@ -642,7 +642,7 @@ void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
 
     // Does this need to be rotated?
     ignition::math::Vector3d offsetCoG = _offset -
-      this->inertial->GetCoG().Ign();
+      this->inertial->CoG();
 
     this->SetEnabled(true);
     dBodyAddForceAtRelPos(this->linkId,

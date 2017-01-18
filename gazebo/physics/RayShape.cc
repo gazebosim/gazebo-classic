@@ -26,6 +26,7 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
@@ -44,7 +45,7 @@ RayShape::RayShape(PhysicsEnginePtr /*_physicsEngine*/)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = ignition::math::MAX_D;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 }
@@ -56,7 +57,7 @@ RayShape::RayShape(CollisionPtr _parent)
   this->AddType(RAY_SHAPE);
   this->SetName("Ray");
 
-  this->contactLen = GZ_DBL_MAX;
+  this->contactLen = ignition::math::MAX_D;
   this->contactRetro = 0.0;
   this->contactFiducial = -1;
 
@@ -73,7 +74,21 @@ RayShape::~RayShape()
 void RayShape::SetPoints(const math::Vector3 &_posStart,
                          const math::Vector3 &_posEnd)
 {
-  math::Vector3 dir;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetPoints(_posStart.Ign(), _posEnd.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void RayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                         const ignition::math::Vector3d &_posEnd)
+{
+  ignition::math::Vector3d dir;
 
   this->relativeStartPos = _posStart;
   this->relativeEndPos = _posEnd;
@@ -82,10 +97,9 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
   {
     this->globalStartPos =
       this->collisionParent->WorldPose().CoordPositionAdd(
-        this->relativeStartPos.Ign());
+        this->relativeStartPos);
     this->globalEndPos =
-      this->collisionParent->WorldPose().CoordPositionAdd(
-        this->relativeEndPos.Ign());
+      this->collisionParent->WorldPose().CoordPositionAdd(this->relativeEndPos);
   }
   else
   {
@@ -101,12 +115,46 @@ void RayShape::SetPoints(const math::Vector3 &_posStart,
 //////////////////////////////////////////////////
 void RayShape::GetRelativePoints(math::Vector3 &_posA, math::Vector3 &_posB)
 {
+  ignition::math::Vector3d pa, pb;
+  this->RelativePoints(pa, pb);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  _posA = pa;
+  _posB = pb;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void RayShape::RelativePoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
+{
   _posA = this->relativeStartPos;
   _posB = this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////
 void RayShape::GetGlobalPoints(math::Vector3 &_posA, math::Vector3 &_posB)
+{
+  ignition::math::Vector3d pa, pb;
+  this->GlobalPoints(pa, pb);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  _posA = pa;
+  _posB = pb;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void RayShape::GlobalPoints(ignition::math::Vector3d &_posA,
+    ignition::math::Vector3d &_posB)
 {
   _posA = this->globalStartPos;
   _posB = this->globalEndPos;
@@ -117,7 +165,7 @@ void RayShape::SetLength(double _len)
 {
   this->contactLen = _len;
 
-  math::Vector3 dir = this->relativeEndPos - this->relativeStartPos;
+  ignition::math::Vector3d dir = this->relativeEndPos - this->relativeStartPos;
   dir.Normalize();
 
   this->relativeEndPos = dir * _len + this->relativeStartPos;
@@ -188,13 +236,13 @@ double RayShape::ComputeVolume() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::Start() const
 {
-  return this->relativeStartPos.Ign();
+  return this->relativeStartPos;
 }
 
 //////////////////////////////////////////////////
 ignition::math::Vector3d RayShape::End() const
 {
-  return this->relativeEndPos.Ign();
+  return this->relativeEndPos;
 }
 
 //////////////////////////////////////////////////

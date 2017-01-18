@@ -1073,7 +1073,7 @@ void PhysicsTest::InelasticCollision(const std::string &_physicsEngine)
     double f = 1000.0;
     double v = 0;
     double x = 0;
-    double m = boxLink->GetInertial()->GetMass();
+    double m = boxLink->GetInertial()->Mass();
 
     int steps = test_duration/dt;
 
@@ -1213,7 +1213,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics->SetGravity(math::Vector3(0, 0, 0));
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   int i = 0;
   while (!this->HasEntity("sphere_atlas") && i < 20)
@@ -1262,7 +1262,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 
           // initial anchor pose in child link frame
           ignition::math::Pose3d anchorInitialInChild =
-            parentJoints[j]->GetInitialAnchorPose().Ign();
+            parentJoints[j]->InitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)
@@ -1346,7 +1346,7 @@ void PhysicsTest::SphereAtlasLargeError(const std::string &_physicsEngine)
 
           // initial anchor pose in child link frame
           ignition::math::Pose3d anchorInitialInChild =
-            parentJoints[j]->GetInitialAnchorPose().Ign();
+            parentJoints[j]->InitialAnchorPose();
 
           physics::LinkPtr parent = parentJoints[j]->GetParent();
           if (parent)

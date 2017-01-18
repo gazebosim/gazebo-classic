@@ -21,6 +21,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <ignition/transport/Node.hh>
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Box.hh>
@@ -76,6 +77,12 @@ namespace gazebo
 
     /// \brief Mutex to protect pad data.
     public: std::mutex padMutex;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

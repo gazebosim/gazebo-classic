@@ -270,6 +270,37 @@ TEST_F(CameraSensor, CheckThrottle)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, TopicName)
+{
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn model with name similar to a nested model
+  std::string modelName = "prefix::camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  EXPECT_NE(camSensor->Topic().find("prefix/camera_model/body/camera_sensor"),
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, FillMsg)
 {
   Load("worlds/empty_test.world");
@@ -391,53 +422,54 @@ TEST_F(CameraSensor, MultiSenseHigh)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
-/*
-  Load("worlds/empty_test.world");
 
-  // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run camera test\n";
-    return;
-  }
-
-  // spawn sensors of various sizes to test speed
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
-
-  // nominal resolution of multisense
-  unsigned int width  = 2048;
-  unsigned int height = 1088;
-  double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  imageCount = 0;
-  img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    camSensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
-  common::Timer timer;
-  timer.Start();
-  // time how long it takes to get N images
-  int total_images = 500;
-  while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
-  double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  c.reset();
-  EXPECT_GT(rate, 24.0);
-  EXPECT_LT(rate, 25.0);
-
-  delete img;
-  */
+//  Load("worlds/empty_test.world");
+//
+//  // Make sure the render engine is available.
+//  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+//      rendering::RenderEngine::NONE)
+//  {
+//    gzerr << "No rendering engine, unable to run camera test\n";
+//    return;
+//  }
+//
+//  // spawn sensors of various sizes to test speed
+//  std::string modelName = "camera_model";
+//  std::string cameraName = "camera_sensor";
+//
+//  // nominal resolution of multisense
+//  unsigned int width  = 2048;
+//  unsigned int height = 1088;
+//  double updateRate = 25;
+//  math::Pose setPose, testPose(
+//      ignition::math::Vector3d(-5, 0, 5),
+//      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+//  SpawnCamera(modelName, cameraName, setPose.Pos(),
+//      setPose.Rot().Euler(), width, height, updateRate);
+//  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+//  sensors::CameraSensorPtr camSensor =
+//    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+//  imageCount = 0;
+//  img = new unsigned char[width * height*3];
+//  event::ConnectionPtr c =
+//    camSensor->Camera()->ConnectNewImageFrame(
+//        std::bind(&::OnNewCameraFrame, &imageCount, img,
+//          _1, _2, _3, _4, _5));
+//  common::Timer timer;
+//  timer.Start();
+//  // time how long it takes to get N images
+//  int total_images = 500;
+//  while (imageCount < total_images)
+//    common::Time::MSleep(10);
+//  common::Time dt = timer.GetElapsed();
+//  double rate = static_cast<double>(total_images)/dt.Double();
+//  gzdbg << "timer [" << dt.Double() << "] seconds rate ["
+//        << rate << "] fps\n";
+//  c.reset();
+//  EXPECT_GT(rate, 24.0);
+//  EXPECT_LT(rate, 25.0);
+//
+//  delete img;
 }
 
 /////////////////////////////////////////////////
@@ -446,54 +478,55 @@ TEST_F(CameraSensor, MultiSenseLow)
   // This test is disabled because it does not work on machines with
   // limited rendering capabilities.
   return;
-/*
-  Load("worlds/empty_test.world");
 
-  // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run camera test\n";
-    return;
-  }
-
-  // spawn sensors of various sizes to test speed
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
-
-  // lower resolution of multisense
-  unsigned int width  = 1024;
-  unsigned int height = 544;
-  double updateRate = 25;
-  math::Pose setPose, testPose(
-      math::Vector3(-5, 0, 5), math::Quaternion(0, IGN_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  imageCount = 0;
-  img = new unsigned char[width * height*3];
-  event::ConnectionPtr c =
-    camSensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNewCameraFrame, &imageCount, img,
-          _1, _2, _3, _4, _5));
-  common::Timer timer;
-  timer.Start();
-  // time how long it takes to get N images
-  int total_images = 500;
-  while (imageCount < total_images)
-    common::Time::MSleep(10);
-  common::Time dt = timer.GetElapsed();
-  double rate = static_cast<double>(total_images)/dt.Double();
-  gzdbg << "timer [" << dt.Double() << "] seconds rate [" << rate << "] fps\n";
-  c.reset();
-  EXPECT_GT(rate, 24.0);
-  EXPECT_LT(rate, 25.0);
-
-  delete img;
-  Unload();
-  */
+//  Load("worlds/empty_test.world");
+//
+//  // Make sure the render engine is available.
+//  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+//      rendering::RenderEngine::NONE)
+//  {
+//    gzerr << "No rendering engine, unable to run camera test\n";
+//    return;
+//  }
+//
+//  // spawn sensors of various sizes to test speed
+//  std::string modelName = "camera_model";
+//  std::string cameraName = "camera_sensor";
+//
+//  // lower resolution of multisense
+//  unsigned int width  = 1024;
+//  unsigned int height = 544;
+//  double updateRate = 25;
+//  math::Pose setPose, testPose(
+//      ignition::math::Vector3d(-5, 0, 5),
+//      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+//  SpawnCamera(modelName, cameraName, setPose.pos,
+//      setPose.Rot().Euler(), width, height, updateRate);
+//  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+//  sensors::CameraSensorPtr camSensor =
+//    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+//  imageCount = 0;
+//  img = new unsigned char[width * height*3];
+//  event::ConnectionPtr c =
+//    camSensor->Camera()->ConnectNewImageFrame(
+//        std::bind(&::OnNewCameraFrame, &imageCount, img,
+//          _1, _2, _3, _4, _5));
+//  common::Timer timer;
+//  timer.Start();
+//  // time how long it takes to get N images
+//  int total_images = 500;
+//  while (imageCount < total_images)
+//    common::Time::MSleep(10);
+//  common::Time dt = timer.GetElapsed();
+//  double rate = static_cast<double>(total_images)/dt.Double();
+//  gzdbg << "timer [" << dt.Double() << "] seconds rate ["
+//        << rate << "] fps\n";
+//  c.reset();
+//  EXPECT_GT(rate, 24.0);
+//  EXPECT_LT(rate, 25.0);
+//
+//  delete img;
+//  Unload();
 }
 
 /////////////////////////////////////////////////

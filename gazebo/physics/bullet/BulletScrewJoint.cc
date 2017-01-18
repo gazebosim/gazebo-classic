@@ -311,7 +311,7 @@ void BulletScrewJoint::SetAxis(const unsigned int /*_index*/,
   if (!this->bulletScrew)
   {
     // this hasn't been initialized yet, store axis in initialWorldAxis
-    auto axisFrame = this->GetAxisFrame(0).Ign();
+    auto axisFrame = this->AxisFrame(0);
     this->initialWorldAxis = axisFrame.RotateVector(_axis);
   }
   else
@@ -548,7 +548,7 @@ ignition::math::Vector3d BulletScrewJoint::GlobalAxis(
     btVector3 vec =
       this->bulletScrew->getRigidBodyA().getCenterOfMassTransform().getBasis()
       * this->bulletScrew->getFrameOffsetA().getBasis().getColumn(0);
-    result = BulletTypes::ConvertVector3(vec).Ign();
+    result = BulletTypes::ConvertVector3Ign(vec);
   }
   else
     gzwarn << "bulletScrew does not exist, returning fake axis\n";

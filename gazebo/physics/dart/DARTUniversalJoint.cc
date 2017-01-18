@@ -67,7 +67,7 @@ ignition::math::Vector3d DARTUniversalJoint::Anchor(
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin).Ign();
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
@@ -112,7 +112,7 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis).Ign();
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -128,7 +128,7 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
   }
 
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-      this->GetAxisFrameOffset(_index).RotateVector(_axis));
+      this->AxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
       = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
   dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;

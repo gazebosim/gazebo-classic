@@ -278,11 +278,18 @@ namespace gazebo
                    double _cx = 0.5, double _cy = 0.5)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnCamera(_modelName, _cameraName, _pos.Ign(), _rpy.Ign(),
                    _width, _height, _rate, _noiseType, _noiseMean,
                    _noiseStdDev , _distortion , _distortionK1,
                    _distortionK2, _distortionK3, _distortionP1,
                    _distortionP2, _cx, _cy);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn a camera.
@@ -389,11 +396,18 @@ namespace gazebo
                    double _noiseStdDev = 0.0)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnRaySensor(_modelName, _raySensorName, _pos.Ign(),
                _rpy.Ign(), _hMinAngle, _hMaxAngle, _vMinAngle,
                _vMaxAngle, _minRange, _maxRange , _rangeResolution,
                _samples, _vSamples, _hResolution, _vResolution,
                _noiseType, _noiseMean, _noiseStdDev);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn a laser.
@@ -466,10 +480,17 @@ namespace gazebo
                    double _noiseStdDev = 0.0)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnGpuRaySensor(_modelName, _raySensorName, _pos.Ign(),
                _rpy.Ign(), _hMinAngle, _hMaxAngle, _minRange, _maxRange,
                _rangeResolution, _samples, _noiseType, _noiseMean,
                _noiseStdDev);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
 
@@ -545,11 +566,18 @@ namespace gazebo
                    double _accelBiasMean = 0.0, double _accelBiasStdDev = 0.0)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnImuSensor(_modelName, _imuSensorName, _pos.Ign(),
                _rpy.Ign(), _noiseType, _rateNoiseMean,
                _rateNoiseStdDev, _rateBiasMean, _rateBiasStdDev,
                _accelNoiseMean, _accelNoiseStdDev, _accelBiasMean,
                _accelBiasStdDev);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn an imu sensor laser.
@@ -591,8 +619,15 @@ namespace gazebo
                    const math::Vector3 &_rpy, bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnUnitContactSensor(_name, _sensorName, _collisionType,
                       _pos.Ign(), _rpy.Ign(), _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn a contact sensor with the specified collision geometry
@@ -627,8 +662,15 @@ namespace gazebo
                    const math::Vector3 &_rpy, bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnUnitImuSensor(_name, _sensorName, _collisionType,
                _topic, _pos.Ign(), _rpy.Ign(), _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn an IMU sensor on a link
@@ -714,9 +756,16 @@ namespace gazebo
                    bool _visualize = true)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnWirelessTransmitterSensor(_name, _sensorName,
                _pos.Ign(), _rpy.Ign(), _essid, _freq, _power,
                _gain, _visualize);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn an Wireless transmitter sensor on a link
@@ -763,9 +812,16 @@ namespace gazebo
                    bool _visualize = true)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnWirelessReceiverSensor(_name, _sensorName, _pos.Ign(),
                _rpy.Ign(), _minFreq, _maxFreq, _power, _gain,
                _sensitivity, _visualize);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn an Wireless receiver sensor on a link
@@ -841,6 +897,10 @@ namespace gazebo
     /// \param[in] _spotFallOff Fall off ("spot" only).
     /// \param[in] _castShadows True to cast shadows.
     /// \deprecated See function that accepts ignition::math parameters
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     protected: void SpawnLight(const std::string &_name,
                    const std::string &_type,
                    const math::Vector3 &_pos, const math::Vector3 &_rpy,
@@ -863,6 +923,9 @@ namespace gazebo
                _attenuationQuadratic, _spotInnerAngle,
                _spotOuterAngle, _spotFallOff, _castShadows);
            }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.
@@ -910,7 +973,14 @@ namespace gazebo
                    bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnCylinder(_name, _pos.Ign(), _rpy.Ign(), _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
 
@@ -939,8 +1009,15 @@ namespace gazebo
                    bool _wait = true, bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnSphere(_name, _pos.Ign(), _rpy.Ign(), _wait,
                _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn a sphere
@@ -971,8 +1048,15 @@ namespace gazebo
                    bool _wait = true, bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnSphere(_name, _pos.Ign(), _rpy.Ign(), _cog.Ign(),
                _radius, _wait, _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
 
@@ -1004,8 +1088,15 @@ namespace gazebo
                    const math::Vector3 &_rpy, bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnBox(_name, _size.Ign(), _pos.Ign(), _rpy.Ign(),
                _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
 
@@ -1038,8 +1129,15 @@ namespace gazebo
                    bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnTrimesh(_name, _modelPath, _scale.Ign(), _pos.Ign(),
                _rpy.Ign(), _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
     /// \brief Spawn a triangle mesh.
@@ -1070,7 +1168,14 @@ namespace gazebo
                    bool _static = false)
                    GAZEBO_DEPRECATED(8.0)
            {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
            SpawnEmptyLink(_name, _pos.Ign(), _rpy.Ign(), _static);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
            }
 
 
@@ -1193,6 +1298,9 @@ namespace gazebo
   {
     // Documentation inherited.
     public: virtual void SetUp();
+
+    // Documentation inherited.
+    protected: virtual void Unload();
   };
 }       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_

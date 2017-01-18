@@ -25,6 +25,8 @@
 #include <ignition/math/Triangle.hh>
 #include <ignition/math/Vector3.hh>
 
+#include "gazebo/math/Pose.hh"
+
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
@@ -194,6 +196,7 @@ void ModelSnap::OnMouseMoveEvent(const common::MouseEvent &_event)
 
   rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
+
   if (vis && !vis->IsPlane())
   {
     // get the triangle being hovered so that it can be highlighted
@@ -307,6 +310,10 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
     const std::vector<math::Vector3> &_triangleDest,
     rendering::VisualPtr _visualSrc)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   ignition::math::Triangle3d triangleSrc(
       _triangleSrc[0].Ign(),
       _triangleSrc[1].Ign(),
@@ -318,6 +325,9 @@ void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
       _triangleDest[2].Ign());
 
   this->Snap(triangleSrc, triangleDest, _visualSrc);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -347,6 +357,10 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
     const math::Pose &_poseSrc, math::Vector3 &_trans,
     math::Quaternion &_rot)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   ignition::math::Triangle3d triangleSrc(
       _triangleSrc[0].Ign(),
       _triangleSrc[1].Ign(),
@@ -362,8 +376,15 @@ void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
 
   this->SnapTransform(triangleSrc, triangleDest, _poseSrc.Ign(), trans, rot);
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _trans = trans;
   _rot = rot;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

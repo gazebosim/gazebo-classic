@@ -64,15 +64,40 @@ namespace gazebo
     {
       /// \brief
       public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)
-        {
-            return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
-        }
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return ConvVec3(_vec3.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
-        /// \brief
+      /// \brief Convert ignition math vector3d to eigen vector3d.
+      /// \param[in] _vec3 Ignition math equalivent object.
+      /// \return Eigen vector3 to convert.
+      public: static Eigen::Vector3d ConvVec3(
+          const ignition::math::Vector3d &_vec3)
+      {
+        return Eigen::Vector3d(_vec3.X(), _vec3.Y(), _vec3.Z());
+      }
+
+      /// \brief
       public: static math::Vector3 ConvVec3(const Eigen::Vector3d &_vec3)
-        {
-            return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
-        }
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return ConvVec3Ign(_vec3);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
       /// \brief Convert eigen vector3d to ignition math vector3d.
       /// \param[in] _vec3 Eigen vector3 to convert.
@@ -83,17 +108,42 @@ namespace gazebo
         return ignition::math::Vector3d(_vec3.x(), _vec3.y(), _vec3.z());
       }
 
-        /// \brief
+      /// \brief
       public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
-        {
-            return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
-        }
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return ConvQuat(_quat.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
-        /// \brief
+      /// \brief Convert ignition quaternion to eigen quaternion.
+      /// \param[in] _quat Ignition object.
+      /// \return Equivalent eigen object.
+      public: static Eigen::Quaterniond ConvQuat(
+          const ignition::math::Quaterniond &_quat)
+      {
+        return Eigen::Quaterniond(_quat.W(), _quat.X(), _quat.Y(), _quat.Z());
+      }
+
+      /// \brief
       public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
-        {
-            return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
-        }
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return ConvQuatIgn(_quat);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
       /// \brief Convert eigen quaternion to ignition quaternion.
       /// \param[in] _quat Eigen object to convert.
@@ -105,29 +155,48 @@ namespace gazebo
             _quat.w(), _quat.x(), _quat.y(), _quat.z());
       }
 
-
-        /// \brief
+      /// \brief
       public: static Eigen::Isometry3d ConvPose(const math::Pose &_pose)
-        {
-            // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
-            // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-            //        ConvQuat(_pose.rot);
+          GAZEBO_DEPRECATED(8.0)
+      {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+        return ConvPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+      }
 
-            Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
+      /// \brief
+      public: static Eigen::Isometry3d ConvPose(
+          const ignition::math::Pose3d &_pose)
+      {
+          // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
+          // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
+          //        ConvQuat(_pose.rot);
 
-            res.translation() = ConvVec3(_pose.pos);
-            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
+          Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
 
-            return res;
-        }
+          res.translation() = ConvVec3(_pose.Pos());
+          res.linear() = Eigen::Matrix3d(ConvQuat(_pose.Rot()));
+
+          return res;
+      }
 
         /// \brief
       public: static math::Pose ConvPose(const Eigen::Isometry3d &_T)
+        GAZEBO_DEPRECATED(8.0)
         {
-            math::Pose pose;
-            pose.pos = ConvVec3(_T.translation());
-            pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
-            return pose;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+          return ConvPoseIgn(_T);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
         }
 
       /// \brief Convert eigen iosmetry3d to ignition math pose3d.

@@ -75,7 +75,7 @@ void SimbodyLink::Init()
 
   Link::Init();
 
-  ignition::math::Vector3d cogVec = this->inertial->GetCoG().Ign();
+  ignition::math::Vector3d cogVec = this->inertial->CoG();
 
   // Set the initial pose of the body
 
@@ -559,21 +559,21 @@ SimTK::MassProperties SimbodyLink::GetMassProperties() const
 
   if (!this->IsStatic())
   {
-    const SimTK::Real mass = this->inertial->GetMass();
+    const SimTK::Real mass = this->inertial->Mass();
     SimTK::Transform X_LI = physics::SimbodyPhysics::Pose2Transform(
-      this->inertial->GetPose());
+      this->inertial->Pose());
     const SimTK::Vec3 &com_L = X_LI.p();  // vector from Lo to com, exp. in L
 
     if (ignition::math::equal(mass, 0.0))
       return SimTK::MassProperties(mass, com_L, SimTK::UnitInertia(1, 1, 1));
 
     // Get mass-weighted central inertia, expressed in I frame.
-    SimTK::Inertia Ic_I(this->inertial->GetIXX(),
-                 this->inertial->GetIYY(),
-                 this->inertial->GetIZZ(),
-                 this->inertial->GetIXY(),
-                 this->inertial->GetIXZ(),
-                 this->inertial->GetIYZ());
+    SimTK::Inertia Ic_I(this->inertial->IXX(),
+                 this->inertial->IYY(),
+                 this->inertial->IZZ(),
+                 this->inertial->IXY(),
+                 this->inertial->IXZ(),
+                 this->inertial->IYZ());
     // Re-express the central inertia from the I frame to the L frame.
     SimTK::Inertia Ic_L = Ic_I.reexpress(~X_LI.R());  // Ic_L=R_LI*Ic_I*R_IL
     // Shift to L frame origin.
@@ -614,5 +614,18 @@ bool SimbodyLink::GetEnabled() const
 /////////////////////////////////////////////////
 void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
 {
-  this->dirtyPose = _pose.Ign();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetDirtyPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void SimbodyLink::SetDirtyPose(const ignition::math::Pose3d &_pose)
+{
+  this->dirtyPose = _pose;
 }

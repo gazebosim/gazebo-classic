@@ -87,7 +87,14 @@ Joint::~Joint()
 //////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->Load(_parent, _child, _pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -325,7 +332,7 @@ void Joint::LoadImpl(const ignition::math::Pose3d &_pose)
     gzthrow("both parent and child link do no exist");
 
   // setting anchor relative to gazebo child link frame position
-  ignition::math::Pose3d worldPose = this->GetWorldPose().Ign();
+  auto worldPose = this->WorldPose();
   this->anchorPos = worldPose.Pos();
 
   // Compute anchor pose relative to parent frame.
@@ -440,7 +447,14 @@ void Joint::Fini()
 //////////////////////////////////////////////////
 math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LocalAxis(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -715,7 +729,14 @@ double Joint::Position(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetUpperLimit(_index, _angle.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   return true;
 }
 
@@ -736,7 +757,14 @@ math::Angle Joint::GetHighStop(unsigned int _index)
 //////////////////////////////////////////////////
 bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetLowerLimit(_index, _angle.Radian());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   return true;
 }
 
@@ -834,11 +862,11 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
         // rotate child (childLink) about anchor point,
 
         // Get Child Link Pose
-        ignition::math::Pose3d childLinkPose = this->childLink->WorldPose();
+        auto childLinkPose = this->childLink->WorldPose();
 
         // Compute new child link pose based on position change
         ignition::math::Pose3d newChildLinkPose =
-          this->ComputeChildLinkPose(_index, _position).Ign();
+          this->ChildLinkPose(_index, _position);
 
         // debug
         // gzerr << "child link pose0 [" << childLinkPose
@@ -932,8 +960,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
       //  interpreted in world frame.
       ignition::math::Quaterniond q;
       ignition::math::Vector3d parentOffset =
-        this->GetParentWorldPose().pos.Ign() -
-        this->parentLink->WorldPose().Pos();
+        this->ParentWorldPose().Pos() - this->parentLink->WorldPose().Pos();
       linearVel = this->parentLink->WorldLinearVel(parentOffset, q);
     }
 
@@ -955,7 +982,7 @@ bool Joint::SetVelocityMaximal(unsigned int _index, double _velocity)
     //  and the desired angular velocity.
     ignition::math::Vector3d childCoGOffset =
       this->childLink->WorldCoGPose().Pos() -
-      this->GetWorldPose().pos.Ign();
+      this->WorldPose().Pos();
     linearVel += angularVel.Cross(childCoGOffset);
     this->childLink->SetLinearVel(linearVel);
   }
@@ -1035,7 +1062,14 @@ void Joint::ApplyStiffnessDamping()
 /////////////////////////////////////////////////
 double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->InertiaRatio(_axis.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1043,8 +1077,8 @@ double Joint::InertiaRatio(const ignition::math::Vector3d &_axis) const
 {
   if (this->parentLink && this->childLink)
   {
-    ignition::math::Matrix3d pm = this->parentLink->WorldInertiaMatrix();
-    ignition::math::Matrix3d cm = this->childLink->WorldInertiaMatrix();
+    auto pm = this->parentLink->WorldInertiaMatrix();
+    auto cm = this->childLink->WorldInertiaMatrix();
 
     // matrix times axis
     ignition::math::Vector3d pia = pm * _axis;
@@ -1357,11 +1391,37 @@ double Joint::GetStopDissipation(unsigned int _index) const
 //////////////////////////////////////////////////
 math::Pose Joint::GetInitialAnchorPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->InitialAnchorPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::InitialAnchorPose() const
+{
   return this->anchorPose;
 }
 
 //////////////////////////////////////////////////
 math::Pose Joint::GetWorldPose() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::WorldPose() const
 {
   if (this->childLink)
     return this->anchorPose + this->childLink->WorldPose();
@@ -1371,6 +1431,19 @@ math::Pose Joint::GetWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetParentWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->ParentWorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::ParentWorldPose() const
+{
   if (this->parentLink)
     return this->parentAnchorPose + this->parentLink->WorldPose();
   return this->parentAnchorPose;
@@ -1379,17 +1452,43 @@ math::Pose Joint::GetParentWorldPose() const
 //////////////////////////////////////////////////
 math::Pose Joint::GetAnchorErrorPose() const
 {
-  return this->GetWorldPose() - this->GetParentWorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->AnchorErrorPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::AnchorErrorPose() const
+{
+  return this->WorldPose() - this->ParentWorldPose();
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->AxisFrame(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
+{
   if (_index >= this->DOF())
   {
-    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+    gzerr << "AxisFrame error, _index[" << _index << "] out of range"
           << std::endl;
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1403,17 +1502,31 @@ math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
     return ignition::math::Quaterniond::Identity;
   }
 
-  return this->GetWorldPose().Ign().Rot();
+  return this->WorldPose().Rot();
 }
 
 //////////////////////////////////////////////////
 math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->AxisFrameOffset(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Quaterniond Joint::AxisFrameOffset(
+    const unsigned int _index) const
+{
   if (_index >= this->DOF())
   {
-    gzerr << "GetAxisFrame error, _index[" << _index << "] out of range"
+    gzerr << "AxisFrameOffset error, _index[" << _index << "] out of range"
           << " returning identity rotation." << std::endl;
-    return math::Quaternion();
+    return ignition::math::Quaterniond::Identity;
   }
 
   // Legacy support for specifying axis in parent model frame (#494)
@@ -1423,7 +1536,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
     // from joint frame to parent model frame, or
     // world frame in absence of parent link.
     ignition::math::Pose3d parentModelWorldPose;
-    ignition::math::Pose3d jointWorldPose = this->GetWorldPose().Ign();
+    auto jointWorldPose = this->WorldPose();
     if (this->parentLink)
     {
       parentModelWorldPose = this->parentLink->GetModel()->WorldPose();
@@ -1433,7 +1546,7 @@ math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
 
   // axis is defined in the joint frame, so
   // return the rotation from joint frame to joint frame.
-  return math::Quaternion();
+  return ignition::math::Quaterniond::Identity;
 }
 
 //////////////////////////////////////////////////
@@ -1495,8 +1608,22 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
 math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
           double _position)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->ChildLinkPose(_index, _position);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Joint::ChildLinkPose(const unsigned int _index,
+    const double _position)
+{
   // child link pose
-  ignition::math::Pose3d childLinkPose = this->childLink->WorldPose();
+  auto childLinkPose = this->childLink->WorldPose();
 
   // default return to current pose
   ignition::math::Pose3d newRelativePose;
@@ -1642,35 +1769,77 @@ math::Angle Joint::GetAngleImpl(unsigned int _index) const
 /////////////////////////////////////////////////
 void Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetAxis(_index, _axis.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetGlobalAxis(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->GlobalAxis(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 void Joint::SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetAnchor(_index, _anchor.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetAnchor(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Anchor(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetLinkForce(unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LinkForce(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
 math::Vector3 Joint::GetLinkTorque(const unsigned int _index) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->LinkTorque(_index);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

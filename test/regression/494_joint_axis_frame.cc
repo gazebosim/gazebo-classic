@@ -156,24 +156,24 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
   // Check that Joint::GlobalAxis matches _axis
   EXPECT_EQ(_axis, _joint->GlobalAxis(0));
 
-  // test LocalAxis, GetAxisFrame, and GetAxisFrameOffset
+  // test LocalAxis, AxisFrame, and AxisFrameOffset
   // get axis specified locally (in joint frame or in parent model frame)
   ignition::math::Vector3d axisLocalFrame = _joint->LocalAxis(0);
   {
     // rotate axis into global frame
     ignition::math::Vector3d axisGlobalFrame =
-      _joint->GetAxisFrame(0).Ign().RotateVector(axisLocalFrame);
-    // Test GetAxisFrame: check that axis in global frame is
+      _joint->AxisFrame(0).RotateVector(axisLocalFrame);
+    // Test AxisFrame: check that axis in global frame is
     // computed correctly.
     EXPECT_EQ(axisGlobalFrame, _axis);
   }
   {
     // rotate axis into joint frame
     ignition::math::Vector3d axisJointFrame =
-      _joint->GetAxisFrameOffset(0).Ign().RotateVector(axisLocalFrame);
+      _joint->AxisFrameOffset(0).RotateVector(axisLocalFrame);
     // roate axis specified in global frame into joint frame
     ignition::math::Vector3d axisJointFrame2 =
-      _joint->GetWorldPose().Ign().Rot().RotateVectorReverse(_axis);
+      _joint->WorldPose().Rot().RotateVectorReverse(_axis);
     EXPECT_EQ(axisJointFrame, axisJointFrame2);
   }
 
@@ -232,12 +232,12 @@ void Issue494Test::CheckJointProperties(physics::JointPtr _joint,
         }
       }
     }
-    std::cout << "    joint pose:        " << _joint->GetWorldPose()
+    std::cout << "    joint pose:        " << _joint->WorldPose()
               << std::endl;
     std::cout << "    global axis:       " << _axis << std::endl;
-    std::cout << "    axis frame:        " << _joint->GetAxisFrame(0)
+    std::cout << "    axis frame:        " << _joint->AxisFrame(0)
               << std::endl;
-    std::cout << "    axis frame offset: " << _joint->GetAxisFrameOffset(0)
+    std::cout << "    axis frame offset: " << _joint->AxisFrameOffset(0)
               << std::endl;
     std::cout << "    desired velocity:  " << vel << std::endl;
     std::cout << "    joint velocity:    " << _joint->GetVelocity(0)

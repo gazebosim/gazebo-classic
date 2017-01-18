@@ -24,6 +24,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
@@ -76,6 +77,15 @@ namespace gazebo
 
     /// \brief Parent sensor collision names.
     private: std::map<std::string, double> collisionNamesToArea;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for publishing tactile messages.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher of tactile messages.
+    private: ignition::transport::Node::Publisher tactilePubIgn;
   };
 }
 #endif

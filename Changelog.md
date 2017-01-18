@@ -1,11 +1,25 @@
+## Gazebo 9
+
+## Gazebo 9.x.x (2018-xx-xx)
+
+1. Remove Gazebo 8 deprecations
+    * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Depend on ignition math3
+    * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
+
 1. Use ignition math with ServerFixture
     * [Pull request #2552](https://bitbucket.org/osrf/gazebo/pull-request/2552)
 
 1. Changed the type of `FrictionPyramid::direction1` from `gazebo::math::Vector3` to `ignition::math::Vector3d`.
     * [Pull request #2548](https://bitbucket.org/osrf/gazebo/pull-request/2548)
+
+1. Added igntition::transport interfaces to header files
+    * [Pull request #2559](https://bitbucket.org/osrf/gazebo/pull-request/2559)
 
 1. Added ignition transport dependency, and output camera sensor images on
    an ignition transport topic.
@@ -138,32 +152,42 @@
     * [Pull request #2245](https://bitbucket.org/osrf/gazebo/pull-request/2245)
 
 1. Deprecate gazebo::math
+    * [Pull request #2594](https://bitbucket.org/osrf/gazebo/pull-request/2594)
     * [Pull request #2513](https://bitbucket.org/osrf/gazebo/pull-request/2513)
+    * [Pull request #2586](https://bitbucket.org/osrf/gazebo/pull-request/2586)
     * [Pull request #2326](https://bitbucket.org/osrf/gazebo/pull-request/2326)
+    * [Pull request #2579](https://bitbucket.org/osrf/gazebo/pull-request/2579)
+    * [Pull request #2574](https://bitbucket.org/osrf/gazebo/pull-request/2574)
     * [Pull request #2426](https://bitbucket.org/osrf/gazebo/pull-request/2426)
     * [Pull request #2567](https://bitbucket.org/osrf/gazebo/pull-request/2567)
     * [Pull request #2355](https://bitbucket.org/osrf/gazebo/pull-request/2355)
     * [Pull request #2407](https://bitbucket.org/osrf/gazebo/pull-request/2407)
     * [Pull request #2564](https://bitbucket.org/osrf/gazebo/pull-request/2564)
+    * [Pull request #2591](https://bitbucket.org/osrf/gazebo/pull-request/2591)
     * [Pull request #2425](https://bitbucket.org/osrf/gazebo/pull-request/2425)
     * [Pull request #2570](https://bitbucket.org/osrf/gazebo/pull-request/2570)
     * [Pull request #2436](https://bitbucket.org/osrf/gazebo/pull-request/2436)
     * [Pull request #2556](https://bitbucket.org/osrf/gazebo/pull-request/2556)
     * [Pull request #2472](https://bitbucket.org/osrf/gazebo/pull-request/2472)
     * [Pull request #2505](https://bitbucket.org/osrf/gazebo/pull-request/2505)
+    * [Pull request #2583](https://bitbucket.org/osrf/gazebo/pull-request/2583)
     * [Pull request #2514](https://bitbucket.org/osrf/gazebo/pull-request/2514)
     * [Pull request #2522](https://bitbucket.org/osrf/gazebo/pull-request/2522)
     * [Pull request #2565](https://bitbucket.org/osrf/gazebo/pull-request/2565)
     * [Pull request #2525](https://bitbucket.org/osrf/gazebo/pull-request/2525)
     * [Pull request #2533](https://bitbucket.org/osrf/gazebo/pull-request/2533)
-    * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
     * [Pull request #2543](https://bitbucket.org/osrf/gazebo/pull-request/2543)
     * [Pull request #2549](https://bitbucket.org/osrf/gazebo/pull-request/2549)
     * [Pull request #2554](https://bitbucket.org/osrf/gazebo/pull-request/2554)
     * [Pull request #2560](https://bitbucket.org/osrf/gazebo/pull-request/2560)
+    * [Pull request #2585](https://bitbucket.org/osrf/gazebo/pull-request/2585)
     * [Pull request #2575](https://bitbucket.org/osrf/gazebo/pull-request/2575)
     * [Pull request #2563](https://bitbucket.org/osrf/gazebo/pull-request/2563)
-    * [Pull request #25xx](https://bitbucket.org/osrf/gazebo/pull-request/25xx)
+    * [Pull request #2573](https://bitbucket.org/osrf/gazebo/pull-request/2573)
+    * [Pull request #2577](https://bitbucket.org/osrf/gazebo/pull-request/2577)
+    * [Pull request #2581](https://bitbucket.org/osrf/gazebo/pull-request/2581)
+    * [Pull request #2566](https://bitbucket.org/osrf/gazebo/pull-request/2566)
+    * [Pull request #2578](https://bitbucket.org/osrf/gazebo/pull-request/2578)
 
 1. Add Wind support
     * [Pull request #1985](https://bitbucket.org/osrf/gazebo/pull-request/1985)

@@ -68,7 +68,7 @@ ignition::math::Vector3d DARTSliderJoint::Anchor(
       this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin).Ign();
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
@@ -99,7 +99,7 @@ ignition::math::Vector3d DARTSliderJoint::GlobalAxis(
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis).Ign();
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
@@ -121,7 +121,7 @@ void DARTSliderJoint::SetAxis(const unsigned int _index,
           this->dataPtr->dtJoint);
 
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
-        this->GetAxisFrameOffset(0).RotateVector(_axis));
+        this->AxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;

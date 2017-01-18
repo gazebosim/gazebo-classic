@@ -129,12 +129,6 @@ TEST_F(Visual_TEST, BoundingBox)
       ignition::math::Vector3d(10, 10, 1),
       ignition::math::Vector3d::Zero);
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
 
@@ -143,6 +137,10 @@ TEST_F(Visual_TEST, BoundingBox)
   rendering::VisualPtr visual;
   while (!visual && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     visual = scene->GetVisual("box");
     common::Time::MSleep(1000);
     sleep++;
@@ -446,12 +444,6 @@ TEST_F(Visual_TEST, DerivedTransparency)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
@@ -462,6 +454,10 @@ TEST_F(Visual_TEST, DerivedTransparency)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -1508,12 +1504,6 @@ TEST_F(Visual_TEST, Scale)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
@@ -1524,6 +1514,10 @@ TEST_F(Visual_TEST, Scale)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -1807,12 +1801,6 @@ TEST_F(Visual_TEST, VisibilityFlags)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(scene, nullptr);
@@ -1823,6 +1811,10 @@ TEST_F(Visual_TEST, VisibilityFlags)
   rendering::VisualPtr cylinder;
   while ((!cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     cylinder = scene->GetVisual("cylinder");
     common::Time::MSleep(1000);
     sleep++;

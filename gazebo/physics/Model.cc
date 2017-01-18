@@ -680,13 +680,26 @@ void Model::ResetPhysicsStates()
 //////////////////////////////////////////////////
 void Model::SetLinearVel(const math::Vector3 &_vel)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinearVel(_vel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Model::SetLinearVel(const ignition::math::Vector3d &_vel)
+{
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearVel(_vel.Ign());
+      (*iter)->SetLinearVel(_vel);
     }
   }
 }
@@ -694,13 +707,26 @@ void Model::SetLinearVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetAngularVel(const math::Vector3 &_vel)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAngularVel(_vel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
+{
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularVel(_vel.Ign());
+      (*iter)->SetAngularVel(_vel);
     }
   }
 }
@@ -708,13 +734,26 @@ void Model::SetAngularVel(const math::Vector3 &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const math::Vector3 &_accel)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinearAccel(_accel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
+{
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetLinearAccel(_accel.Ign());
+      (*iter)->SetLinearAccel(_accel);
     }
   }
 }
@@ -722,13 +761,26 @@ void Model::SetLinearAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const math::Vector3 &_accel)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAngularAccel(_accel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
+{
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
-      (*iter)->SetAngularAccel(_accel.Ign());
+      (*iter)->SetAngularAccel(_accel);
     }
   }
 }
@@ -736,7 +788,14 @@ void Model::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -751,7 +810,14 @@ ignition::math::Vector3d Model::RelativeLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -768,7 +834,14 @@ ignition::math::Vector3d Model::WorldLinearVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -783,7 +856,14 @@ ignition::math::Vector3d Model::RelativeAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularVel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -799,7 +879,14 @@ ignition::math::Vector3d Model::WorldAngularVel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeLinearAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -814,7 +901,14 @@ ignition::math::Vector3d Model::RelativeLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldLinearAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -829,7 +923,14 @@ ignition::math::Vector3d Model::WorldLinearAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetRelativeAngularAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->RelativeAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -844,7 +945,14 @@ ignition::math::Vector3d Model::RelativeAngularAccel() const
 //////////////////////////////////////////////////
 math::Vector3 Model::GetWorldAngularAccel() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1324,6 +1432,19 @@ void Model::StopAnimation()
 //////////////////////////////////////////////////
 void Model::AttachStaticModel(ModelPtr &_model, math::Pose _offset)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AttachStaticModel(_model, _offset.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Model::AttachStaticModel(ModelPtr &_model, ignition::math::Pose3d _offset)
+{
   if (!_model->IsStatic())
   {
     gzerr << "AttachStaticModel requires a static model\n";
@@ -1355,7 +1476,7 @@ void Model::OnPoseChange()
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
     p = this->WorldPose();
-    p += this->attachedModelsOffset[i].Ign();
+    p += this->attachedModelsOffset[i];
     this->attachedModels[i]->SetWorldPose(p, true);
   }
 }
@@ -1447,6 +1568,20 @@ void Model::SetEnabled(bool _enabled)
 /////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinkWorldPose(_pose.Ign(), _linkName);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose,
+    std::string _linkName)
+{
   // look for link matching link name
   LinkPtr link = this->GetLink(_linkName);
   if (link)
@@ -1459,10 +1594,24 @@ void Model::SetLinkWorldPose(const math::Pose &_pose, std::string _linkName)
 /////////////////////////////////////////////////
 void Model::SetLinkWorldPose(const math::Pose &_pose, const LinkPtr &_link)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinkWorldPose(_pose.Ign(), _link);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Model::SetLinkWorldPose(const ignition::math::Pose3d &_pose,
+    const LinkPtr &_link)
+{
   ignition::math::Pose3d linkPose = _link->WorldPose();
   ignition::math::Pose3d currentModelPose = this->WorldPose();
   ignition::math::Pose3d linkRelPose = currentModelPose - linkPose;
-  ignition::math::Pose3d targetModelPose =  linkRelPose * _pose.Ign();
+  ignition::math::Pose3d targetModelPose =  linkRelPose * _pose;
   this->SetWorldPose(targetModelPose);
 }
 

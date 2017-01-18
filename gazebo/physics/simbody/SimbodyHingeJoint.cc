@@ -124,7 +124,7 @@ ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
       SimTK::Vec3 z_W(this->mobod.expressVectorInGroundFrame(
         this->simbodyPhysics->integ->getState(), X_OM.z()));
 
-      return SimbodyPhysics::Vec3ToVector3(z_W).Ign();
+      return SimbodyPhysics::Vec3ToVector3Ign(z_W);
     }
     else
     {
@@ -132,7 +132,7 @@ ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
             << " initial axis vector in world frame (not valid if"
             << " joint frame has moved). Please file"
             << " a report on issue tracker.\n";
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }
@@ -150,7 +150,7 @@ ignition::math::Vector3d SimbodyHingeJoint::GlobalAxis(
             << "global axis.\n";
       // if local axis specified in model frame (to be changed)
       // switch to code below if issue #494 is to be addressed
-      return this->GetAxisFrame(_index).Ign().RotateVector(
+      return this->AxisFrame(_index).RotateVector(
         this->LocalAxis(_index));
     }
   }

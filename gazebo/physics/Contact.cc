@@ -163,8 +163,8 @@ void Contact::FillMsg(msgs::Contact &_msg) const
   {
     _msg.add_depth(this->depths[j]);
 
-    msgs::Set(_msg.add_position(), this->positions[j].Ign());
-    msgs::Set(_msg.add_normal(), this->normals[j].Ign());
+    msgs::Set(_msg.add_position(), this->positions[j]);
+    msgs::Set(_msg.add_normal(), this->normals[j]);
 
     msgs::JointWrench *jntWrench = _msg.add_wrench();
     jntWrench->set_body_1_name(this->collision1->GetScopedName());

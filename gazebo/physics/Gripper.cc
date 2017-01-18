@@ -405,7 +405,7 @@ void GripperPrivate::OnContacts(ConstContactsPtr &_msg)
 void GripperPrivate::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
-    this->diffs[i] = GZ_DBL_MAX;
+    this->diffs[i] = ignition::math::MAX_D;
 }
 
 

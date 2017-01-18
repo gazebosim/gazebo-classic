@@ -52,12 +52,38 @@ void PlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
+void PlaneShape::SetAltitude(const math::Vector3 &_pos)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAltitude(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetAltitude(const ignition::math::Vector3d &/*_pos*/)
 {
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const math::Vector3 &_norm)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetNormal(_norm.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
 {
   this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
@@ -66,13 +92,33 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->Get<math::Vector3>("normal");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Normal();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PlaneShape::Normal() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("normal");
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::SetSize(const math::Vector2d &_size)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetSize(_size.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -116,7 +162,7 @@ void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
   msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 

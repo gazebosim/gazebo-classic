@@ -16,8 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-
-#include "gazebo/math/Vector2d.hh"
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -53,8 +52,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-// Note: The value of GZ_UINT32_MAX is reserved as a flag.
-uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
+// Note: The value of ignition::math::MAX_UI32 is reserved as a flag.
+uint32_t VisualPrivate::visualIdCount = ignition::math::MAX_UI32 - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
@@ -346,7 +345,6 @@ void Visual::Load()
 {
   std::ostringstream stream;
   ignition::math::Pose3d pose;
-  Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
   if (this->dataPtr->parent)
@@ -392,10 +390,6 @@ void Visual::Load()
   // Set the pose of the scene node
   this->SetPose(pose);
   this->dataPtr->initialRelativePose = pose;
-
-  // Get the size of the mesh
-  if (obj)
-    meshSize = obj->getBoundingBox().getSize();
 
   // Keep transparency to set after setting material
   double sdfTransparency = -1;
@@ -579,12 +573,6 @@ void Visual::SetName(const std::string &_name)
 {
   this->dataPtr->name = _name;
   this->dataPtr->sdf->GetAttribute("name")->Set(_name);
-}
-
-//////////////////////////////////////////////////
-std::string Visual::GetName() const
-{
-  return this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -788,12 +776,6 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetScale(const math::Vector3 &_scale)
-{
-  this->SetScale(_scale.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->dataPtr->scale == _scale)
@@ -885,12 +867,6 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 ignition::math::Vector3d Visual::GetGeometrySize() const
 {
   return this->dataPtr->geomSize;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetScale()
-{
-  return this->Scale();
 }
 
 //////////////////////////////////////////////////
@@ -1764,24 +1740,12 @@ bool Visual::GetVisible() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPosition(const math::Vector3 &_pos)
-{
-  this->SetPosition(_pos.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 {
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
   this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetRotation(const math::Quaternion &_rot)
-{
-  this->SetRotation(_rot.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1795,22 +1759,10 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPose(const math::Pose &_pose)
-{
-  this->SetPose(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->SetPosition(_pose.Pos());
   this->SetRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetPosition() const
-{
-  return this->Position();
 }
 
 //////////////////////////////////////////////////
@@ -1822,23 +1774,11 @@ ignition::math::Vector3d Visual::Position() const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Visual::GetRotation() const
-{
-  return this->Rotation();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Quaterniond Visual::Rotation() const
 {
   if (!this->dataPtr->sceneNode)
     return ignition::math::Quaterniond::Identity;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetPose() const
-{
-  return this->Pose();
 }
 
 //////////////////////////////////////////////////
@@ -1857,22 +1797,10 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose &_pose)
-{
-  this->SetWorldPose(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
   this->SetWorldRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetWorldPosition(const math::Vector3 &_pos)
-{
-  this->SetWorldPosition(_pos.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1884,23 +1812,11 @@ void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldRotation(const math::Quaternion &_q)
-{
-  this->SetWorldRotation(_q.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 {
   if (!this->dataPtr->sceneNode)
     return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetWorldPose() const
-{
-  return this->WorldPose();
 }
 
 //////////////////////////////////////////////////
@@ -1929,7 +1845,6 @@ Ogre::SceneNode * Visual::GetSceneNode() const
 {
   return this->dataPtr->sceneNode;
 }
-
 
 //////////////////////////////////////////////////
 bool Visual::IsStatic() const
@@ -2071,19 +1986,6 @@ void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 std::string Visual::GetMaterialName() const
 {
   return this->dataPtr->myMaterialName;
-}
-
-//////////////////////////////////////////////////
-math::Box Visual::GetBoundingBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->BoundingBox();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -2877,20 +2779,6 @@ bool Visual::GetCenterSubMesh() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
-                             double _time,
-                             std::function<void()> _onComplete)
-{
-  std::vector<ignition::math::Pose3d> pts;
-  for (auto const &pt : _pts)
-  {
-    pts.push_back(pt.Ign());
-  }
-
-  this->MoveToPositions(pts, _time, _onComplete);
-}
-
-//////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              const double _time,
                              std::function<void()> _onComplete)
@@ -2938,12 +2826,6 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
     this->dataPtr->preRenderConnection =
       event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
   }
-}
-
-//////////////////////////////////////////////////
-void Visual::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  this->MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////

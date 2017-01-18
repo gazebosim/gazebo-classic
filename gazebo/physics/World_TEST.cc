@@ -147,7 +147,7 @@ TEST_F(WorldTest, EditName)
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != nullptr);
 
-    EXPECT_EQ(inertial->GetMass(), 1.0);
+    EXPECT_EQ(inertial->Mass(), 1.0);
   }
 
   // Edit model mass
@@ -190,7 +190,7 @@ TEST_F(WorldTest, EditName)
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != nullptr);
 
-    EXPECT_EQ(inertial->GetMass(), 2.0);
+    EXPECT_EQ(inertial->Mass(), 2.0);
   }
 }
 
