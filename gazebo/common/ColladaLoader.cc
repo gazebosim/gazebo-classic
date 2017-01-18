@@ -2057,7 +2057,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
     double srcFactor = 0;
     double dstFactor = 0;
 
-    // Calculatee alpha based on opaque mode.
+    // Calculate alpha based on opaque mode.
     // Equations are extracted from collada spec
     // Make sure to update the final transparency value
     // final mat transparency = 1 - srcFactor = dstFactor
