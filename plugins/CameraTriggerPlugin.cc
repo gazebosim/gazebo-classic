@@ -142,7 +142,7 @@ void CameraTriggerPluginPrivate::OnKeyPress(ConstAnyPtr &_msg)
   // 'c'
   if (_msg->int_value() == 99)
   {
-    // Connect to preRender event. We want to perform any camera sensors
+    // Connect to preRender event. We want to perform any camera sensor
     // operations in the rendering thread
     this->preRenderConnection =
         event::Events::ConnectPreRender(
@@ -153,7 +153,7 @@ void CameraTriggerPluginPrivate::OnKeyPress(ConstAnyPtr &_msg)
 /////////////////////////////////////////////////
 void CameraTriggerPluginPrivate::PreRender()
 {
-  // trigger an update and discconect from any future preRender event callbacks.
+  // trigger an update and disconnect from any future preRender event callbacks.
   this->SetCameraEnabled(true);
   this->preRenderConnection.reset();
 }
