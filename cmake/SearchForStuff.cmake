@@ -420,7 +420,7 @@ if (PKG_CONFIG_FOUND)
   ########################################
   # Find AV device. Only check for this on linux.
   if (UNIX)
-    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    pkg_check_modules(libavdevice libavdevice>=56.4.100)
     if (NOT libavdevice_FOUND)
       BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
     else()
