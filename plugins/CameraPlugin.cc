@@ -55,13 +55,13 @@ void CameraPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
       gzmsg << "It is a depth camera sensor\n";
   }
 
-  this->camera = this->parentSensor->Camera();
-
   if (!this->parentSensor)
   {
     gzerr << "CameraPlugin not attached to a camera sensor\n";
     return;
   }
+
+  this->camera = this->parentSensor->Camera();
 
   this->width = this->camera->ImageWidth();
   this->height = this->camera->ImageHeight();

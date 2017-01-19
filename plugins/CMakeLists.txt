@@ -43,6 +43,7 @@ set (plugins_single_header
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
+  CameraTriggerPlugin
   CartDemoPlugin
   CessnaPlugin
   ContactPlugin
