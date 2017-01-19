@@ -166,6 +166,10 @@ namespace gazebo
       /// \param[in] _show True to show, false to hide.
       public slots: void ShowVisuals(const bool _show);
 
+      /// \brief Show or hide link frame visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowLinkFrame(const bool _show);
+
       /// \brief Computes the volume of a link.
       /// \param[in] _collision A collision message.
       /// \return The computed volume.
@@ -262,7 +266,7 @@ namespace gazebo
       public: std::map<std::string, ignition::math::Vector3d> scales;
 
       /// \brief Visual representing this link.
-      public: rendering::VisualPtr linkVisual;
+      private: rendering::VisualPtr linkVisual;
 
       /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
@@ -282,6 +286,9 @@ namespace gazebo
       /// \brief Deleted collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
 
+      /// \brief Link frame visual.
+      public: rendering::LinkFrameVisualPtr linkFrameVis;
+
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
 
@@ -293,6 +300,9 @@ namespace gazebo
 
       /// \brief True if all visuals are currently visible, false otherwise.
       public: bool showVisuals = true;
+
+      /// \brief True if all link frames are currently visible, false otherwise.
+      public: bool showLinkFrame = true;
     };
 
     /// \brief Helper class to store model plugin data

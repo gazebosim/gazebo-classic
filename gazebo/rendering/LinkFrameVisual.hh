@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_FRAME_VISUAL_HH_
-#define _GAZEBO_LINK_FRAME_VISUAL_HH_
+#ifndef GAZEBO_RENDERING_LINKFRAMEVISUAL_HH_
+#define GAZEBO_RENDERING_LINKFRAMEVISUAL_HH_
 
 #include <string>
 
@@ -45,6 +45,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load();
+
+      /// \brief Recalculate scale based on parent link.
+      public: void RecalculateScale();
 
       // Documentation inherited
       public: virtual void SetHighlighted(bool _highlighted);

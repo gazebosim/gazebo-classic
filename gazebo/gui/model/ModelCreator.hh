@@ -239,6 +239,10 @@ namespace gazebo
       /// \param[in] _show True to show, false to hide.
       public slots: void ShowVisuals(const bool _show);
 
+      /// \brief Show or hide link frame visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowLinkFrames(const bool _show);
+
       /// \brief Convert a given pose from the world frame to the local frame
       /// of the model being edited.
       /// \param[in] _world Pose in world frame.
