@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,16 @@
  *
 */
 
-#ifndef _ROAD_HH_
-#define _ROAD_HH_
+#ifndef GAZEBO_PHYSICS_ROAD_HH_
+#define GAZEBO_PHYSICS_ROAD_HH_
 
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
-#include <gazebo/math/Vector3.hh>
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -57,7 +59,13 @@ namespace gazebo
 
       /// \brief Get the point that define the road.
       /// \return The vector of points that define the road.
-      public: const std::vector<math::Vector3> &GetPoints() const;
+      /// \deprecated See Points()
+      public: const std::vector<math::Vector3> GetPoints() const
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the points that define the road.
+      /// \return The vector of points that define the road.
+      public: const std::vector<ignition::math::Vector3d> &Points() const;
 
       /// \brief Get the road width in meters.
       /// \return Road width in meters.
@@ -67,13 +75,22 @@ namespace gazebo
       private: double width;
 
       /// \brief Points that makes up the mid-line of the road.
-      private: std::vector<math::Vector3> points;
+      private: std::vector<ignition::math::Vector3d> points;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
 
       /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Transportation node.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Publisher for road information.
+      private: ignition::transport::Node::Publisher roadPubIgn;
     };
     /// \}
   }

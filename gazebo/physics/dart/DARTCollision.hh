@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DARTCOLLISION_HH_
-#define _GAZEBO_DARTCOLLISION_HH_
-
-#include "gazebo/math/Box.hh"
+#ifndef GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
+#define GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -73,11 +71,11 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get DART body node.
       /// \return Pointer to the dart BodyNode.
-      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
+      public: dart::dynamics::BodyNode *DARTBodyNode() const;
 
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
@@ -103,21 +101,21 @@ namespace gazebo
 
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape *GetDARTCollisionShape() const
+      public: dart::dynamics::Shape *DARTCollisionShape() const
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::ShapePtr GetDARTCollisionShapePtr() const
+      public: dart::dynamics::ShapePtr DARTCollisionShapePtr() const
               GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get DART collision shape node.
-      public: dart::dynamics::ShapeNodePtr GetDARTCollisionShapeNode() const;
+      public: dart::dynamics::ShapeNodePtr DARTCollisionShapeNode() const;
 
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.
       /// \return Dynamically casted pointer to DARTSurfaceParams.
-      public: DARTSurfaceParamsPtr GetDARTSurface() const;
+      public: DARTSurfaceParamsPtr DARTSurface() const;
 
       /// \internal
       /// \brief Pointer to private data

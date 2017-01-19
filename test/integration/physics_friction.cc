@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -246,15 +246,15 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
 
     for (box = boxes.begin(); box != boxes.end(); ++box)
     {
-      math::Vector3 vel = box->model->GetWorldLinearVel();
-      EXPECT_NEAR(vel.x, 0, g_friction_tolerance);
-      EXPECT_NEAR(vel.z, 0, yTolerance);
+      ignition::math::Vector3d vel = box->model->WorldLinearVel();
+      EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.Z(), 0, yTolerance);
 
       // Coulomb friction model
       if (box->friction >= 1.0)
       {
         // Friction is large enough to prevent motion
-        EXPECT_NEAR(vel.y, 0, yTolerance);
+        EXPECT_NEAR(vel.Y(), 0, yTolerance);
       }
       else
       {
@@ -267,7 +267,7 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
           vyTolerance *= 22;
         }
 #endif
-        EXPECT_NEAR(vel.y, (g.Y() + box->friction) * t.Double(),
+        EXPECT_NEAR(vel.Y(), (g.Y() + box->friction) * t.Double(),
                     vyTolerance);
       }
     }
@@ -360,9 +360,9 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    math::Vector3 pos = iter->first->GetWorldPose().pos;
-    double cosPosAngle = pos.x / pos.GetLength();
-    double sinPosAngle = pos.y / pos.GetLength();
+    ignition::math::Vector3d pos = iter->first->WorldPose().Pos();
+    double cosPosAngle = pos.X() / pos.Length();
+    double sinPosAngle = pos.Y() / pos.Length();
     EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
     EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
   }
@@ -463,9 +463,9 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
     double velMag = g.Y() * sinAngle * t;
-    math::Vector3 vel = iter->first->GetWorldLinearVel();
-    EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
-    EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
+    ignition::math::Vector3d vel = iter->first->WorldLinearVel();
+    EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
+    EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
   }
 }
 
@@ -531,9 +531,9 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 
   gzdbg << "Checking velocity after " << t << " seconds" << std::endl;
   double velMag = (g.Y()+g.Z()) * t;
-  math::Vector3 vel = model->GetWorldLinearVel();
-  EXPECT_NEAR(0.0, vel.x, g_friction_tolerance);
-  EXPECT_NEAR(velMag, vel.y, g_friction_tolerance);
+  ignition::math::Vector3d vel = model->WorldLinearVel();
+  EXPECT_NEAR(0.0, vel.X(), g_friction_tolerance);
+  EXPECT_NEAR(velMag, vel.Y(), g_friction_tolerance);
 }
 
 /////////////////////////////////////////////////

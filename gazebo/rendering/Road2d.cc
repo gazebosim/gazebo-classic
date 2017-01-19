@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,12 +91,6 @@ Road2d::~Road2d()
   dPtr->segments.clear();
 }
 
-/////////////////////////////////////////////////
-void Road2d::Load(VisualPtr /*_parent*/)
-{
-  // This function is deprecated. Remove in gazebo9
-}
-
 //////////////////////////////////////////////////
 void Road2d::Load(msgs::Road _msg)
 {
@@ -184,9 +178,9 @@ void RoadSegment::Load(msgs::Road _msg)
 
   ignition::math::Vector3d pA, pB, tangent;
 
-  math::Box bounds;
-  bounds.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  bounds.max.Set(GZ_DBL_MIN, GZ_DBL_MIN, GZ_DBL_MIN);
+  ignition::math::Box bounds;
+  bounds.Min().Set(IGN_DBL_MAX, IGN_DBL_MAX, IGN_DBL_MAX);
+  bounds.Max().Set(IGN_DBL_MIN, IGN_DBL_MIN, IGN_DBL_MIN);
 
   // length for each texture tile, same as road width as texture is square
   // (if texture size should change or made custom in a future version
@@ -224,10 +218,10 @@ void RoadSegment::Load(msgs::Road _msg)
     // Every other point in the road
     else
     {
-      math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
-      math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
+      auto v1 = (this->points[i+1] - this->points[i]).Normalize();
+      auto v0 = (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
-      tangent = (v1+v0).Normalize().Ign();
+      tangent = (v1+v0).Normalize();
 
       // Check to see if the points are not colinear
       // If not colinear, then the road needs to be widended for the turns
@@ -250,11 +244,11 @@ void RoadSegment::Load(msgs::Road _msg)
     pB.X() -= cos(theta) * w;
     pB.Y() -= sin(theta) * w;
 
-    bounds.min.SetToMin(pA);
-    bounds.min.SetToMin(pB);
+    bounds.Min().Min(pA);
+    bounds.Min().Min(pB);
 
-    bounds.max.SetToMax(pA);
-    bounds.max.SetToMax(pB);
+    bounds.Max().Max(pA);
+    bounds.Max().Max(pB);
 
     // Position
     *vertices++ = pA.X();
@@ -293,8 +287,8 @@ void RoadSegment::Load(msgs::Road _msg)
   vBuf->unlock();
   iBuf->unlock();
 
-  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.min.Ign()),
-                   Conversions::Convert(bounds.max.Ign())));
+  mesh->_setBounds(Ogre::AxisAlignedBox(Conversions::Convert(bounds.Min()),
+                   Conversions::Convert(bounds.Max())));
 
   if (_msg.has_material())
   {

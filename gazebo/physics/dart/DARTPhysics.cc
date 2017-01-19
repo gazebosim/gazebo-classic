@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,12 +183,12 @@ void DARTPhysics::UpdateCollision()
     if (!contactFeedback)
       continue;
 
-    math::Pose body1Pose = dartLink1->GetWorldPose();
-    math::Pose body2Pose = dartLink2->GetWorldPose();
-    math::Vector3 localForce1;
-    math::Vector3 localForce2;
-    math::Vector3 localTorque1;
-    math::Vector3 localTorque2;
+    auto body1Pose = dartLink1->WorldPose();
+    auto body2Pose = dartLink2->WorldPose();
+    ignition::math::Vector3d localForce1;
+    ignition::math::Vector3d localForce2;
+    ignition::math::Vector3d localTorque1;
+    ignition::math::Vector3d localTorque2;
 
     // calculate force in world frame
     Eigen::Vector3d force = dtContact.force;
@@ -202,17 +202,17 @@ void DARTPhysics::UpdateCollision()
          dtBodyNode2->getTransform().translation()).cross(-force);
 
     // Convert from world to link frame
-    localForce1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(force));
-    localForce2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(-force));
-    localTorque1 = body1Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueA));
-    localTorque2 = body2Pose.rot.RotateVectorReverse(
-        DARTTypes::ConvVec3(torqueB));
+    localForce1 = body1Pose.Rot().RotateVectorReverse(
+        DARTTypes::ConvVec3Ign(force));
+    localForce2 = body2Pose.Rot().RotateVectorReverse(
+        DARTTypes::ConvVec3Ign(-force));
+    localTorque1 = body1Pose.Rot().RotateVectorReverse(
+        DARTTypes::ConvVec3Ign(torqueA));
+    localTorque2 = body2Pose.Rot().RotateVectorReverse(
+        DARTTypes::ConvVec3Ign(torqueB));
 
-    contactFeedback->positions[0] = DARTTypes::ConvVec3(dtContact.point);
-    contactFeedback->normals[0] = DARTTypes::ConvVec3(dtContact.normal);
+    contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
+    contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);
     contactFeedback->depths[0] = dtContact.penetrationDepth;
 
     if (!dartLink1->IsStatic())
@@ -373,11 +373,11 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
   this->dataPtr->dtWorld->setGravity(
-    Eigen::Vector3d(_gravity.x, _gravity.y, _gravity.z));
+    Eigen::Vector3d(_gravity.X(), _gravity.Y(), _gravity.Z()));
 }
 
 //////////////////////////////////////////////////
@@ -546,7 +546,7 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
     {
       DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(*itLink);
 
-      if (dartLink->GetDARTBodyNode() == _dtBodyNode)
+      if (dartLink->DARTBodyNode() == _dtBodyNode)
       {
         res = dartLink;
         break;

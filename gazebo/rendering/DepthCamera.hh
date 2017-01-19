@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,24 +95,12 @@ namespace gazebo
           std::function<void (const float *, unsigned int, unsigned int,
           unsigned int, const std::string &)>  _subscriber);
 
-      /// \brief Disconnect from an depth image singal
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewDepthFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
-
       /// \brief Connect a to the new rgb point cloud signal
       /// \param[in] _subscriber Subscriber callback function
       /// \return Pointer to the new Connection. This must be kept in scope
       public: event::ConnectionPtr ConnectNewRGBPointCloud(
           std::function<void (const float *, unsigned int, unsigned int,
           unsigned int, const std::string &)>  _subscriber);
-
-      /// \brief Disconnect from an rgb point cloud singal
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Implementation of the render call
       private: virtual void RenderImpl();

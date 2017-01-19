@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -40,6 +41,7 @@
 #include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/InertiaVisual.hh"
 #include "gazebo/rendering/LinkFrameVisual.hh"
+#include "gazebo/rendering/MarkerVisual.hh"
 #include "gazebo/rendering/ContactVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Light.hh"
@@ -104,7 +106,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->dataPtr->contactVisId = GZ_UINT32_MAX;
+  this->dataPtr->contactVisId = ignition::math::MAX_UI32;
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
@@ -382,6 +384,13 @@ void Scene::Init()
   this->dataPtr->requestPub->WaitForConnection();
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
+
+  // Initialize the marker manager
+  if (!this->dataPtr->markerManager.Init(this))
+  {
+    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+      << "will not work.\n";
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1001,14 +1010,12 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
                                   const ignition::math::Vector2i &_mousePos,
                                   const bool _ignoreSelectionObj)
 {
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setRay(mouseRay);
 
@@ -1094,16 +1101,13 @@ bool Scene::FirstContact(CameraPtr _camera,
                          ignition::math::Vector3d &_position)
 {
   bool valid = false;
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = ignition::math::Vector3d::Zero;
 
-  // Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setSortByDistance(true);
   this->dataPtr->raySceneQuery->setRay(mouseRay);
@@ -3355,7 +3359,7 @@ void Scene::ShowContacts(const bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->dataPtr->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->dataPtr->contactVisId == ignition::math::MAX_UI32 && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->dataPtr->worldVisual, "~/physics/contacts"));
@@ -3449,8 +3453,29 @@ void Scene::RemoveProjectors()
 /////////////////////////////////////////////////
 void Scene::ToggleLayer(const int32_t _layer)
 {
+  if (this->HasLayer(_layer))
+    this->dataPtr->layerState[_layer] = !this->dataPtr->layerState[_layer];
+  else
+    this->dataPtr->layerState[_layer] = false;
+
   for (auto visual : this->dataPtr->visuals)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+bool Scene::LayerState(const int32_t _layer) const
+{
+  if (_layer >= 0 && this->HasLayer(_layer))
+    return this->dataPtr->layerState[_layer];
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+bool Scene::HasLayer(const int32_t _layer) const
+{
+  return _layer < 0 ||
+    this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
-
-#ifndef _BULLETPLANESHAPE_HH_
-#define _BULLETPLANESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETPLANESHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETPLANESHAPE_HH_
 
 #include <iostream>
 
@@ -47,7 +42,7 @@ namespace gazebo
       public: virtual ~BulletPlaneShape() {}
 
       /// \brief Set the altitude of the plane
-      public: void SetAltitude(const math::Vector3 &pos)
+      public: void SetAltitude(const ignition::math::Vector3d &pos)
               {
                 PlaneShape::SetAltitude(pos);
               }
@@ -60,8 +55,8 @@ namespace gazebo
                 bParent = boost::dynamic_pointer_cast<BulletCollision>(
                     this->collisionParent);
 
-                math::Vector3 n = this->GetNormal();
-                btVector3 vec(n.x, n.y, n.z);
+                ignition::math::Vector3d n = this->Normal();
+                btVector3 vec(n.X(), n.Y(), n.Z());
 
                 bParent->SetCollisionShape(new btStaticPlaneShape(vec, 0.0),
                     false);

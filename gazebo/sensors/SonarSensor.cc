@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,7 +265,7 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
             this->lastMeasurementTime);
 
   ignition::math::Pose3d referencePose =
-    this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign();
+    this->pose + this->dataPtr->parentEntity->WorldPose();
   ignition::math::Vector3d pos;
 
   // A 5-step hysteresis window was chosen to reduce range value from

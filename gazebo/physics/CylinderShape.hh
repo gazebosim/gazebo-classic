@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Cylinder geometry
- * Author: Nate Koenig, Andrew Howard
- * Date: 8 May 2003
- */
-
-#ifndef _CYLINDERSHAPE_HH_
-#define _CYLINDERSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_CYLINDERSHAPE_HH_
+#define GAZEBO_PHYSICS_CYLINDERSHAPE_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -75,7 +70,7 @@ namespace gazebo
 
       /// \brief Set scale of cylinder.
       /// \param[in] _scale Scale to set the cylinder to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill in the values for a geomertry message.
       /// \param[out] _msg The geometry message to fill.

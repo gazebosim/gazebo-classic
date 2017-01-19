@@ -109,7 +109,7 @@ void MousePickingTest::Shapes()
   // move camera to look at the shapes from +x
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
@@ -237,7 +237,7 @@ void MousePickingTest::ModelEditorSelection()
   // move camera to look at cylinder
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);

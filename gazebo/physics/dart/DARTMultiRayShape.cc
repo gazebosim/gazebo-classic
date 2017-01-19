@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ void DARTMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void DARTMultiRayShape::AddRay(const math::Vector3& _start,
-                               const math::Vector3& _end)
+void DARTMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+                               const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

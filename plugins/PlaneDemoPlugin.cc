@@ -289,8 +289,8 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         if (controlPtr->HasElement("inc_val"))
           jc.incVal = controlPtr->Get<double>("inc_val");
         // initialize to joint limits
-        jc.maxVal = joint->GetUpperLimit(0).Radian();
-        jc.minVal = joint->GetLowerLimit(0).Radian();
+        jc.maxVal = joint->UpperLimit(0);
+        jc.minVal = joint->LowerLimit(0);
         // overwrite if user specified limits
         if (controlPtr->HasElement("max_val"))
           jc.maxVal = controlPtr->Get<double>("max_val");
@@ -333,7 +333,7 @@ void PlaneDemoPlugin::Load(physics::ModelPtr _model,
         else
           cmdMin = -1000.0;
         jc.pid.Init(p, i, d, iMax, iMin, cmdMax, cmdMin);
-        jc.cmd = joint->GetAngle(0).Radian();
+        jc.cmd = joint->Position(0);
         jc.pid.SetCmd(jc.cmd);
         this->dataPtr->jointControls.push_back(jc);
       }
@@ -381,7 +381,7 @@ void PlaneDemoPlugin::OnUpdate()
       ti != this->dataPtr->thrusterControls.end(); ++ti)
     {
       // fire up thruster
-      ignition::math::Pose3d pose = ti->link->GetWorldPose().Ign();
+      ignition::math::Pose3d pose = ti->link->WorldPose();
       ti->link->AddForce(pose.Rot().RotateVector(ti->force));
     }
 
@@ -390,7 +390,7 @@ void PlaneDemoPlugin::OnUpdate()
         ji != this->dataPtr->jointControls.end(); ++ji)
     {
       // spin up joint control
-      double pos = ji->joint->GetAngle(0).Radian();
+      double pos = ji->joint->Position(0);
       double error = pos - ji->cmd;
       double force = ji->pid.Update(error,
           curTime - this->dataPtr->lastUpdateTime);
@@ -469,7 +469,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else if (static_cast<int>(ch) == ji->decKey)
@@ -478,7 +478,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = ignition::math::clamp(ji->cmd, ji->minVal, ji->maxVal);
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else if (static_cast<int>(ch) == 99)  // 'c' resets all control surfaces
@@ -486,7 +486,7 @@ void PlaneDemoPluginPrivate::OnKeyHit(ConstAnyPtr &_msg)
       ji->cmd = 0;
       ji->pid.SetCmd(ji->cmd);
       gzerr << ji->joint->GetName()
-            << " cur: " << ji->joint->GetAngle(0).Radian()
+            << " cur: " << ji->joint->Position(0)
             << " cmd: " << ji->cmd << "\n";
     }
     else

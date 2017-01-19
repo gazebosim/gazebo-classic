@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -167,7 +167,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: DARTPhysicsPrivate *dataPtr;
+      private: DARTPhysicsPrivate *dataPtr = nullptr;
     };
 
   /// \}

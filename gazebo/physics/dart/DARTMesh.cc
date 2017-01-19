@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,21 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_subMesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void DARTMesh::Init(const common::SubMesh *_subMesh,
+                    DARTCollisionPtr _collision,
+                    const ignition::math::Vector3d &_scale)
+{
   float *vertices = nullptr;
   int *indices = nullptr;
 
@@ -65,6 +80,21 @@ void DARTMesh::Init(const common::Mesh *_mesh,
                     DARTCollisionPtr _collision,
                     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_mesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void DARTMesh::Init(const common::Mesh *_mesh,
+                    DARTCollisionPtr _collision,
+                    const ignition::math::Vector3d &_scale)
+{
   float *vertices = nullptr;
   int *indices = nullptr;
 
@@ -83,7 +113,7 @@ void DARTMesh::Init(const common::Mesh *_mesh,
 /////////////////////////////////////////////////
 void DARTMesh::CreateMesh(float *_vertices, int *_indices,
     unsigned int _numVertices, unsigned int _numIndices,
-    DARTCollisionPtr _collision, const math::Vector3 &_scale)
+    DARTCollisionPtr _collision, const ignition::math::Vector3d &_scale)
 {
   GZ_ASSERT(_collision, "DART collision is null");
 
@@ -124,10 +154,10 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
 
   dart::dynamics::ShapePtr dtMeshShape(new dart::dynamics::MeshShape(
       DARTTypes::ConvVec3(_scale), assimpScene));
-  GZ_ASSERT(_collision->GetDARTBodyNode(),
-            "DART _collision->GetDARTBodyNode() is null");
+  GZ_ASSERT(_collision->DARTBodyNode(),
+            "DART _collision->DARTBodyNode() is null");
 
-  _collision->GetDARTBodyNode()->createShapeNodeWith<
+  _collision->DARTBodyNode()->createShapeNodeWith<
       dart::dynamics::VisualAspect,
       dart::dynamics::CollisionAspect,
       dart::dynamics::DynamicsAspect>(dtMeshShape);

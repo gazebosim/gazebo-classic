@@ -48,7 +48,7 @@ void DARTBoxShape::Init()
     boost::dynamic_pointer_cast<DARTCollision>(_parent);
   GZ_ASSERT(_collisionParent.get(), "Parent must be a DARTCollisionPtr");
 
-  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->GetDARTBodyNode();
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
 
   if (!bodyNode.get()) gzerr << "BodyNode is NULL in Init!\n";
   GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL Init!");
@@ -62,36 +62,36 @@ void DARTBoxShape::Init()
 
 
 //////////////////////////////////////////////////
-void DARTBoxShape::SetSize(const math::Vector3 &_size)
+void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
-  if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+  if (_size.X() < 0 || _size.Y() < 0 || _size.Z() < 0)
   {
     gzerr << "Box shape does not support negative size\n";
     return;
   }
-  math::Vector3 size = _size;
-  if (ignition::math::equal(size.x, 0.0))
+  ignition::math::Vector3d size = _size;
+  if (ignition::math::equal(size.X(), 0.0))
   {
     // Warn user, but still create shape with very small value
     // otherwise later resize operations using setLocalScaling
     // will not be possible
     gzwarn << "Setting box shape's x to zero is not supported in DART, "
            << "using 1e-4.\n";
-    size.x = 1e-4;
+    size.X() = 1e-4;
   }
 
-  if (ignition::math::equal(size.y, 0.0))
+  if (ignition::math::equal(size.Y(), 0.0))
   {
     gzwarn << "Setting box shape's y to zero is not supported in DART, "
            << "using 1e-4.\n";
-    size.y = 1e-4;
+    size.Y() = 1e-4;
   }
 
-  if (ignition::math::equal(size.z, 0.0))
+  if (ignition::math::equal(size.Z(), 0.0))
   {
     gzwarn << "Setting box shape's z to zero is not supported in DART "
            << "using 1e-4.\n";
-    size.z = 1e-4;
+    size.Z() = 1e-4;
   }
 
   BoxShape::SetSize(size);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ void JointController::Update()
            iter != this->dataPtr->positions.end(); ++iter)
       {
         double cmd = this->dataPtr->posPids[iter->first].Update(
-            this->dataPtr->joints[iter->first]->GetAngle(0).Radian() -
+            this->dataPtr->joints[iter->first]->Position(0) -
             iter->second, stepTime);
         this->dataPtr->joints[iter->first]->SetForce(0, cmd);
       }
@@ -171,7 +171,7 @@ void JointController::Update()
           this->dataPtr->positions.end())
       {
         this->dataPtr->positions[iter->first] =
-          iter->second->GetAngle(0).Radian();
+          iter->second->Position(0);
       }
     }
     this->SetJointPositions(this->dataPtr->positions);

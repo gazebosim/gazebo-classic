@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/VariablePill.hh"
 

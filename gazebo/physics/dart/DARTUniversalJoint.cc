@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -52,11 +54,12 @@ void DARTUniversalJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::Anchor(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
 
@@ -64,15 +67,16 @@ math::Vector3 DARTUniversalJoint::GetAnchor(unsigned int _index) const
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Vector3>(
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Axis" + std::to_string(_index));
   }
 
@@ -110,12 +114,12 @@ math::Vector3 DARTUniversalJoint::GetGlobalAxis(unsigned int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTUniversalJoint::SetAxis(unsigned int _index,
-    const math::Vector3 &_axis)
+void DARTUniversalJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (!this->dataPtr->IsInitialized())
   {
@@ -126,7 +130,7 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
   }
 
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-      this->GetAxisFrameOffset(_index).RotateVector(_axis));
+      this->AxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
       = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
   dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
@@ -154,25 +158,22 @@ void DARTUniversalJoint::SetAxis(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTUniversalJoint::GetAngleImpl(unsigned int _index) const
+double DARTUniversalJoint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<math::Angle>(
-          "Angle" + std::to_string(_index));
+    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
   }
 
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else if (_index == 1)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(1);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(1);
   }
   else
   {
@@ -215,7 +216,7 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
     this->dataPtr->dtJoint->setVelocity(_index, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";

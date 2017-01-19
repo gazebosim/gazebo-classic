@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -245,12 +245,6 @@ namespace gazebo
       public: event::ConnectionPtr ConnectNewLaserFrame(
         std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
-
-      /// \brief Disconnect Laser Frame.
-      /// \param[in,out] _conn Connection pointer to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual bool IsActive() const;

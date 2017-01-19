@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,12 +98,6 @@ namespace gazebo
                   std::function<void (const float *_frame, unsigned int _width,
                   unsigned int _height, unsigned int _depth,
                   const std::string &_format)> _subscriber);
-
-      /// \brief Disconnect from a laser frame signal
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the number of laser samples in the width and height
       /// \param[in] _w Number of samples in the horizontal sweep

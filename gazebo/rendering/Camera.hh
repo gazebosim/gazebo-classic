@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,10 @@
 #include <deque>
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -59,11 +60,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Pose;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -160,12 +156,6 @@ namespace gazebo
       /// \brief Get the camera's orientation in the world
       /// \return The camera's orientation as an ignition::math::Quaterniond
       public: ignition::math::Quaterniond WorldRotation() const;
-
-      /// \brief Set the global pose of the camera
-      /// \param[in] _pose The new math::Pose of the camera
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: virtual void SetWorldPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the global pose of the camera
       /// \param[in] _pose The new ignition::math::Pose3d of the camera
@@ -384,18 +374,6 @@ namespace gazebo
       /// \param[in] _s Set to True to render objects as wireframe
       public: void ShowWireframe(const bool _s);
 
-      /// \brief Get a world space ray as cast from the camera
-      /// through the viewport
-      /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
-      /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
-      /// \param[out] _origin Origin in the world coordinate frame of the
-      /// resulting ray
-      /// \param[out] _dir Direction of the resulting ray
-      /// \deprecated See function that accepts ignition::math parameters.
-      public: void CameraToViewportRay(const int _screenx, const int _screeny,
-                  ignition::math::Vector3d &_origin,
-                  ignition::math::Vector3d &_dir) const;
-
       /// \brief Set whether to capture data
       /// \param[in] _value Set to true to capture data into a memory buffer.
       public: void SetCaptureData(const bool _value);
@@ -458,6 +436,18 @@ namespace gazebo
                   const ignition::math::Planed &_plane,
                   ignition::math::Vector3d &_result);
 
+      /// \brief Get a world space ray as cast from the camera
+      /// through the viewport
+      /// \param[in] _screenx X coordinate in the camera's viewport, in pixels.
+      /// \param[in] _screeny Y coordinate in the camera's viewport, in pixels.
+      /// \param[out] _origin Origin in the world coordinate frame of the
+      /// resulting ray
+      /// \param[out] _dir Direction of the resulting ray
+      public: virtual void CameraToViewportRay(const int _screenx,
+                  const int _screeny,
+                  ignition::math::Vector3d &_origin,
+                  ignition::math::Vector3d &_dir) const;
+
       /// \brief Set the camera's render target
       /// \param[in] _target Pointer to the render target
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
@@ -505,12 +495,6 @@ namespace gazebo
       public: event::ConnectionPtr ConnectNewImageFrame(
           std::function<void (const unsigned char *, unsigned int, unsigned int,
           unsigned int, const std::string &)> _subscriber);
-
-      /// \brief Disconnect from an image frame
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
@@ -595,7 +579,7 @@ namespace gazebo
       /// \brief Project 3D world coordinates to 2D screen coordinates
       /// \param[in] _pt 3D world coodinates
       /// \return _pt 2D screen coordinates
-      public: ignition::math::Vector2i Project(
+      public: virtual ignition::math::Vector2i Project(
           const ignition::math::Vector3d &_pt) const;
 
       /// \brief Get the visual tracked by this camera.

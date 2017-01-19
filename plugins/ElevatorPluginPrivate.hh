@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
@@ -302,6 +303,12 @@ namespace gazebo
 
     /// \brief Time to hold the door in the open state.
     public: common::Time doorWaitTime;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication
+    public: ignition::transport::Node nodeIgn;
   };
 }
 #endif

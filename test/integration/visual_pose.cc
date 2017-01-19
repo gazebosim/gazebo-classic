@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ void VisualPoseTest::VisualPose()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("test/worlds/visual_pose.world", true, false, true);
+  this->Load("test/worlds/visual_pose.world", true, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");
@@ -68,12 +68,12 @@ void VisualPoseTest::VisualPose()
   // Get box model (physics)
   auto boxModel = world->ModelByName("box");
   QVERIFY(boxModel != NULL);
-  QVERIFY(boxModel->GetWorldPose().Ign() == boxModelVisPose);
+  QVERIFY(boxModel->WorldPose() == boxModelVisPose);
 
   // Get box link (physics)
   auto boxLink = boxModel->GetLink("link");
   QVERIFY(boxLink != NULL);
-  QVERIFY(boxLink->GetRelativePose().Ign() == boxLinkVisPose);
+  QVERIFY(boxLink->RelativePose() == boxLinkVisPose);
 
   // Get box visual id (physics)
   uint32_t boxVisualId;
@@ -94,8 +94,8 @@ void VisualPoseTest::VisualPose()
   // Check that only visual pose changed (physics)
   QVERIFY(boxLink->VisualPose(boxVisualId, boxVisualPose));
   QVERIFY(boxVisualPose == newVisualPose);
-  QVERIFY(boxLinkVisPose == boxLink->GetRelativePose().Ign());
-  QVERIFY(boxModelVisPose == boxModel->GetRelativePose().Ign());
+  QVERIFY(boxLinkVisPose == boxLink->RelativePose());
+  QVERIFY(boxModelVisPose == boxModel->RelativePose());
 
   // Check that only visual pose changed (rendering)
   QVERIFY(newVisualPose == boxVisualVis->Pose());

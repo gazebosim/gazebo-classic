@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #ifndef _BULLETHINGE2JOINT_HH_
 #define _BULLETHINGE2JOINT_HH_
 
-#include "gazebo/math/Angle.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
@@ -55,17 +54,16 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis);
+      public: virtual void SetAxis(const unsigned int _index,
+                  const ignition::math::Vector3d &_axis);
 
-      // Documentation inherited.
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const;
-
-      // Documentation inherited.
-      public: math::Angle GetAngle(unsigned int _index) const;
+      // Function not implemented, will be removed in Gazebo 9.
+      public: virtual math::Vector3 GetAxis(unsigned int _index) const
+          GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       public: double GetVelocity(unsigned int _index) const;
@@ -74,24 +72,25 @@ namespace gazebo
       public: virtual void SetVelocity(unsigned int _index, double _angle);
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual math::Angle GetHighStop(unsigned int _index);
+      public: virtual double UpperLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetLowStop(unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      public: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _torque);
@@ -99,13 +98,13 @@ namespace gazebo
       /// \brief Pointer to bullet hinge2 constraint
       private: btHinge2Constraint *bulletHinge2;
 
-      /// \brief Offset angle used in GetAngleImpl, so that angles are reported
+      /// \brief Offset angle used in PositionImpl, so that angles are reported
       /// relative to the initial configuration.
       private: double angleOffset[2];
 
       /// \brief Initial value of joint axis, expressed as unit vector
       /// in world frame.
-      private: math::Vector3 initialWorldAxis[2];
+      private: ignition::math::Vector3d initialWorldAxis[2];
     };
 
   /// \}

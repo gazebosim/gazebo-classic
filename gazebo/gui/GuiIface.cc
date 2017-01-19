@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,8 @@ void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
     const QString &_msg)
 {
   std::string msg = _msg.toStdString();
-  msg += "(" + _context.function + ")";
+  if (_context.function)
+    msg += std::string("(") + _context.function + ")";
 #else
 void messageHandler(QtMsgType _type, const char *_msg)
 {

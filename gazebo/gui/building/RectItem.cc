@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -906,7 +906,7 @@ void RectItem::SetPosition(double _x, double _y)
 /////////////////////////////////////////////////
 void RectItem::SetRotation(double _angle)
 {
-  this->rotate(_angle - this->rotationAngle);
+  this->setRotation(_angle);
   this->rotationAngle = _angle;
   emit YawChanged(this->rotationAngle);
 }

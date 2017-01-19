@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ namespace gazebo
       ///        the body
       /// \param[in] _posStart Start position, relative the body
       /// \param[in] _posEnd End position, relative to the body
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+      public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
+                                     const ignition::math::Vector3d &_posEnd);
 
       /// \internal
       /// \brief Pointer to private data

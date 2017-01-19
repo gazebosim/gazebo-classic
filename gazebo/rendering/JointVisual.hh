@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
 #define GAZEBO_RENDERING_JOINTVISUAL_HH_
 
 #include <string>
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -57,7 +59,8 @@ namespace gazebo
       /// joint types that have more than 1 axis.
       /// \param[in] _msg Joint message
       /// \param[in] _pose Pose of the joint visual in world coordinates.
-      public: void Load(ConstJointPtr &_msg, const math::Pose &_worldPose);
+      public: void Load(ConstJointPtr &_msg,
+                        const ignition::math::Pose3d &_worldPose);
 
       /// \brief Create an axis and attach it to the joint visual.
       /// \param[in] _axis Axis vector
@@ -65,8 +68,8 @@ namespace gazebo
       /// joint frame.
       /// \param[in] _type Type of axis.
       /// \returns Newly created arrow visual.
-      public: ArrowVisualPtr CreateAxis(const math::Vector3 &_axis,
-          bool _useParentFrame, msgs::Joint::Type _type);
+      public: ArrowVisualPtr CreateAxis(const ignition::math::Vector3d &_axis,
+          const bool _useParentFrame, const msgs::Joint::Type &_type);
 
       // Documentation Inherited.
       public: virtual void SetVisible(bool _visible, bool _cascade = true);
@@ -82,8 +85,8 @@ namespace gazebo
       /// joint frame.
       /// \param[in] _type Type of axis.
       public: void UpdateAxis(ArrowVisualPtr _arrowVisual,
-          const math::Vector3 &_axis, bool _useParentFrame,
-          msgs::Joint::Type _type);
+          const ignition::math::Vector3d &_axis, const bool _useParentFrame,
+          const msgs::Joint::Type &_type);
 
       /// \brief Get the JointVisual which is attached to the parent link.
       /// returns Parent axis visual.

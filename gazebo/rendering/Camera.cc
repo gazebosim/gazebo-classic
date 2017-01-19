@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -313,7 +314,7 @@ void Camera::Update()
       msg.ParseFromString((*iter).data());
       bool result = false;
 
-      if (msg.id() < GZ_UINT32_MAX)
+      if (msg.id() < ignition::math::MAX_UI32)
         result = this->AttachToVisualImpl(msg.id(),
             msg.inherit_orientation(), msg.min_dist(), msg.max_dist());
       else
@@ -578,13 +579,6 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 {
   Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
   return ignition::math::Quaterniond(rot.w, rot.x, rot.y, rot.z);
-}
-
-//////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
-{
-  this->SetWorldPosition(_pose.pos.Ign());
-  this->SetWorldRotation(_pose.rot.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1487,7 +1481,7 @@ void Camera::AttachToVisual(const std::string &_visualName,
   else
   {
     gzerr << "Unable to attach to visual with name[" << _visualName << "]\n";
-    track.set_id(GZ_UINT32_MAX);
+    track.set_id(ignition::math::MAX_UI32);
   }
 
   track.set_name(_visualName);
@@ -1912,12 +1906,6 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 }
 
 //////////////////////////////////////////////////
-void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
-{
-  this->newImageFrame.Disconnect(_c->Id());
-}
-
-/////////////////////////////////////////////////
 VisualPtr Camera::TrackedVisual() const
 {
   return this->dataPtr->trackedVisual;

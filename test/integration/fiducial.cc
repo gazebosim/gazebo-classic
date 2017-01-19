@@ -137,7 +137,7 @@ TEST_F(FiducialCameraTest, Fiducial)
 
   // test occlusion by spawning a box over fiducial_02
   ignition::math::Vector3d boxPos(ignition::math::Vector3d(0, 0, 1) +
-      fiducial02->GetWorldPose().pos.Ign());
+      fiducial02->WorldPose().Pos());
 
   SpawnBox("test_box", ignition::math::Vector3d::One, boxPos,
       ignition::math::Vector3d::Zero);

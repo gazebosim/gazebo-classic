@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,20 +63,6 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->tabWidget->addTab(this->dataPtr->modelTree, tr("Model"));
 
   GZ_ASSERT(this->tabWidget != NULL, "Editor tab widget is NULL");
-
-  rendering::CameraPtr camera = boost::dynamic_pointer_cast<rendering::Camera>(
-      gui::get_active_camera());
-  if (camera)
-  {
-    this->dataPtr->materialSwitcher.reset(new EditorMaterialSwitcher(camera));
-  }
-  else
-  {
-    gzerr << "User camera is NULL. "
-        << "Non-editable models will keep their original material"
-        << std::endl;
-  }
-
 
   this->dataPtr->schematicViewAct = NULL;
   this->dataPtr->svWidget = NULL;
@@ -144,6 +130,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
+
+  this->dataPtr->showLinkFramesAct = new QAction(tr("Link Frames"), this);
+  this->dataPtr->showLinkFramesAct->setStatusTip(tr("Show Link Frames"));
+  this->dataPtr->showLinkFramesAct->setCheckable(true);
+  this->dataPtr->showLinkFramesAct->setChecked(true);
+  this->connect(this->dataPtr->showLinkFramesAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowLinkFrames(bool)));
 
   // Clone actions from main window
   this->dataPtr->showToolbarsAct =
@@ -370,6 +363,7 @@ void ModelEditor::CreateMenus()
   viewMenu->addAction(this->dataPtr->showCollisionsAct);
   viewMenu->addAction(this->dataPtr->showVisualsAct);
   viewMenu->addAction(this->dataPtr->showJointsAct);
+  viewMenu->addAction(this->dataPtr->showLinkFramesAct);
 
   QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
   if (this->dataPtr->schematicViewAct)
@@ -379,6 +373,15 @@ void ModelEditor::CreateMenus()
   }
   windowMenu->addAction(this->dataPtr->showToolbarsAct);
   windowMenu->addAction(this->dataPtr->fullScreenAct);
+
+  // OSX:
+  // There is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  //
+  // Ubuntu Xenial + Unity:
+  // The native menubar is not registering shortcuts (issue #2134)
+  this->dataPtr->menuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////
@@ -507,7 +510,27 @@ void ModelEditor::OnFinish()
 void ModelEditor::ToggleMaterialScheme()
 {
   if (this->dataPtr->active)
+  {
+    if (!this->dataPtr->materialSwitcher)
+    {
+      rendering::CameraPtr camera =
+          boost::dynamic_pointer_cast<rendering::Camera>(
+          gui::get_active_camera());
+      if (camera)
+      {
+        this->dataPtr->materialSwitcher.reset(
+            new EditorMaterialSwitcher(camera));
+      }
+      else
+      {
+        gzerr << "User camera is NULL. "
+            << "Non-editable models will keep their original material"
+            << std::endl;
+      }
+    }
+
     this->dataPtr->materialSwitcher->SetMaterialScheme("ModelEditor");
+  }
   else
     this->dataPtr->materialSwitcher->SetMaterialScheme("");
 }

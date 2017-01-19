@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/transport.hh>
@@ -106,6 +107,12 @@ namespace gazebo
 
     /// \brief Subscriber for listening to changing arrangements.
     protected: transport::SubscriberPtr sub;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for Gazebo transport.
+    protected: ignition::transport::Node nodeIgn;
   };
 }
 #endif

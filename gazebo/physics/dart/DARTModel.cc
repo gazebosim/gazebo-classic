@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,7 @@ void DARTModel::Init()
     DARTModelPrivate::BodyNodeBuildData bodyNodeBD;
     bodyNodeBD.dartLink = dartLink;
     bodyNodeBD.properties = dartLink->DARTProperties();
-    bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->GetWorldPose());
+    bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->WorldPose());
     bodyNodeBD.type = dartLink->IsSoftBody() ? "soft" : "";
 
     bodyNodeMap[dartLink->GetName()] = bodyNodeBD;
@@ -225,9 +225,9 @@ void DARTModel::Init()
       for (size_t j = i + 1; j < linkList.size(); ++j)
       {
         dart::dynamics::BodyNode *itdtBodyNode1 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[i])->GetDARTBodyNode();
+          boost::dynamic_pointer_cast<DARTLink>(linkList[i])->DARTBodyNode();
         dart::dynamics::BodyNode *itdtBodyNode2 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[j])->GetDARTBodyNode();
+          boost::dynamic_pointer_cast<DARTLink>(linkList[j])->DARTBodyNode();
 
         // If this->dtBodyNode and itdtBodyNode are connected then don't enable
         // the pair.

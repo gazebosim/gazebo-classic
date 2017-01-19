@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,7 +124,14 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->world->Gravity();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -353,4 +360,17 @@ sdf::ElementPtr PhysicsEngine::GetSDF() const
 WorldPtr PhysicsEngine::World() const
 {
   return this->world;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetGravity(const math::Vector3 &_gravity)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->SetGravity(_gravity.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

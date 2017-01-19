@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include <sstream>
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/physics/SurfaceParams.hh"
 
@@ -80,7 +79,7 @@ void DARTCollision::Init()
 
     if (!isPlaneShape)
     {
-      Eigen::Isometry3d tf = DARTTypes::ConvPose(this->GetRelativePose());
+      Eigen::Isometry3d tf = DARTTypes::ConvPose(this->RelativePose());
       this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
     }
   }
@@ -123,17 +122,19 @@ unsigned int DARTCollision::GetCollideBits() const
 }
 
 //////////////////////////////////////////////////
-gazebo::math::Box DARTCollision::GetBoundingBox() const
+ignition::math::Box DARTCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result(0, 0, 0, 0, 0, 0);
+
   gzerr << "DART does not provide bounding box info.\n";
+
   return result;
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
+dart::dynamics::BodyNode *DARTCollision::DARTBodyNode() const
 {
-  return boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
+  return boost::static_pointer_cast<DARTLink>(this->link)->DARTBodyNode();
 }
 
 //////////////////////////////////////////////////
@@ -162,29 +163,29 @@ void DARTCollision::SetDARTCollisionShapeNode(
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::ShapePtr DARTCollision::GetDARTCollisionShapePtr() const
+dart::dynamics::ShapePtr DARTCollision::DARTCollisionShapePtr() const
 {
-  gzerr << "Deprecated. Use GetDARTCollisionShapeNode() instead.\n";
+  gzerr << "Deprecated. Use DARTCollisionShapeNode() instead.\n";
   GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
   return this->dataPtr->dtCollisionShape->getShape();
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::Shape *DARTCollision::GetDARTCollisionShape() const
+dart::dynamics::Shape *DARTCollision::DARTCollisionShape() const
 {
-  gzerr << "Deprecated. Use GetDARTCollisionShapeNode() instead.\n";
+  gzerr << "Deprecated. Use DARTCollisionShapeNode() instead.\n";
   GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
   return this->dataPtr->dtCollisionShape->getShape().get();
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::ShapeNodePtr DARTCollision::GetDARTCollisionShapeNode() const
+dart::dynamics::ShapeNodePtr DARTCollision::DARTCollisionShapeNode() const
 {
   return this->dataPtr->dtCollisionShape;
 }
 
 /////////////////////////////////////////////////
-DARTSurfaceParamsPtr DARTCollision::GetDARTSurface() const
+DARTSurfaceParamsPtr DARTCollision::DARTSurface() const
 {
   return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }

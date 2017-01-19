@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -819,7 +819,7 @@ void World::Update()
 
       for (auto &dirtyEntity : this->dataPtr->dirtyPoses)
       {
-        dirtyEntity->SetWorldPose(dirtyEntity->GetDirtyPose(), false);
+        dirtyEntity->SetWorldPose(dirtyEntity->DirtyPose(), false);
       }
 
       this->dataPtr->dirtyPoses.clear();
@@ -2218,7 +2218,14 @@ void World::ProcessFactoryMsgs()
 //////////////////////////////////////////////////
 ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->ModelBelowPoint(_pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2236,7 +2243,14 @@ ModelPtr World::ModelBelowPoint(const ignition::math::Vector3d &_pt) const
 //////////////////////////////////////////////////
 EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->EntityBelowPoint(_pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2538,7 +2552,7 @@ void World::ProcessMessages()
             // Publish the model's relative pose
             poseMsg->set_name(m->GetScopedName());
             poseMsg->set_id(m->GetId());
-            msgs::Set(poseMsg, m->GetRelativePose().Ign());
+            msgs::Set(poseMsg, m->RelativePose());
 
             // Publish each of the model's child links relative poses
             Link_V links = m->GetLinks();
@@ -2547,7 +2561,7 @@ void World::ProcessMessages()
               poseMsg = msg.add_pose();
               poseMsg->set_name(link->GetScopedName());
               poseMsg->set_id(link->GetId());
-              msgs::Set(poseMsg, link->GetRelativePose().Ign());
+              msgs::Set(poseMsg, link->RelativePose());
             }
 
             // add all nested models to the queue
@@ -2634,7 +2648,7 @@ void World::ProcessMessages()
         // \todo Change to relative once lights can be attached to links
         msgs::Light lightMsg;
         lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
+        msgs::Set(lightMsg.mutable_pose(), light->WorldPose());
         this->dataPtr->lightPub->Publish(lightMsg);
       }
     }

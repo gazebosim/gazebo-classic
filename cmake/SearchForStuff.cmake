@@ -565,9 +565,24 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
-if (NOT QT4_FOUND)
-  BUILD_ERROR("Missing: Qt4")
+find_package (Qt5Widgets)
+if (NOT Qt5Widgets_FOUND)
+  BUILD_ERROR("Missing: Qt5Widgets")
+endif()
+
+find_package (Qt5Core)
+if (NOT Qt5Core_FOUND)
+  BUILD_ERROR("Missing: Qt5Core")
+endif()
+
+find_package (Qt5OpenGL)
+if (NOT Qt5OpenGL_FOUND)
+  BUILD_ERROR("Missing: Qt5OpenGL")
+endif()
+
+find_package (Qt5Test)
+if (NOT Qt5Test_FOUND)
+  BUILD_ERROR("Missing: Qt5Test")
 endif()
 
 ########################################
@@ -692,29 +707,22 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.6 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
+find_package(ignition-math3 QUIET)
+if (NOT ignition-math3_FOUND)
+  message(STATUS "Looking for ignition-math3-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
 else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+  message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport2 QUIET)
-if (NOT ignition-transport2_FOUND)
-  find_package(ignition-transport1 QUIET)
-  if (NOT ignition-transport1_FOUND)
-    BUILD_ERROR ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
-  else()
-    message(STATUS "Looking for ignition-transport1-config.cmake - found")
-  endif()
+find_package(ignition-transport3 QUIET)
+if (NOT ignition-transport3_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport3-dev)")
 else()
-  message(STATUS "Looking for ignition-transport2-config.cmake - found")
-endif()
+  message(STATUS "Looking for ignition-transport3-config.cmake - found")
 
-if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
@@ -751,21 +759,15 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/local/lib/qwt.framework/Headers
   ${QWT_WIN_INCLUDE_DIR}
 
-  PATH_SUFFIXES qwt-qt4 qwt qwt5
+  PATH_SUFFIXES qwt qwt5
 )
 
-find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
   ${QWT_WIN_LIBRARY_DIR}
 )
-
-if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-  set(HAVE_QWT TRUE)
-else()
-  set(HAVE_QWT FALSE)
-endif ()
 
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
@@ -785,12 +787,12 @@ endif ()
 
 # in Windows, the path need to point to the parent to get correct qwt/foo headers
 if (WIN32)
-  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")	
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")
 endif()
 
-if (HAVE_QWT)
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY AND (NOT ${QWT_VERSION} VERSION_LESS 6.1.0))
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
-  message (STATUS "Looking for qwt - not found")
+  message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()

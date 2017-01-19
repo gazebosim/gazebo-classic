@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,8 @@ void JointVisual::Load(ConstJointPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
+void JointVisual::Load(ConstJointPtr &_msg,
+    const ignition::math::Pose3d &_worldPose)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
@@ -133,15 +134,15 @@ void JointVisual::Load(ConstJointPtr &_msg, const math::Pose &_worldPose)
       axis1Msg.use_parent_model_frame(), _msg->type());
 
   // joint pose is always relative to the child link so update axis pose
-  this->SetWorldPose(_worldPose.Ign());
+  this->SetWorldPose(_worldPose);
 
   this->GetSceneNode()->setInheritScale(false);
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
 
 /////////////////////////////////////////////////
-ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
-    bool _useParentFrame, msgs::Joint::Type _type)
+ArrowVisualPtr JointVisual::CreateAxis(const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame, const msgs::Joint::Type &_type)
 {
   ArrowVisualPtr axis;
 
@@ -159,13 +160,15 @@ ArrowVisualPtr JointVisual::CreateAxis(const math::Vector3 &_axis,
 
 /////////////////////////////////////////////////
 void JointVisual::UpdateAxis(ArrowVisualPtr _arrowVisual,
-    const math::Vector3 &_axis, bool _useParentFrame, msgs::Joint::Type _type)
+    const ignition::math::Vector3d &_axis,
+    const bool _useParentFrame,
+    const msgs::Joint::Type &_type)
 {
   JointVisualPrivate *dPtr =
       reinterpret_cast<JointVisualPrivate *>(this->dataPtr);
 
   // Get rotation to axis vector
-  ignition::math::Vector3d axisDir = _axis.Ign();
+  ignition::math::Vector3d axisDir = _axis;
   ignition::math::Vector3d u = axisDir.Normalize();
   ignition::math::Vector3d v = ignition::math::Vector3d::UnitZ;
   double cosTheta = v.Dot(u);

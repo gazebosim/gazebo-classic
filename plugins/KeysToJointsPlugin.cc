@@ -116,7 +116,7 @@ void KeysToJointsPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
     if (key.type == "position")
     {
-      auto currPos = key.joint->GetAngle(0).Radian();
+      auto currPos = key.joint->Position(0);
       controller->SetPositionTarget(key.joint->GetScopedName(),
           currPos + key.scale);
     }

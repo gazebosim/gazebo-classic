@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-
-#include "gazebo/math/Vector2d.hh"
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -53,8 +52,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-// Note: The value of GZ_UINT32_MAX is reserved as a flag.
-uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
+// Note: The value of ignition::math::MAX_UI32 is reserved as a flag.
+uint32_t VisualPrivate::visualIdCount = ignition::math::MAX_UI32 - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
@@ -346,7 +345,6 @@ void Visual::Load()
 {
   std::ostringstream stream;
   ignition::math::Pose3d pose;
-  Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
   if (this->dataPtr->parent)
@@ -392,10 +390,6 @@ void Visual::Load()
   // Set the pose of the scene node
   this->SetPose(pose);
   this->dataPtr->initialRelativePose = pose;
-
-  // Get the size of the mesh
-  if (obj)
-    meshSize = obj->getBoundingBox().getSize();
 
   // Keep transparency to set after setting material
   double sdfTransparency = -1;
@@ -526,6 +520,10 @@ void Visual::Load()
       rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
+
+  // Set invisible if this visual's layer is not active
+  if (!this->dataPtr->scene->LayerState(this->dataPtr->layer))
+    this->SetVisible(false);
 }
 
 //////////////////////////////////////////////////
@@ -578,12 +576,6 @@ void Visual::SetName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-std::string Visual::GetName() const
-{
-  return this->Name();
-}
-
-//////////////////////////////////////////////////
 std::string Visual::Name() const
 {
   return this->dataPtr->name;
@@ -623,7 +615,7 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      if (this->dataPtr->sceneNode)
+      if (this->dataPtr->sceneNode && childVis->GetSceneNode())
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       break;
     }
@@ -655,6 +647,11 @@ void Visual::AttachObject(Ogre::MovableObject *_obj)
           std::string newMaterialName;
           newMaterialName = this->dataPtr->sceneNode->getName() +
               "_MATERIAL_" + material->getName();
+
+          // keep a pointer to the original submesh material so it can be used
+          // to restore material state when setting transparency
+          this->dataPtr->submeshMaterials[newMaterialName] = material;
+
           material = material->clone(newMaterialName);
           subEntity->setMaterial(material);
         }
@@ -779,12 +776,6 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetScale(const math::Vector3 &_scale)
-{
-  this->SetScale(_scale.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->dataPtr->scale == _scale)
@@ -876,12 +867,6 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 ignition::math::Vector3d Visual::GetGeometrySize() const
 {
   return this->dataPtr->geomSize;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetScale()
-{
-  return this->Scale();
 }
 
 //////////////////////////////////////////////////
@@ -1484,33 +1469,75 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
       Ogre::Pass *pass;
       Ogre::ColourValue dc;
 
+      // see if the original ogre material associated with this sub-entity
+      // exists or not
+      Ogre::MaterialPtr origMat;
+      auto it = this->dataPtr->submeshMaterials.find(material->getName());
+      if (it != this->dataPtr->submeshMaterials.end())
+        origMat = it->second;
+
       for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
            ++techniqueCount)
       {
         technique = material->getTechnique(techniqueCount);
 
+        // get original material technique
+        Ogre::Technique *origTechnique = nullptr;
+        if (!origMat.isNull()
+            && (techniqueCount < origMat->getNumTechniques()))
+        {
+          origTechnique = material->getTechnique(techniqueCount);
+        }
+
         for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
         {
           pass = technique->getPass(passCount);
 
-          // Need to fix transparency
-          if (!pass->isProgrammable() &&
-              pass->getPolygonMode() == Ogre::PM_SOLID)
+          // get original material pass
+          Ogre::Pass *origPass = nullptr;
+          if (origTechnique)
           {
-            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+            origPass =
+                origMat->getTechnique(techniqueCount)->getPass(passCount);
           }
 
-          if (derivedTransparency > 0.0)
+          // account for the diffuse alpha value in the ogre material script
+          // in addtion to the <transparency> value in sdf.
+          float origPassAlpha = 1.0;
+          if (origPass)
           {
+            Ogre::ColourValue origPassDiffuse = origPass->getDiffuse();
+            origPassAlpha = origPassDiffuse.a;
+          }
+          float passDerivedTransparency = 1.0f -
+              (1.0f - derivedTransparency) * origPassAlpha;
+
+          if (passDerivedTransparency > 0.0)
+          {
+            // set up ogre material pass to render transparent objects
             pass->setDepthWriteEnabled(false);
+            if (!pass->isProgrammable() &&
+                pass->getPolygonMode() == Ogre::PM_SOLID)
+            {
+              pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+            }
           }
           else
           {
-            pass->setDepthWriteEnabled(true);
+            // restore original ogre material pass properties when transparency
+            // is turned off
+            bool depthWrite = true;
+            if (origPass)
+            {
+              pass->setSceneBlending(origPass->getSourceBlendFactor(),
+                  origPass->getDestBlendFactor());
+              depthWrite = origPass->getDepthWriteEnabled();
+            }
+            pass->setDepthWriteEnabled(depthWrite);
           }
 
           dc = pass->getDiffuse();
-          dc.a = (1.0f - derivedTransparency);
+          dc.a = (1.0f - passDerivedTransparency);
           pass->setDiffuse(dc);
           this->dataPtr->diffuse = Conversions::Convert(dc);
 
@@ -1524,7 +1551,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
             {
               textureUnitState->setAlphaOperation(
                   Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                  1.0 - derivedTransparency);
+                  1.0 - passDerivedTransparency);
             }
           }
         }
@@ -1713,24 +1740,12 @@ bool Visual::GetVisible() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPosition(const math::Vector3 &_pos)
-{
-  this->SetPosition(_pos.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 {
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
   this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetRotation(const math::Quaternion &_rot)
-{
-  this->SetRotation(_rot.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1744,22 +1759,10 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPose(const math::Pose &_pose)
-{
-  this->SetPose(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->SetPosition(_pose.Pos());
   this->SetRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetPosition() const
-{
-  return this->Position();
 }
 
 //////////////////////////////////////////////////
@@ -1771,23 +1774,11 @@ ignition::math::Vector3d Visual::Position() const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Visual::GetRotation() const
-{
-  return this->Rotation();
-}
-
-//////////////////////////////////////////////////
 ignition::math::Quaterniond Visual::Rotation() const
 {
   if (!this->dataPtr->sceneNode)
     return ignition::math::Quaterniond::Identity;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetPose() const
-{
-  return this->Pose();
 }
 
 //////////////////////////////////////////////////
@@ -1806,22 +1797,10 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose &_pose)
-{
-  this->SetWorldPose(_pose.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
   this->SetWorldRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetWorldPosition(const math::Vector3 &_pos)
-{
-  this->SetWorldPosition(_pos.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1833,23 +1812,11 @@ void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldRotation(const math::Quaternion &_q)
-{
-  this->SetWorldRotation(_q.Ign());
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 {
   if (!this->dataPtr->sceneNode)
     return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetWorldPose() const
-{
-  return this->WorldPose();
 }
 
 //////////////////////////////////////////////////
@@ -1878,7 +1845,6 @@ Ogre::SceneNode * Visual::GetSceneNode() const
 {
   return this->dataPtr->sceneNode;
 }
-
 
 //////////////////////////////////////////////////
 bool Visual::IsStatic() const
@@ -2020,12 +1986,6 @@ void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 std::string Visual::GetMaterialName() const
 {
   return this->dataPtr->myMaterialName;
-}
-
-//////////////////////////////////////////////////
-math::Box Visual::GetBoundingBox() const
-{
-  return this->BoundingBox();
 }
 
 //////////////////////////////////////////////////
@@ -2404,7 +2364,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->meta().has_layer())
     {
       this->dataPtr->layer = _msg->meta().layer();
-      rendering::Events::newLayer(this->dataPtr->layer);
+      if (!this->dataPtr->scene->HasLayer(this->dataPtr->layer))
+        rendering::Events::newLayer(this->dataPtr->layer);
+
+      // Set invisible if this visual's layer is not active
+      this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
     }
   }
 
@@ -2541,66 +2505,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if (_msg->material().has_lighting())
-    {
-      this->SetLighting(_msg->material().lighting());
-    }
-
-    if (_msg->material().has_script())
-    {
-      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
-      {
-        RenderEngine::Instance()->AddResourcePath(
-            _msg->material().script().uri(i));
-      }
-      if (_msg->material().script().has_name() &&
-          !_msg->material().script().name().empty())
-      {
-        this->SetMaterial(_msg->material().script().name());
-      }
-    }
-
-    if (_msg->material().has_ambient())
-      this->SetAmbient(msgs::Convert(_msg->material().ambient()));
-
-    if (_msg->material().has_diffuse())
-      this->SetDiffuse(msgs::Convert(_msg->material().diffuse()));
-
-    if (_msg->material().has_specular())
-      this->SetSpecular(msgs::Convert(_msg->material().specular()));
-
-    if (_msg->material().has_emissive())
-      this->SetEmissive(msgs::Convert(_msg->material().emissive()));
-
-
-    if (_msg->material().has_shader_type())
-    {
-      if (_msg->material().shader_type() == msgs::Material::VERTEX)
-      {
-        this->SetShaderType("vertex");
-      }
-      else if (_msg->material().shader_type() == msgs::Material::PIXEL)
-      {
-        this->SetShaderType("pixel");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-      {
-        this->SetShaderType("normal_map_object_space");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-      {
-        this->SetShaderType("normal_map_tangent_space");
-      }
-      else
-      {
-        gzerr << "Unrecognized shader type" << std::endl;
-      }
-
-      if (_msg->material().has_normal_map())
-        this->SetNormalMap(_msg->material().normal_map());
-    }
+    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
   }
 
   if (_msg->has_transparency())
@@ -2874,20 +2779,6 @@ bool Visual::GetCenterSubMesh() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
-                             double _time,
-                             std::function<void()> _onComplete)
-{
-  std::vector<ignition::math::Pose3d> pts;
-  for (auto const &pt : _pts)
-  {
-    pts.push_back(pt.Ign());
-  }
-
-  this->MoveToPositions(pts, _time, _onComplete);
-}
-
-//////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              const double _time,
                              std::function<void()> _onComplete)
@@ -2935,12 +2826,6 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
     this->dataPtr->preRenderConnection =
       event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
   }
-}
-
-//////////////////////////////////////////////////
-void Visual::MoveToPosition(const math::Pose &_pose, double _time)
-{
-  this->MoveToPosition(_pose.Ign(), _time);
 }
 
 //////////////////////////////////////////////////
@@ -3412,6 +3297,15 @@ void Visual::ToggleLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetLayer(const int32_t _layer)
+{
+  this->dataPtr->layer = _layer;
+
+  // Set invisible if this visual's layer is not active
+  this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
+}
+
+//////////////////////////////////////////////////
 Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
 {
   Visual::VisualType visualType = Visual::VT_ENTITY;
@@ -3516,4 +3410,131 @@ void Visual::AddPendingChild(std::pair<VisualType,
   msg->CopyFrom(*_pair.second);
 
   this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
+}
+
+/////////////////////////////////////////////////
+void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
+{
+  if (_msg.has_lighting())
+  {
+    this->SetLighting(_msg.lighting());
+  }
+
+  if (_msg.has_script())
+  {
+    for (int i = 0; i < _msg.script().uri_size(); ++i)
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg.script().uri(i));
+    }
+    if (_msg.script().has_name() &&
+        !_msg.script().name().empty())
+    {
+      this->SetMaterial(_msg.script().name());
+    }
+  }
+
+  if (_msg.has_ambient())
+  {
+    this->SetAmbient(common::Color(
+          _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
+          _msg.ambient().a()));
+  }
+
+  if (_msg.has_diffuse())
+  {
+    this->SetDiffuse(common::Color(
+          _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
+          _msg.diffuse().a()));
+  }
+
+  if (_msg.has_specular())
+  {
+    this->SetSpecular(common::Color(
+          _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
+          _msg.specular().a()));
+  }
+
+  if (_msg.has_emissive())
+  {
+    this->SetEmissive(common::Color(
+          _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
+          _msg.emissive().a()));
+  }
+
+  if (_msg.has_shader_type())
+  {
+    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
+    {
+      this->SetShaderType("vertex");
+    }
+    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+    {
+      this->SetShaderType("pixel");
+    }
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    {
+      this->SetShaderType("normal_map_object_space");
+    }
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    {
+      this->SetShaderType("normal_map_tangent_space");
+    }
+    else
+    {
+      gzerr << "Unrecognized shader type" << std::endl;
+    }
+
+    if (_msg.has_normal_map())
+      this->SetNormalMap(_msg.normal_map());
+  }
+}
+
+/////////////////////////////////////////////////
+void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
+{
+  _msg.set_lighting(this->GetLighting());
+
+  if (!this->dataPtr->origMaterialName.empty())
+  {
+    // \todo: Material URI's that are specific to a visual are not
+    // recoverable. Refer to the Visual::ProcessMaterialMsg function
+    _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
+  }
+
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+
+  if (!this->GetNormalMap().empty())
+    _msg.set_normal_map(this->GetNormalMap());
+
+  if (this->GetShaderType().compare("vertex") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::VERTEX);
+  else if (this->GetShaderType().compare("pixel") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::PIXEL);
+  else if (this->GetShaderType().compare("normal_map_object_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  else if (this->GetShaderType().compare("normal_map_tangent_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  else if (!this->GetShaderType().empty())
+    gzerr << "Unrecognized shader type[" << this->GetShaderType() << "]\n";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_RENDERING_SCENE_HH_
-#define _GAZEBO_RENDERING_SCENE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_HH_
+#define GAZEBO_RENDERING_SCENE_HH_
 
 #include <memory>
 #include <string>
@@ -68,6 +68,33 @@ namespace gazebo
 
     /// \class Scene Scene.hh rendering/rendering.hh
     /// \brief Representation of an entire scene graph.
+    ///
+    /// ## Visualization Markers
+    /// Visualization markers are shapes and meshes that have no kinematic
+    /// or dynamic properties. Their primary use is to visually augment the
+    /// rendering scene.
+    ///
+    /// See `gazebo/examples/stand_alone/marker` for an example program that
+    /// manipulates visualization markers.
+    ///
+    /// The `gz marker` command line tool can also be used to manipulate
+    /// visualization markers. For more information use:
+    ///
+    ///    $ gz marker -h
+    ///
+    /// ### Visualization marker services
+    /// The following [Ignition Transport](
+    /// http://ignitionrobotics.org/libraries/transport) services
+    /// can be use to create,
+    /// modify, delete, and list visualization markers.
+    ///
+    /// 1. /marker
+    ///   * Request message type: ign_msgs.Marker
+    ///   * Response mssage type: ign_msgs.StringMsg
+    ///   * Purpose: Add, modify, or delete a visualization marker.
+    /// 1. /marker/list
+    ///   * Response mssage type: ign_msgs.Marker_V
+    ///   * Purpose: Get the list of markers.
     ///
     /// Maintains all the Visuals, Lights, and Cameras for a World.
     class GZ_RENDERING_VISIBLE Scene :
@@ -503,6 +530,19 @@ namespace gazebo
       /// toggled. Visuals with a negative layer index are always visible.
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
+
+      /// \brief Return whether a layer is on or off. A negative layer
+      /// is always active.
+      /// \param[in] _layer Index of the layer to check.
+      /// \return True if the layer is active, false otherwise. True is also
+      /// returned if _layer is negative.
+      public: bool LayerState(const int32_t _layer) const;
+
+      /// \brief Return true if the layer exits.
+      /// \param[in] _layer Index of the layer to check for existance.
+      /// \return True if the layer exists, otherwise false. All negative
+      /// value of _layer return true.
+      public: bool HasLayer(const int32_t _layer) const;
 
       /// \brief Helper function to setup the sky.
       private: void SetSky();

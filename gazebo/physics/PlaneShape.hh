@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  *
 */
-/* Desc: Plane shape
- * Author: Nate Koenig
- * Date: 14 Oct 2009
- */
+#ifndef GAZEBO_PHYSICS_PLANESHAPE_HH_
+#define GAZEBO_PHYSICS_PLANESHAPE_HH_
 
-#ifndef _PLANESHAPE_HH_
-#define _PLANESHAPE_HH_
+#include <ignition/math/Vector2.hh>
 
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/physics/Shape.hh"
@@ -55,27 +52,54 @@ namespace gazebo
 
       /// \brief Set the altitude of the plane.
       /// \param[in] _pos Position of the plane.
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      /// \deprecated See version that accepts an ignition math object.
+      public: virtual void SetAltitude(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the altitude of the plane.
+      /// \param[in] _pos Position of the plane.
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
-      public: void SetNormal(const math::Vector3 &_norm);
+      /// \deprecated See function which accepts an ignition math object.
+      public: void SetNormal(const math::Vector3 &_norm) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the normal.
+      /// \param[in] _norm Plane normal.
+      public: void SetNormal(const ignition::math::Vector3d &_norm);
 
       /// \brief Get the plane normal.
       /// \return The plane normal.
-      public: math::Vector3 GetNormal() const;
+      /// \deprecated See ignition::math::Vector3d Normal() const;
+      public: math::Vector3 GetNormal() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the plane normal.
+      /// \return The plane normal.
+      public: ignition::math::Vector3d Normal() const;
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.
-      public: void SetSize(const math::Vector2d &_size);
+      /// \deprecated Use function which accepts ignition math.
+      public: void SetSize(const math::Vector2d &_size)
+          GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the size.
+      /// \param[in] _size 2D size of the plane.
+      public: void SetSize(const ignition::math::Vector2d &_size);
 
       /// \brief Get the size.
       /// \return Size of the plane.
-      public: math::Vector2d GetSize() const;
+      /// \deprecated Use function which returns ignition math.
+      public: math::Vector2d GetSize() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the size.
+      /// \return Size of the plane.
+      public: ignition::math::Vector2d Size() const;
 
       /// \brief Set the scale of the plane.
       /// \return _scale Scale to set the plane to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Fill a geometry message with data from this object.
       /// \param[out] _msg Message to fill.

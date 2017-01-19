@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,14 @@ void ModelManipulator::Detach()
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->RotateEntity(_vis, _axis.Ign(), _local);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -186,7 +193,14 @@ math::Vector3 ModelManipulator::GetMousePositionOnPlane(
     rendering::CameraPtr _camera,
     const common::MouseEvent &_event)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return MousePositionOnPlane(_camera, _event);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -212,7 +226,14 @@ ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
 math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
     double _interval, double _sensitivity)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return SnapPoint(_point.Ign(), _interval, _sensitivity);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -266,8 +287,15 @@ math::Vector3 ModelManipulator::GetMouseMoveDistance(
     const math::Vector2i &_start, const math::Vector2i &_end,
     const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(), _pose.Ign(),
       _axis.Ign(), _local);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -371,7 +399,14 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
 void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->ScaleEntity(_vis, _axis.Ign(), _local);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -553,7 +588,14 @@ ignition::math::Vector3d ModelManipulator::UpdateScale(
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const math::Vector3 &_axis, bool _local)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->TranslateEntity(_vis, _axis.Ign(), _local);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -678,7 +720,7 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   rendering::VisualPtr vis;
   std::string manipState;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseStart,
+      = this->dataPtr->userCamera->Visual(this->dataPtr->mouseStart,
       manipState);
 
   this->dataPtr->selectionObj->SetState(manipState);
@@ -877,7 +919,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
   else
   {
     std::string manipState;
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos(),
+    this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos(),
         manipState);
     this->dataPtr->selectionObj->SetState(manipState);
 
@@ -885,7 +927,7 @@ void ModelManipulator::OnMouseMoveEvent(const common::MouseEvent &_event)
       QApplication::setOverrideCursor(Qt::OpenHandCursor);
     else
     {
-      rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+      rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
           this->dataPtr->mouseEvent.Pos());
 
       if (vis && !vis->IsPlane())
@@ -926,7 +968,7 @@ void ModelManipulator::OnMouseReleaseEvent(const common::MouseEvent &_event)
     if (this->dataPtr->mouseEvent.Button() == common::MouseEvent::LEFT)
     {
       rendering::VisualPtr vis =
-        this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+        this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
       if (vis && vis->IsPlane())
       {
         this->dataPtr->selectionObj->SetMode(
@@ -1010,7 +1052,7 @@ void ModelManipulator::OnKeyPressEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = true;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1037,7 +1079,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->WorldPose();
       }
     }
-    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
+    else if (!this->dataPtr->keyEvent.shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);
@@ -1068,7 +1110,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(yaw / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(yaw - snap) < GZ_DTOR(10))
+      if (fabs(yaw - snap) < IGN_DTOR(10))
         yaw = snap;
     }
 
@@ -1084,7 +1126,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(pitch / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(pitch - snap) < GZ_DTOR(10))
+      if (fabs(pitch - snap) < IGN_DTOR(10))
         pitch = snap;
     }
 
@@ -1102,7 +1144,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
     {
       double snap = rint(roll / (M_PI * .25)) * (M_PI * 0.25);
 
-      if (fabs(roll - snap) < GZ_DTOR(10))
+      if (fabs(roll - snap) < IGN_DTOR(10))
         roll = snap;
     }
 

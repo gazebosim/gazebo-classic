@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -862,10 +862,4 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
 }

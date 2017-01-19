@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Assert.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
@@ -175,6 +174,12 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
+const std::string &MovableText::GetText() const
+{
+  return this->text;
+}
+
+//////////////////////////////////////////////////
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -260,14 +265,14 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+ignition::math::Box MovableText::AABB()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
-      math::Vector3(this->aabb->getMinimum().x,
+  return ignition::math::Box(
+      ignition::math::Vector3d(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),
-      math::Vector3(this->aabb->getMaximum().x,
+      ignition::math::Vector3d(this->aabb->getMaximum().x,
                     this->aabb->getMaximum().y,
                     this->aabb->getMaximum().z));
 }

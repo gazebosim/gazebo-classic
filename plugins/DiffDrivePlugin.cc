@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,13 +73,13 @@ void DiffDrivePlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void DiffDrivePlugin::Init()
 {
-  this->wheelSeparation = this->leftJoint->GetAnchor(0).Distance(
-      this->rightJoint->GetAnchor(0));
+  this->wheelSeparation = this->leftJoint->Anchor(0).Distance(
+      this->rightJoint->Anchor(0));
 
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->leftJoint->GetChild());
 
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->wheelRadius = bb.Size().Max() * 0.5;
 }

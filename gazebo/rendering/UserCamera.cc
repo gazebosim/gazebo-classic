@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  *
 */
 #include <boost/bind.hpp>
-#include "gazebo/rendering/ogre_gazebo.h"
+#include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Pose.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -207,23 +207,16 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetDefaultPose(const math::Pose &_pose)
+void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 {
-  this->dataPtr->defaultPose = _pose;
-  this->SetWorldPose(_pose.Ign());
+  this->dataPtr->initialPose = _pose;
+  this->SetWorldPose(_pose);
 }
 
 //////////////////////////////////////////////////
-math::Pose UserCamera::DefaultPose() const
+ignition::math::Pose3d UserCamera::InitialPose() const
 {
-  return this->dataPtr->defaultPose;
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
-{
-  Camera::SetWorldPose(_pose.Ign());
-  this->dataPtr->viewController->Init();
+  return this->dataPtr->initialPose;
 }
 
 //////////////////////////////////////////////////
@@ -325,8 +318,9 @@ void UserCamera::SetJoyPoseControl(bool _value)
 }
 
 /////////////////////////////////////////////////
-bool UserCamera::AttachToVisualImpl(VisualPtr _visual, bool _inheritOrientation,
-                                     double /*_minDist*/, double /*_maxDist*/)
+bool UserCamera::AttachToVisualImpl(VisualPtr _visual,
+    const bool _inheritOrientation,
+    const double /*_minDist*/, const double /*_maxDist*/)
 {
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
@@ -396,7 +390,7 @@ void UserCamera::SetViewController(const std::string &_type)
     if (vc == "orbit")
     {
       this->dataPtr->viewController->Init(
-          this->dataPtr->orbitViewController->GetFocalPoint(),
+          this->dataPtr->orbitViewController->FocalPoint(),
           this->dataPtr->orbitViewController->Yaw(),
           this->dataPtr->orbitViewController->Pitch());
     }
@@ -421,7 +415,7 @@ void UserCamera::SetViewController(const std::string &_type)
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type,
-                                   const math::Vector3 &_pos)
+                                   const ignition::math::Vector3d &_pos)
 {
   if (_type.empty() ||
       this->dataPtr->viewController->GetTypeString() == _type)
@@ -604,7 +598,34 @@ void UserCamera::OnMoveToVisualComplete()
 {
   this->dataPtr->orbitViewController->SetDistance(
       this->WorldPose().Pos().Distance(
-      this->dataPtr->orbitViewController->GetFocalPoint().Ign()));
+      this->dataPtr->orbitViewController->FocalPoint()));
+}
+
+
+//////////////////////////////////////////////////
+void UserCamera::SetDevicePixelRatio(const double _ratio)
+{
+  this->dataPtr->devicePixelRatio = _ratio;
+}
+
+//////////////////////////////////////////////////
+double UserCamera::DevicePixelRatio() const
+{
+  return this->dataPtr->devicePixelRatio;
+}
+
+
+//////////////////////////////////////////////////
+void UserCamera::CameraToViewportRay(const int _screenx,
+    const int _screeny,
+    ignition::math::Vector3d &_origin,
+    ignition::math::Vector3d &_dir) const
+{
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  int screenx = ratio * _screenx;
+  int screeny = ratio * _screeny;
+
+  Camera::CameraToViewportRay(screenx, screeny, _origin, _dir);
 }
 
 //////////////////////////////////////////////////
@@ -654,16 +675,20 @@ void UserCamera::EnableViewController(bool _value) const
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
-                                std::string &_mod)
+VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
+    std::string &_mod) const
 {
   VisualPtr result;
 
   if (!this->dataPtr->selectionBuffer)
     return result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(
+      ratio * _mousePos.X(), ratio * _mousePos.Y());
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   _mod = "";
   if (entity)
@@ -706,18 +731,22 @@ VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
+void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
 {
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
 }
 
 //////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
+VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos) const
 {
   VisualPtr result;
 
-  Ogre::Entity *entity =
-    this->dataPtr->selectionBuffer->OnSelectionClick(_mousePos.x, _mousePos.y);
+  int ratio = static_cast<int>(this->dataPtr->devicePixelRatio);
+  ignition::math::Vector2i mousePos(
+      ratio * _mousePos.X(), ratio * _mousePos.Y());
+
+  Ogre::Entity *entity = this->dataPtr->selectionBuffer->OnSelectionClick(
+      mousePos.X(), mousePos.Y());
 
   if (entity && !entity->getUserObjectBindings().getUserAny().isEmpty())
   {
@@ -806,7 +835,7 @@ void UserCamera::OnJoyPose(ConstPosePtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetClipDist(float _near, float _far)
+void UserCamera::SetClipDist(const float _near, const float _far)
 {
   Camera::SetClipDist(_near, _far);
 
@@ -868,4 +897,12 @@ bool UserCamera::SetProjectionType(const std::string &_type)
     this->SetViewController(this->dataPtr->prevViewControllerName);
 
   return Camera::SetProjectionType(_type);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i UserCamera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  auto pt = Camera::Project(_pt);
+  return pt / this->dataPtr->devicePixelRatio;
 }

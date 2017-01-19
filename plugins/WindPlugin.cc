@@ -171,8 +171,8 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 
   // Apply wind velocity
   ignition::math::Vector3d windVel;
-  windVel.X(magnitude * cos(GZ_DTOR(direction)));
-  windVel.Y(magnitude * sin(GZ_DTOR(direction)));
+  windVel.X(magnitude * cos(IGN_DTOR(direction)));
+  windVel.Y(magnitude * sin(IGN_DTOR(direction)));
 
   if (this->noiseVertical)
     windVel.Z(noiseVertical->Apply(this->magnitudeMean));
@@ -202,8 +202,8 @@ void WindPlugin::OnUpdate()
         continue;
 
       // Add wind velocity as a force to the body
-      link->AddRelativeForce(link->GetInertial()->GetMass() *
-          (link->RelativeWindLinearVel() - link->GetRelativeLinearVel().Ign()));
+      link->AddRelativeForce(link->GetInertial()->Mass() *
+          (link->RelativeWindLinearVel() - link->RelativeLinearVel()));
     }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,22 @@ void WindowManager::Fini()
     (*iter)->removeAllViewports();
     (*iter)->destroy();
   }*/
+
+  // ogre 1.9 crashses when deleting the render window on destruction on osx
+  // so detach first before deleting ogre root
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
+  if (!this->dataPtr->windows.empty())
+  {
+    auto root = RenderEngine::Instance()->Root();
+    for (auto iter = this->dataPtr->windows.begin();
+        iter != this->dataPtr->windows.end(); iter++)
+    {
+      auto w = root->detachRenderTarget((*iter)->getName());
+      w->setActive(false);
+      w->removeAllViewports();
+    }
+  }
+#endif
   this->dataPtr->windows.clear();
 }
 
@@ -67,14 +83,15 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
   if (static_cast<unsigned int>(_windowId) < this->dataPtr->windows.size() &&
       this->dataPtr->windows[_windowId])
-    this->dataPtr->windows[_windowId]->removeAllViewports();
+  this->dataPtr->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->dataPtr->windows[_windowId]);
 }
 
 //////////////////////////////////////////////////
 int WindowManager::CreateWindow(const std::string &_ogreHandle,
                                 uint32_t _width,
-                                uint32_t _height)
+                                uint32_t _height,
+                                const double _devicePixelRatio)
 {
   Ogre::StringVector paramsVector;
   Ogre::NameValuePairList params;
@@ -99,6 +116,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
 
   std::ostringstream stream;
   stream << "OgreWindow(" << this->dataPtr->windowCounter++ << ")";
+
+  // Needed for retina displays
+  params["contentScalingFactor"] = std::to_string(_devicePixelRatio);
 
   int attempts = 0;
   while (window == NULL && (attempts++) < 10)

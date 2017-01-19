@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -349,8 +349,7 @@ void GripperPrivate::HandleAttach()
       if (!this->attached && cc[iter->first])
       {
         ignition::math::Pose3d diff =
-          cc[iter->first]->GetLink()->GetWorldPose().Ign() -
-          this->palmLink->GetWorldPose().Ign();
+          cc[iter->first]->GetLink()->WorldPose() - this->palmLink->WorldPose();
 
         double dd = (diff - this->prevDiff).Pos().SquaredLength();
 
@@ -406,7 +405,7 @@ void GripperPrivate::OnContacts(ConstContactsPtr &_msg)
 void GripperPrivate::ResetDiffs()
 {
   for (unsigned int i = 0; i < 10; ++i)
-    this->diffs[i] = GZ_DBL_MAX;
+    this->diffs[i] = ignition::math::MAX_D;
 }
 
 
