@@ -513,7 +513,11 @@ compilation on Windows.
 
 ## Gazebo 5.0
 
-### Gazebo 5.x.x
+### Gazebo 5.4.0 (2017-01-17)
+
+1. Check FSAA support when creating camera render textures
+    * [Pull request 2442](https://bitbucket.org/osrf/gazebo/pull-request/2442)
+    * [Issue #1837](https://bitbucket.org/osrf/gazebo/issue/1837)
 
 1. Fix mouse picking with transparent visuals
     * [Pull request 2305](https://bitbucket.org/osrf/gazebo/pull-request/2305)
