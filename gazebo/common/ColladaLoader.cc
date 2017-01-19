@@ -1244,7 +1244,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
-      // order matters: transparency needs to be loaded before transparent
+      // order matters: transparency needs to be loaded before transparent.
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1255,6 +1255,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       {
         TiXmlElement *transXml = lambertXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
     else if (phongXml)
@@ -1276,6 +1281,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
       }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
+      }
     }
     else if (blinnXml)
     {
@@ -1295,6 +1305,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       {
         TiXmlElement *transXml = blinnXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
   }
@@ -2035,7 +2050,8 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)
   {
-    // gzerr << "No Opaque set\n";
+    // no opaque mode, revert transparency to 0.0
+    _mat->SetTransparency(0.0);
     return;
   }
 
