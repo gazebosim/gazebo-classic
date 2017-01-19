@@ -40,6 +40,10 @@ namespace gazebo
                             unsigned int _width, unsigned int _height,
                             unsigned int _depth, const std::string &_format);
 
+
+    /// \brief PreRender event that is fired within the rendering thread
+    public: void PreRender();
+
     /// \brief Callback each time a key message is received.
     /// \param[in] _msg Keypress message.
     public: void OnKeyPress(ConstAnyPtr &_msg);
@@ -56,6 +60,9 @@ namespace gazebo
 
     /// \brief Event connection when a new image frame is available.
     public: event::ConnectionPtr newFrameConnection;
+
+    /// \brief Event connection for a preRender event
+    public: event::ConnectionPtr preRenderConnection;
 
     /// \brief Subscribe to keyboard messages.
     public: transport::SubscriberPtr keyboardSub;
@@ -79,6 +86,7 @@ CameraTriggerPlugin::~CameraTriggerPlugin()
 {
   this->dataPtr->parentSensor.reset();
   this->dataPtr->camera.reset();
+  this->preRenderConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -124,6 +132,7 @@ void CameraTriggerPluginPrivate::OnNewFrame(const unsigned char * /*_image*/,
                               unsigned int /*_depth*/,
                               const std::string &/*_format*/)
 {
+  // we got a new frame, now we can disable camera updates
   this->SetCameraEnabled(false);
 }
 
@@ -132,7 +141,21 @@ void CameraTriggerPluginPrivate::OnKeyPress(ConstAnyPtr &_msg)
 {
   // 'c'
   if (_msg->int_value() == 99)
-    this->SetCameraEnabled(true);
+  {
+    // Connect to preRender event. We want to perform any camera sensors
+    // operations in the rendering thread
+    this->preRenderConnection =
+        event::Events::ConnectPreRender(
+        std::bind(&CameraTriggerPluginPrivate::PreRender, this));
+  }
+}
+
+/////////////////////////////////////////////////
+void CameraTriggerPluginPrivate::PreRender()
+{
+  // trigger an update and discconect from any future preRender event callbacks.
+  this->SetCameraEnabled(true);
+  this->preRenderConnection.reset();
 }
 
 /////////////////////////////////////////////////
