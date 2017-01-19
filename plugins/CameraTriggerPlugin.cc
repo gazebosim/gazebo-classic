@@ -86,7 +86,6 @@ CameraTriggerPlugin::~CameraTriggerPlugin()
 {
   this->dataPtr->parentSensor.reset();
   this->dataPtr->camera.reset();
-  this->preRenderConnection.reset();
 }
 
 /////////////////////////////////////////////////
