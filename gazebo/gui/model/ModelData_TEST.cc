@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,16 +32,16 @@ void ModelData_TEST::Clone()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -59,7 +59,7 @@ void ModelData_TEST::Clone()
   link->Load(msgs::LinkToSDF(model.link(0)));
   rendering::VisualPtr linkVis(new rendering::Visual("model::box_link",
       scene->WorldVisual()));
-  link->linkVisual = linkVis;
+  link->SetLinkVisual(linkVis);
 
   // add a visual
   rendering::VisualPtr vis(
@@ -97,14 +97,14 @@ void ModelData_TEST::Clone()
         "model::" + cloneLinkName + "::visual")->second,
       ignition::math::Vector3d::One);
 
-  QVERIFY(cloneLink->linkVisual != NULL);
-  QCOMPARE(cloneLink->linkVisual->Name(), "model::" + cloneLinkName);
+  QVERIFY(cloneLink->LinkVisual() != nullptr);
+  QCOMPARE(cloneLink->LinkVisual()->Name(), "model::" + cloneLinkName);
 
   // verify clone link visual
   QCOMPARE(cloneLink->visuals.size(), link->visuals.size());
   QVERIFY(cloneLink->visuals.size() == 1u);
   rendering::VisualPtr cloneVis = cloneLink->visuals.begin()->first;
-  QVERIFY(cloneVis != NULL);
+  QVERIFY(cloneVis != nullptr);
   QCOMPARE(cloneVis->Name(), "model::" + cloneLinkName + "::visual");
   QCOMPARE(cloneVis->GetGeometryType(), std::string("box"));
   QCOMPARE(cloneVis->GetGeometrySize(), size);
@@ -113,7 +113,7 @@ void ModelData_TEST::Clone()
   QCOMPARE(cloneLink->collisions.size(), link->collisions.size());
   QVERIFY(cloneLink->collisions.size() == 1u);
   rendering::VisualPtr cloneCol = cloneLink->collisions.begin()->first;
-  QVERIFY(cloneCol != NULL);
+  QVERIFY(cloneCol != nullptr);
   QCOMPARE(cloneCol->Name(), "model::" + cloneLinkName + "::collision");
   QCOMPARE(cloneCol->GetGeometryType(), std::string("box"));
   QCOMPARE(cloneCol->GetGeometrySize(), size);
@@ -165,7 +165,7 @@ void ModelData_TEST::Clone()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -178,16 +178,16 @@ void ModelData_TEST::LinkScale()
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
-  QVERIFY(cam != NULL);
+  QVERIFY(cam != nullptr);
   gazebo::rendering::ScenePtr scene = cam->GetScene();
-  QVERIFY(scene != NULL);
+  QVERIFY(scene != nullptr);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -877,7 +877,7 @@ void ModelData_TEST::LinkScale()
 
   mainWindow->close();
   delete mainWindow;
-  mainWindow = NULL;
+  mainWindow = nullptr;
 }
 
 /////////////////////////////////////////////////

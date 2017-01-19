@@ -325,11 +325,15 @@ bool SearchModel::filterAcceptsRow(const int _srcRow,
   }
 
   // Collapsed by default
+  this->sourceModel()->blockSignals(true);
   this->sourceModel()->setData(id, false, PlotItemDelegate::TO_EXPAND);
+  this->sourceModel()->blockSignals(false);
 
   // Empty search matches everything
   if (this->search.isEmpty())
+  {
     return true;
+  }
 
   // Each word must match at least once, either self, parent or child
   auto words = this->search.split(" ");
@@ -343,7 +347,9 @@ bool SearchModel::filterAcceptsRow(const int _srcRow,
     // all words
     if (this->hasChildAcceptsItself(id, word))
     {
+      this->sourceModel()->blockSignals(true);
       this->sourceModel()->setData(id, true, PlotItemDelegate::TO_EXPAND);
+      this->sourceModel()->blockSignals(false);
     }
 
     // At least one of the children fits rule 1
