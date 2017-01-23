@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ namespace gazebo
       /// \brief Get the blend factors
       /// \param[in] _srcFactor Source factor is returned in this variable
       /// \param[in] _dstFactor Destination factor is returned in this variable
-      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
+      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor) const;
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode
