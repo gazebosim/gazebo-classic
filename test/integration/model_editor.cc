@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -453,6 +453,55 @@ void ModelEditorTest::ShowVisuals()
   modelCreator->ShowVisuals(true);
   QVERIFY(newLinkVis->GetVisible());
   QVERIFY(newNestedVis->GetVisible());
+
+  delete modelCreator;
+  modelCreator = nullptr;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = nullptr;
+}
+
+/////////////////////////////////////////////////
+void ModelEditorTest::ShowLinkFrames()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  // Create the main window.
+  auto mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Get the user camera and scene
+  auto cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  auto scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  // Create a model creator
+  auto modelCreator = new gazebo::gui::ModelCreator();
+  QVERIFY(modelCreator != nullptr);
+
+  // add a cylinder link
+  modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
+  auto newLinkFrame = scene->GetVisual(
+      "ModelPreview_0_0::link_0_LINK_FRAME_VISUAL__");
+  QVERIFY(newLinkFrame != nullptr);
+  QVERIFY(newLinkFrame->GetVisible());
+
+  // Hide visuals
+  modelCreator->ShowLinkFrames(false);
+  QVERIFY(!newLinkFrame->GetVisible());
+
+  // Show visuals
+  modelCreator->ShowLinkFrames(true);
+  QVERIFY(newLinkFrame->GetVisible());
 
   delete modelCreator;
   modelCreator = nullptr;
