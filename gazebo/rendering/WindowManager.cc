@@ -98,11 +98,8 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::RenderWindow *window = NULL;
 
   // Mac and Windows *must* use externalWindow handle.
-#if defined(__APPLE__) || defined(_MSC_VER)
   params["externalWindowHandle"] = _ogreHandle;
-#else
-  params["parentWindowHandle"] = _ogreHandle;
-#endif
+
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
