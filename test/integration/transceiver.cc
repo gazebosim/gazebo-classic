@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
     double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
     double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
     ignition::math::Pose3d txPose(ignition::math::Vector3d(x, y, 0.055),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
 
     SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
         txPose.Rot().Euler(), txEssid, txFreq, this->Power, this->Gain);
@@ -112,7 +112,7 @@ void TransceiverTest::TxRxEmptySpace(const std::string &_physicsEngine)
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
   ignition::math::Pose3d rxPose(ignition::math::Vector3d(0, 2, 0.055),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   // Spawn rx
   SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.Pos(),
@@ -184,7 +184,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   double x = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
   double y = ignition::math::Rand::DblUniform(-this->MaxPos, this->MaxPos);
   ignition::math::Pose3d txPose(ignition::math::Vector3d(x, y, 0.055),
-                                ignition::math::Quaterniond(0, 0, 0));
+                                ignition::math::Quaterniond::Identity);
 
   SpawnWirelessTransmitterSensor(tx1ModelName, tx1SensorName, txPose.Pos(),
       txPose.Rot().Euler(), txEssid, txFreq, this->Power, this->Gain);
@@ -209,7 +209,7 @@ void TransceiverTest::TxRxFreqOutOfBounds(const std::string &_physicsEngine)
   std::string rxModelName = "rx";
   std::string rxSensorName = "wirelessReceiver";
   ignition::math::Pose3d rxPose(ignition::math::Vector3d(0, 2, 0.055),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   // Spawn rx
   SpawnWirelessReceiverSensor(rxModelName, rxSensorName, rxPose.Pos(),
@@ -259,7 +259,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   std::string txModelName = "tx";
   std::string txSensorName = "wirelessTx";
   ignition::math::Pose3d txPose(ignition::math::Vector3d(0, 0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   // Spawn tx
   SpawnWirelessTransmitterSensor(txModelName, txSensorName, txPose.Pos(),
@@ -275,7 +275,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   std::string rx1ModelName = "rx1";
   std::string rx1SensorName = "wirelessRx1";
   ignition::math::Pose3d rx1Pose(ignition::math::Vector3d(3, 0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   // Spawn rx1
   SpawnWirelessReceiverSensor(rx1ModelName, rx1SensorName, rx1Pose.Pos(),
@@ -292,7 +292,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   std::string rx2ModelName = "rx2";
   std::string rx2SensorName = "wirelessRx2";
   ignition::math::Pose3d rx2Pose(ignition::math::Vector3d(-2, 0, 0.5),
-                                 ignition::math::Quaterniond(0, 0, 0));
+                                 ignition::math::Quaterniond::Identity);
   // Spawn rx2
   SpawnWirelessReceiverSensor(rx2ModelName, rx2SensorName, rx2Pose.Pos(),
       rx2Pose.Rot().Euler(), this->MinFreq, this->MaxFreq, this->Power,
@@ -307,7 +307,7 @@ void TransceiverTest::TxRxObstacle(const std::string &_physicsEngine)
   // Spawn an obstacle between the transmitter and the receiver
   SpawnBox("Box", ignition::math::Vector3d(1, 1, 1),
                   ignition::math::Vector3d(-1, 0, 0.5),
-                  ignition::math::Vector3d(0, 0, 0), true);
+                  ignition::math::Vector3d::Zero, true);
   // Initialize gazebo transport layer
   transport::NodePtr node(new transport::Node());
   node->Init("default");

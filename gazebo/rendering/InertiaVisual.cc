@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,6 @@ void InertiaVisual::Load(const ignition::math::Pose3d &_pose,
   boxVis->Load();
 
   // Inertia indicator: equivalent box of uniform density
-  boxVis->InsertMesh("unit_box");
   boxVis->AttachMesh("unit_box");
 
   boxVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);

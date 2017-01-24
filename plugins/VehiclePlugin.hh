@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/transport/Node.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Plugin.hh"
@@ -65,6 +66,12 @@ namespace gazebo
 
     private: double aeroLoad;
     private: double swayForce;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Transport Node for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,7 @@ void ForceTorqueSensor::Load(const std::string &_worldName,
             "parentJoint should be defined by single argument Load()");
   ignition::math::Quaterniond rotationChildSensor =
     (this->pose +
-     this->dataPtr->parentJoint->GetInitialAnchorPose().Ign()).Rot();
+     this->dataPtr->parentJoint->InitialAnchorPose()).Rot();
 
   this->dataPtr->rotationSensorChild =
     ignition::math::Matrix3d(rotationChildSensor.Inverse());
@@ -222,26 +222,26 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
   {
     if (this->dataPtr->parentToChild)
     {
-      measuredForce = wrench.body1Force.Ign();
-      measuredTorque = wrench.body1Torque.Ign();
+      measuredForce = wrench.body1Force;
+      measuredTorque = wrench.body1Torque;
     }
     else
     {
-      measuredForce = -1*wrench.body1Force.Ign();
-      measuredTorque = -1*wrench.body1Torque.Ign();
+      measuredForce = -1*wrench.body1Force;
+      measuredTorque = -1*wrench.body1Torque;
     }
   }
   else if (this->dataPtr->measureFrame == ForceTorqueSensorPrivate::CHILD_LINK)
   {
     if (!this->dataPtr->parentToChild)
     {
-      measuredForce = wrench.body2Force.Ign();
-      measuredTorque = wrench.body2Torque.Ign();
+      measuredForce = wrench.body2Force;
+      measuredTorque = wrench.body2Torque;
     }
     else
     {
-      measuredForce = -1*wrench.body2Force.Ign();
-      measuredTorque = -1*wrench.body2Torque.Ign();
+      measuredForce = -1*wrench.body2Force;
+      measuredTorque = -1*wrench.body2Torque;
     }
   }
   else
@@ -252,16 +252,16 @@ bool ForceTorqueSensor::UpdateImpl(const bool /*_force*/)
     if (!this->dataPtr->parentToChild)
     {
       measuredForce = this->dataPtr->rotationSensorChild *
-        wrench.body2Force.Ign();
+        wrench.body2Force;
       measuredTorque = this->dataPtr->rotationSensorChild *
-        wrench.body2Torque.Ign();
+        wrench.body2Torque;
     }
     else
     {
       measuredForce = this->dataPtr->rotationSensorChild *
-        (-1*wrench.body2Force.Ign());
+        (-1*wrench.body2Force);
       measuredTorque = this->dataPtr->rotationSensorChild *
-        (-1*wrench.body2Torque.Ign());
+        (-1*wrench.body2Torque);
     }
   }
 

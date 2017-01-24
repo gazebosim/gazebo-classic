@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,13 @@
  * limitations under the License.
  *
 */
-/* Desc: A link state
- * Author: Nate Koenig
- */
-
-#ifndef _LINKSTATE_HH_
-#define _LINKSTATE_HH_
+#ifndef GAZEBO_PHYSICS_LINKSTATE_HH_
+#define GAZEBO_PHYSICS_LINKSTATE_HH_
 
 #include <vector>
 #include <string>
 
+#include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/physics/State.hh"
@@ -97,19 +94,39 @@ namespace gazebo
 
       /// \brief Get the link pose.
       /// \return The math::Pose of the Link.
-      public: const math::Pose &GetPose() const;
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the link pose.
+      /// \return The ignition::math::Pose3d of the Link.
+      public: const ignition::math::Pose3d &Pose() const;
 
       /// \brief Get the link velocity.
-      /// \return The velocity represented as a math::Pose.
-      public: const math::Pose &GetVelocity() const;
+      /// \return The velocity represented as an math::Pose.
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetVelocity() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the link velocity.
+      /// \return The velocity represented as a ignition::math::Pose3d.
+      public: const ignition::math::Pose3d &Velocity() const;
 
       /// \brief Get the link acceleration.
       /// \return The acceleration represented as a math::Pose.
-      public: const math::Pose &GetAcceleration() const;
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetAcceleration() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the link acceleration.
+      /// \return The acceleration represented as a ignition::math::Pose3d.
+      public: const ignition::math::Pose3d &Acceleration() const;
 
       /// \brief Get the force applied to the Link.
       /// \return Magnitude of the force.
-      public: const math::Pose &GetWrench() const;
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetWrench() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the force and torque applied to the Link.
+      /// \return The wrench represented as an ignition::math::Pose3d.
+      public: const ignition::math::Pose3d &Wrench() const;
 
       /// \brief Get the number of link states.
       ///
@@ -188,28 +205,28 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::LinkState &_state)
       {
-        math::Vector3 q(_state.pose.rot.GetAsEuler());
+        ignition::math::Vector3d euler(_state.pose.Rot().Euler());
         _out << std::fixed <<std::setprecision(5)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
+          << _state.pose.Pos().X() << " "
+          << _state.pose.Pos().Y() << " "
+          << _state.pose.Pos().Z() << " "
+          << euler.X() << " "
+          << euler.Y() << " "
+          << euler.Z() << " "
           << "</pose>";
 
         /// Disabling this for efficiency.
-        q = _state.velocity.rot.GetAsEuler();
+        euler = _state.velocity.Rot().Euler();
          _out << std::fixed <<std::setprecision(4)
            << "<velocity>"
-           << _state.velocity.pos.x << " "
-           << _state.velocity.pos.y << " "
-           << _state.velocity.pos.z << " "
-           << q.x << " "
-           << q.y << " "
-           << q.z << " "
+           << _state.velocity.Pos().X() << " "
+           << _state.velocity.Pos().Y() << " "
+           << _state.velocity.Pos().Z() << " "
+           << euler.X() << " "
+           << euler.Y() << " "
+           << euler.Z() << " "
            << "</velocity>";
         // << "<acceleration>" << _state.acceleration << "</acceleration>"
         // << "<wrench>" << _state.wrench << "</wrench>";
@@ -228,16 +245,16 @@ namespace gazebo
       }
 
       /// \brief 3D pose of the link relative to the model.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
 
       /// \brief Velocity of the link (linear and angular).
-      private: math::Pose velocity;
+      private: ignition::math::Pose3d velocity;
 
       /// \brief Acceleration of the link (linear and angular).
-      private: math::Pose acceleration;
+      private: ignition::math::Pose3d acceleration;
 
       /// \brief Force on the link(linear and angular).
-      private: math::Pose wrench;
+      private: ignition::math::Pose3d wrench;
 
       /// \brief State of all the child Collision objects.
       private: std::vector<CollisionState> collisionStates;

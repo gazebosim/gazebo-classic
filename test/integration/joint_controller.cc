@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ TEST_F(JointControllerTest, PositionControl)
 
   world->Step(5000);
 
-  math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
+  auto angle = model->GetJoint("arm_shoulder_pan_joint")->Position(0);
 
-  EXPECT_NEAR(angle.Radian(), 1.0, 0.1);
+  EXPECT_NEAR(angle, 1.0, 0.1);
 }
 
 /////////////////////////////////////////////////

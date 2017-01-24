@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,6 @@
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -144,11 +140,6 @@ namespace gazebo
 
       /// \brief Get the name of the visual.
       /// \return The name of the visual.
-      /// \deprecated See std::string Name() const
-      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the name of the visual.
-      /// \return The name of the visual.
       public: std::string Name() const;
 
       /// \brief Attach a visual to this visual.
@@ -202,17 +193,7 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      /// \deprecated See version that accepts ignition math parameters.
-      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the scale.
-      /// \param[in] _scale The scaling factor for the visual.
       public: void SetScale(const ignition::math::Vector3d &_scale);
-
-      /// \brief Get the scale.
-      /// \return The scaling factor.
-      /// \deprecated See version that return an ignition math object.
-      public: math::Vector3 GetScale() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
@@ -346,19 +327,7 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      /// \deprecated See version that accepts ignition math parameters
-      public: void SetPosition(const math::Vector3 &_pos)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the position of the visual.
-      /// \param[in] _pos The position to set the visual to.
       public: void SetPosition(const ignition::math::Vector3d &_pos);
-
-      /// \brief Set the rotation of the visual.
-      /// \param[in] _rot The rotation of the visual.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetRotation(const math::Quaternion &_rot)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
@@ -366,17 +335,7 @@ namespace gazebo
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the pose of the visual.
-      /// \param[in] _pose The new pose of the visual.
       public: void SetPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Get the position of the visual.
-      /// \return The visual's position.
-      /// \deprecated See ignition::math::Vector3d Position() const
-      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
@@ -384,31 +343,15 @@ namespace gazebo
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      /// \deprecated ignition::math::Quaterniond Rotation() const
-      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the rotation of the visual.
-      /// \return The visual's rotation.
       public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
-      /// \deprecated See ignition::math::Pose3d Pose() const;
-      public: math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the pose of the visual.
-      /// \return The Visual's pose.
-      /// \deprecated See ignition::math::Pose3d Pose() const;
       public: ignition::math::Pose3d Pose() const;
 
       /// \brief Get the initial relative pose of the visual.
       /// \return The visual's initial relative pose.
       public: ignition::math::Pose3d InitialRelativePose() const;
-
-      /// \brief Get the global pose of the node.
-      /// \return The pose in the world coordinate frame.
-      /// \deprecated See ignition::math::Pose3d WorldPose() const.
-      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the global pose of the visual.
       /// \return The pose in the world coordinate frame.
@@ -416,28 +359,11 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the world pose of the visual.
-      /// \param[in] _pose Pose of the visual in the world coordinate frame.
       public: void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldPosition(const math::Vector3 &_pos)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the world linear position of the visual.
-      /// \param[in] _pose Position in the world coordinate frame.
       public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
-
-      /// \brief Set the world orientation of the visual
-      /// \param[in] _rot Rotation in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldRotation(const math::Quaternion &_rot)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the world orientation of the visual
       /// \param[in] _rot Rotation in the world coordinate frame.
@@ -476,11 +402,6 @@ namespace gazebo
       public: void SetRibbonTrail(bool _value,
                   const common::Color &_initialColor,
                   const common::Color &_changeColor);
-
-      /// \brief Get the bounding box for the visual.
-      /// \return The bounding box in world coordinates.
-      /// \deprecated See version the returns an ignition math object.
-      public: math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
@@ -575,25 +496,8 @@ namespace gazebo
       /// \brief Move to a pose and over a given time.
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void MoveToPosition(const math::Pose &_pose, double _time)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Move to a pose and over a given time.
-      /// \param[in] _pose Pose the visual will end at.
-      /// \param[in] _time Time it takes the visual to move to the pose.
       public: void MoveToPosition(const ignition::math::Pose3d &_pose,
                   const double _time);
-
-      /// \brief Move to a series of pose and over a given time.
-      /// \param[in] _poses Series of poses the visual will move to.
-      /// \param[in] _time Time it takes the visual to move to the pose.
-      /// \param[in] _onComplete Callback used when the move is complete.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time,
-                                   std::function<void()> _onComplete = nullptr)
-                                   GAZEBO_DEPRECATED(8.0);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.

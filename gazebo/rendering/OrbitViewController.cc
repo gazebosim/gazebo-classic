@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,13 +61,6 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera,
 OrbitViewController::~OrbitViewController()
 {
   this->refVisual.reset();
-}
-
-//////////////////////////////////////////////////
-void OrbitViewController::Init(const math::Vector3 &_focalPoint,
-    const double _yaw, const double _pitch)
-{
-  this->Init(_focalPoint.Ign(), _yaw, _pitch);
 }
 
 //////////////////////////////////////////////////
@@ -164,6 +157,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     return;
 
   ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
+  drag *= this->camera->DevicePixelRatio();
 
   ignition::math::Vector3d directionVec(0, 0, 0);
 
@@ -299,18 +293,6 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
-{
-  this->TranslateLocal(_vec.Ign());
-}
-
-//////////////////////////////////////////////////
-void OrbitViewController::TranslateGlobal(const math::Vector3 &_vec)
-{
-  this->TranslateGlobal(_vec.Ign());
-}
-
-//////////////////////////////////////////////////
 void OrbitViewController::TranslateLocal(const ignition::math::Vector3d &_vec)
 {
   this->camera->SetWorldPosition(
@@ -334,22 +316,10 @@ void OrbitViewController::SetDistance(float _d)
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
-{
-  this->SetFocalPoint(_fp.Ign());
-}
-
-//////////////////////////////////////////////////
 void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
 {
   this->focalPoint = _fp;
   this->refVisual->SetPosition(this->focalPoint);
-}
-
-//////////////////////////////////////////////////
-math::Vector3 OrbitViewController::GetFocalPoint() const
-{
-  return this->FocalPoint();
 }
 
 //////////////////////////////////////////////////
@@ -409,7 +379,7 @@ void OrbitViewController::UpdateRefVisual()
 
   // Update the size of the referenve visual based on the distance to the
   // focal point.
-  double scale = this->distance * atan(GZ_DTOR(1.0));
+  double scale = this->distance * atan(IGN_DTOR(1.0));
   this->refVisual->SetScale(
       ignition::math::Vector3d(scale, scale, scale * 0.5));
 }

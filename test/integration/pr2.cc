@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ void PR2Test::LoadPR2(std::string _physicsEngine)
     common::Time::MSleep(100);
 
   physics::get_world("default")->Physics()->SetGravity(
-      math::Vector3(-0.5, 0, -0.1));
+      ignition::math::Vector3d(-0.5, 0, -0.1));
   for (int i = 11; i < 200; i++)
   {
     std::ostringstream filename;
@@ -139,8 +139,8 @@ void PR2Test::ScrewJoint(std::string _physicsEngine)
   // Expect torso to lift at least 1 mm/s
   gzdbg << "motor " << motor->GetVelocity(0) << std::endl;
   gzdbg << "screw " << screw->GetVelocity(0) << std::endl;
-  gzdbg << "link  " << link->GetWorldLinearVel() << std::endl;
-  EXPECT_GT(link->GetWorldLinearVel().z, 1e-3);
+  gzdbg << "link  " << link->WorldLinearVel() << std::endl;
+  EXPECT_GT(link->WorldLinearVel().Z(), 1e-3);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 void JointMaker_TEST::JointState()
 {
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   gui::JointMaker *jointMaker = new gui::JointMaker();
   QCOMPARE(jointMaker->State(), gui::JointMaker::JOINT_NONE);

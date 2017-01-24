@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,13 +53,6 @@ void OrthoViewController::Init()
 {
   // this will call the overloaded Init function
   OrbitViewController::Init();
-}
-
-//////////////////////////////////////////////////
-void OrthoViewController::Init(const math::Vector3 &_focalPoint,
-    double _yaw, double _pitch)
-{
-  this->Init(_focalPoint.Ign(), _yaw, _pitch);
 }
 
 //////////////////////////////////////////////////

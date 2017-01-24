@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,7 +182,7 @@ void Material::SetBlendFactors(double _srcFactor, double _dstFactor)
 }
 
 //////////////////////////////////////////////////
-void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor)
+void Material::GetBlendFactors(double &_srcFactor, double &_dstFactor) const
 {
   _srcFactor = this->srcBlendFactor;
   _dstFactor = this->dstBlendFactor;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -710,10 +710,6 @@ namespace gazebo
       /// visual.
       /// \param[in] _vis Visual that the visualizations are attached to.
       private: void RemoveVisualizations(VisualPtr _vis);
-
-      /// \brief Receive messages from the world_stats topic
-      /// \param[in] _msg The world stats message
-      private: void OnStatsMsg(ConstWorldStatisticsPtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

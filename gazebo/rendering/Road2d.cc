@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,12 +89,6 @@ Road2d::~Road2d()
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
   dPtr->segments.clear();
-}
-
-/////////////////////////////////////////////////
-void Road2d::Load(VisualPtr /*_parent*/)
-{
-  // This function is deprecated. Remove in gazebo9
 }
 
 //////////////////////////////////////////////////
@@ -224,10 +218,10 @@ void RoadSegment::Load(msgs::Road _msg)
     // Every other point in the road
     else
     {
-      math::Vector3 v1 = (this->points[i+1] - this->points[i]).Normalize();
-      math::Vector3 v0 = (this->points[i] - this->points[i-1]).Normalize();
+      auto v1 = (this->points[i+1] - this->points[i]).Normalize();
+      auto v0 = (this->points[i] - this->points[i-1]).Normalize();
       double dot = v0.Dot(v1 * -1);
-      tangent = (v1+v0).Normalize().Ign();
+      tangent = (v1+v0).Normalize();
 
       // Check to see if the points are not colinear
       // If not colinear, then the road needs to be widended for the turns

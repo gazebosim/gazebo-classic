@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,24 +73,19 @@ GLWidget::GLWidget(QWidget *_parent)
   connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
   this, SLOT(update()));
 
-  this->setFocusPolicy(Qt::StrongFocus);
-
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
+  // Setting the attribute below to true improves performance but may cause test
+  // failures on OSX/ogre1.9/qt5
+#if !defined(__APPLE__)
   this->setAttribute(Qt::WA_PaintOnScreen, true);
+#endif
+  this->setAttribute(Qt::WA_NoSystemBackground, true);
 
-  this->dataPtr->renderFrame = new QFrame;
-  this->dataPtr->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->dataPtr->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->dataPtr->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->dataPtr->renderFrame->show();
-
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(this->dataPtr->renderFrame);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(mainLayout);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -127,9 +122,6 @@ GLWidget::GLWidget(QWidget *_parent)
         std::bind(&GLWidget::OnAlignMode, this, std::placeholders::_1,
           std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5)));
-
-  this->dataPtr->renderFrame->setMouseTracking(true);
-  this->setMouseTracking(true);
 
   this->dataPtr->entityMaker = NULL;
 
@@ -242,23 +234,28 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
-  // These two functions are most applicable for Linux.
+  // This function is most applicable for Linux.
   QApplication::flush();
-  QApplication::syncX();
 
   if (this->dataPtr->windowId <=0)
   {
     // Get the window handle in a form that OGRE can use.
     std::string winHandle = this->OgreHandle();
 
+    // windowhandle() is available in qt5 only
+    double ratio = this->windowHandle()->devicePixelRatio();
+
     // Create the OGRE render window
     this->dataPtr->windowId =
       rendering::RenderEngine::Instance()->GetWindowManager()->
-        CreateWindow(winHandle, this->width(), this->height());
+        CreateWindow(winHandle, this->width(), this->height(), ratio);
 
     // Attach the user camera to the window
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->dataPtr->windowId, this->dataPtr->userCamera);
+
+    // for retina displays on osx
+    this->dataPtr->userCamera->SetDevicePixelRatio(ratio);
   }
 
   // Let QT continue processing the show event.
@@ -450,11 +447,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier)
+    && (_event->key() != Qt::Key_Control) ? true : false;
   this->dataPtr->keyEvent.shift =
-    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier)
+    && (_event->key() != Qt::Key_Shift) ? true : false;
   this->dataPtr->keyEvent.alt =
-    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier)
+    && (_event->key() != Qt::Key_Alt) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -643,16 +643,24 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->dataPtr->scene)
     return;
 
-  if (_event->delta() > 0)
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), -1);
-  }
-  else
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), 1);
-  }
+  // QTBUG-46461 - fast rotation of mouse wheel produces wrong angle delta
+  // so limit wheel event to our update rate
+  common::Time eventTime = common::Time::GetWallTime();
+  double dt = (eventTime - this->dataPtr->lastWheelEventTime).Double();
+  if (dt < this->dataPtr->updateTimer->interval()*1e-3)
+    return;
+  this->dataPtr->lastWheelEventTime = eventTime;
+
+  int scrollY = 0;
+  int delta = _event->delta();
+
+  if (delta > 0)
+    scrollY = -1;
+  else if (delta < 0)
+    scrollY = 1;
+
+  this->dataPtr->mouseEvent.SetScroll(
+      this->dataPtr->mouseEvent.Scroll().X(), scrollY);
 
   this->dataPtr->mouseEvent.SetType(common::MouseEvent::SCROLL);
 
@@ -925,25 +933,7 @@ rendering::UserCameraPtr GLWidget::Camera() const
 //////////////////////////////////////////////////
 std::string GLWidget::OgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(this->winId());
-#elif defined(WIN32)
-  ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->dataPtr->renderFrame->winId()));
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
-  GZ_ASSERT(q_parent, "q_parent is null");
-
-  ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
-    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
-    std::to_string(static_cast<uint64_t>(q_parent->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }
 
 /////////////////////////////////////////////////

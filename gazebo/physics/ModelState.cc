@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,7 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 
   // Set the model pose
   if (_elem->HasElement("pose"))
-    this->pose = _elem->Get<math::Pose>("pose");
+    this->pose = _elem->Get<ignition::math::Pose3d>("pose");
   else
     this->pose.Set(0, 0, 0, 0, 0, 0);
 
@@ -219,7 +219,20 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose &ModelState::GetPose() const
+const math::Pose ModelState::GetPose() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Pose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &ModelState::Pose() const
 {
   return this->pose;
 }
@@ -252,7 +265,7 @@ bool ModelState::IsZero() const
     result = result && iter->second.IsZero();
   }*/
 
-  return result && this->pose == math::Pose::Zero &&
+  return result && this->pose == ignition::math::Pose3d::Zero &&
       this->scale == ignition::math::Vector3d::Zero;
 }
 
@@ -439,8 +452,8 @@ ModelState ModelState::operator-(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos - _state.pose.pos;
-  result.pose.rot = _state.pose.rot.GetInverse() * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() - _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot().Inverse() * this->pose.Rot();
   result.scale = this->scale - _state.scale;
 
   // Insert the link state diffs.
@@ -514,8 +527,8 @@ ModelState ModelState::operator+(const ModelState &_state) const
   ModelState result;
 
   result.name = this->name;
-  result.pose.pos = this->pose.pos + _state.pose.pos;
-  result.pose.rot = _state.pose.rot * this->pose.rot;
+  result.pose.Pos() = this->pose.Pos() + _state.pose.Pos();
+  result.pose.Rot() = _state.pose.Rot() * this->pose.Rot();
   result.scale = this->scale + _state.scale;
 
   // Insert the link state diffs.

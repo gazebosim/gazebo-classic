@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,11 +54,12 @@ namespace gazebo
       public: virtual void Load(sdf::ElementPtr _sdf);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d Anchor(
+          const unsigned int _index) const;
 
       // Documentation inherited
-      public: virtual void SetAnchor(unsigned int _index,
-                  const math::Vector3 &_anchor);
+      public: virtual void SetAnchor(const unsigned int _index,
+                  const ignition::math::Vector3d &_anchor);
 
       // Documentation inherited.
       public: virtual void Init();
@@ -66,7 +67,8 @@ namespace gazebo
       /// \brief Set the axis of motion
       /// \param[in] _index Axis index.
       /// \param[in] _axis Axis value.
-      public: void SetAxis(unsigned int _index, const math::Vector3 &_axis);
+      public: void SetAxis(const unsigned int _index,
+          const ignition::math::Vector3d &_axis);
 
       // Documentation inherited
       public: virtual void SetThreadPitch(unsigned int _index,
@@ -82,12 +84,12 @@ namespace gazebo
       public: virtual double GetThreadPitch();
 
       // Documentation inherited.
-      public: virtual bool SetHighStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
 
       // Documentation inherited.
-      public: virtual bool SetLowStop(unsigned int _index,
-                  const math::Angle &_angle);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
 
       /// \brief Get the rate of change
       /// \param[in] _index Axis index.
@@ -101,14 +103,15 @@ namespace gazebo
       /// \brief Get the axis of rotation
       /// \param[in] _index Axis index.
       /// \return The axis in world coordinate frame.
-      public: virtual math::Vector3 GetGlobalAxis(unsigned int _index) const;
+      public: virtual ignition::math::Vector3d GlobalAxis(
+          const unsigned int _index) const;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
                   unsigned int _index);
 
       // Documentation inherited.
-      protected: virtual math::Angle GetAngleImpl(unsigned int _index) const;
+      protected: virtual double PositionImpl(const unsigned int _index) const;
 
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _force);
@@ -118,7 +121,7 @@ namespace gazebo
 
       /// \brief Initial value of joint axis, expressed as unit vector
       ///        in world frame.
-      private: math::Vector3 initialWorldAxis;
+      private: ignition::math::Vector3d initialWorldAxis;
     };
     /// \}
   }

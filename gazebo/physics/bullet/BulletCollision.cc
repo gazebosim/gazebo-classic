@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // auto pose = this->RelativePose();
   // BulletLinkPtr bbody =
   //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
@@ -113,7 +113,7 @@ ignition::math::Box BulletCollision::BoundingBox() const
     {
       PlaneShapePtr plane =
         boost::dynamic_pointer_cast<PlaneShape>(this->shape);
-      auto normal = plane->GetNormal().Ign();
+      auto normal = plane->Normal();
       if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented
@@ -131,7 +131,7 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   Collision::SetCollision(_placeable);
   this->collisionShape = _shape;
 
-  // btmath::Vector3 vec;
+  // btVector3 vec;
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);

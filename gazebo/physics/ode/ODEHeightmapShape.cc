@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
-
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/ode/ODECollision.hh"
 #include "gazebo/physics/ode/ODEHeightmapShape.hh"
@@ -61,14 +56,22 @@ void ODEHeightmapShape::Init()
       this->odeData,
       &this->heights[0],
       0,
-      this->GetSize().x,  // in meters
-      this->GetSize().y,  // in meters
-      this->vertSize,  // width sampling size
-      this->vertSize,  // depth sampling size (along height of image)
-      1.0,  // vertical (z-axis) scaling
-      this->GetPos().z,  // vertical (z-axis) offset
-      1.0,  // vertical thickness for closing the height map mesh
-      0);  // wrap mode
+      // in meters
+      this->Size().X(),
+      // in meters
+      this->Size().Y(),
+      // width sampling size
+      this->vertSize,
+      // depth sampling size (along height of image)
+      this->vertSize,
+      // vertical (z-axis) scaling
+      1.0,
+      // vertical (z-axis) offset
+      this->Pos().Z(),
+      // vertical thickness for closing the height map mesh
+      1.0,
+      // wrap mode
+      0);
 
   // Step 4: Restrict the bounds of the AABB to improve efficiency
   dGeomHeightfieldDataSetBounds(this->odeData, this->GetMinHeight(),

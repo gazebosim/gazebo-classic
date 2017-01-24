@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -261,7 +261,7 @@ void MainWindow_TEST::UserCameraFPS()
     std::cerr << "Skipping lower bound FPS check" << std::endl;
     skipFPSTest = true;
   }
-  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  unsigned int iterations = skipFPSTest ? 500 : 5000;
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
@@ -575,10 +575,6 @@ void MainWindow_TEST::UserCameraJoystick()
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->Name(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
@@ -789,6 +785,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(gazebo::gui::g_plotAct);
 
   QVERIFY(gazebo::gui::g_redoHistoryAct);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   mainWindow->close();
   delete mainWindow;

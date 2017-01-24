@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ TEST_F(CameraTest, Follow)
   // Spawn a box to follow.
   SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector3d(10, 10, 1),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d::Zero);
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
@@ -93,7 +93,7 @@ TEST_F(CameraTest, Visible)
   // Spawn a box.
   SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
       ignition::math::Vector3d(1, 0, 0.5),
-      ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d::Zero);
 
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
@@ -136,50 +136,50 @@ TEST_F(CameraTest, Visible)
   ASSERT_TRUE(box != NULL);
 
   // move the box behind the camera and it should not be visible to the camera
-  math::Pose pose = math::Pose(-1, 0, 0.5, 0, 0, 0);
+  ignition::math::Pose3d pose(-1, 0, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the left of the camera and it should not be visible
-  pose = math::Pose(0, -1, 0.5, 0, 0, 0);
+  pose = ignition::math::Pose3d(0, -1, 0.5, 0, 0, 0);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->Name()));
 
   // move the box to the right of the camera with some rotations,
   // it should still not be visible.
-  pose = math::Pose(0, 1, 0.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 0.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->Name()));
@@ -192,17 +192,17 @@ TEST_F(CameraTest, Visible)
   // move the box up and let it drop. The camera should not see the box
   // initially but the box should eventually move into the camera view
   // as it falls
-  pose = math::Pose(0, 1, 5.5, 0, 0, 1.57);
+  pose = ignition::math::Pose3d(0, 1, 5.5, 0, 0, 1.57);
   box->SetWorldPose(pose);
   world->Step(1);
   sleep = 0;
   maxSleep = 10;
-  while (visual->WorldPose() != pose.Ign() && sleep < maxSleep)
+  while (visual->WorldPose() != pose && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(visual->WorldPose() == pose.Ign());
+  EXPECT_TRUE(visual->WorldPose() == pose);
   world->Step(1);
   EXPECT_TRUE(!camera->IsVisible(visual));
   EXPECT_TRUE(!camera->IsVisible(visual->Name()));

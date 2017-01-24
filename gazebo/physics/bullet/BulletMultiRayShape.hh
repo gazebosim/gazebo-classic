@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _BULLETMULTIRAYSHAPE_HH_
-#define _BULLETMULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETMULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/util/system.hh"
@@ -41,8 +41,8 @@ namespace gazebo
       public: virtual void UpdateRays();
 
       /// \brief Add a ray to the collision
-      protected: void AddRay(const math::Vector3 &start,
-                             const math::Vector3 &end);
+      protected: void AddRay(const ignition::math::Vector3d &start,
+                             const ignition::math::Vector3d &end);
 
       private: BulletPhysicsPtr physicsEngine;
     };

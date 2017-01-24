@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@
  * Date: 21 May 2003
  */
 
-#ifndef _HINGE2JOINT_HH_
-#define _HINGE2JOINT_HH_
+#ifndef GAZEBO_PHYSICS_HINGE2JOINT_HH_
+#define GAZEBO_PHYSICS_HINGE2JOINT_HH_
 
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/util/system.hh"
 
@@ -51,21 +50,21 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 2;}
 
       /// \brief Load the joint.
       /// \param[in] _sdf SDF values to load from.
       public: virtual void Load(sdf::ElementPtr _sdf)
-              {
-                T::Load(_sdf);
+        {
+          T::Load(_sdf);
 
-                this->SetAxis(0,
-                    _sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+          this->SetAxis(0,
+              _sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
-                this->SetAxis(1,
-                    _sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
-              }
+          this->SetAxis(1,
+              _sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
+        }
     };
     /// \}
   }

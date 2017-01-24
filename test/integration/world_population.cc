@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ void WorldEnvPopulationTest::LoadEnvironment(const std::string &/*_physicsEng*/)
         boost::lexical_cast<std::string>(i * 3 + j));
       physics::ModelPtr model = world->ModelByName(name);
       ASSERT_TRUE(model != NULL);
-      math::Vector3 pos = model->WorldPose().Pos();
+      auto pos = model->WorldPose().Pos();
       EXPECT_NEAR(pos.Distance(expectedPos), 0.0, tolerance);
 
       expectedPos.X() += step.X();

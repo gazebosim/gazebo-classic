@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
       /// \param[in] _collisionId ODE id of the collision object.
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(dGeomID _collisionId, bool _placeable);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -409,21 +409,9 @@ event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newDepthFrame.Disconnect(_c->Id());
-}
-
-//////////////////////////////////////////////////
 event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
     std::function<void (const float *, unsigned int, unsigned int, unsigned int,
     const std::string &)>  _subscriber)
 {
   return this->dataPtr->newRGBPointCloud.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newRGBPointCloud.Disconnect(_c->Id());
 }

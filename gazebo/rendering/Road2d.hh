@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,6 @@ namespace gazebo
       /// \param[in] _msg Message containing road data.
       public: void Load(msgs::Road _msg);
       using Visual::Load;
-
-      /// \brief Load the visual using a parent visual.
-      /// \param[in] _parent Pointer to the parent visual.
-      /// \sa see function that accepts msgs::Road parameter
-      public: void Load(VisualPtr _parent) GAZEBO_DEPRECATED(8.0);
     };
     /// \}
   }

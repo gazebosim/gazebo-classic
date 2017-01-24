@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,13 +75,13 @@ TEST_F(Issue346Test, SaveLights)
     {
       hasSpotLight++;
       EXPECT_TRUE(pose.Pos() == spotLightPos);
-      EXPECT_TRUE(pose.Rot() == spotLightRot);
+      EXPECT_TRUE(pose.Rot() == ignition::math::Quaterniond(spotLightRot));
     }
     else if (name == pointLightName)
     {
       hasPointLight++;
       EXPECT_TRUE(pose.Pos() == pointLightPos);
-      EXPECT_TRUE(pose.Rot() == pointLightRot);
+      EXPECT_TRUE(pose.Rot() == ignition::math::Quaterniond(pointLightRot));
     }
     lightElem = lightElem->GetNextElement("light");
   }

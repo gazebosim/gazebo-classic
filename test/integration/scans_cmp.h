@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@
     #define MAYBE_UNUSED
 #endif
 
-double inf = GZ_DBL_INF;
+#include <ignition/math/Helpers.hh>
+double inf = ignition::math::INF_D;
 
 static double __box_scan[] = {
   inf,           inf,           inf,           inf,           inf,

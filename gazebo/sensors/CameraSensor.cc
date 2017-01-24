@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ std::string CameraSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/image";
-  common::replaceAll(topicName, "::", "/");
+  common::replaceAll(topicName, topicName, "::", "/");
 
   return topicName;
 }
@@ -85,8 +85,8 @@ std::string CameraSensor::Topic() const
 std::string CameraSensor::TopicIgn() const
 {
   std::string topicName = this->ScopedName() + "/image";
-  common::replaceAll(topicName, "::", "/");
-  common::replaceAll(topicName, " ", "_");
+  common::replaceAll(topicName, topicName, "::", "/");
+  common::replaceAll(topicName, topicName, " ", "_");
 
   return topicName;
 }

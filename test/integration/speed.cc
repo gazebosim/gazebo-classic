@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
   {
     pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
 
   common::Time::MSleep(2000);
@@ -96,7 +96,7 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   {
     pos.Z() += i;
     SpawnSphere(name + boost::lexical_cast<std::string>(i),
-        pos, ignition::math::Vector3d(0, 0, 0), i == 499);
+        pos, ignition::math::Vector3d::Zero, i == 499);
   }
   common::Time::MSleep(2000);
 

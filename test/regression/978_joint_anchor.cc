@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
     opt.worldChild = false;
     opt.worldParent = false;
     opt.noLinkPose = true;
-    opt.modelPose = math::Pose(1, 2, 3, 0, 0, 0);
+    opt.modelPose = ignition::math::Pose3d(1, 2, 3, 0, 0, 0);
 
     physics::JointPtr joint = SpawnJoint(opt);
     ASSERT_TRUE(joint != NULL);
@@ -72,7 +72,7 @@ void Issue978Test::JointAnchor(const std::string &_physicsEngine)
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
 
     // Check anchor location
-    EXPECT_EQ(joint->GetAnchor(0), opt.modelPose.pos);
+    EXPECT_EQ(joint->Anchor(0), opt.modelPose.Pos());
   }
 }
 

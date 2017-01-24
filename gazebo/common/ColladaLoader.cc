@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1244,6 +1244,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
+      // order matters: transparency needs to be loaded before transparent
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1266,6 +1267,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
 
+      // order matters: transparency needs to be loaded before transparent
       if (phongXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
@@ -1285,6 +1287,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));
 
+      // order matters: transparency needs to be loaded before transparent
       if (blinnXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
@@ -2050,18 +2053,27 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
     std::string colorStr = colorCStr;
     Color color = boost::lexical_cast<Color>(colorStr);
 
+    // src is the texel value and dst is the existing pixel value
     double srcFactor = 0;
     double dstFactor = 0;
 
     if (opaqueStr == "RGB_ZERO")
     {
-      srcFactor = color.r * _mat->GetTransparency();
-      dstFactor = 1.0 - color.r * _mat->GetTransparency();
+      dstFactor = color.r * _mat->GetTransparency();
+      srcFactor = 1.0 - color.r * _mat->GetTransparency();
     }
     else if (opaqueStr == "A_ONE")
     {
-      srcFactor = 1.0 - color.a * _mat->GetTransparency();
-      dstFactor = color.a * _mat->GetTransparency();
+      // From collada spec:
+      // result.a = fb.a * (1.0f - transparent.a * transparency) + mat.a *
+      // (transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - color.a * _mat->GetTransparency();
+      srcFactor = color.a * _mat->GetTransparency();
+      // also make sure to update the final transparency value
+      // final mat transparency = 1 - srcFactor = dstFactor
+      _mat->SetTransparency(dstFactor);
     }
 
     _mat->SetBlendFactors(srcFactor, dstFactor);

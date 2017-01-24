@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@ void DARTRayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void DARTRayShape::SetPoints(const math::Vector3& _posStart,
-                             const math::Vector3& _posEnd)
+void DARTRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                             const ignition::math::Vector3d &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 

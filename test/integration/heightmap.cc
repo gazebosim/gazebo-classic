@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,8 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
   EXPECT_TRUE(shape != NULL);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
-  EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d::Zero);
+  EXPECT_TRUE(shape->Size() == ignition::math::Vector3d(129, 129, 10));
 
   common::Image trueImage("media/materials/textures/heightmap_bowl.png");
   common::Image testImage = shape->GetImage();
@@ -293,7 +293,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   ASSERT_NE(shape, nullptr);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->Pos() == ignition::math::Vector3d::Zero);
 
   double maxHeight = shape->GetMaxHeight();
   double minHeight = shape->GetMinHeight();
@@ -363,7 +363,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
   EXPECT_TRUE(shape);
   EXPECT_TRUE(shape->HasType(physics::Base::HEIGHTMAP_SHAPE));
 
-  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d(0, 0, 0));
+  EXPECT_TRUE(shape->GetPos() == ignition::math::Vector3d::Zero);
   EXPECT_TRUE(shape->GetSize() == ignition::math::Vector3d(129, 129, 10));
 
   std::vector<float> physicsTest;

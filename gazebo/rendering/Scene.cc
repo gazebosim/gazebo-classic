@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -105,7 +106,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   // \todo: This is a hack. There is no guarantee (other than the
   // improbability of creating an extreme number of visuals), that
   // this contactVisId is unique.
-  this->dataPtr->contactVisId = GZ_UINT32_MAX;
+  this->dataPtr->contactVisId = ignition::math::MAX_UI32;
 
   this->dataPtr->initialized = false;
   this->dataPtr->showCOMs = false;
@@ -137,9 +138,6 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectToggleLayer(
         std::bind(&Scene::ToggleLayer, this, std::placeholders::_1)));
-
-  this->dataPtr->statsSub = this->dataPtr->node->Subscribe("~/world_stats",
-                                          &Scene::OnStatsMsg, this);
 
   this->dataPtr->sensorSub = this->dataPtr->node->Subscribe("~/sensor",
                                           &Scene::OnSensorMsg, this, true);
@@ -218,7 +216,6 @@ void Scene::Clear()
   this->dataPtr->jointSub.reset();
   this->dataPtr->sensorSub.reset();
   this->dataPtr->sceneSub.reset();
-  this->dataPtr->statsSub.reset();
   this->dataPtr->skeletonPoseSub.reset();
   this->dataPtr->visSub.reset();
   this->dataPtr->skySub.reset();
@@ -1013,14 +1010,12 @@ Ogre::Entity *Scene::OgreEntityAt(CameraPtr _camera,
                                   const ignition::math::Vector2i &_mousePos,
                                   const bool _ignoreSelectionObj)
 {
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setRay(mouseRay);
 
@@ -1106,16 +1101,13 @@ bool Scene::FirstContact(CameraPtr _camera,
                          ignition::math::Vector3d &_position)
 {
   bool valid = false;
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = ignition::math::Vector3d::Zero;
 
-  // Ogre::Real closest_distance = -1.0f;
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+  ignition::math::Vector3d origin;
+  ignition::math::Vector3d dir;
+  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
 
   this->dataPtr->raySceneQuery->setSortByDistance(true);
   this->dataPtr->raySceneQuery->setRay(mouseRay);
@@ -2744,10 +2736,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 common::Time Scene::SimTime() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  // Return the most recent sim time.
-  return
-    this->dataPtr->sceneSimTime > this->dataPtr->sceneSimTimePosesApplied ?
-    this->dataPtr->sceneSimTime : this->dataPtr->sceneSimTimePosesApplied;
+  return this->dataPtr->sceneSimTimePosesApplied;
 }
 
 /////////////////////////////////////////////////
@@ -3370,7 +3359,7 @@ void Scene::ShowContacts(const bool _show)
 {
   ContactVisualPtr vis;
 
-  if (this->dataPtr->contactVisId == GZ_UINT32_MAX && _show)
+  if (this->dataPtr->contactVisId == ignition::math::MAX_UI32 && _show)
   {
     vis.reset(new ContactVisual("__GUIONLY_CONTACT_VISUAL__",
               this->dataPtr->worldVisual, "~/physics/contacts"));
@@ -3489,11 +3478,4 @@ bool Scene::HasLayer(const int32_t _layer) const
 {
   return _layer < 0 ||
     this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
-}
-
-/////////////////////////////////////////////////
-void Scene::OnStatsMsg(ConstWorldStatisticsPtr &_msg)
-{
-  std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
-  this->dataPtr->sceneSimTime = msgs::Convert(_msg->sim_time());
 }

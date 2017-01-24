@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // auto pose = this->RelativePose();
   // SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
 
   // bbody->SetCollisionRelativePose(this, pose);

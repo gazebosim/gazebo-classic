@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include <ignition/math/Box.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <boost/function.hpp>
 #include "gazebo/msgs/msgs.hh"
@@ -90,15 +91,26 @@ namespace gazebo
 
       /// \brief Set the initial pose.
       /// \param[in] _pose The initial pose.
-      public: void SetInitialRelativePose(const math::Pose &_pose);
+      /// \deprecated See version that accepts ignition math object.
+      public: void SetInitialRelativePose(const math::Pose &_pose)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the initial pose.
+      /// \param[in] _pose The initial pose.
+      public: void SetInitialRelativePose(const ignition::math::Pose3d &_pose);
 
       /// \brief Get the initial relative pose.
       /// \return The initial relative pose.
-      public: math::Pose GetInitialRelativePose() const;
+      /// \deprecated See ignition::math::Pose3d InitialRelativePose() const
+      public: math::Pose GetInitialRelativePose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the initial relative pose.
+      /// \return The initial relative pose.
+      public: ignition::math::Pose3d InitialRelativePose() const;
 
       /// \brief Return the bounding box for the entity.
       /// \return The bounding box.
-      /// \deprecated See function that returns ignition math.
+      /// \deprecated See ignition::math::Box BoundingBox() const
       public: virtual math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Return the bounding box for the entity.
@@ -111,7 +123,14 @@ namespace gazebo
       public: inline virtual const math::Pose GetWorldPose() const
               GAZEBO_DEPRECATED(8.0)
       {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
         return this->worldPose;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
       }
 
       /// \brief Get the absolute pose of the entity.
@@ -123,63 +142,126 @@ namespace gazebo
 
       /// \brief Get the pose of the entity relative to its parent.
       /// \return The pose of the entity relative to its parent.
-      public: math::Pose GetRelativePose() const;
+      /// \deprecated See ignition::math::Pose3d RelativePose() const
+      public: math::Pose GetRelativePose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the pose of the entity relative to its parent.
+      /// \return The pose of the entity relative to its parent.
+      public: ignition::math::Pose3d RelativePose() const;
 
       /// \brief Set the pose of the entity relative to its parent.
       /// \param[in] _pose The new pose.
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
+      /// \deprecated See version that accepts an ignition::math object
       public: void SetRelativePose(const math::Pose &_pose,
                                    bool _notify = true,
-                                   bool _publish = true);
+                                   bool _publish = true) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the pose of the entity relative to its parent.
+      /// \param[in] _pose The new pose.
+      /// \param[in] _notify True = tell children of the pose change.
+      /// \param[in] _publish True to publish the pose.
+      public: void SetRelativePose(const ignition::math::Pose3d &_pose,
+                                   const bool _notify = true,
+                                   const bool _publish = true);
 
       /// \brief Set the world pose of the entity.
       /// \param[in] _pose The new world pose.
       /// \param[in] _notify True = tell children of the pose change.
       /// \param[in] _publish True to publish the pose.
+      /// \deprecated See version that accepts an ignition::math object.
       public: void SetWorldPose(const math::Pose &_pose,
+                                bool _notify = true,
+                                bool _publish = true) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the world pose of the entity.
+      /// \param[in] _pose The new world pose.
+      /// \param[in] _notify True = tell children of the pose change.
+      /// \param[in] _publish True to publish the pose.
+      public: void SetWorldPose(const ignition::math::Pose3d &_pose,
                                 const bool _notify = true,
                                 const bool _publish = true);
 
       /// \brief Get the linear velocity of the entity.
       /// \return A math::Vector3 for the linear velocity.
+      /// \deprecated See ignition::math::Vector3d RelativeLinearVel() const
       public: virtual math::Vector3 GetRelativeLinearVel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the entity.
+      /// \return A ignition::math::Vector3d for the linear velocity.
+      public: virtual ignition::math::Vector3d RelativeLinearVel() const;
 
       /// \brief Get the linear velocity of the entity in the world frame.
       /// \return A math::Vector3 for the linear velocity.
+      /// \deprecated See ignition::math::Vector3d WorldLinearVel() const
       public: virtual math::Vector3 GetWorldLinearVel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear velocity of the entity in the world frame.
+      /// \return A ignition::math::Vector3d for the linear velocity.
+      public: virtual ignition::math::Vector3d WorldLinearVel() const;
 
       /// \brief Get the angular velocity of the entity.
       /// \return A math::Vector3 for the velocity.
+      /// \deprecated See ignition::math::Vector3d RelativeAngularVel() const
       public: virtual math::Vector3 GetRelativeAngularVel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the entity.
+      /// \return A ignition::math::Vector3d for the velocity.
+      public: virtual ignition::math::Vector3d RelativeAngularVel() const;
 
       /// \brief Get the angular velocity of the entity in the world frame.
       /// \return A math::Vector3 for the velocity.
+      /// \deprecated See ignition::math::Vector3d WorldAngularVel() const
       public: virtual math::Vector3 GetWorldAngularVel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular velocity of the entity in the world frame.
+      /// \return A ignition::math::Vector3d for the velocity.
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       /// \brief Get the linear acceleration of the entity.
       /// \return A math::Vector3 for the acceleration.
+      /// \deprecated See ignition::math::Vector3d RelativeLinearAccel() const
       public: virtual math::Vector3 GetRelativeLinearAccel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the entity.
+      /// \return A ignition::math::Vector3d for the acceleration.
+      public: virtual ignition::math::Vector3d RelativeLinearAccel() const;
 
       /// \brief Get the linear acceleration of the entity in the world frame.
       /// \return A math::Vector3 for the acceleration.
+      /// \deprecated See ignition::math::Vector3d WorldLinearAccel() const
       public: virtual math::Vector3 GetWorldLinearAccel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the linear acceleration of the entity in the world frame.
+      /// \return A ignition::math::Vector3d for the acceleration.
+      public: virtual ignition::math::Vector3d WorldLinearAccel() const;
 
       /// \brief Get the angular acceleration of the entity.
       /// \return A math::Vector3 for the acceleration.
+      /// \deprecated See ignition::math::Vector3d RelativeAngularAccel() const
       public: virtual math::Vector3 GetRelativeAngularAccel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the entity.
+      /// \return A ignition::math::Vector3d for the acceleration.
+      public: virtual ignition::math::Vector3d RelativeAngularAccel() const;
 
       /// \brief Get the angular acceleration of the entity in the world frame.
       /// \return A math::Vector3 for the acceleration.
+      /// \deprecated See ignition::math::Vector3d WorldAngularAccel() const
       public: virtual math::Vector3 GetWorldAngularAccel() const
-              {return math::Vector3();}
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the angular acceleration of the entity in the world frame.
+      /// \return A ignition::math::Vector3d for the acceleration.
+      public: virtual ignition::math::Vector3d WorldAngularAccel() const;
 
       /// \brief Set to true if this entity is a canonical link for a model.
       /// \param[in] _value True if the link is canonical.
@@ -233,12 +315,12 @@ namespace gazebo
       public: void PlaceOnEntity(const std::string &_entityName);
 
       /// \brief Returns collision bounding box.
-      /// \return Collision bounding box.
-      /// \deprecated See function that returns ignition math.
+      /// \return Collsiion bounding box.
+      /// \deprecated See ignition::math::Box CollisionBoundingBox() const
       public: math::Box GetCollisionBoundingBox() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Returns collision bounding box.
-      /// \return Collision bounding box.
+      /// \return Collsion bounding box.
       public: ignition::math::Box CollisionBoundingBox() const;
 
       /// \brief Set angular and linear rates of an physics::Entity.
@@ -246,9 +328,20 @@ namespace gazebo
       /// \param[in] _angular Angular twist.
       /// \param[in] _updateChildren True to pass this update to child
       /// entities.
+      /// \deprecated See version that accepts ignition math objects.
       public: void SetWorldTwist(const math::Vector3 &_linear,
                                  const math::Vector3 &_angular,
-                                 bool _updateChildren = true);
+                                 bool _updateChildren = true)
+                                 GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set angular and linear rates of an physics::Entity.
+      /// \param[in] _linear Linear twist.
+      /// \param[in] _angular Angular twist.
+      /// \param[in] _updateChildren True to pass this update to child
+      /// entities.
+      public: void SetWorldTwist(const ignition::math::Vector3d &_linear,
+                                 const ignition::math::Vector3d &_angular,
+                                 const bool _updateChildren = true);
 
       /// \brief Returns Entity#dirtyPose.
       ///
@@ -275,8 +368,8 @@ namespace gazebo
       /// \brief Helper function to get the collision bounding box.
       /// \param[in] _base Object to calculated the bounding box for.
       /// \return The bounding box for the passed in object.
-      private: ignition::math::Box
-          CollisionBoundingBoxHelper(BasePtr _base) const;
+      private: ignition::math::Box CollisionBoundingBoxHelper(
+                   BasePtr _base) const;
 
       /// \brief Set the world pose for a model.
       /// \param[in] _pose New pose for the entity.
@@ -376,6 +469,21 @@ namespace gazebo
       /// \brief The function used to to set the world pose.
       private: void (Entity::*setWorldPoseFunc)(const ignition::math::Pose3d &,
                    const bool, const bool);
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition communication node.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Visual publisher.
+      protected: ignition::transport::Node::Publisher visPubIgn;
+
+      /// \brief Request publisher.
+      protected: ignition::transport::Node::Publisher requestPubIgn;
+
+      /// \brief Ignition Pose publisher.
+      private: ignition::transport::Node::Publisher posePubIgn;
     };
     /// \}
   }

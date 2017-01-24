@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -336,19 +337,6 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-{
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 unsigned int GpuRaySensor::CameraCount() const
 {
   return this->dataPtr->laserCam->CameraCount();
@@ -617,11 +605,11 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
       {
-        range = GZ_DBL_INF;
+        range = ignition::math::INF_D;
       }
       else if (range <= this->RangeMin())
       {
-        range = -GZ_DBL_INF;
+        range = -ignition::math::INF_D;
       }
       else if (this->noises.find(GPU_RAY_NOISE) !=
                this->noises.end())

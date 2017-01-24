@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -934,7 +934,7 @@ bool Actor::GetSelfCollide() const
 }
 
 /////////////////////////////////////////////////
-void Actor::SetWindMode(bool /*_enable*/)
+void Actor::SetWindMode(const bool /*_enable*/)
 {
   // Actors don't support wind mode
 }

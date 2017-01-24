@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   unsigned int height = 800;
   double updateRate = 30;
   ignition::math::Pose3d camPose(ignition::math::Vector3d(-5, 0, 5),
-                     ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+                     ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName, cameraName, camPose.Pos(),
       camPose.Rot().Euler(), width, height, updateRate);
 
@@ -90,7 +90,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   std::string modelName2 = "camera_model2";
   std::string cameraName2 = "camera_sensor2";
   ignition::math::Pose3d camPose2(ignition::math::Vector3d(5, 0, 5),
-                      ignition::math::Quaterniond(0, GZ_DTOR(15), 0));
+                      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
   SpawnCamera(modelName2, cameraName2, camPose2.Pos(),
       camPose2.Rot().Euler(), width, height, updateRate);
 
@@ -111,7 +111,7 @@ TEST_F(RenderingSensorTest, Timestamp)
   double rangeResolution = 0.02;
   unsigned int samples = 640;
   ignition::math::Pose3d testPose(ignition::math::Vector3d(0, 0, 0.1),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
 
   SpawnGpuRaySensor(modelName3, raySensorName, testPose.Pos(),
       testPose.Rot().Euler(), hMinAngle, hMaxAngle, minRange, maxRange,

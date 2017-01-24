@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
-  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d::Zero);
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
   gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
@@ -119,22 +119,26 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     this->node->Advertise<msgs::Model>("~/model/modify");
 
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   {
-    math::Pose initialPose = model->WorldPose();
-    EXPECT_EQ(pos, initialPose.pos.Ign());
+    ignition::math::Pose3d initialPose = model->WorldPose();
+    EXPECT_EQ(pos, initialPose.Pos());
   }
 
   {
@@ -142,10 +146,10 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    for (std::vector<math::Pose>::iterator iter = poses.begin();
+    for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), (*iter).Ign());
+      msgs::Set(msg.mutable_pose(), (*iter));
       modelPub->Publish(msg);
 
       while (*iter != model->WorldPose())
@@ -326,15 +330,19 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
   double z0 = 5;
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
   physics::ModelPtr model = world->ModelByName(name);
@@ -349,7 +357,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
       if (link->IsCanonicalLink())
         continue;
 
-      for (std::vector<math::Pose>::iterator iter = poses.begin();
+      for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
            iter != poses.end(); ++iter)
       {
         msgs::Model msg;
@@ -360,12 +368,12 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
+        msgs::Set(linkMsg->mutable_pose(), (*iter));
         modelPub->Publish(msg);
 
         int sleep = 0;
         int maxSleep = 50;
-        while (*iter != link->GetRelativePose() && sleep < maxSleep)
+        while (*iter != link->RelativePose() && sleep < maxSleep)
         {
           world->Step(1);
           common::Time::MSleep(1);
@@ -376,7 +384,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         // this change to the test.
         world->Step(10);
 
-        EXPECT_EQ(*iter, link->GetRelativePose());
+        EXPECT_EQ(*iter, link->RelativePose());
       }
     }
   }
@@ -461,7 +469,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   int steps = 2;
   physics::ModelPtr model;
-  math::Pose pose1, pose2;
+  ignition::math::Pose3d pose1, pose2;
   ignition::math::Vector3d vel1, vel2;
   double x0, y0;
 
@@ -480,9 +488,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
     x0 = modelPos[name].X();
     y0 = modelPos[name].Y();
 
-    EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.z, z0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Z(), z0, PHYSICS_TOL);
   }
 
   // resize model to half of it's size
@@ -552,9 +560,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         }
       }
 #endif
-      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
-      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
-      EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().X(), x0, xTolerance);
+      EXPECT_NEAR(pose1.Pos().Y(), y0, yTolerance);
+      EXPECT_NEAR(pose1.Pos().Z(), 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
     {
@@ -647,7 +655,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (visualGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (visualGeomElem->HasElement("sphere"))
@@ -674,7 +682,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (collisionGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("sphere"))
@@ -710,8 +718,8 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  math::Pose pose(0, 0, 0, 0, 0, 0);
-  math::Vector3 boxSize(1, 1, 1);
+  ignition::math::Pose3d pose(0, 0, 0, 0, 0, 0);
+  ignition::math::Vector3d boxSize(1, 1, 1);
   sdfStream << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='box_test'>"
     << "<allow_auto_disable>false</allow_auto_disable>"
@@ -777,7 +785,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize);
   }
 }
 

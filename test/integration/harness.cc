@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
     // Take a few steps and confirm that the model remains in place
     world->Step(50);
     EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
-    EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-3);
+    EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
   }
 
   // Detach message harness via transport topic
@@ -104,7 +104,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   // subtract one since we already took 1 step after publishing to detach
   world->Step(fallTime / dt - 1);
 
-  const auto vel = model->GetWorldLinearVel().Ign();
+  const auto vel = model->WorldLinearVel();
   EXPECT_NEAR(vel.X(), 0, 2e-3);
   EXPECT_NEAR(vel.Y(), 0, 2e-3);
   EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
@@ -178,7 +178,7 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
     // Take a few steps and confirm that the model remains in place
     common::Time::MSleep(50);
     EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-1);
-    EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-2);
+    EXPECT_NEAR(joint->Position(0), 0.0, 1e-2);
   }
 
   // Detach message harness via transport topic
@@ -246,7 +246,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   // Take a few steps and confirm that the model remains in place
   world->Step(50);
   EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
-  EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   // Prepare harness publisher
   auto velocityPub =
@@ -261,17 +261,17 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   common::Time::MSleep(30);
   world->Step(3.0 / dt);
   EXPECT_NEAR(joint->GetVelocity(0), -0.113, 1e-3);
-  EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), -0.3375, 1e-4);
+  EXPECT_NEAR(joint->Position(0), -0.3375, 1e-4);
 
   // Stop and verify that it holds position
-  const double stopPosition = joint->GetAngle(0).Ign().Radian();
+  const double stopPosition = joint->Position(0);
   msg.set_data(std::to_string(0));
   velocityPub->Publish(msg);
   common::Time::MSleep(30);
   world->Step(1.0 / dt);
 
   EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
-  EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), stopPosition, 1e-2);
+  EXPECT_NEAR(joint->Position(0), stopPosition, 1e-2);
 
   // Raise the harness
   const double upVel = 0.2;
@@ -281,7 +281,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   world->Step(1.0 / dt);
 
   EXPECT_NEAR(joint->GetVelocity(0), upVel, 2e-2);
-  EXPECT_NEAR(joint->GetAngle(0).Ign().Radian(), -0.145, 1e-3);
+  EXPECT_NEAR(joint->Position(0), -0.145, 1e-3);
 }
 
 TEST_P(Harness, LowerStopRaise)

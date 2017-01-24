@@ -132,7 +132,7 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (!this->dataPtr->tiltJoint)
     return;
 
-  double angle = this->dataPtr->tiltJoint->GetAngle(0).Radian();
+  double angle = this->dataPtr->tiltJoint->Position(0);
 
   common::Time time = this->dataPtr->model->GetWorld()->SimTime();
   if (time < this->dataPtr->lastUpdateTime)

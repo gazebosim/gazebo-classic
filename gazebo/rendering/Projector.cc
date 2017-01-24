@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,17 +49,6 @@ Projector::~Projector()
   this->SetEnabled(false);
   // Ogre cleanup
   Ogre::Root::getSingletonPtr()->removeFrameListener(&this->projector);
-}
-
-/////////////////////////////////////////////////
-void Projector::Load(const std::string &_name,
-                     const math::Pose &_pose,
-                     const std::string &_textureName,
-                     double _nearClip,
-                     double _farClip,
-                     double _fov)
-{
-  this->Load(_name, _pose.Ign(), _textureName, _nearClip, _farClip, _fov);
 }
 
 /////////////////////////////////////////////////
@@ -339,12 +328,6 @@ void Projector::ProjectorFrameListener::SetSceneNode()
     this->filterNode->setOrientation(
       Ogre::Quaternion(Ogre::Degree(90), Ogre::Vector3::UNIT_Y));
   }
-}
-
-/////////////////////////////////////////////////
-void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
-{
-  this->SetPose(_pose.Ign());
 }
 
 /////////////////////////////////////////////////

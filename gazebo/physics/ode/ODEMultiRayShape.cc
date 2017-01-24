@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -204,8 +204,8 @@ void ODEMultiRayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 }
 
 //////////////////////////////////////////////////
-void ODEMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void ODEMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

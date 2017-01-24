@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,15 +52,31 @@ namespace gazebo
 
       /// \brief Set the altitude of the plane.
       /// \param[in] _pos Position of the plane.
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      /// \deprecated See version that accepts an ignition math object.
+      public: virtual void SetAltitude(const math::Vector3 &_pos)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the altitude of the plane.
+      /// \param[in] _pos Position of the plane.
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
 
       /// \brief Set the normal.
       /// \param[in] _norm Plane normal.
-      public: void SetNormal(const math::Vector3 &_norm);
+      /// \deprecated See function which accepts an ignition math object.
+      public: void SetNormal(const math::Vector3 &_norm) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the normal.
+      /// \param[in] _norm Plane normal.
+      public: void SetNormal(const ignition::math::Vector3d &_norm);
 
       /// \brief Get the plane normal.
       /// \return The plane normal.
-      public: math::Vector3 GetNormal() const;
+      /// \deprecated See ignition::math::Vector3d Normal() const;
+      public: math::Vector3 GetNormal() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the plane normal.
+      /// \return The plane normal.
+      public: ignition::math::Vector3d Normal() const;
 
       /// \brief Set the size.
       /// \param[in] _size 2D size of the plane.

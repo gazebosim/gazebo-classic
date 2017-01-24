@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ void SpringTestPlugin::ExplicitUpdate()
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
-  double pos = this->jointExplicit->GetAngle(0).Radian();
+  double pos = this->jointExplicit->Position(0);
   double vel = this->jointExplicit->GetVelocity(0);
   double force = -this->kpExplicit * pos
                  -this->kdExplicit * vel;

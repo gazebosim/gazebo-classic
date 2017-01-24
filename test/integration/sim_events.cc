@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,13 +182,13 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   EXPECT_TRUE(can1 != NULL);
 
   unsigned int countBefore1 = GetEventCount();
-  can1->SetWorldPose(math::Pose(0, 5, 0, 0, 0, 0));
+  can1->SetWorldPose(ignition::math::Pose3d(0, 5, 0, 0, 0, 0));
   unsigned int countAfter1 = WaitForNewEvent(countBefore1, 10, 100);
   EXPECT_GT(countAfter1, countBefore1);
 
   // move can1 into the end region
   unsigned int countBefore2 = GetEventCount();
-  can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
+  can1->SetWorldPose(ignition::math::Pose3d(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
   EXPECT_GT(countAfter2, countBefore2);
 }
@@ -218,7 +218,7 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
 
   // Spawn a box on the second floor, which should call the elevator up.
   this->SpawnBox("_my_test_box_", ignition::math::Vector3d(0.5, 0.5, 0.5),
-      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d(0, 0, 0));
+      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d::Zero);
 
   // Wait for elevator to move. 10 seconds is more than long enough.
   common::Time::Sleep(10);

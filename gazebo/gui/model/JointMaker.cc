@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 
@@ -1349,8 +1350,8 @@ void JointData::UpdateMsg()
         msgs::Set(axisMsg->mutable_xyz(), this->axes[i]);
       }
       axisMsg->set_use_parent_model_frame(false);
-      axisMsg->set_limit_lower(-GZ_DBL_MAX);
-      axisMsg->set_limit_upper(GZ_DBL_MAX);
+      axisMsg->set_limit_lower(-ignition::math::MAX_D);
+      axisMsg->set_limit_upper(ignition::math::MAX_D);
       axisMsg->set_limit_effort(-1);
       axisMsg->set_limit_velocity(-1);
       axisMsg->set_damping(0);

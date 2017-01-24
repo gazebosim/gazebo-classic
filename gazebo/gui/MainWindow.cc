@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1655,6 +1655,15 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuLayout->addStretch(5);
   this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+  // OSX:
+  // There is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  //
+  // Ubuntu Xenial + Unity:
+  // The native menubar is not registering shortcuts (issue #2134)
+  this->dataPtr->menuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////

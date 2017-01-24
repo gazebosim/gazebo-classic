@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,7 +218,7 @@ void ImuSensor::Load(const std::string &_worldName)
   // next, account for vel in world frame of the imu
   // given the imu frame is offset from link frame, and link is rotating
   this->dataPtr->lastImuWorldLinearVel =
-      this->dataPtr->parentEntity->GetWorldLinearVel(this->pose.Pos()).Ign();
+      this->dataPtr->parentEntity->WorldLinearVel(this->pose.Pos());
 }
 
 //////////////////////////////////////////////////

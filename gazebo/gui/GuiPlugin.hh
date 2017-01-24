@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,15 @@ namespace gazebo
     /// the plugin SDF, <plugin ...>, and its children. It will be an empty
     /// element when loaded from INI file or command line argument.
     public: virtual void Load(sdf::ElementPtr /*_sdf*/) {}
+
+    // \brief must be defined to support style sheets
+    public: virtual void paintEvent(QPaintEvent *)
+    {
+      QStyleOption opt;
+      opt.init(this);
+      QPainter p(this);
+      style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+    }
   };
 
 /// \brief Plugin registration function for gui plugin. Part of the

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,13 +94,13 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     this->dem = *demData;
     if (this->sdf->HasElement("size"))
     {
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
     }
     else
     {
-      this->heightmapSize.x = this->dem.GetWorldWidth();
-      this->heightmapSize.y = this->dem.GetWorldHeight();
-      this->heightmapSize.z = this->dem.GetMaxElevation() -
+      this->heightmapSize.X() = this->dem.GetWorldWidth();
+      this->heightmapSize.Y() = this->dem.GetWorldHeight();
+      this->heightmapSize.Z() = this->dem.GetMaxElevation() -
           this->dem.GetMinElevation();
     }
 
@@ -136,7 +136,7 @@ int HeightmapShape::LoadTerrainFile(const std::string &_filename)
     if (imageData)
     {
       this->img = *imageData;
-      this->heightmapSize = this->sdf->Get<math::Vector3>("size");
+      this->heightmapSize = this->sdf->Get<ignition::math::Vector3d>("size");
       return 0;
     }
   }
@@ -161,6 +161,22 @@ void HeightmapShape::Load(sdf::ElementPtr _sdf)
   {
     gzerr << "Heightmap data size must be square, with a size of 2^n+1\n";
     return;
+  }
+
+  this->subSampling = 2u;
+  if (this->sdf->HasElement("sampling"))
+  {
+    unsigned int s = this->sdf->Get<unsigned int>("sampling");
+    if (s == 0u || s & (s - 1u))
+    {
+      gzerr << "Heightmap sampling value must be a power of 2. "
+            << "The default value of 2 will be used instead." << std::endl;
+      this->subSampling = 2;
+    }
+    else
+    {
+      this->subSampling = static_cast<int>(s);
+    }
   }
 
   // Check if the geometry of the terrain data matches Ogre constrains
@@ -188,12 +204,11 @@ void HeightmapShape::Init()
       &HeightmapShape::OnRequest, this, true);
   this->responsePub = this->node->Advertise<msgs::Response>("~/response");
 
-  this->subSampling = 2;
-
-  ignition::math::Vector3d terrainSize = this->GetSize().Ign();
+  ignition::math::Vector3d terrainSize = this->Size();
 
   // sampling size along image width and height
-  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)-1;
+  this->vertSize = (this->heightmapData->GetWidth() * this->subSampling)
+      - this->subSampling + 1;
   this->scale.X() = terrainSize.X() / this->vertSize;
   this->scale.Y() = terrainSize.Y() / this->vertSize;
 
@@ -214,7 +229,7 @@ void HeightmapShape::Init()
 
   // Step 1: Construct the heightmap lookup table
   this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->GetSize().Ign(), this->scale, this->flipY, this->heights);
+      this->Size(), this->scale, this->flipY, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -235,13 +250,39 @@ std::string HeightmapShape::GetURI() const
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetSize() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d HeightmapShape::Size() const
+{
   return this->heightmapSize;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 HeightmapShape::GetPos() const
 {
-  return this->sdf->Get<math::Vector3>("pos");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Pos();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d HeightmapShape::Pos() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("pos");
 }
 
 //////////////////////////////////////////////////
@@ -252,9 +293,11 @@ void HeightmapShape::FillMsg(msgs::Geometry &_msg)
   _msg.mutable_heightmap()->set_width(this->vertSize);
   _msg.mutable_heightmap()->set_height(this->vertSize);
 
-  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->GetSize().Ign());
-  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->GetPos().Ign());
+  msgs::Set(_msg.mutable_heightmap()->mutable_size(), this->Size());
+  msgs::Set(_msg.mutable_heightmap()->mutable_origin(), this->Pos());
   _msg.mutable_heightmap()->set_filename(this->GetURI());
+  _msg.mutable_heightmap()->set_sampling(
+      static_cast<unsigned int>(this->subSampling));
 }
 
 //////////////////////////////////////////////////
@@ -308,7 +351,7 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMaxHeight() const
 {
-  float max = GZ_FLT_MIN;
+  float max = ignition::math::MIN_F;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -321,7 +364,7 @@ float HeightmapShape::GetMaxHeight() const
 /////////////////////////////////////////////////
 float HeightmapShape::GetMinHeight() const
 {
-  float min = GZ_FLT_MAX;
+  float min = ignition::math::MAX_F;
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)

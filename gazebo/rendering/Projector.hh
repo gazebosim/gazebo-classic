@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 #include <ignition/math/Pose3.hh>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -72,21 +73,6 @@ namespace gazebo
                   const double _farClip = 15.0,
                   const double _fov = IGN_PI * 0.25);
 
-      /// \brief Load the projector.
-      /// \param[in] _name Name of the projector.
-      /// \param[in] _pos Pose of the projector.
-      /// \param[in] _textureName Name of the texture to project.
-      /// \param[in] _nearClip Near clip distance.
-      /// \param[in] _farClip Far clip distance.
-      /// \param[in] _fov Field of view.
-      /// \deprecated See version that uses a ignition::math Pose3d objects.
-      public: void Load(const std::string &_name,
-                        const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
-                        const std::string &_textureName = "",
-                        double _nearClip = 0.25,
-                        double _farClip = 15.0,
-                        double _fov = IGN_PI * 0.25) GAZEBO_DEPRECATED(8.0);
-
       /// \brief Load a texture into the projector.
       /// \param[in] _textureName Name of the texture to project.
       public: void SetTexture(const std::string &_textureName);
@@ -133,9 +119,6 @@ namespace gazebo
         public: void SetEnabled(bool _enabled);
         public: void SetUsingShaders(bool _usingShaders);
 
-        /// \deprecated See void SetPose(const ignition::math::Pose3d &_pose)
-        public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
         /// \brief Set the pose of the projector.
         /// \param[in] _pose New pose of the projector
         public: void SetPose(const ignition::math::Pose3d &_pose);
@@ -175,6 +158,12 @@ namespace gazebo
 
       /// \brief The projection frame listener.
       private: ProjectorFrameListener projector;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition transport node.
+      private: ignition::transport::Node nodeIgn;
     };
     /// \}
   }

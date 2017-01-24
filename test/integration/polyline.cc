@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // through the polyline
   {
     SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
-        ignition::math::Vector3d(0, 0, 0));
+        ignition::math::Vector3d::Zero);
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);

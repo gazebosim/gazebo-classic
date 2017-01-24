@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,11 @@
 
 #include <memory>
 #include <string>
-#include <QItemDelegate>
-#include <QObject>
-#include <QWidget>
 
 #include <ignition/msgs/plugin.pb.h>
 #include <ignition/msgs/plugin_v.pb.h>
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/util/system.hh"
 

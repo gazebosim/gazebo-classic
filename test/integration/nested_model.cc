@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   EXPECT_TRUE(joint->GetJointLink(1)->GetName() == "link_00" ||
       joint->GetJointLink(1)->GetName() == "link_01");
   EXPECT_EQ(joint->GetMsgType(), msgs::Joint::REVOLUTE);
-  EXPECT_EQ(joint->GetLocalAxis(0), ignition::math::Vector3d::UnitX);
+  EXPECT_EQ(joint->LocalAxis(0), ignition::math::Vector3d::UnitX);
 
   // verify nested model joint
   EXPECT_EQ(nestedModel->GetJointCount(), 0u);
@@ -338,9 +338,9 @@ void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
   EXPECT_TRUE(nestedModelJoint->GetJointLink(1)->GetName() == "link_01" ||
       nestedModelJoint->GetJointLink(1)->GetName() == "link_02");
   EXPECT_EQ(nestedModelJoint->GetMsgType(), msgs::Joint::PRISMATIC);
-  EXPECT_EQ(nestedModelJoint->GetLocalAxis(0), ignition::math::Vector3d::UnitZ);
-  EXPECT_EQ(nestedModelJoint->GetLowerLimit(0), -0.2);
-  EXPECT_EQ(nestedModelJoint->GetUpperLimit(0), 0.5);
+  EXPECT_EQ(nestedModelJoint->LocalAxis(0), ignition::math::Vector3d::UnitZ);
+  EXPECT_NEAR(nestedModelJoint->LowerLimit(0), -0.2, 1e-3);
+  EXPECT_NEAR(nestedModelJoint->UpperLimit(0), 0.5, 1e-3);
 }
 
 /////////////////////////////////////////////////

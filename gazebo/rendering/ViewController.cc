@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,13 +37,6 @@ ViewController::ViewController(UserCameraPtr _cam)
 //////////////////////////////////////////////////
 ViewController::~ViewController()
 {
-}
-
-//////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &_focalPoint,
-    double _yaw, double _pitch)
-{
-  this->Init(_focalPoint.Ign(), _yaw, _pitch);
 }
 
 //////////////////////////////////////////////////

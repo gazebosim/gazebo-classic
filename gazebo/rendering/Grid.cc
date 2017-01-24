@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -273,21 +273,9 @@ void Grid::Enable(const bool _enable)
 }
 
 //////////////////////////////////////////////////
-Ogre::SceneNode *Grid::GetSceneNode()
-{
-  return this->dataPtr->gridVis->GetSceneNode();
-}
-
-//////////////////////////////////////////////////
 VisualPtr Grid::GridVisual() const
 {
   return this->dataPtr->gridVis;
-}
-
-//////////////////////////////////////////////////
-common::Color Grid::GetColor() const
-{
-  return this->Color();
 }
 
 //////////////////////////////////////////////////
@@ -297,21 +285,9 @@ common::Color Grid::Color() const
 }
 
 //////////////////////////////////////////////////
-uint32_t Grid::GetCellCount() const
-{
-  return this->CellCount();
-}
-
-//////////////////////////////////////////////////
 uint32_t Grid::CellCount() const
 {
   return this->dataPtr->cellCount;
-}
-
-//////////////////////////////////////////////////
-float Grid::GetCellLength() const
-{
-  return this->CellLength();
 }
 
 //////////////////////////////////////////////////
@@ -321,22 +297,10 @@ float Grid::CellLength() const
 }
 
 //////////////////////////////////////////////////
-float Grid::GetLineWidth() const
-{
-  return this->LineWidth();
-}
-
-//////////////////////////////////////////////////
 float Grid::LineWidth() const
 {
   gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
   return this->dataPtr->lineWidth;
-}
-
-//////////////////////////////////////////////////
-uint32_t Grid::GetHeight() const
-{
-  return this->Height();
 }
 
 //////////////////////////////////////////////////

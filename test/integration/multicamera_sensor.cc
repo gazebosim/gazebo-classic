@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -217,9 +217,9 @@ TEST_F(MultiCameraSensor, CameraRotationTest)
                          diffMax, diffSum, diffAvg);
 
       // use below to construct test for rotated2 left camera offset
-      // math::Quaternion a(1.2, 1.3, 1.4);
-      // gzerr << "test: " << a.RotateVector(math::Vector3(0, 1, 0)) << "\n";
-
+      // ignition::math::Quaterniond a(1.2, 1.3, 1.4);
+      // gzerr << "test: " << a.RotateVector(
+      // ignition::math::Vector3d::UnitY) << "\n";
       // We expect that there will be some non-zero difference between the two
       // images.
       EXPECT_GT(diffSum, 100u);

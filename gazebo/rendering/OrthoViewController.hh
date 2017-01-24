@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,6 @@ namespace gazebo
 
       /// \brief Initialize the controller.
       public: virtual void Init();
-
-      // Documentation inherited
-      /// \deprecated See version that uses an ignition vector3d object.
-      public: virtual void Init(const math::Vector3 &_focalPoint,
-        const double _yaw = 0, const double _pitch = 0) GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual void Init(const ignition::math::Vector3d &_focalPoint,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -164,7 +164,7 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  ignition::math::Vector3d vel = this->link->GetWorldLinearVel(this->cp).Ign();
+  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp);
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
 
@@ -285,7 +285,7 @@ void LiftDragPlugin::OnUpdate()
   // modify cl per control joint value
   if (this->controlJoint)
   {
-    double controlAngle = this->controlJoint->GetAngle(0).Radian();
+    double controlAngle = this->controlJoint->Position(0);
     cl = cl + this->controlJointRadToCL * controlAngle;
     /// \TODO: also change cm and cd
   }
@@ -346,7 +346,7 @@ void LiftDragPlugin::OnUpdate()
 
   // moment arm from cg to cp in inertial plane
   ignition::math::Vector3d momentArm = pose.Rot().RotateVector(
-    this->cp - this->link->GetInertial()->GetCoG().Ign());
+    this->cp - this->link->GetInertial()->CoG());
   // gzerr << this->cp << " : " << this->link->GetInertial()->GetCoG() << "\n";
 
   // force and torque about cg in inertial frame
