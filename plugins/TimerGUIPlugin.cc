@@ -283,8 +283,8 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
     int xPos, yPos;
     if (this->parent())
     {
-      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() +
-          100;
+      xPos = static_cast<QWidget *>(this->parent())->width() - this->width() -
+          10;
     }
     else
       xPos = 600;
