@@ -363,7 +363,8 @@ bool gui::run(int _argc, char **_argv)
   gazebo::gui::MainWindow *mainWindow = gazebo::gui::get_main_window();
 
   GZ_ASSERT(mainWindow, "Main Window has to be available!");
-  GZ_ASSERT(mainWindow->RenderWidget(), "Main window's RenderWidget must have been created");
+  GZ_ASSERT(mainWindow->RenderWidget(),
+            "Main window's RenderWidget must have been created");
 
   mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
 

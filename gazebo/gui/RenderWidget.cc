@@ -111,7 +111,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->connections.push_back(
       gui::Events::ConnectFollow(
         boost::bind(&RenderWidget::OnFollow, this, _1)));
-
 }
 
 /////////////////////////////////////////////////
@@ -288,13 +287,14 @@ void RenderWidget::AddPlugins(const std::vector<std::string>& _pluginFilenames)
     // Make sure the string is not empty
     if ((*iter).empty()) continue;
 
-    sdf::ElementPtr elem(new sdf::Element()); // create an empty element
+    sdf::ElementPtr elem(new sdf::Element());  // create an empty element
     AddPlugin(*iter, elem);
-   }
+  }
 }
 
 /////////////////////////////////////////////////
-bool RenderWidget::AddPlugin(const std::string& _filename, sdf::ElementPtr _elem)
+bool RenderWidget::AddPlugin(const std::string& _filename,
+                             sdf::ElementPtr _elem)
 {
   if (_filename.empty())
   {
