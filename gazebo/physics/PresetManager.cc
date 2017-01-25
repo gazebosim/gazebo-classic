@@ -607,10 +607,6 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         }
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
       }
     }
     this->GenerateSDFHelper(_preset, elem);
