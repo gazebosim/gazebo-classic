@@ -130,7 +130,7 @@ void RenderWidget::Init()
   auto pluginFilenames = common::split(filenames, ":");
 
   // Load each plugin
-  AddPlugins(pluginFilenames);
+  this->AddPlugins(pluginFilenames);
 }
 
 /////////////////////////////////////////////////
@@ -278,7 +278,7 @@ void RenderWidget::OnFollow(const std::string &_modelName)
 }
 
 /////////////////////////////////////////////////
-void RenderWidget::AddPlugins(const std::vector<std::string>& _pluginFilenames)
+void RenderWidget::AddPlugins(const std::vector<std::string> &_pluginFilenames)
 {
   // Load each plugin
   for (std::vector<std::string>::const_iterator iter = _pluginFilenames.begin();
@@ -287,13 +287,14 @@ void RenderWidget::AddPlugins(const std::vector<std::string>& _pluginFilenames)
     // Make sure the string is not empty
     if ((*iter).empty()) continue;
 
-    sdf::ElementPtr elem(new sdf::Element());  // create an empty element
-    AddPlugin(*iter, elem);
+    // create an empty element as this function ignores SDF
+    sdf::ElementPtr elem(new sdf::Element());
+    this->AddPlugin(*iter, elem);
   }
 }
 
 /////////////////////////////////////////////////
-bool RenderWidget::AddPlugin(const std::string& _filename,
+bool RenderWidget::AddPlugin(const std::string &_filename,
                              sdf::ElementPtr _elem)
 {
   if (_filename.empty())
@@ -320,7 +321,7 @@ bool RenderWidget::AddPlugin(const std::string& _filename,
     return false;
   }
 
-  AddPlugin(plugin, _elem);
+  this->AddPlugin(plugin, _elem);
 
   gzlog << "Loaded GUI plugin[" << _filename << "]\n";
   return true;

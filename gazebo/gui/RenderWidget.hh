@@ -85,7 +85,7 @@ namespace gazebo
       ///       couldn't be created from this file.
       /// \param[in] _filename Filename to load the plugin from
       /// \param[in] _elem Plugin sdf parameters.
-      public: bool AddPlugin(const std::string& _filename,
+      public: bool AddPlugin(const std::string &_filename,
                              sdf::ElementPtr _elem);
 
       /// \brief Add a list of plugins to be loaded from files.
@@ -94,7 +94,7 @@ namespace gazebo
       ///   for each. Use AddPlugin(std::string&, sdf::ElementPtr) to load a GUI
       ///   plugin with an initialized sdf element instead.
       /// \param[in] _pluginFilenames list of filenames with the plugins
-      public: void AddPlugins(const std::vector<std::string>& _pluginFilenames);
+      public: void AddPlugins(const std::vector<std::string> &_pluginFilenames);
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
