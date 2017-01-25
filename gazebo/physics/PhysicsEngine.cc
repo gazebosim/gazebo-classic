@@ -257,12 +257,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
+      if (_value.type() == typeid(math::Vector3))
       {
         copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<math::Vector3>(_value));
@@ -272,12 +267,7 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "magnetic_field")
     {
       boost::any copy = _value;
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
+      if (_value.type() == typeid(math::Vector3))
       {
         copy = boost::lexical_cast<ignition::math::Vector3d>
             (boost::any_cast<math::Vector3>(_value));
