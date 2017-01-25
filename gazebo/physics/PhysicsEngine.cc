@@ -253,28 +253,15 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
+      copy = boost::lexical_cast<ignition::math::Vector3d>
+          (boost::any_cast<ignition::math::Vector3d>(_value));
       this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
       boost::any copy = _value;
-      if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
+      copy = boost::lexical_cast<ignition::math::Vector3d>
+          (boost::any_cast<ignition::math::Vector3d>(_value));
       this->world->SetMagneticField(
           boost::any_cast<ignition::math::Vector3d>(copy));
     }
