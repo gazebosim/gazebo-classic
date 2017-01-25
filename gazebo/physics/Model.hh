@@ -139,7 +139,9 @@ namespace gazebo
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
+      /// \deprecated acceleration should be achieved by applying a force.
       public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
@@ -151,7 +153,9 @@ namespace gazebo
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
+      /// \deprecated acceleration should be achieved by applying a force.
       public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the linear velocity of the entity.
       /// \return math::Vector3, set to 0, 0, 0 if the model has no body.
