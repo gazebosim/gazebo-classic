@@ -47,7 +47,7 @@ RenderWidget::RenderWidget(QWidget *_parent)
   this->setObjectName("renderWidget");
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  this->mainFrame = new QFrame;
+  this->mainFrame = new QFrame(this);
   this->mainFrame->setFrameShape(QFrame::NoFrame);
   this->mainFrame->show();
 
