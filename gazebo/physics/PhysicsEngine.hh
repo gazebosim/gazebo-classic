@@ -22,7 +22,6 @@
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
