@@ -4,6 +4,7 @@
 
 1. Remove Gazebo 8 deprecations
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
+    * [Pull request #2603](https://bitbucket.org/osrf/gazebo/pull-request/2603)
 
 ## Gazebo 8
 
