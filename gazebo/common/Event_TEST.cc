@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,15 +49,8 @@ void callbackDisconnect()
 {
   // Remove both connections in the callback, which should not cause
   // a segfault.
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
   g_event.Disconnect(g_conn->Id());
   g_event.Disconnect(g_conn2->Id());
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

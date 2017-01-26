@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class ModelListWidget_TEST : public QTestFixture
   private: void OnResponse(ConstResponsePtr &_msg);
 
   /// \brief Verify vector3 attributes and values.
-  /// \param[in] _properties Vector3 properties.
+  /// \param[in] _properties Vector3d properties.
   /// \param[in] _xyz Expected vector3 values.
   private: void CheckVector3Property(QList<QtProperty *> _properties,
       const ignition::math::Vector3d &_xyz);
@@ -47,7 +47,7 @@ class ModelListWidget_TEST : public QTestFixture
 
   /// \brief Set vector3 values.
   /// \param[in] _propTreeBrowser Property browser.
-  /// \param[in] _properties Vector3 properties.
+  /// \param[in] _properties Vector3d properties.
   /// \param[in] _xyz Expected vector3 values.
   private: void SetVector3Property(QtTreePropertyBrowser *propTreeBrowser,
       QList<QtProperty *> _properties,

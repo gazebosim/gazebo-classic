@@ -420,7 +420,7 @@ if (PKG_CONFIG_FOUND)
   ########################################
   # Find AV device. Only check for this on linux.
   if (UNIX)
-    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    pkg_check_modules(libavdevice libavdevice>=56.4.100)
     if (NOT libavdevice_FOUND)
       BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
     else()
@@ -552,7 +552,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 4.1.0)
+set (SDFormat_MIN_VERSION 5.0.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -706,12 +706,12 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.7 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
+find_package(ignition-math3 QUIET)
+if (NOT ignition-math3_FOUND)
+  message(STATUS "Looking for ignition-math3-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
 else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+  message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
 
 ########################################

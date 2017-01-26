@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2579,7 +2579,7 @@ bool ConfigWidget::UpdateVector3dWidget(ConfigChildWidget *_widget,
   }
   else
   {
-    gzerr << "Error updating Vector3 Config widget" << std::endl;
+    gzerr << "Error updating Vector3d Config widget" << std::endl;
   }
   return false;
 }
@@ -2829,7 +2829,7 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
   }
   else
   {
-    gzerr << "Error getting value from Vector3 Config widget" << std::endl;
+    gzerr << "Error getting value from Vector3d Config widget" << std::endl;
   }
   return value;
 }
