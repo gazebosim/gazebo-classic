@@ -241,7 +241,6 @@ namespace gazebo
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.
-      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
       public: event::ConnectionPtr ConnectNewLaserFrame(
         std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
