@@ -938,9 +938,11 @@ namespace gazebo
       protected: Visuals_M visuals;
 
       /// \brief Linear acceleration.
+      /// deprecated
       protected: ignition::math::Vector3d linearAccel;
 
       /// \brief Angular acceleration.
+      /// deprecated
       protected: ignition::math::Vector3d angularAccel;
 
       /// \brief Offsets for the attached models.
