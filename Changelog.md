@@ -4,6 +4,13 @@
 
 1. Remove Gazebo 8 deprecations
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
+2. Deprecate functions and variables:
+    * gazebo/physics/Link.hh: void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    * gazebo/physics/Link.hh: void SetAngularAccel(const ignition::math::Vector3d &_accel);
+    * gazebo/physics/Link.hh: members linearAccel and angularAccel.
+    * gazebo/physics/Model.hh: void SetLinearAccel(const ignition::math::Vector3d &_vel);
+    * gazebo/physics/Model.hh: void SetAngularAccel(const ignition::math::Vector3d &_vel);
+
 
 ## Gazebo 8
 
