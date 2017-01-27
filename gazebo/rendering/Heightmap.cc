@@ -394,6 +394,11 @@ void Heightmap::Load()
   this->dataPtr->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
 #endif
 
+  // There is an issue with OGRE terrain LOD if heights are not relative to 0.
+  // So we move the heightmap so that its min elevation = 0 before feeding to
+  // ogre. It is later translated back by the setOrigin call.
+  double minElevation = 0.0;
+
   // try loading heightmap data locally
   if (!this->dataPtr->filename.empty())
   {
@@ -418,6 +423,9 @@ void Heightmap::Load()
               heightmapSizeZ);
         }
       }
+
+      minElevation = demData->GetMinElevation();
+      std::cerr << " min " << minElevation<< std::endl;
 #endif
 
       // these params need to be the same as physics/HeightmapShape.cc
@@ -445,7 +453,7 @@ void Heightmap::Load()
         for (unsigned int x = 0; x < vertSize; ++x)
         {
           int index = (vertSize - y - 1) * vertSize + x;
-          this->dataPtr->heights.push_back(lookup[index]);
+          this->dataPtr->heights.push_back(lookup[index] - minElevation);
         }
       }
 
@@ -546,7 +554,7 @@ void Heightmap::Load()
       0.5 * this->dataPtr->terrainSize.X() / sqrtN,
       orig.y -0.5 * this->dataPtr->terrainSize.X() +
       0.5 * this->dataPtr->terrainSize.X() / sqrtN,
-      orig.z);
+      orig.z + minElevation);
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
@@ -656,7 +664,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->dataPtr->terrainGlobals->setMaxPixelError(0);
+  this->dataPtr->terrainGlobals->setMaxPixelError(this->dataPtr->maxPixelError);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -1152,6 +1160,24 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(nullptr);
   }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetLOD(const double _value)
+{
+  this->dataPtr->maxPixelError = std::max(_value, 0.0);
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setMaxPixelError(
+        this->dataPtr->maxPixelError);
+    std::cerr << " setting lod " << this->dataPtr->maxPixelError << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
+double Heightmap::LOD() const
+{
+  return this->dataPtr->maxPixelError;
 }
 
 /////////////////////////////////////////////////
