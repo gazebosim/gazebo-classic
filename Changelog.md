@@ -7,6 +7,7 @@
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
     * [Pull request #2603](https://bitbucket.org/osrf/gazebo/pull-request/2603)
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
+    * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 ## Gazebo 8
 
