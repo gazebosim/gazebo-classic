@@ -1486,7 +1486,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
         if (!origMat.isNull()
             && (techniqueCount < origMat->getNumTechniques()))
         {
-          origTechnique = material->getTechnique(techniqueCount);
+          origTechnique = origMat->getTechnique(techniqueCount);
         }
 
         for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
@@ -1495,10 +1495,9 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 
           // get original material pass
           Ogre::Pass *origPass = nullptr;
-          if (origTechnique)
+          if (origTechnique && passCount < origTechnique->getNumPasses())
           {
-            origPass =
-                origMat->getTechnique(techniqueCount)->getPass(passCount);
+            origPass = origTechnique->getPass(passCount);
           }
 
           // account for the diffuse alpha value in the ogre material script
