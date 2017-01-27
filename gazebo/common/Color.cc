@@ -175,19 +175,6 @@ ignition::math::Vector3d Color::HSV() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Color::GetAsYUV() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->YUV();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Color::YUV() const
 {
   ignition::math::Vector3d yuv;
