@@ -21,19 +21,6 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////
-bool Region::Contains(const math::Vector3 &_p) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Contains(_p.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////
 bool Region::Contains(const ignition::math::Vector3d &_p) const
 {
   for (auto v: this->boxes)
