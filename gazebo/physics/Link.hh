@@ -267,13 +267,13 @@ namespace gazebo
       /// \brief Set the linear acceleration of the body.
       /// \param[in] _accel Linear acceleration.
       /// \deprecated acceleration should be achieved by setting force, see SetForce()
-      public: void SetLinearAccel(const ignition::math::Vector3d &_accel);
+      public: void SetLinearAccel(const ignition::math::Vector3d &_accel)
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the angular acceleration of the body.
       /// \param[in] _accel Angular acceleration.
       /// \deprecated acceleration should be achieved by setting force, see SetForce()
-      public: void SetAngularAccel(const ignition::math::Vector3d &_accel);
+      public: void SetAngularAccel(const ignition::math::Vector3d &_accel)
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the force applied to the body.

@@ -35,7 +35,8 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   : GUIPlugin()
 {
   // This is needed to avoid the creation of a black widget with default size.
-  this->resize(0, 0);
+  this->move(-1, -1);
+  this->resize(1, 1);
 
   // Set the increment or decrement in angle per key pressed.
   this->angleStep.Degree(1.0);
