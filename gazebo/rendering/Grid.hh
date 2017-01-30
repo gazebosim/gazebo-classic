@@ -78,11 +78,6 @@ namespace gazebo
       /// invisible.
       public: void Enable(const bool _enable);
 
-      /// \brief Get the Ogre scene node associated with this grid
-      /// \return The Ogre scene node associated with this grid
-      /// \deprecated See GridVisual()
-      public: Ogre::SceneNode *GetSceneNode() GAZEBO_DEPRECATED(8.0);
-
       /// \brief Get thevisual associated with this grid
       /// \return The visual associated with this grid
       public: VisualPtr GridVisual() const;
@@ -97,21 +92,11 @@ namespace gazebo
 
       /// \brief Return the grid color
       /// \return The grid color
-      /// \deprecated See Color()
-      public: common::Color GetColor() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Return the grid color
-      /// \return The grid color
       public: common::Color Color() const;
 
       /// \brief Set the number of cells
       /// \param[in] _count The number of cells
       public: void SetCellCount(const uint32_t _count);
-
-      /// \brief Get the number of cells
-      /// \return The number of cells in each direction.
-      /// \deprecated See CellCount()
-      public: uint32_t GetCellCount() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the number of cells
       /// \return The number of cells in each direction.
@@ -123,11 +108,6 @@ namespace gazebo
 
       /// \brief Get the cell length
       /// \return The cell length
-      /// \deprecated See CellLength()
-      public: float GetCellLength() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the cell length
-      /// \return The cell length
       public: float CellLength() const;
 
       /// \brief Set the line width
@@ -136,21 +116,11 @@ namespace gazebo
 
       /// \brief Get the width of the grid line
       /// \return The line width
-      /// \deprecated See LineWidth()
-      public: float GetLineWidth() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the width of the grid line
-      /// \return The line width
       public: float LineWidth() const;
 
       /// \brief Set the height of the grid
       /// \param[in] _count Grid height
       public: void SetHeight(const uint32_t _count);
-
-      /// \brief Get the height of the grid
-      /// \return The height
-      /// \deprecated See Height()
-      public: uint32_t GetHeight() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the number of cells in the normal direction of the grid.
       /// \return The height

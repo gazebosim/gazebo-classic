@@ -33,7 +33,6 @@
 
 #include "gazebo/common/common.hh"
 #include "gazebo/common/Assert.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/MovableText.hh"
 
 #define POS_TEX_BINDING    0
@@ -263,19 +262,6 @@ bool MovableText::GetShowOnTop() const
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
   return this->onTop;
-}
-
-//////////////////////////////////////////////////
-math::Box MovableText::GetAABB()
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->AABB();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

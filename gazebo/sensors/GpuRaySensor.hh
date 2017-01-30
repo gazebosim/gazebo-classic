@@ -241,16 +241,9 @@ namespace gazebo
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.
-      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
       public: event::ConnectionPtr ConnectNewLaserFrame(
         std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
-
-      /// \brief Disconnect Laser Frame.
-      /// \param[in,out] _conn Connection pointer to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual bool IsActive() const;

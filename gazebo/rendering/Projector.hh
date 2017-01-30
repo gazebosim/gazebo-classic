@@ -73,28 +73,6 @@ namespace gazebo
                   const double _farClip = 15.0,
                   const double _fov = IGN_PI * 0.25);
 
-      /// \brief Load the projector.
-      /// \param[in] _name Name of the projector.
-      /// \param[in] _pos Pose of the projector.
-      /// \param[in] _textureName Name of the texture to project.
-      /// \param[in] _nearClip Near clip distance.
-      /// \param[in] _farClip Far clip distance.
-      /// \param[in] _fov Field of view.
-      /// \deprecated See version that uses a ignition::math Pose3d objects.
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      public: void Load(const std::string &_name,
-                        const math::Pose &_pose = math::Pose(0, 0, 0, 0, 0, 0),
-                        const std::string &_textureName = "",
-                        double _nearClip = 0.25,
-                        double _farClip = 15.0,
-                        double _fov = IGN_PI * 0.25) GAZEBO_DEPRECATED(8.0);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-
       /// \brief Load a texture into the projector.
       /// \param[in] _textureName Name of the texture to project.
       public: void SetTexture(const std::string &_textureName);
@@ -140,9 +118,6 @@ namespace gazebo
 
         public: void SetEnabled(bool _enabled);
         public: void SetUsingShaders(bool _usingShaders);
-
-        /// \deprecated See void SetPose(const ignition::math::Pose3d &_pose)
-        public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
 
         /// \brief Set the pose of the projector.
         /// \param[in] _pose New pose of the projector

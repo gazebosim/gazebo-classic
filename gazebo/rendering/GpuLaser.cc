@@ -863,9 +863,3 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
 }
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
-}
