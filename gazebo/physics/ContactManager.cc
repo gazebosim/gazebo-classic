@@ -199,8 +199,6 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   if (!_collision1 || !_collision2)
     return result;
 
-  std::cout<<"New contact! Has connections: "<<this->contactPub->HasConnections()<<std::endl;
-
   // If no one is listening to the default topic, or there are no
   // custom contact publishers then don't create any contact information.
   // This is a signal to the Physics engine that it can skip the extra
