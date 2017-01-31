@@ -90,15 +90,26 @@ namespace gazebo
       /// a new contact is generated. All other users should just make use
       /// of the accessor functions.
       ///
-      /// If no one is listening, then the return value will be NULL.
-      /// This is a signal to the Physics engine that it can skip the extra
-      /// processing necessary to get back contact information.
+      /// If no one is listening, then the return value will be NULL (unless
+      /// it was explicitly enforced with \e SetEnforceContacts())).
+      /// This is then a signal to the Physics engine that it can skip the
+      /// extra processing necessary to get back contact information.
+      ///
       /// \return The new contact. The physics engine should populate the
       /// contact's parameters. NULL will be returned if there are no
-      /// subscribers to the contact topic.
+      /// subscribers to the contact topic and ContactsEnforced()
+      /// returns false (default).
       public: Contact *NewContact(Collision *_collision1,
                                   Collision *_collision2,
                                   const common::Time &_time);
+
+      /// Can be used to enforces the addition of new contacts with
+      /// NewContact() even if there are no subscribers.
+      public: void SetEnforceContacts(const bool _enforce);
+
+      /// Returns the value last set with SetEnforceContacts().
+      /// If SetEnforceContacts() was never called, this will return false.
+      public: bool ContactsEnforced();
 
       /// \brief Return the number of valid contacts.
       public: unsigned int GetContactCount() const;
@@ -193,6 +204,11 @@ namespace gazebo
 
       /// \brief Contact publisher.
       private: ignition::transport::Node::Publisher contactPubIgn;
+
+      /// If true, enforces the addition of new contacts with
+      /// NewContact() even if there are no subscribers.
+      /// Default is false.
+      private: bool enforceContacts;
     };
     /// \}
   }

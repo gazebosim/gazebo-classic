@@ -41,6 +41,7 @@ ContactManager::ContactManager()
 {
   this->contactIndex = 0;
   this->customMutex = new boost::recursive_mutex();
+  this->enforceContacts = false;
 }
 
 /////////////////////////////////////////////////
@@ -80,6 +81,18 @@ void ContactManager::Init(WorldPtr _world)
 
   this->contactPub =
     this->node->Advertise<msgs::Contacts>("~/physics/contacts", 50);
+}
+
+/////////////////////////////////////////////////
+void ContactManager::SetEnforceContacts(const bool _enforce)
+{
+  this->enforceContacts = _enforce;
+}
+
+/////////////////////////////////////////////////
+bool ContactManager::ContactsEnforced()
+{
+  return this->enforceContacts;
 }
 
 /////////////////////////////////////////////////
@@ -135,7 +148,9 @@ Contact *ContactManager::NewContact(Collision *_collision1,
     }
   }
 
-  if (this->contactPub->HasConnections() || !publishers.empty())
+  if (this->ContactsEnforced() ||
+      this->contactPub->HasConnections() ||
+      !publishers.empty())
   {
     // Get or create a contact feedback object.
     if (this->contactIndex < this->contacts.size())
