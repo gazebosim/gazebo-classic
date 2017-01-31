@@ -123,6 +123,75 @@ void DARTPhysics::InitForThread()
 {
 }
 
+
+//////////////////////////////////////////////////
+// Helper class to maintain unique pairs of links in maps
+class LinkPair
+{
+  /// \brief Constructor.
+  /// \param _link1[in] and _link2[in] are the DART links for the contact.
+  ///   Their order may be swapped around.
+  public: LinkPair(const DARTLinkPtr &_link1,
+                   const DARTLinkPtr &_link2)
+          {
+            this->SetDARTLinks(_link1, _link2);
+          }
+
+  /// \brief Copy constructor
+  public: LinkPair(const LinkPair&_linkPair):
+            dtLink1(_linkPair.dtLink1),
+            dtLink2(_linkPair.dtLink2)
+          {}
+
+  /// \brief Destructor.
+  public: virtual ~LinkPair() {}
+
+  /// \brief Comparison operator
+  /// which always chooses the link which evaluates to lower by operator <
+  public: void SetDARTLinks(const DARTLinkPtr &_dtLink1,
+                            const DARTLinkPtr &_dtLink2)
+          {
+            if (cmpLink(_dtLink1, _dtLink2) < 0)
+            {
+              dtLink1 = _dtLink1;
+              dtLink2 = _dtLink2;
+            }
+            else
+            {
+              dtLink2 = _dtLink1;
+              dtLink1 = _dtLink2;
+            }
+          }
+  public: bool operator<(const LinkPair& c) const
+          {
+            int cmp1 = cmpLink(dtLink1, c.dtLink1);
+            if (cmp1 < 0) return true;
+            int cmp2 = cmpLink(dtLink2, c.dtLink2);
+            return (cmp1 == 0) && (cmp2 < 0);
+          }
+
+  public: DARTLinkPtr GetDARTLink1() const { return dtLink1; }
+  public: DARTLinkPtr GetDARTLink2() const { return dtLink2; }
+
+  // \brief internally used comparison operator for links
+  // \retval -1 l1 < l2
+  // \retval 0 l1 == l2
+  // \retval 1 l1 > l2
+  private: int cmpLink(const DARTLinkPtr &l1, const DARTLinkPtr &l2) const
+           {
+            // Comparing by address is required because names can be
+            // the same for different links. Could use the model name of the
+            // link in addition, but that's even more expensive.
+             return l1.get() < l2.get() ? -1 : l1.get() == l2.get() ? 0 : 1;
+           }
+
+  /// \brief Pointer to the first link object
+  private: DARTLinkPtr dtLink1;
+
+  /// \brief Pointer to the second link object
+  private: DARTLinkPtr dtLink2;
+};
+
 //////////////////////////////////////////////////
 void DARTPhysics::UpdateCollision()
 {
@@ -132,6 +201,23 @@ void DARTPhysics::UpdateCollision()
     this->dataPtr->dtWorld->getLastCollisionResult();
   int numContacts = dtLastResult.getNumContacts();
 
+  // DART returns all contact points individually, without grouping
+  // them to link pairs first. The majority of the Gazebo code assumes
+  // the contacts will come per link pair (e.g. all contacts of
+  // link1 and link2 grouped together in one Contact object).
+  // We will have to do this mapping here first.
+  // This could be skipped for performance reasons by supplying
+  // an additional std::vector<std::pair<LinkPair, dart::collision::Contact>
+  // which is just filled with duplicates, skipping the map step.
+
+  typedef std::map<LinkPair, std::deque<const dart::collision::Contact*>>
+    PairedContactsMap;
+  // Attention: The map uses a reference to dart::collision::Contact&, but this
+  // is retrieved from dtLastResult directly and used only within this function,
+  // so it will be safe to use within the scope of this function.
+  PairedContactsMap pairedContacts;
+
+  // insert all the contacts
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
@@ -170,66 +256,101 @@ void DARTPhysics::UpdateCollision()
     GZ_ASSERT(dartLink2.get() != nullptr,
         "dartLink2 in collision pair is null");
 
+    LinkPair dtLinkPair(dartLink1, dartLink2);
+    pairedContacts[dtLinkPair].push_back(&dtContact);
+  }
+
+  for (PairedContactsMap::iterator it=pairedContacts.begin();
+       it!=pairedContacts.end(); ++it)
+  {
+    DARTLinkPtr dartLink1 = it->first.GetDARTLink1();
+    DARTLinkPtr dartLink2 = it->first.GetDARTLink2();
+    const std::deque<const dart::collision::Contact*>& dtContacts = it->second;
+
+    GZ_ASSERT(!dtContacts.empty(),
+             "dtContacts is empty, at least one contact should have been added");
+
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
     CollisionPtr collisionPtr2 = dartLink2->GetCollision(colIndex);
 
     // Add a new contact to the manager. This will return nullptr if no one is
     // listening for contact information.
+    // It would be nice to do this in the first loop in order to save
+    // computation, but we can only add a new contact once per link pair,
+    // which is information we only have after the first loop.
+    // We could avoid all the computation however if the contact manager
+    // had a function returning in advance whether the ContactManger::NewContact
+    // will return NULL!
     Contact *contactFeedback = this->GetContactManager()->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
                                  this->world->SimTime());
-
     if (!contactFeedback)
       continue;
 
+
     auto body1Pose = dartLink1->WorldPose();
     auto body2Pose = dartLink2->WorldPose();
-    ignition::math::Vector3d localForce1;
-    ignition::math::Vector3d localForce2;
-    ignition::math::Vector3d localTorque1;
-    ignition::math::Vector3d localTorque2;
+    dart::dynamics::BodyNode *dtBodyNode1 = dartLink1->DARTBodyNode();
+    dart::dynamics::BodyNode *dtBodyNode2 = dartLink2->DARTBodyNode();
 
-    // calculate force in world frame
-    Eigen::Vector3d force = dtContact.force;
+    contactFeedback->count = 0;
 
-    // calculate torque in world frame
-    Eigen::Vector3d torqueA =
-        (dtContact.point -
-         dtBodyNode1->getTransform().translation()).cross(force);
-    Eigen::Vector3d torqueB =
-        (dtContact.point -
-         dtBodyNode2->getTransform().translation()).cross(-force);
-
-    // Convert from world to link frame
-    localForce1 = body1Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(force));
-    localForce2 = body2Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(-force));
-    localTorque1 = body1Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(torqueA));
-    localTorque2 = body2Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(torqueB));
-
-    contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
-    contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);
-    contactFeedback->depths[0] = dtContact.penetrationDepth;
-
-    if (!dartLink1->IsStatic())
+    std::deque<const dart::collision::Contact*>::const_iterator contIt;
+    int contNum=0;
+    for (contIt=dtContacts.begin();
+         (contNum < MAX_CONTACT_JOINTS) && (contIt != dtContacts.end());
+         ++contIt, ++contNum)
     {
-      contactFeedback->wrench[0].body1Force = localForce1;
-      contactFeedback->wrench[0].body1Torque = localTorque1;
-    }
+      const dart::collision::Contact *dtContact = *contIt;
 
-    if (!dartLink2->IsStatic())
-    {
-      contactFeedback->wrench[0].body2Force = localForce2;
-      contactFeedback->wrench[0].body2Torque = localTorque2;
-    }
+      ignition::math::Vector3d localForce1;
+      ignition::math::Vector3d localForce2;
+      ignition::math::Vector3d localTorque1;
+      ignition::math::Vector3d localTorque2;
 
-    ++contactFeedback->count;
+      // calculate force in world frame
+      Eigen::Vector3d force = dtContact->force;
+
+      // calculate torque in world frame
+      Eigen::Vector3d torqueA =
+          (dtContact->point -
+           dtBodyNode1->getTransform().translation()).cross(force);
+      Eigen::Vector3d torqueB =
+          (dtContact->point -
+           dtBodyNode2->getTransform().translation()).cross(-force);
+
+      // Convert from world to link frame
+      localForce1 = body1Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(force));
+      localForce2 = body2Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(-force));
+      localTorque1 = body1Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(torqueA));
+      localTorque2 = body2Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(torqueB));
+
+      contactFeedback->positions[contNum] = DARTTypes::ConvVec3Ign(dtContact->point);
+      contactFeedback->normals[contNum] = DARTTypes::ConvVec3Ign(dtContact->normal);
+      contactFeedback->depths[contNum] = dtContact->penetrationDepth;
+
+      if (!dartLink1->IsStatic())
+      {
+        contactFeedback->wrench[contNum].body1Force = localForce1;
+        contactFeedback->wrench[contNum].body1Torque = localTorque1;
+      }
+
+      if (!dartLink2->IsStatic())
+      {
+        contactFeedback->wrench[contNum].body2Force = localForce2;
+        contactFeedback->wrench[contNum].body2Torque = localTorque2;
+      }
+
+      ++contactFeedback->count;
+    }
   }
 }
+
 
 //////////////////////////////////////////////////
 void DARTPhysics::UpdatePhysics()
