@@ -81,7 +81,7 @@ namespace gazebo
 }
 
 // empty variable id
-const unsigned int VariablePill::EmptyVariable = IGN_UINT32_MAX;
+const unsigned int VariablePill::EmptyVariable = ignition::math::MAX_UI32;
 
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;
