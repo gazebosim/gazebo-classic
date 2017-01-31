@@ -140,7 +140,7 @@ namespace gazebo
       /// links.
       /// \param[in] _vel The new linear acceleration.
       /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
+      public: void SetLinearAccel(const ignition::math::Vector3d &_vel)
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the angular acceleration of the model, and all its
@@ -154,7 +154,7 @@ namespace gazebo
       /// links.
       /// \param[in] _vel The new angular acceleration
       /// \deprecated acceleration should be achieved by applying a force.
-      public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
+      public: void SetAngularAccel(const ignition::math::Vector3d &_vel)
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the linear velocity of the entity.
