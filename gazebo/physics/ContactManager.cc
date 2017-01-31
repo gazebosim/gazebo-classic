@@ -95,6 +95,100 @@ bool ContactManager::ContactsEnforced()
   return this->enforceContacts;
 }
 
+
+/////////////////////////////////////////////////
+bool ContactManager::SubscribersConnected(Collision *_collision1,
+                                          Collision *_collision2) const
+{
+  if (this->contactPub->HasConnections()) return true;
+
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  boost::unordered_map<std::string, ContactPublisher *>::const_iterator iter;
+  for (iter = this->customContactPublishers.begin();
+       iter != this->customContactPublishers.end(); ++iter)
+  {
+    // A model can simply be loaded later, so check the collisionNames as well.
+    if (!iter->second->collisionNames.empty())
+    {
+      std::vector<std::string>::const_iterator it;
+      for (it = iter->second->collisionNames.begin();
+           it != iter->second->collisionNames.end();)
+      {
+        BasePtr b = this->world->BaseByName(*it);
+        if (b)
+        {
+          return true;
+        }
+        // We could do the same transformation which is done in
+        // GetCustomPublishers() here (insert collisions which now have been
+        // loaded), but this would remove the const qualifier of this function.
+        // It would however speed up repeated calls of this function without
+        // a call of NewContact() or GetCustomPublishers() in between.
+      }
+    }
+
+    // only reason _collision1 or _collision1 cannot be const parameters
+    // is that compiler can't find const pointers in unordered set
+    if (iter->second->collisions.find(_collision1) !=
+        iter->second->collisions.end() ||
+        iter->second->collisions.find(_collision2) !=
+        iter->second->collisions.end())
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ContactManager::GetCustomPublishers(Collision *_collision1,
+                                         Collision *_collision2,
+                                         const bool _getOnlyConnected,
+                                         std::vector<ContactPublisher*> &_publishers)
+{
+  boost::recursive_mutex::scoped_lock lock(*this->customMutex);
+  boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
+  for (iter = this->customContactPublishers.begin();
+       iter != this->customContactPublishers.end(); ++iter)
+  {
+    // A model can simply be loaded later, so convert ones that are not yet
+    // found
+    if (!iter->second->collisionNames.empty())
+    {
+      std::vector<std::string>::iterator it;
+      for (it = iter->second->collisionNames.begin();
+          it != iter->second->collisionNames.end();)
+      {
+        Collision *col = boost::dynamic_pointer_cast<Collision>(
+            this->world->BaseByName(*it)).get();
+        if (!col)
+        {
+          ++it;
+          continue;
+        }
+        else
+          it = iter->second->collisionNames.erase(it);
+        iter->second->collisions.insert(col);
+      }
+    }
+
+    // only reason _collision1 or _collision1 cannot be const parameters
+    // is that compiler can't find const pointers in unordered set
+    if (iter->second->collisions.find(_collision1) !=
+        iter->second->collisions.end() ||
+        iter->second->collisions.find(_collision2) !=
+        iter->second->collisions.end())
+    {
+      GZ_ASSERT(iter->second->publisher!=NULL,
+                "ContactPublisher must have a valid publisher");
+      if (!_getOnlyConnected || iter->second->publisher->HasConnections())
+      {
+        _publishers.push_back(iter->second);
+      }
+    }
+  }
+}
+
 /////////////////////////////////////////////////
 Contact *ContactManager::NewContact(Collision *_collision1,
                                     Collision *_collision2,
@@ -105,48 +199,19 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   if (!_collision1 || !_collision2)
     return result;
 
+  std::cout<<"New contact! Has connections: "<<this->contactPub->HasConnections()<<std::endl;
+
   // If no one is listening to the default topic, or there are no
   // custom contact publishers then don't create any contact information.
   // This is a signal to the Physics engine that it can skip the extra
   // processing necessary to get back contact information.
 
   std::vector<ContactPublisher *> publishers;
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->customMutex);
-    boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
-    for (iter = this->customContactPublishers.begin();
-        iter != this->customContactPublishers.end(); ++iter)
-    {
-      // A model can simply be loaded later, so convert ones that are not yet
-      // found
-      if (!iter->second->collisionNames.empty())
-      {
-        std::vector<std::string>::iterator it;
-        for (it = iter->second->collisionNames.begin();
-            it != iter->second->collisionNames.end();)
-        {
-          Collision *col = boost::dynamic_pointer_cast<Collision>(
-              this->world->BaseByName(*it)).get();
-          if (!col)
-          {
-            ++it;
-            continue;
-          }
-          else
-            it = iter->second->collisionNames.erase(it);
-          iter->second->collisions.insert(col);
-        }
-      }
-
-      if (iter->second->collisions.find(_collision1) !=
-          iter->second->collisions.end() ||
-          iter->second->collisions.find(_collision2) !=
-          iter->second->collisions.end())
-      {
-        publishers.push_back(iter->second);
-      }
-    }
-  }
+  bool getOnlyConnected = false;
+  // TODO check: getOnlyConnected set to false to keep same behaviour as before.
+  // But should we not only add publishers which are connected, as is done
+  // for this->contactPub->HasConnections() condition?
+  GetCustomPublishers(_collision1, _collision2, getOnlyConnected, publishers);
 
   if (this->ContactsEnforced() ||
       this->contactPub->HasConnections() ||
@@ -178,6 +243,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
 
   return result;
 }
+
 
 /////////////////////////////////////////////////
 unsigned int ContactManager::GetContactCount() const
