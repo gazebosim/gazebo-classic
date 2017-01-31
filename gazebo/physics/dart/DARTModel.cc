@@ -288,12 +288,6 @@ void DARTModel::RestoreState()
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::Skeleton *DARTModel::GetDARTSkeleton()
-{
-  return this->DARTSkeleton().get();
-}
-
-//////////////////////////////////////////////////
 dart::dynamics::SkeletonPtr DARTModel::DARTSkeleton()
 {
   return this->dataPtr->dtSkeleton;
@@ -304,12 +298,6 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
   return boost::dynamic_pointer_cast<DARTPhysics>(
     this->GetWorld()->Physics());
-}
-
-//////////////////////////////////////////////////
-dart::simulation::World *DARTModel::GetDARTWorld(void) const
-{
-  return GetDARTPhysics()->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////

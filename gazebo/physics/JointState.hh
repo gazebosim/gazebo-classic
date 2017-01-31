@@ -28,7 +28,6 @@
 #include <ignition/math/Angle.hh>
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -85,28 +84,7 @@ namespace gazebo
       /// \param[in] _axis The axis index.
       /// \return Angle of the axis.
       /// \throw common::Exception When _axis is invalid.
-      /// \deprecated See Position()
-      public: math::Angle GetAngle(unsigned int _axis) const
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the joint position.
-      ///
-      /// For rotational axes, the value is in radians. For prismatic axes,
-      /// it is in meters.
-      ///
-      /// It returns ignition::math::NAN_D in case the position can't be
-      /// obtained. For instance, if the index is invalid.
-      ///
-      /// \param[in] _index Index of the axis, defaults to 0.
-      /// \return Position of the axis.
-      /// \throw common::Exception When _axis is invalid.
       public: double Position(const unsigned int _axis = 0) const;
-
-      /// \brief Get the angles.
-      /// \return Vector of angles.
-      /// \deprecated See Positions()
-      public: const std::vector<math::Angle> GetAngles() const
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the joint positions.
       ///

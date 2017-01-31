@@ -219,19 +219,6 @@ void ModelState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose ModelState::GetPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &ModelState::Pose() const
 {
   return this->pose;

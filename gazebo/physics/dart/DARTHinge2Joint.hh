@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_DARTHINGE2JOINT_HH_
 #define _GAZEBO_DARTHINGE2JOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
 #include "gazebo/util/system.hh"

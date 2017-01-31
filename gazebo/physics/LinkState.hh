@@ -17,6 +17,7 @@
 #ifndef GAZEBO_PHYSICS_LINKSTATE_HH_
 #define GAZEBO_PHYSICS_LINKSTATE_HH_
 
+#include <iomanip>
 #include <vector>
 #include <string>
 
@@ -25,7 +26,6 @@
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/CollisionState.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -93,36 +93,16 @@ namespace gazebo
       public: virtual void Load(const sdf::ElementPtr _elem);
 
       /// \brief Get the link pose.
-      /// \return The math::Pose of the Link.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the link pose.
       /// \return The ignition::math::Pose3d of the Link.
       public: const ignition::math::Pose3d &Pose() const;
-
-      /// \brief Get the link velocity.
-      /// \return The velocity represented as an math::Pose.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetVelocity() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the link velocity.
       /// \return The velocity represented as a ignition::math::Pose3d.
       public: const ignition::math::Pose3d &Velocity() const;
 
       /// \brief Get the link acceleration.
-      /// \return The acceleration represented as a math::Pose.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetAcceleration() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the link acceleration.
       /// \return The acceleration represented as a ignition::math::Pose3d.
       public: const ignition::math::Pose3d &Acceleration() const;
-
-      /// \brief Get the force applied to the Link.
-      /// \return Magnitude of the force.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetWrench() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the force and torque applied to the Link.
       /// \return The wrench represented as an ignition::math::Pose3d.
