@@ -124,6 +124,8 @@ MainWindow::MainWindow()
   this->dataPtr->toolsWidget = new ToolsWidget();
 
   this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
+  // don't call RenderWidget::Init() yet, as some GUI plugins loaded from
+  // there may need the main window to be finalised already.
 
   this->CreateEditors();
 
@@ -286,6 +288,8 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
+  this->RenderWidget()->Init();
+
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", -1);
   int winHeight = getINIProperty<int>("geometry.height", -1);
