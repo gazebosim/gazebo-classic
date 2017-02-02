@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+
+#include <functional>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
@@ -93,14 +95,14 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
   {
     // Setup communication
     this->node = transport::NodePtr(new transport::Node());
-    this->node->Init(this->world->GetName());
+    this->node->Init(this->world->Name());
     this->msgPub = this->node->Advertise<gazebo::msgs::GzString>(topic);
 
     this->msg.set_data(data);
 
     // Connect to the update event.
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&OccupiedEventSource::Update, this));
+        std::bind(&OccupiedEventSource::Update, this));
   }
 }
 
@@ -108,7 +110,7 @@ void OccupiedEventSource::Load(const sdf::ElementPtr _sdf)
 void OccupiedEventSource::Update()
 {
   // Get all the models.
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
 
   // Process each model.
   for (physics::Model_V::iterator iter = models.begin();
@@ -119,7 +121,7 @@ void OccupiedEventSource::Update()
       continue;
 
     // If inside, then transmit the desired message.
-    if (this->regions[this->regionName]->Contains((*iter)->GetWorldPose().pos))
+    if (this->regions[this->regionName]->Contains((*iter)->WorldPose().Pos()))
     {
       this->msgPub->Publish(this->msg);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ void BulletHeightmapShape::Init()
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(this->scale.x, this->scale.y, 1.0);
+  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1.0);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
       this->vertSize,     // # of heights along width

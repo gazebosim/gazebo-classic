@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ using namespace physics;
 PolylineShape::PolylineShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::POLYLINE_SHAPE);
-  this->scale = math::Vector3::One;
   sdf::initFile("polyline_shape.sdf", this->sdf);
 }
 
@@ -96,9 +95,9 @@ double PolylineShape::GetHeight() const
 }
 
 //////////////////////////////////////////////////
-void PolylineShape::SetScale(const math::Vector3 &_scale)
+void PolylineShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)

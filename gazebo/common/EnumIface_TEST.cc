@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ TEST_F(EnumIfaceTest, Iterator)
   // Postfix ++ operator
   i = 0;
   for (common::EnumIterator<MyType> typeIter = MY_TYPE_BEGIN;
-       typeIter != end; typeIter++, ++i)
+       typeIter != end; ++typeIter, ++i)
   {
     EXPECT_EQ(typeIter.Value(), i);
     if (i == 0)
@@ -107,7 +107,7 @@ TEST_F(EnumIfaceTest, Iterator)
   i = MY_TYPE_END - 1;
   common::EnumIterator<MyType> end2;
   for (common::EnumIterator<MyType> typeIter = --end2;
-       typeIter != begin; typeIter--, --i)
+       typeIter != begin; --typeIter, --i)
   {
     EXPECT_EQ(*typeIter, i);
     if (i == 0)

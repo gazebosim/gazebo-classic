@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
  */
 
+#include <ignition/math/Angle.hh>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/Link.hh"
@@ -35,19 +36,19 @@ JointState::JointState(JointPtr _joint, const common::Time &_realTime,
     const common::Time &_simTime, const uint64_t _iterations)
 : State(_joint->GetName(), _realTime, _simTime, _iterations)
 {
-  // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+  // Set the joint positions.
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->positions.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////
 JointState::JointState(JointPtr _joint)
-: State(_joint->GetName(), _joint->GetWorld()->GetRealTime(),
-        _joint->GetWorld()->GetSimTime(), _joint->GetWorld()->GetIterations())
+: State(_joint->GetName(), _joint->GetWorld()->RealTime(),
+        _joint->GetWorld()->SimTime(), _joint->GetWorld()->Iterations())
 {
-  // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+  // Set the joint positions.
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->positions.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////
@@ -72,9 +73,9 @@ void JointState::Load(JointPtr _joint, const common::Time &_realTime,
   this->simTime = _simTime;
   this->wallTime = common::Time::GetWallTime();
 
-  // Set the joint angles.
-  for (unsigned int i = 0; i < _joint->GetAngleCount(); ++i)
-    this->angles.push_back(_joint->GetAngle(i));
+  // Set the joint positions.
+  for (unsigned int i = 0; i < _joint->DOF(); ++i)
+    this->positions.push_back(_joint->Position(i));
 }
 
 /////////////////////////////////////////////////
@@ -83,17 +84,17 @@ void JointState::Load(const sdf::ElementPtr _elem)
   // Set the name
   this->name = _elem->Get<std::string>("name");
 
-  // Set the angles
-  this->angles.clear();
+  // Set the positions
+  this->positions.clear();
   if (_elem->HasElement("angle"))
   {
     sdf::ElementPtr childElem = _elem->GetElement("angle");
     while (childElem)
     {
       unsigned int axis = childElem->Get<unsigned int>("axis");
-      if (axis+1 > this->angles.size())
-        this->angles.resize(axis+1, math::Angle(0.0));
-      this->angles[axis] = childElem->Get<double>();
+      if (axis+1 > this->positions.size())
+        this->positions.resize(axis+1, 0.0);
+      this->positions[axis] = childElem->Get<double>();
       childElem = childElem->GetNextElement("angle");
     }
   }
@@ -102,34 +103,63 @@ void JointState::Load(const sdf::ElementPtr _elem)
 /////////////////////////////////////////////////
 unsigned int JointState::GetAngleCount() const
 {
-  return this->angles.size();
+  return this->positions.size();
 }
 
 /////////////////////////////////////////////////
 math::Angle JointState::GetAngle(unsigned int _axis) const
 {
-  if (_axis < this->angles.size())
-    return this->angles[_axis];
-
-  gzthrow("Index[" + boost::lexical_cast<std::string>(_axis) +
-          "] is out of range.");
-  return math::Angle();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Position(_axis);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Angle> &JointState::GetAngles() const
+double JointState::Position(const unsigned int _axis) const
 {
-  return this->angles;
+  if (_axis < this->positions.size())
+    return this->positions[_axis];
+
+  return ignition::math::NAN_D;
+}
+
+/////////////////////////////////////////////////
+const std::vector<math::Angle> JointState::GetAngles() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  std::vector<math::Angle> gzAngles;
+
+  for (const auto &a : this->positions)
+    gzAngles.push_back(a);
+
+  return gzAngles;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+const std::vector<double> &JointState::Positions() const
+{
+  return this->positions;
 }
 
 /////////////////////////////////////////////////
 bool JointState::IsZero() const
 {
   bool result = true;
-  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end() && result; ++iter)
+  for (std::vector<double>::const_iterator iter =
+       this->positions.begin(); iter != this->positions.end() && result; ++iter)
   {
-    result = result && (*iter) == math::Angle::Zero;
+    result = result && ignition::math::equal((*iter), 0.0);
   }
 
   return result;
@@ -140,14 +170,14 @@ JointState &JointState::operator=(const JointState &_state)
 {
   State::operator=(_state);
 
-  // Clear the angles.
-  this->angles.clear();
+  // Clear the positions.
+  this->positions.clear();
 
-  // Copy the angles.
-  for (std::vector<math::Angle>::const_iterator iter = _state.angles.begin();
-       iter != _state.angles.end(); ++iter)
+  // Copy the positions.
+  for (std::vector<double>::const_iterator iter =
+       _state.positions.begin(); iter != _state.positions.end(); ++iter)
   {
-    this->angles.push_back(*iter);
+    this->positions.push_back(*iter);
   }
 
   return *this;
@@ -161,15 +191,16 @@ JointState JointState::operator-(const JointState &_state) const
   // Set the name
   result.name = this->name;
 
-  // Set the angles.
+  // Set the positions.
   /// \TODO: this will produce incorrect results if _state doesn't have the
-  /// same set of angles as *this.
+  /// same set of positions as *this.
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<double>::const_iterator iterA =
+       this->positions.begin(), iterB = _state.positions.begin();
+       iterA != this->positions.end() &&
+       iterB != _state.positions.end(); ++iterA, ++iterB, ++i)
   {
-    result.angles.push_back((*iterA) - (*iterB));
+    result.positions.push_back((*iterA) - (*iterB));
   }
 
   return result;
@@ -183,15 +214,16 @@ JointState JointState::operator+(const JointState &_state) const
   // Set the name
   result.name = this->name;
 
-  // Set the angles.
+  // Set the positions.
   /// \TODO: this will produce incorrect results if _state doesn't have the
-  /// same set of angles as *this.
+  /// same set of positions as *this.
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iterA = this->angles.begin(),
-       iterB = _state.angles.begin(); iterA != this->angles.end() &&
-       iterB != _state.angles.end(); ++iterA, ++iterB, ++i)
+  for (std::vector<double>::const_iterator iterA =
+       this->positions.begin(), iterB = _state.positions.begin();
+       iterA != this->positions.end() &&
+       iterB != _state.positions.end(); ++iterA, ++iterB, ++i)
   {
-    result.angles.push_back((*iterA) + (*iterB));
+    result.positions.push_back((*iterA) + (*iterB));
   }
 
   return result;
@@ -205,11 +237,11 @@ void JointState::FillSDF(sdf::ElementPtr _sdf)
   _sdf->GetAttribute("name")->Set(this->name);
 
   int i = 0;
-  for (std::vector<math::Angle>::const_iterator iter = this->angles.begin();
-       iter != this->angles.end(); ++iter, ++i)
+  for (std::vector<double>::const_iterator iter =
+       this->positions.begin(); iter != this->positions.end(); ++iter, ++i)
   {
     sdf::ElementPtr elem = _sdf->AddElement("angle");
     elem->GetAttribute("axis")->Set(i);
-    elem->Set((*iter).Radian());
+    elem->Set((*iter));
   }
 }

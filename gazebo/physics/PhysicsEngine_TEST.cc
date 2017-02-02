@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   // Test PhysicsEngine::[GS]etParam()
   {
-    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    physics::PhysicsEnginePtr physics = world->Physics();
     boost::any dt = physics->GetParam("max_step_size");
     EXPECT_DOUBLE_EQ(boost::any_cast<double>(dt),
       physicsPubMsg.max_step_size());
@@ -112,7 +112,7 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
 
   {
     // Test SetParam for non-implementation-specific parameters
-    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    physics::PhysicsEnginePtr physics = world->Physics();
     try
     {
       boost::any value;
@@ -121,8 +121,8 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       double realTimeFactor = 0.04;
       ignition::math::Vector3d gravity(0, 0, 0);
       ignition::math::Vector3d magField(0.1, 0.1, 0.1);
-      gazebo::math::Vector3 gravity2(0.2, 0.2, 0.2);
-      gazebo::math::Vector3 magField2(0.3, 0.3, 0.3);
+      ignition::math::Vector3d gravity2(0.2, 0.2, 0.2);
+      ignition::math::Vector3d magField2(0.3, 0.3, 0.3);
       gzdbg << "Set and Get max_step_size" << std::endl;
       EXPECT_TRUE(physics->SetParam("max_step_size", maxStepSize));
       EXPECT_TRUE(physics->GetParam("max_step_size", value));
@@ -141,20 +141,20 @@ void PhysicsEngineTest::PhysicsEngineParam(const std::string &_physicsEngine)
       EXPECT_TRUE(physics->SetParam("gravity", gravity));
       EXPECT_TRUE(physics->GetParam("gravity", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), gravity);
-      gzdbg << "Set gravity as gazebo::math::Vector3" << std::endl;
+      gzdbg << "Set gravity as ignition::math::Vector3d" << std::endl;
       EXPECT_TRUE(physics->SetParam("gravity", gravity2));
       EXPECT_TRUE(physics->GetParam("gravity", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value),
-                gravity2.Ign());
+                gravity2);
       gzdbg << "Set magnetic_field as ignition::math::Vector3d" << std::endl;
       EXPECT_TRUE(physics->SetParam("magnetic_field", magField));
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value), magField);
-      gzdbg << "Set magnetic_field as gazebo::math::Vector3" << std::endl;
+      gzdbg << "Set magnetic_field as ignition::math::Vector3d" << std::endl;
       EXPECT_TRUE(physics->SetParam("magnetic_field", magField2));
       EXPECT_TRUE(physics->GetParam("magnetic_field", value));
       EXPECT_EQ(boost::any_cast<ignition::math::Vector3d>(value),
-                magField2.Ign());
+                magField2);
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -181,7 +181,7 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
 
   // Initialize to failure conditions
   boost::any value;

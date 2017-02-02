@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   if (i > 20)
     gzthrow("Unable to get model [" << modelName << "].");
 
-  physics::ModelPtr model = world->GetModel(modelName);
+  physics::ModelPtr model = world->ModelByName(modelName);
   EXPECT_TRUE(model != NULL);
 
   // get joints
@@ -105,17 +105,17 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
   // step for some time and expect all three joints to behave
   // the same way (check joint velocity and position).
   double test_duration = 1.5;
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   int steps = test_duration/dt;
 
-  double t0 = world->GetSimTime().Double();
+  double t0 = world->SimTime().Double();
 
   // for (int j = 0; j < 1000; ++j) //  for debug
   for (int i = 0; i < steps; ++i)
   {
-    double pos1 = joint1->GetAngle(0).Radian();
-    double pos2 = joint2->GetAngle(0).Radian();
-    double pos3 = joint3->GetAngle(0).Radian();
+    double pos1 = joint1->Position(0);
+    double pos2 = joint2->Position(0);
+    double pos3 = joint3->Position(0);
     double error1 = pos1 - cmdPos;
     double error2 = pos2 - cmdPos;
     double error3 = pos3 - cmdPos;
@@ -125,13 +125,13 @@ void PhysicsTest::TrikeyWheelResponse(const std::string &_physicsEngine,
     joint1->SetForce(0, force1);
     joint2->SetForce(0, force2);
     joint3->SetForce(0, force3);
-    EXPECT_DOUBLE_EQ(world->GetSimTime().Double(), t0 + dt * i);
+    EXPECT_DOUBLE_EQ(world->SimTime().Double(), t0 + dt * i);
     EXPECT_NEAR(joint1->GetVelocity(0), joint2->GetVelocity(0), TOL);
     EXPECT_NEAR(joint1->GetVelocity(0), joint3->GetVelocity(0), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint2->GetAngle(0).Radian(), TOL);
-    EXPECT_NEAR(joint1->GetAngle(0).Radian(),
-                joint3->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(joint1->Position(0),
+                joint2->Position(0), TOL);
+    EXPECT_NEAR(joint1->Position(0),
+                joint3->Position(0), TOL);
     world->Step(1);
   }
 }

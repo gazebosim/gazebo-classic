@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_DARTCOLLISION_HH_
-#define _GAZEBO_DARTCOLLISION_HH_
-
-#include "gazebo/math/Box.hh"
+#ifndef GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
+#define GAZEBO_PHYSICS_DART_DARTCOLLISION_HH_
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -73,7 +71,7 @@ namespace gazebo
       public: virtual unsigned int GetCollideBits() const;
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get DART body node.
       /// \return Pointer to the dart BodyNode.
@@ -82,11 +80,25 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
+      /// \deprecated See version that accepts dart::dynamics::ShapePtr
       public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         bool _placeable = true);
+                                         const bool _placeable = true)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set DART collision shape.
+      /// \param[in] _shape DART Collision shape
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
+                                         const bool _placeable = true);
 
       /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape *GetDARTCollisionShape() const;
+      /// \deprecated See dart::dynamics::ShapePtr DARTCollisionShape()
+      public: dart::dynamics::Shape *GetDARTCollisionShape() const
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get DART collision shape.
+      /// \return DART Collision shape pointer.
+      public: dart::dynamics::ShapePtr DARTCollisionShape() const;
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.

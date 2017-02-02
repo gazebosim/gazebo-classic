@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,6 +158,18 @@ namespace gazebo
       /// \return A clone of this link data.
       public: LinkData *Clone(const std::string &_newName);
 
+      /// \brief Show or hide collision visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowCollisions(const bool _show);
+
+      /// \brief Show or hide visual visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowVisuals(const bool _show);
+
+      /// \brief Show or hide link frame visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowLinkFrame(const bool _show);
+
       /// \brief Computes the volume of a link.
       /// \param[in] _collision A collision message.
       /// \return The computed volume.
@@ -213,6 +225,18 @@ namespace gazebo
       /// \param[in] _name Name of collision.
       private slots: void OnRemoveCollision(const std::string &_name);
 
+      /// \brief Qt callback when a collision is to be shown/hidden.
+      /// \param[in] _show True to show.
+      /// \param[in] _name Name of collision.
+      private slots: void OnShowCollision(const bool _show,
+          const std::string &_name);
+
+      /// \brief Qt callback when a visual is to be shown/hidden.
+      /// \param[in] _show True to show.
+      /// \param[in] _name Name of visual.
+      private slots: void OnShowVisual(const bool _show,
+          const std::string &_name);
+
       /// \brief Qt callback when the inspector is opened.
       private slots: void OnInspectorOpened();
 
@@ -242,7 +266,7 @@ namespace gazebo
       public: std::map<std::string, ignition::math::Vector3d> scales;
 
       /// \brief Visual representing this link.
-      public: rendering::VisualPtr linkVisual;
+      private: rendering::VisualPtr linkVisual;
 
       /// \brief Visuals of the link.
       public: std::map<rendering::VisualPtr, msgs::Visual> visuals;
@@ -262,11 +286,23 @@ namespace gazebo
       /// \brief Deleted collisions of the link.
       public: std::map<rendering::VisualPtr, msgs::Collision> deletedCollisions;
 
+      /// \brief Link frame visual.
+      public: rendering::LinkFrameVisualPtr linkFrameVis;
+
       /// \brief Inspector for configuring link properties.
       public: LinkInspector *inspector;
 
       /// \brief Flag set to true if this is a link of a nested model.
       public: bool nested;
+
+      /// \brief True if all collisions are currently visible, false otherwise.
+      public: bool showCollisions = true;
+
+      /// \brief True if all visuals are currently visible, false otherwise.
+      public: bool showVisuals = true;
+
+      /// \brief True if all link frames are currently visible, false otherwise.
+      public: bool showLinkFrame = true;
     };
 
     /// \brief Helper class to store model plugin data

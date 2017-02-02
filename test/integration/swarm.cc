@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ void SwarmTest::FlockingWorld(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
-  EXPECT_EQ(world->GetModels().size(), 1003u);
+  EXPECT_EQ(world->Models().size(), 1003u);
 }
 
 TEST_P(SwarmTest, FlockingWorld)

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,12 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: DARTHeightmapShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: DARTHeightmapShape(CollisionPtr _parent) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Collision parent.
+      public: DARTHeightmapShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHeightmapShape();

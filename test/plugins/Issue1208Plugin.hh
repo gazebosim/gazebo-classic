@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace gazebo
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
             {
               this->world = _world;
-              this->physics = this->world->GetPhysicsEngine();
+              this->physics = this->world->Physics();
             }
 
     public: void Init()

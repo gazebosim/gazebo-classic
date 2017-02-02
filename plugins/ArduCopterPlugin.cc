@@ -16,10 +16,25 @@
 */
 #include <functional>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 #include <mutex>
 #include <string>
@@ -135,10 +150,14 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
-  public: static constexpr double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim;
+  public: static double kDefaultFrequencyCutoff;
+  public: static double kDefaultSamplingRate;
 };
+
+double Rotor::kDefaultRotorVelocitySlowdownSim = 10.0;
+double Rotor::kDefaultFrequencyCutoff = 5.0;
+double Rotor::kDefaultSamplingRate = 0.2;
 
 // Private data class
 class gazebo::ArduCopterSocketPrivate
@@ -172,8 +191,12 @@ class gazebo::ArduCopterSocketPrivate
 
     if (bind(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
-      shutdown(this->fd, 0);
-      close(this->fd);
+      shutdown(this->handle, 0);
+      #ifdef _WIN32
+      closesocket(this->handle);
+      #else
+      close(this->handle);
+      #endif
       return false;
     }
     int one = 1;
@@ -252,7 +275,11 @@ class gazebo::ArduCopterSocketPrivate
         return -1;
     }
 
+    #ifdef _WIN32
+    return recv(this->handle, reinterpret_cast<char *>(_buf), _size, 0);
+    #else
     return recv(this->fd, _buf, _size, 0);
+    #endif
   }
 
   /// \brief Socket handle
@@ -407,7 +434,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "samplingRate",
           rotor.samplingRate, rotor.samplingRate);
 
-      // use gazebo::math::Filter
+      // use ignition::math::Filter
       rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
 
       // initialize filter to zero value
@@ -452,7 +479,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  // std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
+  // std::string imuScopedName = this->dataPtr->model->GetWorld()->Name()
   //     + "::" + this->dataPtr->model->GetScopedName()
   //     + "::" + imuName;
   std::vector<std::string> imuScopedName =
@@ -536,7 +563,7 @@ void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
@@ -723,7 +750,7 @@ void ArduCopterPlugin::SendState() const
   // send_fdm
   fdmPacket pkt;
 
-  pkt.timestamp = this->dataPtr->model->GetWorld()->GetSimTime().Double();
+  pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward
@@ -773,7 +800,7 @@ void ArduCopterPlugin::SendState() const
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
   ignition::math::Pose3d worldToModel = gazeboToNED +
-    this->dataPtr->model->GetWorldPose().Ign();
+    this->dataPtr->model->WorldPose();
 
   // get transform from world NED to Model frame
   ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;
@@ -804,7 +831,7 @@ void ArduCopterPlugin::SendState() const
   // or...
   // Get model velocity in NED frame
   ignition::math::Vector3d velGazeboWorldFrame =
-    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+    this->dataPtr->model->GetLink()->WorldLinearVel();
   ignition::math::Vector3d velNEDFrame =
     gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();

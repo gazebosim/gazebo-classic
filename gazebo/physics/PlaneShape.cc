@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -53,12 +52,38 @@ void PlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
+void PlaneShape::SetAltitude(const math::Vector3 &_pos)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAltitude(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetAltitude(const ignition::math::Vector3d &/*_pos*/)
 {
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::SetNormal(const math::Vector3 &_norm)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetNormal(_norm.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
 {
   this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
@@ -67,11 +92,37 @@ void PlaneShape::SetNormal(const math::Vector3 &_norm)
 //////////////////////////////////////////////////
 math::Vector3 PlaneShape::GetNormal() const
 {
-  return this->sdf->Get<math::Vector3>("normal");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Normal();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d PlaneShape::Normal() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("normal");
 }
 
 //////////////////////////////////////////////////
 void PlaneShape::SetSize(const math::Vector2d &_size)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetSize(_size.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
@@ -79,18 +130,31 @@ void PlaneShape::SetSize(const math::Vector2d &_size)
 //////////////////////////////////////////////////
 math::Vector2d PlaneShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector2d>("size");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetScale(const math::Vector3 &_scale)
+ignition::math::Vector2d PlaneShape::Size() const
+{
+  return this->sdf->Get<ignition::math::Vector2d>("size");
+}
+
+//////////////////////////////////////////////////
+void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
 
   this->scale = _scale;
 
-  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  auto size = this->Size() * ignition::math::Vector2d(_scale.X(), scale.Y());
   this->SetSize(size);
 }
 
@@ -98,8 +162,8 @@ void PlaneShape::SetScale(const math::Vector3 &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
-  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
+  msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////

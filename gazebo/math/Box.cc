@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 #include <math.h>
 #include "gazebo/math/Box.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace math;
 
@@ -27,7 +31,6 @@ Box::Box()
   this->max.Set(0, 0, 0);
   this->extent = EXTENT_NULL;
 }
-
 
 //////////////////////////////////////////////////
 Box::Box(const Vector3 &_vec1, const Vector3 &_vec2)

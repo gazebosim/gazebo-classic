@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
-#include <gazebo/math/Helpers.hh>
 
 namespace gazebo
 {
@@ -46,7 +45,7 @@ namespace gazebo
     class MovingWindowFilterPrivate
     {
       // \brief Constructor
-      public: MovingWindowFilterPrivate();
+      public: MovingWindowFilterPrivate<T>();
 
       /// \brief For moving window smoothed value
       public: unsigned int valWindowSize;
@@ -59,22 +58,23 @@ namespace gazebo
 
       /// \brief keep track of running sum
       public: T sum;
-
       /// \brief keep track of number of elements
       public: unsigned int samples;
     };
     /// \endcond
 
     //////////////////////////////////////////////////
+    /// \TODO FIXME hardcoded initial values for now
     template<typename T>
-    MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate()
+    // false positive. Same code is fine if we remove the namespaces
+    // cppcheck-suppress uninitMemberVar
+    MovingWindowFilterPrivate<T>::MovingWindowFilterPrivate() :
+      valWindowSize(4),
+      sum(T()),
+      samples(0)
     {
-      /// \TODO FIXME hardcoded initial value for now
-      this->valWindowSize = 4;
       this->valHistory.resize(this->valWindowSize);
       this->valIter = this->valHistory.begin();
-      this->sum = T();
-      this->samples = 0;
     }
 
     /// \class MovingWindowFilter MovingWindowFilter.hh common/common.hh
@@ -83,7 +83,7 @@ namespace gazebo
     class MovingWindowFilter
     {
       /// \brief Constructor
-      public: MovingWindowFilter();
+      public: MovingWindowFilter<T>();
 
       /// \brief Destructor
       public: virtual ~MovingWindowFilter();
@@ -118,6 +118,8 @@ namespace gazebo
 
     //////////////////////////////////////////////////
     template<typename T>
+    // false positive. Same code is fine if we remove the namespaces
+    // cppcheck-suppress uninitMemberVar
     MovingWindowFilter<T>::MovingWindowFilter()
       : dataPtr(new MovingWindowFilterPrivate<T>())
     {

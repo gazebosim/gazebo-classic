@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,15 +57,15 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   gazebo::rendering::VisualPtr boxLinkVis =
       scene->GetVisual("multilink::box_link");
   QVERIFY(boxLinkVis != nullptr);
-  auto boxLinkPose = boxLinkVis->GetWorldPose().Ign();
-  QVERIFY(boxLinkPose == boxLinkVis->GetWorldPose().Ign());
+  auto boxLinkPose = boxLinkVis->WorldPose();
+  QVERIFY(boxLinkPose == boxLinkVis->WorldPose());
 
   // Get the sphere link
   gazebo::rendering::VisualPtr sphereLinkVis =
       scene->GetVisual("multilink::sphere_link");
   QVERIFY(sphereLinkVis != nullptr);
-  auto sphereLinkPose = sphereLinkVis->GetWorldPose().Ign();
-  QVERIFY(sphereLinkPose == sphereLinkVis->GetWorldPose().Ign());
+  auto sphereLinkPose = sphereLinkVis->WorldPose();
+  QVERIFY(sphereLinkPose == sphereLinkVis->WorldPose());
 
   // Check that an inexistent model doesn't break anything
   gazebo::gui::ApplyWrenchDialog *applyWrenchDialogFakeModel =
@@ -148,15 +148,15 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   QCOMPARE(spins[0]->value(), 1000.0);
 
   // Check that link moved on X axis
-  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->GetWorldPose().Ign().Pos().X());
+  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
   QVERIFY(boxLinkPose.Pos().Y() -
-      boxLinkVis->GetWorldPose().Ign().Pos().Y() < 1e-6);
+      boxLinkVis->WorldPose().Pos().Y() < 1e-6);
   QVERIFY(boxLinkPose.Pos().Z() -
-      boxLinkVis->GetWorldPose().Ign().Pos().Z() < 1e-6);
-  QCOMPARE(boxLinkPose.Rot(), boxLinkVis->GetWorldPose().Ign().Rot());
+      boxLinkVis->WorldPose().Pos().Z() < 1e-6);
+  QCOMPARE(boxLinkPose.Rot(), boxLinkVis->WorldPose().Rot());
 
   // Save current pose
-  boxLinkPose = boxLinkVis->GetWorldPose().Ign();
+  boxLinkPose = boxLinkVis->WorldPose();
 
   // Set and apply torque about -Z axis, magnitude 1000
   spins[9]->setValue(-1.0);
@@ -169,15 +169,15 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   QCOMPARE(spins[9]->value(), -1000.0);
 
   // Check that link rotated
-  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->GetWorldPose().Ign().Pos().X());
+  QVERIFY(boxLinkPose.Pos().X() < boxLinkVis->WorldPose().Pos().X());
   QVERIFY(boxLinkPose.Pos().Y() -
-      boxLinkVis->GetWorldPose().Ign().Pos().Y() < 1e-6);
+      boxLinkVis->WorldPose().Pos().Y() < 1e-6);
   QVERIFY(boxLinkPose.Pos().Z() -
-      boxLinkVis->GetWorldPose().Ign().Pos().Z() < 1e-6);
-  QVERIFY(boxLinkPose.Rot() != boxLinkVis->GetWorldPose().Ign().Rot());
+      boxLinkVis->WorldPose().Pos().Z() < 1e-6);
+  QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
 
   // Save current pose
-  boxLinkPose = boxLinkVis->GetWorldPose().Ign();
+  boxLinkPose = boxLinkVis->WorldPose();
 
   // Apply force and torque
   applyAllButton->click();
@@ -185,8 +185,8 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link translated and rotated
-  QVERIFY(boxLinkPose.Pos() != boxLinkVis->GetWorldPose().Ign().Pos());
-  QVERIFY(boxLinkPose.Rot() != boxLinkVis->GetWorldPose().Ign().Rot());
+  QVERIFY(boxLinkPose.Pos() != boxLinkVis->WorldPose().Pos());
+  QVERIFY(boxLinkPose.Rot() != boxLinkVis->WorldPose().Rot());
 
   // Change link
   comboBoxes[0]->setCurrentIndex(1);
@@ -212,8 +212,8 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link didn't move
-  QVERIFY(sphereLinkPose.Pos() == sphereLinkVis->GetWorldPose().Ign().Pos());
-  QVERIFY(sphereLinkPose.Rot() == sphereLinkVis->GetWorldPose().Ign().Rot());
+  QVERIFY(sphereLinkPose.Pos() == sphereLinkVis->WorldPose().Pos());
+  QVERIFY(sphereLinkPose.Rot() == sphereLinkVis->WorldPose().Rot());
 
   // Set and apply force on Y axis with an offset on X
   spins[1]->setValue(1000.0);
@@ -223,8 +223,8 @@ void ApplyWrenchDialog_TEST::ApplyForceTorqueFromDialog()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Check that link translated and rotated
-  QVERIFY(sphereLinkPose.Pos() != sphereLinkVis->GetWorldPose().Ign().Pos());
-  QVERIFY(sphereLinkPose.Rot() != sphereLinkVis->GetWorldPose().Ign().Rot());
+  QVERIFY(sphereLinkPose.Pos() != sphereLinkVis->WorldPose().Pos());
+  QVERIFY(sphereLinkPose.Rot() != sphereLinkVis->WorldPose().Rot());
 
   // Select CoM as application point
   radioButtons[0]->click();
@@ -285,15 +285,15 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   gazebo::rendering::VisualPtr boxLinkVis =
       scene->GetVisual("multilink::box_link");
   QVERIFY(boxLinkVis != nullptr);
-  auto boxLinkPose = boxLinkVis->GetWorldPose().Ign();
-  QVERIFY(boxLinkPose == boxLinkVis->GetWorldPose().Ign());
+  auto boxLinkPose = boxLinkVis->WorldPose();
+  QVERIFY(boxLinkPose == boxLinkVis->WorldPose());
 
   // Get the sphere link
   gazebo::rendering::VisualPtr sphereLinkVis =
       scene->GetVisual("multilink::sphere_link");
   QVERIFY(sphereLinkVis != nullptr);
-  auto sphereLinkPose = sphereLinkVis->GetWorldPose().Ign();
-  QVERIFY(sphereLinkPose == sphereLinkVis->GetWorldPose().Ign());
+  auto sphereLinkPose = sphereLinkVis->WorldPose();
+  QVERIFY(sphereLinkPose == sphereLinkVis->WorldPose());
 
   // Move the mouse to the corner of the screen so the dialogs open there
   QTest::mouseMove(glWidget, QPoint(-glWidget->width()*0.5,
@@ -413,7 +413,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       boxForceMousePoint(glWidget->width()/2 + 10, 0);
   while (boxForceMousePoint.Y() < glWidget->height())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(boxForceMousePoint);
+    gazebo::rendering::VisualPtr vis = cam->Visual(boxForceMousePoint);
     if (vis && vis == boxApplyWrenchVis->GetForceVisual())
     {
       found = true;
@@ -477,7 +477,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
                                     glWidget->height()/2 - 10);
   while (mousePoint.X() < glWidget->width())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint);
+    gazebo::rendering::VisualPtr vis = cam->Visual(mousePoint);
     if (vis && vis == boxApplyWrenchVis->GetTorqueVisual())
     {
       found = true;
@@ -534,7 +534,7 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
   std::string manipState = "";
   while (mousePoint.Y() < glWidget->height())
   {
-    gazebo::rendering::VisualPtr vis = cam->GetVisual(mousePoint, manipState);
+    gazebo::rendering::VisualPtr vis = cam->Visual(mousePoint, manipState);
     if (!vis && manipState == "rot_y")
     {
       mousePoint.Y() += 20;
@@ -559,11 +559,11 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       gazebo::rendering::SelectionObj::SelectionMode::ROT_Y);
 
   // Get/check the initial visual poses
-  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign() ==
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->Pose() ==
       ignition::math::Pose3d::Zero);
 
-  auto boxTorquePose0 = boxApplyWrenchVis->GetTorqueVisual()->GetPose().Ign();
-  auto boxForcePose0 = boxApplyWrenchVis->GetForceVisual()->GetPose().Ign();
+  auto boxTorquePose0 = boxApplyWrenchVis->GetTorqueVisual()->Pose();
+  auto boxForcePose0 = boxApplyWrenchVis->GetForceVisual()->Pose();
 
   // Drag the tool
   QTestEventList events;
@@ -581,13 +581,13 @@ void ApplyWrenchDialog_TEST::MouseInteractions()
       gazebo::gui::ApplyWrenchDialog::Mode::TORQUE);
 
   // Check that only rot tool and torque were rotated
-  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign().Pos() ==
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->Pose().Pos() ==
       ignition::math::Vector3d::Zero);
-  QVERIFY(boxApplyWrenchVis->GetRotTool()->GetPose().Ign().Rot() !=
-      ignition::math::Vector3d::Zero);
-  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->GetPose().Ign() !=
+  QVERIFY(boxApplyWrenchVis->GetRotTool()->Pose().Rot() !=
+      ignition::math::Quaterniond::Identity);
+  QVERIFY(boxApplyWrenchVis->GetTorqueVisual()->Pose() !=
       boxTorquePose0);
-  QVERIFY(boxApplyWrenchVis->GetForceVisual()->GetPose().Ign() ==
+  QVERIFY(boxApplyWrenchVis->GetForceVisual()->Pose() ==
       boxForcePose0);
 
   // Check that only torque spins X and Z changed

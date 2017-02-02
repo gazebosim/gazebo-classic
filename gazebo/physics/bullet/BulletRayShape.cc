@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ BulletRayShape::BulletRayShape(CollisionPtr _parent)
 {
   this->SetName("Bullet Ray Shape");
   this->physicsEngine = boost::static_pointer_cast<BulletPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////
@@ -66,17 +66,17 @@ void BulletRayShape::Update()
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != nullptr, "Bullet link is null");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
+    this->globalStartPos = link->WorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
+    this->globalEndPos = link->WorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 
-  btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
-      this->globalStartPos.z);
-  btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
-      this->globalEndPos.z);
+  btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+      this->globalStartPos.Z());
+  btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+      this->globalEndPos.Z());
 
   btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
   rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -90,9 +90,9 @@ void BulletRayShape::Update()
 
   if (rayCallback.hasHit())
   {
-    math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
-                         rayCallback.m_hitPointWorld.getY(),
-                         rayCallback.m_hitPointWorld.getZ());
+    ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
+        rayCallback.m_hitPointWorld.getY(),
+        rayCallback.m_hitPointWorld.getZ());
     this->SetLength(this->globalStartPos.Distance(result));
   }
 }
@@ -111,19 +111,19 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
     LinkPtr link = this->collisionParent->GetLink();
     GZ_ASSERT(link != nullptr, "Bullet link is null");
 
-    this->globalStartPos = link->GetWorldPose().CoordPositionAdd(
+    this->globalStartPos = link->WorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
-    this->globalEndPos = link->GetWorldPose().CoordPositionAdd(
+    this->globalEndPos = link->WorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 
   if (this->physicsEngine)
   {
-    btVector3 start(this->globalStartPos.x, this->globalStartPos.y,
-        this->globalStartPos.z);
-    btVector3 end(this->globalEndPos.x, this->globalEndPos.y,
-        this->globalEndPos.z);
+    btVector3 start(this->globalStartPos.X(), this->globalStartPos.Y(),
+        this->globalStartPos.Z());
+    btVector3 end(this->globalEndPos.X(), this->globalEndPos.Y(),
+        this->globalEndPos.Z());
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(start, end);
     rayCallback.m_collisionFilterGroup = GZ_SENSOR_COLLIDE;
@@ -132,9 +132,9 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
         start, end, rayCallback);
     if (rayCallback.hasHit())
     {
-      math::Vector3 result(rayCallback.m_hitPointWorld.getX(),
-                           rayCallback.m_hitPointWorld.getY(),
-                           rayCallback.m_hitPointWorld.getZ());
+      ignition::math::Vector3d result(rayCallback.m_hitPointWorld.getX(),
+          rayCallback.m_hitPointWorld.getY(),
+          rayCallback.m_hitPointWorld.getZ());
       _dist = this->globalStartPos.Distance(result);
 
       BulletLink *link = static_cast<BulletLink *>(
@@ -146,8 +146,8 @@ void BulletRayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void BulletRayShape::SetPoints(const math::Vector3 &_posStart,
-                                   const math::Vector3 &_posEnd)
+void BulletRayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                               const ignition::math::Vector3d &_posEnd)
 {
   RayShape::SetPoints(_posStart, _posEnd);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,17 +178,17 @@ void SimEventsTest::ModelInAndOutOfRegion(const std::string &_physicsEngine)
   transport::SubscriberPtr sceneSub = node->Subscribe("/gazebo/sim_events",
       &ReceiveSimEvent);
 
-  physics::ModelPtr can1 = world->GetModel("can1");
+  physics::ModelPtr can1 = world->ModelByName("can1");
   EXPECT_TRUE(can1 != NULL);
 
   unsigned int countBefore1 = GetEventCount();
-  can1->SetWorldPose(math::Pose(0, 5, 0, 0, 0, 0));
+  can1->SetWorldPose(ignition::math::Pose3d(0, 5, 0, 0, 0, 0));
   unsigned int countAfter1 = WaitForNewEvent(countBefore1, 10, 100);
   EXPECT_GT(countAfter1, countBefore1);
 
   // move can1 into the end region
   unsigned int countBefore2 = GetEventCount();
-  can1->SetWorldPose(math::Pose(10, 10, 0, 0, 0, 0));
+  can1->SetWorldPose(ignition::math::Pose3d(10, 10, 0, 0, 0, 0));
   unsigned int countAfter2 = WaitForNewEvent(countBefore2, 10, 100);
   EXPECT_GT(countAfter2, countBefore2);
 }
@@ -207,28 +207,27 @@ void SimEventsTest::OccupiedEventSource(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the elevator model
-  physics::ModelPtr elevatorModel = world->GetModel("elevator");
+  physics::ModelPtr elevatorModel = world->ModelByName("elevator");
 
   gzdbg << "Elevator Pose1["
-        << elevatorModel->GetWorldPose().pos << "]\n";
+        << elevatorModel->WorldPose().Pos() << "]\n";
 
   // Make sure the elevator is on the ground level
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 0.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 0.07);
+  EXPECT_LT(elevatorModel->WorldPose().Pos().Z(), 0.08);
+  EXPECT_GT(elevatorModel->WorldPose().Pos().Z(), 0.07);
 
   // Spawn a box on the second floor, which should call the elevator up.
-  this->SpawnBox("_my_test_box_", math::Vector3(0.5, 0.5, 0.5),
-      math::Vector3(2, 0, 3.65), math::Vector3(0, 0, 0));
+  this->SpawnBox("_my_test_box_", ignition::math::Vector3d(0.5, 0.5, 0.5),
+      ignition::math::Vector3d(2, 0, 3.65), ignition::math::Vector3d::Zero);
 
   // Wait for elevator to move. 10 seconds is more than long enough.
   common::Time::Sleep(10);
 
-  gzdbg << "Elevator Pose2["
-        << elevatorModel->GetWorldPose().pos << "]\n";
+  gzdbg << "Elevator Pose2[" << elevatorModel->WorldPose().Pos() << "]\n";
 
   // Make sure the elevator has moved up to the second floor.
-  EXPECT_LT(elevatorModel->GetWorldPose().pos.z, 3.08);
-  EXPECT_GT(elevatorModel->GetWorldPose().pos.z, 3.05);
+  EXPECT_LT(elevatorModel->WorldPose().Pos().Z(), 3.08);
+  EXPECT_GT(elevatorModel->WorldPose().Pos().Z(), 3.05);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -244,7 +243,7 @@ void SimEventsTest::JointEventSource(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
 
   // Get the revoluter model
-  physics::ModelPtr model = world->GetModel("revoluter");
+  physics::ModelPtr model = world->ModelByName("revoluter");
   physics::JointPtr joint = model->GetJoint("joint");
 
   // setup the callback that increments the counter everytime a

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  *
 */
 
+#include <ignition/math/Box.hh>
+#include <ignition/math/Vector3.hh>
 #include "gazebo/test/ServerFixture.hh"
-#include "gazebo/math/Box.hh"
 
 using namespace gazebo;
 
@@ -32,7 +33,7 @@ TEST_F(Issue1146Test, Reset)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box");
+  physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("link");
@@ -41,15 +42,17 @@ TEST_F(Issue1146Test, Reset)
   physics::CollisionPtr coll = link->GetCollision("collision");
   ASSERT_TRUE(coll != NULL);
 
-  EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(-0.5, -0.5, 0), math::Vector3(0.5, 0.5, 1)));
+  EXPECT_EQ(coll->CollisionBoundingBox(),
+      ignition::math::Box(
+        ignition::math::Vector3d(-0.5, -0.5, 0),
+        ignition::math::Vector3d(0.5, 0.5, 1)));
 
   // Move the box
-  model->SetWorldPose(math::Pose(10, 15, 20, 0, 0, 0));
+  model->SetWorldPose(ignition::math::Pose3d(10, 15, 20, 0, 0, 0));
 
-  EXPECT_EQ(coll->GetCollisionBoundingBox(),
-      math::Box(math::Vector3(9.5, 14.5, 19.5),
-                math::Vector3(10.5, 15.5, 20.5)));
+  EXPECT_EQ(coll->CollisionBoundingBox(),
+      ignition::math::Box(ignition::math::Vector3d(9.5, 14.5, 19.5),
+                ignition::math::Vector3d(10.5, 15.5, 20.5)));
 }
 
 /////////////////////////////////////////////////

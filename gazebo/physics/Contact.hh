@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: Specification of a contact
- * Author: Nate Koenig
- * Date: 10 Nov 2009
- */
-
-#ifndef _CONTACT_HH_
-#define _CONTACT_HH_
+#ifndef GAZEBO_PHYSICS_CONTACT_HH_
+#define GAZEBO_PHYSICS_CONTACT_HH_
 
 #include <vector>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/msgs/msgs.hh"
-
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/common/Time.hh"
-#include "gazebo/math/Vector3.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/JointWrench.hh"
+#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
 // For the sake of efficiency, use fixed size arrays for collision
@@ -97,10 +91,10 @@ namespace gazebo
       public: JointWrench wrench[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force positions.
-      public: math::Vector3 positions[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3d positions[MAX_CONTACT_JOINTS];
 
       /// \brief Array of force normals.
-      public: math::Vector3 normals[MAX_CONTACT_JOINTS];
+      public: ignition::math::Vector3d normals[MAX_CONTACT_JOINTS];
 
       /// \brief Array of contact depths
       public: double depths[MAX_CONTACT_JOINTS];

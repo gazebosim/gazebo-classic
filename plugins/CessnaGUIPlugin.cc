@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
   #include <Winsock2.h>
 #endif
 #include <algorithm>
-#include <mutex>
+
 #include <gazebo/gui/GuiPlugin.hh>
 #include <gazebo/gui/Actions.hh>
 #include "CessnaGUIPlugin.hh"
@@ -35,10 +35,11 @@ CessnaGUIPlugin::CessnaGUIPlugin()
   : GUIPlugin()
 {
   // This is needed to avoid the creation of a black widget with default size.
-  this->resize(0, 0);
+  this->move(-1, -1);
+  this->resize(1, 1);
 
   // Set the increment or decrement in angle per key pressed.
-  this->angleStep.SetFromDegree(1.0);
+  this->angleStep.Degree(1.0);
 
   // Initialize transport.
   this->gzNode = transport::NodePtr(new transport::Node());
@@ -150,10 +151,10 @@ void CessnaGUIPlugin::OnDecreaseThrust()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnIncreaseFlaps()
 {
-  math::Angle flap;
+  ignition::math::Angle flap;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    flap.SetFromRadian(this->state.cmd_left_flap());
+    flap.Radian(this->state.cmd_left_flap());
   }
 
   msgs::Cessna msg;
@@ -169,10 +170,10 @@ void CessnaGUIPlugin::OnIncreaseFlaps()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnDecreaseFlaps()
 {
-  math::Angle flap;
+  ignition::math::Angle flap;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    flap.SetFromRadian(this->state.cmd_left_flap());
+    flap.Radian(this->state.cmd_left_flap());
   }
 
   msgs::Cessna msg;
@@ -188,10 +189,10 @@ void CessnaGUIPlugin::OnDecreaseFlaps()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnIncreaseRoll()
 {
-  math::Angle aileron;
+  ignition::math::Angle aileron;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    aileron.SetFromRadian(this->state.cmd_left_aileron());
+    aileron.Radian(this->state.cmd_left_aileron());
   }
 
   msgs::Cessna msg;
@@ -207,10 +208,10 @@ void CessnaGUIPlugin::OnIncreaseRoll()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnDecreaseRoll()
 {
-  math::Angle aileron;
+  ignition::math::Angle aileron;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    aileron.SetFromRadian(this->state.cmd_left_aileron());
+    aileron.Radian(this->state.cmd_left_aileron());
   }
 
   msgs::Cessna msg;
@@ -226,10 +227,10 @@ void CessnaGUIPlugin::OnDecreaseRoll()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnIncreaseElevators()
 {
-  math::Angle elevators;
+  ignition::math::Angle elevators;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    elevators.SetFromRadian(this->state.cmd_elevators());
+    elevators.Radian(this->state.cmd_elevators());
   }
 
   msgs::Cessna msg;
@@ -244,10 +245,10 @@ void CessnaGUIPlugin::OnIncreaseElevators()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnDecreaseElevators()
 {
-  math::Angle elevators;
+  ignition::math::Angle elevators;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    elevators.SetFromRadian(this->state.cmd_elevators());
+    elevators.Radian(this->state.cmd_elevators());
   }
 
   msgs::Cessna msg;
@@ -262,10 +263,10 @@ void CessnaGUIPlugin::OnDecreaseElevators()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnIncreaseRudder()
 {
-  math::Angle rudder;
+  ignition::math::Angle rudder;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    rudder.SetFromRadian(this->state.cmd_rudder());
+    rudder.Radian(this->state.cmd_rudder());
   }
 
   msgs::Cessna msg;
@@ -280,10 +281,10 @@ void CessnaGUIPlugin::OnIncreaseRudder()
 /////////////////////////////////////////////////
 void CessnaGUIPlugin::OnDecreaseRudder()
 {
-  math::Angle rudder;
+  ignition::math::Angle rudder;
   {
     std::lock_guard<std::mutex> lock(this->mutex);
-    rudder.SetFromRadian(this->state.cmd_rudder());
+    rudder.Radian(this->state.cmd_rudder());
   }
 
   msgs::Cessna msg;

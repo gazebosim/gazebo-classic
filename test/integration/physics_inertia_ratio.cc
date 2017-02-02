@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@
 
 #include <ignition/math/Vector3Stats.hh>
 
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -50,7 +48,7 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
   EXPECT_EQ(g, ignition::math::Vector3d(0.1, 0, -9.81));
 
   // get model
-  physics::ModelPtr model = world->GetModel("inertia_ratio");
+  physics::ModelPtr model = world->ModelByName("inertia_ratio");
   ASSERT_TRUE(model != NULL);
 
   // get links
@@ -72,8 +70,8 @@ void PhysicsTest::InertiaRatioPendulum(const std::string &_physicsEngine)
     world->Step(1);
 
     // Get statistics on link rotations
-    upperAngles.InsertData(upperLink->GetWorldPose().Ign().Rot().Euler());
-    lowerAngles.InsertData(lowerLink->GetWorldPose().Ign().Rot().Euler());
+    upperAngles.InsertData(upperLink->WorldPose().Rot().Euler());
+    lowerAngles.InsertData(lowerLink->WorldPose().Rot().Euler());
   }
 
   // Expect out of plane angles to fall within limits

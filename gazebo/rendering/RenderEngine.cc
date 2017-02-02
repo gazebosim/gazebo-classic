@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,7 +114,9 @@ void RenderEngine::Load()
     // Make the root
     try
     {
-      this->dataPtr->root = new Ogre::Root();
+      // empty strings for config filenames (plugins.cfg and ogre.cfg)
+      // so ogre doesn't try to look for them.
+      this->dataPtr->root = new Ogre::Root("", "");
     }
     catch(Ogre::Exception &e)
     {
@@ -323,14 +325,15 @@ void RenderEngine::Init()
 //////////////////////////////////////////////////
 void RenderEngine::Fini()
 {
+  // TODO: this was causing a segfault on shutdown
+  // Windows are created on load so clear them even
+  // if render engine is not initialized
+  this->dataPtr->windowManager->Fini();
+
   if (!this->dataPtr->initialized)
     return;
 
   this->dataPtr->connections.clear();
-
-  // TODO: this was causing a segfault on shutdown
-  // Close all the windows first;
-  this->dataPtr->windowManager->Fini();
 
   RTShaderSystem::Instance()->Fini();
 
@@ -774,6 +777,12 @@ void RenderEngine::CheckSystemCapabilities()
   Ogre::RenderSystemCapabilities::ShaderProfiles::const_iterator iter;
 
   capabilities = this->dataPtr->root->getRenderSystem()->getCapabilities();
+  if (!capabilities)
+  {
+    gzerr << "Cannot get render system capabilities" << std::endl;
+    return;
+  }
+
   profiles = capabilities->getSupportedShaderProfiles();
 
   bool hasFragmentPrograms =

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ void EditorMaterialSwitcher_TEST::CreateMaterialSwitcher()
   // create a material swticher with a camera
   this->Load("test/worlds/box.world", false, false, true);
   rendering::ScenePtr scene =
-      gazebo::rendering::get_scene(gazebo::physics::get_world()->GetName());
+      gazebo::rendering::get_scene(gazebo::physics::get_world()->Name());
 
   rendering::CameraPtr camera = scene->CreateCamera("test_camera", false);
   camera->Load();

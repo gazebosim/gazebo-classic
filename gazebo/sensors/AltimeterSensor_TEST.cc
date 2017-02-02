@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -151,11 +151,11 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
@@ -175,8 +175,7 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
   altSensor->Update(true);
 
   // Get the link's angular velocity
-  ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+  ignition::math::Vector3d avel = model->GetLink("link")->RelativeAngularVel();
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod.
@@ -193,11 +192,11 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != nullptr);
 
   physics::JointPtr joint = model->GetJoint("joint");
@@ -217,14 +216,12 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
   altSensor->Update(true);
 
   // Angular velocity of the rod
-  ignition::math::Vector3d avel =
-    model->GetLink("link")->GetRelativeAngularVel().Ign();
+  ignition::math::Vector3d avel = model->GetLink("link")->RelativeAngularVel();
 
   // Linear velocity of the rod at the location that is attached to
   // the prismatic joint.
   ignition::math::Vector3d lvel =
-    model->GetLink("link")->GetWorldLinearVel(
-        ignition::math::Vector3d(0, -5, 0)).Ign();
+    model->GetLink("link")->WorldLinearVel(ignition::math::Vector3d(0, -5, 0));
 
   // Expect the altimeter's velocity to equal the angular velocity at the
   // end of the rod + the rod's linear velocity.
@@ -242,7 +239,7 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 

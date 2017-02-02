@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Image.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -47,11 +46,6 @@ namespace gazebo
       /// \param[in] _filename the path to the image file.
       /// \return True when the operation succeeds to open a file.
       public: int Load(const std::string &_filename="");
-
-      // Documentation inherited.
-      public: void FillHeightMap(int _subSampling, unsigned int _vertSize,
-          const math::Vector3 &_size, const math::Vector3 &_scale, bool _flipY,
-          std::vector<float> &_heights);
 
       // Documentation inherited.
       public: void FillHeightMap(int _subSampling, unsigned int _vertSize,

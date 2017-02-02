@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TRANSPORTER_PLUGIN_HH_
-#define _GAZEBO_TRANSPORTER_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_TRANSPORTERPLUGIN_HH_
+#define GAZEBO_PLUGINS_TRANSPORTERPLUGIN_HH_
+
+#include <memory>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
@@ -103,7 +105,7 @@ namespace gazebo
     private: void OnActivation(ConstGzStringPtr &_msg);
 
     /// \brief Private data pointer.
-    private: TransporterPluginPrivate *dataPtr;
+    private: std::unique_ptr<TransporterPluginPrivate> dataPtr;
   };
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,6 @@
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Node.hh"
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/physics/ContactManager.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/Model.hh"
@@ -55,7 +53,7 @@ PhysicsEngine::PhysicsEngine(WorldPtr _world)
   this->maxStepSize = 0;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->physicsSub = this->node->Subscribe("~/physics",
       &PhysicsEngine::OnPhysicsMsg, this);
 
@@ -126,7 +124,14 @@ PhysicsEngine::~PhysicsEngine()
 //////////////////////////////////////////////////
 math::Vector3 PhysicsEngine::GetGravity() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->world->Gravity();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -141,7 +146,7 @@ CollisionPtr PhysicsEngine::CreateCollision(const std::string &_shapeType,
 {
   CollisionPtr result;
   LinkPtr link =
-    boost::dynamic_pointer_cast<Link>(this->world->GetEntity(_linkName));
+    boost::dynamic_pointer_cast<Link>(this->world->EntityByName(_linkName));
 
   if (!link)
     gzerr << "Unable to find link[" << _linkName << "]\n";
@@ -225,7 +230,7 @@ void PhysicsEngine::OnRequest(ConstRequestPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void PhysicsEngine::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 {
-  this->world->GetPresetManager()->CurrentProfile(_msg->profile_name());
+  this->world->PresetMgr()->CurrentProfile(_msg->profile_name());
 }
 
 //////////////////////////////////////////////////
@@ -248,38 +253,15 @@ bool PhysicsEngine::SetParam(const std::string &_key,
     else if (_key == "gravity")
     {
       boost::any copy = _value;
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
+      copy = boost::lexical_cast<ignition::math::Vector3d>
+          (boost::any_cast<ignition::math::Vector3d>(_value));
       this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
       boost::any copy = _value;
-      if (_value.type() == typeid(sdf::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<sdf::Vector3>(_value));
-      }
-      else if (_value.type() == typeid(math::Vector3))
-      {
-        copy = boost::lexical_cast<ignition::math::Vector3d>
-            (boost::any_cast<math::Vector3>(_value));
-      }
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
+      copy = boost::lexical_cast<ignition::math::Vector3d>
+          (boost::any_cast<ignition::math::Vector3d>(_value));
       this->world->SetMagneticField(
           boost::any_cast<ignition::math::Vector3d>(copy));
     }
@@ -355,4 +337,17 @@ sdf::ElementPtr PhysicsEngine::GetSDF() const
 WorldPtr PhysicsEngine::World() const
 {
   return this->world;
+}
+
+//////////////////////////////////////////////////
+void PhysicsEngine::SetGravity(const math::Vector3 &_gravity)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->SetGravity(_gravity.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

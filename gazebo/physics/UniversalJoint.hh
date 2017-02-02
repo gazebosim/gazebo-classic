@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace gazebo
               { }
 
       // Documentation inherited.
-      public: virtual unsigned int GetAngleCount() const
+      public: virtual unsigned int DOF() const
               {return 2;}
 
       /// \brief Load a UniversalJoint.
@@ -64,9 +64,9 @@ namespace gazebo
 
                 /*
                 this->SetAxis(0,
-                    this->sdf->GetElement("axis")->Get<math::Vector3("xyz"));
+                    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d("xyz"));
                 this->SetAxis(1,
-                    this->sdf->GetElement("axis2")->Get<math::Vector3>("xyz"));
+                    this->sdf->GetElement("axis2")->Get<ignition::math::Vector3d>("xyz"));
                     */
               }
 

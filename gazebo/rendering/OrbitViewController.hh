@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ORBITVIEWCONTROLLER_HH_
-#define _ORBITVIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_ORBITVIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_ORBITVIEWCONTROLLER_HH_
 
 #include <string>
 
@@ -23,7 +23,6 @@
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/ViewController.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -52,7 +51,7 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual void Init(const math::Vector3 &_focalPoint,
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
                   const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update.
@@ -72,11 +71,11 @@ namespace gazebo
 
       /// \brief Set the focal point
       /// \param[in] _fp The focal point
-      public: void SetFocalPoint(const math::Vector3 &_fp);
+      public: void SetFocalPoint(const ignition::math::Vector3d &_fp);
 
       /// \brief Get the focal point
       /// \return The focal point
-      public: math::Vector3 GetFocalPoint() const;
+      public: ignition::math::Vector3d FocalPoint() const;
 
       // Documentation inherited from parent
       public: void HandleKeyReleaseEvent(const std::string &_key);
@@ -90,11 +89,11 @@ namespace gazebo
 
       /// \brief Translate the focal point in the local coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      protected: void TranslateLocal(const math::Vector3 &_vec);
+      protected: void TranslateLocal(const ignition::math::Vector3d &_vec);
 
       /// \brief Translate the focal point in the global coordinate frame.
       /// \param[in] _vec Direction and amount to translate the camera.
-      protected: void TranslateGlobal(const math::Vector3 &_vec);
+      protected: void TranslateGlobal(const ignition::math::Vector3d &_vec);
 
       /// \brief Zoom the camera.
       /// \paramp[in] _amount Zoom quatity.

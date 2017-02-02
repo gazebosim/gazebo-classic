@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,11 +44,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Vector2i;
-  }
-
   namespace common
   {
     class Image;
@@ -185,6 +180,20 @@ namespace gazebo
       /// into.
       /// \return Number of terrain subdivisions
       public: unsigned int TerrainSubdivisionCount() const;
+
+      /// \brief Set custom material for the terrain
+      /// \param[in] _materialName Name of the material
+      public: void SetMaterial(const std::string &_materialName);
+
+      /// \brief Get the custom material name used for the terrain.
+      /// \return Custom material name.
+      public: std::string MaterialName() const;
+
+      /// \brief Create terrain material generator. There are two types:
+      /// custom material generator that support user material scripts,
+      /// and a default material generator that uses our own glsl shader
+      /// and supports PSSM shadows.
+      private: void CreateMaterial();
 
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.

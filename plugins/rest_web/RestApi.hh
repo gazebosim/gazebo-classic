@@ -1,5 +1,5 @@
 /*
- * copyright (C) 2015-2016 Open Source Robotics Foundation
+ * copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,12 @@
  *
 */
 
-#ifndef _GAZEBO_REST_API_HH_
-#define _GAZEBO_REST_API_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTAPI_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTAPI_HH_
 
 #include <string>
 #include <list>
+#include <mutex>
 #include <gazebo/common/Console.hh>
 
 #include "RestException.hh"
@@ -99,7 +100,7 @@ namespace gazebo
     private: std::list<Post> posts;
 
     /// \brief A mutex to ensure integrity of the post list
-    private: boost::mutex postsMutex;
+    private: std::mutex postsMutex;
   };
 }
 

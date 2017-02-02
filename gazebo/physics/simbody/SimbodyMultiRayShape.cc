@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ SimbodyMultiRayShape::SimbodyMultiRayShape(CollisionPtr _parent)
 {
   this->SetName("Simbody Multiray Shape");
   this->physicsEngine = boost::static_pointer_cast<SimbodyPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 }
 
 //////////////////////////////////////////////////
@@ -51,8 +51,8 @@ void SimbodyMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void SimbodyMultiRayShape::AddRay(const math::Vector3 &_start,
-    const math::Vector3 &_end)
+void SimbodyMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
   SimbodyRayShapePtr ray(new SimbodyRayShape(this->physicsEngine));

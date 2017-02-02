@@ -92,7 +92,7 @@ void ViewControlTest::MouseZoomSimulation()
 
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-1.5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
@@ -147,8 +147,8 @@ void ViewControlTest::MouseZoomModelEditor()
   this->ProcessEventsAndDraw(mainWindow);
 
   // create the model editor
-  gazebo::gui::ModelCreator *modelCreator = new gazebo::gui::ModelCreator();
-
+  std::unique_ptr<gazebo::gui::ModelCreator> modelCreator(
+                                              new gazebo::gui::ModelCreator());
   // Inserting a link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
   gazebo::rendering::VisualPtr cylinder =
@@ -160,7 +160,7 @@ void ViewControlTest::MouseZoomModelEditor()
 
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(-1.5, 0.0, 0.5),
-      ignition::math::Quaterniond(0, 0, 0)));
+      ignition::math::Quaterniond::Identity));
 
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);

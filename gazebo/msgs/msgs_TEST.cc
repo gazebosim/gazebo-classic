@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/msgs.hh>
+#include <ignition/msgs/MessageTypes.hh>
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/Exception.hh"
 #include "test/util.hh"
@@ -2618,6 +2620,7 @@ TEST_F(MsgsTest, GeometryToSDF)
       ignition::math::Vector3d(100, 200, 30));
   msgs::Set(heightmapGeom->mutable_origin(),
       ignition::math::Vector3d(50, 100, 15));
+  heightmapGeom->set_sampling(1);
   heightmapGeom->set_use_terrain_paging(true);
 
   msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
@@ -2642,6 +2645,11 @@ TEST_F(MsgsTest, GeometryToSDF)
       ignition::math::Vector3d(100, 200, 30));
   EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("pos") ==
       ignition::math::Vector3d(50, 100, 15));
+  // fix test while we wait for new sdformat4 version to be released
+  if (heightmapElem->HasElementDescription("sampling"))
+  {
+    EXPECT_EQ(heightmapElem->Get<unsigned int>("sampling"), 1u);
+  }
   EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
 
   sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");
@@ -3822,16 +3830,6 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
   auto sdf2 = msgs::VisualToSDF(msg1);
   ASSERT_TRUE(sdf2 != nullptr);
 
-  // DEPRECATED: Remove this test in Gazebo8
-  {
-    EXPECT_TRUE(sdf2->HasElement("plugin"));
-    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("plugin_param"));
-
-    EXPECT_TRUE(sdf2->GetElement("plugin")->HasElement("sdf"));
-    EXPECT_TRUE(sdf2->GetElement("plugin")->GetElement("sdf")->
-        HasElement("plugin_param"));
-  }
-
   // Back to Msg
   auto msg2 = msgs::VisualFromSDF(sdf2);
 
@@ -3856,4 +3854,81 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
 
   EXPECT_TRUE(pluginElem->HasElement("plugin_param"));
   EXPECT_EQ(pluginElem->Get<std::string>("plugin_param"), "param");
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgColor)
+{
+  ignition::msgs::Color ignMsg;
+  ignMsg.set_r(0.1);
+  ignMsg.set_g(0.2);
+  ignMsg.set_b(0.3);
+  ignMsg.set_a(0.4);
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_DOUBLE_EQ(ignMsg.r(), ignMsg2.r());
+  EXPECT_DOUBLE_EQ(ignMsg.g(), ignMsg2.g());
+  EXPECT_DOUBLE_EQ(ignMsg.b(), ignMsg2.b());
+  EXPECT_DOUBLE_EQ(ignMsg.a(), ignMsg2.a());
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterialShaderType)
+{
+  auto ignMsg = ignition::msgs::Material::PIXEL;
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_DOUBLE_EQ(ignMsg, ignMsg2);
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterialScript)
+{
+  ignition::msgs::Material::Script ignMsg;
+  ignMsg.set_name("material_script");
+
+  for (size_t i = 0; i < 3; ++i)
+    ignMsg.add_uri("uri_" + std::to_string(i));
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_EQ(ignMsg.name(), ignMsg2.name());
+  ASSERT_EQ(ignMsg2.uri().size(), 3);
+
+  for (size_t i = 0; i < 3; ++i)
+    EXPECT_EQ(ignMsg.uri(i), ignMsg2.uri(i));
+}
+
+TEST_F(MsgsTest, ConvertIgnMsgMaterial)
+{
+  ignition::msgs::Material ignMsg;
+
+  auto script = ignMsg.mutable_script();
+  script->set_name("script");
+  script->add_uri("uri");
+
+  ignMsg.set_shader_type(ignition::msgs::Material::PIXEL);
+  ignMsg.set_normal_map("normal_map");
+
+  auto ambient = ignMsg.mutable_ambient();
+  ambient->set_r(0.1);
+  ambient->set_g(0.2);
+  ambient->set_b(0.3);
+  ambient->set_a(0.4);
+
+  ignMsg.set_lighting(false);
+
+  auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
+  auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
+
+  EXPECT_EQ(ignMsg.script().name(), ignMsg2.script().name());
+  EXPECT_EQ(ignMsg.script().uri(0), ignMsg2.script().uri(0));
+  EXPECT_EQ(ignMsg.normal_map(), ignMsg2.normal_map());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().r(), ignMsg2.ambient().r());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().g(), ignMsg2.ambient().g());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().b(), ignMsg2.ambient().b());
+  EXPECT_DOUBLE_EQ(ignMsg.ambient().a(), ignMsg2.ambient().a());
+  EXPECT_EQ(ignMsg.lighting(), ignMsg2.lighting());
 }

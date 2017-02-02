@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -712,7 +712,7 @@ void GpuLaser::CreateCanvas()
       & ~GZ_VISIBILITY_SELECTABLE);
 
   ignition::math::Pose3d pose;
-  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Pos().Set(0.01, 0, 0);
   pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->dataPtr->visual->SetPose(pose);
@@ -862,10 +862,4 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
 }

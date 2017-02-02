@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,8 @@ TimePanel::TimePanel(QWidget *_parent)
       gui::Events::ConnectFullScreen(
       std::bind(&TimePanel::OnFullScreen, this, std::placeholders::_1)));
 
-  connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
+  if (g_playAct)
+    connect(g_playAct, SIGNAL(changed()), this, SLOT(OnPlayActionChanged()));
 
   QShortcut *space = new QShortcut(Qt::Key_Space, this);
   QObject::connect(space, SIGNAL(activated()), this, SLOT(TogglePause()));

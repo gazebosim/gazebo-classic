@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_SENSOR_HH_
-#define _GAZEBO_SENSORS_SENSOR_HH_
+#ifndef GAZEBO_SENSORS_SENSOR_HH_
+#define GAZEBO_SENSORS_SENSOR_HH_
 
 #include <vector>
 #include <memory>
@@ -24,6 +24,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -130,7 +131,6 @@ namespace gazebo
 
       /// \brief Return last measurement time.
       /// \return Time of last measurement.
-      /// \deprecated See LastMeasurementTime() function.
       public: common::Time LastMeasurementTime() const;
 
       /// \brief Return true if user requests the sensor to be visualized
@@ -157,13 +157,6 @@ namespace gazebo
       /// \sa Sensor::DisconnectUpdated
       public: event::ConnectionPtr ConnectUpdated(
                   std::function<void()> _subscriber);
-
-      /// \brief Disconnect from a the updated signal.
-      /// \param[in] _c The connection to disconnect
-      /// \sa Sensor::ConnectUpdated
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectUpdated(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the category of the sensor.
       /// \return The category of the sensor.
@@ -246,6 +239,9 @@ namespace gazebo
 
       /// \brief Noise added to sensor data
       protected: std::map<SensorNoiseType, NoisePtr> noises;
+
+      /// \brief Ignition transport node
+      protected: ignition::transport::Node nodeIgn;
 
       /// \internal
       /// \brief Data pointer for private data

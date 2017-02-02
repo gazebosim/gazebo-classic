@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -60,8 +60,8 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
   // get pointers to the falling boxes.
   physics::ModelPtr contactBox, collideBox;
-  contactBox = world->GetModel("contact_box");
-  collideBox = world->GetModel("collide_box");
+  contactBox = world->ModelByName("contact_box");
+  collideBox = world->ModelByName("collide_box");
   ASSERT_TRUE(contactBox != NULL);
   ASSERT_TRUE(collideBox != NULL);
 
@@ -78,16 +78,16 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 
   // Expect boxes to be falling
   double fallVelocity = g.Z() * stepTime;
-  EXPECT_LT(contactBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(contactBox->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(collideBox->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   // Step forward another 0.2 s
   world->Step(steps);
   fallVelocity = g.Z() * 2*stepTime;
   // Expect contactBox to be resting on contact sensor box
-  EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
+  EXPECT_NEAR(contactBox->WorldLinearVel().Z(), 0.0, g_physics_tol);
   // Expect collideBox to still be falling
-  EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(collideBox->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   {
     // Step forward until we get a contacts message from the contact sensor
@@ -127,9 +127,9 @@ void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
   world->Step(steps*2);
   fallVelocity = g.Z() * 4*stepTime;
   // Expect contactBox to still be resting on contact sensor box
-  EXPECT_NEAR(contactBox->GetWorldLinearVel().z, 0.0, g_physics_tol);
+  EXPECT_NEAR(contactBox->WorldLinearVel().Z(), 0.0, g_physics_tol);
   // Expect collideBox to still be falling
-  EXPECT_LT(collideBox->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(collideBox->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   {
     // Step forward until we get a contacts message from the contact sensor
@@ -184,7 +184,7 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -199,10 +199,10 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
 
   // get pointers to the falling boxes.
   physics::ModelPtr box1, box2, box3, box4;
-  box1 = world->GetModel("box1");
-  box2 = world->GetModel("box2");
-  box3 = world->GetModel("box3");
-  box4 = world->GetModel("box4");
+  box1 = world->ModelByName("box1");
+  box2 = world->ModelByName("box2");
+  box3 = world->ModelByName("box3");
+  box4 = world->ModelByName("box4");
   ASSERT_TRUE(box1 != NULL);
   ASSERT_TRUE(box2 != NULL);
   ASSERT_TRUE(box3 != NULL);
@@ -215,29 +215,29 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
 
   // Expect boxes to be falling
   double fallVelocity = g.Z() * stepTime;
-  EXPECT_LT(box1->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box2->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box3->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box4->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box1->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box2->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box3->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
+  EXPECT_LT(box4->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   // Another 2000 steps should put the boxes at rest
   world->Step(2000);
 
   // Expect 3 boxes to be stationary
-  EXPECT_NEAR(box1->GetWorldLinearVel().z, 0, 1e-3);
-  EXPECT_NEAR(box2->GetWorldLinearVel().z, 0, 1e-3);
-  EXPECT_NEAR(box3->GetWorldLinearVel().z, 0, 1e-3);
+  EXPECT_NEAR(box1->WorldLinearVel().Z(), 0, 1e-3);
+  EXPECT_NEAR(box2->WorldLinearVel().Z(), 0, 1e-3);
+  EXPECT_NEAR(box3->WorldLinearVel().Z(), 0, 1e-3);
 
   // The first and second boxes should be on the ground plane
-  EXPECT_NEAR(box1->GetWorldPose().pos.z, 0.5, 1e-3);
-  EXPECT_NEAR(box2->GetWorldPose().pos.z, 0.5, 1e-3);
+  EXPECT_NEAR(box1->WorldPose().Pos().Z(), 0.5, 1e-3);
+  EXPECT_NEAR(box2->WorldPose().Pos().Z(), 0.5, 1e-3);
 
   // The third boxs should be ontop of the firs two boxes
-  EXPECT_NEAR(box3->GetWorldPose().pos.z, 1.5, 1e-3);
+  EXPECT_NEAR(box3->WorldPose().Pos().Z(), 1.5, 1e-3);
 
   // Expect 4th box to still be falling
-  fallVelocity = g.Z() * world->GetSimTime().Double();
-  EXPECT_LT(box4->GetWorldLinearVel().z, fallVelocity*(1-g_physics_tol));
+  fallVelocity = g.Z() * world->SimTime().Double();
+  EXPECT_LT(box4->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   Unload();
 }

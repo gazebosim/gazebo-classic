@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,29 +96,29 @@ void ContactVisual::Update()
   {
     for (int j = 0; j < dPtr->contactsMsg->contact(i).position_size(); j++)
     {
-      math::Vector3 pos = msgs::ConvertIgn(
+      auto pos = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).position(j));
-      math::Vector3 normal = msgs::ConvertIgn(
+      auto normal = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).normal(j));
       double depth = dPtr->contactsMsg->contact(i).depth(j);
 
-      math::Vector3 force = msgs::ConvertIgn(
+      auto force = msgs::ConvertIgn(
           dPtr->contactsMsg->contact(i).wrench(j).body_1_wrench().force());
 
       // Scaling factor for the normal line.
       // Eq in the family of Y = 1/(1+exp(-(x^2)))
       double normalScale = (2.0 * vRange) / (1 + exp
-          (-force.GetSquaredLength() / magScale)) - offset;
+          (-force.SquaredLength() / magScale)) - offset;
 
       // Create a new contact visualization point if necessary
       if (c >= dPtr->points.size())
         this->CreateNewPoint();
 
       dPtr->points[c]->contactPointVis->SetVisible(true);
-      dPtr->points[c]->contactPointVis->SetPosition(pos.Ign());
+      dPtr->points[c]->contactPointVis->SetPosition(pos);
 
-      dPtr->points[c]->normal->SetPoint(1, (normal*normalScale).Ign());
-      dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10).Ign());
+      dPtr->points[c]->normal->SetPoint(1, (normal*normalScale));
+      dPtr->points[c]->depth->SetPoint(1, (normal*-depth*10));
 
       dPtr->points[c]->normal->setMaterial("Gazebo/LightOn");
       dPtr->points[c]->depth->setMaterial("Gazebo/LightOff");
@@ -181,7 +181,7 @@ void ContactVisual::CreateNewPoint()
   ContactVisualPrivate *dPtr =
       reinterpret_cast<ContactVisualPrivate *>(this->dataPtr);
 
-  std::string objName = this->GetName() +
+  std::string objName = this->Name() +
     "_contactpoint_" + std::to_string(dPtr->points.size());
 
   ContactVisualPrivate::ContactPoint *cp =

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Assert.hh>
@@ -49,9 +51,6 @@ ElevatorPlugin::~ElevatorPlugin()
 
   delete this->dataPtr->liftController;
   this->dataPtr->liftController = NULL;
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -116,11 +115,11 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Connect to the update event.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ElevatorPlugin::Update, this, _1));
+      std::bind(&ElevatorPlugin::Update, this, std::placeholders::_1));
 
   // Create the node for communication
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
+  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->Name());
 
   // Subscribe to the elevator topic.
   this->dataPtr->elevatorSub = this->dataPtr->node->Subscribe(elevatorTopic,
@@ -403,7 +402,7 @@ bool ElevatorPluginPrivate::DoorController::Update(
 
   double errorTarget = this->target == OPEN ? 1.0 : 0.0;
 
-  double doorError = this->doorJoint->GetAngle(0).Radian() -
+  double doorError = this->doorJoint->Position() -
     errorTarget;
 
   double doorForce = this->doorPID.Update(doorError,
@@ -452,7 +451,7 @@ bool ElevatorPluginPrivate::LiftController::Update(
     return false;
   }
 
-  double error = this->liftJoint->GetAngle(0).Radian() -
+  double error = this->liftJoint->Position() -
     (this->floor * this->floorHeight);
 
   double force = this->liftPID.Update(error, _info.simTime - this->prevSimTime);
@@ -490,5 +489,3 @@ ElevatorPluginPrivate::LiftController::GetState() const
 {
   return this->state;
 }
-
-
