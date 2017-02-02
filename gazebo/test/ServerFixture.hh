@@ -732,6 +732,9 @@ namespace gazebo
   {
     // Documentation inherited.
     public: virtual void SetUp();
+
+    // Documentation inherited.
+    protected: virtual void Unload();
   };
 }       // namespace gazebo
 #endif  // define _GAZEBO_SERVER_FIXTURE_HH_
