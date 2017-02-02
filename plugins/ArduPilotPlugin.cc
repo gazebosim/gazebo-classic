@@ -310,7 +310,7 @@ class gazebo::ArduPilotPluginPrivate
 
   /// \brief false before ardupilot controller is online
   /// to allow gazebo to continue without waiting
-  public: bool arduPilotOnline;
+  public: bool arduPilotOnline = false;
 
   /// \brief number of times ArduCotper skips update
   public: int connectionTimeoutCount;
@@ -318,13 +318,15 @@ class gazebo::ArduPilotPluginPrivate
   /// \brief number of times ArduCotper skips update
   /// before marking ArduPilot offline
   public: int connectionTimeoutMaxCount;
+
+  /// \brief This flag indicates if the vehicle is allowed to take off.
+  public: bool clearForLaunch = false;
 };
 
 /////////////////////////////////////////////////
 ArduPilotPlugin::ArduPilotPlugin()
   : dataPtr(new ArduPilotPluginPrivate)
 {
-  this->dataPtr->arduPilotOnline = false;
   this->dataPtr->connectionTimeoutCount = 0;
 }
 
@@ -662,7 +664,7 @@ void ArduPilotPlugin::OnUpdate()
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
     this->ReceiveMotorCommand();
-    if (this->dataPtr->arduPilotOnline)
+    if (this->dataPtr->arduPilotOnline && this->dataPtr->clearForLaunch)
     {
       this->ApplyMotorForces((curTime -
         this->dataPtr->lastControllerUpdateTime).Double());
