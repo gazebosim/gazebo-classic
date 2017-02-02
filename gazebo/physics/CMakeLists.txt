@@ -158,6 +158,7 @@ gz_add_library(gazebo_physics ${sources})
 
 target_link_libraries(gazebo_physics
   gazebo_common
+  gazebo_math
   gazebo_util
   gazebo_ode
   gazebo_opcode
