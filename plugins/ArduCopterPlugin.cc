@@ -191,11 +191,11 @@ class gazebo::ArduCopterSocketPrivate
 
     if (bind(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
-      shutdown(this->handle, 0);
+      shutdown(this->fd, 0);
       #ifdef _WIN32
-      closesocket(this->handle);
+      closesocket(this->fd);
       #else
-      close(this->handle);
+      close(this->fd);
       #endif
       return false;
     }
@@ -310,16 +310,16 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Ardupilot Socket to send state to Ardupilot
   public: ArduCopterSocketPrivate socket_out;
 
-  /// \brief Ardupilot address  
+  /// \brief Ardupilot address
   public: std::string fdm_addr;
 
-  /// \brief Ardupilot listen address  
+  /// \brief Ardupilot listen address
   public: std::string listen_addr;
 
   /// \brief Ardupilot port for receiver socket
   public: uint16_t fdm_port_in;
 
-  /// \brief Ardupilot port for sender socket  
+  /// \brief Ardupilot port for sender socket
   public: uint16_t fdm_port_out;
 
   /// \brief Pointer to an IMU sensor
