@@ -70,6 +70,12 @@ namespace gazebo
       /// \return The bits
       public: virtual unsigned int GetCollideBits() const;
 
+      // Documentation inherited.
+      public: virtual bool SupportsCategoryBits() const { return true; }
+
+      // Documentation inherited.
+      public: virtual bool SupportsCollideBits() const { return true; }
+
       // Documentation inherited
       public: virtual ignition::math::Box BoundingBox() const;
 

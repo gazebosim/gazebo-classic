@@ -64,6 +64,18 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
+unsigned int SimbodyCollision::GetCategoryBits() const
+{
+    return 0;
+}
+
+//////////////////////////////////////////////////
+unsigned int SimbodyCollision::GetCollideBits() const
+{
+    return 0;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Box SimbodyCollision::BoundingBox() const
 {
   ignition::math::Box result(0, 0, 0, 0, 0, 0);

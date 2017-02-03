@@ -174,6 +174,24 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
+unsigned int ODECollision::GetCategoryBits() const
+{
+  unsigned int categoryBits = 0;
+  if (this->collisionId)
+    categoryBits = dGeomGetCategoryBits(this->collisionId);
+  return categoryBits;
+}
+
+//////////////////////////////////////////////////
+unsigned int ODECollision::GetCollideBits() const
+{
+  unsigned int collideBits = 0;
+  if (this->collisionId)
+    collideBits = dGeomGetCollideBits(this->collisionId);
+  return collideBits;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Box ODECollision::BoundingBox() const
 {
   dReal aabb[6];

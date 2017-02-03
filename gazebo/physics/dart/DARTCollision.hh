@@ -62,13 +62,17 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetCollideBits(unsigned int _bits);
 
-      /// \brief Get the category bits, used during collision detection
-      /// \return The bits
+      // Documentation inherited.
       public: virtual unsigned int GetCategoryBits() const;
 
-      /// \brief Get the collide bits, used during collision detection
-      /// \return The bits
+      // Documentation inherited.
       public: virtual unsigned int GetCollideBits() const;
+
+      // Documentation inherited.
+      public: virtual bool SupportsCategoryBits() const { return true; }
+
+      // Documentation inherited.
+      public: virtual bool SupportsCollideBits() const { return true; }
 
       // Documentation inherited.
       public: virtual ignition::math::Box BoundingBox() const;

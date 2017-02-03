@@ -75,6 +75,22 @@ namespace gazebo
       /// \param[in] _bits The bits to set.
       public: virtual void SetCollideBits(unsigned int _bits) = 0;
 
+      /// \brief Get the category bits, used during collision detection.
+      /// \return the category bits
+      public: virtual unsigned int GetCategoryBits() const = 0;
+
+      /// \brief Get the collide bits, used during collision detection.
+      /// \return the collide bits
+      public: virtual unsigned int GetCollideBits() const = 0;
+
+      /// \brief Does this physics engine support category bits?
+      /// \return true iff category bits are supported
+      public: virtual bool SupportsCategoryBits() const = 0;
+
+      /// \brief Does this physics engine support collide bits?
+      /// \return true iff collide bits are supported
+      public: virtual bool SupportsCollideBits() const = 0;
+
       /// \brief Set the laser retro reflectiveness.
       /// \param[in] _retro The laser retro value.
       public: void SetLaserRetro(float _retro);
