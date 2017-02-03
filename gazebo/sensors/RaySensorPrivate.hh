@@ -48,6 +48,12 @@ namespace gazebo
 
       /// \brief Laser message.
       public: msgs::LaserScanStamped laserMsg;
+
+      /// \brief Minimum range of the sensor.
+      public: double minRange;
+
+      /// \brief True iff this physics engine supports masking out collisions
+      public: bool supportsCollisionBitmask = false;
     };
   }
 }

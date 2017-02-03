@@ -89,6 +89,10 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->dataPtr->laserCollision != nullptr,
       "Unable to create a multiray collision using the physics engine.");
 
+  this->dataPtr->supportsCollisionBitmask = this->dataPtr->laserCollision
+    ->SupportsCollideBits() && this->dataPtr->laserCollision
+    ->SupportsCategoryBits();
+
   this->dataPtr->laserCollision->SetName("ray_sensor_collision");
   this->dataPtr->laserCollision->SetRelativePose(this->pose);
   this->dataPtr->laserCollision->SetInitialRelativePose(this->pose);
@@ -101,6 +105,16 @@ void RaySensor::Load(const std::string &_worldName)
       "Unable to get the laser shape from the multi-ray collision.");
 
   this->dataPtr->laserShape->Load(this->sdf);
+  this->dataPtr->minRange = this->sdf->GetElement("ray")
+    ->GetElement("range")->Get<double>("min");
+  if (this->dataPtr->supportsCollisionBitmask)
+  {
+    // Raycast from the origin, the model collisions will be masked out
+    // Slight offset to prevent multi-beam sensor from colliding with itself
+    this->sdf->GetElement("ray")
+      ->GetElement("range")->GetElement("min")->Set<double>(0.00000001);
+  }
+  // else { // no masking support, so Raycast from min with bug #1564 }
   this->dataPtr->laserShape->Init();
 
   // Handle noise model settings.
@@ -169,7 +183,7 @@ ignition::math::Angle RaySensor::AngleMax() const
 double RaySensor::RangeMin() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetMinRange();
+    return this->dataPtr->minRange;
   else
     return -1;
 }
@@ -343,12 +357,58 @@ int RaySensor::Fiducial(const unsigned int _index) const
 //////////////////////////////////////////////////
 bool RaySensor::UpdateImpl(const bool /*_force*/)
 {
+  physics::EntityPtr parentEntity = this->dataPtr->parentEntity;
+
+  // #1564 Remove the parent collisions while ray casting
+  std::vector<physics::CollisionPtr> parentCollisions;
+  std::vector<unsigned int> savedCollideBits;
+  std::vector<unsigned int> savedCategoryBits;
+
+  if (this->dataPtr->supportsCollisionBitmask)
+  {
+    auto numChildren = parentEntity->GetChildCount();
+    savedCollideBits.reserve(numChildren);
+    savedCategoryBits.reserve(numChildren);
+    parentCollisions.reserve(numChildren);
+    for (decltype(numChildren) idx = 0; idx < numChildren; idx++)
+    {
+      physics::BasePtr child = parentEntity->GetChild(idx);
+      if (child->HasType(physics::Base::COLLISION))
+      {
+        physics::CollisionPtr parentCollision = parentEntity
+          ->GetChildCollision(child->GetName());
+
+        // save old bits
+        parentCollisions.push_back(parentCollision);
+        savedCollideBits.push_back(parentCollision->GetCollideBits());
+        savedCategoryBits.push_back(parentCollision->GetCategoryBits());
+
+        // collide with nothing
+        parentCollision->SetCollideBits(GZ_NONE_COLLIDE);
+        parentCollision->SetCategoryBits(GZ_NONE_COLLIDE);
+      }
+    }
+  }
+
   // do the collision checks
   // this eventually call OnNewScans, so move mutex lock behind it in case
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->dataPtr->laserShape->Update();
   this->lastMeasurementTime = this->world->SimTime();
+
+  // Restore parent's collision's bitmasks
+  if (this->dataPtr->supportsCollisionBitmask)
+  {
+    auto cIter = parentCollisions.begin();
+    auto bitIter = savedCollideBits.begin();
+    auto catIter = savedCategoryBits.begin();
+    for (; cIter != parentCollisions.end(); ++cIter, ++bitIter, ++catIter)
+    {
+      (*cIter)->SetCollideBits(*bitIter);
+      (*cIter)->SetCategoryBits(*catIter);
+    }
+  }
 
   // moving this behind laserShape update
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);

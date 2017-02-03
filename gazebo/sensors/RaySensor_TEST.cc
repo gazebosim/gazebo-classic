@@ -199,6 +199,31 @@ TEST_F(RaySensor_TEST, LaserScanResolution)
 }
 
 /////////////////////////////////////////////////
+/// \brief ray sensor reports -inf for readings less than minimum #1564
+TEST_F(RaySensor_TEST, ReportNegativeInfinity_1564)
+{
+  Load("test/worlds/gazebo_1564_cpu.world");
+  sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+  sensors::RaySensorPtr sensor = std::dynamic_pointer_cast<sensors::RaySensor>
+    (mgr->GetSensor("laser"));
+  ASSERT_TRUE(sensor != nullptr);
+
+  // Update the sensor (make readings happen)
+  sensor->Update(true);
+
+  std::vector<double> ranges;
+  sensor->Ranges(ranges);
+  decltype(ranges.size()) zero = 0;
+  ASSERT_GT(ranges.size(), zero);
+
+  // All ranges in this world should be -inf
+  for (auto iter = ranges.begin(); iter != ranges.end(); ++iter)
+  {
+    EXPECT_TRUE(std::isinf(*iter) && *iter < 0) << "not -inf:" << *iter;
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
