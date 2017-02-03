@@ -164,6 +164,8 @@ void LaserVisual::Update()
     {
       // Calculate the range of the ray
       double r = dPtr->laserMsg->scan().ranges(j*count + i);
+      if (r < minRange)
+          r = minRange;  // Less than min range, don't display a ray
       bool inf = std::isinf(r);
 
       ignition::math::Quaterniond ray(
