@@ -110,9 +110,16 @@ void RaySensor::Load(const std::string &_worldName)
   if (this->dataPtr->supportsCollisionBitmask)
   {
     // Raycast from the origin, the model collisions will be masked out
-    // Slight offset to prevent multi-beam sensor from colliding with itself
+    // Slight offset chosen through experimentation
+    //    0: sensors with vertical resolution > 1 rays collide with each other
+    //       for about the first 100 world steps, then they're fine
+    //    0.000001: INTEGRATION_laser.LaserBox("bullet") fails with a range
+    //              error of 0.93mm
+    //    0.00001: All tests pass
+    //    0.1: Too big. It risks starting point being outside of collision
+    //         geometry which makes #1564 possible
     this->sdf->GetElement("ray")
-      ->GetElement("range")->GetElement("min")->Set<double>(0.00000001);
+      ->GetElement("range")->GetElement("min")->Set<double>(1e-5);
   }
   // else { // no masking support, so Raycast from min with bug #1564 }
   this->dataPtr->laserShape->Init();
