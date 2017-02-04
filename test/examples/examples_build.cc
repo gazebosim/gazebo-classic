@@ -74,8 +74,6 @@ void ExamplesBuild::Build(const std::string &_type, const std::string &_name)
 
   char cmd[1024];
 
-  snprintf(cmd, sizeof(cmd), "echo $CMAKE_PREFIX_PATH");
-  ASSERT_EQ(system(cmd), 0);
   // cd build && cmake source
   snprintf(cmd, sizeof(cmd), "cd %s && cmake %s && make",
     build.c_str(), source.c_str());
