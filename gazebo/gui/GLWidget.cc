@@ -879,7 +879,6 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
         math::Vector3(0, pitch, yaw)));
 
   // client side heightmap configuration
-  std::cerr << " heightmap gui ini lod " << gazebo::gui::getINIProperty<int>("heightmap.lod", 0) << std::endl;
   _scene->SetHeightmapLOD(gazebo::gui::getINIProperty<int>("heightmap.lod", 0));
 
   // Update at the camera's update rate

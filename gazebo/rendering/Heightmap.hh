@@ -297,14 +297,14 @@ namespace gazebo
       /// \param[in] _value A render-engine specific value used to compute LOD.
       /// In Ogre, this is the max pixel error that should be allowed when
       /// rendering the heightmap. Default is 0, i.e. LOD is disabled.
-      /// Note: enabling LOD has the side effect that the rendering
-      /// engine will be allowed to morph mesh vertices, resulting in
-      /// inconsistencies between the heightmap visual and the collision.
-      public: void SetLOD(const double _value);
+      /// Note: enabling LOD means that the rendering engine will be allowed to
+      /// morph mesh vertices, resulting in a simplified visual that may be
+      /// different from the collision.
+      public: void SetLOD(const unsigned int _value);
 
-      /// \brief Get the heightmap Level of Detail (LOD)
+      /// \brief Get the heightmap Level of Detail (LOD) value
       /// \return Value used to compute LOD.
-      public: double LOD() const;
+      public: unsigned int LOD() const;
 
       /// \brief Create terrain material generator. There are two types:
       /// custom material generator that support user material scripts,

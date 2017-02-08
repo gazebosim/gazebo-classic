@@ -105,13 +105,13 @@ TEST_F(Heightmap_TEST, LOD)
       new gazebo::rendering::Heightmap(scene);
 
   // test basic API
-  EXPECT_DOUBLE_EQ(heightmap->LOD(), 0.0);
-  heightmap->SetLOD(3);
-  EXPECT_DOUBLE_EQ(heightmap->LOD(), 3.0);
+  EXPECT_EQ(heightmap->LOD(), 0u);
+  heightmap->SetLOD(3u);
+  EXPECT_EQ(heightmap->LOD(), 3u);
 
-  // try negative LOD
-  heightmap->SetLOD(-1);
-  EXPECT_DOUBLE_EQ(heightmap->LOD(), 0.0);
+  // try 0 LOD
+  heightmap->SetLOD(0u);
+  EXPECT_EQ(heightmap->LOD(), 0u);
 }
 
 #ifdef HAVE_GDAL
@@ -159,7 +159,7 @@ TEST_F(Heightmap_TEST, LoadDEM)
   // and the actual elevation data (dem.GetElevation)
   common::Dem dem;
   EXPECT_EQ(dem.Load(path.string()), 0);
-  EXPECT_DOUBLE_EQ(heightmap->Height(0, 0),
+  EXPECT_FLOAT_EQ(heightmap->Height(0, 0),
       dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2));
 
   delete heightmap;

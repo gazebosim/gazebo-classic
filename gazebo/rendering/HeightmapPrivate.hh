@@ -441,7 +441,7 @@ namespace gazebo
       public: unsigned int sampling = 2u;
 
       /// \brief Max pixel error allowed for rendering the heightmap. This
-      /// affects LOD.
+      /// affects the transitions between LOD levels.
       public: double maxPixelError = 0.0;
     };
   }

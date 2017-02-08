@@ -422,10 +422,8 @@ void Heightmap::Load()
               demData->GetWorldWidth(), demData->GetWorldHeight(),
               heightmapSizeZ);
         }
+        minElevation = demData->GetMinElevation();
       }
-
-      minElevation = demData->GetMinElevation();
-      std::cerr << " min " << minElevation<< std::endl;
 #endif
 
       // these params need to be the same as physics/HeightmapShape.cc
@@ -1163,21 +1161,20 @@ void Heightmap::SetupShadows(bool _enableShadows)
 }
 
 /////////////////////////////////////////////////
-void Heightmap::SetLOD(const double _value)
+void Heightmap::SetLOD(const unsigned int _value)
 {
-  this->dataPtr->maxPixelError = std::max(_value, 0.0);
+  this->dataPtr->maxPixelError = _value;
   if (this->dataPtr->terrainGlobals)
   {
     this->dataPtr->terrainGlobals->setMaxPixelError(
         this->dataPtr->maxPixelError);
-    std::cerr << " setting lod " << this->dataPtr->maxPixelError << std::endl;
   }
 }
 
 /////////////////////////////////////////////////
-double Heightmap::LOD() const
+unsigned int Heightmap::LOD() const
 {
-  return this->dataPtr->maxPixelError;
+  return static_cast<unsigned int>(this->dataPtr->maxPixelError);
 }
 
 /////////////////////////////////////////////////
@@ -2315,8 +2312,8 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
 
   for (Ogre::uint i = 0; i < numTextures; ++i)
   {
-    _outStream <<
-      "varying vec4 lightSpacePos" << i << ";\n" <<
+    _outStream << fpInStr <<
+      " vec4 lightSpacePos" << i << ";\n" <<
       "uniform sampler2D shadowMap" << i << ";\n";
 
     *_sampler = *_sampler + 1;
