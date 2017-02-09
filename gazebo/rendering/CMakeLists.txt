@@ -91,6 +91,7 @@ set (headers
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
+  GpuLaserDataIterator.hh
   Grid.hh
   Heightmap.hh
   InertiaVisual.hh
@@ -152,6 +153,7 @@ if (HAVE_OCULUS)
 endif ()
 
 set (gtest_sources
+  GpuLaserDataIterator_TEST.cc
   RenderingConversions_TEST.cc
 )
 

@@ -24,6 +24,7 @@
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/GpuLaserDataIterator.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -88,7 +89,16 @@ namespace gazebo
 
       /// \brief All things needed to get back z buffer for laser data.
       /// \return Array of laser data.
-      public: const float *LaserData() const;
+      public: const float *LaserData() const GAZEBO_DEPRECATED(9.0);
+
+      // \brief Constant iterator to access laser data
+      typedef GpuLaserDataIterator<GpuLaser> DataIter;
+
+      // \brief Return an iterator to the begining of the laser data
+      public: DataIter LaserDataBegin() const;
+
+      // \brief Return an iterator to one past the end of the laser data
+      public: DataIter LaserDataEnd() const;
 
       /// \brief Connect to a laser frame signal
       /// \param[in] _subscriber Callback that is called when a new image is

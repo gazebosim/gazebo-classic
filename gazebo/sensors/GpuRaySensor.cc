@@ -592,48 +592,35 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->RangeMin());
   scan->set_range_max(this->RangeMax());
 
-  bool add = scan->ranges_size() == 0;
+  scan->clear_ranges();
+  scan->clear_intensities();
 
-  // todo: add loop for vertical range count
-  for (int j = 0; j < this->VerticalRayCount(); ++j)
+  auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
+  auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
+  for (; dataIter != dataEnd; ++dataIter)
   {
-    for (int i = 0; i < this->RayCount(); ++i)
+    const rendering::GpuLaserData data = *dataIter;
+    double range = data.range;
+    double intensity = data.intensity;
+
+    // Mask ranges outside of min/max to +/- inf, as per REP 117
+    if (range >= this->RangeMax())
     {
-      int index = j * this->RayCount() + i;
-      double range = this->dataPtr->laserCam->LaserData()[index * 3];
-
-      // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (range >= this->RangeMax())
-      {
-        range = ignition::math::INF_D;
-      }
-      else if (range <= this->RangeMin())
-      {
-        range = -ignition::math::INF_D;
-      }
-      else if (this->noises.find(GPU_RAY_NOISE) !=
-               this->noises.end())
-      {
-        range = this->noises[GPU_RAY_NOISE]->Apply(range);
-        range = ignition::math::clamp(range,
-            this->RangeMin(), this->RangeMax());
-      }
-
-      range = ignition::math::isnan(range) ? this->RangeMax() : range;
-
-      if (add)
-      {
-        scan->add_ranges(range);
-        scan->add_intensities(
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
-      else
-      {
-        scan->set_ranges(index, range);
-        scan->set_intensities(index,
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
+      range = ignition::math::INF_D;
     }
+    else if (range <= this->RangeMin())
+    {
+      range = -ignition::math::INF_D;
+    }
+    else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
+    {
+      range = this->noises[GPU_RAY_NOISE]->Apply(range);
+      range = ignition::math::clamp(range, this->RangeMin(), this->RangeMax());
+    }
+
+    range = ignition::math::isnan(range) ? this->RangeMax() : range;
+    scan->add_ranges(range);
+    scan->add_intensities(intensity);
   }
 
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())
