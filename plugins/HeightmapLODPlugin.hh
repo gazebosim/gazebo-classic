@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_HEIGHTMAPLODPLUGIN_HH_
-#define GAZEBO_HEIGHTMAPLODPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_HEIGHTMAPLODPLUGIN_HH_
+#define GAZEBO_PLUGINS_HEIGHTMAPLODPLUGIN_HH_
 
 #include <memory>
 #include <gazebo/common/Plugin.hh>
