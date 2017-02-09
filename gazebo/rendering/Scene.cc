@@ -3318,7 +3318,7 @@ Heightmap *Scene::GetHeightmap() const
 }
 
 /////////////////////////////////////////////////
-void Scene::SetHeightmapLOD(const double _value)
+void Scene::SetHeightmapLOD(const unsigned int _value)
 {
   this->dataPtr->heightmapLOD = _value;
   if (this->dataPtr->terrain)
@@ -3326,7 +3326,7 @@ void Scene::SetHeightmapLOD(const double _value)
 }
 
 /////////////////////////////////////////////////
-double Scene::HeightmapLOD() const
+unsigned int Scene::HeightmapLOD() const
 {
   if (this->dataPtr->terrain)
     return this->dataPtr->terrain->LOD();
