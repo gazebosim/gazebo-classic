@@ -90,7 +90,7 @@ void ContactManager::SetEnforceContacts(const bool _enforce)
 }
 
 /////////////////////////////////////////////////
-bool ContactManager::ContactsEnforced()
+bool ContactManager::ContactsEnforced() const
 {
   return this->enforceContacts;
 }

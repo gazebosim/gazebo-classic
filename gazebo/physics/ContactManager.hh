@@ -105,11 +105,12 @@ namespace gazebo
 
       /// Can be used to enforces the addition of new contacts with
       /// NewContact() even if there are no subscribers.
+      /// \param[in] _enforce flag to set enforcement of contact computation
       public: void SetEnforceContacts(const bool _enforce);
 
-      /// Returns the value last set with SetEnforceContacts().
+      /// \return the value last set with SetEnforceContacts().
       /// If SetEnforceContacts() was never called, this will return false.
-      public: bool ContactsEnforced();
+      public: bool ContactsEnforced() const;
 
       /// \brief Return the number of valid contacts.
       public: unsigned int GetContactCount() const;
@@ -205,9 +206,9 @@ namespace gazebo
       /// \brief Contact publisher.
       private: ignition::transport::Node::Publisher contactPubIgn;
 
-      /// If true, enforces the addition of new contacts with
-      /// NewContact() even if there are no subscribers.
-      /// Default is false.
+      /// \brief Enforces the addition of new contacts.
+      /// Takes effect if NewContact() is called if there
+      /// are no subscribers. Default is false.
       private: bool enforceContacts;
     };
     /// \}
