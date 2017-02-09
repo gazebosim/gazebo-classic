@@ -112,6 +112,26 @@ namespace gazebo
       /// If SetEnforceContacts() was never called, this will return false.
       public: bool ContactsEnforced() const;
 
+      /// Returns true if any subscribers are connected which would be
+      /// interested in contact details of either collision
+      /// \e _collision1 or \e collision2, given that they have been loaded
+      /// into the world already.
+      /// This is the same test which NewContact() uses to determine whether
+      /// there are any subscribers for the contacts, but the test here is
+      /// optimized because it returns as soon as one subscriber is found which
+      /// listens to either of the collisions.
+      /// Note that this function needs to go through the list of custom
+      /// publishers and check whether \e _collsion1 or \e _collision2
+      /// are part of the custom publishers and whether they have been loaded
+      /// into the world, which comes at a cost.
+      /// Unless there are any benefits in calling this function ahead of
+      /// NewContact, it may be better to just use NewContact() directly.
+      /// Also note that in order to exclude that NewContact() returns NULL,
+      /// it is advisable to check ContactsEnforced() first (if it returns
+      /// true, NewContacts never returns NULL).
+      public: bool SubscribersConnected(Collision *_collision1,
+                                        Collision *_collision2) const;
+
       /// \brief Return the number of valid contacts.
       public: unsigned int GetContactCount() const;
 
@@ -175,6 +195,16 @@ namespace gazebo
       /// param[in] _name Name of filter.
       /// return True if the filter exists.
       public: bool HasFilter(const std::string &_name);
+
+      /// \brief Helper function which gets the custom publishers which publish
+      ///   contacts of either \e _collision1 or \e _collision2.
+      /// \param[in] _getOnlyConnected return only publishers which currently have
+      ///   subscribers
+      /// \param[out] _publishers the resulting publishers.
+      private: void GetCustomPublishers(Collision *_collision1,
+                                        Collision *_collision2,
+                                        const bool _getOnlyConnected,
+                                        std::vector<ContactPublisher*> &_publishers);
 
       private: std::vector<Contact*> contacts;
 
