@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Pose3.hh>
 #include <gazebo/gazebo_client.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
