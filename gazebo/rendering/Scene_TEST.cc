@@ -332,6 +332,37 @@ TEST_F(Scene_TEST, VisualType)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Scene_TEST, Shadows)
+{
+  Load("worlds/shapes.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // Test API for enabling and disabling shadows
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  scene->SetShadowsEnabled(false);
+  EXPECT_TRUE(!scene->ShadowsEnabled());
+
+  scene->SetShadowsEnabled(true);
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  // Test API for updating shadow texture size
+  EXPECT_GT(scene->ShadowTextureSize(), 0);
+
+  scene->SetShadowTextureSize(256);
+  EXPECT_GE(scene->ShadowTextureSize(), 256);
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  // setting a shadow texture size of 0 should not work
+  scene->SetShadowTextureSize(0);
+  EXPECT_GE(scene->ShadowTextureSize(), 256);
+  EXPECT_TRUE(scene->ShadowsEnabled());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

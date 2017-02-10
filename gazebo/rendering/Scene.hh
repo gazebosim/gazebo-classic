@@ -499,6 +499,15 @@ namespace gazebo
       /// \return True if shadows are enabled.
       public: bool ShadowsEnabled() const;
 
+      /// \brief Set the shadow texture size
+      /// \param[in] _size Size to set the shadow texture to. This must be a
+      /// power of 2.
+      public: void SetShadowTextureSize(const unsigned int _size);
+
+      /// \brief Get the shadow texture size
+      /// \return Size of the shadow texture
+      public: unsigned int ShadowTextureSize() const;
+
       /// \brief Add a visual to the scene
       /// \param[in] _vis Visual to add.
       public: void AddVisual(VisualPtr _vis);

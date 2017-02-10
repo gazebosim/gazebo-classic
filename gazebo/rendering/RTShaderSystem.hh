@@ -143,6 +143,15 @@ namespace gazebo
       /// \brief Update the RT shaders. This should not be called frequently.
       public: void Update();
 
+      /// \brief Set the shadow texture size.
+      /// \param[in] _size Size of shadow texture to set to. This must be a
+      /// power of 2.
+      public: void SetShadowTextureSize(const unsigned int _size);
+
+      /// \brief Get the shadow texture size.
+      /// \return Size of the shadow texture
+      public: unsigned int ShadowTextureSize() const;
+
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.
       /// \param[out] _cachePath Path to where the generated shaders are

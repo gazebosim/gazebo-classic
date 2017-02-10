@@ -3182,7 +3182,38 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
+  return ShadowsEnabled();
+}
+
+/////////////////////////////////////////////////
+bool Scene::ShadowsEnabled() const
+{
   return this->dataPtr->sdf->Get<bool>("shadows");
+}
+
+/////////////////////////////////////////////////
+void Scene::SetShadowTextureSize(const unsigned int _size)
+{
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+  {
+    // RT Shader shadows
+    RTShaderSystem::Instance()->SetShadowTextureSize(_size);
+    if (this->ShadowsEnabled())
+    {
+      // re-enable the shadows to take effect
+      this->SetShadowsEnabled(false);
+      this->SetShadowsEnabled(true);
+    }
+  }
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::ShadowTextureSize() const
+{
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+    return RTShaderSystem::Instance()->ShadowTextureSize();
 }
 
 /////////////////////////////////////////////////
