@@ -24,7 +24,6 @@
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -67,11 +66,6 @@ namespace gazebo
       /// Load CollisionState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(const sdf::ElementPtr _elem);
-
-      /// \brief Get the Collision pose
-      /// \return The pose of the CollisionState
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the Collision pose
       /// \return The pose of the CollisionState
