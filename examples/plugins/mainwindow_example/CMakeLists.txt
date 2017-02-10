@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-find_package (Qt5Core)
-find_package (Qt5Widgets)
+find_package (Qt5Core REQUIRED)
+find_package (Qt5Widgets REQUIRED)
 set (CMAKE_AUTOMOC ON)
 
 find_package(gazebo REQUIRED)
