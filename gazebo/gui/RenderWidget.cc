@@ -285,7 +285,8 @@ void RenderWidget::AddPlugins(const std::vector<std::string> &_pluginFilenames)
        iter != _pluginFilenames.end(); ++iter)
   {
     // Make sure the string is not empty
-    if ((*iter).empty()) continue;
+    if ((*iter).empty())
+      continue;
 
     // create an empty element as this function ignores SDF
     sdf::ElementPtr elem(new sdf::Element());
@@ -326,8 +327,6 @@ bool RenderWidget::AddPlugin(const std::string &_filename,
   gzlog << "Loaded GUI plugin[" << _filename << "]\n";
   return true;
 }
-
-
 
 /////////////////////////////////////////////////
 void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)
