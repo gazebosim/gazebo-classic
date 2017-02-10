@@ -280,6 +280,9 @@ namespace gazebo
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
 
+      /// \brief The heightmap level of detail
+      public: unsigned int heightmapLOD = 0u;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 

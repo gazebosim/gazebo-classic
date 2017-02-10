@@ -56,6 +56,9 @@ class HeightmapTest : public ServerFixture,
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
 
+  /// \brief Test loading a heightmap with an LOD visual plugin
+  public: void LODVisualPlugin();
+
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -532,6 +535,32 @@ void HeightmapTest::NoVisual()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::LODVisualPlugin()
+{
+  // load a heightmap with no visual
+  Load("worlds/heightmap_lod_plugin.world", false);
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // check the heightmap lod via scene
+  EXPECT_EQ(scene->HeightmapLOD(), 5u);
+
+  // get heightmap object and check lod
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+  EXPECT_EQ(h->LOD(), 5u);
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -595,6 +624,12 @@ TEST_P(HeightmapTest, Material)
 TEST_F(HeightmapTest, NoVisual)
 {
   NoVisual();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, LODVisualPlugin)
+{
+  LODVisualPlugin();
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, HeightmapTest, PHYSICS_ENGINE_VALUES);
