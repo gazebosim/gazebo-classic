@@ -31,12 +31,22 @@ namespace gazebo
     /// \brief Load function
     ///
     /// Called when a plugin is first created.
-    /// This function should not be blocking. This function is only called
-    /// when a GUI plugin is loaded from an SDF file. This function is not
-    /// called when a GUI plugin is loaded via a gui.ini file.
+    /// This function should not be blocking. This function will be
+    /// called with an empty sdf element when a GUI plugin is loaded
+    /// via a gui.ini file or via a command line argument.
     /// \param[in] _sdf Pointer the the SDF element of the plugin. This is
-    /// the plugin SDF, <plugin ...>, and its children.
+    /// the plugin SDF, <plugin ...>, and its children. It will be an empty
+    /// element when loaded from INI file or command line argument.
     public: virtual void Load(sdf::ElementPtr /*_sdf*/) {}
+
+    // \brief must be defined to support style sheets
+    public: virtual void paintEvent(QPaintEvent *)
+    {
+      QStyleOption opt;
+      opt.init(this);
+      QPainter p(this);
+      style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+    }
   };
 
 /// \brief Plugin registration function for gui plugin. Part of the

@@ -76,11 +76,8 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
-  // Setting the attribute below to true improves performance but may cause test
-  // failures on OSX/ogre1.9/qt5
-  // this->setAttribute(Qt::WA_PaintOnScreen, true);
+  this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setAttribute(Qt::WA_NoSystemBackground, true);
-
 
   this->setFocusPolicy(Qt::StrongFocus);
   this->setMouseTracking(true);

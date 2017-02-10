@@ -37,6 +37,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/RenderWidget.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -54,6 +56,9 @@ namespace po = boost::program_options;
 po::variables_map vm;
 
 boost::property_tree::ptree g_propTree;
+
+// Names of all GUI plugins loaded at start. Parsed from command line arguments.
+std::vector<std::string> g_plugins_to_load;
 
 using namespace gazebo;
 
@@ -186,7 +191,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::client::addPlugin(*iter);
+      g_plugins_to_load.push_back(*iter);
     }
   }
 
@@ -349,6 +354,18 @@ bool gui::run(int _argc, char **_argv)
     return false;
 
   gazebo::gui::init();
+
+  // the plugins have to be created after g_app has been created,
+  // otherwise Qt will complain about no existing QApplication.
+  GZ_ASSERT(g_app, "QApplication must have been created");
+
+  gazebo::gui::MainWindow *mainWindow = gazebo::gui::get_main_window();
+
+  GZ_ASSERT(mainWindow, "Main Window has to be available!");
+  GZ_ASSERT(mainWindow->RenderWidget(),
+            "Main window's RenderWidget must have been created");
+
+  mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
