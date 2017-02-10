@@ -25,8 +25,6 @@
 #include <ignition/math/Triangle.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/math/Pose.hh"
-
 #include "gazebo/transport/transport.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
