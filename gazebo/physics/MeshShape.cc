@@ -109,19 +109,6 @@ void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MeshShape::GetSize() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Size();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d MeshShape::Size() const
 {
   return this->sdf->Get<ignition::math::Vector3d>("scale");

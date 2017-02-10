@@ -40,7 +40,7 @@ namespace gazebo
       public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
-      /// \brief Initialization
+      // \brief Initialization
       public: void Init();
 
       public: void RemoveScene(const std::string &_name);

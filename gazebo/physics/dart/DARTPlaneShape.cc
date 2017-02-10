@@ -27,15 +27,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
-  : PlaneShape(_parent),
-    dataPtr(new DARTPlaneShapePrivate())
-{
-  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
-        this->dataPtr->dtBoxShape, false);
-}
-
-//////////////////////////////////////////////////
 DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())

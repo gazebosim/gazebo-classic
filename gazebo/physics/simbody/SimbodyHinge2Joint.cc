@@ -56,20 +56,6 @@ ignition::math::Vector3d SimbodyHinge2Joint::Anchor(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyHinge2Joint::GetAxis(unsigned int /*index*/) const
-{
-  gzerr << "Not implemented";
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Vector3();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double SimbodyHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "Not implemented";
