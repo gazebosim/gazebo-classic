@@ -80,10 +80,16 @@ namespace gazebo
       /// \return The number of angles.
       public: unsigned int GetAngleCount() const;
 
-      /// \brief Get the joint angle.
-      /// \param[in] _axis The axis index.
-      /// \return Angle of the axis.
-      /// \throw common::Exception When _axis is invalid.
+      /// \brief Get the joint position.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// It returns ignition::math::NAN_D in case the position can't be
+      /// obtained. For instance, if the index is invalid.
+      ///
+      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \return Position of the axis.
       public: double Position(const unsigned int _axis = 0) const;
 
       /// \brief Get the joint positions.
