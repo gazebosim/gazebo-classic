@@ -24,6 +24,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "GazeboInterface.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -93,7 +94,7 @@ class GAZEBO_VISIBLE SimulationInterface : public GazeboInterface
   private: double simTime, realTime, pauseTime;
   private: bool paused;
 
-  private: std::map<std::string, gazebo::math::Pose> entityPoses;
+  private: std::map<std::string, ignition::math::Pose3d> entityPoses;
 };
 
   /// \}
