@@ -27,15 +27,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTCylinderShape::DARTCylinderShape(CollisionPtr _parent)
-  : CylinderShape(_parent),
-    dataPtr(new DARTCylinderShapePrivate())
-{
-  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
-        this->dataPtr->dtCylinderShape);
-}
-
-//////////////////////////////////////////////////
 DARTCylinderShape::DARTCylinderShape(DARTCollisionPtr _parent)
   : CylinderShape(_parent),
     dataPtr(new DARTCylinderShapePrivate())

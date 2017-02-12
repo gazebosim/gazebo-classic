@@ -45,21 +45,10 @@ namespace gazebo
 
       /// \brief Set the size of the box.
       /// \param[in] _size Size of each side of the box.
-      /// \deprecated See version that accepts an ignition math object
-      public: virtual void SetSize(const math::Vector3 &_size)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the size of the box.
-      /// \param[in] _size Size of each side of the box.
       public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       // Documentation inherited
       public: virtual void SetScale(const ignition::math::Vector3d &_scale);
-
-      /// \brief Get the size of the box.
-      /// \return The size of each side of the box.
-      /// \deprecated See ignition::math::Vector3d Size() const
-      public: math::Vector3 GetSize() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the size of the box.
       /// \return The size of each side of the box.

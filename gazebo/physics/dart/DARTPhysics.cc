@@ -18,7 +18,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -434,12 +433,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     return false;
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-dart::simulation::World *DARTPhysics::GetDARTWorld() const
-{
-  return this->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////

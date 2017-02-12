@@ -39,7 +39,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
