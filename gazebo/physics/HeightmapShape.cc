@@ -31,7 +31,6 @@
 #include "gazebo/common/Image.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SphericalCoordinates.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/physics/HeightmapShape.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/transport/transport.hh"
@@ -248,35 +247,9 @@ std::string HeightmapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetSize() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Size();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d HeightmapShape::Size() const
 {
   return this->heightmapSize;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 HeightmapShape::GetPos() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pos();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -317,19 +290,6 @@ void HeightmapShape::FillHeights(msgs::Geometry &_msg) const
 void HeightmapShape::ProcessMsg(const msgs::Geometry & /*_msg*/)
 {
   gzerr << "TODO: not implement yet.";
-}
-
-//////////////////////////////////////////////////
-math::Vector2i HeightmapShape::GetVertexCount() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->VertexCount();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

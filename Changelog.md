@@ -14,6 +14,13 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Fix loading gui plugins and OSX framerate issue
+    * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
+    * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
+    * [Issue #2133](https://bitbucket.org/osrf/gazebo/issues/2133)
+
+## Gazebo 8.0.0 (2017-01-25)
+
 1. Depend on ignition math3
     * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
 

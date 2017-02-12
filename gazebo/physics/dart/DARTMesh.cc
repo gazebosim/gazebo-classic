@@ -66,21 +66,6 @@ DARTMesh::~DARTMesh()
 //////////////////////////////////////////////////
 void DARTMesh::Init(const common::SubMesh *_subMesh,
                     DARTCollisionPtr _collision,
-                    const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Init(_subMesh, _collision, _scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
-void DARTMesh::Init(const common::SubMesh *_subMesh,
-                    DARTCollisionPtr _collision,
                     const ignition::math::Vector3d &_scale)
 {
   float *vertices = nullptr;
@@ -97,21 +82,6 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
 
   delete [] vertices;
   delete [] indices;
-}
-
-//////////////////////////////////////////////////
-void DARTMesh::Init(const common::Mesh *_mesh,
-                    DARTCollisionPtr _collision,
-                    const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Init(_mesh, _collision, _scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
