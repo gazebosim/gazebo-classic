@@ -136,6 +136,66 @@ TEST_F(ContactManagerTest, RemoveFilter)
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 }
 
+/////////////////////////////////////////////////
+TEST_F(ContactManagerTest, EnforcedContacts)
+{
+  Load("test/worlds/box.world", false);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != NULL);
+
+  physics::ContactManager *manager = physics->GetContactManager();
+  ASSERT_TRUE(physics != NULL);
+
+  // pause the world in order to use World::Step()
+  // function correctly
+  world->SetPaused(true);
+
+  // advance the world. Contacts should happen between
+  // box and ground.
+  world->Step(1);
+
+  unsigned int numContacts = manager->GetContactCount();
+
+  // we have not enforced contacts computation (yet), so
+  // we should not have access to any contacts information
+  // without the enforcement.
+  ASSERT_TRUE(numContacts == 0);
+
+  manager->SetEnforceContacts(true);
+  ASSERT_TRUE(manager->ContactsEnforced());
+
+  // advance the world again, this time the contacts
+  // information should become available.
+  world->Step(1);
+
+  numContacts = manager->GetContactCount();
+  gzdbg << "Number of contacts: " <<numContacts << std::endl;
+  ASSERT_TRUE(numContacts > 0);
+
+  // make sure there are no subscribers connected which may have
+  // caused the contacts to become true
+  const std::vector<physics::Contact *>& contacts = manager->GetContacts();
+  for (std::vector<physics::Contact *>::const_iterator it= contacts.begin();
+       it!=contacts.end(); ++it)
+  {
+    physics::Contact* contact=*it;
+    physics::Collision* coll1=contact->collision1;
+    physics::Collision* coll2=contact->collision2;
+    ASSERT_TRUE(coll1 != NULL);
+    ASSERT_TRUE(coll2 != NULL);
+    // we have no subscribers connected and still have gotten the contacts
+    // information, which means that enforcing contacts computation has worked.
+    ASSERT_FALSE(manager->SubscribersConnected(coll1, coll2));
+    ASSERT_FALSE(manager->SubscribersConnected(coll2, coll1));
+  }
+}
+
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
