@@ -52,6 +52,7 @@ set (plugins_single_header
   ForceTorquePlugin
   GpuRayPlugin
   HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
