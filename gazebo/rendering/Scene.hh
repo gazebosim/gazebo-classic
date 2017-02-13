@@ -568,7 +568,7 @@ namespace gazebo
 
       /// \brief Get the Level Of Detail (LOD) value for the heightmap.
       /// \return A render-engine specific value that is used to compute LOD.
-      /// \sa Heightmap::SetLOD
+      /// \sa Heightmap::LOD
       public: unsigned int HeightmapLOD() const;
 
       /// \brief Clear rendering::Scene
