@@ -182,6 +182,7 @@ void ViewControlTest::MouseZoomModelEditor()
   QVERIFY(cam->IsVisible(cylinder));
 
   // Clean up
+  delete modelCreator;
   cam->Fini();
   mainWindow->close();
   delete mainWindow;

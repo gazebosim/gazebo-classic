@@ -201,6 +201,8 @@ void DataLogger_TEST::StressTest()
     boost::filesystem::remove_all(paths->GetDefaultTestPath());
 
     QVERIFY(dirCount == count / 2);
+
+    delete dataLogger;
   }
 }
 

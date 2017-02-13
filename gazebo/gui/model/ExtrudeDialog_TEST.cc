@@ -72,6 +72,8 @@ void ExtrudeDialog_TEST::GetSpinValues()
   samplesSpin->setValue(20);
   samples = extrudeDialog->GetSamples();
   QCOMPARE(samples, (unsigned int)20);
+
+  delete extrudeDialog;
 }
 
 // Generate a main function for the test
