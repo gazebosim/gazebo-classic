@@ -808,3 +808,16 @@ void BulletPhysics::SetSeed(uint32_t /*_seed*/)
   // It's going to be blank for now.
   /// \todo Implement this function.
 }
+
+/////////////////////////////////////////////////
+bool BulletPhysics::Supports(const Capability _capability)
+{
+  switch (_capability)
+  {
+    case PhysicsEngine::CATEGORY_BITS:
+    case PhysicsEngine::COLLIDE_BITS:
+        return true;
+    default:
+      return false;
+  }
+}

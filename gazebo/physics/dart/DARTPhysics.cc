@@ -529,3 +529,15 @@ DARTLinkPtr DARTPhysics::FindDARTLink(
   return res;
 }
 
+//////////////////////////////////////////////////
+bool DARTPhysics::Supports(const Capability _capability)
+{
+  switch (_capability)
+  {
+    case PhysicsEngine::CATEGORY_BITS:
+    case PhysicsEngine::COLLIDE_BITS:
+        return true;
+    default:
+      return false;
+  }
+}

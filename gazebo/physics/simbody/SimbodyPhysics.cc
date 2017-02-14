@@ -1713,3 +1713,15 @@ bool SimbodyPhysics::SetParam(const std::string &_key, const boost::any &_value)
   }
   return true;
 }
+
+//////////////////////////////////////////////////
+bool SimbodyPhysics::Supports(const Capability _capability)
+{
+  switch (_capability)
+  {
+    case PhysicsEngine::CATEGORY_BITS:
+    case PhysicsEngine::COLLIDE_BITS:
+    default:
+      return false;
+  }
+}

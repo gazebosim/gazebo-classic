@@ -109,6 +109,9 @@ namespace gazebo
       public: virtual void SetSeed(uint32_t _seed);
 
       // Documentation inherited
+      public: virtual bool Supports(const Capability _capability);
+
+      // Documentation inherited
       public: virtual ModelPtr CreateModel(BasePtr _parent);
 
       // Documentation inherited

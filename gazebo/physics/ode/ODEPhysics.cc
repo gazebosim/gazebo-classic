@@ -1632,3 +1632,16 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
   }
   return true;
 }
+
+//////////////////////////////////////////////////
+bool ODEPhysics::Supports(const Capability _capability)
+{
+  switch (_capability)
+  {
+    case PhysicsEngine::CATEGORY_BITS:
+    case PhysicsEngine::COLLIDE_BITS:
+      return true;
+    default:
+      return false;
+  }
+}

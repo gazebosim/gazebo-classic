@@ -232,6 +232,9 @@ namespace gazebo
       public: virtual bool SetParam(const std::string &_key,
                   const boost::any &_value);
 
+      // Documentation inherited
+      public: virtual bool Supports(const Capability _capability);
+
       /// \brief contact material stiffness.  See sdf description for details.
       private: double contactMaterialStiffness;
 

@@ -74,6 +74,19 @@ namespace gazebo
       /// \param[in] _seed The random number seed.
       public: virtual void SetSeed(uint32_t _seed) = 0;
 
+      /// \brief Physics capabilities an engine may or may not have
+      public: enum Capability
+              {
+                // Collision::SetCategoryBits() has an effect
+                CATEGORY_BITS = 0x100,
+                // Collision::SetCollideBits() has an effect
+                COLLIDE_BITS = 0x101,
+              };
+
+      /// \brief Returns True iff the physics engine supports the capability
+      /// \param[in] _capability the capability being queried.
+      public: virtual bool Supports(const Capability _capability) = 0;
+
       /// \brief Get the simulation update period.
       /// \return Simulation update period.
       public: double GetUpdatePeriod();

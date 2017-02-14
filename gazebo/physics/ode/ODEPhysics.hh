@@ -290,6 +290,9 @@ namespace gazebo
       /// \brief process joint feedbacks.
       /// \param[in] _feedback ODE Joint Contact feedback information.
       public: void ProcessJointFeedback(ODEJointFeedback *_feedback);
+      
+      // Documentation inherited
+      public: virtual bool Supports(const Capability _capability);
 
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 

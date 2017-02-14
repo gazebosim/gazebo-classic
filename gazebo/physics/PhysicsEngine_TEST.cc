@@ -27,6 +27,7 @@ class PhysicsEngineTest : public ServerFixture,
   public: void OnPhysicsMsgResponse(ConstResponsePtr &_msg);
   public: void PhysicsEngineParam(const std::string &_physicsEngine);
   public: void PhysicsEngineGetParamBool(const std::string &_physicsEngine);
+  public: void PhysicsEngineSupports(const std::string &_physicsEngine);
   public: static msgs::Physics physicsPubMsg;
   public: static msgs::Physics physicsResponseMsg;
 };
@@ -222,6 +223,25 @@ void PhysicsEngineTest::PhysicsEngineGetParamBool
 TEST_P(PhysicsEngineTest, PhysicsEngineGetParamBool)
 {
   PhysicsEngineGetParamBool(GetParam());
+}
+
+/////////////////////////////////////////////////
+void PhysicsEngineTest::PhysicsEngineSupports
+    (const std::string &_physicsEngine)
+{
+  Load("worlds/empty.world", false, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  physics::PhysicsEnginePtr physics = world->Physics();
+
+  EXPECT_NO_THROW(physics->Supports(physics::PhysicsEngine::COLLIDE_BITS));
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsEngineTest, PhysicsEngineSupports)
+{
+  PhysicsEngineSupports(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsEngineTest,
