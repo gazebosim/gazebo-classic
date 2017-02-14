@@ -67,6 +67,7 @@ set (plugins_single_header
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
+  ShadowPlugin
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin)
