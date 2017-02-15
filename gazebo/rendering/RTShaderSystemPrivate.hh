@@ -55,7 +55,7 @@ namespace gazebo
       public: bool updateShaders;
 
       /// \brief Size of the PSSM shadow texture at closest layer.
-      public: unsigned int shadowTextureSize = 1024;
+      public: unsigned int shadowTextureSize = 1024u;
     };
   }
 }

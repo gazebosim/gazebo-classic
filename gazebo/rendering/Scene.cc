@@ -3145,7 +3145,8 @@ void Scene::SetShadowsEnabled(bool _value)
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->dataPtr->manager->setShadowTextureConfig(0, 1024, 1024,
+    this->dataPtr->manager->setShadowTextureConfig(0,
+        this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
         Ogre::PF_FLOAT32_RGBA, 0, 2);
     this->dataPtr->manager->setShadowDirectionalLightExtrusionDistance(75);
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
@@ -3165,7 +3166,8 @@ void Scene::SetShadowsEnabled(bool _value)
   else
   {
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
-    this->dataPtr->manager->setShadowTextureSize(512);
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
 
     // The default shadows.
     if (_value && this->dataPtr->manager->getShadowTechnique()
@@ -3194,6 +3196,14 @@ bool Scene::ShadowsEnabled() const
 /////////////////////////////////////////////////
 void Scene::SetShadowTextureSize(const unsigned int _size)
 {
+  // check if texture size is a power of 2
+  if (!(_size > 0u && ((_size & (_size-1)) == 0u)))
+  {
+    gzerr << "Shadow texture size must be a power of 2" << std::endl;
+    return;
+  }
+  this->dataPtr->shadowTextureSize = _size;
+
   if (RenderEngine::Instance()->GetRenderPathType() ==
       RenderEngine::FORWARD)
   {
@@ -3206,6 +3216,11 @@ void Scene::SetShadowTextureSize(const unsigned int _size)
       this->SetShadowsEnabled(true);
     }
   }
+  else
+  {
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -3214,6 +3229,8 @@ unsigned int Scene::ShadowTextureSize() const
   if (RenderEngine::Instance()->GetRenderPathType() ==
       RenderEngine::FORWARD)
     return RTShaderSystem::Instance()->ShadowTextureSize();
+  else
+    return this->dataPtr->shadowTextureSize;
 }
 
 /////////////////////////////////////////////////
