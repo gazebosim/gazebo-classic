@@ -107,7 +107,7 @@ namespace gazebo
   }
 }
 
-#include "GpuLaserDataIterator.impl.hh"
+#include "GpuLaserDataIteratorImpl.hh"
 
 #endif  // GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
 
