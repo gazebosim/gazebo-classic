@@ -9,6 +9,9 @@
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
 
+1. Added GpuLaserDataIterator
+    * [Pull request #2637](https://bitbucket.org/osrf/gazebo/pull-request/2637)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
