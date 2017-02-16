@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
-#define _GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
+#ifndef GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
+#define GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
 
 #include <memory>
 
@@ -103,5 +103,5 @@ namespace gazebo
 
 #include "GpuLaserDataIterator.impl.hh"
 
-#endif  // _GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
+#endif  // GAZEBO_RENDERING_GPULASERDATAITERATOR_HH_
 
