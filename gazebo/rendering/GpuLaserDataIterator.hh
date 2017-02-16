@@ -48,63 +48,61 @@ namespace gazebo
     template <typename F>
     class GpuLaserDataIterator
     {
-      public:
+      public: friend F;
 
-        friend F;
+      public: ~GpuLaserDataIterator();
 
-        ~GpuLaserDataIterator();
+      // \brief return true if the iterators point to the same element
+      public: bool operator==(const GpuLaserDataIterator &rvalue) const;
 
-        // \brief return true if the iterators point to the same element
-        bool operator==(const GpuLaserDataIterator &rvalue) const;
+      // \brief return true if the iterators point to different elements
+      public: bool operator!=(const GpuLaserDataIterator &rvalue) const;
 
-        // \brief return true if the iterators point to different elements
-        bool operator!=(const GpuLaserDataIterator &rvalue) const;
+      // \brief returns laser data at the index pointed to by the iterator
+      public: const GpuLaserData operator*() const;
 
-        // \brief returns laser data at the index pointed to by the iterator
-        const GpuLaserData operator*() const;
+      // \brief returns a shared pointer object at the iterator's index
+      public: const std::shared_ptr<const GpuLaserData> operator->() const;
 
-        // \brief returns a shared pointer object at the iterator's index
-        const std::shared_ptr<const GpuLaserData> operator->() const;
+      // \brief Advance iterator to next reading (++it)
+      public: GpuLaserDataIterator<F>& operator++();
 
-        // \brief Advance iterator to next reading (++it)
-        GpuLaserDataIterator<F>& operator++();
+      // \brief Advance this iterator, but return a copy of this one (it++)
+      public: GpuLaserDataIterator<F> operator++(int _dummy);
 
-        // \brief Advance this iterator, but return a copy of this one (it++)
-        GpuLaserDataIterator<F> operator++(int _dummy);
+      // \brief Move itereator to previous (--it)
+      public: GpuLaserDataIterator<F>& operator--();
 
-        // \brief Move itereator to previous (--it)
-        GpuLaserDataIterator<F>& operator--();
+      // \breif Go to previous, but return a copy of this one (it--)
+      public: GpuLaserDataIterator<F> operator--(int _dummy);
 
-        // \breif Go to previous, but return a copy of this one (it--)
-        GpuLaserDataIterator<F> operator--(int _dummy);
+      // \brief contstruct an iterator to a specified index
+      protected: GpuLaserDataIterator(const unsigned int _index,
+                         const float *_data, const unsigned int _skip,
+                         const unsigned int _rangeOffset,
+                         const unsigned int _intensityOffset,
+                         const unsigned int _horizontalResolution);
 
-      protected:
-        // \brief contstruct an iterator to a specified index
-        GpuLaserDataIterator(const unsigned int _index, const float *_data,
-            const unsigned int _skip, unsigned int _rangeOffset,
-            const unsigned int _intensityOffset,
-            const unsigned int _horizontalResolution);
 
-      private:
-        // Not using PIMPL because it has no benefit on templated classes
+      // Not using PIMPL because it has no benefit on templated classes
 
-        // \brief which reading is this [0, vRes * hRes)
-        unsigned int index = 0;
+      // \brief which reading is this [0, vRes * hRes)
+      private: unsigned int index = 0;
 
-        // \brief the data being decoded
-        const float *data = nullptr;
+      // \brief the data being decoded
+      private: const float *data = nullptr;
 
-        // \brief offset between consecutive readings
-        const unsigned int skip = 0;
+      // \brief offset between consecutive readings
+      private: const unsigned int skip = 0;
 
-        // \brief offset within a reading to range data
-        const unsigned int rangeOffset = 0;
+      // \brief offset within a reading to range data
+      private: const unsigned int rangeOffset = 0;
 
-        // \brief offset within a reading to intensity data
-        const unsigned int intensityOffset = 0;
+      // \brief offset within a reading to intensity data
+      private: const unsigned int intensityOffset = 0;
 
-        // \brief Number of readings in each plane or cone
-        const unsigned int horizontalResolution = 0;
+      // \brief Number of readings in each plane or cone
+      private: const unsigned int horizontalResolution = 0;
     };
   }
 }
