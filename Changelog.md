@@ -9,6 +9,9 @@
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
 
+1. Added `physics::PhysicsEngine::Supports()` to query engine capabilities
+    * [Pull request #2643](https://bitbucket.org/osrf/gazebo/pull-request/2643)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
