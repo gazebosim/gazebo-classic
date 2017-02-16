@@ -602,15 +602,7 @@ void RTShaderSystem::Update()
 /////////////////////////////////////////////////
 void RTShaderSystem::SetShadowTextureSize(const unsigned int _size)
 {
-  // check if texture size is a power of 2
-  if (_size > 0 && ((_size & (_size-1)) == 0))
-  {
-    this->dataPtr->shadowTextureSize = _size;
-  }
-  else
-  {
-    gzerr << "Shadow texture size must be a power of 2" << std::endl;
-  }
+  this->dataPtr->shadowTextureSize = _size;
 }
 
 /////////////////////////////////////////////////
