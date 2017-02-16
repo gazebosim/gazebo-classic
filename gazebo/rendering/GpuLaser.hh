@@ -91,13 +91,13 @@ namespace gazebo
       /// \return Array of laser data.
       public: const float *LaserData() const GAZEBO_DEPRECATED(9.0);
 
-      // \brief Constant iterator to access laser data
-      typedef GpuLaserDataIterator<GpuLaser> DataIter;
+      /// \brief Constant iterator to access laser data
+      public: typedef GpuLaserDataIterator<GpuLaser> DataIter;
 
-      // \brief Return an iterator to the begining of the laser data
+      /// \brief Return an iterator to the begining of the laser data
       public: DataIter LaserDataBegin() const;
 
-      // \brief Return an iterator to one past the end of the laser data
+      /// \brief Return an iterator to one past the end of the laser data
       public: DataIter LaserDataEnd() const;
 
       /// \brief Connect to a laser frame signal
