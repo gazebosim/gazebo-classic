@@ -28,10 +28,13 @@ namespace gazebo
     {
       // The distance of the reading in meters
       double range;
+
       // The intensity reading
       double intensity;
+
       // Which plane or cone this reading belongs to [0, verticalResolution)
       unsigned int beam;
+
       // Which reading in a plane or cone is this [0, horizontalResolution)
       unsigned int reading;
     };
@@ -87,14 +90,19 @@ namespace gazebo
 
         // \brief which reading is this [0, vRes * hRes)
         unsigned int index = 0;
+
         // \brief the data being decoded
         const float *data = nullptr;
+
         // \brief offset between consecutive readings
         const unsigned int skip = 0;
+
         // \brief offset within a reading to range data
         const unsigned int rangeOffset = 0;
+
         // \brief offset within a reading to intensity data
         const unsigned int intensityOffset = 0;
+
         // \brief Number of readings in each plane or cone
         const unsigned int horizontalResolution = 0;
     };
