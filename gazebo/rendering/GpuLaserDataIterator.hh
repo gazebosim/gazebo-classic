@@ -73,7 +73,7 @@ namespace gazebo
       // \brief Move itereator to previous (--it)
       public: GpuLaserDataIterator<F>& operator--();
 
-      // \breif Go to previous, but return a copy of this one (it--)
+      // \brief Go to previous, but return a copy of this one (it--)
       public: GpuLaserDataIterator<F> operator--(int _dummy);
 
       // \brief contstruct an iterator to a specified index
