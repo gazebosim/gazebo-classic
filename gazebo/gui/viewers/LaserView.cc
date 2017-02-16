@@ -487,7 +487,7 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     double noHitRange = std::isinf(r) ? this->rangeMax : hitRange;
     if (r < this->rangeMin)
     {
-        // Display -inf as very clos
+        // Display -inf as very close
         noHitRange = 0;
     }
     QPointF noHitPt(noHitRange * this->scale * cos(angle),
