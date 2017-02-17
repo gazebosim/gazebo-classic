@@ -235,7 +235,10 @@ void PhysicsEngineTest::PhysicsEngineSupports
 
   physics::PhysicsEnginePtr physics = world->Physics();
 
-  EXPECT_NO_THROW(physics->Supports(physics::PhysicsEngine::COLLIDE_BITS));
+  bool result = physics->Supports(physics::PhysicsEngine::COLLIDE_BITS);
+
+  EXPECT_TRUE((_physicsEngine != "simbody" && result)
+      || (_physicsEngine == "simbody" && !result));
 }
 
 /////////////////////////////////////////////////
