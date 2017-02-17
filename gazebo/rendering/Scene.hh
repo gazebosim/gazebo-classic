@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -551,6 +551,16 @@ namespace gazebo
       /// \brief Get a pointer to the heightmap.
       /// \return Pointer to the heightmap, NULL if no heightmap.
       public: Heightmap *GetHeightmap() const;
+
+      /// \brief Set the Level Of Detail (LOD) value for the heightmap.
+      /// \param[in] _value A render-engine specific value used to compute LOD.
+      /// \sa Heightmap::SetLOD
+      public: void SetHeightmapLOD(const unsigned int _value);
+
+      /// \brief Get the Level Of Detail (LOD) value for the heightmap.
+      /// \return A render-engine specific value that is used to compute LOD.
+      /// \sa Heightmap::LOD
+      public: unsigned int HeightmapLOD() const;
 
       /// \brief Clear rendering::Scene
       public: void Clear();

@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -147,7 +148,8 @@ void ViewControlTest::MouseZoomModelEditor()
   this->ProcessEventsAndDraw(mainWindow);
 
   // create the model editor
-  gazebo::gui::ModelCreator *modelCreator = new gazebo::gui::ModelCreator();
+  std::unique_ptr<gazebo::gui::ModelCreator> modelCreator(
+      new gazebo::gui::ModelCreator());
 
   // Inserting a link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_CYLINDER);
