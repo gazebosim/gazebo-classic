@@ -254,7 +254,6 @@ void Heightmap::SplitHeights(const std::vector<float> &_heightmap,
   int width = sqrt(_heightmap.size());
   int newWidth = 1 + (width - 1) / sqrt(_n);
 
-  std::cerr << " split heights n: " << _n << std::endl;
   // Memory allocation
   _v.resize(_n);
 
@@ -352,7 +351,6 @@ bool Heightmap::PrepareTerrain(
   if (updateHash)
   {
     this->UpdateTerrainHash(heightmapHash, _terrainDirPath);
-    std::cerr << " updating hash " << std::endl;
   }
 
   return updateHash;
@@ -647,7 +645,7 @@ t1 = common::Time::GetWallTime();
   // Sync load since we want everything in place when we start
   this->dataPtr->terrainGroup->loadAllTerrains(true);
 
-std::cerr << "defining and loading terrain: " << (common::Time::GetWallTime() - t1).Double() << std::endl;
+std::cerr << "defining terrain: " << (common::Time::GetWallTime() - t1).Double() << std::endl;
 
   // Calculate blend maps
   if (this->dataPtr->terrainsImported)
@@ -675,8 +673,6 @@ std::cerr << "defining and loading terrain: " << (common::Time::GetWallTime() - 
 ///////////////////////////////////////////////////
 void Heightmap::SaveHeightmap()
 {
-  if (this->dataPtr->useTerrainPaging)
-    return;
   // Calculate blend maps
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
@@ -824,7 +820,6 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
     {
       this->dataPtr->terrainGroup->defineTerrain(_x, _y);
       this->dataPtr->terrainsImported = false;
-      std::cerr << "resource exist" << std::endl;
     }
     else
     {
@@ -841,7 +836,14 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
     }
     else
     {
-      std::cerr << "this->dataPtr->terrainIdx " << this->dataPtr->terrainIdx << std::endl;
+      // generate the subterrains if needed
+      if (this->dataPtr->subTerrains.empty())
+      {
+        this->SplitHeights(this->dataPtr->heights,
+            this->dataPtr->numTerrainSubdivisions,
+            this->dataPtr->subTerrains);
+      }
+
       this->dataPtr->terrainGroup->defineTerrain(_x, _y,
           &this->dataPtr->subTerrains[this->dataPtr->terrainIdx][0]);
       ++this->dataPtr->terrainIdx;
