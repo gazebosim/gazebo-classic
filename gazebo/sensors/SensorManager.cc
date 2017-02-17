@@ -357,7 +357,7 @@ SensorPtr SensorManager::GetSensor(const std::string &_name) const
       {
         result = tmpSensor;
         GZ_ASSERT(result != nullptr,
-            "SensorContainer contains a nullptr Sensor");
+            "SensorContainer contains a null Sensor");
       }
       else
       {
@@ -644,7 +644,7 @@ SensorPtr SensorManager::SensorContainer::GetSensor(const std::string &_name,
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::AddSensor(SensorPtr _sensor)
 {
-  GZ_ASSERT(_sensor != nullptr, "Sensor is nullptr when passed to ::AddSensor");
+  GZ_ASSERT(_sensor != nullptr, "Sensor is null when passed to ::AddSensor");
 
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);

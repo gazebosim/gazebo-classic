@@ -301,7 +301,7 @@ namespace gazebo
       private: SimTimeEventHandler *simTimeEventHandler;
 
       /// \brief All the worlds whose sensors have been initialized. This
-      /// includes worlds without sensors..
+      /// includes worlds without sensors.
       private: std::map<std::string, physics::WorldPtr> worlds;
 
       /// \brief Connect to the time reset event.
