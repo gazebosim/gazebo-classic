@@ -95,6 +95,10 @@ namespace gazebo
       /// This is then a signal to the Physics engine that it can skip the
       /// extra processing necessary to get back contact information.
       ///
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
+      /// \param[in] _time the time of the contact
+      ///
       /// \return The new contact. The physics engine should populate the
       /// contact's parameters. NULL will be returned if there are no
       /// subscribers to the contact topic and ContactsEnforced()
@@ -103,17 +107,18 @@ namespace gazebo
                                   Collision *_collision2,
                                   const common::Time &_time);
 
-      /// Can be used to enforces the addition of new contacts with
-      /// NewContact() even if there are no subscribers.
+      /// \brief Enforces the addition of new contacts
+      /// with NewContact(), even if there are no subscribers.
       /// \param[in] _enforce flag to set enforcement of contact computation
       public: void SetEnforceContacts(const bool _enforce);
 
+      /// \brief returns the value last set with SetEnforceContacts().
       /// \return the value last set with SetEnforceContacts().
       /// If SetEnforceContacts() was never called, this will return false.
       public: bool ContactsEnforced() const;
 
-      /// Returns true if any subscribers are connected which would be
-      /// interested in contact details of either collision
+      /// \brief Returns true if any subscribers are connected
+      /// which would be interested in contact details of either collision
       /// \e _collision1 or \e collision2, given that they have been loaded
       /// into the world already.
       /// This is the same test which NewContact() uses to determine whether
@@ -129,6 +134,9 @@ namespace gazebo
       /// Also note that in order to exclude that NewContact() returns NULL,
       /// it is advisable to check ContactsEnforced() first (if it returns
       /// true, NewContacts never returns NULL).
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
+      /// \return true if any subscribers are connected for this pair
       public: bool SubscribersConnected(Collision *_collision1,
                                         Collision *_collision2) const;
 
@@ -198,6 +206,8 @@ namespace gazebo
 
       /// \brief Helper function which gets the custom publishers which publish
       ///   contacts of either \e _collision1 or \e _collision2.
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
       /// \param[in] _getOnlyConnected return only publishers which currently have
       ///   subscribers
       /// \param[out] _publishers the resulting publishers.

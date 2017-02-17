@@ -226,7 +226,6 @@ namespace gazebo
       /// \param[in] _frameOffset amount to offset the Link frame by, this
       /// is a transform defined in the Link frame.
       /// \return Inertial parameters with the shifted frame.
-      /// \deprecated See operator()(const ignition::math::Pose3d &) const
       public: Inertial operator()(
                   const ignition::math::Pose3d &_frameOffset) const;
 
@@ -235,7 +234,6 @@ namespace gazebo
       /// \param[in] _frameOffset amount to offset the Link frame by, this
       /// is a transform defined in the Link frame.
       /// \return Inertial parameters with the shifted frame.
-      /// \deprecated See operator()(const ignition::math::Pose3d &) const
       public: Inertial operator()(
                   const ignition::math::Vector3d &_frameOffset) const;
 
