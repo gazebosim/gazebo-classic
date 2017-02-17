@@ -56,11 +56,13 @@ void SimbodyCollision::OnPoseChange()
 //////////////////////////////////////////////////
 void SimbodyCollision::SetCategoryBits(unsigned int /*_bits*/)
 {
+  gzerr << "Simbody does not support category bits\n";
 }
 
 //////////////////////////////////////////////////
 void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 {
+  gzerr << "Simbody does not support collide bits\n";
 }
 
 //////////////////////////////////////////////////
