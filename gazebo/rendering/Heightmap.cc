@@ -399,17 +399,11 @@ void Heightmap::Load()
   // ogre. It is later translated back by the setOrigin call.
   double minElevation = 0.0;
 
-
-common::Time t1;
-
   // try loading heightmap data locally
   if (!this->dataPtr->filename.empty())
   {
-// TODO ===================
-t1 = common::Time::GetWallTime();
     this->dataPtr->heightmapData = common::HeightmapDataLoader::LoadTerrainFile(
         this->dataPtr->filename);
-std::cerr << "load terrain file: " << (common::Time::GetWallTime() - t1).Double() << std::endl;
 
     if (this->dataPtr->heightmapData)
     {
@@ -516,8 +510,6 @@ std::cerr << "load terrain file: " << (common::Time::GetWallTime() - t1).Double(
     imgPath = this->dataPtr->filename;
     terrainName = imgPath.filename().stem();
     terrainDirPath = this->dataPtr->gzPagingDir / terrainName;
-
-    std::cerr << " terrain: " << terrainDirPath << std::endl;
 
     // Add the top level terrain paging directory to the OGRE
     // ResourceGroupManager
@@ -635,8 +627,8 @@ std::cerr << "load terrain file: " << (common::Time::GetWallTime() - t1).Double(
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
-// TODO ===================
-t1 = common::Time::GetWallTime();
+  gzmsg << "Loading heightmap: " << terrainName.string() << std::endl;
+  common::Time time = common::Time::GetWallTime();
 
   for (int y = 0; y <= sqrtN - 1; ++y)
     for (int x = 0; x <= sqrtN - 1; ++x)
@@ -645,7 +637,8 @@ t1 = common::Time::GetWallTime();
   // Sync load since we want everything in place when we start
   this->dataPtr->terrainGroup->loadAllTerrains(true);
 
-std::cerr << "defining terrain: " << (common::Time::GetWallTime() - t1).Double() << std::endl;
+  gzmsg << "Heightmap loaded. Process took: "
+        <<  (common::Time::GetWallTime() - time).Double() << std::endl;
 
   // Calculate blend maps
   if (this->dataPtr->terrainsImported)
@@ -678,13 +671,18 @@ void Heightmap::SaveHeightmap()
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
     // Save all subterrains using files.
-    // saving an ogre terrain dat file can take quite some time for large dems.
 
-// TODO ===================
-common::Time t1;
-t1 = common::Time::GetWallTime();
+    // saving an ogre terrain dat file can take quite some time for large dems.
+    gzmsg << "Saving heightmap cache data to " <<
+        this->dataPtr->gzPagingDir.string() << std::endl;
+    common::Time time = common::Time::GetWallTime();
+
     this->dataPtr->terrainGroup->saveAllTerrains(true);
-std::cerr << "saving terrain: " << (common::Time::GetWallTime() - t1).Double() << std::endl;
+
+    gzmsg << "Heightmap cache data saved. Process took: "
+          << (common::Time::GetWallTime() - time).Double() << " seconds."
+          << std::endl;
+
     this->dataPtr->terrainsImported = false;
     this->dataPtr->connections.clear();
   }
