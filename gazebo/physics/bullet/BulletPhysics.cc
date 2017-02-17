@@ -814,9 +814,9 @@ bool BulletPhysics::Supports(const Capability _capability)
 {
   switch (_capability)
   {
-    case PhysicsEngine::CATEGORY_BITS:
     case PhysicsEngine::COLLIDE_BITS:
         return true;
+    case PhysicsEngine::CATEGORY_BITS:
     default:
       return false;
   }
