@@ -714,7 +714,14 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       (*iter)->SetLinearAccel(_accel);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
     }
   }
 }
@@ -728,7 +735,14 @@ void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
     if (*iter)
     {
       (*iter)->SetEnabled(true);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       (*iter)->SetAngularAccel(_accel);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
     }
   }
 }
