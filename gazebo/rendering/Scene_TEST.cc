@@ -353,12 +353,12 @@ TEST_F(Scene_TEST, Shadows)
   EXPECT_GT(scene->ShadowTextureSize(), 0u);
 
   scene->SetShadowTextureSize(256u);
-  EXPECT_GE(scene->ShadowTextureSize(), 256u);
+  EXPECT_EQ(256u, scene->ShadowTextureSize());
   EXPECT_TRUE(scene->ShadowsEnabled());
 
   // setting a shadow texture size of 0 should not work
   scene->SetShadowTextureSize(0u);
-  EXPECT_GE(scene->ShadowTextureSize(), 256u);
+  EXPECT_EQ(256u, scene->ShadowTextureSize());
   EXPECT_TRUE(scene->ShadowsEnabled());
 }
 

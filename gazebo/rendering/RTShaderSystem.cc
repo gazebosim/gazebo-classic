@@ -598,7 +598,6 @@ void RTShaderSystem::Update()
   this->dataPtr->updateShaders = false;
 }
 
-
 /////////////////////////////////////////////////
 void RTShaderSystem::SetShadowTextureSize(const unsigned int _size)
 {
