@@ -1002,9 +1002,9 @@ TEST_F(CameraSensor, Timestamp)
         mid = (left + right) * 0.5;
       }
       // edge case - box at edge of image
-      else if ((left < 0 || right < 0) && left != right)
+      else if (left >= 0 && right < 0)
       {
-        mid = (left > right) ? left : right;
+        mid = left;
       }
       else
       {
