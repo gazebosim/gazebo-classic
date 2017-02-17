@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ void CartDemoPlugin::OnUpdate()
   {
     // first joint, set position
     double pos_target = this->jointPositions[i];
-    double pos_curr = this->joints[i]->GetAngle(0).Radian();
+    double pos_curr = this->joints[i]->Position(0);
     double max_cmd = this->jointMaxEfforts[i];
 
     double pos_err = pos_curr - pos_target;
@@ -157,7 +157,7 @@ void CartDemoPlugin::OnUpdate()
     {
       // hold wheel positions
       double pos_target = this->jointPositions[i];
-      double pos_curr = this->joints[i]->GetAngle(0).Radian();
+      double pos_curr = this->joints[i]->Position(0);
       double max_cmd = 100;  // this->jointMaxEfforts[i];
 
       double pos_err = pos_curr - pos_target;
@@ -169,7 +169,7 @@ void CartDemoPlugin::OnUpdate()
     }
 
     gzdbg << " wheel pos ["
-          << this->joints[i]->GetAngle(0).Radian()
+          << this->joints[i]->Position(0)
           << "] vel ["
           << this->joints[i]->GetVelocity(0)
           << "] effort [" << eff << "]";

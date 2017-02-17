@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,8 +49,8 @@ TEST_P(SpawnModels, WirelessTransmitters)
          boost::lexical_cast<std::string>(j);
 
       SpawnWirelessTransmitterSensor(modelName, sensorName,
-          math::Vector3(i, j, 0.25), math::Vector3(0, 0, 0),
-          "osrf", 2450.0, power, gain);
+          ignition::math::Vector3d(i, j, 0.25),
+          ignition::math::Vector3d::Zero, "osrf", 2450.0, power, gain);
 
       sensors::WirelessTransmitterPtr tx =
         std::static_pointer_cast<sensors::WirelessTransmitter>(

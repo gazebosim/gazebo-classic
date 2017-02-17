@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -202,7 +202,7 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   }
 
   // Minumum horizontal size
-  s.X() = std::max(s.X(), 150.0);
+  s.X() = std::max(s.X(), 200.0);
 
   // Minimum vertical size according to the elements present
   if (hasStartButton && hasResetButton)

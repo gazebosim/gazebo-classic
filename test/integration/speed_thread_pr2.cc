@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 #include <boost/filesystem.hpp>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -38,7 +39,7 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
 
   _avgTime = common::Time::Zero;
   _maxTime = common::Time::Zero;
-  _minTime.Set(GZ_INT32_MAX, 0);
+  _minTime.Set(ignition::math::MAX_I32, 0);
 
   int repetitions = 3;
   int steps = 5000;

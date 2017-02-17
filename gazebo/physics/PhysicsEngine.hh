@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -143,8 +144,14 @@ namespace gazebo
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
+      /// \deprecated See function that accepts an ignition math object.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
+          const gazebo::math::Vector3 &_gravity) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Set the gravity vector.
+      /// \param[in] _gravity New gravity vector.
+      public: virtual void SetGravity(
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \brief Return the magnetic field vector.
       /// \deprecated See World::MagneticField() const
@@ -279,6 +286,15 @@ namespace gazebo
 
       /// \brief Real time update rate.
       protected: double maxStepSize;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Response publisher.
+      protected: ignition::transport::Node::Publisher responsePubIgn;
     };
     /// \}
   }

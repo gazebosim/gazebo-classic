@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
@@ -175,6 +176,12 @@ namespace gazebo
 
       /// \brief QT callback for the QAction.
       public slots: void Callback();
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Node for communication.
+      private: ignition::transport::Node nodeIgn;
     };
   }
 }

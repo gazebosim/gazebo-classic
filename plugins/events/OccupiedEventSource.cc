@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,8 +121,7 @@ void OccupiedEventSource::Update()
       continue;
 
     // If inside, then transmit the desired message.
-    if (this->regions[this->regionName]->Contains(
-        (*iter)->GetWorldPose().pos.Ign()))
+    if (this->regions[this->regionName]->Contains((*iter)->WorldPose().Pos()))
     {
       this->msgPub->Publish(this->msg);
     }

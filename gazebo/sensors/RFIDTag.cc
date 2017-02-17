@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,10 +102,10 @@ bool RFIDTag::UpdateImpl(const bool /*_force*/)
   if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
+    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
 
-    // msg.set_position(link->GetWorldPose().pos);
-    // msg.set_orientation(link->GetWorldPose().rot);
+    // msg.set_position(link->WorldPose().Pos());
+    // msg.set_orientation(link->WorldPose().Rot());
     // msgs::LaserScan msg;
 
     // msg.set_frame(this->link->GetScopedName());
@@ -133,5 +133,5 @@ bool RFIDTag::UpdateImpl(const bool /*_force*/)
 /////////////////////////////////////////////////
 ignition::math::Pose3d RFIDTag::TagPose() const
 {
-  return this->dataPtr->entity->GetWorldPose().Ign();
+  return this->dataPtr->entity->WorldPose();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/math/Vector2d.hh"
 
@@ -53,8 +54,8 @@
 using namespace gazebo;
 using namespace rendering;
 
-// Note: The value of GZ_UINT32_MAX is reserved as a flag.
-uint32_t VisualPrivate::visualIdCount = GZ_UINT32_MAX - 1;
+// Note: The value of ignition::math::MAX_UI32 is reserved as a flag.
+uint32_t VisualPrivate::visualIdCount = ignition::math::MAX_UI32 - 1;
 
 //////////////////////////////////////////////////
 Visual::Visual(const std::string &_name, VisualPtr _parent, bool _useRTShader)
@@ -346,7 +347,6 @@ void Visual::Load()
 {
   std::ostringstream stream;
   ignition::math::Pose3d pose;
-  Ogre::Vector3 meshSize(1, 1, 1);
   Ogre::MovableObject *obj = nullptr;
 
   if (this->dataPtr->parent)
@@ -392,10 +392,6 @@ void Visual::Load()
   // Set the pose of the scene node
   this->SetPose(pose);
   this->dataPtr->initialRelativePose = pose;
-
-  // Get the size of the mesh
-  if (obj)
-    meshSize = obj->getBoundingBox().getSize();
 
   // Keep transparency to set after setting material
   double sdfTransparency = -1;
@@ -526,6 +522,10 @@ void Visual::Load()
       rendering::Events::newLayer(this->dataPtr->layer);
     }
   }
+
+  // Set invisible if this visual's layer is not active
+  if (!this->dataPtr->scene->LayerState(this->dataPtr->layer))
+    this->SetVisible(false);
 }
 
 //////////////////////////////////////////////////
@@ -623,7 +623,7 @@ void Visual::DetachVisual(const std::string &_name)
     {
       VisualPtr childVis = (*iter);
       this->dataPtr->children.erase(iter);
-      if (this->dataPtr->sceneNode)
+      if (this->dataPtr->sceneNode && childVis->GetSceneNode())
         this->dataPtr->sceneNode->removeChild(childVis->GetSceneNode());
       break;
     }
@@ -786,7 +786,14 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 //////////////////////////////////////////////////
 void Visual::SetScale(const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetScale(_scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -886,7 +893,14 @@ ignition::math::Vector3d Visual::GetGeometrySize() const
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetScale()
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Scale();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1506,7 +1520,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
         if (!origMat.isNull()
             && (techniqueCount < origMat->getNumTechniques()))
         {
-          origTechnique = material->getTechnique(techniqueCount);
+          origTechnique = origMat->getTechnique(techniqueCount);
         }
 
         for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
@@ -1515,10 +1529,9 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
 
           // get original material pass
           Ogre::Pass *origPass = nullptr;
-          if (origTechnique)
+          if (origTechnique && passCount < origTechnique->getNumPasses())
           {
-            origPass =
-                origMat->getTechnique(techniqueCount)->getPass(passCount);
+            origPass = origTechnique->getPass(passCount);
           }
 
           // account for the diffuse alpha value in the ogre material script
@@ -1762,7 +1775,14 @@ bool Visual::GetVisible() const
 //////////////////////////////////////////////////
 void Visual::SetPosition(const math::Vector3 &_pos)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPosition(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1777,7 +1797,14 @@ void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 //////////////////////////////////////////////////
 void Visual::SetRotation(const math::Quaternion &_rot)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetRotation(_rot.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1793,7 +1820,14 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 //////////////////////////////////////////////////
 void Visual::SetPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1806,7 +1840,14 @@ void Visual::SetPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 math::Vector3 Visual::GetPosition() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Position();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1820,7 +1861,14 @@ ignition::math::Vector3d Visual::Position() const
 //////////////////////////////////////////////////
 math::Quaternion Visual::GetRotation() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Rotation();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1834,7 +1882,14 @@ ignition::math::Quaterniond Visual::Rotation() const
 //////////////////////////////////////////////////
 math::Pose Visual::GetPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Pose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1855,7 +1910,14 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 //////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1868,7 +1930,14 @@ void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 //////////////////////////////////////////////////
 void Visual::SetWorldPosition(const math::Vector3 &_pos)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldPosition(_pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1882,7 +1951,14 @@ void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 //////////////////////////////////////////////////
 void Visual::SetWorldRotation(const math::Quaternion &_q)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->SetWorldRotation(_q.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1896,7 +1972,14 @@ void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 //////////////////////////////////////////////////
 math::Pose Visual::GetWorldPose() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->WorldPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2072,7 +2155,14 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 math::Box Visual::GetBoundingBox() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->BoundingBox();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -2451,7 +2541,11 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->meta().has_layer())
     {
       this->dataPtr->layer = _msg->meta().layer();
-      rendering::Events::newLayer(this->dataPtr->layer);
+      if (!this->dataPtr->scene->HasLayer(this->dataPtr->layer))
+        rendering::Events::newLayer(this->dataPtr->layer);
+
+      // Set invisible if this visual's layer is not active
+      this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
     }
   }
 
@@ -2588,66 +2682,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
   if (_msg->has_material())
   {
-    if (_msg->material().has_lighting())
-    {
-      this->SetLighting(_msg->material().lighting());
-    }
-
-    if (_msg->material().has_script())
-    {
-      for (int i = 0; i < _msg->material().script().uri_size(); ++i)
-      {
-        RenderEngine::Instance()->AddResourcePath(
-            _msg->material().script().uri(i));
-      }
-      if (_msg->material().script().has_name() &&
-          !_msg->material().script().name().empty())
-      {
-        this->SetMaterial(_msg->material().script().name());
-      }
-    }
-
-    if (_msg->material().has_ambient())
-      this->SetAmbient(msgs::Convert(_msg->material().ambient()));
-
-    if (_msg->material().has_diffuse())
-      this->SetDiffuse(msgs::Convert(_msg->material().diffuse()));
-
-    if (_msg->material().has_specular())
-      this->SetSpecular(msgs::Convert(_msg->material().specular()));
-
-    if (_msg->material().has_emissive())
-      this->SetEmissive(msgs::Convert(_msg->material().emissive()));
-
-
-    if (_msg->material().has_shader_type())
-    {
-      if (_msg->material().shader_type() == msgs::Material::VERTEX)
-      {
-        this->SetShaderType("vertex");
-      }
-      else if (_msg->material().shader_type() == msgs::Material::PIXEL)
-      {
-        this->SetShaderType("pixel");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_OBJECT_SPACE)
-      {
-        this->SetShaderType("normal_map_object_space");
-      }
-      else if (_msg->material().shader_type() ==
-          msgs::Material::NORMAL_MAP_TANGENT_SPACE)
-      {
-        this->SetShaderType("normal_map_tangent_space");
-      }
-      else
-      {
-        gzerr << "Unrecognized shader type" << std::endl;
-      }
-
-      if (_msg->material().has_normal_map())
-        this->SetNormalMap(_msg->material().normal_map());
-    }
+    this->ProcessMaterialMsg(msgs::ConvertIgnMsg(_msg->material()));
   }
 
   if (_msg->has_transparency())
@@ -2928,7 +2963,14 @@ void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
   std::vector<ignition::math::Pose3d> pts;
   for (auto const &pt : _pts)
   {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
     pts.push_back(pt.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   }
 
   this->MoveToPositions(pts, _time, _onComplete);
@@ -2987,7 +3029,14 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
 //////////////////////////////////////////////////
 void Visual::MoveToPosition(const math::Pose &_pose, double _time)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   this->MoveToPosition(_pose.Ign(), _time);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -3459,6 +3508,15 @@ void Visual::ToggleLayer(const int32_t _layer)
 }
 
 //////////////////////////////////////////////////
+void Visual::SetLayer(const int32_t _layer)
+{
+  this->dataPtr->layer = _layer;
+
+  // Set invisible if this visual's layer is not active
+  this->SetVisible(this->dataPtr->scene->LayerState(this->dataPtr->layer));
+}
+
+//////////////////////////////////////////////////
 Visual::VisualType Visual::ConvertVisualType(const msgs::Visual::Type &_type)
 {
   Visual::VisualType visualType = Visual::VT_ENTITY;
@@ -3563,4 +3621,131 @@ void Visual::AddPendingChild(std::pair<VisualType,
   msg->CopyFrom(*_pair.second);
 
   this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
+}
+
+/////////////////////////////////////////////////
+void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
+{
+  if (_msg.has_lighting())
+  {
+    this->SetLighting(_msg.lighting());
+  }
+
+  if (_msg.has_script())
+  {
+    for (int i = 0; i < _msg.script().uri_size(); ++i)
+    {
+      RenderEngine::Instance()->AddResourcePath(
+          _msg.script().uri(i));
+    }
+    if (_msg.script().has_name() &&
+        !_msg.script().name().empty())
+    {
+      this->SetMaterial(_msg.script().name());
+    }
+  }
+
+  if (_msg.has_ambient())
+  {
+    this->SetAmbient(common::Color(
+          _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
+          _msg.ambient().a()));
+  }
+
+  if (_msg.has_diffuse())
+  {
+    this->SetDiffuse(common::Color(
+          _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
+          _msg.diffuse().a()));
+  }
+
+  if (_msg.has_specular())
+  {
+    this->SetSpecular(common::Color(
+          _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
+          _msg.specular().a()));
+  }
+
+  if (_msg.has_emissive())
+  {
+    this->SetEmissive(common::Color(
+          _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
+          _msg.emissive().a()));
+  }
+
+  if (_msg.has_shader_type())
+  {
+    if (_msg.shader_type() == ignition::msgs::Material::VERTEX)
+    {
+      this->SetShaderType("vertex");
+    }
+    else if (_msg.shader_type() == ignition::msgs::Material::PIXEL)
+    {
+      this->SetShaderType("pixel");
+    }
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+    {
+      this->SetShaderType("normal_map_object_space");
+    }
+    else if (_msg.shader_type() ==
+        ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+    {
+      this->SetShaderType("normal_map_tangent_space");
+    }
+    else
+    {
+      gzerr << "Unrecognized shader type" << std::endl;
+    }
+
+    if (_msg.has_normal_map())
+      this->SetNormalMap(_msg.normal_map());
+  }
+}
+
+/////////////////////////////////////////////////
+void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
+{
+  _msg.set_lighting(this->GetLighting());
+
+  if (!this->dataPtr->origMaterialName.empty())
+  {
+    // \todo: Material URI's that are specific to a visual are not
+    // recoverable. Refer to the Visual::ProcessMaterialMsg function
+    _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
+  }
+
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+
+  if (!this->GetNormalMap().empty())
+    _msg.set_normal_map(this->GetNormalMap());
+
+  if (this->GetShaderType().compare("vertex") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::VERTEX);
+  else if (this->GetShaderType().compare("pixel") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::PIXEL);
+  else if (this->GetShaderType().compare("normal_map_object_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE);
+  else if (this->GetShaderType().compare("normal_map_tangent_space") == 0)
+      _msg.set_shader_type(ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE);
+  else if (!this->GetShaderType().empty())
+    gzerr << "Unrecognized shader type[" << this->GetShaderType() << "]\n";
 }

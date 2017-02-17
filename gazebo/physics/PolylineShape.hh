@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ namespace gazebo
 
       /// \brief Set the parameters of polyline shape
       /// \param[in] _height Height of the polygon
-      /// \param[in] _vertices std::vector<math::Vector2d>
+      /// \param[in] _vertices std::vector<ignition::math::Vector2d>
       /// containing the vertex information
       private: void SetPolylineShape(const double &_height,
                   const std::vector<std::vector<ignition::math::Vector2d> >

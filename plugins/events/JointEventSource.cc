@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -211,8 +211,8 @@ void JointEventSource::Update()
   bool oldState = this->isTriggered;
   double value = 0;
 
-  double position = this->joint->GetAngle(0).Radian();
-  ignition::math::Angle a = this->joint->GetAngle(0).Ign();
+  double position = this->joint->Position(0);
+  ignition::math::Angle a = this->joint->Position(0);
   // get a value between -PI and PI
   a.Normalize();
   double angle = a.Radian();

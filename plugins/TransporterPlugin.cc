@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,7 @@ void TransporterPlugin::Update()
       continue;
 
     // Get the model's pose
-    ignition::math::Pose3d modelPose = model->GetWorldPose().Ign();
+    ignition::math::Pose3d modelPose = model->WorldPose();
 
     // Iterate over all pads
     for (auto const &padIter : this->dataPtr->pads)

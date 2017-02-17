@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  auto startPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -60,9 +60,9 @@ TEST_F(Issue1082Test, PIDLimitsVelocity)
 
   world->Step(500);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  auto endPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
-  double diffDist = (startPose - endPose).pos.GetLength();
+  double diffDist = (startPose - endPose).Pos().Length();
 
   gzdbg << "Start[" << startPose << "] End[" << endPose << "] Dist["
         << diffDist << "]\n";
@@ -87,7 +87,7 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
     this->node->Advertise<gazebo::msgs::JointCmd>(
         "/gazebo/default/simple_arm/joint_cmd");
 
-  math::Pose startPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  auto startPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
   msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
@@ -102,12 +102,12 @@ TEST_F(Issue1082Test, PIDLimitsPosition)
 
   world->Step(500);
 
-  math::Pose endPose = model->GetLink("arm_elbow_pan")->GetWorldPose();
+  auto endPose = model->GetLink("arm_elbow_pan")->WorldPose();
 
   gzdbg << "Start Pose[" << startPose << "]\n";
   gzdbg << "End Pose[" << endPose << "]\n";
 
-  double diffDist = (startPose - endPose).pos.GetLength();
+  double diffDist = (startPose - endPose).Pos().Length();
 
   EXPECT_LT(diffDist, 0.002);
   EXPECT_GT(diffDist, -0.002);

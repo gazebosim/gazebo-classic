@@ -1,4 +1,3 @@
-include ( ${QT_USE_FILE} )
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(
@@ -6,6 +5,7 @@ include_directories(
   ${tinyxml2_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -14,6 +14,7 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
   ${IGNITION-MATH_LIBRARY_DIRS}
 )
+set (CMAKE_AUTOMOC ON)
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
@@ -40,7 +41,7 @@ gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gaze
 
 add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
 
-add_executable(gz gz.cc gz_topic.cc gz_log.cc)
+add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 
 if (WIN32)
   # Force multiple definitions since there is a collision with sdformat GetAsEuler() function
@@ -54,8 +55,10 @@ target_link_libraries(gz
  gazebo_gui
  gazebo_physics
  gazebo_sensors
- ${QT_LIBRARIES}
+ ${Qt5Core_LIBRARIES}
+ ${Qt5Widgets_LIBRARIES}
  ${Boost_LIBRARIES}
+ ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 if (UNIX)

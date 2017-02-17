@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -980,6 +980,12 @@ namespace gazebo
 
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<ignition::math::Vector3d>("pos"));
+
+        if (geomElem->HasElement("sampling"))
+        {
+          result.mutable_heightmap()->set_sampling(
+              geomElem->Get<unsigned int>("sampling"));
+        }
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         while (textureElem)
@@ -2786,6 +2792,14 @@ namespace gazebo
         {
           geom->GetElement("pos")->Set(ConvertIgn(heightmapGeom.origin()));
         }
+        if (heightmapGeom.has_sampling())
+        {
+          // check if old version of sdformat is in use
+          if (geom->HasElementDescription("sampling"))
+          {
+            geom->GetElement("sampling")->Set(heightmapGeom.sampling());
+          }
+        }
         if (heightmapGeom.has_use_terrain_paging())
         {
           geom->GetElement("use_terrain_paging")->Set(
@@ -3245,6 +3259,182 @@ namespace gazebo
 
       if (_elem->HasElement("precision"))
         result.set_precision(_elem->Get<double>("precision"));
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    ignition::msgs::Color ConvertIgnMsg(const msgs::Color &_msg)
+    {
+      ignition::msgs::Color result;
+
+      if (_msg.has_r())
+        result.set_r(_msg.r());
+      if (_msg.has_g())
+        result.set_g(_msg.g());
+      if (_msg.has_b())
+        result.set_b(_msg.b());
+      if (_msg.has_a())
+        result.set_a(_msg.a());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Color ConvertIgnMsg(const ignition::msgs::Color &_msg)
+    {
+      msgs::Color result;
+
+      if (_msg.has_r())
+        result.set_r(_msg.r());
+      if (_msg.has_g())
+        result.set_g(_msg.g());
+      if (_msg.has_b())
+        result.set_b(_msg.b());
+      if (_msg.has_a())
+        result.set_a(_msg.a());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    ignition::msgs::Material::ShaderType ConvertIgnMsg(
+        const msgs::Material::ShaderType &_type)
+    {
+      auto result = ignition::msgs::Material::VERTEX;
+
+      if (_type == msgs::Material::VERTEX)
+      {
+        result = ignition::msgs::Material::VERTEX;
+      }
+      else if (_type == msgs::Material::PIXEL)
+      {
+        result = ignition::msgs::Material::PIXEL;
+      }
+      else if (_type == msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+      {
+        result = ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE;
+      }
+      else if (_type == msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+      {
+        result = ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE;
+      }
+      else
+      {
+        gzerr << "Unrecognized ShaderType, returning VERTEX" << std::endl;
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Material::ShaderType ConvertIgnMsg(
+        const ignition::msgs::Material::ShaderType &_type)
+    {
+      auto result = msgs::Material::VERTEX;
+
+      if (_type == ignition::msgs::Material::VERTEX)
+      {
+        result = msgs::Material::VERTEX;
+      }
+      else if (_type == ignition::msgs::Material::PIXEL)
+      {
+        result = msgs::Material::PIXEL;
+      }
+      else if (_type == ignition::msgs::Material::NORMAL_MAP_OBJECT_SPACE)
+      {
+        result = msgs::Material::NORMAL_MAP_OBJECT_SPACE;
+      }
+      else if (_type == ignition::msgs::Material::NORMAL_MAP_TANGENT_SPACE)
+      {
+        result = msgs::Material::NORMAL_MAP_TANGENT_SPACE;
+      }
+      else
+      {
+        gzerr << "Unrecognized ShaderType, returning VERTEX" << std::endl;
+      }
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    ignition::msgs::Material::Script ConvertIgnMsg(
+        const msgs::Material::Script &_script)
+    {
+      ignition::msgs::Material::Script result;
+
+      for (auto s : _script.uri())
+      {
+        result.add_uri(s);
+      }
+
+      if (_script.has_name())
+        result.set_name(_script.name());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////////
+    msgs::Material::Script ConvertIgnMsg(
+        const ignition::msgs::Material::Script &_script)
+    {
+      msgs::Material::Script result;
+
+      for (auto s : _script.uri())
+      {
+        result.add_uri(s);
+      }
+
+      if (_script.has_name())
+        result.set_name(_script.name());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    ignition::msgs::Material ConvertIgnMsg(const msgs::Material &_msg)
+    {
+      ignition::msgs::Material result;
+
+      if (_msg.has_script())
+        result.mutable_script()->CopyFrom(ConvertIgnMsg(_msg.script()));
+      if (_msg.has_shader_type())
+        result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
+      if (_msg.has_normal_map())
+        result.set_normal_map(_msg.normal_map());
+      if (_msg.has_ambient())
+        result.mutable_ambient()->CopyFrom(ConvertIgnMsg(_msg.ambient()));
+      if (_msg.has_diffuse())
+        result.mutable_diffuse()->CopyFrom(ConvertIgnMsg(_msg.diffuse()));
+      if (_msg.has_specular())
+        result.mutable_specular()->CopyFrom(ConvertIgnMsg(_msg.specular()));
+      if (_msg.has_emissive())
+        result.mutable_emissive()->CopyFrom(ConvertIgnMsg(_msg.emissive()));
+      if (_msg.has_lighting())
+        result.set_lighting(_msg.lighting());
+
+      return result;
+    }
+
+    /////////////////////////////////////////////
+    msgs::Material ConvertIgnMsg(const ignition::msgs::Material &_msg)
+    {
+      msgs::Material result;
+
+      if (_msg.has_script())
+        result.mutable_script()->CopyFrom(ConvertIgnMsg(_msg.script()));
+      if (_msg.has_shader_type())
+        result.set_shader_type(ConvertIgnMsg(_msg.shader_type()));
+      if (_msg.has_normal_map())
+        result.set_normal_map(_msg.normal_map());
+      if (_msg.has_ambient())
+        result.mutable_ambient()->CopyFrom(ConvertIgnMsg(_msg.ambient()));
+      if (_msg.has_diffuse())
+        result.mutable_diffuse()->CopyFrom(ConvertIgnMsg(_msg.diffuse()));
+      if (_msg.has_specular())
+        result.mutable_specular()->CopyFrom(ConvertIgnMsg(_msg.specular()));
+      if (_msg.has_emissive())
+        result.mutable_emissive()->CopyFrom(ConvertIgnMsg(_msg.emissive()));
+      if (_msg.has_lighting())
+        result.set_lighting(_msg.lighting());
 
       return result;
     }

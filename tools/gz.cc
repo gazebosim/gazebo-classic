@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
 #include <sdf/sdf.hh>
-#include "gz_topic.hh"
 #include "gz_log.hh"
+#include "gz_marker.hh"
+#include "gz_topic.hh"
 #include "gz.hh"
 
 using namespace gazebo;
@@ -1233,6 +1234,7 @@ int main(int argc, char **argv)
   g_commandMap["camera"] = new CameraCommand();
   g_commandMap["help"] = new HelpCommand();
   g_commandMap["joint"] = new JointCommand();
+  g_commandMap["marker"] = new MarkerCommand();
   g_commandMap["model"] = new ModelCommand();
   g_commandMap["world"] = new WorldCommand();
   g_commandMap["physics"] = new PhysicsCommand();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -209,7 +209,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         if (axis >= _state.GetAngleCount())
           continue;
 
-        ignition::math::Angle angle = _state.GetAngle(axis).Ign();
+        auto angle = _state.Position(axis);
 
         if (this->xmlOutput)
         {
@@ -268,7 +268,7 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
     else
     {
       if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
-        result << std::fixed << iter->second.GetAngle(0);
+        result << std::fixed << iter->second.Position(0);
       else
         result << std::fixed << iter->second;
     }
@@ -312,21 +312,21 @@ std::string LinkFilter::FilterParts(gazebo::physics::LinkState &_state,
 
   if (part == "pose")
   {
-    result << this->FilterPose(_state.GetPose().Ign(), part, elemParts, _state);
+    result << this->FilterPose(_state.Pose(), part, elemParts, _state);
   }
   else if (part == "acceleration")
   {
-    result << this->FilterPose(_state.GetAcceleration().Ign(), part,
+    result << this->FilterPose(_state.Acceleration(), part,
         elemParts, _state);
   }
   else if (part == "velocity")
   {
-    result << this->FilterPose(_state.GetVelocity().Ign(), part, elemParts,
+    result << this->FilterPose(_state.Velocity(), part, elemParts,
         _state);
   }
   else if (part == "wrench")
   {
-    result << this->FilterPose(_state.GetWrench().Ign(), part, elemParts,
+    result << this->FilterPose(_state.Wrench(), part, elemParts,
         _state);
   }
 
@@ -454,7 +454,7 @@ std::string ModelFilter::FilterParts(gazebo::physics::ModelState &_state,
   if (*_partIter == "pose")
   {
     // Get the model state pose
-    ignition::math::Pose3d pose = _state.GetPose().Ign();
+    ignition::math::Pose3d pose = _state.Pose();
     ++_partIter;
 
     // Get the elements to filter pose by.

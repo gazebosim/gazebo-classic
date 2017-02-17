@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ TEST_F(GzCamera, Follow)
   ASSERT_TRUE(world != NULL);
 
   // Spawn a box to follow.
-  SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
-      math::Vector3(0, 0, 0));
-
+  SpawnBox("box", ignition::math::Vector3d(1, 1, 1),
+                  ignition::math::Vector3d(10, 10, 1),
+                  ignition::math::Vector3d::Zero);
   ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
 
   // Spawn a camera that will do the following

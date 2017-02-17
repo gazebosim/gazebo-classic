@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,7 @@ bool RFIDSensor::UpdateImpl(const bool /*_force*/)
   if (this->dataPtr->scanPub)
   {
     msgs::Pose msg;
-    msgs::Set(&msg, this->dataPtr->entity->GetWorldPose().Ign());
+    msgs::Set(&msg, this->dataPtr->entity->WorldPose());
     this->dataPtr->scanPub->Publish(msg);
   }
 
@@ -156,7 +156,7 @@ bool RFIDSensor::CheckTagRange(const ignition::math::Pose3d &_pose)
 {
   // copy sensor vector pos into a temp var
   ignition::math::Vector3d v;
-  v = _pose.Pos() - this->dataPtr->entity->GetWorldPose().Ign().Pos();
+  v = _pose.Pos() - this->dataPtr->entity->WorldPose().Pos();
 
   // std::cout << v.GetLength() << std::endl;
 

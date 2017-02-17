@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ TEST_F(SetWorldPoseTest, Stress)
   physics::ModelPtr model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
-  math::Pose pose(1, 2, 3, 0, 0, 0);
+  ignition::math::Pose3d pose(1, 2, 3, 0, 0, 0);
 
   common::Time startTime = common::Time::GetWallTime();
   for (unsigned int i = 0; i < 10000000; ++i)

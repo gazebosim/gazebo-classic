@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -326,9 +326,6 @@ void SelectionObj::CreateTranslateVisual()
   dPtr->transYVisual->Load();
   dPtr->transZVisual->Load();
 
-  this->InsertMesh("axis_shaft");
-  this->InsertMesh("axis_head");
-
   VisualPtr transShaftXVis(
       new Visual("__SELECTION_OBJ__TRANS_SHAFT_NODE_X__"  + this->Name(),
       dPtr->transXVisual, false));
@@ -458,8 +455,6 @@ void SelectionObj::CreateRotateVisual()
       new rendering::Visual(
       this->Name() + "__SELECTION_OBJ_ROT_Z__", dPtr->rotVisual, false));
 
-  dPtr->rotVisual->InsertMesh("selection_tube");
-
   dPtr->rotXVisual->Load();
   dPtr->rotYVisual->Load();
   dPtr->rotZVisual->Load();
@@ -554,8 +549,6 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleYVisual->Load();
   dPtr->scaleZVisual->Load();
 
-  this->InsertMesh("unit_box");
-
   VisualPtr scaleShaftXVis(
       new Visual("__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->Name(),
       dPtr->scaleXVisual, false));
@@ -573,7 +566,7 @@ void SelectionObj::CreateScaleVisual()
       new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_X__"  + this->Name(),
       dPtr->scaleXVisual, false));
   scaleHeadXVis->Load();
-  scaleHeadXVis->AttachMesh("unit_box");
+  scaleHeadXVis->AttachMesh("axis_box");
   scaleHeadXVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
   scaleHeadXVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
   Ogre::MovableObject *headXObj =
@@ -599,7 +592,7 @@ void SelectionObj::CreateScaleVisual()
       new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Y__"  + this->Name(),
       dPtr->scaleYVisual, false));
   scaleHeadYVis->Load();
-  scaleHeadYVis->AttachMesh("unit_box");
+  scaleHeadYVis->AttachMesh("axis_box");
   scaleHeadYVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
   scaleHeadYVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
   Ogre::MovableObject *headYObj =
@@ -625,7 +618,7 @@ void SelectionObj::CreateScaleVisual()
       new Visual("__SELECTION_OBJ__SCALE_HEAD_NODE_Z__"  + this->Name(),
       dPtr->scaleZVisual, false));
   scaleHeadZVis->Load();
-  scaleHeadZVis->AttachMesh("unit_box");
+  scaleHeadZVis->AttachMesh("axis_box");
   scaleHeadZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
   scaleHeadZVis->SetPosition(ignition::math::Vector3d(0, 0, 0.21));
   Ogre::MovableObject *headZObj =

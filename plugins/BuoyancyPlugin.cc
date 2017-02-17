@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,11 +133,11 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         double volume = collision->GetShape()->ComputeVolume();
         volumeSum += volume;
-        weightedPosSum += volume*collision->GetWorldPose().pos.Ign();
+        weightedPosSum += volume*collision->WorldPose().Pos();
       }
       // Subtract the center of volume into the link frame.
       this->volPropsMap[id].cov =
-          weightedPosSum/volumeSum - link->GetWorldPose().pos.Ign();
+          weightedPosSum/volumeSum - link->WorldPose().Pos();
       this->volPropsMap[id].volume = volumeSum;
     }
   }
@@ -166,7 +166,7 @@ void BuoyancyPlugin::OnUpdate()
     ignition::math::Vector3d buoyancy =
         -this->fluidDensity * volume * this->model->GetWorld()->Gravity();
 
-    ignition::math::Pose3d linkFrame = link->GetWorldPose().Ign();
+    ignition::math::Pose3d linkFrame = link->WorldPose();
     // rotate buoyancy into the link frame before applying the force.
     ignition::math::Vector3d buoyancyLinkFrame =
         linkFrame.Rot().Inverse().RotateVector(buoyancy);

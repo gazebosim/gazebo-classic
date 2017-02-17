@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 #include <sstream>
 
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/physics/SurfaceParams.hh"
 
@@ -71,7 +70,7 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     if (!isPlaneShape)
     {
       this->dataPtr->dtCollisionShape->setLocalTransform(
-            DARTTypes::ConvPose(this->GetRelativePose()));
+            DARTTypes::ConvPose(this->RelativePose()));
     }
   }
 }
@@ -119,9 +118,9 @@ unsigned int DARTCollision::GetCollideBits() const
 }
 
 //////////////////////////////////////////////////
-gazebo::math::Box DARTCollision::GetBoundingBox() const
+ignition::math::Box DARTCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result(0, 0, 0, 0, 0, 0);
 
   gzerr << "DART does not provide bounding box info.\n";
 

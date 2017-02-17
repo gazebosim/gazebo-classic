@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,5 +62,5 @@ void ODEPolylineShape::Init()
 
   this->odeMesh->Init(this->mesh,
       boost::static_pointer_cast<ODECollision>(this->collisionParent),
-      math::Vector3(1, 1, 1));
+      ignition::math::Vector3d::One);
 }

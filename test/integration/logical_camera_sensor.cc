@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,15 +87,16 @@ TEST_F(LogicalCameraSensor, Box)
   EXPECT_EQ(cam->Image().model(0).name(), "ground_plane");
 
   // Insert box
-  SpawnBox("spawn_box", math::Vector3(1, 1, 1), math::Vector3(2, 0, 0.5),
-      math::Vector3::Zero);
+  SpawnBox("spawn_box", ignition::math::Vector3d(1, 1, 1),
+      ignition::math::Vector3d(2, 0, 0.5),
+      ignition::math::Vector3d::Zero);
   cam->Update(true);
 
   ASSERT_EQ(cam->Image().model_size(), 2);
   EXPECT_EQ(cam->Image().model(1).name(), "spawn_box");
 
   // Rotate the model, which should move "spawn_box" out of the frustum
-  cameraModel->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 1.5707));
+  cameraModel->SetWorldPose(ignition::math::Pose3d(0, 0, 0, 0, 0, 1.5707));
   cam->Update(true);
   ASSERT_EQ(cam->Image().model_size(), 1);
 }

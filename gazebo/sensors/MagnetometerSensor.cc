@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
   {
     // Get pose in gazebo reference frame
     ignition::math::Pose3d magPose =
-      this->pose + this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->pose + this->dataPtr->parentLink->WorldPose();
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =

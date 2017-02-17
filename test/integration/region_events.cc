@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ void RegionEventTest::ModelEnteringRegion(const std::string &_physicsEngine)
   ASSERT_TRUE(boxModel != NULL);
 
   unsigned int startingCount = GetEventCount();
-  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
+  boxModel->SetWorldPose(regionEventBox->WorldPose());
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);
 
   ASSERT_GT(endingCount, startingCount);
@@ -174,17 +174,14 @@ void RegionEventTest::ModelLeavingRegion(const std::string &_physicsEngine)
   physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
-  math::Pose regionEventBoxPos = regionEventBox->GetWorldPose();
-  math::Pose boxModelPose = boxModel->GetWorldPose();
-
-  boxModel->SetWorldPose(regionEventBox->GetWorldPose());
+  boxModel->SetWorldPose(regionEventBox->WorldPose());
   (void) WaitForNewEvent(GetEventCount(), 10, 100);
 
   unsigned int startingCount = GetEventCount();
   {
-    math::Pose newPose = regionEventBox->GetWorldPose();
-    newPose.pos.x += 5.0;
-    newPose.pos.y += 5.0;
+    ignition::math::Pose3d newPose = regionEventBox->WorldPose();
+    newPose.Pos().X() += 5.0;
+    newPose.Pos().Y() += 5.0;
     boxModel->SetWorldPose(newPose);
   }
   unsigned int endingCount = WaitForNewEvent(startingCount, 10, 100);

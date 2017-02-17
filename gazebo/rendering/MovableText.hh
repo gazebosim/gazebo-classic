@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,18 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: indepedentCreations@gmail.com
- * Date: 13 Feb 2006
- */
-
-#ifndef _MOVABLETEXT_HH_
-#define _MOVABLETEXT_HH_
+#ifndef GAZEBO_RENDERING_MOVABLETEXT_HH_
+#define GAZEBO_RENDERING_MOVABLETEXT_HH_
 
 #include <string>
+
+#include <ignition/math/Box.hh>
 
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/MathTypes.hh"
+#include "gazebo/math/Box.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -149,7 +146,13 @@ namespace gazebo
 
       /// \brief Get the axis aligned bounding box of the text.
       /// \return The axis aligned bounding box.
-      public: math::Box GetAABB();
+      /// \deprecated See ignition::math::Box AABB();
+      public: math::Box GetAABB() GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the axis aligned bounding box of the text.
+      /// \return The axis aligned bounding box.
+      /// \deprecated See ignition::math::Box AABB();
+      public: ignition::math::Box AABB();
 
       /// \brief Update the text.
       public: void Update();

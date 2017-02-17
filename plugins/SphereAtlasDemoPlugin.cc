@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,7 +185,7 @@ void SphereAtlasDemoPlugin::OnUpdate()
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
   {
-    double p = this->joints[j]->GetAngle(0).Radian();
+    double p = this->joints[j]->Position(0);
     double target = 0;
     double perror = target - p;
     double derror = (perror - this->qp[j])/dt;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,20 @@ void ODEMesh::Update()
 void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_subMesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
+    const ignition::math::Vector3d &_scale)
+{
   if (!_subMesh)
     return;
 
@@ -104,6 +118,20 @@ void ODEMesh::Init(const common::SubMesh *_subMesh, ODECollisionPtr _collision,
 void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
     const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_mesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
+    const ignition::math::Vector3d &_scale)
+{
   if (!_mesh)
     return;
 
@@ -122,7 +150,7 @@ void ODEMesh::Init(const common::Mesh *_mesh, ODECollisionPtr _collision,
 
 //////////////////////////////////////////////////
 void ODEMesh::CreateMesh(unsigned int _numVertices, unsigned int _numIndices,
-    ODECollisionPtr _collision, const math::Vector3 &_scale)
+    ODECollisionPtr _collision, const ignition::math::Vector3d &_scale)
 {
   /// This will hold the vertex data of the triangle mesh
   if (this->odeData == nullptr)
@@ -131,9 +159,9 @@ void ODEMesh::CreateMesh(unsigned int _numVertices, unsigned int _numIndices,
   // Scale the vertex data
   for (unsigned int j = 0;  j < _numVertices; j++)
   {
-    this->vertices[j*3+0] = this->vertices[j*3+0] * _scale.x;
-    this->vertices[j*3+1] = this->vertices[j*3+1] * _scale.y;
-    this->vertices[j*3+2] = this->vertices[j*3+2] * _scale.z;
+    this->vertices[j*3+0] = this->vertices[j*3+0] * _scale.X();
+    this->vertices[j*3+1] = this->vertices[j*3+1] * _scale.Y();
+    this->vertices[j*3+2] = this->vertices[j*3+2] * _scale.Z();
   }
 
   // Build the ODE triangle mesh

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,9 @@ ignition::math::Vector3d DynamicLines::Point(
     gzerr << "Point index[" << _index << "] is out of bounds[0-"
            << this->points.size()-1 << "]\n";
 
-    return ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
+    return ignition::math::Vector3d(ignition::math::INF_D,
+                                    ignition::math::INF_D,
+                                    ignition::math::INF_D);
   }
 
   return this->points[_index];

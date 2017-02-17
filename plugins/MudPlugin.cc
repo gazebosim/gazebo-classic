@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -307,8 +307,8 @@ void MudPlugin::OnUpdate()
               (*iterJoint)->SetParam("stop_erp", 0, erp);
               (*iterJoint)->SetParam("stop_cfm", 0, cfm);
             }
-            (*iterJoint)->SetHighStop(0, 0.0);
-            (*iterJoint)->SetLowStop(0, 0.0);
+            (*iterJoint)->SetUpperLimit(0, 0.0);
+            (*iterJoint)->SetLowerLimit(0, 0.0);
 
             (*iterJoint)->Init();
           }

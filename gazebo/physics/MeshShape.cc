@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,20 @@ void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 //////////////////////////////////////////////////
 math::Vector3 MeshShape::GetSize() const
 {
-  return this->sdf->Get<math::Vector3>("scale");
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->Size();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d MeshShape::Size() const
+{
+  return this->sdf->Get<ignition::math::Vector3d>("scale");
 }
 
 //////////////////////////////////////////////////
@@ -122,8 +135,7 @@ std::string MeshShape::GetMeshURI() const
 
 //////////////////////////////////////////////////
 void MeshShape::SetMesh(const std::string &_uri,
-                           const std::string &_submesh,
-                           bool _center)
+    const std::string &_submesh, bool _center)
 {
   this->sdf->GetElement("uri")->Set(_uri);
 

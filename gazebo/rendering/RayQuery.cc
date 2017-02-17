@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "gazebo/common/MeshManager.hh"
 
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/RayQueryPrivate.hh"
 #include "gazebo/rendering/RayQuery.hh"
@@ -52,11 +53,18 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 
   auto result = this->SelectMeshTriangle(_x, _y, _visual, intersect, triangle);
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _intersect = intersect;
   _vertices.clear();
   _vertices.push_back(triangle[0]);
   _vertices.push_back(triangle[1]);
   _vertices.push_back(triangle[2]);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
   return result;
 }
@@ -66,11 +74,18 @@ bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
     const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
     ignition::math::Triangle3d &_triangle) const
 {
+  auto cam = boost::dynamic_pointer_cast<UserCamera>(this->dataPtr->camera);
+  double ratio = 1;
+  if (cam)
+    ratio = cam->DevicePixelRatio();
+
+  double x = _x * ratio;
+  double y = _y * ratio;
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_x) / this->dataPtr->camera->ViewportWidth(),
-      static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
+      static_cast<float>(x) / this->dataPtr->camera->ViewportWidth(),
+      static_cast<float>(y) / this->dataPtr->camera->ViewportHeight());
 
   std::vector<rendering::VisualPtr> visuals;
   this->MeshVisuals(_visual, visuals);

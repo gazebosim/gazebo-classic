@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEMULTIRAYSHAPE_HH_
-#define _ODEMULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEMULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/util/system.hh"
@@ -54,8 +54,8 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of a ray.
       /// \param[in] _end End of a ray.
-      protected: void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+      protected: void AddRay(const ignition::math::Vector3d &_start,
+                             const ignition::math::Vector3d &_end);
 
       /// \brief Space to contain the ray space, for efficiency.
       private: dSpaceID superSpaceId;
