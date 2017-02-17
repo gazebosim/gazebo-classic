@@ -44,7 +44,7 @@ std::string pixelFormat = "";
 
 
 // list of timestamped images used by the Timestamp test
-std::vector<gazebo::msgs::ImageStamped> imagesStamped;
+std::vector<gazebo::msgs::ImageStamped> g_imagesStamped;
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
@@ -65,7 +65,7 @@ void OnImage(ConstImageStampedPtr &_msg)
   std::lock_guard<std::mutex> lock(mutex);
   gazebo::msgs::ImageStamped imgStamped;
   imgStamped.CopyFrom(*_msg.get());
-  imagesStamped.push_back(imgStamped);
+  g_imagesStamped.push_back(imgStamped);
 }
 
 /////////////////////////////////////////////////
@@ -835,21 +835,18 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 // against analytically computed box position.
 TEST_F(CameraSensor, Timestamp)
 {
-  Load("worlds/empty_test.world", true);
+  this->Load("worlds/empty_test.world", true);
 
   // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run camera test\n";
-    return;
-  }
+  ASSERT_TRUE(rendering::RenderEngine::Instance()->GetRenderPathType() !=
+      rendering::RenderEngine::NONE);
 
   // variables for testing
   // camera image width
   unsigned int width  = 240;
   // camera image height
   unsigned int height = 160;
+  unsigned int halfHeight = height * 0.5;
   // camera sensor update rate
   double sensorUpdateRate = 10;
   // Speed at which the box is moved, in meters per second
@@ -867,7 +864,8 @@ TEST_F(CameraSensor, Timestamp)
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
   ignition::math::Pose3d setPose(
-      ignition::math::Vector3d(-5, 0, 0), ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Vector3d(-5, 0, 0),
+      ignition::math::Quaterniond::Identity);
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, sensorUpdateRate);
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
@@ -887,27 +885,23 @@ TEST_F(CameraSensor, Timestamp)
       boxPose.Rot().Euler());
 
   gazebo::physics::ModelPtr boxModel = world->ModelByName(boxName);
-  EXPECT_TRUE(boxModel != NULL);
+  EXPECT_TRUE(boxModel != nullptr);
 
   // step 100 times - this will be the start time for our experiment
   int startTimeIt = 100;
   world->Step(startTimeIt);
 
   // clear the list of timestamp images
-  imagesStamped.clear();
+  g_imagesStamped.clear();
 
   // verify that time moves forward
   double t = world->SimTime().Double();
   EXPECT_GT(t, 0);
 
-  // Initialize gazebo transport layer
-  transport::NodePtr node(new transport::Node());
-  node->Init();
-
   // subscribe to camera topic and collect timestamp images
   std::string cameraTopic = camSensor->Topic();
   EXPECT_TRUE(!cameraTopic.empty());
-  transport::SubscriberPtr sub = node->Subscribe(cameraTopic, OnImage);
+  transport::SubscriberPtr sub = this->node->Subscribe(cameraTopic, OnImage);
 
   // get physics engine
   physics::PhysicsEnginePtr physics = world->Physics();
@@ -935,7 +929,7 @@ TEST_F(CameraSensor, Timestamp)
   while (sleep < maxSleep)
   {
     std::lock_guard<std::mutex> lock(mutex);
-    if (imagesStamped.size() >= imgSampleSize)
+    if (g_imagesStamped.size() >= imgSampleSize)
       break;
     sleep++;
     gazebo::common::Time::MSleep(10);
@@ -948,7 +942,7 @@ TEST_F(CameraSensor, Timestamp)
   // actual pos of the box found in the timestamp images.
   unsigned int imgSize = width * height * 3;
   img = new unsigned char[imgSize];
-  for (auto &msg : imagesStamped)
+  for (const auto &msg : g_imagesStamped)
   {
     // time t
     gazebo::common::Time timestamp = gazebo::msgs::Convert(msg.time());
@@ -966,7 +960,6 @@ TEST_F(CameraSensor, Timestamp)
     int left = -1;
     int right = -1;
     bool transition = false;
-    unsigned int halfHeight = height * 0.5;
     memcpy(img, msg.image().data().c_str(), imgSize);
     for (unsigned int i = 0; i < width; ++i)
     {
