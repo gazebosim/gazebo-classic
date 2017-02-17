@@ -8,6 +8,8 @@
     * [Pull request #2603](https://bitbucket.org/osrf/gazebo/pull-request/2603)
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
+
+1. Deprecate gazebo::physics
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 ## Gazebo 8

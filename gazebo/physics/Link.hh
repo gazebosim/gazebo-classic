@@ -313,7 +313,6 @@ namespace gazebo
 
       /// \brief Get the force applied to the body.
       /// \return Force applied to the body.
-      /// \deprecated See
       public: ignition::math::Vector3d RelativeForce() const;
 
       /// \brief Get the force applied to the body in the world frame.
