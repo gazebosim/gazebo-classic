@@ -638,7 +638,8 @@ void Heightmap::Load()
   this->dataPtr->terrainGroup->loadAllTerrains(true);
 
   gzmsg << "Heightmap loaded. Process took: "
-        <<  (common::Time::GetWallTime() - time).Double() << std::endl;
+        <<  (common::Time::GetWallTime() - time).Double()
+        << " seconds" << std::endl;
 
   // Calculate blend maps
   if (this->dataPtr->terrainsImported)
@@ -670,11 +671,10 @@ void Heightmap::SaveHeightmap()
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
-    // Save all subterrains using files.
-
     // saving an ogre terrain dat file can take quite some time for large dems.
-    gzmsg << "Saving heightmap cache data to " <<
-        this->dataPtr->gzPagingDir.string() << std::endl;
+    gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
+        boost::filesystem::path(this->dataPtr->filename).stem()).string()
+        << std::endl;
     common::Time time = common::Time::GetWallTime();
 
     this->dataPtr->terrainGroup->saveAllTerrains(true);
