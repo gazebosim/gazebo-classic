@@ -27,9 +27,9 @@
 set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
-@set FREEIMAGE_PATH=%cd%\..\..\FreeImage\Dist
-@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64
-@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\x64
+@set FREEIMAGE_PATH=%cd%\..\..\FreeImage-vc12-x64-release-debug
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
+@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
@@ -59,7 +59,7 @@ set OGRE_LIB_SUFFIX=.lib
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
 @set DLFCN_WIN32_INCLUDE_DIR=%DLFCN_WIN32_PATH%\include
 
-@set QT5_PATH=C:\Qt\5.7\\msvc2013_64
+@set QT5_PATH=%cd%\..\..\qt5-x64-static-release
 @set QT5_BIN_DIR=%QT5_PATH%\bin
 
 @set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
