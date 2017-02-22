@@ -22,8 +22,7 @@
 
 
 namespace gazebo {
-
-  /// \brief Private data class for the AttachLightPlugin
+  /// \brief Private data class for the AttachLightPlugin class
   class AttachLightPluginPrivate {
 
     /// \brief Event connections
@@ -85,7 +84,6 @@ void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           while (lightElem)
           {
             std::string lightName = lightElem->Get<std::string>("light_name");
-
             physics::LightPtr light = this->dataPtr->world->Light(lightName);
 
             // lights are loaded before models so we should be able to find them

@@ -36,7 +36,7 @@ class AttachLightTest : public ServerFixture,
 
 void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
 {
-  // Test ray sensor with noise applied
+  // Test plugin for attaching lights to links
   this->Load("worlds/attach_lights.world", true, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");

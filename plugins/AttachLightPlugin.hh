@@ -18,12 +18,7 @@
 #ifndef GAZEBO_PLUGINS_ATTACHLIGHTPLUGIN_HH_
 #define GAZEBO_PLUGINS_ATTACHLIGHTPLUGIN_HH_
 
-#include <string>
-#include <vector>
-
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/transport/transport.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
