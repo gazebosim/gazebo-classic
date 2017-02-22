@@ -344,7 +344,7 @@ TEST_F(Scene_TEST, Shadows)
   EXPECT_TRUE(scene->ShadowsEnabled());
 
   scene->SetShadowsEnabled(false);
-  EXPECT_TRUE(!scene->ShadowsEnabled());
+  EXPECT_FALSE(scene->ShadowsEnabled());
 
   scene->SetShadowsEnabled(true);
   EXPECT_TRUE(scene->ShadowsEnabled());
