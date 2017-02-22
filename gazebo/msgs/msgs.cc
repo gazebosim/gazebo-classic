@@ -2544,7 +2544,7 @@ namespace gazebo
       }
 
       // Use the SDF parser to read all the inner xml.
-      std::string tmp = "<sdf version='1.5'>";
+      std::string tmp = "<sdf version='" + std::string(SDF_VERSION) + "'>";
       tmp += "<plugin name='" + _msg.name() + "' filename='" +
         _msg.filename() + "'>";
       tmp += _msg.innerxml();
