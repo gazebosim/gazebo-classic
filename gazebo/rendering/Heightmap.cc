@@ -816,7 +816,7 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
   {
     if (resourceExists && !this->dataPtr->terrainHashChanged)
     {
-      gzmsg << "Loading heightmap cache data '" << filename << std::endl;
+      gzmsg << "Loading heightmap cache data: " << filename << std::endl;
 
       this->dataPtr->terrainGroup->defineTerrain(_x, _y);
       this->dataPtr->terrainsImported = false;
