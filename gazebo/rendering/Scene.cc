@@ -3194,13 +3194,13 @@ bool Scene::ShadowsEnabled() const
 }
 
 /////////////////////////////////////////////////
-void Scene::SetShadowTextureSize(const unsigned int _size)
+bool Scene::SetShadowTextureSize(const unsigned int _size)
 {
   // check if texture size is a power of 2
   if (!(_size > 0u && ((_size & (_size-1)) == 0u)))
   {
     gzerr << "Shadow texture size must be a power of 2" << std::endl;
-    return;
+    return false;
   }
   this->dataPtr->shadowTextureSize = _size;
 
@@ -3208,7 +3208,9 @@ void Scene::SetShadowTextureSize(const unsigned int _size)
       RenderEngine::FORWARD)
   {
     // RT Shader shadows
-    RTShaderSystem::Instance()->SetShadowTextureSize(_size);
+    if (!RTShaderSystem::Instance()->SetShadowTextureSize(_size))
+      return false;
+
     if (this->ShadowsEnabled())
     {
       // re-enable the shadows to take effect
@@ -3221,6 +3223,7 @@ void Scene::SetShadowTextureSize(const unsigned int _size)
     this->dataPtr->manager->setShadowTextureSize(
         this->dataPtr->shadowTextureSize);
   }
+  return true;
 }
 
 /////////////////////////////////////////////////

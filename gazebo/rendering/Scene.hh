@@ -501,11 +501,12 @@ namespace gazebo
 
       /// \brief Set the shadow texture size
       /// \param[in] _size Size to set the shadow texture to. This must be a
-      /// power of 2.
-      public: void SetShadowTextureSize(const unsigned int _size);
+      /// power of 2. The default size is 1024.
+      /// \return True if size is set successfully, false otherwise.
+      public: bool SetShadowTextureSize(const unsigned int _size);
 
       /// \brief Get the shadow texture size
-      /// \return Size of the shadow texture
+      /// \return Size of the shadow texture. The default size is 1024.
       public: unsigned int ShadowTextureSize() const;
 
       /// \brief Add a visual to the scene
