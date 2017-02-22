@@ -86,7 +86,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for angle wrapping
+    // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
         ignition::math::equal(
@@ -107,7 +107,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for angle wrapping
+    // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
         ignition::math::equal(
@@ -128,7 +128,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
     EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for angle wrapping
+    // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
         ignition::math::equal(
