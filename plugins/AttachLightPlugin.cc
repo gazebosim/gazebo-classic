@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2017 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,19 @@
  *
 */
 
+#include <map>
+#include <vector>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "plugins/AttachLightPlugin.hh"
 
 
-namespace gazebo {
+namespace gazebo
+{
   /// \brief Private data class for the AttachLightPlugin class
-  class AttachLightPluginPrivate {
+  class AttachLightPluginPrivate
+  {
 
     /// \brief Event connections
     public: std::vector<event::ConnectionPtr> connections;
