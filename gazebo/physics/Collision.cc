@@ -132,7 +132,7 @@ void Collision::Init()
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
 {
-  this->placeable = _placeable;
+  SetPlaceable(_placeable);
 
   if (this->IsStatic())
   {
@@ -145,6 +145,12 @@ void Collision::SetCollision(bool _placeable)
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
   }
+}
+
+//////////////////////////////////////////////////
+void Collision::SetPlaceable(bool _placeable)
+{
+  this->placeable = _placeable;
 }
 
 //////////////////////////////////////////////////

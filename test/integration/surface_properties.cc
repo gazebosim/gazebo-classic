@@ -39,6 +39,13 @@ class SurfaceTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 {
+  if ("bullet" == _physicsEngine)
+  {
+    gzerr << _physicsEngine << " Does not support <collide_without_contact>"
+      << " see issue #1038" << std::endl;
+    return;
+  }
+
   // load an empty world
   Load("worlds/collide_without_contact.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -256,10 +263,8 @@ TEST_P(SurfaceTest, CollideBitmask)
   CollideBitmask(GetParam());
 }
 
-// These tests only work with ODE.
-// Issue #1038
-// INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
-INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
+INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values(
+      "ode", "bullet"));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

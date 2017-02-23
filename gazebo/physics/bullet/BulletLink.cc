@@ -176,7 +176,6 @@ void BulletLink::Init()
   // bullet supports setting bits to a rigid body but not individual
   // shapes/collisions so find the first child collision and set rigid body to
   // use its category and collision bits.
-  unsigned int categortyBits = GZ_ALL_COLLIDE;
   unsigned int collideBits = GZ_ALL_COLLIDE;
   BulletCollisionPtr collision;
   for (Base_V::iterator iter = this->children.begin();
@@ -185,12 +184,11 @@ void BulletLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
-      categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;
     }
   }
-  bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
+  bulletWorld->addRigidBody(this->rigidLink, collideBits, collideBits);
 
   // Only use auto disable if no joints and no sensors are present
   this->rigidLink->setActivationState(DISABLE_DEACTIVATION);
@@ -511,6 +509,31 @@ btRigidBody *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
 }
+
+
+//////////////////////////////////////////////////
+void BulletLink::RemoveAndAddBody() const
+{
+  GZ_ASSERT(nullptr != this->rigidLink, "Must add body to world first");
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  bulletWorld->removeRigidBody(this->rigidLink);
+
+  unsigned int collideBits = GZ_ALL_COLLIDE;
+  for (auto iter = this->children.begin();
+         iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      auto collision = boost::static_pointer_cast<BulletCollision>(*iter);
+      collideBits = collision->GetCollideBits();
+      break;
+    }
+  }
+
+  bulletWorld->addRigidBody(this->rigidLink, collideBits, collideBits);
+}
+
 
 //////////////////////////////////////////////////
 void BulletLink::ClearCollisionCache()
