@@ -9,8 +9,11 @@
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
 
-2. Bullet: sending feedback on contact points on depth 0 as well
+1. Bullet: sending feedback on contact points on depth 0 as well
     * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
+
+1. Deprecate functions to set linear/angular acceleration 
+    * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 ## Gazebo 8
 

@@ -332,8 +332,9 @@ void Link::ResetPhysicsStates()
 {
   this->SetAngularVel(ignition::math::Vector3d::Zero);
   this->SetLinearVel(ignition::math::Vector3d::Zero);
-  this->SetAngularAccel(ignition::math::Vector3d::Zero);
-  this->SetLinearAccel(ignition::math::Vector3d::Zero);
+  // deprecated commented
+  // this->SetAngularAccel(ignition::math::Vector3d::Zero);
+  // this->SetLinearAccel(ignition::math::Vector3d::Zero);
   this->SetForce(ignition::math::Vector3d::Zero);
   this->SetTorque(ignition::math::Vector3d::Zero);
 }
@@ -1078,8 +1079,9 @@ void Link::SetState(const LinkState &_state)
   this->SetWorldPose(_state.Pose());
   this->SetLinearVel(_state.Velocity().Pos());
   this->SetAngularVel(_state.Velocity().Rot().Euler());
-  this->SetLinearAccel(_state.Acceleration().Pos());
-  this->SetAngularAccel(_state.Acceleration().Rot().Euler());
+  // deprecated commented
+  // this->SetLinearAccel(_state.Acceleration().Pos());
+  // this->SetAngularAccel(_state.Acceleration().Rot().Euler());
   this->SetForce(_state.Wrench().Pos());
   this->SetTorque(_state.Wrench().Rot().Euler());
 
