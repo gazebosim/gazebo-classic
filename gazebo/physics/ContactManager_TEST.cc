@@ -139,7 +139,9 @@ TEST_F(ContactManagerTest, RemoveFilter)
 /////////////////////////////////////////////////
 TEST_F(ContactManagerTest, EnforcedContacts)
 {
-  Load("test/worlds/box.world", false);
+  // world needs to be paused in order to use World::Step()
+  // function correctly (second parameter true)
+  Load("test/worlds/box.world", true);
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
@@ -151,10 +153,6 @@ TEST_F(ContactManagerTest, EnforcedContacts)
 
   physics::ContactManager *manager = physics->GetContactManager();
   ASSERT_TRUE(physics != NULL);
-
-  // pause the world in order to use World::Step()
-  // function correctly
-  world->SetPaused(true);
 
   // advance the world. Contacts should happen between
   // box and ground.
@@ -176,7 +174,7 @@ TEST_F(ContactManagerTest, EnforcedContacts)
 
   numContacts = manager->GetContactCount();
   gzdbg << "Number of contacts: " <<numContacts << std::endl;
-  ASSERT_TRUE(numContacts > 0);
+  ASSERT_GT(numContacts, 0);
 
   // make sure there are no subscribers connected which may have
   // caused the contacts to become true

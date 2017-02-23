@@ -9,6 +9,9 @@
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
 
+1. Bullet: sending feedback on contact points on depth 0 as well
+    * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
+
 1. Added possibility to enforce contact computation
     * [Pull request #2629](https://bitbucket.org/osrf/gazebo/pull-requests/2629/)
 
@@ -284,6 +287,11 @@
         * [Issue #1698](https://bitbucket.org/osrf/gazebo/issues/1698)
 
 ## Gazebo 7
+
+## Gazebo 7.X.X (201X-XX-XX)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
 
 ## Gazebo 7.5.0 (2017-01-11)
 

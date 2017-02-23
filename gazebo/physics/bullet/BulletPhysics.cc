@@ -168,7 +168,7 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
     for (int j = 0; j < numContacts; ++j)
     {
       btManifoldPoint &pt = contactManifold->getContactPoint(j);
-      if (pt.getDistance() < 0.f)
+      if (pt.getDistance() <= 0.f)
       {
         const btVector3 &ptB = pt.getPositionWorldOnB();
         const btVector3 &normalOnB = pt.m_normalWorldOnB;
