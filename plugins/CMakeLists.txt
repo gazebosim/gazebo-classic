@@ -58,6 +58,7 @@ set (plugins_single_header
   GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
