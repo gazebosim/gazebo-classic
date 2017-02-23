@@ -7,10 +7,21 @@
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
     * [Pull request #2603](https://bitbucket.org/osrf/gazebo/pull-request/2603)
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
+    * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
+
+2. Bullet: sending feedback on contact points on depth 0 as well
+    * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
 
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix loading gui plugins and OSX framerate issue
+    * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
+    * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
+    * [Issue #2133](https://bitbucket.org/osrf/gazebo/issues/2133)
+
+## Gazebo 8.0.0 (2017-01-25)
 
 1. Depend on ignition math3
     * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)

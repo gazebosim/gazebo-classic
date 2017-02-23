@@ -80,11 +80,6 @@ namespace gazebo
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      /// \deprecated See ignition::math::Vector3d Scale() const
-      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Returns scaling factor for this geometry.
-      /// \return Scaling factor.
       public: virtual ignition::math::Vector3d Scale() const;
 
       /// \brief Returns image threshold for this geometry.

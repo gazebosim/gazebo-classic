@@ -354,18 +354,6 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
   }
 }
-/////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->EntityPose(_name);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
 
 /////////////////////////////////////////////////
 ignition::math::Pose3d ServerFixture::EntityPose(

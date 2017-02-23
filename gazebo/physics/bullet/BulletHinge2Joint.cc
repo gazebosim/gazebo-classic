@@ -104,26 +104,6 @@ ignition::math::Vector3d BulletHinge2Joint::Anchor(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BulletHinge2Joint::GetAxis(unsigned int /*index*/) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  if (!this->bulletHinge2)
-  {
-    gzerr << "Joint must be created first.\n";
-    return ignition::math::Vector3d();
-  }
-
-  btVector3 vec = this->bulletHinge2->getAxis1();
-  return ignition::math::Vector3d(vec.getX(), vec.getY(), vec.getZ());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double BulletHinge2Joint::GetVelocity(unsigned int /*_index*/) const
 {
   gzerr << "BulletHinge2Joint::GetVelocity not implemented" << std::endl;

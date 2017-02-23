@@ -405,7 +405,6 @@ else (build_errors)
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou
-    gazebo_math
   )
 
   if (NOT CCD_FOUND)
