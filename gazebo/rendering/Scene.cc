@@ -263,8 +263,8 @@ void Scene::Clear()
   this->dataPtr->userCameras.clear();
 
   // FIXME: Avoid segfault when deleting sky, see issue #2118
-  // delete this->dataPtr->skyx;
-  // delete this->dataPtr->skyxController;
+  if (this->dataPtr->skyx)
+    delete this->dataPtr->skyx;
   this->dataPtr->skyx = nullptr;
   this->dataPtr->skyxController = nullptr;
 

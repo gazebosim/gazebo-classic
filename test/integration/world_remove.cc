@@ -28,7 +28,7 @@
 using namespace gazebo;
 
 /// \brief Test removing different worlds.
-class WorldRemoveTest : public ServerFixture,
+class WorldRemoveTest : public RenderingFixture,
                         public testing::WithParamInterface<const char*>
 {
   /// \brief Test removing a blank world.
