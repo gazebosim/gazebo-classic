@@ -129,8 +129,6 @@ void AttachLightPlugin::OnUpdate()
       physics::LightPtr light = lightIt.first;
       ignition::math::Pose3d pose = lightIt.second;
       light->SetWorldPose(pose + link->GetWorldPose().Ign());
-
-      //std::cerr << "light world pose " << light->GetWorldPose().Ign() << std::endl;
     }
   }
 }
