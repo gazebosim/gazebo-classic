@@ -383,6 +383,11 @@ void Heightmap::Load()
   this->dataPtr->terrainGlobals->setUseVertexCompressionWhenAvailable(false);
 #endif
 
+  // There is an issue with OGRE terrain LOD if heights are not relative to 0.
+  // So we move the heightmap so that its min elevation = 0 before feeding to
+  // ogre. It is later translated back by the setOrigin call.
+  double minElevation = 0.0;
+
   // try loading heightmap data locally
   if (!this->dataPtr->filename.empty())
   {
@@ -406,6 +411,7 @@ void Heightmap::Load()
               demData->GetWorldWidth(), demData->GetWorldHeight(),
               heightmapSizeZ);
         }
+        minElevation = demData->GetMinElevation();
       }
 #endif
 
@@ -434,7 +440,7 @@ void Heightmap::Load()
         for (unsigned int x = 0; x < vertSize; ++x)
         {
           int index = (vertSize - y - 1) * vertSize + x;
-          this->dataPtr->heights.push_back(lookup[index]);
+          this->dataPtr->heights.push_back(lookup[index] - minElevation);
         }
       }
 
@@ -535,7 +541,7 @@ void Heightmap::Load()
       0.5 * this->dataPtr->terrainSize.X() / sqrtN,
       orig.y -0.5 * this->dataPtr->terrainSize.X() +
       0.5 * this->dataPtr->terrainSize.X() / sqrtN,
-      orig.z);
+      orig.z + minElevation);
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
@@ -640,7 +646,7 @@ void Heightmap::ConfigureTerrainDefaults()
   // MaxPixelError: Decides how precise our terrain is going to be.
   // A lower number will mean a more accurate terrain, at the cost of
   // performance (because of more vertices)
-  this->dataPtr->terrainGlobals->setMaxPixelError(0);
+  this->dataPtr->terrainGlobals->setMaxPixelError(this->dataPtr->maxPixelError);
 
   // CompositeMapDistance: decides how far the Ogre terrain will render
   // the lightmapped terrain.
@@ -1083,6 +1089,23 @@ void Heightmap::SetupShadows(bool _enableShadows)
   {
     matProfile->setReceiveDynamicShadowsPSSM(nullptr);
   }
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetLOD(const unsigned int _value)
+{
+  this->dataPtr->maxPixelError = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setMaxPixelError(
+        this->dataPtr->maxPixelError);
+  }
+}
+
+/////////////////////////////////////////////////
+unsigned int Heightmap::LOD() const
+{
+  return static_cast<unsigned int>(this->dataPtr->maxPixelError);
 }
 
 /////////////////////////////////////////////////
@@ -2214,8 +2237,8 @@ GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
 
   for (Ogre::uint i = 0; i < numTextures; ++i)
   {
-    _outStream <<
-      "varying vec4 lightSpacePos" << i << ";\n" <<
+    _outStream << fpInStr <<
+      " vec4 lightSpacePos" << i << ";\n" <<
       "uniform sampler2D shadowMap" << i << ";\n";
 
     *_sampler = *_sampler + 1;

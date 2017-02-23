@@ -285,6 +285,11 @@
 
 ## Gazebo 7
 
+## Gazebo 7.X.X (201X-XX-XX)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
+
 ## Gazebo 7.5.0 (2017-01-11)
 
 1. Remove qt4 webkit in gazebo7 (used for HotkeyDialog).

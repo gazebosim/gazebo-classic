@@ -15,6 +15,8 @@
  *
 */
 
+#include <memory>
+
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ExtrudeDialog_TEST.hh"
 
