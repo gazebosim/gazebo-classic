@@ -63,8 +63,8 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   physics::LightPtr spotLight = world->Light("spot");
   ASSERT_TRUE(spotLight != nullptr);
 
-  // step the world once
-  world->Step(1);
+  // step the world
+  world->Step(1000);
 
   // Get the initial light pose offset relative to link
   ignition::math::Pose3d pointLightPose = pointLight->GetWorldPose().Ign() -
@@ -77,8 +77,6 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   // verify pose for 1000 iterations (1 second);
   for (unsigned int i = 0; i < 1000; ++i)
   {
-    world->Step(1);
-
     // verify point light pose
     auto p = pointLight->GetWorldPose().Ign();
     auto p2 = pointLightPose + upperLink->GetWorldPose().Ign();
@@ -141,6 +139,8 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
         p.Rot().Euler().Z(), p2.Rot().Euler().Z(), ATTACH_ROT_TOL) ||
         ignition::math::equal(
         p.Rot().Euler().Z(), p2.Rot().Euler().Z() - 2*M_PI, ATTACH_ROT_TOL));
+
+    world->Step(1);
   }
 }
 
