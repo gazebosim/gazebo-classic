@@ -9,6 +9,9 @@
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
     * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
 
+2. Bullet: sending feedback on contact points on depth 0 as well
+    * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
