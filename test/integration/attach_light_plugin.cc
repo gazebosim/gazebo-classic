@@ -64,7 +64,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   ASSERT_TRUE(spotLight != nullptr);
 
   // step the world
-  world->Step(1000);
+  world->Step(1);
 
   // Get the initial light pose offset relative to link
   ignition::math::Pose3d pointLightPose = pointLight->GetWorldPose().Ign() -
@@ -74,6 +74,10 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   ignition::math::Pose3d spotLightPose = spotLight->GetWorldPose().Ign() -
       lowerLink->GetWorldPose().Ign();
 
+  gzmsg << "point light pose " << pointLightPose << std::endl;
+  gzmsg << "point light2 pose " << pointLight2Pose << std::endl;
+  gzmsg << "spot light pose " << spotLightPose << std::endl;
+
   // verify pose for 1000 iterations (1 second);
   for (unsigned int i = 0; i < 1000; ++i)
   {
@@ -81,9 +85,12 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     auto p = pointLight->GetWorldPose().Ign();
     auto p2 = pointLightPose + upperLink->GetWorldPose().Ign();
     // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
+    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL)
+        << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL)
+        << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL)
+        << " iteration: " << i;
     // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
@@ -102,9 +109,12 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     p = pointLight2->GetWorldPose().Ign();
     p2 = pointLight2Pose + upperLink->GetWorldPose().Ign();
     // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
+    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL)
+            << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL)
+            << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL)
+            << " iteration: " << i;
     // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
@@ -123,9 +133,12 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     p = spotLight->GetWorldPose().Ign();
     p2 = spotLightPose + lowerLink->GetWorldPose().Ign();
     // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
+    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL)
+            << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL)
+            << " iteration: " << i;
+    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL)
+            << " iteration: " << i;
     // verify rot and account for the case when angle is close to 2pi
     EXPECT_TRUE(ignition::math::equal(
         p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
