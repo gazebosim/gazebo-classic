@@ -105,12 +105,6 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
@@ -121,6 +115,10 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -185,6 +183,10 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   sleep = 0;
   while (box && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     common::Time::MSleep(1000);
     sleep++;
@@ -207,8 +209,6 @@ TEST_F(Scene_TEST, VisualType)
   // FIXME need a camera otherwise test produces a gl vertex buffer error
   math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
   std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
 
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
@@ -225,6 +225,10 @@ TEST_F(Scene_TEST, VisualType)
   rendering::VisualPtr box, sphere, cylinder, newBox;
   while ((!box || !sphere || !cylinder || !newBox) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");

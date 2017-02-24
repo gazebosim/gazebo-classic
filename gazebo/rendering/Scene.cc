@@ -3197,7 +3197,7 @@ bool Scene::ShadowsEnabled() const
 bool Scene::SetShadowTextureSize(const unsigned int _size)
 {
   // check if texture size is a power of 2
-  if (!(_size > 0u && ((_size & (_size-1)) == 0u)))
+  if (!ignition::math::isPowerOfTwo(_size))
   {
     gzerr << "Shadow texture size must be a power of 2" << std::endl;
     return false;
