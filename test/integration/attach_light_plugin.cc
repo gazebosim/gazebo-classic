@@ -71,22 +71,30 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   ignition::math::Pose3d spotLightPose = spotLight->GetWorldPose().Ign() -
       lowerLink->GetWorldPose().Ign();
 
-  auto prevUpperLinkPose = upperLink->GetWorldPose().Ign();
-  auto prevLowerLinkPose = lowerLink->GetWorldPose().Ign();
-
-  // verify pose for 1 second
-  for (unsigned int i = 0; i < 100; ++i)
+  // verify light pose against link pose.
+  // NOTE: there seem to be race condition when verifying pose using
+  // GetWorldPose in the test thread so do the verification in the update
+  // callback which is guaranteed to be done in the physics thread
+  int iteration = 0;
+  auto verifyPose = [&]()
   {
     ignition::math::Pose3d upperLinkPose = upperLink->GetWorldPose().Ign();
     ignition::math::Pose3d lowerLinkPose = lowerLink->GetWorldPose().Ign();
 
-    // NOTE: there's potential race condition when verifying pose
-    // using GetWorldPose
     EXPECT_EQ(pointLight->GetWorldPose(), pointLightPose + upperLinkPose);
     EXPECT_EQ(pointLight2->GetWorldPose(), pointLight2Pose + upperLinkPose);
     EXPECT_EQ(spotLight->GetWorldPose(), spotLightPose + lowerLinkPose);
-    world->Step(10);
-  }
+    iteration++;
+  };
+  auto connection = event::Events::ConnectWorldUpdateEnd(
+      std::bind(verifyPose));
+
+  // verify pose for 1000 iterations
+  for (unsigned int i = 0; i < 1000; ++i)
+    world->Step(1);
+
+  // verify that update is called
+  EXPECT_EQ(iteration, 1000);
 }
 
 TEST_P(AttachLightTest, AttachLightPlugin)
