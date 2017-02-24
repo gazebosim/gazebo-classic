@@ -86,11 +86,10 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
     EXPECT_EQ(spotLight->GetWorldPose(), spotLightPose + lowerLinkPose);
     iteration++;
   };
-  auto connection = event::Events::ConnectWorldUpdateEnd(
-      std::bind(verifyPose));
+  auto connection = event::Events::ConnectWorldUpdateEnd(std::bind(verifyPose));
 
   // verify pose for 1000 iterations
-  for (unsigned int i = 0; i < 1000; ++i)
+  for (unsigned int i = 0; i < 1000u; ++i)
     world->Step(1);
 
   // verify that update is called
