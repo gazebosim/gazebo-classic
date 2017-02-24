@@ -206,10 +206,6 @@ TEST_F(Scene_TEST, VisualType)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
