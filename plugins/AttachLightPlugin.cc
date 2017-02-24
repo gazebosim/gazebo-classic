@@ -116,7 +116,7 @@ void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->dataPtr->linkLights.empty())
     return;
 
-  this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateEnd(
       std::bind(&AttachLightPlugin::OnUpdate, this)));
 }
 

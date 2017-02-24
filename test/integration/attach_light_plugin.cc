@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2017 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,14 @@
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
 #include "gazebo/test/helper_physics_generator.hh"
-
-// why the large tolerance? It seems that for some physics engines the light
-// pose is one timestep behind the link pose.
-#define ATTACH_POS_TOL 1e-2
-#define ATTACH_ROT_TOL 1e-2
 
 using namespace gazebo;
 class AttachLightTest : public ServerFixture,
                         public testing::WithParamInterface<const char*>
 {
+  /// \brief Test AttachLightPlugin by verifying light pose against link pose
+  /// \param[in] _physicsEngine Name of physics engine
   public: void AttachLightPlugin(const std::string &_physicsEngine);
 };
 
@@ -63,7 +58,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   physics::LightPtr spotLight = world->Light("spot");
   ASSERT_TRUE(spotLight != nullptr);
 
-  // step the world once
+  // step the world
   world->Step(1);
 
   // Get the initial light pose offset relative to link
@@ -74,74 +69,29 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   ignition::math::Pose3d spotLightPose = spotLight->GetWorldPose().Ign() -
       lowerLink->GetWorldPose().Ign();
 
-  // verify pose for 1000 iterations (1 second);
-  for (unsigned int i = 0; i < 1000; ++i)
+  // verify light pose against link pose.
+  // NOTE: there seem to be race condition when verifying pose using
+  // GetWorldPose in the test thread so do the verification in the update
+  // callback which is guaranteed to be done in the physics thread
+  int iteration = 0;
+  auto verifyPose = [&]()
   {
+    ignition::math::Pose3d upperLinkPose = upperLink->GetWorldPose().Ign();
+    ignition::math::Pose3d lowerLinkPose = lowerLink->GetWorldPose().Ign();
+
+    EXPECT_EQ(pointLight->GetWorldPose(), pointLightPose + upperLinkPose);
+    EXPECT_EQ(pointLight2->GetWorldPose(), pointLight2Pose + upperLinkPose);
+    EXPECT_EQ(spotLight->GetWorldPose(), spotLightPose + lowerLinkPose);
+    iteration++;
+  };
+  auto connection = event::Events::ConnectWorldUpdateEnd(std::bind(verifyPose));
+
+  // verify pose for 1000 iterations
+  for (unsigned int i = 0; i < 1000u; ++i)
     world->Step(1);
 
-    // verify point light pose
-    auto p = pointLight->GetWorldPose().Ign();
-    auto p2 = pointLightPose + upperLink->GetWorldPose().Ign();
-    // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for the case when angle is close to 2pi
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z() - 2*M_PI, ATTACH_ROT_TOL));
-
-    // verify point2 light pose
-    p = pointLight2->GetWorldPose().Ign();
-    p2 = pointLight2Pose + upperLink->GetWorldPose().Ign();
-    // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for the case when angle is close to 2pi
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z() - 2*M_PI, ATTACH_ROT_TOL));
-
-    // verify spot light pose
-    p = spotLight->GetWorldPose().Ign();
-    p2 = spotLightPose + lowerLink->GetWorldPose().Ign();
-    // verify pos
-    EXPECT_NEAR(p.Pos().X(), p2.Pos().X(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Y(), p2.Pos().Y(), ATTACH_POS_TOL);
-    EXPECT_NEAR(p.Pos().Z(), p2.Pos().Z(), ATTACH_POS_TOL);
-    // verify rot and account for the case when angle is close to 2pi
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().X(), p2.Rot().Euler().X() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Y(), p2.Rot().Euler().Y() - 2*M_PI, ATTACH_ROT_TOL));
-    EXPECT_TRUE(ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z(), ATTACH_ROT_TOL) ||
-        ignition::math::equal(
-        p.Rot().Euler().Z(), p2.Rot().Euler().Z() - 2*M_PI, ATTACH_ROT_TOL));
-  }
+  // verify that update is called
+  EXPECT_EQ(iteration, 1000);
 }
 
 TEST_P(AttachLightTest, AttachLightPlugin)
