@@ -73,7 +73,7 @@ namespace gazebo
 
       /// \brief Advance iterator to next reading (prefix: ++it)
       /// \return reference to this pointer after advancing
-      public: GpuLaserDataIterator<F>& operator++();
+      public: GpuLaserDataIterator<F> &operator++();
 
       /// \brief Advance this iterator (postfix: it++)
       /// \param[in] _dummy does nothing, required for postfix overload
