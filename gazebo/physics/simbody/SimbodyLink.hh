@@ -162,8 +162,6 @@ namespace gazebo
       public: SimTK::MassProperties GetEffectiveMassProps(
         int _numFragments) const;
 
-      public: void SetDirtyPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
       /// \brief Set the dirty pose
       /// \param[in] New dirty pose
       public: void SetDirtyPose(const ignition::math::Pose3d &_pose);

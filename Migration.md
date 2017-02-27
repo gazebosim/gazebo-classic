@@ -7,7 +7,33 @@ release will remove the deprecated code.
 
 ## Gazebo 8.X to 9.X
 
+### Modifications
+
+1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
+    + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
+    + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_vel);
+    + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
+    + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
+    + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
+
+
+
 ### Deprecations
+
+1. **gazebo/physics/Link.hh**
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
+    + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
+    + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
+1. **gazebo/physics/Model.hh**
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_vel);
+    + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
+    + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
+    + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
 
 1. **gazebo/rendering/GpuLaser.hh**
     + ***Deprecation:*** const float* LaserData() const
