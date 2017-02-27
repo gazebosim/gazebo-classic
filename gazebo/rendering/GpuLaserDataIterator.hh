@@ -23,60 +23,73 @@ namespace gazebo
 {
   namespace rendering
   {
-    // \brief struct containing info about a single ray measurement
+    /// \brief struct containing info about a single ray measurement
     struct GpuLaserData
     {
-      // The distance of the reading in meters
+      /// \brief The distance of the reading in meters
       double range;
 
-      // The intensity reading
+      /// \brief The intensity reading
       double intensity;
 
-      // Which plane or cone this reading belongs to [0, verticalResolution)
+      /// \brief Which plane or cone this reading belongs to [0, vRes)
       unsigned int beam;
 
-      // Which reading in a plane or cone is this [0, horizontalResolution)
+      /// \brief the index of areading in a plane or cone[0, hRes)
       unsigned int reading;
     };
 
-    // \brief const Bidirectional iterator for laser data
-    //
-    // This class contains the information needed to access Laser Data
-    // It implements a Bidirectional Input iterator
-    // http://www.cplusplus.com/reference/iterator/BidirectionalIterator/
-    // The compiler should optimize out calls to this class
+    /// \brief const Bidirectional iterator for laser data
+    ///
+    /// This class contains the information needed to access Laser Data
+    /// It implements a Bidirectional Input iterator
+    /// http://www.cplusplus.com/reference/iterator/BidirectionalIterator/
+    /// The compiler should optimize out calls to this class
     template <typename F>
     class GpuLaserDataIterator
     {
       public: friend F;
 
+      /// \brief Destructor
       public: ~GpuLaserDataIterator();
 
-      // \brief return true if the iterators point to the same element
-      public: bool operator==(const GpuLaserDataIterator &rvalue) const;
+      /// \brief Operator ==
+      /// \param[in] _rvalue The iterator on the right of the ==
+      /// \return true iff the iterators point to the same reading
+      public: bool operator==(const GpuLaserDataIterator &_rvalue) const;
 
-      // \brief return true if the iterators point to different elements
-      public: bool operator!=(const GpuLaserDataIterator &rvalue) const;
+      /// \brief Operator !=
+      /// \param[in] _rvalue The iterator on the right of the !=
+      /// \return true iff the iterators point to different readings
+      public: bool operator!=(const GpuLaserDataIterator &_rvalue) const;
 
-      // \brief returns laser data at the index pointed to by the iterator
+      /// \brief Dereference operator *iter
+      /// \return A struct of laser data
       public: const GpuLaserData operator*() const;
 
-      // \brief returns a shared pointer object at the iterator's index
+      /// \brief Dereference operator iter->
+      /// \return a shared pointer object at the iterator's index
       public: const std::shared_ptr<const GpuLaserData> operator->() const;
 
-      // \brief Advance iterator to next reading (++it)
+      /// \brief Advance iterator to next reading (prefix: ++it)
+      /// \return reference to this pointer after advancing
       public: GpuLaserDataIterator<F>& operator++();
 
-      // \brief Advance this iterator, but return a copy of this one (it++)
+      /// \brief Advance this iterator (postfix: it++)
+      /// \param[in] _dummy does nothing, required for postfix overload
+      /// \return a copy of this iterator prior to advancing
       public: GpuLaserDataIterator<F> operator++(int _dummy);
 
-      // \brief Move itereator to previous (--it)
+      /// \brief Move itereator to previous (prefix: --it)
+      /// \return reference to this pointer after moving
       public: GpuLaserDataIterator<F>& operator--();
 
-      // \brief Go to previous, but return a copy of this one (it--)
+      /// \brief Move itereator to previous (postfix: it--)
+      /// \param[in] _dummy does nothing, required for postfix overload
+      /// \return a copy of this iterator prior to moving
       public: GpuLaserDataIterator<F> operator--(int _dummy);
 
-      // \brief contstruct an iterator to a specified index
+      /// \brief contstruct an iterator to a specified index
       protected: GpuLaserDataIterator(const unsigned int _index,
                          const float *_data, const unsigned int _skip,
                          const unsigned int _rangeOffset,
@@ -86,22 +99,22 @@ namespace gazebo
 
       // Not using PIMPL because it has no benefit on templated classes
 
-      // \brief which reading is this [0, vRes * hRes)
+      /// \brief which reading is this [0, vRes * hRes)
       private: unsigned int index = 0;
 
-      // \brief the data being decoded
+      /// \brief the data being decoded
       private: const float *data = nullptr;
 
-      // \brief offset between consecutive readings
+      /// \brief offset between consecutive readings
       private: const unsigned int skip = 0;
 
-      // \brief offset within a reading to range data
+      /// \brief offset within a reading to range data
       private: const unsigned int rangeOffset = 0;
 
-      // \brief offset within a reading to intensity data
+      /// \brief offset within a reading to intensity data
       private: const unsigned int intensityOffset = 0;
 
-      // \brief Number of readings in each plane or cone
+      /// \brief Number of readings in each plane or cone
       private: const unsigned int horizontalResolution = 0;
     };
   }

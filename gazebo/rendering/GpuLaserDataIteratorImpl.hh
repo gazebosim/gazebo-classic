@@ -31,16 +31,16 @@ namespace gazebo
 
     template <typename F>
     bool GpuLaserDataIterator<F>::operator==(
-        const GpuLaserDataIterator<F> &rvalue) const
+        const GpuLaserDataIterator<F> &_rvalue) const
     {
-      return this->index == rvalue.index;
+      return this->index == _rvalue.index;
     }
 
     template <typename F>
     bool GpuLaserDataIterator<F>::operator!=(
-        const GpuLaserDataIterator<F> &rvalue) const
+        const GpuLaserDataIterator<F> &_rvalue) const
     {
-      return this->index != rvalue.index;
+      return this->index != _rvalue.index;
     }
 
     template <typename F>
