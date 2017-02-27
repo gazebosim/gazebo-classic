@@ -69,6 +69,7 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TouchPlugin
   VehiclePlugin)
 
 set (plugins_private_header
