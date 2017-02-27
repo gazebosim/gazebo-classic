@@ -92,6 +92,7 @@ set (headers
   FPSViewController.hh
   GpuLaser.hh
   GpuLaserDataIterator.hh
+  GpuLaserDataIteratorImpl.hh
   Grid.hh
   Heightmap.hh
   InertiaVisual.hh

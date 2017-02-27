@@ -15,6 +15,10 @@
  *
 */
 
+
+#ifndef GAZEBO_RENDERING_GPULASERDATAITERATORIMPL_HH_
+#define GAZEBO_RENDERING_GPULASERDATAITERATORIMPL_HH_
+
 namespace gazebo
 {
   namespace rendering
@@ -106,3 +110,5 @@ namespace gazebo
     }
   }
 }
+
+#endif  // GAZEBO_RENDERING_GPULASERDATAITERATORIMPL_HH_
