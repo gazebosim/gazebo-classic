@@ -28,7 +28,6 @@ namespace gazebo
   /// \brief Private data class for the AttachLightPlugin class
   class AttachLightPluginPrivate
   {
-
     /// \brief Event connections
     public: std::vector<event::ConnectionPtr> connections;
 
