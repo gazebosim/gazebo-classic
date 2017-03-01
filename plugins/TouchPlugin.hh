@@ -17,6 +17,8 @@
 #ifndef GAZEBO_PLUGINS_TOUCHPLUGIN_HH_
 #define GAZEBO_PLUGINS_TOUCHPLUGIN_HH_
 
+#include <string>
+#include <vector>
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/ContactSensor.hh>

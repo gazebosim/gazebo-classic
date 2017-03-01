@@ -175,7 +175,6 @@ void TouchPluginTest::MultiLink(const std::string &_physicsEngine)
 
   // Check it has touched for long enough
   EXPECT_TRUE(this->redTouched);
-
 }
 
 //////////////////////////////////////////////////
