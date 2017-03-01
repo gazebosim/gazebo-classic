@@ -2946,8 +2946,11 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    // commented out for now as sometimes physics light messages could arrive
+    // before the rendering light is created, e.g. light pose updates.
+    // See issue #1778
+    // gzerr << "Light [" << _msg->name() << "] not found."
+    //     << " Use topic ~/factory/light to spawn a new light." << std::endl;
     return false;
   }
   else
