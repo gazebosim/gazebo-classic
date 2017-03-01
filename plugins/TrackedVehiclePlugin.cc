@@ -39,6 +39,9 @@ class gazebo::TrackedVehiclePluginPrivate
   /// \brief Velocity command subscriber.
   public: transport::SubscriberPtr velocitySub;
 
+  /// \brief Subscribe to keyboard messages.
+  public: transport::SubscriberPtr keyboardSub;
+
   /// \brief Publisher of the track velocities.
   public: transport::PublisherPtr tracksVelocityPub;
 
@@ -87,7 +90,7 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(_model, "TrackedVehiclePlugin _model pointer is NULL");
   this->dataPtr->model = _model;
 
-  GZ_ASSERT(_sdf, "PlaneDemoPlugin _sdf pointer is NULL");
+  GZ_ASSERT(_sdf, "TrackedVehiclePlugin _sdf pointer is NULL");
   this->dataPtr->sdf = _sdf;
 
   // Load parameters from SDF plugin contents.
@@ -115,6 +118,9 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
       this->dataPtr->node->Advertise<msgs::Vector2d>(
           this->dataPtr->robotNamespace + "/tracks_speed", 1000);
 
+  this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
+      "~/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress, this, true);
+
   gzdbg << this->handleName.c_str() << ": Loading done." << std::endl;
 }
 
@@ -122,6 +128,18 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
 void TrackedVehiclePlugin::Init()
 {
   gzdbg << this->handleName.c_str() << ": Init done.\n";
+}
+
+void TrackedVehiclePlugin::Reset()
+{
+  if (this->dataPtr->tracksVelocityPub != NULL) {
+    auto speedMsg = msgs::Vector2d();
+    speedMsg.set_x(0);
+    speedMsg.set_y(0);
+    this->dataPtr->tracksVelocityPub->Publish(speedMsg);
+  }
+
+  ModelPlugin::Reset();
 }
 
 void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &msg)
@@ -154,6 +172,36 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &msg)
   speedMsg.set_x(vel_left);
   speedMsg.set_y(vel_right);
   this->dataPtr->tracksVelocityPub->Publish(speedMsg);
+}
+
+void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
+{
+  const int key = _msg->int_value();
+
+  switch (key) {
+    case 13:  // ENTER
+    case 32:  // SPACE
+      this->SetTrackVelocity(0., 0.);
+      break;
+    case 38:  // UP
+    case 16777235:
+      this->SetTrackVelocity(1., 1.);
+      break;
+    case 40:  // DOWN
+    case 16777237:
+      this->SetTrackVelocity(-1., -1.);
+      break;
+    case 37:  // LEFT
+    case 16777234:
+      this->SetTrackVelocity(-1., 1.);
+      break;
+    case 39:  // RIGHT
+    case 16777236:
+      this->SetTrackVelocity(1., -1.);
+      break;
+    default:
+      break;
+  }
 }
 
 std::string TrackedVehiclePlugin::GetRobotNamespace() {

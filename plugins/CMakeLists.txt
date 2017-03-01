@@ -74,10 +74,10 @@ set (plugins_single_header
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
+  SimpleTrackedVehiclePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
-  TrackedVehiclePlugin
   VehiclePlugin
   WindPlugin
 )
@@ -106,6 +106,15 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
 
+add_library(TrackedVehiclePlugin STATIC TrackedVehiclePlugin.cc)
+target_link_libraries(TrackedVehiclePlugin
+        libgazebo
+        ${ogre_libraries}
+        ${IGNITION-TRANSPORT_LIBRARIES}
+        )
+install (TARGETS TrackedVehiclePlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+gz_install_includes("plugins" TrackedVehiclePlugin.hh)
+
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
@@ -116,6 +125,11 @@ foreach (src ${plugins_single_header})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
+
+target_include_directories(SimpleTrackedVehiclePlugin SYSTEM PRIVATE
+        ${CMAKE_SOURCE_DIR}/deps/opende/include)
+target_link_libraries(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
+add_dependencies(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)

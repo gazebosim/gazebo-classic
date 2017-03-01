@@ -56,6 +56,9 @@ namespace gazebo
     /// \brief Initialize the plugin.
     public: virtual void Init();
 
+    /// \brief Reset the plugin.
+    public: virtual void Reset();
+
     /// \brief Namespace used as a prefix for gazebo topic names.
     public: virtual std::string GetRobotNamespace();
 
@@ -99,6 +102,10 @@ namespace gazebo
     /// \param[in] _msg Pose message from external publisher
     protected: virtual void OnVelMsg(ConstPosePtr &_msg);
 
+    /// \brief Callback each time a key message is received.
+    /// \param[in] _msg Keypress message.
+    protected: virtual void OnKeyPress(ConstAnyPtr &_msg);
+
     /// \brief Mutex to protect updates
     protected: std::mutex mutex;
 
@@ -138,7 +145,7 @@ namespace gazebo
         gzdbg << this->handleName.c_str() << " Plugin (ns = "
               << this->GetRobotNamespace().c_str()
               << ") missing <" << name.c_str()
-              << ">, defaults to " << defaultValue;
+              << ">, defaults to " << defaultValue << std::endl;
       }
       else
       {
@@ -146,7 +153,7 @@ namespace gazebo
         gzdbg << this->handleName.c_str() << " Plugin (ns = "
               << this->GetRobotNamespace().c_str()
               << ") <" << name.c_str()
-              << "> set to " << target;
+              << "> set to " << target << std::endl;
       }
     }
 

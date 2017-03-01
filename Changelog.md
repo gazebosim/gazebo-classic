@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added support for tracked vehicles
+    * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
     * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
