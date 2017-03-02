@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2750,27 +2750,35 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     }
     else
     {
-        if (!this->dataPtr->terrain)
+      if (!this->dataPtr->terrain)
+      {
+        this->dataPtr->terrain = new Heightmap(shared_from_this());
+        // check the material fields and set material if it is specified
+        if (_msg->has_material())
         {
-          this->dataPtr->terrain = new Heightmap(shared_from_this());
-          // check the material fields and set material if it is specified
-          if (_msg->has_material())
+          auto matMsg = _msg->material();
+          if (matMsg.has_script())
           {
-            auto matMsg = _msg->material();
-            if (matMsg.has_script())
+            auto scriptMsg = matMsg.script();
+            for (auto const uri : scriptMsg.uri())
             {
-              auto scriptMsg = matMsg.script();
-              for (auto const uri : scriptMsg.uri())
-              {
-                if (!uri.empty())
-                  RenderEngine::Instance()->AddResourcePath(uri);
-              }
-              std::string matName = scriptMsg.name();
-              this->dataPtr->terrain->SetMaterial(matName);
+              if (!uri.empty())
+                RenderEngine::Instance()->AddResourcePath(uri);
             }
+            std::string matName = scriptMsg.name();
+            this->dataPtr->terrain->SetMaterial(matName);
           }
-          this->dataPtr->terrain->LoadFromMsg(_msg);
         }
+        this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        this->dataPtr->terrain->LoadFromMsg(_msg);
+
+        // create a dummy visual for loading heightmap visual plugin
+        // TODO make heightmap a visual to avoid special treatment here?
+        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        auto m = *_msg.get();
+        m.clear_material();
+        visual->Load(msgs::VisualToSDF(m));
+      }
     }
     return true;
   }
@@ -2938,8 +2946,11 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    // commented out for now as sometimes physics light messages could arrive
+    // before the rendering light is created, e.g. light pose updates.
+    // See issue #1778
+    // gzerr << "Light [" << _msg->name() << "] not found."
+    //     << " Use topic ~/factory/light to spawn a new light." << std::endl;
     return false;
   }
   else
@@ -3307,6 +3318,23 @@ Heightmap *Scene::GetHeightmap() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   return this->dataPtr->terrain;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapLOD(const unsigned int _value)
+{
+  this->dataPtr->heightmapLOD = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::HeightmapLOD() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->LOD();
+
+  return this->dataPtr->heightmapLOD;
 }
 
 /////////////////////////////////////////////////

@@ -39,6 +39,7 @@ endif()
 set (plugins_single_header
   ActuatorPlugin
   ArrangePlugin
+  AttachLightPlugin
   BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
@@ -52,6 +53,7 @@ set (plugins_single_header
   ForceTorquePlugin
   GpuRayPlugin
   HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin

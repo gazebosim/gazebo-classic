@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,11 @@ void LaserVisual::Update()
     {
       // Calculate the range of the ray
       double r = dPtr->laserMsg->scan().ranges(j*count + i);
+      if (r < minRange)
+      {
+        // Less than min range, don't display a ray
+        r = minRange;
+      }
       bool inf = std::isinf(r);
 
       ignition::math::Quaterniond ray(

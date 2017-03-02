@@ -1,10 +1,16 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (20XX-XX-XX)
+## Gazebo 7.X.X (201X-XX-XX)
 
 1. Process insertions and deletions on gz log echo
     * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
     * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add plugin for attaching lights to links in a model
+    * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
 
 ## Gazebo 7.5.0 (2017-01-11)
 
