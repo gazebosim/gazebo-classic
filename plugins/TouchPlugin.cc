@@ -131,6 +131,7 @@ void TouchPlugin::Toggle(ConstIntPtr &/*_msg*/)
   else
   {
     this->updateConnection.reset();
+    this->touchedPub->Fini();
     this->touchedPub.reset();
 
     for (auto s : this->contactSensors)
@@ -192,7 +193,7 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
             << "We shouldn't reach this point!" << std::endl;
     }
 
-    if (touchStart != common::Time::Zero)
+    if (this->touchStart != common::Time::Zero)
     {
       gzmsg << "Not touching anything" << std::endl;
     }

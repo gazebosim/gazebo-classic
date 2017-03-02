@@ -66,10 +66,11 @@ namespace gazebo
 
     /// \brief Callback for toggle "service".
     /// \param[in] _msg Unused message
-    public: void Toggle(ConstIntPtr &/*_msg*/);
+    public: void Toggle(ConstIntPtr &_msg);
 
     /// \brief Update plugin's function.
-    private: void OnUpdate(const common::UpdateInfo &/*_info*/);
+    /// \_param[in] _info Information about world.
+    private: void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Contact sensors attached to links in the model
     private: std::vector<sensors::ContactSensorPtr> contactSensors;

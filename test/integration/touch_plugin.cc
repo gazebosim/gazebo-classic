@@ -15,10 +15,8 @@
  *
 */
 
-#include <cmath>
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "scans_cmp.h"
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
