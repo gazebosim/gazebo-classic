@@ -459,3 +459,19 @@ bool JointController::SetVelocityTarget(const std::string &_jointName,
 
   return result;
 }
+
+/////////////////////////////////////////////////
+bool JointController::SetForce(const std::string &_jointName,
+    const double _force)
+{
+  bool result = false;
+
+  if (this->dataPtr->joints.find(_jointName) !=
+      this->dataPtr->joints.end())
+  {
+    this->dataPtr->forces[_jointName] = _force;
+    result = true;
+  }
+
+  return result;
+}

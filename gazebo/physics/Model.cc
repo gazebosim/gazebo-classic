@@ -1068,6 +1068,10 @@ void Model::LoadPlugin(sdf::ElementPtr _sdf)
     {
       plugin->Load(myself, _sdf);
     }
+    catch(gazebo::common::Exception &_e)
+    {
+      gzerr << "Load plugin exception: " << _e << std::endl;
+    }
     catch(...)
     {
       gzerr << "Exception occured in the Load function of plugin with name["
