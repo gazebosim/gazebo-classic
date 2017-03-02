@@ -49,12 +49,13 @@ namespace gazebo
   /// <time> Target time in seconds to maintain contact.
   ///
   /// <namespace> Namespace for transport topics:
-  ///             /<namespace>/toggle : Topic used to toggle plugin on and off.
+  ///             /<namespace>/enable : Topic used to enable and disable the
+  ///                                   plugin.
   ///             /<namespace>/touched : Topic where a message is published once
   ///                                    the touch is complete.
   ///
   /// <enabled> Set this to true so the plugin works from the start and doesn't
-  ///           need to be toggled on.
+  ///           need to be enabled.
   ///
   class GAZEBO_VISIBLE TouchPlugin : public ModelPlugin
   {
@@ -64,9 +65,9 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
-    /// \brief Callback for toggle "service".
-    /// \param[in] _msg Unused message
-    public: void Toggle(ConstIntPtr &_msg);
+    /// \brief Callback for enable "service".
+    /// \param[in] _msg Message with 0 to disable and 1 to enable the plugin.
+    public: void Enable(ConstIntPtr &_msg);
 
     /// \brief Update plugin's function.
     /// \_param[in] _info Information about world.
@@ -97,8 +98,8 @@ namespace gazebo
     /// \brief Publisher which publishes a message after touched for enough time
     private: transport::PublisherPtr touchedPub;
 
-    /// \brief Subscriber to toggle messages.
-    private: transport::SubscriberPtr toggleSub;
+    /// \brief Subscriber to enable messages.
+    private: transport::SubscriberPtr enableSub;
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;

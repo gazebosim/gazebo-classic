@@ -95,23 +95,24 @@ void TouchPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Start/stop "service"
   this->gzNode = transport::NodePtr(new transport::Node());
   this->gzNode->Init();
-  this->toggleSub = this->gzNode->Subscribe("/" + this->ns + "/toggle",
-      &TouchPlugin::Toggle, this);
+  this->enableSub = this->gzNode->Subscribe("/" + this->ns + "/enable",
+      &TouchPlugin::Enable, this);
 
   // Start enabled or not
   auto enabled = _sdf->HasElement("enabled") && _sdf->Get<bool>("enabled");
   if (enabled)
   {
-    ConstIntPtr msg;
-    this->Toggle(msg);
+    boost::shared_ptr<msgs::Int> msg(new msgs::Int());
+    msg->set_data(1);
+    this->Enable(msg);
   }
 }
 
 //////////////////////////////////////////////////
-void TouchPlugin::Toggle(ConstIntPtr &/*_msg*/)
+void TouchPlugin::Enable(ConstIntPtr &_msg)
 {
   // Start
-  if (!this->touchedPub)
+  if (_msg->data() == 1 && !this->touchedPub)
   {
     // Start update
     this->updateConnection = event::Events::ConnectWorldUpdateBegin(
@@ -128,7 +129,7 @@ void TouchPlugin::Toggle(ConstIntPtr &/*_msg*/)
     gzmsg << "Started touch plugin [" << this->ns << "]" << std::endl;
   }
   // Stop
-  else
+  else if (_msg->data() == 0 && this->touchedPub)
   {
     this->updateConnection.reset();
     this->touchedPub->Fini();
@@ -139,6 +140,7 @@ void TouchPlugin::Toggle(ConstIntPtr &/*_msg*/)
 
     gzmsg << "Stopped touch plugin [" << this->ns << "]" << std::endl;
   }
+  // Do nothing if not changing state
 }
 
 /////////////////////////////////////////////////
@@ -222,12 +224,12 @@ void TouchPlugin::OnUpdate(const common::UpdateInfo &_info)
 
     gazebo::msgs::Int msg;
     msg.set_data(1);
-
     this->touchedPub->Publish(msg);
 
-    // Toggle off
-    ConstIntPtr m;
-    this->Toggle(m);
+    // Disable
+    boost::shared_ptr<msgs::Int> m(new msgs::Int());
+    m->set_data(0);
+    this->Enable(m);
   }
 }
 

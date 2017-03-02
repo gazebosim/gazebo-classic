@@ -112,13 +112,13 @@ void TouchPluginTest::OneLink(const std::string &_physicsEngine)
   world->Step(5000);
   EXPECT_FALSE(this->whiteTouched);
 
-  // Toggle plugin on again
-  auto togglePub = this->node->Advertise<msgs::Int>(
-        "/white_touches_only_green/toggle");
+  // Enable plugin again
+  auto enablePub = this->node->Advertise<msgs::Int>(
+        "/white_touches_only_green/enable");
 
   msgs::Int msg;
   msg.set_data(1);
-  togglePub->Publish(msg);
+  enablePub->Publish(msg);
 
   // Wait and see it notifies again
   this->whiteTouched = false;
@@ -216,12 +216,12 @@ void TouchPluginTest::StartDisabled(const std::string &_physicsEngine)
   EXPECT_FALSE(this->blueTouched);
 
   // Enable plugin
-  auto togglePub = this->node->Advertise<msgs::Int>(
-        "/blue_touches_only_green/toggle");
+  auto enablePub = this->node->Advertise<msgs::Int>(
+        "/blue_touches_only_green/enable");
 
   msgs::Int msg;
   msg.set_data(1);
-  togglePub->Publish(msg);
+  enablePub->Publish(msg);
 
   // Wait and see it notifies now
   this->blueTouched = false;
