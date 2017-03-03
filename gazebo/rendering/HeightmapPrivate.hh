@@ -331,9 +331,6 @@ namespace gazebo
     /// \brief Private data for the Heightmap class
     class HeightmapPrivate
     {
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int numTerrainSubdivisions;
-
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
       /// LoadRadiusFactor is a multiplier applied to the terrain size to create
@@ -443,6 +440,13 @@ namespace gazebo
       /// \brief Max pixel error allowed for rendering the heightmap. This
       /// affects the transitions between LOD levels.
       public: double maxPixelError = 0.0;
+
+      /// \brief True if the terrain need to be split into subterrains
+      public: bool splitTerrain = false;
+
+      /// \brief Number of pieces in which a terrain is subdivided. Used
+      /// for paging and also when heighmap is too large for LOD to work.
+      public:  unsigned int numTerrainSubdivisions = 16u;
 
       /// \brief Event connections
       public: std::vector<event::ConnectionPtr> connections;

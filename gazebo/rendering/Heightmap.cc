@@ -50,7 +50,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int HeightmapPrivate::numTerrainSubdivisions = 16;
 const double HeightmapPrivate::loadRadiusFactor = 1.0;
 const double HeightmapPrivate::holdRadiusFactor = 1.15;
 const boost::filesystem::path HeightmapPrivate::pagingDirname = "paging";
@@ -526,11 +525,36 @@ void Heightmap::Load()
   // If the paging is enabled we modify the number of subterrains
   if (this->dataPtr->useTerrainPaging)
   {
+    this->dataPtr->splitTerrain = true;
     nTerrains = this->dataPtr->numTerrainSubdivisions;
     prefix = terrainDirPath / "gazebo_terrain_cache";
   }
   else
   {
+    // Note: ran into problems with LOD height glitches if heightmap size is
+    // larger than 4096 so split it into chunks
+    if (this->dataPtr->maxPixelError > 0 && this->dataPtr->dataSize > 4096u)
+    {
+      this->dataPtr->splitTerrain = true;
+      // Compute subterrain heightmap size.
+      // The number of chunks must be a power of 4 and the size must be < 4096
+      // For example, a heightmap of size 4096 (2^12) should be split into
+      // 4 chunks with a size of into 1024:
+      //   2^12 / 4^1 = 1024
+      // following this logic we could see some examples of subterrain sizes:
+      //   2^13 / 4^1 = 2048
+      //   2^14 / 4^2 = 1024
+      //   2^15 / 4^2 = 2048
+      double pow = std::log2(this->dataPtr->dataSize-1) - 12;
+      this->dataPtr->numTerrainSubdivisions = static_cast<unsigned int>(
+          std::pow(4, static_cast<int>(pow / 2) + 1.0));
+
+      // Unfortunately, from manual testing, max subdivision size that will
+      // work is currently 16. Anything larger causes load to fail
+      this->dataPtr->numTerrainSubdivisions =
+          std::min(this->dataPtr->numTerrainSubdivisions, 16u);
+      nTerrains = this->dataPtr->numTerrainSubdivisions;
+    }
     prefix = terrainDirPath / "gazebo_terrain";
   }
 
@@ -812,29 +836,16 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
       Ogre::ResourceGroupManager::getSingleton().resourceExists(
       this->dataPtr->terrainGroup->getResourceGroup(), filename);
 
-  if (!this->dataPtr->useTerrainPaging)
+  if (resourceExists && !this->dataPtr->terrainHashChanged)
   {
-    if (resourceExists && !this->dataPtr->terrainHashChanged)
-    {
-      gzmsg << "Loading heightmap cache data: " << filename << std::endl;
+    gzmsg << "Loading heightmap cache data: " << filename << std::endl;
 
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
-      this->dataPtr->terrainsImported = false;
-    }
-    else
-    {
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
-          &this->dataPtr->heights[0]);
-    }
+    this->dataPtr->terrainGroup->defineTerrain(_x, _y);
+    this->dataPtr->terrainsImported = false;
   }
   else
   {
-    if (resourceExists && !this->dataPtr->terrainHashChanged)
-    {
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
-      this->dataPtr->terrainsImported = false;
-    }
-    else
+    if (this->dataPtr->splitTerrain)
     {
       // generate the subterrains if needed
       if (this->dataPtr->subTerrains.empty())
@@ -847,6 +858,11 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
       this->dataPtr->terrainGroup->defineTerrain(_x, _y,
           &this->dataPtr->subTerrains[this->dataPtr->terrainIdx][0]);
       ++this->dataPtr->terrainIdx;
+    }
+    else
+    {
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
+          &this->dataPtr->heights[0]);
     }
   }
 }
