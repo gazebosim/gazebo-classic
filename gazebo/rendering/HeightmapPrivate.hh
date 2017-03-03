@@ -446,7 +446,7 @@ namespace gazebo
 
       /// \brief Number of pieces in which a terrain is subdivided. Used
       /// for paging and also when heighmap is too large for LOD to work.
-      public:  unsigned int numTerrainSubdivisions = 16u;
+      public: unsigned int numTerrainSubdivisions = 16u;
 
       /// \brief Event connections
       public: std::vector<event::ConnectionPtr> connections;
