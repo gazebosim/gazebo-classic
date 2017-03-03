@@ -2946,8 +2946,11 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    // commented out for now as sometimes physics light messages could arrive
+    // before the rendering light is created, e.g. light pose updates.
+    // See issue #1778
+    // gzerr << "Light [" << _msg->name() << "] not found."
+    //     << " Use topic ~/factory/light to spawn a new light." << std::endl;
     return false;
   }
   else
@@ -3145,7 +3148,8 @@ void Scene::SetShadowsEnabled(bool _value)
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->dataPtr->manager->setShadowTextureConfig(0, 1024, 1024,
+    this->dataPtr->manager->setShadowTextureConfig(0,
+        this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
         Ogre::PF_FLOAT32_RGBA, 0, 2);
     this->dataPtr->manager->setShadowDirectionalLightExtrusionDistance(75);
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
@@ -3165,7 +3169,8 @@ void Scene::SetShadowsEnabled(bool _value)
   else
   {
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
-    this->dataPtr->manager->setShadowTextureSize(512);
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
 
     // The default shadows.
     if (_value && this->dataPtr->manager->getShadowTechnique()
@@ -3182,7 +3187,56 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
+  return ShadowsEnabled();
+}
+
+/////////////////////////////////////////////////
+bool Scene::ShadowsEnabled() const
+{
   return this->dataPtr->sdf->Get<bool>("shadows");
+}
+
+/////////////////////////////////////////////////
+bool Scene::SetShadowTextureSize(const unsigned int _size)
+{
+  // check if texture size is a power of 2
+  if (!ignition::math::isPowerOfTwo(_size))
+  {
+    gzerr << "Shadow texture size must be a power of 2" << std::endl;
+    return false;
+  }
+  this->dataPtr->shadowTextureSize = _size;
+
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+  {
+    // RT Shader shadows
+    if (!RTShaderSystem::Instance()->SetShadowTextureSize(_size))
+      return false;
+
+    if (this->ShadowsEnabled())
+    {
+      // re-enable the shadows to take effect
+      this->SetShadowsEnabled(false);
+      this->SetShadowsEnabled(true);
+    }
+  }
+  else
+  {
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::ShadowTextureSize() const
+{
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+    return RTShaderSystem::Instance()->ShadowTextureSize();
+  else
+    return this->dataPtr->shadowTextureSize;
 }
 
 /////////////////////////////////////////////////

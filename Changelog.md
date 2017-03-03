@@ -5,8 +5,14 @@
 1. Cache heightmap tile data
     * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
 
+1. Add plugin for attaching lights to links in a model
+    * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
+
 1. Support Heightmap LOD
     * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
+
+1. Support setting shadow texture size
+    * [Pull request 2644](https://bitbucket.org/osrf/gazebo/pull-request/2644)
 
 ## Gazebo 7.5.0 (2017-01-11)
 

@@ -159,7 +159,7 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   if (_msg->geometry().heightmap().has_sampling())
   {
     unsigned int s = _msg->geometry().heightmap().sampling();
-    if (s == 0u || s & (s - 1u))
+    if (!ignition::math::isPowerOfTwo(s))
     {
       gzerr << "Heightmap sampling value must be a power of 2. "
             << "The default value of 2 will be used instead." << std::endl;
