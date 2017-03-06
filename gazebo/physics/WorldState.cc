@@ -176,6 +176,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   {
     auto insertionsElem = _elem->GetElement("insertions");
 
+    // Models
     if (insertionsElem->HasElement("model"))
     {
       auto modelElem = insertionsElem->GetElement("model");
@@ -184,6 +185,18 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       {
         this->insertions.push_back(modelElem->ToString(""));
         modelElem = modelElem->GetNextElement("model");
+      }
+    }
+
+    // Lights
+    if (insertionsElem->HasElement("light"))
+    {
+      auto lightElem = insertionsElem->GetElement("light");
+
+      while (lightElem)
+      {
+        this->insertions.push_back(lightElem->ToString(""));
+        lightElem = lightElem->GetNextElement("light");
       }
     }
   }

@@ -526,45 +526,6 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
-        // Process insertions
-        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
-        {
-          sdf::ElementPtr modelElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "insertions")->GetElement("model");
-
-          while (modelElem)
-          {
-            auto name = modelElem->GetAttribute("name")->GetAsString();
-            if (!this->GetModel(name))
-            {
-              ModelPtr model = this->LoadModel(modelElem,
-                  this->dataPtr->rootElement);
-              model->Init();
-
-              // Disabling plugins on playback
-              // model->LoadPlugins();
-            }
-
-            modelElem = modelElem->GetNextElement("model");
-          }
-        }
-
-        // Process deletions
-        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-        {
-          sdf::ElementPtr nameElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "deletions")->GetElement("name");
-
-          while (nameElem)
-          {
-            transport::requestNoReply(this->GetName(), "entity_delete",
-                                      nameElem->Get<std::string>());
-            nameElem = nameElem->GetNextElement("name");
-          }
-        }
-
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
@@ -2094,8 +2055,13 @@ void World::SetState(const WorldState &_state)
   {
     this->dataPtr->factorySDF->Root()->ClearElements();
 
+    std::stringstream sdfStr;
+    sdfStr << "<sdf version='" << SDF_VERSION << "'>"
+           << insertion
+           << "</sdf>";
+
     // SDF Parsing happens here
-    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    if (!sdf::readString(sdfStr.str(), this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
       continue;
@@ -2160,6 +2126,7 @@ void World::SetState(const WorldState &_state)
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        light->Init();
       }
       catch(...)
       {

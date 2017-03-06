@@ -715,8 +715,7 @@ TEST_F(PhysicsTest, StateInsertion)
 
   // Insertions
   std::stringstream newModelStr;
-  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
-              << "<model name ='" << newModelName << "'>"
+  newModelStr << "<model name ='" << newModelName << "'>"
               << "<link name ='link'>"
               << "  <collision name ='collision'>"
               << "    <geometry>"
@@ -729,15 +728,12 @@ TEST_F(PhysicsTest, StateInsertion)
               << "    </geometry>"
               << "  </visual>"
               << "</link>"
-              << "</model>"
-              << "</sdf>";
+              << "</model>";
 
   std::stringstream newLightStr;
-  newLightStr << "<sdf version='" << SDF_VERSION << "'>"
-              << "<light name ='" << newLightName << "' type='spot'>"
+  newLightStr << "<light name ='" << newLightName << "' type='spot'>"
               << "<diffuse>0 1 0 1</diffuse>"
-              << "</light>"
-              << "</sdf>";
+              << "</light>";
 
   std::vector<std::string> insertions;
   insertions.push_back(newModelStr.str());
