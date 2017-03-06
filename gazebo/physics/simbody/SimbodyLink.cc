@@ -612,19 +612,6 @@ bool SimbodyLink::GetEnabled() const
 }
 
 /////////////////////////////////////////////////
-void SimbodyLink::SetDirtyPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetDirtyPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 void SimbodyLink::SetDirtyPose(const ignition::math::Pose3d &_pose)
 {
   this->dirtyPose = _pose;

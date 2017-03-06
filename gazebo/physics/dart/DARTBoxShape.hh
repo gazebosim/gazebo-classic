@@ -17,7 +17,6 @@
 #ifndef GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
 #define GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"

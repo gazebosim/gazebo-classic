@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"

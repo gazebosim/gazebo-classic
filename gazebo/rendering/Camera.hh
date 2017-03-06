@@ -213,8 +213,6 @@ namespace gazebo
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      /// \deprecated See function that returns an ignition::math object.
-      /// \sa VFOV
       public: ignition::math::Angle VFOV() const;
 
       /// \brief Set the image size

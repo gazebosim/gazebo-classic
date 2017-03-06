@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include <boost/filesystem.hpp>
 
 #include <ignition/math/Rand.hh>
