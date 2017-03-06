@@ -86,12 +86,12 @@ namespace gazebo
 
       /// \brief Add a new contact.
       ///
-      /// Noramlly this is only used by a Physics/Collision engine when
+      /// Normally this is only used by a Physics/Collision engine when
       /// a new contact is generated. All other users should just make use
       /// of the accessor functions.
       ///
       /// If no one is listening, then the return value will be NULL (unless
-      /// it was explicitly enforced with \e SetEnforceContacts())).
+      /// SetNeverDropContacts(true) was called).
       /// This is then a signal to the Physics engine that it can skip the
       /// extra processing necessary to get back contact information.
       ///
@@ -101,21 +101,21 @@ namespace gazebo
       ///
       /// \return The new contact. The physics engine should populate the
       /// contact's parameters. NULL will be returned if there are no
-      /// subscribers to the contact topic and ContactsEnforced()
+      /// subscribers to the contact topic and NeverDropContacts()
       /// returns false (default).
       public: Contact *NewContact(Collision *_collision1,
                                   Collision *_collision2,
                                   const common::Time &_time);
 
-      /// \brief Enforces the addition of new contacts
-      /// with NewContact(), even if there are no subscribers.
-      /// \param[in] _enforce flag to set enforcement of contact computation
-      public: void SetEnforceContacts(const bool _enforce);
+      /// \brief If set to true, NewContact() will always add contacts
+      /// even if there are no subscribers.
+      /// \param[in] _neverDrop flag to set neverDropment of contact computation
+      public: void SetNeverDropContacts(const bool _neverDrop);
 
-      /// \brief returns the value last set with SetEnforceContacts().
-      /// \return the value last set with SetEnforceContacts().
-      /// If SetEnforceContacts() was never called, this will return false.
-      public: bool ContactsEnforced() const;
+      /// \brief returns the value last set with SetNeverDropContacts().
+      /// \return the value last set with SetNeverDropContacts().
+      /// If SetNeverDropContacts() was never called, this will return false.
+      public: bool NeverDropContacts() const;
 
       /// \brief Returns true if any subscribers are connected
       /// which would be interested in contact details of either collision
@@ -132,8 +132,8 @@ namespace gazebo
       /// Unless there are any benefits in calling this function ahead of
       /// NewContact, it may be better to just use NewContact() directly.
       /// Also note that in order to exclude that NewContact() returns NULL,
-      /// it is advisable to check ContactsEnforced() first (if it returns
-      /// true, NewContacts never returns NULL).
+      /// it is advisable to check NeverDropContacts() first (if it returns
+      /// true, NewContacts() never returns NULL).
       /// \param[in] _collision1 the first collision object
       /// \param[in] _collision2 the second collision object
       /// \return true if any subscribers are connected for this pair
@@ -246,10 +246,10 @@ namespace gazebo
       /// \brief Contact publisher.
       private: ignition::transport::Node::Publisher contactPubIgn;
 
-      /// \brief Enforces the addition of new contacts.
-      /// Takes effect if NewContact() is called if there
+      /// \brief Addition of new contacts happens also with no subscribers.
+      /// This takes effect if NewContact() is called if there
       /// are no subscribers. Default is false.
-      private: bool enforceContacts;
+      private: bool neverDropContacts;
     };
     /// \}
   }

@@ -41,7 +41,7 @@ ContactManager::ContactManager()
 {
   this->contactIndex = 0;
   this->customMutex = new boost::recursive_mutex();
-  this->enforceContacts = false;
+  this->neverDropContacts = false;
 }
 
 /////////////////////////////////////////////////
@@ -84,15 +84,15 @@ void ContactManager::Init(WorldPtr _world)
 }
 
 /////////////////////////////////////////////////
-void ContactManager::SetEnforceContacts(const bool _enforce)
+void ContactManager::SetNeverDropContacts(const bool _neverDrop)
 {
-  this->enforceContacts = _enforce;
+  this->neverDropContacts = _neverDrop;
 }
 
 /////////////////////////////////////////////////
-bool ContactManager::ContactsEnforced() const
+bool ContactManager::NeverDropContacts() const
 {
-  return this->enforceContacts;
+  return this->neverDropContacts;
 }
 
 /////////////////////////////////////////////////
@@ -210,7 +210,7 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   // for this->contactPub->HasConnections() condition?
   GetCustomPublishers(_collision1, _collision2, getOnlyConnected, publishers);
 
-  if (this->ContactsEnforced() ||
+  if (this->NeverDropContacts() ||
       this->contactPub->HasConnections() ||
       !publishers.empty())
   {
