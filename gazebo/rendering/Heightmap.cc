@@ -318,7 +318,7 @@ void Heightmap::UpdateTerrainHash(const std::string &_hash,
 }
 
 //////////////////////////////////////////////////
-bool Heightmap::PrepareTerrainPaging(
+bool Heightmap::PrepareTerrain(
     const boost::filesystem::path &_terrainDirPath)
 {
   std::string heightmapHash;
@@ -493,6 +493,13 @@ void Heightmap::Load()
     return;
   }
 
+  if (!ignition::math::isPowerOfTwo(this->dataPtr->dataSize - 1))
+  {
+    gzerr << "Heightmap image size must be square, with a size of 2^n+1"
+        << std::endl;
+    return;
+  }
+
   boost::filesystem::path imgPath;
   boost::filesystem::path terrainName;
   boost::filesystem::path terrainDirPath;
@@ -516,9 +523,6 @@ void Heightmap::Load()
     }
   }
 
-  if (!ignition::math::isPowerOfTwo(this->dataPtr->dataSize - 1))
-    gzthrow("Heightmap image size must be square, with a size of 2^n+1\n");
-
   // If the paging is enabled we modify the number of subterrains
   if (this->dataPtr->useTerrainPaging)
   {
@@ -527,7 +531,7 @@ void Heightmap::Load()
   }
   else
   {
-    prefix = terrainDirPath / "gazebo_terrain_nocache";
+    prefix = terrainDirPath / "gazebo_terrain";
   }
 
   double sqrtN = sqrt(nTerrains);
@@ -585,11 +589,10 @@ void Heightmap::Load()
     }
   }
 
+  this->dataPtr->terrainHashChanged = this->PrepareTerrain(terrainDirPath);
+
   if (this->dataPtr->useTerrainPaging)
   {
-    this->dataPtr->terrainHashChanged =
-        this->PrepareTerrainPaging(terrainDirPath);
-
     if (this->dataPtr->terrainHashChanged)
     {
       // Split the terrain. Every subterrain will be saved on disk and paged
@@ -624,12 +627,19 @@ void Heightmap::Load()
         0, 0, sqrtN - 1, sqrtN - 1);
   }
 
+  gzmsg << "Loading heightmap: " << terrainName.string() << std::endl;
+  common::Time time = common::Time::GetWallTime();
+
   for (int y = 0; y <= sqrtN - 1; ++y)
     for (int x = 0; x <= sqrtN - 1; ++x)
       this->DefineTerrain(x, y);
 
   // Sync load since we want everything in place when we start
   this->dataPtr->terrainGroup->loadAllTerrains(true);
+
+  gzmsg << "Heightmap loaded. Process took: "
+        <<  (common::Time::GetWallTime() - time).Double()
+        << " seconds" << std::endl;
 
   // Calculate blend maps
   if (this->dataPtr->terrainsImported)
@@ -641,17 +651,41 @@ void Heightmap::Load()
       Ogre::Terrain *t = ti.getNext()->instance;
       this->InitBlendMaps(t);
     }
-
-    // saving an ogre terrain dat file can take quite some time for large dems.
-    // so save only if doing terrain paging for now
-    if (this->dataPtr->terrainHashChanged && this->dataPtr->useTerrainPaging)
-    {
-      // Save all subterrains using files.
-      this->dataPtr->terrainGroup->saveAllTerrains(true);
-    }
   }
 
   this->dataPtr->terrainGroup->freeTemporaryResources();
+
+  // save the terrain once its loaded
+  if (this->dataPtr->terrainsImported)
+  {
+    this->dataPtr->connections.push_back(
+        event::Events::ConnectPreRender(
+        std::bind(&Heightmap::SaveHeightmap, this)));
+  }
+}
+
+///////////////////////////////////////////////////
+void Heightmap::SaveHeightmap()
+{
+  // Calculate blend maps
+  if (this->dataPtr->terrainsImported &&
+      !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
+  {
+    // saving an ogre terrain data file can take quite some time for large dems.
+    gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
+        boost::filesystem::path(this->dataPtr->filename).stem()).string()
+        << std::endl;
+    common::Time time = common::Time::GetWallTime();
+
+    this->dataPtr->terrainGroup->saveAllTerrains(true);
+
+    gzmsg << "Heightmap cache data saved. Process took: "
+          << (common::Time::GetWallTime() - time).Double() << " seconds."
+          << std::endl;
+
+    this->dataPtr->terrainsImported = false;
+    this->dataPtr->connections.clear();
+  }
 }
 
 ///////////////////////////////////////////////////
@@ -774,23 +808,46 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
 {
   Ogre::String filename = this->dataPtr->terrainGroup->generateFilename(_x, _y);
 
+  bool resourceExists =
+      Ogre::ResourceGroupManager::getSingleton().resourceExists(
+      this->dataPtr->terrainGroup->getResourceGroup(), filename);
+
   if (!this->dataPtr->useTerrainPaging)
   {
-    this->dataPtr->terrainGroup->defineTerrain(_x, _y,
-        &this->dataPtr->heights[0]);
-  }
-  else if ((Ogre::ResourceGroupManager::getSingleton().resourceExists(
-             this->dataPtr->terrainGroup->getResourceGroup(), filename)) &&
-          (!this->dataPtr->terrainHashChanged))
-  {
-    this->dataPtr->terrainGroup->defineTerrain(_x, _y);
-    this->dataPtr->terrainsImported = false;
+    if (resourceExists && !this->dataPtr->terrainHashChanged)
+    {
+      gzmsg << "Loading heightmap cache data: " << filename << std::endl;
+
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
+      this->dataPtr->terrainsImported = false;
+    }
+    else
+    {
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
+          &this->dataPtr->heights[0]);
+    }
   }
   else
   {
+    if (resourceExists && !this->dataPtr->terrainHashChanged)
+    {
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
+      this->dataPtr->terrainsImported = false;
+    }
+    else
+    {
+      // generate the subterrains if needed
+      if (this->dataPtr->subTerrains.empty())
+      {
+        this->SplitHeights(this->dataPtr->heights,
+            this->dataPtr->numTerrainSubdivisions,
+            this->dataPtr->subTerrains);
+      }
+
       this->dataPtr->terrainGroup->defineTerrain(_x, _y,
           &this->dataPtr->subTerrains[this->dataPtr->terrainIdx][0]);
       ++this->dataPtr->terrainIdx;
+    }
   }
 }
 
