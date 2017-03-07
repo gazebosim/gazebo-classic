@@ -247,6 +247,12 @@ namespace gazebo
       /// \param[in] _materialName Name of material
       public: void setMaterialByName(const std::string &_materialname);
 
+      /// \brief Set the grid size of the terrain, i.e. Number of terrain slots.
+      /// This will be used to determined how the texture will be mapped to the
+      /// terrain
+      /// \param[in] _materialName Name of material
+      public: void setGridSize(const unsigned int _size);
+
       /// \brief Subclassed to provide profile-specific material generation
       class Profile : public Ogre::TerrainMaterialGenerator::Profile
       {
@@ -290,6 +296,9 @@ namespace gazebo
 
       /// \brief Name of material
       protected: std::string materialName;
+
+      /// \brief Size of grid
+      protected: unsigned int gridSize = 1u;
     };
 
 
