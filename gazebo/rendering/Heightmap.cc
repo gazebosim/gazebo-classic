@@ -671,7 +671,7 @@ void Heightmap::SaveHeightmap()
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
-    // saving an ogre terrain dat file can take quite some time for large dems.
+    // saving an ogre terrain data file can take quite some time for large dems.
     gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
         boost::filesystem::path(this->dataPtr->filename).stem()).string()
         << std::endl;
