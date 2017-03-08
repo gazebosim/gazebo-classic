@@ -32,6 +32,7 @@ add_definitions(${QT_DEFINITIONS})
 
 set(tests
   aero_plugin.cc
+  attach_light_plugin.cc
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
@@ -92,6 +93,7 @@ set(tests
   #state_log.cc
   surface_properties.cc
   swarm.cc
+  touch_plugin.cc
   transceiver.cc
   transport.cc
   transporter.cc

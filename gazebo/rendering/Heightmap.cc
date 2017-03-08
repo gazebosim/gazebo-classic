@@ -158,7 +158,7 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
   if (_msg->geometry().heightmap().has_sampling())
   {
     unsigned int s = _msg->geometry().heightmap().sampling();
-    if (s == 0u || s & (s - 1u))
+    if (!ignition::math::isPowerOfTwo(s))
     {
       gzerr << "Heightmap sampling value must be a power of 2. "
             << "The default value of 2 will be used instead." << std::endl;
@@ -695,7 +695,7 @@ void Heightmap::SaveHeightmap()
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
-    // saving an ogre terrain dat file can take quite some time for large dems.
+    // saving an ogre terrain data file can take quite some time for large dems.
     gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
         boost::filesystem::path(this->dataPtr->filename).stem()).string()
         << std::endl;
@@ -1279,7 +1279,7 @@ void Heightmap::CreateMaterial()
     TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(
         this->dataPtr->materialName);
     if (this->dataPtr->splitTerrain)
-      terrainMaterial->setGridSize(this->dataPtr->subTerrains.size());
+      terrainMaterial->setGridSize(this->dataPtr->numTerrainSubdivisions);
     terrainMaterialGenerator.bind(terrainMaterial);
     this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
         terrainMaterialGenerator);
@@ -3313,6 +3313,8 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
 
   // clone the material
   mat = mat->clone(matName);
+  if (!mat->isLoaded())
+    mat->load();
 
   // size of grid in one direction
   unsigned int gridWidth =
@@ -3324,24 +3326,32 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
 
   for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
   {
-    auto tech = mat->getTechnique(i);
+    Ogre::Technique *tech = mat->getTechnique(i);
     for (unsigned int j = 0; j < tech->getNumPasses(); ++j)
     {
-      auto pass = tech->getPass(j);
+      Ogre::Pass *pass = tech->getPass(j);
+
+      // check if there is a fragment shader
+      if (!pass->hasFragmentProgram())
+        continue;
+
       Ogre::GpuProgramParametersSharedPtr params =
           pass->getFragmentProgramParameters();
+      if (params.isNull())
+        continue;
 
       // set up shadow split points in a way that is consistent with the
       // default ogre terrain material generator
       Ogre::PSSMShadowCameraSetup* pssm =
           RTShaderSystem::Instance()->GetPSSMShadowCameraSetup();
-      unsigned int numTextures = (uint)pssm->getSplitCount();
+      unsigned int numTextures =
+          static_cast<unsigned int>(pssm->getSplitCount());
       Ogre::Vector4 splitPoints;
       const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
           pssm->getSplitPoints();
       // populate from split point 1 not 0
       for (unsigned int t = 1u; t < numTextures; ++t)
-	      splitPoints[t-1] = splitPointList[t];
+        splitPoints[t-1] = splitPointList[t];
       params->setNamedConstant("pssmSplitPoints", splitPoints);
 
       // set up uv transform

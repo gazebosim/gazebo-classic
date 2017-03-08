@@ -471,7 +471,7 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d testPose(
-      ignition::math::Vector3d(0, 0, 10),
+      ignition::math::Vector3d(0, 0, 100),
       ignition::math::Quaterniond(0, 1.57, 0));
   SpawnCamera(modelName, cameraName, testPose.Pos(),
       testPose.Rot().Euler(), width, height, updateRate);
