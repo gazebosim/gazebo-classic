@@ -82,18 +82,18 @@ void BulletCollision::SetCollideBits(unsigned int _bits)
 {
   // Collide bits apply to the whole rigid body, so all sibling
   // collisions on the same link must have identical collide bits
-  auto numChildren = link->GetChildCount();
+  auto numChildren = this->link->GetChildCount();
   for (decltype(numChildren) c = 0; c < numChildren; ++c)
   {
-    BasePtr child = link->GetChild(c);
+    BasePtr child = this->link->GetChild(c);
     if (child->HasType(COLLISION))
     {
-      BulletCollision *col = dynamic_cast<BulletCollision*>(&*child);
+      BulletCollision *col = dynamic_cast<BulletCollision *>(&*child);
       col->GetSurface()->collideBitmask = _bits;
     }
   }
 
-  BulletLink *bulletLink = dynamic_cast<BulletLink*>(&*this->parent);
+  BulletLink *bulletLink = dynamic_cast<BulletLink *>(&*this->parent);
 
   // Set mask and group because BulletRayShape still uses them, TODO remove
   btRigidBody *bod = bulletLink->GetBulletLink();

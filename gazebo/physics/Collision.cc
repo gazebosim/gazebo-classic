@@ -132,7 +132,7 @@ void Collision::Init()
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
 {
-  SetPlaceable(_placeable);
+  this->SetPlaceable(_placeable);
 
   if (this->IsStatic())
   {
@@ -148,7 +148,7 @@ void Collision::SetCollision(bool _placeable)
 }
 
 //////////////////////////////////////////////////
-void Collision::SetPlaceable(bool _placeable)
+void Collision::SetPlaceable(const bool _placeable)
 {
   this->placeable = _placeable;
 }

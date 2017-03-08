@@ -520,8 +520,7 @@ void BulletLink::RemoveAndAddBody() const
   bulletWorld->removeRigidBody(this->rigidLink);
 
   unsigned int collideBits = GZ_ALL_COLLIDE;
-  for (auto iter = this->children.begin();
-         iter != this->children.end(); ++iter)
+  for (auto iter = this->children.begin(); iter != this->children.end(); ++iter)
   {
     if ((*iter)->HasType(Base::COLLISION))
     {
@@ -533,7 +532,6 @@ void BulletLink::RemoveAndAddBody() const
 
   bulletWorld->addRigidBody(this->rigidLink, collideBits, collideBits);
 }
-
 
 //////////////////////////////////////////////////
 void BulletLink::ClearCollisionCache()
