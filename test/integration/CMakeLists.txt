@@ -93,6 +93,7 @@ set(tests
   #state_log.cc
   surface_properties.cc
   swarm.cc
+  touch_plugin.cc
   transceiver.cc
   transport.cc
   transporter.cc
