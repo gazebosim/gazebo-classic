@@ -18,7 +18,6 @@
 #ifndef GAZEBO_TEST_INTEGRATION_FORCETORQUEVISUALIZATION_TEST_HH_
 #define GAZEBO_TEST_INTEGRATION_FORCETORQUEVISUALIZATION_TEST_HH_
 
-#include <string>
 #include "gazebo/gui/QTestFixture.hh"
 
 /// \brief A test class for the force torque sensor visualization using
