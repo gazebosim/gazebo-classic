@@ -443,6 +443,9 @@ namespace gazebo
       /// \brief Max pixel error allowed for rendering the heightmap. This
       /// affects the transitions between LOD levels.
       public: double maxPixelError = 0.0;
+
+      /// \brief Event connections
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

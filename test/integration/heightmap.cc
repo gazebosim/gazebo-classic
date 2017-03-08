@@ -59,6 +59,9 @@ class HeightmapTest : public ServerFixture,
   /// \brief Test loading a heightmap with an LOD visual plugin
   public: void LODVisualPlugin();
 
+/// \brief Test loading a heightmap and verify cache files are created
+  public: void HeightmapCache();
+
   public: void NotSquareImage();
   public: void InvalidSizeImage();
   // public: void Heights(const std::string &_physicsEngine);
@@ -561,6 +564,69 @@ void HeightmapTest::LODVisualPlugin()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::HeightmapCache()
+{
+  // path to heightmap cache files
+  std::string heightmapName = "heightmap_bowl";
+  std::string heightmapDir(common::SystemPaths::Instance()->GetLogPath()
+      + "/paging");
+  std::string shaPath = heightmapDir + "/" + heightmapName + "/gzterrain.SHA1";
+  std::string cachePath = heightmapDir +
+      "/" + heightmapName + "/gazebo_terrain_00000000.dat";
+
+  // temporary backup files for testing if cache files exist.
+  std::string shaPathBk = shaPath + ".bk";
+  std::string cachePathBk = cachePath + ".bk";
+  if (common::exists(shaPath))
+    common::moveFile(shaPath, shaPathBk);
+  if (common::exists(cachePath))
+    common::moveFile(cachePath, cachePathBk);
+
+  // there should be no cache files
+  EXPECT_FALSE(common::exists(shaPath));
+  EXPECT_FALSE(common::exists(cachePath));
+
+  // load a heightmap
+  Load("worlds/heightmap_test.world", false);
+  physics::ModelPtr heightmap = this->GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_NE(scene, nullptr);
+
+  // make sure scene is initialized and running
+  int sleep = 0;
+  int maxSleep = 30;
+  while (scene->SimTime().Double() < 2.0 && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // make sure we have the heightmap object
+  rendering::Heightmap *h = scene->GetHeightmap();
+  EXPECT_NE(h, nullptr);
+
+  // verify new sha-1 file exists
+  EXPECT_TRUE(common::exists(shaPath));
+  EXPECT_TRUE(common::isFile(shaPath));
+
+  // wait for the terrain tile cache to be saved
+  sleep = 0;
+  while (!common::exists(cachePath) && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  // verify that terrain tile cache exists
+  EXPECT_TRUE(common::exists(cachePath));
+  EXPECT_TRUE(common::isFile(cachePath));
+
+  // clean up by moving old files back
+  if (common::exists(shaPathBk))
+    common::moveFile(shaPathBk, shaPath);
+  if (common::exists(cachePathBk))
+    common::moveFile(cachePathBk, cachePath);
+  EXPECT_FALSE(common::exists(shaPathBk));
+  EXPECT_FALSE(common::exists(cachePathBk));
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -630,6 +696,12 @@ TEST_F(HeightmapTest, NoVisual)
 TEST_F(HeightmapTest, LODVisualPlugin)
 {
   LODVisualPlugin();
+}
+
+/////////////////////////////////////////////////
+TEST_F(HeightmapTest, HeightmapCache)
+{
+  HeightmapCache();
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, HeightmapTest, PHYSICS_ENGINE_VALUES);
