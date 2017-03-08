@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Force / torque sensor visualization using WrenchVishal
+    * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
+
 1. Add plugin for attaching lights to links in a model
     * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
 
