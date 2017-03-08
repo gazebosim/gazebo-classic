@@ -218,13 +218,14 @@ bool MarkerManagerPrivate::ProcessMarkerMsg(const ignition::msgs::Marker &_msg)
   // Otherwise generate unique id
   else
   {
-    id = ignition::math::Rand::IntUniform(0, IGN_INT32_MAX);
+    id = ignition::math::Rand::IntUniform(0, ignition::math::MAX_I32);
 
     // Make sure it's unique if namespace is given
     if (nsIter != this->markers.end())
     {
       while (nsIter->second.find(id) != nsIter->second.end())
-        id = ignition::math::Rand::IntUniform(IGN_UINT32_MIN, IGN_UINT32_MAX);
+        id = ignition::math::Rand::IntUniform(ignition::math::MIN_UI32,
+                                              ignition::math::MAX_UI32);
     }
   }
 

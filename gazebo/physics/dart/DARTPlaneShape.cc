@@ -27,13 +27,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
-  : PlaneShape(_parent),
-    dataPtr(new DARTPlaneShapePrivate())
-{
-}
-
-//////////////////////////////////////////////////
 DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())

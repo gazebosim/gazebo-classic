@@ -138,44 +138,12 @@ dart::dynamics::BodyNode *DARTCollision::DARTBodyNode() const
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::Shape * /* *_shape*/,
-                                          bool _placeable)
-{
-  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool)\n";
-  Collision::SetCollision(_placeable);
-}
-
-//////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr /* _shape*/,
-                                          bool _placeable)
-{
-  gzerr << "Deprecated. Use SetDARTCollisionShapeNode(ShapePtr, bool)\n";
-  Collision::SetCollision(_placeable);
-}
-
-//////////////////////////////////////////////////
 void DARTCollision::SetDARTCollisionShapeNode(
                                           dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
   this->dataPtr->dtCollisionShape = _shape;
-}
-
-//////////////////////////////////////////////////
-dart::dynamics::ShapePtr DARTCollision::DARTCollisionShapePtr() const
-{
-  gzerr << "Deprecated. Use DARTCollisionShapeNode() instead.\n";
-  GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
-  return this->dataPtr->dtCollisionShape->getShape();
-}
-
-//////////////////////////////////////////////////
-dart::dynamics::Shape *DARTCollision::DARTCollisionShape() const
-{
-  gzerr << "Deprecated. Use DARTCollisionShapeNode() instead.\n";
-  GZ_ASSERT(this->dataPtr->dtCollisionShape != nullptr, "Shape node is NULL");
-  return this->dataPtr->dtCollisionShape->getShape().get();
 }
 
 //////////////////////////////////////////////////

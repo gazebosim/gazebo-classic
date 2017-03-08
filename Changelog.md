@@ -7,10 +7,24 @@
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
     * [Pull request #2603](https://bitbucket.org/osrf/gazebo/pull-request/2603)
     * [Pull request #2604](https://bitbucket.org/osrf/gazebo/pull-request/2604)
+    * [Pull request #2627](https://bitbucket.org/osrf/gazebo/pull-request/2627)
+
+1. Bullet: sending feedback on contact points on depth 0 as well
+    * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
+
+1. Deprecate functions to set linear/angular acceleration 
+    * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix loading gui plugins and OSX framerate issue
+    * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
+    * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
+    * [Issue #2133](https://bitbucket.org/osrf/gazebo/issues/2133)
+
+## Gazebo 8.0.0 (2017-01-25)
 
 1. Depend on ignition math3
     * [Pull request #2588](https://bitbucket.org/osrf/gazebo/pull-request/2588)
@@ -273,6 +287,11 @@
         * [Issue #1698](https://bitbucket.org/osrf/gazebo/issues/1698)
 
 ## Gazebo 7
+
+## Gazebo 7.X.X (201X-XX-XX)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
 
 ## Gazebo 7.5.0 (2017-01-11)
 

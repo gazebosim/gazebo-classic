@@ -27,20 +27,11 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTCylinderShape::DARTCylinderShape(CollisionPtr _parent)
-  : CylinderShape(_parent),
-    dataPtr(new DARTCylinderShapePrivate())
-{
-  gzerr <<"Deprecated. Use other DARTCylinderShape constructor.\n";
-}
-
-//////////////////////////////////////////////////
 DARTCylinderShape::DARTCylinderShape(DARTCollisionPtr _parent)
   : CylinderShape(_parent),
     dataPtr(new DARTCylinderShapePrivate())
 {
 }
-
 
 //////////////////////////////////////////////////
 DARTCylinderShape::~DARTCylinderShape()

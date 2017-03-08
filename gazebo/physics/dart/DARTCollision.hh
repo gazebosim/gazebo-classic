@@ -80,35 +80,12 @@ namespace gazebo
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
-      /// \deprecated See version that accepts dart::dynamics::ShapePtr
-      public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         const bool _placeable = true)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set DART collision shape.
-      /// \param[in] _shape DART Collision shape
-      /// \param[in] _placeable True to make the object movable.
-      public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
-                                         const bool _placeable = true)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set DART collision shape.
-      /// \param[in] _shape DART Collision shape
-      /// \param[in] _placeable True to make the object movable.
       public: void SetDARTCollisionShapeNode(
                            dart::dynamics::ShapeNodePtr _shape,
-                           bool _placeable = true);
-
-
-      /// \brief Get DART collision shape.
-      public: dart::dynamics::Shape *DARTCollisionShape() const
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get DART collision shape.
-      public: dart::dynamics::ShapePtr DARTCollisionShapePtr() const
-              GAZEBO_DEPRECATED(8.0);
+                           const bool _placeable = true);
 
       /// \brief Get DART collision shape node.
+      /// \return DART Collision shape pointer.
       public: dart::dynamics::ShapeNodePtr DARTCollisionShapeNode() const;
 
 

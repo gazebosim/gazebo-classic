@@ -22,7 +22,6 @@
 #include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -138,27 +137,11 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent = ModelPtr()) = 0;
 
-      /// \brief Return the gravity vector.
-      /// \deprecated See World::Gravity() const
-      /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the gravity vector.
-      /// \param[in] _gravity New gravity vector.
-      /// \deprecated See function that accepts an ignition math object.
-      public: virtual void SetGravity(
-          const gazebo::math::Vector3 &_gravity) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
                   const ignition::math::Vector3d &_gravity) = 0;
-
-      /// \brief Return the magnetic field vector.
-      /// \deprecated See World::MagneticField() const
-      /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const
-              GAZEBO_DEPRECATED(8.0);
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map

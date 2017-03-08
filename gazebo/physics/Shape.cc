@@ -47,19 +47,6 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Shape::GetScale() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Scale();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Shape::Scale() const
 {
   return this->scale;
@@ -81,15 +68,3 @@ double Shape::ComputeVolume() const
   return size.X() * size.Y() * size.Z();
 }
 
-//////////////////////////////////////////////////
-void Shape::SetScale(const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->SetScale(_scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}

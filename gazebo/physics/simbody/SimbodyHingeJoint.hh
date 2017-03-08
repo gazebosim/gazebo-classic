@@ -20,7 +20,6 @@
 
 #include <vector>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
