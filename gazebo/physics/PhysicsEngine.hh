@@ -75,10 +75,12 @@ namespace gazebo
       /// the collision states of the world, including contact information,
       /// and PhysicsEngine::UpdatePhysics() will update the dynamics of
       /// the world, i.e. advance the world and react to the collision state.
-      /// However for some physics engines, both is done in one step, and
-      /// all needs to be done in PhysicsEngine::UpdatePhysics(), in which
-      /// case it is possible that PhysicsEngine::UpdateCollision does not
-      /// actually update collision and contact information.
+      /// However for some physics engines, both is done in one step, or
+      /// providing the contact information separately in UpdateCollision()
+      /// would mean double work, as it can't be avoided to be done again
+      /// in PhysicsEngine::UpdatePhysics() - in this case it is better that
+      /// PhysicsEngine::UpdateCollision does not actually update collision
+      /// and contact information, and instead leaves it to UpdatePhysics().
       /// There should be one exception however when it still does make this
       /// update: If World::PhysicsEnabled() returns false, and therefore
       /// PhysicsEngine::UpdatePhysics() will not be called in the update
