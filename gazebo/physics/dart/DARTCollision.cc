@@ -124,10 +124,15 @@ unsigned int DARTCollision::GetCollideBits() const
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
-  ignition::math::Box result(0, 0, 0, 0, 0, 0);
+  const dart::math::BoundingBox& bb =
+    this->dataPtr->dtCollisionShape->getShape()->getBoundingBox();
 
-  gzerr << "DART does not provide bounding box info.\n";
-
+  ignition::math::Box result(bb.getMin().x(),
+                             bb.getMin().y(),
+                             bb.getMin().z(),
+                             bb.getMax().x(),
+                             bb.getMax().y(),
+                             bb.getMax().z());
   return result;
 }
 
