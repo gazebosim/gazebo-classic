@@ -853,6 +853,11 @@ void World::Fini()
   this->dataPtr->publishModelScales.clear();
   this->dataPtr->publishLightPoses.clear();
 
+  if (!this->dataPtr->worldUpdateMutex)
+    return;
+
+  boost::recursive_mutex::scoped_lock lk(*this->dataPtr->worldUpdateMutex);
+
   // Clean entities
   for (auto &model : this->dataPtr->models)
   {
@@ -912,6 +917,7 @@ void World::Fini()
 
   if (this->dataPtr->worldUpdateMutex)
   {
+    lk.unlock();
     delete this->dataPtr->worldUpdateMutex;
     this->dataPtr->worldUpdateMutex = nullptr;
   }
