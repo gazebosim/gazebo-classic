@@ -73,7 +73,8 @@ void WrenchVisual::Fini()
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
   dPtr->wrenchSub.reset();
-  dPtr->node->Fini();
+  if (dPtr->node)
+    dPtr->node->Fini();
   dPtr->node.reset();
   dPtr->connections.clear();
 
@@ -83,7 +84,7 @@ void WrenchVisual::Fini()
   if (dPtr->forceVisual && dPtr->forceLine)
     dPtr->forceVisual->DeleteDynamicLine(dPtr->forceLine);
 
-  if (dPtr->forceVisual &&
+  if (dPtr->scene && dPtr->forceVisual &&
       dPtr->scene->GetVisual(dPtr->forceVisual->GetName()))
   {
     dPtr->scene->RemoveVisual(dPtr->forceVisual);
