@@ -53,6 +53,7 @@ void ForceTorqueVisualizationTest::WrenchVisual()
   // Enable sensor visualizations
   QVERIFY(!scene->EnableVisualizations());
   scene->EnableVisualizations(true);
+  QVERIFY(scene->EnableVisualizations());
 
   this->ProcessEventsAndDraw(mainWindow);
 
