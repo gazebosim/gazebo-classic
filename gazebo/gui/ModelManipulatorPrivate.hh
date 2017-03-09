@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define _MODEL_MANIPULATOR_PRIVATE_HH_
 
 #include <string>
+#include <vector>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/common/KeyEvent.hh"
@@ -46,20 +47,15 @@ namespace gazebo
       /// \brief Keep track of the mouse start screen position.
       public: math::Vector2i mouseStart;
 
-      /// \brief The current selected visual.
-      public: rendering::VisualPtr selectedVis;
-
       /// \brief The current visual attached to the mouse.
       public: rendering::VisualPtr mouseMoveVis;
 
       /// \brief Transportation node.
       public: transport::NodePtr node;
 
-      /// \brief Model publisher that publishes model pose to the server.
-      public: transport::PublisherPtr modelPub;
-
-      /// \brief Light publisher that publishes light pose to the server.
-      public: transport::PublisherPtr lightPub;
+      /// \brief Publish user command messages for the server to place in the
+      /// undo queue.
+      public: transport::PublisherPtr userCmdPub;
 
       /// \brief Pointer to the user camera.
       public: rendering::UserCameraPtr userCamera;
@@ -78,6 +74,9 @@ namespace gazebo
 
       /// \brief Scale of the visual attached to the mouse.
       public: math::Vector3 mouseVisualScale;
+
+      /// \brief Scale of all the child visuals attached to the mouse.
+      public: std::vector<math::Vector3> mouseChildVisualScale;
 
       /// \brief Bounding box of the visual attached to the mouse (for scaling).
       public: math::Box mouseVisualBbox;

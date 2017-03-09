@@ -1,3 +1,7 @@
+if (WIN32)
+    add_definitions(-DBUILDING_DLL)
+endif()
+
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -25,5 +29,5 @@ set (plugins
 
 foreach (src ${plugins})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo gazebo_sensors ${ogre_libraries})
+  target_link_libraries(${src} libgazebo ${ogre_libraries})
 endforeach (src ${plugins})

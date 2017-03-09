@@ -34,7 +34,7 @@
 # Revision $Id: check_test_ran.py 16671 2012-04-27 16:15:28Z dthomas $
 
 """
-Writes a test failure out to test file if it doesn't exist.
+Writes a test failure out to test file if it doesn't exist or is empty.
 """
 
 # Adapted from rosunit/check_test_ran.py
@@ -97,11 +97,11 @@ def check_main():
                 else:
                     pid = m.group(1)
                     print("killing gzserver with pid %s" % (pid))
-                    subprocess.call(["kill", "%s" % (pid)])
+                    subprocess.call(["kill", "-9", "%s" % (pid)])
 
     print("Checking for test results in %s"%test_file)
     
-    if not os.path.exists(test_file):
+    if not os.path.exists(test_file) or os.path.getsize(test_file) == 0:
         if not os.path.exists(os.path.dirname(test_file)):
             os.makedirs(os.path.dirname(test_file))
             

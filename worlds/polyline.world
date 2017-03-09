@@ -55,7 +55,7 @@
               <name>Gazebo/Red</name>
             </script>
           </material>
-        </visual>  
+        </visual>
       </link>
     </model>
 
@@ -94,7 +94,7 @@
               <name>Gazebo/Blue</name>
             </script>
           </material>
-        </visual>  
+        </visual>
       </link>
     </model>
 
@@ -130,7 +130,63 @@
               <name>Gazebo/Yellow</name>
             </script>
           </material>
-        </visual>  
+        </visual>
+      </link>
+    </model>
+
+    <model name="letter">
+      <pose>2 2 0 0 0 0</pose>
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <polyline>
+              <point>2.27467 1.0967</point>
+              <point>1.81094 2.35418</point>
+              <point>2.74009 2.35418</point>
+              <height>1.0</height>
+            </polyline>
+            <polyline>
+              <point>2.08173 0.7599</point>
+              <point>2.4693 0.7599</point>
+              <point>3.4323 3.28672</point>
+              <point>3.07689 3.28672</point>
+              <point>2.84672 2.63851</point>
+              <point>1.7077 2.63851</point>
+              <point>1.47753 3.28672</point>
+              <point>1.11704 3.28672</point>
+              <height>1.0</height>
+            </polyline>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <polyline>
+              <point>2.27467 1.0967</point>
+              <point>1.81094 2.35418</point>
+              <point>2.74009 2.35418</point>
+              <height>1.0</height>
+            </polyline>
+            <polyline>
+              <point>2.08173 0.7599</point>
+              <point>2.4693 0.7599</point>
+              <point>3.4323 3.28672</point>
+              <point>3.07689 3.28672</point>
+              <point>2.84672 2.63851</point>
+              <point>1.7077 2.63851</point>
+              <point>1.47753 3.28672</point>
+              <point>1.11704 3.28672</point>
+              <height>1.0</height>
+            </polyline>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
       </link>
     </model>
   </world>

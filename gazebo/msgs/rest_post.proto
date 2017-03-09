@@ -1,0 +1,19 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestPost
+/// \brief A message to POST data on a REST service. The route (ex /news) and
+/// the content of the message in JSON format are specified.
+
+message RestPost
+{
+  /// \brief ID of this request message
+  optional uint32 id    = 1;
+
+  /// \brief Route to post to.
+  required string route = 2;
+
+  /// \brief Data to post in JSON format
+  required string json  = 3;
+}

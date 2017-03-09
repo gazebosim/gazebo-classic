@@ -1,0 +1,18 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface LogPlaybackStatistics
+/// \brief A message with statistics about a log during playback.
+
+
+import "time.proto";
+
+message LogPlaybackStatistics
+{
+  /// \brief Log start time
+  required Time start_time = 1;
+
+  /// \brief Log end time
+  required Time end_time   = 2;
+}

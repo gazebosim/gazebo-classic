@@ -10,12 +10,24 @@ include_directories(SYSTEM
   ${CMAKE_SOURCE_DIR}/deps/opende/OPCODE
   ${CMAKE_SOURCE_DIR}/deps/opende/GIMPACT/include
   ${CMAKE_SOURCE_DIR}/deps/threadpool
+  ${Boost_INCLUDE_DIRS}
   ${CCD_INCLUDE_DIRS}
 )
 
 link_directories(  
   ${CCD_LIBRARY_DIRS} 
+  ${Boost_LIBRARY_DIR}
 )
+
+if (HAVE_DART)
+  include_directories(${DARTCore_INCLUDE_DIRS})
+  link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
+
+if (HAVE_BULLET)
+  include_directories(${BULLET_INCLUDE_DIRS})
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
 
 add_subdirectory(OPCODE)
 add_subdirectory(GIMPACT)
@@ -162,6 +174,8 @@ src/cylinder.cpp
 src/error.cpp
 src/export-dif.cpp
 src/heightfield.cpp
+src/io.cpp
+src/ioh5.cpp
 src/lcp.cpp
 src/mass.cpp
 src/mat.cpp
@@ -177,11 +191,18 @@ src/odetls.cpp
 src/optimize.cpp
 src/plane.cpp
 src/quickstep.cpp
+src/quickstep_cg_lcp.cpp
+src/quickstep_pgs_lcp.cpp
+src/quickstep_update_bodies.cpp
+src/quickstep_util.cpp
 src/ray.cpp
 src/robuststep.cpp
 src/rotation.cpp
 src/sphere.cpp
 src/step.cpp
+src/step_bullet_lemke_wrapper.cpp
+src/step_bullet_pgs_wrapper.cpp
+src/step_dart_pgs_wrapper.cpp
 src/symm.c
 src/timer.cpp
 src/util.cpp
@@ -221,6 +242,7 @@ include/ode/compatibility.h
 include/ode/contact.h
 include/ode/error.h
 include/ode/export-dif.h
+include/ode/h5dump.h
 include/ode/mass.h
 include/ode/matrix.h
 include/ode/memory.h
@@ -240,18 +262,32 @@ include/ode/timer.h
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNDEBUG -DdNODEBUG -DdDOUBLE -DHAVE_CONFIG_H -DPIC")
 
 if (SSE2_FOUND OR SSE3_FOUND OR SSSE3_FOUND OR SSE4_1_FOUND OR SSE4_2_FOUND)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSSE")
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DODE_SSE")
+endif()
+
+if (WIN32)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DWIN32 -DODE_DLL")
 endif()
 
 set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LINK_FLAGS_${CMAKE_BUILD_TYPE}} -MF -MT -fno-strict-aliasing -DPIC ")
 
-gz_add_library(gazebo_ode ${sources})
+if (WIN32)
+  add_library(gazebo_ode SHARED ${sources})
+else()
+  gz_add_library(gazebo_ode ${sources})
+endif()
+
 target_link_libraries(gazebo_ode
   gazebo_opcode
   gazebo_gimpact
   gazebo_opende_ou
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
+
+if (HDF5_FOUND AND HDF5_INSTRUMENT)
+  message(STATUS "HDF5 Found and Instrument enabled")
+  target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
+endif()
 
 add_dependencies(gazebo_ode gazebo_opcode gazebo_gimpact)
 add_dependencies(gazebo_ode gazebo_opende_ou)

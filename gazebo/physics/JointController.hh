@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ namespace gazebo
 
     /// \class JointController JointController.hh physics/physics.hh
     /// \brief A class for manipulating physics::Joint
-    class GAZEBO_VISIBLE JointController
+    class GZ_PHYSICS_VISIBLE JointController
     {
       /// \brief Constructor
       /// \param[in] _model Model that uses this joint controller.
@@ -52,6 +52,10 @@ namespace gazebo
       /// \brief Add a joint to control.
       /// \param[in] _joint Joint to control.
       public: void AddJoint(JointPtr _joint);
+
+      /// \brief Remove a joint from control.
+      /// \param[in] _joint Joint to remove.
+      public: void RemoveJoint(Joint *_joint);
 
       /// \brief Update the joint control.
       public: void Update();

@@ -21,13 +21,20 @@ endif()
 if (NOT APPLE)
   set(tests
     RAMLibrary_TEST.cc
+  )
+  gz_build_tests(${tests})
+
+  set(fixture_tests
     factory_stress.cc
-    gz_stress.cc
     image_convert_stress.cc
     sensor_stress.cc
     set_world_pose.cc
     transport_stress.cc
   )
+  gz_build_tests(${fixture_tests} EXTRA_LIBS gazebo_test_fixture)
 
-  gz_build_tests(${tests})
+  set(tool_tests
+    gz_stress.cc
+  )
+  gz_build_tests(${tool_tests} EXTRA_LIBS gazebo_transport)
 endif()

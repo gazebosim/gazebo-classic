@@ -91,13 +91,13 @@ static void removeJointReferencesFromAttachedBodies (dxJoint *j)
       dxJointNode *n = body->firstjoint;
       dxJointNode *last = 0;
       while (n) {
-	if (n->joint == j) {
-	  if (last) last->next = n->next;
-	  else body->firstjoint = n->next;
-	  break;
-	}
-	last = n;
-	n = n->next;
+  if (n->joint == j) {
+    if (last) last->next = n->next;
+    else body->firstjoint = n->next;
+    break;
+  }
+  last = n;
+  n = n->next;
       }
     }
   }
@@ -133,8 +133,8 @@ static int g_world_check_tag_generator = 0;
 
 static inline int generateWorldCheckTag()
 {
-	// Atomicity is not necessary here
-	return ++g_world_check_tag_generator;
+  // Atomicity is not necessary here
+  return ++g_world_check_tag_generator;
 }
 
 static void checkWorld (dxWorld *w)
@@ -180,7 +180,7 @@ static void checkWorld (dxWorld *w)
   for (j=w->firstjoint; j; j=(dxJoint*)j->next) {
     if (j->node[0].body || j->node[1].body) {
       if (!(j->node[0].body && j->node[1].body))
-	dDebug (0,"half connected joint found");
+  dDebug (0,"half connected joint found");
     }
   }
   */
@@ -229,7 +229,7 @@ static void checkWorld (dxWorld *w)
     if (j->node[0].body && (j->node[0].body == j->node[1].body))
       dDebug (0,"non-distinct body pointers in joint");
     if ((j->node[0].body && j->node[0].body->tag != count) ||
-	(j->node[1].body && j->node[1].body->tag != count))
+  (j->node[1].body && j->node[1].body->tag != count))
       dDebug (0,"bad body pointer in joint");
   }
 }
@@ -285,7 +285,7 @@ dxBody *dBodyCreate (dxWorld *w)
 
   // set auto-disable parameters
   b->average_avel_buffer = b->average_lvel_buffer = 0; // no buffer at beginning
-  dBodySetAutoDisableDefaults (b);	// must do this after adding to world
+  dBodySetAutoDisableDefaults (b);  // must do this after adding to world
   b->adis_stepsleft = b->adis.idle_steps;
   b->adis_timeleft = b->adis.idle_time;
   b->average_counter = 0;
@@ -294,7 +294,7 @@ dxBody *dBodyCreate (dxWorld *w)
 
   b->moved_callback = 0;
 
-  dBodySetDampingDefaults(b);	// must do this after adding to world
+  dBodySetDampingDefaults(b);  // must do this after adding to world
 
   b->flags |= w->body_flags & dxBodyMaxAngularSpeed;
   b->max_angular_speed = w->max_angular_speed;
@@ -338,13 +338,13 @@ void dBodyDestroy (dxBody *b)
   // delete the average buffers
   if(b->average_lvel_buffer)
   {
-	  delete[] (b->average_lvel_buffer);
-	  b->average_lvel_buffer = 0;
+    delete[] (b->average_lvel_buffer);
+    b->average_lvel_buffer = 0;
   }
   if(b->average_avel_buffer)
   {
-	  delete[] (b->average_avel_buffer);
-	  b->average_avel_buffer = 0;
+    delete[] (b->average_avel_buffer);
+    b->average_avel_buffer = 0;
   }
 
   if (b->contactp) delete b->contactp;
@@ -454,11 +454,11 @@ const dReal * dBodyGetPosition (dBodyID b)
 
 void dBodyCopyPosition (dBodyID b, dVector3 pos)
 {
-	dAASSERT (b);
-	dReal* src = b->posr.pos;
-	pos[0] = src[0];
-	pos[1] = src[1];
-	pos[2] = src[2];
+  dAASSERT (b);
+  dReal* src = b->posr.pos;
+  pos[0] = src[0];
+  pos[1] = src[1];
+  pos[2] = src[2];
 }
 
 
@@ -471,20 +471,20 @@ const dReal * dBodyGetRotation (dBodyID b)
 
 void dBodyCopyRotation (dBodyID b, dMatrix3 R)
 {
-	dAASSERT (b);
-	const dReal* src = b->posr.R;
-	R[0] = src[0];
-	R[1] = src[1];
-	R[2] = src[2];
-	R[3] = src[3];
-	R[4] = src[4];
-	R[5] = src[5];
-	R[6] = src[6];
-	R[7] = src[7];
-	R[8] = src[8];
-	R[9] = src[9];
-	R[10] = src[10];
-	R[11] = src[11];
+  dAASSERT (b);
+  const dReal* src = b->posr.R;
+  R[0] = src[0];
+  R[1] = src[1];
+  R[2] = src[2];
+  R[3] = src[3];
+  R[4] = src[4];
+  R[5] = src[5];
+  R[6] = src[6];
+  R[7] = src[7];
+  R[8] = src[8];
+  R[9] = src[9];
+  R[10] = src[10];
+  R[11] = src[11];
 }
 
 
@@ -497,12 +497,12 @@ const dReal * dBodyGetQuaternion (dBodyID b)
 
 void dBodyCopyQuaternion (dBodyID b, dQuaternion quat)
 {
-	dAASSERT (b);
-	dReal* src = b->q;
-	quat[0] = src[0];
-	quat[1] = src[1];
-	quat[2] = src[2];
-	quat[3] = src[3];
+  dAASSERT (b);
+  dReal* src = b->q;
+  quat[0] = src[0];
+  quat[1] = src[1];
+  quat[2] = src[2];
+  quat[3] = src[3];
 }
 
 
@@ -528,8 +528,8 @@ void dBodySetMass (dBodyID b, const dMass *mass)
   // The centre of mass must be at the origin.
   // Use dMassTranslate( mass, -mass->c[0], -mass->c[1], -mass->c[2] ) to correct it.
   dUASSERT( fabs( mass->c[0] ) <= dEpsilon &&
-			fabs( mass->c[1] ) <= dEpsilon &&
-			fabs( mass->c[2] ) <= dEpsilon, "The centre of mass must be at the origin." )
+      fabs( mass->c[1] ) <= dEpsilon &&
+      fabs( mass->c[2] ) <= dEpsilon, "The centre of mass must be at the origin." )
 
   memcpy (&b->mass,mass,sizeof(dMass));
   if (dInvertPDMatrix (b->mass.I,b->invI,3,NULL)==0) {
@@ -596,7 +596,7 @@ void dBodyAddRelTorque (dBodyID b, dReal fx, dReal fy, dReal fz)
 
 
 void dBodyAddForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
-			 dReal px, dReal py, dReal pz)
+       dReal px, dReal py, dReal pz)
 {
   dAASSERT (b);
   b->facc[0] += fx;
@@ -614,7 +614,7 @@ void dBodyAddForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
 
 
 void dBodyAddForceAtRelPos (dBodyID b, dReal fx, dReal fy, dReal fz,
-			    dReal px, dReal py, dReal pz)
+          dReal px, dReal py, dReal pz)
 {
   dAASSERT (b);
   dVector3 prel,f,p;
@@ -635,7 +635,7 @@ void dBodyAddForceAtRelPos (dBodyID b, dReal fx, dReal fy, dReal fz,
 
 
 void dBodyAddRelForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
-			    dReal px, dReal py, dReal pz)
+          dReal px, dReal py, dReal pz)
 {
   dAASSERT (b);
   dVector3 frel,f;
@@ -656,7 +656,7 @@ void dBodyAddRelForceAtPos (dBodyID b, dReal fx, dReal fy, dReal fz,
 
 
 void dBodyAddRelForceAtRelPos (dBodyID b, dReal fx, dReal fy, dReal fz,
-			       dReal px, dReal py, dReal pz)
+             dReal px, dReal py, dReal pz)
 {
   dAASSERT (b);
   dVector3 frel,prel,f,p;
@@ -710,7 +710,7 @@ void dBodySetTorque (dBodyID b, dReal x, dReal y, dReal z)
 
 
 void dBodyGetRelPointPos (dBodyID b, dReal px, dReal py, dReal pz,
-			  dVector3 result)
+        dVector3 result)
 {
   dAASSERT (b);
   dVector3 prel,p;
@@ -726,7 +726,7 @@ void dBodyGetRelPointPos (dBodyID b, dReal px, dReal py, dReal pz,
 
 
 void dBodyGetRelPointVel (dBodyID b, dReal px, dReal py, dReal pz,
-			  dVector3 result)
+        dVector3 result)
 {
   dAASSERT (b);
   dVector3 prel,p;
@@ -743,7 +743,7 @@ void dBodyGetRelPointVel (dBodyID b, dReal px, dReal py, dReal pz,
 
 
 void dBodyGetPointVel (dBodyID b, dReal px, dReal py, dReal pz,
-		       dVector3 result)
+           dVector3 result)
 {
   dAASSERT (b);
   dVector3 p;
@@ -759,7 +759,7 @@ void dBodyGetPointVel (dBodyID b, dReal px, dReal py, dReal pz,
 
 
 void dBodyGetPosRelPoint (dBodyID b, dReal px, dReal py, dReal pz,
-			  dVector3 result)
+        dVector3 result)
 {
   dAASSERT (b);
   dVector3 prel;
@@ -772,7 +772,7 @@ void dBodyGetPosRelPoint (dBodyID b, dReal px, dReal py, dReal pz,
 
 
 void dBodyVectorToWorld (dBodyID b, dReal px, dReal py, dReal pz,
-			 dVector3 result)
+       dVector3 result)
 {
   dAASSERT (b);
   dVector3 p;
@@ -785,7 +785,7 @@ void dBodyVectorToWorld (dBodyID b, dReal px, dReal py, dReal pz,
 
 
 void dBodyVectorFromWorld (dBodyID b, dReal px, dReal py, dReal pz,
-			   dVector3 result)
+         dVector3 result)
 {
   dAASSERT (b);
   dVector3 p;
@@ -929,132 +929,132 @@ int dBodyGetGravityMode (dBodyID b)
 
 dReal dBodyGetAutoDisableLinearThreshold (dBodyID b)
 {
-	dAASSERT(b);
-	return dSqrt (b->adis.linear_average_threshold);
+  dAASSERT(b);
+  return dSqrt (b->adis.linear_average_threshold);
 }
 
 
 void dBodySetAutoDisableLinearThreshold (dBodyID b, dReal linear_average_threshold)
 {
-	dAASSERT(b);
-	b->adis.linear_average_threshold = linear_average_threshold * linear_average_threshold;
+  dAASSERT(b);
+  b->adis.linear_average_threshold = linear_average_threshold * linear_average_threshold;
 }
 
 
 dReal dBodyGetAutoDisableAngularThreshold (dBodyID b)
 {
-	dAASSERT(b);
-	return dSqrt (b->adis.angular_average_threshold);
+  dAASSERT(b);
+  return dSqrt (b->adis.angular_average_threshold);
 }
 
 
 void dBodySetAutoDisableAngularThreshold (dBodyID b, dReal angular_average_threshold)
 {
-	dAASSERT(b);
-	b->adis.angular_average_threshold = angular_average_threshold * angular_average_threshold;
+  dAASSERT(b);
+  b->adis.angular_average_threshold = angular_average_threshold * angular_average_threshold;
 }
 
 
 int dBodyGetAutoDisableAverageSamplesCount (dBodyID b)
 {
-	dAASSERT(b);
-	return b->adis.average_samples;
+  dAASSERT(b);
+  return b->adis.average_samples;
 }
 
 
 void dBodySetAutoDisableAverageSamplesCount (dBodyID b, unsigned int average_samples_count)
 {
-	dAASSERT(b);
-	b->adis.average_samples = average_samples_count;
-	// update the average buffers
-	if(b->average_lvel_buffer)
-	{
-		delete[] b->average_lvel_buffer;
-		b->average_lvel_buffer = 0;
-	}
-	if(b->average_avel_buffer)
-	{
-		delete[] b->average_avel_buffer;
-		b->average_avel_buffer = 0;
-	}
-	if(b->adis.average_samples > 0)
-	{
-		b->average_lvel_buffer = new dVector3[b->adis.average_samples];
-		b->average_avel_buffer = new dVector3[b->adis.average_samples];
-	}
-	else
-	{
-		b->average_lvel_buffer = 0;
-		b->average_avel_buffer = 0;
-	}
-	// new buffer is empty
-	b->average_counter = 0;
-	b->average_ready = 0;
+  dAASSERT(b);
+  b->adis.average_samples = average_samples_count;
+  // update the average buffers
+  if(b->average_lvel_buffer)
+  {
+    delete[] b->average_lvel_buffer;
+    b->average_lvel_buffer = 0;
+  }
+  if(b->average_avel_buffer)
+  {
+    delete[] b->average_avel_buffer;
+    b->average_avel_buffer = 0;
+  }
+  if(b->adis.average_samples > 0)
+  {
+    b->average_lvel_buffer = new dVector3[b->adis.average_samples];
+    b->average_avel_buffer = new dVector3[b->adis.average_samples];
+  }
+  else
+  {
+    b->average_lvel_buffer = 0;
+    b->average_avel_buffer = 0;
+  }
+  // new buffer is empty
+  b->average_counter = 0;
+  b->average_ready = 0;
 }
 
 
 int dBodyGetAutoDisableSteps (dBodyID b)
 {
-	dAASSERT(b);
-	return b->adis.idle_steps;
+  dAASSERT(b);
+  return b->adis.idle_steps;
 }
 
 
 void dBodySetAutoDisableSteps (dBodyID b, int steps)
 {
-	dAASSERT(b);
-	b->adis.idle_steps = steps;
+  dAASSERT(b);
+  b->adis.idle_steps = steps;
 }
 
 
 dReal dBodyGetAutoDisableTime (dBodyID b)
 {
-	dAASSERT(b);
-	return b->adis.idle_time;
+  dAASSERT(b);
+  return b->adis.idle_time;
 }
 
 
 void dBodySetAutoDisableTime (dBodyID b, dReal time)
 {
-	dAASSERT(b);
-	b->adis.idle_time = time;
+  dAASSERT(b);
+  b->adis.idle_time = time;
 }
 
 
 int dBodyGetAutoDisableFlag (dBodyID b)
 {
-	dAASSERT(b);
-	return ((b->flags & dxBodyAutoDisable) != 0);
+  dAASSERT(b);
+  return ((b->flags & dxBodyAutoDisable) != 0);
 }
 
 
 void dBodySetAutoDisableFlag (dBodyID b, int do_auto_disable)
 {
-	dAASSERT(b);
-	if (!do_auto_disable)
-	{
-		b->flags &= ~dxBodyAutoDisable;
-		// (mg) we should also reset the IsDisabled state to correspond to the DoDisabling flag
-		b->flags &= ~dxBodyDisabled;
-		b->adis.idle_steps = dWorldGetAutoDisableSteps(b->world);
-		b->adis.idle_time = dWorldGetAutoDisableTime(b->world);
-		// resetting the average calculations too
-		dBodySetAutoDisableAverageSamplesCount(b, dWorldGetAutoDisableAverageSamplesCount(b->world) );
-	}
-	else
-	{
-		b->flags |= dxBodyAutoDisable;
-	}
+  dAASSERT(b);
+  if (!do_auto_disable)
+  {
+    b->flags &= ~dxBodyAutoDisable;
+    // (mg) we should also reset the IsDisabled state to correspond to the DoDisabling flag
+    b->flags &= ~dxBodyDisabled;
+    b->adis.idle_steps = dWorldGetAutoDisableSteps(b->world);
+    b->adis.idle_time = dWorldGetAutoDisableTime(b->world);
+    // resetting the average calculations too
+    dBodySetAutoDisableAverageSamplesCount(b, dWorldGetAutoDisableAverageSamplesCount(b->world) );
+  }
+  else
+  {
+    b->flags |= dxBodyAutoDisable;
+  }
 }
 
 
 void dBodySetAutoDisableDefaults (dBodyID b)
 {
-	dAASSERT(b);
-	dWorldID w = b->world;
-	dAASSERT(w);
-	b->adis = w->adis;
-	dBodySetAutoDisableFlag (b, w->body_flags & dxBodyAutoDisable);
+  dAASSERT(b);
+  dWorldID w = b->world;
+  dAASSERT(w);
+  b->adis = w->adis;
+  dBodySetAutoDisableFlag (b, w->body_flags & dxBodyAutoDisable);
 }
 
 
@@ -1250,7 +1250,7 @@ dxJoint * dJointCreateScrew (dWorldID w, dJointGroupID group)
 
 
 dxJoint * dJointCreateContact (dWorldID w, dJointGroupID group,
-			       const dContact *c)
+             const dContact *c)
 {
     dAASSERT (w && c);
     dxJointContact *j = (dxJointContact *)
@@ -1421,13 +1421,13 @@ void dJointAttach (dxJoint *joint, dxBody *body1, dxBody *body2)
   dUASSERT (body1 == 0 || body1 != body2,"can't have body1==body2");
   //dxWorld *world = joint->world;
   dUASSERT ( (!body1 || body1->world == world) &&
-	     (!body2 || body2->world == world),
-	     "joint and bodies must be in same world");
+       (!body2 || body2->world == world),
+       "joint and bodies must be in same world");
 
   // check if the joint can not be attached to just one body
   dUASSERT (!((joint->flags & dJOINT_TWOBODIES) &&
-	      ((body1 != 0) ^ (body2 != 0))),
-	    "joint can not be attached to just one body");
+        ((body1 != 0) ^ (body2 != 0))),
+      "joint can not be attached to just one body");
 
   // remove any existing body attachments
   if (joint->node[0].body || joint->node[1].body) {
@@ -1536,25 +1536,6 @@ void dJointSetScrewThreadPitch (dxJoint *joint, dReal thread_pitch)
   }
 }
 
-void dJointSetDamping (dxJoint *joint, dReal damping)
-{
-  dAASSERT (joint);
-
-  if (joint->type() == dJointTypeHinge || joint->type() == dJointTypeSlider ||
-      joint->type() == dJointTypeScrew)
-  {
-    if (!_dequal(damping, 0.0))
-    {
-      if (damping < 0.0) printf("bad to have negative viscous joint damping, make sure you know what's going on.\n");
-      // set use_damping to true
-      joint->use_damping = true;
-      // damping coefficient is in jicurr->info.damping_coefficient);
-      joint->damping_coefficient = damping;
-      // FIXME: only hinge, slider, screw(rotational) are implemented at this time, extend?
-    }
-  }
-}
-
 dJointFeedback *dJointGetFeedback (dxJoint *joint)
 {
   dAASSERT (joint);
@@ -1567,16 +1548,16 @@ dJointID dConnectingJoint (dBodyID in_b1, dBodyID in_b2)
 {
     dAASSERT (in_b1 || in_b2);
 
-	dBodyID b1, b2;
+  dBodyID b1, b2;
 
-	if (in_b1 == 0) {
-		b1 = in_b2;
-		b2 = in_b1;
-	}
-	else {
-		b1 = in_b1;
-		b2 = in_b2;
-	}
+  if (in_b1 == 0) {
+    b1 = in_b2;
+    b2 = in_b1;
+  }
+  else {
+    b1 = in_b1;
+    b2 = in_b2;
+  }
 
     // look through b1's neighbour list for b2
     for (dxJointNode *n=b1->firstjoint; n; n=n->next) {
@@ -1593,16 +1574,16 @@ int dConnectingJointList (dBodyID in_b1, dBodyID in_b2, dJointID* out_list)
     dAASSERT (in_b1 || in_b2);
 
 
-	dBodyID b1, b2;
+  dBodyID b1, b2;
 
-	if (in_b1 == 0) {
-		b1 = in_b2;
-		b2 = in_b1;
-	}
-	else {
-		b1 = in_b1;
-		b2 = in_b2;
-	}
+  if (in_b1 == 0) {
+    b1 = in_b2;
+    b2 = in_b1;
+  }
+  else {
+    b1 = in_b1;
+    b2 = in_b2;
+  }
 
     // look through b1's neighbour list for b2
     int numConnectingJoints = 0;
@@ -1659,23 +1640,19 @@ dxWorld * dWorldCreate()
   w->body_flags = 0; // everything disabled
 
   w->wmem = 0;
-  for (int jj=0; jj < 1000; jj++)
-  {
-    w->island_wmems[jj] = 0;
-  }
 
   w->adis.idle_steps = 10;
   w->adis.idle_time = 0;
-  w->adis.average_samples = 1;		// Default is 1 sample => Instantaneous velocity
-  w->adis.angular_average_threshold = REAL(0.01)*REAL(0.01);	// (magnitude squared)
-  w->adis.linear_average_threshold = REAL(0.01)*REAL(0.01);		// (magnitude squared)
+  w->adis.average_samples = 1;    // Default is 1 sample => Instantaneous velocity
+  w->adis.angular_average_threshold = REAL(0.01)*REAL(0.01);  // (magnitude squared)
+  w->adis.linear_average_threshold = REAL(0.01)*REAL(0.01);    // (magnitude squared)
 
   w->qs.num_iterations = 20;
   w->qs.precon_iterations = 0;
   w->qs.w = REAL(1.3);
   w->qs.num_chunks = 1;
   w->qs.num_overlap = 0;
-  w->qs.sor_lcp_tolerance = -1;
+  w->qs.pgs_lcp_tolerance = -1;
   w->qs.rms_dlambda[0] = 0;
   w->qs.rms_dlambda[1] = 0;
   w->qs.rms_dlambda[2] = 0;
@@ -1687,9 +1664,13 @@ dxWorld * dWorldCreate()
   w->qs.num_contacts = 0;
   w->qs.dynamic_inertia_reduction = true;
   w->qs.smooth_contacts = 0.01;
+  w->qs.contact_sor_scale = 0.25;
+  w->qs.thread_position_correction = false;
   w->qs.row_reorder1 = true;
   w->qs.warm_start = 0.5;
   w->qs.friction_iterations = 10;
+  w->qs.friction_model = pyramid_friction;
+  w->qs.world_solver_type = ODE_DEFAULT;
 
   w->contactp.max_vel = dInfinity;
   w->contactp.min_depth = 0;
@@ -2019,8 +2000,8 @@ int dWorldRobustStep(dWorldID w, dReal stepsize)
 }
 
 void dWorldImpulseToForce (dWorldID /*w*/, dReal stepsize,
-			   dReal ix, dReal iy, dReal iz,
-			   dVector3 force)
+         dReal ix, dReal iy, dReal iz,
+         dVector3 force)
 {
   //dAASSERT (w);
   stepsize = dRecip(stepsize);
@@ -2035,88 +2016,88 @@ void dWorldImpulseToForce (dWorldID /*w*/, dReal stepsize,
 
 dReal dWorldGetAutoDisableLinearThreshold (dWorldID w)
 {
-	dAASSERT(w);
-	return dSqrt (w->adis.linear_average_threshold);
+  dAASSERT(w);
+  return dSqrt (w->adis.linear_average_threshold);
 }
 
 
 void dWorldSetAutoDisableLinearThreshold (dWorldID w, dReal linear_average_threshold)
 {
-	dAASSERT(w);
-	w->adis.linear_average_threshold = linear_average_threshold * linear_average_threshold;
+  dAASSERT(w);
+  w->adis.linear_average_threshold = linear_average_threshold * linear_average_threshold;
 }
 
 
 dReal dWorldGetAutoDisableAngularThreshold (dWorldID w)
 {
-	dAASSERT(w);
-	return dSqrt (w->adis.angular_average_threshold);
+  dAASSERT(w);
+  return dSqrt (w->adis.angular_average_threshold);
 }
 
 
 void dWorldSetAutoDisableAngularThreshold (dWorldID w, dReal angular_average_threshold)
 {
-	dAASSERT(w);
-	w->adis.angular_average_threshold = angular_average_threshold * angular_average_threshold;
+  dAASSERT(w);
+  w->adis.angular_average_threshold = angular_average_threshold * angular_average_threshold;
 }
 
 
 int dWorldGetAutoDisableAverageSamplesCount (dWorldID w)
 {
-	dAASSERT(w);
-	return w->adis.average_samples;
+  dAASSERT(w);
+  return w->adis.average_samples;
 }
 
 
 void dWorldSetAutoDisableAverageSamplesCount (dWorldID w, unsigned int average_samples_count)
 {
-	dAASSERT(w);
-	w->adis.average_samples = average_samples_count;
+  dAASSERT(w);
+  w->adis.average_samples = average_samples_count;
 }
 
 
 int dWorldGetAutoDisableSteps (dWorldID w)
 {
-	dAASSERT(w);
-	return w->adis.idle_steps;
+  dAASSERT(w);
+  return w->adis.idle_steps;
 }
 
 
 void dWorldSetAutoDisableSteps (dWorldID w, int steps)
 {
-	dAASSERT(w);
-	w->adis.idle_steps = steps;
+  dAASSERT(w);
+  w->adis.idle_steps = steps;
 }
 
 
 dReal dWorldGetAutoDisableTime (dWorldID w)
 {
-	dAASSERT(w);
-	return w->adis.idle_time;
+  dAASSERT(w);
+  return w->adis.idle_time;
 }
 
 
 void dWorldSetAutoDisableTime (dWorldID w, dReal time)
 {
-	dAASSERT(w);
-	w->adis.idle_time = time;
+  dAASSERT(w);
+  w->adis.idle_time = time;
 }
 
 
 int dWorldGetAutoDisableFlag (dWorldID w)
 {
-	dAASSERT(w);
-	return w->body_flags & dxBodyAutoDisable;
+  dAASSERT(w);
+  return w->body_flags & dxBodyAutoDisable;
 }
 
 
 void dWorldSetAutoDisableFlag (dWorldID w, int do_auto_disable)
 {
-	dAASSERT(w);
-	if (do_auto_disable)
-        	w->body_flags |= dxBodyAutoDisable;
-	else
-	        w->body_flags &= ~dxBodyAutoDisable;
+  dAASSERT(w);
+  if (do_auto_disable)
+          w->body_flags |= dxBodyAutoDisable;
+  else
+          w->body_flags &= ~dxBodyAutoDisable;
 }
 
 
@@ -2203,185 +2184,232 @@ void dWorldSetMaxAngularSpeed(dWorldID w, dReal max_speed)
 
 double dWorldGetQuickStepTolerance (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.sor_lcp_tolerance;
+  dAASSERT(w);
+  return w->qs.pgs_lcp_tolerance;
 }
 
 void dWorldSetQuickStepTolerance (dWorldID w, dReal tol)
 {
-	dAASSERT(w);
-	w->qs.sor_lcp_tolerance = tol;
+  dAASSERT(w);
+  w->qs.pgs_lcp_tolerance = tol;
 }
 
 void dWorldSetQuickStepNumChunks (dWorldID w, int num)
 {
-	dAASSERT(w);
-	w->qs.num_chunks = num;
+  dAASSERT(w);
+  w->qs.num_chunks = num;
 }
 
 void dWorldSetQuickStepNumOverlap (dWorldID w, int num)
 {
-	dAASSERT(w);
-	w->qs.num_overlap = num;
+  dAASSERT(w);
+  w->qs.num_overlap = num;
 }
 
 void dWorldSetQuickStepNumIterations (dWorldID w, int num)
 {
-	dAASSERT(w);
-	w->qs.num_iterations = num;
+  dAASSERT(w);
+  w->qs.num_iterations = num;
 }
 void dWorldSetQuickStepPreconIterations (dWorldID w, int num)
 {
-	dAASSERT(w);
-	w->qs.precon_iterations = num;
+  dAASSERT(w);
+  w->qs.precon_iterations = num;
 }
 
 
 int dWorldGetQuickStepPreconIterations (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.precon_iterations;
+  dAASSERT(w);
+  return w->qs.precon_iterations;
 }
 
 int dWorldGetQuickStepNumIterations (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.num_iterations;
+  dAASSERT(w);
+  return w->qs.num_iterations;
 }
 
 void dWorldSetRobustStepMaxIterations (dWorldID w, int num)
 {
-	dAASSERT(w);
-	w->rs.max_iterations = num;
+  dAASSERT(w);
+  w->rs.max_iterations = num;
 }
 
 int dWorldGetRobustStepMaxIterations (dWorldID w)
 {
-	dAASSERT(w);
-	return w->rs.max_iterations;
+  dAASSERT(w);
+  return w->rs.max_iterations;
 }
 
 void dWorldSetQuickStepW (dWorldID w, dReal param)
 {
-	dAASSERT(w);
-	w->qs.w = param;
+  dAASSERT(w);
+  w->qs.w = param;
 }
 
 
 dReal dWorldGetQuickStepW (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.w;
+  dAASSERT(w);
+  return w->qs.w;
 }
 
 dReal *dWorldGetQuickStepRMSDeltaLambda (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.rms_dlambda;
+  dAASSERT(w);
+  return w->qs.rms_dlambda;
 }
 
 dReal* dWorldGetQuickStepRMSConstraintResidual (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.rms_constraint_residual;
+  dAASSERT(w);
+  return w->qs.rms_constraint_residual;
 }
 
 int dWorldGetQuickStepNumContacts (dWorldID w)
 {
-	dAASSERT(w);
-	return w->qs.num_contacts;
+  dAASSERT(w);
+  return w->qs.num_contacts;
 }
 
 /* experimental PGS */
 bool dWorldGetQuickStepInertiaRatioReduction (dWorldID w)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   return w->qs.dynamic_inertia_reduction;
 }
 
 dReal  dWorldGetQuickStepContactResidualSmoothing (dWorldID w)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   return w->qs.smooth_contacts;
+}
+
+dReal  dWorldGetQuickStepContactSORScalingFactor (dWorldID w)
+{
+  dAASSERT(w);
+  return w->qs.contact_sor_scale;
+}
+
+bool  dWorldGetQuickStepThreadPositionCorrection (dWorldID w)
+{
+  dAASSERT(w);
+  return w->qs.thread_position_correction;
 }
 
 bool  dWorldGetQuickStepExperimentalRowReordering (dWorldID w)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   return w->qs.row_reorder1;
 }
 
 dReal  dWorldGetQuickStepWarmStartFactor (dWorldID w)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   return w->qs.warm_start;
 }
 
 int  dWorldGetQuickStepExtraFrictionIterations (dWorldID w)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   return w->qs.friction_iterations;
+}
+
+Friction_Model dWorldGetQuickStepFrictionModel (dWorldID w)
+{
+  dAASSERT(w);
+  return w->qs.friction_model;
+}
+
+World_Solver_Type dWorldGetWorldStepSolverType (dWorldID w)
+{
+  dAASSERT(w);
+  return w->qs.world_solver_type;
 }
 
 void dWorldSetQuickStepInertiaRatioReduction (dWorldID w, bool irr)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   w->qs.dynamic_inertia_reduction = irr;
 }
 
 void dWorldSetQuickStepContactResidualSmoothing (dWorldID w, dReal smoo)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   w->qs.smooth_contacts = smoo;
+}
+
+void dWorldSetQuickStepContactSORScalingFactor (dWorldID w, dReal contact_sor_scale)
+{
+  dAASSERT(w);
+  w->qs.contact_sor_scale = contact_sor_scale;
+}
+
+void dWorldSetQuickStepThreadPositionCorrection (dWorldID w, bool thread)
+{
+  dAASSERT(w);
+  w->qs.thread_position_correction = thread;
 }
 
 void dWorldSetQuickStepExperimentalRowReordering (dWorldID w, bool order)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   w->qs.row_reorder1 = order;
 }
 
 void dWorldSetQuickStepWarmStartFactor (dWorldID w, dReal warm)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   w->qs.warm_start = warm;
 }
 
 void dWorldSetQuickStepExtraFrictionIterations (dWorldID w, int iters)
 {
-	dAASSERT(w);
+  dAASSERT(w);
   w->qs.friction_iterations = iters;
 }
 
 
+void dWorldSetQuickStepFrictionModel (dWorldID w, Friction_Model fricmodel)
+{
+  dAASSERT(w);
+  w->qs.friction_model = fricmodel;
+}
 
+
+void dWorldSetWorldStepSolverType(dWorldID w, World_Solver_Type solvertype)
+{
+  dAASSERT(w);
+  w->qs.world_solver_type= solvertype;
+}
 
 
 void dWorldSetContactMaxCorrectingVel (dWorldID w, dReal vel)
 {
-	dAASSERT(w);
-	w->contactp.max_vel = vel;
+  dAASSERT(w);
+  w->contactp.max_vel = vel;
 }
 
 
 dReal dWorldGetContactMaxCorrectingVel (dWorldID w)
 {
-	dAASSERT(w);
-	return w->contactp.max_vel;
+  dAASSERT(w);
+  return w->contactp.max_vel;
 }
 
 
 void dWorldSetContactSurfaceLayer (dWorldID w, dReal depth)
 {
-	dAASSERT(w);
-	w->contactp.min_depth = depth;
+  dAASSERT(w);
+  w->contactp.min_depth = depth;
 }
 
 
 dReal dWorldGetContactSurfaceLayer (dWorldID w)
 {
-	dAASSERT(w);
-	return w->contactp.min_depth;
+  dAASSERT(w);
+  return w->contactp.min_depth;
 }
 
 //****************************************************************************
@@ -2422,25 +2450,25 @@ extern "C" void dTestDataStructures()
       dBodyID b1 = body [dRand() % nb];
       dBodyID b2 = body [dRand() % nb];
       if (b1 != b2) {
-	DO(printf ("creating joint, attaching to %p,%p\n",b1,b2));
-	joint[nj] = dJointCreateBall (w,0);
-	DO(printf ("\t-->%p\n",joint[nj]));
-	checkWorld (w);
-	dJointAttach (joint[nj],b1,b2);
-	nj++;
-	checkWorld (w);
-	DO(printf ("%d BODIES, %d JOINTS\n",nb,nj));
+  DO(printf ("creating joint, attaching to %p,%p\n",b1,b2));
+  joint[nj] = dJointCreateBall (w,0);
+  DO(printf ("\t-->%p\n",joint[nj]));
+  checkWorld (w);
+  dJointAttach (joint[nj],b1,b2);
+  nj++;
+  checkWorld (w);
+  DO(printf ("%d BODIES, %d JOINTS\n",nb,nj));
       }
     }
     if (nj > 0 && nb > 2 && dRandReal() > 0.5) {
       dBodyID b1 = body [dRand() % nb];
       dBodyID b2 = body [dRand() % nb];
       if (b1 != b2) {
-	int k = dRand() % nj;
-	DO(printf ("reattaching joint %p\n",joint[k]));
-	dJointAttach (joint[k],b1,b2);
-	checkWorld (w);
-	DO(printf ("%d BODIES, %d JOINTS\n",nb,nj));
+  int k = dRand() % nj;
+  DO(printf ("reattaching joint %p\n",joint[k]));
+  dJointAttach (joint[k],b1,b2);
+  checkWorld (w);
+  DO(printf ("%d BODIES, %d JOINTS\n",nb,nj));
       }
     }
     if (nb > 0 && dRandReal() > 0.5) {
@@ -2512,26 +2540,26 @@ REGISTER_EXTENSION( ODE_EXT_no_debug )
 #if dTRIMESH_ENABLED
 REGISTER_EXTENSION( ODE_EXT_trimesh )
 
-	// tri-mesh extensions
-	#if dTRIMESH_OPCODE
-	REGISTER_EXTENSION( ODE_EXT_opcode )
+  // tri-mesh extensions
+  #if dTRIMESH_OPCODE
+  REGISTER_EXTENSION( ODE_EXT_opcode )
 
-		// opcode extensions
-		#if dTRIMESH_16BIT_INDICES
-		REGISTER_EXTENSION( ODE_OPC_16bit_indices )
-		#endif
+    // opcode extensions
+    #if dTRIMESH_16BIT_INDICES
+    REGISTER_EXTENSION( ODE_OPC_16bit_indices )
+    #endif
 
-		#if !dTRIMESH_OPCODE_USE_OLD_TRIMESH_TRIMESH_COLLIDER
-		REGISTER_EXTENSION( ODE_OPC_new_collider )
-		#endif
+    #if !dTRIMESH_OPCODE_USE_OLD_TRIMESH_TRIMESH_COLLIDER
+    REGISTER_EXTENSION( ODE_OPC_new_collider )
+    #endif
 
-	#endif // dTRIMESH_OPCODE
+  #endif // dTRIMESH_OPCODE
 
-	#if dTRIMESH_GIMPACT
-	REGISTER_EXTENSION( ODE_EXT_gimpact )
+  #if dTRIMESH_GIMPACT
+  REGISTER_EXTENSION( ODE_EXT_gimpact )
 
-		// gimpact extensions
-	#endif
+    // gimpact extensions
+  #endif
 
 #endif // dTRIMESH_ENABLED
 
@@ -2553,45 +2581,45 @@ REGISTER_EXTENSION( ODE_EXT_mt_collisions )
 
 const char* dGetConfiguration (void)
 {
-	return ode_configuration;
+  return ode_configuration;
 }
 
 
 // Helper to check for a feature of ODE
 int dCheckConfiguration( const char* extension )
 {
-	const char *start;
-	char *where, *terminator;
+  const char *start;
+  char *where, *terminator;
 
-	/* Feature names should not have spaces. */
-	where = (char*)strchr(extension, ' ');
-	if ( where || *extension == '\0')
-		return 1;
+  /* Feature names should not have spaces. */
+  where = (char*)strchr(extension, ' ');
+  if ( where || *extension == '\0')
+    return 1;
 
-	const char* config = dGetConfiguration();
+  const char* config = dGetConfiguration();
 
-	const size_t ext_length = strlen(extension);
+  const size_t ext_length = strlen(extension);
 
-	/* It takes a bit of care to be fool-proof. Don't be fooled by sub-strings, etc. */
-	start = config;
-	for (  ; ;  )
-	{
-		where = (char*)strstr((const char *) start, extension);
-		if (!where)
-			break;
+  /* It takes a bit of care to be fool-proof. Don't be fooled by sub-strings, etc. */
+  start = config;
+  for (  ; ;  )
+  {
+    where = (char*)strstr((const char *) start, extension);
+    if (!where)
+      break;
 
-		terminator = where + ext_length;
+    terminator = where + ext_length;
 
-		if ( (where == start || *(where - 1) == ' ') &&
-			 (*terminator == ' ' || *terminator == '\0') )
-		{
-			return 1;
-		}
+    if ( (where == start || *(where - 1) == ' ') &&
+       (*terminator == ' ' || *terminator == '\0') )
+    {
+      return 1;
+    }
 
-		start = terminator;
-	}
+    start = terminator;
+  }
 
-	return 0;
+  return 0;
 }
 
 

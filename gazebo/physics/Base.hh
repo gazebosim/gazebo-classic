@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,12 @@
 #ifndef _GAZEBO_PHYSICS_BASE_HH_
 #define _GAZEBO_PHYSICS_BASE_HH_
 
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
+
 #include <boost/enable_shared_from_this.hpp>
 #include <string>
 
@@ -37,7 +43,8 @@ namespace gazebo
   /// \brief namespace for physics
   namespace physics
   {
-    /// \addtogroup gazebo_physics Classes for physics and dynamics
+    /// \addtogroup gazebo_physics Physics
+    /// \brief Physics and dynamics functionality.
     /// \{
 
     /// \brief String names for the different entity types.
@@ -71,7 +78,7 @@ namespace gazebo
 
     /// \class Base Base.hh physics/physics.hh
     /// \brief Base class for most physics classes
-    class GAZEBO_VISIBLE Base : public boost::enable_shared_from_this<Base>
+    class GZ_PHYSICS_VISIBLE Base : public boost::enable_shared_from_this<Base>
     {
       /// \enum EntityType
       /// \brief Unique identifiers for all entity types.
@@ -109,6 +116,8 @@ namespace gazebo
                 UNIVERSAL_JOINT = 0x00001000,
                 /// \brief GearboxJoint type
                 GEARBOX_JOINT   = 0x00002000,
+                /// \brief FixedJoint type
+                FIXED_JOINT     = 0x00004000,
 
                 /// \brief Shape type
                 SHAPE           = 0x00010000,
@@ -244,6 +253,10 @@ namespace gazebo
       /// \brief Remove a child by name.
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
+
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
 
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type

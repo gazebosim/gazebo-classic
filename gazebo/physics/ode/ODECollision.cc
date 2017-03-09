@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,12 @@
  * Author: Nate Koenig
  * Date: 13 Feb 2006
  */
+
+#ifdef _WIN32
+  // Ensure that Winsock2.h is included before Windows.h, which can get
+  // pulled in by anybody (e.g., Boost).
+  #include <Winsock2.h>
+#endif
 
 #include <sstream>
 
@@ -171,16 +177,14 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 //////////////////////////////////////////////////
 math::Box ODECollision::GetBoundingBox() const
 {
-  math::Box box;
   dReal aabb[6];
-
   memset(aabb, 0, 6 * sizeof(dReal));
 
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  box.min.Set(aabb[0], aabb[2], aabb[4]);
-  box.max.Set(aabb[1], aabb[3], aabb[5]);
+  math::Box box(math::Vector3(aabb[0], aabb[2], aabb[4]),
+                math::Vector3(aabb[1], aabb[3], aabb[5]));
 
   return box;
 }

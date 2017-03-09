@@ -56,9 +56,9 @@ ODE_API dReal dRandReal(void);
 /* print out a matrix */
 #ifdef __cplusplus
 ODE_API void dPrintMatrix (const dReal *A, int n, int m, char *fmt = "%10.4f ",
-		   FILE *f=stdout);
+       FILE *f=stdout);
 ODE_API void dPrintIntMatrix (const int *A, int n, int m, char *fmt = "%5d ",
-		   FILE *f=stdout);
+       FILE *f=stdout);
 #else
 ODE_API void dPrintMatrix (const dReal *A, int n, int m, char *fmt, FILE *f);
 ODE_API void dPrintIntMatrix (const int *A, int n, int m, char *fmt, FILE *f);
@@ -86,7 +86,7 @@ ODE_API dReal dMaxDifferenceLowerTriangle (const dReal *A, const dReal *B, int n
  *        Normalizes the angle to be 0 to 2*M_PI
  *        It takes and returns radians.
  */
-ODE_API static inline dReal dNormalizeAnglePositive(dReal angle)
+static inline dReal dNormalizeAnglePositive(dReal angle)
 {
   return fmod(fmod(angle, 2.0*M_PI) + 2.0*M_PI, 2.0*M_PI);
 }
@@ -98,8 +98,8 @@ ODE_API static inline dReal dNormalizeAnglePositive(dReal angle)
  * Normalizes the angle from [0, 2*M_PI] to [-M_PI, +M_PI] circle
  * It takes and returns radians.
  *
- */    
-ODE_API static inline dReal dNormalizeAngle(dReal angle)
+ */
+static inline dReal dNormalizeAngle(dReal angle)
 {
   dReal a = dNormalizeAnglePositive(angle);
   if (a > M_PI)
@@ -107,7 +107,7 @@ ODE_API static inline dReal dNormalizeAngle(dReal angle)
   return a;
 }
 
-  
+
 /*!
  * \function
  * \brief dShortestAngularDistance
@@ -119,7 +119,7 @@ ODE_API static inline dReal dNormalizeAngle(dReal angle)
  * would always be -pi <= result <= pi.  Adding the result
  * to "from" will always get you an equivelent angle to "to".
  */
-ODE_API static inline dReal dShortestAngularDistance(dReal from, dReal to)
+static inline dReal dShortestAngularDistance(dReal from, dReal to)
 {
   dReal result = dNormalizeAngle(dNormalizeAnglePositive(dNormalizeAnglePositive(to) -
     dNormalizeAnglePositive(from)));
@@ -138,7 +138,7 @@ ODE_API static inline dReal dShortestAngularDistance(dReal from, dReal to)
  * However, if |delta| > tol, then this function simply returns incoming parameter "to".
  *
  */
-ODE_API static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.3)
+static inline dReal dShortestAngularDistanceUpdate(dReal from, dReal to, dReal tol = 0.3)
 {
   dReal result = dShortestAngularDistance(from, to);
 

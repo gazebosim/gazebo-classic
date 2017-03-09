@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,9 +77,11 @@ Logger &Logger::operator()(const std::string &_file, int _line)
   int index = _file.find_last_of("/") + 1;
 
   Console::log << "(" << Time::GetWallTime() << ") ";
-  (*this) << this->prefix
+  std::stringstream prefixString;
+  prefixString << this->prefix
     << "[" << _file.substr(index , _file.size() - index) << ":"
     << _line << "] ";
+  (*this) << prefixString.str();
 
   return (*this);
 }
@@ -93,7 +95,15 @@ Logger::Buffer::Buffer(LogType _type, int _color)
 /////////////////////////////////////////////////
 Logger::Buffer::~Buffer()
 {
-  this->pubsync();
+  // Can't throw from a destructor
+  try
+  {
+    this->pubsync();
+  }
+  catch(...)
+  {
+    std::cerr << "Exception thrown while pubsync'ing Buffer" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
@@ -108,11 +118,19 @@ int Logger::Buffer::sync()
   {
     if (this->type == Logger::STDOUT)
     {
-     std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #ifndef _WIN32
+      std::cout << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #else
+      std::cout << this->str();
+      #endif
     }
     else
     {
-     std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #ifndef _WIN32
+      std::cerr << "\033[1;" << this->color << "m" << this->str() << "\033[0m";
+      #else
+      std::cerr << this->str();
+      #endif
     }
   }
 
@@ -251,8 +269,15 @@ FileLogger::Buffer::Buffer(const std::string &_filename)
 /////////////////////////////////////////////////
 FileLogger::Buffer::~Buffer()
 {
-  if (this->stream)
-    static_cast<std::ofstream*>(this->stream)->close();
+  try
+  {
+    if (this->stream)
+      static_cast<std::ofstream*>(this->stream)->close();
+  }
+  catch(...)
+  {
+    std::cerr << "Exception thrown while closing Buffer" << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////
