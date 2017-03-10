@@ -196,9 +196,27 @@ void DARTPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
 
-  const dart::collision::CollisionResult& dtLastResult =
-    this->dataPtr->dtWorld->getLastCollisionResult();
-  int numContacts = dtLastResult.getNumContacts();
+  dart::collision::CollisionResult localResult;
+  const dart::collision::CollisionResult* dtLastResult = &localResult;
+
+  if (!this->world->PhysicsEnabled())
+  {
+    // collision computation is disabled when UpdatePhysics() is not
+    // being called, so do collision detection separately here.
+    std::size_t maxContacts = 1000u;
+    dart::collision::CollisionOption opt(true, maxContacts);
+    // call of checkCollision will not update the result which
+    // can be retrieved with
+    // this->dataPtr->dtWorld->getLastCollisionResult()
+    // so get the results and store them locally.
+    this->dataPtr->dtWorld->checkCollision(opt, &localResult);
+  }
+  else
+  {
+    dtLastResult = &(this->dataPtr->dtWorld->getLastCollisionResult());
+  }
+
+  int numContacts = dtLastResult->getNumContacts();
 
   // DART returns all contact points individually, without grouping
   // them to link pairs first. The majority of the Gazebo code assumes
@@ -220,7 +238,7 @@ void DARTPhysics::UpdateCollision()
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
-        dtLastResult.getContact(i);
+        dtLastResult->getContact(i);
 
     dart::collision::CollisionObject *dtCollObj1 = dtContact.collisionObject1;
     dart::collision::CollisionObject *dtCollObj2 = dtContact.collisionObject2;
