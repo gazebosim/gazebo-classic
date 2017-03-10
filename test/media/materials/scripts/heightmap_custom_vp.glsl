@@ -19,15 +19,21 @@ out vec4 lightSpacePos2;
 
 void main()
 {
+  // calc pos after terrain lod morphing
   vec2 uv = vec2(uv0.x, uv0.y);
   vec4 worldPos = worldMatrix * position;
   float toMorph = -min(0.0, sign(uv1.y - lodMorph.y));
   worldPos.z += uv1.x * toMorph * lodMorph.x;
   gl_Position = viewProjMatrix * worldPos;
+
+  // pass the uv coord
   uvMisc.xy = uv.xy;
+
+  // shadows light space pos.
   lightSpacePos0 = texViewProjMatrix0 * worldPos;
   lightSpacePos1 = texViewProjMatrix1 * worldPos;
   lightSpacePos2 = texViewProjMatrix2 * worldPos;
+
   // pass cam depth
   uvMisc.z = gl_Position.z;
 }

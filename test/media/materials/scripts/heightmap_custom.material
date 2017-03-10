@@ -28,6 +28,8 @@ fragment_program Gazebo/HeightmapFS glsl
     param_named_auto inverseShadowmapSize0  inverse_texture_size 0
     param_named_auto inverseShadowmapSize1  inverse_texture_size 1
     param_named_auto inverseShadowmapSize2  inverse_texture_size 2
+
+    param_named uvTransform matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1
   }
 }
 
