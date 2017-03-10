@@ -3355,11 +3355,13 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
       params->setNamedConstant("pssmSplitPoints", splitPoints);
 
       // set up uv transform
-      Ogre::Matrix4 uvTransform;
-      uvTransform.setScale(Ogre::Vector3(factor, factor, 1.0));
       double xTrans = static_cast<int>(gridCount / gridWidth) * factor;
       double yTrans = (gridWidth - 1 - (gridCount % gridWidth)) * factor;
-      uvTransform.setTrans(Ogre::Vector3(xTrans, yTrans, 1.0));
+      // explicitly set all matrix elements to avoid uninitialized values
+      Ogre::Matrix4 uvTransform(factor, 0.0, 0.0, xTrans,
+                                0.0, factor, 0.0, yTrans,
+                                0.0, 0.0, 1.0, 0.0,
+                                0.0, 0.0, 0.0, 1.0) ;
       params->setNamedConstant("uvTransform", uvTransform);
     }
   }
