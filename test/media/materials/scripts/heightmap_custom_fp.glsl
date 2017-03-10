@@ -66,12 +66,12 @@ in vec4 uvMisc;
 
 uniform mat4 uvTransform;
 
-uniform sampler2D texMap;
-
 uniform vec4 pssmSplitPoints;
 uniform sampler2D shadowMap0;
 uniform sampler2D shadowMap1;
 uniform sampler2D shadowMap2;
+
+uniform sampler2D texMap;
 
 uniform float inverseShadowmapSize0;
 uniform float inverseShadowmapSize1;

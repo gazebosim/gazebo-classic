@@ -29,6 +29,8 @@ fragment_program Gazebo/HeightmapFS glsl
     param_named_auto inverseShadowmapSize1  inverse_texture_size 1
     param_named_auto inverseShadowmapSize2  inverse_texture_size 2
 
+    param_named texMap int 3
+
     param_named uvTransform matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1
   }
 }
@@ -45,15 +47,6 @@ material Gazebo/CustomHeightmapShader
 
       fragment_program_ref Gazebo/HeightmapFS
       {
-        param_named texMap int 0
-      }
-
-      texture_unit
-      {
-        texture heightmap_bowl.png 2d
-        filtering anisotropic anisotropic linear
-        max_anisotropy 16
-        tex_address_mode clamp
       }
 
       texture_unit shadowMap0
@@ -69,6 +62,13 @@ material Gazebo/CustomHeightmapShader
       texture_unit shadowMap2
       {
         content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit
+      {
+        texture heightmap_bowl.png 2d
+        filtering anisotropic anisotropic linear
+        max_anisotropy 16
         tex_address_mode clamp
       }
     }
