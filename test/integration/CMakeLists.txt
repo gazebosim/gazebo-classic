@@ -103,6 +103,7 @@ set(tests
   world_population.cc
   world_remove.cc
   worlds_installed.cc
+  contacts_update.cc
   )
 
 if (HAVE_GTS)
