@@ -34,7 +34,7 @@ fragment_program Gazebo/HeightmapFS glsl
     param_named_auto inverseShadowmapSize1  inverse_texture_size 1
     param_named_auto inverseShadowmapSize2  inverse_texture_size 2
 
-    // texture map - here we are just reusing the heightmsp image to help shade
+    // texture map - here we are just reusing the heightmap image to help shade
     // the whole terrain
     param_named texMap int 3
 
