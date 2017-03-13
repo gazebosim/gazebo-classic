@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2017 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,18 +42,27 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
     // Take the DART test back in as soon as this fix has been merged:
     // https://bitbucket.org/JenniferBuehler/gazebo
     // branch "dart-6-fix-like-PR-2654"
+    return;
   }
 
   this->Load("worlds/empty.world", true, _physicsEngine);
 
   // Load the spheres into the world.
-  // Set position high enough so id doesn't intersect ground plane
+  // Set position high enough so it doesn't intersect ground plane
   ignition::math::Vector3d pos(0, 0, 5);
   this->SpawnSphere("sphere1", pos, ignition::math::Vector3d::Zero, false);
   // Spheres spawned with SpawnSphere() have a radius of 0.5.
   // Move it up so it intersects with the other sphere
   pos.Z() += 0.4;
   this->SpawnSphere("sphere2", pos, ignition::math::Vector3d::Zero, true);
+
+  // Get a pointer to the world, physics engine and contact manager
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != NULL);
+  physics::ContactManager * contactManager = physics->GetContactManager();
+  ASSERT_TRUE(contactManager != NULL);
 
   // need to make a fake subscriber to the contacts topic in order
   // to trigger the ContactManager to maintain all contacts.
@@ -65,22 +74,14 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   node->Init();
   transport::SubscriberPtr sub = node->Subscribe(contactsTopic, &OnContact);
 
-  // Get a pointer to the world, physics engine and contact manager
-  physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
-  physics::ContactManager * contactManager = physics->GetContactManager();
-  ASSERT_TRUE(contactManager != NULL);
-
-  // Disable physics enigne and do one step.
+  // Disable physics engine and do one step.
   // The contacts should be available, even though the engine is disabled.
   world->SetPhysicsEnabled(false);
   world->Step(1);
 
   gzdbg<<"Number of contacts: "<<contactManager->GetContactCount() << "\n";
 
-  ASSERT_GT(contactManager->GetContactCount(), (unsigned int) 0);
+  ASSERT_GT(contactManager->GetContactCount(), 0u);
 }
 
 TEST_P(ContactsUpdate, TestTwoSpheres)
