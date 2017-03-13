@@ -10,7 +10,7 @@
 
 1. Support Heightmap LOD
     * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
-    * [Pull request 2XXX](https://bitbucket.org/osrf/gazebo/pull-request/2XXX)
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
 
 1. Support setting shadow texture size
     * [Pull request 2644](https://bitbucket.org/osrf/gazebo/pull-request/2644)
