@@ -102,7 +102,7 @@ void SensorManager::Stop()
 }
 
 //////////////////////////////////////////////////
-bool SensorManager::Running()
+bool SensorManager::Running() const
 {
   for (auto const &container : this->sensorContainers)
   {
@@ -491,7 +491,7 @@ void SensorManager::SensorContainer::Stop()
 }
 
 //////////////////////////////////////////////////
-bool SensorManager::SensorContainer::Running()
+bool SensorManager::SensorContainer::Running() const
 {
   return !this->stop;
 }
