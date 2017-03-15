@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Force / torque sensor visualization using WrenchVisual
+    * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
+
 1. Cache heightmap tile data
     * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
 
