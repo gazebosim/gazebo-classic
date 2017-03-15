@@ -554,6 +554,9 @@ void Heightmap::Load()
       this->dataPtr->numTerrainSubdivisions =
           std::min(this->dataPtr->numTerrainSubdivisions, 16u);
       nTerrains = this->dataPtr->numTerrainSubdivisions;
+
+      gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
+          this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
     }
     prefix = terrainDirPath / "gazebo_terrain";
   }

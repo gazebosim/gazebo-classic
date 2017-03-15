@@ -31,7 +31,8 @@
           </geometry>
           <material>
             <script>
-              <name>Gazebo/Red</name>
+              <uri>file://media/materials/scripts/heightmap_custom.material</uri>
+              <name>Gazebo/CustomHeightmapShader</name>
             </script>
           </material>
         </visual>
