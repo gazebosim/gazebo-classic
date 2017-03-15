@@ -250,7 +250,7 @@ namespace gazebo
       /// \brief Set the grid size of the terrain, i.e. Number of terrain slots.
       /// This will be used to determined how the texture will be mapped to the
       /// terrain
-      /// \param[in] _materialName Name of material
+      /// \param[in] _size Grid size of the terrain
       public: void setGridSize(const unsigned int _size);
 
       /// \brief Subclassed to provide profile-specific material generation

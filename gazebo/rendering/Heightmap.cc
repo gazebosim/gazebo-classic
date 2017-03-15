@@ -819,11 +819,11 @@ void Heightmap::SetWireframe(const bool _show)
     Ogre::Pass *pass;
 
     for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-        techniqueCount++)
+         ++techniqueCount)
     {
       technique = material->getTechnique(techniqueCount);
 
-      for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+      for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
       {
         pass = technique->getPass(passCount);
         if (_show)
@@ -3364,7 +3364,7 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
       Ogre::Matrix4 uvTransform(factor, 0.0, 0.0, xTrans,
                                 0.0, factor, 0.0, yTrans,
                                 0.0, 0.0, 1.0, 0.0,
-                                0.0, 0.0, 0.0, 1.0) ;
+                                0.0, 0.0, 0.0, 1.0);
       params->setNamedConstant("uvTransform", uvTransform);
     }
   }
