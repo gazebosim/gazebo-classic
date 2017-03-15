@@ -103,6 +103,7 @@ set(tests
   world_population.cc
   world_remove.cc
   worlds_installed.cc
+  transport_msg_count.cc
   )
 
 if (HAVE_GTS)
@@ -124,6 +125,10 @@ set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+
+# TODO: remove the timeout for this test after the requirement
+# to manually start a remote subscriber is removed.
+set_tests_properties(${TEST_TYPE}_transport_msg_count PROPERTIES TIMEOUT 20)
 
 set_property(
   SOURCE world_clone.cc
