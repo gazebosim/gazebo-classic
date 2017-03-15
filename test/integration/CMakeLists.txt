@@ -32,6 +32,7 @@ set(tests
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contacts_update.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -103,7 +104,6 @@ set(tests
   world_population.cc
   world_remove.cc
   worlds_installed.cc
-  contacts_update.cc
   )
 
 if (HAVE_GTS)

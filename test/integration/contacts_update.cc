@@ -26,7 +26,6 @@ class ContactsUpdate : public ServerFixture,
   /// collision engine and checks that contact points are still generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void TestTwoSpheres(const std::string &_physicsEngine);
-
 };
 
 void OnContact(ConstContactsPtr &/*_msg*/)
@@ -58,17 +57,17 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 
   // Get a pointer to the world, physics engine and contact manager
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   physics::ContactManager * contactManager = physics->GetContactManager();
-  ASSERT_TRUE(contactManager != NULL);
+  ASSERT_TRUE(contactManager != nullptr);
 
   // need to make a fake subscriber to the contacts topic in order
   // to trigger the ContactManager to maintain all contacts.
   // This can be replaced by ContactManager::NeverDropContacts()
   // as soon as PR 2629 is merged
-  // https://bitbucket.org/osrf/gazebo/pull-requests/2629/possibility-to-enforce-contact-addition-in/diff
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2629
   std::string contactsTopic = "~/physics/contacts";
   transport::NodePtr node(new transport::Node());
   node->Init();
@@ -77,9 +76,11 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   // Disable physics engine and do one step.
   // The contacts should be available, even though the engine is disabled.
   world->SetPhysicsEnabled(false);
+  EXPECT_FALSE(world->PhysicsEnabled());
+
   world->Step(1);
 
-  gzdbg<<"Number of contacts: "<<contactManager->GetContactCount() << "\n";
+  gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
 
   ASSERT_GT(contactManager->GetContactCount(), 0u);
 }
