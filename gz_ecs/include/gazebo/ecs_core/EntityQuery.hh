@@ -19,9 +19,9 @@
 #ifndef GAZEBO_ECS_CORE_ENTITYQUERY_HH_
 #define GAZEBO_ECS_CORE_ENTITYQUERY_HH_
 
-#include <typeinfo>
 #include <memory>
 #include <vector>
+#include "gazebo/ecs_core/ComponentType.hh"
 #include "gazebo/ecs_core/EntityQueryResult.hh"
 
 namespace gazebo
@@ -42,7 +42,7 @@ class EntityQuery
     template <typename T>
     void AddComponent()
     {
-      this->AddComponent(typeid(T).hash_code());
+      this->AddComponent(GetComponentType<T>());
     }
 
     /// \brief returns true if these are the same instance
@@ -52,11 +52,11 @@ class EntityQuery
     EntityQueryResult* Results() const;
 
     /// \brief Get the components that have been added to the query
-    std::vector<std::size_t> ComponentTypes() const;
+    std::vector<ComponentType> ComponentTypes() const;
 
   private:
 
-    void AddComponent(std::size_t _hash);
+    void AddComponent(ComponentType _hash);
 
     std::shared_ptr<EntityQueryPrivate> impl;
 };

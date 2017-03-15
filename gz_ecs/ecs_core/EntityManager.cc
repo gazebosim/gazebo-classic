@@ -54,7 +54,7 @@ void EntityManager::RemoveQuery(const EntityQuery &_query)
   }
 }
 
-void* EntityManager::AddComponent(Entity _id, std::size_t _hash, std::size_t _size)
+void* EntityManager::AddComponent(Entity _id, ComponentType _hash, std::size_t _size)
 {
   void *ret = nullptr;
   // Make some space to store the components
@@ -68,7 +68,7 @@ void* EntityManager::AddComponent(Entity _id, std::size_t _hash, std::size_t _si
   return ret;
 }
 
-void* EntityManager::GetComponent(Entity _id, std::size_t _hash, std::size_t _size)
+void* EntityManager::GetComponent(Entity _id, ComponentType _hash, std::size_t _size)
 {
   // TODO map.find() better than count() here
   void *ret = nullptr;
@@ -92,7 +92,7 @@ void EntityManager::Update()
   for (; queryIter != queryIterEnd; ++queryIter)
   {
     std::vector<Entity> &results = queryIter->Results()->impl->results;
-    std::vector<std::size_t> components = queryIter->ComponentTypes();
+    std::vector<ComponentType> components = queryIter->ComponentTypes();
 
     // Check every entity
     // TODO this could be faster if which entities had components added

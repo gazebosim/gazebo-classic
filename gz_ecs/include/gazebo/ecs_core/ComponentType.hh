@@ -16,29 +16,32 @@
 */
 
 
-#ifndef GAZEBO_ECS_CORE_ENTITYQUERYPRIVATE_HH_
-#define GAZEBO_ECS_CORE_ENTITYQUERYPRIVATE_HH_
+#ifndef GAZEBO_ECS_CORE_COMPONENTTYPE_HH_
+#define GAZEBO_ECS_CORE_COMPONENTTYPE_HH_
 
-#include <vector>
-#include "gazebo/ecs_core/EntityQueryResult.hh"
+#include <typeinfo>
+#include <type_traits>
 
 namespace gazebo
 {
 namespace ecs_core
 {
 
-class EntityQueryPrivate
+/// \brief A type with a code identifying the type of component
+typedef std::size_t ComponentType;
+
+/// \brief a for getting a type hash code for identifying a component
+template <typename T>
+ComponentType GetComponentType()
 {
-  public:
-    /// \brief list of component types that must be present on entities
-    std::vector<ComponentType> componentTypes;
-
-    /// \brief The results of the query
-    EntityQueryResult results;
-
-};
+  // TODO is POD too strict here? The real problem is EntityManager may
+  // not be able to guarantee calling the destructor of a componenent.
+  static_assert(std::is_pod<T>::value == true, "Component must be Plain Old Data");
+  return typeid(T).hash_code();
+}
 
 }
 }
 
 #endif
+

@@ -22,7 +22,7 @@
 #include <memory>
 #include <typeinfo>
 
-
+#include "gazebo/ecs_core/ComponentType.hh"
 #include "gazebo/ecs_core/Entity.hh"
 #include "gazebo/ecs_core/EntityQuery.hh"
 
@@ -53,13 +53,13 @@ class EntityManager
     template <typename T>
     T* AddComponent(Entity _id)
     {
-      return static_cast<T*>(this->AddComponent(_id, typeid(T).hash_code(), sizeof(T)));
+      return static_cast<T*>(this->AddComponent(_id, GetComponentType<T>(), sizeof(T)));
     }
 
     template <typename T>
     T* GetComponent(Entity _id)
     {
-      return static_cast<T*>(this->GetComponent(_id, typeid(T).hash_code(), sizeof(T)));
+      return static_cast<T*>(this->GetComponent(_id, GetComponentType<T>(), sizeof(T)));
     }
 
     /// \brief Add a query for components of a certain type
@@ -79,9 +79,9 @@ class EntityManager
     void Update();
 
   private:
-    void* AddComponent(Entity _id, std::size_t _hash, std::size_t _size);
+    void* AddComponent(Entity _id, ComponentType _hash, std::size_t _size);
 
-    void* GetComponent(Entity _id, std::size_t _hash, std::size_t _size);
+    void* GetComponent(Entity _id, ComponentType _hash, std::size_t _size);
 
     EntityManager(const EntityManager&) = delete;
 

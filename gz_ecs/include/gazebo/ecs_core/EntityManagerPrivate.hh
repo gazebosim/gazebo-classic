@@ -23,6 +23,7 @@
 #include <vector>
 #include <memory>
 
+#include "gazebo/ecs_core/ComponentType.hh"
 #include "gazebo/ecs_core/Entity.hh"
 #include "gazebo/ecs_core/EntityQuery.hh"
 
@@ -40,8 +41,7 @@ class EntityManagerPrivate
     /// \brief Component by entity storage
     ///
     /// Outer map matches to an entity
-    /// Inner map matches a typeid().hash_code of the component type to a 
-    /// vector of bytes
+    /// Inner map matches component type to bytes
     /// I'm not sure what kind of storage for components and entities will be
     /// On one hand, systems access the components of an entity at the same
     /// time so storing the components of an entity adjacent to each other
@@ -58,7 +58,7 @@ class EntityManagerPrivate
     //    Stores components of the same type "semi-contiguous" in memory
     /// This is a prototype and right now easy is important
     /// TODO profile performance of component storage
-    std::unordered_map<Entity, std::unordered_map<std::size_t, std::shared_ptr<char> > > entities;
+    std::unordered_map<Entity, std::unordered_map<ComponentType, std::shared_ptr<char> > > entities;
 
     /// \brief Queries on this entity manager
     std::vector<EntityQuery> queries;

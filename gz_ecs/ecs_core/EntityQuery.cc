@@ -35,7 +35,7 @@ EntityQuery::~EntityQuery()
 {
 }
 
-void EntityQuery::AddComponent(std::size_t _hash)
+void EntityQuery::AddComponent(ComponentType _hash)
 {
   auto begin = this->impl->componentTypes.begin();
   auto end = this->impl->componentTypes.end();
@@ -57,7 +57,7 @@ EntityQueryResult* EntityQuery::Results() const
   return &(this->impl->results);
 }
 
-std::vector<std::size_t> EntityQuery::ComponentTypes() const
+std::vector<ComponentType> EntityQuery::ComponentTypes() const
 {
   return this->impl->componentTypes;
 }
