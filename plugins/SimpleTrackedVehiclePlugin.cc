@@ -21,6 +21,9 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
+// OpenDE private definitions; unfortunately, we need them
+#include "joints/contact.h"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/transport/transport.hh"
 
@@ -40,8 +43,10 @@ SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
 }
 
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
-                                sdf::ElementPtr _sdf) {
-  if (_model->GetWorld()->Physics()->GetType().compare("ode") != 0) {
+                                      sdf::ElementPtr _sdf)
+{
+  if (_model->GetWorld()->Physics()->GetType().compare("ode") != 0)
+  {
     gzerr << "Tracked vehicle simulation works only with ODE." << std::endl;
     return;
   }
@@ -88,11 +93,25 @@ void SimpleTrackedVehiclePlugin::Init()
   this->contactManager = model->GetWorld()->Physics()->GetContactManager();
 
   // set correct categories and collide bitmasks
-  this->setGeomCategories();
-  for (auto link : model->GetLinks()) {
-    for (auto collision : link->GetCollisions()) {
+  this->SetGeomCategories();
+  for (auto link : model->GetLinks())
+  {
+    for (auto collision : link->GetCollisions())
+    {
       collision->GetSurface()->collideWithoutContactBitmask =
           this->collideWithoutContactBitmask;
+    }
+  }
+
+  // set the desired friction to tracks (override the values set in the
+  // SDF model)
+  for (auto track : {this->leftTrack, this->rightTrack} )
+  {
+    for (auto collision : track->GetCollisions())
+    {
+      auto frictionPyramid = collision->GetSurface()->FrictionPyramid();
+      frictionPyramid->SetMuPrimary(this->GetTrackMu());
+      frictionPyramid->SetMuSecondary(this->GetTrackMu2());
     }
   }
 
@@ -103,15 +122,15 @@ void SimpleTrackedVehiclePlugin::Init()
   // HACK Contact manager would not publish any contacts unless there is at
   // least one filter or someone subscribes to the ~/physics/contacts gazebo
   // topic. We do not handle the received contacts in any way, because we need
-  // to process them earlier then the message is published (which is done in
-  // driveTracks()).
+  // to process them earlier than the message is published (which is done in
+  // DriveTracks()).
   this->contactsSubscriber = this->node->Subscribe(
       this->GetRobotNamespace() + "/physics/contacts",
-      &SimpleTrackedVehiclePlugin::ignoreContacts, this);
+      &SimpleTrackedVehiclePlugin::IgnoreContacts, this);
 
   this->beforePhysicsUpdateConnection =
       event::Events::ConnectBeforePhysicsUpdate(
-          std::bind(&SimpleTrackedVehiclePlugin::driveTracks, this,
+          std::bind(&SimpleTrackedVehiclePlugin::DriveTracks, this,
                     std::placeholders::_1));
 }
 
@@ -122,74 +141,79 @@ void SimpleTrackedVehiclePlugin::Reset()
   TrackedVehiclePlugin::Reset();
 }
 
-void SimpleTrackedVehiclePlugin::SetTrackVelocity(double left, double right)
+void SimpleTrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
 {
-  this->leftTrackVelocity = -left;
-  this->rightTrackVelocity = -right;
+  this->leftTrackVelocity = -_left;
+  this->rightTrackVelocity = -_right;
 }
 
-void SimpleTrackedVehiclePlugin::setGeomCategories() {
-  std::vector<physics::LinkPtr> linksToProcess(
-      this->body->GetModel()->GetLinks());
+void SimpleTrackedVehiclePlugin::SetGeomCategories()
+{
+  auto linksToProcess = this->body->GetModel()->GetLinks();
 
+  // set ROBOT_CATEGORY to the whole body and all subparts
   physics::LinkPtr link;
-  while (!linksToProcess.empty()) {
+  while (!linksToProcess.empty())
+  {
     link = linksToProcess.back();
     linksToProcess.pop_back();
 
-    std::vector<physics::LinkPtr> childLinks(link->GetChildJointsLinks());
+    auto childLinks = link->GetChildJointsLinks();
     linksToProcess.insert(linksToProcess.end(), childLinks.begin(),
                           childLinks.end());
 
-    for (auto collision : link->GetCollisions()) {
+    for (auto collision : link->GetCollisions())
+    {
       collision->SetCategoryBits(ROBOT_CATEGORY);
       collision->SetCollideBits(GZ_FIXED_COLLIDE);
     }
   }
 
-  for (physics::CollisionPtr collision : this->leftTrack->GetCollisions()) {
+  for (auto collision : this->leftTrack->GetCollisions())
+  {
     collision->SetCategoryBits(ROBOT_CATEGORY | BELT_CATEGORY | LEFT_CATEGORY);
   }
-  for (physics::CollisionPtr collision : this->rightTrack->GetCollisions()) {
+  for (auto collision : this->rightTrack->GetCollisions())
+  {
     collision->SetCategoryBits(ROBOT_CATEGORY | BELT_CATEGORY);
   }
-
 }
 
-void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
+void SimpleTrackedVehiclePlugin::DriveTracks(
+    const common::UpdateInfo &/*_unused*/)
 {
   if (this->contactManager->GetContactCount() == 0)
-  {
     return;
-  }
 
   /////////////////////////////////////////////
   // Calculate the desired center of rotation
   /////////////////////////////////////////////
 
-  const double leftBeltSpeed = this->leftTrackVelocity;
-  const double rightBeltSpeed = this->rightTrackVelocity;
+  const auto leftBeltSpeed = this->leftTrackVelocity;
+  const auto rightBeltSpeed = this->rightTrackVelocity;
 
   // the desired linear and angular speeds (set by desired track velocities)
-  const double linearSpeed = (leftBeltSpeed + rightBeltSpeed) / 2;
+  const auto linearSpeed = (leftBeltSpeed + rightBeltSpeed) / 2;
   // for whatever reason, the angular speed needs to be negated here
-  const double angularSpeed = -(leftBeltSpeed - rightBeltSpeed) *
+  const auto angularSpeed = -(leftBeltSpeed - rightBeltSpeed) *
       this->GetSteeringEfficiency() / this->GetTracksSeparation();
 
   // radius of the turn the robot is doing
-  const double desiredRotationRadiusSigned =
+  const auto desiredRotationRadiusSigned =
       (fabs(angularSpeed) < 0.1) ?
-        dInfinity : // is driving straight
+        // is driving straight
+        dInfinity :
         (
           (fabs(linearSpeed) < 0.1) ?
-            0 : // is rotating about a single point
-            linearSpeed / angularSpeed // general movement
-        );
+            // is rotating about a single point
+            0 :
+            // general movement
+            linearSpeed / angularSpeed);
 
-  const ignition::math::Pose3d bodyPose = this->body->WorldPose();
-  const ignition::math::Vector3d bodyYAxisGlobal =
+  const auto bodyPose = this->body->WorldPose();
+  const auto bodyYAxisGlobal =
       bodyPose.Rot().RotateVector(ignition::math::Vector3d(0, 1, 0));
-  const ignition::math::Vector3d centerOfRotation =
+  const auto centerOfRotation =
       (bodyYAxisGlobal * desiredRotationRadiusSigned) + bodyPose.Pos();
 
   ////////////////////////////////////////////////////////////////////////
@@ -197,11 +221,10 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
   // surface movement.
   ////////////////////////////////////////////////////////////////////////
   size_t i = 0;
+  const auto contacts = this->contactManager->GetContacts();
 
-  const std::vector<physics::Contact *> contacts =
-      this->contactManager->GetContacts();
-
-  for (physics::Contact *contact : contacts) {
+  for (auto contact : contacts)
+  {
     // Beware! There may be invalid contacts beyond GetContactCount()...
     if (i == this->contactManager->GetContactCount())
       break;
@@ -209,16 +232,15 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
     ++i;
 
     if (contact->collision1->GetSurface()->collideWithoutContact ||
-        contact->collision1->GetSurface()->collideWithoutContact) {
+        contact->collision2->GetSurface()->collideWithoutContact)
       continue;
-    }
 
     if (!contact->collision1->GetLink()->GetEnabled() ||
-        !contact->collision2->GetLink()->GetEnabled()) {
+        !contact->collision2->GetLink()->GetEnabled())
       continue;
-    }
 
-    if (contact->collision1->IsStatic() && contact->collision2->IsStatic()) {
+    if (contact->collision1->IsStatic() && contact->collision2->IsStatic())
+    {
       // we're not interested in static model collisions
       // (they do not have any ODE bodies).
       continue;
@@ -233,7 +255,8 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
     dGeomID geom2 = dynamic_cast<physics::ODECollision& >(
         *contact->collision2).GetCollisionId();
 
-    if (body1 == 0) {
+    if (body1 == 0)
+    {
       std::swap(body1, body2);
       std::swap(geom1, geom2);
     }
@@ -242,9 +265,8 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
     const bool isGeom1Track = (dGeomGetCategoryBits(geom1) & BELT_CATEGORY) > 0;
     const bool isGeom2Track = (dGeomGetCategoryBits(geom2) & BELT_CATEGORY) > 0;
 
-    if (!isGeom1Track && !isGeom2Track) {
+    if (!isGeom1Track && !isGeom2Track)
       continue;
-    }
 
     // speed and geometry of the track in collision
     const dGeomID trackGeom = (isGeom1Track ? geom1 : geom2);
@@ -253,11 +275,10 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
 
     // remember if we've found at least one contact joint (we should!)
     bool foundContact = false;
-    for (dContact_iterator contactIterator =
-            dContact_iterator::begin(body1, geom1, geom2);
-         contactIterator != dContact_iterator::end();
-         ++contactIterator) {
-
+    for (auto contactIterator = ContactIterator::begin(body1, geom1, geom2);
+         contactIterator != ContactIterator::end();
+         ++contactIterator)
+    {
       dContact* odeContact = *contactIterator;
 
       // now we're sure it is a contact between our two geometries
@@ -267,17 +288,21 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
         odeContact->geom.normal[1], odeContact->geom.normal[2]);
 
       // vector tangent to the belt pointing in the belt's movement direction
-      ignition::math::Vector3d beltDirection(
-          contactNormal.Cross(bodyYAxisGlobal));
+      auto beltDirection(contactNormal.Cross(bodyYAxisGlobal));
 
-      if (beltSpeed > 0) {
+      if (beltSpeed > 0)
         beltDirection = -beltDirection;
-      }
 
-      const ignition::math::Vector3d frictionDirection =
-          this->computeFrictionDirection(linearSpeed, angularSpeed,
-            desiredRotationRadiusSigned == dInfinity, bodyPose, bodyYAxisGlobal,
-            centerOfRotation, odeContact, beltDirection);
+      const auto frictionDirection =
+        this->ComputeFrictionDirection(linearSpeed,
+                                       angularSpeed,
+                                       desiredRotationRadiusSigned == dInfinity,
+                                       bodyPose,
+                                       bodyYAxisGlobal,
+                                       centerOfRotation,
+                                       odeContact,
+                                       beltDirection);
+
       odeContact->fdir1[0] = frictionDirection.X();
       odeContact->fdir1[1] = frictionDirection.Y();
       odeContact->fdir1[2] = frictionDirection.Z();
@@ -285,13 +310,12 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
       // use friction direction and motion1 to simulate the track movement
       odeContact->surface.mode |= dContactFDir1 | dContactMotion1;
 
-      // the dot product <beltDirection,fdir1> is the cosine of the angle they
-      // form (because both are unit vectors)
-      odeContact->surface.motion1 = this->computeSurfaceMotion(
-          beltSpeed, beltDirection, frictionDirection);
+      odeContact->surface.motion1 = this->ComputeSurfaceMotion(
+        beltSpeed, beltDirection, frictionDirection);
     }
 
-    if (!foundContact) {
+    if (!foundContact)
+    {
       gzwarn << "No ODE contact joint found for contact " <<
         contact->DebugString() << std::endl;
       continue;
@@ -299,77 +323,81 @@ void SimpleTrackedVehiclePlugin::driveTracks(const common::UpdateInfo&)
   }
 }
 
-ignition::math::Vector3d SimpleTrackedVehiclePlugin::computeFrictionDirection(
-    const double linearSpeed, const double angularSpeed,
-    const bool drivingStraight, const ignition::math::Pose3d &bodyPose,
-    const ignition::math::Vector3d &bodyYAxisGlobal,
-    const ignition::math::Vector3d &centerOfRotation,
-    const dContact* odeContact,
-    const ignition::math::Vector3d &beltDirection) const {
-
+ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(
+  const double _linearSpeed, const double _angularSpeed,
+  const bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
+  const ignition::math::Vector3d &_bodyYAxisGlobal,
+  const ignition::math::Vector3d &_centerOfRotation,
+  const dContact *_odeContact,
+  const ignition::math::Vector3d &_beltDirection) const
+{
   ignition::math::Vector3d frictionDirection;
 
-  const ignition::math::Vector3d contactNormal(odeContact->geom.normal[0],
-    odeContact->geom.normal[1], odeContact->geom.normal[2]);
+  const ignition::math::Vector3d contactNormal(_odeContact->geom.normal[0],
+    _odeContact->geom.normal[1], _odeContact->geom.normal[2]);
 
-  if (!drivingStraight) { // non-straight drive
-
-    const ignition::math::Vector3d contactPos(odeContact->geom.pos[0],
-      odeContact->geom.pos[1], odeContact->geom.pos[2]);
+  if (!_drivingStraight)
+  {
+    // non-straight drive
+    const ignition::math::Vector3d contactPos(_odeContact->geom.pos[0],
+      _odeContact->geom.pos[1], _odeContact->geom.pos[2]);
 
     // vector pointing from the center of rotation to the contact point
-    const ignition::math::Vector3d COR2Contact =
-        (contactPos - centerOfRotation).Normalize();
+    const auto COR2Contact = (contactPos - _centerOfRotation).Normalize();
 
     // the friction force should be perpendicular to COR2Contact
     frictionDirection = contactNormal.Cross(COR2Contact);
 
     // position of the contact point relative to vehicle body
-    const ignition::math::Vector3d contactInVehiclePos(
-        bodyPose.Rot().RotateVectorReverse(contactPos - bodyPose.Pos()));
+    const auto contactInVehiclePos =
+        _bodyPose.Rot().RotateVectorReverse(contactPos - _bodyPose.Pos());
 
-    const dReal linearSpeedSignum =
-        (fabs(linearSpeed) > 0.1) ? this->sgn(linearSpeed) : 1;
+    // TODO substitute this->sgn with ignition::math::signum when merged
+    const int linearSpeedSignum =
+        (fabs(_linearSpeed) > 0.1) ? this->sgn(_linearSpeed) : 1;
 
     // contactInVehiclePos.Dot(ignition::math::Vector3d(1, 0, 0)) > 0 means
     // the contact is "in front" of the line on which COR moves
-    if ((int)(this->sgn(angularSpeed) *
-            this->sgn(bodyYAxisGlobal.Dot(frictionDirection))) !=
-        (int)((linearSpeedSignum) * this->sgn(contactInVehiclePos.Dot(
-            ignition::math::Vector3d(1, 0, 0))))) {
+    if ((this->sgn(_angularSpeed) *
+          this->sgn(_bodyYAxisGlobal.Dot(frictionDirection))) !=
+      (linearSpeedSignum *
+        this->sgn(contactInVehiclePos.Dot(
+          ignition::math::Vector3d(1, 0, 0)))))
+    {
       frictionDirection = -frictionDirection;
     }
 
-    if (linearSpeed < 0) {
+    if (_linearSpeed < 0)
       frictionDirection = - frictionDirection;
-    }
-
-  } else { // straight drive
-
-    frictionDirection = contactNormal.Cross(bodyYAxisGlobal);
-
-    if (frictionDirection.Dot(beltDirection) < 0) {
-      frictionDirection = -frictionDirection;
-    }
   }
+  else
+  {
+    // straight drive
+    frictionDirection = contactNormal.Cross(_bodyYAxisGlobal);
+
+    if (frictionDirection.Dot(_beltDirection) < 0)
+      frictionDirection = -frictionDirection;
+  }
+
   return frictionDirection;
 }
 
-double SimpleTrackedVehiclePlugin::computeSurfaceMotion(const double beltSpeed,
-    const ignition::math::Vector3d &beltDirection,
-    const ignition::math::Vector3d &frictionDirection) const {
-
-  return -beltDirection.Dot(frictionDirection) * fabs(beltSpeed);
-
+double SimpleTrackedVehiclePlugin::ComputeSurfaceMotion(const double _beltSpeed,
+    const ignition::math::Vector3d &_beltDirection,
+    const ignition::math::Vector3d &_frictionDirection) const
+{
+  // the dot product <beltDirection,fdir1> is the cosine of the angle they
+  // form (because both are unit vectors)
+  // the motion is in the opposite direction than the desired motion of the body
+  return -_beltDirection.Dot(_frictionDirection) * fabs(_beltSpeed);
 }
 
-// dContactIterator main code
-
-SimpleTrackedVehiclePlugin::dContact_iterator::self_type
-SimpleTrackedVehiclePlugin::dContact_iterator::operator++()
+SimpleTrackedVehiclePlugin::ContactIterator
+SimpleTrackedVehiclePlugin::ContactIterator::operator++()
 {
   // initialized && null contact means we've reached the end of the iterator
-  if (this->initialized && this->currentContact == nullptr) {
+  if (this->initialized && this->currentContact == nullptr)
+  {
     return *this;
   }
 
@@ -381,35 +409,29 @@ SimpleTrackedVehiclePlugin::dContact_iterator::operator++()
 
   // remember if we've found at least one contact joint (we should!)
   bool found = false;
-  for (; this->jointIndex < (size_t)dBodyGetNumJoints(this->body);
-         this->jointIndex++) {
-    const dJointID joint = dBodyGetJoint(this->body, (int)this->jointIndex);
+  for (; this->jointIndex < static_cast<size_t>(dBodyGetNumJoints(this->body));
+         this->jointIndex++)
+  {
+    const dJointID joint = dBodyGetJoint(this->body,
+                                         static_cast<int>(this->jointIndex));
 
     // only interested in contact joints
-    if (dJointGetType(joint) != dJointTypeContact) {
+    if (dJointGetType(joint) != dJointTypeContact)
       continue;
-    }
 
-    // HACK uncomment if dxJointContact->contact offset changes in the bundled
-    // ODE to find out its new address.
-    // Here we access ODE's private class dxJointContact, so it's needed to add
-    // deps/opende/src temporarily to include dirs.
-    // The line to uncomment follows.
-    //dContact* odeContact = & static_cast<dxJointContact*>(contactJoint)->contact;
+    // HACK here we unfortunately have to access private ODE data
+     dContact* odeContact = &static_cast<dxJointContact*>(joint)->contact;
 
-    // offset of "contact" member inside dxJointContact has been 0xE8 in the
-    // ODE bundled with Gazebo 8.0
-    dContact* odeContact = (dContact*) ((uint8_t*) joint + 0xE8);
     if (!(
             odeContact->geom.g1 == this->geom1 &&
-            odeContact->geom.g2 == this->geom2
-         ) &&
+            odeContact->geom.g2 == this->geom2)
+        &&
         !(
             odeContact->geom.g1 == this->geom2 &&
-            odeContact->geom.g2 == this->geom1
-         )
-        ) {
-      continue; // not a contact between our two geometries
+            odeContact->geom.g2 == this->geom1))
+    {
+      // not a contact between our two geometries
+      continue;
     }
 
     // we found a contact we're interested in
@@ -417,16 +439,19 @@ SimpleTrackedVehiclePlugin::dContact_iterator::operator++()
     found = true;
     this->initialized = true;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wreturn-stack-address"
+    // intentionally, we allow the reference to escape local scope; we can be
+    // pretty sure the contact instance won't get deleted until this code
+    // finishes, since we are in a pause between contact generation and physics
+    // update
     this->currentContact = &odeContact;
-#pragma clang diagnostic pop
 
-    this->jointIndex++; // needed since we break out of the for-loop
+    // needed since we break out of the for-loop
+    this->jointIndex++;
     break;
   }
 
-  if (!found) {
+  if (!found)
+  {
     // we've reached the end of the iterator
     this->currentContact = nullptr;
     this->initialized = true;
@@ -436,100 +461,100 @@ SimpleTrackedVehiclePlugin::dContact_iterator::operator++()
   return *this;
 }
 
-// Implementation of boring parts of the dContactIterator
-
-SimpleTrackedVehiclePlugin::dContact_iterator::dContact_iterator() :
-    currentContact(nullptr), jointIndex(0), body(0), geom1(0), geom2(0),
+SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator()
+    : currentContact(nullptr), jointIndex(0), body(0), geom1(0), geom2(0),
     initialized(false)
 {
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::dContact_iterator(
+SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator(
     bool _initialized) : currentContact(nullptr), initialized(_initialized)
 {
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::dContact_iterator(
-    const SimpleTrackedVehiclePlugin::dContact_iterator::self_type &rhs)
+SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator(
+    const SimpleTrackedVehiclePlugin::ContactIterator &_rhs)
 {
-  this->currentContact = rhs.currentContact;
-  this->initialized = rhs.initialized;
-  this->jointIndex = rhs.jointIndex;
-  this->body = rhs.body;
-  this->geom1 = rhs.geom1;
-  this->geom2 = rhs.geom2;
+  this->currentContact = _rhs.currentContact;
+  this->initialized = _rhs.initialized;
+  this->jointIndex = _rhs.jointIndex;
+  this->body = _rhs.body;
+  this->geom1 = _rhs.geom1;
+  this->geom2 = _rhs.geom2;
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::dContact_iterator(
+SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator(
     dBodyID _body, dGeomID _geom1, dGeomID _geom2) :
     currentContact(nullptr), jointIndex(0), body(_body),
     geom1(_geom1), geom2(_geom2), initialized(false)
 {
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::self_type
-SimpleTrackedVehiclePlugin::dContact_iterator::begin(
+SimpleTrackedVehiclePlugin::ContactIterator
+SimpleTrackedVehiclePlugin::ContactIterator::begin(
     dBodyID _body, dGeomID _geom1, dGeomID _geom2)
 {
-  return dContact_iterator(_body, _geom1, _geom2);
+  return ContactIterator(_body, _geom1, _geom2);
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::self_type
-SimpleTrackedVehiclePlugin::dContact_iterator::end()
+SimpleTrackedVehiclePlugin::ContactIterator
+SimpleTrackedVehiclePlugin::ContactIterator::end()
 {
-  return dContact_iterator(true);
+  return ContactIterator(true);
 }
 
-bool SimpleTrackedVehiclePlugin::dContact_iterator::operator==(
-    const SimpleTrackedVehiclePlugin::dContact_iterator::self_type &rhs)
+bool SimpleTrackedVehiclePlugin::ContactIterator::operator==(
+    const SimpleTrackedVehiclePlugin::ContactIterator &_rhs)
 {
   if (this->currentContact == nullptr && !this->initialized)
-  {
     ++(*this);
-  }
-  return this->currentContact == rhs.currentContact &&
-         this->initialized == rhs.initialized;
+
+  return this->currentContact == _rhs.currentContact &&
+         this->initialized == _rhs.initialized;
 }
 
-void SimpleTrackedVehiclePlugin::dContact_iterator::operator=(
-    const SimpleTrackedVehiclePlugin::dContact_iterator::self_type &rhs)
+SimpleTrackedVehiclePlugin::ContactIterator&
+SimpleTrackedVehiclePlugin::ContactIterator::operator=(
+    const SimpleTrackedVehiclePlugin::ContactIterator &_rhs)
 {
-  this->currentContact = rhs.currentContact;
-  this->initialized = rhs.initialized;
-  this->jointIndex = rhs.jointIndex;
-  this->body = rhs.body;
-  this->geom1 = rhs.geom1;
-  this->geom2 = rhs.geom2;
+  this->currentContact = _rhs.currentContact;
+  this->initialized = _rhs.initialized;
+  this->jointIndex = _rhs.jointIndex;
+  this->body = _rhs.body;
+  this->geom1 = _rhs.geom1;
+  this->geom2 = _rhs.geom2;
+
+  return *this;
 }
 
-SimpleTrackedVehiclePlugin::dContact_iterator::self_type
-SimpleTrackedVehiclePlugin::dContact_iterator::operator++(int)
+SimpleTrackedVehiclePlugin::ContactIterator
+SimpleTrackedVehiclePlugin::ContactIterator::operator++(int /*_unused*/)
 {
-  self_type i = *this;
+  ContactIterator i = *this;
   ++(*this);
   return i;
 }
 
-dContact *&SimpleTrackedVehiclePlugin::dContact_iterator::operator*()
+SimpleTrackedVehiclePlugin::ContactIterator::reference
+SimpleTrackedVehiclePlugin::ContactIterator::operator*()
 {
   if (!this->initialized)
-  {
     ++(*this);
-  }
+
   return *this->currentContact;
 }
 
-dContact** SimpleTrackedVehiclePlugin::dContact_iterator::operator->()
+SimpleTrackedVehiclePlugin::ContactIterator::pointer
+SimpleTrackedVehiclePlugin::ContactIterator::operator->()
 {
   if (!this->initialized)
-  {
     ++(*this);
-  }
+
   return this->currentContact;
 }
 
-bool SimpleTrackedVehiclePlugin::dContact_iterator::operator!=(
-    const SimpleTrackedVehiclePlugin::dContact_iterator::self_type &rhs)
+bool SimpleTrackedVehiclePlugin::ContactIterator::operator!=(
+    const SimpleTrackedVehiclePlugin::ContactIterator &_rhs)
 {
-  return !SimpleTrackedVehiclePlugin::dContact_iterator::operator==(rhs);
+  return !SimpleTrackedVehiclePlugin::ContactIterator::operator==(_rhs);
 }

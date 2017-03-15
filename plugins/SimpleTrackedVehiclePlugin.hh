@@ -22,14 +22,14 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/transport/TransportTypes.hh"
-
 #include <gazebo/physics/ode/ode_inc.h>
 #include <gazebo/physics/ode/ODELink.hh>
 #include <gazebo/physics/ode/ODECollision.hh>
 #include <gazebo/ode/contact.h>
+
+#include "gazebo/common/Plugin.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/TransportTypes.hh"
 
 #include "plugins/TrackedVehiclePlugin.hh"
 
@@ -41,17 +41,22 @@ namespace gazebo {
   ///        without grousers.
   /// \since 8.1
   ///
+  /// The motion model is based on adjusting motion1 in ODE contact properties
+  /// and on computing Instantaneous Center of Rotation for a tracked vehicle.
+  /// A detailed description of the model is given in
+  /// https://arxiv.org/abs/1703.04316 .
+  ///
   /// The plugin processes the following parameters, plus the common parameters
   /// defined in TrackedVehiclePlugin.
   ///
   /// <body>  Body of the vehicle to which the two tracks are connected.
   /// <left_track>  The left track link's name.
   /// <right_track>  The right track link's name.
-  /// <collide_without_contact_bitmask> Collision bitmask that would be set to
+  /// <collide_without_contact_bitmask> Collision bitmask that will be set to
   ///     the whole vehicle.
 
-  class SimpleTrackedVehiclePlugin : public TrackedVehiclePlugin {
-
+  class SimpleTrackedVehiclePlugin : public TrackedVehiclePlugin
+  {
     public: SimpleTrackedVehiclePlugin();
 
     public: virtual ~SimpleTrackedVehiclePlugin();
@@ -69,11 +74,9 @@ namespace gazebo {
 
     /// \brief Set new target velocity for the tracks.
     ///
-    /// Descendant classes need to implement this function.
-    ///
-    /// \param[in] left Velocity of left track.
-    /// \param[in] right Velocity of right track.
-    protected: virtual void SetTrackVelocity(double left, double right);
+    /// \param[in] _left Velocity of left track.
+    /// \param[in] _right Velocity of right track.
+    protected: virtual void SetTrackVelocity(double _left, double _right);
 
     /// \brief Body of the robot.
     protected: physics::LinkPtr body;
@@ -85,43 +88,46 @@ namespace gazebo {
     protected: double leftTrackVelocity = 0, rightTrackVelocity = 0;
 
     /// \brief Compute and apply the forces that make the tracks move.
-    protected: void driveTracks(const common::UpdateInfo&);
+    protected: void DriveTracks(const common::UpdateInfo &/*_unused*/);
 
     /// \brief Set collide categories and bits of all geometries to the
     ///        required values.
     ///
     /// This is a workaround for https://bitbucket.org/osrf/gazebo/issues/1855 .
-    protected: void setGeomCategories();
+    protected: void SetGeomCategories();
 
     /// \brief Compute the direction of friction force in given contact point.
-    /// \param[in] linearSpeed Linear speed of the vehicle.
-    /// \param[in] angularSpeed Angular speed of the vehicle.
-    /// \param[in] drivingStraight Whether the vehicle should steer.
-    /// \param[in] bodyPose Pose of the vehicle body.
-    /// \param[in] bodyYAxisGlobal Direction of the y-axis of the body in world.
-    /// \param[in] centerOfRotation Center of the circle the vehicle
-    ///             circumferences (Inf/-Inf if driving straight).
-    /// \param[in] odeContact The ode contact information (to be changed).
-    /// \param[in] beltDirection World-frame forward direction of the belt.
+    /// \param[in] _linearSpeed Linear speed of the vehicle.
+    /// \param[in] _angularSpeed Angular speed of the vehicle.
+    /// \param[in] _drivingStraight Whether the vehicle should steer.
+    /// \param[in] _bodyPose Pose of the vehicle body.
+    /// \param[in] _bodyYAxisGlobal Direction of the y-axis of the body in
+    ///            world frame.
+    /// \param[in] _centerOfRotation Center of the circle the vehicle
+    ///            follows (Inf/-Inf if driving straight).
+    /// \param[in] _odeContact The ode contact information (to be changed).
+    /// \param[in] _beltDirection World-frame forward direction of the belt.
     /// \return Direction of the friction force in world frame.
-    protected: ignition::math::Vector3d computeFrictionDirection(
-        const double linearSpeed, const double angularSpeed,
-        const bool drivingStraight, const ignition::math::Pose3d &bodyPose,
-        const ignition::math::Vector3d &bodyYAxisGlobal,
-        const ignition::math::Vector3d &centerOfRotation,
-        const dContact *odeContact,
-        const ignition::math::Vector3d &beltDirection) const;
+    protected: ignition::math::Vector3d ComputeFrictionDirection(
+      const double _linearSpeed, const double _angularSpeed,
+      const bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
+      const ignition::math::Vector3d &_bodyYAxisGlobal,
+      const ignition::math::Vector3d &_centerOfRotation,
+      const dContact *_odeContact,
+      const ignition::math::Vector3d &_beltDirection) const;
 
     /// \brief Compute the velocity of the surface motion in all contact points.
-    /// \param[in] beltSpeed The desired belt speed.
-    /// \param[in] beltDirection Forward direction of the belt.
-    /// \param[in] frictionDirection First friction direction.
-    protected: double computeSurfaceMotion(const double beltSpeed,
-        const ignition::math::Vector3d &beltDirection,
-        const ignition::math::Vector3d &frictionDirection) const;
+    /// \param[in] _beltSpeed The desired belt speed.
+    /// \param[in] _beltDirection Forward direction of the belt.
+    /// \param[in] _frictionDirection First friction direction.
+    protected: double ComputeSurfaceMotion(const double _beltSpeed,
+      const ignition::math::Vector3d &_beltDirection,
+      const ignition::math::Vector3d &_frictionDirection) const;
 
     private: transport::NodePtr node;
+
     private: event::ConnectionPtr beforePhysicsUpdateConnection;
+
     private: transport::SubscriberPtr contactsSubscriber;
 
     /// \brief This bitmask will be set to the whole vehicle body.
@@ -133,26 +139,29 @@ namespace gazebo {
     /// \brief Category for all items on the left side.
     protected: static const uint LEFT_CATEGORY = 0x40000000;
 
-    private: physics::ContactManager* contactManager;
+    private: physics::ContactManager *contactManager;
 
     /// \brief An empty callback which we need to register to the contacts
     ///        publisher so that contacts are computed.
-    private: void ignoreContacts(ConstContactsPtr&)
+    private: void IgnoreContacts(ConstContactsPtr &/*_unused*/)
     {
     }
 
     /// \brief The signum function.
     /// \param[in] The value.
     /// \return The signum of the value.
-    private: template <typename T> int sgn(T val) const
+    private: template <typename T> int sgn(T _val) const
     {
-      return (T(0) < val) - (val < T(0));
+      // uncomment when the following PR gets merged (and comment next line):
+      // https://bitbucket.org/ignitionrobotics/ign-math/pull-requests/153
+      // return ignition::math::signum(_val);
+      return (T(0) < _val) - (_val < T(0));
     }
 
 
-    /// \class dContact_iterator
+    /// \class ContactIterator
     /// \brief An iterator over all contacts between two geometries.
-    class dContact_iterator : std::iterator<std::input_iterator_tag, dContact*>
+    class ContactIterator : std::iterator<std::input_iterator_tag, dContact*>
     {
       /// \brief The contact to return as the next element.
       private: pointer currentContact;
@@ -165,34 +174,30 @@ namespace gazebo {
       /// \brief True if at least one value has been returned.
       private: bool initialized;
 
-      public: typedef dContact_iterator self_type;
-
       // Constructors.
-      public: dContact_iterator();
-      public: dContact_iterator(bool _initialized);
-      public: dContact_iterator(const self_type& rhs);
-      public: dContact_iterator(dBodyID _body, dGeomID _geom1, dGeomID _geom2);
+      public: ContactIterator();
+      public: ContactIterator(bool _initialized);
+      public: ContactIterator(const ContactIterator &_rhs);
+      public: ContactIterator(dBodyID _body, dGeomID _geom1, dGeomID _geom2);
 
-      /// Use to "instantiate" the iterator from user code
-      public: static self_type begin(dBodyID _body, dGeomID _geom1,
+      /// \brief Use to "instantiate" the iterator from user code
+      public: static ContactIterator begin(dBodyID _body, dGeomID _geom1,
                                      dGeomID _geom2);
-      public: static self_type end();
+      public: static ContactIterator end();
 
-      /// Finding the next element; this is the main magic.
-      public: self_type operator++();
+      /// \brief Finding the next element; this is the main logic.
+      public: ContactIterator operator++();
 
       // Operators. It is required to implement them in iterators.
-      public: bool operator==(const self_type& rhs);
-      public: void operator=(const self_type& rhs);
-      public: self_type operator++(int);
+      public: bool operator==(const ContactIterator &_rhs);
+      public: ContactIterator &operator=(const ContactIterator &_rhs);
+      public: ContactIterator operator++(int /*_unused*/);
       public: reference operator*();
       public: pointer operator->();
-      public: bool operator!=(const self_type& rhs);
+      public: bool operator!=(const ContactIterator &_rhs);
     };
-
   };
-
 }
 
 
-#endif //GAZEBO_SIMPLETRACKEDVEHICLEPLUGIN_HH
+#endif

@@ -2,12 +2,22 @@ if (WIN32)
   add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
 endif()
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}
+include_directories(SYSTEM
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
   ${Qt5Core_INCLUDE_DIRS}
+)
+
+include_directories(
+  ${PROJECT_SOURCE_DIR}
+)
+
+# needed for SimpleTrackedVehiclePlugin
+include_directories(SYSTEM
+  ${Boost_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/deps/threadpool
+  ${CMAKE_SOURCE_DIR}/deps/opende/src
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common

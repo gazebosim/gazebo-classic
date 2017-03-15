@@ -66,24 +66,22 @@ class gazebo::TrackedVehiclePluginPrivate
   /// \brief Namespace used as a prefix for gazebo topic names.
   public: std::string robotNamespace;
 
-  public: template <typename T> int sgn(T val)
+  // TODO delete when ignition::math::signum is merged
+  public: template <typename T> int sgn(T _val)
   {
-    return (T(0) < val) - (val < T(0));
+    return (T(0) < _val) - (_val < T(0));
   }
 };
 
-/////////////////////////////////////////////////
 TrackedVehiclePlugin::TrackedVehiclePlugin()
   : dataPtr(new TrackedVehiclePluginPrivate)
 {
 }
 
-/////////////////////////////////////////////////
 TrackedVehiclePlugin::~TrackedVehiclePlugin()
 {
 }
 
-/////////////////////////////////////////////////
 void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
 {
@@ -106,6 +104,11 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
   this->LoadParam(_sdf, "track_mu", this->dataPtr->trackMu, 2.0);
   this->LoadParam(_sdf, "track_mu2", this->dataPtr->trackMu2, 0.5);
 
+  gzdbg << this->handleName.c_str() << ": Loading done." << std::endl;
+}
+
+void TrackedVehiclePlugin::Init()
+{
   // Initialize transport.
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -115,24 +118,19 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
     &TrackedVehiclePlugin::OnVelMsg, this);
 
   this->dataPtr->tracksVelocityPub =
-      this->dataPtr->node->Advertise<msgs::Vector2d>(
-          this->dataPtr->robotNamespace + "/tracks_speed", 1000);
+    this->dataPtr->node->Advertise<msgs::Vector2d>(
+      this->dataPtr->robotNamespace + "/tracks_speed", 1000);
 
   this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
-      "~/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress, this, true);
+    "~/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress, this, true);
 
-  gzdbg << this->handleName.c_str() << ": Loading done." << std::endl;
-}
-
-/////////////////////////////////////////////////
-void TrackedVehiclePlugin::Init()
-{
   gzdbg << this->handleName.c_str() << ": Init done.\n";
 }
 
 void TrackedVehiclePlugin::Reset()
 {
-  if (this->dataPtr->tracksVelocityPub != NULL) {
+  if (this->dataPtr->tracksVelocityPub)
+  {
     auto speedMsg = msgs::Vector2d();
     speedMsg.set_x(0);
     speedMsg.set_y(0);
@@ -142,35 +140,40 @@ void TrackedVehiclePlugin::Reset()
   ModelPlugin::Reset();
 }
 
-void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &msg)
+void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  const double yaw = msgs::ConvertIgn(msg->orientation()).Euler().Z();
+  const double yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
 
-  const double linearSpeed = msg->position().x() * this->dataPtr->linearSpeedGain;
+  const double linearSpeed =
+    _msg->position().x() * this->dataPtr->linearSpeedGain;
   const double angularSpeed = yaw * this->dataPtr->angularSpeedGain;
 
-  double vel_left = linearSpeed + angularSpeed *
+  double leftVelocity = linearSpeed + angularSpeed *
     this->dataPtr->tracksSeparation / 2 / this->dataPtr->steeringEfficiency;
 
-  double vel_right = linearSpeed - angularSpeed *
+  double rightVelocity = linearSpeed - angularSpeed *
     this->dataPtr->tracksSeparation / 2 / this->dataPtr->steeringEfficiency;
 
   const double maxLinearSpeed = fabs(this->dataPtr->linearSpeedGain);
-  if (fabs(vel_left) > maxLinearSpeed) {
-    vel_left = this->dataPtr->sgn(vel_left) * maxLinearSpeed;
+  if (fabs(leftVelocity) > maxLinearSpeed)
+  {
+    // TODO use ignition::math::signum when merged
+    leftVelocity = this->dataPtr->sgn(leftVelocity) * maxLinearSpeed;
   }
-  if (fabs(vel_right) > maxLinearSpeed) {
-    vel_right = this->dataPtr->sgn(vel_right) * maxLinearSpeed;
+  if (fabs(rightVelocity) > maxLinearSpeed)
+  {
+    // TODO use ignition::math::signum when merged
+    rightVelocity = this->dataPtr->sgn(rightVelocity) * maxLinearSpeed;
   }
 
   // call the descendant handler
-  this->SetTrackVelocity(vel_left, vel_right);
+  this->SetTrackVelocity(leftVelocity, rightVelocity);
 
   auto speedMsg = msgs::Vector2d();
-  speedMsg.set_x(vel_left);
-  speedMsg.set_y(vel_right);
+  speedMsg.set_x(leftVelocity);
+  speedMsg.set_y(rightVelocity);
   this->dataPtr->tracksVelocityPub->Publish(speedMsg);
 }
 
@@ -178,24 +181,31 @@ void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
   const int key = _msg->int_value();
 
-  switch (key) {
-    case 13:  // ENTER
-    case 32:  // SPACE
+  switch (key)
+  {
+    // ENTER
+    case 13:
+    // SPACE
+    case 32:
       this->SetTrackVelocity(0., 0.);
       break;
-    case 38:  // UP
+    // UP
+    case 38:
     case 16777235:
       this->SetTrackVelocity(1., 1.);
       break;
-    case 40:  // DOWN
+    // DOWN
+    case 40:
     case 16777237:
       this->SetTrackVelocity(-1., -1.);
       break;
-    case 37:  // LEFT
+    // LEFT
+    case 37:
     case 16777234:
       this->SetTrackVelocity(-1., 1.);
       break;
-    case 39:  // RIGHT
+    // RIGHT
+    case 39:
     case 16777236:
       this->SetTrackVelocity(1., -1.);
       break;
@@ -204,37 +214,46 @@ void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
   }
 }
 
-std::string TrackedVehiclePlugin::GetRobotNamespace() {
+std::string TrackedVehiclePlugin::GetRobotNamespace()
+{
   return this->dataPtr->robotNamespace;
 }
 
-double TrackedVehiclePlugin::GetSteeringEfficiency() {
+double TrackedVehiclePlugin::GetSteeringEfficiency()
+{
   return this->dataPtr->steeringEfficiency;
 }
 
-void TrackedVehiclePlugin::SetSteeringEfficiency(double steeringEfficiency) {
-  this->dataPtr->steeringEfficiency = steeringEfficiency;
-  this->dataPtr->sdf->GetElement("steering_efficiency")->Set(steeringEfficiency);
+void TrackedVehiclePlugin::SetSteeringEfficiency(double _steeringEfficiency)
+{
+  this->dataPtr->steeringEfficiency = _steeringEfficiency;
+  this->dataPtr->sdf->GetElement("steering_efficiency")
+    ->Set(_steeringEfficiency);
 }
 
-double TrackedVehiclePlugin::GetTracksSeparation() {
+double TrackedVehiclePlugin::GetTracksSeparation()
+{
   return this->dataPtr->tracksSeparation;
 }
 
-double TrackedVehiclePlugin::GetTrackMu() {
+double TrackedVehiclePlugin::GetTrackMu()
+{
   return this->dataPtr->trackMu;
 }
 
-void TrackedVehiclePlugin::SetTrackMu(double mu) {
-  this->dataPtr->trackMu = mu;
-  this->dataPtr->sdf->GetElement("track_mu")->Set(mu);
+void TrackedVehiclePlugin::SetTrackMu(double _mu)
+{
+  this->dataPtr->trackMu = _mu;
+  this->dataPtr->sdf->GetElement("track_mu")->Set(_mu);
 }
 
-double TrackedVehiclePlugin::GetTrackMu2() {
+double TrackedVehiclePlugin::GetTrackMu2()
+{
   return this->dataPtr->trackMu2;
 }
 
-void TrackedVehiclePlugin::SetTrackMu2(double mu2) {
-  this->dataPtr->trackMu2 = mu2;
-  this->dataPtr->sdf->GetElement("track_mu2")->Set(mu2);
+void TrackedVehiclePlugin::SetTrackMu2(double _mu2)
+{
+  this->dataPtr->trackMu2 = _mu2;
+  this->dataPtr->sdf->GetElement("track_mu2")->Set(_mu2);
 }
