@@ -2251,6 +2251,12 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
     if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
+      if (this->dataPtr->joints.find(_msg->parent()) ==
+          this->dataPtr->joints.end())
+      {
+        return false;
+      }
+
       ConstJointPtr jointMsg = this->dataPtr->joints[_msg->parent()];
 
       if (!jointMsg)
@@ -2434,6 +2440,9 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   // If this needs to be added, make sure it is called after all of the visuals
   // the childVis link have been loaded
   // childVis->ShowJoints(this->dataPtr->showJoints);
+
+  ConstJointPtr msgCopy(_msg);
+  this->dataPtr->joints[_msg->name()] = msgCopy;
 
   return true;
 }
@@ -3650,4 +3659,16 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::EnableVisualizations(const bool _enable)
+{
+  this->dataPtr->enableVisualizations = _enable;
+}
+
+/////////////////////////////////////////////////
+bool Scene::EnableVisualizations() const
+{
+  return this->dataPtr->enableVisualizations;
 }
