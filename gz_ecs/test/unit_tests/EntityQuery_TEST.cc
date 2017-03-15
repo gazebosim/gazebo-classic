@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include <typeinfo>
+#include "gazebo/ecs_core/ComponentType.hh"
 #include "gazebo/ecs_core/EntityQuery.hh"
 #include "gazebo/ecs_core/EntityQueryPrivate.hh"
 
@@ -41,9 +42,12 @@ struct TC3
 };
 
 // Type IDs for convenience
-const std::size_t TC1HashCode = typeid(TC1).hash_code();
-const std::size_t TC2HashCode = typeid(TC2).hash_code();
-const std::size_t TC3HashCode = typeid(TC3).hash_code();
+const gazebo::ecs_core::ComponentType TC1HashCode = 
+  gazebo::ecs_core::GetComponentType<TC1>();
+const gazebo::ecs_core::ComponentType TC2HashCode =
+  gazebo::ecs_core::GetComponentType<TC2>();
+const gazebo::ecs_core::ComponentType TC3HashCode =
+  gazebo::ecs_core::GetComponentType<TC3>();
 
 /////////////////////////////////////////////////
 TEST(EntityQuery, AddSingleComponent)

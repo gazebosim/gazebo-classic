@@ -33,8 +33,8 @@ namespace components
 /// can iterate through all those components and do useful work.
 struct Fraction
 {
-  float numerator = 0.0f;
-  float denominator = 1.0f;
+  float numerator;
+  float denominator;
 };
 
 }
