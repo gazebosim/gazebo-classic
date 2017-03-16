@@ -18,7 +18,6 @@
 #include <algorithm>
 #include <gtest/gtest.h>
 #include "gazebo/plugin/PluginLoader.hh"
-#include "gazebo/plugin/PluginLoaderPrivate.hh"
 #include "gazebo/test/util/DummyPlugins.hh"
 
 
