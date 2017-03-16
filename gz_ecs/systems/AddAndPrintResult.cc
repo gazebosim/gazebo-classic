@@ -14,8 +14,7 @@ namespace systems
 
 void AddAndPrintResult::Init(ecs_core::EntityQuery &_query)
 {
-  // First things first, tell the system manager what components
-  // this system requires. This sytem only requires the Fraction component
+  // Add components which are required
   _query.AddComponent<components::Triplet>();
 }
 
