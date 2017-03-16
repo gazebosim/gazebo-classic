@@ -78,21 +78,21 @@ void ODEHeightmapShape::Init()
   oParent->SetStatic(true);
 
   // Rotate so Z is up, not Y (which is the default orientation)
-  math::Quaternion quat;
-  math::Pose pose = oParent->GetWorldPose();
+  // if Y is up, rotating by roll of 90 deg will put Z-down.
+  ignition::math::Quaterniond quat(IGN_DTOR(90), 0, 0);
 
-  // TODO: FIXME:  double check this, if Y is up,
-  // rotating by roll of 90 deg will put Z-down.
-  quat.SetFromEuler(math::Vector3(GZ_DTOR(90), 0, 0));
+  ignition::math::Pose3d pose = oParent->GetWorldPose().Ign();
 
-  pose.rot = pose.rot * quat;
+  pose.Rot() = pose.Rot() * quat;
   // this->body->SetPose(pose);
 
   dQuaternion q;
-  q[0] = pose.rot.w;
-  q[1] = pose.rot.x;
-  q[2] = pose.rot.y;
-  q[3] = pose.rot.z;
+  q[0] = pose.Rot().W();
+  q[1] = pose.Rot().X();
+  q[2] = pose.Rot().Y();
+  q[3] = pose.Rot().Z();
 
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
+  dGeomSetPosition(oParent->GetCollisionId(),
+      pose.Pos().X(), pose.Pos().Y(), pose.Pos().Z());
 }
