@@ -15,35 +15,20 @@
  *
 */
 
-
-#ifndef GAZEBO_PRIVATE_ECS_CORE_SYSTEMMANAGERPRIVATE_HH_
-#define GAZEBO_PRIVATE_ECS_CORE_SYSTEMMANAGERPRIVATE_HH_
-
-#include <vector>
-#include <memory>
+#ifndef GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
+#define GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
 
 namespace gazebo
 {
-namespace ecs_core
+namespace components
 {
 
-/// \brief Forward declaration
-class EntityManager;
-
-/// \brief Forward declaration
-class System;
-
-
-class SystemManagerPrivate
+/// \brief Three numbers
+struct Triplet
 {
-  public:
-    EntityManager *entityManager;
-
-    /// \brief Systems that are added to the manager
-    std::vector<std::unique_ptr<System> > systems;
-
-    /// \brief Queries for each system
-    std::vector<EntityQuery> queries;
+  float first;
+  float second;
+  float third;
 };
 
 }

@@ -1,2 +1,2 @@
-
 add_library(DivideAndPrintResult SHARED DivideAndPrintResult.cc)
+add_library(AddAndPrintResult SHARED AddAndPrintResult.cc)

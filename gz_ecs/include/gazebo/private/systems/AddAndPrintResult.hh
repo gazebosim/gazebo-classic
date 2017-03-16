@@ -16,34 +16,26 @@
 */
 
 
-#ifndef GAZEBO_PRIVATE_ECS_CORE_SYSTEMMANAGERPRIVATE_HH_
-#define GAZEBO_PRIVATE_ECS_CORE_SYSTEMMANAGERPRIVATE_HH_
+#ifndef GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
+#define GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
 
-#include <vector>
-#include <memory>
+#include "gazebo/ecs_core/System.hh"
 
 namespace gazebo
 {
-namespace ecs_core
+namespace systems
 {
 
-/// \brief Forward declaration
-class EntityManager;
+/// \brief Forward Declaration
+class EntityQueryResult;
 
-/// \brief Forward declaration
-class System;
-
-
-class SystemManagerPrivate
+class AddAndPrintResult : public ecs_core::System
 {
   public:
-    EntityManager *entityManager;
+    virtual void Init(ecs_core::EntityQuery &_query);
 
-    /// \brief Systems that are added to the manager
-    std::vector<std::unique_ptr<System> > systems;
-
-    /// \brief Queries for each system
-    std::vector<EntityQuery> queries;
+    virtual void Update(
+        double _dt, const ecs_core::EntityQueryResult &_result);
 };
 
 }

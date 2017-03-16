@@ -47,16 +47,24 @@ class SystemManager
 
     void Update(double _dt);
 
+    /// \brief Convenience function to load a system from a type
+    ///
+    /// Ex: sm->LoadSystem<FancySystemClass>();
     template <typename T>
-    void LoadSystem()
+    bool LoadSystem()
     {
       T *system = new T();
-      this->LoadSystem(dynamic_cast<System*>(system));
+      System *sys = dynamic_cast<System*>(system);
+      std::unique_ptr<System> pSys(sys);
+      return this->LoadSystem(std::move(pSys));
     }
 
-  private:
     /// \brief Load a system
-    void LoadSystem(System *_sys);
+    ///
+    /// Ex: sm->LoadSystem(std::move(aUniquePtrInstance))
+    bool LoadSystem(std::unique_ptr<System> _sys);
+
+  private:
 
     /// \brief No copy constructor
     SystemManager(const SystemManager&) = delete;

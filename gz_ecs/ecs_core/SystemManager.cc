@@ -72,16 +72,21 @@ void SystemManager::Update(double _dt)
 }
 
 
-void SystemManager::LoadSystem(System *_sys)
+bool SystemManager::LoadSystem(std::unique_ptr<System> _sys)
 {
-  std::shared_ptr<System> sysPtr(_sys);
-  sysPtr->impl->em = this->impl->entityManager;
-  sysPtr->impl->sm = this;
-  EntityQuery query;
-  sysPtr->Init(query);
-  this->impl->entityManager->AddQuery(query);
-  this->impl->systems.push_back(sysPtr);
-  this->impl->queries.push_back(query);
+  bool success = false;
+  if (_sys)
+  {
+    _sys->impl->em = this->impl->entityManager;
+    _sys->impl->sm = this;
+    EntityQuery query;
+    _sys->Init(query);
+    this->impl->entityManager->AddQuery(query);
+    this->impl->systems.push_back(std::move(_sys));
+    this->impl->queries.push_back(query);
+    success = true;
+  }
+  return success;
 }
 
 
