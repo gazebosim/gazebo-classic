@@ -163,7 +163,7 @@ TEST_F(ContactManagerTest, EnforcedContacts)
   // we have not enforced contacts computation (yet), so
   // we should not have access to any contacts information
   // without the enforcement.
-  ASSERT_TRUE(numContacts == 0);
+  ASSERT_EQ(numContacts, 0);
 
   manager->SetEnforceContacts(true);
   ASSERT_TRUE(manager->ContactsEnforced());
@@ -179,12 +179,12 @@ TEST_F(ContactManagerTest, EnforcedContacts)
   // make sure there are no subscribers connected which may have
   // caused the contacts to become true
   const std::vector<physics::Contact *>& contacts = manager->GetContacts();
-  for (std::vector<physics::Contact *>::const_iterator it= contacts.begin();
-       it!=contacts.end(); ++it)
+  for (std::vector<physics::Contact *>::const_iterator it = contacts.begin();
+       it != contacts.end(); ++it)
   {
-    physics::Contact* contact=*it;
-    physics::Collision* coll1=contact->collision1;
-    physics::Collision* coll2=contact->collision2;
+    physics::Contact* contact = *it;
+    physics::Collision* coll1 = contact->collision1;
+    physics::Collision* coll2 = contact->collision2;
     ASSERT_TRUE(coll1 != NULL);
     ASSERT_TRUE(coll2 != NULL);
     // we have no subscribers connected and still have gotten the contacts

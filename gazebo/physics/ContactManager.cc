@@ -141,9 +141,8 @@ bool ContactManager::SubscribersConnected(Collision *_collision1,
 
 /////////////////////////////////////////////////
 void ContactManager::GetCustomPublishers(Collision *_collision1,
-                                         Collision *_collision2,
-                                         const bool _getOnlyConnected,
-                                         std::vector<ContactPublisher*> &_publishers)
+                     Collision *_collision2, const bool _getOnlyConnected,
+                     std::vector<ContactPublisher*> &_publishers)
 {
   boost::recursive_mutex::scoped_lock lock(*this->customMutex);
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
@@ -178,7 +177,7 @@ void ContactManager::GetCustomPublishers(Collision *_collision1,
         iter->second->collisions.find(_collision2) !=
         iter->second->collisions.end())
     {
-      GZ_ASSERT(iter->second->publisher!=NULL,
+      GZ_ASSERT(iter->second->publisher != NULL,
                 "ContactPublisher must have a valid publisher");
       if (!_getOnlyConnected || iter->second->publisher->HasConnections())
       {
@@ -208,7 +207,8 @@ Contact *ContactManager::NewContact(Collision *_collision1,
   // TODO check: getOnlyConnected set to false to keep same behaviour as before.
   // But should we not only add publishers which are connected, as is done
   // for this->contactPub->HasConnections() condition?
-  GetCustomPublishers(_collision1, _collision2, getOnlyConnected, publishers);
+  this->GetCustomPublishers(_collision1, _collision2,
+                            getOnlyConnected, publishers);
 
   if (this->NeverDropContacts() ||
       this->contactPub->HasConnections() ||

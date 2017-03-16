@@ -109,7 +109,7 @@ namespace gazebo
 
       /// \brief If set to true, NewContact() will always add contacts
       /// even if there are no subscribers.
-      /// \param[in] _neverDrop flag to set neverDropment of contact computation
+      /// \param[in] _neverDrop if true, never drop contact computation
       public: void SetNeverDropContacts(const bool _neverDrop);
 
       /// \brief returns the value last set with SetNeverDropContacts().
@@ -208,13 +208,12 @@ namespace gazebo
       ///   contacts of either \e _collision1 or \e _collision2.
       /// \param[in] _collision1 the first collision object
       /// \param[in] _collision2 the second collision object
-      /// \param[in] _getOnlyConnected return only publishers which currently have
-      ///   subscribers
+      /// \param[in] _getOnlyConnected return only publishers which currently
+      ///   have subscribers
       /// \param[out] _publishers the resulting publishers.
       private: void GetCustomPublishers(Collision *_collision1,
-                                        Collision *_collision2,
-                                        const bool _getOnlyConnected,
-                                        std::vector<ContactPublisher*> &_publishers);
+                       Collision *_collision2, const bool _getOnlyConnected,
+                       std::vector<ContactPublisher*> &_publishers);
 
       private: std::vector<Contact*> contacts;
 
