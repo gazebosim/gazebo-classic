@@ -34,6 +34,21 @@ namespace gazebo
 
       /// \brief Default destructor
       public: ~DARTMeshPrivate() = default;
+
+      public: dart::dynamics::ShapeNodePtr GetShapeNode()
+      {
+        return dtMeshShape;
+      }
+
+      public: dart::dynamics::MeshShape* GetShape()
+      {
+        GZ_ASSERT(dtMeshShape.get() != nullptr, "MeshShape is NULL");
+        return static_cast<dart::dynamics::MeshShape*>
+                       (dtMeshShape->getShape().get());
+      }
+
+      /// \brief DART mesh shape node
+      public: dart::dynamics::ShapeNodePtr dtMeshShape;
     };
   }
 }

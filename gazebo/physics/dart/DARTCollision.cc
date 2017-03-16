@@ -124,6 +124,11 @@ unsigned int DARTCollision::GetCollideBits() const
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
+  GZ_ASSERT(this->dataPtr->dtCollisionShape,
+            "DARTCollision Must have a collision shape");
+  GZ_ASSERT(this->dataPtr->dtCollisionShape->getShape(),
+            "DARTCollision has no shape");
+
   const dart::math::BoundingBox& bb =
     this->dataPtr->dtCollisionShape->getShape()->getBoundingBox();
 
