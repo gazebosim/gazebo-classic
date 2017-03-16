@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   {
     // EntityX, anax, and artemis all have an Entity class that acts as a
     // convenience wrapper for world or entity manager calls. This line is
-    // is different in that it returns the ID which can be used for calling
+    // is different in that it returns the ID which can be given to the
     // the EntityManager. It is less convenient, but it avoids giving the 
     // impression that an Entity is more than an ID.
     gazebo::ecs_core::Entity e = em.CreateEntity();
