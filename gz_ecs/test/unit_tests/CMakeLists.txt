@@ -8,6 +8,7 @@ set(unit_tests
   EntityQuery_TEST.cc
   EntityQueryResult_TEST.cc
   SystemManager_TEST.cc
+  PluginLoader_TEST.cc
 )
 
 
@@ -17,7 +18,7 @@ foreach (src_file ${unit_tests})
   string(REGEX REPLACE "\\.cc" "" BINARY_NAME ${src_file})
   set(BINARY_NAME UNIT_${BINARY_NAME})
   add_executable(${BINARY_NAME} ${src_file})
-  target_link_libraries(${BINARY_NAME} gtest gtest_main GazeboECSCore)
+  target_link_libraries(${BINARY_NAME} gtest gtest_main GazeboECSCore GazeboPlugin)
   if (UNIX)
     # gtest uses pthread on UNIX
     target_link_libraries(${BINARY_NAME} pthread)

@@ -25,7 +25,7 @@
 #include "gazebo/plugin/PluginLoader.hh"
 
 // I can't imagine why someone would inherit from a system. Calling these
-// private gives freedom to make changes without worring about breaking code
+// private gives freedom to make changes to them
 #include "gazebo/private/systems/DivideAndPrintResult.hh"
 
 int main(int argc, char **argv)
