@@ -332,9 +332,6 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   // Load our force torque test world
   Load("worlds/force_torque_test2.world", true, _physicsEngine);
 
-  // std::cout<<"Press any key to continue"<<std::endl;
-  // std::cin.get();
-
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);

@@ -215,7 +215,7 @@ void DARTModel::Init()
     gzwarn << "DART does not fully support self-collision yet. "
            << __FILE__ << ", " << __LINE__ << "\n";
     /*
-      This has to be disalbed in dart 6 because there is no equivalent to disalbePair().
+      This has to be disabled in dart 6 because there is no equivalent to disablePair().
     dart::simulation::WorldPtr dtWorld = this->GetDARTPhysics()->GetDARTWorldPtr();
     dart::collision::CollisionDetectorPtr dtCollDet =
         dtWorld->getConstraintSolver()->getCollisionDetector();
