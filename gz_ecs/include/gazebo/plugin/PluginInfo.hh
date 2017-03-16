@@ -36,12 +36,6 @@ struct PluginInfo
     /// \brief the name of the type of plugin this implements
     std::string interface;
     
-    // Weirdness note: If the macro sets name or interface, they
-    // are just empty strings. C-style string is required to be
-    // set when a dynamic library is loaded
-    const char *char_name;
-    const char *char_interface;
-
     /// \brief a method that instantiates a new instance of a plugin
     std::function<void*()> factory;
 };
