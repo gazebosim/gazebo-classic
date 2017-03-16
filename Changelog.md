@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Force / torque sensor visualization using WrenchVisual
+    * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
+
 1. Cache heightmap tile data
     * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
 
@@ -14,6 +17,22 @@
 
 1. Support setting shadow texture size
     * [Pull request 2644](https://bitbucket.org/osrf/gazebo/pull-request/2644)
+
+1. Fix deprecated sdf warnings produced by PluginToSDF
+    * [Pull request 2646](https://bitbucket.org/osrf/gazebo/pull-request/2646)
+
+1. Added TouchPlugin, which checks if a model has been in contact with another
+   model exclusively for a certain time.
+    * [Pull request 2651](https://bitbucket.org/osrf/gazebo/pull-request/2651)
+
+1. Fixes -inf laser reading being displayed as +inf
+    * [Pull request 2641](https://bitbucket.org/osrf/gazebo/pull-request/2641)
+
+1. Fix memory leaks in tests
+    * [Pull request 2639](https://bitbucket.org/osrf/gazebo/pull-request/2639)
+
+1. Remove end year from copyright
+    * [Pull request 2614](https://bitbucket.org/osrf/gazebo/pull-request/2614)
 
 ## Gazebo 7.5.0 (2017-01-11)
 
