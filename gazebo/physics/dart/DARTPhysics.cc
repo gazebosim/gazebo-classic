@@ -259,15 +259,15 @@ void DARTPhysics::UpdateCollision()
     pairedContacts[dtLinkPair].push_back(&dtContact);
   }
 
-  for (PairedContactsMap::iterator it=pairedContacts.begin();
-       it!=pairedContacts.end(); ++it)
+  for (PairedContactsMap::iterator it = pairedContacts.begin();
+       it != pairedContacts.end(); ++it)
   {
     DARTLinkPtr dartLink1 = it->first.GetDARTLink1();
     DARTLinkPtr dartLink2 = it->first.GetDARTLink2();
     const std::deque<const dart::collision::Contact*>& dtContacts = it->second;
 
     GZ_ASSERT(!dtContacts.empty(),
-             "dtContacts is empty, at least one contact should have been added");
+           "dtContacts is empty, at least one contact should have been added");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
@@ -295,8 +295,8 @@ void DARTPhysics::UpdateCollision()
     contactFeedback->count = 0;
 
     std::deque<const dart::collision::Contact*>::const_iterator contIt;
-    int contNum=0;
-    for (contIt=dtContacts.begin();
+    int contNum = 0;
+    for (contIt = dtContacts.begin();
          (contNum < MAX_CONTACT_JOINTS) && (contIt != dtContacts.end());
          ++contIt, ++contNum)
     {
@@ -328,9 +328,12 @@ void DARTPhysics::UpdateCollision()
       localTorque2 = body2Pose.Rot().RotateVectorReverse(
           DARTTypes::ConvVec3Ign(torqueB));
 
-      contactFeedback->positions[contNum] = DARTTypes::ConvVec3Ign(dtContact->point);
-      contactFeedback->normals[contNum] = DARTTypes::ConvVec3Ign(dtContact->normal);
-      contactFeedback->depths[contNum] = dtContact->penetrationDepth;
+      contactFeedback->positions[contNum] =
+        DARTTypes::ConvVec3Ign(dtContact->point);
+      contactFeedback->normals[contNum] =
+        DARTTypes::ConvVec3Ign(dtContact->normal);
+      contactFeedback->depths[contNum] =
+        dtContact->penetrationDepth;
 
       if (!dartLink1->IsStatic())
       {
