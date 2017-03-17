@@ -71,6 +71,7 @@ do
     -DENABLE_SCREEN_TESTS:BOOL=True \
     -DFORCE_GRAPHIC_TESTS_COMPILATION:BOOL=True
   catkin build
+  catkin build --make-args tests
   . $BUILD_ROOT/devel/setup.bash
   . $BUILD_ROOT/devel/share/gazebo/setup.sh
 
