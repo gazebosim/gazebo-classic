@@ -1,32 +1,36 @@
 # Introduction
 
 Interested in developing new features, fixing bugs, or making any other
-kind of contribution which touches Gazebo's codebase? Read on to find out how.
+kind of contribution which touches Gazebo's codebase? Read on to find out how!
 
 ## Development process
 
 We follow a development process designed to reduce errors, encourage
 collaboration, and make high quality code. The process may seem rigid and
-tedious, but every step is worth the effort (especially if you like
-applications that work).
+tedious, but every step is worth the effort.
 
 ### Steps to follow
 
-We will use the Gazebo repository as an example, but the step apply equally
-well to other repositories maintained by OSRF.
-
 1. Are you sure?
-> Run through this mental checklist before getting started.
->
-> 1. Has your idea already been done, or maybe someone is already working on it?
->
->     Check [answers.gazebosim.org](http://answers.gazebosim.org) and the [issue tracker](https://bitbucket.org/osrf/gazebo/issues).
->
-> 1. Get feedback from the Gazebo core team.
->     Send an email to the [mailing list](https://groups.google.com/a/osrfoundation.org/forum/#!forum/gazebo), post a question on [answers.gazebosim.org](http://answers.gazebosim.org), or use the [issue tracker](https://bitbucket.org/osrf/gazebo/issues) to get feedback from Gazebo developers.
+
+    Run through this mental checklist before getting started.
+
+    1. Has your idea already been done, or maybe someone is already working on it?
+
+        Check [answers.gazebosim.org](http://answers.gazebosim.org) and the [issue tracker](https://bitbucket.org/osrf/gazebo/issues).
+
+    1. Get feedback from the Gazebo core team.
+
+        Send an email to the
+        [mailing list](https://groups.google.com/a/osrfoundation.org/forum/#!forum/gazebo),
+        post a question on [Gazebo Answers](http://answers.gazebosim.org), or use the
+        [issue tracker](https://bitbucket.org/osrf/gazebo/issues) to get feedback from
+        Gazebo developers.
 
 1. [Fork Gazebo](https://bitbucket.org/osrf/gazebo/fork)
-> This will create your own personal copy of Gazebo. All of your development should take place in your fork.
+
+    This will create your own personal copy of Gazebo. All of your development
+    should take place in your fork.
 
 1. Work out of a branch: `hg branch my_new_branch_name`
 > Always work out of a new branch, never off of default. This is a good habit to get in, and will make your life easier.
