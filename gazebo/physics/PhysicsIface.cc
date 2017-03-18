@@ -85,6 +85,25 @@ physics::WorldPtr physics::get_world(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
+bool physics::has_world(const std::string &_name)
+{
+  if (_name.empty())
+  {
+    if (g_worlds.empty()) return false;
+    return true;
+  }
+  else
+  {
+    for (auto const &world : g_worlds)
+    {
+      if (world->Name() == _name)
+        return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
 void physics::load_worlds(sdf::ElementPtr _sdf)
 {
   for (auto &world : g_worlds)
