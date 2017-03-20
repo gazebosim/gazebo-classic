@@ -32,6 +32,7 @@ set(tests
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contacts_update.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
