@@ -199,6 +199,7 @@ set (gtest_sources
   Inertial_TEST.cc
   JointController_TEST.cc
   ModelState_TEST.cc
+  JointState_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
 )
