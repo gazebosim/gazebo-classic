@@ -72,9 +72,11 @@ void BulletCollision::OnPoseChange()
 }
 
 //////////////////////////////////////////////////
-void BulletCollision::SetCategoryBits(unsigned int /*_bits*/)
+void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
   gzwarn << "SetCategoryBits is not implemented" << std::endl;
+  // Prevent unused variable warning
+  this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
@@ -115,7 +117,8 @@ void BulletCollision::SetCollideBits(unsigned int _bits)
 unsigned int BulletCollision::GetCategoryBits() const
 {
   gzwarn << "GetCategoryBits is not implemented" << std::endl;
-  return 0;
+  // Prevent unused variable warning
+  return this->categoryBits;
 }
 
 //////////////////////////////////////////////////
