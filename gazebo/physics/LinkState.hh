@@ -227,13 +227,16 @@ namespace gazebo
       /// \brief 3D pose of the link relative to the model.
       private: ignition::math::Pose3d pose;
 
-      /// \brief Velocity of the link (linear and angular).
+      /// \brief Velocity of the link (linear and angular)
+      /// in the world frame.
       private: ignition::math::Pose3d velocity;
 
-      /// \brief Acceleration of the link (linear and angular).
+      /// \brief Acceleration of the link (linear and angular)
+      /// in the world frame.
       private: ignition::math::Pose3d acceleration;
 
-      /// \brief Force on the link(linear and angular).
+      /// \brief Force on the link(linear and angular)
+      /// in the world frame.
       private: ignition::math::Pose3d wrench;
 
       /// \brief State of all the child Collision objects.
