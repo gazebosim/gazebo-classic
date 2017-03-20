@@ -596,7 +596,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   const int numRays = this->RayCount() * this->VerticalRayCount();
   if (scan->ranges_size() != numRays)
   {
-    gzdbg << "Size mismatch; allocating memory\n";
+    // gzdbg << "Size mismatch; allocating memory\n";
     scan->clear_ranges();
     scan->clear_intensities();
     for (int i = 0; i < numRays; ++i)
