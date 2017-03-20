@@ -48,9 +48,9 @@ namespace gazebo
     {
       GpuLaserData reading = {
         // range
-        this->data[index * this->skip + this->rangeOffset],
+        this->data[this->index * this->skip + this->rangeOffset],
         // intensity
-        this->data[index * this->skip + this->intensityOffset],
+        this->data[this->index * this->skip + this->intensityOffset],
         // beam
         index / this->horizontalResolution,
         // reading
@@ -111,4 +111,5 @@ namespace gazebo
   }
 }
 
-#endif  // GAZEBO_RENDERING_GPULASERDATAITERATORIMPL_HH_
+// GAZEBO_RENDERING_GPULASERDATAITERATORIMPL_HH_
+#endif

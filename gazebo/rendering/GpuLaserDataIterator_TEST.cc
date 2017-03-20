@@ -105,7 +105,7 @@ TEST(GpuLaserDataIteratorTest, OneBeamSensor)
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
-  for (unsigned int i = 0; i < hRes; i++)
+  for (unsigned int i = 0; i < hRes; ++i)
   {
     GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
         i, readings, skip, rangeOffset, intenOffset, hRes);
@@ -123,7 +123,7 @@ TEST(GpuLaserDataIteratorTest, threeBeamSensor)
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
-  for (unsigned int i = 0; i < vRes; i++)
+  for (unsigned int i = 0; i < vRes; ++i)
   {
     GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
         i, readings, skip, rangeOffset, intenOffset, hRes);
