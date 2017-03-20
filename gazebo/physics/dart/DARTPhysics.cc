@@ -535,7 +535,6 @@ bool DARTPhysics::Supports(const Capability _capability)
   switch (_capability)
   {
     case PhysicsEngine::COLLIDE_BITS:
-        return true;
     case PhysicsEngine::CATEGORY_BITS:
     default:
       return false;
