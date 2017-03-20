@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math.hh>
 #include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
@@ -592,12 +593,22 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->RangeMin());
   scan->set_range_max(this->RangeMax());
 
-  scan->clear_ranges();
-  scan->clear_intensities();
+  const int numRays = this->RayCount() * this->VerticalRayCount();
+  if (scan->ranges_size() != numRays)
+  {
+    gzdbg << "Size mismatch; allocating memory\n";
+    scan->clear_ranges();
+    scan->clear_intensities();
+    for (int i = 0; i < numRays; ++i)
+    {
+      scan->add_ranges(ignition::math::NAN_F);
+      scan->add_intensities(ignition::math::NAN_F);
+    }
+  }
 
   auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
   auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
-  for (; dataIter != dataEnd; ++dataIter)
+  for (int i = 0; dataIter != dataEnd; ++dataIter, ++i)
   {
     const rendering::GpuLaserData data = *dataIter;
     double range = data.range;
@@ -619,8 +630,8 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     }
 
     range = ignition::math::isnan(range) ? this->RangeMax() : range;
-    scan->add_ranges(range);
-    scan->add_intensities(intensity);
+    scan->set_ranges(i, range);
+    scan->set_intensities(i, intensity);
   }
 
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())
