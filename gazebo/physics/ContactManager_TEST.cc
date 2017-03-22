@@ -137,7 +137,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ContactManagerTest, EnforcedContacts)
+TEST_F(ContactManagerTest, NeverDropdContacts)
 {
   // world needs to be paused in order to use World::Step()
   // function correctly (second parameter true)
@@ -165,8 +165,8 @@ TEST_F(ContactManagerTest, EnforcedContacts)
   // without the enforcement.
   ASSERT_EQ(numContacts, 0);
 
-  manager->SetEnforceContacts(true);
-  ASSERT_TRUE(manager->ContactsEnforced());
+  manager->SetNeverDropContacts(true);
+  ASSERT_TRUE(manager->NeverDropContacts());
 
   // advance the world again, this time the contacts
   // information should become available.
