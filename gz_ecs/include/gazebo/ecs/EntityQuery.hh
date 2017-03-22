@@ -23,7 +23,6 @@
 #include "gazebo/ecs/Entity.hh"
 #include "gazebo/ecs/Component.hh"
 #include "gazebo/ecs/ComponentFactory.hh"
-#include "gazebo/ecs/EntityQueryResult.hh"
 
 namespace gazebo
 {
@@ -50,13 +49,10 @@ namespace gazebo
       /// \brief returns true if these are the same instance
       public: bool operator==(const EntityQuery &_rhs) const;
 
-      public: bool AddEntity(Entity *_entity);
+      public: bool AddEntity(EntityId _id);
 
-      /// \brief Get the entity at the index in the results
-      public: Entity *EntityAt(std::size_t _index);
-
-      /// \brief number of entities that matched the query
-      public: std::size_t EntityCount() const;
+      /// \brief Get the entity ids
+      public: const std::set<EntityId> &EntityIds() const;
 
       private: std::shared_ptr<EntityQueryPrivate> dataPtr;
     };

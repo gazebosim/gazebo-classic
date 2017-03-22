@@ -28,7 +28,7 @@ class gazebo::ecs::EntityQueryPrivate
   public: std::set<ComponentType> componentTypes;
 
   /// \brief all entities that matched the query
-  public: std::vector<Entity *> entities;
+  //public: std::vector<const Entity *> entities;
 
   public: std::set<EntityId> entityIds;
 };
@@ -72,14 +72,14 @@ bool EntityQuery::operator==(const EntityQuery &_rhs) const
 
 /////////////////////////////////////////////////
 // this is dangerous. We are storing raw pointers!!!!
-bool EntityQuery::AddEntity(Entity *_entity)
+//bool EntityQuery::AddEntity(const Entity *_entity)
+bool EntityQuery::AddEntity(EntityId _id)
 {
   // Only add unique enities.
-  if (_entity && this->dataPtr->entityIds.find(_entity->Id()) ==
-      this->dataPtr->entityIds.end())
+  if (this->dataPtr->entityIds.find(_id) == this->dataPtr->entityIds.end())
   {
-    this->dataPtr->entities.push_back(_entity);
-    this->dataPtr->entityIds.insert(_entity->Id());
+    //this->dataPtr->entities.push_back(_entity);
+    this->dataPtr->entityIds.insert(_id);
     return true;
   }
   return false;
@@ -92,17 +92,7 @@ const std::set<ComponentId> &EntityQuery::ComponentTypes() const
 }
 
 /////////////////////////////////////////////////
-std::size_t EntityQuery::EntityCount() const
+const std::set<EntityId> &EntityQuery::EntityIds() const
 {
-  return this->dataPtr->entities.size();
-}
-
-/////////////////////////////////////////////////
-Entity *EntityQuery::EntityAt(std::size_t _index)
-{
-  if (_index >= 0 && _index < this->EntityCount())
-  {
-    return this->dataPtr->entities[_index];
-  }
-  return nullptr;
+  return this->dataPtr->entityIds;
 }

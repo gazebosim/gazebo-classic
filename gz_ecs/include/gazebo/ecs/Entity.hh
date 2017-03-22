@@ -31,7 +31,7 @@ namespace gazebo
     typedef int EntityId;
 
     /// \brief For results which there is no entity
-    const EntityId NO_ENTITY = 0;
+    const EntityId NO_ENTITY = -1;
 
     class Manager;
     class Entity
@@ -65,7 +65,7 @@ namespace gazebo
                 this->idTypes[_id] = _type;
               }
 
-      public: bool Matches(const std::set<ComponentType> &_types)
+      public: bool Matches(const std::set<ComponentType> &_types) const
               {
                 for (auto const &t : _types)
                 {
