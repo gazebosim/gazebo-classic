@@ -29,7 +29,6 @@
 
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 
-
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(SimpleTrackedVehiclePlugin)
@@ -70,12 +69,12 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   GZ_ASSERT(this->body, "SimpleTrackedVehiclePlugin "
       "<body> link does not exist.");
 
-  this->leftTrack = _model->GetLink(
+  this->tracks[Tracks::LEFT] = _model->GetLink(
       _sdf->GetElement("left_track")->Get<std::string>());
   GZ_ASSERT(this->leftTrack, "SimpleTrackedVehiclePlugin "
       "<left_track> link does not exist.");
 
-  this->rightTrack = _model->GetLink(
+  this->tracks[Tracks::RIGHT] = _model->GetLink(
       _sdf->GetElement("right_track")->Get<std::string>());
   GZ_ASSERT(this->rightTrack, "SimpleTrackedVehiclePlugin "
       "<right_track> link does not exist.");
@@ -105,15 +104,7 @@ void SimpleTrackedVehiclePlugin::Init()
 
   // set the desired friction to tracks (override the values set in the
   // SDF model)
-  for (auto track : {this->leftTrack, this->rightTrack} )
-  {
-    for (auto collision : track->GetCollisions())
-    {
-      auto frictionPyramid = collision->GetSurface()->FrictionPyramid();
-      frictionPyramid->SetMuPrimary(this->GetTrackMu());
-      frictionPyramid->SetMuSecondary(this->GetTrackMu2());
-    }
-  }
+  this->UpdateTrackSurface();
 
   // initialize Gazebo node, subscribers and publishers and event connections
   this->node = transport::NodePtr(new transport::Node());
@@ -124,8 +115,7 @@ void SimpleTrackedVehiclePlugin::Init()
   // topic. We do not handle the received contacts in any way, because we need
   // to process them earlier than the message is published (which is done in
   // DriveTracks()).
-  this->contactsSubscriber = this->node->Subscribe(
-      this->GetRobotNamespace() + "/physics/contacts",
+  this->contactsSubscriber = this->node->Subscribe("~/physics/contacts",
       &SimpleTrackedVehiclePlugin::IgnoreContacts, this);
 
   this->beforePhysicsUpdateConnection =
@@ -136,15 +126,26 @@ void SimpleTrackedVehiclePlugin::Init()
 
 void SimpleTrackedVehiclePlugin::Reset()
 {
-  this->leftTrackVelocity = this->rightTrackVelocity = 0;
+  for (auto track: this->tracks)
+  {
+    this->trackVelocity[track.first] = 0;
+  }
 
   TrackedVehiclePlugin::Reset();
 }
 
 void SimpleTrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
 {
-  this->leftTrackVelocity = -_left;
-  this->rightTrackVelocity = -_right;
+  this->trackVelocity[Tracks::LEFT] = -_left;
+  this->trackVelocity[Tracks::RIGHT] = -_right;
+}
+
+void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
+{
+  for (auto track : this->tracks )
+  {
+    this->SetLinkMu(track.second);
+  }
 }
 
 void SimpleTrackedVehiclePlugin::SetGeomCategories()
@@ -169,13 +170,17 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     }
   }
 
-  for (auto collision : this->leftTrack->GetCollisions())
+  for (auto track : this->tracks)
   {
-    collision->SetCategoryBits(ROBOT_CATEGORY | BELT_CATEGORY | LEFT_CATEGORY);
-  }
-  for (auto collision : this->rightTrack->GetCollisions())
-  {
-    collision->SetCategoryBits(ROBOT_CATEGORY | BELT_CATEGORY);
+    auto trackLink = track.second;
+    for (auto collision : trackLink->GetCollisions())
+    {
+      auto bits = ROBOT_CATEGORY | BELT_CATEGORY;
+      if (track.first == Tracks::LEFT)
+        bits |= LEFT_CATEGORY;
+
+      collision->SetCategoryBits(bits);
+    }
   }
 }
 
@@ -189,8 +194,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   // Calculate the desired center of rotation
   /////////////////////////////////////////////
 
-  const auto leftBeltSpeed = this->leftTrackVelocity;
-  const auto rightBeltSpeed = this->rightTrackVelocity;
+  const auto leftBeltSpeed = this->trackVelocity[Tracks::LEFT];
+  const auto rightBeltSpeed = this->trackVelocity[Tracks::RIGHT];
 
   // the desired linear and angular speeds (set by desired track velocities)
   const auto linearSpeed = (leftBeltSpeed + rightBeltSpeed) / 2;
@@ -352,16 +357,15 @@ ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(
     const auto contactInVehiclePos =
         _bodyPose.Rot().RotateVectorReverse(contactPos - _bodyPose.Pos());
 
-    // TODO substitute this->sgn with ignition::math::signum when merged
     const int linearSpeedSignum =
-        (fabs(_linearSpeed) > 0.1) ? this->sgn(_linearSpeed) : 1;
+        (fabs(_linearSpeed) > 0.1) ? ignition::math::signum(_linearSpeed) : 1;
 
     // contactInVehiclePos.Dot(ignition::math::Vector3d(1, 0, 0)) > 0 means
     // the contact is "in front" of the line on which COR moves
-    if ((this->sgn(_angularSpeed) *
-          this->sgn(_bodyYAxisGlobal.Dot(frictionDirection))) !=
+    if ((ignition::math::signum(_angularSpeed) *
+      ignition::math::signum(_bodyYAxisGlobal.Dot(frictionDirection))) !=
       (linearSpeedSignum *
-        this->sgn(contactInVehiclePos.Dot(
+        ignition::math::signum(contactInVehiclePos.Dot(
           ignition::math::Vector3d(1, 0, 0)))))
     {
       frictionDirection = -frictionDirection;
@@ -420,7 +424,7 @@ SimpleTrackedVehiclePlugin::ContactIterator::operator++()
       continue;
 
     // HACK here we unfortunately have to access private ODE data
-     dContact* odeContact = &static_cast<dxJointContact*>(joint)->contact;
+     dContact* odeContact = &(static_cast<dxJointContact*>(joint)->contact);
 
     if (!(
             odeContact->geom.g1 == this->geom1 &&

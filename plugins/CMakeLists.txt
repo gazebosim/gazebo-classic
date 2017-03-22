@@ -16,6 +16,7 @@ include_directories(
 # needed for SimpleTrackedVehiclePlugin
 include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}/deps/opende/include
   ${CMAKE_SOURCE_DIR}/deps/threadpool
   ${CMAKE_SOURCE_DIR}/deps/opende/src
 )
@@ -89,6 +90,7 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   VehiclePlugin
+  WheelTrackedVehiclePlugin
   WindPlugin
 )
 
@@ -140,6 +142,9 @@ target_include_directories(SimpleTrackedVehiclePlugin SYSTEM PRIVATE
         ${CMAKE_SOURCE_DIR}/deps/opende/include)
 target_link_libraries(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
 add_dependencies(SimpleTrackedVehiclePlugin TrackedVehiclePlugin)
+
+target_link_libraries(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
+add_dependencies(WheelTrackedVehiclePlugin TrackedVehiclePlugin)
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)

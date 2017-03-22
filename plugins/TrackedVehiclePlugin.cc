@@ -65,17 +65,13 @@ class gazebo::TrackedVehiclePluginPrivate
 
   /// \brief Namespace used as a prefix for gazebo topic names.
   public: std::string robotNamespace;
-
-  // TODO delete when ignition::math::signum is merged
-  public: template <typename T> int sgn(T _val)
-  {
-    return (T(0) < _val) - (_val < T(0));
-  }
 };
 
 TrackedVehiclePlugin::TrackedVehiclePlugin()
   : dataPtr(new TrackedVehiclePluginPrivate)
 {
+  this->trackNames[Tracks::LEFT] = "left";
+  this->trackNames[Tracks::RIGHT] = "right";
 }
 
 TrackedVehiclePlugin::~TrackedVehiclePlugin()
@@ -111,7 +107,7 @@ void TrackedVehiclePlugin::Init()
 {
   // Initialize transport.
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->Init(this->GetRobotNamespace());
 
   this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
     this->dataPtr->robotNamespace + "/cmd_vel",
@@ -122,7 +118,8 @@ void TrackedVehiclePlugin::Init()
       this->dataPtr->robotNamespace + "/tracks_speed", 1000);
 
   this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
-    "~/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress, this, true);
+    "/gazebo/default/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress,
+    this, true);
 
   gzdbg << this->handleName.c_str() << ": Init done.\n";
 }
@@ -159,13 +156,11 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
   const double maxLinearSpeed = fabs(this->dataPtr->linearSpeedGain);
   if (fabs(leftVelocity) > maxLinearSpeed)
   {
-    // TODO use ignition::math::signum when merged
-    leftVelocity = this->dataPtr->sgn(leftVelocity) * maxLinearSpeed;
+    leftVelocity = ignition::math::signum(leftVelocity) * maxLinearSpeed;
   }
   if (fabs(rightVelocity) > maxLinearSpeed)
   {
-    // TODO use ignition::math::signum when merged
-    rightVelocity = this->dataPtr->sgn(rightVelocity) * maxLinearSpeed;
+    rightVelocity = ignition::math::signum(rightVelocity) * maxLinearSpeed;
   }
 
   // call the descendant handler
@@ -181,36 +176,47 @@ void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
   const int key = _msg->int_value();
 
+  double linearVel = 0., angularVel = 0.;
+
   switch (key)
   {
     // ENTER
     case 13:
     // SPACE
     case 32:
-      this->SetTrackVelocity(0., 0.);
+      linearVel = 0.;
+      angularVel = 0.;
       break;
     // UP
     case 38:
     case 16777235:
-      this->SetTrackVelocity(1., 1.);
+      linearVel = 1.;
       break;
     // DOWN
     case 40:
     case 16777237:
-      this->SetTrackVelocity(-1., -1.);
+      linearVel = -1.;
       break;
     // LEFT
     case 37:
     case 16777234:
-      this->SetTrackVelocity(-1., 1.);
+      angularVel = -1.;
       break;
     // RIGHT
     case 39:
     case 16777236:
-      this->SetTrackVelocity(1., -1.);
+      angularVel = 1.;
       break;
     default:
-      break;
+      return;
+  }
+
+  {
+    msgs::PosePtr message(new msgs::Pose());
+    message->mutable_position()->set_x(linearVel);
+    auto yaw = ignition::math::Quaterniond::EulerToQuaternion(0, 0, angularVel);
+    msgs::Set(message->mutable_orientation(), yaw);
+    this->OnVelMsg(message);
   }
 }
 
@@ -245,6 +251,7 @@ void TrackedVehiclePlugin::SetTrackMu(double _mu)
 {
   this->dataPtr->trackMu = _mu;
   this->dataPtr->sdf->GetElement("track_mu")->Set(_mu);
+  this->UpdateTrackSurface();
 }
 
 double TrackedVehiclePlugin::GetTrackMu2()
@@ -256,4 +263,32 @@ void TrackedVehiclePlugin::SetTrackMu2(double _mu2)
 {
   this->dataPtr->trackMu2 = _mu2;
   this->dataPtr->sdf->GetElement("track_mu2")->Set(_mu2);
+  this->UpdateTrackSurface();
+}
+
+void TrackedVehiclePlugin::SetLinkMu(const physics::LinkPtr &_link)
+{
+  for (auto collision : _link->GetCollisions())
+    {
+      auto frictionPyramid = collision->GetSurface()->FrictionPyramid();
+      double mu = this->GetTrackMu();
+      double mu2 = this->GetTrackMu2();
+
+      if (!ignition::math::equal(frictionPyramid->MuPrimary(), mu, 1e-6))
+      {
+        gzdbg << "Setting mu (friction) of link '" << _link->GetName() <<
+              "' from " << frictionPyramid->MuPrimary() << " to " <<
+              mu << std::endl;
+      }
+
+      if (!ignition::math::equal(frictionPyramid->MuSecondary(), mu2, 1e-6))
+      {
+        gzdbg << "Setting mu2 (friction) of link '" << _link->GetName() <<
+              "' from " << frictionPyramid->MuSecondary() << " to " <<
+              mu2 << std::endl;
+      }
+
+      frictionPyramid->SetMuPrimary(mu);
+      frictionPyramid->SetMuSecondary(mu2);
+    }
 }

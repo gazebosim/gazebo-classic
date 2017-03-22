@@ -222,7 +222,7 @@ namespace gazebo
             {
               auto result = _sdf->Get<V>(_name, _defaultValue);
 
-              if (result.second)
+              if (!result.second)
               {
                 gzdbg << this->handleName.c_str() << " Plugin missing <"
                       << _name.c_str() << ">, defaults to "

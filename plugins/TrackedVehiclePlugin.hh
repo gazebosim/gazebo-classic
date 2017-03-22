@@ -18,12 +18,34 @@
 #define GAZEBO_PLUGINS_TRACKEDVEHICLEPLUGIN_HH_
 
 #include <string>
+#include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
+#include <gazebo/physics/ode/ODELink.hh>
+#include <gazebo/physics/ode/ODECollision.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "plugins/TrackedVehiclePlugin.hh"
+
+namespace gazebo
+{
+  /// \enum Tracks
+  /// \brief Enum for distinguishing between left and right tracks.
+  enum class Tracks : bool { LEFT, RIGHT };
+}
+
+namespace std
+{
+  template <> struct hash<gazebo::Tracks>
+  {
+    size_t operator() (const gazebo::Tracks &_t) const
+    {
+      return size_t(_t);
+    }
+  };
+}
 
 namespace gazebo
 {
@@ -86,8 +108,21 @@ namespace gazebo
     /// \param[in] _mu2 The new coefficient.
     public: virtual void SetTrackMu2(double _mu2);
 
+    /// \brief Update surface parameters of the tracks to correspond to the
+    ///        values set in this plugin.
+    protected: virtual void UpdateTrackSurface() = 0;
+
+    /// \brief Set mu and mu2 of all collisions of the given link to values
+    ///        given by GetTrackMu() and GetTrackMu2().
+    ///
+    /// \param[in] _link The link whose "mu"s are to be set.
+    protected: void SetLinkMu(const physics::LinkPtr &_link);
+
     /// \brief Distance between the centers of the tracks.
     public: virtual double GetTracksSeparation();
+
+    /// \brief Textual lowercase names of the tracks.
+    protected: std::unordered_map<Tracks, std::string> trackNames;
 
     /// \brief Set new target velocity for the tracks.
     ///

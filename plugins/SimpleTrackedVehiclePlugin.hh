@@ -19,6 +19,7 @@
 #define GAZEBO_SIMPLETRACKEDVEHICLEPLUGIN_HH
 
 #include <string>
+#include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
 
@@ -78,14 +79,18 @@ namespace gazebo {
     /// \param[in] _right Velocity of right track.
     protected: virtual void SetTrackVelocity(double _left, double _right);
 
+    /// \brief Update surface parameters of the tracks to correspond to the
+    ///        values set in this plugin.
+    protected: virtual void UpdateTrackSurface();
+
     /// \brief Body of the robot.
     protected: physics::LinkPtr body;
 
     /// \brief The tracks controlled by this plugin.
-    protected: physics::LinkPtr leftTrack, rightTrack;
+    protected: std::unordered_map<Tracks, physics::LinkPtr> tracks;
 
     /// \brief Desired velocities of the tracks.
-    protected: double leftTrackVelocity = 0, rightTrackVelocity = 0;
+    protected: std::unordered_map<Tracks, double> trackVelocity;
 
     /// \brief Compute and apply the forces that make the tracks move.
     protected: void DriveTracks(const common::UpdateInfo &/*_unused*/);
@@ -145,17 +150,6 @@ namespace gazebo {
     ///        publisher so that contacts are computed.
     private: void IgnoreContacts(ConstContactsPtr &/*_unused*/)
     {
-    }
-
-    /// \brief The signum function.
-    /// \param[in] The value.
-    /// \return The signum of the value.
-    private: template <typename T> int sgn(T _val) const
-    {
-      // uncomment when the following PR gets merged (and comment next line):
-      // https://bitbucket.org/ignitionrobotics/ign-math/pull-requests/153
-      // return ignition::math::signum(_val);
-      return (T(0) < _val) - (_val < T(0));
     }
 
 
