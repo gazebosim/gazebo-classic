@@ -62,16 +62,9 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != nullptr);
   physics::ContactManager * contactManager = physics->GetContactManager();
   ASSERT_TRUE(contactManager != nullptr);
-
-  // need to make a fake subscriber to the contacts topic in order
-  // to trigger the ContactManager to maintain all contacts.
-  // This can be replaced by ContactManager::NeverDropContacts()
-  // as soon as PR 2629 is merged
-  // https://bitbucket.org/osrf/gazebo/pull-requests/2629
-  std::string contactsTopic = "~/physics/contacts";
-  transport::NodePtr node(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sub = node->Subscribe(contactsTopic, &OnContact);
+  // Set contact manager to never drop contacts, even if there are
+  // no subscribers.
+  contactManager->SetNeverDropContacts(true);
 
   // Disable physics engine and do one step.
   // The contacts should be available, even though the engine is disabled.
