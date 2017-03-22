@@ -87,6 +87,12 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
 
+  // the default world has to exist
+  ASSERT_TRUE(physics::has_world("default") != nullptr);
+  // calling has_world with empty string should check whether
+  // any world exists at all, which has to be true too.
+  ASSERT_TRUE(physics::has_world("") != nullptr);
+
   // Get world pointer
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);

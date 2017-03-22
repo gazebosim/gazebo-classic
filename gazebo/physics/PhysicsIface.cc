@@ -89,8 +89,7 @@ bool physics::has_world(const std::string &_name)
 {
   if (_name.empty())
   {
-    if (g_worlds.empty()) return false;
-    return true;
+    return !g_worlds.empty();
   }
   else
   {
