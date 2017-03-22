@@ -17,6 +17,7 @@
 #include <iostream>
 #include "gazebo/components/Triplet.hh"
 #include "gazebo/ecs/Entity.hh"
+#include "gazebo/ecs/Manager.hh"
 #include "gazebo/ecs/EntityQuery.hh"
 #include "gazebo/plugin/RegisterMacros.hh"
 #include "gazebo/systems/AddAndPrintResult.hh"
@@ -38,16 +39,16 @@ ecs::EntityQuery AddAndPrintResult::Init()
 
 /////////////////////////////////////////////////
 void AddAndPrintResult::Update(double _dt,
-    ecs::EntityQuery &_query)
+    ecs::EntityQuery &_query, ecs::Manager &_mgr)
 {
   // Loop through all of the entities which have the required components
-  for (int i = 0; i < _query.EntityCount(); i++)
+  for (auto const &entityId : _query.EntityIds())
   {
-    auto &numbers = _query.EntityAt(i)->ComponentValue<
+    auto &numbers = _mgr.GetEntity(entityId).ComponentValue<
       gazebo::components::Triplet>("gazebo::components::Triplet");
 
-    std::cout << "Adding " << _query.EntityAt(i)->Id() << ":" <<
-      numbers.first << " " << numbers.second << " "<< numbers.third << std::endl;
+    std::cout << "Adding " << entityId << ":" <<
+      numbers.first + numbers.second + numbers.third << std::endl;
   }
 }
 

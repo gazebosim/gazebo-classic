@@ -29,6 +29,8 @@ namespace gazebo
     /// \brief Forward declaration
     class SystemPrivate;
 
+    class Manager;
+
     /// \brief Forward declaration
     class EntityQuery;
 
@@ -41,23 +43,13 @@ namespace gazebo
       public: System();
       public: ~System();
 
-      // public: void Load(Manager &_manager);
-
       /// \brief Initialize the system and return the entity query
       /// required by this system.
       public: virtual EntityQuery Init() = 0;
 
         /// \brief Update all entities matching this system's requirements
       public: virtual void Update(
-                  double _dt, EntityQuery &_result) = 0;
-
-      /*public: template<typename T>
-              Component<T> &GetComponent(const EntityId _id,
-                  const std::string &_type)
-              {
-                return this->dataPtr->manager.Component(_id, _type);
-              }
-              */
+                  double _dt, EntityQuery &_result, Manager &_mgr) = 0;
 
       /// \brief No copy constructor
       private: System(const System&) = delete;

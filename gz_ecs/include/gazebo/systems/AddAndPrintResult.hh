@@ -15,30 +15,25 @@
  *
 */
 
+#ifndef GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
+#define GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
 
-#ifndef GAZEBO_PRIVATE_SYSTEMS_DIVIDEANDPRINTRESULT_HH_
-#define GAZEBO_PRIVATE_SYSTEMS_DIVIDEANDPRINTRESULT_HH_
-
-#include "gazebo/ecs_core/System.hh"
+#include "gazebo/ecs/System.hh"
 
 namespace gazebo
 {
-namespace systems
-{
+  namespace systems
+  {
+    /// \brief Forward Declaration
+    class EntityQueryResult;
 
-/// \brief Forward Declaration
-class EntityQueryResult;
+    class AddAndPrintResult : public ecs::System
+    {
+      public: virtual ecs::EntityQuery Init();
 
-class DivideAndPrintResult : public ecs_core::System
-{
-  public:
-    virtual void Init(ecs_core::EntityQuery &_query);
-
-    virtual void Update(
-        double _dt, const ecs_core::EntityQueryResult &_result);
-};
-
+      public: virtual void Update(double _dt, ecs::EntityQuery &_result,
+                  ecs::Manager &_mgr);
+    };
+  }
 }
-}
-
 #endif

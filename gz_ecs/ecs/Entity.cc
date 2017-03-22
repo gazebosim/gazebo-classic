@@ -15,30 +15,34 @@
  *
 */
 
+#include "gazebo/ecs/Manager.hh"
+#include "gazebo/ecs/Entity.hh"
 
-#ifndef GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
-#define GAZEBO_PRIVATE_SYSTEMS_ADDANDPRINTRESULT_HH_
+using namespace gazebo;
+using namespace ecs;
 
-#include "gazebo/ecs_core/System.hh"
+EntityId Entity::nextId = 0;
 
-namespace gazebo
+/////////////////////////////////////////////////
+Entity::Entity(Manager *_mgr)
+: manager(_mgr), id(nextId++)
 {
-namespace systems
-{
-
-/// \brief Forward Declaration
-class EntityQueryResult;
-
-class AddAndPrintResult : public ecs_core::System
-{
-  public:
-    virtual void Init(ecs_core::EntityQuery &_query);
-
-    virtual void Update(
-        double _dt, const ecs_core::EntityQueryResult &_result);
-};
-
-}
 }
 
-#endif
+/////////////////////////////////////////////////
+Entity::~Entity()
+{
+}
+
+/////////////////////////////////////////////////
+EntityId Entity::Id() const
+{
+  return this->id;
+}
+
+/////////////////////////////////////////////////
+ComponentBase *Entity::ComponentBaseValue(const std::string &_comp)
+{
+  return this->manager->EntityComponent(this->id,
+      ComponentFactory::Type(_comp));
+}
