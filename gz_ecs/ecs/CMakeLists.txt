@@ -1,8 +1,9 @@
 set(sources
-  EntityManager.cc
+  Entity.cc
   EntityQuery.cc
-  EntityQueryResult.cc
-  SystemManager.cc
+  Component.cc
+  ComponentFactory.cc
+  Manager.cc
   System.cc
 )
 

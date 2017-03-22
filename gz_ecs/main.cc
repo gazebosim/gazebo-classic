@@ -20,52 +20,39 @@
 
 #include "gazebo/components/Fraction.hh"
 #include "gazebo/components/Triplet.hh"
-#include "gazebo/ecs_core/EntityManager.hh"
-#include "gazebo/ecs_core/SystemManager.hh"
+#include "gazebo/ecs/ComponentFactory.hh"
+#include "gazebo/ecs/Manager.hh"
 #include "gazebo/plugin/PluginLoader.hh"
 
-// I can't imagine why someone would inherit from a system. Calling these
-// private gives freedom to make changes to them
-#include "gazebo/private/systems/DivideAndPrintResult.hh"
+#include "gazebo/systems/DivideAndPrintResult.hh"
 
 int main(int argc, char **argv)
 {
-  // ECS libraries EntityX, anax, and artemis all have a "world" class
-  // that handles entity, component, and system storage. I'm avoiding making
-  // one because of possible confusion with gazebo worlds
-
-  // Something to store entities and components
-  gazebo::ecs_core::EntityManager em;
-
-  // Something to store Systems
-  gazebo::ecs_core::SystemManager sm;
+  gazebo::ecs::Manager manager;
 
   // Something to deal with loading plugins
   gazebo::plugin::PluginLoader pm;
 
+  // First way to load a system: not using a plugin. Useful for testing
+  manager.LoadSystem<gazebo::systems::DivideAndPrintResult>();
+
   // Add a place to search for plugins
   const char *path = std::getenv("GAZEBO_PLUGIN_PATH");
   if (nullptr != path)
-    pm.AddSearchPath(std::string(path));
+    pm.AddSearchPath(path);
   else
     std::cerr << "No plugin path given" << std::endl;
-
-  // All systems are going to require entities and components to operate on
-  sm.SetEntityManager(&em);
-
-  // First way to load a system: not using a plugin. Useful for testing
-  sm.LoadSystem<gazebo::systems::DivideAndPrintResult>();
 
   // Second way to load a system: using a plugin.
   if (pm.LoadLibrary("AddAndPrintResult"))
   {
-    std::unique_ptr<gazebo::ecs_core::System> sys;
-    sys = pm.Instantiate<gazebo::ecs_core::System>(
+    std::unique_ptr<gazebo::ecs::System> sys;
+    sys = pm.Instantiate<gazebo::ecs::System>(
         "::gazebo::systems::AddAndPrintResult",
-        "::gazebo::ecs_core::System");
-    if (!sm.LoadSystem(std::move(sys)))
+        "::gazebo::ecs::System");
+    if (!manager.LoadSystem(std::move(sys)))
     {
-      std::cerr << "Faied to load plugin from library" << std::endl;
+      std::cerr << "Failed to load plugin from library" << std::endl;
     }
   }
   else
@@ -79,36 +66,39 @@ int main(int argc, char **argv)
     // EntityX, anax, and artemis all have an Entity class that acts as a
     // convenience wrapper for world or entity manager calls. This line is
     // is different in that it returns the ID which can be given to the
-    // the EntityManager. It is less convenient, but it avoids giving the 
+    // the EntityManager. It is less convenient, but it avoids giving the
     // impression that an Entity is more than an ID.
-    gazebo::ecs_core::Entity e = em.CreateEntity();
-    
+    gazebo::ecs::EntityId e = manager.CreateEntity();
+
     if (e % 2 == 0)
     {
-      auto fraction = em.AddComponent<gazebo::components::Fraction>(e);
-      fraction->numerator = 100.0f + i;
-      fraction->denominator = 1.0f + i;
+      // One method of adding a component
+      auto &fraction = manager.AddComponent<gazebo::components::Fraction>(
+          "gazebo::components::Fraction", e);
+
+      fraction.numerator = 100.0f + i;
+      fraction.denominator = 1.0f + i;
     }
     if (e % 3 == 0)
     {
       // This test program knows about components, but AddComponent<>() will
       // really be called by a componentizer plugin. Gazebo won't know what
       // components are beyond their typeid hash and size.
-      auto numbers = em.AddComponent<gazebo::components::Triplet>(e);
-      numbers->first = e;
-      numbers->second = i;
-      numbers->third = 3;
+      auto numbers = GZ_COMPONENT_FACTORY_CREATE(gazebo::components::Triplet);
+
+      numbers->data.first = e;
+      numbers->data.second = i;
+      numbers->data.third = 3;
+
+      manager.AddComponent(std::move(numbers), e);
     }
   }
-
-  // Update results of EntityManager queries after adding entities
-  em.Update();
 
   // Run all the systems once. Value chosen for time_step is unimportant for
   // this demo. In practice Update() should be called in a loop for as long
   // as the simulation is running.
   double timeStep = 0.001;
-  sm.Update(timeStep);
+  manager.UpdateSystems(timeStep);
 
   return 0;
 }
