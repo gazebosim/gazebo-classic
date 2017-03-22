@@ -15,30 +15,22 @@
  *
 */
 
+#include "gazebo/ecs/System.hh"
 
-#ifndef GAZEBO_ECS_CORE_ENTITYQUERYPRIVATE_HH_
-#define GAZEBO_ECS_CORE_ENTITYQUERYPRIVATE_HH_
+using namespace gazebo;
+using namespace ecs;
 
-#include <vector>
-#include "gazebo/ecs_core/EntityQueryResult.hh"
-
-namespace gazebo
+class gazebo::ecs::SystemPrivate
 {
-namespace ecs_core
-{
-
-class EntityQueryPrivate
-{
-  public:
-    /// \brief list of component types that must be present on entities
-    std::vector<ComponentType> componentTypes;
-
-    /// \brief The results of the query
-    EntityQueryResult results;
-
 };
 
-}
+/////////////////////////////////////////////////
+System::System()
+: dataPtr(new SystemPrivate())
+{
 }
 
-#endif
+/////////////////////////////////////////////////
+System::~System()
+{
+}

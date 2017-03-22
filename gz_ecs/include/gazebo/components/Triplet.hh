@@ -20,18 +20,16 @@
 
 namespace gazebo
 {
-namespace components
-{
-
-/// \brief Three numbers
-struct Triplet
-{
-  float first;
-  float second;
-  float third;
-};
-
-}
+  namespace components
+  {
+    /// \brief Three numbers
+    struct Triplet
+    {
+      float first;
+      float second;
+      float third;
+    };
+  }
 }
 
 #endif

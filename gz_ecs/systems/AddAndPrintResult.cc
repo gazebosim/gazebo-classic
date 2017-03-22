@@ -16,41 +16,40 @@
 */
 #include <iostream>
 #include "gazebo/components/Triplet.hh"
-#include "gazebo/ecs_core/Entity.hh"
-#include "gazebo/ecs_core/EntityQuery.hh"
-#include "gazebo/ecs_core/EntityQueryResult.hh"
-#include "gazebo/ecs_core/EntityManager.hh"
+#include "gazebo/ecs/Entity.hh"
+#include "gazebo/ecs/EntityQuery.hh"
 #include "gazebo/plugin/RegisterMacros.hh"
-#include "gazebo/private/systems/AddAndPrintResult.hh"
+#include "gazebo/systems/AddAndPrintResult.hh"
 
-namespace gazebo
-{
-namespace systems
-{
+using namespace gazebo;
+using namespace systems;
 
-void AddAndPrintResult::Init(ecs_core::EntityQuery &_query)
+/////////////////////////////////////////////////
+ecs::EntityQuery AddAndPrintResult::Init()
 {
+  ecs::EntityQuery query;
+
   // Add components which are required
-  _query.AddComponent<components::Triplet>();
+  if (!query.AddComponent("gazebo::components::Triplet"))
+    std::cerr << "Undefined component[gazebo::components::Triplet]\n";
+
+  return query;
 }
 
-void AddAndPrintResult::Update(
-    double _dt, const ecs_core::EntityQueryResult &_result)
+/////////////////////////////////////////////////
+void AddAndPrintResult::Update(double _dt,
+    ecs::EntityQuery &_query)
 {
   // Loop through all of the entities which have the required components
-  auto em = this->GetEntityManager();
-  for (int i = 0; i < _result.NumResults(); i++)
+  for (int i = 0; i < _query.EntityCount(); i++)
   {
-    ecs_core::Entity entity = _result.At(i);
-    auto numbers = em->GetComponent<components::Triplet>(entity);
+    auto &numbers = _query.EntityAt(i)->ComponentValue<
+      gazebo::components::Triplet>("gazebo::components::Triplet");
 
-    std::cout << "Adding " << entity << ":" << 
-      numbers->first + numbers->second + numbers->third << std::endl;
+    std::cout << "Adding " << _query.EntityAt(i)->Id() << ":" <<
+      numbers.first << " " << numbers.second << " "<< numbers.third << std::endl;
   }
 }
 
-}
-}
-
 GZ_REGISTER_SINGLE_PLUGIN(gazebo::systems::AddAndPrintResult,
-                          gazebo::ecs_core::System)
+                          gazebo::ecs::System)

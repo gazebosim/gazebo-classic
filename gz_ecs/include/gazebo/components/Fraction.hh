@@ -20,24 +20,23 @@
 
 namespace gazebo
 {
-namespace components
-{
-
-/// \brief A fraction that can be divided
-///
-/// Why a fraction component instead of a numerator and a denominator?
-/// It's becomming clear that the best possible cache performance means
-/// One component per system. Combining the related data into one
-/// component means the cache can be filled with a list of components,
-/// And the system which operates on them (in this case the division system)
-/// can iterate through all those components and do useful work.
-struct Fraction
-{
-  float numerator;
-  float denominator;
-};
-
-}
+  namespace components
+  {
+    /// \brief A fraction that can be divided
+    ///
+    /// Why a fraction component instead of a numerator and a denominator?
+    /// It's becomming clear that the best possible cache performance means
+    /// One component per system. Combining the related data into one
+    /// component means the cache can be filled with a list of components,
+    /// And the system which operates on them (in this case the division system)
+    /// can iterate through all those components and do useful work.
+    struct Fraction
+    {
+      float numerator;
+      float denominator;
+      float test;
+    };
+  }
 }
 
 #endif
