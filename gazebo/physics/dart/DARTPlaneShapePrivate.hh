@@ -51,18 +51,18 @@ namespace gazebo
 
       public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr,
-                    "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(new dart::dynamics::BoxShape(
-                                           Eigen::Vector3d(2100, 2100, 2100)));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<
-                                        dart::dynamics::VisualAspect,
-                                        dart::dynamics::CollisionAspect,
-                                        dart::dynamics::DynamicsAspect>(shape);
-          Eigen::Isometry3d trans = Eigen::Isometry3d::Identity();
-          trans.translate(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
-          node->setRelativeTransform(trans);
-          dtBoxShape.set(node);
+        GZ_ASSERT(bodyNode.get() != nullptr,
+                  "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(new dart::dynamics::BoxShape(
+                                         Eigen::Vector3d(2100, 2100, 2100)));
+        dart::dynamics::ShapeNode *node = bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        Eigen::Isometry3d trans = Eigen::Isometry3d::Identity();
+        trans.translate(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+        node->setRelativeTransform(trans);
+        dtBoxShape.set(node);
       }
 
       /// \brief DART box shape

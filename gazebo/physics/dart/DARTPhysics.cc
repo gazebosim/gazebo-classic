@@ -264,7 +264,7 @@ void DARTPhysics::UpdateCollision()
   {
     DARTLinkPtr dartLink1 = it->first.GetDARTLink1();
     DARTLinkPtr dartLink2 = it->first.GetDARTLink2();
-    const std::deque<const dart::collision::Contact*>& dtContacts = it->second;
+    const std::deque<const dart::collision::Contact*> &dtContacts = it->second;
 
     GZ_ASSERT(!dtContacts.empty(),
            "dtContacts is empty, at least one contact should have been added");
@@ -435,10 +435,12 @@ CollisionPtr DARTPhysics::CreateCollision(const std::string &_type,
 ShapePtr DARTPhysics::CreateShape(const std::string &_type,
                                     CollisionPtr _collision)
 {
-  ShapePtr shape;
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_collision),
+            "Collision must be a DARTCollisionPtr");
   DARTCollisionPtr collision =
-    boost::dynamic_pointer_cast<DARTCollision>(_collision);
+    boost::static_pointer_cast<DARTCollision>(_collision);
 
+  ShapePtr shape;
   if (_type == "sphere")
     shape.reset(new DARTSphereShape(collision));
   else if (_type == "plane")

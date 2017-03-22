@@ -52,14 +52,14 @@ namespace gazebo
 
       public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(
-                                    new dart::dynamics::CylinderShape(1, 1));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<
-                                        dart::dynamics::VisualAspect,
-                                        dart::dynamics::CollisionAspect,
-                                        dart::dynamics::DynamicsAspect>(shape);
-          dtCylinderShape.set(node);
+        GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(
+                                  new dart::dynamics::CylinderShape(1, 1));
+        dart::dynamics::ShapeNode *node = bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        dtCylinderShape.set(node);
       }
 
       /// \brief DART cylinder shape

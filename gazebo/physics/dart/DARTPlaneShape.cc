@@ -44,9 +44,10 @@ DARTPlaneShape::~DARTPlaneShape()
 void DARTPlaneShape::Init()
 {
   BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
   DARTCollisionPtr _collisionParent =
-    boost::dynamic_pointer_cast<DARTCollision>(_parent);
-  GZ_ASSERT(_collisionParent.get(), "Parent must be a DARTCollisionPtr");
+    boost::static_pointer_cast<DARTCollision>(_parent);
 
   dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
   if (!bodyNode.get()) gzerr << "BodyNode is NULL in init!\n";

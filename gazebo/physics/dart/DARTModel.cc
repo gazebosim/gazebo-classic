@@ -211,39 +211,6 @@ void DARTModel::Init()
   {
     this->dataPtr->dtSkeleton->enableSelfCollisionCheck();
     this->dataPtr->dtSkeleton->setAdjacentBodyCheck(false);
-
-    gzwarn << "DART does not fully support self-collision yet. "
-           << __FILE__ << ", " << __LINE__ << "\n";
-    /*
-      This has to be disabled in dart 6 because there is no equivalent to disablePair().
-    dart::simulation::WorldPtr dtWorld = this->GetDARTPhysics()->GetDARTWorldPtr();
-    dart::collision::CollisionDetectorPtr dtCollDet =
-        dtWorld->getConstraintSolver()->getCollisionDetector();
-
-    for (size_t i = 0; i < linkList.size() - 1; ++i)
-    {
-      for (size_t j = i + 1; j < linkList.size(); ++j)
-      {
-        dart::dynamics::BodyNode *itdtBodyNode1 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[i])->DARTBodyNode();
-        dart::dynamics::BodyNode *itdtBodyNode2 =
-          boost::dynamic_pointer_cast<DARTLink>(linkList[j])->DARTBodyNode();
-
-        // If this->dtBodyNode and itdtBodyNode are connected then don't enable
-        // the pair.
-        // Please see: https://bitbucket.org/osrf/gazebo/issue/899
-        if ((itdtBodyNode1->getParentBodyNode() == itdtBodyNode2) ||
-            itdtBodyNode2->getParentBodyNode() == itdtBodyNode1)
-        {
-          dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
-        }
-
-        if (!linkList[i]->GetSelfCollide() || !linkList[j]->GetSelfCollide())
-        {
-          dtCollDet->disablePair(itdtBodyNode1, itdtBodyNode2);
-        }
-      }
-    }*/
   }
 
   // Note: This function should be called after the skeleton is added to the
