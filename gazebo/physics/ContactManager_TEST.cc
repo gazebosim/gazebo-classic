@@ -163,7 +163,7 @@ TEST_F(ContactManagerTest, NeverDropdContacts)
   // we have not enforced contacts computation (yet), so
   // we should not have access to any contacts information
   // without the enforcement.
-  ASSERT_EQ(numContacts, 0);
+  ASSERT_EQ(numContacts, 0u);
 
   manager->SetNeverDropContacts(true);
   ASSERT_TRUE(manager->NeverDropContacts());
@@ -174,7 +174,7 @@ TEST_F(ContactManagerTest, NeverDropdContacts)
 
   numContacts = manager->GetContactCount();
   gzdbg << "Number of contacts: " <<numContacts << std::endl;
-  ASSERT_GT(numContacts, 0);
+  ASSERT_GT(numContacts, 0u);
 
   // make sure there are no subscribers connected which may have
   // caused the contacts to become true
