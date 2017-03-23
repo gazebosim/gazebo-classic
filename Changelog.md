@@ -2,6 +2,10 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1.
+
+## Gazebo 7.6.0 (2017-03-20)
+
 1. Force / torque sensor visualization using WrenchVisual
     * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
 
