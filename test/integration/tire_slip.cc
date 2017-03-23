@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
@@ -103,7 +103,7 @@ TEST_F(TireSlipTest, Lateral)
   this->drumJointCmdPub = node->Advertise<msgs::JointCmd>("~/drum/joint_cmd");
 
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         sensors::get_sensor("default::tire::axel_wheel::force_torque"));
 
   ASSERT_TRUE(sensor != NULL);
@@ -114,7 +114,7 @@ TEST_F(TireSlipTest, Lateral)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
 
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
 
   physics::ModelPtr wheelModel = world->GetModel("tire");
   ASSERT_TRUE(wheelModel != NULL);
@@ -318,11 +318,11 @@ TEST_F(TireSlipTest, Lateral)
       statsSteer.InsertData(
         (this->steerJoint->GetAngle(0) - state.steer).Radian());
       statsForceLateral.InsertData(
-        sensor->GetForce().y - state.axelForceLateral);
+        sensor->Force().Y() - state.axelForceLateral);
       statsForceLongitudinal.InsertData(
-        sensor->GetForce().x - state.axelForceLongitudinal);
+        sensor->Force().X() - state.axelForceLongitudinal);
       statsForceVertical.InsertData(
-        sensor->GetForce().z - (state.suspForce - (modelMass-wheelMass)*g.z));
+        sensor->Force().Z() - (state.suspForce - (modelMass-wheelMass)*g.Z()));
       statsWheelSpeed.InsertData(spinJoint->GetVelocity(0) - state.wheelSpeed);
     }
     EXPECT_LT(statsDrumSpeed.Value(), 0.5);

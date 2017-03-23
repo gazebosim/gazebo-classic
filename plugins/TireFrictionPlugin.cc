@@ -243,36 +243,36 @@ void TireFrictionPlugin::OnUpdate()
     for (int j = 0; j < contact->position_size(); ++j)
     {
       // Contact position in world coordinates.
-      math::Vector3 position = msgs::Convert(contact->position(j));
+      auto position = msgs::ConvertIgn(contact->position(j));
 
       // Velocity of each link at contact point in world coordinates.
-      math::Vector3 velocity1;
-      math::Vector3 velocity2;
+      ignition::math::Vector3d velocity1;
+      ignition::math::Vector3d velocity2;
       {
-        math::Pose linkPose = link1->GetWorldPose();
-        math::Vector3 offset = position - linkPose.pos;
-        velocity1 = link1->GetWorldLinearVel(offset, math::Quaternion());
+        ignition::math::Pose3d linkPose = link1->GetWorldPose().Ign();
+        ignition::math::Vector3d offset = position - linkPose.Pos();
+        velocity1 = link1->GetWorldLinearVel(offset, math::Quaternion()).Ign();
       }
       {
-        math::Pose linkPose = link2->GetWorldPose();
-        math::Vector3 offset = position - linkPose.pos;
-        velocity2 = link2->GetWorldLinearVel(offset, math::Quaternion());
+        ignition::math::Pose3d linkPose = link2->GetWorldPose().Ign();
+        ignition::math::Vector3d offset = position - linkPose.Pos();
+        velocity2 = link2->GetWorldLinearVel(offset, math::Quaternion()).Ign();
       }
 
       // Relative link velocity at contact point.
-      math::Vector3 slipVelocity = velocity1 - velocity2;
+      ignition::math::Vector3d slipVelocity = velocity1 - velocity2;
 
       // Subtract normal velocity component
-      math::Vector3 normal = msgs::Convert(contact->normal(j));
+      auto normal = msgs::ConvertIgn(contact->normal(j));
       slipVelocity -= normal * slipVelocity.Dot(normal);
 
       // Scale slip speed by normal force
-      double slipSpeed = slipVelocity.GetLength();
+      double slipSpeed = slipVelocity.Length();
       double normalForce;
       {
-        math::Vector3 force1 = msgs::Convert(
+        ignition::math::Vector3d force1 = msgs::ConvertIgn(
           contact->wrench(j).body_1_wrench().force());
-        math::Quaternion rot1 = link1->GetWorldPose().rot;
+        ignition::math::Quaterniond rot1 = link1->GetWorldPose().Ign().Rot();
         normalForce = rot1.RotateVector(force1).Dot(normal);
       }
       scaledSlipSpeed += slipSpeed * std::abs(normalForce);
@@ -281,11 +281,11 @@ void TireFrictionPlugin::OnUpdate()
       // Compute reference speed
       // max of absolute speed at contact points and at link origin
       double referenceSpeed =
-        std::max(velocity1.GetLength(), velocity2.GetLength());
+        std::max(velocity1.Length(), velocity2.Length());
       referenceSpeed = std::max(referenceSpeed,
-        link1->GetWorldLinearVel().GetLength());
+        link1->GetWorldLinearVel().Ign().Length());
       referenceSpeed = std::max(referenceSpeed,
-        link2->GetWorldLinearVel().GetLength());
+        link2->GetWorldLinearVel().Ign().Length());
       scaledReferenceSpeed += referenceSpeed * std::abs(normalForce);
     }
 
@@ -304,14 +304,13 @@ void TireFrictionPlugin::OnUpdate()
   // Set friction coefficient.
   if (this->dataPtr->physics->GetType() == "ode")
   {
-    physics::ODESurfaceParamsPtr surface =
-      boost::dynamic_pointer_cast<physics::ODESurfaceParams>(
-        this->dataPtr->collision->GetSurface());
+    physics::SurfaceParamsPtr surface =
+        this->dataPtr->collision->GetSurface();
     if (surface)
     {
       // ideally we should change fdir1 I think?
-      surface->frictionPyramid.SetMuPrimary(friction);
-      surface->frictionPyramid.SetMuSecondary(friction);
+      surface->GetFrictionPyramid()->SetMuPrimary(friction);
+      surface->GetFrictionPyramid()->SetMuSecondary(friction);
     }
     else
     {
