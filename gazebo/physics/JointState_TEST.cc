@@ -52,9 +52,9 @@ TEST_F(JointStateTest, LoadFromSdfSingleAxis) {
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
   sdf::ElementPtr modelElem = stateElem->GetElement("model");
-  EXPECT_TRUE(modelElem != NULL);
+  EXPECT_TRUE(modelElem != nullptr);
   sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-  EXPECT_TRUE(jointElem != NULL);
+  EXPECT_TRUE(jointElem != nullptr);
 
   physics::JointState jointState;
   jointState.Load(jointElem);
@@ -87,9 +87,9 @@ TEST_F(JointStateTest, LoadFromSdfMultiAxis) {
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
   sdf::ElementPtr modelElem = stateElem->GetElement("model");
-  EXPECT_TRUE(modelElem != NULL);
+  EXPECT_TRUE(modelElem != nullptr);
   sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-  EXPECT_TRUE(jointElem != NULL);
+  EXPECT_TRUE(jointElem != nullptr);
 
   physics::JointState jointState;
   jointState.Load(jointElem);
@@ -123,9 +123,9 @@ TEST_F(JointStateTest, StreamDefaultConstructed) {
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
   sdf::ElementPtr modelElem = stateElem->GetElement("model");
-  EXPECT_TRUE(modelElem != NULL);
+  EXPECT_TRUE(modelElem != nullptr);
   sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-  EXPECT_TRUE(jointElem != NULL);
+  EXPECT_TRUE(jointElem != nullptr);
 
   physics::JointState sdfJointState;
   sdfJointState.Load(jointElem);
@@ -158,9 +158,9 @@ TEST_F(JointStateTest, StreamSingleAxis) {
     sdf::ElementPtr stateElem = worldElem->GetElement("state");
     EXPECT_TRUE(stateElem->HasElement("model"));
     sdf::ElementPtr modelElem = stateElem->GetElement("model");
-    EXPECT_TRUE(modelElem != NULL);
+    EXPECT_TRUE(modelElem != nullptr);
     sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-    EXPECT_TRUE(jointElem != NULL);
+    EXPECT_TRUE(jointElem != nullptr);
 
     initialJointState.Load(jointElem);
   }
@@ -186,9 +186,9 @@ TEST_F(JointStateTest, StreamSingleAxis) {
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
   sdf::ElementPtr modelElem = stateElem->GetElement("model");
-  EXPECT_TRUE(modelElem != NULL);
+  EXPECT_TRUE(modelElem != nullptr);
   sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-  EXPECT_TRUE(jointElem != NULL);
+  EXPECT_TRUE(jointElem != nullptr);
 
   physics::JointState sdfJointState;
   sdfJointState.Load(jointElem);
@@ -222,9 +222,9 @@ TEST_F(JointStateTest, StreamMultiAxis) {
     sdf::ElementPtr stateElem = worldElem->GetElement("state");
     EXPECT_TRUE(stateElem->HasElement("model"));
     sdf::ElementPtr modelElem = stateElem->GetElement("model");
-    EXPECT_TRUE(modelElem != NULL);
+    EXPECT_TRUE(modelElem != nullptr);
     sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-    EXPECT_TRUE(jointElem != NULL);
+    EXPECT_TRUE(jointElem != nullptr);
 
     initialJointState.Load(jointElem);
   }
@@ -250,9 +250,9 @@ TEST_F(JointStateTest, StreamMultiAxis) {
   sdf::ElementPtr stateElem = worldElem->GetElement("state");
   EXPECT_TRUE(stateElem->HasElement("model"));
   sdf::ElementPtr modelElem = stateElem->GetElement("model");
-  EXPECT_TRUE(modelElem != NULL);
+  EXPECT_TRUE(modelElem != nullptr);
   sdf::ElementPtr jointElem = modelElem->GetElement("joint");
-  EXPECT_TRUE(jointElem != NULL);
+  EXPECT_TRUE(jointElem != nullptr);
 
   physics::JointState sdfJointState;
   sdfJointState.Load(jointElem);

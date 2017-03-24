@@ -130,7 +130,8 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::JointState &_state)
       {
-        if(_state.GetAngleCount() > 0) {
+        if(_state.GetAngleCount() > 0)
+        {
           _out << "<joint name='" << _state.GetName() << "'>";
 
           int i = 0;
