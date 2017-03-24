@@ -64,7 +64,7 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
       }
     }
 
-    GZ_ASSERT(this->jointNames[track].size() >= 2,
+    GZ_ASSERT(jointNames.size() >= 2,
               "WheelTrackedVehiclePlugin: At least two " + jointTagName +
                 " tags have to be specified.");
 

@@ -71,12 +71,12 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
 
   this->tracks[Tracks::LEFT] = _model->GetLink(
       _sdf->GetElement("left_track")->Get<std::string>());
-  GZ_ASSERT(this->leftTrack, "SimpleTrackedVehiclePlugin "
+  GZ_ASSERT(this->tracks[Tracks::LEFT], "SimpleTrackedVehiclePlugin "
       "<left_track> link does not exist.");
 
   this->tracks[Tracks::RIGHT] = _model->GetLink(
       _sdf->GetElement("right_track")->Get<std::string>());
-  GZ_ASSERT(this->rightTrack, "SimpleTrackedVehiclePlugin "
+  GZ_ASSERT(this->tracks[Tracks::RIGHT], "SimpleTrackedVehiclePlugin "
       "<right_track> link does not exist.");
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
