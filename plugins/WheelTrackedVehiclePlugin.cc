@@ -65,8 +65,8 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
     }
 
     GZ_ASSERT(jointNames.size() >= 2,
-              "WheelTrackedVehiclePlugin: At least two " + jointTagName +
-                " tags have to be specified.");
+              ("WheelTrackedVehiclePlugin: At least two " + jointTagName +
+                " tags have to be specified.").c_str());
 
     // find the corresponding joint and wheel radius
     for (auto jointName : jointNames)
@@ -85,16 +85,16 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
 {
   auto joint = _model->GetJoint(_jointName);
 
-  GZ_ASSERT(joint, "WheelTrackedVehiclePlugin (ns = " +
+  GZ_ASSERT(joint, ("WheelTrackedVehiclePlugin (ns = " +
         GetRobotNamespace() + ") couldn't get " + this->trackNames[_track] +
-        " joint named \"" + _jointName + "\"");
+        " joint named \"" + _jointName + "\"").c_str());
 
-  GZ_ASSERT(joint->GetType() == physics::Base::HINGE_JOINT, "Joint " +
-        _jointName + " is not a hinge (revolute) joint.");
+  GZ_ASSERT(joint->GetType() == physics::Base::HINGE_JOINT, ("Joint " +
+        _jointName + " is not a hinge (revolute) joint.").c_str());
 
   auto childWheel = joint->GetChild();
-  GZ_ASSERT(childWheel, "Joint " + _jointName + " has no child link that "
-        " could act as the wheel.");
+  GZ_ASSERT(childWheel, ("Joint " + _jointName + " has no child link that "
+        " could act as the wheel.").c_str());
 
   if (childWheel->GetSelfCollide())
   {
