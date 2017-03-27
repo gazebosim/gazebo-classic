@@ -70,7 +70,7 @@ void DARTJoint::Init()
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first
-  GZ_ASSERT(this->dataPtr->dtJoint != nullptr, "DARTJoint is not initialized.");
+  GZ_ASSERT(this->dataPtr->dtJoint, "DARTJoint is not initialized.");
 
   // Parent and child link information
   DARTLinkPtr dartParentLink =
@@ -84,7 +84,7 @@ void DARTJoint::Init()
   Eigen::Isometry3d dtTransformParentBodyNode = Eigen::Isometry3d::Identity();
   Eigen::Isometry3d dtTransformChildBodyNode = Eigen::Isometry3d::Identity();
 
-  GZ_ASSERT(dartChildLink.get() != nullptr, "dartChildLink pointer is null");
+  GZ_ASSERT(dartChildLink, "dartChildLink pointer is null");
   {
     dtTransformChildBodyNode =
         DARTTypes::ConvPose(dartChildLink->WorldPose());
@@ -92,7 +92,7 @@ void DARTJoint::Init()
   }
   dtTransformChildLinkToJoint = DARTTypes::ConvPose(this->anchorPose);
 
-  if (dartParentLink.get() != nullptr)
+  if (dartParentLink)
   {
     dtTransformParentBodyNode =
         DARTTypes::ConvPose(dartParentLink->WorldPose());
@@ -125,7 +125,7 @@ LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
     DARTLinkPtr dartLink1
         = boost::static_pointer_cast<DARTLink>(this->parentLink);
 
-    if (dartLink1 != nullptr)
+    if (dartLink1)
       return this->parentLink;
   }
 
@@ -134,7 +134,7 @@ LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
     DARTLinkPtr dartLink2
         = boost::static_pointer_cast<DARTLink>(this->childLink);
 
-    if (dartLink2 != nullptr)
+    if (dartLink2)
       return this->childLink;
   }
 
@@ -144,7 +144,7 @@ LinkPtr DARTJoint::GetJointLink(unsigned int _index) const
 //////////////////////////////////////////////////
 bool DARTJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 {
-  if (_one.get() == nullptr && _two.get() == nullptr)
+  if (_one == nullptr && _two == nullptr)
     return false;
 
   if ((this->childLink.get() == _one.get() &&
@@ -378,7 +378,7 @@ ignition::math::Vector3d DARTJoint::LinkForce(
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
   // the parent Link frame.
-  if (theChildLink != nullptr)
+  if (theChildLink)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->DARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
@@ -426,7 +426,7 @@ ignition::math::Vector3d DARTJoint::LinkTorque(
   // JointWrench.body1Force contains the
   // force applied by the parent Link on the Joint specified in
   // the parent Link frame.
-  if (theChildLink != nullptr)
+  if (theChildLink)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->DARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
@@ -552,7 +552,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
   // JointWrench.body2Force (F2) contains
   // the force applied by the child Link on the parent link specified
   // in the child Link orientation frame and with respect to the joint origin
-  if (theChildLink != nullptr)
+  if (theChildLink)
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->DARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");

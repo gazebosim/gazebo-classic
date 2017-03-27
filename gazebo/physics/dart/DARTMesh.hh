@@ -60,7 +60,7 @@ namespace gazebo
                       const ignition::math::Vector3d &_scale);
 
       /// \brief Returns the DART mesh shape node
-      public: dart::dynamics::ShapeNodePtr GetShapeNode();
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const;
 
       /// \brief Helper function to create the collision shape.
       /// \param[in] _vertices Array of vertices.

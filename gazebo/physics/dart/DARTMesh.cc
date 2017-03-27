@@ -137,7 +137,7 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
 }
 
 /////////////////////////////////////////////////
-dart::dynamics::ShapeNodePtr DARTMesh::GetShapeNode()
+dart::dynamics::ShapeNodePtr DARTMesh::ShapeNode() const
 {
-  return dataPtr->GetShapeNode();
+  return dataPtr->ShapeNode();
 }

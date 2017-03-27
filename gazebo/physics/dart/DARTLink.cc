@@ -91,7 +91,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 
           if (softContactElem->HasElement("dart"))
           {
-            if (dartElem != nullptr)
+            if (dartElem)
             {
               gzerr << "DART supports only one deformable body in a link.\n";
               break;
@@ -108,7 +108,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (dartElem != nullptr)
+  if (dartElem)
   {
     dart::dynamics::SoftBodyNode::UniqueProperties softProperties;
 
@@ -191,7 +191,7 @@ void DARTLink::Init()
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first
-  GZ_ASSERT(this->dataPtr->dtBodyNode != nullptr,
+  GZ_ASSERT(this->dataPtr->dtBodyNode,
             "DART BodyNode is not initialized.");
 
   // Name

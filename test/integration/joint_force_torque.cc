@@ -366,7 +366,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-  static const unsigned int steps = 4500;
+  static const unsigned int steps = 4500u;
   for (unsigned int i = 0; i < steps; ++i)
   {
     // pd control
@@ -498,7 +498,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-  static const unsigned int steps = 4500;
+  static const unsigned int steps = 4500u;
   for (unsigned int j = 0; j < 2; ++j)
   {
     for (unsigned int i = 0; i < steps; ++i)

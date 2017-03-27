@@ -53,11 +53,11 @@ void DARTSphereShape::Init()
   dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
 
   if (!bodyNode.get()) gzerr << "BodyNode is NULL in init!\n";
-  GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL in init!");
+  GZ_ASSERT(bodyNode, "BodyNode is NULL in init!");
 
   this->dataPtr->CreateShape(bodyNode);
   _collisionParent->SetDARTCollisionShapeNode(
-                       this->dataPtr->GetShapeNode(), false);
+                       this->dataPtr->ShapeNode(), false);
 
   SphereShape::Init();
 }
@@ -83,6 +83,6 @@ void DARTSphereShape::SetRadius(double _radius)
 
   SphereShape::SetRadius(_radius);
 
-  this->dataPtr->GetShape()->setRadius(_radius);
+  this->dataPtr->Shape()->setRadius(_radius);
 }
 

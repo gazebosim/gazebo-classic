@@ -51,11 +51,11 @@ void DARTCylinderShape::Init()
 
   dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
 
-  if (!bodyNode.get()) gzerr << "BodyNode is NULL in init!\n";
-  GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL in init!");
+  if (!bodyNode) gzerr << "BodyNode is NULL in init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL in init!");
 
   this->dataPtr->CreateShape(bodyNode);
-  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->GetShapeNode());
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->ShapeNode());
 
   CylinderShape::Init();
 }
@@ -94,6 +94,6 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
 
   CylinderShape::SetSize(_radius, _length);
 
-  this->dataPtr->GetShape()->setRadius(_radius);
-  this->dataPtr->GetShape()->setHeight(_length);
+  this->dataPtr->Shape()->setRadius(_radius);
+  this->dataPtr->Shape()->setHeight(_length);
 }

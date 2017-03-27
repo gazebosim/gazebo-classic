@@ -44,7 +44,7 @@ void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::BallJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

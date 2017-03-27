@@ -45,7 +45,7 @@ void DARTFixedJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::WeldJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

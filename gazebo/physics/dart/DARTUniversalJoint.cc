@@ -44,7 +44,7 @@ void DARTUniversalJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::UniversalJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
