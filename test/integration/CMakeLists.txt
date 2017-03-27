@@ -96,6 +96,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  transport_msg_count.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
@@ -103,7 +104,6 @@ set(tests
   world_population.cc
   world_remove.cc
   worlds_installed.cc
-  transport_msg_count.cc
   )
 
 if (HAVE_GTS)
