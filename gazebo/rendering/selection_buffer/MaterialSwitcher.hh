@@ -47,8 +47,14 @@ namespace gazebo
       public: ~MaterialSwitcher();
 
       /// \brief Get the entity with a specific color
+      /// \deprecated See version that accepts an ignition::math::Color object.
       public: const std::string &GetEntityName(
-                  const common::Color &_color) const;
+                  const common::Color &_color) const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the entity with a specific color
+      /// \param[in] _color Color to find an entity by.
+      public: const std::string &EntityName(
+                  const ignition::math::Color &_color) const;
 
       /// \brief Reset the color value incrementor
       public: void Reset();
@@ -64,7 +70,7 @@ namespace gazebo
       private: typedef std::map<unsigned int, std::string> ColorMap;
       private: typedef ColorMap::const_iterator ColorMapConstIter;
       private: std::string emptyString;
-      private: common::Color currentColor;
+      private: ignition::math::Color currentColor;
       private: std::string lastEntity;
       private: Ogre::Technique *lastTechnique;
       private: MaterialSwitcher::ColorMap colorDict;

@@ -26,8 +26,9 @@
 #include <functional>
 
 #include <sdf/sdf.hh>
-#include <ignition/math/Vector3.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -177,16 +178,16 @@ namespace gazebo
       public: std::string subMeshName;
 
       /// \brief Ambient color of the visual.
-      public: common::Color ambient;
+      public: ignition::math::Color ambient;
 
       /// \brief Diffuse color of the visual.
-      public: common::Color diffuse;
+      public: ignition::math::Color diffuse;
 
       /// \brief Specular color of the visual.
-      public: common::Color specular;
+      public: ignition::math::Color specular;
 
       /// \brief Emissive color of the visual.
-      public: common::Color emissive;
+      public: ignition::math::Color emissive;
 
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;

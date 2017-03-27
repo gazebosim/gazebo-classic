@@ -70,20 +70,30 @@ MovableText::~MovableText()
 }
 
 //////////////////////////////////////////////////
-void MovableText::Load(const std::string &name_,
-                        const std::string &text_,
-                        const std::string &fontName_,
-                        float charHeight_,
-                        const common::Color &color_)
+void MovableText::Load(const std::string &_name,
+                        const std::string &_text,
+                        const std::string &_fontName,
+                        float _charHeight,
+                        const common::Color &_color)
+{
+  this->Load(_name, _text, _fontName, _charHeight, _color.Ign());
+}
+
+//////////////////////////////////////////////////
+void MovableText::Load(const std::string &_name,
+                        const std::string &_text,
+                        const std::string &_fontName,
+                        float _charHeight,
+                        const ignition::math::Color &_color)
 {
   {
     boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-    this->text = text_;
-    this->color = color_;
-    this->fontName = fontName_;
-    this->charHeight = charHeight_;
-    this->mName = name_;
+    this->text = _text;
+    this->color = _color;
+    this->fontName = _fontName;
+    this->charHeight = _charHeight;
+    this->mName = _name;
 
     if (this->mName == "")
       throw Ogre::Exception(Ogre::Exception::ERR_INVALIDPARAMS,
@@ -180,13 +190,25 @@ const std::string &MovableText::GetText() const
 }
 
 //////////////////////////////////////////////////
-void MovableText::SetColor(const common::Color &newColor)
+void MovableText::SetColor(const common::Color &_newColor)
+{
+  this->SetColor(_newColor.Ign());
+}
+
+//////////////////////////////////////////////////
+const ignition::math::Color &MovableText::Color() const
+{
+  return this->color;
+}
+
+//////////////////////////////////////////////////
+void MovableText::SetColor(const ignition::math::Color &_newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (this->color != newColor)
+  if (this->color != _newColor)
   {
-    this->color = newColor;
+    this->color = _newColor;
     this->updateColors = true;
   }
 }
@@ -621,8 +643,8 @@ void MovableText::_updateColors(void)
   GZ_ASSERT(!this->material.isNull(), "material class member is null");
 
   // Convert to system-specific
-  Ogre::ColourValue cv(this->color.r, this->color.g,
-                       this->color.b, this->color.a);
+  Ogre::ColourValue cv(this->color.R(), this->color.G(),
+                       this->color.B(), this->color.A());
   Ogre::Root::getSingleton().convertColourValue(cv, &clr);
 
   vbuf = this->renderOp.vertexData->vertexBufferBinding->getBuffer(

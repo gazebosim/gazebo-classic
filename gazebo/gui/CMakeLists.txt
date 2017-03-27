@@ -20,7 +20,8 @@ add_definitions(${Qt5Core_DEFINITIONS})
 add_subdirectory(qtpropertybrowser)
 
 set (internal_qt_headers
-  VideoRecorder.hh)
+  VideoRecorder.hh
+  ConfigWidget.hh)
 
 set (sources
   Actions.cc
@@ -77,7 +78,6 @@ set (qt_headers
   AlignWidget.hh
   ApplyWrenchDialog.hh
   CloneWindow.hh
-  ConfigWidget.hh
   DataLogger.hh
   Editor.hh
   GLWidget.hh

@@ -313,7 +313,7 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetColor(QColor _color)
 {
-  common::Color newColor(_color.red(), _color.green(), _color.blue());
+  ignition::math::Color newColor(_color.red(), _color.green(), _color.blue());
   this->dataPtr->color = newColor;
   this->dataPtr->visual->SetAmbient(this->dataPtr->color);
   this->dataPtr->maker->BuildingChanged();

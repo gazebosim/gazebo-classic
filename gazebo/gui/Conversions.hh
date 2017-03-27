@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_GUI_CONVERSIONS_HH_
 #define _GAZEBO_GUI_CONVERSIONS_HH_
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -46,10 +47,20 @@ namespace gazebo
       /// \return Qt color value
       public: static QColor Convert(const common::Color &_color);
 
+      /// \brief Return the equivalent qt color
+      /// \param[in] _color Ignition math color to convert
+      /// \return Qt color value
+      public: static QColor Convert(const ignition::math::Color &_color);
+
       /// \brief Return the equivalent gazebo color
       /// \param[in] _color Qt color to convert
       /// \return Gazebo color value
       public: static common::Color Convert(const QColor &_color);
+
+      /// \brief Return the equivalent ignition math color
+      /// \param[in] _color Qt color to convert
+      /// \return Ignition math color value
+      public: static ignition::math::Color ConvertIgn(const QColor &_color);
 
       /// \brief Return the equivalent QPointF.
       /// \param[in] _point Ignition vector to convert.

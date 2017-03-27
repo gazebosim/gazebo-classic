@@ -38,10 +38,10 @@ std::string GetVisualSDFString(const std::string &_name,
     double _transparency = 0, bool _castShadows = true,
     const std::string &_material = "Gazebo/Grey",
     bool _lighting = true,
-    const common::Color &_ambient = common::Color::White,
-    const common::Color &_diffuse = common::Color::White,
-    const common::Color &_specular = common::Color::Black,
-    const common::Color &_emissive = common::Color::Black)
+    const ignition::math::Color &_ambient = ignition::math::Color::White,
+    const ignition::math::Color &_diffuse = ignition::math::Color::White,
+    const ignition::math::Color &_specular = ignition::math::Color::Black,
+    const ignition::math::Color &_emissive = ignition::math::Color::Black)
 {
   std::stringstream visualString;
   visualString
@@ -93,8 +93,8 @@ std::string GetVisualSDFString(const std::string &_name,
 
 /////////////////////////////////////////////////
 void CreateColorMaterial(const std::string &_materialName,
-    const common::Color &_ambient, const common::Color &_diffuse,
-    const common::Color &_specular, const common::Color &_emissive)
+    const ignition::math::Color &_ambient, const ignition::math::Color &_diffuse,
+    const ignition::math::Color &_specular, const ignition::math::Color &_emissive)
 {
   // test setup - create a material for testing
   Ogre::MaterialPtr ogreMaterial =
@@ -932,71 +932,71 @@ TEST_F(Visual_TEST, Color)
   sdf::initFile("visual.sdf", cylinderSDF);
   sdf::readString(GetVisualSDFString("visual_cylinder_black", "cylinder",
       ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
-      "Gazebo/Grey", true, common::Color::Black, common::Color::Black,
-      common::Color::Black, common::Color::Black), cylinderSDF);
+      "Gazebo/Grey", true, ignition::math::Color::Black, ignition::math::Color::Black,
+      ignition::math::Color::Black, ignition::math::Color::Black), cylinderSDF);
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
-  EXPECT_EQ(cylinderVis->GetAmbient(), common::Color::Black);
-  EXPECT_EQ(cylinderVis->GetDiffuse(), common::Color::Black);
-  EXPECT_EQ(cylinderVis->GetSpecular(), common::Color::Black);
-  EXPECT_EQ(cylinderVis->GetEmissive(), common::Color::Black);
+  EXPECT_EQ(cylinderVis->GetAmbient(), ignition::math::Color::Black);
+  EXPECT_EQ(cylinderVis->GetDiffuse(), ignition::math::Color::Black);
+  EXPECT_EQ(cylinderVis->GetSpecular(), ignition::math::Color::Black);
+  EXPECT_EQ(cylinderVis->GetEmissive(), ignition::math::Color::Black);
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
   sdf::readString(GetVisualSDFString("visual_cylinder_color", "cylinder",
       ignition::math::Vector3d::One, ignition::math::Pose3d::Zero, 0, true,
-      "Gazebo/Grey", true, common::Color::Green, common::Color::Blue,
-      common::Color::Red, common::Color::Yellow), cylinderSDF2);
+      "Gazebo/Grey", true, ignition::math::Color::Green, ignition::math::Color::Blue,
+      ignition::math::Color::Red, ignition::math::Color::Yellow), cylinderSDF2);
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
-  EXPECT_EQ(cylinderVis2->GetAmbient(), common::Color::Green);
-  EXPECT_EQ(cylinderVis2->GetDiffuse(), common::Color::Blue);
-  EXPECT_EQ(cylinderVis2->GetSpecular(), common::Color::Red);
-  EXPECT_EQ(cylinderVis2->GetEmissive(), common::Color::Yellow);
+  EXPECT_EQ(cylinderVis2->GetAmbient(), ignition::math::Color::Green);
+  EXPECT_EQ(cylinderVis2->GetDiffuse(), ignition::math::Color::Blue);
+  EXPECT_EQ(cylinderVis2->GetSpecular(), ignition::math::Color::Red);
+  EXPECT_EQ(cylinderVis2->GetEmissive(), ignition::math::Color::Yellow);
 
   // test changing ambient/diffuse/specular colors
   {
-    common::Color color(0.1, 0.2, 0.3, 0.4);
+    ignition::math::Color color(0.1, 0.2, 0.3, 0.4);
     cylinderVis->SetAmbient(color);
     EXPECT_EQ(cylinderVis->GetAmbient(), color);
   }
   {
-    common::Color color(1.0, 1.0, 1.0, 1.0);
+    ignition::math::Color color(1.0, 1.0, 1.0, 1.0);
     cylinderVis->SetDiffuse(color);
     EXPECT_EQ(cylinderVis->GetDiffuse(), color);
   }
   {
-    common::Color color(0.5, 0.6, 0.4, 0.0);
+    ignition::math::Color color(0.5, 0.6, 0.4, 0.0);
     cylinderVis->SetSpecular(color);
     EXPECT_EQ(cylinderVis->GetSpecular(), color);
   }
   {
-    common::Color color(0.9, 0.8, 0.7, 0.6);
+    ignition::math::Color color(0.9, 0.8, 0.7, 0.6);
     cylinderVis->SetEmissive(color);
     EXPECT_EQ(cylinderVis->GetEmissive(), color);
   }
 
   {
-    common::Color color(0.0, 0.0, 0.0, 0.0);
+    ignition::math::Color color(0.0, 0.0, 0.0, 0.0);
     cylinderVis2->SetAmbient(color);
     EXPECT_EQ(cylinderVis2->GetAmbient(), color);
   }
   {
-    common::Color color(1.0, 1.0, 1.0, 1.0);
+    ignition::math::Color color(1.0, 1.0, 1.0, 1.0);
     cylinderVis2->SetDiffuse(color);
     EXPECT_EQ(cylinderVis2->GetDiffuse(), color);
   }
   // test with color values that are out of range but should still work,
   // rendering engine should clamp the values internally
   {
-    common::Color color(5.0, 5.0, 5.5, 5.1);
+    ignition::math::Color color(5.0, 5.0, 5.5, 5.1);
     cylinderVis2->SetSpecular(color);
     EXPECT_EQ(cylinderVis2->GetSpecular(), color);
   }
   {
-    common::Color color(-5.0, -5.0, -5.5, -5.1);
+    ignition::math::Color color(-5.0, -5.0, -5.5, -5.1);
     cylinderVis2->SetEmissive(color);
     EXPECT_EQ(cylinderVis2->GetEmissive(), color);
   }
@@ -1022,20 +1022,20 @@ TEST_F(Visual_TEST, ChildColor)
   vis2->Load();
 
   // Check default colors
-  EXPECT_EQ(vis1->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetAmbient(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetEmissive(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetSpecular(), gazebo::common::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetDiffuse(), gazebo::common::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetAmbient(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetEmissive(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetSpecular(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->GetDiffuse(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetAmbient(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetEmissive(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetSpecular(), gazebo::ignition::math::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->GetDiffuse(), gazebo::ignition::math::Color(0, 0, 0, 0));
 
   // Set vis1's color with default cascade
-  gazebo::common::Color defaultCascadeAmbient(0.1, 0, 0, 1);
-  gazebo::common::Color defaultCascadeEmissive(0.2, 0, 0, 1);
-  gazebo::common::Color defaultCascadeSpecular(0.3, 0, 0, 1);
-  gazebo::common::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
+  gazebo::ignition::math::Color defaultCascadeAmbient(0.1, 0, 0, 1);
+  gazebo::ignition::math::Color defaultCascadeEmissive(0.2, 0, 0, 1);
+  gazebo::ignition::math::Color defaultCascadeSpecular(0.3, 0, 0, 1);
+  gazebo::ignition::math::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
   vis1->SetAmbient(defaultCascadeAmbient);
   vis1->SetEmissive(defaultCascadeEmissive);
   vis1->SetSpecular(defaultCascadeSpecular);
@@ -1050,10 +1050,10 @@ TEST_F(Visual_TEST, ChildColor)
   EXPECT_EQ(vis2->GetDiffuse(), defaultCascadeDiffuse);
 
   // Set vis1's color with explicit cascade
-  gazebo::common::Color explicitCascadeAmbient(0, 0.1, 0, 1);
-  gazebo::common::Color explicitCascadeEmissive(0, 0.2, 0, 1);
-  gazebo::common::Color explicitCascadeSpecular(0, 0.3, 0, 1);
-  gazebo::common::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
+  gazebo::ignition::math::Color explicitCascadeAmbient(0, 0.1, 0, 1);
+  gazebo::ignition::math::Color explicitCascadeEmissive(0, 0.2, 0, 1);
+  gazebo::ignition::math::Color explicitCascadeSpecular(0, 0.3, 0, 1);
+  gazebo::ignition::math::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
   vis1->SetAmbient(explicitCascadeAmbient, true);
   vis1->SetEmissive(explicitCascadeEmissive, true);
   vis1->SetSpecular(explicitCascadeSpecular, true);
@@ -1068,10 +1068,10 @@ TEST_F(Visual_TEST, ChildColor)
   EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
 
   // Set vis1's color with no cascade
-  gazebo::common::Color noCascadeAmbient(0, 0, 0.1, 1);
-  gazebo::common::Color noCascadeEmissive(0, 0, 0.2, 1);
-  gazebo::common::Color noCascadeSpecular(0, 0, 0.3, 1);
-  gazebo::common::Color noCascadeDiffuse(0, 0, 0.4, 1);
+  gazebo::ignition::math::Color noCascadeAmbient(0, 0, 0.1, 1);
+  gazebo::ignition::math::Color noCascadeEmissive(0, 0, 0.2, 1);
+  gazebo::ignition::math::Color noCascadeSpecular(0, 0, 0.3, 1);
+  gazebo::ignition::math::Color noCascadeDiffuse(0, 0, 0.4, 1);
   vis1->SetAmbient(noCascadeAmbient, false);
   vis1->SetEmissive(noCascadeEmissive, false);
   vis1->SetSpecular(noCascadeSpecular, false);
@@ -1086,10 +1086,10 @@ TEST_F(Visual_TEST, ChildColor)
   EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
 
   // Set vis2's color
-  gazebo::common::Color vis2Ambient(0.1, 0.1, 0.1, 1);
-  gazebo::common::Color vis2Emissive(0.1, 0.2, 0.2, 1);
-  gazebo::common::Color vis2Specular(0.1, 0.3, 0.3, 1);
-  gazebo::common::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
+  gazebo::ignition::math::Color vis2Ambient(0.1, 0.1, 0.1, 1);
+  gazebo::ignition::math::Color vis2Emissive(0.1, 0.2, 0.2, 1);
+  gazebo::ignition::math::Color vis2Specular(0.1, 0.3, 0.3, 1);
+  gazebo::ignition::math::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
   vis2->SetAmbient(vis2Ambient);
   vis2->SetEmissive(vis2Emissive);
   vis2->SetSpecular(vis2Specular);
@@ -1113,9 +1113,9 @@ TEST_F(Visual_TEST, ColorMaterial)
   ASSERT_NE(scene, nullptr);
 
   std::string materialName = "Test/Grey";
-  CreateColorMaterial(materialName, common::Color(0.3, 0.3, 0.3, 1.0),
-      common::Color(0.7, 0.7, 0.7, 1.0), common::Color(0.01, 0.01, 0.01, 1.0),
-      common::Color::Black);
+  CreateColorMaterial(materialName, ignition::math::Color(0.3, 0.3, 0.3, 1.0),
+      ignition::math::Color(0.7, 0.7, 0.7, 1.0), ignition::math::Color(0.01, 0.01, 0.01, 1.0),
+      ignition::math::Color::Black);
 
   // test with a visual that only has a material name and no color components.
   std::string visualName = "boxMaterialColor";
@@ -1151,34 +1151,34 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones specified in
   // the material script
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), ignition::math::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color::Black);
 
   // test changing diffuse colors and verify color again.
-  common::Color redColor(1.0, 0.0, 0.0, 1.0);
+  ignition::math::Color redColor(1.0, 0.0, 0.0, 1.0);
   boxVis->SetDiffuse(redColor);
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(0.3, 0.3, 0.3, 1.0));
   EXPECT_EQ(boxVis->GetDiffuse(), redColor);
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color::Black);
 
   // test setting a different material name
   std::string greenMaterialName = "Test/Green";
-  CreateColorMaterial(greenMaterialName, common::Color(0.0, 1.0, 0.0, 1.0),
-      common::Color(0.0, 1.0, 0.0, 1.0), common::Color(0.1, 0.1, 0.1, 1.0),
-      common::Color::Black);
+  CreateColorMaterial(greenMaterialName, ignition::math::Color(0.0, 1.0, 0.0, 1.0),
+      ignition::math::Color(0.0, 1.0, 0.0, 1.0), ignition::math::Color(0.1, 0.1, 0.1, 1.0),
+      ignition::math::Color::Black);
   boxVis->SetMaterial(greenMaterialName);
   EXPECT_TRUE(
       boxVis->GetMaterialName().find(greenMaterialName) != std::string::npos);
 
   // Verify the visual color components are the same as the ones in the new
   // material script
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.0, 1.0, 0.0, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.0, 1.0, 0.0, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), ignition::math::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.1, 0.1, 0.1, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color::Black);
 
   // test setting back to original material color
   boxVis->SetMaterial(materialName);
@@ -1187,34 +1187,34 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones in the
   // original material script
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(0.3, 0.3, 0.3, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(0.7, 0.7, 0.7, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color::Black);
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->GetDiffuse(), ignition::math::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color::Black);
 
   // test with a semi-transparent color material
   std::string redTransparentMaterialName = "Test/RedTransparent";
   CreateColorMaterial(redTransparentMaterialName,
-      common::Color(1.0, 0.0, 0.0, 0.2), common::Color(1.0, 0.0, 0.0, 0.4),
-      common::Color(0.1, 0.1, 0.1, 0.6), common::Color(1.0, 0.0, 0.0, 0.8));
+      ignition::math::Color(1.0, 0.0, 0.0, 0.2), ignition::math::Color(1.0, 0.0, 0.0, 0.4),
+      ignition::math::Color(0.1, 0.1, 0.1, 0.6), ignition::math::Color(1.0, 0.0, 0.0, 0.8));
   boxVis->SetMaterial(redTransparentMaterialName);
   EXPECT_TRUE(boxVis->GetMaterialName().find(redTransparentMaterialName)
       != std::string::npos);
 
   // Verify the visual color components are the same as the ones in the new
   // material script
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
-  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.4));
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), ignition::math::Color(1.0, 0.0, 0.0, 0.4));
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color(1.0, 0.0, 0.0, 0.8));
 
   // update transparency and verify diffuse alpha value has changed
   boxVis->SetTransparency(0.5f);
   EXPECT_DOUBLE_EQ(boxVis->GetTransparency(), 0.5f);
-  EXPECT_EQ(boxVis->GetAmbient(), common::Color(1.0, 0.0, 0.0, 0.2));
-  EXPECT_EQ(boxVis->GetDiffuse(), common::Color(1.0, 0.0, 0.0, 0.5));
-  EXPECT_EQ(boxVis->GetSpecular(), common::Color(0.1, 0.1, 0.1, 0.6));
-  EXPECT_EQ(boxVis->GetEmissive(), common::Color(1.0, 0.0, 0.0, 0.8));
+  EXPECT_EQ(boxVis->GetAmbient(), ignition::math::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->GetDiffuse(), ignition::math::Color(1.0, 0.0, 0.0, 0.5));
+  EXPECT_EQ(boxVis->GetSpecular(), ignition::math::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->GetEmissive(), ignition::math::Color(1.0, 0.0, 0.0, 0.8));
 }
 
 /////////////////////////////////////////////////

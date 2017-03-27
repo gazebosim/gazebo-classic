@@ -30,6 +30,28 @@ QColor Conversions::Convert(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
+QColor Conversions::Convert(const ignition::math::Color &_color)
+{
+  return QColor(_color.R()*255.0, _color.G()*255.0, _color.B()*255.0,
+      _color.A()*255.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Conversions::ConvertIgn(const QColor &_color)
+{
+  return ignition::math::Color(_color.red() / 255.0,
+                               _color.green() / 255.0,
+                               _color.blue() / 255.0,
+                               _color.alpha() / 255.0);
+}
+
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+
+//////////////////////////////////////////////////
 common::Color Conversions::Convert(const QColor &_color)
 {
   return common::Color(_color.red() / 255.0,
@@ -37,6 +59,9 @@ common::Color Conversions::Convert(const QColor &_color)
                        _color.blue() / 255.0,
                        _color.alpha() / 255.0);
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 
 //////////////////////////////////////////////////
 QPointF Conversions::Convert(const ignition::math::Vector2d &_pt)

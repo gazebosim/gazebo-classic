@@ -384,7 +384,8 @@ namespace gazebo
       /// \brief Get a color value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Color value.
-      public: common::Color ColorWidgetValue(const std::string &_name) const;
+      public: ignition::math::Color ColorWidgetValue(
+                  const std::string &_name) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _name Name of the child widget.

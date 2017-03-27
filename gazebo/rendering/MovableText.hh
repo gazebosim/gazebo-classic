@@ -74,11 +74,26 @@ namespace gazebo
       /// \param[in] _fontName Font to use
       /// \param[in] _charHeight Height of the characters
       /// \param[in] _color Text color
+      /// \deprecated See version that accepts an ignition::math::Color
       public: void Load(const std::string &_name,
                         const std::string &_text,
-                        const std::string &_fontName = "Arial",
-                        float _charHeight = 1.0,
-                        const common::Color &_color = common::Color::White);
+                        const std::string &_fontName,
+                        float _charHeight,
+                        const common::Color &_color)
+              GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Loads text and font info
+      /// \param[in] _name Name of the text object
+      /// \param[in] _text Text to render
+      /// \param[in] _fontName Font to use
+      /// \param[in] _charHeight Height of the characters
+      /// \param[in] _color Text color
+      public: void Load(const std::string &_name,
+                  const std::string &_text,
+                  const std::string &_fontName = "Arial",
+                  float _charHeight = 1.0,
+                  const ignition::math::Color &_color =
+                  ignition::math::Color::White);
 
       /// \brief Set the font
       /// \param[in] _font Name of the font
@@ -98,11 +113,22 @@ namespace gazebo
 
       /// \brief Set the text color.
       /// \param[in] _color Text color.
-      public: void SetColor(const common::Color &_color);
+      /// \deprecated See version that accepts an ignition::math::Color
+      /// object.
+      public: void SetColor(const common::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the text color.
+      /// \param[in] _color Text color.
+      public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Get the text color.
       /// \return Texture color.
-      public: const common::Color &GetColor() const;
+      /// \deprecated See const ignition::math::Color Color() const;
+      public: const common::Color &GetColor() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the text color.
+      /// \return Texture color.
+      public: const ignition::math::Color &Color() const;
 
       /// \brief Set the height of a character.
       /// \param[in] _height Height of the characters.
@@ -208,7 +234,7 @@ namespace gazebo
       private: std::string fontName;
       private: std::string text;
 
-      private: common::Color color;
+      private: ignition::math::Color color;
       private: Ogre::RenderOperation renderOp;
       private: Ogre::AxisAlignedBox *aabb;
       private: Ogre::LightList lightList;

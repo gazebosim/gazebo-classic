@@ -18,10 +18,16 @@
 #define _GAZEBO_COLOR_HH_
 
 #include <iostream>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
+
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 namespace gazebo
 {
@@ -66,17 +72,25 @@ namespace gazebo
       public: typedef unsigned int ABGR;
 
       /// \brief Constructor
-      public: Color();
+      /// \deprecated Use ignition::math::Color
+      public: Color() GAZEBO_DEPRECATED(9.0);
 
       /// \brief Constructor
       /// \param[in] _r Red value (range 0 to 1)
       /// \param[in] _g Green value (range 0 to 1
       /// \param[in] _b Blue value (range 0 to 1
       /// \param[in] _a Alpha value (0=transparent, 1=opaque)
-      public: Color(float _r, float _g, float _b, float _a = 1.0);
+      /// \deprecated Use ignition::math::Color
+      public: Color(float _r, float _g, float _b, float _a = 1.0)
+              GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Ignition math color copy Constructor
+      /// \param[in] _clr Color to copy
+      public: Color(const ignition::math::Color &_clr);
 
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
+      /// \deprecated Use ignition::math::Color
       public: Color(const Color &_clr);
 
       /// \brief Destructor
@@ -225,6 +239,10 @@ namespace gazebo
       /// \return True if the this color does not equal _pt
       public: bool operator!=(const Color &_pt) const;
 
+      /// \brief Convert to ignition::math::Color
+      /// \return This color object as an ignition::math::Color object.
+      public: ignition::math::Color Ign() const;
+
       /// \brief Clamp the color values to valid ranges
       private: void Clamp();
 
@@ -256,4 +274,7 @@ namespace gazebo
     /// \}
   }
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 #endif

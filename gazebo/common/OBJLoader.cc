@@ -14,6 +14,10 @@
  * limitations under the License.
  *
  */
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 #include <memory>
 
@@ -177,3 +181,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
 
   return mesh;
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+

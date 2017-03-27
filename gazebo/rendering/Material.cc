@@ -151,28 +151,28 @@ void Material::Update(const gazebo::common::Material *_mat)
 
   Ogre::Pass *pass = matPtr->getTechnique(0)->getPass(0);
 
-  common::Color ambient =  _mat->GetAmbient();
-  common::Color diffuse =  _mat->GetDiffuse();
-  common::Color specular = _mat->GetSpecular();
-  common::Color emissive = _mat->GetEmissive();
+  ignition::math::Color ambient =  _mat->GetAmbient().Ign();
+  ignition::math::Color diffuse =  _mat->GetDiffuse().Ign();
+  ignition::math::Color specular = _mat->GetSpecular().Ign();
+  ignition::math::Color emissive = _mat->GetEmissive().Ign();
   float transparency = _mat->GetTransparency();
 
   // use transparency value if specified otherwise use diffuse alpha value
-  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
-  diffuse.a = alpha;
-  pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-  pass->setAmbient(ambient.r, ambient.g, ambient.b);
+  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.A();
+  diffuse.A() = alpha;
+  pass->setDiffuse(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  pass->setAmbient(ambient.R(), ambient.G(), ambient.B());
   pass->setDepthWriteEnabled(_mat->GetDepthWrite());
 
-  if (diffuse.a < 1.0)
+  if (diffuse.A() < 1.0)
   {
     // set up pass for rendering transparency
     pass->setDepthWriteEnabled(false);
     pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   }
 
-  pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
-  pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
+  pass->setSpecular(specular.R(), specular.G(), specular.B(), specular.A());
+  pass->setSelfIllumination(emissive.R(), emissive.G(), emissive.B());
   pass->setShininess(_mat->GetShininess());
   pass->setLightingEnabled(_mat->GetLighting());
 
@@ -194,6 +194,19 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
           common::Color &_ambient, common::Color &_diffuse,
           common::Color &_specular, common::Color &_emissive)
 {
+  ignition::math::Color ambient, diffuse, specular, emissive;
+  ambient = _ambient.Ign();
+  diffuse = _diffuse.Ign();
+  specular = _specular.Ign();
+  emissive = _emissive.Ign();
+  return MaterialAsColor(_materialName, ambient, diffuse, specular, emissive);
+}
+
+//////////////////////////////////////////////////
+bool Material::MaterialAsColor(const std::string &_materialName,
+          ignition::math::Color &_ambient,  ignition::math::Color &_diffuse,
+          ignition::math::Color &_specular, ignition::math::Color &_emissive)
+{
   Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(_materialName))
@@ -210,10 +223,10 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
       Ogre::Pass *pass = technique->getPass(0);
       if (pass)
       {
-        _ambient = Conversions::Convert(pass->getAmbient());
-        _diffuse = Conversions::Convert(pass->getDiffuse());
-        _specular = Conversions::Convert(pass->getSpecular());
-        _emissive = Conversions::Convert(pass->getSelfIllumination());
+        _ambient = Conversions::ConvertIgn(pass->getAmbient());
+        _diffuse = Conversions::ConvertIgn(pass->getDiffuse());
+        _specular = Conversions::ConvertIgn(pass->getSpecular());
+        _emissive = Conversions::ConvertIgn(pass->getSelfIllumination());
         return true;
       }
     }

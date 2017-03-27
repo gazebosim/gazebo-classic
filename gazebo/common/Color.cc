@@ -23,6 +23,11 @@
 using namespace gazebo;
 using namespace common;
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 const Color Color::White = Color(1, 1, 1, 1);
 const Color Color::Black = Color(0, 0, 0, 1);
 const Color Color::Red = Color(1, 0, 0, 1);
@@ -43,6 +48,12 @@ Color::Color(float _r, float _g, float _b, const float _a)
 : r(_r), g(_g), b(_b), a(_a)
 {
   this->Clamp();
+}
+
+//////////////////////////////////////////////////
+Color::Color(const ignition::math::Color &_clr)
+  : r(_clr.R()), g(_clr.G()), b(_clr.B()), a(_clr.A())
+{
 }
 
 //////////////////////////////////////////////////
@@ -512,3 +523,13 @@ void Color::Clamp()
   this->b = this->b < 0 ? 0: this->b;
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
+
+//////////////////////////////////////////////////
+ignition::math::Color Color::Ign() const
+{
+  return ignition::math::Color(this->r, this->g, this->b, this->a);
+}
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+
