@@ -153,6 +153,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
+  EXPECT_FALSE(physics::has_world());
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
