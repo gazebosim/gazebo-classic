@@ -137,7 +137,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
 }
 
 /////////////////////////////////////////////////
-TEST_F(ContactManagerTest, NeverDropdContacts)
+TEST_F(ContactManagerTest, NeverDropContacts)
 {
   // world needs to be paused in order to use World::Step()
   // function correctly (second parameter true)
@@ -145,14 +145,14 @@ TEST_F(ContactManagerTest, NeverDropdContacts)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(manager);
 
   // advance the world. Contacts should happen between
   // box and ground.
