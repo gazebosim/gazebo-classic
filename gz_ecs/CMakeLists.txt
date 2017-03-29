@@ -10,8 +10,7 @@ enable_testing()
 add_subdirectory(ecs)
 add_subdirectory(systems)
 add_subdirectory(plugin)
-# add_subdirectory(test)
+add_subdirectory(test)
 
 add_executable(gz_ecs main.cc)
-# TODO load System libraries in a plugin-able fashion
 target_link_libraries(gz_ecs DivideAndPrintResult GazeboECSCore GazeboPlugin)
