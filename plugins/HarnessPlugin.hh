@@ -45,6 +45,11 @@ namespace gazebo
   ///      - Message Type: GzString, expected to be a bool ("true")
   ///      - Purpose: Detach the <detach> joint.
   ///
+  ///  3. ~/<plugin_model_name>/harness/attach
+  ///      - Message Type: Pose, world pose to be set for child link
+  ///        before attaching
+  ///      - Purpose: Attach the joint at the specified world pose
+  ///
   /// For an example refer to:
   ///   - World file: worlds/harness.world
   ///   - Code: examples/stand_alone/harness
@@ -70,8 +75,13 @@ namespace gazebo
     /// \return Velocity of the winch joint
     public: double WinchVelocity() const;
 
+    /// \brief Move the child link to the specified pose and recreate the
+    /// harness joint.
+    /// \param[in] _pose Desired world pose of child link before harnessing
+    public: void Attach(const ignition::math::Pose3d &_pose);
+
     /// \brief Detach the <detach> joint. Once the joint is detached, it
-    /// cannot be reattached.
+    /// can be reattached with the Attach method.
     public: void Detach();
 
     /// \brief Callback for World Update events.
@@ -129,6 +139,10 @@ namespace gazebo
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
+
+    /// \brief Attach control subscriber
+    /// \todo: Transition to ignition-transport in gazebo8
+    private: transport::SubscriberPtr attachSub;
   };
 }
 #endif

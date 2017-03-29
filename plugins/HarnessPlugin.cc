@@ -55,6 +55,10 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       "~/" + _model->GetName() + "/harness/velocity",
       &HarnessPlugin::OnVelocity, this);
 
+  this->attachSub = this->node->Subscribe(
+      "~/" + _model->GetName() + "/harness/attach",
+      &HarnessPlugin::OnAttach, this);
+
   this->detachSub = this->node->Subscribe(
       "~/" + _model->GetName() + "/harness/detach",
       &HarnessPlugin::OnDetach, this);
@@ -343,6 +347,12 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
   {
     gzerr << "Invalid velocity data[" << _msg->data() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void HarnessPlugin::OnAttach(ConstPosePtr &_msg)
+{
+  this->Attach(msgs::ConvertIgn(_msg));
 }
 
 /////////////////////////////////////////////////
