@@ -15,21 +15,12 @@
  *
 */
 
-#ifndef GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
-#define GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
+#include "gazebo/ecs/ComponentFactory.hh"
 
-namespace gazebo
-{
-  namespace components
-  {
-    /// \brief Three numbers
-    struct Triplet
-    {
-      float first;
-      float second;
-      float third;
-    };
-  }
-}
+using namespace gazebo;
+using namespace ecs;
 
-#endif
+std::map<std::string, std::function<ComponentBase* ()>>
+ComponentFactory::typeFactory;
+
+std::map<std::string, ComponentId> ComponentFactory::types;

@@ -15,21 +15,10 @@
  *
 */
 
-#ifndef GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
-#define GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
+#include "gazebo/ecs/Component.hh"
 
-namespace gazebo
-{
-  namespace components
-  {
-    /// \brief Three numbers
-    struct Triplet
-    {
-      float first;
-      float second;
-      float third;
-    };
-  }
-}
+using namespace gazebo;
+using namespace ecs;
 
-#endif
+ComponentId ComponentBase::typeCounter = 0;
+ComponentId ComponentBase::idCounter = 0;

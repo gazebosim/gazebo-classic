@@ -16,42 +16,42 @@
 */
 #include <iostream>
 #include "gazebo/components/Fraction.hh"
-#include "gazebo/ecs_core/Entity.hh"
-#include "gazebo/ecs_core/EntityQuery.hh"
-#include "gazebo/ecs_core/EntityQueryResult.hh"
-#include "gazebo/ecs_core/EntityManager.hh"
+#include "gazebo/ecs/Entity.hh"
+#include "gazebo/ecs/Manager.hh"
+#include "gazebo/ecs/EntityQuery.hh"
 #include "gazebo/plugin/RegisterMacros.hh"
-#include "gazebo/private/systems/DivideAndPrintResult.hh"
+#include "gazebo/systems/DivideAndPrintResult.hh"
 
-namespace gazebo
-{
-namespace systems
-{
+using namespace gazebo;
+using namespace systems;
 
-void DivideAndPrintResult::Init(ecs_core::EntityQuery &_query)
+/////////////////////////////////////////////////
+ecs::EntityQuery DivideAndPrintResult::Init()
 {
+  ecs::EntityQuery query;
+
   // First things first, tell the system manager what components
   // this system requires. This sytem only requires the Fraction component
-  _query.AddComponent<components::Fraction>();
+  if (!query.AddComponent("gazebo::components::Fraction"))
+    std::cerr << "Undefined component[gazebo::components::Fraction]\n";
+
+  return query;
 }
 
+/////////////////////////////////////////////////
 void DivideAndPrintResult::Update(
-    double _dt, const ecs_core::EntityQueryResult &_result)
+    double _dt, ecs::EntityQuery &_result, ecs::Manager &_mgr)
 {
   // Loop through all of the entities which have the required components
-  auto em = this->GetEntityManager();
-  for (int i = 0; i < _result.NumResults(); i++)
+  for (auto const &entityId : _result.EntityIds())
   {
-    ecs_core::Entity entity = _result.At(i);
-    auto fraction = em->GetComponent<components::Fraction>(entity);
+    auto &fraction = _mgr.GetEntity(entityId).ComponentValue<
+      gazebo::components::Fraction>("gazebo::components::Fraction");
 
-    std::cout << "Dividing " << entity << ":" << 
-      fraction->numerator / fraction->denominator << std::endl;
+    std::cout << "Dividing " << entityId << ":" <<
+      fraction.numerator / fraction.denominator << std::endl;
   }
 }
 
-}
-}
-
 GZ_REGISTER_SINGLE_PLUGIN(gazebo::systems::DivideAndPrintResult,
-                          gazebo::ecs_core::System)
+                          gazebo::ecs::System)

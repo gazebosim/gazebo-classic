@@ -15,21 +15,22 @@
  *
 */
 
-#ifndef GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
-#define GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
+#include "gazebo/ecs/System.hh"
 
-namespace gazebo
+using namespace gazebo;
+using namespace ecs;
+
+class gazebo::ecs::SystemPrivate
 {
-  namespace components
-  {
-    /// \brief Three numbers
-    struct Triplet
-    {
-      float first;
-      float second;
-      float third;
-    };
-  }
+};
+
+/////////////////////////////////////////////////
+System::System()
+: dataPtr(new SystemPrivate())
+{
 }
 
-#endif
+/////////////////////////////////////////////////
+System::~System()
+{
+}

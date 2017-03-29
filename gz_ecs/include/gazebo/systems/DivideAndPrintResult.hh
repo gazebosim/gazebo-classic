@@ -15,21 +15,26 @@
  *
 */
 
-#ifndef GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
-#define GAZEBO_GZ_ECS_COMPONENTS_TRIPLET_HH_
+
+#ifndef GAZEBO_PRIVATE_SYSTEMS_DIVIDEANDPRINTRESULT_HH_
+#define GAZEBO_PRIVATE_SYSTEMS_DIVIDEANDPRINTRESULT_HH_
+
+#include "gazebo/ecs/System.hh"
 
 namespace gazebo
 {
-  namespace components
+  namespace systems
   {
-    /// \brief Three numbers
-    struct Triplet
+    /// \brief Forward Declaration
+    class EntityQueryResult;
+
+    class DivideAndPrintResult : public ecs::System
     {
-      float first;
-      float second;
-      float third;
+      public: virtual ecs::EntityQuery Init();
+
+      public: virtual void Update(const double _dt, ecs::EntityQuery &_result,
+                  ecs::Manager &_mgr);
     };
   }
 }
-
 #endif
