@@ -2,7 +2,8 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
-1.
+1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
+    * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
