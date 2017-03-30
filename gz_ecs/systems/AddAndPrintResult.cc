@@ -15,11 +15,12 @@
  *
 */
 #include <iostream>
+#include <ignition/common/PluginMacros.hh>
+
 #include "gazebo/components/Triplet.hh"
 #include "gazebo/ecs/Entity.hh"
 #include "gazebo/ecs/Manager.hh"
 #include "gazebo/ecs/EntityQuery.hh"
-#include "gazebo/plugin/RegisterMacros.hh"
 #include "gazebo/systems/AddAndPrintResult.hh"
 
 using namespace gazebo;
@@ -52,5 +53,5 @@ void AddAndPrintResult::Update(double _dt,
   }
 }
 
-GZ_REGISTER_SINGLE_PLUGIN(gazebo::systems::AddAndPrintResult,
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(gazebo::systems::AddAndPrintResult,
                           gazebo::ecs::System)

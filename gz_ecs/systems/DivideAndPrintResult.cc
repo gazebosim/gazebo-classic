@@ -15,11 +15,12 @@
  *
 */
 #include <iostream>
+#include <ignition/common/PluginMacros.hh>
+
 #include "gazebo/components/Fraction.hh"
 #include "gazebo/ecs/Entity.hh"
 #include "gazebo/ecs/Manager.hh"
 #include "gazebo/ecs/EntityQuery.hh"
-#include "gazebo/plugin/RegisterMacros.hh"
 #include "gazebo/systems/DivideAndPrintResult.hh"
 
 using namespace gazebo;
@@ -53,5 +54,5 @@ void DivideAndPrintResult::Update(
   }
 }
 
-GZ_REGISTER_SINGLE_PLUGIN(gazebo::systems::DivideAndPrintResult,
+IGN_COMMON_REGISTER_SINGLE_PLUGIN(gazebo::systems::DivideAndPrintResult,
                           gazebo::ecs::System)

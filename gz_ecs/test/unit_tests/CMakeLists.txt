@@ -8,7 +8,6 @@ set(unit_tests
   EntityQuery_TEST.cc
   EntityQueryResult_TEST.cc
   SystemManager_TEST.cc
-  PluginLoader_TEST.cc
 )
 
 

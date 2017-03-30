@@ -18,11 +18,12 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <ignition/common/PluginLoader.hh>
+
 #include "gazebo/components/Fraction.hh"
 #include "gazebo/components/Triplet.hh"
 #include "gazebo/ecs/ComponentFactory.hh"
 #include "gazebo/ecs/Manager.hh"
-#include "gazebo/plugin/PluginLoader.hh"
 
 #include "gazebo/systems/DivideAndPrintResult.hh"
 
@@ -31,7 +32,7 @@ int main(int argc, char **argv)
   gazebo::ecs::Manager manager;
 
   // Something to deal with loading plugins
-  gazebo::plugin::PluginLoader pm;
+  ignition::common::plugin::PluginLoader pm;
 
   // First way to load a system: not using a plugin. Useful for testing
   manager.LoadSystem<gazebo::systems::DivideAndPrintResult>();
@@ -47,10 +48,8 @@ int main(int argc, char **argv)
   if (pm.LoadLibrary("AddAndPrintResult"))
   {
     std::unique_ptr<gazebo::ecs::System> sys;
-    // TODO pm.Instantiate<gazebo::ecs::System>("::gazebo::systems::Asdf");
     sys = pm.Instantiate<gazebo::ecs::System>(
-        "::gazebo::systems::AddAndPrintResult",
-        "::gazebo::ecs::System");
+        "::gazebo::systems::AddAndPrintResult");
     if (!manager.LoadSystem(std::move(sys)))
     {
       std::cerr << "Failed to load plugin from library" << std::endl;

@@ -7,13 +7,17 @@ include_directories(include)
 
 enable_testing()
 
+
+find_package(ignition-common0 REQUIRED)
+
+include_directories(${IGNITION-COMMON_INCLUDE_DIRS})
+
 add_subdirectory(ecs)
 add_subdirectory(systems)
-add_subdirectory(plugin)
 add_subdirectory(test)
 
 add_executable(gz_ecs main.cc)
-target_link_libraries(gz_ecs DivideAndPrintResult GazeboECS GazeboPlugin)
+target_link_libraries(gz_ecs DivideAndPrintResult GazeboECS)
 
 
 # TODO install rules that don't install gazebo/system/*.hh
