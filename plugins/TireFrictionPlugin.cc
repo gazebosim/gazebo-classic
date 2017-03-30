@@ -305,8 +305,8 @@ void TireFrictionPlugin::OnUpdate()
     if (surface)
     {
       // ideally we should change fdir1 I think?
-      surface->GetFrictionPyramid()->SetMuPrimary(friction);
-      surface->GetFrictionPyramid()->SetMuSecondary(friction);
+      surface->FrictionPyramid()->SetMuPrimary(friction);
+      surface->FrictionPyramid()->SetMuSecondary(friction);
     }
     else
     {
