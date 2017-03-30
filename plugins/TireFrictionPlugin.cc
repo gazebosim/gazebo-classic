@@ -45,10 +45,6 @@ TireFrictionPlugin::TireFrictionPlugin()
 /////////////////////////////////////////////////
 TireFrictionPlugin::~TireFrictionPlugin()
 {
-  // Destroy the private data structure.
-  // Make sure this happens last.
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////

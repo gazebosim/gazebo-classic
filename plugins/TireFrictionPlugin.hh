@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TIRE_FRICTION_PLUGIN_HH_
-#define _GAZEBO_TIRE_FRICTION_PLUGIN_HH_
+#ifndef GAZEBO_TIRE_FRICTION_PLUGIN_HH_
+#define GAZEBO_TIRE_FRICTION_PLUGIN_HH_
 
+#include <memory>
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/Plugin.hh"
@@ -58,7 +59,7 @@ namespace gazebo
 
     /// \internal
     /// \brief Pointer to private data.
-    protected: TireFrictionPluginPrivate *dataPtr;
+    protected: std::unique_ptr<TireFrictionPluginPrivate> dataPtr;
   };
 }
 #endif
