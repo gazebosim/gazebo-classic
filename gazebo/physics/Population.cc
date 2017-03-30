@@ -108,7 +108,7 @@ bool Population::PopulateOne(const sdf::ElementPtr _population)
 
   // Create an sdf containing the model description.
   sdf::SDF sdf;
-  sdf.SetFromString("<sdf version ='1.5'>" + params.modelSdf + "</sdf>");
+  sdf.SetFromString("<sdf version ='" + std::string(SDF_PROTOCOL_VERSION) + "'>" + params.modelSdf + "</sdf>");
 
   for (size_t i = 0; i < objects.size(); ++i)
   {
