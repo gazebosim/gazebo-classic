@@ -31,14 +31,14 @@ TEST_F(ContactManagerTest, CreateFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 
@@ -76,14 +76,14 @@ TEST_F(ContactManagerTest, RemoveFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   // Add one filter then remove it
   std::map<std::string, physics::CollisionPtr> collisionMap;
@@ -107,7 +107,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
     ss << name << i;
     std::map<std::string, physics::CollisionPtr> collisions;
     collisionMap["collision"] = physics::CollisionPtr();
-    ASSERT_TRUE(collisionMap["collision"] == NULL);
+    ASSERT_TRUE(collisionMap["collision"] == nullptr);
 
     manager->CreateFilter(ss.str(), collisions);
     EXPECT_TRUE(manager->HasFilter(ss.str()));
@@ -185,8 +185,8 @@ TEST_F(ContactManagerTest, NeverDropContacts)
     physics::Contact* contact = *it;
     physics::Collision* coll1 = contact->collision1;
     physics::Collision* coll2 = contact->collision2;
-    ASSERT_TRUE(coll1 != NULL);
-    ASSERT_TRUE(coll2 != NULL);
+    ASSERT_TRUE(coll1 != nullptr);
+    ASSERT_TRUE(coll2 != nullptr);
     // we have no subscribers connected and still have gotten the contacts
     // information, which means that enforcing contacts computation has worked.
     ASSERT_FALSE(manager->SubscribersConnected(coll1, coll2));
