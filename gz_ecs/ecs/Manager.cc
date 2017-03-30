@@ -73,6 +73,7 @@ class gazebo::ecs::ManagerPrivate
 Manager::Manager()
 : dataPtr(new ManagerPrivate)
 {
+  // TODO Componentizer to register components
   ComponentFactory::Register<gazebo::components::Triplet>(
       "gazebo::components::Triplet");
 
