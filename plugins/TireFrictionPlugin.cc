@@ -344,17 +344,17 @@ void TireFrictionPlugin::OnUpdate()
 // * (slipDynamic,frictionDynamic)
 // * (Inf,frictionDynamic)
 //
-//   |
-//   |         frictionStatic
-//   |        /.\
-//   |       / . \
-//   |      /  .  \_____________ frictionDynamic
-//   |     /   .  .
-//   |    /    .  .
-//   |   /     .  .
-//   |  /      .  .
-//   | /       .  .
-//   |/        .  .
+//   |                                            .
+//   |         frictionStatic                     .
+//   |        /.\                                 .
+//   |       / . \                                .
+//   |      /  .  \_____________ frictionDynamic  .
+//   |     /   .  .                               .
+//   |    /    .  .                               .
+//   |   /     .  .                               .
+//   |  /      .  .                               .
+//   | /       .  .                               .
+//   |/        .  .                               .
 // --+-------------------------- slipRatio
 //   |         |  └— slipDynamic
 //   |         └— slipStatic
