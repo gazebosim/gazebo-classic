@@ -32,15 +32,15 @@
         </inertial>
         <collision name="collision">
           <geometry>
-            <!--
             <sphere>
               <radius><%= wheel_radius %></radius>
             </sphere>
-            -->
+            <!--
             <cylinder>
               <radius><%= wheel_radius %></radius>
               <length><%= wheel_width %></length>
             </cylinder>
+            -->
           </geometry>
           <surface>
             <contact>
@@ -74,10 +74,15 @@
 
         <visual name="visual">
           <geometry>
+            <sphere>
+              <radius><%= wheel_radius %></radius>
+            </sphere>
+            <!--
             <cylinder>
               <radius><%= wheel_radius %></radius>
               <length><%= wheel_width %></length>
             </cylinder>
+            -->
           </geometry>
           <material>
             <script><name>Gazebo/DarkGrey</name></script>
