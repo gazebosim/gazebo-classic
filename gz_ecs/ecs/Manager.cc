@@ -21,7 +21,6 @@
 #include "gazebo/components/Fraction.hh"
 #include "gazebo/components/Triplet.hh"
 
-#include "gazebo/plugin/PluginLoader.hh"
 #include "gazebo/ecs/EntityQuery.hh"
 #include "gazebo/ecs/Manager.hh"
 
@@ -68,9 +67,6 @@ class gazebo::ecs::ManagerPrivate
 
   /// \brief Queries on this manager
   public: std::vector<EntityQuery> queries;
-
-  /// \brief Something to deal with loading plugins
-  public: gazebo::plugin::PluginLoader pl;
 };
 
 /////////////////////////////////////////////////
