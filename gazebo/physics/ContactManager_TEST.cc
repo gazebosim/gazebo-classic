@@ -145,14 +145,14 @@ TEST_F(ContactManagerTest, NeverDropContacts)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(manager);
+  ASSERT_TRUE(manager != nullptr);
 
   // advance the world. Contacts should happen between
   // box and ground.
