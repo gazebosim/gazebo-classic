@@ -687,6 +687,17 @@ namespace gazebo
       /// \param[in] _layer Index of the layer to toggle.
       public: void ToggleLayer(const int32_t _layer);
 
+      /// \brief Enable visualizations, currently only applies to sensor
+      /// visuals.
+      /// \param[in] _enable True to enable, false to disable.
+      /// \sa EnableVisualizations()
+      public: void EnableVisualizations(const bool _enable);
+
+      /// \brief Check whether visualizations are enabled or not.
+      /// \return True if enabled.
+      /// \sa EnableVisualizations(bool)
+      public: bool EnableVisualizations() const;
+
       /// \brief Helper function to setup the sky.
       private: void SetSky();
 
