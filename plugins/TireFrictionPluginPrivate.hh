@@ -47,30 +47,6 @@ namespace gazebo
     /// \brief Pointer to tire collision.
     public: physics::CollisionPtr collision;
 
-    /// \brief Connection to World Update events.
-    public: event::ConnectionPtr updateConnection;
-
-    // The following attributes are all related to receiving contact
-    // information from transport topics.
-
-    /// \brief Transport node used for subscribing to contact messages.
-    public: transport::NodePtr node;
-
-    /// \brief Subscriber to contact messages.
-    public: transport::SubscriberPtr contactSub;
-
-    /// \brief Mutex to protect reads and writes to newestContactsMsg.
-    public: mutable boost::mutex mutex;
-
-    /// \brief Store newest contacts message.
-    public: msgs::Contacts newestContactsMsg;
-
-    /// \brief Flag to indicate new contact message.
-    public: bool newMsg;
-
-    /// \brief Number of updates without having a new contacts message.
-    public: common::Time newMsgWait;
-
     // The following attributes are related to the friction vs slip model.
 
     /// \brief Static coefficient of friction.
@@ -87,6 +63,32 @@ namespace gazebo
 
     /// \brief Reference speed below which static friction is used.
     public: double speedStatic;
+
+    // The following attributes are related to receiving contact
+    // information from transport topics.
+
+    /// \brief Mutex to protect reads and writes to newestContactsMsg.
+    public: mutable boost::mutex mutex;
+
+    /// \brief Store newest contacts message.
+    public: msgs::Contacts newestContactsMsg;
+
+    /// \brief Flag to indicate new contact message.
+    public: bool newMsg;
+
+    /// \brief Number of updates without having a new contacts message.
+    public: common::Time newMsgWait;
+
+    /// \brief Transport node used for subscribing to contact messages.
+    public: transport::NodePtr node;
+
+    /// \brief Subscriber to contact messages.
+    public: transport::SubscriberPtr contactSub;
+
+    // The following is related to the callback at each time step.
+
+    /// \brief Connection to World Update events.
+    public: event::ConnectionPtr updateConnection;
   };
 }
 #endif
