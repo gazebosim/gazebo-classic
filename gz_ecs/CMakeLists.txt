@@ -13,4 +13,7 @@ add_subdirectory(plugin)
 add_subdirectory(test)
 
 add_executable(gz_ecs main.cc)
-target_link_libraries(gz_ecs DivideAndPrintResult GazeboECSCore GazeboPlugin)
+target_link_libraries(gz_ecs DivideAndPrintResult GazeboECS GazeboPlugin)
+
+
+# TODO install rules that don't install gazebo/system/*.hh

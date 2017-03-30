@@ -47,6 +47,7 @@ namespace gazebo
       /// required by this system.
       public: virtual EntityQuery Init() = 0;
 
+      // TODO ECS to put manager into dataPtr
         /// \brief Update all entities matching this system's requirements
       public: virtual void Update(
                   double _dt, EntityQuery &_result, Manager &_mgr) = 0;

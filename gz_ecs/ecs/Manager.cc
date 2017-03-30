@@ -59,6 +59,8 @@ class gazebo::ecs::ManagerPrivate
   /// TODO profile performance of component storage
 
 
+  // TODO Have a EntityManager and SystemManager
+
   // All the entities
   public: std::vector<Entity> entities;
 

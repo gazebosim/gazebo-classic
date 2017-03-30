@@ -47,6 +47,7 @@ int main(int argc, char **argv)
   if (pm.LoadLibrary("AddAndPrintResult"))
   {
     std::unique_ptr<gazebo::ecs::System> sys;
+    // TODO pm.Instantiate<gazebo::ecs::System>("::gazebo::systems::Asdf");
     sys = pm.Instantiate<gazebo::ecs::System>(
         "::gazebo::systems::AddAndPrintResult",
         "::gazebo::ecs::System");
@@ -70,9 +71,12 @@ int main(int argc, char **argv)
     // impression that an Entity is more than an ID.
     gazebo::ecs::EntityId e = manager.CreateEntity();
 
+    // TODO manager.CreateEntity<ComponentA, ComponentB, ...>();
+
     if (e % 2 == 0)
     {
       // One method of adding a component
+      // TODO mgr.AddComponent<gazebo::components::Fraction>(e);
       auto &fraction = manager.AddComponent<gazebo::components::Fraction>(
           "gazebo::components::Fraction", e);
 
