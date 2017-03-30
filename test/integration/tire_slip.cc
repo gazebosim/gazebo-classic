@@ -331,9 +331,9 @@ TEST_F(TireSlipTest, Lateral)
     if (state.description.compare("Longitudinal torque control: moderate") != 0)
     {
       // Lateral forces are really noisy on that test
-      EXPECT_LT(statsForceLateral.Value(), state.suspForce * 5e-2);
+      EXPECT_LT(statsForceLateral.Value(), state.suspForce * 6.2e-2);
     }
-    EXPECT_LT(statsForceLongitudinal.Value(), state.suspForce * 7e-2);
+    EXPECT_LT(statsForceLongitudinal.Value(), state.suspForce * 9e-2);
     EXPECT_LT(statsForceVertical.Value(), state.suspForce * 9e-2);
     EXPECT_LT(statsWheelSpeed.Value(), 3.1e-1);
   }
