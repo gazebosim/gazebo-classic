@@ -41,6 +41,7 @@ namespace gazebo
 
       public: EntityId Id() const;
 
+      // TODO Get component value by template only, no name in param
       public: template <typename T>
               T &ComponentValue(const std::string &_comp)
               {
@@ -48,6 +49,7 @@ namespace gazebo
                     this->ComponentBaseValue(_comp))->data;
               }
 
+      // TODO Methods renamed without conflicting with ComponentID Symbol
       public: ComponentId CmpId(const ComponentType &_type) const
               {
                 return this->typeIds.find(_type)->second;

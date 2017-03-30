@@ -52,6 +52,7 @@ namespace gazebo
                   // component type.
                   typeFactory[_name] = [] ()
                   {
+                    // TODO using new bypasses idea that components are stored in adjacent memory
                     return new Component<T>();
                   };
                   success = true;

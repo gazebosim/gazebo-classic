@@ -7,4 +7,4 @@ set(sources
   System.cc
 )
 
-add_library(GazeboECSCore SHARED ${sources})
+add_library(GazeboECS SHARED ${sources})

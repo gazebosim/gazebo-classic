@@ -59,11 +59,13 @@ namespace gazebo
 
       public: void UpdateSystems(const double _dt);
 
+      // TODO What if the entity id doesn't exist?
       public: Entity &GetEntity(const EntityId _id) const;
 
       public: template <typename T>
               T &AddComponent(const std::string &_name, EntityId _id)
               {
+                // TODO AddComponent without giving it the component name
                 ComponentPtr<T> cmp = ComponentFactory::Create<T>(_name);
                 ComponentId id = cmp->Id();
                 this->AddComponent(std::move(cmp), _id);
@@ -78,6 +80,7 @@ namespace gazebo
 
       public: void UpdateEntity(const EntityId _id);
 
+      // TODO Private methods into ManagerPrivate
       private: ComponentBase *EntityComponent(const ComponentId _compId);
       private: ComponentBase *EntityComponent(const EntityId _id,
                                              const ComponentType _compType);
