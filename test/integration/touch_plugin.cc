@@ -83,7 +83,7 @@ void TouchPluginTest::OneLink(const std::string &_physicsEngine)
   ASSERT_NE(world , nullptr);
 
   // Get models
-  auto whiteBox = world->GetModel("white_box");
+  auto whiteBox = world->ModelByName("white_box");
 
   // Subscribe to plugin notifications
   auto whiteSub = this->node->Subscribe("/white_touches_only_green/touched",
@@ -148,7 +148,7 @@ void TouchPluginTest::MultiLink(const std::string &_physicsEngine)
   ASSERT_NE(world , nullptr);
 
   // Get models
-  auto redYellowBox = world->GetModel("red_yellow_box");
+  auto redYellowBox = world->ModelByName("red_yellow_box");
 
   // Subscribe to plugin notifications
   auto redSub = this->node->Subscribe(
@@ -197,7 +197,7 @@ void TouchPluginTest::StartDisabled(const std::string &_physicsEngine)
   ASSERT_NE(world , nullptr);
 
   // Get models
-  auto blueBox = world->GetModel("blue_box");
+  auto blueBox = world->ModelByName("blue_box");
 
   // Subscribe to plugin notifications
   auto blueSub = this->node->Subscribe("/blue_touches_only_green/touched",

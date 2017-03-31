@@ -85,7 +85,7 @@ void WrenchVisual::Fini()
     dPtr->forceVisual->DeleteDynamicLine(dPtr->forceLine);
 
   if (dPtr->scene && dPtr->forceVisual &&
-      dPtr->scene->GetVisual(dPtr->forceVisual->GetName()))
+      dPtr->scene->GetVisual(dPtr->forceVisual->Name()))
   {
     dPtr->scene->RemoveVisual(dPtr->forceVisual);
   }
@@ -143,7 +143,7 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
 
   // Force visual
   dPtr->forceVisual.reset(new rendering::Visual(
-      this->GetName() + "_FORCE_VISUAL_", shared_from_this()));
+      this->Name() + "_FORCE_VISUAL_", shared_from_this()));
   dPtr->forceVisual->Load();
 
   dPtr->forceLine = dPtr->forceVisual->CreateDynamicLine(RENDERING_LINE_LIST);
