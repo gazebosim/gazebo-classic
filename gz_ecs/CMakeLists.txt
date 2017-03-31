@@ -17,7 +17,7 @@ add_subdirectory(systems)
 add_subdirectory(test)
 
 add_executable(gz_ecs main.cc)
-target_link_libraries(gz_ecs DivideAndPrintResult GazeboECS)
+target_link_libraries(gz_ecs DivideAndPrintResult GazeboECS ${IGNITION-COMMON_LIBRARIES})
 
 
 # TODO install rules that don't install gazebo/system/*.hh
