@@ -17,10 +17,12 @@
 
 #include "gazebo/ecs/ComponentFactory.hh"
 
-using namespace gazebo;
-using namespace ecs;
+using namespace gazebo::ecs;
 
-std::map<std::string, std::function<ComponentBase* ()>>
-ComponentFactory::typeFactory;
+std::mutex ComponentFactory::mtx;
 
-std::map<std::string, ComponentId> ComponentFactory::types;
+std::map<std::string, ComponentType> ComponentFactory::typesByName;
+
+std::map<std::size_t, ComponentType> ComponentFactory::typesByHash;
+
+std::vector<ComponentTypeInfo> ComponentFactory::typeInfoById;

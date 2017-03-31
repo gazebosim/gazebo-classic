@@ -17,10 +17,8 @@
 
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <typeinfo>
-#include "gazebo/ecs_core/ComponentType.hh"
-#include "gazebo/ecs_core/EntityQuery.hh"
-#include "gazebo/ecs_core/EntityQueryPrivate.hh"
+#include "gazebo/ecs/ComponentFactory.hh"
+#include "gazebo/ecs/EntityQuery.hh"
 
 // Component Types for testing
 struct TC1
@@ -41,57 +39,54 @@ struct TC3
   double itemThree;
 };
 
-// Type IDs for convenience
-const gazebo::ecs_core::ComponentType TC1HashCode = 
-  gazebo::ecs_core::GetComponentType<TC1>();
-const gazebo::ecs_core::ComponentType TC2HashCode =
-  gazebo::ecs_core::GetComponentType<TC2>();
-const gazebo::ecs_core::ComponentType TC3HashCode =
-  gazebo::ecs_core::GetComponentType<TC3>();
 
 /////////////////////////////////////////////////
 TEST(EntityQuery, AddSingleComponent)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  uut.AddComponent<TC1>();
+  gazebo::ecs::EntityQuery uut;
+  uut.AddComponent("TC1");
   
-  std::vector<std::size_t> types = uut.ComponentTypes();
+  std::set<gazebo::ecs::ComponentType> types = uut.ComponentTypes();
   ASSERT_EQ(1, types.size());
 
-  EXPECT_EQ(TC1HashCode, types[0]);
+  EXPECT_EQ(types.begin() , std::find(types.begin(), types.end(),
+        gazebo::ecs::ComponentFactory::Type<TC1>()));
 }
 
 /////////////////////////////////////////////////
 TEST(EntityQuery, AddTwoComponents)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  uut.AddComponent<TC1>();
-  uut.AddComponent<TC2>();
+  gazebo::ecs::EntityQuery uut;
+  uut.AddComponent("TC1");
+  uut.AddComponent("TC2");
   
-  std::vector<std::size_t> types = uut.ComponentTypes();
+  std::set<gazebo::ecs::ComponentType> types = uut.ComponentTypes();
   ASSERT_EQ(2, types.size());
 
-  EXPECT_NE(types.end(), std::find(types.begin(), types.end(), TC1HashCode));
-  EXPECT_NE(types.end(), std::find(types.begin(), types.end(), TC2HashCode));
-  EXPECT_EQ(types.end(), std::find(types.begin(), types.end(), TC3HashCode));
+  EXPECT_NE(types.end(), std::find(types.begin(), types.end(),
+        gazebo::ecs::ComponentFactory::Type<TC1>()));
+  EXPECT_NE(types.end(), std::find(types.begin(), types.end(),
+        gazebo::ecs::ComponentFactory::Type<TC2>()));
+  EXPECT_EQ(types.end(), std::find(types.begin(), types.end(),
+        gazebo::ecs::ComponentFactory::Type<TC3>()));
 }
 
 /////////////////////////////////////////////////
 TEST(EntityQuery, DuplicateComponent)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  uut.AddComponent<TC1>();
-  uut.AddComponent<TC1>();
+  gazebo::ecs::EntityQuery uut;
+  uut.AddComponent("TC1");
+  uut.AddComponent("TC1");
   
-  std::vector<std::size_t> types = uut.ComponentTypes();
+  std::set<gazebo::ecs::ComponentType> types = uut.ComponentTypes();
   ASSERT_EQ(1, types.size());
 }
 
 /////////////////////////////////////////////////
 TEST(EntityQuery, ShallowCopyQuery)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  gazebo::ecs_core::EntityQuery uutCopy(uut);
+  gazebo::ecs::EntityQuery uut;
+  gazebo::ecs::EntityQuery uutCopy(uut);
 
   EXPECT_TRUE(uutCopy == uut);
 }
@@ -99,8 +94,8 @@ TEST(EntityQuery, ShallowCopyQuery)
 /////////////////////////////////////////////////
 TEST(EntityQuery, UnequalQueries)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  gazebo::ecs_core::EntityQuery uut2;
+  gazebo::ecs::EntityQuery uut;
+  gazebo::ecs::EntityQuery uut2;
 
   EXPECT_FALSE(uut2 == uut);
 }
@@ -108,13 +103,18 @@ TEST(EntityQuery, UnequalQueries)
 /////////////////////////////////////////////////
 TEST(EntityQuery, InitiallyNoResults)
 {
-  gazebo::ecs_core::EntityQuery uut;
-  EXPECT_EQ(0, uut.Results()->NumResults());
+  gazebo::ecs::EntityQuery uut;
+  EXPECT_EQ(0, uut.EntityIds().size());
 }
 
 
 int main(int argc, char **argv)
 {
+  // Register types with the factory
+  gazebo::ecs::ComponentFactory::Register<TC1>("TC1");
+  gazebo::ecs::ComponentFactory::Register<TC2>("TC2");
+  gazebo::ecs::ComponentFactory::Register<TC3>("TC3");
+
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

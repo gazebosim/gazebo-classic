@@ -18,15 +18,27 @@
 #include "gazebo/ecs/Manager.hh"
 #include "gazebo/ecs/Entity.hh"
 
-using namespace gazebo;
-using namespace ecs;
+using namespace gazebo::ecs;
+
+
+/// \brief Private class for PIMPL
+class gazebo::ecs::EntityPrivate
+{
+  // TODO weak ptr?
+  /// \brief The manager that created this entity
+  public: Manager *manager;
+};
+
 
 EntityId Entity::nextId = 0;
 
 /////////////////////////////////////////////////
+// TODO manager to allocate id
 Entity::Entity(Manager *_mgr)
-: manager(_mgr), id(nextId++)
+: id(nextId++)
 {
+  this->impl.reset(new EntityPrivate());
+  this->impl->manager = _mgr;
 }
 
 /////////////////////////////////////////////////
@@ -41,8 +53,19 @@ EntityId Entity::Id() const
 }
 
 /////////////////////////////////////////////////
-ComponentBase *Entity::ComponentBaseValue(const std::string &_comp)
+void *Entity::Component(const ComponentType &_type)
 {
-  return this->manager->EntityComponent(this->id,
-      ComponentFactory::Type(_comp));
+  return this->impl->manager->EntityComponent(this->id, _type);
+}
+
+/////////////////////////////////////////////////
+void *Entity::AddComponent(const ComponentType &_type)
+{
+  return this->impl->manager->AddComponent(_type, this->id);
+}
+
+/////////////////////////////////////////////////
+bool Entity::Matches(const std::set<ComponentType> &_types) const
+{
+  return this->impl->manager->EntityMatches(this->id, _types);
 }

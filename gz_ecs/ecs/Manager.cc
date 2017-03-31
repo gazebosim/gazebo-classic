@@ -15,8 +15,9 @@
  *
 */
 #include <set>
-#include <vector>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 #include "gazebo/components/Fraction.hh"
 #include "gazebo/components/Triplet.hh"
@@ -63,7 +64,10 @@ class gazebo::ecs::ManagerPrivate
   // All the entities
   public: std::vector<Entity> entities;
 
-  public: std::map<ComponentId, std::unique_ptr<ComponentBase>> components;
+  // TODO better storage of components
+  // Map EntityId/ComponentType pair to an index in this->components
+  public: std::map<std::pair<EntityId, ComponentType>, int> componentIndices;
+  public: std::vector<char*> components;
 
   /// \brief Queries on this manager
   public: std::vector<EntityQuery> queries;
@@ -84,6 +88,20 @@ Manager::Manager()
 /////////////////////////////////////////////////
 Manager::~Manager()
 {
+  // Call destructor on the components
+  for (auto const &kv : this->dataPtr->componentIndices)
+  {
+    const ComponentType &type = kv.first.second;
+    const int index = kv.second;
+
+    char *storage = this->dataPtr->components[index];
+    void *data = static_cast<void*>(storage);
+
+    ComponentTypeInfo info = ComponentFactory::TypeInfo(type);
+    info.destructor(data);
+    delete [] storage;
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -181,29 +199,56 @@ bool Manager::LoadSystem(std::unique_ptr<System> _sys)
 }
 
 /////////////////////////////////////////////////
-void Manager::AddComponent(std::unique_ptr<ComponentBase> _cmp, EntityId _id)
+void *Manager::AddComponent(ComponentType _type, EntityId _id)
 {
-  // Insert the type of the component into the entity component container.
-  this->dataPtr->entities[_id].AddComponent(_cmp->Id(), _cmp->Type());
+  void *component = nullptr;
+  auto key = std::make_pair(_id, _type);
+  if (this->dataPtr->componentIndices.find(key) ==
+      this->dataPtr->componentIndices.end())
+  {
+    // Allocate memory and call constructor
+    ComponentTypeInfo info = ComponentFactory::TypeInfo(_type);
+    // TODO store components in adjacent memory
+    char *storage = new char[info.size];
+    component = static_cast<void *>(storage);
+    info.constructor(component);
 
-  // Store the pointer to the actual component.
-  this->dataPtr->components[_cmp->Id()] = std::move(_cmp);
+    auto index = this->dataPtr->components.size();
+    this->dataPtr->componentIndices[key] = index;
+    this->dataPtr->components.push_back(storage);
+    this->UpdateEntity(_id);
+  }
 
-  this->UpdateEntity(_id);
+  return component;
 }
 
 /////////////////////////////////////////////////
-ComponentBase *Manager::EntityComponent(const ComponentId _compId)
+void *Manager::EntityComponent(EntityId _id, ComponentType _type)
 {
-  return this->dataPtr->components[_compId].get();
+  void *component = nullptr;
+  auto key = std::make_pair(_id, _type);
+  if (this->dataPtr->componentIndices.find(key) !=
+      this->dataPtr->componentIndices.end())
+  {
+    auto index = this->dataPtr->componentIndices[key];
+    char *data = this->dataPtr->components[index];
+    component = static_cast<void*>(data);
+  }
+  return component;
 }
 
-/////////////////////////////////////////////////
-ComponentBase *Manager::EntityComponent(const EntityId _id,
-                               const ComponentType _compType)
+bool Manager::EntityMatches(EntityId _id, const std::set<ComponentType> &_types)
 {
-  return this->dataPtr->components[
-    this->dataPtr->entities[_id].CmpId(_compType)].get();
+  for (auto const &type : _types)
+  {
+    auto key = std::make_pair(_id, type);
+    if (this->dataPtr->componentIndices.find(key) ==
+      this->dataPtr->componentIndices.end())
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 /////////////////////////////////////////////////

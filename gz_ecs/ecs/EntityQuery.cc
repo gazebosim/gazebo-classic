@@ -86,7 +86,7 @@ bool EntityQuery::AddEntity(EntityId _id)
 }
 
 /////////////////////////////////////////////////
-const std::set<ComponentId> &EntityQuery::ComponentTypes() const
+const std::set<ComponentType> &EntityQuery::ComponentTypes() const
 {
   return this->dataPtr->componentTypes;
 }

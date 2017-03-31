@@ -34,6 +34,8 @@ int main(int argc, char **argv)
   // Something to deal with loading plugins
   ignition::common::plugin::PluginLoader pm;
 
+  // TODO Componentizer
+
   // First way to load a system: not using a plugin. Useful for testing
   manager.LoadSystem<gazebo::systems::DivideAndPrintResult>();
 
@@ -69,31 +71,40 @@ int main(int argc, char **argv)
     // the EntityManager. It is less convenient, but it avoids giving the
     // impression that an Entity is more than an ID.
     gazebo::ecs::EntityId e = manager.CreateEntity();
+    // Convenience wrapper
+    gazebo::ecs::Entity entity = manager.GetEntity(e);
 
     // TODO manager.CreateEntity<ComponentA, ComponentB, ...>();
 
     if (e % 2 == 0)
     {
-      // One method of adding a component
-      // TODO mgr.AddComponent<gazebo::components::Fraction>(e);
-      auto &fraction = manager.AddComponent<gazebo::components::Fraction>(
-          "gazebo::components::Fraction", e);
+      // One method of adding a component to an entity
+      auto *fraction = manager.AddComponent<gazebo::components::Fraction>(e);
+      if (nullptr != fraction)
+      {
+        fraction->numerator = 100.0f + i;
+        fraction->denominator = 1.0f + i;
+      }
+      else
+      {
+        std::cerr << "Failed to add fraction to entity" << std::endl;
+      }
 
-      fraction.numerator = 100.0f + i;
-      fraction.denominator = 1.0f + i;
     }
     if (e % 3 == 0)
     {
-      // This test program knows about components, but AddComponent<>() will
-      // really be called by a componentizer plugin. Gazebo won't know what
-      // components are beyond their typeid hash and size.
-      auto numbers = GZ_COMPONENT_FACTORY_CREATE(gazebo::components::Triplet);
-
-      numbers->data.first = e;
-      numbers->data.second = i;
-      numbers->data.third = 3;
-
-      manager.AddComponent(std::move(numbers), e);
+      // Another method of adding a component to an entity
+      auto numbers = entity.AddComponent<gazebo::components::Triplet>();
+      if (nullptr != numbers)
+      {
+        numbers->first = e;
+        numbers->second = i;
+        numbers->third = 3;
+      }
+      else
+      {
+        std::cerr << "Failed to add triplet to entity" << std::endl;
+      }
     }
   }
 
