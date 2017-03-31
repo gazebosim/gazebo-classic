@@ -31,8 +31,7 @@ ecs::EntityQuery DivideAndPrintResult::Init()
 {
   ecs::EntityQuery query;
 
-  // First things first, tell the system manager what components
-  // this system requires. This sytem only requires the Fraction component
+  // Add components which are required
   if (!query.AddComponent("gazebo::components::Fraction"))
     std::cerr << "Undefined component[gazebo::components::Fraction]\n";
 
@@ -46,11 +45,11 @@ void DivideAndPrintResult::Update(
   // Loop through all of the entities which have the required components
   for (auto const &entityId : _result.EntityIds())
   {
-    auto &fraction = _mgr.GetEntity(entityId).ComponentValue<
-      gazebo::components::Fraction>("gazebo::components::Fraction");
+    auto entity = _mgr.GetEntity(entityId);
+    auto fraction = entity.Component<gazebo::components::Fraction>();
 
     std::cout << "Dividing " << entityId << ":" <<
-      fraction.numerator / fraction.denominator << std::endl;
+      fraction->numerator / fraction->denominator << std::endl;
   }
 }
 

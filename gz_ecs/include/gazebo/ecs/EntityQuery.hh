@@ -21,7 +21,6 @@
 #include <memory>
 #include <vector>
 #include "gazebo/ecs/Entity.hh"
-#include "gazebo/ecs/Component.hh"
 #include "gazebo/ecs/ComponentFactory.hh"
 
 namespace gazebo

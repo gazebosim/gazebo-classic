@@ -19,9 +19,10 @@
 #define GAZEBO_ECS_ENTITY_HH_
 
 #include <map>
+#include <memory>
 #include <set>
 #include <vector>
-#include "gazebo/ecs/Component.hh"
+#include "gazebo/ecs/ComponentFactory.hh"
 
 namespace gazebo
 {
@@ -30,63 +31,69 @@ namespace gazebo
     /// \brief An entity is an id!
     typedef int EntityId;
 
+
     /// \brief For results which there is no entity
     const EntityId NO_ENTITY = -1;
 
+
+    /// \brief Forward Declaration
+    class EntityPrivate;
+
+
+    /// \brief Forward Declaration
     class Manager;
+
+
+    /// \brief A convenience class for working with entities
     class Entity
     {
-      public: Entity(Manager *mgr);
+      /// \brief Destructor
       public: ~Entity();
 
+      /// \brief Return id of entity
       public: EntityId Id() const;
 
-      // TODO Get component value by template only, no name in param
+      /// \brief Get a component by actual type
+      /// \returns pointer to a component or nullptr on error
       public: template <typename T>
-              T &ComponentValue(const std::string &_comp)
+              T *Component()
               {
-                return static_cast<Component<T> *>(
-                    this->ComponentBaseValue(_comp))->data;
+                auto type = ComponentFactory::Type<T>();
+                return static_cast<T*>(this->Component(type));
               }
 
-      // TODO Methods renamed without conflicting with ComponentID Symbol
-      public: ComponentId CmpId(const ComponentType &_type) const
+      /// \brief Get a component by ComponentType
+      /// \returns pointer to a component or nullptr on error
+      public: void *Component(const ComponentType&);
+
+      /// \brief Add a component by actual type
+      /// \returns pointer to a component or nullptr on error
+      public: template <typename T>
+              T *AddComponent()
               {
-                return this->typeIds.find(_type)->second;
+                auto type = ComponentFactory::Type<T>();
+                return static_cast<T*>(this->AddComponent(type));
               }
 
-      public: ComponentType CmpType(const ComponentId &_id) const
-              {
-                return this->idTypes.find(_id)->second;
-              }
+      /// \brief Add a component by ComponentType
+      /// \returns pointer to a component or nullptr on error
+      public: void *AddComponent(const ComponentType&);
 
-      public: void AddComponent(const ComponentId _id,
-                                const ComponentType _type)
-              {
-                this->typeIds[_type] = _id;
-                this->idTypes[_id] = _type;
-              }
+      /// \brief Check if entity has some components
+      //  \returns True iff this entity has all of the components
+      public: bool Matches(const std::set<ComponentType> &_types) const;
 
-      public: bool Matches(const std::set<ComponentType> &_types) const
-              {
-                for (auto const &t : _types)
-                {
-                  if (this->typeIds.find(t) == this->typeIds.end())
-                  {
-                    return false;
-                  }
-                }
-                return true;
-              }
+      /// \brief PIMPL pattern
+      private: std::shared_ptr<EntityPrivate> impl;
 
-      private: ComponentBase *ComponentBaseValue(const std::string &_comp);
-
-      private: Manager *manager;
       private: EntityId id;
       private: static EntityId nextId;
 
-      private: std::map<ComponentType, ComponentId> typeIds;
-      private: std::map<ComponentId, ComponentType> idTypes;
+      /// \brief Constructor. Use Manager::CreateEntity() instead
+      private: Entity(Manager *_mgr);
+
+      /// \brief friendship
+      friend Manager;
     };
   }
 }

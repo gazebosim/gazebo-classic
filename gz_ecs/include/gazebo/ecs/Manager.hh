@@ -20,10 +20,10 @@
 
 #include <memory>
 #include <iostream>
+#include <set>
 
 #include "gazebo/ecs/Entity.hh"
 #include "gazebo/ecs/System.hh"
-#include "gazebo/ecs/Component.hh"
 #include "gazebo/ecs/ComponentFactory.hh"
 
 namespace gazebo
@@ -63,27 +63,27 @@ namespace gazebo
       public: Entity &GetEntity(const EntityId _id) const;
 
       public: template <typename T>
-              T &AddComponent(const std::string &_name, EntityId _id)
+              T *AddComponent(EntityId _id)
               {
-                // TODO AddComponent without giving it the component name
-                ComponentPtr<T> cmp = ComponentFactory::Create<T>(_name);
-                ComponentId id = cmp->Id();
-                this->AddComponent(std::move(cmp), _id);
-                return static_cast<Component<T>*>(
-                    this->EntityComponent(id))->data;
+                ComponentType type = ComponentFactory::Type<T>();
+                return static_cast<T*>(this->AddComponent(type, _id));
               }
 
-      public: void AddComponent(std::unique_ptr<ComponentBase> _cmp,
-                                EntityId _id);
+      /// \brief Get component on entity by component type
+      /// \returns pointer to component iff entity has component of that type
+      public: void *EntityComponent(EntityId _id, ComponentType _type);
+
+      /// \brief Add component to entity by ComponentType
+      /// \returns pointer to component iff it was successfully added
+      public: void *AddComponent(ComponentType _type, EntityId _id);
+
+      /// \brief check if an entity has these components
+      /// \returns true iff entity has all components in the set
+      public: bool EntityMatches(EntityId _id, const std::set<ComponentType> &_types);
 
       public: void UpdateSystem(double _dt);
 
       public: void UpdateEntity(const EntityId _id);
-
-      // TODO Private methods into ManagerPrivate
-      private: ComponentBase *EntityComponent(const ComponentId _compId);
-      private: ComponentBase *EntityComponent(const EntityId _id,
-                                             const ComponentType _compType);
 
       /// \brief Add a query for components of a certain type
       ///
