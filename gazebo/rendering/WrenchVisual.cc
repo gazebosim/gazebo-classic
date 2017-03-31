@@ -90,6 +90,8 @@ void WrenchVisual::Fini()
     dPtr->scene->RemoveVisual(dPtr->forceVisual);
   }
   dPtr->forceVisual.reset();
+
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
