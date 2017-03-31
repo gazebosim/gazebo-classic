@@ -6,7 +6,6 @@
 set(unit_tests
   EntityManager_TEST.cc
   EntityQuery_TEST.cc
-  EntityQueryResult_TEST.cc
   SystemManager_TEST.cc
 )
 
