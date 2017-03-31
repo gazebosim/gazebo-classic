@@ -66,7 +66,6 @@ WrenchVisual::~WrenchVisual()
 }
 
 /////////////////////////////////////////////////
-// Note to carefully test this when merging forward to Gazebo8
 void WrenchVisual::Fini()
 {
   WrenchVisualPrivate *dPtr =
