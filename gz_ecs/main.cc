@@ -65,14 +65,10 @@ int main(int argc, char **argv)
   // Create a few entities to work with
   for (int i = 0; i < 10; i++)
   {
-    // EntityX, anax, and artemis all have an Entity class that acts as a
-    // convenience wrapper for world or entity manager calls. This line is
-    // is different in that it returns the ID which can be given to the
-    // the EntityManager. It is less convenient, but it avoids giving the
-    // impression that an Entity is more than an ID.
+    // An entity is just an ID
     gazebo::ecs::EntityId e = manager.CreateEntity();
-    // Convenience wrapper
-    gazebo::ecs::Entity entity = manager.GetEntity(e);
+    // Convenience wrapper for working with an Id
+    gazebo::ecs::Entity entity = manager.Entity(e);
 
     // TODO manager.CreateEntity<ComponentA, ComponentB, ...>();
 

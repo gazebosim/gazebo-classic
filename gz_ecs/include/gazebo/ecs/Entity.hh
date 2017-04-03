@@ -41,7 +41,7 @@ namespace gazebo
 
 
     /// \brief Forward Declaration
-    class Manager;
+    class EntityComponentDatabase;
 
 
     /// \brief A convenience class for working with entities
@@ -79,21 +79,14 @@ namespace gazebo
       /// \returns pointer to a component or nullptr on error
       public: void *AddComponent(const ComponentType&);
 
-      /// \brief Check if entity has some components
-      //  \returns True iff this entity has all of the components
-      public: bool Matches(const std::set<ComponentType> &_types) const;
-
       /// \brief PIMPL pattern
       private: std::shared_ptr<EntityPrivate> impl;
 
-      private: EntityId id;
-      private: static EntityId nextId;
-
       /// \brief Constructor. Use Manager::CreateEntity() instead
-      private: Entity(Manager *_mgr);
+      private: Entity(EntityComponentDatabase *_mgr, EntityId _id);
 
       /// \brief friendship
-      friend Manager;
+      friend EntityComponentDatabase;
     };
   }
 }

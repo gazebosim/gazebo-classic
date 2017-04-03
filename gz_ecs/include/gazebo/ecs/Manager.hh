@@ -54,13 +54,11 @@ namespace gazebo
       /// Ex: sm->LoadSystem(std::move(aUniquePtrInstance))
       public: bool LoadSystem(std::unique_ptr<System> _sys);
 
-      /// \brief Updates all the queryies which have been added to it
-      public: void UpdateEntities();
-
       public: void UpdateSystems(const double _dt);
 
-      // TODO What if the entity id doesn't exist?
-      public: Entity &GetEntity(const EntityId _id) const;
+      /// \brief Returns an entity instance with the given ID
+      /// \returns Entity with id set to NO_ENTITY if entity does not exist
+      public: gazebo::ecs::Entity Entity(const EntityId _id) const;
 
       public: template <typename T>
               T *AddComponent(EntityId _id)
@@ -77,20 +75,13 @@ namespace gazebo
       /// \returns pointer to component iff it was successfully added
       public: void *AddComponent(ComponentType _type, EntityId _id);
 
-      /// \brief check if an entity has these components
-      /// \returns true iff entity has all components in the set
-      public: bool EntityMatches(EntityId _id, const std::set<ComponentType> &_types);
-
       public: void UpdateSystem(double _dt);
 
-      public: void UpdateEntity(const EntityId _id);
-
       /// \brief Add a query for components of a certain type
+      /// \returns true if the query was added successfully
       ///
-      /// This does the query, and returns a proxy to the result. The result
-      /// Can be used to retreive the entities that matched. The query will
-      /// Continue to be processed until it is removed.
-      private: std::size_t AddQuery(const EntityQuery &_query);
+      /// The query will be processed until it is removed.
+      private: bool AddQuery(const EntityQuery &_query);
 
       private: Manager(const Manager&) = delete;
 

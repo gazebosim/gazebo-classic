@@ -71,8 +71,6 @@ bool EntityQuery::operator==(const EntityQuery &_rhs) const
 }
 
 /////////////////////////////////////////////////
-// this is dangerous. We are storing raw pointers!!!!
-//bool EntityQuery::AddEntity(const Entity *_entity)
 bool EntityQuery::AddEntity(EntityId _id)
 {
   // Only add unique enities.
@@ -83,6 +81,12 @@ bool EntityQuery::AddEntity(EntityId _id)
     return true;
   }
   return false;
+}
+
+/////////////////////////////////////////////////
+void EntityQuery::Clear()
+{
+  this->dataPtr->entityIds.clear();
 }
 
 /////////////////////////////////////////////////

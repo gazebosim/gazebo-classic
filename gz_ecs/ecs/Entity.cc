@@ -15,7 +15,7 @@
  *
 */
 
-#include "gazebo/ecs/Manager.hh"
+#include "gazebo/ecs/EntityComponentDatabase.hh"
 #include "gazebo/ecs/Entity.hh"
 
 using namespace gazebo::ecs;
@@ -25,20 +25,22 @@ using namespace gazebo::ecs;
 class gazebo::ecs::EntityPrivate
 {
   // TODO weak ptr?
-  /// \brief The manager that created this entity
-  public: Manager *manager;
+  /// \brief The database that created this entity
+  public: EntityComponentDatabase *database;
+  
+  /// \brief ID of entity
+  public: EntityId id;
 };
 
 
-EntityId Entity::nextId = 0;
 
 /////////////////////////////////////////////////
-// TODO manager to allocate id
-Entity::Entity(Manager *_mgr)
-: id(nextId++)
+// TODO database to allocate id
+Entity::Entity(EntityComponentDatabase *_mgr, EntityId _id)
 {
   this->impl.reset(new EntityPrivate());
-  this->impl->manager = _mgr;
+  this->impl->database = _mgr;
+  this->impl->id = _id;
 }
 
 /////////////////////////////////////////////////
@@ -49,23 +51,17 @@ Entity::~Entity()
 /////////////////////////////////////////////////
 EntityId Entity::Id() const
 {
-  return this->id;
+  return this->impl->id;
 }
 
 /////////////////////////////////////////////////
 void *Entity::Component(const ComponentType &_type)
 {
-  return this->impl->manager->EntityComponent(this->id, _type);
+  return this->impl->database->EntityComponent(this->impl->id, _type);
 }
 
 /////////////////////////////////////////////////
 void *Entity::AddComponent(const ComponentType &_type)
 {
-  return this->impl->manager->AddComponent(_type, this->id);
-}
-
-/////////////////////////////////////////////////
-bool Entity::Matches(const std::set<ComponentType> &_types) const
-{
-  return this->impl->manager->EntityMatches(this->id, _types);
+  return this->impl->database->AddComponent(this->impl->id, _type);
 }
