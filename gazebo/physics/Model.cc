@@ -979,7 +979,7 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-std::vector<std::string> Model::GetSensorScopedName(
+std::vector<std::string> Model::SensorScopedName(
   const std::string _name) const
 {
   std::vector<std::string> names;

@@ -371,7 +371,7 @@ namespace gazebo
       /// \param[in] _name Unscoped sensor name.
       /// \return The scoped name of the sensor(s),
       ///         or empty list if not found.
-      public: std::vector<std::string> GetSensorScopedName(
+      public: std::vector<std::string> SensorScopedName(
         const std::string _name) const;
 
       /// \brief Get a handle to the Controller for the joints in this model.
