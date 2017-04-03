@@ -45,7 +45,7 @@ void AddAndPrintResult::Update(double _dt,
   // Loop through all of the entities which have the required components
   for (auto const &entityId : _query.EntityIds())
   {
-    auto entity = _mgr.GetEntity(entityId);
+    auto entity = _mgr.Entity(entityId);
     auto numbers = entity.Component<gazebo::components::Triplet>();
 
     std::cout << "Adding " << entityId << ":" <<

@@ -30,12 +30,16 @@ namespace gazebo
     /// \brief Forward declaration
     class EntityQueryPrivate;
 
+    /// \brief Forward declaration
+    class EntityComponentDatabase;
+
     /// \brief a Class for querying entities from a manager
     class EntityQuery
     {
       public: EntityQuery();
       public: ~EntityQuery();
 
+      // TODO templated version
       /// \brief Add a component based on a name.
       public: bool AddComponent(const std::string &_name);
 
@@ -51,7 +55,14 @@ namespace gazebo
       public: bool AddEntity(EntityId _id);
 
       /// \brief Get the entity ids
+      /// TODO ordered results matching component placement in memory
       public: const std::set<EntityId> &EntityIds() const;
+
+      /// \brief Clear results of a query
+      private: void Clear();
+
+      /// \brief friendship
+      private: friend EntityComponentDatabase;
 
       private: std::shared_ptr<EntityQueryPrivate> dataPtr;
     };

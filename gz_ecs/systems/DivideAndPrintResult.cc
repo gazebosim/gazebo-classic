@@ -45,7 +45,7 @@ void DivideAndPrintResult::Update(
   // Loop through all of the entities which have the required components
   for (auto const &entityId : _result.EntityIds())
   {
-    auto entity = _mgr.GetEntity(entityId);
+    auto entity = _mgr.Entity(entityId);
     auto fraction = entity.Component<gazebo::components::Fraction>();
 
     std::cout << "Dividing " << entityId << ":" <<
