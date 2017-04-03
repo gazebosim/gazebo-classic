@@ -980,7 +980,7 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 
 //////////////////////////////////////////////////
 std::vector<std::string> Model::SensorScopedName(
-  const std::string _name) const
+  const std::string &_name) const
 {
   std::vector<std::string> names;
   for (Link_V::const_iterator iter = this->links.begin();
