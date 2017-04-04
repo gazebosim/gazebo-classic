@@ -124,6 +124,73 @@
             </plugin>
           </model>
         </model>
+        <model name="model_04">
+          <pose>1.25 0 0.0 0 0 0</pose>
+          <link name="link_04">
+            <pose>0.25 0 0.0 0 0 0</pose>
+            <collision name="collision_04">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+            </collision>
+            <visual name="visual_04">
+              <geometry>
+                <box>
+                  <size>1 1 1</size>
+                </box>
+              </geometry>
+              <material>
+                <script>
+                  <uri>file://media/materials/scripts/gazebo.material</uri>
+                  <name>Gazebo/Blue</name>
+                </script>
+              </material>
+            </visual>
+          </link>
+          <link name='model_04/imu_link'>
+            <inertial>
+              <pose>0 0 0 0 0 0</pose>
+              <mass>0.15</mass>
+              <inertia>
+                <ixx>0.00001</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.00002</iyy>
+                <iyz>0</iyz>
+                <izz>0.00002</izz>
+              </inertia>
+            </inertial>
+            <sensor name="imu_sensor" type="imu">
+              <pose>0 0 0 3.141593 0 0</pose>
+              <always_on>1</always_on>
+              <update_rate>1000.0</update_rate>
+            </sensor>
+          </link>
+          <joint name='model_04/imu_joint' type='revolute'>
+            <child>model_04/imu_link</child>
+            <parent>link_04</parent>
+            <axis>
+              <xyz>0 0 1</xyz>
+              <limit>
+                <lower>0</lower>
+                <upper>0</upper>
+                <effort>0</effort>
+                <velocity>0</velocity>
+              </limit>
+              <dynamics>
+                <damping>1.0</damping>
+              </dynamics>
+              <use_parent_model_frame>1</use_parent_model_frame>
+            </axis>
+            <physics>
+              <ode>
+                <implicit_spring_damper>1</implicit_spring_damper>
+              </ode>
+            </physics>
+          </joint>
+        </model>
       </model>
 
       <joint name="joint_00" type="revolute">
