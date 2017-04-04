@@ -14,6 +14,9 @@
 
 1. Deprecate functions to set linear/angular acceleration 
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
+    
+1. Add function to retreive scoped sensors name in multi-nested model
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2676)
 
 ## Gazebo 8
 
