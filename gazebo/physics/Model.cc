@@ -988,16 +988,17 @@ std::vector<std::string> Model::SensorScopedName(
   {
     for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
     {
-      if ((*iter)->GetSensorName(j).size() < _name.size())
+      const auto sensorName = (*iter)->GetSensorName(j);
+      if (sensorName.size() < _name.size())
       {
         continue;
       }
-      if ((*iter)->GetSensorName(j).substr(
-            (*iter)->GetSensorName(j).size()
+      if (sensorName.substr(
+            sensorName.size()
             - _name.size(), _name.size()) ==
           _name)
       {
-        names.push_back((*iter)->GetSensorName(j));
+        names.push_back(sensorName);
       }
     }
   }
