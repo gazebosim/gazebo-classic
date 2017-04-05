@@ -993,9 +993,7 @@ std::vector<std::string> Model::SensorScopedName(
       {
         continue;
       }
-      if (sensorName.substr(
-            sensorName.size()
-            - _name.size(), _name.size()) ==
+      if (sensorName.substr(sensorName.size() - _name.size(), _name.size()) ==
           _name)
       {
         names.push_back(sensorName);
