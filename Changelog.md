@@ -2,7 +2,8 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
-1.
+1. Added <collide_bitmask> support to bullet
+    * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
