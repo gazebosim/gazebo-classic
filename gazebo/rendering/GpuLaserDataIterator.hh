@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Dereference operator iter->
       /// \return a shared pointer object at the iterator's index
-      public: const std::shared_ptr<const GpuLaserData> operator->() const;
+      public: const std::unique_ptr<const GpuLaserData> operator->() const;
 
       /// \brief Advance iterator to next reading (prefix: ++it)
       /// \return reference to this pointer after advancing

@@ -46,7 +46,7 @@ namespace gazebo
     template <typename F>
     const GpuLaserData GpuLaserDataIterator<F>::operator*() const
     {
-      GpuLaserData reading = {
+      return {
         // range
         this->data[this->index * this->skip + this->rangeOffset],
         // intensity
@@ -56,14 +56,13 @@ namespace gazebo
         // reading
         index % this->horizontalResolution,
       };
-      return reading;
     }
 
     template <typename F>
-    const std::shared_ptr<const GpuLaserData>
+    const std::unique_ptr<const GpuLaserData>
       GpuLaserDataIterator<F>::operator->() const
     {
-      return std::shared_ptr<const GpuLaserData>(
+      return std::unique_ptr<const GpuLaserData>(
           new GpuLaserData(this->operator*()));
     }
 
