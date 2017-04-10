@@ -61,19 +61,24 @@ def run_grep(filename, arg):
     return stdout, stderr
 
 def run_xsltproc(stylesheet, document):
+    test_ran_message = ''
     try:
         process = subprocess.Popen(['xsltproc', stylesheet, document], stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
+        if process.returncode != 0:
+            test_ran_message = "Error while converting QTest XML to junit with xsltproc."
         # Overwrite same document
         open(document, 'w').write(stdout)
     except OSError as err:
+        test_ran_message = "Unable to find xsltproc. Can not parse output test for QTest suite."
+    if len(test_ran_message) > 0:
         test_name = os.path.basename(document)
         f = open(document, 'w')
-        d = {'test': test_name, 'test_file': document, 'test_no_xml': test_name.replace('.xml', '')}
+        d = {'test': test_name, 'test_file': document, 'test_no_xml': test_name.replace('.xml', ''), 'message': test_ran_message}
         f.write("""<?xml version="1.0" encoding="UTF-8"?>
 <testsuite tests="1" failures="1" time="1" errors="0" name="%(test)s">
   <testcase name="test_ran" status="run" time="1" classname="%(test_no_xml)s">
-    <failure message="Unable to find xsltproc. Can not parse output test for QTest suite." type=""/>
+    <failure message="%(message)s" type=""/>
   </testcase>
 </testsuite>"""%d)
         sys.exit(getattr(os, 'EX_USAGE', 1))
