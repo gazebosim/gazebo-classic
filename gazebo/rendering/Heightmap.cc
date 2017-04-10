@@ -533,27 +533,15 @@ void Heightmap::Load()
   {
     // Note: ran into problems with LOD height glitches if heightmap size is
     // larger than 4096 so split it into chunks
+    // Note: dataSize should be 2^n + 1
     if (this->dataPtr->maxPixelError > 0 && this->dataPtr->dataSize > 4096u)
     {
       this->dataPtr->splitTerrain = true;
-      // Compute subterrain heightmap size.
-      // The number of chunks must be a power of 4 and the size must be < 4096
-      // For example, a heightmap of size 4096 (2^12) should be split into
-      // 4 chunks with a size of 1024:
-      //   2^12 / 4^1 = 1024
-      // following this logic we could see some examples of subterrain sizes:
-      //   2^13 / 4^1 = 2048
-      //   2^14 / 4^2 = 1024
-      //   2^15 / 4^2 = 2048
-      double pow = std::log2(this->dataPtr->dataSize-1) - 12;
-      this->dataPtr->numTerrainSubdivisions = static_cast<unsigned int>(
-          std::pow(4, static_cast<int>(pow / 2) + 1.0));
-
-      // Unfortunately, from manual testing, max subdivision size that will
-      // work is currently 16. Anything larger causes load to fail
-      this->dataPtr->numTerrainSubdivisions =
-          std::min(this->dataPtr->numTerrainSubdivisions, 16u);
-      nTerrains = this->dataPtr->numTerrainSubdivisions;
+      if (this->dataPtr->dataSize == 4097u)
+        this->dataPtr->numTerrainSubdivisions = 4u;
+      else
+        this->dataPtr->numTerrainSubdivisions = 16u;
+     nTerrains = this->dataPtr->numTerrainSubdivisions;
 
       gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
           this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
