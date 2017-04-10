@@ -61,6 +61,11 @@ namespace gazebo
 
       /// \brief Mapping of distorted to undistorted normalized pixels
       public: std::vector<math::Vector2d> distortionMap;
+
+      /// \brief Width of distortion texture map
+      public: unsigned int distortionTexWidth;
+      /// \brief Height of distortion texture map
+      public: unsigned int distortionTexHeight;
     };
   }
 }

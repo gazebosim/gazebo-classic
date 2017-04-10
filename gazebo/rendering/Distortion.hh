@@ -34,8 +34,7 @@ namespace gazebo
     /// \{
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
-    /// \brief Camera distortion based on Brown's model. Note that the current
-    /// implementation only supports barrel distortion.
+    /// \brief Camera distortion based on the Brown-Conrady model.
     class GZ_RENDERING_VISIBLE Distortion
     {
       /// \brief Constructor
@@ -56,7 +55,7 @@ namespace gazebo
       /// image points.
       /// \param[in] _crop True to crop the black border
       public: void SetCrop(bool _crop);
-
+      
       /// \brief Get the radial distortion coefficient k1.
       /// \return Distortion coefficient k1.
       public: double GetK1() const;
@@ -94,12 +93,18 @@ namespace gazebo
         const math::Vector2d &_center, double _k1, double _k2, double _k3,
         double _p1, double _p2);
 
+      /// \brief get the distortion map value.
+      /// \return the distortion map value at the specified index, or (-1, -1) if the index
+      /// is out of bounds.
+      protected: math::Vector2d GetDistortionMapValueClamped(int x, int y) const;
+
       /// \brief Distortion SDF values.
       protected: sdf::ElementPtr sdf;
 
       /// \internal
       /// \brief Pointer to private data.
       private: DistortionPrivate *dataPtr;
+
     };
     /// \}
   }
