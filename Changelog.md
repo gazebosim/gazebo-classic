@@ -14,6 +14,8 @@
 
 1. Deprecate functions to set linear/angular acceleration 
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
+1. Added GpuLaserDataIterator
+    * [Pull request #2637](https://bitbucket.org/osrf/gazebo/pull-request/2637)
 
 ## Gazebo 8
 
