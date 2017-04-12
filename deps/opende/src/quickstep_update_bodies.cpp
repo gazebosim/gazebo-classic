@@ -63,9 +63,41 @@ void quickstep::dxUpdateBodies(
       dxBody *const *const bodyend = body + nb;
       for (dxBody *const *bodycurr = body; bodycurr != bodyend; caccelcurr+=6, bodycurr++) {
         dxBody *b_ptr = *bodycurr;
+
+        const char* name = b_ptr->name_callback(b_ptr);
+        if (0 == strcmp(name, "leftIndexFingerPitch3Link"))
+        {
+          printf("%s, v0 %e %e %e, w0 %e %e %e\n",
+            name,
+            b_ptr->lvel[0],
+            b_ptr->lvel[1],
+            b_ptr->lvel[2],
+            b_ptr->avel[0],
+            b_ptr->avel[1],
+            b_ptr->avel[2]);
+          printf("    dt*caccel %e %e %e, %e %e %e\n",
+            stepsize * caccelcurr[0],
+            stepsize * caccelcurr[1],
+            stepsize * caccelcurr[2],
+            stepsize * caccelcurr[3],
+            stepsize * caccelcurr[4],
+            stepsize * caccelcurr[5]);
+        }
+
         for (int j=0; j<3; j++) {
           b_ptr->lvel[j] += stepsize * caccelcurr[j];
           b_ptr->avel[j] += stepsize * caccelcurr[3+j];
+        }
+        if (0 == strcmp(name, "leftIndexFingerPitch3Link"))
+        {
+          printf("%s, v1 %e %e %e, w1 %e %e %e\n",
+            name,
+            b_ptr->lvel[0],
+            b_ptr->lvel[1],
+            b_ptr->lvel[2],
+            b_ptr->avel[0],
+            b_ptr->avel[1],
+            b_ptr->avel[2]);
         }
         // printf("caccel [%f %f %f] [%f %f %f]\n"
         //   ,caccelcurr[0] ,caccelcurr[1] ,caccelcurr[2]
@@ -111,6 +143,18 @@ void quickstep::dxUpdateBodies(
             fb->t2[2] = data[5];
           }
 
+          if (0 == strcmp((const char *)dJointGetData(joint), "leftIndexFingerPitch3"))
+          {
+            printf("%s, f %e %e %e, t %e, %e, %e\n",
+              (const char *)dJointGetData(joint),
+              fb->f1[0],
+              fb->f1[1],
+              fb->f1[2],
+              fb->t1[0],
+              fb->t1[1],
+              fb->t1[2]);
+          }
+
           Jcopyrow += infom * 12;
         }
 
@@ -134,6 +178,18 @@ void quickstep::dxUpdateBodies(
         tmp_tacc[j] = b_ptr->tacc[j] * stepsize;
       }
       dMultiplyAdd0_331 (b_ptr->avel, invMOIrow, tmp_tacc);
+        const char* name = b_ptr->name_callback(b_ptr);
+        if (0 == strcmp(name, "leftIndexFingerPitch3Link"))
+        {
+          printf("%s, v2 %e %e %e, w2 %e %e %e\n",
+            name,
+            b_ptr->lvel[0],
+            b_ptr->lvel[1],
+            b_ptr->lvel[2],
+            b_ptr->avel[0],
+            b_ptr->avel[1],
+            b_ptr->avel[2]);
+        }
       // printf("fe [%f %f %f] [%f %f %f]\n"
       //   ,b_ptr->facc[0] ,b_ptr->facc[1] ,b_ptr->facc[2]
       //   ,b_ptr->tacc[0] ,b_ptr->tacc[1] ,b_ptr->tacc[2]);
@@ -300,6 +356,18 @@ void quickstep::dxUpdateBodies(
                ,caccel_curr[3+j], caccel_erp_curr[3+j]);
         */
       }
+        const char* name = b_ptr->name_callback(b_ptr);
+        if (0 == strcmp(name, "leftIndexFingerPitch3Link"))
+        {
+          printf("%s, v3 %e %e %e, w3 %e %e %e\n",
+            name,
+            b_ptr->lvel[0],
+            b_ptr->lvel[1],
+            b_ptr->lvel[2],
+            b_ptr->avel[0],
+            b_ptr->avel[1],
+            b_ptr->avel[2]);
+        }
       /*  DEBUG PRINTOUTS
       printf("corrected vel [%f %f %f] [%f %f %f]\n",
         b_ptr->lvel[0], b_ptr->lvel[1], b_ptr->lvel[2],

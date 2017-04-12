@@ -176,6 +176,11 @@ namespace gazebo
       /// \param[in] _id Id of the body.
       public: static void MoveCallback(dBodyID _id);
 
+      /// \brief Return name of ode link for debugging inside ode.
+      /// \param[in] _id Id of the body.
+      /// \return Name of body.
+      public: static const char* NameCallback(dBodyID _id);
+
       // Documentation inherited
       public: virtual void SetLinkStatic(bool _static);
 

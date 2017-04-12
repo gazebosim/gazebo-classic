@@ -128,6 +128,10 @@ void JointController::Update()
           iter != this->dataPtr->forces.end(); ++iter)
       {
         this->dataPtr->joints[iter->first]->SetForce(0, iter->second);
+        gzerr << this->dataPtr->joints[iter->first]->GetName()
+              << " , GetForce "
+              << this->dataPtr->joints[iter->first]->GetForce(0)
+              << std::endl;
       }
     }
 

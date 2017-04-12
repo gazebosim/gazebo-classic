@@ -142,6 +142,12 @@ void Base::SetName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
+const char* Base::GetConstName() const
+{
+  return this->name.c_str();
+}
+
+//////////////////////////////////////////////////
 std::string Base::GetName() const
 {
   return this->name;

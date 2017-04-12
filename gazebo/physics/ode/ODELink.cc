@@ -122,7 +122,9 @@ void ODELink::Init()
   if (this->linkId)
   {
     dBodySetMovedCallback(this->linkId, MoveCallback);
+    dBodySetNameCallback(this->linkId, NameCallback);
     dBodySetDisabledCallback(this->linkId, DisabledCallback);
+    gzerr << "Init:" << this->NameCallback(this->linkId) << std::endl;
   }
   else if (!this->IsStatic() && this->initialized)
   {
@@ -135,6 +137,13 @@ void ODELink::Init()
 //////////////////////////////////////////////////
 void ODELink::DisabledCallback(dBodyID /*_id*/)
 {
+}
+
+//////////////////////////////////////////////////
+const char* ODELink::NameCallback(dBodyID _id)
+{
+  ODELink *self = static_cast<ODELink*>(dBodyGetData(_id));
+  return self->GetConstName();
 }
 
 //////////////////////////////////////////////////

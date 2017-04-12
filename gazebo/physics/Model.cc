@@ -298,6 +298,15 @@ void Model::Update()
 
   if (this->jointController)
     this->jointController->Update();
+  {
+    auto pitch3 = this->GetJoint("leftIndexFingerPitch3");
+    if (pitch3 != nullptr)
+    {
+      gzerr << pitch3->GetName() << " GetForce "
+            << pitch3->GetForce(0)
+            << std::endl;
+    }
+  }
 
   if (!this->jointAnimations.empty())
   {

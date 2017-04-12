@@ -182,6 +182,7 @@ struct dxBody : public dObject {
   dxBody(dxWorld *w);
 
   dxContactParameters* contactp; // option to set contact max_vel and min_depths per body
+  const char* (*name_callback)(dxBody*); // get name of this body
 };
 
 

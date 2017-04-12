@@ -1630,6 +1630,8 @@ ODE_API int dBodyGetGravityMode (dBodyID b);
  */
 ODE_API void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID));
 
+ODE_API void dBodySetNameCallback(dBodyID b, const char* (*callback)(dBodyID));
+
 ODE_API void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID));
 
 /**

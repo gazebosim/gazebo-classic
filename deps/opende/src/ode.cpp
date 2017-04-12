@@ -293,6 +293,7 @@ dxBody *dBodyCreate (dxWorld *w)
   dBodySetAutoDisableAverageSamplesCount(b, b->adis.average_samples);
 
   b->moved_callback = 0;
+  b->name_callback = 0;
 
   dBodySetDampingDefaults(b);  // must do this after adding to world
 
@@ -1155,6 +1156,12 @@ void dBodySetMovedCallback(dBodyID b, void (*callback)(dBodyID))
 {
         dAASSERT(b);
         b->moved_callback = callback;
+}
+
+void dBodySetNameCallback(dBodyID b, const char* (*callback)(dBodyID))
+{
+        dAASSERT(b);
+        b->name_callback = callback;
 }
 
 void dBodySetDisabledCallback(dBodyID b, void (*callback)(dBodyID))

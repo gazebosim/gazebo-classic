@@ -131,6 +131,12 @@ void ODEJoint::Load(sdf::ElementPtr _sdf)
       this->SetParam(dParamVel,
           elem->GetElement("velocity")->Get<double>());
   }
+
+  gzerr << "Load: dJointSetData(" << this->jointId
+        << ", " << this->GetConstName() << ")"
+        << std::endl;
+  dJointSetData(this->jointId, (void *)(this->GetConstName()));
+  printf("Load: dJointGetData(): %s\n", (const char *)dJointGetData(this->jointId));
 }
 
 //////////////////////////////////////////////////
@@ -886,6 +892,15 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
     double angle = this->GetAngle(i).Radian();
     double dAngle = 2.0 * this->GetVelocity(i) * dt;
     angle += dAngle;
+    if (0 == this->GetName().compare("leftIndexFingerPitch3"))
+    {
+      gzwarn << "t=" << this->GetWorld()->GetSimTime().Double() << " "
+            << this->GetName() << ": pos "
+            << this->GetAngle(i).Radian() << " , vel "
+            << this->GetVelocity(i) << " , f "
+            << this->GetForce(i)
+            << std::endl;
+    }
 
     if ((math::equal(this->dissipationCoefficient[i], 0.0) &&
          math::equal(this->stiffnessCoefficient[i], 0.0)) ||
@@ -903,6 +918,18 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         this->SetParam("lo_stop", i, this->lowerLimit[i].Radian());
         this->SetParam("hi_stop", i, this->upperLimit[i].Radian());
         this->implicitDampingState[i] = ODEJoint::JOINT_LIMIT;
+        if (this->GetName().find("Pitch3") != std::string::npos)
+        {
+          gzdbg << "t=" << this->GetWorld()->GetSimTime().Double() << " "
+                << "limit " << this->GetName() << ": "
+                << this->GetParam("lo_stop", i) << " <= "
+                << this->GetAngle(i).Radian() << " , "
+                << angle << " <= "
+                << this->GetParam("hi_stop", i) << ", erp,cfm: "
+                << this->GetParam("stop_erp", i) << ","
+                << this->GetParam("stop_cfm", i)
+                << std::endl;
+        }
       }
       /* test to see if we can reduce jitter at joint limits
       // apply spring damper explicitly if in joint limit
@@ -950,6 +977,19 @@ void ODEJoint::ApplyImplicitStiffnessDamping()
         this->SetParam("lo_stop", i, this->springReferencePosition[i]);
         this->SetParam("hi_stop", i, this->springReferencePosition[i]);
         this->implicitDampingState[i] = ODEJoint::DAMPING_ACTIVE;
+        if (this->GetName().find("Pitch3") != std::string::npos)
+        {
+          gzdbg << "t=" << this->GetWorld()->GetSimTime().Double() << " "
+                << "free  " << this->GetName() << ": "
+                << this->GetParam("lo_stop", i) << " <= "
+                << this->GetAngle(i).Radian() << " , "
+                << angle << " <= "
+                << this->GetParam("hi_stop", i) << ", erp,cfm: "
+                << this->GetParam("stop_erp", i) << ","
+                << this->GetParam("stop_cfm", i)
+                << ", torque " << this->GetForceTorque(i).body1Torque
+                << std::endl;
+        }
       }
     }
   }

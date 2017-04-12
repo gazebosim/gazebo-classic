@@ -186,6 +186,10 @@ namespace gazebo
       /// \return Name of the entity.
       public: std::string GetName() const;
 
+      /// \brief Return const pointer to the name of the entity.
+      /// \return Name of the entity.
+      public: const char* GetConstName() const;
+
       /// \brief Return the ID of this entity. This id is unique.
       /// \return Integer ID.
       public: uint32_t GetId() const;

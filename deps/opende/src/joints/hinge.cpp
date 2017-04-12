@@ -176,7 +176,18 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
     info->c[4] = k * dCalcVectorDot3( b, q );
 
     // if the hinge is powered, or has joint limits, add in the stuff
-    limot.addLimot( this, info, 5, ax1, 1 );
+    if (limot.addLimot( this, info, 5, ax1, 1 ))
+    {
+      if (0 == strcmp((const char *)dJointGetData(this), "leftIndexFingerPitch3"))
+      {
+        printf("%s, row5 c %e, lo %e, hi %e, cfm %e\n",
+          (const char *)dJointGetData(this),
+          info->c[5],
+          info->lo[5],
+          info->hi[5],
+          info->cfm[5]);
+      }
+    }
 }
 
 
