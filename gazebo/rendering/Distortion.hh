@@ -21,6 +21,7 @@
 #include <sdf/sdf.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/math/Vector2d.hh"
 
 namespace gazebo
 {
@@ -55,7 +56,7 @@ namespace gazebo
       /// image points.
       /// \param[in] _crop True to crop the black border
       public: void SetCrop(bool _crop);
-      
+
       /// \brief Get the radial distortion coefficient k1.
       /// \return Distortion coefficient k1.
       public: double GetK1() const;
@@ -76,6 +77,11 @@ namespace gazebo
       /// \return Distortion coefficient p2.
       public: double GetP2() const;
 
+      /// \brief Get whether or not the camera is being cropped to
+      /// account for black borders created by barrel distortion.
+      /// \return Distortion crop vale.
+      public: bool GetCrop() const;
+
       /// \brief Get the distortion center.
       /// \return Distortion center.
       public: math::Vector2d GetCenter() const;
@@ -94,9 +100,11 @@ namespace gazebo
         double _p1, double _p2);
 
       /// \brief get the distortion map value.
-      /// \return the distortion map value at the specified index, or (-1, -1) if the index
+      /// \return the distortion map value at the specified index,
+      /// or (-1, -1) if the index
       /// is out of bounds.
-      protected: math::Vector2d GetDistortionMapValueClamped(int x, int y) const;
+      protected: math::Vector2d
+        GetDistortionMapValueClamped(int x, int y) const;
 
       /// \brief Distortion SDF values.
       protected: sdf::ElementPtr sdf;
@@ -104,7 +112,6 @@ namespace gazebo
       /// \internal
       /// \brief Pointer to private data.
       private: DistortionPrivate *dataPtr;
-
     };
     /// \}
   }

@@ -57,16 +57,27 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->p1 = this->sdf->Get<double>("p1");
   this->dataPtr->p2 = this->sdf->Get<double>("p2");
   this->dataPtr->lensCenter = this->sdf->Get<math::Vector2d>("center");
+
+  if (this->dataPtr->k1 < 0)
+  {
+    this->dataPtr->distortionCrop = true;
+  }
+  else
+  {
+    this->dataPtr->distortionCrop = false;
+  }
 }
 
 //////////////////////////////////////////////////
 math::Vector2d Distortion::GetDistortionMapValueClamped(int x, int y) const
 {
-  if(x < 0 || x >= (int)this->dataPtr->distortionTexWidth || y < 0 || y >= (int)this->dataPtr->distortionTexHeight)
+  if (x < 0 || x >= static_cast<int>(this->dataPtr->distortionTexWidth) ||
+      y < 0 || y >= static_cast<int>(this->dataPtr->distortionTexHeight))
   {
     return math::Vector2d(-1, -1);
   }
-  math::Vector2d res = this->dataPtr->distortionMap[y*this->dataPtr->distortionTexWidth+x];
+  math::Vector2d res =
+      this->dataPtr->distortionMap[y*this->dataPtr->distortionTexWidth+x];
   return res;
 }
 
@@ -79,16 +90,14 @@ void Distortion::SetCamera(CameraPtr _camera)
     return;
   }
 
-  if(this->dataPtr->k1 < 0) {
-    this->dataPtr->distortionCrop = true;
-  }
 
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
   this->dataPtr->distortionTexWidth = texSide+1;
   this->dataPtr->distortionTexHeight = texSide+1;
-  unsigned int imageSize = this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
+  unsigned int imageSize =
+      this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
   double incrU = 1.0 / this->dataPtr->distortionTexWidth;
   double incrV = 1.0 / this->dataPtr->distortionTexHeight;
 
@@ -115,7 +124,8 @@ void Distortion::SetCamera(CameraPtr _camera)
       unsigned int idxU = out.x * this->dataPtr->distortionTexWidth;
       unsigned int idxV = out.y * this->dataPtr->distortionTexHeight;
 
-      if (idxU < this->dataPtr->distortionTexWidth && idxV < this->dataPtr->distortionTexHeight)
+      if (idxU < this->dataPtr->distortionTexWidth &&
+          idxV < this->dataPtr->distortionTexHeight)
       {
         unsigned int mapIdx = idxV * this->dataPtr->distortionTexWidth + idxU;
         this->dataPtr->distortionMap[mapIdx] = uv;
@@ -173,55 +183,55 @@ void Distortion::SetCamera(CameraPtr _camera)
 
         math::Vector2d top_left = this->GetDistortionMapValueClamped(j-1, i-1);
         math::Vector2d top_right = this->GetDistortionMapValueClamped(j+1, i-1);
-        math::Vector2d bottom_left = this->GetDistortionMapValueClamped(j-1, i+1);
-        math::Vector2d bottom_right = this->GetDistortionMapValueClamped(j+1, i+1);
+        math::Vector2d bot_left = this->GetDistortionMapValueClamped(j-1, i+1);
+        math::Vector2d bot_right = this->GetDistortionMapValueClamped(j+1, i+1);
 
 
         math::Vector2d interpolated;
         double divisor = 0;
-        if(right.x > -0.5)
+        if (right.x > -0.5)
         {
           divisor++;
           interpolated += right;
         }
-        if(left.x > -0.5)
+        if (left.x > -0.5)
         {
           divisor++;
           interpolated += left;
         }
-        if(top.x > -0.5)
+        if (top.x > -0.5)
         {
           divisor++;
           interpolated += top;
         }
-        if(bottom.x > -0.5)
+        if (bottom.x > -0.5)
         {
           divisor++;
           interpolated += bottom;
         }
 
-        if(bottom_right.x > -0.5)
+        if (bot_right.x > -0.5)
         {
           divisor += 0.707;
-          interpolated += bottom_right * 0.707;
+          interpolated += bot_right * 0.707;
         }
-        if(bottom_left.x > -0.5)
+        if (bot_left.x > -0.5)
         {
           divisor += 0.707;
-          interpolated += bottom_left * 0.707;
+          interpolated += bot_left * 0.707;
         }
-        if(top_right.x > -0.5)
+        if (top_right.x > -0.5)
         {
           divisor += 0.707;
           interpolated += top_right * 0.707;
         }
-        if(top_left.x > -0.5)
+        if (top_left.x > -0.5)
         {
           divisor += 0.707;
           interpolated += top_left * 0.707;
         }
 
-        if(divisor > 0.5)
+        if (divisor > 0.5)
         {
           interpolated /= divisor;
         }
@@ -238,7 +248,7 @@ void Distortion::SetCamera(CameraPtr _camera)
     }
   }
   pixelBuffer->unlock();
- 
+
   if (this->dataPtr->distortionCrop)
   {
     // I believe that if not used with a square distortion texture, this
@@ -326,6 +336,12 @@ double Distortion::GetP1() const
 double Distortion::GetP2() const
 {
   return this->dataPtr->p2;
+}
+
+//////////////////////////////////////////////////
+bool Distortion::GetCrop() const
+{
+  return this->dataPtr->distortionCrop;
 }
 
 //////////////////////////////////////////////////
