@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2017 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ using namespace gazebo;
 
 class Distortion_TEST : public RenderingFixture { };
 
-sdf::ElementPtr createDistortionSDFElement(double _k1, double _k2,
+sdf::ElementPtr CreateDistortionSDFElement(double _k1, double _k2,
     double _k3, double _p1, double _p2, double _cx, double _cy)
 {
   std::ostringstream newModelStr;
@@ -85,38 +85,35 @@ sdf::ElementPtr createDistortionSDFElement(double _k1, double _k2,
 TEST_F(Distortion_TEST, DistortionModelBasics)
 {
   Load("worlds/empty.world");
-  // gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  // ASSERT_TRUE(scene != NULL);
-  // rendering::CameraPtr camera = scene->CreateCamera("test_camera", false);
 
   rendering::Distortion distortion;
 
   // check the default crop behavior of the different distortion models
   // undistorted
-  distortion.Load(createDistortionSDFElement(0, 0, 0, 0, 0, 0.5, 0.5));
-  EXPECT_EQ(distortion.GetCrop(), false);
+  distortion.Load(CreateDistortionSDFElement(0, 0, 0, 0, 0, 0.5, 0.5));
+  EXPECT_EQ(distortion.Crop(), false);
 
   // barrel distortion
   distortion.Load(
-    createDistortionSDFElement(-0.1, -0.05, -0.01, 0, 0, 0.5, 0.5));
-  EXPECT_EQ(distortion.GetCrop(), true);
+    CreateDistortionSDFElement(-0.1, -0.05, -0.01, 0, 0, 0.5, 0.5));
+  EXPECT_EQ(distortion.Crop(), true);
 
   // pincushion distortion
-  distortion.Load(createDistortionSDFElement(0.1, 0.05, 0.01, 0, 0, 0.5, 0.5));
-  EXPECT_EQ(distortion.GetCrop(), false);
+  distortion.Load(CreateDistortionSDFElement(0.1, 0.05, 0.01, 0, 0, 0.5, 0.5));
+  EXPECT_EQ(distortion.Crop(), false);
 
   // getters and setters
   distortion.SetCrop(false);
-  EXPECT_EQ(distortion.GetCrop(), false);
+  EXPECT_EQ(distortion.Crop(), false);
   distortion.SetCrop(true);
-  EXPECT_EQ(distortion.GetCrop(), true);
+  EXPECT_EQ(distortion.Crop(), true);
   EXPECT_DOUBLE_EQ(distortion.GetK1(), 0.1);
   EXPECT_DOUBLE_EQ(distortion.GetK2(), 0.05);
   EXPECT_DOUBLE_EQ(distortion.GetK3(), 0.01);
   EXPECT_DOUBLE_EQ(distortion.GetP1(), 0.0);
   EXPECT_DOUBLE_EQ(distortion.GetP2(), 0.0);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().x, 0.5);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().y, 0.5);
+  EXPECT_DOUBLE_EQ(distortion.GetCenter().X(), 0.5);
+  EXPECT_DOUBLE_EQ(distortion.GetCenter().Y(), 0.5);
 }
 
 int main(int argc, char **argv)
