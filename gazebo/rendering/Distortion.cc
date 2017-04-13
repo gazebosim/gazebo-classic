@@ -76,7 +76,7 @@ ignition::math::Vector2d
   if (x < 0 || x >= static_cast<int>(this->dataPtr->distortionTexWidth) ||
       y < 0 || y >= static_cast<int>(this->dataPtr->distortionTexHeight))
   {
-    return ignition::math::Vector2d();
+    return ignition::math::Vector2d(-1, -1);
   }
   ignition::math::Vector2d res =
       this->dataPtr->distortionMap[y*this->dataPtr->distortionTexWidth+x];
@@ -95,8 +95,8 @@ void Distortion::SetCamera(CameraPtr _camera)
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
-  this->dataPtr->distortionTexWidth = texSide + 1;
-  this->dataPtr->distortionTexHeight = texSide + 1;
+  this->dataPtr->distortionTexWidth = texSide - 1;
+  this->dataPtr->distortionTexHeight = texSide - 1;
   unsigned int imageSize =
       this->dataPtr->distortionTexWidth * this->dataPtr->distortionTexHeight;
   double incrU = 1.0 / this->dataPtr->distortionTexWidth;

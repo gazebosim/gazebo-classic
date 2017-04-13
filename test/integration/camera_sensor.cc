@@ -39,9 +39,11 @@ std::mutex mutex;
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
 unsigned char* img3 = NULL;
+unsigned char* img4 = NULL;
 int imageCount = 0;
 int imageCount2 = 0;
 int imageCount3 = 0;
+int imageCount4 = 0;
 std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
@@ -580,9 +582,14 @@ TEST_F(CameraSensor, CheckDistortion)
     return;
   }
 
-  // Spawn two cameras in the same location, one with noise and one without.
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
+  // Spawn 4 cameras. One has no distortion.
+  // The second has distortion, but all the distortion parameters are set to 0.
+  // The third has barrel (negative k1) distortion.
+  // The fourth has pincushion (positive k1) distortion.
+  std::string modelNameUndistorted = "camera_model_undistorted";
+  std::string cameraNameUndistorted = "camera_sensor_undistorted";
+  std::string modelNameFlat = "camera_model_flat";
+  std::string cameraNameFlat = "camera_sensor_flat";
   std::string modelNameBarrel = "camera_model_barrel";
   std::string cameraNameBarrel = "camera_sensor_barrel";
   std::string modelNamePincushion = "camera_model_pincushion";
@@ -590,38 +597,57 @@ TEST_F(CameraSensor, CheckDistortion)
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 10;
-
   math::Pose setPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.pos,
+
+  // spawn an undistorted camera
+  SpawnCamera(modelNameUndistorted, cameraNameUndistorted, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate);
+  // spawn a flat camera
+  SpawnCamera(modelNameFlat, cameraNameFlat, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate,
+      "", 0, 0, true, 0, 0, 0, 0, 0, 0.5, 0.5);
   // spawn a camera with barrel distortion
   SpawnCamera(modelNameBarrel, cameraNameBarrel, setPose.pos,
       setPose.rot.GetAsEuler(), width, height, updateRate,
-      "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  sensor = sensors::get_sensor(cameraNameBarrel);
+      "", 0, 0, true, -0.1349, -0.51868, -0.001, 0, 0, 0.5, 0.5);
+  // spawn a camera with pincushion distortion
+  SpawnCamera(modelNamePincushion, cameraNamePincushion, setPose.pos,
+      setPose.rot.GetAsEuler(), width, height, updateRate,
+      "", 0, 0, true, 0.1349, 0.51868, 0.001, 0, 0, 0.5, 0.5);
+
+  sensors::SensorPtr sensorUndistorted =
+    sensors::get_sensor(cameraNameUndistorted);
+  sensors::CameraSensorPtr camSensorUndistorted =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorUndistorted);
+  sensors::SensorPtr sensorFlat =
+    sensors::get_sensor(cameraNameFlat);
+  sensors::CameraSensorPtr camSensorFlat =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorFlat);
+  sensors::SensorPtr sensorBarrel =
+      sensors::get_sensor(cameraNameBarrel);
   sensors::CameraSensorPtr camSensorBarrel =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  sensor = sensors::get_sensor(cameraNamePincushion);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrel);
+  sensors::SensorPtr sensorPincushion =
+      sensors::get_sensor(cameraNamePincushion);
   sensors::CameraSensorPtr camSensorPincushion =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushion);
 
   imageCount = 0;
   imageCount2 = 0;
   imageCount3 = 0;
+  imageCount4 = 0;
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
   img3 = new unsigned char[width * height*3];
+  img4 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->Camera()->ConnectNewImageFrame(
+    camSensorUndistorted->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensorBarrel->Camera()->ConnectNewImageFrame(
+    camSensorFlat->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount2, img2,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
@@ -630,28 +656,50 @@ TEST_F(CameraSensor, CheckDistortion)
         std::bind(&::OnNewCameraFrame, &imageCount3, img3,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c4 =
+    camSensorPincushion->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount4, img4,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
-  while (imageCount < 10 || imageCount2 < 10 || imageCount3 < 1)
+  while (imageCount < 10 || imageCount2 < 10 ||
+      imageCount3 < 10 || imageCount4 < 10)
+  {
     common::Time::MSleep(10);
+  }
 
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;
-  this->ImageCompare(img, img2, width, height, 3,
-                     diffMax, diffSum, diffAvg);
 
-  // We expect that there will be some non-zero difference between the two
-  // images.
+  // We expect that there will be some non-zero difference between the images.
+  // The flat-distortion camera will not be 100% the same as the original
+  // undistorted camera, because of slight blurring and interpolation caused
+  // by the distortion map. However, we want it to be as close as possible.
+
+  // this->ImageCompare(img, img2, width, height, 3,
+  //                    diffMax, diffSum, diffAvg);
+
+  this->ImageCompare(img, img3, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  this->ImageCompare(img, img4, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  this->ImageCompare(img3, img4, width, height, 3,
+                     diffMax, diffSum, diffAvg);
   EXPECT_NE(diffSum, 0u);
 
   // Compare colors. Barrel distorted image should have more darker pixels than
   // the original as the ground plane has been warped to occupy more of the
-  // image. The same be true for pincushion distortion (although different
-  // regions of the image are distorted, the ground plane area should increase
-  // in size).
+  // image. The same should be true for pincushion distortion, because the
+  // ground plane is still distorted to be larger - just different parts
+  // of the image are distorted.
   unsigned int colorSum = 0;
-  unsigned int colorSum2 = 0;
   unsigned int colorSum3 = 0;
+  unsigned int colorSum4 = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -660,22 +708,25 @@ TEST_F(CameraSensor, CheckDistortion)
       unsigned int g = img[(y*width*3)+1];
       unsigned int b = img[(y*width*3)+2];
       colorSum += r + g + b;
-      unsigned int r2 = img2[(y*width*3)];
-      unsigned int g2 = img2[(y*width*3)+1];
-      unsigned int b2 = img2[(y*width*3)+2];
-      colorSum2 += r2 + g2 + b2;
       unsigned int r3 = img3[(y*width*3)];
       unsigned int g3 = img3[(y*width*3)+1];
       unsigned int b3 = img3[(y*width*3)+2];
       colorSum3 += r3 + g3 + b3;
+      unsigned int r4 = img4[(y*width*3)];
+      unsigned int g4 = img4[(y*width*3)+1];
+      unsigned int b4 = img4[(y*width*3)+2];
+      colorSum4 += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSum, colorSum2);
+  gzmsg << "colorSum3: " << colorSum3 << ", colorSum4: " << colorSum4 << "\n";
+
   EXPECT_GT(colorSum, colorSum3);
+  EXPECT_GT(colorSum, colorSum4);
 
   delete[] img;
   delete[] img2;
-  delete[] img3;
+  // delete[] img3;
+  // delete[] img4;
 }
 
 int main(int argc, char **argv)
