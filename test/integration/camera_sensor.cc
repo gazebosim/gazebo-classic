@@ -718,15 +718,13 @@ TEST_F(CameraSensor, CheckDistortion)
       colorSum4 += r4 + g4 + b4;
     }
   }
-  gzmsg << "colorSum3: " << colorSum3 << ", colorSum4: " << colorSum4 << "\n";
-
   EXPECT_GT(colorSum, colorSum3);
   EXPECT_GT(colorSum, colorSum4);
 
   delete[] img;
   delete[] img2;
-  // delete[] img3;
-  // delete[] img4;
+  delete[] img3;
+  delete[] img4;
 }
 
 int main(int argc, char **argv)
