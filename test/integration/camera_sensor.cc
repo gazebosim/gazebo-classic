@@ -672,13 +672,13 @@ TEST_F(CameraSensor, CheckDistortion)
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;
 
-  // We expect that there will be some non-zero difference between the images.
-  // The flat-distortion camera will not be 100% the same as the original
-  // undistorted camera, because of slight blurring and interpolation caused
-  // by the distortion map. However, we want it to be as close as possible.
+  // We expect that there will be some non-zero difference between the images,
+  // except for the 0.0 distortion camera, which should return a completely
+  // identical camera to the one with no distortion tag in the SDF.
 
-  // this->ImageCompare(img, img2, width, height, 3,
-  //                    diffMax, diffSum, diffAvg);
+  this->ImageCompare(img, img2, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_EQ(diffSum, 0u);
 
   this->ImageCompare(img, img3, width, height, 3,
                      diffMax, diffSum, diffAvg);

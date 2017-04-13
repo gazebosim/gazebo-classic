@@ -92,6 +92,19 @@ void Distortion::SetCamera(CameraPtr _camera)
     return;
   }
 
+  // If no distortion is required, immediately return.
+  // Comparing doubles with 0.0 should be OK here, since presumably
+  // no calculations have been performed on them, however, it throws a
+  // compiler warning.
+  if (this->dataPtr->k1 <= 1e-7 && this->dataPtr->k1 >= -1e-7 &&
+      this->dataPtr->k2 <= 1e-7 && this->dataPtr->k2 >= -1e-7 &&
+      this->dataPtr->k3 <= 1e-7 && this->dataPtr->k3 >= -1e-7 &&
+      this->dataPtr->p1 <= 1e-7 && this->dataPtr->p1 >= -1e-7 &&
+      this->dataPtr->p2 <= 1e-7 && this->dataPtr->p2 >= -1e-7)
+  {
+    return;
+  }
+
   // seems to work best with a square distortion map texture
   unsigned int texSide = _camera->ImageHeight() > _camera->ImageWidth() ?
       _camera->ImageHeight() : _camera->ImageWidth();
