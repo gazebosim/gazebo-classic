@@ -1,3 +1,4 @@
+<?xml version="1.0" ?>
 <sdf version='1.6'>
   <world name='default'>
     <include>
@@ -7,48 +8,62 @@
       <uri>model://ground_plane</uri>
     </include>
     <gravity>0 1 -9.81</gravity>
-    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
-    <atmosphere type='adiabatic'/>
-    <physics name='default_physics' default='0' type='ode'>
-      <max_step_size>0.001</max_step_size>
-      <real_time_factor>1</real_time_factor>
-      <real_time_update_rate>1000</real_time_update_rate>
-    </physics>
-    <scene>
-      <ambient>0.4 0.4 0.4 1</ambient>
-      <background>0.7 0.7 0.7 1</background>
-      <shadows>1</shadows>
-    </scene>
-    <audio>
-      <device>default</device>
-    </audio>
-    <spherical_coordinates>
-      <surface_model>EARTH_WGS84</surface_model>
-      <latitude_deg>0</latitude_deg>
-      <longitude_deg>0</longitude_deg>
-      <elevation>0</elevation>
-      <heading_deg>0</heading_deg>
-    </spherical_coordinates>
+<%
+  # Test pyramid friction model
+  # Set asymmetric friction coefficients and friction direction
+  require 'matrix'
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+
+  # box dimensions
+  dx = 0.5
+  dy = dx
+  dz = 0.2
+
+  box = {}
+  box[:size] = Vector[dx, dy, dz]
+  box[:mass] = 1
+  box[:ixx] = box[:mass] / 12.0 * (dy**2 + dz**2)
+  box[:iyy] = box[:mass] / 12.0 * (dz**2 + dx**2)
+  box[:izz] = box[:mass] / 12.0 * (dx**2 + dy**2)
+  #boxes = {}
+  #boxes["ref"] = {:ixx => 0.97,  :iyy => 0.82,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 0"}
+  #boxes["x90"] = {:ixx => 0.97,  :iyy => 0.17,  :izz => 0.82,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "#{Math::PI/2} 0 0"}
+  #boxes["y90"] = {:ixx => 0.17,  :iyy => 0.82,  :izz => 0.97,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 #{Math::PI/2} 0"}
+  #boxes["z90"] = {:ixx => 0.82,  :iyy => 0.97,  :izz => 0.17,  :ixy => 0, :ixz => 0, :iyz => 0, :rpy => "0 0 #{Math::PI/2}"}
+  #boxes["x45"] = {:ixx => 0.97,  :iyy => 0.495, :izz => 0.495, :ixy => 0, :ixz => 0, :iyz => 0.325, :rpy => "#{-Math::PI/4} 0 0"}
+  #boxes["y45"] = {:ixx => 0.57,  :iyy => 0.82,  :izz => 0.57,  :ixy => 0, :ixz => -0.40, :iyz => 0, :rpy => "0 #{-Math::PI/4} 0"}
+  #boxes["z45"] = {:ixx => 0.895, :iyy => 0.895, :izz => 0.17,  :ixy => 0.075, :ixz => 0, :iyz => 0, :rpy => "0 0 #{-Math::PI/4}"}
+  #boxes.keys.each_with_index { |k,i|
+  #  rpy = boxes[k][:rpy]
+  #  ixx = boxes[k][:ixx]
+  #  iyy = boxes[k][:iyy]
+  #  izz = boxes[k][:izz]
+  #  ixy = boxes[k][:ixy]
+  #  ixz = boxes[k][:ixz]
+  #  iyz = boxes[k][:iyz]
+%>
     <model name='box_model0'>
       <pose frame=''>5 0 0.1 0 -0 0</pose>
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -77,7 +92,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -96,21 +111,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -139,7 +154,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -158,21 +173,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -201,7 +216,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -220,21 +235,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -263,7 +278,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -282,21 +297,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -325,7 +340,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -344,21 +359,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -387,7 +402,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -406,21 +421,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -449,7 +464,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -468,21 +483,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -511,7 +526,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -530,21 +545,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -573,7 +588,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -592,21 +607,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -635,7 +650,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -654,21 +669,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -697,7 +712,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -716,21 +731,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -759,7 +774,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -778,21 +793,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0.314159</pose>
@@ -821,7 +836,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -840,21 +855,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0.628319</pose>
@@ -883,7 +898,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -902,21 +917,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0.942478</pose>
@@ -945,7 +960,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -964,21 +979,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 1.25664</pose>
@@ -1007,7 +1022,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1026,21 +1041,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 1.5708</pose>
@@ -1069,7 +1084,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1088,21 +1103,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 1.88496</pose>
@@ -1131,7 +1146,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1150,21 +1165,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 2.19911</pose>
@@ -1193,7 +1208,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1212,21 +1227,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 2.51327</pose>
@@ -1255,7 +1270,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1274,21 +1289,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 2.82743</pose>
@@ -1317,7 +1332,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1336,21 +1351,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 3.14159</pose>
@@ -1379,7 +1394,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1398,21 +1413,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1441,7 +1456,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1460,21 +1475,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0.314159</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1503,7 +1518,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1522,21 +1537,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0.628319</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1565,7 +1580,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1584,21 +1599,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0.942478</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1627,7 +1642,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1646,21 +1661,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 1.25664</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1689,7 +1704,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1708,21 +1723,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 1.5708</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1751,7 +1766,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1770,21 +1785,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 1.88496</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1813,7 +1828,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1832,21 +1847,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 2.19911</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1875,7 +1890,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1894,21 +1909,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 2.51327</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1937,7 +1952,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -1956,21 +1971,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 2.82743</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -1999,7 +2014,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2018,21 +2033,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 3.14159</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2061,7 +2076,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2080,21 +2095,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2123,7 +2138,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2142,21 +2157,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2185,7 +2200,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2204,21 +2219,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2247,7 +2262,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2266,21 +2281,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2309,7 +2324,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2328,21 +2343,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2371,7 +2386,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2390,21 +2405,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2433,7 +2448,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2452,21 +2467,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2495,7 +2510,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2514,21 +2529,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2557,7 +2572,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2576,21 +2591,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2619,7 +2634,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2638,21 +2653,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2681,7 +2696,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
@@ -2700,21 +2715,21 @@
       <link name='link_1'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <inertial>
-          <mass>1</mass>
+          <mass><%= box[:mass] %></mass>
           <pose frame=''>0 0 0 0 -0 0</pose>
           <inertia>
-            <ixx>0.0241667</ixx>
+            <ixx><%= box[:ixx] %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>0.0241667</iyy>
+            <iyy><%= box[:iyy] %></iyy>
             <iyz>0</iyz>
-            <izz>0.0416667</izz>
+            <izz><%= box[:izz] %></izz>
           </inertia>
         </inertial>
         <collision name='collision'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <pose frame=''>0 0 0 0 -0 0</pose>
@@ -2743,7 +2758,7 @@
         <visual name='visual'>
           <geometry>
             <box>
-              <size>0.5 0.5 0.2</size>
+              <size><%= a_to_s(box[:size]) %></size>
             </box>
           </geometry>
           <material>
