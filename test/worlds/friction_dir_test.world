@@ -12,10 +12,8 @@
     <model name='box_model0'>
       <pose>5 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -31,7 +29,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -60,10 +57,8 @@
     <model name='box_model1'>
       <pose>4.75528 1.54509 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -79,7 +74,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -108,10 +102,8 @@
     <model name='box_model2'>
       <pose>4.04509 2.93893 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -127,7 +119,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -156,10 +147,8 @@
     <model name='box_model3'>
       <pose>2.93893 4.04509 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -175,7 +164,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -204,10 +192,8 @@
     <model name='box_model4'>
       <pose>1.54509 4.75528 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -223,7 +209,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -252,10 +237,8 @@
     <model name='box_model5'>
       <pose>0 5 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -271,7 +254,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -300,10 +282,8 @@
     <model name='box_model6'>
       <pose>-1.54509 4.75528 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -319,7 +299,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -348,10 +327,8 @@
     <model name='box_model7'>
       <pose>-2.93893 4.04509 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -367,7 +344,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -396,10 +372,8 @@
     <model name='box_model8'>
       <pose>-4.04509 2.93893 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -415,7 +389,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -444,10 +417,8 @@
     <model name='box_model9'>
       <pose>-4.75528 1.54509 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -463,7 +434,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -492,10 +462,8 @@
     <model name='box_model10'>
       <pose>-5 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -511,7 +479,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -540,10 +507,8 @@
     <model name='box_model11'>
       <pose>6 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -559,7 +524,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -588,10 +552,8 @@
     <model name='box_model12'>
       <pose>5.70634 1.8541 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -636,10 +598,8 @@
     <model name='box_model13'>
       <pose>4.8541 3.52671 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -684,10 +644,8 @@
     <model name='box_model14'>
       <pose>3.52671 4.8541 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -732,10 +690,8 @@
     <model name='box_model15'>
       <pose>1.8541 5.70634 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -780,10 +736,8 @@
     <model name='box_model16'>
       <pose>0 6 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -828,10 +782,8 @@
     <model name='box_model17'>
       <pose>-1.8541 5.70634 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -876,10 +828,8 @@
     <model name='box_model18'>
       <pose>-3.52671 4.8541 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -924,10 +874,8 @@
     <model name='box_model19'>
       <pose>-4.8541 3.52671 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -972,10 +920,8 @@
     <model name='box_model20'>
       <pose>-5.70634 1.8541 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1020,10 +966,8 @@
     <model name='box_model21'>
       <pose>-6 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1068,10 +1012,8 @@
     <model name='box_model22'>
       <pose>7 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1087,7 +1029,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1119,7 +1060,6 @@
         <pose>0 0 0 0 -0 0.314159</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1135,7 +1075,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1167,7 +1106,6 @@
         <pose>0 0 0 0 -0 0.628319</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1183,7 +1121,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1215,7 +1152,6 @@
         <pose>0 0 0 0 -0 0.942478</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1231,7 +1167,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1263,7 +1198,6 @@
         <pose>0 0 0 0 -0 1.25664</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1279,7 +1213,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1311,7 +1244,6 @@
         <pose>0 0 0 0 -0 1.5708</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1327,7 +1259,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1359,7 +1290,6 @@
         <pose>0 0 0 0 -0 1.88496</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1375,7 +1305,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1407,7 +1336,6 @@
         <pose>0 0 0 0 -0 2.19911</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1423,7 +1351,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1455,7 +1382,6 @@
         <pose>0 0 0 0 -0 2.51327</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1471,7 +1397,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1503,7 +1428,6 @@
         <pose>0 0 0 0 -0 2.82743</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1519,7 +1443,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1551,7 +1474,6 @@
         <pose>0 0 0 0 -0 3.14159</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1567,7 +1489,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1596,10 +1517,8 @@
     <model name='box_model33'>
       <pose>8 0 0.1 0 -0 0</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1615,7 +1534,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1644,10 +1562,8 @@
     <model name='box_model34'>
       <pose>7.60845 2.47214 0.1 0 -0 0.314159</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1663,7 +1579,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1692,10 +1607,8 @@
     <model name='box_model35'>
       <pose>6.47214 4.70228 0.1 0 -0 0.628319</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1711,7 +1624,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1740,10 +1652,8 @@
     <model name='box_model36'>
       <pose>4.70228 6.47214 0.1 0 -0 0.942478</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1759,7 +1669,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1788,10 +1697,8 @@
     <model name='box_model37'>
       <pose>2.47214 7.60845 0.1 0 -0 1.25664</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1807,7 +1714,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1836,10 +1742,8 @@
     <model name='box_model38'>
       <pose>0 8 0.1 0 -0 1.5708</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1855,7 +1759,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1884,10 +1787,8 @@
     <model name='box_model39'>
       <pose>-2.47214 7.60845 0.1 0 -0 1.88496</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1903,7 +1804,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1932,10 +1832,8 @@
     <model name='box_model40'>
       <pose>-4.70228 6.47214 0.1 0 -0 2.19911</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1951,7 +1849,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -1980,10 +1877,8 @@
     <model name='box_model41'>
       <pose>-6.47214 4.70228 0.1 0 -0 2.51327</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -1999,7 +1894,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -2028,10 +1922,8 @@
     <model name='box_model42'>
       <pose>-7.60845 2.47214 0.1 0 -0 2.82743</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -2047,7 +1939,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
@@ -2076,10 +1967,8 @@
     <model name='box_model43'>
       <pose>-8 0 0.1 0 -0 3.14159</pose>
       <link name='link_1'>
-        <pose>0 0 0 0 -0 0</pose>
         <inertial>
           <mass>1</mass>
-          <pose>0 0 0 0 -0 0</pose>
           <inertia>
             <ixx>0.02416666666666667</ixx>
             <ixy>0</ixy>
@@ -2095,7 +1984,6 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
-          <pose>0 0 0 0 -0 0</pose>
           <surface>
             <friction>
               <ode>
