@@ -118,6 +118,13 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
+  if (_sdf->HasElement("force_approximation_scaling_factor"))
+  {
+    sdf::ElementPtr sdfForceApprox = _sdf->GetElement("force_approximation_scaling_factor");
+
+    this->forceApproximationScalingFactor = sdfForceApprox->Get<double>();
+  }
+
   double period = this->world->GetPhysicsEngine()->GetMaxStepSize();
 
   this->kMag = period / this->characteristicTimeForWindRise;
@@ -126,8 +133,8 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   wind.SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          std::bind(&WindPlugin::OnUpdate, this));
+  // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  //         std::bind(&WindPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -182,6 +189,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 /////////////////////////////////////////////////
 void WindPlugin::OnUpdate()
 {
+  // Using the force on mass approximation
   // Get all the models
   physics::Model_V models = this->world->GetModels();
 
@@ -200,6 +208,7 @@ void WindPlugin::OnUpdate()
 
       // Add wind velocity as a force to the body
       link->AddRelativeForce(link->GetInertial()->GetMass() *
+          this->forceApproximationScalingFactor *
           (link->RelativeWindLinearVel() - link->GetRelativeLinearVel().Ign()));
     }
   }

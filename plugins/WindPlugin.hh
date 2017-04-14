@@ -106,6 +106,9 @@ namespace gazebo
 
     /// \brief Noise added to Z axis
     private: sensors::NoisePtr noiseVertical;
+
+    /// \brief The scaling factor to approximate wind as force on a mass.
+    private: double forceApproximationScalingFactor = 0;
   };
 }
 
