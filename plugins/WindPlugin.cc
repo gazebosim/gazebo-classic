@@ -111,12 +111,6 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   {
     sdf::ElementPtr sdfVert = _sdf->GetElement("vertical");
 
-    if (sdfVert->HasElement("time_for_rise"))
-    {
-      this->characteristicTimeForWindRiseVertical =
-        sdfVert->Get<double>("time_for_rise");
-    }
-
     if (sdfVert->HasElement("noise"))
     {
       this->noiseVertical = sensors::NoiseFactory::NewNoiseModel(
@@ -124,24 +118,16 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
-  if (_sdf->HasElement("force_approximation_scaling_factor"))
-  {
-    sdf::ElementPtr sdfForceApprox = _sdf->GetElement("force_approximation_scaling_factor");
-
-    this->forceApproximationScalingFactor = sdfForceApprox->Get<double>();
-  }
-
   double period = this->world->GetPhysicsEngine()->GetMaxStepSize();
 
   this->kMag = period / this->characteristicTimeForWindRise;
-  this->kMagVertical = period / this->characteristicTimeForWindRiseVertical;
   this->kDir = period / this->characteristicTimeForWindOrientationChange;
 
   wind.SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
-  // this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-  //         std::bind(&WindPlugin::OnUpdate, this));
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+          std::bind(&WindPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -150,14 +136,10 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 {
   // Compute magnitude
   this->magnitudeMean = (1. - this->kMag) * this->magnitudeMean +
-      this->kMag * sqrt(_wind->LinearVel().X() * _wind->LinearVel().X() +
-                        _wind->LinearVel().Y() * _wind->LinearVel().Y());
+      this->kMag * _wind->LinearVel().Length();
+
   double magnitude = this->magnitudeMean;
 
-  // Compute magnitude
-  this->magnitudeMeanVertical = (1. - this->kMagVertical) * this->magnitudeMeanVertical +
-      this->kMagVertical * _wind->LinearVel().Z();
-  
   magnitude += this->magnitudeSinAmplitudePercent * this->magnitudeMean *
     sin(2 * M_PI * this->world->GetSimTime().Double() /
         this->magnitudeSinPeriod);
@@ -190,9 +172,9 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   windVel.Y(magnitude * sin(GZ_DTOR(direction)));
 
   if (this->noiseVertical)
-    windVel.Z(noiseVertical->Apply(this->magnitudeMeanVertical));
+    windVel.Z(noiseVertical->Apply(this->magnitudeMean));
   else
-    windVel.Z(this->magnitudeMeanVertical);
+    windVel.Z(this->magnitudeMean);
 
   return windVel;
 }
@@ -224,7 +206,6 @@ void WindPlugin::OnUpdate()
 
       // Add wind velocity as a force to the body
       link->AddRelativeForce(link->GetInertial()->GetMass() *
-          this->forceApproximationScalingFactor *
           (link->RelativeWindLinearVel() - link->GetRelativeLinearVel().Ign()));
     }
   }
