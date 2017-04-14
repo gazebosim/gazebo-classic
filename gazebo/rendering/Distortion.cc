@@ -134,7 +134,7 @@ void Distortion::SetCamera(CameraPtr _camera)
           uv,
           this->dataPtr->lensCenter,
           this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-          this->dataPtr->p1, this->dataPtr->p2);
+          this->dataPtr->p1, this->dataPtr->p2).Ign();
 
       // compute the index in the distortion map
       unsigned int idxU = out.X() * this->dataPtr->distortionTexWidth;
@@ -279,12 +279,12 @@ void Distortion::SetCamera(CameraPtr _camera)
         ignition::math::Vector2d(0, 0),
         this->dataPtr->lensCenter,
         this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-        this->dataPtr->p1, this->dataPtr->p2);
+        this->dataPtr->p1, this->dataPtr->p2).Ign();
     ignition::math::Vector2d boundB = this->Distort(
         ignition::math::Vector2d(1, 1),
         this->dataPtr->lensCenter,
         this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-        this->dataPtr->p1, this->dataPtr->p2);
+        this->dataPtr->p1, this->dataPtr->p2).Ign();
     this->dataPtr->distortionScale = boundB - boundA;
 
     // Both invalid: scale very close to 0 OR negative scale
@@ -318,15 +318,15 @@ void Distortion::SetCamera(CameraPtr _camera)
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector2d Distortion::Distort(
-    const ignition::math::Vector2d &_in,
-    const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
+math::Vector2d Distortion::Distort(
+    const math::Vector2d &_in,
+    const math::Vector2d &_center, double _k1, double _k2, double _k3,
     double _p1, double _p2)
 {
   // apply Brown's distortion model, see
   // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
 
-  ignition::math::Vector2d normalized2d = _in - _center;
+  ignition::math::Vector2d normalized2d = (_in - _center).Ign();
   ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
   double rSq = normalized.X() * normalized.X()
       + normalized.Y() * normalized.Y();
@@ -343,7 +343,7 @@ ignition::math::Vector2d Distortion::Distort(
   dist.Y() += _p1 * (rSq + 2 * (normalized.Y()*normalized.Y())) +
       2 * _p2 * normalized.X() * normalized.Y();
   ignition::math::Vector2d out =
-      _center + ignition::math::Vector2d(dist.X(), dist.Y());
+      _center.Ign() + ignition::math::Vector2d(dist.X(), dist.Y());
 
   return out;
 }
@@ -391,7 +391,7 @@ bool Distortion::Crop() const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector2d Distortion::GetCenter() const
+math::Vector2d Distortion::GetCenter() const
 {
   return this->dataPtr->lensCenter;
 }

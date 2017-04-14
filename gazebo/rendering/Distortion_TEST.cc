@@ -112,8 +112,8 @@ TEST_F(Distortion_TEST, DistortionModelBasics)
   EXPECT_DOUBLE_EQ(distortion.GetK3(), 0.01);
   EXPECT_DOUBLE_EQ(distortion.GetP1(), 0.0);
   EXPECT_DOUBLE_EQ(distortion.GetP2(), 0.0);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().X(), 0.5);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().Y(), 0.5);
+  EXPECT_DOUBLE_EQ(distortion.GetCenter().Ign().X(), 0.5);
+  EXPECT_DOUBLE_EQ(distortion.GetCenter().Ign().Y(), 0.5);
 }
 
 int main(int argc, char **argv)

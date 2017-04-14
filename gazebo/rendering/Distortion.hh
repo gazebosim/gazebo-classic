@@ -84,7 +84,7 @@ namespace gazebo
 
       /// \brief Get the distortion center.
       /// \return Distortion center.
-      public: ignition::math::Vector2d GetCenter() const;
+      public: math::Vector2d GetCenter() const;
 
       /// \brief Apply distortion model
       /// \param[in] _in Input uv coordinate.
@@ -95,9 +95,9 @@ namespace gazebo
       /// \param[in] _p1 Tangential distortion coefficient p1.
       /// \param[in] _p2 Tangential distortion coefficient p2.
       /// \return Distorted coordinate.
-      public: static ignition::math::Vector2d Distort(
-        const ignition::math::Vector2d &_in,
-        const ignition::math::Vector2d &_center, double _k1, double _k2,
+      public: static math::Vector2d Distort(
+        const math::Vector2d &_in,
+        const math::Vector2d &_center, double _k1, double _k2,
         double _k3, double _p1, double _p2);
 
       /// \brief get the distortion map value.
