@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+#include <cmath>
+#include <string>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -396,7 +397,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/friction_dir_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -406,50 +407,24 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set the gravity vector
-  math::Vector3 g(0.0, 1.0, -9.81);
-  physics->SetGravity(g);
+  ignition::math::Vector3d g(0.0, 1.0, -9.81);
+  world->SetGravity(g);
 
-  // Spawn concentric semi-circles of boxes
-  int boxes = 10;
-  double dx = 0.5;
-  double dy = 0.5;
-  double dz = 0.2;
+  // Pointers and location of concentric semi-circles of boxes
   std::map<physics::ModelPtr, double> modelAngles;
 
-  for (int ring = 0; ring < 4; ++ring)
+  auto models = world->GetModels();
+  for (auto model : models)
   {
-    gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
-    for (int i = 0; i <= boxes; ++i)
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
     {
-      // Set box size and anisotropic friction
-      SpawnFrictionBoxOptions opt;
-      opt.size.Set(dx, dy, dz);
-      opt.friction1 = 100.0;
-      opt.friction2 = 0.0;
-
-      // Compute angle for each box
-      double radius = 5.0 + ring;
-      double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
-
-      if (ring == 0)
-        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
-      else
-        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
-
-      if (ring == 1)
-        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 2)
-        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 3)
-        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
-
-      physics::ModelPtr model = SpawnBox(opt);
-      ASSERT_TRUE(model != NULL);
-      modelAngles[model] = angle;
+      continue;
     }
+    auto pos = model->GetWorldPose().Ign().Pos();
+    double angle = std::atan2(pos.Y(), pos.X());
+    modelAngles[model] = angle;
   }
 
   // Step forward
@@ -462,10 +437,10 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    double velMag = g.y * sinAngle * t;
-    math::Vector3 vel = iter->first->GetWorldLinearVel();
-    EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
-    EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
+    double velMag = g.Y() * sinAngle * t;
+    ignition::math::Vector3d vel = iter->first->GetWorldLinearVel().Ign();
+    EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
+    EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
   }
 }
 
