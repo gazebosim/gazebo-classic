@@ -161,7 +161,8 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  math::Vector3 vel = this->link->GetWorldLinearVel(this->cp);
+  math::Vector3 link_vel = this->link->GetWorldLinearVel(this->cp);
+  math::Vector3 vel = link_vel - this->link->WorldWindLinearVel();
   math::Vector3 velI = vel;
   velI.Normalize();
 
@@ -170,6 +171,7 @@ void LiftDragPlugin::OnUpdate()
   // this->velSmooth = e*vel + (1.0 - e)*velSmooth;
   // vel = this->velSmooth;
 
+  // skip out if no velocity
   if (vel.GetLength() <= 0.01)
     return;
 
@@ -365,8 +367,11 @@ void LiftDragPlugin::OnUpdate()
     gzdbg << "Link: [" << this->link->GetName()
           << "] pose: [" << pose
           << "] dynamic pressure: [" << q << "]\n";
-    gzdbg << "spd: [" << vel.GetLength()
+    gzdbg << "link spd: [" << link_vel.GetLength()
+          << "] vel: [" << link_vel << "]\n";
+    gzdbg << "air spd: [" << vel.GetLength()
           << "] vel: [" << vel << "]\n";
+    gzdbg << "world wind vel: [" << this->link->WorldWindLinearVel() << "]\n";
     gzdbg << "LD plane spd: [" << velInLDPlane.GetLength()
           << "] vel : [" << velInLDPlane << "]\n";
     gzdbg << "forward (inertial): " << forwardI << "\n";
