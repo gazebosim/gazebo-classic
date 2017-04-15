@@ -189,5 +189,71 @@ void ViewControlTest::MouseZoomModelEditor()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ViewControlTest::MouseZoomTerrain()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/heightmap.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  std::string boxName = "box4";
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  gazebo::rendering::VisualPtr boxVis = scene->GetVisual(boxName);
+  QVERIFY(boxVis != nullptr);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  // move camera so that it faces the box but partially occluded by terrain
+  cam->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(62.93, -64.88, 9.67),
+      ignition::math::Vector3d(0, -0.5, 1.57)));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // make sure the box is visible and not completely occluded
+  QVERIFY(cam->IsVisible(boxVis));
+  ignition::math::Pose3d boxPt =
+      ignition::math::Pose3d(0.0, -0.5, 0.45, 0.0, 0.0, 0.0) +
+      boxVis->GetWorldPose().Ign();
+  auto vis = cam->GetVisual(cam->Project(boxPt.Pos()));
+  QVERIFY(vis != nullptr);
+  QCOMPARE(vis->GetRootVisual(), boxVis);
+
+  // zoom in. It should not zoom pass the terrain.
+  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  MouseZoom(glWidget);
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Make sure the box is still in the frustum but it should now be
+  // completely occluded.
+  QVERIFY(cam->IsVisible(boxVis));
+  vis = cam->GetVisual(cam->Project(boxPt.Pos()));
+  QVERIFY(vis == nullptr);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ViewControlTest)
