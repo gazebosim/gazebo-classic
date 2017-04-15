@@ -17,6 +17,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
@@ -96,11 +98,11 @@ void Distortion::SetCamera(CameraPtr _camera)
   // Comparing doubles with 0.0 should be OK here, since presumably
   // no calculations have been performed on them, however, it throws a
   // compiler warning.
-  if (this->dataPtr->k1 <= 1e-7 && this->dataPtr->k1 >= -1e-7 &&
-      this->dataPtr->k2 <= 1e-7 && this->dataPtr->k2 >= -1e-7 &&
-      this->dataPtr->k3 <= 1e-7 && this->dataPtr->k3 >= -1e-7 &&
-      this->dataPtr->p1 <= 1e-7 && this->dataPtr->p1 >= -1e-7 &&
-      this->dataPtr->p2 <= 1e-7 && this->dataPtr->p2 >= -1e-7)
+  if (ignition::math::equal(this->dataPtr->k1, 0.0) &&
+      ignition::math::equal(this->dataPtr->k2, 0.0) &&
+      ignition::math::equal(this->dataPtr->k3, 0.0) &&
+      ignition::math::equal(this->dataPtr->p1, 0.0) &&
+      ignition::math::equal(this->dataPtr->p2, 0.0))
   {
     return;
   }
