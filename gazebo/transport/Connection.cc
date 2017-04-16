@@ -25,10 +25,8 @@
   // Type used for raw data on this platform.
   typedef char raw_type;
   // snprintf is available since VS 2015 
-  #ifdef _MSC_VER 
-    #if _MSC_VER < 1800
-      #define snprintf _snprintf
-    #endif 
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    #define snprintf _snprintf 
   #endif
 #else
   // For data types
