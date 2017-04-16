@@ -63,7 +63,7 @@
 
 /* Visual C does not define these functions */
 #if defined(_MSC_VER)
-  #if _MSC_VER < 1800
+  #if _MSC_VER < 1900
     #define copysignf(x, y) ((float)_copysign(x, y))
     #define copysign(x, y) _copysign(x, y)
     #define nextafterf(x, y) _nextafterf(x, y)
