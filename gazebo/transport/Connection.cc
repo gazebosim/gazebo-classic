@@ -26,7 +26,7 @@
   typedef char raw_type;
   // snprintf is available since VS 2015 
   #if defined(_MSC_VER) && (_MSC_VER < 1900)
-    #define snprintf _snprintf 
+    #define snprintf _snprintf
   #endif
 #else
   // For data types
