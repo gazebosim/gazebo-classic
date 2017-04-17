@@ -1279,8 +1279,11 @@ bool Scene::FirstContact(CameraPtr _camera,
         catch(Ogre::Exception &e)
         {
           gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-          return false;
+          continue;
         }
+        if (!vis)
+          continue;
+
         RayQuery rayQuery(_camera);
         math::Vector3 intersect;
         std::vector<math::Vector3> vertices;
