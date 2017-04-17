@@ -335,6 +335,7 @@ void Link::ResetPhysicsStates()
   // deprecated commented
   // this->SetAngularAccel(ignition::math::Vector3d::Zero);
   // this->SetLinearAccel(ignition::math::Vector3d::Zero);
+  gzwarn << "Link::SetAngularAccel()/Link::SetLinearAccel() are deprecated \n";
   this->SetForce(ignition::math::Vector3d::Zero);
   this->SetTorque(ignition::math::Vector3d::Zero);
 }
@@ -642,6 +643,7 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 //////////////////////////////////////////////////
 void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Link::SetLinearAccel() is deprecated \n";
   this->SetEnabled(true);
   this->linearAccel = _accel;
 }
@@ -649,6 +651,7 @@ void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
 //////////////////////////////////////////////////
 void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Link::SetAngularAccel() is deprecated \n";
   this->SetEnabled(true);
   this->angularAccel = _accel;
 }
@@ -1082,6 +1085,7 @@ void Link::SetState(const LinkState &_state)
   // deprecated commented
   // this->SetLinearAccel(_state.Acceleration().Pos());
   // this->SetAngularAccel(_state.Acceleration().Rot().Euler());
+  gzwarn << "Link::SetAngularAccel()/Link::SetLinearAccel() are deprecated \n";
   this->SetForce(_state.Wrench().Pos());
   this->SetTorque(_state.Wrench().Rot().Euler());
 
