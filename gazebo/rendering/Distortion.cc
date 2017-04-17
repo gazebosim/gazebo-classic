@@ -95,9 +95,6 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
 
   // If no distortion is required, immediately return.
-  // Comparing doubles with 0.0 should be OK here, since presumably
-  // no calculations have been performed on them, however, it throws a
-  // compiler warning.
   if (ignition::math::equal(this->dataPtr->k1, 0.0) &&
       ignition::math::equal(this->dataPtr->k2, 0.0) &&
       ignition::math::equal(this->dataPtr->k3, 0.0) &&
