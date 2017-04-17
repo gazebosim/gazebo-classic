@@ -479,6 +479,34 @@ const float* GpuLaser::LaserData() const
   return this->dataPtr->laserBuffer;
 }
 
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataBegin() const
+{
+  const unsigned int index = 0;
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataEnd() const
+{
+  const unsigned int index = this->ImageHeight() * this->ImageWidth();
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
+}
+
 /////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {

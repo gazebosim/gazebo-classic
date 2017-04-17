@@ -344,6 +344,9 @@ namespace gazebo
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
 
+      /// \brief Size of shadow texture
+      public: unsigned int shadowTextureSize = 1024u;
+
       /// \brief Manager of marker visuals
       public: MarkerManager markerManager;
 
