@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Fix orbiting view around heightmap
+    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
+
 1. Added <collide_bitmask> support to bullet
     * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
 
