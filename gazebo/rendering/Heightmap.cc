@@ -50,7 +50,6 @@
 using namespace gazebo;
 using namespace rendering;
 
-const unsigned int HeightmapPrivate::numTerrainSubdivisions = 16;
 const double HeightmapPrivate::loadRadiusFactor = 1.0;
 const double HeightmapPrivate::holdRadiusFactor = 1.15;
 const boost::filesystem::path HeightmapPrivate::pagingDirname = "paging";
@@ -526,11 +525,27 @@ void Heightmap::Load()
   // If the paging is enabled we modify the number of subterrains
   if (this->dataPtr->useTerrainPaging)
   {
+    this->dataPtr->splitTerrain = true;
     nTerrains = this->dataPtr->numTerrainSubdivisions;
     prefix = terrainDirPath / "gazebo_terrain_cache";
   }
   else
   {
+    // Note: ran into problems with LOD height glitches if heightmap size is
+    // larger than 4096 so split it into chunks
+    // Note: dataSize should be 2^n + 1
+    if (this->dataPtr->maxPixelError > 0 && this->dataPtr->dataSize > 4096u)
+    {
+      this->dataPtr->splitTerrain = true;
+      if (this->dataPtr->dataSize == 4097u)
+        this->dataPtr->numTerrainSubdivisions = 4u;
+      else
+        this->dataPtr->numTerrainSubdivisions = 16u;
+     nTerrains = this->dataPtr->numTerrainSubdivisions;
+
+      gzmsg << "Large heightmap used with LOD. It will be subdivided into " <<
+          this->dataPtr->numTerrainSubdivisions << " terrains." << std::endl;
+    }
     prefix = terrainDirPath / "gazebo_terrain";
   }
 
@@ -560,9 +575,6 @@ void Heightmap::Load()
 
   this->dataPtr->terrainGroup->setOrigin(Conversions::Convert(origin));
   this->ConfigureTerrainDefaults();
-
-  // use gazebo shaders
-  this->CreateMaterial();
 
   if (!this->dataPtr->heights.empty())
   {
@@ -633,6 +645,9 @@ void Heightmap::Load()
   for (int y = 0; y <= sqrtN - 1; ++y)
     for (int x = 0; x <= sqrtN - 1; ++x)
       this->DefineTerrain(x, y);
+
+  // use gazebo shaders
+  this->CreateMaterial();
 
   // Sync load since we want everything in place when we start
   this->dataPtr->terrainGroup->loadAllTerrains(true);
@@ -778,27 +793,32 @@ void Heightmap::ConfigureTerrainDefaults()
 /////////////////////////////////////////////////
 void Heightmap::SetWireframe(const bool _show)
 {
-  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
-  GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
-
-  Ogre::Material *material = terrain->getMaterial().get();
-
-  unsigned int techniqueCount, passCount;
-  Ogre::Technique *technique;
-  Ogre::Pass *pass;
-
-  for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-      techniqueCount++)
+  Ogre::TerrainGroup::TerrainIterator ti =
+    this->dataPtr->terrainGroup->getTerrainIterator();
+  while (ti.hasMoreElements())
   {
-    technique = material->getTechnique(techniqueCount);
+    Ogre::Terrain *terrain = ti.getNext()->instance;
+    GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
 
-    for (passCount = 0; passCount < technique->getNumPasses(); passCount++)
+    Ogre::Material *material = terrain->getMaterial().get();
+
+    unsigned int techniqueCount, passCount;
+    Ogre::Technique *technique;
+    Ogre::Pass *pass;
+
+    for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+         ++techniqueCount)
     {
-      pass = technique->getPass(passCount);
-      if (_show)
-        pass->setPolygonMode(Ogre::PM_WIREFRAME);
-      else
-        pass->setPolygonMode(Ogre::PM_SOLID);
+      technique = material->getTechnique(techniqueCount);
+
+      for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
+      {
+        pass = technique->getPass(passCount);
+        if (_show)
+          pass->setPolygonMode(Ogre::PM_WIREFRAME);
+        else
+          pass->setPolygonMode(Ogre::PM_SOLID);
+      }
     }
   }
 }
@@ -812,29 +832,16 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
       Ogre::ResourceGroupManager::getSingleton().resourceExists(
       this->dataPtr->terrainGroup->getResourceGroup(), filename);
 
-  if (!this->dataPtr->useTerrainPaging)
+  if (resourceExists && !this->dataPtr->terrainHashChanged)
   {
-    if (resourceExists && !this->dataPtr->terrainHashChanged)
-    {
-      gzmsg << "Loading heightmap cache data: " << filename << std::endl;
+    gzmsg << "Loading heightmap cache data: " << filename << std::endl;
 
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
-      this->dataPtr->terrainsImported = false;
-    }
-    else
-    {
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
-          &this->dataPtr->heights[0]);
-    }
+    this->dataPtr->terrainGroup->defineTerrain(_x, _y);
+    this->dataPtr->terrainsImported = false;
   }
   else
   {
-    if (resourceExists && !this->dataPtr->terrainHashChanged)
-    {
-      this->dataPtr->terrainGroup->defineTerrain(_x, _y);
-      this->dataPtr->terrainsImported = false;
-    }
-    else
+    if (this->dataPtr->splitTerrain)
     {
       // generate the subterrains if needed
       if (this->dataPtr->subTerrains.empty())
@@ -847,6 +854,11 @@ void Heightmap::DefineTerrain(const int _x, const int _y)
       this->dataPtr->terrainGroup->defineTerrain(_x, _y,
           &this->dataPtr->subTerrains[this->dataPtr->terrainIdx][0]);
       ++this->dataPtr->terrainIdx;
+    }
+    else
+    {
+      this->dataPtr->terrainGroup->defineTerrain(_x, _y,
+          &this->dataPtr->heights[0]);
     }
   }
 }
@@ -1257,6 +1269,8 @@ void Heightmap::CreateMaterial()
     Ogre::TerrainMaterialGeneratorPtr terrainMaterialGenerator;
     TerrainMaterial *terrainMaterial = OGRE_NEW TerrainMaterial(
         this->dataPtr->materialName);
+    if (this->dataPtr->splitTerrain)
+      terrainMaterial->setGridSize(this->dataPtr->numTerrainSubdivisions);
     terrainMaterialGenerator.bind(terrainMaterial);
     this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
         terrainMaterialGenerator);
@@ -3242,6 +3256,18 @@ void TerrainMaterial::setMaterialByName(const std::string &_materialname)
 }
 
 //////////////////////////////////////////////////
+void TerrainMaterial::setGridSize(const unsigned int _size)
+{
+  if (_size == 0)
+  {
+    gzerr << "Unable to set a grid size of zero" << std::endl;
+    return;
+  }
+
+  this->gridSize = _size;
+}
+
+//////////////////////////////////////////////////
 TerrainMaterial::Profile::Profile(Ogre::TerrainMaterialGenerator *_parent,
     const Ogre::String &_name, const Ogre::String &_desc)
     : Ogre::TerrainMaterialGenerator::Profile(_parent, _name, _desc)
@@ -3270,9 +3296,67 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
   if (!mat.isNull())
       Ogre::MaterialManager::getSingleton().remove(matName);
 
+  TerrainMaterial *parent =
+      dynamic_cast<TerrainMaterial *>(getParent());
+
   // Set Ogre material
-  mat = Ogre::MaterialManager::getSingleton().getByName(
-      (dynamic_cast<TerrainMaterial *>(getParent()))->materialName);
+  mat = Ogre::MaterialManager::getSingleton().getByName(parent->materialName);
+
+  // clone the material
+  mat = mat->clone(matName);
+  if (!mat->isLoaded())
+    mat->load();
+
+  // size of grid in one direction
+  unsigned int gridWidth =
+      static_cast<unsigned int>(std::sqrt(parent->gridSize));
+  // factor to be applied to uv transformation: scale and translation
+  double factor = 1.0 / gridWidth;
+  // static counter to keep track which terrain slot we are currently in
+  static int gridCount = 0;
+
+  for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *tech = mat->getTechnique(i);
+    for (unsigned int j = 0; j < tech->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = tech->getPass(j);
+
+      // check if there is a fragment shader
+      if (!pass->hasFragmentProgram())
+        continue;
+
+      Ogre::GpuProgramParametersSharedPtr params =
+          pass->getFragmentProgramParameters();
+      if (params.isNull())
+        continue;
+
+      // set up shadow split points in a way that is consistent with the
+      // default ogre terrain material generator
+      Ogre::PSSMShadowCameraSetup* pssm =
+          RTShaderSystem::Instance()->GetPSSMShadowCameraSetup();
+      unsigned int numTextures =
+          static_cast<unsigned int>(pssm->getSplitCount());
+      Ogre::Vector4 splitPoints;
+      const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
+          pssm->getSplitPoints();
+      // populate from split point 1 not 0
+      for (unsigned int t = 1u; t < numTextures; ++t)
+        splitPoints[t-1] = splitPointList[t];
+      params->setNamedConstant("pssmSplitPoints", splitPoints);
+
+      // set up uv transform
+      double xTrans = static_cast<int>(gridCount / gridWidth) * factor;
+      double yTrans = (gridWidth - 1 - (gridCount % gridWidth)) * factor;
+      // explicitly set all matrix elements to avoid uninitialized values
+      Ogre::Matrix4 uvTransform(factor, 0.0, 0.0, xTrans,
+                                0.0, factor, 0.0, yTrans,
+                                0.0, 0.0, 1.0, 0.0,
+                                0.0, 0.0, 0.0, 1.0);
+      params->setNamedConstant("uvTransform", uvTransform);
+    }
+  }
+  gridCount++;
 
   // Get default pass
   Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
@@ -3282,7 +3366,7 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
   Ogre::TextureUnitState *tu = p->createTextureUnitState(matName+"/nm");
 
   Ogre::TexturePtr nmtx = _terrain->getTerrainNormalMap();
-      tu->_setTexturePtr(nmtx);
+  tu->_setTexturePtr(nmtx);
 
   return mat;
 }
