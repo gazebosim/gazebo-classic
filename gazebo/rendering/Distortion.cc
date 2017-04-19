@@ -288,7 +288,7 @@ void Distortion::CalculateAndApplyDistortionScale()
 {
   if (!this->dataPtr->distortionMaterial.isNull())
   {
-    if (this->dataPtr->distortionCrop)
+    if (this->dataPtr->distortionCrop && this->dataPtr->k1 < 0)
     {
       // I believe that if not used with a square distortion texture, this
       // calculation will result in stretching of the final output image.
