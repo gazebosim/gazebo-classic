@@ -2,8 +2,14 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Added <collide_bitmask> support to bullet
+    * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
+
 1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
+
+1. Subdivide large heightmaps to fix LOD and support global texture mapping
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
 
 ## Gazebo 7.6.0 (2017-03-20)
 
