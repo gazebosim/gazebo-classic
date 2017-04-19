@@ -224,8 +224,10 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   }
   common::Time dt = _info.simTime - this->prevSimTime;
 
-  if (this->winchIndex < 0 ||
-      this->winchIndex >= static_cast<int>(this->joints.size()))
+  // store winchIndex in local variable since it can change in callback
+  int tmpWinchIndex = this->winchIndex;
+  if (tmpWinchIndex < 0 ||
+      tmpWinchIndex >= static_cast<int>(this->joints.size()))
   {
     if (this->detachIndex >= 0 &&
         this->detachIndex < static_cast<int>(this->joints.size()))
@@ -241,12 +243,12 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   if (ignition::math::equal(this->winchTargetVel, 0.0f))
   {
     // Calculate the position error if vel target is 0
-    pError = this->joints[this->winchIndex]->GetAngle(0).Radian() -
+    pError = this->joints[tmpWinchIndex]->GetAngle(0).Radian() -
       this->winchTargetPos;
   }
 
   // Calculate the velocity error
-  double vError = this->joints[this->winchIndex]->GetVelocity(0) -
+  double vError = this->joints[tmpWinchIndex]->GetVelocity(0) -
     this->winchTargetVel;
 
 
@@ -259,7 +261,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   winchVelForce = winchVelForce > 0? winchVelForce : 0.0;
 
   // Apply the joint force
-  this->joints[this->winchIndex]->SetForce(0, winchVelForce + winchPosForce);
+  this->joints[tmpWinchIndex]->SetForce(0, winchVelForce + winchPosForce);
 
   this->prevSimTime = _info.simTime;
 }
@@ -303,8 +305,10 @@ double HarnessPlugin::WinchVelocity() const
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
-  if (this->winchIndex < 0 ||
-      this->winchIndex >= static_cast<int>(this->joints.size()))
+  // store winchIndex in local variable since it can change in callback
+  int tmpWinchIndex = this->winchIndex;
+  if (tmpWinchIndex < 0 ||
+      tmpWinchIndex >= static_cast<int>(this->joints.size()))
   {
     gzerr << "No known winch joint to set velocity" << std::endl;
     return;
@@ -314,7 +318,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
   if (ignition::math::equal(_value, 0.0f))
   {
     // if zero velocity is commanded, hold position
-    this->winchTargetPos = this->joints[this->winchIndex]->GetAngle(0).Radian();
+    this->winchTargetPos = this->joints[tmpWinchIndex]->GetAngle(0).Radian();
     this->winchPosPID.Reset();
   }
 }
