@@ -39,7 +39,7 @@ Distortion::Distortion()
   this->dataPtr->p2 = 0;
   this->dataPtr->lensCenter = ignition::math::Vector2d(0.5, 0.5);
   this->dataPtr->distortionScale = ignition::math::Vector2d(1.0, 1.0);
-  this->dataPtr->distortionCrop = false;
+  this->dataPtr->distortionCrop = true;
 }
 
 //////////////////////////////////////////////////
@@ -152,11 +152,10 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
 
   // set up the distortion instance
-  Ogre::MaterialPtr distMat =
+  this->dataPtr->distortionMaterial =
       Ogre::MaterialManager::getSingleton().getByName(
-      "Gazebo/CameraDistortionMap");
-  distMat =
-      distMat->clone("Gazebo/" + _camera->Name() + "_CameraDistortionMap");
+          "Gazebo/CameraDistortionMap")->clone(
+              "Gazebo/" + _camera->Name() + "_CameraDistortionMap");
 
   // create the distortion map texture for the distortion instance
   std::string texName = _camera->Name() + "_distortionTex";
@@ -270,21 +269,45 @@ void Distortion::SetCamera(CameraPtr _camera)
   }
   pixelBuffer->unlock();
 
-  if (this->dataPtr->distortionCrop)
+  // set up the distortion map texture to be used in the pixel shader.
+  this->dataPtr->distortionMaterial->getTechnique(0)->getPass(0)->
+      createTextureUnitState(texName, 1);
+
+  this->dataPtr->lensDistortionInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(
+      _camera->OgreViewport(), "CameraDistortionMap/Default");
+  this->dataPtr->lensDistortionInstance->getTechnique()->getOutputTargetPass()->
+      getPass(0)->setMaterial(this->dataPtr->distortionMaterial);
+
+  this->CalculateAndApplyDistortionScale();
+
+  this->dataPtr->lensDistortionInstance->setEnabled(true);
+}
+
+void Distortion::CalculateAndApplyDistortionScale()
+{
+  if (!this->dataPtr->distortionMaterial.isNull())
   {
-    // I believe that if not used with a square distortion texture, this
-    // calculation will result in stretching of the final output image.
-    ignition::math::Vector2d boundA = this->Distort(
-        ignition::math::Vector2d(0, 0),
-        this->dataPtr->lensCenter,
-        this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-        this->dataPtr->p1, this->dataPtr->p2).Ign();
-    ignition::math::Vector2d boundB = this->Distort(
-        ignition::math::Vector2d(1, 1),
-        this->dataPtr->lensCenter,
-        this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-        this->dataPtr->p1, this->dataPtr->p2).Ign();
-    this->dataPtr->distortionScale = boundB - boundA;
+    if (this->dataPtr->distortionCrop)
+    {
+      // I believe that if not used with a square distortion texture, this
+      // calculation will result in stretching of the final output image.
+      ignition::math::Vector2d boundA = this->Distort(
+          ignition::math::Vector2d(0, 0),
+          this->dataPtr->lensCenter,
+          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+          this->dataPtr->p1, this->dataPtr->p2).Ign();
+      ignition::math::Vector2d boundB = this->Distort(
+          ignition::math::Vector2d(1, 1),
+          this->dataPtr->lensCenter,
+          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+          this->dataPtr->p1, this->dataPtr->p2).Ign();
+      this->dataPtr->distortionScale = boundB - boundA;
+    }
+    else
+    {
+      this->dataPtr->distortionScale = ignition::math::Vector2d(1, 1);
+    }
 
     // Both invalid: scale very close to 0 OR negative scale
     if (this->dataPtr->distortionScale.X() < 1e-7 ||
@@ -297,23 +320,13 @@ void Distortion::SetCamera(CameraPtr _camera)
     else
     {
       Ogre::GpuProgramParametersSharedPtr params =
-          distMat->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
+          this->dataPtr->distortionMaterial->getTechnique(0)->getPass(0)->
+              getFragmentProgramParameters();
       params->setNamedConstant("scale",
           Ogre::Vector3(1.0/this->dataPtr->distortionScale.X(),
           1.0/this->dataPtr->distortionScale.Y(), 1.0));
     }
   }
-
-  // set up the distortion map texture to be used in the pixel shader.
-  distMat->getTechnique(0)->getPass(0)->createTextureUnitState(texName, 1);
-
-  // these lines should come after the distortion map is applied to distMat.
-  this->dataPtr->lensDistortionInstance =
-      Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->OgreViewport(), "CameraDistortionMap/Default");
-  this->dataPtr->lensDistortionInstance->getTechnique()->getOutputTargetPass()->
-      getPass(0)->setMaterial(distMat);
-  this->dataPtr->lensDistortionInstance->setEnabled(true);
 }
 
 //////////////////////////////////////////////////
@@ -350,7 +363,12 @@ math::Vector2d Distortion::Distort(
 //////////////////////////////////////////////////
 void Distortion::SetCrop(bool _crop)
 {
-  this->dataPtr->distortionCrop = _crop;
+  // Only update the distortion scale if the crop value is going to flip.
+  if (this->dataPtr->distortionCrop != _crop)
+  {
+    this->dataPtr->distortionCrop = _crop;
+    this->CalculateAndApplyDistortionScale();
+  }
 }
 
 //////////////////////////////////////////////////

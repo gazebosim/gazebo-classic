@@ -56,6 +56,9 @@ namespace gazebo
       /// \brief Lens distortion compositor
       public: Ogre::CompositorInstance *lensDistortionInstance;
 
+      /// \brief Ogre Material that contains the distortion shader
+      public: Ogre::MaterialPtr distortionMaterial;
+
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
 

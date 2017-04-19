@@ -107,6 +107,11 @@ namespace gazebo
       protected: ignition::math::Vector2d
         DistortionMapValueClamped(const int x, const int y) const;
 
+      /// \brief calculate the correct scale factor to "zoom" the render,
+      /// cutting off black borders caused by distortion (only if the crop
+      /// flag has been set).
+      protected: void CalculateAndApplyDistortionScale();
+
       /// \brief Distortion SDF values.
       protected: sdf::ElementPtr sdf;
 
