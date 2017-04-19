@@ -269,6 +269,11 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 }
 
 /////////////////////////////////////////////////
+void Attach(const ignition::math::Pose3d &_pose)
+{
+}
+
+/////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
   if (this->detachIndex < 0 ||
@@ -352,7 +357,7 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void HarnessPlugin::OnAttach(ConstPosePtr &_msg)
 {
-  this->Attach(msgs::ConvertIgn(_msg));
+  this->Attach(msgs::ConvertIgn(*_msg));
 }
 
 /////////////////////////////////////////////////
