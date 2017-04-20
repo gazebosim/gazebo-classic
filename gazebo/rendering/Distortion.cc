@@ -154,8 +154,10 @@ void Distortion::SetCamera(CameraPtr _camera)
   // set up the distortion instance
   this->dataPtr->distortionMaterial =
       Ogre::MaterialManager::getSingleton().getByName(
-          "Gazebo/CameraDistortionMap")->clone(
-              "Gazebo/" + _camera->Name() + "_CameraDistortionMap");
+          "Gazebo/CameraDistortionMap");
+  this->dataPtr->distortionMaterial =
+      this->dataPtr->distortionMaterial->clone(
+          "Gazebo/" + _camera->Name() + "_CameraDistortionMap");
 
   // create the distortion map texture for the distortion instance
   std::string texName = _camera->Name() + "_distortionTex";
