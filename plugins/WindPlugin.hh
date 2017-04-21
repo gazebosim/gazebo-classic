@@ -71,7 +71,7 @@ namespace gazebo
     /// \brief Time for wind to rise
     private: double characteristicTimeForWindRise = 1;
 
-    
+
     /// \brief Time for wind to rise
     private: double characteristicTimeForWindRiseVertical = 1;
 
@@ -101,7 +101,7 @@ namespace gazebo
 
     /// \brief Mean of the magnitude
     private: double magnitudeMean = 0;
-    
+
     /// \brief Mean of the magnitude
     private: double magnitudeMeanVertical = 0;
 

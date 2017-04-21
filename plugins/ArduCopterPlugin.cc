@@ -329,16 +329,16 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Ardupilot Socket to send state to Ardupilot
   public: ArduCopterSocketPrivate socket_out;
 
-  /// \brief Ardupilot address  
+  /// \brief Ardupilot address
   public: std::string fdm_addr;
 
-  /// \brief Ardupilot listen address  
+  /// \brief Ardupilot listen address
   public: std::string listen_addr;
 
   /// \brief Ardupilot port for receiver socket
   public: uint16_t fdm_port_in;
 
-  /// \brief Ardupilot port for sender socket  
+  /// \brief Ardupilot port for sender socket
   public: uint16_t fdm_port_out;
 
   /// \brief Pointer to an IMU sensor
@@ -685,7 +685,7 @@ void ArduCopterPlugin::ReceiveMotorCommand()
   ssize_t recvSize =
       this->dataPtr->socket_in.Recv(&pkt, sizeof(ServoPacket), waitMs);
 
-  //Drain the socket in the case we're backed up
+  // Drain the socket in the case we're backed up
   int counter = 0;
   ServoPacket last_pkt;
   ssize_t recvSize_last = 1;

@@ -129,7 +129,8 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   if (_sdf->HasElement("force_approximation_scaling_factor"))
   {
-    sdf::ElementPtr sdfForceApprox = _sdf->GetElement("force_approximation_scaling_factor");
+    sdf::ElementPtr sdfForceApprox =
+      _sdf->GetElement("force_approximation_scaling_factor");
 
     this->forceApproximationScalingFactor = sdfForceApprox->Get<double>();
   }
@@ -158,9 +159,10 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   double magnitude = this->magnitudeMean;
 
   // Compute magnitude
-  this->magnitudeMeanVertical = (1. - this->kMagVertical) * this->magnitudeMeanVertical +
+  this->magnitudeMeanVertical =
+      (1. - this->kMagVertical) * this->magnitudeMeanVertical +
       this->kMagVertical * _wind->LinearVel().Z();
-  
+
   magnitude += this->magnitudeSinAmplitudePercent * this->magnitudeMean *
     sin(2 * M_PI * this->world->SimTime().Double() /
         this->magnitudeSinPeriod);
@@ -205,10 +207,10 @@ void WindPlugin::OnUpdate()
 {
   // Update loop for using the force on mass approximation
   // This is not recommended. Please use the LiftDragPlugin instead.
-  
+
   // If the forceApproximationScalingFactor is very small don't iterate.
   // It doesn't make sense to be negative, that would be negative wind drag.
-  if (fabs(this->forceApproximationScalingFactor) < 1E-6) { return; };
+  if (fabs(this->forceApproximationScalingFactor) < 1E-6) { return; }
   // Get all the models
   physics::Model_V models = this->world->Models();
 

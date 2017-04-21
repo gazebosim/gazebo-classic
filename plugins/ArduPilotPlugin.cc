@@ -778,7 +778,7 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   ssize_t recvSize =
     this->dataPtr->socket_in.Recv(&pkt, sizeof(ServoPacket), waitMs);
 
-  //Drain the socket in the case we're backed up
+  // Drain the socket in the case we're backed up
   int counter = 0;
   ServoPacket last_pkt;
   ssize_t recvSize_last = 1;
@@ -798,8 +798,9 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   {
     gzdbg << "Drained n packets: " << counter << std::endl;
   }
+  // TODO using pkt.motorSpeed uninitialized on first packet?
   ssize_t expectedPktSize =
-    sizeof(pkt.motorSpeed[0])*this->dataPtr->controls.size(); //TODO using pkt.motorSpeed uninitialized on first packet?
+    sizeof(pkt.motorSpeed[0])*this->dataPtr->controls.size();
   ssize_t recvChannels = recvSize/sizeof(pkt.motorSpeed[0]);
   if (recvSize == -1)
   {
