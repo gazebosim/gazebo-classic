@@ -78,7 +78,6 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
   ASSERT_TRUE(world != nullptr);
 
   // Box size
-  // const double dx = 0.9;
   const double dy = 0.4;
   const double dz = 0.9;
 
