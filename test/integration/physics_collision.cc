@@ -130,11 +130,30 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
       EXPECT_EQ(link->GetWorldPose().Ign().Pos() + collisionPose.Pos(),
                 collision->GetWorldPose().Ign().Pos());
     }
+  }
 
-    const double t0 = 1.5;
-    const double dt = 1e-3;
-    const int steps = floor(t0 / dt);
-    world->Step(steps);
+  const double t0 = 1.5;
+  const double dt = 1e-3;
+  const int steps = floor(t0 / dt);
+  world->Step(steps);
+
+  for (auto model : models)
+  {
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
+    {
+      continue;
+    }
+
+    int i = std::stoi(name.substr(4, 5));
+
+    auto link = model->GetLink();
+    ASSERT_TRUE(link != nullptr);
+
+    const unsigned int index = 0;
+    auto collision = link->GetCollision(index);
+    ASSERT_TRUE(collision != nullptr);
 
     // For 0-2, drop and expect box to rest at specific height
     if (i <= 2)
