@@ -71,7 +71,6 @@ namespace gazebo
     /// \brief Time for wind to rise
     private: double characteristicTimeForWindRise = 1;
 
-    
     /// \brief Time for wind to rise
     private: double characteristicTimeForWindRiseVertical = 1;
 
