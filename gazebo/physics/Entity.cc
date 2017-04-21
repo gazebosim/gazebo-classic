@@ -376,11 +376,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
-  this->worldPose = _pose;
-  this->worldPose.Correct();
-
-  if (_notify)
-    this->UpdatePhysicsPose(true);
+  this->SetWorldPoseDefault(_pose, _notify, _publish);
 
   if (!this->parentEntity->HasType(MODEL))
   {
@@ -414,19 +410,6 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
-
-  // Tell collisions that their current world pose is dirty (needs
-  // updating). We set a dirty flag instead of directly updating the
-  // value to improve performance.
-  for (Base_V::iterator iterC = this->children.begin();
-      iterC != this->children.end(); ++iterC)
-  {
-    if ((*iterC)->HasType(COLLISION))
-    {
-      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-      entityC->SetWorldPoseDirty();
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -438,6 +421,22 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 
   if (_notify)
     this->UpdatePhysicsPose(true);
+
+  if (this->HasType(LINK))
+  {
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (Base_V::iterator iterC = this->children.begin();
+        iterC != this->children.end(); ++iterC)
+    {
+      if ((*iterC)->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+        entityC->SetWorldPoseDirty();
+      }
+    }
+  }
 }
 
 
