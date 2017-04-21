@@ -9,9 +9,6 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-# Disable testing
-set (ENABLE_TESTS_COMPILATION False)
-
 set (GAZEBO_MAJOR_VERSION 8)
 set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
