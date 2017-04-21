@@ -271,7 +271,7 @@ class gazebo::ArduCopterSocketPrivate
 
   public: ssize_t Send(const void *_buf, size_t _size)
   {
-    return send(this->fd, reinterpret_cast<raw_type *>(_buf), _size, 0);
+    return send(this->fd, reinterpret_cast<const raw_type *>(_buf), _size, 0);
   }
 
   /// \brief Receive data

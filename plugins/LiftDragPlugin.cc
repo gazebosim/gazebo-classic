@@ -164,7 +164,7 @@ void LiftDragPlugin::OnUpdate()
 {
   GZ_ASSERT(this->link, "Link was NULL");
   // get linear velocity at cp in inertial frame
-  ignition::math::Vector3d vel = this->link->WorldLinearVel(this->cp);
+  ignition::math::Vector3d link_vel = this->link->WorldLinearVel(this->cp);
   ignition::math::Vector3d vel = link_vel - this->link->WorldWindLinearVel();
   ignition::math::Vector3d velI = vel;
   velI.Normalize();
