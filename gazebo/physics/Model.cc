@@ -708,6 +708,8 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Model::SetLinearAccel() is deprecated and has no effect. "
+         << "Use Link::SetForce() on the link directly instead. \n";
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
@@ -718,8 +720,6 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-      gzwarn << "Link::SetLinearAccel() is deprecated and has no effect. "
-             << "Use Link::SetForce() on the link directly instead. \n";
       (*iter)->SetLinearAccel(_accel);
 #ifndef _WIN32
       #pragma GCC diagnostic pop
@@ -731,6 +731,8 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Model::SetAngularAccel() is deprecated and has no effect. "
+         << "Use Link::SetTorque() on the link directly instead. \n";
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
@@ -741,8 +743,6 @@ void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
       #pragma GCC diagnostic push
       #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-      gzwarn << "Link::SetAngularAccel() is deprecated and has no effect. "
-             << "Use Link::SetTorque() on the link directly instead. \n";
       (*iter)->SetAngularAccel(_accel);
 #ifndef _WIN32
       #pragma GCC diagnostic pop
