@@ -332,12 +332,6 @@ void Link::ResetPhysicsStates()
 {
   this->SetAngularVel(ignition::math::Vector3d::Zero);
   this->SetLinearVel(ignition::math::Vector3d::Zero);
-  // deprecated commented
-  // this->SetAngularAccel(ignition::math::Vector3d::Zero);
-  // this->SetLinearAccel(ignition::math::Vector3d::Zero);
-  gzwarn << "Link::SetAngularAccel()/Link::SetLinearAccel() are deprecated "
-         << "and have no effect. Use Link::SetForce()/Link::SetTorque() "
-         << "instead.\n";
   this->SetForce(ignition::math::Vector3d::Zero);
   this->SetTorque(ignition::math::Vector3d::Zero);
 }
@@ -1086,12 +1080,6 @@ void Link::SetState(const LinkState &_state)
   this->SetWorldPose(_state.Pose());
   this->SetLinearVel(_state.Velocity().Pos());
   this->SetAngularVel(_state.Velocity().Rot().Euler());
-  // deprecated commented
-  // this->SetLinearAccel(_state.Acceleration().Pos());
-  // this->SetAngularAccel(_state.Acceleration().Rot().Euler());
-  gzwarn << "Link::SetAngularAccel()/Link::SetLinearAccel() are deprecated "
-         << "and have no effect. Use Link::SetForce()/Link::SetTorque() "
-         << "instead.\n";
   this->SetForce(_state.Wrench().Pos());
   this->SetTorque(_state.Wrench().Rot().Euler());
 
