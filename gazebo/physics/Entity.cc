@@ -336,9 +336,10 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         else
         {
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-          if (_publish)
-            entity->PublishPose();
         }
+
+        if (_publish)
+          entity->PublishPose();
 
         if (_notify)
           entity->UpdatePhysicsPose(false);
