@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,13 @@ DARTMeshShape::DARTMeshShape(CollisionPtr _parent)
 }
 
 //////////////////////////////////////////////////
+DARTMeshShape::DARTMeshShape(DARTCollisionPtr _parent)
+  : MeshShape(_parent),
+    dataPtr(new DARTMeshShapePrivate())
+{
+}
+
+//////////////////////////////////////////////////
 DARTMeshShape::~DARTMeshShape()
 {
   delete this->dataPtr;
@@ -65,12 +72,12 @@ void DARTMeshShape::Init()
   {
     this->dataPtr->dartMesh->Init(this->submesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
     this->dataPtr->dartMesh->Init(this->mesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

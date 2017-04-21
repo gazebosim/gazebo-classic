@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,7 +210,7 @@ void TimeWidget_TEST::ValidTimes()
       std::cerr << "Skipping lower bound FPS check" << std::endl;
       skipFPSTest = true;
     }
-    unsigned int iterations = skipFPSTest ? 50 : 5000;
+    unsigned int iterations = skipFPSTest ? 500 : 5000;
     double lowerFPSBound = skipFPSTest ? 0 : 45;
 
     // Wait a little bit so that time increases.
@@ -250,7 +250,7 @@ void TimeWidget_TEST::ValidTimes()
 /////////////////////////////////////////////////
 void TimeWidget_TEST::Visibility()
 {
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create a new time widget
   gazebo::gui::TimeWidget *timeWidget = new gazebo::gui::TimeWidget;

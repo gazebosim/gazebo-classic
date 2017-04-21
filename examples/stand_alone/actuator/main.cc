@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ int main(int _argc, char **_argv)
 
   for (unsigned int i = 0; i < modelNames.size(); i++)
   {
-    gazebo::physics::ModelPtr model = world->GetModel(modelNames[i]);
+    gazebo::physics::ModelPtr model = world->ModelByName(modelNames[i]);
     if (!model)
     {
       std::cout << "Couldn't find model: " << modelNames[i] << std::endl;
@@ -192,7 +192,7 @@ int main(int _argc, char **_argv)
     // Print joint position, velocity and torques for each model to file
     for (unsigned int j = 0; j < joints.size(); ++j)
     {
-      fileStream << joints[j]->GetAngle(index) << "\t"
+      fileStream << joints[j]->Position(index) << "\t"
                  << joints[j]->GetVelocity(index) << "\t"
                  << joints[j]->GetForce(index);
       if (j == joints.size() - 1)

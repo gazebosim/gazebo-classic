@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,7 +125,7 @@ void Link::Load(sdf::ElementPtr _sdf)
 
         // Tell the sensor library to create a sensor.
         event::Events::createSensor(sensorElem,
-            this->GetWorld()->GetName(), this->GetScopedName(), this->GetId());
+            this->GetWorld()->Name(), this->GetScopedName(), this->GetId());
 
         this->sensors.push_back(sensorName);
       }
@@ -166,7 +166,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       }
 
       std::string topic =
-        this->world->GetPhysicsEngine()->GetContactManager()->CreateFilter(
+        this->world->Physics()->GetContactManager()->CreateFilter(
             this->GetScopedName() + "/audio_collision", collisionNames);
       this->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
@@ -216,8 +216,8 @@ void Link::Init()
   this->enabled = true;
 
   // Set Link pose before setting pose of child collisions
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
-  this->SetInitialRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
+  this->SetInitialRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   // Call Init for child collisions, which whill set their pose
   Base_V::iterator iter;
@@ -292,10 +292,10 @@ void Link::Fini()
   this->visuals.clear();
 
 #ifdef HAVE_OPENAL
-  if (this->world && this->world->GetPhysicsEngine() &&
-      this->world->GetPhysicsEngine()->GetContactManager())
+  if (this->world && this->world->Physics() &&
+      this->world->Physics()->GetContactManager())
   {
-    this->world->GetPhysicsEngine()->GetContactManager()->RemoveFilter(
+    this->world->Physics()->GetContactManager()->RemoveFilter(
         this->GetScopedName() + "/audio_collision");
   }
   this->audioContactsSub.reset();
@@ -331,12 +331,12 @@ void Link::Reset()
 //////////////////////////////////////////////////
 void Link::ResetPhysicsStates()
 {
-  this->SetAngularVel(math::Vector3(0, 0, 0));
-  this->SetLinearVel(math::Vector3(0, 0, 0));
-  this->SetAngularAccel(math::Vector3(0, 0, 0));
-  this->SetLinearAccel(math::Vector3(0, 0, 0));
-  this->SetForce(math::Vector3(0, 0, 0));
-  this->SetTorque(math::Vector3(0, 0, 0));
+  this->SetAngularVel(ignition::math::Vector3d::Zero);
+  this->SetLinearVel(ignition::math::Vector3d::Zero);
+  this->SetAngularAccel(ignition::math::Vector3d::Zero);
+  this->SetLinearAccel(ignition::math::Vector3d::Zero);
+  this->SetForce(ignition::math::Vector3d::Zero);
+  this->SetTorque(ignition::math::Vector3d::Zero);
 }
 
 //////////////////////////////////////////////////
@@ -491,16 +491,16 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 #ifdef HAVE_OPENAL
   if (this->audioSink)
   {
-    this->audioSink->SetPose(this->GetWorldPose().Ign());
-    this->audioSink->SetVelocity(this->GetWorldLinearVel().Ign());
+    this->audioSink->SetPose(this->WorldPose());
+    this->audioSink->SetVelocity(this->WorldLinearVel());
   }
 
   // Update all the audio sources
   for (std::vector<util::OpenALSourcePtr>::iterator iter =
       this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
   {
-    (*iter)->SetPose(this->GetWorldPose().Ign());
-    (*iter)->SetVelocity(this->GetWorldLinearVel().Ign());
+    (*iter)->SetPose(this->WorldPose());
+    (*iter)->SetVelocity(this->WorldLinearVel());
   }
 #endif
 
@@ -589,7 +589,7 @@ void Link::LoadCollision(sdf::ElementPtr _sdf)
   if (geomType == "heightmap" || geomType == "map")
     this->SetStatic(true);
 
-  collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision(geomType,
+  collision = this->GetWorld()->Physics()->CreateCollision(geomType,
       boost::static_pointer_cast<Link>(shared_from_this()));
 
   if (!collision)
@@ -642,12 +642,38 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 //////////////////////////////////////////////////
 void Link::SetLinearAccel(const math::Vector3 &_accel)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinearAccel(_accel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
+{
   this->SetEnabled(true);
   this->linearAccel = _accel;
 }
 
 //////////////////////////////////////////////////
 void Link::SetAngularAccel(const math::Vector3 &_accel)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAngularAccel(_accel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
 {
   this->SetEnabled(true);
   this->angularAccel = _accel;
@@ -656,72 +682,200 @@ void Link::SetAngularAccel(const math::Vector3 &_accel)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldCoGPose() const
 {
-  math::Pose pose = this->GetWorldPose();
-  pose.pos += pose.rot.RotateVector(this->inertial->GetCoG());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldCoGPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Link::WorldCoGPose() const
+{
+  ignition::math::Pose3d pose = this->WorldPose();
+  pose.Pos() += pose.Rot().RotateVector(this->inertial->CoG());
   return pose;
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearVel() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(
-      this->GetWorldLinearVel());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeLinearVel() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldLinearVel());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularVel() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(
-         this->GetWorldAngularVel());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeAngularVel() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldAngularVel());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeLinearAccel() const
 {
-  return this->GetRelativeForce() / this->inertial->GetMass();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeLinearAccel() const
+{
+  return this->RelativeForce() / this->inertial->Mass();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldLinearAccel() const
 {
-  return this->GetWorldForce() / this->inertial->GetMass();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldLinearAccel() const
+{
+  return this->WorldForce() / this->inertial->Mass();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeAngularAccel() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(
-    this->GetWorldAngularAccel());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeAngularAccel() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldAngularAccel());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularAccel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldAngularAccel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldAngularAccel() const
 {
   // I: inertia matrix in world frame
   // T: sum of external torques in world frame
   // L: angular momentum of CoG in world frame
   // w: angular velocity in world frame
   // return I^-1 * (T - w x L)
-  return this->GetWorldInertiaMatrix().Inverse() * (this->GetWorldTorque()
-    - this->GetWorldAngularVel().Cross(this->GetWorldAngularMomentum()));
+  return this->WorldInertiaMatrix().Inverse() *
+    (this->WorldTorque() -
+     this->WorldAngularVel().Cross(this->WorldAngularMomentum()));
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetWorldAngularMomentum() const
 {
-  return this->GetWorldInertiaMatrix() * this->GetWorldAngularVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldAngularMomentum();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldAngularMomentum() const
+{
+  return this->WorldInertiaMatrix() * this->WorldAngularVel();
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeForce() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldForce());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeForce();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeForce() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldForce());
 }
 
 //////////////////////////////////////////////////
 math::Vector3 Link::GetRelativeTorque() const
 {
-  return this->GetWorldPose().rot.RotateVectorReverse(this->GetWorldTorque());
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->RelativeTorque();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d Link::RelativeTorque() const
+{
+  return this->WorldPose().Rot().RotateVectorReverse(this->WorldTorque());
 }
 
 //////////////////////////////////////////////////
@@ -731,17 +885,18 @@ ModelPtr Link::GetModel() const
 }
 
 //////////////////////////////////////////////////
-math::Box Link::GetBoundingBox() const
+ignition::math::Box Link::BoundingBox() const
 {
-  math::Box box;
+  ignition::math::Box box;
 
-  box.min.Set(GZ_DBL_MAX, GZ_DBL_MAX, GZ_DBL_MAX);
-  box.max.Set(0, 0, 0);
+  box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
+      ignition::math::MAX_D);
+  box.Max().Set(0, 0, 0);
 
   for (Collision_V::const_iterator iter = this->collisions.begin();
        iter != this->collisions.end(); ++iter)
   {
-    box += (*iter)->GetBoundingBox();
+    box += (*iter)->BoundingBox();
   }
 
   return box;
@@ -806,21 +961,47 @@ void Link::SetInertial(const InertialPtr &/*_inertial*/)
 //////////////////////////////////////////////////
 math::Pose Link::GetWorldInertialPose() const
 {
-  math::Pose inertialPose;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldInertialPose();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Pose3d Link::WorldInertialPose() const
+{
+  ignition::math::Pose3d inertialPose;
   if (this->inertial)
-    inertialPose = this->inertial->GetPose();
-  return inertialPose + this->GetWorldPose();
+    inertialPose = this->inertial->Pose();
+  return inertialPose + this->WorldPose();
 }
 
 //////////////////////////////////////////////////
 math::Matrix3 Link::GetWorldInertiaMatrix() const
 {
-  math::Matrix3 moi;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldInertiaMatrix();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix3d Link::WorldInertiaMatrix() const
+{
+  ignition::math::Matrix3d moi;
   if (this->inertial)
   {
-    math::Vector3 pos = this->inertial->GetPose().pos;
-    math::Quaternion rot = this->GetWorldPose().rot.GetInverse();
-    moi = this->inertial->GetMOI(math::Pose(pos, rot));
+    ignition::math::Vector3d pos = this->inertial->Pose().Pos();
+    ignition::math::Quaterniond rot = this->WorldPose().Rot().Inverse();
+    moi = this->inertial->MOI(ignition::math::Pose3d(pos, rot));
   }
   return moi;
 }
@@ -872,7 +1053,7 @@ void Link::RemoveChildJoint(const std::string &_jointName)
 //////////////////////////////////////////////////
 void Link::FillMsg(msgs::Link &_msg)
 {
-  math::Pose relPose = this->GetRelativePose();
+  ignition::math::Pose3d relPose = this->RelativePose();
 
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
@@ -881,25 +1062,24 @@ void Link::FillMsg(msgs::Link &_msg)
   _msg.set_enable_wind(this->WindMode());
   _msg.set_kinematic(this->GetKinematic());
   _msg.set_enabled(this->GetEnabled());
-  msgs::Set(_msg.mutable_pose(), relPose.Ign());
+  msgs::Set(_msg.mutable_pose(), relPose);
 
   // The visual msgs name might not have been set if the link was created
   // dynamically without using SDF.
   if (!this->visualMsg->has_name())
     this->visualMsg->set_name(this->GetScopedName());
 
-  msgs::Set(this->visualMsg->mutable_pose(), relPose.Ign());
+  msgs::Set(this->visualMsg->mutable_pose(), relPose);
   _msg.add_visual()->CopyFrom(*this->visualMsg);
 
-  _msg.mutable_inertial()->set_mass(this->inertial->GetMass());
-  _msg.mutable_inertial()->set_ixx(this->inertial->GetIXX());
-  _msg.mutable_inertial()->set_ixy(this->inertial->GetIXY());
-  _msg.mutable_inertial()->set_ixz(this->inertial->GetIXZ());
-  _msg.mutable_inertial()->set_iyy(this->inertial->GetIYY());
-  _msg.mutable_inertial()->set_iyz(this->inertial->GetIYZ());
-  _msg.mutable_inertial()->set_izz(this->inertial->GetIZZ());
-  msgs::Set(_msg.mutable_inertial()->mutable_pose(),
-      this->inertial->GetPose().Ign());
+  _msg.mutable_inertial()->set_mass(this->inertial->Mass());
+  _msg.mutable_inertial()->set_ixx(this->inertial->IXX());
+  _msg.mutable_inertial()->set_ixy(this->inertial->IXY());
+  _msg.mutable_inertial()->set_ixz(this->inertial->IXZ());
+  _msg.mutable_inertial()->set_iyy(this->inertial->IYY());
+  _msg.mutable_inertial()->set_iyz(this->inertial->IYZ());
+  _msg.mutable_inertial()->set_izz(this->inertial->IZZ());
+  msgs::Set(_msg.mutable_inertial()->mutable_pose(), this->inertial->Pose());
 
   for (auto &child : this->children)
   {
@@ -1029,6 +1209,20 @@ std::string Link::GetSensorName(unsigned int _i) const
 //////////////////////////////////////////////////
 void Link::AttachStaticModel(ModelPtr &_model, const math::Pose &_offset)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AttachStaticModel(_model, _offset.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void Link::AttachStaticModel(ModelPtr &_model,
+    const ignition::math::Pose3d &_offset)
+{
   if (!_model->IsStatic())
   {
     gzerr << "AttachStaticModel requires a static model\n";
@@ -1063,12 +1257,12 @@ void Link::DetachAllStaticModels()
 //////////////////////////////////////////////////
 void Link::OnPoseChange()
 {
-  math::Pose p;
+  ignition::math::Pose3d p;
   for (unsigned int i = 0; i < this->attachedModels.size(); i++)
   {
-    p = this->GetWorldPose();
-    p.pos += this->attachedModelsOffset[i].pos;
-    p.rot = p.rot * this->attachedModelsOffset[i].rot;
+    p = this->WorldPose();
+    p.Pos() += this->attachedModelsOffset[i].Pos();
+    p.Rot() = p.Rot() * this->attachedModelsOffset[i].Rot();
 
     this->attachedModels[i]->SetWorldPose(p, true);
   }
@@ -1077,13 +1271,13 @@ void Link::OnPoseChange()
 //////////////////////////////////////////////////
 void Link::SetState(const LinkState &_state)
 {
-  this->SetWorldPose(_state.GetPose());
-  this->SetLinearVel(_state.GetVelocity().pos);
-  this->SetAngularVel(_state.GetVelocity().rot.GetAsEuler());
-  this->SetLinearAccel(_state.GetAcceleration().pos);
-  this->SetAngularAccel(_state.GetAcceleration().rot.GetAsEuler());
-  this->SetForce(_state.GetWrench().pos);
-  this->SetTorque(_state.GetWrench().rot.GetAsEuler());
+  this->SetWorldPose(_state.Pose());
+  this->SetLinearVel(_state.Velocity().Pos());
+  this->SetAngularVel(_state.Velocity().Rot().Euler());
+  this->SetLinearAccel(_state.Acceleration().Pos());
+  this->SetAngularAccel(_state.Acceleration().Rot().Euler());
+  this->SetForce(_state.Wrench().Pos());
+  this->SetTorque(_state.Wrench().Rot().Euler());
 
   /*
   for (unsigned int i = 0; i < _state.GetCollisionStateCount(); ++i)
@@ -1156,12 +1350,12 @@ void Link::PublishData()
 {
   if (this->publishData && this->dataPub->HasConnections())
   {
-    msgs::Set(this->linkDataMsg.mutable_time(), this->world->GetSimTime());
+    msgs::Set(this->linkDataMsg.mutable_time(), this->world->SimTime());
     linkDataMsg.set_name(this->GetScopedName());
     msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
-        this->GetWorldLinearVel().Ign());
+        this->WorldLinearVel());
     msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
-        this->GetWorldAngularVel().Ign());
+        this->WorldAngularVel());
     this->dataPub->Publish(this->linkDataMsg);
   }
 }
@@ -1351,6 +1545,19 @@ void Link::RemoveCollision(const std::string &_name)
 /////////////////////////////////////////////////
 void Link::SetScale(const math::Vector3 &_scale)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetScale(_scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::SetScale(const ignition::math::Vector3d &_scale)
+{
   Base_V::const_iterator biter;
   for (biter = this->children.begin(); biter != this->children.end(); ++biter)
   {
@@ -1363,11 +1570,11 @@ void Link::SetScale(const math::Vector3 &_scale)
   // update the visual sdf to ensure cloning and saving has the correct values.
   this->UpdateVisualGeomSDF(_scale);
 
-  this->scale = _scale.Ign();
+  this->scale = _scale;
 }
 
 //////////////////////////////////////////////////
-void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
+void Link::UpdateVisualGeomSDF(const ignition::math::Vector3d &_scale)
 {
   // TODO: this shouldn't be in the physics sim
   if (this->sdf->HasElement("visual"))
@@ -1379,8 +1586,8 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
 
       if (geomElem->HasElement("box"))
       {
-        math::Vector3 size =
-            geomElem->GetElement("box")->Get<math::Vector3>("size");
+        ignition::math::Vector3d size =
+            geomElem->GetElement("box")->Get<ignition::math::Vector3d>("size");
         geomElem->GetElement("box")->GetElement("size")->Set(
             _scale/this->scale*size);
       }
@@ -1388,7 +1595,7 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
       {
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("sphere")->Get<double>("radius");
-        double newRadius = std::max(_scale.z, std::max(_scale.x, _scale.y));
+        double newRadius = _scale.Max();
         double oldRadius = std::max(this->scale.Z(),
             std::max(this->scale.X(), this->scale.Y()));
         geomElem->GetElement("sphere")->GetElement("radius")->Set(
@@ -1398,14 +1605,14 @@ void Link::UpdateVisualGeomSDF(const math::Vector3 &_scale)
       {
         // update radius the same way as collision shapes
         double radius = geomElem->GetElement("cylinder")->Get<double>("radius");
-        double newRadius = std::max(_scale.x, _scale.y);
+        double newRadius = std::max(_scale.X(), _scale.Y());
         double oldRadius = std::max(this->scale.X(), this->scale.Y());
 
         double length = geomElem->GetElement("cylinder")->Get<double>("length");
         geomElem->GetElement("cylinder")->GetElement("radius")->Set(
             newRadius/oldRadius*radius);
         geomElem->GetElement("cylinder")->GetElement("length")->Set(
-            _scale.z/this->scale.Z()*length);
+            _scale.Z()/this->scale.Z()*length);
       }
       else if (geomElem->HasElement("mesh"))
         geomElem->GetElement("mesh")->GetElement("scale")->Set(_scale);
@@ -1470,10 +1677,10 @@ double Link::GetWorldEnergyPotential() const
   // compute gravitational potential energy for link CG location
   // use origin as reference position
   // E = -m g^T z
-  double m = this->GetInertial()->GetMass();
+  double m = this->GetInertial()->Mass();
   auto g = this->GetWorld()->Gravity();
-  math::Vector3 z = this->GetWorldCoGPose().pos;
-  return -m * g.Dot(z.Ign());
+  auto z = this->WorldCoGPose().Pos();
+  return -m * g.Dot(z);
 }
 
 /////////////////////////////////////////////////
@@ -1484,17 +1691,17 @@ double Link::GetWorldEnergyKinetic() const
   // compute linear kinetic energy
   // E = 1/2 m v^T v
   {
-    double m = this->GetInertial()->GetMass();
-    math::Vector3 v = this->GetWorldCoGLinearVel();
+    double m = this->GetInertial()->Mass();
+    ignition::math::Vector3d v = this->WorldCoGLinearVel();
     energy += 0.5 * m * v.Dot(v);
   }
 
   // compute angular kinetic energy
   // E = 1/2 w^T I w
   {
-    math::Vector3 w = this->GetWorldAngularVel();
-    math::Matrix3 I = this->GetWorldInertiaMatrix();
-    energy += 0.5 * w.Dot(I * w);
+    ignition::math::Vector3d w = this->WorldAngularVel();
+    ignition::math::Matrix3d inertia = this->WorldInertiaMatrix();
+    energy += 0.5 * w.Dot(inertia * w);
   }
 
   return energy;
@@ -1510,10 +1717,25 @@ double Link::GetWorldEnergy() const
 void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
                      const math::Pose &_worldReferenceFrameDst)
 {
-  math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
-    + _worldReferenceFrameDst;
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->MoveFrame(_worldReferenceFrameSrc.Ign(), _worldReferenceFrameDst.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::MoveFrame(const ignition::math::Pose3d &_worldReferenceFrameSrc,
+                     const ignition::math::Pose3d &_worldReferenceFrameDst)
+{
+  ignition::math::Pose3d targetWorldPose = (this->WorldPose() -
+      _worldReferenceFrameSrc) + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+  this->SetWorldTwist(ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////
@@ -1700,7 +1922,7 @@ void Link::ProcessWrenchMsg(const msgs::Wrench &_msg)
     return;
   }
 
-  math::Vector3 pos = math::Vector3::Zero;
+  ignition::math::Vector3d pos;
   if (_msg.has_force_offset())
   {
     pos = msgs::ConvertIgn(_msg.force_offset());
@@ -1724,7 +1946,7 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 const ignition::math::Vector3d Link::RelativeWindLinearVel() const
 {
-  return this->GetWorldPose().Ign().Rot().Inverse().RotateVector(
+  return this->WorldPose().Rot().Inverse().RotateVector(
       this->windLinearVel);
 }
 
@@ -1736,27 +1958,27 @@ void Link::RegisterIntrospectionItems()
   // Callbacks.
   auto fLinkPose = [this]()
   {
-    return this->GetWorldPose().Ign();
+    return this->WorldPose();
   };
 
   auto fLinkLinVel = [this]()
   {
-    return this->GetWorldLinearVel().Ign();
+    return this->WorldLinearVel();
   };
 
   auto fLinkAngVel = [this]()
   {
-    return this->GetWorldAngularVel().Ign();
+    return this->WorldAngularVel();
   };
 
   auto fLinkLinAcc = [this]()
   {
-    return this->GetWorldLinearAccel().Ign();
+    return this->WorldLinearAccel();
   };
 
   auto fLinkAngAcc = [this]()
   {
-    return this->GetWorldAngularAccel().Ign();
+    return this->WorldAngularAccel();
   };
 
   // Register items.
@@ -1789,4 +2011,235 @@ void Link::RegisterIntrospectionItems()
   this->introspectionItems.push_back(angAccURI);
   gazebo::util::IntrospectionManager::Instance()->Register
       <ignition::math::Vector3d>(angAccURI.Str(), fLinkAngAcc);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector3d Link::WorldLinearVel() const
+{
+  return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset) const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearVel(_offset.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldLinearVel(const math::Vector3 &_offset,
+    const math::Quaternion &_q) const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldLinearVel(_offset.Ign(), _q.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldCoGLinearVel() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldCoGLinearVel();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::SetLinearVel(const math::Vector3 &_vel)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetLinearVel(_vel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::SetAngularVel(const math::Vector3 &_vel)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetAngularVel(_vel.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::SetForce(const math::Vector3 &_force)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetForce(_force.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::SetTorque(const math::Vector3 &_torque)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetTorque(_torque.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddForce(const math::Vector3 &_force)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddForce(_force.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeForce(const math::Vector3 &_force)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddRelativeForce(_force.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtWorldPosition(const math::Vector3 &_force,
+    const math::Vector3 &_pos)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddForceAtWorldPosition(_force.Ign(), _pos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddForceAtRelativePosition(const math::Vector3 &_force,
+    const math::Vector3 &_relPos)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddForceAtRelativePosition(_force.Ign(), _relPos.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddLinkForce(const math::Vector3 &_force,
+    const math::Vector3 &_offset)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddLinkForce(_force.Ign(), _offset.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddTorque(const math::Vector3 &_torque)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddTorque(_torque.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Link::AddRelativeTorque(const math::Vector3 &_torque)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddRelativeTorque(_torque.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldForce() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldForce();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+math::Vector3 Link::GetWorldTorque() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->WorldTorque();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }

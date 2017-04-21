@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,6 +210,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
 
       auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
       wrenchPub->Publish(_msg->wrench());
+      wrenchPub->Fini();
 
       break;
     }
@@ -358,5 +359,3 @@ void UserCmdManager::PublishCurrentStats()
 
   this->dataPtr->userCmdStatsPub->Publish(statsMsg);
 }
-
-

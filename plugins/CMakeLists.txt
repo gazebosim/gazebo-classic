@@ -7,7 +7,7 @@ include_directories(
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
-  ${IGNITION-MATH_INCLUDE_DIRS}
+  ${Qt5Core_INCLUDE_DIRS}
 )
 
 # Tinyxml are used since the plugins are linking against gazebo_common
@@ -19,11 +19,10 @@ link_directories(
   ${CCD_LIBRARY_DIRS}
   ${SDFormat_LIBRARY_DIRS}
   ${tinyxml_LIBRARY_DIRS}
-  ${IGNITION-MATH_LIBRARY_DIRS}
 )
 
-include (${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+add_definitions(${Qt5Core_DEFINITIONS})
+set (CMAKE_AUTOMOC ON)
 
 if (HAVE_BULLET)
   link_directories(${BULLET_LIBRARY_DIRS})
@@ -46,6 +45,7 @@ set (plugins_single_header
   ArduCopterIRLockPlugin
   ArduPilotPlugin
   ArrangePlugin
+  AttachLightPlugin
   BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
@@ -61,12 +61,15 @@ set (plugins_single_header
   GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToJointsPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
+  LinkPlot3DPlugin
   ModelPropShop
   MudPlugin
   PlaneDemoPlugin
@@ -77,6 +80,7 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TouchPlugin
   VehiclePlugin
   WindPlugin
 )
@@ -97,6 +101,7 @@ endif()
 set (GUIplugins
   CessnaGUIPlugin
   KeyboardGUIPlugin
+  LookAtDemoPlugin
   TimerGUIPlugin
 )
 
@@ -106,23 +111,37 @@ set(GAZEBO_PLUGIN_INSTALL_DIR
 
 foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
 foreach (src ${plugins_private_header})
   add_library(${src} SHARED ${src}.cc)
-  target_link_libraries(${src} libgazebo ${ogre_libraries})
+  target_link_libraries(${src}
+    libgazebo
+    ${ogre_libraries}
+    ${IGNITION-TRANSPORT_LIBRARIES}
+  )
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
   gz_install_includes("plugins" ${src}Private.hh)
 endforeach ()
 
 foreach (src ${GUIplugins})
-  QT4_WRAP_CPP(${src}_MOC ${src}.hh)
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
-  target_link_libraries(${src} libgazebo ${ogre_libraries} ${QT_LIBRARIES})
+  target_link_libraries(${src}
+                        libgazebo
+                        gazebo_gui
+                        ${ogre_libraries}
+                        ${Qt5Core_LIBRARIES}
+                        ${Qt5Widgets_LIBRARIES}
+                        ${IGNITION-TRANSPORT_LIBRARIES}
+)
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()

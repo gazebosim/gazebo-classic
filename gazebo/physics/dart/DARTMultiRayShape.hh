@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_DARTMULTIRAYSHAPE_HH_
-#define _GAZEBO_DARTMULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTMULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_DART_DARTMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
@@ -37,7 +36,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTMultiRayShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: explicit DARTMultiRayShape(CollisionPtr _parent)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit DARTMultiRayShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTMultiRayShape();
@@ -48,8 +53,8 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start location of the ray.
       /// \param[in] _end End location of the ray.
-      protected: void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+      protected: void AddRay(const ignition::math::Vector3d &_start,
+                             const ignition::math::Vector3d &_end);
 
       /// \internal
       /// \brief Pointer to private data

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
   unsigned int imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
 
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
@@ -125,7 +125,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
 
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
@@ -149,7 +149,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   gzdbg << "sent reset world message\n";
   common::Time::MSleep(100);
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
   gzdbg << "world time is now " << now << '\n';
   EXPECT_LT(now, 0.12);
 
@@ -162,7 +162,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double() - now;
+  now = world->SimTime().Double() - now;
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
   gzdbg << "counted " << imuMsgCount << " imu messages in "
@@ -185,7 +185,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
   gzdbg << "counted " << imuMsgCount << " imu messages in "

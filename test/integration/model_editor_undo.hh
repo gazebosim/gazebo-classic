@@ -25,6 +25,9 @@ class ModelEditorUndoTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test undo/redo link scaling.
+  private slots: void LinkScaling();
+
   /// \brief Test undo/redo link insertion using the mouse.
   private slots: void LinkInsertionByMouse();
 
@@ -41,9 +44,6 @@ class ModelEditorUndoTest : public QTestFixture
   /// \brief Test undo/redo joint insertion via creation dialog.
   private slots: void JointInsertionByDialog();
 
-  /// \brief Test undo/redo model plugin insertion.
-  private slots: void ModelPluginInsertion();
-
   /// \brief Test undo/redo model plugin deletion via the right-click context
   /// menu.
   private slots: void ModelPluginDeletionByContextMenu();
@@ -54,8 +54,8 @@ class ModelEditorUndoTest : public QTestFixture
   /// \brief Test undo/redo nested model align.
   private slots: void NestedModelAlign();
 
-  /// \brief Test undo/redo link scaling.
-  private slots: void LinkScaling();
+  /// \brief Test undo/redo model plugin insertion.
+  private slots: void ModelPluginInsertion();
 
   /// \brief Helper callback to trigger the delete action on the context
   /// menu after the menu, which is modal, has been opened.

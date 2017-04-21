@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,9 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact Plugin
- * Author: Nate Koenig mod by John Hsu
- */
-#ifndef _GAZEBO_CONTACT_PLUGIN_HH_
-#define _GAZEBO_CONTACT_PLUGIN_HH_
+
+#ifndef GAZEBO_PLUGINS_CONTACTPLUGIN_HH_
+#define GAZEBO_PLUGINS_CONTACTPLUGIN_HH_
 
 #include <string>
 

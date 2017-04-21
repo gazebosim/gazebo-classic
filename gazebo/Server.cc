@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,7 +226,14 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
+#ifndef _WIN32
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
+#ifndef _WIN32
+# pragma GCC diagnostic pop
+#endif
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
@@ -340,9 +347,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (this->dataPtr->vm.count("profile"))
     {
       std::string profileName = this->dataPtr->vm["profile"].as<std::string>();
-      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      if (physics::get_world()->PresetMgr()->HasProfile(profileName))
       {
-        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        physics::get_world()->PresetMgr()->CurrentProfile(profileName);
         gzmsg << "Setting physics profile to [" << profileName << "]."
               << std::endl;
       }

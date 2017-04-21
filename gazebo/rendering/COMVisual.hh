@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMVISUAL_HH_
-#define _COMVISUAL_HH_
+#ifndef GAZEBO_RENDERING_COMVISUAL_HH_
+#define GAZEBO_RENDERING_COMVISUAL_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -54,7 +54,12 @@ namespace gazebo
 
       /// \brief Get inertia pose.
       /// \return Inertia pose in link frame.
-      public: math::Pose GetInertiaPose() const;
+      /// \deprecated See ignition::math::Pose3d InertiaPose() const
+      public: math::Pose GetInertiaPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get inertia pose.
+      /// \return Inertia pose in link frame.
+      public: ignition::math::Pose3d InertiaPose() const;
 
       /// \brief Load using previously set member variables.
       private: void Load();

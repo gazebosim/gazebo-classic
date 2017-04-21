@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
 #define GAZEBO_RENDERING_VIEWCONTROLLER_HH_
 
 #include <string>
+
+#include <ignition/math/Vector3.hh>
+
+#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -51,8 +55,16 @@ namespace gazebo
       /// \param[in] _focalPoint The point to look at.
       /// \param[in] _yaw Initial yaw angle.
       /// \param[in] _pitch Initial pitch angle.
+      /// \deprecated See function that uses ignition::math
       public: virtual void Init(const math::Vector3 &_focalPoint,
-                  const double _yaw = 0, const double _pitch = 0);
+        const double _yaw = 0, const double _pitch = 0) GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Initialize with a focus point.
+      /// \param[in] _focalPoint The point to look at.
+      /// \param[in] _yaw Initial yaw angle.
+      /// \param[in] _pitch Initial pitch angle.
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
+        const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.

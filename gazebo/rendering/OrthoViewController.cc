@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,20 @@ void OrthoViewController::Init()
 void OrthoViewController::Init(const math::Vector3 &_focalPoint,
     double _yaw, double _pitch)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_focalPoint.Ign(), _yaw, _pitch);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void OrthoViewController::Init(const ignition::math::Vector3d &_focalPoint,
+    double _yaw, double _pitch)
+{
   // this function also gets called when camera animation is complete so make
   // sure zoom is reset only if not yet initialized.
   if (!this->init)
@@ -91,9 +105,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   if (!this->enabled)
     return;
 
-  math::Vector2i drag = _event.Pos() - _event.PrevPos();
-
-  math::Vector3 directionVec(0, 0, 0);
+  ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
 
   int width = this->camera->ViewportWidth();
   int height = this->camera->ViewportHeight();
@@ -129,8 +141,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
       (_event.Buttons() & common::MouseEvent::LEFT && _event.Shift())))
   {
     // Compute the delta yaw and pitch.
-    double dy = this->NormalizeYaw(drag.x * _event.MoveScale() * -0.4);
-    double dp = this->NormalizePitch(drag.y * _event.MoveScale() * 0.4);
+    double dy = this->NormalizeYaw(drag.X() * _event.MoveScale() * -0.4);
+    double dp = this->NormalizePitch(drag.Y() * _event.MoveScale() * 0.4);
 
     // Limit rotation to pitch only if the "y" key is pressed.
     if (!this->key.empty() && this->key == "y")
@@ -144,7 +156,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The left mouse button is used to translate the camera.
   else if ((_event.Buttons() & common::MouseEvent::LEFT) && _event.Dragging())
   {
-    math::Vector3 translation;
+    ignition::math::Vector3d translation;
 
     double factor = 1.0;
 
@@ -157,13 +169,13 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     if (!this->key.empty())
     {
       if (this->key == "x")
-        translation.Set((drag.y / static_cast<float>(height)) *
+        translation.Set((drag.Y() / static_cast<float>(height)) *
                         orthoHeight * factor, 0.0, 0.0);
       else if (this->key == "y")
-        translation.Set(0.0, (drag.x / static_cast<float>(width)) *
+        translation.Set(0.0, (drag.X() / static_cast<float>(width)) *
                         orthoWidth * factor, 0.0);
       else if (this->key == "z")
-        translation.Set(0.0, 0.0, (drag.y / static_cast<float>(height)) *
+        translation.Set(0.0, 0.0, (drag.Y() / static_cast<float>(height)) *
                         orthoHeight * factor);
       else
         gzerr << "Unable to handle key [" << this->key << "] in orbit view "
@@ -176,8 +188,8 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
     {
       // Translate in the "y" "z" plane.
       translation.Set(0.0,
-          (drag.x / static_cast<float>(width)) * orthoWidth * factor,
-          (drag.y / static_cast<float>(height)) * orthoHeight * factor);
+          (drag.X() / static_cast<float>(width)) * orthoWidth * factor,
+          (drag.Y() / static_cast<float>(height)) * orthoHeight * factor);
 
       // Translate in the local coordinate frame
       this->TranslateLocal(translation);
@@ -186,7 +198,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
   // The right mouse button is used to zoom the camera.
   else if ((_event.Buttons() & common::MouseEvent::RIGHT) && _event.Dragging())
   {
-    double amount = 1.0 + (drag.y / static_cast<float>(height));
+    double amount = 1.0 + (drag.Y() / static_cast<float>(height));
     this->Zoom(amount, _event.PressPos());
   }
   // The scroll wheel controls zoom.
@@ -222,7 +234,7 @@ void OrthoViewController::HandleMouseEvent(const common::MouseEvent &_event)
 
 //////////////////////////////////////////////////
 void OrthoViewController::Zoom(const float _amount,
-                               const math::Vector2i &_screenPos)
+                               const ignition::math::Vector2i &_screenPos)
 {
   // Zoom to mouse cursor position
   // Three step process:
@@ -230,7 +242,7 @@ void OrthoViewController::Zoom(const float _amount,
   // Zoom by changing the orthographic window size
   // Translate back to mouse cursor position
 
-  math::Vector3 translation;
+  ignition::math::Vector3d translation;
   int width = this->camera->ViewportWidth();
   int height = this->camera->ViewportHeight();
 
@@ -238,9 +250,9 @@ void OrthoViewController::Zoom(const float _amount,
   double orthoHeight = height / this->dataPtr->scale;
 
   translation.Set(0.0,
-      ((width/2.0 - _screenPos.x) / static_cast<float>(width))
+      ((width/2.0 - _screenPos.X()) / static_cast<float>(width))
       * orthoWidth,
-      ((height/2.0 - _screenPos.y) / static_cast<float>(height))
+      ((height/2.0 - _screenPos.Y()) / static_cast<float>(height))
       * orthoHeight);
   this->TranslateLocal(translation);
 
@@ -263,9 +275,9 @@ void OrthoViewController::Zoom(const float _amount,
   double newOrthoHeight = height / this->dataPtr->scale;
 
   translation.Set(0.0,
-      ((_screenPos.x - width/2.0) / static_cast<float>(width))
+      ((_screenPos.X() - width/2.0) / static_cast<float>(width))
       * newOrthoWidth,
-      ((_screenPos.y - height/2.0) / static_cast<float>(height))
+      ((_screenPos.Y() - height/2.0) / static_cast<float>(height))
       * newOrthoHeight);
 
   this->TranslateLocal(translation);

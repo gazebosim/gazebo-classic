@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ void WideAngleCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -147,6 +147,11 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   std::string lensTopicName = "~/";
   lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
+
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->TopicIgn(), opts);
 
   sdf::ElementPtr lensSdf =
     this->sdf->GetElement("camera")->GetElement("lens");

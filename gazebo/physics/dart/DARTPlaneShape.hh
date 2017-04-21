@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DARTPLANESHAPE_HH_
-#define _GAZEBO_DARTPLANESHAPE_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTPLANESHAPE_HH_
+#define GAZEBO_PHYSICS_DART_DARTPLANESHAPE_HH_
 
 #include "gazebo/physics/PlaneShape.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
@@ -36,7 +36,13 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent Collision.
-      public: explicit DARTPlaneShape(CollisionPtr _parent);
+      /// \deprecated See version that accepts DARTCollisionPtr
+      public: explicit DARTPlaneShape(CollisionPtr _parent)
+              GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Constructor.
+      /// \param[in] _parent Parent Collision.
+      public: explicit DARTPlaneShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTPlaneShape();
@@ -45,7 +51,7 @@ namespace gazebo
       public: virtual void CreatePlane();
 
       // Documentation inherited
-      public: virtual void SetAltitude(const math::Vector3 &_pos);
+      public: virtual void SetAltitude(const ignition::math::Vector3d &_pos);
 
       /// \internal
       /// \brief Pointer to private data

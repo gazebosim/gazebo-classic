@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,24 +47,50 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->enabled = true;
   dPtr->receivedMsg = false;
 
+  // Transport
   dPtr->node = transport::NodePtr(new transport::Node());
   dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->wrenchSub = dPtr->node->Subscribe(_topicName,
       &WrenchVisual::OnMsg, this, true);
+
+  dPtr->connections.push_back(
+      event::Events::ConnectPreRender(
+      std::bind(&WrenchVisual::Update, this)));
 }
 
 /////////////////////////////////////////////////
 WrenchVisual::~WrenchVisual()
 {
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+void WrenchVisual::Fini()
+{
   WrenchVisualPrivate *dPtr =
       reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
 
+  dPtr->wrenchSub.reset();
+  if (dPtr->node)
+    dPtr->node->Fini();
   dPtr->node.reset();
   dPtr->connections.clear();
 
-  this->DeleteDynamicLine(dPtr->forceLine);
-  dPtr->forceLine = NULL;
+  dPtr->wrenchMsg.reset();
+
+  // Remove force visual and line
+  if (dPtr->forceVisual && dPtr->forceLine)
+    dPtr->forceVisual->DeleteDynamicLine(dPtr->forceLine);
+
+  if (dPtr->scene && dPtr->forceVisual &&
+      dPtr->scene->GetVisual(dPtr->forceVisual->Name()))
+  {
+    dPtr->scene->RemoveVisual(dPtr->forceVisual);
+  }
+  dPtr->forceVisual.reset();
+
+  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
@@ -78,22 +104,26 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
 
+  // Initialize visuals on Load because we can't use shared_from_this in the
+  // constructor
+
+  // Torque visual
   dPtr->coneXVis.reset(
-      new Visual(this->GetName()+"__WRENCH_X_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_X_CONE__", shared_from_this(),
       false));
   dPtr->coneXVis->Load();
   dPtr->coneXVis->AttachMesh("unit_cone");
   dPtr->coneXVis->SetMaterial("__GAZEBO_TRANS_RED_MATERIAL__");
 
   dPtr->coneYVis.reset(
-      new Visual(this->GetName()+"__WRENCH_Y_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_Y_CONE__", shared_from_this(),
       false));
   dPtr->coneYVis->Load();
   dPtr->coneYVis->AttachMesh("unit_cone");
   dPtr->coneYVis->SetMaterial("__GAZEBO_TRANS_GREEN_MATERIAL__");
 
   dPtr->coneZVis.reset(
-      new Visual(this->GetName()+"__WRENCH_Z_CONE__", shared_from_this(),
+      new Visual(this->Name()+"__WRENCH_Z_CONE__", shared_from_this(),
       false));
   dPtr->coneZVis->Load();
   dPtr->coneZVis->AttachMesh("unit_cone");
@@ -112,13 +142,14 @@ void WrenchVisual::Load(ConstJointPtr &_msg)
   dPtr->coneZVis->SetRotation(q);
   dPtr->coneZVis->SetScale(ignition::math::Vector3d(0.02, 0.02, 0.02));
 
-  VisualPtr lineVis(
-      new Visual(this->GetName()+"__WRENCH_FORCE_NODE__", shared_from_this(),
-      false));
+  // Force visual
+  dPtr->forceVisual.reset(new rendering::Visual(
+      this->Name() + "_FORCE_VISUAL_", shared_from_this()));
+  dPtr->forceVisual->Load();
 
-  dPtr->forceLine = lineVis->CreateDynamicLine(RENDERING_LINE_LIST);
-  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
-  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
+  dPtr->forceLine = dPtr->forceVisual->CreateDynamicLine(RENDERING_LINE_LIST);
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d::Zero);
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0.1));
   dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);

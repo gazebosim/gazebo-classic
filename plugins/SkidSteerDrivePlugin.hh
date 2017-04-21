@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SkidSteerDrive_PLUGIN_HH_
-#define _GAZEBO_SkidSteerDrive_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
+#define GAZEBO_PLUGINS_SKIDSTEERDRIVEPLUGIN_HH_
 
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -72,6 +73,12 @@ namespace gazebo
 
     /// \brief Radius of the wheels (Determined from SDF)
     private: double wheelRadius;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for subscriber
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

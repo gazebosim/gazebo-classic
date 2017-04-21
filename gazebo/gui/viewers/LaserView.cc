@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,8 @@ LaserView::~LaserView()
 /////////////////////////////////////////////////
 void LaserView::UpdateImpl()
 {
+  this->laserItem->UpdateGeometry();
+
   std::ostringstream value;
   value << this->laserItem->GetHoverRange();
   this->rangeEdit->setText(tr(value.str().c_str()));
@@ -233,7 +235,7 @@ LaserView::LaserItem::LaserItem()
 void LaserView::LaserItem::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem * /*_option*/, QWidget * /*_widget*/)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
 
   QColor orange(245, 129, 19, 255);
   QColor noHitDarkGrey(200, 200, 200, 255);
@@ -340,7 +342,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
           << this->indexAngle << " radians";
       else
         stream << std::fixed << std::setprecision(4)
-          << GZ_RTOD(this->indexAngle) << " degrees";
+          << IGN_RTOD(this->indexAngle) << " degrees";
 
       _painter->setPen(QPen(orange));
       _painter->drawText(x1, y1, stream.str().c_str());
@@ -352,7 +354,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
                   rangeMaxScaled * 1.1 * 2.0 + textWidth * 2.0);
 
       _painter->setPen(QPen(orange));
-      _painter->drawArc(rect, 0, GZ_RTOD(this->indexAngle) * 16);
+      _painter->drawArc(rect, 0, IGN_RTOD(this->indexAngle) * 16);
 
 
       // Draw the line that marks the start of the arc
@@ -393,7 +395,7 @@ QRectF LaserView::LaserItem::GetBoundingRect() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverRange() const
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
 
   // Compute the index of the ray that the mouse is hovering over.
   int index = static_cast<int>(
@@ -408,8 +410,8 @@ double LaserView::LaserItem::GetHoverRange() const
 /////////////////////////////////////////////////
 double LaserView::LaserItem::GetHoverAngle() const
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  return this->radians ? this->indexAngle : GZ_RTOD(this->indexAngle);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  return this->radians ? this->indexAngle : IGN_RTOD(this->indexAngle);
 }
 
 /////////////////////////////////////////////////
@@ -421,7 +423,7 @@ QRectF LaserView::LaserItem::boundingRect() const
 /////////////////////////////////////////////////
 void LaserView::LaserItem::Clear()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   this->ranges.clear();
   this->points.clear();
   this->noHitPoints.clear();
@@ -430,14 +432,14 @@ void LaserView::LaserItem::Clear()
 /////////////////////////////////////////////////
 void LaserView::LaserItem::AddRange(double _range)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   this->ranges.push_back(_range);
 }
 
 /////////////////////////////////////////////////
 void LaserView::LaserItem::SetRange(unsigned int _index, double _range)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   if (_index < this->ranges.size())
     this->ranges[_index] = _range;
 }
@@ -446,7 +448,7 @@ void LaserView::LaserItem::SetRange(unsigned int _index, double _range)
 void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     double _angleStep, double _rangeMax, double _rangeMin)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
 
   this->angleMin = _angleMin;
   this->angleMax = _angleMax;
@@ -483,6 +485,11 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
         -hitRange * this->scale * sin(angle));
     this->points[i] = pt;
     double noHitRange = std::isinf(r) ? this->rangeMax : hitRange;
+    if (r < this->rangeMin)
+    {
+        // Display -inf as very close
+        noHitRange = 0;
+    }
     QPointF noHitPt(noHitRange * this->scale * cos(angle),
         -noHitRange * this->scale * sin(angle));
     this->noHitPoints[i] = noHitPt;
@@ -509,15 +516,26 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
     this->points[this->ranges.size()] = QPointF(0, 0);
     this->noHitPoints[this->ranges.size()] = QPointF(0, 0);
   }
+  this->dirty = true;
+}
 
-  // Tell QT we have changed.
-  this->prepareGeometryChange();
+/////////////////////////////////////////////////
+void LaserView::LaserItem::UpdateGeometry()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  if (this->dirty)
+  {
+    // Tell QT we have changed.
+    this->prepareGeometryChange();
+    this->dirty = false;
+  }
 }
 
 /////////////////////////////////////////////////
 unsigned int LaserView::LaserItem::GetRangeCount()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   return this->ranges.size();
 }
 

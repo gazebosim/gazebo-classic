@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,9 @@ namespace gazebo
       public: RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
+      /// \brief Initialization
+      public: void Init();
+
       public: void RemoveScene(const std::string &_name);
       public: void CreateScene(const std::string &_name);
 
@@ -70,10 +73,28 @@ namespace gazebo
       /// \return Message displayed in the render window
       public: std::string GetOverlayMsg() const;
 
-      /// \brief Add a plugin to the render widget.
+      /// \brief Add a plugin to the render widget and call GUIPlugin::Load().
       /// \param[in] _plugin Plugin pointer to add.
       /// \param[in] _elem Plugin sdf parameters.
       public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
+
+      /// \brief Add a plugin to the render widget and call GUIPlugin::Load().
+      /// \retval true on success.
+      /// \retval false if the plugin in the file is not of the right type,
+      ///       it needs to be a GUIPlugin. Also returns false if the plugin
+      ///       couldn't be created from this file.
+      /// \param[in] _filename Filename to load the plugin from
+      /// \param[in] _elem Plugin sdf parameters.
+      public: bool AddPlugin(const std::string &_filename,
+                             sdf::ElementPtr _elem);
+
+      /// \brief Add a list of plugins to be loaded from files.
+      ///   This will create a plugin from each file in the list and call
+      ///   AddPlugin(std::string, sdf::ElementPtr with an empty sdf::Element
+      ///   for each. Use AddPlugin(std::string&, sdf::ElementPtr) to load a GUI
+      ///   plugin with an initialized sdf element instead.
+      /// \param[in] _pluginFilenames list of filenames with the plugins
+      public: void AddPlugins(const std::vector<std::string> &_pluginFilenames);
 
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar

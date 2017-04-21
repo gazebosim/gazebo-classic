@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -705,7 +705,7 @@ TEST_F(TransportTest, Errors)
   EXPECT_STREQ("/gazebo/default/world_stats", statsSub->GetTopic().c_str());
 
   // This generates a warning message
-  // EXPECT_THROW(testNode->Advertise<math::Vector3>("~/scene"),
+  // EXPECT_THROW(testNode->Advertise<ignition::math::Vector3d>("~/scene"),
   //             common::Exception);
 
   scenePub = testNode->Advertise<msgs::Scene>("~/scene");

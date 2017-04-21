@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
-#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
@@ -30,6 +30,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/msgs/msgs.hh"
+#include "gazebo/rendering/MarkerManager.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/transport/TransportTypes.hh"
 
@@ -290,6 +291,9 @@ namespace gazebo
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
 
+      /// \brief The heightmap level of detail
+      public: unsigned int heightmapLOD = 0u;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 
@@ -339,6 +343,16 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Size of shadow texture
+      public: unsigned int shadowTextureSize = 1024u;
+
+      /// \brief Manager of marker visuals
+      public: MarkerManager markerManager;
+
+      /// \brief State of each layer where key is the layer id, and value is
+      /// the layer's visibility.
+      public: std::map<int32_t, bool> layerState;
     };
   }
 }

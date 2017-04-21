@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -503,7 +503,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 void Actor::Init()
 {
   this->scriptTime = 0;
-  this->prevFrameTime = this->world->GetSimTime();
+  this->prevFrameTime = this->world->SimTime();
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
@@ -513,7 +513,7 @@ void Actor::Init()
 void Actor::Play()
 {
   this->active = true;
-  this->playStartTime = this->world->GetSimTime();
+  this->playStartTime = this->world->SimTime();
 }
 
 //////////////////////////////////////////////////
@@ -537,7 +537,7 @@ void Actor::Update()
   if (this->skelAnimation.empty() && this->trajectories.empty())
     return;
 
-  common::Time currentTime = this->world->GetSimTime();
+  common::Time currentTime = this->world->SimTime();
 
   // do not refresh animation faster than 30 Hz sim time
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
@@ -670,7 +670,7 @@ void Actor::Update()
   if (!this->customTrajectoryInfo)
     actorPose.Rot() = modelPose.Rot() * rootRot;
   else
-    actorPose.Rot() = modelPose.Rot() * this->GetWorldPose().Ign().Rot();
+    actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
@@ -693,7 +693,7 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   ignition::math::Pose3d mainLinkPose;
 
   if (this->customTrajectoryInfo)
-    mainLinkPose.Rot() = this->worldPose.Ign().Rot();
+    mainLinkPose.Rot() = this->worldPose.Rot();
 
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
@@ -732,10 +732,9 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
       bone_pose->mutable_position()->CopyFrom(msgs::Convert(bonePose.Pos()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(bonePose.Rot()));
       LinkPtr parentLink = this->GetChildLink(parentBone->GetName());
-      math::Pose parentPose = parentLink->GetWorldPose();
-      math::Matrix4 parentTrans(parentPose.rot.GetAsMatrix4());
-      parentTrans.SetTranslate(parentPose.pos);
-      transform = (parentTrans * transform).Ign();
+      auto parentPose = parentLink->WorldPose();
+      ignition::math::Matrix4d parentTrans(parentPose);
+      transform = parentTrans * transform;
     }
 
     msgs::Pose *link_pose = msg.add_pose();
@@ -762,9 +761,9 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   else
   {
     model_pose->mutable_position()->CopyFrom(
-        msgs::Convert(this->worldPose.Ign().Pos()));
+        msgs::Convert(this->worldPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-        msgs::Convert(this->worldPose.Ign().Rot()));
+        msgs::Convert(this->worldPose.Rot()));
   }
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
@@ -935,7 +934,7 @@ bool Actor::GetSelfCollide() const
 }
 
 /////////////////////////////////////////////////
-void Actor::SetWindMode(bool /*_enable*/)
+void Actor::SetWindMode(const bool /*_enable*/)
 {
   // Actors don't support wind mode
 }

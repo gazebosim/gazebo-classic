@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
   #pragma comment(lib, "Rpcrt4.lib")
 #else /* UNIX */
 
+#include <functional>
 #include <gazebo/gazebo.hh>
 
 #ifdef HAVE_UUID
@@ -106,8 +107,8 @@ void RestWebPlugin::Init()
   this->subSimEvent = node->Subscribe("/gazebo/sim_events",
                                 &RestWebPlugin::OnSimEvent, this);
 
-  this->requestQThread = new boost::thread(
-      boost::bind(&RestWebPlugin::RunRequestQ, this));
+  this->requestQThread = new std::thread(
+      std::bind(&RestWebPlugin::RunRequestQ, this));
 }
 
 //////////////////////////////////////////////////
@@ -135,7 +136,7 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
     msgs::Time pauseT = ws.pause_time();
     bool paused = ws.paused();
 
-    std::string worldName = physics::get_world()->GetName();
+    std::string worldName = physics::get_world()->Name();
     std::string event = "{\n";
 
     event += "\"session\": \"" + this->session + "\", ";
@@ -223,7 +224,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
       event += "\"name\": ";
       event += "\"";
-      event += world->GetName();
+      event += world->Name();
       event += "\", ";
 
       if (!world->IsPaused())
@@ -243,19 +244,19 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 
       event += "\"real_time\": ";
       event += "\"";
-      t = world->GetRealTime();
+      t = world->RealTime();
       event += t.FormattedString();
       event += "\", ";
 
       event += "\"sim_time\": ";
       event += "\"";
-      t = world->GetSimTime();
+      t = world->SimTime();
       event += t.FormattedString();
       event += "\", ";
 
       event += "\"pause_time\": ";
       event += "\"";
-      t = world->GetPauseTime();
+      t = world->PauseTime();
       event += t.FormattedString();
       event += "\" ";
 
@@ -284,14 +285,14 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->requestQMutex);
+  std::lock_guard<std::mutex> lock(this->requestQMutex);
   this->msgLoginQ.push_back(_msg);
 }
 
 //////////////////////////////////////////////////
 void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->requestQMutex);
+  std::lock_guard<std::mutex> lock(this->requestQMutex);
   this->restApi.Logout();
 
   gazebo::msgs::RestResponse msg;
@@ -350,7 +351,7 @@ void RestWebPlugin::RunRequestQ()
       boost::shared_ptr<const gazebo::msgs::RestLogin> login;
       // Grab the mutex and remove first message the queue
       {
-        boost::mutex::scoped_lock lock(this->requestQMutex);
+        std::lock_guard<std::mutex> lock(this->requestQMutex);
         if (!this->msgLoginQ.empty())
         {
           login = this->msgLoginQ.front();

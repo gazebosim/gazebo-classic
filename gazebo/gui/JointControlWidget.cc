@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ JointForceControl::JointForceControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->forceSpin = new QDoubleSpinBox;
-  this->dataPtr->forceSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->forceSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->forceSpin->setSingleStep(0.001);
   this->dataPtr->forceSpin->setDecimals(3);
   this->dataPtr->forceSpin->setValue(0.000);
@@ -75,25 +76,29 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-ignition::math::MAX_D,
+                                    ignition::math::MAX_D);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
@@ -135,7 +140,7 @@ void JointPIDPosControl::SetToDegrees()
   if (this->dataPtr->radians)
   {
     this->dataPtr->radians = false;
-    this->dataPtr->posSpin->setValue(GZ_RTOD(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_RTOD(this->dataPtr->posSpin->value()));
   }
 }
 
@@ -145,7 +150,7 @@ void JointPIDPosControl::SetToRadians()
   if (!this->dataPtr->radians)
   {
     this->dataPtr->radians = true;
-    this->dataPtr->posSpin->setValue(GZ_DTOR(this->dataPtr->posSpin->value()));
+    this->dataPtr->posSpin->setValue(IGN_DTOR(this->dataPtr->posSpin->value()));
   }
 }
 
@@ -155,7 +160,7 @@ void JointPIDPosControl::OnChanged(double _value)
   if (this->dataPtr->radians)
     emit changed(_value, this->dataPtr->name);
   else
-    emit changed(GZ_DTOR(_value), this->dataPtr->name);
+    emit changed(IGN_DTOR(_value), this->dataPtr->name);
 }
 
 /////////////////////////////////////////////////
@@ -184,25 +189,29 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
 {
   this->dataPtr->name = _name;
   this->dataPtr->posSpin = new QDoubleSpinBox;
-  this->dataPtr->posSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->posSpin->setRange(-ignition::math::MAX_D,
+                                    ignition::math::MAX_D);
   this->dataPtr->posSpin->setSingleStep(0.001);
   this->dataPtr->posSpin->setDecimals(3);
   this->dataPtr->posSpin->setValue(0.000);
 
   this->dataPtr->pGainSpin = new QDoubleSpinBox;
-  this->dataPtr->pGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->pGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->pGainSpin->setSingleStep(0.01);
   this->dataPtr->pGainSpin->setDecimals(3);
   this->dataPtr->pGainSpin->setValue(1.000);
 
   this->dataPtr->iGainSpin = new QDoubleSpinBox;
-  this->dataPtr->iGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->iGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->iGainSpin->setSingleStep(0.01);
   this->dataPtr->iGainSpin->setDecimals(3);
   this->dataPtr->iGainSpin->setValue(0.100);
 
   this->dataPtr->dGainSpin = new QDoubleSpinBox;
-  this->dataPtr->dGainSpin->setRange(-IGN_DBL_MAX, IGN_DBL_MAX);
+  this->dataPtr->dGainSpin->setRange(-ignition::math::MAX_D,
+                                      ignition::math::MAX_D);
   this->dataPtr->dGainSpin->setSingleStep(0.01);
   this->dataPtr->dGainSpin->setDecimals(3);
   this->dataPtr->dGainSpin->setValue(0.010);
@@ -264,7 +273,10 @@ void JointPIDVelControl::OnDChanged(double _value)
 void JointControlWidget::SetModelName(const std::string &_modelName)
 {
   if (this->dataPtr->jointPub)
+  {
+    this->dataPtr->jointPub->Fini();
     this->dataPtr->jointPub.reset();
+  }
 
   msgs::Model modelMsg;
 

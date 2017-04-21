@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -70,7 +70,7 @@ void PhysicsMsgsTest::SetGravity(const std::string &_physicsEngine)
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -20));
   gravityValues.push_back(ignition::math::Vector3d(0, 0, 20));
-  gravityValues.push_back(ignition::math::Vector3d(0, 0, 0));
+  gravityValues.push_back(ignition::math::Vector3d::Zero);
   gravityValues.push_back(ignition::math::Vector3d(0, 0, -9.81));
   gravityValues.push_back(ignition::math::Vector3d(1, 1, 9.81));
   gravityValues.push_back(ignition::math::Vector3d(2, 3, -20));
@@ -101,7 +101,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -109,9 +109,9 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
   // spawn a box
   std::string name = "test_box";
   double z0 = 5;
-  math::Vector3 pos = math::Vector3(0, 0, z0);
-  math::Vector3 size = math::Vector3(1, 1, 1);
-  SpawnBox(name, size, pos, math::Vector3::Zero);
+  ignition::math::Vector3d pos(0, 0, z0);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox(name, size, pos, ignition::math::Vector3d::Zero);
   gzdbg << "SpawnBox called" << std::endl;
 
   // advertise on "~/model/modify"
@@ -119,22 +119,26 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     this->node->Advertise<msgs::Model>("~/model/modify");
 
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   {
-    math::Pose initialPose = model->GetWorldPose();
-    EXPECT_EQ(pos, initialPose.pos);
+    ignition::math::Pose3d initialPose = model->WorldPose();
+    EXPECT_EQ(pos, initialPose.Pos());
   }
 
   {
@@ -142,13 +146,13 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     msg.set_name(name);
     msg.set_id(model->GetId());
 
-    for (std::vector<math::Pose>::iterator iter = poses.begin();
+    for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
          iter != poses.end(); ++iter)
     {
-      msgs::Set(msg.mutable_pose(), (*iter).Ign());
+      msgs::Set(msg.mutable_pose(), (*iter));
       modelPub->Publish(msg);
 
-      while (*iter != model->GetWorldPose())
+      while (*iter != model->WorldPose())
       {
         world->Step(1);
         common::Time::MSleep(1);
@@ -159,7 +163,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       // this change to the test.
       world->Step(10);
 
-      EXPECT_EQ(*iter, model->GetWorldPose());
+      EXPECT_EQ(*iter, model->WorldPose());
     }
   }
 }
@@ -178,22 +182,22 @@ void PhysicsMsgsTest::LinkProperties(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // spawn a box
   std::string name = "test_box";
   double z0 = 5;
-  math::Vector3 pos = math::Vector3(0, 0, z0);
-  math::Vector3 size = math::Vector3(1, 1, 1);
-  SpawnBox(name, size, pos, math::Vector3::Zero);
+  ignition::math::Vector3d pos(0, 0, z0);
+  ignition::math::Vector3d size(1, 1, 1);
+  SpawnBox(name, size, pos, ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify"
   transport::PublisherPtr modelPub =
     this->node->Advertise<msgs::Model>("~/model/modify");
 
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   // change gravity mode and verify the msg gets through
@@ -315,7 +319,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // set gravity to zero
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   world->SetGravity(ignition::math::Vector3d::Zero);
@@ -326,18 +330,22 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
 
   double z0 = 5;
   // list of poses to move to
-  std::vector<math::Pose> poses;
-  poses.push_back(math::Pose(5, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 8, z0, 0, 0, 0));
-  poses.push_back(math::Pose(-99, 0, z0, 0, 0, 0));
-  poses.push_back(math::Pose(0, 999, z0, 0, 0, 0));
-  poses.push_back(math::Pose(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
-  poses.push_back(math::Pose(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
-  poses.push_back(math::Pose(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
-  poses.push_back(math::Pose(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
+  std::vector<ignition::math::Pose3d> poses;
+  poses.push_back(ignition::math::Pose3d(5, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 8, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(-99, 0, z0, 0, 0, 0));
+  poses.push_back(ignition::math::Pose3d(0, 999, z0, 0, 0, 0));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, 456.123, z0*10, 0.1, -0.2, 0.3));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, 456.123, z0*10, 0.2, 0.4, -0.6));
+  poses.push_back(
+      ignition::math::Pose3d(123.456, -456.123, z0*10, 0.3, -0.6, 0.9));
+  poses.push_back(
+      ignition::math::Pose3d(-123.456, -456.123, z0*10, -0.4, 0.8, -1.2));
 
   std::string name = "multilink";
-  physics::ModelPtr model = world->GetModel(name);
+  physics::ModelPtr model = world->ModelByName(name);
   ASSERT_TRUE(model != NULL);
 
   {
@@ -349,7 +357,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
       if (link->IsCanonicalLink())
         continue;
 
-      for (std::vector<math::Pose>::iterator iter = poses.begin();
+      for (std::vector<ignition::math::Pose3d>::iterator iter = poses.begin();
            iter != poses.end(); ++iter)
       {
         msgs::Model msg;
@@ -360,12 +368,12 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         linkMsg->set_id(link->GetId());
         linkMsg->set_name(link->GetScopedName());
 
-        msgs::Set(linkMsg->mutable_pose(), (*iter).Ign());
+        msgs::Set(linkMsg->mutable_pose(), (*iter));
         modelPub->Publish(msg);
 
         int sleep = 0;
         int maxSleep = 50;
-        while (*iter != link->GetRelativePose() && sleep < maxSleep)
+        while (*iter != link->RelativePose() && sleep < maxSleep)
         {
           world->Step(1);
           common::Time::MSleep(1);
@@ -376,7 +384,7 @@ void PhysicsMsgsTest::LinkPose(const std::string &_physicsEngine)
         // this change to the test.
         world->Step(10);
 
-        EXPECT_EQ(*iter, link->GetRelativePose());
+        EXPECT_EQ(*iter, link->RelativePose());
       }
     }
   }
@@ -402,7 +410,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -417,40 +425,43 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   // spawn some simple shapes with unit size
   double z0 = 0.5;
-  std::map<std::string, math::Vector3> modelPos;
-  modelPos["test_box"] = math::Vector3(0, 0, z0);
-  modelPos["test_sphere"] = math::Vector3(4, 0, z0);
-  modelPos["test_cylinder"] = math::Vector3(8, 0, z0);
-  modelPos["test_non_unit_box"] = math::Vector3(16, 0, z0);
+  std::map<std::string, ignition::math::Vector3d> modelPos;
+  modelPos["test_box"] = ignition::math::Vector3d(0, 0, z0);
+  modelPos["test_sphere"] = ignition::math::Vector3d(4, 0, z0);
+  modelPos["test_cylinder"] = ignition::math::Vector3d(8, 0, z0);
+  modelPos["test_non_unit_box"] = ignition::math::Vector3d(16, 0, z0);
 
-  std::map<std::string, math::Vector3> modelSize;
-  modelSize["test_box"] = math::Vector3::One;
-  modelSize["test_sphere"] = math::Vector3::One;
-  modelSize["test_cylinder"] = math::Vector3::One;
-  modelSize["test_non_unit_box"] = math::Vector3(3, 8, 1.0);
+  std::map<std::string, ignition::math::Vector3d> modelSize;
+  modelSize["test_box"] = ignition::math::Vector3d::One;
+  modelSize["test_sphere"] = ignition::math::Vector3d::One;
+  modelSize["test_cylinder"] = ignition::math::Vector3d::One;
+  modelSize["test_non_unit_box"] = ignition::math::Vector3d(3, 8, 1.0);
 
-  SpawnBox("test_box", math::Vector3(1, 1, 1), modelPos["test_box"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere", modelPos["test_sphere"], math::Vector3::Zero);
+  SpawnBox("test_box", ignition::math::Vector3d(1, 1, 1), modelPos["test_box"],
+      ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere", modelPos["test_sphere"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder", modelPos["test_cylinder"],
-      math::Vector3::Zero);
+      ignition::math::Vector3d::Zero);
   SpawnBox("test_non_unit_box", modelSize["test_non_unit_box"],
-      modelPos["test_non_unit_box"], math::Vector3::Zero);
+      modelPos["test_non_unit_box"], ignition::math::Vector3d::Zero);
 
   // spawn another set of shapes and use messages to resize these
-  modelPos["test_box2"] = math::Vector3(0, 9, z0);
-  modelPos["test_sphere2"] = math::Vector3(4, 9, z0);
-  modelPos["test_cylinder2"] = math::Vector3(8, 9, z0);
+  modelPos["test_box2"] = ignition::math::Vector3d(0, 9, z0);
+  modelPos["test_sphere2"] = ignition::math::Vector3d(4, 9, z0);
+  modelPos["test_cylinder2"] = ignition::math::Vector3d(8, 9, z0);
 
-  modelSize["test_box2"] = math::Vector3::One;
-  modelSize["test_sphere2"] = math::Vector3::One;
-  modelSize["test_cylinder2"] = math::Vector3::One;
+  modelSize["test_box2"] = ignition::math::Vector3d::One;
+  modelSize["test_sphere2"] = ignition::math::Vector3d::One;
+  modelSize["test_cylinder2"] = ignition::math::Vector3d::One;
 
-  SpawnBox("test_box2", math::Vector3(1, 1, 1), modelPos["test_box2"],
-      math::Vector3::Zero);
-  SpawnSphere("test_sphere2", modelPos["test_sphere2"], math::Vector3::Zero);
+  SpawnBox("test_box2", ignition::math::Vector3d(1, 1, 1),
+      modelPos["test_box2"],
+      ignition::math::Vector3d::Zero);
+  SpawnSphere("test_sphere2", modelPos["test_sphere2"],
+      ignition::math::Vector3d::Zero);
   SpawnCylinder("test_cylinder2", modelPos["test_cylinder2"],
-      math::Vector3::Zero);
+      ignition::math::Vector3d::Zero);
 
   // advertise on "~/model/modify" to generate resize messages
   transport::PublisherPtr modelPub =
@@ -458,8 +469,8 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
 
   int steps = 2;
   physics::ModelPtr model;
-  math::Pose pose1, pose2;
-  math::Vector3 vel1, vel2;
+  ignition::math::Pose3d pose1, pose2;
+  ignition::math::Vector3d vel1, vel2;
   double x0, y0;
 
   // Allow objects to settle on ground_plane
@@ -470,16 +481,16 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter.first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     EXPECT_TRUE(model != NULL);
 
-    pose1 = model->GetWorldPose();
-    x0 = modelPos[name].x;
-    y0 = modelPos[name].y;
+    pose1 = model->WorldPose();
+    x0 = modelPos[name].X();
+    y0 = modelPos[name].Y();
 
-    EXPECT_NEAR(pose1.pos.x, x0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.y, y0, PHYSICS_TOL);
-    EXPECT_NEAR(pose1.pos.z, z0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().X(), x0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Y(), y0, PHYSICS_TOL);
+    EXPECT_NEAR(pose1.Pos().Z(), z0, PHYSICS_TOL);
   }
 
   // resize model to half of it's size
@@ -487,7 +498,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (*(name.rbegin()) == '2')
     {
       // Use a message to resize this one
@@ -509,7 +520,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   double tHit = sqrt(2*(z0-0.5*scaleFactor) / (-g.Z()));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   steps = ceil(dtHit / dt);
   EXPECT_GT(steps, 0);
   world->Step(steps);
@@ -529,14 +540,14 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   {
     std::string name = iter.first;
     // Make sure the model is loaded
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     if (model != NULL)
     {
       gzdbg << "Check ground contact of model " << name << '\n';
       // Check that model is resting on ground
-      pose1 = model->GetWorldPose();
-      x0 = modelPos[name].x;
-      y0 = modelPos[name].y;
+      pose1 = model->WorldPose();
+      x0 = modelPos[name].X();
+      y0 = modelPos[name].Y();
       double xTolerance = PHYSICS_TOL;
       double yTolerance = PHYSICS_TOL;
 #ifdef HAVE_BULLET
@@ -549,9 +560,9 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         }
       }
 #endif
-      EXPECT_NEAR(pose1.pos.x, x0, xTolerance);
-      EXPECT_NEAR(pose1.pos.y, y0, yTolerance);
-      EXPECT_NEAR(pose1.pos.z, 0.5*scaleFactor, PHYSICS_TOL);
+      EXPECT_NEAR(pose1.Pos().X(), x0, xTolerance);
+      EXPECT_NEAR(pose1.Pos().Y(), y0, yTolerance);
+      EXPECT_NEAR(pose1.Pos().Z(), 0.5*scaleFactor, PHYSICS_TOL);
     }
     else
     {
@@ -564,7 +575,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     msgs::Model modelMsg;
     model->FillMsg(modelMsg);
 
@@ -582,19 +593,19 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         if (geomMsg.has_box())
         {
           EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
-              modelSize[name].Ign() * scaleFactor);
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * scaleFactor);
+              modelSize[name].Z() * scaleFactor);
         }
       }
 
@@ -606,19 +617,19 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
         if (geomMsg.has_box())
         {
           EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()),
-              modelSize[name].Ign() * scaleFactor);
+              modelSize[name] * scaleFactor);
         }
         else if (geomMsg.has_sphere())
         {
           EXPECT_DOUBLE_EQ(geomMsg.sphere().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
         }
         else if (geomMsg.has_cylinder())
         {
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().radius(),
-              modelSize[name].x * 0.5 * scaleFactor);
+              modelSize[name].X() * 0.5 * scaleFactor);
           EXPECT_DOUBLE_EQ(geomMsg.cylinder().length(),
-              modelSize[name].z * scaleFactor);
+              modelSize[name].Z() * scaleFactor);
         }
       }
     }
@@ -628,7 +639,7 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
   for (auto const &iter : modelPos)
   {
     std::string name = iter.first;
-    model = world->GetModel(name);
+    model = world->ModelByName(name);
     sdf::ElementPtr modelElem = model->GetSDF();
 
     EXPECT_TRUE(modelElem->HasElement("link"));
@@ -644,22 +655,22 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (visualGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = visualGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (visualGeomElem->HasElement("sphere"))
       {
         sdf::ElementPtr sphereElem = visualGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
       }
       else if (visualGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem = visualGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+        EXPECT_EQ(length, modelSize[name].Z() * scaleFactor);
       }
 
       // verify collision geom sdf
@@ -671,23 +682,23 @@ void PhysicsMsgsTest::SimpleShapeResize(const std::string &_physicsEngine)
       if (collisionGeomElem->HasElement("box"))
       {
         sdf::ElementPtr boxElem = collisionGeomElem->GetElement("box");
-        math::Vector3 size = boxElem->Get<math::Vector3>("size");
+        auto size = boxElem->Get<ignition::math::Vector3d>("size");
         EXPECT_EQ(size, modelSize[name] * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("sphere"))
       {
         sdf::ElementPtr sphereElem = collisionGeomElem->GetElement("sphere");
         double radius = sphereElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
       }
       else if (collisionGeomElem->HasElement("cylinder"))
       {
         sdf::ElementPtr cylinderElem =
             collisionGeomElem->GetElement("cylinder");
         double radius = cylinderElem->Get<double>("radius");
-        EXPECT_EQ(radius, modelSize[name].x * 0.5 * scaleFactor);
+        EXPECT_EQ(radius, modelSize[name].X() * 0.5 * scaleFactor);
         double length = cylinderElem->Get<double>("length");
-        EXPECT_EQ(length, modelSize[name].z * scaleFactor);
+        EXPECT_EQ(length, modelSize[name].Z() * scaleFactor);
       }
       linkElem = linkElem->GetNextElement("link");
     }
@@ -702,13 +713,13 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::ostringstream sdfStream;
-  math::Pose pose(0, 0, 0, 0, 0, 0);
-  math::Vector3 boxSize(1, 1, 1);
+  ignition::math::Pose3d pose(0, 0, 0, 0, 0, 0);
+  ignition::math::Vector3d boxSize(1, 1, 1);
   sdfStream << "<sdf version='" << SDF_VERSION << "'>"
     << "<model name ='box_test'>"
     << "<allow_auto_disable>false</allow_auto_disable>"
@@ -743,7 +754,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
   SpawnSDF(sdfStream.str());
 
   physics::ModelPtr model;
-  model = world->GetModel("box_test");
+  model = world->ModelByName("box_test");
   EXPECT_TRUE(model != NULL);
   msgs::Model msg;
   model->FillMsg(msg);
@@ -774,7 +785,7 @@ void PhysicsMsgsTest::LinkVisualMsg(const std::string &_physicsEngine)
     EXPECT_EQ(visualMsg.type(), msgs::Visual::VISUAL);
     msgs::Geometry geomMsg = visualMsg.geometry();
     EXPECT_TRUE(geomMsg.has_box());
-    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize.Ign());
+    EXPECT_EQ(msgs::ConvertIgn(geomMsg.box().size()), boxSize);
   }
 }
 
@@ -786,7 +797,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -896,7 +907,7 @@ void PhysicsMsgsTest::JointMsg(const std::string &_physicsEngine)
   SpawnSDF(sdfStream.str());
 
   physics::ModelPtr model;
-  model = world->GetModel("joint_msg_test");
+  model = world->ModelByName("joint_msg_test");
   EXPECT_TRUE(model != NULL);
   msgs::Model msg;
   model->FillMsg(msg);

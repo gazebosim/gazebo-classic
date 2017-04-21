@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Bullet Link class
- * Author: Nate Koenig
- * Date: 15 May 2009
- */
-
-#ifndef _BULLETLINK_HH_
-#define _BULLETLINK_HH_
+#ifndef GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
+#define GAZEBO_PHYSICS_BULLET_BULLETLINK_HH_
 
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
@@ -66,37 +61,37 @@ namespace gazebo
       public: virtual bool GetEnabled() const;
 
       // Documentation inherited.
-      public: virtual void SetLinearVel(const math::Vector3 &_vel);
+      public: virtual void SetLinearVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetAngularVel(const math::Vector3 &_vel);
+      public: virtual void SetAngularVel(const ignition::math::Vector3d &_vel);
 
       // Documentation inherited.
-      public: virtual void SetForce(const math::Vector3 &_force);
+      public: virtual void SetForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void SetTorque(const math::Vector3 &_torque);
+      public: virtual void SetTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Vector3 &_offset) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+                  const ignition::math::Vector3d &_offset) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldLinearVel(
-                  const math::Vector3 &_offset,
-                  const math::Quaternion &_q) const;
+      public: virtual ignition::math::Vector3d WorldLinearVel(
+                  const ignition::math::Vector3d &_offset,
+                  const ignition::math::Quaterniond &_q) const;
 
       // Documentation inherited
-      public: virtual math::Vector3 GetWorldCoGLinearVel() const;
+      public: virtual ignition::math::Vector3d WorldCoGLinearVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldAngularVel() const;
+      public: virtual ignition::math::Vector3d WorldAngularVel() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldForce() const;
+      public: virtual ignition::math::Vector3d WorldForce() const;
 
       // Documentation inherited.
-      public: virtual math::Vector3 GetWorldTorque() const;
+      public: virtual ignition::math::Vector3d WorldTorque() const;
 
       // Documentation inherited.
       public: virtual void SetGravityMode(bool _mode);
@@ -111,6 +106,9 @@ namespace gazebo
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
 
+      /// \brief Remove and re-add this rigid body from the world.
+      public: void RemoveAndAddBody() const;
+
       /// \internal
       /// \brief Clear bullet collision cache needed when the body is resized.
       public: void ClearCollisionCache();
@@ -122,34 +120,38 @@ namespace gazebo
       public: virtual void SetAngularDamping(double _damping);
 
       /// \brief Set the relative pose of a child collision.
-      /*public: void SetCollisionRelativePose(BulletCollision *collision,
-                                            const math::Pose &newPose);
-                                            */
+      // public: void SetCollisionRelativePose(BulletCollision *collision,
+      // const ignition::math::Pose3d &newPose);
 
       // Documentation inherited.
-      public: virtual void AddForce(const math::Vector3 &_force);
+      public: virtual void AddForce(const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddRelativeForce(const math::Vector3 &_force);
+      public: virtual void AddRelativeForce(
+                  const ignition::math::Vector3d &_force);
 
       // Documentation inherited.
-      public: virtual void AddForceAtWorldPosition(const math::Vector3 &_force,
-                                                   const math::Vector3 &_pos);
+      public: virtual void AddForceAtWorldPosition(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_pos);
 
       // Documentation inherited.
       public: virtual void AddForceAtRelativePosition(
-                  const math::Vector3 &_force,
-                  const math::Vector3 &_relpos);
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_relpos);
 
       // Documentation inherited
-      public: virtual void AddLinkForce(const math::Vector3 &_force,
-          const math::Vector3 &_offset = math::Vector3::Zero);
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                  ignition::math::Vector3d::Zero);
 
       // Documentation inherited.
-      public: virtual void AddTorque(const math::Vector3 &_torque);
+      public: virtual void AddTorque(const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
-      public: virtual void AddRelativeTorque(const math::Vector3 &_torque);
+      public: virtual void AddRelativeTorque(
+                  const ignition::math::Vector3d &_torque);
 
       // Documentation inherited.
       public: virtual void SetAutoDisable(bool _disable);

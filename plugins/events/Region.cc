@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,21 @@
 
 using namespace gazebo;
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////
 bool Region::Contains(const math::Vector3 &_p) const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return Contains(_p.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////
+bool Region::Contains(const ignition::math::Vector3d &_p) const
 {
   for (auto v: this->boxes)
   {
@@ -33,7 +46,7 @@ bool Region::Contains(const math::Vector3 &_p) const
   return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////
 void Region::Load(const sdf::ElementPtr &_sdf)
 {
   sdf::ElementPtr child = _sdf->GetFirstElement();
@@ -42,8 +55,9 @@ void Region::Load(const sdf::ElementPtr &_sdf)
     std::string ename = child->GetName();
     if (ename == "volume")
     {
-      this->boxes.push_back(math::Box(child->Get<math::Vector3>("min"),
-                                      child->Get<math::Vector3>("max")));
+      this->boxes.push_back(
+          ignition::math::Box(child->Get<ignition::math::Vector3d>("min"),
+          child->Get<ignition::math::Vector3d>("max")));
     }
     else if (ename == "name")
     {

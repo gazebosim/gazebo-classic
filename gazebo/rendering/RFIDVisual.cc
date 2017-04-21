@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,6 +64,6 @@ RFIDVisual::~RFIDVisual()
 /////////////////////////////////////////////////
 void RFIDVisual::OnScan(ConstPosePtr &/*_msg*/)
 {
-  // math::Vector3 pt = msgs::Convert(_msg->position());
+  // auto pt = msgs::Convert(_msg->position());
   // this->sceneNode->setPosition(Conversions::Convert(pt));
 }

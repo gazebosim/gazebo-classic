@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,15 +88,13 @@ void WirelessTransmitter::Init()
   // This ray will be used in SignalStrength() for checking obstacles
   // between the transmitter and a given point.
   this->dataPtr->testRay = boost::dynamic_pointer_cast<RayShape>(
-      this->world->GetPhysicsEngine()->CreateShape("ray",
-        CollisionPtr()));
+      this->world->Physics()->CreateShape("ray", CollisionPtr()));
 }
 
 //////////////////////////////////////////////////
 bool WirelessTransmitter::UpdateImpl(const bool /*_force*/)
 {
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose + this->parentEntity.lock()->WorldPose();
 
   if (this->dataPtr->visualize)
   {
@@ -170,7 +168,7 @@ double WirelessTransmitter::SignalStrength(
 
   // Acquire the mutex for avoiding race condition with the physics engine
   boost::recursive_mutex::scoped_lock lock(*(
-        this->world->GetPhysicsEngine()->GetPhysicsUpdateMutex()));
+        this->world->Physics()->GetPhysicsUpdateMutex()));
 
   // Compute the value of n depending on the obstacles between Tx and Rx
   double n = WirelessTransmitterPrivate::NEmpty;

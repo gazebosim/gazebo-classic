@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,13 +110,6 @@ namespace gazebo
       /// and visibility accordingly.
       /// \param[in] _mode New mode.
       public: void SetMode(Mode _mode);
-
-      /// \brief Get the rotation to point the positive Z axis to the
-      /// given direction.
-      /// \param[in] _dir Direction vector.
-      /// \return Resulting quaternion
-      private: ignition::math::Quaterniond QuaternionFromVector(
-          const ignition::math::Vector3d &_dir);
     };
     /// \}
   }

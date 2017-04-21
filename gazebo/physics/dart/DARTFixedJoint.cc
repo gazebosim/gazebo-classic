@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -30,19 +31,21 @@ using namespace physics;
 DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
   : FixedJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::WeldJoint();
 }
 
 //////////////////////////////////////////////////
 DARTFixedJoint::~DARTFixedJoint()
 {
-  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
 void DARTFixedJoint::Load(sdf::ElementPtr _sdf)
 {
   FixedJoint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::WeldJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -52,27 +55,35 @@ void DARTFixedJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTFixedJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d DARTFixedJoint::Anchor(
+    const unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+          "Anchor" + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTFixedJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTFixedJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
 
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
-                             const math::Vector3& /*_axis*/)
+void DARTFixedJoint::SetAxis(const unsigned int /*_index*/,
+                             const ignition::math::Vector3d& /*_axis*/)
 {
   gzwarn << "DARTFixedJoint: called method "
          << "SetAxis that is not valid for joints of type fixed.\n";
@@ -80,11 +91,11 @@ void DARTFixedJoint::SetAxis(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+double DARTFixedJoint::PositionImpl(const unsigned int /*_index*/) const
 {
   gzwarn << "DARTFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////

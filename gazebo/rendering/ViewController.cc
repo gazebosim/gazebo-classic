@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,22 @@ ViewController::~ViewController()
 }
 
 //////////////////////////////////////////////////
-void ViewController::Init(const math::Vector3 &/*_focalPoint*/,
-    double /*_yaw*/, double /*_pitch*/)
+void ViewController::Init(const math::Vector3 &_focalPoint,
+    double _yaw, double _pitch)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_focalPoint.Ign(), _yaw, _pitch);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void ViewController::Init(const ignition::math::Vector3d &/*_focalPoint*/,
+    const double /*_yaw*/, const double /*_pitch*/)
 {
 }
 

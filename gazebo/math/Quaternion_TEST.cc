@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Quaternion.hh"
+
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 using namespace gazebo;
 
@@ -363,14 +367,14 @@ TEST_F(QuaternionTest, Integrate)
     const double angle = 0.5;
     math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
     math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
-    EXPECT_NE(qZY.GetAsEuler(), angle*math::Vector3(0, 1, 1));
+    EXPECT_NE(qZY.GetAsEuler().Ign(), (angle*math::Vector3(0, 1, 1)).Ign());
   }
   {
     const math::Quaternion q(1, 0, 0, 0);
     const double angle = 0.5;
     math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
     math::Quaternion qZX  = qZ.Integrate(math::Vector3::UnitX, angle);
-    EXPECT_NE(qZX.GetAsEuler(), angle*math::Vector3(1, 0, 1));
+    EXPECT_NE(qZX.GetAsEuler().Ign(), angle*math::Vector3(1, 0, 1).Ign());
   }
   {
     const math::Quaternion q(1, 0, 0, 0);
@@ -378,14 +382,14 @@ TEST_F(QuaternionTest, Integrate)
     math::Quaternion qZ   = q.Integrate(math::Vector3::UnitZ, angle);
     math::Quaternion qZY  = qZ.Integrate(math::Vector3::UnitY, angle);
     math::Quaternion qZYX = qZY.Integrate(math::Vector3::UnitX, angle);
-    EXPECT_NE(qZYX.GetAsEuler(), angle*math::Vector3(1, 1, 1));
+    EXPECT_NE(qZYX.GetAsEuler().Ign(), angle*math::Vector3(1, 1, 1).Ign());
   }
   {
     const math::Quaternion q(1, 0, 0, 0);
     const double angle = 0.5;
     math::Quaternion qY   = q.Integrate(math::Vector3::UnitY, angle);
     math::Quaternion qYX  = qY.Integrate(math::Vector3::UnitX, angle);
-    EXPECT_NE(qYX.GetAsEuler(), angle*math::Vector3(1, 1, 0));
+    EXPECT_NE(qYX.GetAsEuler().Ign(), angle*math::Vector3(1, 1, 0).Ign());
   }
 
   // Integrate a full rotation about different axes,

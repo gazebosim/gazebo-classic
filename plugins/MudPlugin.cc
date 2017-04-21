@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,15 @@
  *
 */
 
+#include <functional>
+#include <map>
+#include <set>
+
 #include <boost/algorithm/string.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/physics/physics.hh"
@@ -49,7 +55,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
   this->world = this->model->GetWorld();
   GZ_ASSERT(this->world, "MudPlugin world pointer is NULL");
 
-  this->physics = this->world->GetPhysicsEngine();
+  this->physics = this->world->Physics();
   GZ_ASSERT(this->physics, "MudPlugin physics pointer is NULL");
 
   this->link = _model->GetLink();
@@ -98,7 +104,7 @@ void MudPlugin::Load(physics::ModelPtr _model,
 void MudPlugin::Init()
 {
   this->node.reset(new transport::Node());
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
 
   if (!this->contactSensorName.empty())
   {
@@ -113,7 +119,7 @@ void MudPlugin::Init()
     {
       std::string name = this->contactSensorName;
       boost::replace_all(name, "/", "::");
-      name = this->world->GetName() + "::"+ this->modelName + "::" + name;
+      name = this->world->Name() + "::"+ this->modelName + "::" + name;
       sensors::SensorManager *mgr = sensors::SensorManager::Instance();
       // Get a pointer to the contact sensor
       sensors::ContactSensorPtr sensor =
@@ -126,7 +132,7 @@ void MudPlugin::Init()
           std::string colName = sensor->GetCollisionName(i);
           physics::CollisionPtr colPtr =
               boost::dynamic_pointer_cast<physics::Collision>(
-              this->world->GetEntity(colName));
+              this->world->EntityByName(colName));
           if (colPtr)
           {
             this->contactSurfaceBitmask |=
@@ -144,7 +150,7 @@ void MudPlugin::Init()
   for (unsigned int i = 0; i < this->allowedLinks.size(); ++i)
   {
     physics::LinkPtr allowedLink = boost::dynamic_pointer_cast<physics::Link>(
-        this->world->GetEntity(this->allowedLinks[i]));
+        this->world->EntityByName(this->allowedLinks[i]));
 
     if (!allowedLink)
       continue;
@@ -165,7 +171,7 @@ void MudPlugin::Init()
 /////////////////////////////////////////////////
 void MudPlugin::OnContact(ConstContactsPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   this->newestContactsMsg = *_msg;
   this->newMsg = true;
 }
@@ -178,11 +184,11 @@ void MudPlugin::OnUpdate()
     dt = 1e-6;
   if (this->newMsg)
   {
-    boost::mutex::scoped_lock lock(this->mutex);
+    std::lock_guard<std::mutex> lock(this->mutex);
 
     unsigned int nc = this->newestContactsMsg.contact_size();
-    boost::unordered_set<std::string> contactLinkNames;
-    boost::unordered_map<std::string, unsigned int> linkNameIndices;
+    std::set<std::string> contactLinkNames;
+    std::map<std::string, unsigned int> linkNameIndices;
 
     // If new contacts, then get the link names
     if (nc)
@@ -227,7 +233,7 @@ void MudPlugin::OnUpdate()
       if (contactLinkNames.end() != contactLinkNames.find(*iterLinkName))
       {
         // Compute the average contact point position
-        math::Vector3 contactPositionAverage;
+        ignition::math::Vector3d contactPositionAverage;
         {
           // Find the index to the correct contact data structure
           unsigned int i = linkNameIndices[*iterLinkName];
@@ -267,7 +273,7 @@ void MudPlugin::OnUpdate()
             std::string targetModelName = (*iterLinkName).substr(0,
                                           (*iterLinkName).rfind("::"));
             physics::ModelPtr targetModel =
-              this->world->GetModel(targetModelName);
+              this->world->ModelByName(targetModelName);
             if (targetModel)
               *iterLink = targetModel->GetLink(*iterLinkName);
           }
@@ -282,7 +288,8 @@ void MudPlugin::OnUpdate()
             (*iterJoint)->Attach(this->link, *iterLink);
 
             (*iterJoint)->Load(this->link, *iterLink,
-              math::Pose(contactPositionAverage, math::Quaternion()));
+              ignition::math::Pose3d(contactPositionAverage,
+                  ignition::math::Quaterniond::Identity));
             // Joint names must be unique
             // name as mud_joint_0, mud_joint_1, etc.
             {
@@ -300,8 +307,8 @@ void MudPlugin::OnUpdate()
               (*iterJoint)->SetParam("stop_erp", 0, erp);
               (*iterJoint)->SetParam("stop_cfm", 0, cfm);
             }
-            (*iterJoint)->SetHighStop(0, 0.0);
-            (*iterJoint)->SetLowStop(0, 0.0);
+            (*iterJoint)->SetUpperLimit(0, 0.0);
+            (*iterJoint)->SetLowerLimit(0, 0.0);
 
             (*iterJoint)->Init();
           }

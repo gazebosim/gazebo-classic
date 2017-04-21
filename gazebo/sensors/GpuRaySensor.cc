@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/Model.hh"
@@ -116,7 +117,7 @@ void GpuRaySensor::Load(const std::string &_worldName)
   }
 
   this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
@@ -132,7 +133,7 @@ void GpuRaySensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -590,7 +591,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -617,11 +618,11 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
       {
-        range = GZ_DBL_INF;
+        range = ignition::math::INF_D;
       }
       else if (range <= this->RangeMin())
       {
-        range = -GZ_DBL_INF;
+        range = -ignition::math::INF_D;
       }
       else if (this->noises.find(GPU_RAY_NOISE) !=
                this->noises.end())

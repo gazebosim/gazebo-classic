@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include "gazebo/gazebo_core.hh"
 #include "gazebo/physics/physics.hh"
 
@@ -31,7 +32,7 @@ namespace gazebo
       this->node.reset(new transport::Node());
 
       // Initialize the node with the world name
-      this->node->Init(_parent->GetWorld()->GetName());
+      this->node->Init(_parent->GetWorld()->Name());
 
       std::string name = std::string("~/") + _parent->GetName() + "/" +
                           _sdf->Get<std::string>("projector");
@@ -44,7 +45,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ProjectorPlugin::OnUpdate, this));
+          std::bind(&ProjectorPlugin::OnUpdate, this));
     }
 
     //////////////////////////////////////////////////

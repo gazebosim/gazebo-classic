@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,7 +104,7 @@ void Sensor::Load(const std::string &_worldName)
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->dataPtr->sensorPub =
     this->node->Advertise<msgs::Sensor>("~/sensor");
 }
@@ -165,7 +165,7 @@ bool Sensor::NeedsUpdate()
   if (this->dataPtr->category == IMAGE && this->scene)
     simTime = this->scene->SimTime();
   else
-    simTime = this->world->GetSimTime();
+    simTime = this->world->SimTime();
 
   // case when last update occurred in the future probably due to
   // world reset
@@ -192,7 +192,7 @@ void Sensor::Update(const bool _force)
     if (this->dataPtr->category == IMAGE && this->scene)
       simTime = this->scene->SimTime();
     else
-      simTime = this->world->GetSimTime();
+      simTime = this->world->SimTime();
 
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
@@ -267,8 +267,7 @@ std::string Sensor::Name() const
 //////////////////////////////////////////////////
 std::string Sensor::ScopedName() const
 {
-  return this->world->GetName() + "::" +
-         this->parentName + "::" + this->Name();
+  return this->world->Name() + "::" + this->parentName + "::" + this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -424,13 +423,13 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
-      distortionMsg->set_k1(distortion->GetK1());
-      distortionMsg->set_k2(distortion->GetK2());
-      distortionMsg->set_k3(distortion->GetK3());
-      distortionMsg->set_p1(distortion->GetP1());
-      distortionMsg->set_p2(distortion->GetP2());
-      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
-      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+      distortionMsg->set_k1(distortion->K1());
+      distortionMsg->set_k2(distortion->K2());
+      distortionMsg->set_k3(distortion->K3());
+      distortionMsg->set_p1(distortion->P1());
+      distortionMsg->set_p2(distortion->P2());
+      distortionMsg->mutable_center()->set_x(distortion->Center().X());
+      distortionMsg->mutable_center()->set_y(distortion->Center().Y());
     }
   }
 }
@@ -438,7 +437,7 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
 //////////////////////////////////////////////////
 std::string Sensor::WorldName() const
 {
-  return this->world->GetName();
+  return this->world->Name();
 }
 
 //////////////////////////////////////////////////

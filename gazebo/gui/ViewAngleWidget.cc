@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,7 +159,7 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   {
     for (auto const &vis : selectedVisuals)
     {
-      ignition::math::Vector3d visPos = vis->GetWorldPose().pos.Ign();
+      ignition::math::Vector3d visPos = vis->WorldPose().Pos();
       lookAt += visPos;
     }
     lookAt /= selectedVisuals.size();
@@ -173,16 +173,10 @@ void ViewAngleWidget::LookDirection(const ignition::math::Vector3d &_dir)
   ignition::math::Vector3d newCamPos = lookAt - _dir * distance;
 
   // Calculate camera orientation
-  double roll = 0;
-  double pitch = -std::atan2(_dir.Z(),
-      std::sqrt(std::pow(_dir.X(), 2) + std::pow(_dir.Y(), 2)));
-  double yaw = std::atan2(_dir.Y(), _dir.X());
-
-  ignition::math::Quaterniond quat =
-      ignition::math::Quaterniond(roll, pitch, yaw);
+  auto mat = ignition::math::Matrix4d::LookAt(newCamPos, lookAt);
 
   // Move camera to that pose in 1s
-  cam->MoveToPosition(ignition::math::Pose3d(newCamPos, quat), 1);
+  cam->MoveToPosition(mat.Pose(), 1);
 }
 
 /////////////////////////////////////////////////
@@ -229,7 +223,7 @@ void ViewAngleWidget::OnResetView()
   if (!cam)
     return;
 
-  cam->MoveToPosition(cam->DefaultPose().Ign(), 1);
+  cam->MoveToPosition(cam->InitialPose(), 1);
 }
 
 /////////////////////////////////////////////////

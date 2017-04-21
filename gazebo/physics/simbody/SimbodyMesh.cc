@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,17 +37,47 @@ SimbodyMesh::~SimbodyMesh()
 }
 
 //////////////////////////////////////////////////
+void SimbodyMesh::Init(const common::SubMesh * _subMesh,
+                      SimbodyCollisionPtr _collision,
+                      const math::Vector3 & _scale)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_subMesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
 void SimbodyMesh::Init(const common::SubMesh * /*_subMesh*/,
                       SimbodyCollisionPtr /*_collision*/,
-                      const math::Vector3 & /*_scale*/)
+                      const ignition::math::Vector3d & /*_scale*/)
 {
   gzerr << "SimbodyMesh is not supported\n";
 }
 
 //////////////////////////////////////////////////
+void SimbodyMesh::Init(const common::Mesh *_mesh,
+                       SimbodyCollisionPtr _collision,
+                       const math::Vector3 &_scale)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Init(_mesh, _collision, _scale.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
 void SimbodyMesh::Init(const common::Mesh * /*_mesh*/,
                        SimbodyCollisionPtr /*_collision*/,
-                       const math::Vector3 &/*_scale*/)
+                       const ignition::math::Vector3d &/*_scale*/)
 {
   gzerr << "SimbodyMesh is not supported\n";
 }
@@ -56,6 +86,6 @@ void SimbodyMesh::Init(const common::Mesh * /*_mesh*/,
 void SimbodyMesh::CreateMesh(float * /*_vertices*/, int * /*_indices*/,
     unsigned int /*_numVertices*/, unsigned int /*_numIndices*/,
     SimbodyCollisionPtr /*_collision*/,
-    const math::Vector3 & /*_scale*/)
+    const ignition::math::Vector3d & /*_scale*/)
 {
 }

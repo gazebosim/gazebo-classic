@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_USERCAMERA_PRIVATE_HH_
-#define _GAZEBO_USERCAMERA_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
+#define GAZEBO_RENDERING_USERCAMERA_PRIVATE_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
 namespace gazebo
 {
@@ -82,8 +82,11 @@ namespace gazebo
       /// \brief True if stereo rendering should be enabled.
       public: bool stereoEnabled;
 
-      /// \brief Default camera pose.
-      public: math::Pose defaultPose;
+      /// \brief Ratio of screen point to pixel.
+      public: double devicePixelRatio = 1.0;
+
+      /// \brief Initial camera pose.
+      public: ignition::math::Pose3d initialPose;
     };
   }
 }

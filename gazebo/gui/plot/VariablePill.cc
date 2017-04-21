@@ -17,6 +17,7 @@
 
 #include "gazebo/common/Console.hh"
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/plot/VariablePillContainer.hh"
 #include "gazebo/gui/plot/VariablePill.hh"
 
@@ -80,7 +81,7 @@ namespace gazebo
 }
 
 // empty variable id
-const unsigned int VariablePill::EmptyVariable = IGN_UINT32_MAX;
+const unsigned int VariablePill::EmptyVariable = ignition::math::MAX_UI32;
 
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;

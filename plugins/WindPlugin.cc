@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Events.hh"
 #include "plugins/WindPlugin.hh"
@@ -131,7 +134,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     this->forceApproximationScalingFactor = sdfForceApprox->Get<double>();
   }
 
-  double period = this->world->GetPhysicsEngine()->GetMaxStepSize();
+  double period = this->world->Physics()->GetMaxStepSize();
 
   this->kMag = period / this->characteristicTimeForWindRise;
   this->kMagVertical = period / this->characteristicTimeForWindRiseVertical;
@@ -159,7 +162,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
       this->kMagVertical * _wind->LinearVel().Z();
   
   magnitude += this->magnitudeSinAmplitudePercent * this->magnitudeMean *
-    sin(2 * M_PI * this->world->GetSimTime().Double() /
+    sin(2 * M_PI * this->world->SimTime().Double() /
         this->magnitudeSinPeriod);
 
   if (this->noiseMagnitude)
@@ -178,7 +181,7 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   direction = this->directionMean;
 
   direction += this->orientationSinAmplitude *
-    sin(2 * M_PI * this->world->GetSimTime().Double() /
+    sin(2 * M_PI * this->world->SimTime().Double() /
         this->orientationSinPeriod);
 
   if (this->noiseDirection)
@@ -186,8 +189,8 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 
   // Apply wind velocity
   ignition::math::Vector3d windVel;
-  windVel.X(magnitude * cos(GZ_DTOR(direction)));
-  windVel.Y(magnitude * sin(GZ_DTOR(direction)));
+  windVel.X(magnitude * cos(IGN_DTOR(direction)));
+  windVel.Y(magnitude * sin(IGN_DTOR(direction)));
 
   if (this->noiseVertical)
     windVel.Z(noiseVertical->Apply(this->magnitudeMeanVertical));
@@ -207,7 +210,7 @@ void WindPlugin::OnUpdate()
   // It doesn't make sense to be negative, that would be negative wind drag.
   if (fabs(this->forceApproximationScalingFactor) < 1E-6) { return; };
   // Get all the models
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
 
   // Process each model.
   for (auto const &model : models)
@@ -223,9 +226,9 @@ void WindPlugin::OnUpdate()
         continue;
 
       // Add wind velocity as a force to the body
-      link->AddRelativeForce(link->GetInertial()->GetMass() *
+      link->AddRelativeForce(link->GetInertial()->Mass() *
           this->forceApproximationScalingFactor *
-          (link->RelativeWindLinearVel() - link->GetRelativeLinearVel().Ign()));
+          (link->RelativeWindLinearVel() - link->RelativeLinearVel()));
     }
   }
 }
