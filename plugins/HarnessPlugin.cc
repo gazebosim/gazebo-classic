@@ -271,7 +271,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 }
 
 /////////////////////////////////////////////////
-void Attach(const ignition::math::Pose3d &_pose)
+void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 {
 }
 
