@@ -350,7 +350,7 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  
+
   if (NOT OGRE_FOUND)
     # If OGRE was not found, try with the standard find_package(OGRE)
     find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
@@ -366,7 +366,7 @@ if (PKG_CONFIG_FOUND)
     list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
     list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
   endif ()
-  
+
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
   else ()
