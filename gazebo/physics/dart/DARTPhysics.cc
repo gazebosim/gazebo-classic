@@ -249,6 +249,8 @@ void DARTPhysics::UpdateCollision()
 
     GZ_ASSERT(dtShapeFrame1, "shape frame 1 is null!");
     GZ_ASSERT(dtShapeFrame2, "shape frame 2 is null!");
+    GZ_ASSERT(dtShapeFrame1->asShapeNode(), "shape frame 1 is no shape node!");
+    GZ_ASSERT(dtShapeFrame2->asShapeNode(), "shape frame 2 is no shape node!");
 
     if (dtShapeFrame1->isShapeNode())
       dtBodyNode1 = dtShapeFrame1->asShapeNode()->getBodyNodePtr();
@@ -261,15 +263,8 @@ void DARTPhysics::UpdateCollision()
     DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
     DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
 
-    // GZ_ASSERT(dartLink1, "dartLink1 in collision pair is null");
-    // GZ_ASSERT(dartLink2, "dartLink2 in collision pair is null");
-
-    if (!dartLink1 || !dartLink2)
-    {
-      gzwarn << "A link was not found in DART, this can happen just "
-             << "after it has been removed.\n";
-      continue;
-    }
+    GZ_ASSERT(dartLink1, "dartLink1 in collision pair is null");
+    GZ_ASSERT(dartLink2, "dartLink2 in collision pair is null");
 
     LinkPair dtLinkPair(dartLink1, dartLink2);
     pairedContacts[dtLinkPair].push_back(&dtContact);

@@ -63,6 +63,8 @@ void DARTModel::Init()
   if (this->sdf->HasElement("model"))
     return;
 
+  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
+
   //----------------------------------------------------------------
   // Build DART Skeleton from the list of links and joints
   //
@@ -231,12 +233,42 @@ void DARTModel::Update()
 //////////////////////////////////////////////////
 void DARTModel::Fini()
 {
+  // get a backup of the world, because Model::Fini() (eventually
+  // calling Base::Fini()) will reset the world pointer
+  dart::simulation::WorldPtr _world = this->DARTWorld();
+  // remove all links and joints properly
   Model::Fini();
+  // remove the skeleton from the world
+  if (_world && this->dataPtr->dtSkeleton)
+  {
+    _world->removeSkeleton(this->dataPtr->dtSkeleton);
+  }
+
+  // update the world which now does not have the removed model an more
+  if (_world)
+  {
+    // We need to clear the last collision result because the next call of
+    // DARTPhysics::UpdateCollision() crashes if the last collision result
+    // still contains the removed model.
+    // Unfortunately, we cannot use
+    // _world->getLastCollisionResult().clear()
+    // (DARTPhysics::UpdateCollision() uses world->getLastCollisionResult())
+    // because it returns a const pointer.
+    // We could instead use
+    // _world->getConstraintSolver()->getLastCollisionResult().clear();
+    // (which works as well, as tested with DART-6)
+    // but that could conflict with future versions of DART and different
+    // handling in DARTPhysics::UpdateCollision() and here.
+    // So instead, for now we will just step() the world, which will also
+    // update the last collision result used in DARTPhysics::UpdateCollision().
+    _world->step();
+  }
 }
 
 //////////////////////////////////////////////////
 void DARTModel::BackupState()
 {
+  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
   this->dataPtr->genPositions = this->dataPtr->dtSkeleton->getPositions();
   this->dataPtr->genVelocities = this->dataPtr->dtSkeleton->getVelocities();
 }
@@ -244,8 +276,7 @@ void DARTModel::BackupState()
 //////////////////////////////////////////////////
 void DARTModel::RestoreState()
 {
-  if (!this->dataPtr->dtSkeleton)
-    return;
+  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
 
   GZ_ASSERT(static_cast<size_t>(this->dataPtr->genPositions.size()) ==
             this->dataPtr->dtSkeleton->getNumDofs(),
@@ -267,6 +298,7 @@ dart::dynamics::SkeletonPtr DARTModel::DARTSkeleton()
 //////////////////////////////////////////////////
 DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 {
+  if (!this->GetWorld()) return nullptr;
   return boost::dynamic_pointer_cast<DARTPhysics>(
     this->GetWorld()->Physics());
 }
@@ -274,5 +306,7 @@ DARTPhysicsPtr DARTModel::GetDARTPhysics(void) const
 //////////////////////////////////////////////////
 dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
 {
-  return GetDARTPhysics()->DARTWorld();
+  DARTPhysicsPtr physics = GetDARTPhysics();
+  if (!physics) return nullptr;
+  return physics->DARTWorld();
 }
