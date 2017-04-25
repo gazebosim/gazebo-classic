@@ -18,6 +18,25 @@
 #include <memory>
 #include <functional>
 
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+  #include <BaseTsd.h>
+  typedef SSIZE_T ssize_t;
+#endif
+
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
@@ -35,6 +54,32 @@ GZ_REGISTER_SENSOR_PLUGIN(ArduCopterIRLockPlugin)
 
 namespace gazebo
 {
+  /// \brief Obtains a parameter from sdf.
+  /// \param[in] _sdf Pointer to the sdf object.
+  /// \param[in] _name Name of the parameter.
+  /// \param[out] _param Param Variable to write the parameter to.
+  /// \param[in] _default_value Default value, if the parameter not available.
+  /// \param[in] _verbose If true, gzerror if the parameter is not available.
+  /// \return True if the parameter was found in _sdf, false otherwise.
+  template<class T>
+  bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
+    T &_param, const T &_defaultValue, const bool &_verbose = false)
+  {
+    if (_sdf->HasElement(_name))
+    {
+      _param = _sdf->GetElement(_name)->Get<T>();
+      return true;
+    }
+
+    _param = _defaultValue;
+    if (_verbose)
+    {
+      gzerr << "[ArduPilotPlugin] Please specify a value for parameter ["
+        << _name << "].\n";
+    }
+    return false;
+  }
+
   class ArduCopterIRLockPluginPrivate
   {
     /// \brief Pointer to the parent camera sensor
@@ -48,6 +93,12 @@ namespace gazebo
 
     /// \brief A list of fiducials tracked by this camera.
     public: std::vector<std::string> fiducials;
+
+    /// \brief Irlock address
+    public: std::string irlock_addr;
+
+    /// \brief Irlock port for receiver socket
+    public: uint16_t irlock_port;
 
     public: int handle;
 
@@ -86,14 +137,24 @@ ArduCopterIRLockPlugin::ArduCopterIRLockPlugin()
 {
   // socket
   this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  #ifndef _WIN32
+  // Windows does not support FD_CLOEXEC
   fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+  #endif
   int one = 1;
-  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY, &one,
-      sizeof(one));
-  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR, &one,
-      sizeof(one));
+  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
+      reinterpret_cast<const char *>(&one), sizeof(one));
+  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
+      reinterpret_cast<const char *>(&one), sizeof(one));
+
+  #ifdef _WIN32
+  u_long on = 1;
+  ioctlsocket(this->dataPtr->handle, FIONBIO,
+      reinterpret_cast<u_long FAR *>(&on));
+  #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
+  #endif
 }
 
 /////////////////////////////////////////////////
@@ -132,6 +193,10 @@ void ArduCopterIRLockPlugin::Load(sensors::SensorPtr _sensor,
         << std::endl;
     return;
   }
+  getSdfParam<std::string>(_sdf, "irlock_addr",
+      this->dataPtr->irlock_addr, "127.0.0.1");
+  getSdfParam<uint16_t>(_sdf, "irlock_port",
+      this->dataPtr->irlock_port, 9005);
 
   this->dataPtr->parentSensor->SetActive(true);
 
@@ -169,7 +234,7 @@ void ArduCopterIRLockPlugin::OnNewFrame(const unsigned char * /*_image*/,
       continue;
 
     ignition::math::Vector2i pt = GetScreenSpaceCoords(
-        vis->GetWorldPose().pos.Ign(), camera);
+        vis->WorldPose().Pos(), camera);
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
@@ -194,7 +259,7 @@ void ArduCopterIRLockPlugin::OnNewFrame(const unsigned char * /*_image*/,
 
     if (result && result->GetRootVisual() == vis)
     {
-      this->Publish(vis->GetName(), pt.X(), pt.Y());
+      this->Publish(vis->Name(), pt.X(), pt.Y());
     }
   }
 }
@@ -205,16 +270,16 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
 {
   rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
 
-  double imageWidth = this->dataPtr->parentSensor->ImageWidth();
-  double imageHeight = this->dataPtr->parentSensor->ImageHeight();
-  double hfov = camera->HFOV().Radian();
-  double vfov = camera->VFOV().Radian();
-  double pixelsPerRadianX = imageWidth / hfov;
-  double pixelsPerRadianY = imageHeight / vfov;
-  float angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
-      pixelsPerRadianX;
-  float angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
-      pixelsPerRadianY;
+  const double imageWidth = this->dataPtr->parentSensor->ImageWidth();
+  const double imageHeight = this->dataPtr->parentSensor->ImageHeight();
+  const double hfov = camera->HFOV().Radian();
+  const double vfov = camera->VFOV().Radian();
+  const double pixelsPerRadianX = imageWidth / hfov;
+  const double pixelsPerRadianY = imageHeight / vfov;
+  const float angleX = static_cast<float>(
+    (static_cast<double>(_x) - (imageWidth * 0.5)) / pixelsPerRadianX);
+  const float angleY = static_cast<float>(
+    -((imageHeight * 0.5) - static_cast<double>(_y)) / pixelsPerRadianY);
 
   // send_packet
   ArduCopterIRLockPluginPrivate::irlockPacket pkt;
@@ -233,9 +298,11 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
 
   struct sockaddr_in sockaddr;
   memset(&sockaddr, 0, sizeof(sockaddr));
-  sockaddr.sin_port = htons(9005);  // TODO: make it variable
+  sockaddr.sin_port = htons(this->dataPtr->irlock_port);
   sockaddr.sin_family = AF_INET;
-  sockaddr.sin_addr.s_addr = inet_addr("127.0.0.1");  // TODO: make it variable
-  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
-    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+  sockaddr.sin_addr.s_addr = inet_addr(this->dataPtr->irlock_addr.c_str());
+  ::sendto(this->dataPtr->handle,
+           reinterpret_cast<raw_type *>(&pkt),
+           sizeof(pkt), 0,
+           (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
