@@ -350,8 +350,23 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9.
-  # Please read gazebo issues: 994, 995
+
+  if (NOT OGRE_FOUND)
+    # If OGRE was not found, try with the standard find_package(OGRE)
+    find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
+    # Add each component include directories to OGRE_INCLUDE_DIRS because
+    # some OGRE components headers include without prefix headers contained
+    # in other components (see http://www.ogre3d.org/forums/viewtopic.php?f=2&t=73222)
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_RTShaderSystem_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Overlay_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Paging_INCLUDE_DIRS})
+    list(APPEND OGRE_LIBRARIES ${OGRE_RTShaderSystem_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
+  endif ()
+
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
   else ()
