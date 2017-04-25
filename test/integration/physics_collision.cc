@@ -81,6 +81,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
   const double dy = 0.4;
   const double dz = 0.9;
 
+  int modelCount = 0;
   auto models = world->GetModels();
   for (auto model : models)
   {
@@ -90,6 +91,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     {
       continue;
     }
+    modelCount++;
 
     int i = std::stoi(name.substr(4, 5));
 
@@ -130,6 +132,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
                 collision->GetWorldPose().Ign().Pos());
     }
   }
+  EXPECT_EQ(modelCount, 4);
 
   const double t0 = 1.5;
   const double dt = 1e-3;
