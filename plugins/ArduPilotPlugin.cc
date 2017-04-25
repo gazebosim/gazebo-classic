@@ -319,7 +319,7 @@ class gazebo::ArduPilotPluginPrivate
 
   /// \brief Pointer to the model;
   public: physics::ModelPtr model;
-  
+
   /// \brief String of the model name;
   public: std::string modelName;
 
