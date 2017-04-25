@@ -426,7 +426,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     double angle = std::atan2(pos.Y(), pos.X());
     modelAngles[model] = angle;
   }
-  EXPECT_EQ(modelAngels.size(), 44u);
+  EXPECT_EQ(modelAngles.size(), 44u);
 
   // Step forward
   world->Step(1500);
