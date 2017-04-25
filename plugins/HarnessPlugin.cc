@@ -27,12 +27,63 @@
 
 #include "plugins/HarnessPlugin.hh"
 
+namespace gazebo
+{
+  /// \brief Private data for the HarnessPlugin class
+  class HarnessPluginPrivate
+  {
+    /// \brief Vector of joints
+    public: std::vector<physics::JointPtr> joints;
+
+    /// \brief Index into the joints vector that specifies the winch joint.
+    public: int winchIndex = 0;
+
+    /// \brief Index into the joints vector that specifies the joint to detach.
+    public: int detachIndex = 0;
+
+    /// \brief Position PID controller for the winch
+    public: common::PID winchPosPID;
+
+    /// \brief Velocity PID controller for the winch
+    public: common::PID winchVelPID;
+
+    /// \brief Target winch position
+    public: float winchTargetPos = 0.0;
+
+    /// \brief Target winch velocity
+    public: float winchTargetVel = 0.0;
+
+    /// \brief Previous simulation time
+    public: common::Time prevSimTime = common::Time::Zero;
+
+    /// \brief Communication node
+    /// \todo: Transition to ignition-transport in gazebo8
+    public: transport::NodePtr node;
+
+    /// \brief Velocity control subscriber
+    /// \todo: Transition to ignition-transport in gazebo8
+    public: transport::SubscriberPtr velocitySub;
+
+    /// \brief Attach control subscriber
+    /// \todo: Transition to ignition-transport in gazebo8
+    public: transport::SubscriberPtr attachSub;
+
+    /// \brief Detach control subscriber
+    /// \todo: Transition to ignition-transport in gazebo8
+    public: transport::SubscriberPtr detachSub;
+
+    /// \brief Connection to World Update events.
+    public: event::ConnectionPtr updateConnection;
+  };
+}
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(HarnessPlugin)
 
 /////////////////////////////////////////////////
 HarnessPlugin::HarnessPlugin()
+  : dataPtr(new HarnessPluginPrivate)
 {
 }
 
@@ -48,18 +99,18 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   // Get a pointer to the world
   physics::WorldPtr world = _model->GetWorld();
 
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(world->GetName());
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(world->GetName());
 
-  this->velocitySub = this->node->Subscribe(
+  this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
       "~/" + _model->GetName() + "/harness/velocity",
       &HarnessPlugin::OnVelocity, this);
 
-  this->attachSub = this->node->Subscribe(
+  this->dataPtr->attachSub = this->dataPtr->node->Subscribe(
       "~/" + _model->GetName() + "/harness/attach",
       &HarnessPlugin::OnAttach, this);
 
-  this->detachSub = this->node->Subscribe(
+  this->dataPtr->detachSub = this->dataPtr->node->Subscribe(
       "~/" + _model->GetName() + "/harness/detach",
       &HarnessPlugin::OnDetach, this);
 
@@ -71,7 +122,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
     try
     {
       auto joint = _model->CreateJoint(jointElem);
-      this->joints.push_back(joint);
+      this->dataPtr->joints.push_back(joint);
     }
     catch(gazebo::common::Exception &_e)
     {
@@ -84,7 +135,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   }
 
   // Make sure at least one joint was created.
-  if (this->joints.empty())
+  if (this->dataPtr->joints.empty())
   {
     gzerr << "No joints specified in the harness plugin."
           << "The harness plugin will not run."
@@ -96,12 +147,12 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   if (_sdf->HasElement("detach"))
   {
     std::string jointName = _sdf->Get<std::string>("detach");
-    this->detachIndex = this->JointIndex(jointName);
+    this->dataPtr->detachIndex = this->JointIndex(jointName);
 
     // Error reporting
-    if (this->detachIndex < 0)
+    if (this->dataPtr->detachIndex < 0)
     {
-      this->detachIndex = 0;
+      this->dataPtr->detachIndex = 0;
       gzwarn << "Invalid <detach> joint name[" << jointName << "] in the "
              << "harness plugin. The first joint will be used as the detach "
              << "joint."
@@ -125,12 +176,12 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
     if (winchElem->HasElement("joint"))
     {
       std::string winchJointName = winchElem->Get<std::string>("joint");
-      this->winchIndex = this->JointIndex(winchJointName);
+      this->dataPtr->winchIndex = this->JointIndex(winchJointName);
 
       // Error reporting
-      if (this->winchIndex < 0)
+      if (this->dataPtr->winchIndex < 0)
       {
-        this->winchIndex = 0;
+        this->dataPtr->winchIndex = 0;
         gzwarn << "Invalid <joint> name[" << winchJointName << "] in the "
                << "<winch> element of the harness plugin.\n"
                << "The first joint will be used as the winch."
@@ -162,7 +213,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       double cmdMin =
         pidElem->HasElement("cmd_min") ? pidElem->Get<double>("cmd_min") : 0;
 
-      this->winchPosPID.Init(pValue, iValue, dValue,
+      this->dataPtr->winchPosPID.Init(pValue, iValue, dValue,
         iMax, iMin, cmdMax, cmdMin);
     }
     // Load the Velocity PID controller
@@ -181,7 +232,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
       double cmdMin =
         pidElem->HasElement("cmd_min") ? pidElem->Get<double>("cmd_min") : 0;
 
-      this->winchVelPID.Init(pValue, iValue, dValue,
+      this->dataPtr->winchVelPID.Init(pValue, iValue, dValue,
         iMax, iMin, cmdMax, cmdMin);
     }
   }
@@ -197,7 +248,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void HarnessPlugin::Init()
 {
-  for (auto &joint : this->joints)
+  for (auto &joint : this->dataPtr->joints)
   {
     try
     {
@@ -210,9 +261,9 @@ void HarnessPlugin::Init()
     }
   }
 
-  if (!this->joints.empty())
+  if (!this->dataPtr->joints.empty())
   {
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&HarnessPlugin::OnUpdate, this, std::placeholders::_1));
   }
 }
@@ -221,20 +272,20 @@ void HarnessPlugin::Init()
 void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 {
   // Bootstrap the time.
-  if (this->prevSimTime == common::Time::Zero)
+  if (this->dataPtr->prevSimTime == common::Time::Zero)
   {
-    this->prevSimTime = _info.simTime;
+    this->dataPtr->prevSimTime = _info.simTime;
     return;
   }
-  common::Time dt = _info.simTime - this->prevSimTime;
+  common::Time dt = _info.simTime - this->dataPtr->prevSimTime;
 
   // store winchIndex in local variable since it can change in callback
-  int tmpWinchIndex = this->winchIndex;
+  int tmpWinchIndex = this->dataPtr->winchIndex;
   if (tmpWinchIndex < 0 ||
-      tmpWinchIndex >= static_cast<int>(this->joints.size()))
+      tmpWinchIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
-    if (this->detachIndex >= 0 &&
-        this->detachIndex < static_cast<int>(this->joints.size()))
+    if (this->dataPtr->detachIndex >= 0 &&
+        this->dataPtr->detachIndex < static_cast<int>(this->dataPtr->joints.size()))
     {
       gzmsg << "Detaching harness joint" << std::endl;
       this->Detach();
@@ -244,48 +295,56 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   }
 
   double pError = 0;
-  if (ignition::math::equal(this->winchTargetVel, 0.0f))
+  if (ignition::math::equal(this->dataPtr->winchTargetVel, 0.0f))
   {
     // Calculate the position error if vel target is 0
-    pError = this->joints[tmpWinchIndex]->GetAngle(0).Radian() -
-      this->winchTargetPos;
+    pError = this->dataPtr->joints[tmpWinchIndex]->GetAngle(0).Radian() -
+      this->dataPtr->winchTargetPos;
   }
 
   // Calculate the velocity error
-  double vError = this->joints[tmpWinchIndex]->GetVelocity(0) -
-    this->winchTargetVel;
+  double vError = this->dataPtr->joints[tmpWinchIndex]->GetVelocity(0) -
+    this->dataPtr->winchTargetVel;
 
 
   // Use the PID controller to compute the joint force
-  double winchPosForce = this->winchPosPID.Update(pError, dt);
-  double winchVelForce = this->winchVelPID.Update(vError, dt);
+  double winchPosForce = this->dataPtr->winchPosPID.Update(pError, dt);
+  double winchVelForce = this->dataPtr->winchVelPID.Update(vError, dt);
 
   // Truncate winchForce so it doesn't push the robot downwards
   // although this can also be accomplished by cmd_min and cmd_max.
   winchVelForce = winchVelForce > 0? winchVelForce : 0.0;
 
   // Apply the joint force
-  this->joints[tmpWinchIndex]->SetForce(0, winchVelForce + winchPosForce);
+  this->dataPtr->joints[tmpWinchIndex]->SetForce(0, winchVelForce + winchPosForce);
 
-  this->prevSimTime = _info.simTime;
+  this->dataPtr->prevSimTime = _info.simTime;
 }
 
 /////////////////////////////////////////////////
 void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 {
+  if (this->dataPtr->detachIndex >= 0 || this->dataPtr->winchIndex >= 0)
+  {
+    gzerr << "Winch or detach joints already exist, unable to attach new joint"
+          << std::endl;
+    return;
+  }
 }
 
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
-  if (this->detachIndex < 0 ||
-      this->detachIndex >= static_cast<int>(this->joints.size()))
+  if (this->dataPtr->detachIndex < 0 ||
+      this->dataPtr->detachIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
     gzerr << "No known joint to detach" << std::endl;
     return;
   }
-  const auto detachName = this->joints[this->detachIndex]->GetName();
-  physics::BasePtr parent = this->joints[this->detachIndex]->Base::GetParent();
+  const auto detachName =
+      this->dataPtr->joints[this->dataPtr->detachIndex]->GetName();
+  physics::BasePtr parent =
+      this->dataPtr->joints[this->dataPtr->detachIndex]->Base::GetParent();
 
   auto model = boost::dynamic_pointer_cast<physics::Model>(parent);
   if (!model)
@@ -295,40 +354,41 @@ void HarnessPlugin::Detach()
   }
 
   // We no longer need to update
-  this->updateConnection.reset();
+  this->dataPtr->updateConnection.reset();
 
-  (this->joints[this->detachIndex]).reset();
+  (this->dataPtr->joints[this->dataPtr->detachIndex]).reset();
   model->RemoveJoint(detachName);
-  this->detachIndex = -1;
-  this->winchIndex = -1;
+  this->dataPtr->detachIndex = -1;
+  this->dataPtr->winchIndex = -1;
 
-  this->prevSimTime == common::Time::Zero;
+  this->dataPtr->prevSimTime == common::Time::Zero;
 }
 
 /////////////////////////////////////////////////
 double HarnessPlugin::WinchVelocity() const
 {
-  return this->joints[this->winchIndex]->GetVelocity(0);
+  return this->dataPtr->joints[this->dataPtr->winchIndex]->GetVelocity(0);
 }
 
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
   // store winchIndex in local variable since it can change in callback
-  int tmpWinchIndex = this->winchIndex;
+  int tmpWinchIndex = this->dataPtr->winchIndex;
   if (tmpWinchIndex < 0 ||
-      tmpWinchIndex >= static_cast<int>(this->joints.size()))
+      tmpWinchIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
     gzerr << "No known winch joint to set velocity" << std::endl;
     return;
   }
 
-  this->winchTargetVel = _value;
+  this->dataPtr->winchTargetVel = _value;
   if (ignition::math::equal(_value, 0.0f))
   {
     // if zero velocity is commanded, hold position
-    this->winchTargetPos = this->joints[tmpWinchIndex]->GetAngle(0).Radian();
-    this->winchPosPID.Reset();
+    this->dataPtr->winchTargetPos =
+        this->dataPtr->joints[tmpWinchIndex]->GetAngle(0).Radian();
+    this->dataPtr->winchPosPID.Reset();
   }
 }
 
@@ -336,9 +396,9 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
 int HarnessPlugin::JointIndex(const std::string &_name) const
 {
   // Find the winch joint in our list of joints
-  for (size_t i = 0; i < this->joints.size(); ++i)
+  for (size_t i = 0; i < this->dataPtr->joints.size(); ++i)
   {
-    if (this->joints[i]->GetName() == _name)
+    if (this->dataPtr->joints[i]->GetName() == _name)
       return i;
   }
 
@@ -371,6 +431,6 @@ void HarnessPlugin::OnDetach(ConstGzStringPtr &_msg)
       _msg->data() == "TRUE" ||
       _msg->data() == "True")
   {
-    this->winchIndex = -1;
+    this->dataPtr->winchIndex = -1;
   }
 }

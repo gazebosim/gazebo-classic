@@ -17,6 +17,7 @@
 #ifndef GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 #define GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -26,6 +27,9 @@
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class HarnessPluginPrivate;
+
   /// \brief This plugin is designed to lower a model at a controlled rate.
   /// Joints between a harness model and a model to lower are created
   /// according to SDF provided to this plugin.
@@ -105,48 +109,9 @@ namespace gazebo
     /// \return Index into this->jointsto
     private: int JointIndex(const std::string &_name) const;
 
-    /// \brief Vector of joints
-    private: std::vector<physics::JointPtr> joints;
-
-    /// \brief Index into the joints vector that specifies the winch joint.
-    private: int winchIndex = 0;
-
-    /// \brief Index into the joints vector that specifies the joint to detach.
-    private: int detachIndex = 0;
-
-    /// \brief Position PID controller for the winch
-    private: common::PID winchPosPID;
-
-    /// \brief Velocity PID controller for the winch
-    private: common::PID winchVelPID;
-
-    /// \brief Target winch position
-    private: float winchTargetPos = 0.0;
-
-    /// \brief Target winch velocity
-    private: float winchTargetVel = 0.0;
-
-    /// \brief Previous simulation time
-    private: common::Time prevSimTime = common::Time::Zero;
-
-    /// \brief Communication node
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::NodePtr node;
-
-    /// \brief Velocity control subscriber
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::SubscriberPtr velocitySub;
-
-    /// \brief Detach control subscriber
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::SubscriberPtr detachSub;
-
-    /// \brief Connection to World Update events.
-    private: event::ConnectionPtr updateConnection;
-
-    /// \brief Attach control subscriber
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::SubscriberPtr attachSub;
+    /// \internal
+    /// \brief Pointer to private data.
+    private: std::unique_ptr<HarnessPluginPrivate> dataPtr;
   };
 }
 #endif
