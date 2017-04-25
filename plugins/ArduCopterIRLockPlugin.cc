@@ -206,7 +206,7 @@ void ArduCopterIRLockPlugin::OnNewFrame(const unsigned char * /*_image*/,
       continue;
 
     ignition::math::Vector2i pt = GetScreenSpaceCoords(
-        vis->GetWorldPose().pos.Ign(), camera);
+        vis->WorldPose().Pos(), camera);
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
@@ -231,7 +231,7 @@ void ArduCopterIRLockPlugin::OnNewFrame(const unsigned char * /*_image*/,
 
     if (result && result->GetRootVisual() == vis)
     {
-      this->Publish(vis->GetName(), pt.X(), pt.Y());
+      this->Publish(vis->Name(), pt.X(), pt.Y());
     }
   }
 }
