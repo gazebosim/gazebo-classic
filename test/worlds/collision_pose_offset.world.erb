@@ -8,8 +8,10 @@
     </include>
     <gravity>0 0 -9.81</gravity>
 <%
-  # Test pyramid friction model
-  # Set asymmetric friction coefficients and friction direction
+  # Test pose offsets for model, link and collision elements
+  # There are three equivalent models that have 90 degree rotations
+  # expressed in each element.
+  # There is a 4th model with a translation of the collision
   require 'matrix'
   def a_to_s(v)
     Array(v).join(" ")
@@ -27,6 +29,7 @@
   box[:iyy] = box[:mass] / 12.0 * (dz**2 + dx**2)
   box[:izz] = box[:mass] / 12.0 * (dx**2 + dy**2)
 %>
+    <!-- model pose rotation -->
     <model name='box_0'>
       <pose>0 0 0.9 <%= 0.5*Math::PI %> -0 0</pose>
       <link name='link_1'>
@@ -63,6 +66,7 @@
         </visual>
       </link>
     </model>
+    <!-- link pose rotation -->
     <model name='box_1'>
       <pose>4.5 0 0.9 0 -0 0</pose>
       <link name='link_1'>
@@ -100,6 +104,7 @@
         </visual>
       </link>
     </model>
+    <!-- collision pose rotation -->
     <model name='box_2'>
       <pose>9 0 0.9 0 -0 0</pose>
       <link name='link_1'>
@@ -138,6 +143,7 @@
         </visual>
       </link>
     </model>
+    <!-- collision pose translation -->
     <model name='box_3'>
       <pose>13.5 0 0.9 0 -0 0</pose>
       <link name='link_1'>

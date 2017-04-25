@@ -426,6 +426,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     double angle = std::atan2(pos.Y(), pos.X());
     modelAngles[model] = angle;
   }
+  EXPECT_EQ(modelAngles.size(), 44u);
 
   // Pointers to spheres model and its links
   physics::ModelPtr spheres = world->GetModel("spheres");
