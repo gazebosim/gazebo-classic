@@ -84,7 +84,7 @@ struct ServoPacket
 {
   /// \brief Motor speed data.
   /// should rename to servo_command here and in ArduPilot SIM_Gazebo.cpp
-  float motorSpeed[MAX_MOTORS];
+  float motorSpeed[MAX_MOTORS] = {0.0f};
 };
 
 /// \brief Flight Dynamics Model packet that is sent back to the ArduPilot
@@ -657,9 +657,9 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       gzwarn << "imu_sensor scoped name [" << imuName
             << "] not found, trying unscoped name.\n" << "\n";
-      /// TODO: this fails for multi-nested models.
-      /// TODO: and transforms fail for rotated nested model,
-      ///       joints point the wrong way.
+      // TODO: this fails for multi-nested models.
+      // TODO: and transforms fail for rotated nested model,
+      //       joints point the wrong way.
       this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
         (sensors::SensorManager::Instance()->GetSensor(imuName));
     }
@@ -698,7 +698,8 @@ void ArduPilotPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
+  const gazebo::common::Time curTime =
+    this->dataPtr->model->GetWorld()->SimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
@@ -765,24 +766,24 @@ void ArduPilotPlugin::ApplyMotorForces(const double _dt)
   {
     if (this->dataPtr->controls[i].type == "VELOCITY")
     {
-      double velTarget = this->dataPtr->controls[i].cmd /
+      const double velTarget = this->dataPtr->controls[i].cmd /
         this->dataPtr->controls[i].rotorVelocitySlowdownSim;
-      double vel = this->dataPtr->controls[i].joint->GetVelocity(0);
-      double error = vel - velTarget;
-      double force = this->dataPtr->controls[i].pid.Update(error, _dt);
+      const double vel = this->dataPtr->controls[i].joint->GetVelocity(0);
+      const double error = vel - velTarget;
+      const double force = this->dataPtr->controls[i].pid.Update(error, _dt);
       this->dataPtr->controls[i].joint->SetForce(0, force);
     }
     else if (this->dataPtr->controls[i].type == "POSITION")
     {
-      double posTarget = this->dataPtr->controls[i].cmd;
-      double pos = this->dataPtr->controls[i].joint->Position();
-      double error = pos - posTarget;
-      double force = this->dataPtr->controls[i].pid.Update(error, _dt);
+      const double posTarget = this->dataPtr->controls[i].cmd;
+      const double pos = this->dataPtr->controls[i].joint->Position();
+      const double error = pos - posTarget;
+      const double force = this->dataPtr->controls[i].pid.Update(error, _dt);
       this->dataPtr->controls[i].joint->SetForce(0, force);
     }
     else if (this->dataPtr->controls[i].type == "EFFORT")
     {
-      double force = this->dataPtr->controls[i].cmd;
+      const double force = this->dataPtr->controls[i].cmd;
       this->dataPtr->controls[i].joint->SetForce(0, force);
     }
     else
@@ -805,29 +806,24 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   // missed receives before declaring the FCS offline.
 
   ServoPacket pkt;
-  int waitMs = 1;
+  uint32_t waitMs = 1;
   if (this->dataPtr->arduPilotOnline)
   {
     // increase timeout for receive once we detect a packet from
     // ArduPilot FCS.
     waitMs = 1000;
   }
-  else
-  {
-    // Otherwise skip quickly and do not set control force.
-    waitMs = 1;
-  }
+
   ssize_t recvSize =
     this->dataPtr->socket_in.Recv(&pkt, sizeof(ServoPacket), waitMs);
 
   // Drain the socket in the case we're backed up
   int counter = 0;
   ServoPacket last_pkt;
-  ssize_t recvSize_last = 1;
   while (true)
   {
     // last_pkt = pkt;
-    recvSize_last =
+    const ssize_t recvSize_last =
       this->dataPtr->socket_in.Recv(&last_pkt, sizeof(ServoPacket), 0ul);
     if (recvSize_last == -1)
     {
@@ -835,15 +831,13 @@ void ArduPilotPlugin::ReceiveMotorCommand()
     }
     counter++;
     pkt = last_pkt;
+    recvSize = recvSize_last;
   }
   if (counter > 0)
   {
     gzdbg << "Drained n packets: " << counter << std::endl;
   }
-  // TODO using pkt.motorSpeed uninitialized on first packet?
-  ssize_t expectedPktSize =
-    sizeof(pkt.motorSpeed[0])*this->dataPtr->controls.size();
-  ssize_t recvChannels = recvSize/sizeof(pkt.motorSpeed[0]);
+
   if (recvSize == -1)
   {
     // didn't receive a packet
@@ -867,12 +861,14 @@ void ArduPilotPlugin::ReceiveMotorCommand()
   }
   else
   {
+    const ssize_t expectedPktSize =
+    sizeof(pkt.motorSpeed[0]) * this->dataPtr->controls.size();
     if (recvSize < expectedPktSize)
     {
       gzerr << "got less than model needs. Got: " << recvSize
             << "commands, expected size: " << expectedPktSize << "\n";
     }
-
+    const ssize_t recvChannels = recvSize / sizeof(pkt.motorSpeed[0]);
     // for(unsigned int i = 0; i < recvChannels; ++i)
     // {
     //   gzdbg << "servo_command [" << i << "]: " << pkt.motorSpeed[i] << "\n";
@@ -894,7 +890,7 @@ void ArduPilotPlugin::ReceiveMotorCommand()
         if (this->dataPtr->controls[i].channel < recvChannels)
         {
           // bound incoming cmd between 0 and 1
-          double cmd = ignition::math::clamp(
+          const double cmd = ignition::math::clamp(
             pkt.motorSpeed[this->dataPtr->controls[i].channel],
             -1.0f, 1.0f);
           this->dataPtr->controls[i].cmd =
@@ -941,7 +937,7 @@ void ArduPilotPlugin::SendState() const
   //   z down
 
   // get linear acceleration in body frame
-  ignition::math::Vector3d linearAccel =
+  const ignition::math::Vector3d linearAccel =
     this->dataPtr->imuSensor->LinearAcceleration();
 
   // copy to pkt
@@ -951,7 +947,7 @@ void ArduPilotPlugin::SendState() const
   // gzerr << "lin accel [" << linearAccel << "]\n";
 
   // get angular velocity in body frame
-  ignition::math::Vector3d angularVel =
+  const ignition::math::Vector3d angularVel =
     this->dataPtr->imuSensor->AngularVelocity();
 
   // copy to pkt
@@ -981,12 +977,12 @@ void ArduPilotPlugin::SendState() const
   // adding modelXYZToAirplaneXForwardZDown rotates
   //   from: model XYZ
   //   to: airplane x-forward, y-left, z-down
-  ignition::math::Pose3d gazeboXYZToModelXForwardZDown =
+  const ignition::math::Pose3d gazeboXYZToModelXForwardZDown =
     this->modelXYZToAirplaneXForwardZDown +
     this->dataPtr->model->WorldPose();
 
   // get transform from world NED to Model frame
-  ignition::math::Pose3d NEDToModelXForwardZUp =
+  const ignition::math::Pose3d NEDToModelXForwardZUp =
     gazeboXYZToModelXForwardZDown - this->gazeboXYZToNED;
 
   // gzerr << "ned to model [" << NEDToModelXForwardZUp << "]\n";
@@ -1015,9 +1011,9 @@ void ArduPilotPlugin::SendState() const
   // Get NED velocity in body frame *
   // or...
   // Get model velocity in NED frame
-  ignition::math::Vector3d velGazeboWorldFrame =
+  const ignition::math::Vector3d velGazeboWorldFrame =
     this->dataPtr->model->GetLink()->WorldLinearVel();
-  ignition::math::Vector3d velNEDFrame =
+  const ignition::math::Vector3d velNEDFrame =
     this->gazeboXYZToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();
   pkt.velocityXYZ[1] = velNEDFrame.Y();
