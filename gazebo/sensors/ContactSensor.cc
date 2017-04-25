@@ -60,29 +60,6 @@ ContactSensor::~ContactSensor()
 void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-
-  // Create a publisher for the contact information.
-  if (this->sdf->HasElement("contact") &&
-      this->sdf->GetElement("contact")->HasElement("topic") &&
-      this->sdf->GetElement("contact")->Get<std::string>("topic")
-      != "__default_topic__")
-  {
-    // This will create a topic based on the name specified in SDF.
-    this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
-      this->sdf->GetElement("contact")->Get<std::string>("topic"),
-      100);
-  }
-  else
-  {
-    // This will create a topic based on the name of the parent and the
-    // name of the sensor.
-    std::string topicName = "~/";
-    topicName += this->ParentName() + "/" + this->Name();
-    boost::replace_all(topicName, "::", "/");
-
-    this->dataPtr->contactsPub =
-      this->node->Advertise<msgs::Contacts>(topicName, 100);
-  }
 }
 
 //////////////////////////////////////////////////
@@ -112,27 +89,62 @@ void ContactSensor::Load(const std::string &_worldName)
 
     collisionElem = collisionElem->GetNextElement("collision");
   }
-
-  if (!this->dataPtr->collisions.empty())
-  {
-    // request the contact manager to publish messages to a custom topic for
-    // this sensor
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
-        this->dataPtr->collisions);
-    if (!this->dataPtr->contactSub)
-    {
-      this->dataPtr->contactSub = this->node->Subscribe(topic,
-          &ContactSensor::OnContacts, this);
-    }
-  }
 }
 
 //////////////////////////////////////////////////
 void ContactSensor::Init()
 {
   Sensor::Init();
+}
+
+//////////////////////////////////////////////////
+void ContactSensor::SetActive(const bool _value)
+{
+  physics::ContactManager *mgr =
+      this->world->GetPhysicsEngine()->GetContactManager();
+
+  if (_value && !this->dataPtr->collisions.empty() &&
+      !this->dataPtr->contactSub)
+  {
+    // Create a publisher for the contact information.
+    if (this->sdf->HasElement("contact") &&
+        this->sdf->GetElement("contact")->HasElement("topic") &&
+        this->sdf->GetElement("contact")->Get<std::string>("topic")
+        != "__default_topic__")
+    {
+      // This will create a topic based on the name specified in SDF.
+      this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
+        this->sdf->GetElement("contact")->Get<std::string>("topic"),
+        100);
+    }
+    else
+    {
+      // This will create a topic based on the name of the parent and the
+      // name of the sensor.
+      std::string topicName = "~/";
+      topicName += this->ParentName() + "/" + this->Name();
+      boost::replace_all(topicName, "::", "/");
+
+      this->dataPtr->contactsPub =
+        this->node->Advertise<msgs::Contacts>(topicName, 100);
+    }
+
+    // Create filter on contact manager
+    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
+        this->dataPtr->collisions);
+
+    // Subscribe to contact info
+    this->dataPtr->contactSub = this->node->Subscribe(topic,
+        &ContactSensor::OnContacts, this);
+  }
+  else
+  {
+    mgr->RemoveFilter(this->dataPtr->filterName);
+    this->dataPtr->contactSub.reset();
+    this->dataPtr->contactPub.reset();
+  }
+
+  Sensor::SetActive(_value);
 }
 
 //////////////////////////////////////////////////

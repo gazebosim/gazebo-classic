@@ -64,6 +64,9 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      public: virtual void SetActive(const bool _value);
+
+      // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the sensor.
