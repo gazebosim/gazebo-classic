@@ -280,12 +280,13 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   common::Time dt = _info.simTime - this->dataPtr->prevSimTime;
 
   // store winchIndex in local variable since it can change in callback
-  int tmpWinchIndex = this->dataPtr->winchIndex;
-  if (tmpWinchIndex < 0 ||
-      tmpWinchIndex >= static_cast<int>(this->dataPtr->joints.size()))
+  int joints_size = static_cast<int>(this->dataPtr->joints.size();
+  int winchIndex = this->dataPtr->winchIndex;
+  if (winchIndex < 0 ||
+      winchIndex >= joints_size)
   {
     if (this->dataPtr->detachIndex >= 0 &&
-        this->dataPtr->detachIndex < static_cast<int>(this->dataPtr->joints.size()))
+        this->dataPtr->detachIndex < joints_size)
     {
       gzmsg << "Detaching harness joint" << std::endl;
       this->Detach();
@@ -298,12 +299,12 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   if (ignition::math::equal(this->dataPtr->winchTargetVel, 0.0f))
   {
     // Calculate the position error if vel target is 0
-    pError = this->dataPtr->joints[tmpWinchIndex]->GetAngle(0).Radian() -
+    pError = this->dataPtr->joints[winchIndex]->GetAngle(0).Radian() -
       this->dataPtr->winchTargetPos;
   }
 
   // Calculate the velocity error
-  double vError = this->dataPtr->joints[tmpWinchIndex]->GetVelocity(0) -
+  double vError = this->dataPtr->joints[winchIndex]->GetVelocity(0) -
     this->dataPtr->winchTargetVel;
 
 
@@ -316,7 +317,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   winchVelForce = winchVelForce > 0? winchVelForce : 0.0;
 
   // Apply the joint force
-  this->dataPtr->joints[tmpWinchIndex]->SetForce(0, winchVelForce + winchPosForce);
+  this->dataPtr->joints[winchIndex]->SetForce(0, winchVelForce + winchPosForce);
 
   this->dataPtr->prevSimTime = _info.simTime;
 }
@@ -335,8 +336,9 @@ void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
+  int joints_size = static_cast<int>(this->dataPtr->joints.size();
   if (this->dataPtr->detachIndex < 0 ||
-      this->dataPtr->detachIndex >= static_cast<int>(this->dataPtr->joints.size()))
+      this->dataPtr->detachIndex >= joints_size)
   {
     gzerr << "No known joint to detach" << std::endl;
     return;
@@ -374,9 +376,9 @@ double HarnessPlugin::WinchVelocity() const
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
   // store winchIndex in local variable since it can change in callback
-  int tmpWinchIndex = this->dataPtr->winchIndex;
-  if (tmpWinchIndex < 0 ||
-      tmpWinchIndex >= static_cast<int>(this->dataPtr->joints.size()))
+  int winchIndex = this->dataPtr->winchIndex;
+  if (winchIndex < 0 ||
+      winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
     gzerr << "No known winch joint to set velocity" << std::endl;
     return;
@@ -387,7 +389,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
   {
     // if zero velocity is commanded, hold position
     this->dataPtr->winchTargetPos =
-        this->dataPtr->joints[tmpWinchIndex]->GetAngle(0).Radian();
+        this->dataPtr->joints[winchIndex]->GetAngle(0).Radian();
     this->dataPtr->winchPosPID.Reset();
   }
 }
