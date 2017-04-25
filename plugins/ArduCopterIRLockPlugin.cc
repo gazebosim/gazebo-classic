@@ -242,15 +242,15 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
 {
   rendering::CameraPtr camera = this->dataPtr->parentSensor->Camera();
 
-  double imageWidth = this->dataPtr->parentSensor->ImageWidth();
-  double imageHeight = this->dataPtr->parentSensor->ImageHeight();
-  double hfov = camera->HFOV().Radian();
-  double vfov = camera->VFOV().Radian();
-  double pixelsPerRadianX = imageWidth / hfov;
-  double pixelsPerRadianY = imageHeight / vfov;
-  float angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
+  const double imageWidth = this->dataPtr->parentSensor->ImageWidth();
+  const double imageHeight = this->dataPtr->parentSensor->ImageHeight();
+  const double hfov = camera->HFOV().Radian();
+  const double vfov = camera->VFOV().Radian();
+  const double pixelsPerRadianX = imageWidth / hfov;
+  const double pixelsPerRadianY = imageHeight / vfov;
+  const float angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
       pixelsPerRadianX;
-  float angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
+  const float angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
       pixelsPerRadianY;
 
   // send_packet
@@ -272,7 +272,7 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
   memset(&sockaddr, 0, sizeof(sockaddr));
   sockaddr.sin_port = htons(this->dataPtr->irlock_port);
   sockaddr.sin_family = AF_INET;
-  sockaddr.sin_addr.s_addr = inet_addr(this->dataPtr->irlock_addr);
+  sockaddr.sin_addr.s_addr = inet_addr(this->dataPtr->irlock_addr.c_str());
   ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
     (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
