@@ -18,6 +18,25 @@
 #include <memory>
 #include <functional>
 
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+  #include <BaseTsd.h>
+  typedef SSIZE_T ssize_t;
+#endif
+
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
@@ -119,14 +138,24 @@ ArduCopterIRLockPlugin::ArduCopterIRLockPlugin()
 {
   // socket
   this->dataPtr->handle = socket(AF_INET, SOCK_DGRAM /*SOCK_STREAM*/, 0);
+  #ifndef _WIN32
+  // Windows does not support FD_CLOEXEC
   fcntl(this->dataPtr->handle, F_SETFD, FD_CLOEXEC);
+  #endif
   int one = 1;
-  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY, &one,
-      sizeof(one));
-  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR, &one,
-      sizeof(one));
+  setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
+      reinterpret_cast<const char *>(&one), sizeof(one));
+  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR, 
+      reinterpret_cast<const char *>(&one), sizeof(one));
+      
+  #ifdef _WIN32
+  u_long on = 1;
+  ioctlsocket(this->dataPtr->handle, FIONBIO,
+      reinterpret_cast<u_long FAR *>(&on));
+  #else
   fcntl(this->dataPtr->handle, F_SETFL,
       fcntl(this->dataPtr->handle, F_GETFL, 0) | O_NONBLOCK);
+  #endif
 }
 
 /////////////////////////////////////////////////
@@ -273,6 +302,8 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
   sockaddr.sin_port = htons(this->dataPtr->irlock_port);
   sockaddr.sin_family = AF_INET;
   sockaddr.sin_addr.s_addr = inet_addr(this->dataPtr->irlock_addr.c_str());
-  ::sendto(this->dataPtr->handle, &pkt, sizeof(pkt), 0,
-    (struct sockaddr *)&sockaddr, sizeof(sockaddr));
+  ::sendto(this->dataPtr->handle,
+           reinterpret_cast<raw_type *>(&pkt),
+           sizeof(pkt), 0,
+           (struct sockaddr *)&sockaddr, sizeof(sockaddr));
 }
