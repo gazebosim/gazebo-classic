@@ -54,7 +54,6 @@ GZ_REGISTER_SENSOR_PLUGIN(ArduCopterIRLockPlugin)
 
 namespace gazebo
 {
-
   /// \brief Obtains a parameter from sdf.
   /// \param[in] _sdf Pointer to the sdf object.
   /// \param[in] _name Name of the parameter.
@@ -64,7 +63,7 @@ namespace gazebo
   /// \return True if the parameter was found in _sdf, false otherwise.
   template<class T>
   bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
-   T &_param, const T &_defaultValue, const bool &_verbose = false)
+    T &_param, const T &_defaultValue, const bool &_verbose = false)
   {
     if (_sdf->HasElement(_name))
     {
@@ -94,7 +93,7 @@ namespace gazebo
 
     /// \brief A list of fiducials tracked by this camera.
     public: std::vector<std::string> fiducials;
-    
+
     /// \brief Irlock address
     public: std::string irlock_addr;
 
@@ -145,9 +144,9 @@ ArduCopterIRLockPlugin::ArduCopterIRLockPlugin()
   int one = 1;
   setsockopt(this->dataPtr->handle, IPPROTO_TCP, TCP_NODELAY,
       reinterpret_cast<const char *>(&one), sizeof(one));
-  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR, 
+  setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
       reinterpret_cast<const char *>(&one), sizeof(one));
-      
+
   #ifdef _WIN32
   u_long on = 1;
   ioctlsocket(this->dataPtr->handle, FIONBIO,
@@ -277,10 +276,10 @@ void ArduCopterIRLockPlugin::Publish(const std::string &/*_fiducial*/,
   const double vfov = camera->VFOV().Radian();
   const double pixelsPerRadianX = imageWidth / hfov;
   const double pixelsPerRadianY = imageHeight / vfov;
-  const float angleX = (static_cast<double>(_x) - (imageWidth * 0.5)) /
-      pixelsPerRadianX;
-  const float angleY = -((imageHeight * 0.5) - static_cast<double>(_y)) /
-      pixelsPerRadianY;
+  const float angleX = static_cast<float>(
+    (static_cast<double>(_x) - (imageWidth * 0.5)) / pixelsPerRadianX);
+  const float angleY = static_cast<float>(
+    -((imageHeight * 0.5) - static_cast<double>(_y)) / pixelsPerRadianY);
 
   // send_packet
   ArduCopterIRLockPluginPrivate::irlockPacket pkt;
