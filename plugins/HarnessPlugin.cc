@@ -96,24 +96,6 @@ HarnessPlugin::~HarnessPlugin()
 void HarnessPlugin::Load(physics::ModelPtr _model,
                          sdf::ElementPtr _sdf)
 {
-  // Get a pointer to the world
-  physics::WorldPtr world = _model->GetWorld();
-
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(world->GetName());
-
-  this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/velocity",
-      &HarnessPlugin::OnVelocity, this);
-
-  this->dataPtr->attachSub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/attach",
-      &HarnessPlugin::OnAttach, this);
-
-  this->dataPtr->detachSub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/detach",
-      &HarnessPlugin::OnDetach, this);
-
   // Load all the harness joints
   sdf::ElementPtr jointElem = _sdf->GetElement("joint");
   while (jointElem)
@@ -260,6 +242,24 @@ void HarnessPlugin::Init()
       return;
     }
   }
+
+  // Get a pointer to the world
+  physics::WorldPtr world = _model->GetWorld();
+
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(world->GetName());
+
+  this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
+      "~/" + _model->GetName() + "/harness/velocity",
+      &HarnessPlugin::OnVelocity, this);
+
+  this->dataPtr->attachSub = this->dataPtr->node->Subscribe(
+      "~/" + _model->GetName() + "/harness/attach",
+      &HarnessPlugin::OnAttach, this);
+
+  this->dataPtr->detachSub = this->dataPtr->node->Subscribe(
+      "~/" + _model->GetName() + "/harness/detach",
+      &HarnessPlugin::OnDetach, this);
 
   if (!this->dataPtr->joints.empty())
   {
