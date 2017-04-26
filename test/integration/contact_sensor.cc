@@ -42,6 +42,10 @@ class ContactSensor : public ServerFixture,
   public: void StackTest(const std::string &_physicsEngine);
   public: void TorqueTest(const std::string &_physicsEngine);
 
+  /// \brief Check communications while sensor is active or not.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void Active();
+
   /// \brief Callback for sensor subscribers in MultipleSensors test.
   private: void Callback(const ConstContactsPtr &_msg);
 };
@@ -53,7 +57,6 @@ void ContactSensor::Callback(const ConstContactsPtr &/*_msg*/)
 {
   g_messageCount++;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
@@ -80,7 +83,7 @@ void ContactSensor::ModelRemoval(const std::string &_physicsEngine)
   }
   EXPECT_GT(topicsCount, 0);
 
-  // spanw the model
+  // spawn the model
   std::string modelName = "contactModel";
   std::string contactSensorName = "contactSensor";
   ignition::math::Pose3d modelPose(0, -0.3, 1.5, M_PI/2.0, 0, 0);
@@ -681,6 +684,91 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 TEST_P(ContactSensor, TorqueTest)
 {
   TorqueTest(GetParam());
+}
+
+////////////////////////////////////////////////////////////////////////
+void ContactSensor::Active()
+{
+  // Load an empty world
+  this->Load("worlds/empty.world", true);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Spawn a model with a contact sensor
+  std::string modelName = "contactModel";
+  std::string contactSensorName = "contactSensor";
+
+  this->SpawnUnitContactSensor(modelName, contactSensorName, "cylinder",
+      math::Vector3::Zero, math::Vector3::Zero);
+
+  auto sensor = sensors::get_sensor(contactSensorName);
+  ASSERT_TRUE(sensor != nullptr);
+
+  auto contactSensor =
+      std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
+  ASSERT_TRUE(contactSensor != nullptr);
+
+  // Initialize sensor manager
+  sensors::SensorManager::Instance()->Init();
+  sensors::SensorManager::Instance()->RunThreads();
+
+  // Check that sensor is not active
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  // Check there's only one contact topic (~/physics/contacts)
+  auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  auto topicsCount = topics.size();
+  ASSERT_EQ(topicsCount, 1u);
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/physics/contacts") != topics.end());
+
+  // Set sensor active
+  contactSensor->SetActive(true);
+  EXPECT_TRUE(contactSensor->IsActive());
+
+  // Check the sensor has added 2 topics:
+  // * One from the contace manager with filtered contacts
+  // * One from the sensor
+  int maxSleep = 30;
+  int sleep = 0;
+  while (topicsCount < topicsCount + 2 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+    topicsCount = topics.size();
+
+    sleep++;
+  }
+  EXPECT_EQ(topicsCount, 3u);
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/physics/contacts") != topics.end());
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/contactModel/body/contactSensor") != topics.end());
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/contactModel/body/contactSensor/contacts") != topics.end());
+
+  // Set sensor back to inactive
+  contactSensor->SetActive(false);
+  EXPECT_FALSE(contactSensor->IsActive());
+
+  // Check the 2 topics are gone
+  sleep = 0;
+  while (topicsCount > 1 && sleep < maxSleep)
+  {
+    common::Time::MSleep(100);
+    topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+    topicsCount = topics.size();
+
+    sleep++;
+  }
+  EXPECT_EQ(topicsCount, 1u);
+  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/physics/contacts") != topics.end());
+}
+
+TEST_F(ContactSensor, Active)
+{
+  Active();
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);

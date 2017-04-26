@@ -141,7 +141,9 @@ void ContactSensor::SetActive(const bool _value)
   {
     mgr->RemoveFilter(this->dataPtr->filterName);
     this->dataPtr->contactSub.reset();
-    this->dataPtr->contactPub.reset();
+    if (this->dataPtr->contactsPub)
+      this->dataPtr->contactsPub->Fini();
+    this->dataPtr->contactsPub.reset();
   }
 
   Sensor::SetActive(_value);
