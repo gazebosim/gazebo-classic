@@ -231,6 +231,7 @@ boost::shared_ptr<msgs::Response> transport::request(
     }
   }
 
+  node->Fini();
   requestPub.reset();
   responseSub.reset();
   node.reset();

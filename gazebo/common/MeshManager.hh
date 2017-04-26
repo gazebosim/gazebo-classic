@@ -28,11 +28,6 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector2i.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Plane.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
@@ -106,7 +101,7 @@ namespace gazebo
 
       /// \brief Get a mesh by name.
       /// \param[in] _name the name of the mesh to look for
-      /// \return the mesh or NULL if not found
+      /// \return the mesh or nullptr if not found
       public: const Mesh *GetMesh(const std::string &_name) const;
 
       /// \brief Return true if the mesh exists.

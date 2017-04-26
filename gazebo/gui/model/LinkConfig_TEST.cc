@@ -40,6 +40,7 @@ void LinkConfig_TEST::Initialization()
   QVERIFY(cw->BoolWidgetValue("gravity"));
   QVERIFY(!cw->BoolWidgetValue("self_collide"));
   QVERIFY(!cw->BoolWidgetValue("kinematic"));
+  QVERIFY(!cw->BoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////
@@ -54,12 +55,14 @@ void LinkConfig_TEST::LinkMsgUpdate()
   linkMsgPtr->set_gravity(false);
   linkMsgPtr->set_self_collide(true);
   linkMsgPtr->set_kinematic(true);
+  linkMsgPtr->set_enable_wind(true);
 
   lc.Update(linkMsgPtr);
 
   QVERIFY(!cw->BoolWidgetValue("gravity"));
   QVERIFY(cw->BoolWidgetValue("self_collide"));
   QVERIFY(cw->BoolWidgetValue("kinematic"));
+  QVERIFY(cw->BoolWidgetValue("enable_wind"));
 }
 
 /////////////////////////////////////////////////

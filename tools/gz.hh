@@ -21,6 +21,7 @@
 #include <list>
 #include <boost/thread.hpp>
 #include <boost/program_options.hpp>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
@@ -148,7 +149,7 @@ namespace gazebo
     /// \param[in] _node Node for communication.
     /// \return True if the spawn message was sent.
     private: bool ProcessSpawn(sdf::SDFPtr _sdf,
-                 const std::string &_name, const math::Pose &_pose,
+                 const std::string &_name, const ignition::math::Pose3d &_pose,
                  transport::NodePtr _node);
   };
 

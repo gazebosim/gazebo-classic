@@ -17,7 +17,7 @@
 #ifndef _GAZEBO_ODE_STEP_BULLET_PGS_WRAPPER_H_
 #define _GAZEBO_ODE_STEP_BULLET_PGS_WRAPPER_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 void dSolveLCP_bullet_pgs(int _m, dReal *_A, dReal *_x, dReal *_b,
   dReal *_lo, dReal *_hi, int *findex);
 #endif

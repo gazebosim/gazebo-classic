@@ -82,15 +82,6 @@ CloneWindow::~CloneWindow()
 }
 
 /////////////////////////////////////////////////
-int CloneWindow::GetPort()
-{
-  if (this->dataPtr->validPort)
-    return this->dataPtr->port;
-  else
-    return 0;
-}
-
-/////////////////////////////////////////////////
 int CloneWindow::Port() const
 {
   if (this->dataPtr->validPort)

@@ -19,7 +19,10 @@
 #endif
 
 #include <cstdlib>
+#include <cstring>
+#include <string>
 #include <fstream>
+#include <vector>
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -34,11 +37,18 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
+
+#ifdef _WIN32
+  const auto& gzstrtok = strtok_s;
+#else
+  const auto& gzstrtok = strtok_r;
+#endif
 
 #ifdef _WIN32
 # define GZ_PATH_MAX _MAX_PATH
@@ -50,6 +60,49 @@ using namespace gazebo;
 # define GZ_PATH_MAX _POSIX_PATH_MAX
 #endif
 
+/////////////////////////////////////////////////
+// avcodec log callback. We use this to redirect message to gazebo's console
+// messages.
+#ifdef HAVE_FFMPEG
+void logCallback(void *_ptr, int _level, const char *_fmt, va_list _args)
+{
+  static char message[8192];
+
+  std::string msg = "ffmpeg ";
+
+  // Get the ffmpeg module.
+  if (_ptr)
+  {
+    AVClass *avc = *reinterpret_cast<AVClass**>(_ptr);
+    const char *module = avc->item_name(_ptr);
+    if (module)
+      msg += std::string("[") + module + "] ";
+  }
+
+  // Create the actual message
+  vsnprintf(message, sizeof(message), _fmt, _args);
+  msg += message;
+
+  // Output to the appropriate stream.
+  switch (_level)
+  {
+    case AV_LOG_DEBUG:
+      // There are a lot of debug messages. So we'll skip those.
+      break;
+    case AV_LOG_PANIC:
+    case AV_LOG_FATAL:
+    case AV_LOG_ERROR:
+      gzerr << msg << std::endl;
+      break;
+    case AV_LOG_WARNING:
+      gzwarn << msg << std::endl;
+      break;
+    default:
+      gzmsg << msg << std::endl;
+      break;
+  }
+}
+#endif
 
 /////////////////////////////////////////////////
 void common::load()
@@ -61,10 +114,33 @@ void common::load()
     first = false;
     avcodec_register_all();
     av_register_all();
+
+#if defined(__linux__) && defined(HAVE_AVDEVICE)
+    avdevice_register_all();
+#endif
+
+    // Set the log callback function.
+    av_log_set_callback(logCallback);
   }
 #endif
 }
 
+/////////////////////////////////////////////////
+std::string common::unique_file_path(const std::string &_pathAndName,
+    const std::string &_extension)
+{
+  std::string result = _pathAndName + "." + _extension;
+  int count = 1;
+  struct stat buf;
+
+  // Check if file exists and change name accordingly
+  while (stat(result.c_str(), &buf) != -1)
+  {
+    result = _pathAndName + "(" + std::to_string(count++) + ")." + _extension;
+  }
+
+  return result;
+}
 /////////////////////////////////////////////////
 void common::add_search_path_suffix(const std::string &_suffix)
 {
@@ -109,10 +185,30 @@ const char *common::getEnv(const char *_name)
   if (GetEnvironmentVariable(_name, buffer, buffSize))
     return buffer;
   else
-    return NULL;
+    return nullptr;
 #else
   return getenv(_name);
 #endif
+}
+
+/////////////////////////////////////////////////
+std::vector<std::string> common::split(const std::string &_str,
+    const std::string &_delim)
+{
+  std::vector<std::string> tokens;
+  char *saveptr;
+  char *str = strdup(_str.c_str());
+
+  auto token = gzstrtok(str, _delim.c_str(), &saveptr);
+
+  while (token)
+  {
+    tokens.push_back(token);
+    token = gzstrtok(nullptr, _delim.c_str(), &saveptr);
+  }
+
+  free(str);
+  return tokens;
 }
 
 /////////////////////////////////////////////////

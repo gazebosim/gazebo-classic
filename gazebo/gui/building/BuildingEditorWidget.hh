@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_GUI_BUILDING_EDITOR_WIDGET_HH_
-#define _GAZEBO_GUI_BUILDING_EDITOR_WIDGET_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDINGEDITORWIDGET_HH_
+#define GAZEBO_GUI_BUILDING_BUILDINGEDITORWIDGET_HH_
 
 #include <memory>
 
@@ -44,7 +43,7 @@ namespace gazebo
       public: BuildingEditorWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
-      public: ~BuildingEditorWidget() = default;
+      public: ~BuildingEditorWidget();
 
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.

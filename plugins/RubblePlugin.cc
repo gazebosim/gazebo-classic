@@ -16,7 +16,7 @@
 */
 
 #include <sstream>
-#include <gazebo/math/Rand.hh>
+#include <ignition/math/Rand.hh>
 #include <gazebo/physics/World.hh>
 #include "RubblePlugin.hh"
 
@@ -34,29 +34,36 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->world = _world;
 
-  math::Vector3 bottomRight = _sdf->Get<math::Vector3>("bottom_right");
-  math::Vector3 topLeft = _sdf->Get<math::Vector3>("top_left");
-  math::Vector3 minSize = _sdf->Get<math::Vector3>("min_size");
-  math::Vector3 maxSize = _sdf->Get<math::Vector3>("max_size");
+  ignition::math::Vector3d bottomRight =
+      _sdf->Get<ignition::math::Vector3d>("bottom_right");
+  ignition::math::Vector3d topLeft =
+      _sdf->Get<ignition::math::Vector3d>("top_left");
+  ignition::math::Vector3d minSize =
+      _sdf->Get<ignition::math::Vector3d>("min_size");
+  ignition::math::Vector3d maxSize =
+      _sdf->Get<ignition::math::Vector3d>("max_size");
   double minMass = _sdf->Get<double>("min_mass");
   double maxMass = _sdf->Get<double>("max_mass");
   unsigned int count = _sdf->Get<unsigned int>("count");
 
   for (unsigned int i = 0; i < count; ++i)
   {
-    int rubbleType = math::Rand::GetIntUniform(0, 1);
-    double mass = math::Rand::GetDblUniform(minMass, maxMass);
+    int rubbleType = ignition::math::Rand::IntUniform(0, 1);
+    double mass = ignition::math::Rand::DblUniform(minMass, maxMass);
 
     Obj obj;
 
-    obj.pose.pos.x = math::Rand::GetDblUniform(bottomRight.x, topLeft.x);
-    obj.pose.pos.y = math::Rand::GetDblUniform(bottomRight.y, topLeft.y);
-    obj.pose.pos.z = math::Rand::GetDblUniform(bottomRight.z, topLeft.z);
+    obj.pose.Pos().X() = ignition::math::Rand::DblUniform(bottomRight.X(),
+        topLeft.X());
+    obj.pose.Pos().Y() = ignition::math::Rand::DblUniform(bottomRight.Y(),
+        topLeft.Y());
+    obj.pose.Pos().Z() = ignition::math::Rand::DblUniform(bottomRight.Z(),
+        topLeft.Z());
 
-    obj.pose.rot.SetFromEuler(math::Vector3(
-        math::Rand::GetDblUniform(0.0, 3.1415),
-        math::Rand::GetDblUniform(-0.1, 0.1),
-        math::Rand::GetDblUniform(0.0, 3.1415)));
+    obj.pose.Rot().Euler(ignition::math::Vector3d(
+        ignition::math::Rand::DblUniform(0.0, 3.1415),
+        ignition::math::Rand::DblUniform(-0.1, 0.1),
+        ignition::math::Rand::DblUniform(0.0, 3.1415)));
 
 
     obj.type = rubbleType;
@@ -65,34 +72,34 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     if (rubbleType == 0)
     {
       // between 2 and 8 feet.
-      obj.size.x = math::Rand::GetDblUniform(0.6096, 2.4384);
+      obj.size.X() = ignition::math::Rand::DblUniform(0.6096, 2.4384);
 
       // 4 inches
-      obj.size.y = 0.1016;
+      obj.size.Y() = 0.1016;
 
       // 2 inches
-      obj.size.z = 0.0508;
+      obj.size.Z() = 0.0508;
     }
     // Make a cinder block
     else if (rubbleType == 1)
     {
       // Standard US cinder block size
-      obj.size.x = 0.2032;
-      obj.size.y = 0.2032;
-      obj.size.z = 0.4064;
+      obj.size.X() = 0.2032;
+      obj.size.Y() = 0.2032;
+      obj.size.Z() = 0.4064;
     }
     // Make a cylinder
     else
     {
-      obj.size.x = math::Rand::GetDblUniform(minSize.x, maxSize.x);
-      obj.size.z = math::Rand::GetDblUniform(minSize.z, maxSize.z);
-      obj.size.y = obj.size.x;
+      obj.size.X() = ignition::math::Rand::DblUniform(minSize.X(), maxSize.X());
+      obj.size.Z() = ignition::math::Rand::DblUniform(minSize.Z(), maxSize.Z());
+      obj.size.Y() = obj.size.X();
     }
 
-    // Make sure the bottom of the rubble piece is above the bottomRight.z
+    // Make sure the bottom of the rubble piece is above the bottomRight.Z()
     // This will prevent ground penetration.
-    if (obj.pose.pos.z - obj.size.z * 0.5 < bottomRight.z)
-      obj.pose.pos.z = bottomRight.z + obj.size.z * 0.5;
+    if (obj.pose.Pos().Z() - obj.size.Z() * 0.5 < bottomRight.Z())
+      obj.pose.Pos().Z() = bottomRight.Z() + obj.size.Z() * 0.5;
 
     std::ostringstream name;
     name << "rubble_" << i;
@@ -124,7 +131,7 @@ void RubblePlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         std::vector<Obj>::iterator objIter;
 
         (*iter).pos.Set(0, 0, 0);
-        math::Vector3 min, max;
+        ignition::math::Vector3d min, max;
         min.x = min.y = min.z = std::numeric_limits<double>::max();
         max.x = max.y = max.z = std::numeric_limits<double>::min();
 
@@ -179,14 +186,16 @@ void RubblePlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
-                              math::Vector3 &_size, double _mass)
+void RubblePlugin::MakeCinderBlock(const std::string &_name,
+                                   ignition::math::Pose3d &_pose,
+                                   ignition::math::Vector3d &_size,
+                                   const double _mass)
 {
   std::ostringstream newModelStr;
 
-  float sx = _size.x;
-  float sy = _size.y;
-  float sz = _size.z;
+  float sx = _size.X();
+  float sy = _size.Y();
+  float sz = _size.Z();
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
@@ -224,14 +233,16 @@ void RubblePlugin::MakeCinderBlock(const std::string &_name, math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
-void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
-                           math::Vector3 &_size, double _mass)
+void RubblePlugin::MakeBox(const std::string &_name,
+                           ignition::math::Pose3d &_pose,
+                           ignition::math::Vector3d &_size,
+                           const double _mass)
 {
   std::ostringstream newModelStr;
 
-  float sx = _size.x;
-  float sy = _size.y;
-  float sz = _size.z;
+  float sx = _size.X();
+  float sy = _size.Y();
+  float sz = _size.Z();
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
     "<model name='" << _name << "'>"
@@ -270,8 +281,10 @@ void RubblePlugin::MakeBox(const std::string &_name, math::Pose &_pose,
 }
 
 /////////////////////////////////////////////////
-/*void RubblePlugin::MakeCylinder(const std::string &_name, math::Vector3 &_pos,
-                                math::Vector3 &_size, double _mass)
+/*void RubblePlugin::MakeCylinder(const std::string &_name,
+                                  ignition::math::Vector3d &_pos,
+                                  ignition::math::Vector3d &_size,
+                                  double _mass)
 {
   std::ostringstream newModelStr;
 

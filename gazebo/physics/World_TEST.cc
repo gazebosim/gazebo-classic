@@ -25,7 +25,8 @@ using namespace gazebo;
 class WorldTest : public ServerFixture {};
 
 //////////////////////////////////////////////////
-/// \brief Test generating unique model name for models on insertion.
+/// \brief Test the factory message's allow_renaming flag and unique model name
+/// generation.
 TEST_F(WorldTest, UniqueModelName)
 {
   // Load a blank world
@@ -36,8 +37,8 @@ TEST_F(WorldTest, UniqueModelName)
   std::string modelName("new_model");
 
   // Check the model hasn't been created
-  EXPECT_TRUE(world->GetModel(modelName) == nullptr);
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_TRUE(world->ModelByName(modelName) == nullptr);
+  EXPECT_EQ(world->ModelCount(), 0u);
   EXPECT_EQ(world->UniqueModelName(modelName), modelName);
 
   // Spawn model
@@ -57,28 +58,44 @@ TEST_F(WorldTest, UniqueModelName)
   // Wait for the entity to spawn
   int sleep = 0;
   int maxSleep = 10;
-  while (sleep < maxSleep && !world->GetModel(modelName))
+  while (sleep < maxSleep && !world->ModelByName(modelName))
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  ASSERT_TRUE(world->GetModel(modelName) != nullptr);
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  ASSERT_TRUE(world->ModelByName(modelName) != nullptr);
+  EXPECT_EQ(world->ModelCount(), 1u);
   EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_0");
 
-  // Spawn a new model with the same name
+  // Try to spawn with same name without allowing renaming
   facMsg.set_sdf(modelSDFStr);
+  facMsg.set_allow_renaming(false);
+  this->factoryPub->Publish(facMsg);
+
+  // Wait and check no models are inserted
+  sleep = 0;
+  while (sleep < maxSleep && world->ModelCount() == 1u)
+  {
+    common::Time::MSleep(100);
+    sleep++;
+  }
+  EXPECT_EQ(world->ModelCount(), 1u);
+  EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_0");
+
+  // Now try again, but allow renaming
+  facMsg.set_sdf(modelSDFStr);
+  facMsg.set_allow_renaming(true);
   this->factoryPub->Publish(facMsg);
 
   // Check a new entity is spawned with a different name
   sleep = 0;
-  while (sleep < maxSleep && !world->GetModel(modelName + "_0"))
+  while (sleep < maxSleep && !world->ModelByName(modelName + "_0"))
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  ASSERT_TRUE(world->GetModel(modelName + "_0") != nullptr);
-  EXPECT_EQ(world->GetModelCount(), 2u);
+  ASSERT_TRUE(world->ModelByName(modelName + "_0") != nullptr);
+  EXPECT_EQ(world->ModelCount(), 2u);
   EXPECT_EQ(world->UniqueModelName(modelName), modelName + "_1");
 }
 
@@ -90,7 +107,7 @@ TEST_F(WorldTest, EditName)
   this->Load("worlds/blank.world", true);
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 
   // Spawn a box
   {
@@ -111,16 +128,16 @@ TEST_F(WorldTest, EditName)
   // Wait for the model to be inserted
   int sleep = 0;
   int maxSleep = 10;
-  while (sleep < maxSleep && !world->GetModel("box"))
+  while (sleep < maxSleep && !world->ModelByName("box"))
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  EXPECT_EQ(world->ModelCount(), 1u);
 
   // Check the box model weighs 1 Kg
   {
-    auto box = world->GetModel("box");
+    auto box = world->ModelByName("box");
     ASSERT_TRUE(box != nullptr);
 
     EXPECT_EQ(box->GetLinks().size(), 1u);
@@ -130,7 +147,7 @@ TEST_F(WorldTest, EditName)
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != nullptr);
 
-    EXPECT_EQ(inertial->GetMass(), 1.0);
+    EXPECT_EQ(inertial->Mass(), 1.0);
   }
 
   // Edit model mass
@@ -159,11 +176,11 @@ TEST_F(WorldTest, EditName)
   }
 
   // World still has the same number of models
-  EXPECT_EQ(world->GetModelCount(), 1u);
+  EXPECT_EQ(world->ModelCount(), 1u);
 
   // Check the box model now weighs 2 Kg
   {
-    auto box = world->GetModel("box");
+    auto box = world->ModelByName("box");
     ASSERT_TRUE(box != nullptr);
 
     EXPECT_EQ(box->GetLinks().size(), 1u);
@@ -173,7 +190,7 @@ TEST_F(WorldTest, EditName)
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != nullptr);
 
-    EXPECT_EQ(inertial->GetMass(), 2.0);
+    EXPECT_EQ(inertial->Mass(), 2.0);
   }
 }
 

@@ -38,7 +38,7 @@ MouseEvent::MouseEvent(const MouseEvent &_other)
 MouseEvent::~MouseEvent()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////

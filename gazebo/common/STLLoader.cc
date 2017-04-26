@@ -17,8 +17,11 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <memory>
 
-#include "gazebo/math/Helpers.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/STLLoader.hh"
@@ -46,7 +49,7 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!file)
   {
     gzerr << "Unable to open file[" << _filename << "]\n";
-    return NULL;
+    return nullptr;
   }
 
   Mesh *mesh = new Mesh();
@@ -55,12 +58,12 @@ Mesh *STLLoader::Load(const std::string &_filename)
   if (!this->ReadAscii(file, mesh))
   {
     fclose(file);
-    file = fopen(_filename.c_str(), "r");
+    file = fopen(_filename.c_str(), "rb");
     if (!this->ReadBinary(file, mesh))
       gzerr << "Unable to read STL[" << _filename << "]\n";
-    fclose(file);
   }
 
+  fclose(file);
   return mesh;
 }
 
@@ -81,17 +84,18 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
   SubMesh *subMesh = new SubMesh();
 
   // Read the next line of the file into INPUT.
-  while (fgets (input, LINE_MAX_LEN, _filein) != NULL)
+  while (fgets (input, LINE_MAX_LEN, _filein) != nullptr)
   {
     // Advance to the first nonspace character in INPUT.
-    for (next = input; *next != '\0' && isspace(*next); next++);
+    for (next = input; *next != '\0' && iswspace(*next); next++);
 
     // Skip blank lines and comments.
     if (*next == '\0' || *next == '#' || *next == '!' || *next == '$')
       continue;
 
-    // Extract the first word in this line.
-    sscanf(next, "%s%n", token, &width);
+    // Extract the first word in this line
+    std::string sscanf_format = "%" + std::to_string(LINE_MAX_LEN) + "s%n";
+    sscanf(next, sscanf_format.c_str() , token, &width);
 
     // Set NEXT to point to just after this token.
     next = next + width;
@@ -102,13 +106,15 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       ignition::math::Vector3d normal;
 
       // Get the XYZ coordinates of the normal vector to the face.
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
       sscanf(next, "%*s %e %e %e", &r1, &r2, &r3);
 
       normal.X(r1);
       normal.Y(r2);
       normal.Z(r3);
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;
@@ -117,12 +123,14 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
       for (; result; )
       {
         ignition::math::Vector3d vertex;
-        if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+        if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
         {
           result = false;
           break;
         }
 
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
         count = sscanf(input, "%*s %e %e %e", &r1, &r2, &r3);
 
         if (count != 3)
@@ -137,7 +145,7 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
         subMesh->AddIndex(subMesh->GetVertexIndex(vertex));
       }
 
-      if (fgets (input, LINE_MAX_LEN, _filein) == NULL)
+      if (fgets (input, LINE_MAX_LEN, _filein) == nullptr)
       {
         result = false;
         break;
@@ -146,6 +154,8 @@ bool STLLoader::ReadAscii(FILE *_filein, Mesh *_mesh)
     // COLOR
     else if (this->Leqi (token, const_cast<char*>("color")))
     {
+      // cppcheck-suppress invalidscanf
+      // cppcheck-suppress invalidscanf_libc
       sscanf(next, "%*s %f %f %f %f", &r1, &r2, &r3, &r4);
     }
     // SOLID
@@ -185,7 +195,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
   int iface;
   int face_num;
 
-  SubMesh *subMesh = new SubMesh();
+  std::unique_ptr<SubMesh> subMesh(new SubMesh());
 
   // 80 byte Header.
   for (i = 0; i < 80; ++i)
@@ -246,7 +256,7 @@ bool STLLoader::ReadBinary(FILE *_filein, Mesh *_mesh)
       return false;
   }
 
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(subMesh.release());
   return true;
 }
 

@@ -68,7 +68,7 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->node = transport::NodePtr(new transport::Node());
 
   // Initialize the node with the world name
-  this->node->Init(_parent->GetName());
+  this->node->Init(_parent->Name());
 
   // Read topic, if specified
   std::string topic ="/gazebo/sim_events";
@@ -167,9 +167,9 @@ void SimEventsPlugin::Init()
     events[i]->Init();
   }
   // seed the map with the initial models
-  for (unsigned int i = 0; i < world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < world->ModelCount(); ++i)
   {
-    std::string name = world->GetModel(i)->GetName();
+    std::string name = world->ModelByIndex(i)->GetName();
     models.insert(name);
   }
 }

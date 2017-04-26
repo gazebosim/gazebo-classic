@@ -56,11 +56,11 @@ void BulletMeshShape::Init()
   if (this->submesh)
   {
     this->bulletMesh->Init(this->submesh, bParent,
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
   else
   {
     this->bulletMesh->Init(this->mesh, bParent,
-        this->sdf->Get<math::Vector3>("scale"));
+        this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
 }

@@ -123,12 +123,12 @@ ModelRightMenu::ModelRightMenu()
   connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
   this->viewStates.push_back(state);
 
-  // \todo Reimplement
-  // this->skeletonAction = new QAction(tr("Skeleton"), this);
-  // this->skeletonAction->setStatusTip(tr("Show model skeleton"));
-  // this->skeletonAction->setCheckable(true);
-  // connect(this->skeletonAction, SIGNAL(triggered()), this,
-  //         SLOT(OnSkeleton()));
+  state = new ViewState(this, "show_skeleton", "hide_skeleton");
+  state->action = new QAction(tr("Skeleton"), this);
+  state->action->setStatusTip(tr("Show model skeleton"));
+  state->action->setCheckable(true);
+  connect(state->action, SIGNAL(triggered()), state, SLOT(Callback()));
+  this->viewStates.push_back(state);
 
   // Window mode
   this->windowMode = "Simulation";
@@ -166,7 +166,9 @@ bool ModelRightMenu::OnKeyRelease(const common::KeyEvent &_event)
 /////////////////////////////////////////////////
 ModelRightMenu::~ModelRightMenu()
 {
+  this->requestSub.reset();
   this->node->Fini();
+  this->node.reset();
 }
 
 /////////////////////////////////////////////////
@@ -247,9 +249,6 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     menu.addAction(g_deleteAct);
   }
 
-  /// \todo Reimplement these features.
-  // menu.addAction(this->skeletonAction);
-
   menu.exec(_pt);
 }
 
@@ -294,11 +293,11 @@ void ModelRightMenu::OnApplyWrench()
   {
     modelName = this->entityName;
     // If model selected just take the first link
-    linkName = vis->GetChild(0)->GetName();
+    linkName = vis->GetChild(0)->Name();
   }
   else
   {
-    modelName = vis->GetRootVisual()->GetName();
+    modelName = vis->GetRootVisual()->Name();
     linkName = this->entityName;
   }
 
@@ -413,26 +412,3 @@ void ModelRightMenu::OnWindowMode(const std::string &_mode)
 {
   this->windowMode = _mode;
 }
-
-/// \todo Reimplement these functions.
-/////////////////////////////////////////////////
-// void ModelRightMenu::OnSkeleton()
-// {
-//   this->skeletonActionState[this->entityName] =
-//     this->skeletonAction->isChecked();
-//
-//   if (this->skeletonAction->isChecked())
-//   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
-//     this->requestMsg->set_dbl_data(1.0);
-//   }
-//   else
-//   {
-//     this->requestMsg = msgs::CreateRequest("show_skeleton",
-//         this->entityName);
-//     this->requestMsg->set_dbl_data(0.0);
-//   }
-//
-//   this->requestPub->Publish(*this->requestMsg);
-// }

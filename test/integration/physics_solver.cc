@@ -45,15 +45,15 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // check the gravity vector
-  math::Vector3 gravity = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(gravity.x, 0);
-  EXPECT_DOUBLE_EQ(gravity.y, 0);
-  EXPECT_DOUBLE_EQ(gravity.z, -10.0);
+  auto gravity = world->Gravity();
+  EXPECT_DOUBLE_EQ(gravity.X(), 0);
+  EXPECT_DOUBLE_EQ(gravity.Y(), 0);
+  EXPECT_DOUBLE_EQ(gravity.Z(), -10.0);
 
   if (_physicsEngine == "ode")
   {
@@ -62,19 +62,19 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
   }
-  math::Pose pose;
-  physics::ModelPtr sphere_model = world->GetModel("sphere");
-  if (sphere_model)
-    pose = sphere_model->GetWorldPose();
+  ignition::math::Pose3d pose;
+  physics::ModelPtr sphereModel = world->ModelByName("sphere");
+  if (sphereModel)
+    pose = sphereModel->WorldPose();
 
-  double z = pose.pos.z;
+  double z = pose.Pos().Z();
   double test_duration = 3.0;
 
   // Dynamic duration includes the bounce back
   double dynamic_duration = 2.4;
   double v = 0.0;
   double g = -10.0;
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   int steps = test_duration/dt;
   int dynamic_steps = dynamic_duration/dt;
   for (int i = 0; i < steps; ++i)
@@ -83,15 +83,15 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
     z += dt * v;
 
     world->Step(1);
-    physics::ModelPtr sphere_model = world->GetModel("sphere");
-    if (sphere_model)
+    physics::ModelPtr sphereModel = world->ModelByName("sphere");
+    if (sphereModel)
     {
-      math::Vector3 vel = sphere_model->GetWorldLinearVel();
-      math::Pose pose = sphere_model->GetWorldPose();
+      ignition::math::Vector3d vel = sphereModel->WorldLinearVel();
+      ignition::math::Pose3d pose = sphereModel->WorldPose();
       if (z > 0.5)
       {
-        EXPECT_LT(fabs(vel.z - v), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - z), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z() - v), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - z), PHYSICS_TOL);
       }
 
       // After contact with ground, and no bounce back
@@ -105,8 +105,8 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
                 << std::endl;
           break;
         }
-        EXPECT_LT(fabs(vel.z), PHYSICS_TOL);
-        EXPECT_LT(fabs(pose.pos.z - 0.5), PHYSICS_TOL);
+        EXPECT_LT(fabs(vel.Z()), PHYSICS_TOL);
+        EXPECT_LT(fabs(pose.Pos().Z() - 0.5), PHYSICS_TOL);
       }
     }
   }

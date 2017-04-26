@@ -32,7 +32,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Bullet_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new BulletSurfaceParams());
   this->collideBits = GZ_ALL_COLLIDE;
 }
@@ -42,7 +42,7 @@ BulletCollision::~BulletCollision()
 {
   /*
   delete this->collisionShape;
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   */
 }
 
@@ -64,7 +64,7 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // auto pose = this->RelativePose();
   // BulletLinkPtr bbody =
   //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
@@ -135,26 +135,27 @@ unsigned int BulletCollision::GetCollideBits() const
 }*/
 
 //////////////////////////////////////////////////
-math::Box BulletCollision::GetBoundingBox() const
+ignition::math::Box BulletCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result;
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
-                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
+    result = ignition::math::Box(
+        ignition::math::Vector3d(btMin.x(), btMin.y(), btMin.z()),
+        ignition::math::Vector3d(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->GetShapeType() & PLANE_SHAPE)
     {
       PlaneShapePtr plane =
         boost::dynamic_pointer_cast<PlaneShape>(this->shape);
-      math::Vector3 normal = plane->GetNormal();
-      if (normal == math::Vector3::UnitZ)
+      auto normal = plane->Normal();
+      if (normal == ignition::math::Vector3d::UnitZ)
       {
         // Should check altitude, but it's not implemented
-        result.max.z =  0.0;
+        result.Max().Z() =  0.0;
       }
     }
   }
@@ -168,7 +169,7 @@ void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
   Collision::SetPlaceable(_placeable);
   this->collisionShape = _shape;
 
-  // btmath::Vector3 vec;
+  // btVector3 vec;
   // this->collisionShape->calculateLocalInertia(this->mass.GetAsDouble(), vec);
 
   // this->mass.SetCoG(this->GetRelativePose().pos);

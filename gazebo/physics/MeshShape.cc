@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -104,15 +103,15 @@ void MeshShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MeshShape::SetScale(const math::Vector3 &_scale)
+void MeshShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   this->sdf->GetElement("scale")->Set(_scale);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MeshShape::GetSize() const
+ignition::math::Vector3d MeshShape::Size() const
 {
-  return this->sdf->Get<math::Vector3>("scale");
+  return this->sdf->Get<ignition::math::Vector3d>("scale");
 }
 
 //////////////////////////////////////////////////
@@ -123,8 +122,7 @@ std::string MeshShape::GetMeshURI() const
 
 //////////////////////////////////////////////////
 void MeshShape::SetMesh(const std::string &_uri,
-                           const std::string &_submesh,
-                           bool _center)
+    const std::string &_submesh, bool _center)
 {
   this->sdf->GetElement("uri")->Set(_uri);
 

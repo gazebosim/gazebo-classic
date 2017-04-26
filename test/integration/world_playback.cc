@@ -102,13 +102,25 @@ TEST_P(WorldPlaybackTest, Pause)
   msgs::LogPlaybackControl msg;
   msg.set_pause(false);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+  int sleep = 0;
+  while (this->world->IsPaused() && sleep < 100)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    sleep++;
+  }
   EXPECT_TRUE(!this->world->IsPaused());
 
   // Send a message to pause the world.
   msg.set_pause(true);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  sleep = 0;
+  while (!this->world->IsPaused() && sleep < 100)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    sleep++;
+  }
   EXPECT_TRUE(this->world->IsPaused());
 }
 
@@ -132,7 +144,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(1);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 10, 20);
-  EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Step -1
   msg.Clear();
@@ -140,7 +152,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(-1);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 10, 20);
-  EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Step +3
   msg.Clear();
@@ -148,7 +160,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(3);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 10, 20);
-  EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Step -2
   msg.Clear();
@@ -156,7 +168,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(-2);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 10, 20);
-  EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Insane backwards jump.
   msg.Clear();
@@ -164,7 +176,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(-9999);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 20, 20);
-  EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(world->SimTime(), expectedSimTime);
 
   // Insane forward jump.
   msg.Clear();
@@ -172,7 +184,7 @@ TEST_P(WorldPlaybackTest, Step)
   msg.set_multi_step(999999);
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 100, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 }
 
 /////////////////////////////////////////////////
@@ -194,7 +206,7 @@ TEST_P(WorldPlaybackTest, Rewind)
     msg.set_rewind(true);
     this->logPlaybackPub->Publish(msg);
     this->WaitUntilSimTime(expectedSimTime, 10, 20);
-    EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+    EXPECT_EQ(world->SimTime(), expectedSimTime);
   }
 }
 
@@ -217,7 +229,7 @@ TEST_P(WorldPlaybackTest, Forward)
     msg.set_forward(true);
     this->logPlaybackPub->Publish(msg);
     this->WaitUntilSimTime(expectedSimTime, 50, 400);
-    EXPECT_EQ(world->GetSimTime(), expectedSimTime);
+    EXPECT_EQ(world->SimTime(), expectedSimTime);
   }
 }
 
@@ -236,7 +248,7 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 50, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 
   // Move the simulation to the time at last frame.
   expectedSimTime.Set(std::get<3>(this->features));
@@ -246,7 +258,7 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 50, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 
   // Specify a time slightly before #4.
   expectedSimTime.Set(std::get<2>(this->features));
@@ -255,7 +267,7 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 50, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 
   // Specify a time before the initial time.
   expectedSimTime.Set(std::get<0>(this->features));
@@ -264,7 +276,7 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 50, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 
   // Specify a time after the last frame.
   expectedSimTime.Set(std::get<3>(this->features));
@@ -273,7 +285,7 @@ TEST_P(WorldPlaybackTest, Seek)
   msg.mutable_seek()->set_nsec(msgExpectedTime.nsec());
   this->logPlaybackPub->Publish(msg);
   this->WaitUntilSimTime(expectedSimTime, 50, 50);
-  EXPECT_EQ(this->world->GetSimTime(), expectedSimTime);
+  EXPECT_EQ(this->world->SimTime(), expectedSimTime);
 }
 
 // Test with different log files.

@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -24,6 +23,13 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
+#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/copy.hpp>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include <gazebo/util/util.hh>
 #include "gz_log.hh"
@@ -62,7 +68,7 @@ std::ostringstream &FilterBase::Out(std::ostringstream &_stream,
 }
 
 /////////////////////////////////////////////////
-std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
+std::string FilterBase::FilterPose(const ignition::math::Pose3d &_pose,
     const std::string &_xmlName,
     std::string _filter,
     const gazebo::physics::State &_state)
@@ -82,7 +88,7 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
   }
 
   // Get the euler angles.
-  gazebo::math::Vector3 rpy = _pose.rot.GetAsEuler();
+  ignition::math::Vector3d rpy = _pose.Rot().Euler();
 
   // If the filter is empty, then output the whole pose.
   if (!_filter.empty())
@@ -103,29 +109,29 @@ std::string FilterBase::FilterPose(const gazebo::math::Pose &_pose,
         case 'X':
         case 'x':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.x << " ";
+            << _pose.Pos().X() << " ";
           break;
         case 'Y':
         case 'y':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.y << " ";
+            << _pose.Pos().Y() << " ";
           break;
         case 'Z':
         case 'z':
           this->Out(result, _state) << std::fixed
-            << _pose.pos.z << " ";
+            << _pose.Pos().Z() << " ";
           break;
         case 'R':
         case 'r':
-          this->Out(result, _state) << std::fixed << rpy.x << " ";
+          this->Out(result, _state) << std::fixed << rpy.X() << " ";
           break;
         case 'P':
         case 'p':
-          this->Out(result, _state) << std::fixed << rpy.y << " ";
+          this->Out(result, _state) << std::fixed << rpy.Y() << " ";
           break;
         case 'A':
         case 'a':
-          this->Out(result, _state) << std::fixed << rpy.z << " ";
+          this->Out(result, _state) << std::fixed << rpy.Z() << " ";
           break;
         default:
           std::cerr << "Invalid pose value[" << *elemIter << "]\n";
@@ -203,7 +209,7 @@ std::string JointFilter::FilterParts(gazebo::physics::JointState &_state,
         if (axis >= _state.GetAngleCount())
           continue;
 
-        gazebo::math::Angle angle = _state.GetAngle(axis);
+        auto angle = _state.Position(axis);
 
         if (this->xmlOutput)
         {
@@ -262,7 +268,7 @@ std::string JointFilter::Filter(gazebo::physics::ModelState &_state)
     else
     {
       if (!this->xmlOutput && iter->second.GetAngleCount() == 1)
-        result << std::fixed << iter->second.GetAngle(0);
+        result << std::fixed << iter->second.Position(0);
       else
         result << std::fixed << iter->second;
     }
@@ -305,17 +311,24 @@ std::string LinkFilter::FilterParts(gazebo::physics::LinkState &_state,
     elemParts = *_partIter;
 
   if (part == "pose")
-    result << this->FilterPose(_state.GetPose(), part, elemParts,
-        _state);
+  {
+    result << this->FilterPose(_state.Pose(), part, elemParts, _state);
+  }
   else if (part == "acceleration")
-    result << this->FilterPose(_state.GetAcceleration(), part,
+  {
+    result << this->FilterPose(_state.Acceleration(), part,
         elemParts, _state);
+  }
   else if (part == "velocity")
-    result << this->FilterPose(_state.GetVelocity(), part, elemParts,
+  {
+    result << this->FilterPose(_state.Velocity(), part, elemParts,
         _state);
+  }
   else if (part == "wrench")
-    result << this->FilterPose(_state.GetWrench(), part, elemParts,
+  {
+    result << this->FilterPose(_state.Wrench(), part, elemParts,
         _state);
+  }
 
   return result.str();
 }
@@ -441,7 +454,7 @@ std::string ModelFilter::FilterParts(gazebo::physics::ModelState &_state,
   if (*_partIter == "pose")
   {
     // Get the model state pose
-    gazebo::math::Pose pose = _state.GetPose();
+    ignition::math::Pose3d pose = _state.Pose();
     ++_partIter;
 
     // Get the elements to filter pose by.
@@ -590,8 +603,16 @@ LogCommand::LogCommand()
     ("hz,z", po::value<double>(), "Filter output to the specified Hz rate."
      "Only valid for echo and step commands.")
     ("file,f", po::value<std::string>(), "Path to a log file.")
+    ("output,o", po::value<std::string>(),
+     "Output file, valid in conjunction with the filter, raw, hz, and "
+     "encoding commands. By default, the output file will have the same "
+     "encoding as the source file. Override with the --encoding option")
+    ("encoding,n", po::value<std::string>(),
+     "Specify the encoding (txt, zlib, or bz2) for an output file. "
+     "Valid in conjunction with the output command. See also the "
+     "--output argument.")
     ("filter", po::value<std::string>(),
-     "Filter output. Valid only for the echo and step commands");
+     "Filter output. Valid only with the echo, step, and output commands");
 }
 
 /////////////////////////////////////////////////
@@ -661,7 +682,15 @@ bool LogCommand::RunImpl()
   g_stateSdf.reset(new sdf::Element);
   sdf::initFile("state.sdf", g_stateSdf);
 
-  if (this->vm.count("echo"))
+  if (this->vm.count("output"))
+  {
+    std::string encoding = this->vm.count("encoding") ?
+      this->vm["encoding"].as<std::string>() : "";
+
+    this->Output(this->vm["output"].as<std::string>(), filter, raw, stamp, hz,
+        encoding);
+  }
+  else if (this->vm.count("echo"))
     this->Echo(filter, raw, stamp, hz);
   else if (this->vm.count("step"))
     this->Step(filter, raw, stamp, hz);
@@ -776,6 +805,81 @@ void LogCommand::Info(const std::string &_filename)
     << "Encoding:       " << play->Encoding() << "\n"
     // << "Model Count:    " << modelCount << "\n"
     << "\n";
+}
+
+/////////////////////////////////////////////////
+void LogCommand::Output(const std::string &_outFilename,
+    const std::string &_filter, const bool _raw,
+    const std::string &_stamp, const double _hz, const std::string &_encoding)
+{
+  std::ofstream outFile(_outFilename, std::fstream::out | std::ios::binary);
+
+  if (!outFile.is_open())
+  {
+    std::cerr << "Unable to open file[" << _outFilename << "] for writing.\n";
+    return;
+  }
+
+  gazebo::util::LogPlay *play = gazebo::util::LogPlay::Instance();
+  if (!play->IsOpen())
+  {
+    std::cerr << "No source log file specified. Use the -f command line "
+      << "argument.\n";
+    return;
+  }
+
+  std::string stateString, bufferString;
+
+  std::string encoding = _encoding.empty() ? play->Encoding() : _encoding;
+  if (encoding != "txt" && encoding != "zlib" && encoding != "bz2")
+  {
+    std::cerr << "Invalid log file encoding[" << encoding << "]. "
+      << "Use one of: txt, bz2, zlib.\n";
+    outFile.close();
+    return;
+  }
+
+  // Output the header
+  if (!_raw)
+  {
+    std::string header = play->Header();
+    outFile.write(header.c_str(), header.size());
+  }
+
+  StateFilter filter(!_raw, _stamp, _hz);
+  filter.Init(_filter);
+
+  unsigned int i = 0;
+  while (play->Step(stateString))
+  {
+    if (i == 0 && !_raw)
+    {
+      this->OutputWriter(outFile, stateString, _raw, encoding);
+    }
+    else
+    {
+      bufferString += filter.Filter(stateString);
+
+      if (i%1000 == 0 && !bufferString.empty())
+      {
+        this->OutputWriter(outFile, bufferString, _raw, encoding);
+        bufferString.clear();
+      }
+    }
+
+    ++i;
+  }
+
+  if (!bufferString.empty())
+    this->OutputWriter(outFile, bufferString, _raw, encoding);
+
+  if (!_raw)
+  {
+    std::string endTag = "</gazebo_log>\n";
+    outFile.write(endTag.c_str(), endTag.size());
+  }
+
+  outFile.close();
 }
 
 /////////////////////////////////////////////////
@@ -951,4 +1055,57 @@ bool LogCommand::LoadLogFromFile(const std::string &_filename)
   }
 
   return true;
+}
+
+/////////////////////////////////////////////////
+void LogCommand::OutputWriter(std::ofstream &_outFile,
+    const std::string &_stateString, const bool _raw,
+    const std::string &_encoding)
+{
+  if (!_raw)
+  {
+    std::string buffer = "<chunk encoding='" + _encoding + "'>\n<![CDATA[";
+
+    if (_encoding == "txt")
+      buffer.append(_stateString);
+    else if (_encoding == "zlib")
+    {
+      std::string str;
+
+      // Compress to zlib
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::zlib_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+    else if (_encoding == "bz2")
+    {
+      std::string str;
+
+      // Compress to bzip2
+      {
+        boost::iostreams::filtering_ostream out;
+        out.push(boost::iostreams::bzip2_compressor());
+        out.push(std::back_inserter(str));
+        boost::iostreams::copy(
+            boost::make_iterator_range(_stateString), out);
+      }
+
+      // Encode in base64.
+      Base64Encode(str.c_str(), str.size(), buffer);
+    }
+
+    buffer.append("]]>\n</chunk>\n");
+    _outFile.write(buffer.c_str(), buffer.size());
+  }
+  else
+  {
+    _outFile.write(_stateString.c_str(), _stateString.size());
+  }
 }

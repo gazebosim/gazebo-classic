@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MAINWINDOW_HH_
-#define _GAZEBO_GUI_MAINWINDOW_HH_
+#ifndef GAZEBO_GUI_MAINWINDOW_HH_
+#define GAZEBO_GUI_MAINWINDOW_HH_
 
 #include <memory>
 #include <string>
@@ -78,12 +78,6 @@ namespace gazebo
       /// the main tab.
       public: void ShowLeftColumnWidget(const std::string &_name = "default");
 
-
-      /// \brief Get a pointer to the render widget.
-      /// \return A pointer to the render widget.
-      /// \deprecated See RenderWidget() const.
-      public: gui::RenderWidget *GetRenderWidget() const GAZEBO_DEPRECATED(7.0);
-
       /// \brief Get a pointer to the render widget.
       /// \return A pointer to the render widget.
       public: gui::RenderWidget *RenderWidget() const;
@@ -125,17 +119,14 @@ namespace gazebo
       /// \brief Get an editor by name
       /// \param[in] _name Name of the editor.
       /// \return Pointer to the editor.
-      /// \deprecated See Editor(const std::string &_name) const.
-      public: gui::Editor *GetEditor(
-          const std::string &_name) const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get an editor by name
-      /// \param[in] _name Name of the editor.
-      /// \return Pointer to the editor.
       public: gui::Editor *Editor(const std::string &_name) const;
 
       /// \brief A signal to trigger loading of GUI plugins.
       signals: void AddPlugins();
+
+      /// \brief A signal to track a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      signals: void TrackVisual(const std::string &_visualName);
 
       /// \brief A signal to indicate the main window is about to close.
       signals: void Close();
@@ -220,6 +211,9 @@ namespace gazebo
       /// \brief Qt callback when the show link frame action is triggered.
       private slots: void ShowLinkFrame();
 
+      /// \brief Qt callback when the show skeleton action is triggered.
+      private slots: void ShowSkeleton();
+
       /// \brief Qt callback when the full screen action is triggered.
       private slots: void FullScreen();
 
@@ -246,11 +240,15 @@ namespace gazebo
       /// \brief Callback when topic selection action.
       private slots: void SelectTopic();
 
-      /// \brief Callback for diagnostics action.
-      private slots: void Diagnostics();
+      /// \brief Callback for plot action.
+      private slots: void Plot();
 
       /// \brief Callback for adding plugins.
       private slots: void OnAddPlugins();
+
+      /// \brief Callback for tracking a visual.
+      /// \param[in] _visualName Name of the visual to attach the camera to.
+      private slots: void OnTrackVisual(const std::string &_visualName);
 
       /// \brief Qt call back when one of the editor actions is triggered.
       /// \param[in] _action Action in the group which was triggered.

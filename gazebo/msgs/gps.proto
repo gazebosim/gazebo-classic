@@ -5,7 +5,6 @@ package gazebo.msgs;
 /// \interface GPS
 /// \brief Data from a GPS sensor
 
-
 import "time.proto";
 
 message GPS

@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
@@ -158,12 +159,12 @@ void ModelCreator_TEST::NestedModel()
   QVERIFY(model01Vis != NULL);
 
   // remove box model and verify
-  modelCreator->RemoveEntity(boxModelVis->GetName());
+  modelCreator->RemoveEntity(boxModelVis->Name());
   boxModelVis = scene->GetVisual("ModelPreview_0_0::box_model");
   QVERIFY(boxModelVis == NULL);
 
   // remove nested model and verify
-  modelCreator->RemoveEntity(modelVis->GetName());
+  modelCreator->RemoveEntity(modelVis->Name());
   modelVis = scene->GetVisual("ModelPreview_0_0::model_00");
   QVERIFY(modelVis == NULL);
   link00Vis = scene->GetVisual("ModelPreview_0_0::model_00::link_00");
@@ -232,7 +233,8 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Move a link to have unsaved changes
-  cylinder->SetWorldPose(math::Pose(1, 2, 3, 4, 5, 6));
+  gazebo::gui::Events::moveEntity(cylinder->Name(),
+      ignition::math::Pose3d(1, 2, 3, 4, 5, 6), true);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -245,7 +247,7 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Remove a link to have unsaved changes
-  modelCreator->RemoveEntity(cylinder->GetName());
+  modelCreator->RemoveEntity(cylinder->Name());
   QCOMPARE(modelCreator->CurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
@@ -665,7 +667,7 @@ void ModelCreator_TEST::CopyPaste()
 
   // Verify there is a clone of the cylinder link
   rendering::VisualPtr cylinderClone =
-      scene->GetVisual(cylinder->GetName() + "_clone");
+      scene->GetVisual(cylinder->Name() + "_clone");
   QVERIFY(cylinderClone != NULL);
 
   // copy and paste box model
@@ -682,7 +684,7 @@ void ModelCreator_TEST::CopyPaste()
 
   // Verify there is a clone of the box model
   rendering::VisualPtr boxModelClone =
-      scene->GetVisual(boxModel->GetName() + "_clone");
+      scene->GetVisual(boxModel->Name() + "_clone");
   QVERIFY(boxModelClone != NULL);
 
   this->ProcessEventsAndDraw(mainWindow);

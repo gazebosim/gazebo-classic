@@ -108,7 +108,7 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->world = _world;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->Init(_world->Name());
 
   this->dataPtr->userCmdSub = this->dataPtr->node->Subscribe("~/user_cmd",
       &UserCmdManager::OnUserCmdMsg, this, true);

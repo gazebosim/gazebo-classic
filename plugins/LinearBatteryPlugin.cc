@@ -126,7 +126,7 @@ void LinearBatteryPlugin::Reset()
 /////////////////////////////////////////////////
 double LinearBatteryPlugin::OnUpdateVoltage(const common::BatteryPtr &_battery)
 {
-  double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = this->world->Physics()->GetMaxStepSize();
   double totalpower = 0.0;
   double k = dt / this->tau;
 

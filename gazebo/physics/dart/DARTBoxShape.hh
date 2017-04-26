@@ -14,10 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DARTBOXSHAPE_HH_
-#define _GAZEBO_DARTBOXSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
+#define GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/util/system.hh"
@@ -43,7 +42,7 @@ namespace gazebo
       public: virtual ~DARTBoxShape();
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size);
+      public: virtual void SetSize(const ignition::math::Vector3d &_size);
 
       /// \internal
       /// \brief Pointer to private data

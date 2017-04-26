@@ -23,8 +23,6 @@
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/common/Mesh.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector2i.hh"
 
 struct _GtsSurface;
 typedef _GtsSurface GtsSurface;

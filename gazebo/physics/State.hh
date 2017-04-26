@@ -134,7 +134,7 @@ namespace gazebo
 
       /// \brief The number of simulation iterations when this state was
       /// generated.
-      protected: uint64_t iterations;
+      protected: uint64_t iterations = 0;
     };
     /// \}
   }

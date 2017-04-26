@@ -39,7 +39,7 @@ void ExtrudeDialog_TEST::GetSpinValues()
   // Check a good file
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/loader.svg";
-  std::unique_ptr <gazebo::gui::ExtrudeDialog> extrudeDialog(
+  std::unique_ptr<gazebo::gui::ExtrudeDialog> extrudeDialog(
       new gazebo::gui::ExtrudeDialog(filePath));
 
   // Get default thickness, change value and check new value

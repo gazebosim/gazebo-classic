@@ -61,10 +61,10 @@ namespace gazebo
       /// \param[in] _data Data to send to the boost function pointer.
       public: ConnectionReadTask(
                   boost::function<void (const std::string &)> _func,
-                  const std::string &_data)
+                  const std::string &_data) :
+                func(_func),
+                data(_data)
               {
-                this->func = _func;
-                this->data = _data;
               }
 
       /// \bried Overridden function from tbb::task that exectues the data
@@ -324,12 +324,6 @@ namespace gazebo
       public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
                  _subscriber)
               { return this->shutdown.Connect(_subscriber); }
-
-      /// \brief Unregister a function to be called when the connection is
-      /// shut down \param[in] _subscriber Handle previously returned by
-      /// ConnectToShutdown()
-      public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
-              {this->shutdown.Disconnect(_subscriber);}
 
       /// \brief Handle on-write callbacks
       public: void ProcessWriteQueue(bool _blocking = false);

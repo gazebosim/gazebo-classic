@@ -14,10 +14,6 @@
  * limitations under the License.
  *
 */
-/* Desc: Map shape
- * Author: Nate Koenig
-*/
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -115,7 +111,7 @@ void MapShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::IMAGE);
   _msg.mutable_image()->set_uri(this->GetURI());
-  _msg.mutable_image()->set_scale(this->GetScale().x);
+  _msg.mutable_image()->set_scale(this->Scale().X());
   _msg.mutable_image()->set_threshold(this->GetThreshold());
   _msg.mutable_image()->set_height(this->GetHeight());
   _msg.mutable_image()->set_granularity(this->GetGranularity());
@@ -129,7 +125,7 @@ std::string MapShape::GetURI() const
 }
 
 //////////////////////////////////////////////////
-void MapShape::SetScale(const math::Vector3 &_scale)
+void MapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -142,10 +138,10 @@ void MapShape::SetScale(const math::Vector3 &_scale)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 MapShape::GetScale() const
+ignition::math::Vector3d MapShape::Scale() const
 {
   double mapScale = this->sdf->Get<double>("scale");
-  return math::Vector3(mapScale, mapScale, mapScale);
+  return ignition::math::Vector3d(mapScale, mapScale, mapScale);
 }
 
 //////////////////////////////////////////////////
@@ -178,7 +174,7 @@ void MapShape::CreateBoxes(QuadNode * /*_node*/)
     std::ostringstream stream;
 
     // Create the box geometry
-    CollisionPtr collision = this->GetWorld()->GetPhysicsEngine()->CreateCollision("box", this->collisionParent->GetLink());
+    CollisionPtr collision = this->GetWorld()-Physics()->CreateCollision("box", this->collisionParent->GetLink());
     collision->SetSaveable(false);
 
     stream << "<gazebo:world xmlns:gazebo =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#gz\" xmlns:collision =\"http://playerstage.sourceforge.net/gazebo/xmlschema/#collision\">";

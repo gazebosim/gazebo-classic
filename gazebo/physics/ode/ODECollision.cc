@@ -29,7 +29,6 @@
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
-#include "gazebo/math/Box.hh"
 
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
@@ -44,7 +43,7 @@ ODECollision::ODECollision(LinkPtr _link)
 : Collision(_link)
 {
   this->SetName("ODE_Collision");
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
   this->onPoseChangeFunc = &ODECollision::OnPoseChangeNull;
 
   this->SetSpaceId(
@@ -58,7 +57,7 @@ ODECollision::~ODECollision()
 {
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
-  this->collisionId = NULL;
+  this->collisionId = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -86,11 +85,11 @@ void ODECollision::Fini()
   /*
      if (this->collisionId)
      dGeomDestroy(this->collisionId);
-     this->collisionId = NULL;
+     this->collisionId = nullptr;
 
      if (this->spaceId)
      dSpaceDestroy(this->spaceId);
-     this->spaceId = NULL;
+     this->spaceId = nullptr;
      */
 
   Collision::Fini();
@@ -119,7 +118,7 @@ void ODECollision::SetCollision(dGeomID _collisionId, bool _placeable)
   if (dGeomGetSpace(this->collisionId) == 0)
   {
     dSpaceAdd(this->spaceId, this->collisionId);
-    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is NULL");
+    GZ_ASSERT(dGeomGetSpace(this->collisionId) != 0, "Collision ID is null");
   }
 
   if (this->collisionId && this->placeable)
@@ -175,7 +174,7 @@ void ODECollision::SetCollideBits(unsigned int _bits)
 }
 
 //////////////////////////////////////////////////
-math::Box ODECollision::GetBoundingBox() const
+ignition::math::Box ODECollision::BoundingBox() const
 {
   dReal aabb[6];
   memset(aabb, 0, 6 * sizeof(dReal));
@@ -183,8 +182,9 @@ math::Box ODECollision::GetBoundingBox() const
   // if (this->collisionId && this->type != Shape::PLANE)
   dGeomGetAABB(this->collisionId, aabb);
 
-  math::Box box(math::Vector3(aabb[0], aabb[2], aabb[4]),
-                math::Vector3(aabb[1], aabb[3], aabb[5]));
+  ignition::math::Box box(
+      ignition::math::Vector3d(aabb[0], aabb[2], aabb[4]),
+      ignition::math::Vector3d(aabb[1], aabb[3], aabb[5]));
 
   return box;
 }
@@ -210,45 +210,53 @@ ODESurfaceParamsPtr ODECollision::GetODESurface() const
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeGlobal()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
 
   // Transform into global pose since a static collision does not have a link
-  math::Pose localPose = this->GetWorldPose();
+  ignition::math::Pose3d localPose = this->WorldPose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cogVec = this->link->GetInertial()->CoG();
+  localPose.Pos() = localPose.Pos() - cogVec;
 
-  q[0] = localPose.rot.w;
-  q[1] = localPose.rot.x;
-  q[2] = localPose.rot.y;
-  q[3] = localPose.rot.z;
+  q[0] = localPose.Rot().W();
+  q[1] = localPose.Rot().X();
+  q[2] = localPose.Rot().Y();
+  q[3] = localPose.Rot().Z();
 
-  dGeomSetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-                   localPose.pos.z);
+  dGeomSetPosition(this->collisionId, localPose.Pos().X(),
+      localPose.Pos().Y(), localPose.Pos().Z());
   dGeomSetQuaternion(this->collisionId, q);
 }
 
 /////////////////////////////////////////////////
 void ODECollision::OnPoseChangeRelative()
 {
+  // A collision is not guaranteed to have a link (such as a standalone ray)
+  if (!this->link)
+    return;
+
   dQuaternion q;
   // Transform into CoM relative Pose
-  math::Pose localPose = this->GetRelativePose();
+  ignition::math::Pose3d localPose = this->RelativePose();
 
   // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
+  ignition::math::Vector3d cogVec = this->link->GetInertial()->CoG();
+  localPose.Pos() = localPose.Pos() - cogVec;
 
-  q[0] = localPose.rot.w;
-  q[1] = localPose.rot.x;
-  q[2] = localPose.rot.y;
-  q[3] = localPose.rot.z;
+  q[0] = localPose.Rot().W();
+  q[1] = localPose.Rot().X();
+  q[2] = localPose.Rot().Y();
+  q[3] = localPose.Rot().Z();
 
   // Set the pose of the encapsulated collision; this is always relative
   // to the CoM
-  dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
-      localPose.pos.z);
+  dGeomSetOffsetPosition(this->collisionId,
+      localPose.Pos().X(), localPose.Pos().Y(), localPose.Pos().Z());
   dGeomSetOffsetQuaternion(this->collisionId, q);
 }
 

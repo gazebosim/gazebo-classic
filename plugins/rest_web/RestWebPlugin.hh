@@ -15,12 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_REST_WEB_PLUGIN_HH_
-#define _GAZEBO_REST_WEB_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTWEBPLUGIN_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTWEBPLUGIN_HH_
 
 #include <list>
+#include <mutex>
 #include <vector>
 #include <string>
+#include <thread>
 
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
@@ -102,10 +104,10 @@ namespace gazebo
         msgLoginQ;
 
     /// \brief A thread to process requests without stopping the simulation
-    private: boost::thread *requestQThread;
+    private: std::thread *requestQThread;
 
     /// \brief A mutex to ensure integrity of the request list
-    private: boost::mutex requestQMutex;
+    private: std::mutex requestQMutex;
 
     /// \brief A session string to keep track of exercises
     private: std::string session;
@@ -113,5 +115,3 @@ namespace gazebo
 }
 
 #endif
-
-

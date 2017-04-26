@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "plugins/SphereAtlasDemoPlugin.hh"
 
@@ -156,7 +158,7 @@ void SphereAtlasDemoPlugin::Load(physics::ModelPtr _model,
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
+          std::bind(&SphereAtlasDemoPlugin::OnUpdate, this));
 }
 
 /////////////////////////////////////////////////
@@ -170,24 +172,20 @@ void SphereAtlasDemoPlugin::Reset()
   gzlog << "SphereAtlasDemoPlugin: \n"
         << "  This is not a typical usage of plugin Reset function,\n"
         << "  we are doing this just for testing purposes.\n";
-  if (this->updateConnection)
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-    this->updateConnection.reset();
-  }
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////
 void SphereAtlasDemoPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
   double dt = stepTime.Double();
 
   for (unsigned int j = 0; j < this->joints.size(); ++j)
   {
-    double p = this->joints[j]->GetAngle(0).Radian();
+    double p = this->joints[j]->Position(0);
     double target = 0;
     double perror = target - p;
     double derror = (perror - this->qp[j])/dt;

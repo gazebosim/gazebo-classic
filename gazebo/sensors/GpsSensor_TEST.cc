@@ -100,7 +100,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  EXPECT_TRUE(sensor != NULL);
+  EXPECT_TRUE(sensor != nullptr);
 
   EXPECT_DOUBLE_EQ(sensor->Latitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
@@ -109,7 +109,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
   EXPECT_TRUE(sensor->IsActive());
 
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->Step(100);
 }
 

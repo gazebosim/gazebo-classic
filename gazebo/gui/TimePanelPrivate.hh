@@ -18,14 +18,21 @@
 #define _GAZEBO_TIME_PANEL_PRIVATE_HH_
 
 #include <list>
+#include <mutex>
 #include <vector>
 
+#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/gui/qt.h"
+#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
   namespace gui
   {
+    class LogPlayWidget;
+    class TimeWidget;
+
     /// \internal
     /// \brief Private data for the TimePanel class
     class TimePanelPrivate
@@ -36,8 +43,8 @@ namespace gazebo
       /// \brief List of real times used to compute averages.
       public: std::list<common::Time> realTimes;
 
-      /// \brief Mutex to protect the memeber variables.
-      public: boost::mutex mutex;
+      /// \brief Mutex to protect the member variables.
+      public: std::mutex mutex;
 
       /// \brief Paused state of the simulation.
       public: bool paused;

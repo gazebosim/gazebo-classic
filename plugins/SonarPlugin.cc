@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "SonarPlugin.hh"
 
@@ -31,7 +33,7 @@ SonarPlugin::SonarPlugin()
 /////////////////////////////////////////////////
 SonarPlugin::~SonarPlugin()
 {
-  this->parentSensor->DisconnectUpdate(this->connection);
+  this->connection.reset();
   this->parentSensor.reset();
 }
 

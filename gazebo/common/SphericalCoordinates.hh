@@ -23,9 +23,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Matrix3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo

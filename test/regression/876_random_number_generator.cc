@@ -15,8 +15,8 @@
  *
 */
 
+#include <ignition/math/Rand.hh>
 #include "gazebo/test/ServerFixture.hh"
-#include "gazebo/math/Rand.hh"
 
 using namespace gazebo;
 
@@ -31,15 +31,15 @@ TEST_F(Issue876Test, Reset)
 {
   Load("worlds/empty.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_NE(world, nullptr);
 
-  math::Rand::SetSeed(math::Rand::GetSeed());
+  ignition::math::Rand::Seed(ignition::math::Rand::Seed());
 
   int sampleCount = 500;
 
   std::vector<int> num;
   for (int i = 0; i < sampleCount; ++i)
-    num.push_back(math::Rand::GetIntUniform(-10, 10));
+    num.push_back(ignition::math::Rand::IntUniform(-10, 10));
 
   for (int j = 0; j < 1000; ++j)
   {
@@ -47,7 +47,7 @@ TEST_F(Issue876Test, Reset)
 
     std::vector<int> numReset;
     for (int i = 0; i < sampleCount; ++i)
-      numReset.push_back(math::Rand::GetIntUniform(-10, 10));
+      numReset.push_back(ignition::math::Rand::IntUniform(-10, 10));
 
     // Using ASSERT_EQ to prevent spamming of similar errors.
     for (int i = 0; i < sampleCount; ++i)

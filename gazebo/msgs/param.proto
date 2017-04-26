@@ -1,0 +1,15 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Param
+/// \brief Param message.
+
+import "any.proto";
+
+message Param
+{
+  required string name     = 1;
+  optional Any    value    = 2;
+  repeated Param  children = 3;
+}

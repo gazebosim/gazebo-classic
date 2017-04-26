@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_EXCEPTION_HH_
-#define _REST_EXCEPTION_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTEXCEPTION_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTEXCEPTION_HH_
 
 #include <stdexcept>
 
@@ -30,4 +30,3 @@ namespace gazebo
 }
 
 #endif
-

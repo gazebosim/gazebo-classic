@@ -37,114 +37,79 @@ namespace gazebo
     class GZ_COMMON_VISIBLE Events
     {
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the pause signal
+      /// \brief Connect a callback to the pause signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectPause(T _subscriber)
               { return pause.Connect(_subscriber); }
 
-      /// \brief Disconnect a boost::slot the the pause signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectPause(ConnectionPtr _subscriber)
-              { pause.Disconnect(_subscriber); }
-
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the step signal
+      /// \brief Connect a callback to the step signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectStep(T _subscriber)
               { return step.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the step signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectStep(ConnectionPtr _subscriber)
-              { step.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the stop signal
+      /// \brief Connect a callback to the stop signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectStop(T _subscriber)
               { return stop.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the stop signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectStop(ConnectionPtr _subscriber)
-              { stop.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the world created signal
+      /// \brief Connect a callback to the world created signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectWorldCreated(T _subscriber)
               { return worldCreated.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the world created signal
-      public: static void DisconnectWorldCreated(ConnectionPtr _subscriber)
-              { worldCreated.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the add entity signal
+      /// \brief Connect a callback to the add entity signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectCreateEntity(T _subscriber)
               { return entityCreated.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the add entity signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectCreateEntity(ConnectionPtr _subscriber)
-              { entityCreated.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the set selected entity
+      /// \brief Connect a callback to the set selected entity signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectSetSelectedEntity(T _subscriber)
               { return setSelectedEntity.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the set selected entity
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectSetSelectedEntity(ConnectionPtr _subscriber)
-              { setSelectedEntity.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the delete entity
+      /// \brief Connect a callback to the delete entity signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectDeleteEntity(T _subscriber)
               { return deleteEntity.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the delete entity
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectDeleteEntity(ConnectionPtr _subscriber)
-              { deleteEntity.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the add entity signal
+      /// \brief Connect a callback to the add entity signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectAddEntity(T _subscriber)
               { return addEntity.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the add entity signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectAddEntity(ConnectionPtr _subscriber)
-              { addEntity.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the world update start signal
+      /// \brief Connect a callback to the world update start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectWorldUpdateBegin(T _subscriber)
               { return worldUpdateBegin.Connect(_subscriber); }
 
-      /// \brief Disconnect a boost::slot the the world update start signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldUpdateBegin(
-                  ConnectionPtr _subscriber);
-
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the before physics update signal
+      /// \brief Connect a callback to the before physics update signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       ///
@@ -155,36 +120,21 @@ namespace gazebo
               static ConnectionPtr ConnectBeforePhysicsUpdate(T _subscriber)
               { return beforePhysicsUpdate.Connect(_subscriber); }
 
-      /// \brief Disconnect a boost::slot from the before physics update signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectBeforePhysicsUpdate(
-                ConnectionPtr _subscriber)
-              { beforePhysicsUpdate.Disconnect(_subscriber); }
-
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the the world update end signal
+      /// \brief Connect a callback to the world update end signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectWorldUpdateEnd(T _subscriber)
               { return worldUpdateEnd.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the the world update end signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldUpdateEnd(ConnectionPtr _subscriber)
-              { worldUpdateEnd.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect to the the world reset signal
+      /// \brief Connect to the world reset signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectWorldReset(T _subscriber)
               { return worldReset.Connect(_subscriber); }
-
-      /// \brief Disconnect from the world reset signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectWorldReset(ConnectionPtr _subscriber)
-              { worldReset.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect to the time reset signal
@@ -194,11 +144,6 @@ namespace gazebo
               static ConnectionPtr ConnectTimeReset(T _subscriber)
               { return timeReset.Connect(_subscriber); }
 
-      /// \brief Disconnect from the time reset signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectTimeReset(ConnectionPtr _subscriber)
-              { timeReset.Disconnect(_subscriber); }
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect to the remove sensor signal
       /// \param[in] _subscriber the subscriber to this event
@@ -206,11 +151,6 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectRemoveSensor(T _subscriber)
               { return removeSensor.Connect(_subscriber); }
-
-      /// \brief Disconnect from the remove sensor signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectRemoveSensor(ConnectionPtr _subscriber)
-              { removeSensor.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Connect to the create sensor signal
@@ -220,11 +160,6 @@ namespace gazebo
               static ConnectionPtr ConnectCreateSensor(T _subscriber)
               { return createSensor.Connect(_subscriber); }
 
-      /// \brief Disconnect from the create sensor signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectCreateSensor(ConnectionPtr _subscriber)
-              { createSensor.Disconnect(_subscriber); }
-
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal
       /// \param[in] _subscriber the subscriber to this event
@@ -232,67 +167,46 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPreRender(T _subscriber)
               { return preRender.Connect(_subscriber); }
-      /// \brief Disconnect a render start signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectPreRender(ConnectionPtr _subscriber)
-              { preRender.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the render update signal
+      /// \brief Connect a callback to the render update signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectRender(T _subscriber)
               { return render.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the render update signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectRender(ConnectionPtr _subscriber)
-              { render.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the post render update signal
+      /// \brief Connect a callback to the post render update signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectPostRender(T _subscriber)
               { return postRender.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the post render update signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectPostRender(ConnectionPtr _subscriber)
-              { postRender.Disconnect(_subscriber); }
+
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the diagnostic timer start signal
+      /// \brief Connect a callback to the diagnostic timer start signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectDiagTimerStart(T _subscriber)
               { return diagTimerStart.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the diagnostic timer start signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectDiagTimerStart(ConnectionPtr _subscriber)
-              { diagTimerStart.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot the diagnostic timer stop signal
+      /// \brief Connect a callback to the diagnostic timer stop signal
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectDiagTimerStop(T _subscriber)
               { return diagTimerStop.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot the diagnostic timer stop signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectDiagTimerStop(ConnectionPtr _subscriber)
-              { diagTimerStop.Disconnect(_subscriber); }
 
       //////////////////////////////////////////////////////////////////////////
-      /// \brief Connect a boost::slot to the sigint event
+      /// \brief Connect a callback to the sigint event
       /// \param[in] _subscriber the subscriber to this event
       /// \return a connection
       public: template<typename T>
               static ConnectionPtr ConnectSigInt(T _subscriber)
               { return sigInt.Connect(_subscriber); }
-      /// \brief Disconnect a boost::slot to the sigint event
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectSigInt(ConnectionPtr _subscriber)
-              { sigInt.Disconnect(_subscriber); }
 
       /// \brief Pause signal
       public: static EventT<void (bool)> pause;

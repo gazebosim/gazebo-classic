@@ -1,9 +1,10 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(${IGNITION-MATH_INCLUDE_DIRS} ${IGNITION-MSGS_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
   any.proto
+  atmosphere.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -17,14 +18,17 @@ set (msgs
   contacts.proto
   contactsensor.proto
   cylindergeom.proto
+  density.proto
   diagnostics.proto
   distortion.proto
+  empty.proto
   factory.proto
   fluid.proto
   fog.proto
   friction.proto
   geometry.proto
   gps.proto
+  gps_sensor.proto
   gui_camera.proto
   gui.proto
   gz_string.proto
@@ -37,6 +41,7 @@ set (msgs
   image_stamped.proto
   images_stamped.proto
   imu.proto
+  imu_sensor.proto
   inertial.proto
   int.proto
   joint.proto
@@ -64,6 +69,8 @@ set (msgs
   model_v.proto
   packet.proto
   physics.proto
+  param.proto
+  param_v.proto
   planegeom.proto
   pid.proto
   plugin.proto
@@ -94,6 +101,7 @@ set (msgs
   scene.proto
   selection.proto
   sensor.proto
+  sensor_noise.proto
   server_control.proto
   shadows.proto
   sim_event.proto
@@ -113,6 +121,7 @@ set (msgs
   vector2d.proto
   vector3d.proto
   visual.proto
+  wind.proto
   wireless_node.proto
   wireless_nodes.proto
   world_control.proto
@@ -143,7 +152,7 @@ set (headers msgs.hh MsgFactory.hh)
 ###########################################################
 # Append str to a string property of a target.
 # target: string: target name.
-# property: name of targetâ€™s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# property: name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
 # str: string: string to be appended to the property
 macro(my_append_target_property target property str)
   get_target_property(current_property ${target} ${property})
@@ -163,25 +172,18 @@ foreach(FIL ${msgs})
   list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
   list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
 
-  # Need to add .exe to executable in windows
-  if (WIN32)
-     set(gazebomsgs_out_binary "gazebomsgs_out.exe")
-  else()
-     set(gazebomsgs_out_binary "gazebomsgs_out")
-  endif()
-
   add_custom_command(
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=$<TARGET_FILE:gazebomsgs_out> --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )
 endforeach()
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILDING_DLL_GZ_MSGS")
+add_definitions(-DBUILDING_DLL_GZ_MSGS)
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
@@ -198,6 +200,7 @@ endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   ${GZ_PROTOBUF_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

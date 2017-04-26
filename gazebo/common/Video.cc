@@ -23,10 +23,6 @@
 using namespace gazebo;
 using namespace common;
 
-/// \brief Destination audio video frame
-/// TODO Do not merge forward. Declared here for gazebo7 ABI compatibility
-AVFrame *avFrameDst;
-
 /////////////////////////////////////////////////
 // #ifdef HAVE_FFMPEG
 // static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
@@ -46,14 +42,12 @@ AVFrame *avFrameDst;
 /////////////////////////////////////////////////
 Video::Video()
 {
-  this->formatCtx = NULL;
-  this->codecCtx = NULL;
-  this->swsCtx = NULL;
-  this->avFrame = NULL;
+  this->formatCtx = nullptr;
+  this->codecCtx = nullptr;
+  this->swsCtx = nullptr;
+  this->avFrame = nullptr;
   this->videoStream = -1;
-
-  this->pic = NULL;
-  avFrameDst = NULL;
+  this->avFrameDst = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -75,7 +69,7 @@ void Video::Cleanup()
   // Close the codec
   avcodec_close(this->codecCtx);
 
-  av_free(avFrameDst);
+  av_free(this->avFrameDst);
 #endif
 }
 
@@ -83,7 +77,7 @@ void Video::Cleanup()
 #ifdef HAVE_FFMPEG
 bool Video::Load(const std::string &_filename)
 {
-  AVCodec *codec = NULL;
+  AVCodec *codec = nullptr;
   this->videoStream = -1;
 
   if (this->formatCtx || this->avFrame || this->codecCtx)
@@ -92,14 +86,15 @@ bool Video::Load(const std::string &_filename)
   this->avFrame = common::AVFrameAlloc();
 
   // Open video file
-  if (avformat_open_input(&this->formatCtx, _filename.c_str(), NULL, NULL) < 0)
+  if (avformat_open_input(&this->formatCtx, _filename.c_str(),
+        nullptr, nullptr) < 0)
   {
     gzerr << "Unable to read video file[" << _filename << "]\n";
     return false;
   }
 
   // Retrieve stream information
-  if (avformat_find_stream_info(this->formatCtx, NULL) < 0)
+  if (avformat_find_stream_info(this->formatCtx, nullptr) < 0)
   {
     gzerr << "Couldn't find stream information\n";
     return false;
@@ -140,7 +135,7 @@ bool Video::Load(const std::string &_filename)
 
   // Find the decoder for the video stream
   codec = avcodec_find_decoder(this->codecCtx->codec_id);
-  if (codec == NULL)
+  if (codec == nullptr)
   {
     gzerr << "Codec not found\n";
     return false;
@@ -152,7 +147,7 @@ bool Video::Load(const std::string &_filename)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
 
   // Open codec
-  if (avcodec_open2(this->codecCtx, codec, NULL) < 0)
+  if (avcodec_open2(this->codecCtx, codec, nullptr) < 0)
   {
     gzerr << "Could not open codec\n";
     return false;
@@ -165,19 +160,19 @@ bool Video::Load(const std::string &_filename)
       this->codecCtx->width,
       this->codecCtx->height,
       AV_PIX_FMT_RGB24,
-      SWS_BICUBIC, NULL, NULL, NULL);
+      SWS_BICUBIC, nullptr, nullptr, nullptr);
 
-  if (this->swsCtx == NULL)
+  if (this->swsCtx == nullptr)
   {
     gzerr << "Error while calling sws_getContext\n";
     return false;
   }
 
-  avFrameDst = common::AVFrameAlloc();
-  avFrameDst->format = this->codecCtx->pix_fmt;
-  avFrameDst->width = this->codecCtx->width;
-  avFrameDst->height = this->codecCtx->height;
-  av_image_alloc(avFrameDst->data, avFrameDst->linesize,
+  this->avFrameDst = common::AVFrameAlloc();
+  this->avFrameDst->format = this->codecCtx->pix_fmt;
+  this->avFrameDst->width = this->codecCtx->width;
+  this->avFrameDst->height = this->codecCtx->height;
+  av_image_alloc(this->avFrameDst->data, this->avFrameDst->linesize,
       this->codecCtx->width, this->codecCtx->height, this->codecCtx->pix_fmt,
       1);
 
@@ -249,10 +244,10 @@ bool Video::GetNextFrame(unsigned char **_buffer)
       if (frameAvailable)
       {
         sws_scale(swsCtx, this->avFrame->data, this->avFrame->linesize, 0,
-            this->codecCtx->height, avFrameDst->data,
-            avFrameDst->linesize);
+            this->codecCtx->height, this->avFrameDst->data,
+            this->avFrameDst->linesize);
 
-        memcpy(*_buffer, avFrameDst->data[0],
+        memcpy(*_buffer, this->avFrameDst->data[0],
             this->codecCtx->height * (this->codecCtx->width*3));
 
         // Debug:

@@ -15,10 +15,11 @@
  *
 */
 
-#ifndef _GAZEBO_LIGHT_STATE_HH_
-#define _GAZEBO_LIGHT_STATE_HH_
+#ifndef GAZEBO_PHYSICS_LIGHTSTATE_HH_
+#define GAZEBO_PHYSICS_LIGHTSTATE_HH_
 
 #include <iomanip>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
 

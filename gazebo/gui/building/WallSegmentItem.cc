@@ -163,12 +163,12 @@ void WallSegmentItem::SegmentUpdated()
       (this->line().length()+2*t)*this->itemScale);
 
   // Doors, windows...
-  QList<QGraphicsItem *> children = this->childItems();
-  for (int j = 0; j < children.size(); ++j)
+  QList<QGraphicsItem *> mychildren = this->childItems();
+  for (int j = 0; j < mychildren.size(); ++j)
   {
     // TODO find a more generic way than casting child as rect item,
     // and need to keep wall-children pos ratio fixed
-    RectItem *rectItem = dynamic_cast<RectItem *>(children[j]);
+    RectItem *rectItem = dynamic_cast<RectItem *>(mychildren[j]);
     if (rectItem)
     {
       rectItem->SetRotation(-this->line().angle() + rectItem->AngleOnWall());

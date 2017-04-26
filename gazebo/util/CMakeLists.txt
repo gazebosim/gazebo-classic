@@ -6,18 +6,28 @@ if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-include_directories(${TBB_INCLUDEDIR})
+include_directories(${TBB_INCLUDEDIR}
+                    ${tinyxml_INCLUDE_DIRS}
+                    ${tinyxml2_INCLUDE_DIRS}
+                    ${IGNITION-TRANSPORT_INCLUDE_DIRS})
 
-include_directories(${tinyxml_INCLUDE_DIRS})
+link_directories(${tinyxml2_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
+
 set (sources
   Diagnostics.cc
+  IgnMsgSdf.cc
+  IntrospectionClient.cc
+  IntrospectionManager.cc
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
 )
 
+if (NOT USE_EXTERNAL_TINYXML2)
+  list (APPEND sources ${CMAKE_SOURCE_DIR}/deps/tinyxml2/gazebo/tinyxml2.cpp)
+endif()
+
 if (NOT USE_EXTERNAL_TINYXML)
-  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp
@@ -25,14 +35,11 @@ if (NOT USE_EXTERNAL_TINYXML)
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxmlparser.cpp)
 endif()
 
-if (NOT USE_EXTERNAL_TINYXML2)
-  include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml2)
-  set (sources ${sources}
-       ${CMAKE_SOURCE_DIR}/deps/win/tinyxml2/tinyxml2.cpp)
-endif()
-
 set (headers
   Diagnostics.hh
+  IgnMsgSdf.hh
+  IntrospectionClient.hh
+  IntrospectionManager.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
@@ -42,6 +49,9 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  IgnMsgSdf_TEST.cc
+  IntrospectionClient_TEST.cc
+  IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
@@ -58,6 +68,11 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/util.hh )
 
+
+if (WIN32)
+  add_definitions(-DBUILDING_DLL)
+endif()
+
 gz_add_library(gazebo_util ${sources})
 
 add_dependencies(gazebo_util
@@ -70,7 +85,15 @@ target_link_libraries(gazebo_util
   gazebo_transport
   gazebo_msgs
   ${tinyxml2_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
+
+if (WIN32)
+  include_directories(IGNITION-MSGS_INCLUDE_DIR)
+  set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
+endif()
+
 
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)

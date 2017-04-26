@@ -16,10 +16,8 @@
 */
 
 #include <ignition/math/Inertial.hh>
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Pose.hh"
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/rendering/DynamicLines.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -41,33 +39,13 @@ InertiaVisual::InertiaVisual(const std::string &_name, VisualPtr _vis)
 /////////////////////////////////////////////////
 InertiaVisual::~InertiaVisual()
 {
-  InertiaVisualPrivate *dPtr =
-      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
-  if (dPtr && dPtr->sceneNode)
-  {
-    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
-    dPtr->sceneNode->removeAndDestroyAllChildren();
-  }
-}
-
-/////////////////////////////////////////////////
-void InertiaVisual::Fini()
-{
-  InertiaVisualPrivate *dPtr =
-      reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
-  if (dPtr && dPtr->sceneNode)
-  {
-    this->DestroyAllAttachedMovableObjects(dPtr->sceneNode);
-    dPtr->sceneNode->removeAndDestroyAllChildren();
-  }
-  Visual::Fini();
 }
 
 /////////////////////////////////////////////////
 void InertiaVisual::Load(sdf::ElementPtr _elem)
 {
   Visual::Load();
-  math::Pose pose = _elem->Get<math::Pose>("origin");
+  ignition::math::Pose3d pose = _elem->Get<ignition::math::Pose3d>("origin");
   this->Load(pose);
 }
 
@@ -100,31 +78,31 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void InertiaVisual::Load(const math::Pose &_pose,
-    const math::Vector3 &_scale)
+void InertiaVisual::Load(const ignition::math::Pose3d &_pose,
+    const ignition::math::Vector3d &_scale)
 {
   InertiaVisualPrivate *dPtr =
       reinterpret_cast<InertiaVisualPrivate *>(this->dataPtr);
 
   // Inertia position indicator
-  ignition::math::Vector3d p1(0, 0, -2*_scale.z);
-  ignition::math::Vector3d p2(0, 0, 2*_scale.z);
-  ignition::math::Vector3d p3(0, -2*_scale.y, 0);
-  ignition::math::Vector3d p4(0, 2*_scale.y, 0);
-  ignition::math::Vector3d p5(-2*_scale.x, 0, 0);
-  ignition::math::Vector3d p6(2*_scale.x, 0, 0);
-  p1 = _pose.Ign().Rot().RotateVector(p1);
-  p2 = _pose.Ign().Rot().RotateVector(p2);
-  p3 = _pose.Ign().Rot().RotateVector(p3);
-  p4 = _pose.Ign().Rot().RotateVector(p4);
-  p5 = _pose.Ign().Rot().RotateVector(p5);
-  p6 = _pose.Ign().Rot().RotateVector(p6);
-  p1 += _pose.Ign().Pos();
-  p2 += _pose.Ign().Pos();
-  p3 += _pose.Ign().Pos();
-  p4 += _pose.Ign().Pos();
-  p5 += _pose.Ign().Pos();
-  p6 += _pose.Ign().Pos();
+  ignition::math::Vector3d p1(0, 0, -2*_scale.Z());
+  ignition::math::Vector3d p2(0, 0, 2*_scale.Z());
+  ignition::math::Vector3d p3(0, -2*_scale.Y(), 0);
+  ignition::math::Vector3d p4(0, 2*_scale.Y(), 0);
+  ignition::math::Vector3d p5(-2*_scale.X(), 0, 0);
+  ignition::math::Vector3d p6(2*_scale.X(), 0, 0);
+  p1 = _pose.Rot().RotateVector(p1);
+  p2 = _pose.Rot().RotateVector(p2);
+  p3 = _pose.Rot().RotateVector(p3);
+  p4 = _pose.Rot().RotateVector(p4);
+  p5 = _pose.Rot().RotateVector(p5);
+  p6 = _pose.Rot().RotateVector(p6);
+  p1 += _pose.Pos();
+  p2 += _pose.Pos();
+  p3 += _pose.Pos();
+  p4 += _pose.Pos();
+  p5 += _pose.Pos();
+  p6 += _pose.Pos();
 
   dPtr->crossLines = this->CreateDynamicLine(rendering::RENDERING_LINE_LIST);
   dPtr->crossLines->setMaterial("Gazebo/Green");
@@ -135,54 +113,20 @@ void InertiaVisual::Load(const math::Pose &_pose,
   dPtr->crossLines->AddPoint(p5);
   dPtr->crossLines->AddPoint(p6);
 
+  VisualPtr boxVis(
+      new Visual(this->Name()+"_BOX_", shared_from_this(), false));
+  boxVis->Load();
+
   // Inertia indicator: equivalent box of uniform density
-  this->InsertMesh("unit_box");
+  boxVis->AttachMesh("unit_box");
 
-  Ogre::MovableObject *boxObj =
-    (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
-          this->GetName()+"__BOX__", "unit_box"));
-  boxObj->setVisibilityFlags(GZ_VISIBILITY_GUI);
-  ((Ogre::Entity*)boxObj)->setMaterialName("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  boxVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  boxVis->SetMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  boxVis->SetCastShadows(false);
 
-  dPtr->boxNode =
-      dPtr->sceneNode->createChildSceneNode(this->GetName() + "_BOX_");
-
-  dPtr->boxNode->attachObject(boxObj);
-  dPtr->boxNode->setScale(_scale.x, _scale.y, _scale.z);
-  dPtr->boxNode->setPosition(_pose.pos.x, _pose.pos.y, _pose.pos.z);
-  dPtr->boxNode->setOrientation(Ogre::Quaternion(_pose.rot.w, _pose.rot.x,
-                                                 _pose.rot.y, _pose.rot.z));
+  boxVis->SetScale(_scale);
+  boxVis->SetPosition(_pose.Pos());
+  boxVis->SetRotation(_pose.Rot());
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-}
-
-/////////////////////////////////////////////////
-void InertiaVisual::DestroyAllAttachedMovableObjects(
-        Ogre::SceneNode *_sceneNode)
-{
-  if (!_sceneNode)
-    return;
-
-  // Destroy all the attached objects
-  Ogre::SceneNode::ObjectIterator itObject =
-    _sceneNode->getAttachedObjectIterator();
-
-  while (itObject.hasMoreElements())
-  {
-    Ogre::Entity *ent = static_cast<Ogre::Entity*>(itObject.getNext());
-    if (ent->getMovableType() != DynamicLines::GetMovableType())
-      this->dataPtr->scene->OgreSceneManager()->destroyEntity(ent);
-    else
-      delete ent;
-  }
-
-  // Recurse to child SceneNodes
-  Ogre::SceneNode::ChildNodeIterator itChild = _sceneNode->getChildIterator();
-
-  while (itChild.hasMoreElements())
-  {
-    Ogre::SceneNode* pChildNode =
-        static_cast<Ogre::SceneNode*>(itChild.getNext());
-    this->DestroyAllAttachedMovableObjects(pChildNode);
-  }
 }

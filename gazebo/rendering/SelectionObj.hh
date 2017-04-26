@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _SELECTIONOBJ_HH_
-#define _SELECTIONOBJ_HH_
+#ifndef GAZEBO_RENDERING_SELECTIONOBJ_HH_
+#define GAZEBO_RENDERING_SELECTIONOBJ_HH_
 
 #include <string>
 
@@ -76,9 +76,6 @@ namespace gazebo
 
       /// \brief Load
       public: void Load();
-
-      // Documentation inherited.
-      public: virtual void Fini();
 
       /// \brief Attach the selection object to the given visual
       /// \param[in] _vis Pointer to visual to which the selection object

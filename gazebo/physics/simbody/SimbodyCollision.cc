@@ -15,6 +15,7 @@
  *
 */
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/simbody/simbody_inc.h"
 #include "gazebo/physics/simbody/SimbodyCollision.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -27,14 +28,14 @@ SimbodyCollision::SimbodyCollision(LinkPtr _parent)
     : Collision(_parent)
 {
   this->SetName("Simbody_Collision");
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
   this->surface.reset(new SurfaceParams());
 }
 
 //////////////////////////////////////////////////
 SimbodyCollision::~SimbodyCollision()
 {
-  this->collisionShape = NULL;
+  this->collisionShape = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -46,7 +47,7 @@ void SimbodyCollision::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void SimbodyCollision::OnPoseChange()
 {
-  // math::Pose pose = this->GetRelativePose();
+  // auto pose = this->RelativePose();
   // SimbodyLink *bbody = static_cast<SimbodyLink*>(this->body);
 
   // bbody->SetCollisionRelativePose(this, pose);
@@ -63,9 +64,12 @@ void SimbodyCollision::SetCollideBits(unsigned int /*_bits*/)
 }
 
 //////////////////////////////////////////////////
-math::Box SimbodyCollision::GetBoundingBox() const
+ignition::math::Box SimbodyCollision::BoundingBox() const
 {
-  math::Box result;
+  ignition::math::Box result(0, 0, 0, 0, 0, 0);
+
+  gzerr << "Simbody does not provide bounding box info.\n";
+
   return result;
 }
 

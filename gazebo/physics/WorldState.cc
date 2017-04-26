@@ -42,13 +42,13 @@ WorldState::WorldState()
 
 /////////////////////////////////////////////////
 WorldState::WorldState(const WorldPtr _world)
-  : State(_world->GetName(), _world->GetRealTime(), _world->GetSimTime(),
-      _world->GetIterations())
+  : State(_world->Name(), _world->RealTime(), _world->SimTime(),
+      _world->Iterations())
 {
   this->world = _world;
 
   // Add a state for all the models
-  Model_V models = _world->GetModels();
+  Model_V models = _world->Models();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
@@ -83,14 +83,14 @@ WorldState::~WorldState()
 void WorldState::Load(const WorldPtr _world)
 {
   this->world = _world;
-  this->name = _world->GetName();
+  this->name = _world->Name();
   this->wallTime = common::Time::GetWallTime();
-  this->simTime = _world->GetSimTime();
-  this->realTime = _world->GetRealTime();
-  this->iterations = _world->GetIterations();
+  this->simTime = _world->SimTime();
+  this->realTime = _world->RealTime();
+  this->iterations = _world->Iterations();
 
   // Add a state for all the models
-  Model_V models = _world->GetModels();
+  Model_V models = _world->Models();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
@@ -394,7 +394,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   {
     if (!_state.HasModelState(iter->second.GetName()) && this->world)
     {
-      ModelPtr model = this->world->GetModel(iter->second.GetName());
+      ModelPtr model = this->world->ModelByName(iter->second.GetName());
       if (model)
         result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
@@ -405,7 +405,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
   {
     if (!_state.HasLightState(light.second.GetName()) && this->world)
     {
-      LightPtr lightPtr = this->world->Light(light.second.GetName());
+      LightPtr lightPtr = this->world->LightByName(light.second.GetName());
       result.insertions.push_back(lightPtr->GetSDF()->ToString(""));
     }
   }

@@ -38,12 +38,6 @@ namespace gazebo
                 ConnectToggleEditMode(T _subscriber)
           { return toggleEditMode.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the toggle edit mode signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectToggleEditMode(
-            event::ConnectionPtr _subscriber)
-          { toggleEditMode.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the create editor item signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -51,12 +45,6 @@ namespace gazebo
             static event::ConnectionPtr
                 ConnectCreateBuildingEditorItem(T _subscriber)
           { return createBuildingEditorItem.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the create editor item signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectCreateBuildingEditorItem(
-            event::ConnectionPtr _subscriber)
-          { createBuildingEditorItem.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the color selected signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -66,12 +54,6 @@ namespace gazebo
                 ConnectColorSelected(T _subscriber)
           { return colorSelected.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the color selected signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectColorSelected(
-            event::ConnectionPtr _subscriber)
-          { colorSelected.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the texture selected signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -80,24 +62,12 @@ namespace gazebo
                 ConnectTextureSelected(T _subscriber)
           { return textureSelected.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the texture selected signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectTextureSelected(
-            event::ConnectionPtr _subscriber)
-          { textureSelected.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the save model signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectSaveBuildingModel(T _subscriber)
           { return saveBuildingModel.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the save model signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSaveBuildingModel(
-            event::ConnectionPtr _subscriber)
-          { saveBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the finish model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -107,12 +77,6 @@ namespace gazebo
             ConnectFinishBuildingModel(T _subscriber)
           { return finishBuildingModel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the finish model signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectFinishBuildingModel(
-            event::ConnectionPtr _subscriber)
-          { finishBuildingModel.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the new model signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -120,12 +84,6 @@ namespace gazebo
             static event::ConnectionPtr
                 ConnectNewBuildingModel(T _subscriber)
           { return newBuildingModel.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the new model signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectNewBuildingModel(
-            event::ConnectionPtr _subscriber)
-          { newBuildingModel.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the change model signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -135,24 +93,12 @@ namespace gazebo
                 ConnectChangeBuildingLevel(T _subscriber)
           { return changeBuildingLevel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the change level signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeBuildingLevel(
-            event::ConnectionPtr _subscriber)
-          { changeBuildingLevel.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the add level signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectAddBuildingLevel(T _subscriber)
           { return addBuildingLevel.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the add level signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectAddBuildingLevel(
-            event::ConnectionPtr _subscriber)
-          { addBuildingLevel.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the delete level signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -162,24 +108,12 @@ namespace gazebo
             ConnectDeleteBuildingLevel(T _subscriber)
           { return deleteBuildingLevel.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the delete level signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectDeleteBuildingLevel(
-              event::ConnectionPtr _subscriber)
-          { deleteBuildingLevel.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the show floorplan signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectShowFloorplan(T _subscriber)
           { return showFloorplan.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the show floorplan signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectShowFloorplan(
-              event::ConnectionPtr _subscriber)
-          { showFloorplan.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the trigger show floorplan
         /// signal.
@@ -190,25 +124,12 @@ namespace gazebo
             ConnectTriggerShowFloorplan(T _subscriber)
           { return triggerShowFloorplan.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the trigger show floorplan
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectTriggerShowFloorplan(
-              event::ConnectionPtr _subscriber)
-          { triggerShowFloorplan.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the show elements signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectShowElements(T _subscriber)
           { return showElements.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the show elements signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectShowElements(
-              event::ConnectionPtr _subscriber)
-          { showElements.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the trigger show elements
         /// signal.
@@ -219,13 +140,6 @@ namespace gazebo
             ConnectTriggerShowElements(T _subscriber)
           { return triggerShowElements.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the trigger show elements
-        /// signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectTriggerShowElements(
-              event::ConnectionPtr _subscriber)
-          { triggerShowElements.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the update level widget signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -233,12 +147,6 @@ namespace gazebo
             static event::ConnectionPtr
                 ConnectUpdateLevelWidget(T _subscriber)
           { return updateLevelWidget.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the update level widget signal
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectUpdateLevelWidget(
-              event::ConnectionPtr _subscriber)
-          { updateLevelWidget.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the change zoom signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -248,24 +156,12 @@ namespace gazebo
               ConnectChangeBuildingEditorZoom(T _subscriber)
         { return changeBuildingEditorZoom.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the change zoom level signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectChangeBuildingEditorZoom(
-            event::ConnectionPtr _subscriber)
-          { changeBuildingEditorZoom.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the save signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectSaveBuildingEditor(T _subscriber)
           { return saveBuildingEditor.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the save signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSaveBuildingEditor(
-            event::ConnectionPtr _subscriber)
-          { saveBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the save as signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -275,12 +171,6 @@ namespace gazebo
               (T _subscriber)
           { return saveAsBuildingEditor.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the save as signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectSaveAsBuildingEditor(
-            event::ConnectionPtr _subscriber)
-          { saveAsBuildingEditor.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the new signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
@@ -289,24 +179,12 @@ namespace gazebo
             ConnectNewBuildingEditor(T _subscriber)
           { return newBuildingEditor.Connect(_subscriber); }
 
-        /// \brief Disconnect a Gazebo event from the new signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectNewBuildingEditor(
-              event::ConnectionPtr _subscriber)
-          { newBuildingEditor.Disconnect(_subscriber); }
-
         /// \brief Connect a Gazebo event to the exit signal.
         /// \param[in] _subscriber the subscriber to this event
         /// \return a connection
         public: template<typename T>
             static event::ConnectionPtr ConnectExitBuildingEditor(T _subscriber)
           { return exitBuildingEditor.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the exit signal
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectExitBuildingEditor(
-            event::ConnectionPtr _subscriber)
-          { exitBuildingEditor.Disconnect(_subscriber); }
 
         /// \brief Connect a Gazebo event to the name changed signal.
         /// \param[in] _subscriber the subscriber to this event
@@ -315,12 +193,6 @@ namespace gazebo
             static event::ConnectionPtr ConnectBuildingNameChanged
               (T _subscriber)
           { return buildingNameChanged.Connect(_subscriber); }
-
-        /// \brief Disconnect a Gazebo event from the name changed signal.
-        /// \param[in] _subscriber the subscriber to this event
-        public: static void DisconnectBuildingNameChanged(
-            event::ConnectionPtr _subscriber)
-          { buildingNameChanged.Disconnect(_subscriber); }
 
         /// \brief Toggle if the edit mode was checked or not.
         public: static event::EventT<void (bool)> toggleEditMode;

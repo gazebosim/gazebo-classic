@@ -14,8 +14,9 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_DIFFDRIVE_PLUGIN_HH_
-#define _GAZEBO_DIFFDRIVE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
+#define GAZEBO_PLUGINS_DIFFDRIVEPLUGIN_HH_
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -47,6 +48,12 @@ namespace gazebo
     private: common::Time prevUpdateTime;
 
     private: physics::LinkPtr link, leftWheelLink, rightWheelLink;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

@@ -162,7 +162,7 @@ void HarnessPlugin::Init()
   physics::WorldPtr world = this->dataPtr->model->GetWorld();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(world->GetName());
+  this->dataPtr->node->Init(world->Name());
 
   this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
       "~/" + this->dataPtr->model->GetName() + "/harness/velocity",
@@ -214,7 +214,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   if (ignition::math::equal(this->dataPtr->winchTargetVel, 0.0f))
   {
     // Calculate the position error if vel target is 0
-    pError = this->dataPtr->joints[winchIndex]->GetAngle(0).Radian() -
+    pError = this->dataPtr->joints[winchIndex]->Position(0) -
       this->dataPtr->winchTargetPos;
   }
 
@@ -424,7 +424,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
   {
     // if zero velocity is commanded, hold position
     this->dataPtr->winchTargetPos =
-        this->dataPtr->joints[winchIndex]->GetAngle(0).Radian();
+        this->dataPtr->joints[winchIndex]->Position(0);
     this->dataPtr->winchPosPID.Reset();
   }
 }

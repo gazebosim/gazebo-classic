@@ -34,7 +34,7 @@ TEST_F(ContactManagerTest, CreateFilter)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   physics::ContactManager *manager = physics->GetContactManager();
@@ -79,7 +79,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   physics::ContactManager *manager = physics->GetContactManager();

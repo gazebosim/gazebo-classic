@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -53,44 +52,44 @@ void PlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetAltitude(const math::Vector3 &/*_pos*/)
+void PlaneShape::SetAltitude(const ignition::math::Vector3d &/*_pos*/)
 {
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetNormal(const math::Vector3 &_norm)
+void PlaneShape::SetNormal(const ignition::math::Vector3d &_norm)
 {
   this->sdf->GetElement("normal")->Set(_norm);
   this->CreatePlane();
 }
 
 //////////////////////////////////////////////////
-math::Vector3 PlaneShape::GetNormal() const
+ignition::math::Vector3d PlaneShape::Normal() const
 {
-  return this->sdf->Get<math::Vector3>("normal");
+  return this->sdf->Get<ignition::math::Vector3d>("normal");
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetSize(const math::Vector2d &_size)
+void PlaneShape::SetSize(const ignition::math::Vector2d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
-math::Vector2d PlaneShape::GetSize() const
+ignition::math::Vector2d PlaneShape::Size() const
 {
-  return this->sdf->Get<math::Vector2d>("size");
+  return this->sdf->Get<ignition::math::Vector2d>("size");
 }
 
 //////////////////////////////////////////////////
-void PlaneShape::SetScale(const math::Vector3 &_scale)
+void PlaneShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
 
   this->scale = _scale;
 
-  math::Vector2d size = this->GetSize() * math::Vector2d(_scale.x, scale.y);
+  auto size = this->Size() * ignition::math::Vector2d(_scale.X(), scale.Y());
   this->SetSize(size);
 }
 
@@ -98,8 +97,8 @@ void PlaneShape::SetScale(const math::Vector3 &_scale)
 void PlaneShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::PLANE);
-  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->GetNormal().Ign());
-  msgs::Set(_msg.mutable_plane()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_plane()->mutable_normal(), this->Normal());
+  msgs::Set(_msg.mutable_plane()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////

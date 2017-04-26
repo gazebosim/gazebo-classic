@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
-#include "gazebo/transport/transport.hh"
-#include "gazebo/physics/physics.hh"
+#include <functional>
 #include "gazebo/gazebo.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "msgs/custom.pb.h"
 
@@ -33,7 +33,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&CustomMessages::OnUpdate, this));
+          std::bind(&CustomMessages::OnUpdate, this));
     }
 
     // Called by the world update start event

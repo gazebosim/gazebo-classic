@@ -58,7 +58,7 @@ void ReceiveRestError(ConstRestResponsePtr &_msg)
     return;
 
   EXPECT_EQ(_msg->id(), g_restID);
-  EXPECT_EQ(_msg->type(), msgs::RestResponse::ERROR);
+  EXPECT_EQ(_msg->type(), msgs::RestResponse::ERR);
   EXPECT_FALSE(_msg->msg().empty());
 
   g_count += 1;

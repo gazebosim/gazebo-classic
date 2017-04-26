@@ -202,6 +202,8 @@ void SchematicViewWidget_TEST::Selection()
   QVERIFY(!itemB->isSelected());
   QVERIFY(!edge0->isSelected());
   QCOMPARE(view->scene()->selectedItems().size(), 1);
+
+  delete svWidget;
 }
 
 // Generate a main function for the test

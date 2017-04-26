@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TOP_TOOLBAR_PRIVATE_HH_
-#define _GAZEBO_TOP_TOOLBAR_PRIVATE_HH_
+#ifndef GAZEBO_GUI_TOPTOOLBARPRIVATE_HH_
+#define GAZEBO_GUI_TOPTOOLBARPRIVATE_HH_
 
 #include <vector>
 

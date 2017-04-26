@@ -170,7 +170,7 @@ void ImagesView::OnImages(ConstImagesStampedPtr &_msg)
         frameLayout->itemAtPosition(i / 2, i % 2)->widget());
 
     if (imageFrame)
-        imageFrame->OnImage(_msg->image(i));
+      imageFrame->OnImage(_msg->image(i));
   }
 
   // Update the Hz and Bandwidth info

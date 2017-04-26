@@ -14,14 +14,15 @@
  * limitations under the License.
  *
 */
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
 
-#include "gazebo/common/CommonTypes.hh"
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Animation.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/KeyFrame.hh"
-#include "gazebo/physics/Model.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/physics/Model.hh"
 
 namespace gazebo
 {

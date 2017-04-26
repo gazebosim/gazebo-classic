@@ -26,7 +26,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
+DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
   : HeightmapShape(_parent),
     dataPtr(new DARTHeightmapShapePrivate())
 {
@@ -35,7 +35,8 @@ DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
 //////////////////////////////////////////////////
 DARTHeightmapShape::~DARTHeightmapShape()
 {
-  delete dataPtr;
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////

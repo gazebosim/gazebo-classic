@@ -119,7 +119,7 @@ namespace gazebo
       private: sdf::ElementPtr sdf;
 
       /// \brief Callback function for applying custom noise to sensor data.
-      private: boost::function<double (double)> customNoiseCallback;
+      private: std::function<double (double)> customNoiseCallback;
     };
     /// \}
   }

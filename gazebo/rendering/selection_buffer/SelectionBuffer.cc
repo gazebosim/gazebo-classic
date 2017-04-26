@@ -132,7 +132,10 @@ void SelectionBuffer::DeleteRTTBuffer()
   if (!this->dataPtr->texture.isNull() && this->dataPtr->texture->isLoaded())
     this->dataPtr->texture->unload();
   if (this->dataPtr->buffer)
+  {
     delete [] this->dataPtr->buffer;
+    this->dataPtr->buffer = nullptr;
+  }
   if (this->dataPtr->pixelBox)
     delete this->dataPtr->pixelBox;
 }

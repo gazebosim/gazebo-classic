@@ -210,7 +210,7 @@ void TimeWidget_TEST::ValidTimes()
       std::cerr << "Skipping lower bound FPS check" << std::endl;
       skipFPSTest = true;
     }
-    unsigned int iterations = skipFPSTest ? 50 : 5000;
+    unsigned int iterations = skipFPSTest ? 500 : 5000;
     double lowerFPSBound = skipFPSTest ? 0 : 45;
 
     // Wait a little bit so that time increases.
@@ -250,7 +250,7 @@ void TimeWidget_TEST::ValidTimes()
 /////////////////////////////////////////////////
 void TimeWidget_TEST::Visibility()
 {
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create a new time widget
   gazebo::gui::TimeWidget *timeWidget = new gazebo::gui::TimeWidget;

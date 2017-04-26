@@ -55,7 +55,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // Load in a world with lasers
   Load("worlds/ray_test.world");
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   unsigned int i;
   double updateRateHokuyo, updateRateImu, now, then;
@@ -67,11 +67,11 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   // get the hokuyo sensor
   sensors::SensorPtr sensor;
   sensor = mgr->GetSensor("default::hokuyo::link::laser");
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   sensors::SensorPtr imuSensor;
   imuSensor = mgr->GetSensor("default::box_model::box_link::box_imu_sensor");
-  ASSERT_TRUE(imuSensor != NULL);
+  ASSERT_TRUE(imuSensor != nullptr);
 
   // set update rate to 30 Hz
   updateRateHokuyo = 30.0;
@@ -106,7 +106,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   unsigned int hokuyoMsgCount = g_hokuyoMsgCount;
   unsigned int imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
 
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
@@ -125,7 +125,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
 
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
 
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
@@ -149,7 +149,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   gzdbg << "sent reset world message\n";
   common::Time::MSleep(100);
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
   gzdbg << "world time is now " << now << '\n';
   EXPECT_LT(now, 0.12);
 
@@ -162,7 +162,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double() - now;
+  now = world->SimTime().Double() - now;
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
   gzdbg << "counted " << imuMsgCount << " imu messages in "
@@ -185,7 +185,7 @@ TEST_F(Sensor_TEST, UpdateAfterReset)
   }
   hokuyoMsgCount = g_hokuyoMsgCount;
   imuMsgCount = g_imuMsgCount;
-  now = world->GetSimTime().Double();
+  now = world->SimTime().Double();
   gzdbg << "counted " << hokuyoMsgCount << " hokuyo messages in "
         << now << " seconds\n";
   gzdbg << "counted " << imuMsgCount << " imu messages in "

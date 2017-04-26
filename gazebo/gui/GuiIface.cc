@@ -18,7 +18,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+     #define snprintf _snprintf
+  #endif
 #endif
 
 #include <signal.h>
@@ -37,6 +40,8 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelRightMenu.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/GuiPlugin.hh"
+#include "gazebo/gui/RenderWidget.hh"
 
 #ifdef WIN32
 # define HOMEDIR "HOMEPATH"
@@ -55,6 +60,9 @@ po::variables_map vm;
 
 boost::property_tree::ptree g_propTree;
 
+// Names of all GUI plugins loaded at start. Parsed from command line arguments.
+std::vector<std::string> g_plugins_to_load;
+
 using namespace gazebo;
 
 gui::ModelRightMenu *g_modelRightMenu = NULL;
@@ -71,6 +79,14 @@ bool g_fullscreen = false;
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(common::Time)
 
+// This makes it possible to use std::string in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::string)
+
+// This makes it possible to use std::set<std::string> in QT signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(std::set<std::string>)
+
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -78,7 +94,8 @@ void messageHandler(QtMsgType _type, const QMessageLogContext &_context,
     const QString &_msg)
 {
   std::string msg = _msg.toStdString();
-  msg += "(" + _context.function + ")";
+  if (_context.function)
+    msg += std::string("(") + _context.function + ")";
 #else
 void messageHandler(QtMsgType _type, const char *_msg)
 {
@@ -177,7 +194,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::client::addPlugin(*iter);
+      g_plugins_to_load.push_back(*iter);
     }
   }
 
@@ -303,7 +320,6 @@ bool gui::load()
   if (!gui::register_metatypes())
     std::cerr << "Unable to register Qt metatypes" << std::endl;
 
-
   g_splashScreen = new gui::SplashScreen();
 
   g_main_win = new gui::MainWindow();
@@ -321,6 +337,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
   else
     return 0;
 }
+
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
@@ -342,6 +359,18 @@ bool gui::run(int _argc, char **_argv)
 
   gazebo::gui::init();
 
+  // the plugins have to be created after g_app has been created,
+  // otherwise Qt will complain about no existing QApplication.
+  GZ_ASSERT(g_app, "QApplication must have been created");
+
+  gazebo::gui::MainWindow *mainWindow = gazebo::gui::get_main_window();
+
+  GZ_ASSERT(mainWindow, "Main Window has to be available!");
+  GZ_ASSERT(mainWindow->RenderWidget(),
+            "Main window's RenderWidget must have been created");
+
+  mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
+
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
@@ -360,10 +389,10 @@ bool gui::run(int _argc, char **_argv)
   g_app->exec();
 
   gazebo::gui::fini();
-  gazebo::client::shutdown();
 
   delete g_splashScreen;
   delete g_main_win;
+  gazebo::client::shutdown();
   return true;
 }
 
@@ -417,6 +446,14 @@ bool gui::register_metatypes()
   // Register common::Time as a type that can be used in signals and slots.
   // Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType<common::Time>();
+
+  // Register std::string as a type that can be used in signals and slots.
+  // Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<std::string>();
+
+  // Register std::set<std::string> as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType< std::set<std::string> >();
 
   return true;
 }

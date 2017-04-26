@@ -37,7 +37,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent.
-      public: explicit DARTCylinderShape(CollisionPtr _parent);
+      public: explicit DARTCylinderShape(DARTCollisionPtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTCylinderShape();

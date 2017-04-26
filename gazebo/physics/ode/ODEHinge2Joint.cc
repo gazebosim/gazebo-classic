@@ -19,6 +19,8 @@
  * Date: 21 May 2003
  */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 
@@ -34,14 +36,13 @@ using namespace physics;
 ODEHinge2Joint::ODEHinge2Joint(dWorldID _worldId, BasePtr _parent)
     : Hinge2Joint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge2(_worldId, NULL);
+  this->jointId = dJointCreateHinge2(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEHinge2Joint::~ODEHinge2Joint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
@@ -51,7 +52,8 @@ void ODEHinge2Joint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::Anchor(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -63,14 +65,17 @@ math::Vector3 ODEHinge2Joint::GetAnchor(unsigned int _index) const
       dJointGetHinge2Anchor2(this->jointId, result);
   }
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return ignition::math::Vector3d::Zero;
+  }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
-    const math::Vector3 &_anchor)
+void ODEHinge2Joint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -78,13 +83,14 @@ void ODEHinge2Joint::SetAnchor(unsigned int /*_index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetHinge2Anchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetHinge2Anchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEHinge2Joint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -95,26 +101,34 @@ void ODEHinge2Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
   /// \TODO: currently we assume joint axis is specified in model frame,
   /// this is incorrect, and should be corrected to be
   /// joint frame which is specified in child link frame.
-  math::Vector3 globalAxis = _axis;
+  ignition::math::Vector3d globalAxis = _axis;
   if (this->parentLink)
+  {
     globalAxis =
-      this->GetParent()->GetModel()->GetWorldPose().rot.RotateVector(_axis);
+      this->GetParent()->GetModel()->WorldPose().Rot().RotateVector(
+          _axis);
+  }
 
   if (this->jointId)
   {
     if (_index == 0)
+    {
       dJointSetHinge2Axis1(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
     else
+    {
       dJointSetHinge2Axis2(this->jointId,
-        globalAxis.x, globalAxis.y, globalAxis.z);
+        globalAxis.X(), globalAxis.Y(), globalAxis.Z());
+    }
   }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEHinge2Joint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -123,16 +137,17 @@ math::Vector3 ODEHinge2Joint::GetGlobalAxis(unsigned int _index) const
   else
     dJointGetHinge2Axis2(this->jointId, result);
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHinge2Joint::GetAngleImpl(unsigned int _index) const
+double ODEHinge2Joint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
 
   if (this->jointId)
   {
+    /// \todo Return position of axis 1
     if (_index == 0)
       result = dJointGetHinge2Angle1(this->jointId);
   }

@@ -1,0 +1,43 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface IMUSensor
+/// \brief Information about an imu sensor 
+
+import "sensor_noise.proto";
+
+message IMUSensor
+{
+  /// \brief Angular velocity information
+  message AngularVelocity
+  {
+    /// \brief Noise about the x-axis
+    optional SensorNoise x_noise = 1;
+
+    /// \brief Noise about the y-axis
+    optional SensorNoise y_noise = 2;
+
+    /// \brief Noise about the z-axis
+    optional SensorNoise z_noise = 3;
+  }
+
+  /// \brief Linear acceleration information
+  message LinearAcceleration
+  {
+    /// \brief Noise about the x-axis
+    optional SensorNoise x_noise = 1;
+
+    /// \brief Noise about the y-axis
+    optional SensorNoise y_noise = 2;
+
+    /// \brief Noise about the z-axis
+    optional SensorNoise z_noise = 3;
+  }
+
+  /// \brief Angular velocity information
+  optional AngularVelocity angular_velocity = 1;
+
+  /// \brief Linear acceleration information
+  optional LinearAcceleration linear_acceleration = 2;
+}

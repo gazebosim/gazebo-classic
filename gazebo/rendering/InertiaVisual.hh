@@ -20,7 +20,6 @@
 
 #include <string>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
 
 namespace gazebo
@@ -42,9 +41,6 @@ namespace gazebo
       /// \brief Destructor
       public: ~InertiaVisual();
 
-      // Inherited from parent class
-      public: virtual void Fini();
-
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
@@ -54,16 +50,12 @@ namespace gazebo
       /// \param[in] _msg Pointer to the message
       public: virtual void Load(ConstLinkPtr &_msg);
 
-      /// \brief Load based on a math::Pose
+      /// \brief Load based on an ignition::math::Pose3d.
       /// \param[in] _pose Pose of the Inertia visual
       /// \param[in] _scale Scale factor for the box visual.
-      private: void Load(const math::Pose &_pose,
-          const math::Vector3 &_scale = math::Vector3(0.02, 0.02, 0.02));
-
-      /// \brief Destroy all the movable objects attached to a scene node.
-      /// \param[in] _sceneNode Pointer to the scene node to process.
-      private: void DestroyAllAttachedMovableObjects(
-                        Ogre::SceneNode *_sceneNode);
+      private: void Load(const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_scale =
+                   ignition::math::Vector3d(0.02, 0.02, 0.02));
     };
     /// \}
   }

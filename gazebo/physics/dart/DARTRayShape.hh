@@ -61,8 +61,8 @@ namespace gazebo
       ///        the body
       /// \param[in] _posStart Start position, relative the body
       /// \param[in] _posEnd End position, relative to the body
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+      public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
+                                     const ignition::math::Vector3d &_posEnd);
 
       /// \internal
       /// \brief Pointer to private data

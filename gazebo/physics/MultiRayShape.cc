@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -30,10 +29,16 @@ using namespace physics;
 
 //////////////////////////////////////////////////
 MultiRayShape::MultiRayShape(CollisionPtr _parent)
-  : Shape(_parent)
+: Shape(_parent)
 {
   this->AddType(MULTIRAY_SHAPE);
   this->SetName("multiray");
+}
+
+//////////////////////////////////////////////////
+MultiRayShape::MultiRayShape(PhysicsEnginePtr /*_physicsEngine*/)
+: MultiRayShape(CollisionPtr())
+{
 }
 
 //////////////////////////////////////////////////
@@ -45,9 +50,9 @@ MultiRayShape::~MultiRayShape()
 //////////////////////////////////////////////////
 void MultiRayShape::Init()
 {
-  math::Vector3 start, end, axis;
+  ignition::math::Vector3d start, end, axis;
   double yawAngle, pitchAngle;
-  math::Quaternion ray;
+  ignition::math::Quaterniond ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
@@ -57,8 +62,6 @@ void MultiRayShape::Init()
   int vertSamples = 1;
   // double vertResolution = 1.0;
   double vertMinAngle = 0;
-
-  double minRange, maxRange;
 
   this->rayElem = this->sdf->GetElement("ray");
   this->scanElem = this->rayElem->GetElement("scan");
@@ -81,10 +84,10 @@ void MultiRayShape::Init()
   // horzResolution = this->horzElem->Get<double>("resolution");
   yDiff = horzMaxAngle - horzMinAngle;
 
-  minRange = this->rangeElem->Get<double>("min");
-  maxRange = this->rangeElem->Get<double>("max");
+  this->minRange = this->rangeElem->Get<double>("min");
+  this->maxRange = this->rangeElem->Get<double>("max");
 
-  this->offset = this->collisionParent->GetRelativePose();
+  this->offset = this->collisionParent->RelativePose();
 
   // Create an array of ray collisions
   for (unsigned int j = 0; j < (unsigned int)vertSamples; ++j)
@@ -99,11 +102,11 @@ void MultiRayShape::Init()
 
       // since we're rotating a unit x vector, a pitch rotation will now be
       // around the negative y axis
-      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ray.Euler(ignition::math::Vector3d(0.0, -pitchAngle, yawAngle));
+      axis = this->offset.Rot() * ray * ignition::math::Vector3d::UnitX;
 
-      start = (axis * minRange) + this->offset.pos;
-      end = (axis * maxRange) + this->offset.pos;
+      start = (axis * this->minRange) + this->offset.Pos();
+      end = (axis * this->maxRange) + this->offset.Pos();
 
       this->AddRay(start, end);
     }
@@ -111,7 +114,7 @@ void MultiRayShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::SetScale(const math::Vector3 &_scale)
+void MultiRayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -175,8 +178,8 @@ void MultiRayShape::Update()
 
   // Reset the ray lengths and mark the collisions as dirty (so they get
   // redrawn)
-  unsigned int ray_size = this->rays.size();
-  for (unsigned int i = 0; i < ray_size; i++)
+  unsigned int raySize = this->rays.size();
+  for (unsigned int i = 0; i < raySize; ++i)
   {
     this->rays[i]->SetLength(fullRange);
     this->rays[i]->SetRetro(0.0);
@@ -193,8 +196,22 @@ void MultiRayShape::Update()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
-                           const math::Vector3 &/*_end*/)
+bool MultiRayShape::SetRay(const unsigned int _rayIndex,
+    const ignition::math::Vector3d &_start,
+    const ignition::math::Vector3d &_end)
+{
+  if (_rayIndex < this->rays.size())
+  {
+    this->rays[_rayIndex]->SetPoints(_start, _end);
+    return true;
+  }
+
+  return false;
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::AddRay(const ignition::math::Vector3d &/*_start*/,
+                           const ignition::math::Vector3d &/*_end*/)
 {
   // msgs::Vector3d *pt = NULL;
 
@@ -207,13 +224,13 @@ void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
 //////////////////////////////////////////////////
 double MultiRayShape::GetMinRange() const
 {
-  return this->rangeElem->Get<double>("min");
+  return this->minRange;
 }
 
 //////////////////////////////////////////////////
 double MultiRayShape::GetMaxRange() const
 {
-  return this->rangeElem->Get<double>("max");
+  return this->maxRange;
 }
 
 //////////////////////////////////////////////////
@@ -235,13 +252,13 @@ double MultiRayShape::GetScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMinAngle() const
+ignition::math::Angle MultiRayShape::MinAngle() const
 {
   return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetMaxAngle() const
+ignition::math::Angle MultiRayShape::MaxAngle() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -265,22 +282,23 @@ double MultiRayShape::GetVerticalScanResolution() const
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMinAngle() const
+ignition::math::Angle MultiRayShape::VerticalMinAngle() const
 {
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle MultiRayShape::GetVerticalMaxAngle() const
+ignition::math::Angle MultiRayShape::VerticalMaxAngle() const
 {
   if (this->vertElem)
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
+
 
 //////////////////////////////////////////////////
 void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)
@@ -296,4 +314,20 @@ void MultiRayShape::ProcessMsg(const msgs::Geometry &/*_msg*/)
 double MultiRayShape::ComputeVolume() const
 {
   return 0;
+}
+
+
+//////////////////////////////////////////////////
+unsigned int MultiRayShape::RayCount() const
+{
+  return this->rays.size();
+}
+
+//////////////////////////////////////////////////
+RayShapePtr MultiRayShape::Ray(const unsigned int _rayIndex) const
+{
+  if (_rayIndex < this->rays.size())
+    return this->rays[_rayIndex];
+  else
+    return RayShapePtr();
 }

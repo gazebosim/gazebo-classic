@@ -14,12 +14,9 @@
  * limitations under the License.
  *
 */
-/*
- * Desc: Contact Plugin
- * Author: Nate Koenig mod by John Hsu
- */
-#ifndef _GAZEBO_CONTACT_PLUGIN_HH_
-#define _GAZEBO_CONTACT_PLUGIN_HH_
+
+#ifndef GAZEBO_PLUGINS_CONTACTPLUGIN_HH_
+#define GAZEBO_PLUGINS_CONTACTPLUGIN_HH_
 
 #include <string>
 

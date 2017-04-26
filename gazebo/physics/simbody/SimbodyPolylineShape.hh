@@ -45,7 +45,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Simbody collsion mesh helper class.
+      /// \brief Simbody collision mesh helper class.
       private: SimbodyMesh *simbodyMesh;
     };
     /// \}

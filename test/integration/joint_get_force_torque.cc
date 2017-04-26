@@ -167,11 +167,9 @@ class JointGetForceTorqueTest : public ServerFixture,
 
   /// \brief Helper function for GetForceTorqueDemo
   /// \param[in] _world         Pointer to the world object
-  /// \param[in] _physics       Pointer to the physics object.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _options       Options for the joint to test.
   public: void GetFTDemoHelper(physics::WorldPtr _world,
-                               physics::PhysicsEnginePtr _physics,
                                const std::string &_physicsEngine,
                                const SpawnGetFTBoxOptions & opt);
 
@@ -183,14 +181,13 @@ class JointGetForceTorqueTest : public ServerFixture,
 /////////////////////////////////////////////////
 void JointGetForceTorqueTest::GetFTDemoHelper(
     physics::WorldPtr _world,
-    physics::PhysicsEnginePtr _physics,
     const std::string& _physicsEngine,
     const SpawnGetFTBoxOptions& opt)
 {
   gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
         << "joint type " << opt.jointType
         << " joint axis " << opt.jointAxis << std::endl;
-  ignition::math::Vector3d g = _physics->GetGravity().Ign();
+  ignition::math::Vector3d g = _world->Gravity();
   double mass = opt.mass;
 
   physics::ModelPtr model = SpawnBox(opt);
@@ -201,8 +198,8 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   ASSERT_TRUE(link != NULL);
   ASSERT_TRUE(joint != NULL);
 
-  ignition::math::Vector3d com = link->GetWorldCoGPose().pos.Ign();
-  ignition::math::Vector3d jointOrigin = joint->GetWorldPose().pos.Ign();
+  ignition::math::Vector3d com = link->WorldCoGPose().Pos();
+  ignition::math::Vector3d jointOrigin = joint->WorldPose().Pos();
 
   // do a simulation step to get a meaningful measure
   _world->Step(1);
@@ -240,11 +237,11 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   ignition::math::Vector3d tauWorld = mass*(com-jointOrigin).Cross(g);
 
   ignition::math::Pose3d parentPose;
-  ignition::math::Pose3d childPose = link->GetWorldPose().Ign();
+  ignition::math::Pose3d childPose = link->WorldPose();
 
   if (!opt.parentIsWorld)
   {
-    parentPose = link->GetParentJointsLinks()[0]->GetWorldPose().Ign();
+    parentPose = link->GetParentJointsLinks()[0]->WorldPose();
   }
 
   ignition::math::Vector3d body1ForceExpected =
@@ -256,19 +253,19 @@ void JointGetForceTorqueTest::GetFTDemoHelper(
   ignition::math::Vector3d body2TorqueExpected =
     childPose.Rot().Inverse() * tauWorld;
 
-  EXPECT_NEAR(body1ForceExpected.X(), W.body1Force.x, TOL_FORCE);
-  EXPECT_NEAR(body1ForceExpected.Y(), W.body1Force.y, TOL_FORCE);
-  EXPECT_NEAR(body1ForceExpected.Z(), W.body1Force.z, TOL_FORCE);
-  EXPECT_NEAR(body1TorqueExpected.X(), W.body1Torque.x, TOL_TORQUE);
-  EXPECT_NEAR(body1TorqueExpected.Y(), W.body1Torque.y, TOL_TORQUE);
-  EXPECT_NEAR(body1TorqueExpected.Z(), W.body1Torque.z, TOL_TORQUE);
+  EXPECT_NEAR(body1ForceExpected.X(), W.body1Force.X(), TOL_FORCE);
+  EXPECT_NEAR(body1ForceExpected.Y(), W.body1Force.Y(), TOL_FORCE);
+  EXPECT_NEAR(body1ForceExpected.Z(), W.body1Force.Z(), TOL_FORCE);
+  EXPECT_NEAR(body1TorqueExpected.X(), W.body1Torque.X(), TOL_TORQUE);
+  EXPECT_NEAR(body1TorqueExpected.Y(), W.body1Torque.Y(), TOL_TORQUE);
+  EXPECT_NEAR(body1TorqueExpected.Z(), W.body1Torque.Z(), TOL_TORQUE);
 
-  EXPECT_NEAR(body2ForceExpected.X(), W.body2Force.x, TOL_FORCE);
-  EXPECT_NEAR(body2ForceExpected.Y(), W.body2Force.y, TOL_FORCE);
-  EXPECT_NEAR(body2ForceExpected.Z(), W.body2Force.z, TOL_FORCE);
-  EXPECT_NEAR(body2TorqueExpected.X(), W.body2Torque.x, TOL_TORQUE);
-  EXPECT_NEAR(body2TorqueExpected.Y(), W.body2Torque.y, TOL_TORQUE);
-  EXPECT_NEAR(body2TorqueExpected.Z(), W.body2Torque.z, TOL_TORQUE);
+  EXPECT_NEAR(body2ForceExpected.X(), W.body2Force.X(), TOL_FORCE);
+  EXPECT_NEAR(body2ForceExpected.Y(), W.body2Force.Y(), TOL_FORCE);
+  EXPECT_NEAR(body2ForceExpected.Z(), W.body2Force.Z(), TOL_FORCE);
+  EXPECT_NEAR(body2TorqueExpected.X(), W.body2Torque.X(), TOL_TORQUE);
+  EXPECT_NEAR(body2TorqueExpected.Y(), W.body2Torque.Y(), TOL_TORQUE);
+  EXPECT_NEAR(body2TorqueExpected.Z(), W.body2Torque.Z(), TOL_TORQUE);
 
   // Remove model
   _world->RemoveModel(model);
@@ -287,7 +284,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physEng);
 
@@ -298,10 +295,10 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   opt.linkPose.Rot().Euler(0.1, 0.0, 0.0);
 
   opt.parentIsWorld = true;
-  this->GetFTDemoHelper(world, physics, _physEng, opt);
+  this->GetFTDemoHelper(world, _physEng, opt);
 
   opt.parentIsWorld = false;
-  this->GetFTDemoHelper(world, physics, _physEng, opt);
+  this->GetFTDemoHelper(world, _physEng, opt);
 
   // test a revolute joint against all axis
 
@@ -323,7 +320,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
           break;
       }
 
-      this->GetFTDemoHelper(world, physics, _physEng, opt);
+      this->GetFTDemoHelper(world, _physEng, opt);
     }
   }
 
@@ -349,7 +346,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
           opt.jointAxis = ignition::math::Vector3d::UnitZ;
           break;
       }
-      this->GetFTDemoHelper(world, physics, _physEng, opt);
+      this->GetFTDemoHelper(world, _physEng, opt);
     }
   }
 }

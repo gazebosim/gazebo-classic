@@ -23,7 +23,6 @@
 #include <ignition/math/Angle.hh>
 #include <sdf/sdf.hh>
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorTypes.hh"
 #include "gazebo/util/system.hh"
@@ -71,11 +70,6 @@ namespace gazebo
       /// \brief Accessor for current latitude angle
       /// \return Current latitude angle.
       public: ignition::math::Angle Latitude() const;
-
-      /// \brief Accessor for current altitude
-      /// \return Current altitude above sea level.
-      /// \deprecated See Altitude()
-      public: double GetAltitude() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.

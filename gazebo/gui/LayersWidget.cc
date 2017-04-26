@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <functional>
 #include <sstream>
 
 #include "gazebo/rendering/RenderEvents.hh"
@@ -42,7 +44,7 @@ LayersWidget::LayersWidget(QWidget *_parent)
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectNewLayer(
-        boost::bind(&LayersWidget::OnNewLayer, this, _1)));
+        std::bind(&LayersWidget::OnNewLayer, this, std::placeholders::_1)));
 }
 
 /////////////////////////////////////////////////

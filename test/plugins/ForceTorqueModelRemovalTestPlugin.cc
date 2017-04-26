@@ -38,11 +38,7 @@ void ForceTorqueModelRemovalTestPlugin::Init()
 /////////////////////////////////////////////////
 ForceTorqueModelRemovalTestPlugin::~ForceTorqueModelRemovalTestPlugin()
 {
-  if (this->updateConnection.get())
-  {
-    event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
-    this->updateConnection = gazebo::event::ConnectionPtr();
-  }
+  this->updateConnection.reset();
 
   parentSensor = 0;
 }

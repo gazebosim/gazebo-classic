@@ -44,21 +44,35 @@ ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine)
   this->collisionParent.reset();
 }
 
+//////////////////////////////////////////////////
+ODERayShape::ODERayShape(PhysicsEnginePtr _physicsEngine, dSpaceID _spaceId)
+: RayShape(_physicsEngine)
+{
+  this->SetName("ODE Ray Shape");
+
+  this->physicsEngine =
+    boost::static_pointer_cast<ODEPhysics>(_physicsEngine);
+
+  this->geomId = dCreateRay(_spaceId, 2.0);
+  dGeomSetCategoryBits(this->geomId, GZ_SENSOR_COLLIDE);
+  dGeomSetCollideBits(this->geomId, ~GZ_SENSOR_COLLIDE);
+  this->collisionParent.reset();
+}
 
 //////////////////////////////////////////////////
 ODERayShape::ODERayShape(CollisionPtr _parent)
-    : RayShape(_parent)
+: RayShape(_parent)
 {
-  GZ_ASSERT(_parent, "Parent collision shape is NULL");
+  GZ_ASSERT(_parent, "Parent collision shape is null");
   this->SetName("ODE Ray Shape");
 
   ODECollisionPtr collision =
     boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 
-  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is NULL");
+  GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
 
   // Create default ray with unit length
@@ -76,7 +90,7 @@ ODERayShape::~ODERayShape()
 //////////////////////////////////////////////////
 void ODERayShape::Update()
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
 
   if (this->collisionParent)
   {
@@ -84,22 +98,24 @@ void ODERayShape::Update()
       boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
     this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
     this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
-        this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
-        dir.x, dir.y, dir.z);
+        this->globalStartPos.X(),
+        this->globalStartPos.Y(),
+        this->globalStartPos.Z(),
+        dir.X(), dir.Y(), dir.Z());
 
     dGeomRaySetLength(this->geomId,
         this->globalStartPos.Distance(this->globalEndPos));
@@ -130,18 +146,18 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void ODERayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
+void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                            const ignition::math::Vector3d &_posEnd)
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
   RayShape::SetPoints(_posStart, _posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x,
-              this->globalStartPos.y, this->globalStartPos.z,
-              dir.x, dir.y, dir.z);
+  dGeomRaySet(this->geomId, this->globalStartPos.X(),
+              this->globalStartPos.Y(), this->globalStartPos.Z(),
+              dir.X(), dir.Y(), dir.Z());
 
   dGeomRaySetLength(this->geomId,
                      this->globalStartPos.Distance(this->globalEndPos));
@@ -151,7 +167,7 @@ void ODERayShape::SetPoints(const math::Vector3 &_posStart,
 void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
 {
   dContactGeom contact;
-  ODERayShape::Intersection *inter = NULL;
+  ODERayShape::Intersection *inter = nullptr;
 
   inter = static_cast<Intersection*>(_data);
 
@@ -163,7 +179,7 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
   else
   {
     ODECollision *collision1, *collision2;
-    ODECollision *hitCollision = NULL;
+    ODECollision *hitCollision = nullptr;
 
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
@@ -208,4 +224,10 @@ void ODERayShape::UpdateCallback(void *_data, dGeomID _o1, dGeomID _o2)
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+dGeomID ODERayShape::ODEGeomId() const
+{
+  return this->geomId;
 }

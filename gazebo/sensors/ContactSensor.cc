@@ -97,7 +97,7 @@ void ContactSensor::Load(const std::string &_worldName)
     this->sdf->GetElement("contact")->GetElement("collision");
 
   std::string entityName =
-      this->world->GetEntity(this->ParentName())->GetScopedName();
+      this->world->EntityByName(this->ParentName())->GetScopedName();
   this->dataPtr->filterName = entityName + "::" + this->Name();
 
   // Get all the collision elements
@@ -117,8 +117,7 @@ void ContactSensor::Load(const std::string &_worldName)
   {
     // request the contact manager to publish messages to a custom topic for
     // this sensor
-    physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
+    physics::ContactManager *mgr = this->world->Physics()->GetContactManager();
     std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
         this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
@@ -196,7 +195,7 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
   // Clear the incoming contact list.
   this->dataPtr->incomingContacts.clear();
 
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
   msgs::Set(this->dataPtr->contactsMsg.mutable_time(),
             this->lastMeasurementTime);
 
@@ -213,10 +212,10 @@ bool ContactSensor::UpdateImpl(const bool /*_force*/)
 //////////////////////////////////////////////////
 void ContactSensor::Fini()
 {
-  if (this->world && this->world->GetRunning())
+  if (this->world && this->world->Running())
   {
     physics::ContactManager *mgr =
-        this->world->GetPhysicsEngine()->GetContactManager();
+        this->world->Physics()->GetContactManager();
     mgr->RemoveFilter(this->dataPtr->filterName);
   }
 
@@ -262,23 +261,10 @@ unsigned int ContactSensor::GetCollisionContactCount(
 }
 
 //////////////////////////////////////////////////
-msgs::Contacts ContactSensor::GetContacts() const
-{
-  return this->Contacts();
-}
-
-//////////////////////////////////////////////////
 msgs::Contacts ContactSensor::Contacts() const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   return this->dataPtr->contactsMsg;
-}
-
-//////////////////////////////////////////////////
-std::map<std::string, gazebo::physics::Contact> ContactSensor::GetContacts(
-    const std::string &_collisionName)
-{
-  return this->Contacts(_collisionName);
 }
 
 //////////////////////////////////////////////////

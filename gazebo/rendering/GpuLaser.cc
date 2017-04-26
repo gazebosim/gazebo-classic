@@ -474,15 +474,37 @@ void GpuLaser::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* GpuLaser::GetLaserData()
-{
-  return this->LaserData();
-}
-
-//////////////////////////////////////////////////
 const float* GpuLaser::LaserData() const
 {
   return this->dataPtr->laserBuffer;
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataBegin() const
+{
+  const unsigned int index = 0;
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataEnd() const
+{
+  const unsigned int index = this->ImageHeight() * this->ImageWidth();
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
 }
 
 /////////////////////////////////////////////////
@@ -718,7 +740,7 @@ void GpuLaser::CreateCanvas()
       & ~GZ_VISIBILITY_SELECTABLE);
 
   ignition::math::Pose3d pose;
-  pose.Pos() = ignition::math::Vector3d(0.01, 0, 0);
+  pose.Pos().Set(0.01, 0, 0);
   pose.Rot().Euler(ignition::math::Vector3d(0, 0, 0));
 
   this->dataPtr->visual->SetPose(pose);
@@ -742,21 +764,9 @@ void GpuLaser::SetVertHalfAngle(const double _angle)
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetHorzHalfAngle() const
-{
-  return this->HorzHalfAngle();
-}
-
-//////////////////////////////////////////////////
 double GpuLaser::HorzHalfAngle() const
 {
   return this->horzHalfAngle;
-}
-
-//////////////////////////////////////////////////
-double GpuLaser::GetVertHalfAngle() const
-{
-  return this->VertHalfAngle();
 }
 
 //////////////////////////////////////////////////
@@ -778,21 +788,9 @@ bool GpuLaser::IsHorizontal() const
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetHorzFOV() const
-{
-  return this->HorzFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuLaser::HorzFOV() const
 {
   return this->hfov;
-}
-
-//////////////////////////////////////////////////
-double GpuLaser::GetVertFOV() const
-{
-  return this->VertFOV();
 }
 
 //////////////////////////////////////////////////
@@ -814,12 +812,6 @@ void GpuLaser::SetVertFOV(const double _vfov)
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetCosHorzFOV() const
-{
-  return this->CosHorzFOV();
-}
-
-//////////////////////////////////////////////////
 double GpuLaser::CosHorzFOV() const
 {
   return this->chfov;
@@ -829,12 +821,6 @@ double GpuLaser::CosHorzFOV() const
 void GpuLaser::SetCosHorzFOV(const double _chfov)
 {
   this->chfov = _chfov;
-}
-
-//////////////////////////////////////////////////
-double GpuLaser::GetCosVertFOV() const
-{
-  return this->CosVertFOV();
 }
 
 //////////////////////////////////////////////////
@@ -850,21 +836,9 @@ void GpuLaser::SetCosVertFOV(const double _cvfov)
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetNearClip() const
-{
-  return this->NearClip();
-}
-
-//////////////////////////////////////////////////
 double GpuLaser::NearClip() const
 {
   return this->nearClip;
-}
-
-//////////////////////////////////////////////////
-double GpuLaser::GetFarClip() const
-{
-  return this->FarClip();
 }
 
 //////////////////////////////////////////////////
@@ -886,12 +860,6 @@ void GpuLaser::SetFarClip(const double _far)
 }
 
 //////////////////////////////////////////////////
-double GpuLaser::GetCameraCount() const
-{
-  return this->CameraCount();
-}
-
-//////////////////////////////////////////////////
 unsigned int GpuLaser::CameraCount() const
 {
   return this->cameraCount;
@@ -901,12 +869,6 @@ unsigned int GpuLaser::CameraCount() const
 void GpuLaser::SetCameraCount(const unsigned int _cameraCount)
 {
   this->cameraCount = _cameraCount;
-}
-
-//////////////////////////////////////////////////
-double GpuLaser::GetRayCountRatio() const
-{
-  return this->RayCountRatio();
 }
 
 //////////////////////////////////////////////////
@@ -928,10 +890,4 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c);
 }

@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -70,17 +72,18 @@ void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyFixedJoint::GetGlobalAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyFixedJoint::GlobalAxis(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+double SimbodyFixedJoint::PositionImpl(const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }

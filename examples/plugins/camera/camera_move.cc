@@ -14,7 +14,7 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
+#include <functional>
 #include "gazebo/gazebo.hh"
 #include "gazebo/physics/physics.hh"
 
@@ -32,19 +32,19 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&CameraMove::OnUpdate, this));
+          std::bind(&CameraMove::OnUpdate, this));
     }
 
     // Called by the world update start event
     public: void OnUpdate()
     {
-      math::Vector3 v(0.03, 0, 0);
-      math::Pose pose = this->model->GetWorldPose();
-      v = pose.rot * v;
+      ignition::math::Vector3d v(0.03, 0, 0);
+      ignition::math::Pose3d pose = this->model->GetWorldPose().Ign();
+      v = pose.Rot() * v;
 
       // Apply a small linear velocity to the model.
       this->model->SetLinearVel(v);
-      this->model->SetAngularVel(math::Vector3(0, 0, 0.01));
+      this->model->SetAngularVel(ignition::math::Vector3d(0, 0, 0.01));
     }
 
     // Pointer to the model

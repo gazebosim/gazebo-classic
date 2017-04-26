@@ -34,7 +34,7 @@ namespace gazebo
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
             {
               this->world = _world;
-              this->physics = this->world->GetPhysicsEngine();
+              this->physics = this->world->Physics();
             }
 
     public: void Init()

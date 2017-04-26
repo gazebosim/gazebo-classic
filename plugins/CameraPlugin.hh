@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_CAMERA_PLUGIN_HH_
-#define _GAZEBO_CAMERA_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CAMERAPLUGIN_HH_
+#define GAZEBO_PLUGINS_CAMERAPLUGIN_HH_
 
 #include <string>
 

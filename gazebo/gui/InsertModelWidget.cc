@@ -71,6 +71,17 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   frameLayout->setContentsMargins(0, 0, 0, 0);
   frame->setLayout(frameLayout);
 
+  // set name, size and location of the button add model path gui.
+  QPushButton *addPathButton = new QPushButton("Add Path", this);
+
+  addPathButton->setGeometry(QRect(QPoint(100, 0),
+    QSize(200, 50)));
+
+  mainLayout->addWidget(addPathButton);
+  // Connect button signal to appropriate slot.
+  connect(addPathButton, SIGNAL(released()), this,
+    SLOT(HandleButton()));
+
   mainLayout->addWidget(frame);
   this->setLayout(mainLayout);
   this->layout()->setContentsMargins(0, 0, 0, 0);
@@ -127,6 +138,29 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::HandleButton()
+{
+  QFileDialog fileDialog(this, tr("Open Directory"), QDir::homePath());
+  fileDialog.setFileMode(QFileDialog::Directory);
+  fileDialog.setOptions(QFileDialog::ShowDirsOnly
+      | QFileDialog::DontResolveSymlinks);
+  fileDialog.setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
+
+  if (fileDialog.exec() == QDialog::Accepted)
+  {
+    QStringList selected = fileDialog.selectedFiles();
+    if (selected.empty())
+      return;
+
+    common::SystemPaths::Instance()->AddModelPaths(
+      selected[0].toStdString());
+
+    this->UpdateLocalPath(selected[0].toStdString());
+  }
 }
 
 /////////////////////////////////////////////////

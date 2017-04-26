@@ -62,11 +62,6 @@ namespace gazebo
 
       /// \brief Returns the imu message
       /// \return Imu message.
-      /// \deprecated See ImuMessage()
-      public: msgs::IMU GetImuMessage() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns the imu message
-      /// \return Imu message.
       public: msgs::IMU ImuMessage() const;
 
       /// \brief Returns the angular velocity in the IMU sensor local frame.
@@ -101,19 +96,6 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool IsActive() const;
-
-      /// \brief Sets the transform from world frame to IMU's reference frame.
-      /// For example, if this IMU works with respect to NED frame, then
-      /// call this function with the transform that transforms world frame
-      /// to NED frame. Subsequently, ImuSensor::Orientation will return
-      /// identity transform if the IMU is aligned with the NED frame.
-      /// This call replaces SetReferencePose.
-      /// \param _pose rotation from world frame to imu reference frame,
-      /// tranlation part of _pose param is ignored.
-      /// \deprecated See SetWorldToReferenceOrientation(Quaterniond)
-      public: void SetWorldToReferencePose(
-        const ignition::math::Pose3d &_pose = ignition::math::Pose3d())
-        GAZEBO_DEPRECATED(8.0);
 
       /// \brief Sets the rotation transform from world frame to IMU's
       /// reference frame.

@@ -14,8 +14,8 @@
  * limitations under the License.k *
 */
 
-#ifndef _SIMEVENTS_PLUGIN_HH_
-#define _SIMEVENTS_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SIMEVENTSPLUGIN_HH_
+#define GAZEBO_PLUGINS_SIMEVENTSPLUGIN_HH_
 
 #include <iostream>
 #include <map>

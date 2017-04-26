@@ -15,7 +15,7 @@
  *
 */
 
-#include <mutex>
+#include <functional>
 #include <string>
 #include <sdf/sdf.hh>
 #include <gazebo/common/Assert.hh>
@@ -30,8 +30,10 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(CessnaPlugin)
 
 ////////////////////////////////////////////////////////////////////////////////
-CessnaPlugin::CessnaPlugin() : cmds {{0, 0, 0, 0, 0, 0, 0}}
+CessnaPlugin::CessnaPlugin()
 {
+  this->cmds.fill(0.0f);
+
   // PID default parameters.
   this->propellerPID.Init(50.0, 0.1, 1, 0.0, 0.0, 20000.0, -20000.0);
   this->propellerPID.SetCmd(0.0);
@@ -46,7 +48,7 @@ CessnaPlugin::CessnaPlugin() : cmds {{0, 0, 0, 0, 0, 0, 0}}
 /////////////////////////////////////////////////
 CessnaPlugin::~CessnaPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////
@@ -130,12 +132,12 @@ void CessnaPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Controller time control.
-  this->lastControllerUpdateTime = this->model->GetWorld()->GetSimTime();
+  this->lastControllerUpdateTime = this->model->GetWorld()->SimTime();
 
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    boost::bind(&CessnaPlugin::Update, this, _1));
+    std::bind(&CessnaPlugin::Update, this, std::placeholders::_1));
 
   // Initialize transport.
   this->node = transport::NodePtr(new transport::Node());
@@ -153,7 +155,7 @@ void CessnaPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
-  gazebo::common::Time curTime = this->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->model->GetWorld()->SimTime();
 
   if (curTime > this->lastControllerUpdateTime)
   {
@@ -203,7 +205,7 @@ void CessnaPlugin::UpdatePIDs(double _dt)
   // Position PID for the control surfaces.
   for (size_t i = 0; i < this->controlSurfacesPID.size(); ++i)
   {
-    double pos = this->joints[i]->GetAngle(0).Radian();
+    double pos = this->joints[i]->Position(0);
     error = pos - this->cmds[i];
     force = this->controlSurfacesPID[i].Update(error, _dt);
     this->joints[i]->SetForce(0, force);
@@ -217,12 +219,12 @@ void CessnaPlugin::PublishState()
   double propellerRpms = this->joints[kPropeller]->GetVelocity(0)
     /(2.0*M_PI)*60.0;
   float propellerSpeed = propellerRpms / this->propellerMaxRpm;
-  float leftAileron = this->joints[kLeftAileron]->GetAngle(0).Radian();
-  float leftFlap = this->joints[kLeftFlap]->GetAngle(0).Radian();
-  float rightAileron = this->joints[kRightAileron]->GetAngle(0).Radian();
-  float rightFlap = this->joints[kRightFlap]->GetAngle(0).Radian();
-  float elevators = this->joints[kElevators]->GetAngle(0).Radian();
-  float rudder = this->joints[kRudder]->GetAngle(0).Radian();
+  float leftAileron = this->joints[kLeftAileron]->Position(0);
+  float leftFlap = this->joints[kLeftFlap]->Position(0);
+  float rightAileron = this->joints[kRightAileron]->Position(0);
+  float rightFlap = this->joints[kRightFlap]->Position(0);
+  float elevators = this->joints[kElevators]->Position(0);
+  float rudder = this->joints[kRudder]->Position(0);
 
   msgs::Cessna msg;
   // Set the observed state.

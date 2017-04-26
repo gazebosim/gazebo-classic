@@ -101,7 +101,7 @@ void SchematicViewWidget::Init()
        boost::bind(&SchematicViewWidget::OnDeselectAll, this, _1, _2)));
 
   this->connections.push_back(
-     gui::model::Events::ConnectSetSelectedLink(
+     gui::model::Events::ConnectSetSelectedEntity(
        boost::bind(&SchematicViewWidget::OnSetSelectedEntity, this, _1, _2)));
 
   this->connections.push_back(
@@ -456,7 +456,7 @@ void SchematicViewWidget::OnSelectionChanged()
       else
         selected = currentlySelected.contains(item);
 
-      gui::model::Events::setSelectedLink(id, selected);
+      gui::model::Events::setSelectedEntity(id, selected);
     }
     else if (type == "Joint")
     {

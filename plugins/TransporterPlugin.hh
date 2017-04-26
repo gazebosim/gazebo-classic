@@ -14,8 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_TRANSPORTER_PLUGIN_HH_
-#define _GAZEBO_TRANSPORTER_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_TRANSPORTERPLUGIN_HH_
+#define GAZEBO_PLUGINS_TRANSPORTERPLUGIN_HH_
+
+#include <memory>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
@@ -103,7 +105,7 @@ namespace gazebo
     private: void OnActivation(ConstGzStringPtr &_msg);
 
     /// \brief Private data pointer.
-    private: TransporterPluginPrivate *dataPtr;
+    private: std::unique_ptr<TransporterPluginPrivate> dataPtr;
   };
 }
 #endif

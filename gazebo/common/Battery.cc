@@ -43,7 +43,7 @@ Battery::Battery()
 Battery::~Battery()
 {
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -57,8 +57,14 @@ void Battery::Load(const sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void Battery::Init()
 {
-  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
+  this->ResetVoltage();
   this->InitConsumers();
+}
+
+/////////////////////////////////////////////////
+void Battery::ResetVoltage()
+{
+  this->dataPtr->realVoltage = std::max(0.0, this->dataPtr->initVoltage);
 }
 
 //////////////////////////////////////////////////

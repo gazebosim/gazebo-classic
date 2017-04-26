@@ -17,8 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/KeyFrame.hh"
 #include "gazebo/common/Animation.hh"
 #include "test/util.hh"

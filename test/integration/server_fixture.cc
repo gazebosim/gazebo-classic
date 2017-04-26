@@ -67,7 +67,7 @@ void ServerFixtureTest::LoadEmptyOfType(const std::string &_physicsType)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsType);
 }
@@ -91,7 +91,7 @@ void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
   EXPECT_TRUE(world->IsPaused());
 
   std::stringstream sdfStr;
-  math::Pose pose(1, 2, 3, 0, 0, 0);
+  ignition::math::Pose3d pose(1, 2, 3, 0, 0, 0);
   sdfStr << "<sdf version='" << SDF_VERSION << "'>"
          << "<model name='box'>"
          << "  <pose>" << pose << "</pose>"
@@ -112,10 +112,10 @@ void ServerFixtureTest::SpawnSDF(const std::string &_physicsType)
   ServerFixture::SpawnSDF(sdfStr.str());
 
   physics::ModelPtr model;
-  model = world->GetModel("box");
+  model = world->ModelByName("box");
   ASSERT_TRUE(model != NULL);
 
-  EXPECT_EQ(pose.pos, model->GetWorldPose().pos);
+  EXPECT_EQ(pose.Pos(), model->WorldPose().Pos());
 }
 
 TEST_P(ServerFixtureTest, SpawnSDF)

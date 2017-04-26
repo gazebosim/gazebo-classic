@@ -20,7 +20,6 @@
 
 #include <string>
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/rendering/AxisVisual.hh"
 #include "gazebo/util/system.hh"
 

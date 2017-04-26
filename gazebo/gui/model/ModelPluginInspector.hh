@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
-#define _GAZEBO_MODEL_PLUGIN_INSPECTOR_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELPLUGININSPECTOR_HH_
+#define GAZEBO_GUI_MODEL_MODELPLUGININSPECTOR_HH_
 
 #include "gazebo/msgs/msgs.hh"
 

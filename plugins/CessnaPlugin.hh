@@ -15,13 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_CESSNA_PLUGIN_HH_
-#define _GAZEBO_CESSNA_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CESSNAPLUGIN_HH_
+#define GAZEBO_PLUGINS_CESSNAPLUGIN_HH_
 
 #include <array>
 #include <mutex>
 #include <string>
 #include <sdf/sdf.hh>
+#include <ignition/transport/Node.hh>
 #include <gazebo/common/PID.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/common/UpdateInfo.hh>
@@ -128,7 +129,7 @@ namespace gazebo
     private: int32_t propellerMaxRpm = 2500;
 
     /// \brief Next command to be applied to the propeller and control surfaces.
-    private: std::array<float, 7>cmds;
+    private: std::array<float, 7> cmds;
 
     /// \brief Velocity PID for the propeller.
     private: common::PID propellerPID;
@@ -141,6 +142,15 @@ namespace gazebo
 
     /// \brief Controller update mutex.
     private: std::mutex mutex;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node used for using Gazebo communications.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition Publisher.
+    private: ignition::transport::Node::Publisher statePubIgn;
   };
 }
 #endif

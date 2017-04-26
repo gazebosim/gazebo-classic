@@ -33,7 +33,7 @@ namespace gazebo
     class GZ_RENDERING_VISIBLE MergeSchemeHandler :
       public Ogre::MaterialManager::Listener
     {
-      public: MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
+      public: explicit MergeSchemeHandler(bool _useDSF) : useDSF(_useDSF)
       {
         if (this->useDSF)
         {
@@ -48,6 +48,19 @@ namespace gazebo
           this->techName = "DeferredLighting";
         }
       }
+
+      /// \brief Destructor
+      public: ~MergeSchemeHandler()
+      {
+        delete this->materialGenerator;
+      }
+
+      /// Delete copy constructor: no copy
+      public: MergeSchemeHandler(const MergeSchemeHandler& x) = delete;
+
+      /// Delete assignment operator: no assignment
+      public: MergeSchemeHandler &operator=(
+                  const MergeSchemeHandler& x) = delete;
 
       /// @copydoc MaterialManager::Listener::handleSchemeNotFound
       public: virtual Ogre::Technique *handleSchemeNotFound(

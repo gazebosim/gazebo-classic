@@ -15,11 +15,12 @@
  *
 */
 
-#ifndef _GAZEBO_REST_API_HH_
-#define _GAZEBO_REST_API_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTAPI_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTAPI_HH_
 
 #include <string>
 #include <list>
+#include <mutex>
 #include <gazebo/common/Console.hh>
 
 #include "RestException.hh"
@@ -99,7 +100,7 @@ namespace gazebo
     private: std::list<Post> posts;
 
     /// \brief A mutex to ensure integrity of the post list
-    private: boost::mutex postsMutex;
+    private: std::mutex postsMutex;
   };
 }
 

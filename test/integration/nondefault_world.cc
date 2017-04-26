@@ -33,7 +33,7 @@ void NonDefaultWorld::Load(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("not_the_default_world_name");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::ModelPtr model = world->ModelByName("ground_plane");
   ASSERT_TRUE(model != NULL);
 }
 

@@ -6,13 +6,12 @@ include_directories (
   ${PROTOBUF_INCLUDE_DIR}
 )
 
-include ( ${QT_USE_FILE} )
-
 link_directories(
   ${ogre_library_dirs}
   ${Boost_LIBRARY_DIRS}
   ${ODE_LIBRARY_DIRS}
 )
+set (CMAKE_AUTOMOC ON)
 
 # Disable the player test for now, until we figure out a better way to test them
 #if (INCLUDE_PLAYER)
@@ -28,14 +27,13 @@ if(HAVE_DART)
   link_directories ( ${DARTCore_LIBRARY_DIRS} )
 endif()
 
-add_definitions(${QT_DEFINITIONS})
-
 set(tests
   aero_plugin.cc
   attach_light_plugin.cc
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contacts_update.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -47,6 +45,8 @@ set(tests
   gz_world.cc
   harness.cc
   imu.cc
+  info_services.cc
+  introspection_items.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -59,13 +59,16 @@ set(tests
   joint_universal.cc
   keys_to_joints.cc
   laser.cc
+  link.cc
   logical_camera_sensor.cc
   model.cc
   model_database.cc
+  multirayshape.cc
   nested_model.cc
   noise.cc
   nondefault_world.cc
   physics.cc
+  physics_base.cc
   physics_basic_controller_response.cc
   physics_collision.cc
   physics_friction.cc
@@ -82,7 +85,6 @@ set(tests
   rayshape.cc
   region_events.cc
   rest_web.cc
-  road.cc
   saving_and_loading.cc
   sensor.cc
   server_fixture.cc
@@ -120,32 +122,27 @@ endif()
 
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
-if (ENABLE_TESTS_COMPILATION)
-  # Increase timeout, to account for model download time.
-  set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
-  set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-  set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
-  set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
+# Increase timeout, to account for model download time.
+set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
+set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
+set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
-  set_property(
-    SOURCE world_clone.cc
-    PROPERTY COMPILE_DEFINITIONS
-    GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
-  )
+set_property(
+  SOURCE world_clone.cc
+  PROPERTY COMPILE_DEFINITIONS
+  GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
+)
 
-  # Increase timeout for debug-mode
-  if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
-      ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
-    set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
-  endif()
-
-  # Add plugin dependency
-  add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
-
-  set_target_properties(${TEST_TYPE}_model_database PROPERTIES
-    COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
+# Increase timeout for debug-mode
+if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
+    ${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "COVERAGE")
+  set_tests_properties(${TEST_TYPE}_joint_gearbox PROPERTIES TIMEOUT 400)
 endif()
+
+# Add plugin dependency
+add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 
 set(display_tests
 )
@@ -156,7 +153,10 @@ gz_build_display_tests(${display_tests})
 set(dri_tests
   camera.cc
   camera_sensor.cc
+  camera_sensor_igntransport.cc
+  depth_camera.cc
   factory.cc
+  fiducial.cc
   gpu_laser.cc
   gz_camera.cc
   heightmap.cc
@@ -165,6 +165,7 @@ set(dri_tests
   pr2.cc
   projector.cc
   rendering_sensor.cc
+  road.cc
   speed_pr2.cc
   wideanglecamera_sensor.cc
   world_reset.cc
@@ -172,12 +173,16 @@ set(dri_tests
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 
 set(qt_tests
+  camera_gui.cc
   collada_visualization.cc
   force_torque_visualization.cc
   insert_model.cc
+  marker.cc
   model_editor.cc
+  model_editor_undo.cc
   model_manipulation.cc
   mouse_pick.cc
+  track_visual.cc
   undo.cc
   view_angle.cc
   view_control.cc
@@ -186,7 +191,7 @@ set(qt_tests
 
 gz_build_qt_tests(${qt_tests})
 
-if (ENABLE_TESTS_COMPILATION AND VALID_DRI_DISPLAY)
+if (VALID_DRI_DISPLAY)
   # Increase timeout, to account for model download time.
   set_tests_properties(${TEST_TYPE}_factory PROPERTIES TIMEOUT 500)
   set_tests_properties(${TEST_TYPE}_pr2 PROPERTIES TIMEOUT 500)

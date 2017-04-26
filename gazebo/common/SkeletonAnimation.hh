@@ -24,8 +24,6 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Matrix4.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/util/system.hh"
 #include "gazebo/common/CommonTypes.hh"
 

@@ -24,9 +24,11 @@
 #include <boost/algorithm/string.hpp>
 #include <math.h>
 
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/FPSViewController.hh"
 #include "gazebo/rendering/Heightmap.hh"
@@ -69,26 +71,17 @@ GLWidget::GLWidget(QWidget *_parent)
 
   this->dataPtr->updateTimer = new QTimer(this);
   connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
-          this, SLOT(update()));
-
-  this->setFocusPolicy(Qt::StrongFocus);
+  this, SLOT(update()));
 
   this->dataPtr->windowId = -1;
 
   this->setAttribute(Qt::WA_OpaquePaintEvent, true);
   this->setAttribute(Qt::WA_PaintOnScreen, true);
+  this->setAttribute(Qt::WA_NoSystemBackground, true);
 
-  this->dataPtr->renderFrame = new QFrame;
-  this->dataPtr->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->dataPtr->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->dataPtr->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->dataPtr->renderFrame->show();
-
-  QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(this->dataPtr->renderFrame);
-  mainLayout->setContentsMargins(0, 0, 0, 0);
-  this->setLayout(mainLayout);
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
   this->dataPtr->connections.push_back(
       rendering::Events::ConnectRemoveScene(
@@ -126,9 +119,6 @@ GLWidget::GLWidget(QWidget *_parent)
           std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5)));
 
-  this->dataPtr->renderFrame->setMouseTracking(true);
-  this->setMouseTracking(true);
-
   this->dataPtr->entityMaker = NULL;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -156,19 +146,27 @@ GLWidget::GLWidget(QWidget *_parent)
   MouseEventHandler::Instance()->AddDoubleClickFilter("glwidget",
       std::bind(&GLWidget::OnMouseDoubleClick, this, std::placeholders::_1));
 
-  connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
-  connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
-
-  connect(g_editModelAct, SIGNAL(toggled(bool)), this,
-      SLOT(OnModelEditor(bool)));
-
+  if (g_copyAct)
+    connect(g_copyAct, SIGNAL(triggered()), this, SLOT(OnCopy()));
+  if (g_pasteAct)
+    connect(g_pasteAct, SIGNAL(triggered()), this, SLOT(OnPaste()));
+  if (g_editModelAct)
+  {
+    connect(g_editModelAct, SIGNAL(toggled(bool)), this,
+        SLOT(OnModelEditor(bool)));
+  }
   // Connect the ortho action
-  connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
-          SLOT(OnOrtho()));
-
-  // Connect the perspective action
-  connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
-          SLOT(OnPerspective()));
+  if (g_cameraOrthoAct)
+  {
+    connect(g_cameraOrthoAct, SIGNAL(triggered()), this,
+            SLOT(OnOrtho()));
+  }
+  if (g_cameraPerspectiveAct)
+  {
+    // Connect the perspective action
+    connect(g_cameraPerspectiveAct, SIGNAL(triggered()), this,
+            SLOT(OnPerspective()));
+  }
 
   // Create the scene. This must be done in the constructor so that
   // we can then create a user camera.
@@ -199,9 +197,12 @@ GLWidget::~GLWidget()
   MouseEventHandler::Instance()->RemoveMoveFilter("glwidget");
   MouseEventHandler::Instance()->RemoveDoubleClickFilter("glwidget");
 
-  this->dataPtr->connections.clear();
-  this->dataPtr->node.reset();
+  this->dataPtr->requestSub.reset();
   this->dataPtr->selectionPub.reset();
+  this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  this->dataPtr->connections.clear();
 
   ModelManipulator::Instance()->Clear();
   ModelSnap::Instance()->Clear();
@@ -229,23 +230,28 @@ bool GLWidget::eventFilter(QObject * /*_obj*/, QEvent *_event)
 /////////////////////////////////////////////////
 void GLWidget::showEvent(QShowEvent *_event)
 {
-  // These two functions are most applicable for Linux.
+  // This function is most applicable for Linux.
   QApplication::flush();
-  QApplication::syncX();
 
   if (this->dataPtr->windowId <=0)
   {
     // Get the window handle in a form that OGRE can use.
     std::string winHandle = this->OgreHandle();
 
+    // windowhandle() is available in qt5 only
+    double ratio = this->windowHandle()->devicePixelRatio();
+
     // Create the OGRE render window
     this->dataPtr->windowId =
       rendering::RenderEngine::Instance()->GetWindowManager()->
-        CreateWindow(winHandle, this->width(), this->height());
+        CreateWindow(winHandle, this->width(), this->height(), ratio);
 
     // Attach the user camera to the window
     rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
         this->dataPtr->windowId, this->dataPtr->userCamera);
+
+    // for retina displays on osx
+    this->dataPtr->userCamera->SetDevicePixelRatio(ratio);
   }
 
   // Let QT continue processing the show event.
@@ -336,10 +342,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   if (_event->key() == Qt::Key_Delete &&
       this->dataPtr->selectionLevel == SelectionLevels::MODEL)
   {
+    ModelManipulator::Instance()->Detach();
     std::lock_guard<std::mutex> lock(this->dataPtr->selectedVisMutex);
     while (!this->dataPtr->selectedVisuals.empty())
     {
-      std::string name = this->dataPtr->selectedVisuals.back()->GetName();
+      std::string name = this->dataPtr->selectedVisuals.back()->Name();
       int id = this->dataPtr->selectedVisuals.back()->GetId();
       this->dataPtr->selectedVisuals.pop_back();
 
@@ -381,11 +388,11 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
   }
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -436,11 +443,14 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
   this->dataPtr->keyModifiers = _event->modifiers();
 
   this->dataPtr->keyEvent.control =
-    this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ControlModifier)
+    && (_event->key() != Qt::Key_Control) ? true : false;
   this->dataPtr->keyEvent.shift =
-    this->dataPtr->keyModifiers & Qt::ShiftModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::ShiftModifier)
+    && (_event->key() != Qt::Key_Shift) ? true : false;
   this->dataPtr->keyEvent.alt =
-    this->dataPtr->keyModifiers & Qt::AltModifier ? true : false;
+    (this->dataPtr->keyModifiers & Qt::AltModifier)
+    && (_event->key() != Qt::Key_Alt) ? true : false;
 
   this->dataPtr->mouseEvent.SetControl(this->dataPtr->keyEvent.control);
   this->dataPtr->mouseEvent.SetShift(this->dataPtr->keyEvent.shift);
@@ -545,18 +555,24 @@ bool GLWidget::OnMouseRelease(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 {
   // Update the view depending on the current GUI state
-  if (this->dataPtr->state == "make_entity")
-    this->OnMouseMoveMakeEntity();
-  else if (this->dataPtr->state == "select")
+  if (this->dataPtr->state == "select")
+  {
     this->OnMouseMoveNormal();
+  }
   else if (this->dataPtr->state == "translate" ||
            this->dataPtr->state == "rotate"    ||
            this->dataPtr->state == "scale")
   {
     ModelManipulator::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
   }
+  else if (this->dataPtr->state == "make_entity")
+  {
+    this->OnMouseMoveMakeEntity();
+  }
   else if (this->dataPtr->state == "snap")
+  {
     ModelSnap::Instance()->OnMouseMoveEvent(this->dataPtr->mouseEvent);
+  }
 
   return true;
 }
@@ -565,9 +581,9 @@ bool GLWidget::OnMouseMove(const common::MouseEvent & /*_event*/)
 bool GLWidget::OnMouseDoubleClick(const common::MouseEvent & /*_event*/)
 {
   rendering::VisualPtr vis =
-    this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+    this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
-  if (vis && gui::get_entity_id(vis->GetRootVisual()->GetName()))
+  if (vis && gui::get_entity_id(vis->GetRootVisual()->Name()))
   {
     if (vis->IsPlane())
     {
@@ -601,7 +617,7 @@ void GLWidget::OnMousePressNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   this->dataPtr->userCamera->HandleMouseEvent(this->dataPtr->mouseEvent);
@@ -623,16 +639,24 @@ void GLWidget::wheelEvent(QWheelEvent *_event)
   if (!this->dataPtr->scene)
     return;
 
-  if (_event->delta() > 0)
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), -1);
-  }
-  else
-  {
-    this->dataPtr->mouseEvent.SetScroll(
-        this->dataPtr->mouseEvent.Scroll().X(), 1);
-  }
+  // QTBUG-46461 - fast rotation of mouse wheel produces wrong angle delta
+  // so limit wheel event to our update rate
+  common::Time eventTime = common::Time::GetWallTime();
+  double dt = (eventTime - this->dataPtr->lastWheelEventTime).Double();
+  if (dt < this->dataPtr->updateTimer->interval()*1e-3)
+    return;
+  this->dataPtr->lastWheelEventTime = eventTime;
+
+  int scrollY = 0;
+  int delta = _event->delta();
+
+  if (delta > 0)
+    scrollY = -1;
+  else if (delta < 0)
+    scrollY = 1;
+
+  this->dataPtr->mouseEvent.SetScroll(
+      this->dataPtr->mouseEvent.Scroll().X(), scrollY);
 
   this->dataPtr->mouseEvent.SetType(common::MouseEvent::SCROLL);
 
@@ -687,7 +711,7 @@ void GLWidget::OnMouseMoveNormal()
   if (!this->dataPtr->userCamera)
     return;
 
-  rendering::VisualPtr vis = this->dataPtr->userCamera->GetVisual(
+  rendering::VisualPtr vis = this->dataPtr->userCamera->Visual(
       this->dataPtr->mouseEvent.Pos());
 
   if (vis && !vis->IsPlane())
@@ -736,7 +760,7 @@ void GLWidget::OnMouseReleaseNormal()
   if (!this->dataPtr->mouseEvent.Dragging())
   {
     rendering::VisualPtr vis =
-      this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+      this->dataPtr->userCamera->Visual(this->dataPtr->mouseEvent.Pos());
 
     if (vis)
     {
@@ -795,19 +819,19 @@ void GLWidget::OnMouseReleaseNormal()
         this->dataPtr->selectionLevel = SelectionLevels::MODEL;
       }
       this->SetSelectedVisual(selectVis);
-      event::Events::setSelectedEntity(selectVis->GetName(), "normal");
+      event::Events::setSelectedEntity(selectVis->Name(), "normal");
 
       // Open context menu
       if (rightButton)
       {
         if (selectVis == modelVis)
         {
-          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+          g_modelRightMenu->Run(selectVis->Name(), QCursor::pos(),
               ModelRightMenu::EntityTypes::MODEL);
         }
         else if (selectVis == linkVis)
         {
-          g_modelRightMenu->Run(selectVis->GetName(), QCursor::pos(),
+          g_modelRightMenu->Run(selectVis->Name(), QCursor::pos(),
               ModelRightMenu::EntityTypes::LINK);
         }
       }
@@ -868,15 +892,11 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   gui::set_active_camera(this->dataPtr->userCamera);
   this->dataPtr->scene = _scene;
 
-  math::Vector3 camPos(5, -5, 2);
-  math::Vector3 lookAt(0, 0, 0);
-  math::Vector3 delta = lookAt - camPos;
+  ignition::math::Vector3d camPos(5, -5, 2);
+  ignition::math::Vector3d lookAt(0, 0, 0);
+  auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  double yaw = atan2(delta.y, delta.x);
-
-  double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
-  this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
-        math::Vector3(0, pitch, yaw)));
+  this->dataPtr->userCamera->SetInitialPose(mat.Pose());
 
   // client side heightmap configuration
   _scene->SetHeightmapLOD(gazebo::gui::getINIProperty<int>("heightmap.lod", 0));
@@ -884,13 +904,7 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   // Update at the camera's update rate
   this->dataPtr->updateTimer->start(
       static_cast<int>(
-        std::round(1000.0 / (4*this->dataPtr->userCamera->RenderRate()))));
-}
-
-/////////////////////////////////////////////////
-rendering::ScenePtr GLWidget::GetScene() const
-{
-  return this->Scene();
+        std::round(1000.0 / this->dataPtr->userCamera->RenderRate())));
 }
 
 /////////////////////////////////////////////////
@@ -910,12 +924,6 @@ void GLWidget::Clear()
 }
 
 //////////////////////////////////////////////////
-rendering::UserCameraPtr GLWidget::GetCamera() const
-{
-  return this->Camera();
-}
-
-//////////////////////////////////////////////////
 rendering::UserCameraPtr GLWidget::Camera() const
 {
   return this->dataPtr->userCamera;
@@ -924,25 +932,7 @@ rendering::UserCameraPtr GLWidget::Camera() const
 //////////////////////////////////////////////////
 std::string GLWidget::OgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(__APPLE__)
-  ogreHandle = std::to_string(this->winId());
-#elif defined(WIN32)
-  ogreHandle = std::to_string(
-      reinterpret_cast<uint32_t>(this->renderFrame->winId()));
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->dataPtr->renderFrame);
-  GZ_ASSERT(q_parent, "q_parent is null");
-
-  ogreHandle =
-    std::to_string(reinterpret_cast<uint64_t>(info.display())) + ":" +
-    std::to_string(static_cast<uint32_t>(info.screen())) + ":" +
-    std::to_string(static_cast<uint64_t>(q_parent->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }
 
 /////////////////////////////////////////////////
@@ -1100,7 +1090,7 @@ void GLWidget::SetSelectedVisual(rendering::VisualPtr _vis)
     g_copyAct->setEnabled(true);
 
     msg.set_id(_vis->GetId());
-    msg.set_name(_vis->GetName());
+    msg.set_name(_vis->Name());
     msg.set_selected(true);
     this->dataPtr->selectionPub->Publish(msg);
   }
@@ -1123,7 +1113,7 @@ void GLWidget::DeselectAllVisuals()
   {
     this->dataPtr->selectedVisuals[i]->SetHighlighted(false);
     msg.set_id(this->dataPtr->selectedVisuals[i]->GetId());
-    msg.set_name(this->dataPtr->selectedVisuals[i]->GetName());
+    msg.set_name(this->dataPtr->selectedVisuals[i]->Name());
     msg.set_selected(false);
     this->dataPtr->selectionPub->Publish(msg);
   }
@@ -1149,7 +1139,7 @@ void GLWidget::OnManipMode(const std::string &_mode)
     {
       // Make sure model is not updated by server during manipulation
       this->dataPtr->scene->SelectVisual(
-          this->dataPtr->selectedVisuals.back()->GetName(), "move");
+          this->dataPtr->selectedVisuals.back()->Name(), "move");
     }
   }
 
@@ -1167,8 +1157,8 @@ void GLWidget::OnManipMode(const std::string &_mode)
               = this->dataPtr->selectedVisuals.begin();
               it != --this->dataPtr->selectedVisuals.end();)
       {
-         (*it)->SetHighlighted(false);
-         it = this->dataPtr->selectedVisuals.erase(it);
+        (*it)->SetHighlighted(false);
+        it = this->dataPtr->selectedVisuals.erase(it);
       }
     }
   }
@@ -1181,7 +1171,7 @@ void GLWidget::OnCopy()
   if (!this->dataPtr->selectedVisuals.empty() &&
       !this->dataPtr->modelEditorEnabled)
   {
-    this->Copy(this->dataPtr->selectedVisuals.back()->GetName());
+    this->Copy(this->dataPtr->selectedVisuals.back()->Name());
   }
 }
 
@@ -1261,7 +1251,7 @@ void GLWidget::OnSetSelectedEntity(const std::string &_name,
           this->dataPtr->selectedVisuals.end(), selection);
 
     // Shortcircuit the case when GLWidget already selected the visual.
-    if (it == this->dataPtr->selectedVisuals.end() || _name != (*it)->GetName())
+    if (it == this->dataPtr->selectedVisuals.end() || _name != (*it)->Name())
     {
       this->SetSelectedVisual(selection);
       this->dataPtr->scene->SelectVisual(name, _mode);
@@ -1287,7 +1277,7 @@ void GLWidget::OnRequest(ConstRequestPtr &_msg)
           it != this->dataPtr->selectedVisuals.end();
           ++it)
       {
-        if ((*it)->GetName() == _msg->data())
+        if ((*it)->Name() == _msg->data())
         {
           ModelManipulator::Instance()->Detach();
           this->dataPtr->selectedVisuals.erase(it);
@@ -1344,7 +1334,7 @@ void GLWidget::OnPerspective()
 /////////////////////////////////////////////////
 QPaintEngine *GLWidget::paintEngine() const
 {
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////

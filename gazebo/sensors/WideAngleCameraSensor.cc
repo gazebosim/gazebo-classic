@@ -53,6 +53,11 @@ WideAngleCameraSensor::WideAngleCameraSensor()
 }
 
 //////////////////////////////////////////////////
+WideAngleCameraSensor::~WideAngleCameraSensor()
+{
+}
+
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
 {
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -63,7 +68,7 @@ void WideAngleCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -110,7 +115,7 @@ void WideAngleCameraSensor::Init()
       cameraPose = cameraSdf->Get<ignition::math::Pose3d>("pose") + cameraPose;
 
     this->camera->SetWorldPose(cameraPose);
-    this->camera->AttachToVisual(this->ParentId(), true);
+    this->camera->AttachToVisual(this->ParentId(), true, 0, 0);
 
     if (cameraSdf->HasElement("noise"))
     {
@@ -142,6 +147,11 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
   std::string lensTopicName = "~/";
   lensTopicName += this->ParentName() + "/" + this->Name() + "/lens/";
   boost::replace_all(lensTopicName, "::", "/");
+
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->TopicIgn(), opts);
 
   sdf::ElementPtr lensSdf =
     this->sdf->GetElement("camera")->GetElement("lens");

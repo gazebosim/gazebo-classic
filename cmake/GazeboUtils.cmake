@@ -137,10 +137,10 @@ macro (gz_setup_windows)
     add_definitions(-DBUILDING_STATIC_LIBS -DWIN32_LEAN_AND_MEAN)
 
     # Need for M_PI constant
-    add_definitions(-D_USE_MATH_DEFINES) 
+    add_definitions(-D_USE_MATH_DEFINES)
 
     # Don't pull in the Windows min/max macros
-    add_definitions(-DNOMINMAX) 
+    add_definitions(-DNOMINMAX)
 
     #use static libraries for FREEIMAGE
     add_definitions(-DFREEIMAGE_LIB)
@@ -148,20 +148,13 @@ macro (gz_setup_windows)
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
 
-    # And force linking to MSVC dynamic runtime
-    if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
-      add_definitions("/MDd")
-    else()
-      add_definitions("/MD")
-    endif()
-
     # And we want exceptions
     add_definitions("/EHsc")
 
     if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
       # Not need if proper cmake gnerator (-G "...Win64") is passed to cmake
       # Enable as a second measure to workaround over bug
-      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240 
+      # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
       set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
     endif()
 endmacro()
@@ -201,38 +194,47 @@ endmacro()
 # directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
 include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
-
-#################################################
-# Enable tests compilation by default
-if (NOT DEFINED ENABLE_TESTS_COMPILATION)
-  set (ENABLE_TESTS_COMPILATION True)
-endif()
-
-# Define testing macros as empty and redefine them if support is found and 
-# ENABLE_TESTS_COMPILATION is set to true
-macro (gz_build_tests)
-endmacro()
-macro (gz_build_qt_tests)
-endmacro()
-macro (gz_build_display_tests)
-endmacro()
-macro (gz_build_dri_tests)
-endmacro()
-
-if (ENABLE_TESTS_COMPILATION)
-  include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
-endif()
+include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
 
 #################################################
 # Macro to setup supported compiler flags
-# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST. 
+# Based on work of Florent Lamiraux, Thomas Moulard, JRL, CNRS/AIST.
 include(CheckCXXCompilerFlag)
 
-macro(filter_valid_compiler_flags) 
+macro(filter_valid_compiler_flags)
   foreach(flag ${ARGN})
     CHECK_CXX_COMPILER_FLAG(${flag} R${flag})
     if(${R${flag}})
       set(VALID_CXX_FLAGS "${VALID_CXX_FLAGS} ${flag}")
     endif()
   endforeach()
+endmacro()
+
+#####################################
+# Gnu Precompiled Headers
+if (CMAKE_COMPILER_IS_GNUCXX)
+  option(USE_PCH "compiles using gnu precompiled headers" OFF)
+endif()
+
+# target_name a target name for generating the PCH file
+# filename the name of the PCH file, relative to the dir of the CMakeLists calling the macro
+macro(add_pch target_name filename)
+
+  set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.out.gch)
+  set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
+  set(FLAGS -g -O2 -fPIC -x c++-header)
+
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS} ${ARGN}")
+
+  add_custom_command(OUTPUT ${pch_out}
+    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}
+    DEPENDS ${pch_in}
+    COMMENT "Generating precompiled header: ${pch_out}"
+    VERBATIM)
+
+  add_custom_target(${target_name}_pch DEPENDS ${pch_out})
+
+  target_compile_options(${target_name} PRIVATE -Winvalid-pch -include ${filename}.out)
+  add_dependencies(${target_name} ${target_name}_pch)
+
 endmacro()

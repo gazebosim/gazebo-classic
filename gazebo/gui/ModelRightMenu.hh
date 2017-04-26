@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/KeyEvent.hh"
 #include "gazebo/gui/qt.h"
@@ -89,8 +90,6 @@ namespace gazebo
       /// \brief QT callback when snap below has been selected.
       // private slots: void OnSnapBelow();
 
-      // private slots: void OnSkeleton();
-
       /// \brief Key release callback.
       /// \param[in] _event The key event.
       /// \return True if the key press was handled.
@@ -134,7 +133,6 @@ namespace gazebo
       /// \brief Action for snapping an object to another object below the
       /// first.
       // private: QAction *snapBelowAct;
-      // private: QAction *skeletonAct;
 
       /// \brief The various view states
       private: std::vector<ViewState*> viewStates;
@@ -178,6 +176,12 @@ namespace gazebo
 
       /// \brief QT callback for the QAction.
       public slots: void Callback();
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Node for communication.
+      private: ignition::transport::Node nodeIgn;
     };
   }
 }

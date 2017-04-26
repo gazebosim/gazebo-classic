@@ -46,13 +46,13 @@ void PhysicsThreadSafeTest::BlankWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // The following lines cause a seg-fault on revision 031749b
   // This test passes if it doesn't seg-fault.
-  math::Vector3 g = physics->GetGravity();
+  auto g = world->Gravity();
   physics->SetGravity(g);
 }
 
@@ -63,7 +63,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -73,7 +73,7 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   std::string modelName = "pendulum_0deg";
   std::string linkName = "lower_link";
 
-  physics::ModelPtr model = world->GetModel(modelName);
+  physics::ModelPtr model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink(linkName);
@@ -83,15 +83,16 @@ void PhysicsThreadSafeTest::LinkGet(const std::string &_physicsEngine)
   world->SetPaused(false);
 
   // Run for 5 seconds of sim time
-  while (world->GetSimTime().sec < 5)
+  while (world->SimTime().sec < 5)
   {
     // Call these functions repeatedly
     // Test passes if it doesn't abort early
-    math::Vector3 vel = link->GetWorldLinearVel();
-    vel += link->GetWorldLinearVel(math::Vector3());
-    vel += link->GetWorldLinearVel(math::Vector3(), math::Quaternion());
-    vel += link->GetWorldCoGLinearVel();
-    vel += link->GetWorldAngularVel();
+    ignition::math::Vector3d vel = link->WorldLinearVel();
+    vel += link->WorldLinearVel(ignition::math::Vector3d::Zero);
+    vel += link->WorldLinearVel(ignition::math::Vector3d::Zero,
+        ignition::math::Quaterniond::Identity);
+    vel += link->WorldCoGLinearVel();
+    vel += link->WorldAngularVel();
   }
 }
 

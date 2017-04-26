@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_MODEL_MAKER_HH_
-#define _GAZEBO_MODEL_MAKER_HH_
+#ifndef GAZEBO_GUI_MODELMAKER_HH_
+#define GAZEBO_GUI_MODELMAKER_HH_
 
 #include <list>
+#include <memory>
 #include <string>
 #include <sdf/sdf.hh>
 
@@ -85,6 +86,10 @@ namespace gazebo
 
       /// \brief Publish a factory message to create the entity.
       private: virtual void CreateTheEntity();
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<ModelMakerPrivate> dataPtr;
     };
   }
 }

@@ -161,6 +161,24 @@ TEST(ManTest, gztopic)
 }
 
 /////////////////////////////////////////////////
+TEST(ManTest, gzphysics)
+{
+  toolTest(::testing::UnitTest::GetInstance()->current_test_info()->name());
+}
+
+/////////////////////////////////////////////////
+TEST(ManTest, gzmodel)
+{
+  toolTest(::testing::UnitTest::GetInstance()->current_test_info()->name());
+}
+
+/////////////////////////////////////////////////
+TEST(ManTest, gzmarker)
+{
+  toolTest(::testing::UnitTest::GetInstance()->current_test_info()->name());
+}
+
+/////////////////////////////////////////////////
 TEST(ManTest, gz)
 {
   std::string command =

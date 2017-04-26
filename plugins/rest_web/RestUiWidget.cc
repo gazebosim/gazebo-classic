@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/GuiEvents.hh>
 #include <gazebo/gui/MainWindow.hh>
@@ -85,7 +87,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       // Connections
       this->connections.push_back(
           gui::Events::ConnectWindowMode(
-          boost::bind(&RestUiWidget::OnWindowMode, this, _1)));
+          std::bind(&RestUiWidget::OnWindowMode, this, std::placeholders::_1)));
     }
   }
   if (!this->toolbar)
@@ -161,7 +163,7 @@ void RestUiWidget::Update()
     this->msgRespQ.pop_front();
 
     // look for login error, and reenable the login menu if necessary
-    if (msg->type() == msgs::RestResponse::ERROR)
+    if (msg->type() == msgs::RestResponse::ERR)
     {
       this->loginMenuAction.setEnabled(true);
       this->logoutMenuAction.setEnabled(false);

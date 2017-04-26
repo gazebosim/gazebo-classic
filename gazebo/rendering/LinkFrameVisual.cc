@@ -63,14 +63,14 @@ void LinkFrameVisual::RecalculateScale()
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
   double linkSize = std::max(0.1,
-      dPtr->parent->GetBoundingBox().GetSize().GetLength());
+      dPtr->parent->BoundingBox().Size().Length());
   linkSize = std::min(linkSize, 1.0);
-  dPtr->scaleToLink = math::Vector3(linkSize * 0.7,
-                                    linkSize * 0.7,
-                                    linkSize * 0.7);
+  dPtr->scaleToLink = ignition::math::Vector3d(linkSize * 0.7,
+                                               linkSize * 0.7,
+                                               linkSize * 0.7);
 
   // Scale according to the link it is attached to
-  if (dPtr->scaleToLink != math::Vector3::Zero)
+  if (dPtr->scaleToLink != ignition::math::Vector3d::Zero)
     this->SetScale(dPtr->scaleToLink);
 }
 
@@ -96,5 +96,6 @@ bool LinkFrameVisual::GetHighlighted()
   LinkFrameVisualPrivate *dPtr =
       reinterpret_cast<LinkFrameVisualPrivate *>(this->dataPtr);
 
-  return math::equal(this->GetTransparency(), dPtr->highlightedTransp);
+  return ignition::math::equal(this->GetTransparency(),
+                               dPtr->highlightedTransp);
 }

@@ -36,7 +36,11 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
+
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // create a default link message
   gazebo::msgs::LinkPtr linkDefaultMsg;
@@ -52,20 +56,20 @@ TEST_F(COMVisual_TEST, COMVisualTest)
       new gazebo::rendering::COMVisual("_COM_VISUAL_", linkDefaultVis));
   comDefaultVis->Load(linkDefaultMsg);
 
-  EXPECT_EQ(comDefaultVis->GetInertiaPose().pos, math::Vector3::Zero);
-  EXPECT_EQ(comDefaultVis->GetInertiaPose().rot.GetAsEuler(),
-      math::Vector3::Zero);
+  EXPECT_EQ(comDefaultVis->InertiaPose().Pos(), ignition::math::Vector3d::Zero);
+  EXPECT_EQ(comDefaultVis->InertiaPose().Rot().Euler(),
+      ignition::math::Vector3d::Zero);
 
   // Create a message and set inertia pose
-  math::Vector3 pos(1, 0, -3);
-  math::Quaternion quat(M_PI/2, 0, -M_PI/5);
+  ignition::math::Vector3d pos(1, 0, -3);
+  ignition::math::Quaterniond quat(IGN_PI/2, 0, -IGN_PI/5);
 
   gazebo::msgs::Link linkMsg;
   linkMsg.set_name("link");
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_position(),
-      pos.Ign());
+      pos);
   msgs::Set(linkMsg.mutable_inertial()->mutable_pose()->mutable_orientation(),
-      quat.Ign());
+      quat);
 
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
@@ -77,8 +81,15 @@ TEST_F(COMVisual_TEST, COMVisualTest)
       new gazebo::rendering::COMVisual("_COM_VISUAL_", linkVis));
   comVis->Load(msgs::LinkToSDF(linkMsg));
 
-  EXPECT_EQ(comVis->GetInertiaPose().pos, pos);
-  EXPECT_EQ(comVis->GetInertiaPose().rot, quat);
+  EXPECT_EQ(comVis->InertiaPose().Pos(), pos);
+  EXPECT_EQ(comVis->InertiaPose().Rot(), quat);
+
+  // test destroying the visual
+  comVis->Fini();
+  EXPECT_EQ(comVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

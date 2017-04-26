@@ -15,12 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_LIGHTMAKER_HH_
-#define _GAZEBO_LIGHTMAKER_HH_
+#ifndef GAZEBO_GUI_LIGHTMAKER_HH_
+#define GAZEBO_GUI_LIGHTMAKER_HH_
 
+#include <memory>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/msgs/msgs.hh"
+#include "gazebo/msgs/light.pb.h"
 #include "gazebo/gui/EntityMaker.hh"
 
 namespace gazebo
@@ -34,6 +36,9 @@ namespace gazebo
     {
       /// \brief Constructor
       public: LightMaker();
+
+      /// \brief Destructor
+      public: virtual ~LightMaker();
 
       // Documentation inherited
       public: void Start();
@@ -59,6 +64,16 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void CreateTheEntity();
+
+      /// \brief Message that holds all the light information.
+      protected: msgs::Light msg;
+
+      /// \brief Type of the light being spawned.
+      protected: std::string lightTypename;
+
+      /// \internal
+      /// \brief Pointer to private data.
+      private: std::unique_ptr<LightMakerPrivate> dataPtr;
     };
 
     /// \brief Used to insert a new point light into the scene.

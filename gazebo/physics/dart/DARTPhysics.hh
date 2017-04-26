@@ -127,7 +127,7 @@ namespace gazebo
                                            CollisionPtr _collision);
 
       // Documentation inherited
-      public: virtual void SetGravity(const gazebo::math::Vector3 &_gravity);
+      public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
 
       // Documentation inherited
       public: virtual void DebugPrint() const;
@@ -145,7 +145,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this DART Physics.
       /// \return The pointer to DART World.
-      public: dart::simulation::World *GetDARTWorld();
+      public: dart::simulation::WorldPtr DARTWorld() const;
 
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
@@ -161,7 +161,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: DARTPhysicsPrivate *dataPtr;
+      private: DARTPhysicsPrivate *dataPtr = nullptr;
     };
 
   /// \}

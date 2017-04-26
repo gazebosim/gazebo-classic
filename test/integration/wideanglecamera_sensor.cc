@@ -37,10 +37,10 @@ std::string pixelFormat = "";
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int *_imageCounter, unsigned char *_imageDest,
-                  const unsigned char *_image,
-                  unsigned int _width, unsigned int _height,
-                  unsigned int _depth,
-                  const std::string &_format)
+                      const unsigned char *_image,
+                      unsigned int _width, unsigned int _height,
+                      unsigned int _depth,
+                      const std::string &_format)
 {
   std::lock_guard<std::mutex> lock(mutex);
   pixelFormat = _format;

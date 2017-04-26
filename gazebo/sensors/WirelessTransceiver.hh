@@ -56,17 +56,7 @@ namespace gazebo
 
       /// \brief Returns the antenna's gain of the receiver (dBi).
       /// \return Antenna's gain of the receiver (dBi).
-      /// \deprecated See Gain()
-      public: double GetGain() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns the antenna's gain of the receiver (dBi).
-      /// \return Antenna's gain of the receiver (dBi).
       public: double Gain() const;
-
-      /// \brief Returns the receiver power (dBm).
-      /// \return Receiver power (dBm).
-      /// \deprecated See Power()
-      public: double GetPower() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Returns the receiver power (dBm).
       /// \return Receiver power (dBm).

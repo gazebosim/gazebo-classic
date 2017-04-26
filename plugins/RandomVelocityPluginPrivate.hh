@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_RANDOMVELOCITY_PLUGIN_PRIVATE_HH_
-#define _GAZEBO_RANDOMVELOCITY_PLUGIN_PRIVATE_HH_
+#ifndef GAZEBO_PLUGINS_RANDOMVELOCITYPLUGINPRIVATE_HH_
+#define GAZEBO_PLUGINS_RANDOMVELOCITYPLUGINPRIVATE_HH_
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
@@ -32,9 +32,9 @@ namespace gazebo
     public: RandomVelocityPluginPrivate()
             : velocityFactor(1.0),
               updatePeriod(10, 0),
-              xRange(-IGN_DBL_MAX, IGN_DBL_MAX),
-              yRange(-IGN_DBL_MAX, IGN_DBL_MAX),
-              zRange(-IGN_DBL_MAX, IGN_DBL_MAX)
+              xRange(-ignition::math::MAX_D, ignition::math::MAX_D),
+              yRange(-ignition::math::MAX_D, ignition::math::MAX_D),
+              zRange(-ignition::math::MAX_D, ignition::math::MAX_D)
             {
             }
 

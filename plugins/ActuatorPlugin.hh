@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_ACTUATOR_PLUGIN_
-#define _GAZEBO_ACTUATOR_PLUGIN_
+#ifndef GAZEBO_PLUGINS_ACTUATORPLUGIN_
+#define GAZEBO_PLUGINS_ACTUATORPLUGIN_
 
+#include <functional>
 #include <vector>
 #include <string>
 #include <gazebo/common/Events.hh>
@@ -76,7 +77,7 @@ namespace gazebo
     /// \param[in] float2 Input torque.
     /// \param[in] ActuatorProperties Static properties of this actuator
     /// \return Torque according to the model.
-    public: boost::function<float (float, float, const ActuatorProperties&)>
+    public: std::function<float (float, float, const ActuatorProperties&)>
               modelFunction;
   };
 

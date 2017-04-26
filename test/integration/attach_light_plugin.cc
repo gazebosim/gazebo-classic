@@ -39,7 +39,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
 
   // Get the double pendulum model
   physics::ModelPtr pendulumModel =
-      world->GetModel("double_pendulum_with_lights");
+      world->ModelByName("double_pendulum_with_lights");
   ASSERT_TRUE(pendulumModel != nullptr);
 
   // Get the links
@@ -51,23 +51,23 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   ASSERT_TRUE(lowerLink != nullptr);
 
   // Get the lights
-  physics::LightPtr pointLight = world->Light("point");
+  physics::LightPtr pointLight = world->LightByName("point");
   ASSERT_TRUE(pointLight != nullptr);
-  physics::LightPtr pointLight2 = world->Light("point2");
+  physics::LightPtr pointLight2 = world->LightByName("point2");
   ASSERT_TRUE(pointLight2 != nullptr);
-  physics::LightPtr spotLight = world->Light("spot");
+  physics::LightPtr spotLight = world->LightByName("spot");
   ASSERT_TRUE(spotLight != nullptr);
 
   // step the world
   world->Step(1);
 
   // Get the initial light pose offset relative to link
-  ignition::math::Pose3d pointLightPose = pointLight->GetWorldPose().Ign() -
-      upperLink->GetWorldPose().Ign();
-  ignition::math::Pose3d pointLight2Pose = pointLight2->GetWorldPose().Ign() -
-      upperLink->GetWorldPose().Ign();
-  ignition::math::Pose3d spotLightPose = spotLight->GetWorldPose().Ign() -
-      lowerLink->GetWorldPose().Ign();
+  ignition::math::Pose3d pointLightPose = pointLight->WorldPose() -
+      upperLink->WorldPose();
+  ignition::math::Pose3d pointLight2Pose = pointLight2->WorldPose() -
+      upperLink->WorldPose();
+  ignition::math::Pose3d spotLightPose = spotLight->WorldPose() -
+      lowerLink->WorldPose();
 
   // verify light pose against link pose.
   // NOTE: there seem to be race condition when verifying pose using
@@ -76,12 +76,12 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   int iteration = 0;
   auto verifyPose = [&]()
   {
-    ignition::math::Pose3d upperLinkPose = upperLink->GetWorldPose().Ign();
-    ignition::math::Pose3d lowerLinkPose = lowerLink->GetWorldPose().Ign();
+    ignition::math::Pose3d upperLinkPose = upperLink->WorldPose();
+    ignition::math::Pose3d lowerLinkPose = lowerLink->WorldPose();
 
-    EXPECT_EQ(pointLight->GetWorldPose(), pointLightPose + upperLinkPose);
-    EXPECT_EQ(pointLight2->GetWorldPose(), pointLight2Pose + upperLinkPose);
-    EXPECT_EQ(spotLight->GetWorldPose(), spotLightPose + lowerLinkPose);
+    EXPECT_EQ(pointLight->WorldPose(), pointLightPose + upperLinkPose);
+    EXPECT_EQ(pointLight2->WorldPose(), pointLight2Pose + upperLinkPose);
+    EXPECT_EQ(spotLight->WorldPose(), spotLightPose + lowerLinkPose);
     iteration++;
   };
   auto connection = event::Events::ConnectWorldUpdateEnd(std::bind(verifyPose));

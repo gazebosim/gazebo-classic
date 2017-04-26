@@ -22,9 +22,7 @@
 #ifndef _ODECOLLISION_HH_
 #define _ODECOLLISION_HH_
 
-#include "ode/ode.h"
-
-#include "gazebo/common/CommonTypes.hh"
+#include "gazebo/physics/ode/ode_inc.h"
 
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Collision.hh"
@@ -54,7 +52,7 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
-      /// \brief Set the encapsulated collsion object.
+      /// \brief Set the encapsulated collision object.
       /// \param[in] _collisionId ODE id of the collision object.
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(dGeomID _collisionId, bool _placeable);
@@ -77,7 +75,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int bits);
 
       // Documentation inherited.
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Get the collision's space ID
       /// \return The collision's space ID

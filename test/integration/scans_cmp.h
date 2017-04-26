@@ -27,7 +27,8 @@
     #define MAYBE_UNUSED
 #endif
 
-double inf = GZ_DBL_INF;
+#include <ignition/math/Helpers.hh>
+double inf = ignition::math::INF_D;
 
 static double __box_scan[] = {
   inf,           inf,           inf,           inf,           inf,

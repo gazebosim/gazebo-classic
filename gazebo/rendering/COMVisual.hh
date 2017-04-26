@@ -14,13 +14,12 @@
  * limitations under the License.
  *
 */
-
-#ifndef _COMVISUAL_HH_
-#define _COMVISUAL_HH_
+#ifndef GAZEBO_RENDERING_COMVISUAL_HH_
+#define GAZEBO_RENDERING_COMVISUAL_HH_
 
 #include <string>
+#include <ignition/math/Pose3.hh>
 
-#include "gazebo/math/Pose.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -43,9 +42,6 @@ namespace gazebo
       /// \brief Destructor
       public: ~COMVisual();
 
-      // Inherited from parent class
-      public: virtual void Fini();
-
       /// \brief Load the Visual from an SDF pointer
       /// \param[in] _elem SDF Element pointer
       public: virtual void Load(sdf::ElementPtr _elem);
@@ -57,15 +53,10 @@ namespace gazebo
 
       /// \brief Get inertia pose.
       /// \return Inertia pose in link frame.
-      public: math::Pose GetInertiaPose() const;
+      public: ignition::math::Pose3d InertiaPose() const;
 
       /// \brief Load using previously set member variables.
       private: void Load();
-
-      /// \brief Destroy all the movable objects attached to a scene node.
-      /// \param[in] _sceneNode Pointer to the scene node to process.
-      private: void DestroyAllAttachedMovableObjects(
-                        Ogre::SceneNode *_sceneNode);
     };
     /// \}
   }

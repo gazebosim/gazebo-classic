@@ -68,7 +68,7 @@ TEST_F(SensorManager_TEST, Data)
   EXPECT_EQ(sensors.size(), sensorCount);
 
   // Get the current simulation time
-  common::Time time = physics::get_world()->GetSimTime();
+  common::Time time = physics::get_world()->SimTime();
 
   // Wait for 1 second
   for (unsigned int i = 0; i < 10; ++i)
@@ -79,19 +79,19 @@ TEST_F(SensorManager_TEST, Data)
   // Get each sensor, and make sure that it has been updated
   {
     sensor = mgr->GetSensor("default::camera_1::link::camera");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::camera_2::link::camera");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_1::link::laser");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
 
     sensor = mgr->GetSensor("default::laser_2::link::laser");
-    ASSERT_TRUE(sensor != NULL);
+    ASSERT_TRUE(sensor != nullptr);
     EXPECT_TRUE(sensor->LastMeasurementTime() > time);
   }
 }

@@ -22,81 +22,56 @@ using namespace gazebo;
 using namespace event;
 
 //////////////////////////////////////////////////
-EventPrivate::EventPrivate()
-  : signaled(false)
-{
-}
-
-//////////////////////////////////////////////////
 Event::Event()
-  : dataPtr(new EventPrivate())
-{
-}
-
-//////////////////////////////////////////////////
-Event::Event(EventPrivate &_d)
-  : dataPtr(&_d)
+  : signaled(false)
 {
 }
 
 //////////////////////////////////////////////////
 Event::~Event()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 //////////////////////////////////////////////////
-bool Event::GetSignaled() const
+bool Event::Signaled() const
 {
-  return this->dataPtr->signaled;
+  return this->signaled;
 }
 
 //////////////////////////////////////////////////
-ConnectionPrivate::ConnectionPrivate()
-  : event(NULL), id(-1)
+void Event::SetSignaled(const bool _sig)
 {
+  this->signaled = _sig;
 }
 
 //////////////////////////////////////////////////
-ConnectionPrivate::ConnectionPrivate(Event *_e, int _i)
+Connection::Connection(Event *_e, const int _i)
   : event(_e), id(_i)
 {
-}
-
-//////////////////////////////////////////////////
-Connection::Connection()
-  : dataPtr(new ConnectionPrivate())
-{
-}
-
-//////////////////////////////////////////////////
-Connection::Connection(Event *_e, int _i)
-  : dataPtr(new ConnectionPrivate(_e, _i))
-{
-  this->dataPtr->creationTime = common::Time::GetWallTime();
+  this->creationTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  common::Time diffTime = common::Time::GetWallTime() -
-    this->dataPtr->creationTime;
-  if ((this->dataPtr->event && !this->dataPtr->event->GetSignaled()) &&
+  common::Time diffTime = common::Time::GetWallTime() - this->creationTime;
+  if ((this->event && !this->event->Signaled()) &&
       diffTime < common::Time(0, 10000))
-    gzwarn << "Warning: Deleteing a connection right after creation. "
-          << "Make sure to save the ConnectionPtr from a Connect call\n";
-
-  if (this->dataPtr->event && this->dataPtr->id >= 0)
   {
-    this->dataPtr->event->Disconnect(this->dataPtr->id);
-    this->dataPtr->id = -1;
-    this->dataPtr->event = NULL;
+    gzwarn << "Warning: Deleting a connection right after creation. "
+          << "Make sure to save the ConnectionPtr from a Connect call\n";
+  }
+
+  if (this->event && this->id >= 0)
+  {
+    this->event->Disconnect(this->id);
+    this->id = -1;
+    this->event = nullptr;
   }
 }
 
 //////////////////////////////////////////////////
-int Connection::GetId() const
+int Connection::Id() const
 {
-  return this->dataPtr->id;
+  return this->id;
 }

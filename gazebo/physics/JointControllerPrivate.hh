@@ -21,8 +21,8 @@
 #include <map>
 
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/PID.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 
 namespace gazebo

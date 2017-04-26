@@ -1,0 +1,32 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Atmosphere
+/// \brief A message containing a description of the global atmosphere properties
+
+
+message Atmosphere
+{
+  /// \brief Types of atmosphere models.
+  enum Type
+  {
+    /// \brief Adiabatic atmosphere model.
+    ADIABATIC = 1;
+  }
+
+  /// \brief Type of the atmosphere model.
+  optional Type type                         = 1[default=ADIABATIC];
+
+  /// \brief Temperature at sea level in kelvins.
+  optional double temperature                = 2;
+
+  /// \brief Pressure at sea level in pascals.
+  optional double pressure                   = 3;
+
+  /// \brief Mass density of the air at sea level in kg/m^3.
+  optional double mass_density               = 4;
+
+  /// \brief Enable atmosphere model
+  optional bool enable_atmosphere            = 5;
+}

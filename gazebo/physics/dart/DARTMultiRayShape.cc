@@ -31,7 +31,7 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
+DARTMultiRayShape::DARTMultiRayShape(DARTCollisionPtr _parent)
   : MultiRayShape(_parent),
     dataPtr(new DARTMultiRayShapePrivate())
 {
@@ -42,6 +42,7 @@ DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
 DARTMultiRayShape::~DARTMultiRayShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -55,8 +56,8 @@ void DARTMultiRayShape::UpdateRays()
 }
 
 //////////////////////////////////////////////////
-void DARTMultiRayShape::AddRay(const math::Vector3& _start,
-                               const math::Vector3& _end)
+void DARTMultiRayShape::AddRay(const ignition::math::Vector3d &_start,
+                               const ignition::math::Vector3d &_end)
 {
   MultiRayShape::AddRay(_start, _end);
 

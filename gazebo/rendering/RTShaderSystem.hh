@@ -73,9 +73,6 @@ namespace gazebo
       /// \brief Finalize the shader system
       public: void Fini();
 
-      /// \brief Clear the shader system
-      public: void Clear() GAZEBO_DEPRECATED(7.0);
-
       /// \brief Add a scene manager
       /// \param[in] _scene The scene to process
       public: void AddScene(ScenePtr _scene);
@@ -90,18 +87,6 @@ namespace gazebo
 
       /// \brief Queue a call to update the shaders.
       public: void UpdateShaders();
-
-      /// \brief Set an Ogre::Entity to use RT shaders.
-      /// \param[in] _vis Visual that will use the RTShaderSystem.
-      /// \deprecated This function is no longer needed, and has no
-      /// implementation.
-      public: void AttachEntity(Visual *vis) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Remove and entity.
-      /// \param[in] _vis Remove this visual.
-      /// \deprecated This function is no longer needed, and has no
-      /// implementation.
-      public: void DetachEntity(Visual *_vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Set a viewport to use shaders.
       /// \param[in] _viewport The viewport to add.
@@ -118,11 +103,6 @@ namespace gazebo
       /// \brief Set the lighting model to per pixel or per vertex.
       /// \param[in] _set True means to use per-pixel shaders.
       public: void SetPerPixelLighting(bool _set);
-
-      /// \brief Generate shaders for an entity
-      /// \param[in] _vis The visual to generate shaders for.
-      /// \sa GenerateShaders(const VisualPtr &_vis)
-      public: void GenerateShaders(Visual *_vis) GAZEBO_DEPRECATED(7.0);
 
       /// \brief Generate shaders for an entity
       /// \param[in] _vis The visual to generate shaders for.

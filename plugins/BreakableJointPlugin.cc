@@ -14,14 +14,17 @@
  * limitations under the License.
  *
 */
+
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+
 #include "gazebo/physics/PhysicsIface.hh"
-#include "BreakableJointPlugin.hh"
+#include "plugins/BreakableJointPlugin.hh"
 
 using namespace gazebo;
 
@@ -37,13 +40,27 @@ BreakableJointPlugin::BreakableJointPlugin()
 /////////////////////////////////////////////////
 BreakableJointPlugin::~BreakableJointPlugin()
 {
+  this->connection.reset();
+  this->parentSensor.reset();
 }
 
 /////////////////////////////////////////////////
 void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
     sdf::ElementPtr _sdf)
 {
-  ForceTorquePlugin::Load(_parent, _sdf);
+  this->parentSensor =
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(_parent);
+
+  if (!this->parentSensor)
+  {
+    gzerr << "BreakableJointPlugin requires a "
+      << "force_torque sensor as its parent.\n";
+    return;
+  }
+
+  this->connection = this->parentSensor->ConnectUpdate(
+      std::bind(&BreakableJointPlugin::OnUpdate,
+        this, std::placeholders::_1));
 
   std::string paramName = "breaking_force_N";
   if (_sdf->HasElement(paramName))
@@ -61,7 +78,7 @@ void BreakableJointPlugin::OnUpdate(msgs::WrenchStamped _msg)
     if (force.Length() > this->breakingForce)
     {
       this->worldConnection = event::Events::ConnectWorldUpdateBegin(
-        boost::bind(&BreakableJointPlugin::OnWorldUpdate, this));
+        std::bind(&BreakableJointPlugin::OnWorldUpdate, this));
     }
   }
 }
@@ -72,5 +89,5 @@ void BreakableJointPlugin::OnWorldUpdate()
   this->parentSensor->SetActive(false);
   this->parentJoint->Detach();
   this->parentJoint->SetProvideFeedback(false);
-  event::Events::DisconnectWorldUpdateBegin(this->worldConnection);
+  this->worldConnection.reset();
 }

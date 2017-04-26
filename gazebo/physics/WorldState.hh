@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef _WORLDSTATE_HH_
-#define _WORLDSTATE_HH_
+#ifndef GAZEBO_PHYSICS_WORLDSTATE_HH_
+#define GAZEBO_PHYSICS_WORLDSTATE_HH_
 
 #include <string>
 #include <vector>

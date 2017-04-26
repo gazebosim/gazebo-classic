@@ -21,6 +21,9 @@
 #include <linux/input.h>
 #include <linux/types.h>
 #include <cstring>
+#include <string>
+#include <functional>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/HydraPlugin.hh"
@@ -86,15 +89,15 @@ RazerHydra::RazerHydra()
     v = 0;
 
   // magic number for 50% mix at each step
-  this->periodEstimate.SetFc(0.11, 1.0);
+  this->periodEstimate.Fc(0.11, 1.0);
 
-  this->periodEstimate.SetValue(0.004);
+  this->periodEstimate.Set(0.004);
 }
 
 /////////////////////////////////////////////////
 RazerHydra::~RazerHydra()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->updateConnection.reset();
 
   this->stop = true;
   if (this->pollThread)
@@ -122,7 +125,7 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
       while (std::getline(fileIn, line) && device.empty())
       {
         if (line.find("HID_NAME=Razer Razer Hydra") != std::string::npos)
-          device = "/dev/hidraw" + boost::lexical_cast<std::string>(i);
+          device = "/dev/hidraw" + std::to_string(i);
       }
     }
   }
@@ -179,34 +182,38 @@ void RazerHydra::Load(physics::WorldPtr _world, sdf::ElementPtr /*_sdf*/)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RazerHydra::Update, this, _1));
+      std::bind(&RazerHydra::Update, this));
 
-  this->pollThread = new boost::thread(boost::bind(&RazerHydra::Run, this));
+  this->pollThread = new std::thread(std::bind(&RazerHydra::Run, this));
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(_world->GetName());
+  this->node->Init(_world->Name());
   this->pub = this->node->Advertise<msgs::Hydra>("~/hydra");
 }
 
 /////////////////////////////////////////////////
-void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
+void RazerHydra::Update()
 {
-  boost::mutex::scoped_lock lock(this->mutex);
-  math::Pose origRight(this->pos[1], this->quat[1]);
+  std::lock_guard<std::mutex> lock(this->mutex);
+  ignition::math::Pose3d origRight(this->pos[1], this->quat[1]);
 
-  math::Pose pivotRight = origRight;
-  math::Pose grabRight = origRight;
+  ignition::math::Pose3d pivotRight = origRight;
+  ignition::math::Pose3d grabRight = origRight;
 
-  pivotRight.pos += origRight.rot * math::Vector3(-0.04, 0, 0);
-  grabRight.pos += origRight.rot * math::Vector3(-0.12, 0, 0);
+  pivotRight.Pos() +=
+      origRight.Rot() * ignition::math::Vector3d(-0.04, 0, 0);
+  grabRight.Pos() +=
+      origRight.Rot() * ignition::math::Vector3d(-0.12, 0, 0);
 
-  math::Pose origLeft(this->pos[0], this->quat[0]);
+  ignition::math::Pose3d origLeft(this->pos[0], this->quat[0]);
 
-  math::Pose pivotLeft = origLeft;
-  math::Pose grabLeft = origLeft;
+  ignition::math::Pose3d pivotLeft = origLeft;
+  ignition::math::Pose3d grabLeft = origLeft;
 
-  pivotLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.04, 0, 0));
-  grabLeft.pos += origLeft.rot.RotateVector(math::Vector3(-0.12, 0, 0));
+  pivotLeft.Pos() +=
+      origLeft.Rot().RotateVector(ignition::math::Vector3d(-0.04, 0, 0));
+  grabLeft.Pos() +=
+      origLeft.Rot().RotateVector(ignition::math::Vector3d(-0.12, 0, 0));
 
   msgs::Hydra msg;
   msgs::Hydra::Paddle *rightPaddle = msg.mutable_right();
@@ -243,8 +250,8 @@ void RazerHydra::Update(const common::UpdateInfo & /*_info*/)
   rightPaddle->set_button_center(this->buttons[12]);
   rightPaddle->set_button_joy(this->buttons[13]);
 
-  msgs::Set(rightPaddle->mutable_pose(), grabRight.Ign());
-  msgs::Set(leftPaddle->mutable_pose(), grabLeft.Ign());
+  msgs::Set(rightPaddle->mutable_pose(), grabRight);
+  msgs::Set(leftPaddle->mutable_pose(), grabLeft);
 
   this->pub->Publish(msg);
 }
@@ -318,13 +325,13 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
     firstTime = false;
 
   // Update filter frequencies
-  float fs = 1.0 / this->periodEstimate.GetValue();
+  float fs = 1.0 / this->periodEstimate.Value();
   float fc = _lowPassCornerHz;
 
   for (int i = 0; i < 2; ++i)
   {
-    this->filterPos[i].SetFc(fc, fs);
-    this->filterQuat[i].SetFc(fc, fs);
+    this->filterPos[i].Fc(fc, fs);
+    this->filterQuat[i].Fc(fc, fs);
   }
 
   // Read data
@@ -352,18 +359,18 @@ bool RazerHydra::Poll(float _lowPassCornerHz)
   this->rawAnalog[4] = *(reinterpret_cast<int16_t *>(buf+47));
   this->rawAnalog[5] = buf[49];
 
-  boost::mutex::scoped_lock lock(this->mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   // Put the raw position and orientation into Gazebo coordinate frame
   for (int i = 0; i < 2; ++i)
   {
-    this->pos[i].x = -this->rawPos[3*i+1] * 0.001;
-    this->pos[i].y = -this->rawPos[3*i+0] * 0.001;
-    this->pos[i].z = -this->rawPos[3*i+2] * 0.001;
+    this->pos[i].X(-this->rawPos[3*i+1] * 0.001);
+    this->pos[i].Y(-this->rawPos[3*i+0] * 0.001);
+    this->pos[i].Z(-this->rawPos[3*i+2] * 0.001);
 
-    this->quat[i].w = this->rawQuat[i*4+0] / 32768.0;
-    this->quat[i].x = -this->rawQuat[i*4+2] / 32768.0;
-    this->quat[i].y = -this->rawQuat[i*4+1] / 32768.0;
-    this->quat[i].z = -this->rawQuat[i*4+3] / 32768.0;
+    this->quat[i].W(this->rawQuat[i*4+0] / 32768.0);
+    this->quat[i].X(-this->rawQuat[i*4+2] / 32768.0);
+    this->quat[i].Y(-this->rawQuat[i*4+1] / 32768.0);
+    this->quat[i].Z(-this->rawQuat[i*4+3] / 32768.0);
   }
 
   // Apply filters

@@ -62,7 +62,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 
   this->pub = this->node->Advertise<msgs::WirelessNodes>(
       this->Topic(), 30);
-  GZ_ASSERT(this->pub != NULL,
+  GZ_ASSERT(this->pub != nullptr,
       "wirelessReceiverSensor did not get a valid publisher pointer");
 
   sdf::ElementPtr transceiverElem =
@@ -113,8 +113,7 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
   double rxPower;
   double txFreq;
 
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose + this->parentEntity.lock()->WorldPose();
 
   ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();
@@ -154,33 +153,15 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetMinFreqFiltered() const
-{
-  return this->MinFreqFiltered();
-}
-
-/////////////////////////////////////////////////
 double WirelessReceiver::MinFreqFiltered() const
 {
   return this->dataPtr->minFreq;
 }
 
 /////////////////////////////////////////////////
-double WirelessReceiver::GetMaxFreqFiltered() const
-{
-  return this->MaxFreqFiltered();
-}
-
-/////////////////////////////////////////////////
 double WirelessReceiver::MaxFreqFiltered() const
 {
   return this->dataPtr->maxFreq;
-}
-
-/////////////////////////////////////////////////
-double WirelessReceiver::GetSensitivity() const
-{
-  return this->Sensitivity();
 }
 
 /////////////////////////////////////////////////

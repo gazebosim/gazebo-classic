@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"
@@ -27,7 +26,6 @@ using namespace physics;
 PolylineShape::PolylineShape(CollisionPtr _parent) : Shape(_parent)
 {
   this->AddType(Base::POLYLINE_SHAPE);
-  this->scale = math::Vector3::One;
   sdf::initFile("polyline_shape.sdf", this->sdf);
 }
 
@@ -96,9 +94,9 @@ double PolylineShape::GetHeight() const
 }
 
 //////////////////////////////////////////////////
-void PolylineShape::SetScale(const math::Vector3 &_scale)
+void PolylineShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)

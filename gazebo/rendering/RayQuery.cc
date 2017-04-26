@@ -15,14 +15,19 @@
  *
 */
 
-#include "gazebo/common/MeshManager.hh"
-#include "gazebo/rendering/Visual.hh"
+#include <ignition/math/Triangle.hh>
+#include <ignition/math/Vector3.hh>
 
-#include "gazebo/rendering/Conversions.hh"
-#include "gazebo/rendering/Scene.hh"
+#include "gazebo/common/MeshManager.hh"
+
 #include "gazebo/rendering/Camera.hh"
+#include "gazebo/rendering/UserCamera.hh"
+#include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/RayQueryPrivate.hh"
 #include "gazebo/rendering/RayQuery.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 
 using namespace gazebo;
 using namespace rendering;
@@ -37,23 +42,28 @@ RayQuery::RayQuery(CameraPtr _camera)
 /////////////////////////////////////////////////
 RayQuery::~RayQuery()
 {
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
-bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
-    math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
+bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
+    const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
+    ignition::math::Triangle3d &_triangle) const
 {
+  auto cam = boost::dynamic_pointer_cast<UserCamera>(this->dataPtr->camera);
+  double ratio = 1;
+  if (cam)
+    ratio = cam->DevicePixelRatio();
+
+  double x = _x * ratio;
+  double y = _y * ratio;
   // create the ray to test
   Ogre::Ray ray =
       this->dataPtr->camera->OgreCamera()->getCameraToViewportRay(
-      static_cast<float>(_x) / this->dataPtr->camera->ViewportWidth(),
-      static_cast<float>(_y) / this->dataPtr->camera->ViewportHeight());
+      static_cast<float>(x) / this->dataPtr->camera->ViewportWidth(),
+      static_cast<float>(y) / this->dataPtr->camera->ViewportHeight());
 
   std::vector<rendering::VisualPtr> visuals;
-  this->GetMeshVisuals(_visual, visuals);
-
+  this->MeshVisuals(_visual, visuals);
 
   Ogre::Real closestDistance = -1.0f;
   Ogre::Vector3 closestResult;
@@ -117,11 +127,11 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
   if (closestDistance >= 0.0f && vertices.size() == 3u)
   {
     // raycast success
-    _intersect = Conversions::Convert(closestResult);
-    _vertices.clear();
-    _vertices.push_back(Conversions::Convert(vertices[0]));
-    _vertices.push_back(Conversions::Convert(vertices[1]));
-    _vertices.push_back(Conversions::Convert(vertices[2]));
+    _intersect = Conversions::ConvertIgn(closestResult);
+    _triangle.Set(
+        Conversions::ConvertIgn(vertices[0]),
+        Conversions::ConvertIgn(vertices[1]),
+        Conversions::ConvertIgn(vertices[2]));
     return true;
   }
   // raycast failed
@@ -129,12 +139,13 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
 }
 
 /////////////////////////////////////////////////
-void RayQuery::GetMeshVisuals(rendering::VisualPtr _visual,
-    std::vector<rendering::VisualPtr> &_visuals)
+void RayQuery::MeshVisuals(const rendering::VisualPtr _visual,
+    std::vector<rendering::VisualPtr> &_visuals) const
 {
-  if (_visual->GetMeshName() != "")
+  if (!_visual->GetMeshName().empty() &&
+      (_visual->GetVisibilityFlags() & GZ_VISIBILITY_SELECTABLE))
     _visuals.push_back(_visual);
 
   for (unsigned int i = 0; i < _visual->GetChildCount(); ++i)
-    this->GetMeshVisuals(_visual->GetChild(i), _visuals);
+    this->MeshVisuals(_visual->GetChild(i), _visuals);
 }

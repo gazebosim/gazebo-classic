@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
-#define _GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
+#ifndef GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
+#define GAZEBO_SENSORS_SENSOR_PRIVATE_HH_
 
 #include <mutex>
 #include <sdf/sdf.hh>

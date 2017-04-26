@@ -42,7 +42,7 @@ TEST_F(ImageTest, Image)
   EXPECT_TRUE(img.GetFilename().find("materials/textures/wood.jpg") !=
       std::string::npos);
 
-  unsigned char *data = NULL;
+  unsigned char *data = nullptr;
   unsigned int size = 0;
   img.GetData(&data, size);
   EXPECT_EQ(static_cast<unsigned int>(489552), size);

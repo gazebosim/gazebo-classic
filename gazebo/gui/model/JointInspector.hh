@@ -145,6 +145,10 @@ namespace gazebo
       /// \return True if all values are valid.
       private: bool CheckValid();
 
+      /// \brief Qt close event
+      /// \param[in] _event Qt close event pointer
+      private: void closeEvent(QCloseEvent *_event);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<JointInspectorPrivate> dataPtr;

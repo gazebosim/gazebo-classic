@@ -1,0 +1,29 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface GPSSensor
+/// \brief Information about a GPS sensor element
+
+import "sensor_noise.proto";
+
+message GPSSensor
+{
+  /// \brief Sensing information
+  message Sensing
+  {
+    /// \brief Horizontal noise
+    optional SensorNoise horizontal_noise = 1;
+
+    /// \brief Vertical noise
+    optional SensorNoise vertical_noise   = 2;
+  }
+
+  /// \brief Position sensing. Consists of horizontal and vertical noise
+  /// properties
+  optional Sensing position = 1;
+
+  /// \brief Velocity sensing. Consists of horizontal and vertical noise
+  /// properties
+  optional Sensing velocity = 2;
+}

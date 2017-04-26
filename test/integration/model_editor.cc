@@ -78,6 +78,8 @@ void ModelEditorTest::EditModel()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Make sure we have the tmp box visual in model editor
+  QVERIFY(scene->VisualCount() > visualCount);
+
   gazebo::rendering::VisualPtr editorBoxLink =
       scene->GetVisual("ModelPreview_1::link");
   QVERIFY(editorBoxLink != nullptr);
@@ -145,7 +147,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
 
   // Insert another link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_BOX);
@@ -159,7 +161,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(box->GetWorldPose() == boxPose);
+  QVERIFY(box->WorldPose() == boxPose);
 
   // Add a revolute joint
   gazebo::gui::JointMaker *jointMaker = modelCreator->JointMaker();
@@ -171,7 +173,7 @@ void ModelEditorTest::SaveModelPose()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // Save all changes
@@ -182,9 +184,9 @@ void ModelEditorTest::SaveModelPose()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify pose again
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
-  QVERIFY(box->GetWorldPose() == boxPose);
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
+  QVERIFY(box->WorldPose() == boxPose);
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;
@@ -237,7 +239,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(cylinder->GetWorldPose() == cylinderPose);
+  QVERIFY(cylinder->WorldPose() == cylinderPose);
 
   // add a sphere link
   modelCreator->AddShape(gazebo::gui::ModelCreator::ENTITY_SPHERE);
@@ -251,7 +253,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(sphere->GetWorldPose() == spherePose);
+  QVERIFY(sphere->WorldPose() == spherePose);
 
   // a box nested model
   double mass = 1.0;
@@ -276,7 +278,7 @@ void ModelEditorTest::JointInspectorUpdate()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(boxModelVis->GetWorldPose() == boxPose);
+  QVERIFY(boxModelVis->WorldPose() == boxPose);
 
   // Add a revolute joint between cylinder link and box nested model
   jointMaker->AddJoint(gazebo::gui::JointMaker::JOINT_HINGE);
@@ -287,7 +289,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify joint hotspot pose
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
   // get the joint inspector and populate it with data
@@ -325,7 +327,7 @@ void ModelEditorTest::JointInspectorUpdate()
   this->ProcessEventsAndDraw(mainWindow);
 
   // verify the joint hotspot visual pose is also updated
-  QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
+  QVERIFY(jointData->hotspot->WorldPose().Pos() ==
       cylinderPose.Pos() + (spherePose.Pos() - cylinderPose.Pos())*0.5);
 
   delete modelCreator;

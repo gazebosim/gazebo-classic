@@ -91,6 +91,10 @@ namespace gazebo
       /// \brief Pose of link currently selected to be the child of the joint
       /// being created, before being selected.
       public: ignition::math::Pose3d childLinkOriginalPose;
+
+      /// \brief Pointer to the user command manager. The pointer's lifetime is
+      /// managed by ModelCreator, so we don't need to delete it.
+      public: MEUserCmdManager *userCmdManager = nullptr;
     };
   }
 }

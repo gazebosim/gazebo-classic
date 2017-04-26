@@ -28,9 +28,6 @@ class ModelEditorTest : public QTestFixture
   /// \brief Test editing and saving existing model
   private slots: void EditModel();
 
-  /// \brief Test pose of model links and joints before and after saving
-  private slots: void SaveModelPose();
-
   /// \brief Test pose of joint hotspot visual when parent or child link is
   /// changed via the joint inspector
   private slots: void JointInspectorUpdate();
@@ -43,6 +40,9 @@ class ModelEditorTest : public QTestFixture
 
   /// \brief Test showing and hiding link frames.
   private slots: void ShowLinkFrames();
+
+  /// \brief Test pose of model links and joints before and after saving
+  private slots: void SaveModelPose();
 };
 
 #endif

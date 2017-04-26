@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _MAIN_WINDOW_EXAMPLE_WIDGET_HH_
-#define _MAIN_WINDOW_EXAMPLE_WIDGET_HH_
+#ifndef MAIN_WINDOW_EXAMPLE_WIDGET_HH_
+#define MAIN_WINDOW_EXAMPLE_WIDGET_HH_
 
 #include <string>
 #include <vector>

@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _ODEMULTIRAYSHAPE_HH_
-#define _ODEMULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEMULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEMULTIRAYSHAPE_HH_
 
 #include "gazebo/physics/MultiRayShape.hh"
 #include "gazebo/util/system.hh"
@@ -34,6 +34,10 @@ namespace gazebo
       /// \param[in] _parent Parent Collision.
       public: explicit ODEMultiRayShape(CollisionPtr _parent);
 
+      /// \brief Constructor for a global multiray shape.
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit ODEMultiRayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Destructor.
       public: virtual ~ODEMultiRayShape();
 
@@ -50,14 +54,18 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of a ray.
       /// \param[in] _end End of a ray.
-      protected: void AddRay(const math::Vector3 &_start,
-                             const math::Vector3 &_end);
+      protected: void AddRay(const ignition::math::Vector3d &_start,
+                             const ignition::math::Vector3d &_end);
 
       /// \brief Space to contain the ray space, for efficiency.
       private: dSpaceID superSpaceId;
 
       /// \brief Ray space for collision detector.
       private: dSpaceID raySpaceId;
+
+      /// \brief Helper to get the correct ray shape in the UpdateCallback
+      /// function.
+      private: bool defaultUpdate = true;
     };
     /// \}
   }

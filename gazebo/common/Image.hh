@@ -132,14 +132,14 @@ namespace gazebo
                                Image::PixelFormat _format);
 
       /// \brief Get the image as a data array
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetData(unsigned char **_data,
                            unsigned int &_count) const;
 
       /// \brief Get only the RGB data from the image. This will drop the
       /// alpha channel if one is present.
-      /// \param[out] _data Pointer to a NULL array of char.
+      /// \param[out] _data Pointer to a nullptr array of char.
       /// \param[out] _count The resulting data array size
       public: void GetRGBData(unsigned char **_data,
                               unsigned int &_count) const;

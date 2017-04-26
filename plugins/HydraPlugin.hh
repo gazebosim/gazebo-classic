@@ -15,11 +15,15 @@
  *
 */
 
-#ifndef _GAZEBO_RAZER_HYDRA_HH_
-#define _GAZEBO_RAZER_HYDRA_HH_
+#ifndef GAZEBO_PLUGINS_HYDRAPLUGIN_HH_
+#define GAZEBO_PLUGINS_HYDRAPLUGIN_HH_
 
-#include <gazebo/math/Filter.hh>
-#include <gazebo/math/Vector3.hh>
+#include <mutex>
+#include <thread>
+
+#include <ignition/math/Filter.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
 #include <gazebo/common/Plugin.hh>
 
 namespace gazebo
@@ -44,8 +48,7 @@ namespace gazebo
     private: void Run();
 
     /// \brief Update the hydra.
-    /// \param[in] _info Update information.
-    private: void Update(const common::UpdateInfo &_info);
+    private: void Update();
 
     /// \brief Raw controller positions.
     private: int16_t rawPos[6];
@@ -63,16 +66,16 @@ namespace gazebo
     private: int hidrawFd;
 
     /// \brief Left and right controller positions.
-    private: math::Vector3 pos[2];
+    private: ignition::math::Vector3d pos[2];
 
     /// \brief Left and right controller orientations.
-    private: math::Quaternion quat[2];
+    private: ignition::math::Quaterniond quat[2];
 
     /// \brief Left and right filtered positions.
-    private: math::OnePoleVector3 filterPos[2];
+    private: ignition::math::OnePoleVector3 filterPos[2];
 
     /// \brief Left and right filtered controller orientations.
-    private: math::OnePoleQuaternion filterQuat[2];
+    private: ignition::math::OnePoleQuaternion filterQuat[2];
 
     /// \brief Analog joysticks
     private: float analog[6];
@@ -81,7 +84,7 @@ namespace gazebo
     private: uint8_t buttons[14];
 
     /// \brief Estimate of the update period.
-    private: math::OnePole<float> periodEstimate;
+    private: ignition::math::OnePole<float> periodEstimate;
 
     /// \brief Time of the last poll cycle.
     private: common::Time lastCycleStart;
@@ -90,10 +93,10 @@ namespace gazebo
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Mutex
-    private: boost::mutex mutex;
+    private: std::mutex mutex;
 
     /// \brief Additional thread
-    private: boost::thread *pollThread;
+    private: std::thread *pollThread;
 
     /// \brief Use to stop the additional thread that the plugin uses.
     private: bool stop;

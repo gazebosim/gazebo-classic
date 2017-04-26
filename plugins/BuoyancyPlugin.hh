@@ -15,13 +15,14 @@
  *
 */
 
-#ifndef _GAZEBO_BUOYANCY_PLUGIN_HH_
-#define _GAZEBO_BUOYANCY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_BUOYANCYPLUGIN_HH_
+#define GAZEBO_PLUGINS_BUOYANCYPLUGIN_HH_
 
 #include <map>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Plugin.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/physics.hh"
 
 namespace gazebo
@@ -33,7 +34,7 @@ namespace gazebo
     public: VolumeProperties() : volume(0) {}
 
     /// \brief Center of volume in the link frame.
-    public: math::Vector3 cov;
+    public: ignition::math::Vector3d cov;
 
     /// \brief Volume of this link.
     public: double volume;
@@ -76,9 +77,6 @@ namespace gazebo
 
     /// \brief Pointer to model containing the plugin.
     protected: physics::ModelPtr model;
-
-    /// \brief Pointer to the physics engine (for accessing gravity).
-    protected: physics::PhysicsEnginePtr physicsEngine;
 
     /// \brief Pointer to the plugin SDF.
     protected: sdf::ElementPtr sdf;

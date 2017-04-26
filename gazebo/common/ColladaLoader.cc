@@ -18,16 +18,17 @@
 #include <tinyxml.h>
 #include <math.h>
 #include <sstream>
+#include <set>
+#include <memory>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/unordered_map.hpp>
 
-#include "gazebo/math/Helpers.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Vector2d.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Matrix4.hh"
-#include "gazebo/math/Quaternion.hh"
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Matrix4.hh>
+#include <ignition/math/Vector2.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Material.hh"
 #include "gazebo/common/Mesh.hh"
@@ -98,11 +99,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   TiXmlDocument xmlDoc;
 
-  this->dataPtr->path.clear();
-  if (_filename.rfind('/') != std::string::npos)
-  {
-    this->dataPtr->path = _filename.substr(0, _filename.rfind('/'));
-  }
+  boost::filesystem::path p(_filename);
+  this->dataPtr->path = p.parent_path().generic_string();
 
   this->dataPtr->filename = _filename;
   if (!xmlDoc.LoadFile(_filename))
@@ -237,6 +235,14 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
 
     TiXmlElement *instSkelXml = instContrXml->FirstChildElement("skeleton");
+    if (!instSkelXml)
+    {
+      gzwarn << "<instance_controller> without a <skeleton> cannot be parsed"
+          << std::endl;
+      instContrXml = instContrXml->NextSiblingElement("instance_controller");
+      continue;
+    }
+
     std::string rootURL = instSkelXml->GetText();
     TiXmlElement *rootNodeXml = this->GetElementId("node", rootURL);
 
@@ -332,7 +338,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
       TiXmlElement *_skelXml,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
-  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, NULL));
+  Skeleton *skeleton = new Skeleton(this->LoadSkeletonNodes(_skelXml, nullptr));
   _mesh->SetSkeleton(skeleton);
 
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
@@ -457,7 +463,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
 
   std::vector<float> weights;
   for (unsigned int i = 0; i < wStrs.size(); ++i)
-    weights.push_back(math::parseFloat(wStrs[i]));
+    weights.push_back(ignition::math::parseFloat(wStrs[i]));
 
   std::string cString = vertWeightsXml->FirstChildElement("vcount")->GetText();
   std::string vString = vertWeightsXml->FirstChildElement("v")->GetText();
@@ -471,10 +477,10 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   std::vector<unsigned int> v;
 
   for (unsigned int i = 0; i < vCountStrs.size(); ++i)
-    vCount.push_back(math::parseInt(vCountStrs[i]));
+    vCount.push_back(ignition::math::parseInt(vCountStrs[i]));
 
   for (unsigned int i = 0; i < vStrs.size(); ++i)
-    v.push_back(math::parseInt(vStrs[i]));
+    v.push_back(ignition::math::parseInt(vStrs[i]));
 
   skeleton->SetNumVertAttached(vCount.size());
 
@@ -567,8 +573,8 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
           }
         }
 
-      TiXmlElement *frameTimesXml = NULL;
-      TiXmlElement *frameTransXml = NULL;
+      TiXmlElement *frameTimesXml = nullptr;
+      TiXmlElement *frameTransXml = nullptr;
 
       TiXmlElement *sampXml = this->GetElementId("sampler", sourceURL);
       TiXmlElement *inputXml = sampXml->FirstChildElement("input");
@@ -593,7 +599,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> times;
       for (unsigned int i = 0; i < timeStrs.size(); ++i)
-        times.push_back(math::parseFloat(timeStrs[i]));
+        times.push_back(ignition::math::parseFloat(timeStrs[i]));
 
       TiXmlElement *output = frameTransXml->FirstChildElement("float_array");
       std::string outputStr = output->GetText();
@@ -602,7 +608,7 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
 
       std::vector<double> values;
       for (unsigned int i = 0; i < outputStrs.size(); ++i)
-        values.push_back(math::parseFloat(outputStrs[i]));
+        values.push_back(ignition::math::parseFloat(outputStrs[i]));
 
       TiXmlElement *accessor =
         frameTransXml->FirstChildElement("technique_common");
@@ -673,8 +679,11 @@ SkeletonNode* ColladaLoader::LoadSkeletonNodes(TiXmlElement *_xml,
 
   SkeletonNode* node = new SkeletonNode(_parent, name, _xml->Attribute("id"));
 
-  if (std::string(_xml->Attribute("type")) == std::string("NODE"))
+  if (_xml->Attribute("type") &&
+      std::string(_xml->Attribute("type")) == std::string("NODE"))
+  {
     node->SetType(SkeletonNode::NODE);
+  }
 
   this->SetSkeletonNodeTransform(_xml, node);
 
@@ -846,7 +855,7 @@ TiXmlElement *ColladaLoader::GetElementId(TiXmlElement *_parent,
     elem = elem->NextSiblingElement();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -956,7 +965,7 @@ void ColladaLoader::LoadPositions(const std::string &_id,
   end = strs.end();
   for (iter = strs.begin(); iter != end; iter += 3)
   {
-    ignition::math::Vector3d vec(math::parseFloat(*iter),
+    ignition::math::Vector3d vec(ignition::math::parseFloat(*iter),
         ignition::math::parseFloat(*(iter+1)),
         ignition::math::parseFloat(*(iter+2)));
 
@@ -1215,7 +1224,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
   TiXmlElement *matXml = this->GetElementId("material", _name);
   if (!matXml || !matXml->FirstChildElement("instance_effect"))
-    return NULL;
+    return nullptr;
 
   Material *mat = new Material();
   std::string effectName =
@@ -1235,6 +1244,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
+      // order matters: transparency needs to be loaded before transparent.
       if (lambertXml->FirstChildElement("transparency"))
       {
         mat->SetTransparency(
@@ -1245,6 +1255,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       {
         TiXmlElement *transXml = lambertXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
     else if (phongXml)
@@ -1257,6 +1272,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
 
+      // order matters: transparency needs to be loaded before transparent
       if (phongXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
@@ -1264,6 +1280,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       {
         TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
     else if (blinnXml)
@@ -1276,6 +1297,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));
 
+      // order matters: transparency needs to be loaded before transparent
       if (blinnXml->FirstChildElement("transparency"))
         mat->SetTransparency(
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
@@ -1283,6 +1305,11 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       {
         TiXmlElement *transXml = blinnXml->FirstChildElement("transparent");
         this->LoadTransparent(transXml, mat);
+      }
+      else
+      {
+        // no <transparent> tag, revert to zero transparency
+        mat->SetTransparency(0.0);
       }
     }
   }
@@ -1325,7 +1352,7 @@ void ColladaLoader::LoadColorOrTexture(TiXmlElement *_elem,
   else if (typeElem->FirstChildElement("texture"))
   {
     _mat->SetLighting(true);
-    TiXmlElement *imageXml = NULL;
+    TiXmlElement *imageXml = nullptr;
     std::string textureName =
       typeElem->FirstChildElement("texture")->Attribute("texture");
     TiXmlElement *textureXml = this->GetElementId("newparam", textureName);
@@ -1478,7 +1505,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   boost::split(vcountStrs, vcountStr, boost::is_any_of("   "));
   std::vector<int> vcounts;
   for (unsigned int j = 0; j < vcountStrs.size(); ++j)
-    vcounts.push_back(math::parseInt(vcountStrs[j]));
+    vcounts.push_back(ignition::math::parseInt(vcountStrs[j]));
 
   // read p
   TiXmlElement *pXml = _polylistXml->FirstChildElement("p");
@@ -1694,7 +1721,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   const ignition::math::Matrix4d &_transform,
                                   Mesh *_mesh)
 {
-  SubMesh *subMesh = new SubMesh;
+  std::unique_ptr<SubMesh> subMesh(new SubMesh);
   subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
@@ -1963,7 +1990,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   }
 
   delete [] values;
-  _mesh->AddSubMesh(subMesh);
+  _mesh->AddSubMesh(subMesh.release());
 }
 
 /////////////////////////////////////////////////
@@ -2023,7 +2050,8 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
   const char *opaqueCStr = _elem->Attribute("opaque");
   if (!opaqueCStr)
   {
-    // gzerr << "No Opaque set\n";
+    // no opaque mode, revert transparency to 0.0
+    _mat->SetTransparency(0.0);
     return;
   }
 
@@ -2041,18 +2069,62 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
     std::string colorStr = colorCStr;
     Color color = boost::lexical_cast<Color>(colorStr);
 
+    // src is the texel value and dst is the existing pixel value
     double srcFactor = 0;
     double dstFactor = 0;
 
+    // Calculate alpha based on opaque mode.
+    // Equations are extracted from collada spec
+    // Make sure to update the final transparency value
+    // final mat transparency = 1 - srcFactor = dstFactor
     if (opaqueStr == "RGB_ZERO")
     {
-      srcFactor = color.r * _mat->GetTransparency();
-      dstFactor = 1.0 - color.r * _mat->GetTransparency();
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.r +
+                        0.715160 * color.g +
+                        0.072169 * color.b;
+      // result.a = fb.a * (lumiance(transparent.rgb) * transparency) + mat.a *
+      // (1.0f - luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = luminance * _mat->GetTransparency();
+      srcFactor = 1.0 - luminance * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "RGB_ONE")
+    {
+      // Lunimance based on ISO/CIE color standards ITU-R BT.709-4
+      float luminance = 0.212671 * color.r +
+                        0.715160 * color.g +
+                        0.072169 * color.b;
+
+      // result.a = fb.a * (1.0f - lumiance(transparent.rgb) * transparency) +
+      // mat.a * (luminance(transparent.rgb) * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - luminance * _mat->GetTransparency();
+      srcFactor = luminance * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
     }
     else if (opaqueStr == "A_ONE")
     {
-      srcFactor = 1.0 - color.a * _mat->GetTransparency();
+      // result.a = fb.a * (1.0f - transparent.a * transparency) + mat.a *
+      // (transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
+      dstFactor = 1.0 - color.a * _mat->GetTransparency();
+      srcFactor = color.a * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
+    }
+    else if (opaqueStr == "A_ZERO")
+    {
+      // result.a = fb.a * (transparent.a * transparency) + mat.a *
+      // (1.0f - transparent.a * transparency)
+      // where fb corresponds to the framebuffer (existing pixel) and
+      // mat corresponds to material before transparency (texel)
       dstFactor = color.a * _mat->GetTransparency();
+      srcFactor = 1.0 - color.a * _mat->GetTransparency();
+      _mat->SetTransparency(dstFactor);
     }
 
     _mat->SetBlendFactors(srcFactor, dstFactor);

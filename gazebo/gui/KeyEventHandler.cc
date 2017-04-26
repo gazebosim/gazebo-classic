@@ -75,12 +75,6 @@ bool KeyEventHandler::HandleRelease(const common::KeyEvent &_event)
 }
 
 /////////////////////////////////////////////////
-bool KeyEventHandler::GetAutoRepeat() const
-{
-  return this->AutoRepeat();
-}
-
-/////////////////////////////////////////////////
 bool KeyEventHandler::AutoRepeat() const
 {
   return this->dataPtr->autoRepeat;

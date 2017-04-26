@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include "gazebo/gazebo_core.hh"
 #include "gazebo/physics/physics.hh"
 
@@ -31,7 +32,7 @@ namespace gazebo
       this->node.reset(new transport::Node());
 
       // Initialize the node with the world name
-      this->node->Init(_parent->GetWorld()->GetName());
+      this->node->Init(_parent->GetWorld()->Name());
 
       std::string name = std::string("~/") + _parent->GetName() + "/" +
                           _sdf->Get<std::string>("projector");
@@ -44,7 +45,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ProjectorPlugin::OnUpdate, this));
+          std::bind(&ProjectorPlugin::OnUpdate, this));
     }
 
     //////////////////////////////////////////////////

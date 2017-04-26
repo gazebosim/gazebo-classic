@@ -21,7 +21,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -48,7 +47,7 @@ namespace gazebo
       /// \brief (1, 1, 0)
       public: static const Color Yellow;
       /// \brief (1, 0, 1)
-      public: static const Color Purple;
+      public: static const Color Magenta;
 
       /// \def RGBA
       /// \brief A RGBA packed value as an unsigned int
@@ -102,12 +101,6 @@ namespace gazebo
       /// \param[in] _s Saturation(0..1)
       /// \param[in] _v Value(0..1)
       public: void SetFromHSV(float _h, float _s, float _v);
-
-      /// \brief Get the color in YUV colorspace
-      /// \return the YUV  color
-      /// \deprecated See YUV() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAsYUV() const;
 
       /// \brief Get the color in YUV colorspace
       /// \return The YUV color in an ignition::math::Vector3d format.

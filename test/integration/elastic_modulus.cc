@@ -69,7 +69,6 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   Load("worlds/elastic_modulus_contact_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   EXPECT_TRUE(world != NULL);
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
 
   int i = 0;
   while (!this->HasEntity("sphere") && i < 20)
@@ -82,9 +81,9 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     gzthrow("Unable to get sphere");
 
   // get models and links
-  physics::ModelPtr box_model = world->GetModel("box");
+  physics::ModelPtr box_model = world->ModelByName("box");
   physics::LinkPtr box_link = box_model->GetLink("link");
-  physics::ModelPtr sphere_model = world->GetModel("sphere");
+  physics::ModelPtr sphere_model = world->ModelByName("sphere");
   physics::LinkPtr sphere_link = sphere_model->GetLink("link");
 
   // Sleep to ensure transport topics are all advertised
@@ -131,7 +130,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
   double eStar = 1.0 / ((1.0 - nu1*nu1)/e1 + (1.0 - nu2*nu2)/e2);
   double rStar = 1.0 / (1.0/r1 + 1.0/r2);
   // contact force
-  double f1 = -physics->GetGravity().x * m1;
+  double f1 = -world->Gravity().X() * m1;
 
   for (int n = 0; n < 10; ++n)
   {
@@ -168,8 +167,8 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_LT(fabs(d_convergence_error), PHYSICS_TOL);
 
     // GET CONTACT DEPTH FROM LINK POSES AND KNOWN GEOMETRY INFORMATION
-    double d2 = 1.0 - (sphere_link->GetWorldPose().pos.x -
-                 box_link->GetWorldPose().pos.x) - minDepth;
+    double d2 = 1.0 - (sphere_link->WorldPose().Pos().X() -
+        box_link->WorldPose().Pos().X()) - minDepth;
 
     EXPECT_FLOAT_EQ(d1, d2);
 
@@ -204,7 +203,7 @@ void PhysicsTest::ElasticModulusContact(const std::string &_physicsEngine)
     EXPECT_FLOAT_EQ(k_lin, k_lin_converged);
 
     gzdbg << "Contact State:\n"
-          << "  t [" << world->GetSimTime().Double()
+          << "  t [" << world->SimTime().Double()
           << "]\n f1 [" << f1
           << "]\n  E* [" << eStar
           << "]\n  R* [" << rStar

@@ -63,7 +63,7 @@ static SDFCollisionInitializer g_SDFInit;
 
 //////////////////////////////////////////////////
 Collision::Collision(LinkPtr _link)
-    : Entity(_link), maxContacts(1)
+: Entity(_link), maxContacts(1)
 {
   this->AddType(Base::COLLISION);
 
@@ -90,6 +90,7 @@ void Collision::Fini()
     msgs::Request *msg = msgs::CreateRequest("entity_delete",
         this->GetScopedName()+"__COLLISION_VISUAL__");
     this->requestPub->Publish(*msg, true);
+    delete msg;
   }
 
   this->link.reset();
@@ -110,7 +111,7 @@ void Collision::Load(sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("laser_retro"))
     this->SetLaserRetro(this->sdf->Get<double>("laser_retro"));
 
-  this->SetRelativePose(this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 
   this->surface->Load(this->sdf->GetElement("surface"));
 
@@ -125,8 +126,7 @@ void Collision::Init()
 {
   this->shape->Init();
 
-  this->SetRelativePose(
-    this->sdf->Get<math::Pose>("pose"));
+  this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
 }
 
 //////////////////////////////////////////////////
@@ -204,81 +204,81 @@ ShapePtr Collision::GetShape() const
 }
 
 //////////////////////////////////////////////////
-void Collision::SetScale(const math::Vector3 &_scale)
+void Collision::SetScale(const ignition::math::Vector3d &_scale)
 {
   this->shape->SetScale(_scale);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearVel() const
+ignition::math::Vector3d Collision::RelativeLinearVel() const
 {
   if (this->link)
-    return this->link->GetRelativeLinearVel();
+    return this->link->RelativeLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearVel() const
+ignition::math::Vector3d Collision::WorldLinearVel() const
 {
   if (this->link)
-    return this->link->GetWorldLinearVel();
+    return this->link->WorldLinearVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularVel() const
+ignition::math::Vector3d Collision::RelativeAngularVel() const
 {
   if (this->link)
-    return this->link->GetRelativeAngularVel();
+    return this->link->RelativeAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularVel() const
+ignition::math::Vector3d Collision::WorldAngularVel() const
 {
   if (this->link)
-    return this->link->GetWorldAngularVel();
+    return this->link->WorldAngularVel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeLinearAccel() const
+ignition::math::Vector3d Collision::RelativeLinearAccel() const
 {
   if (this->link)
-    return this->link->GetRelativeLinearAccel();
+    return this->link->RelativeLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldLinearAccel() const
+ignition::math::Vector3d Collision::WorldLinearAccel() const
 {
   if (this->link)
-    return this->link->GetWorldLinearAccel();
+    return this->link->WorldLinearAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetRelativeAngularAccel() const
+ignition::math::Vector3d Collision::RelativeAngularAccel() const
 {
   if (this->link)
-    return this->link->GetRelativeAngularAccel();
+    return this->link->RelativeAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Collision::GetWorldAngularAccel() const
+ignition::math::Vector3d Collision::WorldAngularAccel() const
 {
   if (this->link)
-    return this->link->GetWorldAngularAccel();
+    return this->link->WorldAngularAccel();
   else
-    return math::Vector3();
+    return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -290,7 +290,7 @@ void Collision::UpdateParameters(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Collision::FillMsg(msgs::Collision &_msg)
 {
-  msgs::Set(_msg.mutable_pose(), this->GetRelativePose().Ign());
+  msgs::Set(_msg.mutable_pose(), this->RelativePose());
   _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
   _msg.set_laser_retro(this->GetLaserRetro());
@@ -298,7 +298,7 @@ void Collision::FillMsg(msgs::Collision &_msg)
   this->shape->FillMsg(*_msg.mutable_geometry());
   this->surface->FillMsg(*_msg.mutable_surface());
 
-  msgs::Set(this->visualMsg->mutable_pose(), this->GetRelativePose().Ign());
+  msgs::Set(this->visualMsg->mutable_pose(), this->RelativePose());
 
   if (!this->HasType(physics::Base::SENSOR_COLLISION))
   {
@@ -354,7 +354,7 @@ msgs::Visual Collision::CreateCollisionVisual()
   msg.set_is_static(this->IsStatic());
   msg.set_cast_shadows(false);
   msg.set_type(msgs::Visual::COLLISION);
-  msgs::Set(msg.mutable_pose(), this->GetRelativePose().Ign());
+  msgs::Set(msg.mutable_pose(), this->RelativePose());
   msg.mutable_material()->mutable_script()->add_uri(
       "file://media/materials/scripts/gazebo.material");
   msg.mutable_material()->mutable_script()->set_name(
@@ -374,7 +374,7 @@ CollisionState Collision::GetState()
 /////////////////////////////////////////////////
 void Collision::SetState(const CollisionState &_state)
 {
-  this->SetRelativePose(_state.GetPose());
+  this->SetRelativePose(_state.Pose());
 }
 
 /////////////////////////////////////////////////
@@ -391,14 +391,13 @@ unsigned int Collision::GetMaxContacts()
 }
 
 /////////////////////////////////////////////////
-const math::Pose &Collision::GetWorldPose() const
+const ignition::math::Pose3d &Collision::WorldPose() const
 {
   // If true, compute a new world pose value.
   //
   if (this->worldPoseDirty)
   {
-    this->worldPose = this->GetInitialRelativePose() +
-                      this->link->GetWorldPose();
+    this->worldPose = this->InitialRelativePose() + this->link->WorldPose();
     this->worldPoseDirty = false;
   }
 

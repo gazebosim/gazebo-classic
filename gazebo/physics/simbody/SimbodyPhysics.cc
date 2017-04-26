@@ -54,7 +54,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -73,7 +72,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
     : PhysicsEngine(_world), system(), matter(system), forces(system),
       gravity(forces, matter, -SimTK::ZAxis, 0),
       discreteForces(forces, matter),
-      tracker(system), contact(system, tracker),  integ(NULL)
+      tracker(system), contact(system, tracker),  integ(nullptr)
       , contactMaterialStiffness(0.0)
       , contactMaterialDissipation(0.0)
       , contactMaterialPlasticCoefRestitution(0.0)
@@ -83,7 +82,7 @@ SimbodyPhysics::SimbodyPhysics(WorldPtr _world)
       , contactMaterialViscousFriction(0.0)
       , contactImpactCaptureVelocity(0.0)
       , contactStictionTransitionVelocity(0.0)
-      , dynamicsWorld(NULL)
+      , dynamicsWorld(nullptr)
       , stepTimeDouble(0.0)
 {
   // Instantiate the Multibody System
@@ -189,12 +188,12 @@ void SimbodyPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_type(msgs::Physics::SIMBODY);
     // min_step_size is defined but not yet used
     physicsMsg.set_min_step_size(this->GetMaxStepSize());
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
 
     physicsMsg.mutable_gravity()->CopyFrom(
       msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -214,7 +213,7 @@ void SimbodyPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
   PhysicsEngine::OnPhysicsMsg(_msg);
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_gravity())
     this->SetGravity(msgs::ConvertIgn(_msg->gravity()));
@@ -274,7 +273,7 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
   if (currentState.getSystemStage() != SimTK::Stage::Empty)
   {
     stateTime = currentState.getTime();
-    physics::Model_V models = this->world->GetModels();
+    physics::Model_V models = this->world->Models();
     for (physics::Model_V::iterator mi = models.begin();
          mi != models.end(); ++mi)
     {
@@ -346,7 +345,7 @@ void SimbodyPhysics::InitModel(const physics::ModelPtr _model)
     // set/retsore state time.
     state.setTime(stateTime);
 
-    physics::Model_V models = this->world->GetModels();
+    physics::Model_V models = this->world->Models();
     for (physics::Model_V::iterator mi = models.begin();
          mi != models.end(); ++mi)
     {
@@ -440,10 +439,10 @@ void SimbodyPhysics::UpdateCollision()
 
       /// \TODO: See issue #1584
       /// \TODO: below, get collision data from simbody contacts
-      Collision *collision1 = NULL;
-      Collision *collision2 = NULL;
-      physics::LinkPtr link1 = NULL;
-      physics::LinkPtr link2 = NULL;
+      Collision *collision1 = nullptr;
+      Collision *collision2 = nullptr;
+      physics::LinkPtr link1 = nullptr;
+      physics::LinkPtr link2 = nullptr;
 
       /// \TODO: get SimTK::ContactGeometry* from ContactForce somehow
       const SimTK::ContactGeometry &cg1 = cs1.getShape();
@@ -454,7 +453,7 @@ void SimbodyPhysics::UpdateCollision()
       /// this is going to be very very slow, we'll need
       /// something with a void* pointer in simbody
       /// to support something like this.
-      physics::Model_V models = this->world->GetModels();
+      physics::Model_V models = this->world->Models();
       for (physics::Model_V::iterator mi = models.begin();
            mi != models.end(); ++mi)
       {
@@ -483,10 +482,10 @@ void SimbodyPhysics::UpdateCollision()
         }
       }
 
-      // add contacts to the manager. This will return NULL if no one is
+      // add contacts to the manager. This will return nullptr if no one is
       // listening for contact information.
       Contact *contactFeedback = this->contactManager->NewContact(collision1,
-          collision2, this->world->GetSimTime());
+          collision2, this->world->SimTime());
 
       if (contactFeedback)
       {
@@ -551,42 +550,43 @@ void SimbodyPhysics::UpdateCollision()
               /// arbitrarily based on frames.
               ///
               /// shift forces to link1 frame without rotating it first
-              math::Pose pose1 = link1->GetWorldPose();
-              math::Pose pose2 = link2->GetWorldPose();
+              ignition::math::Pose3d pose1 = link1->WorldPose();
+              ignition::math::Pose3d pose2 = link2->WorldPose();
               const SimTK::Vec3 offset1 = -detail.getContactPoint()
-                + SimbodyPhysics::Vector3ToVec3(pose1.pos - pose2.pos);
+                + SimbodyPhysics::Vector3ToVec3(pose1.Pos() - pose2.Pos());
               SimTK::SpatialVec s1cg = SimTK::shiftForceBy(-s2, offset1);
 
               /// get torque and force components
               SimTK::Vec3 t1cg = s1cg[0];
               SimTK::Vec3 f1cg = s1cg[1];
 
-              /* actually don't need to do this? confirm that
-                 everything is in the world frame!
-              /// \TODO: rotate it into link 1 frame, there must be
-              /// a clean way to do this in simbody...
-              /// my gazebo way of rotating frames for now, to replace with
-              /// clean simbody function calls.
-              /// rotation from link2 to link1 frame specified in link2 frame
-              math::Quaternion rot21 = (pose1 - pose2).rot;
-              t1cg = SimbodyPhysics::Vector3ToVec3(
-                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(t1cg)));
-              f1cg = SimbodyPhysics::Vector3ToVec3(
-                rot21.RotateVectorReverse(SimbodyPhysics::Vec3ToVector3(f1cg)));
+              // actually don't need to do this? confirm that
+              //    everything is in the world frame!
+              // /// \TODO: rotate it into link 1 frame, there must be
+              // /// a clean way to do this in simbody...
+              // /// my gazebo way of rotating frames for now, to replace with
+              // /// clean simbody function calls.
+              // /// rotation from link2 to link1 frame specified in link2 frame
+              // math::Quaternion rot21 = (pose1 - pose2).rot;
+              // t1cg = SimbodyPhysics::Vector3ToVec3(
+              //   rot21.RotateVectorReverse(
+              //   SimbodyPhysics::Vec3ToVector3(t1cg)));
+              // f1cg = SimbodyPhysics::Vector3ToVec3(
+              //   rot21.RotateVectorReverse(
+              //   SimbodyPhysics::Vec3ToVector3(f1cg)));
 
-              gzerr << "numc: " << j << "\n";
-              gzerr << "count: " << count << "\n";
-              gzerr << "index: " << i << "\n";
-              gzerr << "offset 2: " << detail.getContactPoint() << "\n";
-              gzerr << "s2: " << s2 << "\n";
-              gzerr << "s2cg: " << s2cg << "\n";
-              gzerr << "f2cg: " << f2cg << "\n";
-              gzerr << "t2cg: " << t2cg << "\n";
-              gzerr << "offset 1: " << detail.getContactPoint() << "\n";
-              gzerr << "s1cg: " << s1cg << "\n";
-              gzerr << "f1cg: " << f1cg << "\n";
-              gzerr << "t1cg: " << t1cg << "\n";
-              */
+              // gzerr << "numc: " << j << "\n";
+              // gzerr << "count: " << count << "\n";
+              // gzerr << "index: " << i << "\n";
+              // gzerr << "offset 2: " << detail.getContactPoint() << "\n";
+              // gzerr << "s2: " << s2 << "\n";
+              // gzerr << "s2cg: " << s2cg << "\n";
+              // gzerr << "f2cg: " << f2cg << "\n";
+              // gzerr << "t2cg: " << t2cg << "\n";
+              // gzerr << "offset 1: " << detail.getContactPoint() << "\n";
+              // gzerr << "s1cg: " << s1cg << "\n";
+              // gzerr << "f1cg: " << f1cg << "\n";
+              // gzerr << "t1cg: " << t1cg << "\n";
 
               // copy.
               contactFeedback->wrench[count].body1Force.Set(
@@ -640,7 +640,7 @@ void SimbodyPhysics::UpdatePhysics()
   // need to lock, otherwise might conflict with world resetting
   boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
 
-  common::Time currTime =  this->world->GetRealTime();
+  common::Time currTime =  this->world->RealTime();
 
   // Simbody cannot step the integrator without a subsystem
   const SimTK::State &s = this->integ->getState();
@@ -648,12 +648,12 @@ void SimbodyPhysics::UpdatePhysics()
     return;
 
   bool trying = true;
-  while (trying && integ->getTime() < this->world->GetSimTime().Double())
+  while (trying && integ->getTime() < this->world->SimTime().Double())
   {
     try
     {
-      this->integ->stepTo(this->world->GetSimTime().Double(),
-                         this->world->GetSimTime().Double());
+      this->integ->stepTo(this->world->SimTime().Double(),
+                          this->world->SimTime().Double());
     }
     catch(const std::exception& e)
     {
@@ -670,12 +670,12 @@ void SimbodyPhysics::UpdatePhysics()
   //       << "] q [" << s.getQ()
   //       << "] u [" << s.getU()
   //       << "] dt [" << this->stepTimeDouble
-  //       << "] t [" << this->world->GetSimTime().Double()
+  //       << "] t [" << this->world->SimTime().Double()
   //       << "]\n";
   // this->lastUpdateTime = currTime;
 
   // pushing new entity pose into dirtyPoses for visualization
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
   for (physics::Model_V::iterator mi = models.begin();
        mi != models.end(); ++mi)
   {
@@ -685,7 +685,7 @@ void SimbodyPhysics::UpdatePhysics()
     {
       physics::SimbodyLinkPtr simbodyLink =
         boost::dynamic_pointer_cast<physics::SimbodyLink>(*lx);
-      math::Pose pose = SimbodyPhysics::Transform2Pose(
+      auto pose = SimbodyPhysics::Transform2PoseIgn(
         simbodyLink->masterMobod.getBodyTransform(s));
       simbodyLink->SetDirtyPose(pose);
       this->world->dataPtr->dirtyPoses.push_back(
@@ -715,7 +715,7 @@ void SimbodyPhysics::Fini()
 //////////////////////////////////////////////////
 LinkPtr SimbodyPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   SimbodyLinkPtr link(new SimbodyLink(_parent));
@@ -763,7 +763,7 @@ ShapePtr SimbodyPhysics::CreateShape(const std::string &_type,
     if (_collision)
       shape.reset(new SimbodyRayShape(_collision));
     else
-      shape.reset(new SimbodyRayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new SimbodyRayShape(this->world->Physics()));
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -798,13 +798,13 @@ JointPtr SimbodyPhysics::CreateJoint(const std::string &_type,
 }
 
 //////////////////////////////////////////////////
-void SimbodyPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void SimbodyPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
+  this->world->SetGravitySDF(_gravity);
 
   {
     boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-    if (this->simbodyPhysicsInitialized && this->world->GetModelCount() > 0)
+    if (this->simbodyPhysicsInitialized && this->world->ModelCount() > 0)
       this->gravity.setGravityVector(this->integ->updAdvancedState(),
          SimbodyPhysics::Vector3ToVec3(_gravity));
     else
@@ -852,11 +852,15 @@ void SimbodyPhysics::CreateMultibodyGraph(
     // gzerr << "debug : " << (*li)->GetName() << "\n";
 
     if (simbodyLink)
-      _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->GetMass(),
+    {
+      _mbgraph.addBody((*li)->GetName(), (*li)->GetInertial()->Mass(),
                       simbodyLink->mustBeBaseLink, (*li).get());
+    }
     else
+    {
       gzerr << "simbodyLink [" << (*li)->GetName()
             << "]is not a SimbodyLinkPtr\n";
+    }
   }
 
   // Step 3: Tell it about all the joints we read from the input file,
@@ -895,7 +899,7 @@ void SimbodyPhysics::InitSimbodySystem()
   // this->contact.setTransitionVelocity(0.01);  // now done in Load using sdf
 
   // Specify gravity (read in above from world).
-  if (!math::equal(this->world->Gravity().Length(), 0.0))
+  if (!ignition::math::equal(this->world->Gravity().Length(), 0.0))
     this->gravity.setDefaultGravityVector(
       SimbodyPhysics::Vector3ToVec3(this->world->Gravity()));
   else
@@ -975,7 +979,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
     MobilizedBody mobod;
 
     MobilizedBody parentMobod =
-      gzInb == NULL ? this->matter.Ground() : gzInb->masterMobod;
+      gzInb == nullptr ? this->matter.Ground() : gzInb->masterMobod;
 
     if (mob.isAddedBaseMobilizer())
     {
@@ -991,19 +995,19 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             massProps,    Transform());
 
         SimTK::Transform inboard_X_ML;
-        if (gzInb == NULL)
+        if (gzInb == nullptr)
         {
           // GZ_ASSERT(gzOutb, "must be here");
           physics::ModelPtr model = gzOutb->GetParentModel();
           inboard_X_ML =
-            ~SimbodyPhysics::Pose2Transform(model->GetWorldPose());
+            ~SimbodyPhysics::Pose2Transform(model->WorldPose());
         }
         else
           inboard_X_ML =
-            SimbodyPhysics::Pose2Transform(gzInb->GetRelativePose());
+            SimbodyPhysics::Pose2Transform(gzInb->RelativePose());
 
         SimTK::Transform outboard_X_ML =
-          SimbodyPhysics::Pose2Transform(gzOutb->GetRelativePose());
+          SimbodyPhysics::Pose2Transform(gzOutb->RelativePose());
 
         // defX_ML link frame specified in model frame
         freeJoint.setDefaultTransform(~inboard_X_ML*outboard_X_ML);
@@ -1042,13 +1046,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       {
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
         double pitch =
           dynamic_cast<physics::SimbodyScrewJoint*>(gzJoint)->GetThreadPitch(0);
 
-        if (math::equal(pitch, 0.0))
+        if (ignition::math::equal(pitch, 0.0))
         {
           gzerr << "thread pitch should not be zero (joint is a slider?)"
                 << " using pitch = 1.0e6\n";
@@ -1068,8 +1072,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         gzdbg << "Setting limitForce[0] for [" << gzJoint->GetName() << "]\n";
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1096,12 +1100,12 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "universal")
       {
         UnitVec3 axis1(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
-        /// \TODO: check if this is right, or GetAxisFrameOffset(1) is needed.
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_PARENT))));
+        /// \TODO: check if this is right, or AxisFrameOffset(1) is needed.
         UnitVec3 axis2(SimbodyPhysics::Vector3ToVec3(
-          gzJoint->GetAxisFrameOffset(0).RotateVector(
-          gzJoint->GetLocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
+          gzJoint->AxisFrameOffset(0).RotateVector(
+          gzJoint->LocalAxis(UniversalJoint<Joint>::AXIS_CHILD))));
 
         // Simbody's univeral joint is along axis1=Y and axis2=X
         // note X and Y are reversed because Simbody defines universal joint
@@ -1118,8 +1122,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
 
         for (unsigned int nj = 0; nj < 2; ++nj)
         {
-          double low = gzJoint->GetLowerLimit(nj).Radian();
-          double high = gzJoint->GetUpperLimit(nj).Radian();
+          double low = gzJoint->LowerLimit(nj);
+          double high = gzJoint->UpperLimit(nj);
 
           // initialize stop stiffness and dissipation from joint parameters
           gzJoint->limitForce[nj] =
@@ -1161,13 +1165,13 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
         // flip transform based on isReversed flag.
         UnitVec3 axis(
           SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
-        // gzerr << "[" << gzJoint->GetAxisFrameOffset(0).GetAsEuler()
+        // gzerr << "[" << gzJoint->AxisFrameOffset(0).Euler()
         //       << "] ["
-        //       << gzJoint->GetAxisFrameOffset(0).RotateVector(
-        //          gzJoint->GetLocalAxis(0)) << "]\n";
+        //       << gzJoint->AxisFrameOffset(0).RotateVector(
+        //          gzJoint->LocalAxis(0)) << "]\n";
 
         // Simbody's pin is along Z
         Rotation R_JZ(axis, ZAxis);
@@ -1179,8 +1183,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = pinJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1207,8 +1211,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
       else if (type == "prismatic")
       {
         UnitVec3 axis(SimbodyPhysics::Vector3ToVec3(
-            gzJoint->GetAxisFrameOffset(0).RotateVector(
-            gzJoint->GetLocalAxis(0))));
+            gzJoint->AxisFrameOffset(0).RotateVector(
+            gzJoint->LocalAxis(0))));
 
         // Simbody's slider is along X
         Rotation R_JX(axis, XAxis);
@@ -1220,8 +1224,8 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
             direction);
         mobod = sliderJoint;
 
-        double low = gzJoint->GetLowerLimit(0u).Radian();
-        double high = gzJoint->GetUpperLimit(0u).Radian();
+        double low = gzJoint->LowerLimit(0u);
+        double high = gzJoint->UpperLimit(0u);
 
         // initialize stop stiffness and dissipation from joint parameters
         gzJoint->limitForce[0] =
@@ -1283,7 +1287,7 @@ void SimbodyPhysics::AddDynamicModelToSimbodySystem(
   }
 
   // Weld the slaves to their masters.
-  physics::Model_V models = this->world->GetModels();
+  physics::Model_V models = this->world->Models();
   for (physics::Model_V::iterator mi = models.begin();
        mi != models.end(); ++mi)
   {
@@ -1415,7 +1419,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
                              ci !=  collisions.end(); ++ci)
   {
     Transform X_LC =
-      SimbodyPhysics::Pose2Transform((*ci)->GetRelativePose());
+      SimbodyPhysics::Pose2Transform((*ci)->RelativePose());
 
     // use pointer to store CollisionGeometry
     SimbodyCollisionPtr sc =
@@ -1432,7 +1436,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
         // rotate it based on normal vector specified by user
         // Create a rotation whos x-axis is in the
         // negative normal vector direction
-        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->GetNormal());
+        Vec3 normal = SimbodyPhysics::Vector3ToVec3(p->Normal());
         Rotation R_XN(-UnitVec3(normal), XAxis);
 
         ContactSurface surface(ContactGeometry::HalfSpace(), material);
@@ -1500,7 +1504,7 @@ void SimbodyPhysics::AddCollisionsToLink(const physics::SimbodyLink *_link,
       {
         Vec3 hsz = SimbodyPhysics::Vector3ToVec3(
           (boost::dynamic_pointer_cast<physics::BoxShape>(
-          (*ci)->GetShape()))->GetSize())/2;
+          (*ci)->GetShape()))->Size())/2;
 
         /// \TODO: harcoded resolution, make collision resolution
         /// an adjustable parameter (#980)
@@ -1546,52 +1550,58 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 }
 
 /////////////////////////////////////////////////
-SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
+SimTK::Quaternion SimbodyPhysics::QuadToQuad(
+    const ignition::math::Quaterniond &_q)
 {
-  return SimTK::Quaternion(_q.w, _q.x, _q.y, _q.z);
+  return SimTK::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
 }
 
 /////////////////////////////////////////////////
-math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
+ignition::math::Quaterniond SimbodyPhysics::QuadToQuadIgn(
+    const SimTK::Quaternion &_q)
 {
-  return math::Quaternion(_q[0], _q[1], _q[2], _q[3]);
+  return ignition::math::Quaterniond(_q[0], _q[1], _q[2], _q[3]);
 }
 
 /////////////////////////////////////////////////
-SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
+SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(
+    const ignition::math::Vector3d &_v)
 {
-  return SimTK::Vec3(_v.x, _v.y, _v.z);
+  return SimTK::Vec3(_v.X(), _v.Y(), _v.Z());
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
+ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3Ign(const SimTK::Vec3 &_v)
 {
-  return math::Vector3(_v[0], _v[1], _v[2]);
+  return ignition::math::Vector3d(_v[0], _v[1], _v[2]);
 }
 
 /////////////////////////////////////////////////
-SimTK::Transform SimbodyPhysics::Pose2Transform(const math::Pose &_pose)
+SimTK::Transform SimbodyPhysics::Pose2Transform(
+    const ignition::math::Pose3d &_pose)
 {
-  SimTK::Quaternion q(_pose.rot.w, _pose.rot.x, _pose.rot.y,
-                   _pose.rot.z);
-  SimTK::Vec3 v(_pose.pos.x, _pose.pos.y, _pose.pos.z);
+  SimTK::Quaternion q(_pose.Rot().W(), _pose.Rot().X(), _pose.Rot().Y(),
+                   _pose.Rot().Z());
+  SimTK::Vec3 v(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
 }
 
 /////////////////////////////////////////////////
-math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
+ignition::math::Pose3d SimbodyPhysics::Transform2PoseIgn(
+    const SimTK::Transform &_xAB)
 {
   SimTK::Quaternion q(_xAB.R());
   const SimTK::Vec4 &qv = q.asVec4();
-  return math::Pose(math::Vector3(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
-    math::Quaternion(qv[0], qv[1], qv[2], qv[3]));
+  return ignition::math::Pose3d(
+       ignition::math::Vector3d(_xAB.p()[0], _xAB.p()[1], _xAB.p()[2]),
+       ignition::math::Quaterniond(qv[0], qv[1], qv[2], qv[3]));
 }
 
 /////////////////////////////////////////////////
 SimTK::Transform SimbodyPhysics::GetPose(sdf::ElementPtr _element)
 {
-  const math::Pose pose = _element->Get<math::Pose>("pose");
+  const auto pose = _element->Get<ignition::math::Pose3d>("pose");
   return Pose2Transform(pose);
 }
 

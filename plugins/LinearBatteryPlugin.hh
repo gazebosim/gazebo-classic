@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_LINEAR_BATTERY_PLUGIN_HH_
-#define _GAZEBO_LINEAR_BATTERY_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_LINEARBATTERYPLUGIN_HH_
+#define GAZEBO_PLUGINS_LINEARBATTERYPLUGIN_HH_
 
 #include <string>
 #include <map>

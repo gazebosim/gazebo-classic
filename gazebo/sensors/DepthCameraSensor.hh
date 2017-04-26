@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/sensors/CameraSensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
@@ -40,7 +40,7 @@ namespace gazebo
     /// \{
     /// \brief Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
-    class GAZEBO_VISIBLE DepthCameraSensor : public Sensor
+    class GAZEBO_VISIBLE DepthCameraSensor : public CameraSensor
     {
       /// \brief Constructor
       public: DepthCameraSensor();
@@ -48,46 +48,23 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~DepthCameraSensor();
 
-      /// \brief Load the sensor with SDF parameters
-      /// \param[in] _sdf SDF Sensor parameters
-      /// \param[in] _worldName Name of world to load from
-      protected: virtual void Load(const std::string &_worldName,
-                                   sdf::ElementPtr _sdf);
+      /// \brief Initialize the camera
+      public: virtual void Init();
+
+      /// \brief Gets the raw depth data from the sensor.
+      /// \return The pointer to the depth data array.
+      public: virtual const float *DepthData() const;
+
+      /// \brief Returns a pointer to the rendering::DepthCamera
+      /// \return Depth Camera pointer
+      public: virtual rendering::DepthCameraPtr DepthCamera() const;
 
       /// \brief Load the sensor with default parameters
       /// \param[in] _worldName Name of world to load from
       protected: virtual void Load(const std::string &_worldName);
 
-      /// \brief Initialize the camera
-      protected: virtual void Init();
-
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
-
-      /// Finalize the camera
-      protected: virtual void Fini();
-
-      /// \brief Set whether the sensor is active or not
-      /// \param[in] _value True if active, false if not
-      public: virtual void SetActive(const bool _value);
-
-      /// \brief Returns a pointer to the rendering::DepthCamera
-      /// \return Depth Camera pointer
-      /// \deprecated See DepthCamera()
-      public: rendering::DepthCameraPtr GetDepthCamera() const
-              GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Returns a pointer to the rendering::DepthCamera
-      /// \return Depth Camera pointer
-      public: rendering::DepthCameraPtr DepthCamera() const;
-
-      /// \brief Saves an image frame of depth camera sensor to file
-      /// \param[in] Name of file to save as
-      /// \return True if saved, false if not
-      public: bool SaveFrame(const std::string &_filename);
-
-      /// \brief Handle the render event.
-      private: void Render();
 
       /// \internal
       /// \brief Private data pointer

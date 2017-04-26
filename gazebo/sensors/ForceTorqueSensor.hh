@@ -71,11 +71,6 @@ namespace gazebo
 
       /// \brief Get Parent Joint
       /// \return Pointer to the joint containing this sensor
-      /// \deprecated See Joint()
-      public: physics::JointPtr GetJoint() const GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get Parent Joint
-      /// \return Pointer to the joint containing this sensor
       public: physics::JointPtr Joint() const;
 
       // Documentation inherited.
@@ -84,14 +79,8 @@ namespace gazebo
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
-      /// \deprecated See ConnectUpdate that accepts a std::function
-      /// parameter.
       public: event::ConnectionPtr ConnectUpdate(
                   std::function<void (msgs::WrenchStamped)> _subscriber);
-
-      /// \brief Disconnect from the update signal.
-      /// \param[in] _conn Connection to remove.
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn);
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(const bool _force);

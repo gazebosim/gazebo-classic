@@ -95,12 +95,8 @@ FollowerPlugin::FollowerPlugin()
 /////////////////////////////////////////////////
 FollowerPlugin::~FollowerPlugin()
 {
-  if (this->dataPtr->depthCamera)
-  {
-    this->dataPtr->depthCamera->DisconnectNewDepthFrame(
-        this->dataPtr->newDepthFrameConnection);
-  }
-  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  this->dataPtr->newDepthFrameConnection.reset();
+  this->dataPtr->updateConnection.reset();
   if (this->dataPtr->depthBuffer != NULL)
     delete [] this->dataPtr->depthBuffer;
 }
@@ -161,13 +157,13 @@ void FollowerPlugin::Init()
     return;
 
   this->dataPtr->wheelSeparation =
-      this->dataPtr->leftJoint->GetAnchor(0).Distance(
-      this->dataPtr->rightJoint->GetAnchor(0));
+      this->dataPtr->leftJoint->Anchor(0).Distance(
+      this->dataPtr->rightJoint->Anchor(0));
 
   physics::EntityPtr parent = boost::dynamic_pointer_cast<physics::Entity>(
       this->dataPtr->leftJoint->GetChild());
 
-  ignition::math::Box bb = parent->GetBoundingBox().Ign();
+  ignition::math::Box bb = parent->BoundingBox();
   // This assumes that the largest dimension of the wheel is the diameter
   this->dataPtr->wheelRadius = bb.Size().Max() * 0.5;
 }

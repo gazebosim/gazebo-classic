@@ -16,7 +16,9 @@
 */
 
 #include <gtest/gtest.h>
-#include "gazebo/math/Rand.hh"
+
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/JointVisual.hh"
@@ -39,6 +41,10 @@ TEST_F(JointVisual_TEST, JointVisualTest)
 
   EXPECT_TRUE(scene != NULL);
 
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != NULL);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
+
   // create a fake child visual where the joint visual will be attached to
   gazebo::rendering::VisualPtr childVis;
   childVis.reset(
@@ -47,9 +53,9 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent(scene->WorldVisual()->Name());
   jointMsg->set_parent_id(scene->WorldVisual()->GetId());
-  jointMsg->set_child(childVis->GetName());
+  jointMsg->set_child(childVis->Name());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");
   jointMsg->set_id(11111);
@@ -89,7 +95,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->Load(jointMsg);
 
   // pose matches the message's pose
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(1, 2, 3, 1.57, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(),
+      ignition::math::Pose3d(1, 2, 3, 1.57, 1.57, 0));
 
   // has axis 1 and it is visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -108,7 +115,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose properly updated
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(),
+      ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -138,7 +146,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose hasn't changed
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(3, 2, 1, 0, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(),
+      ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -158,7 +167,8 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // new pose
-  EXPECT_EQ(jointVis->GetPose(), math::Pose(0, -2, 1, -1.57, 1.57, 0));
+  EXPECT_EQ(jointVis->Pose(),
+      ignition::math::Pose3d(0, -2, 1, -1.57, 1.57, 0));
 
   // axis 1 still there but not visible
   EXPECT_TRUE(jointVis->GetArrowVisual() != NULL);
@@ -168,6 +178,14 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   EXPECT_TRUE(jointVis->GetParentAxisVisual() != NULL);
   EXPECT_TRUE(jointVis->GetParentAxisVisual()->GetArrowVisual() != NULL);
   EXPECT_FALSE(jointVis->GetParentAxisVisual()->GetArrowVisual()->GetVisible());
+
+  // test destroying the visuals
+  childVis->Fini();
+  EXPECT_EQ(childVis->GetChildCount(), 0u);
+  EXPECT_EQ(jointVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

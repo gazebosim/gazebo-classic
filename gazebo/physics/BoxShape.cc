@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/BoxShape.hh"
 
 using namespace gazebo;
@@ -41,31 +39,31 @@ BoxShape::~BoxShape()
 //////////////////////////////////////////////////
 void BoxShape::Init()
 {
-  this->SetSize(this->sdf->Get<math::Vector3>("size"));
+  this->SetSize(this->sdf->Get<ignition::math::Vector3d>("size"));
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetSize(const math::Vector3 &_size)
+void BoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
   this->sdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 BoxShape::GetSize() const
+ignition::math::Vector3d BoxShape::Size() const
 {
-  return this->sdf->Get<math::Vector3>("size");
+  return this->sdf->Get<ignition::math::Vector3d>("size");
 }
 
 //////////////////////////////////////////////////
-void BoxShape::SetScale(const math::Vector3 &_scale)
+void BoxShape::SetScale(const ignition::math::Vector3d &_scale)
 {
-  if (_scale.x < 0 || _scale.y < 0 || _scale.z < 0)
+  if (_scale.X() < 0 || _scale.Y() < 0 || _scale.Z() < 0)
     return;
 
   if (_scale == this->scale)
     return;
 
-  this->SetSize((_scale/this->scale)*this->GetSize());
+  this->SetSize((_scale/this->scale)*this->Size());
 
   this->scale = _scale;
 }
@@ -74,7 +72,7 @@ void BoxShape::SetScale(const math::Vector3 &_scale)
 void BoxShape::FillMsg(msgs::Geometry &_msg)
 {
   _msg.set_type(msgs::Geometry::BOX);
-  msgs::Set(_msg.mutable_box()->mutable_size(), this->GetSize().Ign());
+  msgs::Set(_msg.mutable_box()->mutable_size(), this->Size());
 }
 
 //////////////////////////////////////////////////
@@ -86,6 +84,5 @@ void BoxShape::ProcessMsg(const msgs::Geometry &_msg)
 //////////////////////////////////////////////////
 double BoxShape::ComputeVolume() const
 {
-  math::Vector3 size = this->GetSize();
-  return size.x * size.y * size.z;
+  return IGN_BOX_VOLUME_V(this->Size());
 }

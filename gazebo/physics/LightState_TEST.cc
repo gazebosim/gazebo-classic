@@ -84,7 +84,7 @@ TEST_F(LightStateTest, LightConstructor)
   EXPECT_TRUE(lightPtr != NULL);
 
   lightPtr->ProcessMsg(lightMsg);
-  EXPECT_EQ(lightPtr->GetWorldPose(), pose);
+  EXPECT_EQ(lightPtr->WorldPose(), pose);
 
   // Create the light state
   physics::LightState lightState(lightPtr, common::Time(1), common::Time(1), 1);

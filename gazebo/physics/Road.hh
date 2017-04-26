@@ -15,14 +15,15 @@
  *
 */
 
-#ifndef _ROAD_HH_
-#define _ROAD_HH_
+#ifndef GAZEBO_PHYSICS_ROAD_HH_
+#define GAZEBO_PHYSICS_ROAD_HH_
 
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <ignition/math/Vector3.hh>
+#include <ignition/transport/Node.hh>
 
-#include <gazebo/math/Vector3.hh>
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/Base.hh"
 #include "gazebo/util/system.hh"
@@ -55,9 +56,9 @@ namespace gazebo
       /// \brief Finalize the road.
       public: virtual void Fini();
 
-      /// \brief Get the point that define the road.
+      /// \brief Get the points that define the road.
       /// \return The vector of points that define the road.
-      public: const std::vector<math::Vector3> &GetPoints() const;
+      public: const std::vector<ignition::math::Vector3d> &Points() const;
 
       /// \brief Get the road width in meters.
       /// \return Road width in meters.
@@ -67,13 +68,22 @@ namespace gazebo
       private: double width;
 
       /// \brief Points that makes up the mid-line of the road.
-      private: std::vector<math::Vector3> points;
+      private: std::vector<ignition::math::Vector3d> points;
 
       /// \brief Transportation node.
       private: transport::NodePtr node;
 
       /// \brief Publisher for road information.
       private: transport::PublisherPtr roadPub;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Transportation node.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Publisher for road information.
+      private: ignition::transport::Node::Publisher roadPubIgn;
     };
     /// \}
   }

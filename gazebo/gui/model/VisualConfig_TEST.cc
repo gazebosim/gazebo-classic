@@ -207,6 +207,8 @@ void VisualConfig_TEST::Restore()
   // Remove a visual and restore
   auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
   QVERIFY(button);
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
   button->click();
 
   QCOMPARE(vc.GetVisualCount(), 1u);

@@ -271,8 +271,9 @@ void DepthCamera::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
   vp = _target->getViewport(0);
 
-  // return 0 in case no renderable object is inside frustrum
-  vp->setBackgroundColour(Ogre::ColourValue(Ogre::ColourValue(0, 0, 0)));
+  // return farClip in case no renderable object is inside frustrum
+  vp->setBackgroundColour(Ogre::ColourValue(this->FarClip(),
+      this->FarClip(), this->FarClip()));
 
   Ogre::CompositorManager::getSingleton().setCompositorEnabled(
                                                 vp, _matName, true);
@@ -368,12 +369,6 @@ void DepthCamera::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* DepthCamera::GetDepthData()
-{
-  return this->DepthData();
-}
-
-//////////////////////////////////////////////////
 const float* DepthCamera::DepthData() const
 {
   return this->dataPtr->depthBuffer;
@@ -414,21 +409,9 @@ event::ConnectionPtr DepthCamera::ConnectNewDepthFrame(
 }
 
 //////////////////////////////////////////////////
-void DepthCamera::DisconnectNewDepthFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newDepthFrame.Disconnect(_c);
-}
-
-//////////////////////////////////////////////////
 event::ConnectionPtr DepthCamera::ConnectNewRGBPointCloud(
     std::function<void (const float *, unsigned int, unsigned int, unsigned int,
     const std::string &)>  _subscriber)
 {
   return this->dataPtr->newRGBPointCloud.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void DepthCamera::DisconnectNewRGBPointCloud(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newRGBPointCloud.Disconnect(_c);
 }

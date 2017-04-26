@@ -14,9 +14,8 @@
  * limitations under the License.
  *
 */
-
-#ifndef _SIMBODY_RAY_SHAPE_HH_
-#define _SIMBODY_RAY_SHAPE_HH_
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYRAYSHAPE_HH_
 
 #include <string>
 #include "gazebo/physics/RayShape.hh"
@@ -51,8 +50,8 @@ namespace gazebo
       public: virtual void GetIntersection(double &_dist, std::string &_entity);
 
       // Documentation inherited
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                                     const math::Vector3 &_posEnd);
+      public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
+                                     const ignition::math::Vector3d &_posEnd);
 
       /// \brief Pointer to the physics engine.
       private: SimbodyPhysicsPtr physicsEngine;

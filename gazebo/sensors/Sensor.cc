@@ -104,7 +104,7 @@ void Sensor::Load(const std::string &_worldName)
   // loaded, but not updated
   this->lastUpdateTime = common::Time(0.0);
 
-  this->node->Init(this->world->GetName());
+  this->node->Init(this->world->Name());
   this->dataPtr->sensorPub =
     this->node->Advertise<msgs::Sensor>("~/sensor");
 }
@@ -138,33 +138,15 @@ void Sensor::SetParent(const std::string &_name, const uint32_t _id)
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetParentName() const
-{
-  return this->ParentName();
-}
-
-//////////////////////////////////////////////////
 std::string Sensor::ParentName() const
 {
   return this->parentName;
 }
 
 //////////////////////////////////////////////////
-uint32_t Sensor::GetId() const
-{
-  return this->Id();
-}
-
-//////////////////////////////////////////////////
 uint32_t Sensor::Id() const
 {
   return this->dataPtr->id;
-}
-
-//////////////////////////////////////////////////
-uint32_t Sensor::GetParentId() const
-{
-  return this->ParentId();
 }
 
 //////////////////////////////////////////////////
@@ -183,7 +165,7 @@ bool Sensor::NeedsUpdate()
   if (this->dataPtr->category == IMAGE && this->scene)
     simTime = this->scene->SimTime();
   else
-    simTime = this->world->GetSimTime();
+    simTime = this->world->SimTime();
 
   // case when last update occurred in the future probably due to
   // world reset
@@ -210,7 +192,7 @@ void Sensor::Update(const bool _force)
     if (this->dataPtr->category == IMAGE && this->scene)
       simTime = this->scene->SimTime();
     else
-      simTime = this->world->GetSimTime();
+      simTime = this->world->SimTime();
 
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutexLastUpdateTime);
@@ -273,12 +255,6 @@ void Sensor::Fini()
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetName() const
-{
-  return this->Name();
-}
-
-//////////////////////////////////////////////////
 std::string Sensor::Name() const
 {
   if (this->sdf)
@@ -289,16 +265,9 @@ std::string Sensor::Name() const
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetScopedName() const
-{
-  return this->ScopedName();
-}
-
-//////////////////////////////////////////////////
 std::string Sensor::ScopedName() const
 {
-  return this->world->GetName() + "::" +
-         this->parentName + "::" + this->Name();
+  return this->world->Name() + "::" + this->parentName + "::" + this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -364,12 +333,6 @@ void Sensor::SetPose(const ignition::math::Pose3d &_pose)
 }
 
 //////////////////////////////////////////////////
-double Sensor::GetUpdateRate()
-{
-  return this->UpdateRate();
-}
-
-//////////////////////////////////////////////////
 double Sensor::UpdateRate() const
 {
   if (this->updatePeriod.Double() > 0.0)
@@ -388,21 +351,9 @@ void Sensor::SetUpdateRate(const double _hz)
 }
 
 //////////////////////////////////////////////////
-common::Time Sensor::GetLastUpdateTime()
-{
-  return this->LastUpdateTime();
-}
-
-//////////////////////////////////////////////////
 common::Time Sensor::LastUpdateTime() const
 {
   return this->lastUpdateTime;
-}
-
-//////////////////////////////////////////////////
-common::Time Sensor::GetLastMeasurementTime()
-{
-  return this->LastMeasurementTime();
 }
 
 //////////////////////////////////////////////////
@@ -412,33 +363,15 @@ common::Time Sensor::LastMeasurementTime() const
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetType() const
-{
-  return this->Type();
-}
-
-//////////////////////////////////////////////////
 std::string Sensor::Type() const
 {
   return this->sdf->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
-bool Sensor::GetVisualize() const
-{
-  return this->Visualize();
-}
-
-//////////////////////////////////////////////////
 bool Sensor::Visualize() const
 {
   return this->sdf->Get<bool>("visualize");
-}
-
-//////////////////////////////////////////////////
-std::string Sensor::GetTopic() const
-{
-  return this->Topic();
 }
 
 //////////////////////////////////////////////////
@@ -490,45 +423,27 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
     if (distortion)
     {
       msgs::Distortion *distortionMsg = camMsg->mutable_distortion();
-      distortionMsg->set_k1(distortion->GetK1());
-      distortionMsg->set_k2(distortion->GetK2());
-      distortionMsg->set_k3(distortion->GetK3());
-      distortionMsg->set_p1(distortion->GetP1());
-      distortionMsg->set_p2(distortion->GetP2());
-      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
-      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+      distortionMsg->set_k1(distortion->K1());
+      distortionMsg->set_k2(distortion->K2());
+      distortionMsg->set_k3(distortion->K3());
+      distortionMsg->set_p1(distortion->P1());
+      distortionMsg->set_p2(distortion->P2());
+      distortionMsg->mutable_center()->set_x(distortion->Center().X());
+      distortionMsg->mutable_center()->set_y(distortion->Center().Y());
     }
   }
 }
 
 //////////////////////////////////////////////////
-std::string Sensor::GetWorldName() const
-{
-  return this->WorldName();
-}
-
-//////////////////////////////////////////////////
 std::string Sensor::WorldName() const
 {
-  return this->world->GetName();
-}
-
-//////////////////////////////////////////////////
-SensorCategory Sensor::GetCategory() const
-{
-  return this->Category();
+  return this->world->Name();
 }
 
 //////////////////////////////////////////////////
 SensorCategory Sensor::Category() const
 {
   return this->dataPtr->category;
-}
-
-//////////////////////////////////////////////////
-NoisePtr Sensor::GetNoise(const SensorNoiseType _type) const
-{
-  return this->Noise(_type);
 }
 
 //////////////////////////////////////////////////
@@ -555,10 +470,4 @@ void Sensor::ResetLastUpdateTime()
 event::ConnectionPtr Sensor::ConnectUpdated(std::function<void()> _subscriber)
 {
   return this->dataPtr->updated.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void Sensor::DisconnectUpdated(event::ConnectionPtr &_c)
-{
-  this->dataPtr->updated.Disconnect(_c);
 }

@@ -14,22 +14,17 @@
  * limitations under the License.
  *
 */
-/* Desc: Middleman between OGRE and Gazebo
- * Author: indepedentCreations@gmail.com
- * Date: 13 Feb 2006
- */
-
-#ifndef _MOVABLETEXT_HH_
-#define _MOVABLETEXT_HH_
+#ifndef GAZEBO_RENDERING_MOVABLETEXT_HH_
+#define GAZEBO_RENDERING_MOVABLETEXT_HH_
 
 #include <string>
+
+#include <ignition/math/Box.hh>
 
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/Color.hh"
-#include "gazebo/math/MathTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace boost
@@ -150,7 +145,7 @@ namespace gazebo
 
       /// \brief Get the axis aligned bounding box of the text.
       /// \return The axis aligned bounding box.
-      public: math::Box GetAABB();
+      public: ignition::math::Box AABB();
 
       /// \brief Update the text.
       public: void Update();

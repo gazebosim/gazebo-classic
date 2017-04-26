@@ -69,7 +69,7 @@ namespace gazebo
         };
 
       /// \brief Constructor
-      public: GBufferMaterialGenerator(GBufferType _type);
+      public: explicit GBufferMaterialGenerator(GBufferType _type);
 
       // The mask of the flags that matter for generating the fragment shader
       public: static const uint32_t FS_MASK = 0x0000FFFF;

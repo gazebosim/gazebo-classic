@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_MODEL_EDITOR_HH_
-#define _GAZEBO_GUI_MODEL_EDITOR_HH_
+#ifndef GAZEBO_GUI_MODEL_MODELEDITOR_HH_
+#define GAZEBO_GUI_MODEL_MODELEDITOR_HH_
 
 #include <memory>
 #include <string>

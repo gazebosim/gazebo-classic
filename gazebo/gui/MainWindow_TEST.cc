@@ -15,7 +15,11 @@
  *
 */
 #include <boost/filesystem.hpp>
-#include "gazebo/math/Helpers.hh"
+
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/gui/Actions.hh"
@@ -140,14 +144,14 @@ void MainWindow_TEST::Selection()
     mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != NULL);
 
-  gazebo::math::Vector2i glWidgetCenter(
+  ignition::math::Vector2i glWidgetCenter(
       glWidget->width()*0.5, glWidget->height()*0.5);
 
   // get model at center of window - should get the box
   gazebo::rendering::VisualPtr vis =
-      cam->GetVisual(glWidgetCenter);
+      cam->Visual(glWidgetCenter);
   QVERIFY(vis != NULL);
-  QVERIFY(vis->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis->GetRootVisual()->Name() == "box");
 
   // move camera to look at the box
   ignition::math::Pose3d cameraPose(ignition::math::Vector3d(-1, 0, 0.5),
@@ -157,9 +161,9 @@ void MainWindow_TEST::Selection()
 
   // verify we get a box
   gazebo::rendering::VisualPtr vis2 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis2 != NULL);
-  QVERIFY(vis2->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis2->GetRootVisual()->Name() == "box");
 
   // look upwards
   ignition::math::Quaterniond pitch90(ignition::math::Vector3d(0, -1.57, 0));
@@ -167,7 +171,7 @@ void MainWindow_TEST::Selection()
   QVERIFY(cam->WorldRotation() == pitch90);
 
   // verify there is nothing in the middle of the window
-  gazebo::rendering::VisualPtr vis3 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis3 = cam->Visual(glWidgetCenter);
   QVERIFY(vis3 == NULL);
 
   // reset orientation
@@ -177,13 +181,13 @@ void MainWindow_TEST::Selection()
 
   // verify we can still get the box
   gazebo::rendering::VisualPtr vis4 =
-      cam->GetVisual(gazebo::math::Vector2i(0, 0));
+      cam->Visual(ignition::math::Vector2i(0, 0));
   QVERIFY(vis4 != NULL);
-  QVERIFY(vis4->GetRootVisual()->GetName() == "box");
+  QVERIFY(vis4->GetRootVisual()->Name() == "box");
 
   // hide the box
   vis4->SetVisible(false);
-  gazebo::rendering::VisualPtr vis5 = cam->GetVisual(glWidgetCenter);
+  gazebo::rendering::VisualPtr vis5 = cam->Visual(glWidgetCenter);
 
   // verify we don't get anything now
   QVERIFY(vis5 == NULL);
@@ -206,9 +210,10 @@ void MainWindow_TEST::SceneDestruction()
 
   // Create the main window.
   mainWindow->Load();
-
   mainWindow->Init();
   mainWindow->show();
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -256,7 +261,7 @@ void MainWindow_TEST::UserCameraFPS()
     std::cerr << "Skipping lower bound FPS check" << std::endl;
     skipFPSTest = true;
   }
-  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  unsigned int iterations = skipFPSTest ? 500 : 5000;
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
@@ -422,7 +427,7 @@ void MainWindow_TEST::Wireframe()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_dark_plane.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -473,7 +478,7 @@ void MainWindow_TEST::Wireframe()
 
   // Redraw the screen
   for (unsigned int i = 0; i < 100 &&
-      gazebo::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
+      ignition::math::equal(avgPostWireframe, avgPreWireframe, 1e-3); ++i)
   {
     gazebo::common::Time::MSleep(30);
     QCoreApplication::processEvents();
@@ -500,7 +505,7 @@ void MainWindow_TEST::Wireframe()
         << "] AvgPostWireframe[" << avgPostWireframe << "]\n";
 
   // Removing the grey ground plane should change the image.
-  QVERIFY(!gazebo::math::equal(avgPreWireframe, avgPostWireframe));
+  QVERIFY(!ignition::math::equal(avgPreWireframe, avgPostWireframe));
 
   cam->Fini();
   mainWindow->close();
@@ -515,7 +520,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_different_name.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -529,8 +534,7 @@ void MainWindow_TEST::NonDefaultWorld()
   // Get the user camera, and tell it to save frames
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
 
-  if (!cam)
-    return;
+  QVERIFY(cam != nullptr);
 
   cam->SetCaptureData(true);
 
@@ -571,10 +575,6 @@ void MainWindow_TEST::UserCameraJoystick()
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
@@ -660,7 +660,7 @@ void MainWindow_TEST::ActionCreationDestruction()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, true);
+  this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
@@ -732,6 +732,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_showLinkFrameAct);
 
+  QVERIFY(gazebo::gui::g_showSkeletonAct);
+
   QVERIFY(gazebo::gui::g_transparentAct);
 
   QVERIFY(gazebo::gui::g_viewWireframeAct);
@@ -780,7 +782,11 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(gazebo::gui::g_redoAct);
 
+  QVERIFY(gazebo::gui::g_plotAct);
+
   QVERIFY(gazebo::gui::g_redoHistoryAct);
+
+  this->ProcessEventsAndDraw(mainWindow);
 
   mainWindow->close();
   delete mainWindow;
@@ -849,6 +855,8 @@ void MainWindow_TEST::ActionCreationDestruction()
 
   QVERIFY(!gazebo::gui::g_showLinkFrameAct);
 
+  QVERIFY(!gazebo::gui::g_showSkeletonAct);
+
   QVERIFY(!gazebo::gui::g_transparentAct);
 
   QVERIFY(!gazebo::gui::g_viewWireframeAct);
@@ -898,6 +906,8 @@ void MainWindow_TEST::ActionCreationDestruction()
   QVERIFY(!gazebo::gui::g_redoAct);
 
   QVERIFY(!gazebo::gui::g_redoHistoryAct);
+
+  QVERIFY(!gazebo::gui::g_plotAct);
 }
 
 /////////////////////////////////////////////////
@@ -1036,7 +1046,7 @@ void MainWindow_TEST::WindowModes()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

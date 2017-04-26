@@ -49,11 +49,11 @@ void SavingLoadingTest::SaveScaledModel(const std::string &_physicsEngine)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   // Get box and check scale
-  auto box = world->GetModel("box");
+  auto box = world->ModelByName("box");
   ASSERT_TRUE(box != NULL);
   EXPECT_EQ(box->Scale(), ignition::math::Vector3d::One);
 
@@ -216,22 +216,22 @@ void SavingLoadingTest::LoadScaledModels(const std::string &_physicsEngine)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  auto physics = world->GetPhysicsEngine();
+  auto physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
 
   // Get box and check scale
-  auto box = world->GetModel("box");
+  auto box = world->ModelByName("box");
   ASSERT_TRUE(box != NULL);
   EXPECT_EQ(box->Scale(), ignition::math::Vector3d(3.34637, 2.87999, 0.123722));
 
   // Get sphere and check scale
-  auto sphere = world->GetModel("sphere");
+  auto sphere = world->ModelByName("sphere");
   ASSERT_TRUE(sphere != NULL);
   EXPECT_EQ(sphere->Scale(),
       ignition::math::Vector3d(0.402674, 0.402674, 0.402674));
 
   // Get cylinder and check scale
-  auto cylinder = world->GetModel("cylinder");
+  auto cylinder = world->ModelByName("cylinder");
   ASSERT_TRUE(cylinder != NULL);
   EXPECT_EQ(cylinder->Scale(),
       ignition::math::Vector3d(2.2969, 2.2969, 2.09564));

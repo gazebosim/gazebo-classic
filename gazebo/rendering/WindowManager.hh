@@ -61,9 +61,11 @@ namespace gazebo
       /// \param[in] _ogreHandle String representing the ogre window handle.
       /// \param[in] _width With of the window in pixels.
       /// \param[in] _height Height of the window in pixels.
+      /// \param[in] _devicePixelRatio Screen point to pixel ratio
       public: int CreateWindow(const std::string &_ogreHandle,
                                uint32_t _width,
-                               uint32_t _height);
+                               uint32_t _height,
+                               const double _devicePixelRatio = 1.0);
 
       /// \brief Attach a camera to a window.
       /// \param[in] _windowId Id of the window to add the camera to.
@@ -83,31 +85,12 @@ namespace gazebo
       /// \brief Get the average FPS.
       /// \param[in] _id ID of the window.
       /// \return The frames per second.
-      /// \deprecated See AvgFPS()
-      public: float GetAvgFPS(uint32_t _id) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the average FPS.
-      /// \param[in] _id ID of the window.
-      /// \return The frames per second.
       public: float AvgFPS(const uint32_t _id) const;
 
       /// \brief Get the triangle count.
       /// \param[in] _id ID of the window.
       /// \return The triangle count.
-      /// \deprecated See TriangleCount()
-      public: uint32_t GetTriangleCount(uint32_t _id) GAZEBO_DEPRECATED(7.0);
-
-      /// \brief Get the triangle count.
-      /// \param[in] _id ID of the window.
-      /// \return The triangle count.
       public: uint32_t TriangleCount(const uint32_t _id) const;
-
-      /// \brief Get the render window associated with the given id.
-      /// \param[in] _id ID of the window.
-      /// \return Pointer to the render window, NULL if the id is invalid.
-      /// \deprecated See Window()
-      public: Ogre::RenderWindow *GetWindow(uint32_t _id)
-          GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the render window associated with the given id.
       /// \param[in] _id ID of the window.

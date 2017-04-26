@@ -140,6 +140,15 @@ void BuildingEditor::CreateMenus()
   fileMenu->addAction(this->saveAct);
   fileMenu->addAction(this->saveAsAct);
   fileMenu->addAction(this->exitAct);
+
+  // OSX:
+  // There is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  //
+  // Ubuntu Xenial + Unity:
+  // The native menubar is not registering shortcuts (issue #2134)
+  this->menuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////

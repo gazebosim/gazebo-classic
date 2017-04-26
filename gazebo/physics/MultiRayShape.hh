@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _MULTIRAYSHAPE_HH_
-#define _MULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -44,6 +42,19 @@ namespace gazebo
       /// \param[in] _parent Parent collision shape.
       public: explicit MultiRayShape(CollisionPtr _parent);
 
+      /// \brief Constructor for a stand alone multiray shape. Stand alone
+      /// means the multiray shape is not attached to a Collision object.
+      ///
+      /// Example:
+      ///
+      ///  gazebo::physics::MultiRayShapePtr rays =
+      ///      boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
+      ///        world->Physics()->CreateShape("multiray",
+      ///          gazebo::physics::CollisionPtr()));
+      ///
+      /// \param[in] _physicsEngine Pointer to the physics engine.
+      public: explicit MultiRayShape(PhysicsEnginePtr _physicsEngine);
+
       /// \brief Destructor.
       public: virtual ~MultiRayShape();
 
@@ -52,7 +63,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -91,11 +102,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      public: ignition::math::Angle MinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      public: ignition::math::Angle MaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -107,11 +118,11 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      public: ignition::math::Angle VerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      public: ignition::math::Angle VerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();
@@ -136,25 +147,43 @@ namespace gazebo
               event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
               {return this->newLaserScans.Connect(_subscriber);}
 
-      /// \brief Disconnect from the new laser scans signal.
-      /// \param[in] _conn Connection to remove.
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              {this->newLaserScans.Disconnect(_conn);}
-
-      /// \brief Physics engine specific method for updating the rays.
-      protected: virtual void UpdateRays() = 0;
+      /// \brief Method for updating the rays. This function is normally
+      /// called automatically, such as when a laser sensor is updated.
+      /// Only call this function on a standalone multiray shape.
+      /// \sa explicit MultiRayShape(PhysicsEnginePtr _physicsEngine)
+      public: virtual void UpdateRays() = 0;
 
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      protected: virtual void AddRay(const math::Vector3 &_start,
-                                     const math::Vector3 &_end);
+      public: virtual void AddRay(const ignition::math::Vector3d &_start,
+                                  const ignition::math::Vector3d &_end);
+
+      /// \brief Set the points of a ray.
+      /// \param[in] _rayIndex Index of the ray to set.
+      /// \param[in] _start Start of the ray.
+      /// \param[in] _end End of the ray.
+      /// \return True if the ray was set. False can be returned if the
+      /// _rayIndex is invalid.
+      public: bool SetRay(const unsigned int _rayIndex,
+                  const ignition::math::Vector3d &_start,
+                  const ignition::math::Vector3d &_end);
+
+      /// \brief Get the number of rays.
+      /// \return Number of rays in this shape.
+      public: unsigned int RayCount() const;
+
+      /// \brief Get a pointer to a ray
+      /// \param[in] _rayIndex index to the ray
+      /// \return Pointer to the ray, or NULL on error
+      /// \sa RayCount()
+      public: RayShapePtr Ray(const unsigned int _rayIndex) const;
 
       /// \brief Ray data
       protected: std::vector<RayShapePtr> rays;
 
       /// \brief Pose offset of all the rays.
-      protected: math::Pose offset;
+      protected: ignition::math::Pose3d offset;
 
       /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;
@@ -173,6 +202,12 @@ namespace gazebo
 
       /// \brief New laser scans event.
       protected: event::EventT<void()> newLaserScans;
+
+      /// \brief Min range of a ray
+      private: double minRange = 0;
+
+      /// \brief Max range of a ray
+      private: double maxRange = 1000;
     };
     /// \}
   }

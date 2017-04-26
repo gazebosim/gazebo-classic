@@ -20,6 +20,9 @@
   #include <Winsock2.h>
 #endif
 
+#include <functional>
+#include <ignition/math/Helpers.hh>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
@@ -107,7 +110,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forceElementLabel->setText(tr("Z:"));
     QLabel *forceUnitLabel = new QLabel(tr("N"));
 
-    forceSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forceSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     forceSpins[i]->setSingleStep(100);
     forceSpins[i]->setDecimals(3);
     forceSpins[i]->setValue(0);
@@ -126,7 +129,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *forceMagUnitLabel = new QLabel(tr("N"));
 
   this->dataPtr->forceMagSpin = new QDoubleSpinBox();
-  this->dataPtr->forceMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->forceMagSpin->setRange(0, ignition::math::MAX_D);
   this->dataPtr->forceMagSpin->setSingleStep(100);
   this->dataPtr->forceMagSpin->setDecimals(3);
   this->dataPtr->forceMagSpin->setValue(0);
@@ -205,7 +208,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       forcePosElementLabel->setText(tr("Z:"));
     QLabel *forcePosUnitLabel = new QLabel(tr("m"));
 
-    forcePosSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    forcePosSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     forcePosSpins[i]->setSingleStep(0.1);
     forcePosSpins[i]->setDecimals(3);
     forcePosSpins[i]->setValue(0);
@@ -289,7 +292,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
       torqueElementLabel->setText(tr("Z:"));
     QLabel *torqueUnitLabel = new QLabel(tr("Nm"));
 
-    torqueSpins[i]->setRange(-GZ_DBL_MAX, GZ_DBL_MAX);
+    torqueSpins[i]->setRange(-ignition::math::MAX_D, ignition::math::MAX_D);
     torqueSpins[i]->setSingleStep(100);
     torqueSpins[i]->setDecimals(3);
     torqueSpins[i]->setValue(0);
@@ -308,7 +311,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   QLabel *torqueMagUnitLabel = new QLabel(tr("Nm"));
 
   this->dataPtr->torqueMagSpin = new QDoubleSpinBox();
-  this->dataPtr->torqueMagSpin->setRange(0, GZ_DBL_MAX);
+  this->dataPtr->torqueMagSpin->setRange(0, ignition::math::MAX_D);
   this->dataPtr->torqueMagSpin->setSingleStep(100);
   this->dataPtr->torqueMagSpin->setDecimals(3);
   this->dataPtr->torqueMagSpin->setValue(0);
@@ -389,18 +392,15 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
-  this->dataPtr->comVector = math::Vector3::Zero;
-  this->dataPtr->forceVector = math::Vector3::Zero;
-  this->dataPtr->torqueVector = math::Vector3::Zero;
+  this->dataPtr->comVector = ignition::math::Vector3d::Zero;
+  this->dataPtr->forceVector = ignition::math::Vector3d::Zero;
+  this->dataPtr->torqueVector = ignition::math::Vector3d::Zero;
 }
 
 /////////////////////////////////////////////////
 ApplyWrenchDialog::~ApplyWrenchDialog()
 {
   this->Fini();
-
-  delete this->dataPtr;
-  this->dataPtr = NULL;
 }
 
 /////////////////////////////////////////////////
@@ -440,17 +440,19 @@ void ApplyWrenchDialog::Fini()
     this->dataPtr->mainWindow->removeEventFilter(this);
 
   this->dataPtr->userCmdPub.reset();
-  this->dataPtr->node->Fini();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
   this->dataPtr->connections.clear();
 
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
 
     this->dataPtr->applyWrenchVisual->Fini();
   }
@@ -479,7 +481,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   // Check if model/link hasn't been deleted on PreRender
   this->dataPtr->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&ApplyWrenchDialog::OnPreRender, this)));
+      std::bind(&ApplyWrenchDialog::OnPreRender, this)));
 
   this->dataPtr->modelLabel->setText(("<b>Model:</b> " + _modelName).c_str());
 
@@ -490,7 +492,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
   for (unsigned int i = 0; i < vis->GetChildCount(); ++i)
   {
     rendering::VisualPtr childVis = vis->GetChild(i);
-    std::string linkName = childVis->GetName();
+    std::string linkName = childVis->Name();
 
     // Issue #1553: This is failing to get real links sometimes:
     // uint32_t flags = childVis->GetVisibilityFlags();
@@ -510,7 +512,7 @@ bool ApplyWrenchDialog::SetModel(const std::string &_modelName)
 
         if (comVis)
         {
-          this->dataPtr->linkToCOMMap[linkName] = comVis->GetInertiaPose().pos;
+          this->dataPtr->linkToCOMMap[linkName] = comVis->InertiaPose().Pos();
           break;
         }
       }
@@ -584,8 +586,9 @@ bool ApplyWrenchDialog::SetLink(const std::string &_linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->AddReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseRelease, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMouseRelease, this,
+        std::placeholders::_1));
   }
 
   return true;
@@ -598,7 +601,7 @@ void ApplyWrenchDialog::SetLink(const QString _linkName)
   if (this->dataPtr->applyWrenchVisual)
   {
     MouseEventHandler::Instance()->RemoveReleaseFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 
   if (!this->SetLink(this->dataPtr->modelName + "::" + _linkName.toStdString()))
@@ -610,9 +613,9 @@ void ApplyWrenchDialog::OnApplyAll()
 {
   // Publish wrench message
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
 
   // Register user command on server
   // The wrench will be applied from the server
@@ -630,9 +633,9 @@ void ApplyWrenchDialog::OnApplyForce()
 {
   // Publish wrench message
   msgs::Wrench msg;
-  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector.Ign());
+  msgs::Set(msg.mutable_force(), this->dataPtr->forceVector);
   msgs::Set(msg.mutable_torque(), ignition::math::Vector3d::Zero);
-  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector.Ign());
+  msgs::Set(msg.mutable_force_offset(), this->dataPtr->forcePosVector);
 
   // Register user command on server
   // The wrench will be applied from the server
@@ -651,7 +654,7 @@ void ApplyWrenchDialog::OnApplyTorque()
   // Publish wrench message
   msgs::Wrench msg;
   msgs::Set(msg.mutable_force(), ignition::math::Vector3d::Zero);
-  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector.Ign());
+  msgs::Set(msg.mutable_torque(), this->dataPtr->torqueVector);
 
   // Register user command on server
   // The wrench will be applied from the server
@@ -675,9 +678,9 @@ void ApplyWrenchDialog::OnForcePosChanged(double /*_value*/)
 {
   // Update forcePos vector with values from XYZ spins
   this->SetForcePos(
-      math::Vector3(this->dataPtr->forcePosXSpin->value(),
-                    this->dataPtr->forcePosYSpin->value(),
-                    this->dataPtr->forcePosZSpin->value()));
+      ignition::math::Vector3d(this->dataPtr->forcePosXSpin->value(),
+                               this->dataPtr->forcePosYSpin->value(),
+                               this->dataPtr->forcePosZSpin->value()));
 }
 
 /////////////////////////////////////////////////
@@ -685,9 +688,9 @@ void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 {
   // Update force vector proportionally
   // Normalize current vector
-  math::Vector3 v = this->dataPtr->forceVector;
-  if (v == math::Vector3::Zero)
-    v = math::Vector3::UnitX;
+  ignition::math::Vector3d v = this->dataPtr->forceVector;
+  if (v == ignition::math::Vector3d::Zero)
+    v = ignition::math::Vector3d::UnitX;
   else
     v.Normalize();
 
@@ -699,15 +702,15 @@ void ApplyWrenchDialog::OnForceMagChanged(double /*_magnitude*/)
 void ApplyWrenchDialog::OnForceChanged(double /*_value*/)
 {
   // Update force vector with values from XYZ spins
-  this->SetForce(math::Vector3(this->dataPtr->forceXSpin->value(),
-                               this->dataPtr->forceYSpin->value(),
-                               this->dataPtr->forceZSpin->value()));
+  this->SetForce(ignition::math::Vector3d(this->dataPtr->forceXSpin->value(),
+                                          this->dataPtr->forceYSpin->value(),
+                                          this->dataPtr->forceZSpin->value()));
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnForceClear()
 {
-  this->SetForce(math::Vector3::Zero);
+  this->SetForce(ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////
@@ -715,9 +718,9 @@ void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 {
   // Update torque vector proportionally
   // Normalize current vector
-  math::Vector3 v = this->dataPtr->torqueVector;
-  if (v == math::Vector3::Zero)
-    v = math::Vector3::UnitX;
+  ignition::math::Vector3d v = this->dataPtr->torqueVector;
+  if (v == ignition::math::Vector3d::Zero)
+    v = ignition::math::Vector3d::UnitX;
   else
     v.Normalize();
 
@@ -729,15 +732,15 @@ void ApplyWrenchDialog::OnTorqueMagChanged(double /*_magnitude*/)
 void ApplyWrenchDialog::OnTorqueChanged(double /*_value*/)
 {
   // Update torque vector with values from XYZ spins
-  this->SetTorque(math::Vector3(this->dataPtr->torqueXSpin->value(),
-                               this->dataPtr->torqueYSpin->value(),
-                               this->dataPtr->torqueZSpin->value()));
+  this->SetTorque(ignition::math::Vector3d(this->dataPtr->torqueXSpin->value(),
+      this->dataPtr->torqueYSpin->value(),
+      this->dataPtr->torqueZSpin->value()));
 }
 
 /////////////////////////////////////////////////
 void ApplyWrenchDialog::OnTorqueClear()
 {
-  this->SetTorque(math::Vector3::Zero);
+  this->SetTorque(ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////
@@ -750,7 +753,7 @@ void ApplyWrenchDialog::ToggleComRadio(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
+void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, const double _value)
 {
   _spin->blockSignals(true);
   _spin->setValue(_value);
@@ -758,14 +761,14 @@ void ApplyWrenchDialog::SetSpinValue(QDoubleSpinBox *_spin, double _value)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
+void ApplyWrenchDialog::SetForcePos(const ignition::math::Vector3d &_forcePos)
 {
   this->dataPtr->forcePosVector = _forcePos;
 
   // Spins
-  this->SetSpinValue(this->dataPtr->forcePosXSpin, _forcePos.x);
-  this->SetSpinValue(this->dataPtr->forcePosYSpin, _forcePos.y);
-  this->SetSpinValue(this->dataPtr->forcePosZSpin, _forcePos.z);
+  this->SetSpinValue(this->dataPtr->forcePosXSpin, _forcePos.X());
+  this->SetSpinValue(this->dataPtr->forcePosYSpin, _forcePos.Y());
+  this->SetSpinValue(this->dataPtr->forcePosZSpin, _forcePos.Z());
 
   // Check COM box
   if (_forcePos == this->dataPtr->comVector)
@@ -785,11 +788,11 @@ void ApplyWrenchDialog::SetForcePos(const math::Vector3 &_forcePos)
   }
 
   this->dataPtr->applyWrenchVisual->SetForcePos(
-      this->dataPtr->forcePosVector.Ign());
+      this->dataPtr->forcePosVector);
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
+void ApplyWrenchDialog::SetForce(const ignition::math::Vector3d &_force,
     const bool _rotatedByMouse)
 {
   // This can be called from the dialog or the mouse
@@ -798,15 +801,15 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
   this->dataPtr->forceVector = _force;
 
   // Spins
-  this->SetSpinValue(this->dataPtr->forceXSpin, _force.x);
-  this->SetSpinValue(this->dataPtr->forceYSpin, _force.y);
-  this->SetSpinValue(this->dataPtr->forceZSpin, _force.z);
-  this->SetSpinValue(this->dataPtr->forceMagSpin, _force.GetLength());
+  this->SetSpinValue(this->dataPtr->forceXSpin, _force.X());
+  this->SetSpinValue(this->dataPtr->forceYSpin, _force.Y());
+  this->SetSpinValue(this->dataPtr->forceZSpin, _force.Z());
+  this->SetSpinValue(this->dataPtr->forceMagSpin, _force.Length());
 
   // Mode
-  if (_force == math::Vector3::Zero)
+  if (_force == ignition::math::Vector3d::Zero)
   {
-    if (this->dataPtr->torqueVector == math::Vector3::Zero)
+    if (this->dataPtr->torqueVector == ignition::math::Vector3d::Zero)
       this->SetMode(Mode::NONE);
     else
       this->SetMode(Mode::TORQUE);
@@ -823,11 +826,11 @@ void ApplyWrenchDialog::SetForce(const math::Vector3 &_force,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetForce(_force.Ign(), _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetForce(_force, _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
+void ApplyWrenchDialog::SetTorque(const ignition::math::Vector3d &_torque,
     const bool _rotatedByMouse)
 {
   // This can be called from the dialog or the mouse
@@ -836,15 +839,15 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
   this->dataPtr->torqueVector = _torque;
 
   // Spins
-  this->SetSpinValue(this->dataPtr->torqueXSpin, _torque.x);
-  this->SetSpinValue(this->dataPtr->torqueYSpin, _torque.y);
-  this->SetSpinValue(this->dataPtr->torqueZSpin, _torque.z);
-  this->SetSpinValue(this->dataPtr->torqueMagSpin, _torque.GetLength());
+  this->SetSpinValue(this->dataPtr->torqueXSpin, _torque.X());
+  this->SetSpinValue(this->dataPtr->torqueYSpin, _torque.Y());
+  this->SetSpinValue(this->dataPtr->torqueZSpin, _torque.Z());
+  this->SetSpinValue(this->dataPtr->torqueMagSpin, _torque.Length());
 
   // Mode
-  if (_torque == math::Vector3::Zero)
+  if (_torque == ignition::math::Vector3d::Zero)
   {
-    if (this->dataPtr->forceVector == math::Vector3::Zero)
+    if (this->dataPtr->forceVector == ignition::math::Vector3d::Zero)
       this->SetMode(Mode::NONE);
     else
       this->SetMode(Mode::FORCE);
@@ -861,11 +864,11 @@ void ApplyWrenchDialog::SetTorque(const math::Vector3 &_torque,
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetTorque(_torque.Ign(), _rotatedByMouse);
+  this->dataPtr->applyWrenchVisual->SetTorque(_torque, _rotatedByMouse);
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
+void ApplyWrenchDialog::SetCoM(const ignition::math::Vector3d &_com)
 {
   this->dataPtr->comVector = _com;
 
@@ -876,7 +879,7 @@ void ApplyWrenchDialog::SetCoM(const math::Vector3 &_com)
     return;
   }
 
-  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector.Ign());
+  this->dataPtr->applyWrenchVisual->SetCoM(this->dataPtr->comVector);
 }
 
 /////////////////////////////////////////////////
@@ -934,6 +937,11 @@ void ApplyWrenchDialog::AttachVisuals()
       this->dataPtr->applyWrenchVisual->GetParent() !=
       this->dataPtr->linkVisual)
   {
+    if (this->dataPtr->applyWrenchVisual->GetParent())
+    {
+      this->dataPtr->applyWrenchVisual->GetParent()->DetachVisual(
+          this->dataPtr->applyWrenchVisual);
+    }
     this->dataPtr->linkVisual->AttachVisual(this->dataPtr->applyWrenchVisual);
     this->dataPtr->applyWrenchVisual->Resize();
   }
@@ -961,7 +969,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
   this->dataPtr->draggingTool = false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (vis)
@@ -979,7 +987,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
     // Register rotTool pose at drag start
     this->dataPtr->dragStartPose =
-        this->dataPtr->applyWrenchVisual->GetRotTool()->GetWorldPose();
+        this->dataPtr->applyWrenchVisual->GetRotTool()->WorldPose();
   }
   return false;
 }
@@ -991,7 +999,7 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
+  rendering::VisualPtr vis = userCamera->Visual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (!vis || _event.Dragging())
@@ -1003,8 +1011,8 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
     this->ActivateWindow();
 
     // Activate visual, can't attach rot tool with zero vector, UnitX by default
-    if (this->dataPtr->forceVector == math::Vector3::Zero)
-      this->SetForce(math::Vector3::UnitX);
+    if (this->dataPtr->forceVector == ignition::math::Vector3d::Zero)
+      this->SetForce(ignition::math::Vector3d::UnitX);
     else
       this->SetForce(this->dataPtr->forceVector);
 
@@ -1015,8 +1023,8 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
     this->ActivateWindow();
 
     // Activate visual, can't attach rot tool with zero vector, UnitX by default
-    if (this->dataPtr->torqueVector == math::Vector3::Zero)
-      this->SetTorque(math::Vector3::UnitX);
+    if (this->dataPtr->torqueVector == ignition::math::Vector3d::Zero)
+      this->SetTorque(ignition::math::Vector3d::UnitX);
     else
       this->SetTorque(this->dataPtr->torqueVector);
 
@@ -1045,12 +1053,12 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     ignition::math::Vector3d axis;
     if (this->dataPtr->manipState == "rot_z")
     {
-      normal = this->dataPtr->dragStartPose.rot.GetZAxis().Ign();
+      normal = this->dataPtr->dragStartPose.Rot().ZAxis();
       axis = ignition::math::Vector3d::UnitZ;
     }
     else if (this->dataPtr->manipState == "rot_y")
     {
-      normal = this->dataPtr->dragStartPose.rot.GetYAxis().Ign();
+      normal = this->dataPtr->dragStartPose.Rot().YAxis();
       axis = ignition::math::Vector3d::UnitY;
     }
     else
@@ -1060,7 +1068,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
       return false;
     }
 
-    double offset = this->dataPtr->dragStartPose.pos.Ign().Dot(normal);
+    double offset = this->dataPtr->dragStartPose.Pos().Dot(normal);
 
     ignition::math::Vector3d pressPoint;
     userCamera->WorldPointOnPlane(_event.PressPos().X(),
@@ -1072,9 +1080,9 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
         ignition::math::Planed(normal, offset), newPoint);
 
     ignition::math::Vector3d v1 = pressPoint -
-      this->dataPtr->dragStartPose.pos.Ign();
+      this->dataPtr->dragStartPose.Pos();
     ignition::math::Vector3d v2 = newPoint -
-      this->dataPtr->dragStartPose.pos.Ign();
+      this->dataPtr->dragStartPose.Pos();
     v1 = v1.Normalize();
     v2 = v2.Normalize();
     double signTest = v1.Cross(v2).Dot(normal);
@@ -1087,7 +1095,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
       angle = rint(angle / (M_PI * 0.25)) * (M_PI * 0.25);
 
     ignition::math::Quaterniond rot(axis, angle);
-    rot = this->dataPtr->dragStartPose.rot.Ign() * rot;
+    rot = this->dataPtr->dragStartPose.Rot() * rot;
 
     // Must rotate the tool here to make sure we have proper roll,
     // once the rotation gets transformed into a vector we lose a DOF
@@ -1102,8 +1110,8 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     vec.Z(-sin(rotEuler.Y()));
 
     // To local frame
-    vec = this->dataPtr->linkVisual->GetWorldPose().rot.RotateVectorReverse(
-        vec).Ign();
+    vec = this->dataPtr->linkVisual->WorldPose().Rot().RotateVectorReverse(
+        vec);
 
     if (this->GetMode() == Mode::FORCE)
     {
@@ -1118,7 +1126,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
   // Highlight hovered tools
   else
   {
-    userCamera->GetVisual(_event.Pos(), this->dataPtr->manipState);
+    userCamera->Visual(_event.Pos(), this->dataPtr->manipState);
 
     if (this->dataPtr->manipState == "rot_z" ||
         this->dataPtr->manipState == "rot_y")
@@ -1148,12 +1156,12 @@ ApplyWrenchDialog::Mode ApplyWrenchDialog::GetMode() const
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
+void ApplyWrenchDialog::NewForceDirection(const ignition::math::Vector3d &_dir)
 {
   // Normalize direction
-  math::Vector3 v = _dir;
-  if (v == math::Vector3::Zero)
-    v = math::Vector3::UnitX;
+  ignition::math::Vector3d v = _dir;
+  if (v == ignition::math::Vector3d::Zero)
+    v = ignition::math::Vector3d::UnitX;
   else
     v.Normalize();
 
@@ -1162,12 +1170,12 @@ void ApplyWrenchDialog::NewForceDirection(const math::Vector3 &_dir)
 }
 
 /////////////////////////////////////////////////
-void ApplyWrenchDialog::NewTorqueDirection(const math::Vector3 &_dir)
+void ApplyWrenchDialog::NewTorqueDirection(const ignition::math::Vector3d &_dir)
 {
   // Normalize direction
-  math::Vector3 v = _dir;
-  if (v == math::Vector3::Zero)
-    v = math::Vector3::UnitX;
+  ignition::math::Vector3d v = _dir;
+  if (v == ignition::math::Vector3d::Zero)
+    v = ignition::math::Vector3d::UnitX;
   else
     v.Normalize();
 
@@ -1198,12 +1206,14 @@ void ApplyWrenchDialog::SetActive(bool _active)
       g_arrowAct->trigger();
 
     MouseEventHandler::Instance()->AddPressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMousePress, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMousePress, this,
+        std::placeholders::_1));
 
     MouseEventHandler::Instance()->AddMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName(),
-        boost::bind(&ApplyWrenchDialog::OnMouseMove, this, _1));
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name(),
+        std::bind(&ApplyWrenchDialog::OnMouseMove, this,
+        std::placeholders::_1));
   }
   else
   {
@@ -1211,9 +1221,9 @@ void ApplyWrenchDialog::SetActive(bool _active)
         rendering::ApplyWrenchVisual::Mode::NONE);
 
     MouseEventHandler::Instance()->RemovePressFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
     MouseEventHandler::Instance()->RemoveMoveFilter(
-        "dialog_"+this->dataPtr->applyWrenchVisual->GetName());
+        "dialog_"+this->dataPtr->applyWrenchVisual->Name());
   }
 }
 
@@ -1298,8 +1308,8 @@ void ApplyWrenchDialog::changeEvent(QEvent *_event)
     // During tests it seems not to find main window, so this is true by default
     bool mainWindowActive = true;
 
-    if (!this->dataPtr->mainWindow || (this->dataPtr->mainWindow &&
-        !this->dataPtr->mainWindow->isActiveWindow()))
+    if (!this->dataPtr->mainWindow ||
+        !this->dataPtr->mainWindow->isActiveWindow())
     {
       mainWindowActive = false;
     }

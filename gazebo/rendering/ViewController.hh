@@ -14,16 +14,23 @@
  * limitations under the License.
  *
 */
-#ifndef _VIEWCONTROLLER_HH_
-#define _VIEWCONTROLLER_HH_
+#ifndef GAZEBO_RENDERING_VIEWCONTROLLER_HH_
+#define GAZEBO_RENDERING_VIEWCONTROLLER_HH_
 
 #include <string>
-#include "gazebo/common/CommonTypes.hh"
+
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
+  namespace common
+  {
+    class MouseEvent;
+  }
+
   namespace rendering
   {
     /// \addtogroup gazebo_rendering
@@ -35,7 +42,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _camera The user camera to controll.
-      public: ViewController(UserCameraPtr _camera);
+      public: explicit ViewController(UserCameraPtr _camera);
 
       /// \brief Destructor
       public: virtual ~ViewController();
@@ -47,8 +54,8 @@ namespace gazebo
       /// \param[in] _focalPoint The point to look at.
       /// \param[in] _yaw Initial yaw angle.
       /// \param[in] _pitch Initial pitch angle.
-      public: virtual void Init(const math::Vector3 &_focalPoint,
-                  const double _yaw = 0, const double _pitch = 0);
+      public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
+        const double _yaw = 0, const double _pitch = 0);
 
       /// \brief Update the controller, which should update the position
       /// of the Camera.

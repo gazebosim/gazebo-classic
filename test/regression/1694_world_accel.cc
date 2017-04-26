@@ -27,17 +27,17 @@ class Issue1694Test : public ServerFixture
   /// \brief Check acceleration value.
   /// \param[in] _accel Acceleration to check.
   /// \param[in] _expected Expected value.
-  public: static void CheckAccel(const math::Vector3 &_accel,
-                                 const math::Vector3 &_expected);
+  public: static void CheckAccel(const ignition::math::Vector3d &_accel,
+                                 const ignition::math::Vector3d &_expected);
 };
 
 /////////////////////////////////////////////////
-void Issue1694Test::CheckAccel(const math::Vector3 &_accel,
-                               const math::Vector3 &_expected)
+void Issue1694Test::CheckAccel(const ignition::math::Vector3d &_accel,
+                               const ignition::math::Vector3d &_expected)
 {
-  EXPECT_NEAR(_accel.x, _expected.x, g_tolerance);
-  EXPECT_NEAR(_accel.y, _expected.y, g_tolerance);
-  EXPECT_NEAR(_accel.z, _expected.z, g_tolerance);
+  EXPECT_NEAR(_accel.X(), _expected.X(), g_tolerance);
+  EXPECT_NEAR(_accel.Y(), _expected.Y(), g_tolerance);
+  EXPECT_NEAR(_accel.Z(), _expected.Z(), g_tolerance);
 }
 
 /////////////////////////////////////////////////
@@ -48,25 +48,27 @@ TEST_F(Issue1694Test, WorldAccel)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr model = world->GetModel("box_model");
+  physics::ModelPtr model = world->ModelByName("box_model");
   ASSERT_TRUE(model != NULL);
 
   physics::LinkPtr link = model->GetLink("box_link");
   ASSERT_TRUE(link != NULL);
 
-  const math::Vector3 g = world->GetPhysicsEngine()->GetGravity();
+  const auto g = world->Gravity();
 
   world->Step(1);
 
   // Expect box to still be falling
-  CheckAccel(link->GetRelativeLinearAccel(), g);
-  CheckAccel(link->GetWorldLinearAccel(), g);
+  CheckAccel(link->RelativeLinearAccel(), g);
+  CheckAccel(link->WorldLinearAccel(), g);
 
   world->Step(3000);
 
   // The box should be resting on the ground
-  CheckAccel(link->GetRelativeLinearAccel(), math::Vector3());
-  CheckAccel(link->GetWorldLinearAccel(), math::Vector3());
+  CheckAccel(link->RelativeLinearAccel(),
+      ignition::math::Vector3d::Zero);
+  CheckAccel(link->WorldLinearAccel(),
+      ignition::math::Vector3d::Zero);
 }
 
 /////////////////////////////////////////////////

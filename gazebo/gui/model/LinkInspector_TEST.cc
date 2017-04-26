@@ -74,7 +74,7 @@ void LinkInspector_TEST::AppliedSignal()
   // Get spins
   QList<QDoubleSpinBox *> spins =
       linkInspector->findChildren<QDoubleSpinBox *>();
-  QVERIFY(spins.size() == 19);
+  QCOMPARE(spins.size(), 23);
 
   // Get push buttons
   QList<QPushButton *> pushButtons =

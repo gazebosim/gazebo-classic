@@ -15,6 +15,8 @@
  *
 */
 
+#include <functional>
+
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -40,19 +42,19 @@ void RestUiPlugin::Load(int _argc, char ** _argv)
   for (int i = 0; i < _argc; ++i)
   {
     std::string arg = _argv[i];
-    if (arg.find("menu=") == 0)
+    if (arg.compare(0, 5, "menu=") == 0)
     {
       this->menuTitle = arg.substr(5);
     }
-    else if (arg.find("title=") == 0 )
+    else if (arg.compare(0, 6, "title=") == 0 )
     {
       this->loginTitle = arg.substr(6);
     }
-    else if (arg.find("label=") == 0 )
+    else if (arg.compare(0, 6, "label=") == 0 )
     {
       this->urlLabel = arg.substr(6);
     }
-    else if (arg.find("url=") == 0 )
+    else if (arg.compare(0, 4, "url=") == 0 )
     {
       this->defaultUrl = arg.substr(4);
     }
@@ -69,11 +71,11 @@ void RestUiPlugin::Init()
   // Connect to the sensor update event.
   this->connections.push_back(
       gui::Events::ConnectMainWindowReady(
-      boost::bind(&RestUiPlugin::OnMainWindowReady, this)));
+      std::bind(&RestUiPlugin::OnMainWindowReady, this)));
 
   this->connections.push_back(
       event::Events::ConnectPreRender(
-      boost::bind(&RestUiPlugin::Update, this)));
+      std::bind(&RestUiPlugin::Update, this)));
 }
 
 /////////////////////////////////////////////////

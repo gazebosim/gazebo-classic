@@ -14,6 +14,12 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
+#include <ignition/math/Plane.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector2.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/MouseEvent.hh"
 
@@ -34,7 +40,7 @@ static const float PITCH_LIMIT_HIGH = M_PI*0.5 - 0.001;
 //////////////////////////////////////////////////
 OrbitViewController::OrbitViewController(UserCameraPtr _camera,
     const std::string &_name)
-  : ViewController(_camera), distance(5.0f)
+  : ViewController(_camera), yaw(0.0f), pitch(0.0f), distance(5.0f)
 {
   this->typeString = TYPE_STRING;
   this->init = false;
@@ -44,7 +50,7 @@ OrbitViewController::OrbitViewController(UserCameraPtr _camera,
 
   this->refVisual->Load();
   this->refVisual->AttachMesh("unit_sphere");
-  this->refVisual->SetScale(math::Vector3(0.2, 0.2, 0.1));
+  this->refVisual->SetScale(ignition::math::Vector3d(0.2, 0.2, 0.1));
   this->refVisual->SetCastShadows(false);
   this->refVisual->SetMaterial("Gazebo/YellowTransparent");
   this->refVisual->SetVisible(false);
@@ -58,13 +64,13 @@ OrbitViewController::~OrbitViewController()
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::Init(const math::Vector3 &_focalPoint,
+void OrbitViewController::Init(const ignition::math::Vector3d &_focalPoint,
     const double _yaw, const double _pitch)
 {
   this->yaw = _yaw;
   this->pitch = _pitch;
 
-  this->focalPoint = _focalPoint.Ign();
+  this->focalPoint = _focalPoint;
   this->distance = this->camera->WorldPosition().Distance(
       this->focalPoint);
 
@@ -88,7 +94,7 @@ void OrbitViewController::Init()
   }
 
   // If the plane is too far away.
-  if (dist < 0 || dist > 20 || math::isnan(dist))
+  if (dist < 0 || dist > 20 || ignition::math::isnan(dist))
   {
     // First, see if the camera is looking at the origin.
     ignition::math::Vector3d dir = this->camera->Direction();
@@ -151,6 +157,7 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
     return;
 
   ignition::math::Vector2i drag = _event.Pos() - _event.PrevPos();
+  drag *= this->camera->DevicePixelRatio();
 
   ignition::math::Vector3d directionVec(0, 0, 0);
 
@@ -286,19 +293,19 @@ void OrbitViewController::HandleMouseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::TranslateLocal(const math::Vector3 &_vec)
+void OrbitViewController::TranslateLocal(const ignition::math::Vector3d &_vec)
 {
   this->camera->SetWorldPosition(
       this->camera->WorldPose().Pos() +
-      this->camera->WorldPose().Rot() * _vec.Ign());
+      this->camera->WorldPose().Rot() * _vec);
   this->UpdateRefVisual();
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::TranslateGlobal(const math::Vector3 &_vec)
+void OrbitViewController::TranslateGlobal(const ignition::math::Vector3d &_vec)
 {
   this->camera->SetWorldPosition(
-      this->camera->WorldPose().Pos() + _vec.Ign());
+      this->camera->WorldPose().Pos() + _vec);
   this->UpdateRefVisual();
 }
 
@@ -309,14 +316,14 @@ void OrbitViewController::SetDistance(float _d)
 }
 
 //////////////////////////////////////////////////
-void OrbitViewController::SetFocalPoint(const math::Vector3 &_fp)
+void OrbitViewController::SetFocalPoint(const ignition::math::Vector3d &_fp)
 {
-  this->focalPoint = _fp.Ign();
+  this->focalPoint = _fp;
   this->refVisual->SetPosition(this->focalPoint);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 OrbitViewController::GetFocalPoint() const
+ignition::math::Vector3d OrbitViewController::FocalPoint() const
 {
   return this->focalPoint;
 }
@@ -372,8 +379,9 @@ void OrbitViewController::UpdateRefVisual()
 
   // Update the size of the referenve visual based on the distance to the
   // focal point.
-  double scale = this->distance * atan(GZ_DTOR(1.0));
-  this->refVisual->SetScale(math::Vector3(scale, scale, scale * 0.5));
+  double scale = this->distance * atan(IGN_DTOR(1.0));
+  this->refVisual->SetScale(
+      ignition::math::Vector3d(scale, scale, scale * 0.5));
 }
 
 /////////////////////////////////////////////////
@@ -401,7 +409,8 @@ void OrbitViewController::Orbit(double _dy, double _dp)
   // Rotate and update the reference visual.
   this->yaw = this->NormalizeYaw(this->yaw + _dy);
   this->pitch = this->NormalizePitch(this->pitch + _dp);
-  this->refVisual->SetRotation(math::Quaternion(0, this->pitch, this->yaw));
+  this->refVisual->SetRotation(
+      ignition::math::Quaterniond(0, this->pitch, this->yaw));
 
   // Get the final position of the camera. Special case when the orbit view
   // camera has just been initialized.

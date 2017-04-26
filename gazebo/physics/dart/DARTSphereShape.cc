@@ -31,12 +31,14 @@ DARTSphereShape::DARTSphereShape(DARTCollisionPtr _parent)
   : SphereShape(_parent),
     dataPtr(new DARTSphereShapePrivate())
 {
+  _parent->SetDARTCollisionShape(this->dataPtr->dtEllipsoidShape, false);
 }
 
 //////////////////////////////////////////////////
 DARTSphereShape::~DARTSphereShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -47,7 +49,7 @@ void DARTSphereShape::SetRadius(double _radius)
     gzerr << "Sphere shape does not support negative radius.\n";
     return;
   }
-  if (math::equal(_radius, 0.0))
+  if (ignition::math::equal(_radius, 0.0))
   {
     // Warn user, but still create shape with very small value
     // otherwise later resize operations using setLocalScaling
@@ -59,28 +61,7 @@ void DARTSphereShape::SetRadius(double _radius)
 
   SphereShape::SetRadius(_radius);
 
-  DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
-  {
-    dart::dynamics::BodyNode *dtBodyNode =
-        dartCollisionParent->GetDARTBodyNode();
-    dart::dynamics::EllipsoidShape *dtEllisoidShape =
-        new dart::dynamics::EllipsoidShape(Eigen::Vector3d(_radius*2.0,
-                                                           _radius*2.0,
-                                                           _radius*2.0));
-    dtBodyNode->addCollisionShape(dtEllisoidShape);
-    dartCollisionParent->SetDARTCollisionShape(dtEllisoidShape);
-  }
-  else
-  {
-    dart::dynamics::EllipsoidShape *dtEllipsoidShape =
-        dynamic_cast<dart::dynamics::EllipsoidShape*>(
-          dartCollisionParent->GetDARTCollisionShape());
-    dtEllipsoidShape->setSize(Eigen::Vector3d(_radius*2.0,
-                                              _radius*2.0,
-                                              _radius*2.0));
-  }
+  this->dataPtr->dtEllipsoidShape->setSize(
+        Eigen::Vector3d(_radius*2.0, _radius*2.0, _radius*2.0));
 }
 

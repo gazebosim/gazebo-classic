@@ -30,8 +30,9 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/transport/transport.hh>
 #include <sdf/sdf.hh>
-#include "gz_topic.hh"
 #include "gz_log.hh"
+#include "gz_marker.hh"
+#include "gz_topic.hh"
 #include "gz.hh"
 
 using namespace gazebo;
@@ -46,6 +47,7 @@ Command::Command(const std::string &_name, const std::string &_brief)
   : name(_name), brief(_brief), visibleOptions("Options"), argc(0), argv(NULL)
 {
   this->visibleOptions.add_options()
+    ("verbose", "Print extra information")
     ("help,h", "Print this help message");
 }
 
@@ -74,7 +76,7 @@ void Command::ListOptions()
   {
     pieces.clear();
     std::string formatName = (*iter)->format_name();
-    boost::split(pieces, formatName, boost::is_any_of(" "));
+    pieces = common::split(formatName, " ");
 
     if (pieces.empty())
     {
@@ -186,6 +188,11 @@ bool Command::Run(int _argc, char **_argv)
   {
     this->Help();
     return true;
+  }
+
+  if (this->vm.count("verbose"))
+  {
+    gazebo::common::Console::SetQuiet(false);
   }
 
   if (!this->TransportInit())
@@ -355,9 +362,7 @@ bool PhysicsCommand::RunImpl()
 
   if (this->vm.count("gravity"))
   {
-    std::vector<std::string> values;
-    boost::split(values, this->vm["gravity"].as<std::string>(),
-        boost::is_any_of(","));
+    auto values = common::split(this->vm["gravity"].as<std::string>(), ",");
 
     msg.mutable_gravity()->set_x(boost::lexical_cast<double>(values[0]));
     msg.mutable_gravity()->set_y(boost::lexical_cast<double>(values[1]));
@@ -431,22 +436,22 @@ bool ModelCommand::RunImpl()
     return false;
   }
 
-  math::Pose pose;
-  math::Vector3 rpy;
+  ignition::math::Pose3d pose;
+  ignition::math::Vector3d rpy;
 
   if (this->vm.count("pose-x"))
-    pose.pos.x = this->vm["pose-x"].as<double>();
+    pose.Pos().X(this->vm["pose-x"].as<double>());
   if (this->vm.count("pose-y"))
-    pose.pos.y = this->vm["pose-y"].as<double>();
+    pose.Pos().Y(this->vm["pose-y"].as<double>());
   if (this->vm.count("pose-z"))
-    pose.pos.z = this->vm["pose-z"].as<double>();
+    pose.Pos().Z(this->vm["pose-z"].as<double>());
   if (this->vm.count("pose-R"))
-    rpy.x = this->vm["pose-R"].as<double>();
+    rpy.X(this->vm["pose-R"].as<double>());
   if (this->vm.count("pose-P"))
-    rpy.y = this->vm["pose-P"].as<double>();
+    rpy.Y(this->vm["pose-P"].as<double>());
   if (this->vm.count("pose-Y"))
-    rpy.z = this->vm["pose-Y"].as<double>();
-  pose.rot.SetFromEuler(rpy);
+    rpy.Z(this->vm["pose-Y"].as<double>());
+  pose.Rot().Euler(rpy);
 
   transport::NodePtr node(new transport::Node());
   node->Init(worldName);
@@ -541,7 +546,7 @@ bool ModelCommand::RunImpl()
 
     msgs::Model msg;
     msg.set_name(modelName);
-    msgs::Set(msg.mutable_pose(), pose.Ign());
+    msgs::Set(msg.mutable_pose(), pose);
     pub->Publish(msg, true);
   }
 
@@ -550,7 +555,8 @@ bool ModelCommand::RunImpl()
 
 /////////////////////////////////////////////////
 bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
-    const std::string &_name, const math::Pose &_pose, transport::NodePtr _node)
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    transport::NodePtr _node)
 {
   sdf::ElementPtr modelElem = _sdf->Root()->GetElement("model");
 
@@ -569,7 +575,7 @@ bool ModelCommand::ProcessSpawn(sdf::SDFPtr _sdf,
 
   msgs::Factory msg;
   msg.set_sdf(_sdf->ToString());
-  msgs::Set(msg.mutable_pose(), _pose.Ign());
+  msgs::Set(msg.mutable_pose(), _pose);
   pub->Publish(msg, true);
 
   return true;
@@ -586,12 +592,14 @@ JointCommand::JointCommand()
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
     ("delete,d", "Delete a model.")
-    ("force,f", po::value<double>(), "Force to apply to a joint.")
-    ("pos-t", po::value<double>(), "Target angle.")
+    ("force,f", po::value<double>(), "Force to apply to a joint (N).")
+    ("pos-t", po::value<double>(),
+     "Target angle(rad) for rotation joints or position (m) for linear joints.")
     ("pos-p", po::value<double>(), "Position proportional gain.")
     ("pos-i", po::value<double>(), "Position integral gain.")
     ("pos-d", po::value<double>(), "Position differential gain.")
-    ("vel-t", po::value<double>(), "Target speed.")
+    ("vel-t", po::value<double>(),
+     "Target speed (rad/s for rotational joints or m/s for linear joints).")
     ("vel-p", po::value<double>(), "Velocity proportional gain.")
     ("vel-i", po::value<double>(), "Velocity integral gain.")
     ("vel-d", po::value<double>(), "Velocity differential gain.");
@@ -605,6 +613,17 @@ void JointCommand::HelpDetailed()
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
     "\tA model name and joint name are required.\n"
+    "\n"
+    "\tIt is recommended to use only one type of command:\n"
+    "\tforce, position PID, or velocity PID.\n"
+    "\n"
+    "\tForce: Use --force to apply a force.\n"
+    "\n"
+    "\tPosition PID: Use --pos-t to specify a target position\n"
+    "\twith --pos-p, --pos-i, --pos-d to specify the PID parameters.\n"
+    "\n"
+    "\tVelocity PID: Use --vel-t to specify a target velocity\n"
+    "\twith --vel-p, --vel-i, --vel-d to specify the PID parameters.\n"
     << std::endl;
 }
 
@@ -759,8 +778,7 @@ bool CameraCommand::RunImpl()
 
         if (topicInfo.msg_type() == "gazebo.msgs.CameraCmd")
         {
-          std::vector<std::string> parts;
-          boost::split(parts, topics.data(i), boost::is_any_of("/"));
+          auto parts = common::split(topics.data(i), "/");
           std::cout << parts[parts.size()-2] << std::endl;
         }
       }
@@ -1216,6 +1234,7 @@ int main(int argc, char **argv)
   g_commandMap["camera"] = new CameraCommand();
   g_commandMap["help"] = new HelpCommand();
   g_commandMap["joint"] = new JointCommand();
+  g_commandMap["marker"] = new MarkerCommand();
   g_commandMap["model"] = new ModelCommand();
   g_commandMap["world"] = new WorldCommand();
   g_commandMap["physics"] = new PhysicsCommand();

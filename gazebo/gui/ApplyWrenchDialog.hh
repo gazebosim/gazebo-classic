@@ -14,16 +14,15 @@
  * limitations under the License.
  *
 */
+#ifndef GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
+#define GAZEBO_GUI_APPLYWRENCHDIALOG_HH_
 
-#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_HH_
-#define _GAZEBO_APPLY_WRENCH_DIALOG_HH_
-
+#include <memory>
 #include <string>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/gui/qt.h"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
 namespace gazebo
 {
@@ -147,22 +146,22 @@ namespace gazebo
       /// avoid recursion loops.
       /// \param[in] _spin Spin whose value will be changed.
       /// \param[in] _value New value.
-      private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
+      private: void SetSpinValue(QDoubleSpinBox *_spin, const double _value);
 
       /// \brief Set force position vector, send it to visuals and update spins.
       /// \param[in] _forcePos New force position.
-      private: void SetForcePos(const math::Vector3 &_forcePos);
+      private: void SetForcePos(const ignition::math::Vector3d &_forcePos);
 
       /// \brief Set force vector, send it to visuals and update spins.
       /// \param[in] _force New force.
       /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
-      private: void SetForce(const math::Vector3 &_force,
+      private: void SetForce(const ignition::math::Vector3d &_force,
           const bool _rotatedByMouse = false);
 
       /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
       /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
-      private: void SetTorque(const math::Vector3 &_torque,
+      private: void SetTorque(const ignition::math::Vector3d &_torque,
           const bool _rotatedByMouse = false);
 
       /// \brief Callback on prerender to check if target link hasn't been
@@ -174,7 +173,7 @@ namespace gazebo
 
       /// \brief Set CoM vector and send it to visuals.
       /// \param[in] _com CoM position in link frame.
-      private: void SetCoM(const math::Vector3 &_com);
+      private: void SetCoM(const ignition::math::Vector3d &_com);
 
       /// \brief Callback for a mouse press event.
       /// \param[in] _event The mouse press event
@@ -198,12 +197,12 @@ namespace gazebo
       /// \brief Update force vector with direction given by mouse, magnitude
       /// from spin.
       /// \param[in] _dir New direction, doesn't need to be normalized.
-      private: void NewForceDirection(const math::Vector3 &_dir);
+      private: void NewForceDirection(const ignition::math::Vector3d &_dir);
 
       /// \brief Update torque vector with direction given by mouse, magnitude
       /// from spin.
       /// \param[in] _dir New direction, doesn't need to be normalized.
-      private: void NewTorqueDirection(const math::Vector3 &_dir);
+      private: void NewTorqueDirection(const ignition::math::Vector3d &_dir);
 
       /// \brief Set this dialog to be active, visuals visible and mouse
       /// filters on.
@@ -215,7 +214,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data.
-      private: ApplyWrenchDialogPrivate *dataPtr;
+      private: std::unique_ptr<ApplyWrenchDialogPrivate> dataPtr;
     };
     /// \}
   }

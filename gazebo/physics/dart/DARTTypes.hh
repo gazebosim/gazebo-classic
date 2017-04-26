@@ -14,13 +14,15 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_DARTTYPES_HH_
-#define _GAZEBO_DARTTYPES_HH_
+#ifndef GAZEBO_PHYSICS_DART_DARTTYPES_HH_
+#define GAZEBO_PHYSICS_DART_DARTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
+#include <ignition/math/Pose3.hh>
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Assert.hh"
-#include "gazebo/math/Pose.hh"
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/util/system.hh"
 
@@ -48,6 +50,11 @@ namespace gazebo
     typedef boost::shared_ptr<DARTRayShape>  DARTRayShapePtr;
     typedef boost::shared_ptr<DARTSurfaceParams> DARTSurfaceParamsPtr;
 
+    using DARTBodyNodePropPtr =
+      std::shared_ptr<dart::dynamics::BodyNode::Properties>;
+    using DARTJointPropPtr =
+      std::shared_ptr<dart::dynamics::Joint::Properties>;
+
     /// \addtogroup gazebo_physics_dart
     /// \{
 
@@ -56,53 +63,70 @@ namespace gazebo
     ///        by gazebo and dart.
     class GZ_PHYSICS_VISIBLE DARTTypes
     {
+      /// \brief Convert ignition math vector3d to eigen vector3d.
+      /// \param[in] _vec3 Ignition math equalivent object.
+      /// \return Eigen vector3 to convert.
+      public: static Eigen::Vector3d ConvVec3(
+          const ignition::math::Vector3d &_vec3)
+      {
+        return Eigen::Vector3d(_vec3.X(), _vec3.Y(), _vec3.Z());
+      }
+
+      /// \brief Convert eigen vector3d to ignition math vector3d.
+      /// \param[in] _vec3 Eigen vector3 to convert.
+      /// \return Ignition math equalivent object.
+      public: static ignition::math::Vector3d ConvVec3Ign(
+                  const Eigen::Vector3d &_vec3)
+      {
+        return ignition::math::Vector3d(_vec3.x(), _vec3.y(), _vec3.z());
+      }
+
+      /// \brief Convert ignition quaternion to eigen quaternion.
+      /// \param[in] _quat Ignition object.
+      /// \return Equivalent eigen object.
+      public: static Eigen::Quaterniond ConvQuat(
+          const ignition::math::Quaterniond &_quat)
+      {
+        return Eigen::Quaterniond(_quat.W(), _quat.X(), _quat.Y(), _quat.Z());
+      }
+
+      /// \brief Convert eigen quaternion to ignition quaternion.
+      /// \param[in] _quat Eigen object to convert.
+      /// \return Equivalent ignition object.
+      public: static ignition::math::Quaterniond ConvQuatIgn(
+                  const Eigen::Quaterniond &_quat)
+      {
+        return ignition::math::Quaterniond(
+            _quat.w(), _quat.x(), _quat.y(), _quat.z());
+      }
+
       /// \brief
-      public: static Eigen::Vector3d ConvVec3(const math::Vector3 &_vec3)
-        {
-            return Eigen::Vector3d(_vec3.x, _vec3.y, _vec3.z);
-        }
+      public: static Eigen::Isometry3d ConvPose(
+          const ignition::math::Pose3d &_pose)
+      {
+          // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
+          // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
+          //        ConvQuat(_pose.rot);
 
-        /// \brief
-      public: static math::Vector3 ConvVec3(const Eigen::Vector3d &_vec3)
-        {
-            return math::Vector3(_vec3.x(), _vec3.y(), _vec3.z());
-        }
+          Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
 
-        /// \brief
-      public: static Eigen::Quaterniond ConvQuat(const math::Quaternion &_quat)
-        {
-            return Eigen::Quaterniond(_quat.w, _quat.x, _quat.y, _quat.z);
-        }
+          res.translation() = ConvVec3(_pose.Pos());
+          res.linear() = Eigen::Matrix3d(ConvQuat(_pose.Rot()));
 
-        /// \brief
-      public: static math::Quaternion ConvQuat(const Eigen::Quaterniond &_quat)
-        {
-            return math::Quaternion(_quat.w(), _quat.x(), _quat.y(), _quat.z());
-        }
+          return res;
+      }
 
-        /// \brief
-      public: static Eigen::Isometry3d ConvPose(const math::Pose &_pose)
-        {
-            // Below line doesn't work with 'libeigen3-dev is 3.0.5-1'
-            // return Eigen::Translation3d(ConvVec3(_pose.pos)) *
-            //        ConvQuat(_pose.rot);
-
-            Eigen::Isometry3d res = Eigen::Isometry3d::Identity();
-
-            res.translation() = ConvVec3(_pose.pos);
-            res.linear() = Eigen::Matrix3d(ConvQuat(_pose.rot));
-
-            return res;
-        }
-
-        /// \brief
-      public: static math::Pose ConvPose(const Eigen::Isometry3d &_T)
-        {
-            math::Pose pose;
-            pose.pos = ConvVec3(_T.translation());
-            pose.rot = ConvQuat(Eigen::Quaterniond(_T.linear()));
-            return pose;
-        }
+      /// \brief Convert eigen iosmetry3d to ignition math pose3d.
+      /// \param[in] _T eigen object to convert
+      /// \return Equvalent ignition math object.
+      public: static ignition::math::Pose3d ConvPoseIgn(
+                  const Eigen::Isometry3d &_T)
+      {
+        ignition::math::Pose3d pose;
+        pose.Pos() = ConvVec3Ign(_T.translation());
+        pose.Rot() = ConvQuatIgn(Eigen::Quaterniond(_T.linear()));
+        return pose;
+      }
 
       /// \brief Invert thread pitch to match the different definitions of
       /// thread pitch in Gazebo and DART.

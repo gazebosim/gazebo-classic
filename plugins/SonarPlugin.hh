@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_SONAR_PLUGIN_HH_
-#define _GAZEBO_SONAR_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SONARPLUGIN_HH_
+#define GAZEBO_PLUGINS_SONARPLUGIN_HH_
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/sensors/SensorTypes.hh"

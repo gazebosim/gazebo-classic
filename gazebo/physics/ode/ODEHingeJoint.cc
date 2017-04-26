@@ -20,6 +20,7 @@
  */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -35,14 +36,13 @@ using namespace physics;
 ODEHingeJoint::ODEHingeJoint(dWorldID _worldId, BasePtr _parent)
     : HingeJoint<ODEJoint>(_parent)
 {
-  this->jointId = dJointCreateHinge(_worldId, NULL);
+  this->jointId = dJointCreateHinge(_worldId, nullptr);
 }
 
 //////////////////////////////////////////////////
 ODEHingeJoint::~ODEHingeJoint()
 {
-  if (this->applyDamping)
-    physics::Joint::DisconnectJointUpdate(this->applyDamping);
+  this->applyDamping.reset();
 }
 
 //////////////////////////////////////////////////
@@ -52,21 +52,25 @@ void ODEHingeJoint::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHingeJoint::GetAnchor(unsigned int /*index*/) const
+ignition::math::Vector3d ODEHingeJoint::Anchor(
+    const unsigned int /*index*/) const
 {
   dVector3 result;
 
   if (this->jointId)
     dJointGetHingeAnchor(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return ignition::math::Vector3d::Zero;
+  }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAnchor(unsigned int /*index*/,
-    const math::Vector3 &_anchor)
+void ODEHingeJoint::SetAnchor(const unsigned int /*index*/,
+    const ignition::math::Vector3d &_anchor)
 {
   if (this->childLink)
     this->childLink->SetEnabled(true);
@@ -74,26 +78,31 @@ void ODEHingeJoint::SetAnchor(unsigned int /*index*/,
     this->parentLink->SetEnabled(true);
 
   if (this->jointId)
-    dJointSetHingeAnchor(this->jointId, _anchor.x, _anchor.y, _anchor.z);
+    dJointSetHingeAnchor(this->jointId, _anchor.X(), _anchor.Y(), _anchor.Z());
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 
 //////////////////////////////////////////////////
-math::Vector3 ODEHingeJoint::GetGlobalAxis(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEHingeJoint::GlobalAxis(
+    const unsigned int /*_index*/) const
 {
   dVector3 result;
   if (this->jointId)
     dJointGetHingeAxis(this->jointId, result);
   else
+  {
     gzerr << "ODE Joint ID is invalid\n";
+    return ignition::math::Vector3d::Zero;
+  }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEHingeJoint::SetAxis(const unsigned int _index,
+                            const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -103,19 +112,22 @@ void ODEHingeJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   // ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(0);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  auto axisFrame = this->AxisFrame(0);
+  auto globalAxis = axisFrame.RotateVector(_axis);
 
   if (this->jointId)
-    dJointSetHingeAxis(this->jointId, globalAxis.x, globalAxis.y, globalAxis.z);
+  {
+    dJointSetHingeAxis(this->jointId, globalAxis.X(), globalAxis.Y(),
+        globalAxis.Z());
+  }
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEHingeJoint::GetAngleImpl(unsigned int /*index*/) const
+double ODEHingeJoint::PositionImpl(const unsigned int /*index*/) const
 {
-  math::Angle result;
+  double result = ignition::math::NAN_D;
   if (this->jointId)
     result = dJointGetHingeAngle(this->jointId);
   else

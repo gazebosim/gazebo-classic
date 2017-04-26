@@ -38,6 +38,7 @@ DARTPolylineShape::DARTPolylineShape(CollisionPtr _parent)
 DARTPolylineShape::~DARTPolylineShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -58,5 +59,5 @@ void DARTPolylineShape::Init()
 
   this->dataPtr->dartMesh->Init(this->mesh,
       boost::static_pointer_cast<DARTCollision>(this->collisionParent),
-      math::Vector3(1, 1, 1));
+      ignition::math::Vector3d::One);
 }

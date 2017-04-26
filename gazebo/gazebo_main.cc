@@ -25,7 +25,10 @@
 
 bool sig_killed = false;
 int status1, status2;
-pid_t  pid1, pid2;
+// pid of server process
+pid_t pid1;
+// pid of client process
+pid_t pid2;
 bool killed1 = false;
 bool killed2 = false;
 
@@ -66,44 +69,50 @@ void help()
   << "\n";
 }
 
+/// \brief Try to kill a single process.
+/// \param[in] _pid Process ID.
+/// \param[in] _name Process name.
+/// \param[in] _waittime Total time to wait in seconds.
+/// \param[in,out] _killed Set to true if process was successfully killed.
+/// \param[in,out] _status Store status information for that process.
+static void kill_one_process(const int _pid, const std::string &_name,
+                             const double _waittime, bool &_killed,
+                             int &_status)
+{
+  kill(_pid, SIGINT);
+  double sleepSecs = 0.001;
+  // Wait some time and if not dead, escalate to SIGKILL
+  for (unsigned int i = 0; i < (unsigned int)(_waittime / sleepSecs); ++i)
+  {
+    if (_killed)
+    {
+      break;
+    }
+    else
+    {
+      int p = waitpid(_pid, &_status, WNOHANG);
+      if (p == _pid)
+      {
+        _killed = true;
+        break;
+      }
+    }
+    // Sleep briefly
+    gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
+  }
+  if (!_killed)
+  {
+    std::cerr << "escalating to SIGKILL on " << _name << std::endl;
+    kill(_pid, SIGKILL);
+  }
+}
+
 /////////////////////////////////////////////////
 void sig_handler(int /*signo*/)
 {
   sig_killed = true;
-  kill(pid1, SIGINT);
-  kill(pid2, SIGINT);
-  double sleepSecs = 0.001;
-  double totalWaitSecs = 5.0;
-  // Wait some time and if not dead, escalate to SIGKILL
-  for (unsigned int i = 0; i < (unsigned int)(totalWaitSecs*1/sleepSecs); ++i)
-  {
-    if (!killed1)
-    {
-      int p1 = waitpid(pid1, &status1, WNOHANG);
-      if (p1 == pid1)
-        killed1 = true;
-    }
-    if (!killed2)
-    {
-      int p2 = waitpid(pid2, &status2, WNOHANG);
-      if (p2 == pid2)
-        killed2 = true;
-    }
-    if (killed1 && killed2)
-      break;
-    // Sleep briefly
-    gazebo::common::Time::Sleep(gazebo::common::Time(sleepSecs));
-  }
-  if (!killed1)
-  {
-    gzwarn << "escalating to SIGKILL on server\n";
-    kill(pid1, SIGKILL);
-  }
-  if (!killed2)
-  {
-    gzwarn << "escalating to SIGKILL on client\n";
-    kill(pid2, SIGKILL);
-  }
+  kill_one_process(pid2, "client", 5.0, killed2, status2);
+  kill_one_process(pid1, "server", 5.0, killed1, status1);
 }
 
 /////////////////////////////////////////////////
@@ -123,8 +132,8 @@ int main(int _argc, char **_argv)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
-    gzerr << "Stopping. Unable to catch SIGINT.\n"
-          << " Please visit http://gazebosim.org/support.html for help.\n";
+    std::cerr << "Stopping. Unable to catch SIGINT.\n"
+              << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }
 
@@ -173,20 +182,15 @@ int main(int _argc, char **_argv)
     }
     else
     {
-      // gazebo::gui::run(_argc, _argv);
-      // gzclient argv
+      // remove client from foreground process group
+      setpgid(0, 0);
       execvp(argvClient[0], argvClient);
     }
   }
   else
   {
-    // gazebo::Server *server = new gazebo::Server();
-    // if (!server->ParseArgs(_argc, _argv))
-      // return -1;
-    // server->Run();
-    // server->Fini();
-    // delete server;
-    // server = NULL;
+    // remove server from foreground process group
+    setpgid(0, 0);
     execvp(argvServer[0], argvServer);
   }
 

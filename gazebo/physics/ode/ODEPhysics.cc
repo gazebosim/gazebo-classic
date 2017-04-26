@@ -32,12 +32,13 @@
 #include <utility>
 #include <vector>
 
+#include <ignition/math/Rand.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Rand.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Timer.hh"
 
@@ -138,7 +139,7 @@ extern "C" void dMessageQuiet(int, const char *, va_list)
 ODEPhysics::ODEPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new ODEPhysicsPrivate)
 {
-  this->dataPtr->physicsStepFunc = NULL;
+  this->dataPtr->physicsStepFunc = nullptr;
   this->dataPtr->maxContacts = 0;
 
   // Collision detection init
@@ -157,7 +158,7 @@ ODEPhysics::ODEPhysics(WorldPtr _world)
 
   // Set random seed for physics engine based on gazebo's random seed.
   // Note: this was moved from physics::PhysicsEngine constructor.
-  this->SetSeed(math::Rand::GetSeed());
+  this->SetSeed(ignition::math::Rand::Seed());
 }
 
 //////////////////////////////////////////////////
@@ -166,7 +167,7 @@ ODEPhysics::~ODEPhysics()
   this->Fini();
 
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -236,7 +237,7 @@ void ODEPhysics::Load(sdf::ElementPtr _sdf)
 
   // Set the physics update function
   this->SetStepType(this->dataPtr->stepType);
-  if (this->dataPtr->physicsStepFunc == NULL)
+  if (this->dataPtr->physicsStepFunc == nullptr)
     gzthrow(std::string("Invalid step type[") + this->dataPtr->stepType);
 }
 
@@ -267,7 +268,7 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     }
     physicsMsg.set_precon_iters(this->GetSORPGSPreconIters());
     physicsMsg.set_iters(this->GetSORPGSIters());
-    physicsMsg.set_enable_physics(this->world->GetEnablePhysicsEngine());
+    physicsMsg.set_enable_physics(this->world->PhysicsEnabled());
     physicsMsg.set_sor(this->GetSORPGSW());
     physicsMsg.set_cfm(this->GetWorldCFM());
     physicsMsg.set_erp(this->GetWorldERP());
@@ -276,9 +277,9 @@ void ODEPhysics::OnRequest(ConstRequestPtr &_msg)
     physicsMsg.set_contact_surface_layer(
       this->GetContactSurfaceLayer());
     physicsMsg.mutable_gravity()->CopyFrom(
-      msgs::Convert(this->GetGravity().Ign()));
+      msgs::Convert(this->world->Gravity()));
     physicsMsg.mutable_magnetic_field()->CopyFrom(
-      msgs::Convert(this->MagneticField()));
+      msgs::Convert(this->world->MagneticField()));
     physicsMsg.set_real_time_update_rate(this->realTimeUpdateRate);
     physicsMsg.set_real_time_factor(this->targetRealTimeFactor);
     physicsMsg.set_max_step_size(this->maxStepSize);
@@ -319,7 +320,7 @@ void ODEPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
     this->SetWorldERP(_msg->erp());
 
   if (_msg->has_enable_physics())
-    this->world->EnablePhysicsEngine(_msg->enable_physics());
+    this->world->SetPhysicsEnabled(_msg->enable_physics());
 
   if (_msg->has_contact_max_correcting_vel())
     this->SetContactMaxCorrectingVel(_msg->contact_max_correcting_vel());
@@ -414,7 +415,7 @@ void ODEPhysics::UpdatePhysics()
     (*(this->dataPtr->physicsStepFunc))
       (this->dataPtr->worldId, this->maxStepSize);
 
-    math::Vector3 f1, f2, t1, t2;
+    ignition::math::Vector3d f1, f2, t1, t2;
 
     // Set the joint contact feedback for each contact.
     for (unsigned int i = 0; i < this->dataPtr->jointFeedbackIndex; ++i)
@@ -423,8 +424,8 @@ void ODEPhysics::UpdatePhysics()
       Collision *col1 = contactFeedback->collision1;
       Collision *col2 = contactFeedback->collision2;
 
-      GZ_ASSERT(col1 != NULL, "Collision 1 is NULL");
-      GZ_ASSERT(col2 != NULL, "Collision 2 is NULL");
+      GZ_ASSERT(col1 != nullptr, "Collision 1 is null");
+      GZ_ASSERT(col2 != nullptr, "Collision 2 is null");
 
       for (int j = 0; j < this->dataPtr->jointFeedbacks[i]->count; ++j)
       {
@@ -436,13 +437,13 @@ void ODEPhysics::UpdatePhysics()
 
         // set force torque in link frame
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Force =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(f1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(f1);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Force =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(f2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(f2);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body1Torque =
-             col1->GetLink()->GetWorldPose().rot.RotateVectorReverse(t1);
+             col1->GetLink()->WorldPose().Rot().RotateVectorReverse(t1);
         this->dataPtr->jointFeedbacks[i]->contact->wrench[j].body2Torque =
-             col2->GetLink()->GetWorldPose().rot.RotateVectorReverse(t2);
+             col2->GetLink()->WorldPose().Rot().RotateVectorReverse(t2);
       }
     }
   }
@@ -473,9 +474,9 @@ void ODEPhysics::Fini()
 
   if (this->dataPtr->worldId)
     dWorldDestroy(this->dataPtr->worldId);
-  this->dataPtr->worldId = NULL;
+  this->dataPtr->worldId = nullptr;
 
-  this->dataPtr->spaceId = NULL;
+  this->dataPtr->spaceId = nullptr;
 
   PhysicsEngine::Fini();
 }
@@ -491,7 +492,7 @@ void ODEPhysics::Reset()
 //////////////////////////////////////////////////
 LinkPtr ODEPhysics::CreateLink(ModelPtr _parent)
 {
-  if (_parent == NULL)
+  if (_parent == nullptr)
     gzthrow("Link must have a parent\n");
 
   std::map<std::string, dSpaceID>::iterator iter;
@@ -539,7 +540,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "polyline")
     shape.reset(new ODEPolylineShape(collision));
   else if (_type == "multiray")
-    shape.reset(new ODEMultiRayShape(collision));
+  {
+    if (_collision)
+      shape.reset(new ODEMultiRayShape(collision));
+    else
+      shape.reset(new ODEMultiRayShape(this->world->Physics()));
+  }
   else if (_type == "mesh" || _type == "trimesh")
     shape.reset(new ODEMeshShape(collision));
   else if (_type == "heightmap")
@@ -547,10 +553,12 @@ ShapePtr ODEPhysics::CreateShape(const std::string &_type,
   else if (_type == "map" || _type == "image")
     shape.reset(new MapShape(collision));
   else if (_type == "ray")
+  {
     if (_collision)
       shape.reset(new ODERayShape(collision));
     else
-      shape.reset(new ODERayShape(this->world->GetPhysicsEngine()));
+      shape.reset(new ODERayShape(this->world->Physics()));
+  }
   else
     gzerr << "Unable to create collision of type[" << _type << "]\n";
 
@@ -845,23 +853,23 @@ void ODEPhysics::ConvertMass(void *_engineMass, InertialPtr _inertial)
 {
   dMass *odeMass = static_cast<dMass*>(_engineMass);
 
-  odeMass->mass = _inertial->GetMass();
-  odeMass->c[0] = _inertial->GetCoG()[0];
-  odeMass->c[1] = _inertial->GetCoG()[1];
-  odeMass->c[2] = _inertial->GetCoG()[2];
+  odeMass->mass = _inertial->Mass();
+  odeMass->c[0] = _inertial->CoG()[0];
+  odeMass->c[1] = _inertial->CoG()[1];
+  odeMass->c[2] = _inertial->CoG()[2];
 
-  odeMass->I[0*4+0] = _inertial->GetPrincipalMoments()[0];
-  odeMass->I[1*4+1] = _inertial->GetPrincipalMoments()[1];
-  odeMass->I[2*4+2] = _inertial->GetPrincipalMoments()[2];
+  odeMass->I[0*4+0] = _inertial->PrincipalMoments()[0];
+  odeMass->I[1*4+1] = _inertial->PrincipalMoments()[1];
+  odeMass->I[2*4+2] = _inertial->PrincipalMoments()[2];
 
-  odeMass->I[0*4+1] = _inertial->GetProductsofInertia()[0];
-  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[0];
+  odeMass->I[0*4+1] = _inertial->ProductsOfInertia()[0];
+  odeMass->I[1*4+0] = _inertial->ProductsOfInertia()[0];
 
-  odeMass->I[0*4+2] = _inertial->GetProductsofInertia()[1];
-  odeMass->I[1*4+0] = _inertial->GetProductsofInertia()[1];
+  odeMass->I[0*4+2] = _inertial->ProductsOfInertia()[1];
+  odeMass->I[1*4+0] = _inertial->ProductsOfInertia()[1];
 
-  odeMass->I[1*4+2] = _inertial->GetProductsofInertia()[2];
-  odeMass->I[2*4+1] = _inertial->GetProductsofInertia()[2];
+  odeMass->I[1*4+2] = _inertial->ProductsOfInertia()[2];
+  odeMass->I[2*4+1] = _inertial->ProductsOfInertia()[2];
 }
 
 //////////////////////////////////////////////////
@@ -922,10 +930,11 @@ void ODEPhysics::SetStepType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void ODEPhysics::SetGravity(const gazebo::math::Vector3 &_gravity)
+void ODEPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
-  this->world->SetGravitySDF(_gravity.Ign());
-  dWorldSetGravity(this->dataPtr->worldId, _gravity.x, _gravity.y, _gravity.z);
+  this->world->SetGravitySDF(_gravity);
+  dWorldSetGravity(this->dataPtr->worldId, _gravity.X(), _gravity.Y(),
+      _gravity.Z());
 }
 
 //////////////////////////////////////////////////
@@ -948,8 +957,8 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
   else
   {
-    ODECollision *collision1 = NULL;
-    ODECollision *collision2 = NULL;
+    ODECollision *collision1 = nullptr;
+    ODECollision *collision2 = nullptr;
 
     // Exit if both bodies are not enabled
     if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
@@ -1056,7 +1065,7 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
     this->dataPtr->indices[i] = i;
 
   // Choose only the best contacts if too many were generated.
-  if (numc > maxCollide)
+  if (maxCollide > 0 && numc > maxCollide)
   {
     double max = _contactCollisions[maxCollide-1].depth;
     for (unsigned int i = maxCollide; i < numc; ++i)
@@ -1101,11 +1110,11 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   //                                _collision2->surface->softCFM);
 
   // assign fdir1 if not set as 0
-  math::Vector3 fd = surf1->FrictionPyramid()->direction1;
-  if (fd != math::Vector3::Zero)
+  ignition::math::Vector3d fd = surf1->FrictionPyramid()->direction1;
+  if (fd != ignition::math::Vector3d::Zero)
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd = _collision1->GetWorldPose().rot.RotateVector(fd);
+    fd = _collision1->WorldPose().Rot().RotateVector(fd);
   }
 
   /// \TODO: Better treatment when both surfaces have fdir1 specified.
@@ -1115,29 +1124,31 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   /// As a hack, we'll simply compare mu1 from
   /// both surfaces for now, and use fdir1 specified by
   /// surface with smaller mu1.
-  math::Vector3 fd2 = surf2->FrictionPyramid()->direction1;
-  if (fd2 != math::Vector3::Zero && (fd == math::Vector3::Zero ||
+  ignition::math::Vector3d fd2 = surf2->FrictionPyramid()->direction1;
+  if (fd2 != ignition::math::Vector3d::Zero &&
+      (fd == ignition::math::Vector3d::Zero ||
         surf1->FrictionPyramid()->MuPrimary() >
         surf2->FrictionPyramid()->MuPrimary()))
   {
     // fdir1 is in body local frame, rotate it into world frame
-    fd2 = _collision2->GetWorldPose().rot.RotateVector(fd2);
+    fd2 = _collision2->WorldPose().Rot().RotateVector(fd2);
 
     /// \TODO: uncomment gzlog below once we confirm it does not affect
     /// performance
-    /// if (fd2 != math::Vector3::Zero && fd != math::Vector3::Zero &&
+    /// if (fd2 != ignition::math::Vector3d::Zero &&
+    ///       fd != ignition::math::Vector3d::Zero &&
     ///       _collision1->surface->mu1 > _collision2->surface->mu1)
     ///   gzlog << "both contact surfaces have non-zero fdir1, comparing"
     ///         << " comparing mu1 from both surfaces, and use fdir1"
     ///         << " from surface with smaller mu1\n";
   }
 
-  if (fd != math::Vector3::Zero)
+  if (fd != ignition::math::Vector3d::Zero)
   {
     contact.surface.mode |= dContactFDir1;
-    contact.fdir1[0] = fd.x;
-    contact.fdir1[1] = fd.y;
-    contact.fdir1[2] = fd.z;
+    contact.fdir1[0] = fd.X();
+    contact.fdir1[1] = fd.Y();
+    contact.fdir1[2] = fd.Z();
   }
 
   // Set the friction coefficients.
@@ -1233,12 +1244,12 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   dBodyID b1 = dGeomGetBody(_collision1->GetCollisionId());
   dBodyID b2 = dGeomGetBody(_collision2->GetCollisionId());
 
-  // Add a new contact to the manager. This will return NULL if no one is
+  // Add a new contact to the manager. This will return nullptr if no one is
   // listening for contact information.
   Contact *contactFeedback = this->contactManager->NewContact(_collision1,
-      _collision2, this->world->GetSimTime());
+      _collision2, this->world->SimTime());
 
-  ODEJointFeedback *jointFeedback = NULL;
+  ODEJointFeedback *jointFeedback = nullptr;
 
   // Create a joint feedback mechanism
   if (contactFeedback)
@@ -1340,18 +1351,18 @@ void ODEPhysics::DebugPrint() const
   {
     b = dWorldGetBody(this->dataPtr->worldId, i);
     ODELink *link = static_cast<ODELink*>(dBodyGetData(b));
-    math::Pose pose = link->GetWorldPose();
+    ignition::math::Pose3d pose = link->WorldPose();
     const dReal *pos = dBodyGetPosition(b);
     const dReal *rot = dBodyGetRotation(b);
-    math::Vector3 dpos(pos[0], pos[1], pos[2]);
-    math::Quaternion drot(rot[0], rot[1], rot[2], rot[3]);
+    ignition::math::Vector3d dpos(pos[0], pos[1], pos[2]);
+    ignition::math::Quaterniond drot(rot[0], rot[1], rot[2], rot[3]);
 
     std::cout << "Body[" << link->GetScopedName() << "]\n";
     std::cout << "  World: Pos[" << dpos << "] Rot[" << drot << "]\n";
-    if (pose.pos != dpos)
-      std::cout << "    Incorrect world pos[" << pose.pos << "]\n";
-    if (pose.rot != drot)
-      std::cout << "    Incorrect world rot[" << pose.rot << "]\n";
+    if (pose.Pos() != dpos)
+      std::cout << "    Incorrect world pos[" << pose.Pos() << "]\n";
+    if (pose.Rot() != drot)
+      std::cout << "    Incorrect world rot[" << pose.Rot() << "]\n";
 
     dMass mass;
     dBodyGetMass(b, &mass);
@@ -1363,7 +1374,7 @@ void ODEPhysics::DebugPrint() const
     {
       ODECollision *coll = static_cast<ODECollision*>(dGeomGetData(g));
 
-      pose = coll->GetWorldPose();
+      pose = coll->WorldPose();
       const dReal *gpos = dGeomGetPosition(g);
       const dReal *grot = dGeomGetRotation(g);
       dpos.Set(gpos[0], gpos[1], gpos[2]);
@@ -1372,10 +1383,10 @@ void ODEPhysics::DebugPrint() const
       std::cout << "    Geom[" << coll->GetScopedName() << "]\n";
       std::cout << "      World: Pos[" << dpos << "] Rot[" << drot << "]\n";
 
-      if (pose.pos != dpos)
-        std::cout << "      Incorrect world pos[" << pose.pos << "]\n";
-      if (pose.rot != drot)
-        std::cout << "      Incorrect world rot[" << pose.rot << "]\n";
+      if (pose.Pos() != dpos)
+        std::cout << "      Incorrect world pos[" << pose.Pos() << "]\n";
+      if (pose.Rot() != drot)
+        std::cout << "      Incorrect world rot[" << pose.Rot() << "]\n";
 
       g = dBodyGetNextGeom(g);
     }
@@ -1392,7 +1403,7 @@ void ODEPhysics::SetSeed(uint32_t _seed)
 bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   try
   {
@@ -1550,7 +1561,7 @@ boost::any ODEPhysics::GetParam(const std::string &_key) const
 bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
 {
   sdf::ElementPtr odeElem = this->sdf->GetElement("ode");
-  GZ_ASSERT(odeElem != NULL, "ODE SDF element does not exist");
+  GZ_ASSERT(odeElem != nullptr, "ODE SDF element does not exist");
 
   if (_key == "solver_type")
   {

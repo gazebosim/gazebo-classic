@@ -48,7 +48,8 @@ void GraphView::resizeEvent(QResizeEvent */*_event*/)
 /////////////////////////////////////////////////
 void GraphView::contextMenuEvent(QContextMenuEvent *_event)
 {
-  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  QGraphicsItem *item = this->scene()->itemAt(
+      this->mapToScene(_event->pos()), this->transform());
   if (item)
   {
     QString itemData = item->data(0).toString();
@@ -112,7 +113,8 @@ void GraphView::mouseReleaseEvent(QMouseEvent *_event)
     return;
   }
 
-  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  QGraphicsItem *item = this->scene()->itemAt(
+      this->mapToScene(_event->pos()), this->transform());
   this->lastClickedItem = item;
   if (item)
   {
@@ -165,7 +167,8 @@ void GraphView::keyPressEvent(QKeyEvent *_event)
 /////////////////////////////////////////////////
 void GraphView::mouseDoubleClickEvent(QMouseEvent *_event)
 {
-  QGraphicsItem *item = this->scene()->itemAt(this->mapToScene(_event->pos()));
+  QGraphicsItem *item = this->scene()->itemAt(
+      this->mapToScene(_event->pos()), this->transform());
   if (item)
   {
     QString itemData = item->data(0).toString();

@@ -49,7 +49,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Update();
 
-      /// \brief ODE collsion mesh helper class.
+      /// \brief ODE collision mesh helper class.
       private: ODEMesh *odeMesh;
     };
     /// \}

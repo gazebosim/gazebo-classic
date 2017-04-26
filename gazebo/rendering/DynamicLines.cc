@@ -56,13 +56,6 @@ const Ogre::String &DynamicLines::getMovableType() const
 }
 
 /////////////////////////////////////////////////
-void DynamicLines::AddPoint(const math::Vector3 &_pt,
-                            const common::Color &_color)
-{
-  this->AddPoint(_pt.Ign(), _color);
-}
-
-/////////////////////////////////////////////////
 void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
                             const common::Color &_color)
 {
@@ -76,12 +69,6 @@ void DynamicLines::AddPoint(double _x, double _y, double _z,
                             const common::Color &_color)
 {
   this->AddPoint(ignition::math::Vector3d(_x, _y, _z), _color);
-}
-
-/////////////////////////////////////////////////
-void DynamicLines::SetPoint(unsigned int _index, const math::Vector3 &_value)
-{
-  this->SetPoint(_index, _value.Ign());
 }
 
 /////////////////////////////////////////////////
@@ -108,15 +95,6 @@ void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 }
 
 /////////////////////////////////////////////////
-math::Vector3 DynamicLines::GetPoint(unsigned int _index) const
-{
-  if (_index >= this->points.size())
-    gzthrow("Point index is out of bounds");
-
-  return this->points[_index];
-}
-
-/////////////////////////////////////////////////
 ignition::math::Vector3d DynamicLines::Point(
     const unsigned int _index) const
 {
@@ -125,7 +103,9 @@ ignition::math::Vector3d DynamicLines::Point(
     gzerr << "Point index[" << _index << "] is out of bounds[0-"
            << this->points.size()-1 << "]\n";
 
-    return ignition::math::Vector3d(IGN_DBL_INF, IGN_DBL_INF, IGN_DBL_INF);
+    return ignition::math::Vector3d(ignition::math::INF_D,
+                                    ignition::math::INF_D,
+                                    ignition::math::INF_D);
   }
 
   return this->points[_index];

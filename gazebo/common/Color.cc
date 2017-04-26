@@ -17,7 +17,6 @@
 #include <math.h>
 #include <algorithm>
 
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Color.hh"
 
@@ -30,6 +29,7 @@ const Color Color::Red = Color(1, 0, 0, 1);
 const Color Color::Green = Color(0, 1, 0, 1);
 const Color Color::Blue = Color(0, 0, 1, 1);
 const Color Color::Yellow = Color(1, 1, 0, 1);
+const Color Color::Magenta = Color(1, 0, 1, 1);
 
 //////////////////////////////////////////////////
 Color::Color()
@@ -172,12 +172,6 @@ ignition::math::Vector3d Color::HSV() const
   hsv.Z(v);
 
   return hsv;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Color::GetAsYUV() const
-{
-  return this->YUV();
 }
 
 //////////////////////////////////////////////////

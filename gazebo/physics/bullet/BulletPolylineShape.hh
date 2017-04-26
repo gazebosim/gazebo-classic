@@ -45,7 +45,7 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      /// \brief Bullet collsion mesh helper class.
+      /// \brief Bullet collision mesh helper class.
       private: BulletMesh *bulletMesh;
     };
     /// \}

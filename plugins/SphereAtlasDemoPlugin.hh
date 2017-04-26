@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
-#define _GAZEBO_SPHERE_ATLAS_DEMO_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_SPHEREATLASDEMOPLUGIN_HH_
+#define GAZEBO_PLUGINS_SPHEREATLASDEMOPLUGIN_HH_
 
 #include <string>
 #include <vector>

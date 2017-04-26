@@ -67,7 +67,7 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
   sdf::readString(sonarSensorString, sdf);
 
   physics::WorldPtr world = physics::get_world("default");
-  physics::ModelPtr model = world->GetModel("ground_plane");
+  physics::ModelPtr model = world->ModelByName("ground_plane");
   physics::LinkPtr link = model->GetLink("link");
 
   // Create the Sonar sensor
@@ -85,7 +85,7 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
     std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   // Update the sensor
   sensor->Update(true);
@@ -104,11 +104,19 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
 void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
                                  bool _paused)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support sonar sensor, "
+          << "see issue #2062."
+          << std::endl;
+    return;
+  }
+
   Load("worlds/sonar_demo.world", _paused, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   world->Step(100);
 
   // Sonar sensor name
@@ -122,7 +130,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
     std::dynamic_pointer_cast<sensors::SonarSensor>(mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
-  ASSERT_TRUE(sensor != NULL);
+  ASSERT_TRUE(sensor != nullptr);
 
   // Update the sensor
   sensor->Update(true);
@@ -154,14 +162,14 @@ void SonarSensor_TEST::GroundPlane(const std::string &_physicsEngine)
 
   Load("worlds/empty.world", false, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   sensors::SonarSensorPtr sonar = SpawnSonar("sonar", "sonar",
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0), 0, 2, 0.2);
-  ASSERT_TRUE(sonar != NULL);
+  ASSERT_TRUE(sonar != nullptr);
 
-  physics::ModelPtr model = world->GetModel("sonar");
-  ASSERT_TRUE(model != NULL);
+  physics::ModelPtr model = world->ModelByName("sonar");
+  ASSERT_TRUE(model != nullptr);
 
   // Wait for collision engine to turn over
   common::Time::MSleep(1000);

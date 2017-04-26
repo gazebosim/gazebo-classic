@@ -25,6 +25,7 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
+#include "gazebo/physics/AtmosphereFactory.hh"
 #include "gazebo/physics/PhysicsFactory.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/gazebo_config.h"
@@ -40,6 +41,7 @@ uint32_t g_uniqueId = 0;
 bool physics::load()
 {
   physics::PhysicsFactory::RegisterAll();
+  physics::AtmosphereFactory::RegisterAll();
   return true;
 }
 
@@ -72,7 +74,7 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   {
     for (auto const &world : g_worlds)
     {
-      if (world->GetName() == _name)
+      if (world->Name() == _name)
         return world;
     }
   }
@@ -80,6 +82,24 @@ physics::WorldPtr physics::get_world(const std::string &_name)
   gzerr << "Unable to find world by name in physics::get_world["
     << _name.c_str() << "]\n";
   gzthrow("Unable to find world by name in physics::get_world(world_name)");
+}
+
+/////////////////////////////////////////////////
+bool physics::has_world(const std::string &_name)
+{
+  if (_name.empty())
+  {
+    return !g_worlds.empty();
+  }
+  else
+  {
+    for (auto const &world : g_worlds)
+    {
+      if (world->Name() == _name)
+        return true;
+    }
+  }
+  return false;
 }
 
 /////////////////////////////////////////////////
@@ -164,7 +184,7 @@ bool physics::worlds_running()
 {
   for (auto const &world : g_worlds)
   {
-    if (world->GetRunning())
+    if (world->Running())
       return true;
   }
 
