@@ -127,14 +127,14 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   // Now re-attach it at a new location
   auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
   ignition::math::Pose3d newPose(1, 2, 3, 0.1, 0.2, 0.3);
-  EXPECT_NE(newPose, model->GetWorldPose().Ign());
+  EXPECT_NE(newPose, model->WorldPose());
   msgs::Pose msgPose;
   msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
-  world->Step(50);
+  world->Step(150);
   EXPECT_NE(model->GetJoint("joint1"), nullptr);
-  EXPECT_TRUE(newPose.Pos().Equal(model->GetWorldPose().Ign().Pos(), 2e-2));
-  EXPECT_EQ(newPose.Rot(), model->GetWorldPose().Ign().Rot());
+  EXPECT_TRUE(newPose.Pos().Equal(model->WorldPose().Pos(), 2e-2));
+  EXPECT_EQ(newPose.Rot(), model->WorldPose().Rot());
 }
 
 TEST_P(Harness, DetachPaused)
