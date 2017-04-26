@@ -113,6 +113,7 @@ void RTShaderSystem::Fini()
 
   this->dataPtr->pssmSetup.setNull();
   this->dataPtr->scenes.clear();
+  this->dataPtr->shadowsApplied = false;
   this->dataPtr->initialized = false;
 }
 
