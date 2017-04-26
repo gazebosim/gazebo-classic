@@ -27,7 +27,7 @@ using namespace gazebo;
 class Harness : public ServerFixture,
                 public testing::WithParamInterface<const char*>
 {
-  /// \brief Detach the box and expect it to fall.
+  /// \brief Detach the box and expect it to fall, then Attach it again.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DetachPaused(const std::string &_physicsEngine);
 
@@ -123,6 +123,18 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   msg.set_data(std::to_string(0.0));
   velocityPub->Publish(msg);
   world->Step(15);
+
+  // Now re-attach it at a new location
+  auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
+  ignition::math::Pose3d newPose(1, 2, 3, 0.1, 0.2, 0.3);
+  EXPECT_NE(newPose, model->GetWorldPose().Ign());
+  msgs::Pose msgPose;
+  msgs::Set(&msgPose, newPose);
+  attachPub->Publish(msgPose);
+  world->Step(50);
+  EXPECT_NE(model->GetJoint("joint1"), nullptr);
+  EXPECT_TRUE(newPose.Pos().Equal(model->GetWorldPose().Ign().Pos(), 2e-2));
+  EXPECT_EQ(newPose.Rot(), model->GetWorldPose().Ign().Rot());
 }
 
 TEST_P(Harness, DetachPaused)
