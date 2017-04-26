@@ -88,6 +88,10 @@ namespace gazebo
     /// can be reattached with the Attach method.
     public: void Detach();
 
+    /// \brief Attach harness joints at current robot pose.
+    /// \param[in] _model Pointer to parent model.
+    private: void Attach();
+
     /// \brief Callback for World Update events.
     /// \param[in] _info Update information
     private: void OnUpdate(const common::UpdateInfo &_info);

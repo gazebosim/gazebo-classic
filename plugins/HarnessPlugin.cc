@@ -32,6 +32,12 @@ namespace gazebo
   /// \brief Private data for the HarnessPlugin class
   class HarnessPluginPrivate
   {
+    /// \brief sdf pointer
+    public: sdf::ElementPtr sdf;
+
+    /// \brief sdf pointer
+    public: physics::ModelPtr model;
+
     /// \brief Vector of joints
     public: std::vector<physics::JointPtr> joints;
 
@@ -96,88 +102,17 @@ HarnessPlugin::~HarnessPlugin()
 void HarnessPlugin::Load(physics::ModelPtr _model,
                          sdf::ElementPtr _sdf)
 {
+  // store pointers
+  this->dataPtr->model = _model;
+  this->dataPtr->sdf = _sdf;
+
   // Load all the harness joints
-  sdf::ElementPtr jointElem = _sdf->GetElement("joint");
-  while (jointElem)
-  {
-    std::string jointName = jointElem->Get<std::string>("name");
-    try
-    {
-      auto joint = _model->CreateJoint(jointElem);
-      this->dataPtr->joints.push_back(joint);
-    }
-    catch(gazebo::common::Exception &_e)
-    {
-      gzerr << "Unable to load joint[" << jointName << "]. "
-            << _e.GetErrorStr()
-            << std::endl;
-    }
-
-    jointElem = jointElem->GetNextElement("joint");
-  }
-
-  // Make sure at least one joint was created.
-  if (this->dataPtr->joints.empty())
-  {
-    gzerr << "No joints specified in the harness plugin."
-          << "The harness plugin will not run."
-          << std::endl;
-    return;
-  }
-
-  // Get the detach joint
-  if (_sdf->HasElement("detach"))
-  {
-    std::string jointName = _sdf->Get<std::string>("detach");
-    this->dataPtr->detachIndex = this->JointIndex(jointName);
-
-    // Error reporting
-    if (this->dataPtr->detachIndex < 0)
-    {
-      this->dataPtr->detachIndex = 0;
-      gzwarn << "Invalid <detach> joint name[" << jointName << "] in the "
-             << "harness plugin. The first joint will be used as the detach "
-             << "joint."
-             << std::endl;
-    }
-  }
-  else
-  {
-    // Error reporting
-    gzwarn << "A <detach> element is missing from the harness plugin. "
-           << "The first joint will be used as the detach joint."
-           << std::endl;
-  }
+  this->Attach();
 
   // Get the winch
   if (_sdf->HasElement("winch"))
   {
     sdf::ElementPtr winchElem = _sdf->GetElement("winch");
-
-    // Find the winch joint
-    if (winchElem->HasElement("joint"))
-    {
-      std::string winchJointName = winchElem->Get<std::string>("joint");
-      this->dataPtr->winchIndex = this->JointIndex(winchJointName);
-
-      // Error reporting
-      if (this->dataPtr->winchIndex < 0)
-      {
-        this->dataPtr->winchIndex = 0;
-        gzwarn << "Invalid <joint> name[" << winchJointName << "] in the "
-               << "<winch> element of the harness plugin.\n"
-               << "The first joint will be used as the winch."
-               << std::endl;
-      }
-    }
-    else
-    {
-      // Error reporting
-      gzwarn << "A <winch><joint>joint_name</joint></winch> element is "
-             << "missing from the harness plugin.\n"
-             << "The first joint will be used as the winch."
-             << std::endl;
-    }
 
     // Load the Position PID controller
     if (winchElem->HasElement("pos_pid"))
@@ -218,47 +153,27 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
         iMax, iMin, cmdMax, cmdMin);
     }
   }
-  else
-  {
-    // Error reporting
-    gzwarn << "A <winch> element is missing from the harness plugin. "
-           << "The first joint will be used as the winch."
-           << std::endl;
-  }
 }
 
 /////////////////////////////////////////////////
 void HarnessPlugin::Init()
 {
-  for (auto &joint : this->dataPtr->joints)
-  {
-    try
-    {
-      joint->Init();
-    }
-    catch(...)
-    {
-      gzerr << "Init joint failed" << std::endl;
-      return;
-    }
-  }
-
   // Get a pointer to the world
-  physics::WorldPtr world = _model->GetWorld();
+  physics::WorldPtr world = this->dataPtr->model->GetWorld();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(world->GetName());
 
   this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/velocity",
+      "~/" + this->dataPtr->model->GetName() + "/harness/velocity",
       &HarnessPlugin::OnVelocity, this);
 
   this->dataPtr->attachSub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/attach",
+      "~/" + this->dataPtr->model->GetName() + "/harness/attach",
       &HarnessPlugin::OnAttach, this);
 
   this->dataPtr->detachSub = this->dataPtr->node->Subscribe(
-      "~/" + _model->GetName() + "/harness/detach",
+      "~/" + this->dataPtr->model->GetName() + "/harness/detach",
       &HarnessPlugin::OnDetach, this);
 
   if (!this->dataPtr->joints.empty())
@@ -320,6 +235,115 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   this->dataPtr->joints[winchIndex]->SetForce(0, winchVelForce + winchPosForce);
 
   this->dataPtr->prevSimTime = _info.simTime;
+}
+
+/////////////////////////////////////////////////
+void HarnessPlugin::Attach()
+{
+  // Load all the harness joints
+  sdf::ElementPtr jointElem = this->dataPtr->sdf->GetElement("joint");
+  while (jointElem)
+  {
+    std::string jointName = jointElem->Get<std::string>("name");
+    try
+    {
+      auto joint = this->dataPtr->model->CreateJoint(jointElem);
+      this->dataPtr->joints.push_back(joint);
+    }
+    catch(gazebo::common::Exception &_e)
+    {
+      gzerr << "Unable to load joint[" << jointName << "]. "
+            << _e.GetErrorStr()
+            << std::endl;
+    }
+
+    jointElem = jointElem->GetNextElement("joint");
+  }
+
+  // Make sure at least one joint was created.
+  if (this->dataPtr->joints.empty())
+  {
+    gzerr << "No joints specified in the harness plugin."
+          << "The harness plugin will not run."
+          << std::endl;
+    return;
+  }
+
+  // Get the detach joint
+  if (this->dataPtr->sdf->HasElement("detach"))
+  {
+    std::string jointName = this->dataPtr->sdf->Get<std::string>("detach");
+    this->dataPtr->detachIndex = this->JointIndex(jointName);
+
+    // Error reporting
+    if (this->dataPtr->detachIndex < 0)
+    {
+      this->dataPtr->detachIndex = 0;
+      gzwarn << "Invalid <detach> joint name[" << jointName << "] in the "
+             << "harness plugin. The first joint will be used as the detach "
+             << "joint."
+             << std::endl;
+    }
+  }
+  else
+  {
+    // Error reporting
+    gzwarn << "A <detach> element is missing from the harness plugin. "
+           << "The first joint will be used as the detach joint."
+           << std::endl;
+  }
+
+  // Get the winch
+  if (this->dataPtr->sdf->HasElement("winch"))
+  {
+    sdf::ElementPtr winchElem = this->dataPtr->sdf->GetElement("winch");
+
+    // Find the winch joint
+    if (winchElem->HasElement("joint"))
+    {
+      std::string winchJointName = winchElem->Get<std::string>("joint");
+      this->dataPtr->winchIndex = this->JointIndex(winchJointName);
+
+      // Error reporting
+      if (this->dataPtr->winchIndex < 0)
+      {
+        this->dataPtr->winchIndex = 0;
+        gzwarn << "Invalid <joint> name[" << winchJointName << "] in the "
+               << "<winch> element of the harness plugin.\n"
+               << "The first joint will be used as the winch."
+               << std::endl;
+      }
+    }
+    else
+    {
+      // Error reporting
+      gzwarn << "A <winch><joint>joint_name</joint></winch> element is "
+             << "missing from the harness plugin.\n"
+             << "The first joint will be used as the winch."
+             << std::endl;
+    }
+  }
+  else
+  {
+    // Error reporting
+    gzwarn << "A <winch> element is missing from the harness plugin. "
+           << "The first joint will be used as the winch."
+           << std::endl;
+  }
+
+  // Init the joints
+  for (auto &joint : this->dataPtr->joints)
+  {
+    try
+    {
+      joint->Init();
+    }
+    catch(...)
+    {
+      gzerr << "Init joint failed" << std::endl;
+      return;
+    }
+  }
 }
 
 /////////////////////////////////////////////////
