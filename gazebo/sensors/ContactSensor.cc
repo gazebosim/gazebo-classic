@@ -333,16 +333,20 @@ void ContactSensor::OnContacts(ConstContactsPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  // Only store information if the sensor is active
-  if (this->IsActive())
+  if (!this->IsActive())
   {
-    // Store the contacts message for processing in UpdateImpl
-    this->dataPtr->incomingContacts.push_back(_msg);
-
-    // Prevent the incomingContacts list to grow indefinitely.
-    if (this->dataPtr->incomingContacts.size() > 100)
-      this->dataPtr->incomingContacts.pop_front();
+    gzwarn << "Contact sensor [" << this->Name() << "] is subscribed to "
+           << "contacts even though it isn't active. This should not "
+           << "happen." << std::endl;
+    return;
   }
+
+  // Store the contacts message for processing in UpdateImpl
+  this->dataPtr->incomingContacts.push_back(_msg);
+
+  // Prevent the incomingContacts list to grow indefinitely.
+  if (this->dataPtr->incomingContacts.size() > 100)
+    this->dataPtr->incomingContacts.pop_front();
 }
 
 //////////////////////////////////////////////////
