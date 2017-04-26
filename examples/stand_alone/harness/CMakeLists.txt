@@ -6,6 +6,9 @@ include_directories(${GAZEBO_INCLUDE_DIRS})
 link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
+add_executable(harness_attach harness_attach.cc)
+target_link_libraries(harness_attach ${GAZEBO_LIBRARIES})
+
 add_executable(harness_detach harness_detach.cc)
 target_link_libraries(harness_detach ${GAZEBO_LIBRARIES})
 

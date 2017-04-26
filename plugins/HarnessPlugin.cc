@@ -355,6 +355,16 @@ void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
           << std::endl;
     return;
   }
+
+  this->dataPtr->model->SetWorldPose(_pose);
+  this->Attach();
+  this->dataPtr->winchTargetPos = 0;
+  this->dataPtr->winchTargetVel = 0;
+  if (!this->dataPtr->joints.empty())
+  {
+    this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
+        std::bind(&HarnessPlugin::OnUpdate, this, std::placeholders::_1));
+  }
 }
 
 /////////////////////////////////////////////////
@@ -386,6 +396,7 @@ void HarnessPlugin::Detach()
   model->RemoveJoint(detachName);
   this->dataPtr->detachIndex = -1;
   this->dataPtr->winchIndex = -1;
+  this->dataPtr->joints.clear();
 
   this->dataPtr->prevSimTime == common::Time::Zero;
 }
