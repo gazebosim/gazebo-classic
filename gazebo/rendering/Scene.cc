@@ -1392,7 +1392,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) || !added_shared)
+    if (!submesh->useSharedVertices || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2652,6 +2652,13 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     {
       if (!this->dataPtr->terrain)
       {
+        // create a dummy visual for loading heightmap visual plugin
+        // TODO make heightmap a visual to avoid special treatment here?
+        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        auto m = *_msg.get();
+        m.clear_material();
+        visual->Load(msgs::VisualToSDF(m));
+
         this->dataPtr->terrain = new Heightmap(shared_from_this());
         // check the material fields and set material if it is specified
         if (_msg->has_material())
@@ -2671,13 +2678,6 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
         this->dataPtr->terrain->LoadFromMsg(_msg);
-
-        // create a dummy visual for loading heightmap visual plugin
-        // TODO make heightmap a visual to avoid special treatment here?
-        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
-        auto m = *_msg.get();
-        m.clear_material();
-        visual->Load(msgs::VisualToSDF(m));
       }
     }
     return true;

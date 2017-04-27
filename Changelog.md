@@ -279,6 +279,9 @@
 1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
+1. Subdivide large heightmaps to fix LOD and support global texture mapping
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
+
 ## Gazebo 7.6.0 (2017-03-20)
 
 1. Force / torque sensor visualization using WrenchVisual
