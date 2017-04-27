@@ -47,6 +47,10 @@ namespace gazebo
     /// \brief Index into the joints vector that specifies the joint to detach.
     public: int detachIndex = 0;
 
+    /// \brief Name of child link of detach joint.
+    /// This is used when re-attaching.
+    public: std::string detachLinkName;
+
     /// \brief Position PID controller for the winch
     public: common::PID winchPosPID;
 
@@ -284,6 +288,13 @@ void HarnessPlugin::Attach()
              << "joint."
              << std::endl;
     }
+
+    // Get name of child link of detach joint for when we re-attach.
+    auto child = this->dataPtr->joints[this->dataPtr->detachIndex]->GetChild();
+    if (child)
+    {
+      this->dataPtr->detachLinkName = child->GetName();
+    }
   }
   else
   {
@@ -356,7 +367,18 @@ void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
     return;
   }
 
-  this->dataPtr->model->SetWorldPose(_pose);
+  ignition::math::Pose3d detachLinkOffset;
+  auto link = this->dataPtr->model->GetLink(this->dataPtr->detachLinkName);
+  if (link)
+  {
+    detachLinkOffset = link->WorldPose() - this->dataPtr->model->WorldPose();
+  }
+  else
+  {
+    gzerr << "Unable to determine link to set pose, default to canonical link"
+          << std::endl;
+  }
+  this->dataPtr->model->SetWorldPose(-detachLinkOffset + _pose);
   this->Attach();
   this->dataPtr->winchTargetPos = 0;
   this->dataPtr->winchTargetVel = 0;
