@@ -111,7 +111,7 @@ bool ContactManager::SubscribersConnected(Collision *_collision1,
     {
       std::vector<std::string>::const_iterator it;
       for (it = iter->second->collisionNames.begin();
-           it != iter->second->collisionNames.end();)
+           it != iter->second->collisionNames.end(); ++it)
       {
         BasePtr b = this->world->BaseByName(*it);
         if (b)
