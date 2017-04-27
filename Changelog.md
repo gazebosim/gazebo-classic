@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. HarnessPlugin: PIMPL and allow re-attaching
+    * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
+
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
