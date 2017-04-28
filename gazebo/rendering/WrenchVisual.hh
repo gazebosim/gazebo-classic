@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _WRENCHVISUAL_HH_
-#define _WRENCHVISUAL_HH_
+#ifndef GAZEBO_RENDERING_WRENCHVISUAL_HH_
+#define GAZEBO_RENDERING_WRENCHVISUAL_HH_
 
 #include <string>
 
@@ -32,7 +32,9 @@ namespace gazebo
     /// \{
 
     /// \class WrenchVisual WrenchVisual.hh rendering/rendering.hh
-    /// \brief Visualization for sonar data.
+    /// \brief Visualization for wrench data. It consists of a purple line
+    /// pointing at the force direction and 3 RGB cones representing the torque
+    /// about the XYZ directions.
     class GZ_RENDERING_VISIBLE WrenchVisual : public Visual
     {
       /// \brief Constructor.
@@ -49,6 +51,9 @@ namespace gazebo
       /// \param[in] _msg Joint message
       public: void Load(ConstJointPtr &_msg);
       using Visual::Load;
+
+      // Documentation inherited
+      public: void Fini();
 
       /// \brief Set to true to enable wrench visualization.
       /// \param[in] _enabled True to show wrenches, false to hide.

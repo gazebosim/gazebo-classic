@@ -39,6 +39,13 @@ class SurfaceTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void SurfaceTest::CollideWithoutContact(const std::string &_physicsEngine)
 {
+  if ("bullet" == _physicsEngine)
+  {
+    gzerr << _physicsEngine << " Does not support <collide_without_contact>"
+      << " see issue #1038" << std::endl;
+    return;
+  }
+
   // load an empty world
   Load("worlds/collide_without_contact.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -208,20 +215,10 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   ASSERT_TRUE(box3 != NULL);
   ASSERT_TRUE(box4 != NULL);
 
-  // Step forward 0.2 s
-  double stepTime = 0.2;
+  // Step forward 1.5 s
+  double stepTime = 1.5;
   unsigned int steps = floor(stepTime / dt);
   world->Step(steps);
-
-  // Expect boxes to be falling
-  double fallVelocity = g.Z() * stepTime;
-  EXPECT_LT(box1->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box2->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box3->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
-  EXPECT_LT(box4->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
-
-  // Another 2000 steps should put the boxes at rest
-  world->Step(2000);
 
   // Expect 3 boxes to be stationary
   EXPECT_NEAR(box1->WorldLinearVel().Z(), 0, 1e-3);
@@ -232,11 +229,11 @@ void SurfaceTest::CollideBitmask(const std::string &_physicsEngine)
   EXPECT_NEAR(box1->WorldPose().Pos().Z(), 0.5, 1e-3);
   EXPECT_NEAR(box2->WorldPose().Pos().Z(), 0.5, 1e-3);
 
-  // The third boxs should be ontop of the firs two boxes
+  // The third box should be ontop of the first two boxes
   EXPECT_NEAR(box3->WorldPose().Pos().Z(), 1.5, 1e-3);
 
-  // Expect 4th box to still be falling
-  fallVelocity = g.Z() * world->SimTime().Double();
+  // Expect 4th box to be falling
+  double fallVelocity = g.Z() * world->SimTime().Double();
   EXPECT_LT(box4->WorldLinearVel().Z(), fallVelocity*(1-g_physics_tol));
 
   Unload();
@@ -256,10 +253,8 @@ TEST_P(SurfaceTest, CollideBitmask)
   CollideBitmask(GetParam());
 }
 
-// These tests only work with ODE.
-// Issue #1038
-// INSTANTIATE_TEST_CASE_P(PhysicsEngines, SurfaceTest, PHYSICS_ENGINE_VALUES);
-INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values("ode"));
+INSTANTIATE_TEST_CASE_P(TestODE, SurfaceTest, ::testing::Values(
+      "ode", "bullet"));
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
