@@ -15,7 +15,6 @@
  *
 */
 
-#include <unistd.h>
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "test_config.h"
