@@ -139,7 +139,10 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     ASSERT_TRUE(link != nullptr);
 
     const unsigned int index = 0;
-    auto collision = link->GetCollision(index);
+    // The following line used to be 
+    // auto collision = link->GetCollision(index);
+    // but for some reason that version caused a C2666 in Visual Studio 2015
+    CollisionPtr collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
     EXPECT_EQ(model->WorldPose(), modelPose);
