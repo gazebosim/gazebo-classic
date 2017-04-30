@@ -64,6 +64,8 @@ ignition::math::Vector3d DARTFixedJoint::Anchor(
           "Anchor" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();

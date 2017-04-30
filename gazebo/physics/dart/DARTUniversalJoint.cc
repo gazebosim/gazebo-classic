@@ -63,6 +63,8 @@ ignition::math::Vector3d DARTUniversalJoint::Anchor(
           "Anchor" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -81,6 +83,8 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
   }
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
   {
@@ -129,6 +133,8 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
       this->AxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
@@ -167,6 +173,8 @@ double DARTUniversalJoint::PositionImpl(const unsigned int _index) const
 
   double result = ignition::math::NAN_D;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
     result = this->dataPtr->dtJoint->getPosition(0);
@@ -194,6 +202,8 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 
   double result = 0.0;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     result = this->dataPtr->dtJoint->getVelocity(0);
   else if (_index == 1)
@@ -216,6 +226,8 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index < this->DOF())
     this->dataPtr->dtJoint->setVelocity(_index, _vel);
   else
@@ -232,6 +244,9 @@ void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
         boost::bind(&DARTUniversalJoint::SetForceImpl, this, _index, _effort));
     return;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else if (_index == 1)

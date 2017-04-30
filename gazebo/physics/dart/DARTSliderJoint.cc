@@ -64,6 +64,8 @@ ignition::math::Vector3d DARTSliderJoint::Anchor(
                                                    + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
       this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -82,6 +84,8 @@ ignition::math::Vector3d DARTSliderJoint::GlobalAxis(
   }
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
   {
@@ -115,6 +119,8 @@ void DARTSliderJoint::SetAxis(const unsigned int _index,
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
     dart::dynamics::PrismaticJoint *dtPrismaticJoint =
@@ -146,6 +152,8 @@ double DARTSliderJoint::PositionImpl(const unsigned int _index) const
 
   double result = ignition::math::NAN_D;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
     result = this->dataPtr->dtJoint->getPosition(0);
@@ -170,6 +178,8 @@ void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
   else
@@ -186,6 +196,8 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
   }
 
   double result = 0.0;
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
     result = this->dataPtr->dtJoint->getVelocity(0);
@@ -205,6 +217,8 @@ void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
         boost::bind(&DARTSliderJoint::SetForceImpl, this, _index, _effort));
     return;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);

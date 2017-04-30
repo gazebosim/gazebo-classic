@@ -69,7 +69,6 @@ void DARTJoint::Init()
 
   this->dataPtr->Initialize();
 
-  // DARTModel::Load() should be called first
   GZ_ASSERT(this->dataPtr->dtJoint, "DARTJoint is not initialized.");
 
   // Parent and child link information
@@ -103,6 +102,7 @@ void DARTJoint::Init()
                                  dtTransformChildLinkToJoint;
 
   // We assume that the joint angles are all zero.
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   this->dataPtr->dtJoint->setTransformFromParentBodyNode(
         dtTransformParentLinkToJoint);
   this->dataPtr->dtJoint->setTransformFromChildBodyNode(
@@ -238,6 +238,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     bool childStatic =
         this->GetChild() ? this->GetChild()->IsStatic() : false;
 
+
     if (!this->applyDamping)
     {
       if (!parentStatic && !childStatic)
@@ -250,6 +251,8 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
                             _index, _stiffness, _damping, _reference));
           return;
         }
+
+        GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
 
         this->dataPtr->dtJoint->setSpringStiffness(
               static_cast<int>(_index), _stiffness);
@@ -291,6 +294,7 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   this->dataPtr->dtJoint->setPositionUpperLimit(_index, _limit);
 }
 
@@ -311,6 +315,7 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   this->dataPtr->dtJoint->setPositionLowerLimit(_index, _limit);
 }
 
@@ -329,6 +334,7 @@ double DARTJoint::UpperLimit(const unsigned int _index) const
           "HighStop" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   return this->dataPtr->dtJoint->getPositionUpperLimit(_index);
 }
 
@@ -347,6 +353,7 @@ double DARTJoint::LowerLimit(const unsigned int _index) const
           "LowStop" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   return this->dataPtr->dtJoint->getPositionLowerLimit(_index);
 }
 
@@ -382,6 +389,7 @@ ignition::math::Vector3d DARTJoint::LinkForce(
   {
     dart::dynamics::BodyNode *dartChildBody = theChildLink->DARTBodyNode();
     GZ_ASSERT(dartChildBody, "dartChildBody pointer is null");
+    GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
     F2 = -dart::math::dAdT(
           this->dataPtr->dtJoint->getTransformFromChildBodyNode(),
           dartChildBody->getBodyForce());
@@ -476,6 +484,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "friction")
     {
+      GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
       this->dataPtr->dtJoint->setCoulombFriction(
             _index, boost::any_cast<double>(_value));
     }
@@ -512,6 +521,7 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
   {
     if (_key == "friction")
     {
+      GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
       return this->dataPtr->dtJoint->getCoulombFriction(_index);
     }
   }
@@ -538,6 +548,8 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
     return JointWrench();
 
   JointWrench jointWrench;
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
 
   //---------------------------------------------
   // Parent and child link information
@@ -635,6 +647,7 @@ DARTJointPropPtr DARTJoint::DARTProperties() const
 /////////////////////////////////////////////////
 void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
 {
+  GZ_ASSERT(_dtJoint, "Can only set joints which are not nullptr");
   this->dataPtr->dtJoint = _dtJoint;
 }
 

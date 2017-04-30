@@ -74,6 +74,8 @@ ignition::math::Vector3d DARTScrewJoint::Anchor(
           "Anchor" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
       this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -92,6 +94,8 @@ ignition::math::Vector3d DARTScrewJoint::GlobalAxis(
   }
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index < this->DOF())
   {
@@ -127,6 +131,8 @@ void DARTScrewJoint::SetAxis(const unsigned int _index,
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index < this->DOF())
   {
     dart::dynamics::ScrewJoint *dtScrewJoint =
@@ -160,6 +166,8 @@ double DARTScrewJoint::GetVelocity(unsigned int _index) const
 
   double result = 0.0;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     result = this->dataPtr->dtJoint->getVelocity(0);
   else if (_index == 1)
@@ -180,6 +188,8 @@ void DARTScrewJoint::SetVelocity(unsigned int _index, double _vel)
         boost::bind(&DARTScrewJoint::SetVelocity, this, _index, _vel));
     return;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
@@ -210,6 +220,8 @@ void DARTScrewJoint::SetThreadPitch(double _threadPitch)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   dart::dynamics::ScrewJoint *dtScrewJoint =
       dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
   GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
@@ -230,6 +242,7 @@ double DARTScrewJoint::GetThreadPitch(unsigned int _index)
 //////////////////////////////////////////////////
 double DARTScrewJoint::GetThreadPitch()
 {
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
   GZ_ASSERT(
     !this->dataPtr->IsInitialized() ||
     (std::abs(dynamic_cast<dart::dynamics::ScrewJoint *>(
@@ -261,6 +274,8 @@ double DARTScrewJoint::GetParam(const std::string &_key, unsigned int _index)
 
   if (!this->dataPtr->IsInitialized())
     return this->dataPtr->GetCached<double>(_key + std::to_string(_index));
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_key  == "thread_pitch")
   {
@@ -306,6 +321,8 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
           boost::bind(&DARTScrewJoint::SetParam, this, _key, _index, _value));
     return true;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   // try because boost::any_cast can throw
   try
@@ -355,6 +372,8 @@ double DARTScrewJoint::PositionImpl(const unsigned int _index) const
 
   double result = ignition::math::NAN_D;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
     // angular position
@@ -387,6 +406,8 @@ void DARTScrewJoint::SetForceImpl(unsigned int _index, double _effort)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else if (_index == 1)
@@ -407,6 +428,7 @@ double DARTScrewJoint::UpperLimit(const unsigned int _index) const
               "HighStop" + std::to_string(_index));
       }
 
+      GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
       return this->dataPtr->dtJoint->getPositionUpperLimit(0);
     case 1:
       gzerr << "DARTScrewJoint::UpperLimit: Not implemented for index[1].\n";
@@ -429,7 +451,7 @@ double DARTScrewJoint::LowerLimit(const unsigned int _index) const
         return this->dataPtr->GetCached<double>(
               "LowStop" + std::to_string(_index));
       }
-
+      GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
       return this->dataPtr->dtJoint->getPositionLowerLimit(0);
     case 1:
       gzerr << "DARTScrewJoint::LowerLimit: Not implemented for index[1].\n";
