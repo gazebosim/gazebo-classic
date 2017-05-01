@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
 
 namespace gazebo
@@ -97,7 +95,7 @@ namespace gazebo
     private: void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Velocity control callback.
-    /// \param[in] _msg Message data, interpretted as a float
+    /// \param[in] _msg Message data, interpreted as a float
     private: void OnVelocity(ConstGzStringPtr &_msg);
 
     /// \brief Attach callback.
@@ -105,7 +103,7 @@ namespace gazebo
     private: void OnAttach(ConstPosePtr &_msg);
 
     /// \brief Detach callback.
-    /// \param[in] _msg Message data, interpretted as a bool
+    /// \param[in] _msg Message data, interpreted as a bool
     private: void OnDetach(ConstGzStringPtr &_msg);
 
     /// \brief Get the index of a joint with the given name.

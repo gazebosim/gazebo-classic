@@ -16,6 +16,8 @@
 */
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/PID.hh"
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 
@@ -35,7 +37,7 @@ namespace gazebo
     /// \brief sdf pointer
     public: sdf::ElementPtr sdf;
 
-    /// \brief sdf pointer
+    /// \brief model pointer
     public: physics::ModelPtr model;
 
     /// \brief Vector of joints
