@@ -93,9 +93,6 @@ void Sensor::Load(const std::string &_worldName)
       this->sdf->Get<ignition::math::Pose3d>("pose");
   }
 
-  if (this->sdf->Get<bool>("always_on"))
-    this->SetActive(true);
-
   this->world = physics::get_world(_worldName);
 
   if (this->dataPtr->category == IMAGE)
@@ -107,6 +104,9 @@ void Sensor::Load(const std::string &_worldName)
   this->node->Init(this->world->GetName());
   this->dataPtr->sensorPub =
     this->node->Advertise<msgs::Sensor>("~/sensor");
+
+  if (this->sdf->Get<bool>("always_on"))
+    this->SetActive(true);
 }
 
 //////////////////////////////////////////////////

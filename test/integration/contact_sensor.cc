@@ -187,9 +187,9 @@ TEST_P(ContactSensor, ModelRemoval)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::MoveTool(const std::string &_physicsEngine)
 {
-  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  this->Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   const std::string modelName("sphere");
   const math::Vector3 pos(0, 0, 1.8);
@@ -207,7 +207,7 @@ void ContactSensor::MoveTool(const std::string &_physicsEngine)
 
   // Try moving the model
   auto model = world->GetModel(modelName);
-  ASSERT_TRUE(model != NULL);
+  ASSERT_TRUE(model != nullptr);
 
   auto pose = model->GetWorldPose();
   pose.pos.x += 0.2;
@@ -241,9 +241,9 @@ TEST_P(ContactSensor, MoveTool)
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
 {
-  Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
+  this->Load("worlds/contact_sensors_multiple.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   const std::string contactSensorName1("box_contact");
   const std::string contactSensorName2("box_contact2");
@@ -252,14 +252,14 @@ void ContactSensor::MultipleSensors(const std::string &_physicsEngine)
     sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
     sensors::ContactSensorPtr contactSensor1 =
         std::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
-    ASSERT_TRUE(contactSensor1 != NULL);
+    ASSERT_TRUE(contactSensor1 != nullptr);
   }
 
   {
     sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
     sensors::ContactSensorPtr contactSensor2 =
         std::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
-    ASSERT_TRUE(contactSensor2 != NULL);
+    ASSERT_TRUE(contactSensor2 != nullptr);
   }
 
   // There should be 5 topics advertising Contacts messages
@@ -320,11 +320,11 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::string modelName01 = "contactModel01";
@@ -355,13 +355,13 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor01 =
       std::dynamic_pointer_cast<sensors::ContactSensor>(sensor01);
 
-  ASSERT_TRUE(contactSensor01 != NULL);
+  ASSERT_TRUE(contactSensor01 != nullptr);
 
   sensors::SensorPtr sensor02 = sensors::get_sensor(contactSensorName02);
   sensors::ContactSensorPtr contactSensor02 =
       std::dynamic_pointer_cast<sensors::ContactSensor>(sensor02);
 
-  ASSERT_TRUE(contactSensor02 != NULL);
+  ASSERT_TRUE(contactSensor02 != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -382,8 +382,8 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
   physics::ModelPtr contactModel01 = world->GetModel(modelName01);
   physics::ModelPtr contactModel02 = world->GetModel(modelName02);
-  ASSERT_TRUE(contactModel01 != NULL);
-  ASSERT_TRUE(contactModel02 != NULL);
+  ASSERT_TRUE(contactModel01 != nullptr);
+  ASSERT_TRUE(contactModel02 != nullptr);
 
   std::vector<physics::ModelPtr> models;
   models.push_back(contactModel01);
@@ -433,7 +433,7 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
 
     unsigned int ColInd = 0;
     physics::CollisionPtr col = models[k]->GetLink()->GetCollision(ColInd);
-    ASSERT_TRUE(col != NULL);
+    ASSERT_TRUE(col != nullptr);
 
     // calculate tolerance based on magnitude of force
     // Uncomment lines below once we are able to accurately determine the
@@ -556,11 +556,11 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   std::string modelName = "contactModel";
@@ -579,7 +579,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   sensors::ContactSensorPtr contactSensor =
       std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
 
-  ASSERT_TRUE(contactSensor != NULL);
+  ASSERT_TRUE(contactSensor != nullptr);
 
   sensors::SensorManager::Instance()->Init();
   sensors::SensorManager::Instance()->RunThreads();
@@ -594,7 +594,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
   EXPECT_TRUE(contactSensor->IsActive());
 
   physics::ModelPtr contactModel = world->GetModel(modelName);
-  ASSERT_TRUE(contactModel != NULL);
+  ASSERT_TRUE(contactModel != nullptr);
 
   double gravityZ = -9.8;
   physics->SetGravity(math::Vector3(0, 0, gravityZ));
@@ -624,7 +624,7 @@ void ContactSensor::TorqueTest(const std::string &_physicsEngine)
 
   unsigned int ColInd = 0;
   physics::CollisionPtr col = contactModel->GetLink()->GetCollision(ColInd);
-  ASSERT_TRUE(col != NULL);
+  ASSERT_TRUE(col != nullptr);
 
   // double tol = 2e-1;
   // loop through contact collision pairs

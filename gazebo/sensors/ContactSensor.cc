@@ -89,6 +89,16 @@ void ContactSensor::Load(const std::string &_worldName)
 
     collisionElem = collisionElem->GetNextElement("collision");
   }
+
+  if (this->dataPtr->collisions.empty())
+  {
+    gzerr << "Contact sensor missing collisions, it won't be initialized."
+          << std::endl;
+  }
+
+  // Disable transport in case there are no collisions
+  // Create it if it's active, but we only added the collisions now
+  this->SetActive(this->IsActive() && !this->dataPtr->collisions.empty());
 }
 
 //////////////////////////////////////////////////
@@ -103,6 +113,7 @@ void ContactSensor::SetActive(const bool _value)
   physics::ContactManager *mgr =
       this->world->GetPhysicsEngine()->GetContactManager();
 
+  // Need collisions for filter
   if (_value && !this->dataPtr->collisions.empty() &&
       !this->dataPtr->contactSub)
   {
@@ -137,7 +148,7 @@ void ContactSensor::SetActive(const bool _value)
     this->dataPtr->contactSub = this->node->Subscribe(topic,
         &ContactSensor::OnContacts, this);
   }
-  else
+  else if (!_value)
   {
     mgr->RemoveFilter(this->dataPtr->filterName);
     this->dataPtr->contactSub.reset();
