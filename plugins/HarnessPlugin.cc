@@ -102,6 +102,14 @@ HarnessPlugin::HarnessPlugin()
 /////////////////////////////////////////////////
 HarnessPlugin::~HarnessPlugin()
 {
+  // clear subscribers and transport
+  this->dataPtr->updateConnection.reset();
+  this->dataPtr->detachSub.reset();
+  this->dataPtr->attachSub.reset();
+  this->dataPtr->velocitySub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 /////////////////////////////////////////////////
