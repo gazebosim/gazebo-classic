@@ -436,7 +436,15 @@ void HarnessPlugin::Detach()
 /////////////////////////////////////////////////
 double HarnessPlugin::WinchVelocity() const
 {
-  return this->dataPtr->joints[this->dataPtr->winchIndex]->GetVelocity(0);
+  // store winchIndex in local variable since it can change in callback
+  int winchIndex = this->dataPtr->winchIndex;
+  if (winchIndex < 0 ||
+      winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
+  {
+    gzerr << "No known winch joint to get velocity" << std::endl;
+    return 0;
+  }
+  return this->dataPtr->joints[winchIndex]->GetVelocity(0);
 }
 
 /////////////////////////////////////////////////
@@ -464,7 +472,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
 /////////////////////////////////////////////////
 int HarnessPlugin::JointIndex(const std::string &_name) const
 {
-  // Find the winch joint in our list of joints
+  // Find the given joint in our list of joints
   for (size_t i = 0; i < this->dataPtr->joints.size(); ++i)
   {
     if (this->dataPtr->joints[i]->GetName() == _name)
