@@ -61,14 +61,7 @@ void Distortion::Load(sdf::ElementPtr _sdf)
   this->dataPtr->lensCenter =
     this->sdf->Get<ignition::math::Vector2d>("center");
 
-  if (this->dataPtr->k1 < 0)
-  {
-    this->dataPtr->distortionCrop = true;
-  }
-  else
-  {
-    this->dataPtr->distortionCrop = false;
-  }
+  this->dataPtr->distortionCrop = this->dataPtr->k1 < 0;
 }
 
 //////////////////////////////////////////////////
@@ -286,6 +279,7 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->dataPtr->lensDistortionInstance->setEnabled(true);
 }
 
+//////////////////////////////////////////////////
 void Distortion::CalculateAndApplyDistortionScale()
 {
   if (!this->dataPtr->distortionMaterial.isNull())
