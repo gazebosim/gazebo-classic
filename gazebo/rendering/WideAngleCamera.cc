@@ -658,7 +658,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           this->dataPtr->envTextureSize,
           this->dataPtr->envTextureSize,
           0,
-          (Ogre::PixelFormat)this->imageFormat,
+          static_cast<Ogre::PixelFormat>(this->imageFormat),
           Ogre::TU_RENDERTARGET,
           0,
           false,
