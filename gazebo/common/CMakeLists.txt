@@ -267,7 +267,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  set(MORE_FLAGS "-pthread")
+  set(MORE_FLAGS "-pthread" ${Boost_PKGCONFIG_CFLAGS})
   add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
 endif()
 
