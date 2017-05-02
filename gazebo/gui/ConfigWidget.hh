@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -377,7 +377,7 @@ namespace gazebo
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \return Vector3 value.
+      /// \return ignition math Vector3d value.
       public: ignition::math::Vector3d Vector3dWidgetValue(
           const std::string &_name) const;
 
@@ -578,7 +578,8 @@ namespace gazebo
 
       /// \brief Update a vector3d message.
       /// \param[in] _msg Vector3d message to be updated.
-      /// \param[in] _value Vector3 used for updating the message.
+      /// \param[in] _value ignition math Vector3d used for updating the
+      /// message.
       private: void UpdateVector3dMsg(google::protobuf::Message *_msg,
           const ignition::math::Vector3d &_value);
 

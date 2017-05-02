@@ -87,6 +87,14 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
 
+  // The default world has to exist
+  ASSERT_TRUE(physics::has_world("default"));
+  // Calling has_world with empty string should check whether
+  // any world exists at all, which has to be true too.
+  ASSERT_TRUE(physics::has_world(""));
+  // Make sure that has_world also works for non-existent world names
+  EXPECT_FALSE(physics::has_world("nonexistent_world"));
+
   // Get world pointer
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
@@ -95,7 +103,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -147,6 +155,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
+  EXPECT_FALSE(physics::has_world());
 
   // Check all topics related to that world are gone
   msgTypes = gazebo::transport::getAdvertisedTopics();
@@ -187,7 +196,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   EXPECT_GT(worldPtrCount, 1);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
@@ -210,7 +219,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   std::vector<physics::ModelPtr> modelPtrs;
   for (auto &name : modelNames)
   {
-    auto model = world->GetModel(name);
+    auto model = world->ModelByName(name);
     ASSERT_TRUE(model != nullptr);
     modelPtrs.push_back(model);
   }
@@ -222,7 +231,7 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   std::vector<physics::LightPtr> lightPtrs;
   for (auto &name : lightNames)
   {
-    auto light = world->Light(name);
+    auto light = world->LightByName(name);
     ASSERT_TRUE(light != nullptr);
     lightPtrs.push_back(light);
   }
@@ -377,7 +386,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   EXPECT_GT(worldPtrCount, 1);
 
   // Get model pointer
-  auto model = world->GetModel("joint_model0");
+  auto model = world->ModelByName("joint_model0");
   ASSERT_TRUE(model != nullptr);
 
   // Check model has the joint
@@ -392,7 +401,7 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   ASSERT_TRUE(childLink != nullptr);
 
   // Get physics engine pointer
-  auto physicsEngine = world->GetPhysicsEngine();
+  auto physicsEngine = world->Physics();
   ASSERT_TRUE(physicsEngine != nullptr);
 
   auto physicsEnginePtrCount = physicsEngine.use_count();

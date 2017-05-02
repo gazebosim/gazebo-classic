@@ -49,7 +49,7 @@ void HarnessPlugin::Load(physics::ModelPtr _model,
   physics::WorldPtr world = _model->GetWorld();
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(world->GetName());
+  this->node->Init(world->Name());
 
   this->velocitySub = this->node->Subscribe(
       "~/" + _model->GetName() + "/harness/velocity",
@@ -241,7 +241,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   if (ignition::math::equal(this->winchTargetVel, 0.0f))
   {
     // Calculate the position error if vel target is 0
-    pError = this->joints[this->winchIndex]->GetAngle(0).Radian() -
+    pError = this->joints[this->winchIndex]->Position(0) -
       this->winchTargetPos;
   }
 
@@ -314,7 +314,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
   if (ignition::math::equal(_value, 0.0f))
   {
     // if zero velocity is commanded, hold position
-    this->winchTargetPos = this->joints[this->winchIndex]->GetAngle(0).Radian();
+    this->winchTargetPos = this->joints[this->winchIndex]->Position(0);
     this->winchPosPID.Reset();
   }
 }

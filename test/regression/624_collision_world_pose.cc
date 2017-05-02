@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -92,7 +92,7 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
     while (!this->HasEntity(name))
       common::Time::MSleep(100);
   }
-  physics::ModelPtr model = world->GetModel("box_1");
+  physics::ModelPtr model = world->ModelByName("box_1");
 
   physics::Link_V links = model->GetLinks();
   for (physics::Link_V::iterator li = links.begin(); li != links.end(); ++li)
@@ -103,25 +103,25 @@ void Issue624Test::CollisionWorldPose(const std::string &_physicsEngine)
        ci != collisions.end(); ++ci)
     {
       gzdbg << "name [" << (*ci)->GetName()
-            << "] abs pose [" << (*ci)->GetWorldPose()
-            << "] rel pose [" << (*ci)->GetRelativePose() << "]\n";
+            << "] abs pose [" << (*ci)->WorldPose()
+            << "] rel pose [" << (*ci)->RelativePose() << "]\n";
       if ((*ci)->GetName() == "col1")
       {
-        EXPECT_EQ((*ci)->GetWorldPose(),
-          math::Pose(3, 4, 5, 0.7, 0.7, 0.7) +
-          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
-          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
-        EXPECT_EQ((*ci)->GetRelativePose(),
-          math::Pose(3, 4, 5, 0.7, 0.7, 0.7));
+        EXPECT_EQ((*ci)->WorldPose(),
+          ignition::math::Pose3d(3, 4, 5, 0.7, 0.7, 0.7) +
+          ignition::math::Pose3d(2, 3, 4, 0.6, 0.6, 0.6) +
+          ignition::math::Pose3d(1, 2, 3, 0.5, 0.5, 0.5));
+        EXPECT_EQ((*ci)->RelativePose(),
+          ignition::math::Pose3d(3, 4, 5, 0.7, 0.7, 0.7));
       }
       else if ((*ci)->GetName() == "col2")
       {
-        EXPECT_EQ((*ci)->GetWorldPose(),
-          math::Pose(6, 7, 8, 0.8, 0.8, 0.8) +
-          math::Pose(2, 3, 4, 0.6, 0.6, 0.6) +
-          math::Pose(1, 2, 3, 0.5, 0.5, 0.5));
-        EXPECT_EQ((*ci)->GetRelativePose(),
-          math::Pose(6, 7, 8, 0.8, 0.8, 0.8));
+        EXPECT_EQ((*ci)->WorldPose(),
+          ignition::math::Pose3d(6, 7, 8, 0.8, 0.8, 0.8) +
+          ignition::math::Pose3d(2, 3, 4, 0.6, 0.6, 0.6) +
+          ignition::math::Pose3d(1, 2, 3, 0.5, 0.5, 0.5));
+        EXPECT_EQ((*ci)->RelativePose(),
+          ignition::math::Pose3d(6, 7, 8, 0.8, 0.8, 0.8));
       }
     }
   }

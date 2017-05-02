@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,9 +60,9 @@ void SimbodyModel::Init()
     return;
 
   // Record the model's initial pose (for reseting)
-  this->SetInitialRelativePose(this->GetWorldPose());
+  this->SetInitialRelativePose(this->WorldPose());
 
-  this->SetRelativePose(this->GetWorldPose());
+  this->SetRelativePose(this->WorldPose());
 
   // Initialize the bodies before the joints
   for (Base_V::iterator iter = this->children.begin();
@@ -83,10 +83,12 @@ void SimbodyModel::Init()
   // this needs to happen before this->joints are used
   physics::SimbodyPhysicsPtr simbodyPhysics =
     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
-      this->GetWorld()->GetPhysicsEngine());
+        this->GetWorld()->Physics());
   if (simbodyPhysics)
+  {
     simbodyPhysics->InitModel(
         boost::static_pointer_cast<Model>(shared_from_this()));
+  }
 
   // Initialize the joints last.
   Joint_V myJoints = this->GetJoints();
@@ -126,7 +128,7 @@ void SimbodyModel::Init()
 //   // this needs to happen before this->joints are used
 //   physics::SimbodyPhysicsPtr simbodyPhysics =
 //     boost::dynamic_pointer_cast<physics::SimbodyPhysics>(
-//       this->GetWorld()->GetPhysicsEngine());
+//       this->GetWorld()->Physics());
 //   if (simbodyPhysics)
 //     simbodyPhysics->InitModel(this);
 //

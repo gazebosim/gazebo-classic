@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -82,7 +83,8 @@ void ODEGearboxJoint::SetGearboxRatio(double _gearRatio)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d ODEGearboxJoint::GlobalAxis(
+    const unsigned int _index) const
 {
   dVector3 result;
 
@@ -93,14 +95,15 @@ math::Vector3 ODEGearboxJoint::GetGlobalAxis(unsigned int _index) const
   else
   {
     gzerr << "index [" << _index << "] out of range\n";
-    return math::Vector3::Zero;
+    return ignition::math::Vector3d::Zero;
   }
 
-  return math::Vector3(result[0], result[1], result[2]);
+  return ignition::math::Vector3d(result[0], result[1], result[2]);
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void ODEGearboxJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
   ODEJoint::SetAxis(_index, _axis);
 
@@ -110,28 +113,28 @@ void ODEGearboxJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
     this->parentLink->SetEnabled(true);
 
   /// ODE needs global axis
-  math::Quaternion axisFrame = this->GetAxisFrame(_index);
-  math::Vector3 globalAxis = axisFrame.RotateVector(_axis);
+  auto axisFrame = this->AxisFrame(_index);
+  auto globalAxis = axisFrame.RotateVector(_axis);
 
   if (_index == 0)
   {
-    dJointSetGearboxAxis1(this->jointId, globalAxis.x, globalAxis.y,
-      globalAxis.z);
+    dJointSetGearboxAxis1(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else if (_index == 1)
   {
-    dJointSetGearboxAxis2(this->jointId, globalAxis.x, globalAxis.y,
-      globalAxis.z);
+    dJointSetGearboxAxis2(this->jointId, globalAxis.X(), globalAxis.Y(),
+      globalAxis.Z());
   }
   else
     gzerr << "index [" << _index << "] out of range\n";
 }
 
 //////////////////////////////////////////////////
-math::Angle ODEGearboxJoint::GetAngleImpl(unsigned int /*index*/) const
+double ODEGearboxJoint::PositionImpl(const unsigned int /*index*/) const
 {
   gzlog << "GetAngle not implemented for gearbox\n";
-  return math::Angle(0);
+  return ignition::math::NAN_D;
 }
 
 //////////////////////////////////////////////////
@@ -172,15 +175,16 @@ void ODEGearboxJoint::SetParam(unsigned int /*_parameter*/, double /*_value*/)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 ODEGearboxJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d ODEGearboxJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
-  gzlog << "ODEGearboxJoint::GetAnchor not implemented.\n";
-  return math::Vector3::Zero;
+  gzlog << "ODEGearboxJoint::Anchor not implemented.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-void ODEGearboxJoint::SetAnchor(unsigned int /*_index*/,
-  const math::Vector3 &/*_anchor*/)
+void ODEGearboxJoint::SetAnchor(const unsigned int /*_index*/,
+  const ignition::math::Vector3d &/*_anchor*/)
 {
   gzlog << "ODEGearboxJoint::SetAnchor not implemented.\n";
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMSTATE_EVENTSOURCE_HH_
-#define _SIMSTATE_EVENTSOURCE_HH_
+#ifndef GAZEBO_PLUGINS_SIMSTATEEVENTSOURCE_HH_
+#define GAZEBO_PLUGINS_SIMSTATEEVENTSOURCE_HH_
 
 #include "EventSource.hh"
 

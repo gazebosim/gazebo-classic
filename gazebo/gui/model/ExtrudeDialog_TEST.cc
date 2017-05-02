@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  *
 */
 
+#include <memory>
+
 #include "gazebo/gui/model/ExtrudeDialog.hh"
 #include "gazebo/gui/model/ExtrudeDialog_TEST.hh"
 
@@ -26,11 +28,9 @@ void ExtrudeDialog_TEST::BadFilename()
   // Check that bad filenames don't break anything
   std::string bad("/not/a/file.svg");
 
-  gazebo::gui::ExtrudeDialog *extrudeDialog =
-      new gazebo::gui::ExtrudeDialog(bad);
+  std::unique_ptr<gazebo::gui::ExtrudeDialog> extrudeDialog(
+      new gazebo::gui::ExtrudeDialog(bad));
   QVERIFY(extrudeDialog != NULL);
-
-  delete extrudeDialog;
 }
 
 /////////////////////////////////////////////////
@@ -39,8 +39,8 @@ void ExtrudeDialog_TEST::GetSpinValues()
   // Check a good file
   std::string filePath = std::string(PROJECT_SOURCE_PATH);
   filePath += "/test/data/loader.svg";
-  gazebo::gui::ExtrudeDialog *extrudeDialog =
-      new gazebo::gui::ExtrudeDialog(filePath);
+  std::unique_ptr<gazebo::gui::ExtrudeDialog> extrudeDialog(
+      new gazebo::gui::ExtrudeDialog(filePath));
 
   // Get default thickness, change value and check new value
   double thickness = extrudeDialog->GetThickness();

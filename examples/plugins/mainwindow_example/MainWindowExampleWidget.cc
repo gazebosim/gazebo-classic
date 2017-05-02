@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <functional>
 #include <sstream>
 #include <vector>
 
@@ -85,7 +86,7 @@ MainWindowExampleWidget::MainWindowExampleWidget()
       &MainWindowExampleWidget::OnStats, this);
 
   this->connections.push_back(gui::Events::ConnectMainWindowReady(
-              boost::bind(&MainWindowExampleWidget::PauseWorld, this)));
+              std::bind(&MainWindowExampleWidget::PauseWorld, this)));
 }
 
 /////////////////////////////////////////////////

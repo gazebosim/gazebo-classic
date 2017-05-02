@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 
   this->boxSize = boxEl->Get<ignition::math::Vector3d>("size");
   this->boxScale = ignition::math::Vector3d::One;
-  this->boxPose = this->model->GetWorldPose().Ign();
+  this->boxPose = this->model->WorldPose();
   this->UpdateRegion(this->boxSize * this->boxScale, this->boxPose);
 
   if (_sdf->HasElement("event"))
@@ -84,7 +84,8 @@ void RegionEventBoxPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   }
 
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&RegionEventBoxPlugin::OnUpdate, this, _1));
+      std::bind(&RegionEventBoxPlugin::OnUpdate, this,
+      std::placeholders::_1));
 }
 
 //////////////////////////////////////////////////
@@ -105,9 +106,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
   // due to user interaction via the gui, if so update region dimensions
   {
     std::lock_guard<std::mutex> lock(this->receiveMutex);
-    if (this->boxPose != this->model->GetWorldPose().Ign())
+    if (this->boxPose != this->model->WorldPose())
     {
-      this->boxPose = this->model->GetWorldPose().Ign();
+      this->boxPose = this->model->WorldPose();
       this->hasStaleSizeAndPose = true;
     }
 
@@ -120,9 +121,9 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
   // check if any model in the world is in the region or if a model that was
   // previously in the region has exited the region.
-  for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
   {
-    physics::ModelPtr m = this->world->GetModel(i);
+    physics::ModelPtr m = this->world->ModelByIndex(i);
     std::string name = m->GetName();
 
     if (name == "ground_plane" || name == this->modelName)
@@ -130,7 +131,7 @@ void RegionEventBoxPlugin::OnUpdate(const common::UpdateInfo &_info)
 
     auto it = this->insiders.find(m->GetName());
 
-    if (this->PointInRegion(m->GetWorldPose().pos.Ign(), this->box,
+    if (this->PointInRegion(m->WorldPose().Pos(), this->box,
         this->boxPose))
     {
       if (it == this->insiders.end())

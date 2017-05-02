@@ -100,10 +100,10 @@ void GimbalSmall2dPlugin::Load(physics::ModelPtr _model,
 void GimbalSmall2dPlugin::Init()
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
+  this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->Name());
 
   this->dataPtr->lastUpdateTime =
-    this->dataPtr->model->GetWorld()->GetSimTime();
+    this->dataPtr->model->GetWorld()->SimTime();
 
   std::string topic = std::string("~/") +  this->dataPtr->model->GetName() +
     "/gimbal_tilt_cmd";
@@ -132,9 +132,9 @@ void GimbalSmall2dPlugin::OnUpdate()
   if (!this->dataPtr->tiltJoint)
     return;
 
-  double angle = this->dataPtr->tiltJoint->GetAngle(0).Radian();
+  double angle = this->dataPtr->tiltJoint->Position(0);
 
-  common::Time time = this->dataPtr->model->GetWorld()->GetSimTime();
+  common::Time time = this->dataPtr->model->GetWorld()->SimTime();
   if (time < this->dataPtr->lastUpdateTime)
   {
     this->dataPtr->lastUpdateTime = time;

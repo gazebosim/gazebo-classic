@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  *
 */
 
-#ifndef _GAZEBO_ARRANGE_PLUGIN_HH_
-#define _GAZEBO_ARRANGE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_ARRANGEPLUGIN_HH_
+#define GAZEBO_PLUGINS_ARRANGEPLUGIN_HH_
 
 #include <map>
+#include <memory>
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-
 #include <sdf/sdf.hh>
+#include <ignition/math/Pose3.hh>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/transport/transport.hh>
-#include <gazebo/math/Pose.hh>
 #include <gazebo/physics/PhysicsTypes.hh>
 #include <gazebo/util/system.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -74,9 +74,9 @@ namespace gazebo
                  public: physics::ModelPtr model;
 
                  /// \brief Initial object pose.
-                 public: math::Pose pose;
+                 public: ignition::math::Pose3d pose;
                };
-    typedef boost::shared_ptr<Object> ObjectPtr;
+    typedef std::shared_ptr<Object> ObjectPtr;
 
     /// \brief Map of strings to model pointers.
     typedef std::map<std::string, ObjectPtr> Object_M;
@@ -85,7 +85,7 @@ namespace gazebo
     protected: Object_M objects;
 
     /// \brief Map of strings to model poses.
-    typedef std::map<std::string, math::Pose> Pose_M;
+    typedef std::map<std::string, ignition::math::Pose3d> Pose_M;
 
     /// \brief Map of strings to Pose_M (arrangement map).
     typedef std::map<std::string, Pose_M> Arrangement_M;
@@ -107,6 +107,12 @@ namespace gazebo
 
     /// \brief Subscriber for listening to changing arrangements.
     protected: transport::SubscriberPtr sub;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for Gazebo transport.
+    protected: ignition::transport::Node nodeIgn;
   };
 }
 #endif

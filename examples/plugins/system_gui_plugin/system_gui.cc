@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@
  *
 */
 
-// Include Rand.hh first due to compilation error on osx (boost #5010)
-// https://svn.boost.org/trac/boost/ticket/5010
-#include <gazebo/math/Rand.hh>
+#include <functional>
 #include <gazebo/gui/GuiIface.hh>
 #include <gazebo/rendering/rendering.hh>
 #include <gazebo/gazebo.hh>
@@ -42,7 +40,7 @@ namespace gazebo
     {
       this->connections.push_back(
           event::Events::ConnectPreRender(
-            boost::bind(&SystemGUI::Update, this)));
+            std::bind(&SystemGUI::Update, this)));
     }
 
     /////////////////////////////////////////////

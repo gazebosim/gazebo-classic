@@ -80,8 +80,7 @@ else ()
 endif ()
 
 ########################################
-include (FindHDF5)
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C CXX)
 
 if (NOT HDF5_FOUND)
   BUILD_WARNING("HDF5 not found")
@@ -98,8 +97,22 @@ if (MSVC)
   set (PKG_CONFIG_FOUND TRUE)
 endif()
 
+find_package(CURL)
+if (CURL_FOUND)
+  # FindCURL.cmake distributed with CMake exports 
+  # the CURL_INCLUDE_DIRS variable, while the pkg_check_modules
+  # function exports the CURL_INCLUDEDIR variable.
+  # TODO: once the configure.bat VS2013 based script has been removed, 
+  #       remove the call pkg_check_modules(CURL libcurl) and all the uses of 
+  #       CURL_LIBDIR and CURL_INCLUDEDIR and use directly the variables 
+  #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake 
+  set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
+endif ()
+
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(CURL libcurl)
+  if (NOT CURL_FOUND)
+    pkg_check_modules(CURL libcurl)
+  endif ()
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
   endif()
@@ -148,13 +161,13 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 4.3.3 QUIET)
+  find_package(DARTCore 5.1.1 QUIET)
   if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - found")
+    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
     set (HAVE_DART TRUE)
   else()
     message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core4-dev.")
+    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -337,8 +350,23 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9.
-  # Please read gazebo issues: 994, 995
+
+  if (NOT OGRE_FOUND)
+    # If OGRE was not found, try with the standard find_package(OGRE)
+    find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
+    # Add each component include directories to OGRE_INCLUDE_DIRS because
+    # some OGRE components headers include without prefix headers contained
+    # in other components (see http://www.ogre3d.org/forums/viewtopic.php?f=2&t=73222)
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_RTShaderSystem_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Overlay_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Paging_INCLUDE_DIRS})
+    list(APPEND OGRE_LIBRARIES ${OGRE_RTShaderSystem_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
+  endif ()
+
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
   else ()
@@ -420,7 +448,7 @@ if (PKG_CONFIG_FOUND)
   ########################################
   # Find AV device. Only check for this on linux.
   if (UNIX)
-    pkg_check_modules(libavdevice libavdevice>="56.4.100")
+    pkg_check_modules(libavdevice libavdevice>=56.4.100)
     if (NOT libavdevice_FOUND)
       BUILD_WARNING ("libavdevice not found. Recording to a video device will be disabled.")
     else()
@@ -552,7 +580,7 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 4.1.0)
+set (SDFormat_MIN_VERSION 5.0.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
@@ -564,9 +592,24 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
-if (NOT QT4_FOUND)
-  BUILD_ERROR("Missing: Qt4")
+find_package (Qt5Widgets)
+if (NOT Qt5Widgets_FOUND)
+  BUILD_ERROR("Missing: Qt5Widgets")
+endif()
+
+find_package (Qt5Core)
+if (NOT Qt5Core_FOUND)
+  BUILD_ERROR("Missing: Qt5Core")
+endif()
+
+find_package (Qt5OpenGL)
+if (NOT Qt5OpenGL_FOUND)
+  BUILD_ERROR("Missing: Qt5OpenGL")
+endif()
+
+find_package (Qt5Test)
+if (NOT Qt5Test_FOUND)
+  BUILD_ERROR("Missing: Qt5Test")
 endif()
 
 ########################################
@@ -685,29 +728,28 @@ if (NOT ignition-msgs0_FOUND)
   BUILD_ERROR ("Missing: Ignition msgs0 library.")
 else()
   message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
+  link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math2 2.6 QUIET)
-if (NOT ignition-math2_FOUND)
-  message(STATUS "Looking for ignition-math2-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math2 library.")
+find_package(ignition-math3 QUIET)
+if (NOT ignition-math3_FOUND)
+  message(STATUS "Looking for ignition-math3-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
 else()
-  message(STATUS "Looking for ignition-math2-config.cmake - found")
+  message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport2 QUIET)
-if (NOT ignition-transport2_FOUND)
-  find_package(ignition-transport1 QUIET)
-  if (NOT ignition-transport1_FOUND)
-    BUILD_WARNING ("Missing: Ignition Transport (libignition-transport-dev or libignition-transport2-dev)")
-  endif()
-endif()
+find_package(ignition-transport3 QUIET)
+if (NOT ignition-transport3_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport3-dev)")
+else()
+  message(STATUS "Looking for ignition-transport3-config.cmake - found")
 
-if (ignition-transport2_FOUND OR ignition-transport1_FOUND)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
@@ -744,21 +786,15 @@ find_path(QWT_INCLUDE_DIR NAMES qwt.h PATHS
   /usr/local/lib/qwt.framework/Headers
   ${QWT_WIN_INCLUDE_DIR}
 
-  PATH_SUFFIXES qwt-qt4 qwt qwt5
+  PATH_SUFFIXES qwt qwt5
 )
 
-find_library(QWT_LIBRARY NAMES qwt qwt6 qwt5 PATHS
+find_library(QWT_LIBRARY NAMES qwt-qt5 qwt PATHS
   /usr/lib
   /usr/local/lib
   /usr/local/lib/qwt.framework
   ${QWT_WIN_LIBRARY_DIR}
 )
-
-if (QWT_INCLUDE_DIR AND QWT_LIBRARY)
-  set(HAVE_QWT TRUE)
-else()
-  set(HAVE_QWT FALSE)
-endif ()
 
 # version
 set ( _VERSION_FILE ${QWT_INCLUDE_DIR}/qwt_global.h )
@@ -776,9 +812,14 @@ if ( _VERSION_LINE )
     ${QWT_MAJOR_VERSION}.${QWT_MINOR_VERSION}.${QWT_PATCH_VERSION})
 endif ()
 
-if (HAVE_QWT)
+# in Windows, the path need to point to the parent to get correct qwt/foo headers
+if (WIN32)
+  SET(QWT_INCLUDE_DIR "${QWT_INCLUDE_DIR}\\..")
+endif()
+
+if (QWT_INCLUDE_DIR AND QWT_LIBRARY AND (NOT ${QWT_VERSION} VERSION_LESS 6.1.0))
   message (STATUS "Looking for qwt - found: version ${QWT_VERSION}")
 else()
-  message (STATUS "Looking for qwt - not found")
+  message (STATUS "Looking for qwt >= 6.1.0 - not found")
   BUILD_ERROR ("Missing: libqwt-dev. Required for plotting.")
 endif ()

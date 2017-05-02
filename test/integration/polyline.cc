@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ void PolylineTest::ComputeVolume(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr cubeModel = world->GetModel("cube");
+  physics::ModelPtr cubeModel = world->ModelByName("cube");
   EXPECT_TRUE(cubeModel != NULL);
 
   physics::LinkPtr cubeLink = cubeModel->GetLink("polyLine2");
@@ -82,7 +82,7 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  physics::ModelPtr triangleModel = world->GetModel("triangle");
+  physics::ModelPtr triangleModel = world->ModelByName("triangle");
   EXPECT_TRUE(triangleModel != NULL);
 
   physics::LinkPtr triangleLink = triangleModel->GetLink("link");
@@ -134,12 +134,12 @@ void PolylineTest::PolylineWorld(const std::string &_physicsEngine)
   // Spawn a sphere over the polyline shape, and check that it doesn't pass
   // through the polyline
   {
-    SpawnSphere("test_sphere", math::Vector3(0, 0, 1.5),
-        math::Vector3(0, 0, 0));
+    SpawnSphere("test_sphere", ignition::math::Vector3d(0, 0, 1.5),
+        ignition::math::Vector3d::Zero);
     physics::ModelPtr sphere = GetModel("test_sphere");
 
     common::Time::MSleep(1000);
-    EXPECT_NEAR(sphere->GetWorldPose().pos.z, 1.5, 1e-2);
+    EXPECT_NEAR(sphere->WorldPose().Pos().Z(), 1.5, 1e-2);
   }
 }
 

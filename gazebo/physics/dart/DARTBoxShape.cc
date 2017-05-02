@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ DARTBoxShape::DARTBoxShape(DARTCollisionPtr _parent)
   : BoxShape(_parent),
     dataPtr(new DARTBoxShapePrivate())
 {
+  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape);
 }
 
 //////////////////////////////////////////////////
@@ -41,57 +42,39 @@ DARTBoxShape::~DARTBoxShape()
 }
 
 //////////////////////////////////////////////////
-void DARTBoxShape::SetSize(const math::Vector3 &_size)
+void DARTBoxShape::SetSize(const ignition::math::Vector3d &_size)
 {
-  if (_size.x < 0 || _size.y < 0 || _size.z < 0)
+  if (_size.X() < 0 || _size.Y() < 0 || _size.Z() < 0)
   {
     gzerr << "Box shape does not support negative size\n";
     return;
   }
-  math::Vector3 size = _size;
-  if (math::equal(size.x, 0.0))
+  ignition::math::Vector3d size = _size;
+  if (ignition::math::equal(size.X(), 0.0))
   {
     // Warn user, but still create shape with very small value
     // otherwise later resize operations using setLocalScaling
     // will not be possible
     gzwarn << "Setting box shape's x to zero is not supported in DART, "
            << "using 1e-4.\n";
-    size.x = 1e-4;
+    size.X() = 1e-4;
   }
 
-  if (math::equal(size.y, 0.0))
+  if (ignition::math::equal(size.Y(), 0.0))
   {
     gzwarn << "Setting box shape's y to zero is not supported in DART, "
            << "using 1e-4.\n";
-    size.y = 1e-4;
+    size.Y() = 1e-4;
   }
 
-  if (math::equal(size.z, 0.0))
+  if (ignition::math::equal(size.Z(), 0.0))
   {
     gzwarn << "Setting box shape's z to zero is not supported in DART "
            << "using 1e-4.\n";
-    size.z = 1e-4;
+    size.Z() = 1e-4;
   }
 
   BoxShape::SetSize(size);
 
-  DARTCollisionPtr dartCollisionParent =
-      boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
-
-  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
-  {
-    dart::dynamics::BodyNode *dtBodyNode =
-        dartCollisionParent->GetDARTBodyNode();
-    dart::dynamics::BoxShape *dtBoxShape =
-        new dart::dynamics::BoxShape(DARTTypes::ConvVec3(size));
-    dtBodyNode->addCollisionShape(dtBoxShape);
-    dartCollisionParent->SetDARTCollisionShape(dtBoxShape);
-  }
-  else
-  {
-    dart::dynamics::BoxShape *dtBoxShape =
-        dynamic_cast<dart::dynamics::BoxShape*>(
-          dartCollisionParent->GetDARTCollisionShape());
-    dtBoxShape->setSize(DARTTypes::ConvVec3(size));
-  }
+  this->dataPtr->dtBoxShape->setSize(DARTTypes::ConvVec3(size));
 }

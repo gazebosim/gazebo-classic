@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   // create a joint message for testing
   gazebo::msgs::JointPtr jointMsg;
   jointMsg.reset(new gazebo::msgs::Joint);
-  jointMsg->set_parent(scene->WorldVisual()->GetName());
+  jointMsg->set_parent(scene->WorldVisual()->Name());
   jointMsg->set_parent_id(scene->WorldVisual()->GetId());
-  jointMsg->set_child(childVis->GetName());
+  jointMsg->set_child(childVis->Name());
   jointMsg->set_child_id(childVis->GetId());
   jointMsg->set_name("test_joint");
   jointMsg->set_id(11111);
@@ -95,7 +95,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->Load(jointMsg);
 
   // pose matches the message's pose
-  EXPECT_EQ(jointVis->GetPose().Ign(),
+  EXPECT_EQ(jointVis->Pose(),
       ignition::math::Pose3d(1, 2, 3, 1.57, 1.57, 0));
 
   // has axis 1 and it is visible
@@ -115,7 +115,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose properly updated
-  EXPECT_EQ(jointVis->GetPose().Ign(),
+  EXPECT_EQ(jointVis->Pose(),
       ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
@@ -146,7 +146,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // pose hasn't changed
-  EXPECT_EQ(jointVis->GetPose().Ign(),
+  EXPECT_EQ(jointVis->Pose(),
       ignition::math::Pose3d(3, 2, 1, 0, 1.57, 0));
 
   // axis 1 still visible
@@ -167,7 +167,7 @@ TEST_F(JointVisual_TEST, JointVisualTest)
   jointVis->UpdateFromMsg(jointMsg);
 
   // new pose
-  EXPECT_EQ(jointVis->GetPose().Ign(),
+  EXPECT_EQ(jointVis->Pose(),
       ignition::math::Pose3d(0, -2, 1, -1.57, 1.57, 0));
 
   // axis 1 still there but not visible

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _REST_UI_PLUGIN_HH_
-#define _REST_UI_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_REST_WEB_RESTUIPLUGIN_HH_
+#define GAZEBO_PLUGINS_REST_WEB_RESTUIPLUGIN_HH_
 
 #include <string>
 #include <vector>
@@ -74,4 +74,3 @@ namespace gazebo
 }
 
 #endif
-

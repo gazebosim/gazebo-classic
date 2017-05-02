@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,15 @@ namespace gazebo
     /// \return Pointer to the world.
     GZ_PHYSICS_VISIBLE
     WorldPtr get_world(const std::string &_name = "");
+
+    /// \brief checks if the world with this name exists.
+    /// Can be used to check if get_world(const std::string&)
+    /// will succeed or throw an exception.
+    /// \param[in] _name Name of the world to check for, or
+    ///   empty to check if *any* world has been loaded.
+    /// \return true if the world exists.
+    GZ_PHYSICS_VISIBLE
+    bool has_world(const std::string &_name = "");
 
     /// \brief Load world from sdf::Element pointer.
     /// \param[in] _world Pointer to a world.

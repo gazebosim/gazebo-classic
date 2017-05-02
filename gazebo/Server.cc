@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    #define snprintf _snprintf
+  #endif
 #endif
 
 #include <stdio.h>
@@ -227,7 +230,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-      math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
@@ -341,9 +343,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     if (this->dataPtr->vm.count("profile"))
     {
       std::string profileName = this->dataPtr->vm["profile"].as<std::string>();
-      if (physics::get_world()->GetPresetManager()->HasProfile(profileName))
+      if (physics::get_world()->PresetMgr()->HasProfile(profileName))
       {
-        physics::get_world()->GetPresetManager()->CurrentProfile(profileName);
+        physics::get_world()->PresetMgr()->CurrentProfile(profileName);
         gzmsg << "Setting physics profile to [" << profileName << "]."
               << std::endl;
       }

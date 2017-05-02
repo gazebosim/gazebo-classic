@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,8 +78,7 @@ void RaySensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->world != nullptr,
       "RaySensor did not get a valid World pointer");
 
-  physics::PhysicsEnginePtr physicsEngine =
-    this->world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physicsEngine = this->world->Physics();
 
   GZ_ASSERT(physicsEngine != nullptr,
       "Unable to get a pointer to the physics engine");
@@ -113,8 +112,7 @@ void RaySensor::Load(const std::string &_worldName)
         this->Type());
   }
 
-  this->dataPtr->parentEntity =
-    this->world->GetEntity(this->ParentName());
+  this->dataPtr->parentEntity = this->world->EntityByName(this->ParentName());
 
   GZ_ASSERT(this->dataPtr->parentEntity != nullptr,
       "Unable to get the parent entity.");
@@ -151,7 +149,7 @@ void RaySensor::Fini()
 ignition::math::Angle RaySensor::AngleMin() const
 {
   if (this->dataPtr->laserShape)
-    return this->dataPtr->laserShape->GetMinAngle().Ign();
+    return this->dataPtr->laserShape->MinAngle();
   else
     return -1;
 }
@@ -161,8 +159,7 @@ ignition::math::Angle RaySensor::AngleMax() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetMaxAngle().Radian());
+    return this->dataPtr->laserShape->MaxAngle();
   }
   else
     return -1;
@@ -247,8 +244,7 @@ ignition::math::Angle RaySensor::VerticalAngleMin() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMinAngle().Radian());
+    return this->dataPtr->laserShape->VerticalMinAngle();
   }
   else
     return -1;
@@ -259,8 +255,7 @@ ignition::math::Angle RaySensor::VerticalAngleMax() const
 {
   if (this->dataPtr->laserShape)
   {
-    return ignition::math::Angle(
-        this->dataPtr->laserShape->GetVerticalMaxAngle().Radian());
+    return this->dataPtr->laserShape->VerticalMaxAngle();
   }
   else
     return -1;
@@ -353,7 +348,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
   // need to move mutex lock after this? or make the OnNewLaserScan connection
   // call somewhere else?
   this->dataPtr->laserShape->Update();
-  this->lastMeasurementTime = this->world->GetSimTime();
+  this->lastMeasurementTime = this->world->SimTime();
 
   // moving this behind laserShape update
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -365,7 +360,7 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
 
   // Store the latest laser scans into laserMsg
   msgs::Set(scan->mutable_world_pose(),
-      this->pose + this->dataPtr->parentEntity->GetWorldPose().Ign());
+      this->pose + this->dataPtr->parentEntity->WorldPose());
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
@@ -483,11 +478,11 @@ bool RaySensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
       {
-        range = IGN_DBL_INF;
+        range = ignition::math::INF_D;
       }
       else if (range <= this->RangeMin())
       {
-        range = -IGN_DBL_INF;
+        range = -ignition::math::INF_D;
       }
       else if (this->noises.find(RAY_NOISE) !=
                this->noises.end())

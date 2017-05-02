@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,7 +121,7 @@ void SensorManager::Update(bool _force)
     if (this->worlds.empty() && physics::worlds_running() && this->initialized)
     {
       auto world = physics::get_world();
-      this->worlds[world->GetName()] = world;
+      this->worlds[world->Name()] = world;
       world->_SetSensorsInitialized(true);
     }
 
@@ -213,6 +213,9 @@ double SensorManager::GetNextRequiredTimestamp()
   // scan all sensors whose category is IMAGE
   for (auto& s : this->sensorContainers[sensors::IMAGE]->sensors)
   {
+    // skip deactivated sensors
+    if (!s->IsActive()) continue;
+    
     double candidate = s->GetNextRequiredTimestamp();
     // take the smallest valid value
     if (!std::isnan(candidate)
@@ -527,7 +530,7 @@ void SensorManager::SensorContainer::RunLoop()
   physics::WorldPtr world = physics::get_world();
   GZ_ASSERT(world != nullptr, "Pointer to World is null");
 
-  physics::PhysicsEnginePtr engine = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr engine = world->Physics();
   GZ_ASSERT(engine != nullptr, "Pointer to PhysicsEngine is null");
 
   engine->InitForThread();
@@ -582,14 +585,14 @@ void SensorManager::SensorContainer::RunLoop()
     }
 
     // Get the start time of the update.
-    startTime = world->GetSimTime();
+    startTime = world->SimTime();
 
     this->Update(false);
 
     // Compute the time it took to update the sensors.
     // It's possible that the world time was reset during the Update. This
     // would case a negative diffTime. Instead, just use a event time of zero
-    diffTime = std::max(common::Time::Zero, world->GetSimTime() - startTime);
+    diffTime = std::max(common::Time::Zero, world->SimTime() - startTime);
 
     // Set the default sleep time
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
@@ -798,7 +801,7 @@ void SimTimeEventHandler::AddRelativeEvent(const common::Time &_time,
 
   // Create the new event.
   SimTimeEvent *event = new SimTimeEvent;
-  event->time = world->GetSimTime() + _time;
+  event->time = world->SimTime() + _time;
   event->condition = _var;
 
   // Add the event to the list.

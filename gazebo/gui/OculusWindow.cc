@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
  */
+
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/gui/OculusWindow.hh"
@@ -42,18 +44,10 @@ OculusWindow::OculusWindow(int _x, int _y, const std::string &_visual,
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Oculus"));
 
-  this->renderFrame = new QFrame;
-  this->renderFrame->setFrameShape(QFrame::NoFrame);
-  this->renderFrame->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  this->renderFrame->setContentsMargins(0, 0, 0, 0);
-  this->renderFrame->show();
+  this->setFocusPolicy(Qt::StrongFocus);
+  this->setMouseTracking(true);
+  this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-  QVBoxLayout *renderLayout = new QVBoxLayout;
-  renderLayout->addWidget(this->renderFrame);
-  renderLayout->setContentsMargins(0, 0, 0, 0);
-
-  this->setLayout(renderLayout);
   this->attachCameraThread = nullptr;
 }
 
@@ -122,15 +116,9 @@ void OculusWindow::AttachCameraToVisual()
 
   ignition::math::Vector3d camPos(0.1, 0, 0);
   ignition::math::Vector3d lookAt(0, 0, 0);
-  auto delta = lookAt - camPos;
+  auto mat = ignition::math::Matrix4d::LookAt(camPos, lookAt);
 
-  double yaw = atan2(delta.Y(), delta.X());
-
-  double pitch = atan2(-delta.Z(),
-      sqrt(delta.X()*delta.X() + delta.Y()*delta.Y()));
-
-  this->oculusCamera->SetWorldPose(ignition::math::Pose3d(camPos,
-      ignition::math::Quaterniond(0.0, pitch, yaw)));
+  this->oculusCamera->SetWorldPose(mat.Pose());
 }
 
 /////////////////////////////////////////////////
@@ -183,23 +171,5 @@ void OculusWindow::showEvent(QShowEvent *_event)
 //////////////////////////////////////////////////
 std::string OculusWindow::GetOgreHandle() const
 {
-  std::string ogreHandle;
-
-#if defined(WIN32) || defined(__APPLE__)
-  ogreHandle = boost::lexical_cast<std::string>(this->winId());
-#else
-  QX11Info info = x11Info();
-  QWidget *q_parent = dynamic_cast<QWidget*>(this->renderFrame);
-  ogreHandle = boost::lexical_cast<std::string>(
-      reinterpret_cast<uint64_t>(info.display()));
-  ogreHandle += ":";
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint32_t>(info.screen()));
-  ogreHandle += ":";
-  assert(q_parent);
-  ogreHandle += boost::lexical_cast<std::string>(
-      static_cast<uint64_t>(q_parent->winId()));
-#endif
-
-  return ogreHandle;
+  return std::to_string(static_cast<uint64_t>(this->winId()));
 }

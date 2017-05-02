@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,8 +113,7 @@ bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
   double rxPower;
   double txFreq;
 
-  this->referencePose = this->pose +
-    this->parentEntity.lock()->GetWorldPose().Ign();
+  this->referencePose = this->pose + this->parentEntity.lock()->WorldPose();
 
   ignition::math::Pose3d myPos = this->referencePose;
   Sensor_V sensors = SensorManager::Instance()->GetSensors();

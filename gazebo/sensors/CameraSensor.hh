@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_CAMERASENSOR_HH_
-#define _GAZEBO_SENSORS_CAMERASENSOR_HH_
+#ifndef GAZEBO_SENSORS_CAMERASENSOR_HH_
+#define GAZEBO_SENSORS_CAMERASENSOR_HH_
 
 #include <memory>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -79,13 +80,16 @@ namespace gazebo
       /// \return Topic name
       public: virtual std::string Topic() const;
 
+      /// \brief Gets the ignition topic name of the sensor
+      /// \return Ignition topic name
+      public: std::string TopicIgn() const;
+
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.
       public: rendering::CameraPtr Camera() const;
 
       /// \brief Gets the width of the image in pixels.
       /// \return The image width in pixels.
-      /// \deprecated See ImageWidth()
       public: unsigned int ImageWidth() const;
 
       /// \brief Gets the height of the image in pixels.
@@ -128,6 +132,9 @@ namespace gazebo
 
       /// \brief Publisher of image messages.
       protected: transport::PublisherPtr imagePub;
+
+      /// \brief Publisher of image messages.
+      protected: ignition::transport::Node::Publisher imagePubIgn;
 
       /// \internal
       /// \brief Private data pointer

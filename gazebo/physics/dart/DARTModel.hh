@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,14 +64,17 @@ namespace gazebo
       /// \brief
       public: void RestoreState();
 
-      /// \brief
-      public: dart::dynamics::Skeleton *GetDARTSkeleton();
+      /// \brief Get pointer to DART Skeleton.
+      /// \return The pointer to DART Skeleton.
+      public: dart::dynamics::SkeletonPtr DARTSkeleton();
 
-      /// \brief
+      /// \brief Get pointer to DART Physics.
+      /// \return The pointer to DART Physics.
       public: DARTPhysicsPtr GetDARTPhysics(void) const;
 
-      /// \brief
-      public: dart::simulation::World *GetDARTWorld(void) const;
+      /// \brief Get pointer to DART World
+      /// \return The pointer to DART World.
+      public: dart::simulation::WorldPtr DARTWorld(void) const;
 
       /// \internal
       /// \brief Pointer to private data

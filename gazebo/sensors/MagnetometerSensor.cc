@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ void MagnetometerSensor::Load(const std::string &_worldName)
   Sensor::Load(_worldName);
 
   physics::EntityPtr parentEntity =
-    this->world->GetEntity(this->ParentName());
+    this->world->EntityByName(this->ParentName());
   this->dataPtr->parentLink =
     boost::dynamic_pointer_cast<physics::Link>(parentEntity);
 
@@ -140,7 +140,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
   {
     // Get pose in gazebo reference frame
     ignition::math::Pose3d magPose =
-      this->pose + this->dataPtr->parentLink->GetWorldPose().Ign();
+      this->pose + this->dataPtr->parentLink->WorldPose();
 
     // Get the reference magnetic field
     ignition::math::Vector3d field =
@@ -176,8 +176,7 @@ bool MagnetometerSensor::UpdateImpl(const bool /*_force*/)
   }
 
   // Save the time of the measurement
-  msgs::Set(this->dataPtr->magMsg.mutable_time(),
-            this->world->GetSimTime());
+  msgs::Set(this->dataPtr->magMsg.mutable_time(), this->world->SimTime());
 
   // Publish the message if needed
   if (this->dataPtr->magPub)

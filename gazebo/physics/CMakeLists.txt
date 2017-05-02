@@ -163,6 +163,7 @@ target_link_libraries(gazebo_physics
   gazebo_opcode
   gazebo_rendering
   ${Boost_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
 # Link in Bullet support if present

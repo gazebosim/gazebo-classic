@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,6 @@ Shape::Shape(CollisionPtr _p)
 
   if (_p)
     this->collisionParent = _p;
-
-  this->scale = math::Vector3::One;
 }
 
 //////////////////////////////////////////////////
@@ -49,7 +47,7 @@ Shape::~Shape()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Shape::GetScale() const
+ignition::math::Vector3d Shape::Scale() const
 {
   return this->scale;
 }
@@ -65,6 +63,8 @@ double Shape::ComputeVolume() const
   gzwarn << "ComputeVolume not fully implemented for this shape type, returning"
          << " bounding box approximation" << std::endl;
 
-  math::Vector3 size = this->collisionParent->GetBoundingBox().GetSize();
-  return size.x * size.y * size.z;
+  ignition::math::Vector3d size =
+    this->collisionParent->BoundingBox().Size();
+  return size.X() * size.Y() * size.Z();
 }
+

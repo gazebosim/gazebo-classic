@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _GUI_TIMER_PLUGIN_HH_
-#define _GUI_TIMER_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_TIMERGUIPLUGIN_HH_
+#define GAZEBO_PLUGINS_TIMERGUIPLUGIN_HH_
 
+#include <mutex>
 #include <string>
 #include <vector>
-#include <boost/thread/mutex.hpp>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
@@ -121,7 +122,7 @@ namespace gazebo
     private: std::vector<event::ConnectionPtr> connections;
 
     /// \brief Mutex to protect timer updates.
-    private: boost::mutex timerMutex;
+    private: std::mutex timerMutex;
 
     /// \brief Start/stop button.
     private: QPushButton *startStopButton;
@@ -142,6 +143,12 @@ namespace gazebo
     /// \brief Number of pixels from the timer's top and the window's
     /// bottom. Only needed for negative positions.
     private: int posY;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Node used to establish communication with gzserver.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 

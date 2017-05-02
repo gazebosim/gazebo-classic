@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -188,10 +188,10 @@ TEST_F(WorldClone, Clone)
 
   // Wait until the world is really cleared.
   retries = 0;
-  while (world->GetModelCount() != 0u && retries++ < 100)
+  while (world->ModelCount() != 0u && retries++ < 100)
     common::Time::MSleep(20);
 
-  ASSERT_EQ(world->GetModelCount(), 0u);
+  ASSERT_EQ(world->ModelCount(), 0u);
   common::Time::MSleep(500);
 
   // Check that the original world does not contain the camera topics.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -126,7 +126,8 @@ namespace gazebo
       /// \brief Get the blend factors
       /// \param[in] _srcFactor Source factor is returned in this variable
       /// \param[in] _dstFactor Destination factor is returned in this variable
-      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor);
+      public: void GetBlendFactors(double &_srcFactor, double &_dstFactor)
+          const;
 
       /// \brief Set the blending mode
       /// \param[in] _b the blend mode
@@ -208,10 +209,10 @@ namespace gazebo
       protected: Color emissive;
 
       /// \brief transparency value in the range 0 to 1
-      protected: double transparency;
+      protected: double transparency = 0.0;
 
       /// \brief shininess value (0 to 1)
-      protected: double shininess;
+      protected: double shininess = 0.0;
 
       /// \brief point size
       protected: double pointSize;
@@ -226,9 +227,9 @@ namespace gazebo
       private: static unsigned int counter;
 
       /// \brief flag to perform depth buffer write
-      private: bool depthWrite;
+      private: bool depthWrite = true;
 
-      private: bool lighting;
+      private: bool lighting = true;
 
       /// \brief source blend factor
       private: double srcBlendFactor;

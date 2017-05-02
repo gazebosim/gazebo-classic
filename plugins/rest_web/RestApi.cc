@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,7 +200,7 @@ void RestApi::PostJsonData(const char *_route, const char *_json)
   post.route = _route;
   post.json = _json;
   {
-    boost::mutex::scoped_lock lock(this->postsMutex);
+    std::lock_guard<std::mutex> lock(this->postsMutex);
     this->posts.push_back(post);
   }
   this->SendUnpostedPosts();
@@ -247,7 +247,7 @@ void RestApi::SendUnpostedPosts()
     {
       Post post;
       {
-        boost::mutex::scoped_lock lock(this->postsMutex);
+        std::lock_guard<std::mutex> lock(this->postsMutex);
         post = this->posts.front();
 
         //  You can generate a similar request on the cmd line like so:

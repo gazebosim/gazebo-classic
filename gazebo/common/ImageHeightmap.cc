@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,16 +37,6 @@ int ImageHeightmap::Load(const std::string &_filename)
   }
 
   return 0;
-}
-
-//////////////////////////////////////////////////
-void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const math::Vector3 &_size,
-    const math::Vector3 &_scale, bool _flipY,
-    std::vector<float> &_heights)
-{
-  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
-      _flipY, _heights);
 }
 
 //////////////////////////////////////////////////

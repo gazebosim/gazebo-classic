@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -102,12 +101,6 @@ namespace gazebo
       /// \param[in] _s Saturation(0..1)
       /// \param[in] _v Value(0..1)
       public: void SetFromHSV(float _h, float _s, float _v);
-
-      /// \brief Get the color in YUV colorspace
-      /// \return the YUV  color
-      /// \deprecated See YUV() function that returns an
-      /// ignition::math::Vector3d object.
-      public: math::Vector3 GetAsYUV() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the color in YUV colorspace
       /// \return The YUV color in an ignition::math::Vector3d format.

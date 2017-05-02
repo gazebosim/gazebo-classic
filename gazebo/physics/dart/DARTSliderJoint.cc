@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 */
 
 #include <boost/bind.hpp>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
@@ -30,19 +31,21 @@ using namespace physics;
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
   : SliderJoint<DARTJoint>(_parent)
 {
-  this->dataPtr->dtJoint = new dart::dynamics::PrismaticJoint();
 }
 
 //////////////////////////////////////////////////
 DARTSliderJoint::~DARTSliderJoint()
 {
-  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////
 void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<DARTJoint>::Load(_sdf);
+
+  this->dataPtr->dtProperties.reset(
+        new dart::dynamics::PrismaticJoint::Properties(
+          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -52,18 +55,32 @@ void DARTSliderJoint::Init()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d DARTSliderJoint::Anchor(
+    const unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>("Anchor"
+                                                   + std::to_string(_index));
+  }
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
       this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
 
-  return DARTTypes::ConvVec3(worldOrigin);
+  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
-math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
+ignition::math::Vector3d DARTSliderJoint::GlobalAxis(
+    const unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+          "Axis" + std::to_string(_index));
+  }
+
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
@@ -82,12 +99,21 @@ math::Vector3 DARTSliderJoint::GetGlobalAxis(unsigned int _index) const
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  return DARTTypes::ConvVec3(globalAxis);
+  return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
 //////////////////////////////////////////////////
-void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
+void DARTSliderJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &_axis)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Axis" + std::to_string(_index),
+          boost::bind(&DARTSliderJoint::SetAxis, this, _index, _axis));
+    return;
+  }
+
   if (_index == 0)
   {
     dart::dynamics::PrismaticJoint *dtPrismaticJoint =
@@ -95,7 +121,7 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
           this->dataPtr->dtJoint);
 
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
-        this->GetAxisFrameOffset(0).RotateVector(_axis));
+        this->AxisFrameOffset(0).RotateVector(_axis));
     Eigen::Isometry3d dartTransfJointLeftToParentLink
         = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
     dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
@@ -109,14 +135,18 @@ void DARTSliderJoint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
 }
 
 //////////////////////////////////////////////////
-math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
+double DARTSliderJoint::PositionImpl(const unsigned int _index) const
 {
-  math::Angle result;
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
+  }
+
+  double result = ignition::math::NAN_D;
 
   if (_index == 0)
   {
-    double radianAngle = this->dataPtr->dtJoint->getPosition(0);
-    result.SetFromRadian(radianAngle);
+    result = this->dataPtr->dtJoint->getPosition(0);
   }
   else
   {
@@ -129,12 +159,17 @@ math::Angle DARTSliderJoint::GetAngleImpl(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 {
-  if (_index == 0)
+  if (!this->dataPtr->IsInitialized())
   {
-    this->dataPtr->dtJoint->setVelocity(0, _vel);
-    this->dataPtr->dtJoint->getSkeleton()->computeForwardKinematics(
-          false, true, false);
+    this->dataPtr->Cache(
+          "Velocity" + std::to_string(_index),
+          boost::bind(&DARTSliderJoint::SetVelocity, this, _index, _vel),
+          _vel);
+    return;
   }
+
+  if (_index == 0)
+    this->dataPtr->dtJoint->setVelocity(0, _vel);
   else
     gzerr << "Invalid index[" << _index << "]\n";
 }
@@ -142,6 +177,12 @@ void DARTSliderJoint::SetVelocity(unsigned int _index, double _vel)
 //////////////////////////////////////////////////
 double DARTSliderJoint::GetVelocity(unsigned int _index) const
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
   double result = 0.0;
 
   if (_index == 0)
@@ -155,6 +196,14 @@ double DARTSliderJoint::GetVelocity(unsigned int _index) const
 //////////////////////////////////////////////////
 void DARTSliderJoint::SetForceImpl(unsigned int _index, double _effort)
 {
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Force" + std::to_string(_index),
+        boost::bind(&DARTSliderJoint::SetForceImpl, this, _index, _effort));
+    return;
+  }
+
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);
   else

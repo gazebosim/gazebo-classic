@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _MULTIRAYSHAPE_HH_
-#define _MULTIRAYSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
+#define GAZEBO_PHYSICS_MULTIRAYSHAPE_HH_
 
 #include <vector>
 #include <string>
-
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
+#include <ignition/math/Angle.hh>
 
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Shape.hh"
@@ -51,7 +49,7 @@ namespace gazebo
       ///
       ///  gazebo::physics::MultiRayShapePtr rays =
       ///      boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
-      ///        world->GetPhysicsEngine()->CreateShape("multiray",
+      ///        world->Physics()->CreateShape("multiray",
       ///          gazebo::physics::CollisionPtr()));
       ///
       /// \param[in] _physicsEngine Pointer to the physics engine.
@@ -65,7 +63,7 @@ namespace gazebo
 
       /// \brief Set the scale of the multi ray shape.
       /// \return _scale Scale to set the multi ray shape to.
-      public: virtual void SetScale(const math::Vector3 &_scale);
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Get detected range for a ray.
       /// \param[in] _index Index of the ray.
@@ -104,11 +102,11 @@ namespace gazebo
 
       /// \brief Get the minimum angle.
       /// \return Minimum angle of ray scan.
-      public: math::Angle GetMinAngle() const;
+      public: ignition::math::Angle MinAngle() const;
 
       /// \brief Get the maximum angle.
       /// \return Maximum angle of ray scan.
-      public: math::Angle GetMaxAngle() const;
+      public: ignition::math::Angle MaxAngle() const;
 
       /// \brief Get the vertical sample count.
       /// \return Verical sample count.
@@ -120,11 +118,11 @@ namespace gazebo
 
       /// \brief Get the vertical min angle.
       /// \return Vertical min angle.
-      public: math::Angle GetVerticalMinAngle() const;
+      public: ignition::math::Angle VerticalMinAngle() const;
 
       /// \brief Get the vertical max angle.
       /// \return Vertical max angle.
-      public: math::Angle GetVerticalMaxAngle() const;
+      public: ignition::math::Angle VerticalMaxAngle() const;
 
       /// \brief Update the ray collisions.
       public: void Update();
@@ -149,13 +147,6 @@ namespace gazebo
               event::ConnectionPtr ConnectNewLaserScans(T _subscriber)
               {return this->newLaserScans.Connect(_subscriber);}
 
-      /// \brief Disconnect from the new laser scans signal.
-      /// \param[in] _conn Connection to remove.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserScans(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0)
-              {this->newLaserScans.Disconnect(_conn->Id());}
-
       /// \brief Method for updating the rays. This function is normally
       /// called automatically, such as when a laser sensor is updated.
       /// Only call this function on a standalone multiray shape.
@@ -165,8 +156,8 @@ namespace gazebo
       /// \brief Add a ray to the collision.
       /// \param[in] _start Start of the ray.
       /// \param[in] _end End of the ray.
-      public: virtual void AddRay(const math::Vector3 &_start,
-                                  const math::Vector3 &_end);
+      public: virtual void AddRay(const ignition::math::Vector3d &_start,
+                                  const ignition::math::Vector3d &_end);
 
       /// \brief Set the points of a ray.
       /// \param[in] _rayIndex Index of the ray to set.
@@ -192,7 +183,7 @@ namespace gazebo
       protected: std::vector<RayShapePtr> rays;
 
       /// \brief Pose offset of all the rays.
-      protected: math::Pose offset;
+      protected: ignition::math::Pose3d offset;
 
       /// \brief Ray SDF element pointer.
       protected: sdf::ElementPtr rayElem;

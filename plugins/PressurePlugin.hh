@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@
  * Desc: Pressure Sensor Plugin
  * Author: Steve Peters
  */
-#ifndef _GAZEBO_PRESSURE_PLUGIN_HH_
-#define _GAZEBO_PRESSURE_PLUGIN_HH_
 
+#ifndef GAZEBO_PLUGINS_PRESSUREPLUGIN_HH_
+#define GAZEBO_PLUGINS_PRESSUREPLUGIN_HH_
+
+#include <map>
 #include <string>
-#include <boost/unordered_map.hpp>
+#include <ignition/transport/Node.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/sensors/sensors.hh>
@@ -74,7 +76,16 @@ namespace gazebo
     private: std::string parentSensorName;
 
     /// \brief Parent sensor collision names.
-    private: boost::unordered_map<std::string, double> collisionNamesToArea;
+    private: std::map<std::string, double> collisionNamesToArea;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for publishing tactile messages.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher of tactile messages.
+    private: ignition::transport::Node::Publisher tactilePubIgn;
   };
 }
 #endif

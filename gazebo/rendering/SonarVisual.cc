@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ void SonarVisual::Load()
   dPtr->sonarRay->AddPoint(0, 0, 0);
 
   dPtr->coneVis.reset(
-      new Visual(this->GetName() + "_SONAR_CONE_", shared_from_this(), false));
+      new Visual(this->Name() + "_SONAR_CONE_", shared_from_this(), false));
   dPtr->coneVis->Load();
   dPtr->coneVis->InsertMesh("unit_cone");
   dPtr->coneVis->AttachMesh("unit_cone");
@@ -112,8 +112,8 @@ void SonarVisual::Update()
 
   // Skip the update if the user is moving the sonar.
   if (this->GetScene()->SelectedVisual() &&
-      this->GetRootVisual()->GetName() ==
-      this->GetScene()->SelectedVisual()->GetName())
+      this->GetRootVisual()->Name() ==
+      this->GetScene()->SelectedVisual()->Name())
   {
     return;
   }
@@ -122,8 +122,8 @@ void SonarVisual::Update()
       - dPtr->sonarMsg->sonar().range_min();
   double radiusScale = dPtr->sonarMsg->sonar().radius()*2.0;
 
-  if (!ignition::math::equal(dPtr->coneVis->GetScale().z, rangeDelta) ||
-      !ignition::math::equal(dPtr->coneVis->GetScale().x, radiusScale))
+  if (!ignition::math::equal(dPtr->coneVis->Scale().Z(), rangeDelta) ||
+      !ignition::math::equal(dPtr->coneVis->Scale().X(), radiusScale))
   {
     dPtr->coneVis->SetScale(
         ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));

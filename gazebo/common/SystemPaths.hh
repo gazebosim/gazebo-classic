@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,30 +85,12 @@ namespace gazebo
       /// Returns the default path suitable for temporary files.
       /// \return a full path name to directory.
       /// E.g.: /tmp (Linux).
-      /// \deprecated See const std::string &TmpPath() const
-      public: std::string GetTmpPath() GAZEBO_DEPRECATED(8.0);
-
-      /// Returns the default path suitable for temporary files.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp (Linux).
       public: const std::string &TmpPath() const;
 
       /// Returns a unique temporary file for this instance of SystemPath.
       /// \return a full path name to directory.
       /// E.g.: /tmp/gazebo_234123 (Linux).
-      /// \deprecated See const std::string &TmpInstancePath() const
-      public: std::string GetTmpInstancePath() GAZEBO_DEPRECATED(8.0);
-
-      /// Returns a unique temporary file for this instance of SystemPath.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp/gazebo_234123 (Linux).
       public: const std::string &TmpInstancePath() const;
-
-      /// Returns the default temporary test path.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp/gazebo_test (Linux).
-      /// \deprecated See std::string DefaultTestPath() const
-      public: std::string GetDefaultTestPath() GAZEBO_DEPRECATED(8.0);
 
       /// Returns the default temporary test path.
       /// \return a full path name to directory.

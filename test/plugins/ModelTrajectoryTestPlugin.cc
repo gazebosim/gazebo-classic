@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ void ModelTrajectoryTestPlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   this->trajSub = this->node->Subscribe(std::string("~/") +
       this->model->GetName() + "/pose_trajectory",
@@ -59,13 +59,13 @@ void ModelTrajectoryTestPlugin::OnPoseTrajectoryMsg(
 /////////////////////////////////////////////////
 void ModelTrajectoryTestPlugin::OnUpdate()
 {
-  common::Time currTime = this->model->GetWorld()->GetSimTime();
+  common::Time currTime = this->model->GetWorld()->SimTime();
   common::Time stepTime = currTime - this->prevUpdateTime;
   this->prevUpdateTime = currTime;
 
   {
     // ignore everything else, get position and force only
-    math::Pose pose;
+    ignition::math::Pose3d pose;
     this->model->SetWorldPose(pose);
   }
 }

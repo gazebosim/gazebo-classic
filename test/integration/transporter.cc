@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,36 +34,36 @@ TEST_F(TransporterTest, Transport)
   ASSERT_TRUE(world != NULL);
 
   // Get the box model
-  physics::ModelPtr boxModel = world->GetModel("box");
+  physics::ModelPtr boxModel = world->ModelByName("box");
   ASSERT_TRUE(boxModel != NULL);
 
   // Make sure the starting location is correct.
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 10.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box onto the auto transport pad
-  boxModel->SetWorldPose(math::Pose(100.5, 0, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box transported to the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 0.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0.0, 1e-3);
 
   // Move the box away
-  boxModel->SetWorldPose(math::Pose(10, 10, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(10, 10, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 10.0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 10.0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 10.0, 1e-3);
 
   // Move the box to the manual transporter pad
-  boxModel->SetWorldPose(math::Pose(-100.5, 0, 0.5, 0, 0, 0));
+  boxModel->SetWorldPose(ignition::math::Pose3d(-100.5, 0, 0.5, 0, 0, 0));
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box is in the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, -100.5, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), -100.5, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0, 1e-3);
 
   // Trigger the transporter
   {
@@ -87,8 +87,8 @@ TEST_F(TransporterTest, Transport)
   common::Time::Sleep(common::Time(1, 0));
 
   // Check that the box transported to the correct location
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.x, 0, 1e-3);
-  EXPECT_NEAR(boxModel->GetWorldPose().pos.y, 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().X(), 0, 1e-3);
+  EXPECT_NEAR(boxModel->WorldPose().Pos().Y(), 0, 1e-3);
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,33 +165,15 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpPath()
-{
-  return this->TmpPath();
-}
-
-/////////////////////////////////////////////////
 const std::string &SystemPaths::TmpPath() const
 {
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpInstancePath()
-{
-  return this->TmpInstancePath();
-}
-
-/////////////////////////////////////////////////
 const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
-}
-
-/////////////////////////////////////////////////
-std::string SystemPaths::GetDefaultTestPath()
-{
-  return this->DefaultTestPath();
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,10 +61,10 @@ namespace gazebo
       /// \param[in] _data Data to send to the boost function pointer.
       public: ConnectionReadTask(
                   boost::function<void (const std::string &)> _func,
-                  const std::string &_data)
+                  const std::string &_data) :
+                func(_func),
+                data(_data)
               {
-                this->func = _func;
-                this->data = _data;
               }
 
       /// \bried Overridden function from tbb::task that exectues the data
@@ -324,15 +324,6 @@ namespace gazebo
       public: event::ConnectionPtr ConnectToShutdown(boost::function<void()>
                  _subscriber)
               { return this->shutdown.Connect(_subscriber); }
-
-      /// \brief Unregister a function to be called when the connection is
-      /// shut down
-      /// \param[in] _subscriber Handle previously returned by
-      /// ConnectToShutdown()
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectShutdown(event::ConnectionPtr _subscriber)
-              GAZEBO_DEPRECATED(8.0)
-              {this->shutdown.Disconnect(_subscriber->Id());}
 
       /// \brief Handle on-write callbacks
       public: void ProcessWriteQueue(bool _blocking = false);

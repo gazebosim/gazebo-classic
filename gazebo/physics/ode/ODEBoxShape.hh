@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 */
 #ifndef _ODEBOXSHAPE_HH_
 #define _ODEBOXSHAPE_HH_
-
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
@@ -46,7 +44,7 @@ namespace gazebo
       public: virtual ~ODEBoxShape() {}
 
       // Documentation inherited.
-      public: virtual void SetSize(const math::Vector3 &_size)
+      public: virtual void SetSize(const ignition::math::Vector3d &_size)
       {
         BoxShape::SetSize(_size);
 
@@ -55,10 +53,15 @@ namespace gazebo
             this->collisionParent);
 
         if (oParent->GetCollisionId() == nullptr)
-          oParent->SetCollision(dCreateBox(0, _size.x, _size.y, _size.z), true);
+        {
+          oParent->SetCollision(
+              dCreateBox(0, _size.X(), _size.Y(), _size.Z()), true);
+        }
         else
+        {
           dGeomBoxSetLengths(oParent->GetCollisionId(),
-                             _size.x, _size.y, _size.z);
+              _size.X(), _size.Y(), _size.Z());
+        }
       }
     };
     /// \}

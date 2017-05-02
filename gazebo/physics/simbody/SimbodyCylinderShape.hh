@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace gazebo
                   gzerr << "Cylinder shape does not support negative length\n";
                   return;
                 }
-                if (math::equal(_radius, 0.0))
+                if (ignition::math::equal(_radius, 0.0))
                 {
                   // Warn user, but still create shape with very small value
                   // otherwise later resize operations using setLocalScaling
@@ -61,7 +61,7 @@ namespace gazebo
                   gzwarn << "Setting cylinder shape's radius to zero \n";
                   _radius = 1e-4;
                 }
-                if (math::equal(_length, 0.0))
+                if (ignition::math::equal(_length, 0.0))
                 {
                   gzwarn << "Setting cylinder shape's length to zero \n";
                   _length = 1e-4;

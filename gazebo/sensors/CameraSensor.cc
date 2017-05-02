@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Image.hh"
+#include "gazebo/common/CommonIface.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -79,7 +80,17 @@ std::string CameraSensor::Topic() const
 {
   std::string topicName = "~/";
   topicName += this->ParentName() + "/" + this->Name() + "/image";
-  boost::replace_all(topicName, "::", "/");
+  common::replaceAll(topicName, topicName, "::", "/");
+
+  return topicName;
+}
+
+//////////////////////////////////////////////////
+std::string CameraSensor::TopicIgn() const
+{
+  std::string topicName = this->ScopedName() + "/image";
+  common::replaceAll(topicName, topicName, "::", "/");
+  common::replaceAll(topicName, topicName, " ", "_");
 
   return topicName;
 }
@@ -88,8 +99,12 @@ std::string CameraSensor::Topic() const
 void CameraSensor::Load(const std::string &_worldName)
 {
   Sensor::Load(_worldName);
-  this->imagePub = this->node->Advertise<msgs::ImageStamped>(
-      this->Topic(), 50);
+  this->imagePub = this->node->Advertise<msgs::ImageStamped>(this->Topic(), 50);
+
+  ignition::transport::AdvertiseMessageOptions opts;
+  opts.SetMsgsPerSec(50);
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+      this->TopicIgn(), opts);
 }
 
 //////////////////////////////////////////////////
@@ -102,7 +117,7 @@ void CameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -201,7 +216,7 @@ bool CameraSensor::NeedsUpdate()
     return false;
   }
 
-  double dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = this->world->Physics()->GetMaxStepSize();
 
   // If next rendering time is not set yet
   if (std::isnan(this->dataPtr->nextRenderingTime))
@@ -248,7 +263,7 @@ void CameraSensor::PrerenderEnded()
     // compute next rendering time, take care of the case where period is zero.
     double dt;
     if (this->updatePeriod <= 0.0)
-      dt = this->world->GetPhysicsEngine()->GetMaxStepSize();
+      dt = this->world->Physics()->GetMaxStepSize();
     else
       dt = this->updatePeriod.Double();
     this->dataPtr->nextRenderingTime += dt;
@@ -279,22 +294,48 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
   this->camera->PostRender();
 
-  if (this->imagePub && this->imagePub->HasConnections())
+
+  if ((this->imagePub && this->imagePub->HasConnections()) ||
+      this->imagePubIgn.HasConnections())
   {
-    msgs::ImageStamped msg;
-    msgs::Set(msg.mutable_time(), this->scene->SimTime());
-    msg.mutable_image()->set_width(this->camera->ImageWidth());
-    msg.mutable_image()->set_height(this->camera->ImageHeight());
-    msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
-          this->camera->ImageFormat()));
+    auto simTime = this->scene->SimTime();
+    if (this->imagePub && this->imagePub->HasConnections())
+    {
+      msgs::ImageStamped msg;
+      msgs::Set(msg.mutable_time(), simTime);
+      msg.mutable_image()->set_width(this->camera->ImageWidth());
+      msg.mutable_image()->set_height(this->camera->ImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->ImageFormat()));
 
-    msg.mutable_image()->set_step(this->camera->ImageWidth() *
-        this->camera->ImageDepth());
-    msg.mutable_image()->set_data(this->camera->ImageData(),
-        msg.image().width() * this->camera->ImageDepth() *
-        msg.image().height());
+      msg.mutable_image()->set_step(this->camera->ImageWidth() *
+          this->camera->ImageDepth());
+      msg.mutable_image()->set_data(this->camera->ImageData(),
+          msg.image().width() * this->camera->ImageDepth() *
+          msg.image().height());
 
-    this->imagePub->Publish(msg);
+      this->imagePub->Publish(msg);
+    }
+
+    if (this->imagePubIgn.HasConnections())
+    {
+      ignition::msgs::ImageStamped msg;
+      msg.mutable_time()->set_sec(simTime.sec);
+      msg.mutable_time()->set_nsec(simTime.nsec);
+
+      msg.mutable_image()->set_width(this->camera->ImageWidth());
+      msg.mutable_image()->set_height(this->camera->ImageHeight());
+      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+            this->camera->ImageFormat()));
+
+      msg.mutable_image()->set_step(this->camera->ImageWidth() *
+          this->camera->ImageDepth());
+      msg.mutable_image()->set_data(this->camera->ImageData(),
+          msg.image().width() * this->camera->ImageDepth() *
+          msg.image().height());
+
+      this->imagePubIgn.Publish(msg);
+    }
   }
 
   this->dataPtr->rendered = false;
@@ -359,7 +400,8 @@ bool CameraSensor::SaveFrame(const std::string &_filename)
 bool CameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
-    (this->imagePub && this->imagePub->HasConnections());
+    (this->imagePub && this->imagePub->HasConnections()) ||
+    this->imagePubIgn.HasConnections();
 }
 
 //////////////////////////////////////////////////

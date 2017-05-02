@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  *
  */
 
-#ifndef _WIREBOX_HH_
-#define _WIREBOX_HH_
+#ifndef GAZEBO_RENDERING_WIREBOX_HH_
+#define GAZEBO_RENDERING_WIREBOX_HH_
 
-#include "gazebo/math/Box.hh"
+#include <memory>
+#include <ignition/math/Box.hh>
+
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
 
@@ -38,14 +40,15 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _box Dimension of the box to draw.
       /// \param[in] _parent Parent visual of the box.
-      public: explicit WireBox(VisualPtr _parent, const math::Box &_box);
+      public: explicit WireBox(VisualPtr _parent,
+          const ignition::math::Box &_box);
 
       /// \brief Destructor.
       public: ~WireBox();
 
       /// \brief Builds the wireframe line list.
       /// \param[in] _box Box to build a wireframe from.
-      public: void Init(const math::Box &_box);
+      public: void Init(const ignition::math::Box &_box);
 
       /// \brief Set the visibility of the box.
       /// \param[in] _visible True to make the box visible, False to hide.
@@ -53,15 +56,15 @@ namespace gazebo
 
       /// \brief Get the visibility of the box.
       /// \return True if the box is visual.
-      public: bool GetVisible() const;
+      public: bool Visible() const;
 
       /// \brief Get the wireframe box.
       /// \return The wireframe box.
-      public: math::Box GetBox() const;
+      public: ignition::math::Box Box() const;
 
       /// \internal
       /// \brief Pointer to private data.
-      private: WireBoxPrivate *dataPtr;
+      private: std::unique_ptr<WireBoxPrivate> dataPtr;
     };
     /// \}
   }

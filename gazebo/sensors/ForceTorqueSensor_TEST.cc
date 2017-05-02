@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ void ForceTorqueSensor_TEST::ForceTorqueTest(const std::string &_physicsEngine)
   sdf::readString(forceTorqueSensorString, sdf);
 
   physics::WorldPtr world = physics::get_world("default");
-  physics::ModelPtr model = world->GetModel("pioneer2dx");
+  physics::ModelPtr model = world->ModelByName("pioneer2dx");
   physics::JointPtr joint = model->GetJoint("left_wheel_hinge");
 
   // Create the force torque sensor

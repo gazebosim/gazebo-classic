@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <string>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -63,6 +64,28 @@ namespace gazebo
       public: virtual void InitForThread() = 0;
 
       /// \brief Update the physics engine collision.
+      /// This function works in tandem with PhysicsEngine::UpdatePhysics()
+      /// to update the world. This function will be called even
+      /// if the physics is disabled (when World::PhysicsEnabled())
+      /// returns false).
+      /// Which updates are done in which of the two functions
+      /// PhysicsEngine::UpdateCollision() and PhysicsEngine::UpdatePhysics()
+      /// is to some extent left to the implementing physics engine.
+      /// The intention is that PhysicsEngine::UpdateCollision() will update
+      /// the collision states of the world, including contact information,
+      /// and PhysicsEngine::UpdatePhysics() will update the dynamics of
+      /// the world, i.e. advance the world and react to the collision state.
+      /// However for some physics engines, both is done in one step, or
+      /// providing the contact information separately in UpdateCollision()
+      /// would mean double work, as it can't be avoided to be done again
+      /// in PhysicsEngine::UpdatePhysics() - in this case it is better that
+      /// PhysicsEngine::UpdateCollision does not actually update collision
+      /// and contact information, and instead leaves it to UpdatePhysics().
+      /// There should be one exception however when it still does make this
+      /// update: If World::PhysicsEnabled() returns false, and therefore
+      /// PhysicsEngine::UpdatePhysics() will not be called in the update
+      /// step, *then* PhysicsEngine::UpdateCollision will need to ensure that
+      /// collision and contact information will still be updated.
       public: virtual void UpdateCollision() = 0;
 
       /// \brief Return the physics engine type (ode|bullet|dart|simbody).
@@ -102,6 +125,9 @@ namespace gazebo
       public: void SetMaxStepSize(double _stepSize);
 
       /// \brief Update the physics engine.
+      /// Will only be called if the physics are enabled, which
+      /// is the case when World::PhysicsEnabled() returns true.
+      /// \sa PhysicsEngine::UpdateCollision()
       public: virtual void UpdatePhysics() {}
 
       /// \brief Create a new model.
@@ -136,21 +162,11 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(const std::string &_type,
                                            ModelPtr _parent = ModelPtr()) = 0;
 
-      /// \brief Return the gravity vector.
-      /// \deprecated See World::Gravity() const
-      /// \return The gravity vector.
-      public: virtual math::Vector3 GetGravity() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the gravity vector.
       /// \param[in] _gravity New gravity vector.
       public: virtual void SetGravity(
-                  const gazebo::math::Vector3 &_gravity) = 0;
-
-      /// \brief Return the magnetic field vector.
-      /// \deprecated See World::MagneticField() const
-      /// \return The magnetic field vector.
-      public: virtual ignition::math::Vector3d MagneticField() const
-              GAZEBO_DEPRECATED(8.0);
+                  const ignition::math::Vector3d &_gravity) = 0;
 
       /// \TODO: Remove this function, and replace it with a more generic
       /// property map
@@ -279,6 +295,15 @@ namespace gazebo
 
       /// \brief Real time update rate.
       protected: double maxStepSize;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      protected: ignition::transport::Node nodeIgn;
+
+      /// \brief Response publisher.
+      protected: ignition::transport::Node::Publisher responsePubIgn;
     };
     /// \}
   }

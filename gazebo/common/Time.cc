@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@
   #include <Windows.h>
   #include <Winsock2.h>
   #include <cstdint>
-  struct timespec
-  {
-    int64_t tv_sec;
-    int64_t tv_nsec;
-  };
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    struct timespec
+    {
+      int64_t tv_sec;
+      int64_t tv_nsec;
+    };
+  #endif 
 #else
   #include <unistd.h>
   #include <sys/time.h>

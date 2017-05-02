@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/EnumIface.hh"
@@ -186,8 +187,8 @@ void ConfigWidget::RangeFromKey(const std::string &_key, double &_min,
     double &_max) const
 {
   // Maximum range by default
-  _min = -GZ_DBL_MAX;
-  _max = GZ_DBL_MAX;
+  _min = -ignition::math::MAX_D;
+  _max = ignition::math::MAX_D;
 
   if (_key == "mass" || _key == "ixx" || _key == "ixy" || _key == "ixz" ||
       _key == "iyy" || _key == "iyz" || _key == "izz" || _key == "length" ||
@@ -2578,7 +2579,7 @@ bool ConfigWidget::UpdateVector3dWidget(ConfigChildWidget *_widget,
   }
   else
   {
-    gzerr << "Error updating Vector3 Config widget" << std::endl;
+    gzerr << "Error updating Vector3d Config widget" << std::endl;
   }
   return false;
 }
@@ -2828,7 +2829,7 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
   }
   else
   {
-    gzerr << "Error getting value from Vector3 Config widget" << std::endl;
+    gzerr << "Error getting value from Vector3d Config widget" << std::endl;
   }
   return value;
 }

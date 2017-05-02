@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,9 +61,11 @@ namespace gazebo
       /// \param[in] _ogreHandle String representing the ogre window handle.
       /// \param[in] _width With of the window in pixels.
       /// \param[in] _height Height of the window in pixels.
+      /// \param[in] _devicePixelRatio Screen point to pixel ratio
       public: int CreateWindow(const std::string &_ogreHandle,
                                uint32_t _width,
-                               uint32_t _height);
+                               uint32_t _height,
+                               const double _devicePixelRatio = 1.0);
 
       /// \brief Attach a camera to a window.
       /// \param[in] _windowId Id of the window to add the camera to.

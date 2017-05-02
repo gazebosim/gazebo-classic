@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,12 +87,6 @@ namespace gazebo
       /// \return The connection, which must be kept in scope.
       public: event::ConnectionPtr ConnectUpdate(
                   std::function<void (msgs::SonarStamped)> _subscriber);
-
-      /// \brief Disconnect from the update signal.
-      /// \param[in] _conn Connection to remove.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);

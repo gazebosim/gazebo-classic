@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <string>
 #include <cmath>
+#include <functional>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo.hh"
@@ -68,6 +69,13 @@ void RenderingFixture::SetUp()
 {
   // start rendering in test thread
   rendering::load();
+}
+
+/////////////////////////////////////////////////
+void RenderingFixture::Unload()
+{
+  rendering::fini();
+  ServerFixture::Unload();
 }
 
 /////////////////////////////////////////////////
@@ -190,7 +198,7 @@ void ServerFixture::LoadArgs(const std::string &_args)
 
   // Create, load, and run the server in its own thread
   this->serverThread = new boost::thread(
-    boost::bind(&ServerFixture::RunServer, this, params));
+    std::bind(&ServerFixture::RunServer, this, params));
 
   // Wait for the server to come up
   // Use a 60 second timeout.
@@ -259,10 +267,10 @@ void ServerFixture::RunServer(const std::vector<std::string> &_args)
 
   if (this->server->ParseArgs(argc, argv))
   {
-    if (!rendering::get_scene(gazebo::physics::get_world()->GetName()))
+    if (!rendering::get_scene(gazebo::physics::get_world()->Name()))
     {
       ASSERT_NO_THROW(rendering::create_scene(
-            gazebo::physics::get_world()->GetName(), false, true));
+            gazebo::physics::get_world()->Name(), false, true));
     }
 
     ASSERT_NO_THROW(this->server->Run());
@@ -340,7 +348,7 @@ double ServerFixture::GetPercentRealTime() const
 /////////////////////////////////////////////////
 void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     this->poses[_msg->pose(i).name()] = msgs::ConvertIgn(_msg->pose(i));
@@ -348,11 +356,12 @@ void ServerFixture::OnPose(ConstPosesStampedPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-math::Pose ServerFixture::GetEntityPose(const std::string &_name)
+ignition::math::Pose3d ServerFixture::EntityPose(
+    const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
 
-  std::map<std::string, math::Pose>::iterator iter;
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   EXPECT_TRUE(iter != this->poses.end());
   return iter->second;
@@ -361,8 +370,8 @@ math::Pose ServerFixture::GetEntityPose(const std::string &_name)
 /////////////////////////////////////////////////
 bool ServerFixture::HasEntity(const std::string &_name)
 {
-  boost::mutex::scoped_lock lock(this->receiveMutex);
-  std::map<std::string, math::Pose>::iterator iter;
+  std::lock_guard<std::mutex> lock(this->receiveMutex);
+  std::map<std::string, ignition::math::Pose3d>::iterator iter;
   iter = this->poses.find(_name);
   return iter != this->poses.end();
 }
@@ -555,13 +564,14 @@ physics::ModelPtr ServerFixture::SpawnModel(const msgs::Model &_msg)
     }
   }
 
-  return world->GetModel(_msg.name());
+  return world->ModelByName(_msg.name());
 }
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCamera(const std::string &_modelName,
     const std::string &_cameraName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     unsigned int _width, unsigned int _height, double _rate,
     const std::string &_noiseType, double _noiseMean, double _noiseStdDev,
     bool _distortion, double _distortionK1, double _distortionK2,
@@ -595,13 +605,16 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     // << "      <save enabled ='true' path ='/tmp/camera/'/>"
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   if (_distortion)
+  {
     newModelStr << "      <distortion>"
     << "        <k1>" << _distortionK1 << "</k1>"
     << "        <k2>" << _distortionK2 << "</k2>"
@@ -610,6 +623,7 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "        <p2>" << _distortionP2 << "</p2>"
     << "        <center>" << _cx << " " << _cy << "</center>"
     << "      </distortion>";
+  }
 
   newModelStr << "    </camera>"
     << "  </sensor>"
@@ -625,9 +639,70 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
 }
 
 /////////////////////////////////////////////////
+void ServerFixture::SpawnWideAngleCamera(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate,
+    const double _hfov, const std::string &_lensType,
+    const bool _scaleToHfov, const double _cutoffAngle,
+    const double _envTextureSize, const double _c1, const double _c2,
+    const double _f, const std::string &_fun)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName
+    << "' type ='wideanglecamera'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>false</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>" << _hfov << "</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>0.1</near><far>100</far>"
+    << "      </clip>"
+    << "      <lens>"
+    << "        <type>" << _lensType << "</type>"
+    << "        <scale_to_hfov>" << _scaleToHfov << "</scale_to_hfov>"
+    << "        <cutoff_angle>" << _cutoffAngle << "</cutoff_angle>"
+    << "        <env_texture_size>" << _envTextureSize << "</env_texture_size>";
+
+  if (_lensType == "custom")
+  {
+    newModelStr << "<custom_function>"
+    << "          <c1>" << _c1 << "</c1>"
+    << "          <c2>" << _c2 << "</c2>"
+    << "          <f>" << _f << "</f>"
+    << "          <fun>" << _fun << "</fun>"
+    << "        </custom_function>";
+  }
+  newModelStr << "</lens>"
+    << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
+}
+
+/////////////////////////////////////////////////
 void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _vMinAngle, double _vMaxAngle,
     double _minRange, double _maxRange,
@@ -677,11 +752,13 @@ void ServerFixture::SpawnRaySensor(const std::string &_modelName,
     << "      </range>";
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   newModelStr << "    </ray>"
     << "    <visualize>true</visualize>"
@@ -739,7 +816,7 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
@@ -781,11 +858,13 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     << "      </range>";
 
   if (_noiseType.size() > 0)
+  {
     newModelStr << "      <noise>"
     << "        <type>" << _noiseType << "</type>"
     << "        <mean>" << _noiseMean << "</mean>"
     << "        <stddev>" << _noiseStdDev << "</stddev>"
     << "      </noise>";
+  }
 
   newModelStr << "    </ray>"
     << "  </sensor>"
@@ -844,7 +923,7 @@ void ServerFixture::SpawnDepthCameraSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnImuSensor(const std::string &_modelName,
     const std::string &_imuSensorName,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     const std::string &_noiseType,
     double _rateNoiseMean, double _rateNoiseStdDev,
     double _rateBiasMean, double _rateBiasStdDev,
@@ -942,8 +1021,9 @@ void ServerFixture::SpawnImuSensor(const std::string &_modelName,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
     const std::string &_sensorName,
-    const std::string &_collisionType, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_collisionType,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1002,8 +1082,9 @@ void ServerFixture::SpawnUnitContactSensor(const std::string &_name,
 void ServerFixture::SpawnUnitImuSensor(const std::string &_name,
     const std::string &_sensorName,
     const std::string &_collisionType,
-    const std::string &_topic, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const std::string &_topic,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
@@ -1172,8 +1253,8 @@ void ServerFixture::launchTimeoutFailure(const char *_logMsg,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     const std::string &_essid,
     double _freq,
     double _power,
@@ -1214,8 +1295,8 @@ void ServerFixture::SpawnWirelessTransmitterSensor(const std::string &_name,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnWirelessReceiverSensor(const std::string &_name,
     const std::string &_sensorName,
-    const math::Vector3 &_pos,
-    const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     double _minFreq,
     double _maxFreq,
     double _power,
@@ -1300,7 +1381,7 @@ void ServerFixture::WaitUntilIteration(const uint32_t _goalIteration,
 {
   int i = 0;
   auto world = physics::get_world();
-  while ((world->GetIterations() != _goalIteration) && (i < _retries))
+  while ((world->Iterations() != _goalIteration) && (i < _retries))
   {
     ++i;
     common::Time::MSleep(_sleepEach);
@@ -1313,7 +1394,7 @@ void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
 {
   int i = 0;
   auto world = physics::get_world();
-  while ((world->GetSimTime() != _goalTime) && (i < _retries))
+  while ((world->SimTime() != _goalTime) && (i < _retries))
   {
     ++i;
     common::Time::MSleep(_sleepEach);
@@ -1323,10 +1404,11 @@ void ServerFixture::WaitUntilSimTime(const common::Time &_goalTime,
 /////////////////////////////////////////////////
 void ServerFixture::SpawnLight(const std::string &_name,
     const std::string &_type,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy,
     const common::Color &_diffuse,
     const common::Color &_specular,
-    const math::Vector3 &_direction,
+    const ignition::math::Vector3d &_direction,
     double _attenuationRange,
     double _attenuationConstant,
     double _attenuationLinear,
@@ -1374,7 +1456,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
   int maxTimeOut = 10;
   while (timeOutCount < maxTimeOut)
   {
-    sceneMsg = world->GetSceneMsg();
+    sceneMsg = world->SceneMsg();
     for (int i = 0; i < sceneMsg.light_size(); ++i)
     {
       if (sceneMsg.light(i).name() == _name)
@@ -1387,7 +1469,7 @@ void ServerFixture::SpawnLight(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnCylinder(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1395,8 +1477,8 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   msgs::AddCylinderLink(model, 1.0, 0.5, 1.0);
   auto link = model.mutable_link(0);
   link->set_name("body");
@@ -1416,7 +1498,7 @@ void ServerFixture::SpawnCylinder(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1451,8 +1533,8 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnSphere(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
-    const math::Vector3 &_cog, double _radius,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    const ignition::math::Vector3d &_cog, double _radius,
     bool _wait, bool _static)
 {
   msgs::Factory msg;
@@ -1460,14 +1542,14 @@ void ServerFixture::SpawnSphere(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   msgs::AddSphereLink(model, 1.0, _radius);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
   msgs::Set(link->mutable_inertial()->mutable_pose(),
-            ignition::math::Pose3d(_cog.Ign(),
+            ignition::math::Pose3d(_cog,
               ignition::math::Quaterniond()));
 
   newModelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -1484,17 +1566,17 @@ void ServerFixture::SpawnSphere(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnBox(const std::string &_name,
-    const math::Vector3 &_size, const math::Vector3 &_pos,
-    const math::Vector3 &_rpy, bool _static)
+    const ignition::math::Vector3d &_size, const ignition::math::Vector3d &_pos,
+    const ignition::math::Vector3d &_rpy, bool _static)
 {
   msgs::Factory msg;
   std::ostringstream newModelStr;
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
-  msgs::AddBoxLink(model, 1.0, _size.Ign());
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
+  msgs::AddBoxLink(model, 1.0, _size);
   auto link = model.mutable_link(0);
   link->set_name("body");
   link->mutable_collision(0)->set_name("geom");
@@ -1513,8 +1595,8 @@ void ServerFixture::SpawnBox(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnTrimesh(const std::string &_name,
-    const std::string &_modelPath, const math::Vector3 &_scale,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const std::string &_modelPath, const ignition::math::Vector3d &_scale,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1552,7 +1634,7 @@ void ServerFixture::SpawnTrimesh(const std::string &_name,
 
 /////////////////////////////////////////////////
 void ServerFixture::SpawnEmptyLink(const std::string &_name,
-    const math::Vector3 &_pos, const math::Vector3 &_rpy,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
     bool _static)
 {
   msgs::Factory msg;
@@ -1560,8 +1642,8 @@ void ServerFixture::SpawnEmptyLink(const std::string &_name,
   msgs::Model model;
   model.set_name(_name);
   model.set_is_static(_static);
-  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos.Ign(),
-      ignition::math::Quaterniond(_rpy.Ign())));
+  msgs::Set(model.mutable_pose(), ignition::math::Pose3d(_pos,
+      ignition::math::Quaterniond(_rpy)));
   model.add_link();
   model.mutable_link(0)->set_name("body");
 
@@ -1627,7 +1709,7 @@ physics::ModelPtr ServerFixture::GetModel(const std::string &_name)
 {
   // Get the first world...we assume it the only one running
   physics::WorldPtr world = physics::get_world();
-  return world->GetModel(_name);
+  return world->ModelByName(_name);
 }
 
 /////////////////////////////////////////////////

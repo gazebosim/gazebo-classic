@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,12 +45,12 @@ void ViewAngleWidget_TEST::EmptyWorld()
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
   QVERIFY(cam != NULL);
 
-  // Get camera default pose and check that's the current pose
-  ignition::math::Pose3d defaultPose = cam->DefaultPose().Ign();
-  QVERIFY(defaultPose == cam->WorldPose());
+  // Get camera initial pose and check that's the current pose
+  ignition::math::Pose3d initialPose = cam->InitialPose();
+  QVERIFY(initialPose == cam->WorldPose());
 
   // Get the camera distance from the world origin (zoom level)
-  double dist = defaultPose.Pos().Length();
+  double dist = initialPose.Pos().Length();
 
   // Get the view angle widget
   gazebo::gui::ViewAngleWidget *viewAngleWidget =
@@ -128,7 +128,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->WorldPose();
-  QVERIFY((pose.Pos() - defaultPose.Pos()).Length() < tol);
+  QVERIFY((pose.Pos() - initialPose.Pos()).Length() < tol);
 
   // Clean up
   cam->Fini();
