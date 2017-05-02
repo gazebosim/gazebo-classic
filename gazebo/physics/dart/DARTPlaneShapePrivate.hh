@@ -31,17 +31,45 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTPlaneShapePrivate()
-        : dtBoxShape(new dart::dynamics::BoxShape(
-                       Eigen::Vector3d(2100, 2100, 2100)))
       {
-        this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
       }
 
       /// \brief Default destructor
       public: ~DARTPlaneShapePrivate() = default;
 
+      // \brief returns the shape
+      public: dart::dynamics::BoxShape* Shape() const
+      {
+        GZ_ASSERT(this->dtBoxShape, "BodyNode is NULL");
+        return static_cast<dart::dynamics::BoxShape*>
+          (this->dtBoxShape->getShape().get());
+      }
+
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
+      {
+        return this->dtBoxShape;
+      }
+
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
+      {
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(new dart::dynamics::BoxShape(
+                                         Eigen::Vector3d(2100, 2100, 2100)));
+        dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        Eigen::Isometry3d trans = Eigen::Isometry3d::Identity();
+        trans.translate(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+        node->setRelativeTransform(trans);
+        this->dtBoxShape.set(node);
+      }
+
       /// \brief DART box shape
-      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
+      private: dart::dynamics::ShapeNodePtr dtBoxShape;
       // We use BoxShape untile PlaneShape is completely supported in DART.
       // Please see: https://github.com/dartsim/dart/issues/114
     };

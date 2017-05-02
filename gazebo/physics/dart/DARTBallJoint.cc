@@ -44,7 +44,7 @@ void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::BallJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -62,6 +62,8 @@ ignition::math::Vector3d DARTBallJoint::Anchor(
     return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();

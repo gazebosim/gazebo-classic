@@ -42,6 +42,9 @@ namespace gazebo
       public: virtual ~DARTPlaneShape();
 
       // Documentation inherited
+      public: virtual void Init();
+
+      // Documentation inherited
       public: virtual void CreatePlane();
 
       // Documentation inherited

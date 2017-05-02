@@ -21,7 +21,7 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (CURL_FOUND)

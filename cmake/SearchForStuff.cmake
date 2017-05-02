@@ -161,13 +161,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 5.1.1 QUIET)
-  if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
+  set(DART_MIN_REQUIRED_VERSION 6)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION})
+  if (DART_FOUND)
+    message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
   else()
-    message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
+    message (STATUS "Looking for DART - not found")
+    BUILD_WARNING ("DART ${DART_MIN_REQUIRED_VERSION} not found, for dart physics engine option, please install libdart${DART_MIN_REQUIRED_VERSION}-dev.")
     set (HAVE_DART FALSE)
   endif()
 

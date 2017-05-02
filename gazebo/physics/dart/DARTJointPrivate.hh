@@ -56,20 +56,32 @@ namespace gazebo
       /// \brief Call all the cached setter functions and clear them
       public: void Initialize()
       {
-        GZ_ASSERT(dtJoint != nullptr, "dtJoint is null pointer.\n");
-
+        // dtJoint must have been set before initialization, which is
+        // not very nice but necessary. The current solution also requires
+        // the constructor to be called before we can set the joint, so
+        // passing it into constructor is not an option either.
+        // Cached functions may need a valid dtJoint already, or there will
+        // be crashes with boost function binding which are not nice to debug.
+        // So in general, we can consider this object invalid without a
+        // dtJoint which was explicitly set before calling Initialize().
+        if (!this->dtJoint)
+        {
+          gzerr << "No joint initialized for joint "
+                << this->dtProperties->mName << std::endl;
+        }
+        GZ_ASSERT(this->dtJoint, "dtJoint is null pointer.\n");
         for (auto func : mFuncs)
           func();
 
         mFuncs.clear();
 
-        dtJoint->setPositionLimitEnforced(true);
+        this->dtJoint->setPositionLimitEnforced(true);
       }
 
       /// \brief Return true if DART Joint is initialized
       public: bool IsInitialized() const
       {
-        return dtJoint != nullptr;
+        return this->dtJoint;
       }
 
       /// \brief Cache a setter function. The cached functions will be called in
