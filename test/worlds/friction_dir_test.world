@@ -1,4 +1,5 @@
 <?xml version="1.0" ?>
+<!-- this file was generated using embedded ruby -->
 <sdf version='1.6'>
   <world name='default'>
     <include>
@@ -148,7 +149,7 @@
     </model>
 
     <model name='box_fdir_3'>
-      <pose>2.9389262614623664 4.045084971874736 0.1 0 -0 0</pose>
+      <pose>2.938926261462366 4.045084971874737 0.1 0 -0 0</pose>
       <link name='link_1'>
         <inertial>
           <mass>1</mass>
@@ -172,7 +173,7 @@
               <ode>
                 <mu>100</mu>
                 <mu2>0</mu2>
-                <fdir1>-0.8090169943749473 0.5877852522924732 0</fdir1>
+                <fdir1>-0.8090169943749475 0.5877852522924731 0</fdir1>
               </ode>
             </friction>
           </surface>
@@ -657,7 +658,7 @@
     </model>
 
     <model name='box_collision_3'>
-      <pose>3.5267115137548393 4.854101966249684 0.1 0 -0 0</pose>
+      <pose>3.526711513754839 4.854101966249685 0.1 0 -0 0</pose>
       <link name='link_1'>
         <inertial>
           <mass>1</mass>
@@ -1174,7 +1175,7 @@
     </model>
 
     <model name='box_link_3'>
-      <pose>4.114496766047313 5.663118960624631 0.1 0 -0 0</pose>
+      <pose>4.114496766047312 5.663118960624632 0.1 0 -0 0</pose>
       <link name='link_1'>
         <pose>0 0 0  0 0 0.9424777960769379</pose>
         <inertial>
@@ -1688,7 +1689,7 @@
     </model>
 
     <model name='box_model_3'>
-      <pose>4.702282018339786 6.472135954999579 0.1 0 -0 0.9424777960769379</pose>
+      <pose>4.702282018339785 6.47213595499958 0.1 0 -0 0.9424777960769379</pose>
       <link name='link_1'>
         <inertial>
           <mass>1</mass>
