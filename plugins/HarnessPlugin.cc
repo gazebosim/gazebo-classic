@@ -326,7 +326,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
 /////////////////////////////////////////////////
 int HarnessPlugin::JointIndex(const std::string &_name) const
 {
-  // Find the winch joint in our list of joints
+  // Find the given joint in our list of joints
   for (size_t i = 0; i < this->joints.size(); ++i)
   {
     if (this->joints[i]->GetName() == _name)
