@@ -5,6 +5,10 @@
 1. Fix race condition during Detach of HarnessPlugin
     * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
 
+1. Added support for pincushion distortion model; fixed bug where
+   cameras with different distortion models would have the same distortion.
+    * [Pull request 2678](https://bitbucket.org/osrf/gazebo/pull-requests/2678)
+
 1. Added <collide_bitmask> support to bullet
     * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
 
