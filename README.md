@@ -17,7 +17,7 @@ Gazebo cmake parameters available at configuring time:
  - BUILD_TESTING (boot) [default False]
    Include the testsuite compilation in the default make call (make all)
  - USE_HOST_CFLAGS (bool) [default True]
-   Check the building machine for supported compiler optimizations and use 
+   Check the building machine for supported compiler optimizations and use
    them to build the software.
  - USE_UPSTREAM_CFLAGS (bool) [default True]
    Use the recommend gazebo developers compiler optimizations flags.
@@ -34,7 +34,7 @@ Gazebo cmake parameters available at configuring time:
  - ENABLE_SCREEN_TESTS (bool) [default True]
    Enable or disable tests that need screen rendering to run properly.
    Headless machines or machines with the screen turned off should set this to
-   False 
+   False
  - USE_PCH (bool) [default False]
    Use GNU Precompiled Headers. Only works with the gnu compiler
 
