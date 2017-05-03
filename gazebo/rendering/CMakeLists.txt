@@ -230,7 +230,7 @@ if (NOT APPLE AND NOT WIN32)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_rendering rendering_pch.hh)
+  add_pch(gazebo_rendering rendering_pch.hh ${Boost_PKGCONFIG_CFLAGS})
 endif()
 
 gz_install_library(gazebo_rendering)

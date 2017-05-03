@@ -186,7 +186,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_physics physics_pch.hh)
+  add_pch(gazebo_physics physics_pch.hh ${Boost_PKGCONFIG_CFLAGS} "-I${TBB_INCLUDEDIR}")
 endif()
 
 gz_install_library(gazebo_physics)
