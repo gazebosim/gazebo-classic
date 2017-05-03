@@ -495,8 +495,8 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
       distortionMsg->set_k3(distortion->GetK3());
       distortionMsg->set_p1(distortion->GetP1());
       distortionMsg->set_p2(distortion->GetP2());
-      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
-      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+      distortionMsg->mutable_center()->set_x(distortion->GetCenter().Ign().X());
+      distortionMsg->mutable_center()->set_y(distortion->GetCenter().Ign().Y());
     }
   }
 }
