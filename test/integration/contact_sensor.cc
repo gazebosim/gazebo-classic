@@ -740,12 +740,12 @@ void ContactSensor::Active()
     sleep++;
   }
   EXPECT_EQ(topicsCount, 3u);
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/physics/contacts") != topics.end());
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/contactModel/body/contactSensor") != topics.end());
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/contactModel/body/contactSensor/contacts") != topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+    "/gazebo/default/physics/contacts"), topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+    "/gazebo/default/contactModel/body/contactSensor"), topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+    "/gazebo/default/contactModel/body/contactSensor/contacts"), topics.end());
 
   // Set sensor back to inactive
   contactSensor->SetActive(false);
@@ -762,8 +762,8 @@ void ContactSensor::Active()
     sleep++;
   }
   EXPECT_EQ(topicsCount, 1u);
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/physics/contacts") != topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+      "/gazebo/default/physics/contacts"), topics.end());
 }
 
 TEST_F(ContactSensor, Active)
