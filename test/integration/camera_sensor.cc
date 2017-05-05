@@ -504,7 +504,7 @@ TEST_F(CameraSensor, MultiSenseLow)
 //  math::Pose setPose, testPose(
 //      ignition::math::Vector3d(-5, 0, 5),
 //      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
-//  SpawnCamera(modelName, cameraName, setPose.pos,
+//  SpawnCamera(modelName, cameraName, setPose.Pos(),
 //      setPose.Rot().Euler(), width, height, updateRate);
 //  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
 //  sensors::CameraSensorPtr camSensor =
@@ -631,13 +631,13 @@ TEST_F(CameraSensor, CheckDistortion)
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 10;
-  ignition::math::Pose setPose(
-      ignition::math::Vector3(-5, 0, 5),
-      ignition::math::Quaternion(0, IGN_DTOR(15), 0));
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
 
   // spawn an undistorted camera
-  SpawnCamera(modelNameUndistorted, cameraNameUndistorted, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate);
+  SpawnCamera(modelNameUndistorted, cameraNameUndistorted, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
   // spawn a flat camera
   SpawnCamera(modelNameFlat, cameraNameFlat, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate,
@@ -647,8 +647,8 @@ TEST_F(CameraSensor, CheckDistortion)
       setPose.Rot().Euler(), width, height, updateRate,
       "", 0, 0, true, -0.1349, -0.51868, -0.001, 0, 0, 0.5, 0.5);
   // spawn a camera with pincushion distortion
-  SpawnCamera(modelNamePincushion, cameraNamePincushion, setPose.pos,
-      setPose.rot.GetAsEuler(), width, height, updateRate,
+  SpawnCamera(modelNamePincushion, cameraNamePincushion, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
       "", 0, 0, true, 0.1349, 0.51868, 0.001, 0, 0, 0.5, 0.5);
 
   sensors::SensorPtr sensorUndistorted =

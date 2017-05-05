@@ -107,13 +107,13 @@ TEST_F(Distortion_TEST, DistortionModelBasics)
   EXPECT_EQ(distortion.Crop(), false);
   distortion.SetCrop(true);
   EXPECT_EQ(distortion.Crop(), true);
-  EXPECT_DOUBLE_EQ(distortion.GetK1(), 0.1);
-  EXPECT_DOUBLE_EQ(distortion.GetK2(), 0.05);
-  EXPECT_DOUBLE_EQ(distortion.GetK3(), 0.01);
-  EXPECT_DOUBLE_EQ(distortion.GetP1(), 0.0);
-  EXPECT_DOUBLE_EQ(distortion.GetP2(), 0.0);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().Ign().X(), 0.5);
-  EXPECT_DOUBLE_EQ(distortion.GetCenter().Ign().Y(), 0.5);
+  EXPECT_DOUBLE_EQ(distortion.K1(), 0.1);
+  EXPECT_DOUBLE_EQ(distortion.K2(), 0.05);
+  EXPECT_DOUBLE_EQ(distortion.K3(), 0.01);
+  EXPECT_DOUBLE_EQ(distortion.P1(), 0.0);
+  EXPECT_DOUBLE_EQ(distortion.P2(), 0.0);
+  EXPECT_DOUBLE_EQ(distortion.Center().X(), 0.5);
+  EXPECT_DOUBLE_EQ(distortion.Center().Y(), 0.5);
 }
 
 int main(int argc, char **argv)
