@@ -28,10 +28,22 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
-    <model name="box_01_model">
+<%
+  boxes = {}
+  boxes["box_01"] = {:mu => 0.998,  :x0 => 2}
+  boxes["box_02"] = {:mu => 0.9985, :x0 => 4}
+  boxes["box_03"] = {:mu => 0.999,  :x0 => 6}
+  boxes["box_04"] = {:mu => 0.9995, :x0 => 8}
+  boxes["box_05"] = {:mu => 1,      :x0 => 10}
+  boxes["box_06"] = {:mu => 1.01,   :x0 => 12}
+  boxes.keys.each do |box_prefix|
+    mu = boxes[box_prefix][:mu]
+    x0 = boxes[box_prefix][:x0]
+%>
+    <model name="<%= box_prefix %>_model">
       <allow_auto_disable>0</allow_auto_disable>
-      <pose>2 8 0.5 0 0 0</pose>
-      <link name="box_01_body">
+      <pose><%= x0 %> 8 0.5 0 0 0</pose>
+      <link name="<%= box_prefix %>_body">
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
@@ -44,7 +56,7 @@
           </inertia>
           <mass>1</mass>
         </inertial>
-        <collision name="box_01_geom">
+        <collision name="<%= box_prefix %>_geom">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -53,8 +65,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.998000</mu>
-                <mu2>0.998000</mu2>
+                <mu><%= mu %></mu>
+                <mu2><%= mu %></mu2>
                 <slip1>0</slip1>
                 <slip2>0</slip2>
               </ode>
@@ -71,7 +83,7 @@
             </contact>
           </surface>
         </collision>
-        <visual name="box_01_geom_visual">
+        <visual name="<%= box_prefix %>_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -83,280 +95,8 @@
         </visual>
       </link>
     </model>
-    <model name="box_02_model">
-      <allow_auto_disable>0</allow_auto_disable>
-      <pose>4 8 0.5 0 0 0</pose>
-      <link name="box_02_body">
-        <inertial>
-          <pose>0 0 -0.5 0 0 0</pose>
-          <inertia>
-            <ixx>10</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>10</iyy>
-            <iyz>0</iyz>
-            <izz>10</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <collision name="box_02_geom">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.998500</mu>
-                <mu2>0.998500</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>100000</kp>
-                <kd>1</kd>
-                <max_vel>100</max_vel>
-                <min_depth>0.001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-        <visual name="box_02_geom_visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/Rocky</script>
-          </material>
-        </visual>
-      </link>
-    </model>
-    <model name="box_03_model">
-      <allow_auto_disable>0</allow_auto_disable>
-      <pose>6 8 0.5 0 0 0</pose>
-      <link name="box_03_body">
-        <inertial>
-          <pose>0 0 -0.5 0 0 0</pose>
-          <inertia>
-            <ixx>10</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>10</iyy>
-            <iyz>0</iyz>
-            <izz>10</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <collision name="box_03_geom">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.999000</mu>
-                <mu2>0.999000</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>100000</kp>
-                <kd>1</kd>
-                <max_vel>100</max_vel>
-                <min_depth>0.001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-        <visual name="box_03_geom_visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/Rocky</script>
-          </material>
-        </visual>
-      </link>
-    </model>
-    <model name="box_04_model">
-      <allow_auto_disable>0</allow_auto_disable>
-      <pose>8 8 0.5 0 0 0</pose>
-      <link name="box_04_body">
-        <inertial>
-          <pose>0 0 -0.5 0 0 0</pose>
-          <inertia>
-            <ixx>10</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>10</iyy>
-            <iyz>0</iyz>
-            <izz>10</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <collision name="box_04_geom">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>0.999500</mu>
-                <mu2>0.999500</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>100000</kp>
-                <kd>1</kd>
-                <max_vel>100</max_vel>
-                <min_depth>0.001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-        <visual name="box_04_geom_visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/Rocky</script>
-          </material>
-        </visual>
-      </link>
-    </model>
-    <model name="box_05_model">
-      <allow_auto_disable>0</allow_auto_disable>
-      <pose>10 8 0.5 0 0 0</pose>
-      <link name="box_05_body">
-        <inertial>
-          <pose>0 0 -0.5 0 0 0</pose>
-          <inertia>
-            <ixx>10</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>10</iyy>
-            <iyz>0</iyz>
-            <izz>10</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <collision name="box_05_geom">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1</mu>
-                <mu2>1</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>100000</kp>
-                <kd>1</kd>
-                <max_vel>100</max_vel>
-                <min_depth>0.001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-        <visual name="box_05_geom_visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/Rocky</script>
-          </material>
-        </visual>
-      </link>
-    </model>
-    <model name="box_06_model">
-      <allow_auto_disable>0</allow_auto_disable>
-      <pose>12 8 0.5 0 0 0</pose>
-      <link name="box_06_body">
-        <inertial>
-          <pose>0 0 -0.5 0 0 0</pose>
-          <inertia>
-            <ixx>10</ixx>
-            <ixy>0</ixy>
-            <ixz>0</ixz>
-            <iyy>10</iyy>
-            <iyz>0</iyz>
-            <izz>10</izz>
-          </inertia>
-          <mass>1</mass>
-        </inertial>
-        <collision name="box_06_geom">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <surface>
-            <friction>
-              <ode>
-                <mu>1.01</mu>
-                <mu2>1.01</mu2>
-                <slip1>0</slip1>
-                <slip2>0</slip2>
-              </ode>
-            </friction>
-            <contact>
-              <ode>
-                <soft_cfm>0</soft_cfm>
-                <soft_erp>0.2</soft_erp>
-                <kp>100000</kp>
-                <kd>1</kd>
-                <max_vel>100</max_vel>
-                <min_depth>0.001</min_depth>
-              </ode>
-            </contact>
-          </surface>
-        </collision>
-        <visual name="box_06_geom_visual">
-          <geometry>
-            <box>
-              <size>1 1 1</size>
-            </box>
-          </geometry>
-          <material>
-            <script>Gazebo/Rocky</script>
-          </material>
-        </visual>
-      </link>
-    </model>
+<%
+  end
+%>
   </world>
 </sdf>

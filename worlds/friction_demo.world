@@ -28,6 +28,7 @@
     <include>
       <uri>model://ground_plane</uri>
     </include>
+
     <model name="box_01_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>2 8 0.5 0 0 0</pose>
@@ -53,8 +54,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.998000</mu>
-                <mu2>0.998000</mu2>
+                <mu>0.998</mu>
+                <mu2>0.998</mu2>
                 <slip1>0</slip1>
                 <slip2>0</slip2>
               </ode>
@@ -83,6 +84,7 @@
         </visual>
       </link>
     </model>
+
     <model name="box_02_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>4 8 0.5 0 0 0</pose>
@@ -108,8 +110,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.998500</mu>
-                <mu2>0.998500</mu2>
+                <mu>0.9985</mu>
+                <mu2>0.9985</mu2>
                 <slip1>0</slip1>
                 <slip2>0</slip2>
               </ode>
@@ -138,6 +140,7 @@
         </visual>
       </link>
     </model>
+
     <model name="box_03_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>6 8 0.5 0 0 0</pose>
@@ -163,8 +166,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.999000</mu>
-                <mu2>0.999000</mu2>
+                <mu>0.999</mu>
+                <mu2>0.999</mu2>
                 <slip1>0</slip1>
                 <slip2>0</slip2>
               </ode>
@@ -193,6 +196,7 @@
         </visual>
       </link>
     </model>
+
     <model name="box_04_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>8 8 0.5 0 0 0</pose>
@@ -218,8 +222,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>0.999500</mu>
-                <mu2>0.999500</mu2>
+                <mu>0.9995</mu>
+                <mu2>0.9995</mu2>
                 <slip1>0</slip1>
                 <slip2>0</slip2>
               </ode>
@@ -248,6 +252,7 @@
         </visual>
       </link>
     </model>
+
     <model name="box_05_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>10 8 0.5 0 0 0</pose>
@@ -303,6 +308,7 @@
         </visual>
       </link>
     </model>
+
     <model name="box_06_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>12 8 0.5 0 0 0</pose>
@@ -358,5 +364,6 @@
         </visual>
       </link>
     </model>
+
   </world>
 </sdf>
