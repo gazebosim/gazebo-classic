@@ -29,6 +29,62 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <model name="box_00_model">
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0 8 0.5 0 0 0</pose>
+      <link name="box_00_body">
+        <inertial>
+          <pose>0 0 -0.5 0 0 0</pose>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <collision name="box_00_geom">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.998</mu>
+                <mu2>0.998</mu2>
+                <slip1>1.0</slip1>
+                <slip2>1.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>100000</kp>
+                <kd>1</kd>
+                <max_vel>100</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="box_00_geom_visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Rocky</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <model name="box_01_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>2 8 0.5 0 0 0</pose>
@@ -353,6 +409,174 @@
           </surface>
         </collision>
         <visual name="box_06_geom_visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Rocky</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_07_model">
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>14 8 0.5 0 0 0</pose>
+      <link name="box_07_body">
+        <inertial>
+          <pose>0 0 -0.5 0 0 0</pose>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <collision name="box_07_geom">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.01</mu>
+                <mu2>1.01</mu2>
+                <slip1>0.1</slip1>
+                <slip2>0.1</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>100000</kp>
+                <kd>1</kd>
+                <max_vel>100</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="box_07_geom_visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Rocky</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_08_model">
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>16 8 0.5 0 0 0</pose>
+      <link name="box_08_body">
+        <inertial>
+          <pose>0 0 -0.5 0 0 0</pose>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <collision name="box_08_geom">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.01</mu>
+                <mu2>1.01</mu2>
+                <slip1>0.3</slip1>
+                <slip2>0.3</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>100000</kp>
+                <kd>1</kd>
+                <max_vel>100</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="box_08_geom_visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>Gazebo/Rocky</script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box_09_model">
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>18 8 0.5 0 0 0</pose>
+      <link name="box_09_body">
+        <inertial>
+          <pose>0 0 -0.5 0 0 0</pose>
+          <inertia>
+            <ixx>10</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>10</iyy>
+            <iyz>0</iyz>
+            <izz>10</izz>
+          </inertia>
+          <mass>1</mass>
+        </inertial>
+        <collision name="box_09_geom">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>1.01</mu>
+                <mu2>1.01</mu2>
+                <slip1>1.0</slip1>
+                <slip2>1.0</slip2>
+              </ode>
+            </friction>
+            <contact>
+              <ode>
+                <soft_cfm>0</soft_cfm>
+                <soft_erp>0.2</soft_erp>
+                <kp>100000</kp>
+                <kd>1</kd>
+                <max_vel>100</max_vel>
+                <min_depth>0.001</min_depth>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="box_09_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>

@@ -30,12 +30,16 @@
     </include>
 <%
   boxes = {}
+  boxes["box_00"] = {:mu => 0.998,  :slip => 1.0, :x0 => 0}
   boxes["box_01"] = {:mu => 0.998,  :slip => 0,   :x0 => 2}
   boxes["box_02"] = {:mu => 0.9985, :slip => 0,   :x0 => 4}
   boxes["box_03"] = {:mu => 0.999,  :slip => 0,   :x0 => 6}
   boxes["box_04"] = {:mu => 0.9995, :slip => 0,   :x0 => 8}
   boxes["box_05"] = {:mu => 1,      :slip => 0,   :x0 => 10}
   boxes["box_06"] = {:mu => 1.01,   :slip => 0,   :x0 => 12}
+  boxes["box_07"] = {:mu => 1.01,   :slip => 0.1, :x0 => 14}
+  boxes["box_08"] = {:mu => 1.01,   :slip => 0.3, :x0 => 16}
+  boxes["box_09"] = {:mu => 1.01,   :slip => 1.0, :x0 => 18}
   boxes.keys.each do |box_prefix|
     mu = boxes[box_prefix][:mu]
     slip = boxes[box_prefix][:slip]
