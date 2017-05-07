@@ -164,8 +164,7 @@ void ContactManager::GetCustomPublishers(Collision *_collision1,
           ++it;
           continue;
         }
-        else
-          it = iter->second->collisionNames.erase(it);
+        it = iter->second->collisionNames.erase(it);
         iter->second->collisions.insert(col);
       }
     }
