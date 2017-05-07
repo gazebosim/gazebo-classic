@@ -25,7 +25,8 @@
 #include "gazebo/common/ColladaExporterPrivate.hh"
 #include "gazebo/common/ColladaExporter.hh"
 
-#ifdef _WIN32
+// snprintf is available since VS 2015
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
   #define snprintf _snprintf
 #endif
 

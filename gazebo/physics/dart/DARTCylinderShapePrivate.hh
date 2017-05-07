@@ -37,29 +37,32 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTCylinderShapePrivate() = default;
 
-
-      public: dart::dynamics::ShapeNodePtr GetShapeNode()
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
       {
-        return dtCylinderShape;
+        return this->dtCylinderShape;
       }
 
-      public: dart::dynamics::CylinderShape* GetShape()
+      // \brief returns the shape
+      public: dart::dynamics::CylinderShape* Shape() const
       {
-        GZ_ASSERT(dtCylinderShape.get() != nullptr, "CylinderShape is NULL");
+        GZ_ASSERT(this->dtCylinderShape, "CylinderShape is NULL");
         return static_cast<dart::dynamics::CylinderShape*>
-                       (dtCylinderShape->getShape().get());
+                       (this->dtCylinderShape->getShape().get());
       }
 
-      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(
-                                    new dart::dynamics::CylinderShape(1, 1));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<
-                                        dart::dynamics::VisualAspect,
-                                        dart::dynamics::CollisionAspect,
-                                        dart::dynamics::DynamicsAspect>(shape);
-          dtCylinderShape.set(node);
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(
+                                  new dart::dynamics::CylinderShape(1, 1));
+        dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        this->dtCylinderShape.set(node);
       }
 
       /// \brief DART cylinder shape

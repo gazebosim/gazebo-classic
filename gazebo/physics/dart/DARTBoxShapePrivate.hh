@@ -37,28 +37,32 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTBoxShapePrivate() = default;
 
-      public: dart::dynamics::ShapeNodePtr GetShapeNode()
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
       {
-        return dtBoxShape;
+        return this->dtBoxShape;
       }
 
-      public: dart::dynamics::BoxShape* GetShape()
+      // \brief returns the shape
+      public: dart::dynamics::BoxShape* Shape() const
       {
-        GZ_ASSERT(dtBoxShape.get() != nullptr, "BoxShape is NULL");
+        GZ_ASSERT(dtBoxShape, "BoxShape is NULL");
         return static_cast<dart::dynamics::BoxShape*>
                         (dtBoxShape->getShape().get());
       }
 
-      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(
-            new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)));
-          dart::dynamics::ShapeNode * node =
-            bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
-                                        dart::dynamics::CollisionAspect,
-                                        dart::dynamics::DynamicsAspect>(shape);
-          dtBoxShape.set(node);
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(
+          new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)));
+        dart::dynamics::ShapeNode *node =
+          _bodyNode->createShapeNodeWith<dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        this->dtBoxShape.set(node);
       }
 
       /// \brief DART box shape

@@ -37,27 +37,31 @@ namespace gazebo
       /// \brief Default destructor
       public: ~DARTSphereShapePrivate() = default;
 
-      public: dart::dynamics::ShapeNodePtr GetShapeNode()
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
       {
-        return dtSphereShape;
+        return this->dtSphereShape;
       }
 
-      public: dart::dynamics::SphereShape* GetShape()
+      // \brief returns the shape
+      public: dart::dynamics::SphereShape* Shape() const
       {
-        GZ_ASSERT(dtSphereShape.get() != nullptr, "SphereShape is NULL");
+        GZ_ASSERT(this->dtSphereShape, "SphereShape is NULL");
         return static_cast<dart::dynamics::SphereShape*>
-                      (dtSphereShape->getShape().get());
+                      (this->dtSphereShape->getShape().get());
       }
 
-      public: void CreateShape(const dart::dynamics::BodyNodePtr& bodyNode)
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
       {
-          GZ_ASSERT(bodyNode.get() != nullptr, "BodyNode is NULL");
-          dart::dynamics::ShapePtr shape(new dart::dynamics::SphereShape(1));
-          dart::dynamics::ShapeNode * node = bodyNode->createShapeNodeWith<
-                                        dart::dynamics::VisualAspect,
-                                        dart::dynamics::CollisionAspect,
-                                        dart::dynamics::DynamicsAspect>(shape);
-          dtSphereShape.set(node);
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(new dart::dynamics::SphereShape(1));
+        dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        this->dtSphereShape.set(node);
       }
 
       /// \brief DART sphere shape

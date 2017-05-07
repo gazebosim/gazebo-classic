@@ -332,9 +332,6 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   // Load our force torque test world
   Load("worlds/force_torque_test2.world", true, _physicsEngine);
 
-  // std::cout<<"Press any key to continue"<<std::endl;
-  // std::cin.get();
-
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
@@ -369,7 +366,8 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-  for (unsigned int i = 0; i < 3388; ++i)
+  static const unsigned int steps = 4500u;
+  for (unsigned int i = 0; i < steps; ++i)
   {
     // pd control
     double j1State = joint_01->Position(0);
@@ -385,7 +383,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
     // test joint_01 wrench
     physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
 
-    if (i == 3387)
+    if (i == steps-1)
     {
       EXPECT_NEAR(wrench_01.body1Force.X(),     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_01.body1Force.Y(),     0.0, TOL_CONT);
@@ -420,7 +418,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForce(
 
     // test joint_12 wrench
     physics::JointWrench wrench_12 = joint_12->GetForceTorque(0u);
-    if (i == 3387)
+    if (i == steps-1)
     {
       EXPECT_NEAR(wrench_12.body1Force.X(),     0.0, TOL_CONT);
       EXPECT_NEAR(wrench_12.body1Force.Y(),     0.0, TOL_CONT);
@@ -500,10 +498,10 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
   static const double kp2 = 10000.0;
   static const double target1 = 0.0;
   static const double target2 = -0.25*M_PI;
-
+  static const unsigned int steps = 4500u;
   for (unsigned int j = 0; j < 2; ++j)
   {
-    for (unsigned int i = 0; i < 3388; ++i)
+    for (unsigned int i = 0; i < steps; ++i)
     {
       // pd control
       double j1State = joint_01->Position(0);
@@ -519,7 +517,7 @@ void JointForceTorqueTest::GetForceTorqueWithAppliedForceReset(
       // test joint_01 wrench
       physics::JointWrench wrench_01 = joint_01->GetForceTorque(0u);
 
-      if (i < 3387)
+      if (i < steps-1)
         continue;
 
       EXPECT_NEAR(wrench_01.body1Force.X(),     0.0, TOL_CONT);
