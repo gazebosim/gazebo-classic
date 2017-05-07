@@ -245,14 +245,16 @@ namespace gazebo
       private: void UpdateTerrainHash(const std::string &_hash,
           const boost::filesystem::path &_terrainDir);
 
-      /// \brief It checks if the terrain was previously loaded. In negative
-      /// case, it splits the original terrain into pieces and creates a hash
-      /// file.
+      /// \brief Checks if the terrain was previously loaded by comparing its
+      /// hash against the one stored in the terrain directory
       /// \param[in] _terrainDirPath Path to the directory containing the
-      /// terrain pages and hash.
+      /// terrain files and hash.
       /// \return True if the terrain requires to regenerate the terrain files.
-      private: bool PrepareTerrainPaging(
-        const boost::filesystem::path &_terrainDirPath);
+      private: bool PrepareTerrain(
+          const boost::filesystem::path &_terrainDirPath);
+
+      /// \brief Save the heightmap tiles to disk
+      private: void SaveHeightmap();
 
       /// \internal
       /// \brief Pointer to private data.

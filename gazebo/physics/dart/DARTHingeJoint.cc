@@ -64,6 +64,8 @@ ignition::math::Vector3d DARTHingeJoint::Anchor(
           "Anchor" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
   Eigen::Vector3d worldOrigin = T.translation();
@@ -81,13 +83,16 @@ ignition::math::Vector3d DARTHingeJoint::GlobalAxis(
           "Axis" + std::to_string(_index));
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
   if (_index == 0)
   {
     dart::dynamics::RevoluteJoint *dtRevoluteJoint =
-        reinterpret_cast<dart::dynamics::RevoluteJoint *>(
+        dynamic_cast<dart::dynamics::RevoluteJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtRevoluteJoint, "RevoluteJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
@@ -114,11 +119,18 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
     return;
   }
 
+  if (!this->dataPtr->dtJoint)
+  {
+    gzerr << " No Joint set \n";
+    return;
+  }
+
   if (_index == 0)
   {
     dart::dynamics::RevoluteJoint *dtRevoluteJoint =
-        reinterpret_cast<dart::dynamics::RevoluteJoint *>(
+        dynamic_cast<dart::dynamics::RevoluteJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtRevoluteJoint, "RevoluteJoint is NULL");
 
     Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
         this->AxisFrameOffset(0).RotateVector(_axis));
@@ -145,6 +157,8 @@ double DARTHingeJoint::PositionImpl(const unsigned int _index) const
 
   double result = ignition::math::NAN_D;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
     result = this->dataPtr->dtJoint->getPosition(0);
@@ -168,6 +182,8 @@ void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     this->dataPtr->dtJoint->setVelocity(0, _vel);
   else
@@ -182,6 +198,8 @@ double DARTHingeJoint::GetVelocity(unsigned int _index) const
     return this->dataPtr->GetCached<double>(
           "Velocity" + std::to_string(_index));
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   double result = 0.0;
 
@@ -203,6 +221,8 @@ void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
         boost::bind(&DARTHingeJoint::SetForceImpl, this, _index, _effort));
     return;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);

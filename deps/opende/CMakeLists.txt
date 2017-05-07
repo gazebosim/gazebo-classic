@@ -20,8 +20,8 @@ link_directories(
 )
 
 if (HAVE_DART)
-  include_directories(${DARTCore_INCLUDE_DIRS})
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (HAVE_BULLET)

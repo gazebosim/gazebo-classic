@@ -182,7 +182,7 @@ namespace gazebo
 
       /// \brief Get pointer to DART BodyNode associated with this link.
       /// \return Pointer to DART BodyNode.
-      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
+      public: dart::dynamics::BodyNode *DARTBodyNode() const;
 
       /// \brief Set parent joint of this link.
       /// \param[in] _dartParentJoint Pointer to the parent joint.

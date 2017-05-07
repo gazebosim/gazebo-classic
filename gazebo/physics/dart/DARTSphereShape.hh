@@ -44,6 +44,9 @@ namespace gazebo
       public: virtual ~DARTSphereShape();
 
       // Documentation inherited.
+      public: virtual void Init();
+
+      // Documentation inherited.
       public: virtual void SetRadius(double _radius);
 
       /// \internal

@@ -73,4 +73,14 @@ void DARTMeshShape::Init()
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
         this->sdf->Get<ignition::math::Vector3d>("scale"));
   }
+
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  GZ_ASSERT(this->dataPtr->dartMesh->ShapeNode(), "Must have a shape node");
+  _collisionParent->SetDARTCollisionShapeNode
+     (this->dataPtr->dartMesh->ShapeNode());
 }
