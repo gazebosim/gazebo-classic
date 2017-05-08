@@ -70,6 +70,7 @@ namespace gazebo
                 << this->dtProperties->mName << std::endl;
         }
         GZ_ASSERT(this->dtJoint, "dtJoint is null pointer.\n");
+
         for (auto func : mFuncs)
           func();
 

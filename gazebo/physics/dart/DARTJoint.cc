@@ -238,7 +238,6 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
     bool childStatic =
         this->GetChild() ? this->GetChild()->IsStatic() : false;
 
-
     if (!this->applyDamping)
     {
       if (!parentStatic && !childStatic)

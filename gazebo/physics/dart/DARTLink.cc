@@ -332,8 +332,12 @@ void DARTLink::OnPoseChange()
   }
   else
   {
-    gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not free joint (6-dof).\n";
+    // We don't really need this debug message... this function will still
+    // need to be called also for free joints just to call Link::OnPoseChange().
+    // We can take this commented code out as soon as we are sure we don't want
+    // to put this back in.
+    // gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
+    //      << "is not free joint (6-dof).\n";
   }
 }
 

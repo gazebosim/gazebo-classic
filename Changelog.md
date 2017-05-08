@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Integration of DART-6
+    * [Pull request #2547](https://bitbucket.org/osrf/gazebo/pull-requests/2547)
+
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
