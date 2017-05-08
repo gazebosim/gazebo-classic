@@ -24,7 +24,10 @@
   #include <iphlpapi.h>
   // Type used for raw data on this platform.
   typedef char raw_type;
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    #define snprintf _snprintf
+  #endif
 #else
   // For data types
   #include <sys/types.h>

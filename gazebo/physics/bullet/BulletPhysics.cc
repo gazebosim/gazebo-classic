@@ -79,6 +79,7 @@ struct CollisionFilter : public btOverlapFilterCallback
       GZ_ASSERT(_proxy0 != nullptr && _proxy1 != nullptr,
           "Bullet broadphase overlapping pair proxies are null");
 
+      // BulletRayShape uses these, TODO remove in favor of collideBits
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
       collide = collide && (_proxy1->m_collisionFilterGroup
@@ -102,6 +103,21 @@ struct CollisionFilter : public btOverlapFilterCallback
           rb1->getUserPointer());
       GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
 
+      const Collision_V &cols0 = link0->GetCollisions();
+      const Collision_V &cols1 = link1->GetCollisions();
+
+      if (cols0.size() == 0 || cols1.size() == 0)
+      {
+        // no collision on the link? It can't collide
+        return false;
+      }
+
+      // use first collision, BulletLink expects all to have same bits
+      SurfaceParamsPtr surf0 = cols0[0]->GetSurface();
+      SurfaceParamsPtr surf1 = cols1[0]->GetSurface();
+
+      collide = surf0->collideBitmask & surf1->collideBitmask;
+
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
         if (link0->GetModel() == link1->GetModel())
@@ -112,7 +128,10 @@ struct CollisionFilter : public btOverlapFilterCallback
 };
 
 //////////////////////////////////////////////////
-void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
+// Gets the contact information in the current state of
+// the world, updates the contact manager and
+// and sets the contact feedback information.
+void UpdateContacts(btDynamicsWorld *_world, btScalar _timeStep)
 {
   int numManifolds = _world->getDispatcher()->getNumManifolds();
   for (int i = 0; i < numManifolds; ++i)
@@ -208,6 +227,12 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
+{
+  UpdateContacts(_world, _timeStep);
 }
 
 //////////////////////////////////////////////////
@@ -459,6 +484,24 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 void BulletPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
+
+  if (!this->world->PhysicsEnabled())
+  {
+    // if physics is disabled, UpdatePhysics() will not be
+    // called, and collision updates will not be made
+    // unless this->dynamicsWorld->stepSimulation() or
+    // this->dynamicsWorld->performDiscreteCollisionDetection()
+    // is called.
+    // A call to both UpdateCollision() and UpdatePhysics() (or
+    // only of UpdateCollision()) expects the calculation of contact
+    // points to happen. So because UpdatePhysics() won't be
+    // called, we have to do this here with
+    // this->dynamicsWorld->performDiscreteCollisionDetection().
+    this->dynamicsWorld->performDiscreteCollisionDetection();
+    // In addition, the contacts have to be updated in the contact
+    // manager and for the feedback.
+    UpdateContacts(this->dynamicsWorld, this->maxStepSize);
+  }
 }
 
 //////////////////////////////////////////////////

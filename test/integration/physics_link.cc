@@ -236,7 +236,8 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       << std::endl;
   model->SetLinkWorldPose(ignition::math::Pose3d(
         ignition::math::Vector3d(-1.5, 0.8, 3),
-        ignition::math::Quaterniond(-IGN_PI/4.5, IGN_PI/3.0, IGN_PI*1.2)), link);
+        ignition::math::Quaterniond(-IGN_PI/4.5, IGN_PI/3.0, IGN_PI*1.2)),
+        link);
   inertialPose = ignition::math::Pose3d(ignition::math::Vector3d(1, 0, -5.6),
       ignition::math::Quaterniond(IGN_PI/9, 0, IGN_PI*3));
   link->GetInertial()->SetCoG(inertialPose);
