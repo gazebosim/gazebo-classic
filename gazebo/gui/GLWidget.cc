@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->state = "select";
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
+
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+          this, SLOT(update()));
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -285,8 +289,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     event::Events::preRender();
   }
-
-  this->update();
 
   _e->accept();
 }
@@ -875,6 +877,14 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
+
+  // client side heightmap configuration
+  _scene->SetHeightmapLOD(gazebo::gui::getINIProperty<int>("heightmap.lod", 0));
+
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / (4*this->dataPtr->userCamera->RenderRate()))));
 }
 
 /////////////////////////////////////////////////

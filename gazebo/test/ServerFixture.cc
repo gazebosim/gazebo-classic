@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,13 @@ void RenderingFixture::SetUp()
 {
   // start rendering in test thread
   rendering::load();
+}
+
+/////////////////////////////////////////////////
+void RenderingFixture::Unload()
+{
+  rendering::fini();
+  ServerFixture::Unload();
 }
 
 /////////////////////////////////////////////////
@@ -224,7 +231,9 @@ void ServerFixture::LoadArgs(const std::string &_args)
   // Use a 30 second timeout.
   waitCount = 0;
   maxWaitCount = 3000;
-  while ((!physics::get_world() ||
+  while ((!this->server ||
+          !this->server->GetInitialized() ||
+          !physics::get_world() ||
            physics::get_world()->IsPaused() != paused) &&
          ++waitCount < maxWaitCount)
   {
@@ -612,6 +621,67 @@ void ServerFixture::SpawnCamera(const std::string &_modelName,
     << "      </distortion>";
 
   newModelStr << "    </camera>"
+    << "  </sensor>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  WaitUntilEntitySpawn(_modelName, 100, 50);
+  WaitUntilSensorSpawn(_cameraName, 100, 100);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnWideAngleCamera(const std::string &_modelName,
+    const std::string &_cameraName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    unsigned int _width, unsigned int _height, double _rate,
+    const double _hfov, const std::string &_lensType,
+    const bool _scaleToHfov, const double _cutoffAngle,
+    const double _envTextureSize, const double _c1, const double _c2,
+    const double _f, const std::string &_fun)
+{
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='" << _modelName << "'>"
+    << "<static>true</static>"
+    << "<pose>" << _pos << " " << _rpy << "</pose>"
+    << "<link name ='body'>"
+    << "  <sensor name ='" << _cameraName
+    << "' type ='wideanglecamera'>"
+    << "    <always_on>1</always_on>"
+    << "    <update_rate>" << _rate << "</update_rate>"
+    << "    <visualize>false</visualize>"
+    << "    <camera>"
+    << "      <horizontal_fov>" << _hfov << "</horizontal_fov>"
+    << "      <image>"
+    << "        <width>" << _width << "</width>"
+    << "        <height>" << _height << "</height>"
+    << "      </image>"
+    << "      <clip>"
+    << "        <near>0.1</near><far>100</far>"
+    << "      </clip>"
+    << "      <lens>"
+    << "        <type>" << _lensType << "</type>"
+    << "        <scale_to_hfov>" << _scaleToHfov << "</scale_to_hfov>"
+    << "        <cutoff_angle>" << _cutoffAngle << "</cutoff_angle>"
+    << "        <env_texture_size>" << _envTextureSize << "</env_texture_size>";
+
+  if (_lensType == "custom")
+  {
+    newModelStr << "<custom_function>"
+    << "          <c1>" << _c1 << "</c1>"
+    << "          <c2>" << _c2 << "</c2>"
+    << "          <f>" << _f << "</f>"
+    << "          <fun>" << _fun << "</fun>"
+    << "        </custom_function>";
+  }
+  newModelStr << "</lens>"
+    << "    </camera>"
     << "  </sensor>"
     << "</link>"
     << "</model>"

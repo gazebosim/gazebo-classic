@@ -1625,12 +1625,12 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
-  else if (_key == "world_step_solver")
-    _value = this->GetWorldStepSolverType();
   else if (_key == "island_threads")
     _value = dWorldGetIslandThreads(this->dataPtr->worldId);
   else if (_key == "ode_quiet")
     _value = dGetMessageHandler() != 0;
+  else if (_key == "world_step_solver")
+    _value = this->GetWorldStepSolverType();
   else
   {
     return PhysicsEngine::GetParam(_key, _value);

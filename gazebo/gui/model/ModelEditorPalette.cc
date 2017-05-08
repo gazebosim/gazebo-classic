@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,14 +218,14 @@ void ModelEditorPalette::OnCustom()
     {
       event::Events::setSelectedEntity("", "normal");
       g_arrowAct->trigger();
-      if (info.completeSuffix().toLower() == "dae" ||
-          info.completeSuffix().toLower() == "stl")
+      auto suffix = info.completeSuffix().toLower().toStdString();
+      if (suffix == "dae" || suffix == "stl" || suffix == "obj")
       {
         this->dataPtr->modelCreator->AddCustomLink(ModelCreator::ENTITY_MESH,
             ignition::math::Vector3d::One, ignition::math::Pose3d::Zero,
             importDialog.GetImportPath());
       }
-      else if (info.completeSuffix().toLower() == "svg")
+      else if (suffix == "svg")
       {
         ExtrudeDialog extrudeDialog(importDialog.GetImportPath(), this);
         extrudeDialog.deleteLater();

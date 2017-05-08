@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,6 +110,9 @@ namespace gazebo
       /// \brief Get the bullet rigid body.
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
+
+      /// \brief Remove and re-add this rigid body from the world.
+      public: void RemoveAndAddBody() const;
 
       /// \internal
       /// \brief Clear bullet collision cache needed when the body is resized.

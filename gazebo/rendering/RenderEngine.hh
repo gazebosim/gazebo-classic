@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/common/CommonTypes.hh"
@@ -133,6 +134,10 @@ namespace gazebo
       /// \brief Get a pointer to the Ogre root object.
       /// \return Pointer to the Ogre root object.
       public: Ogre::Root *Root() const;
+
+      /// \brief Get a list of all supported FSAA levels for this render system
+      /// \return a list of FSAA levels
+      public: std::vector<unsigned int> FSAALevels() const;
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
       /// \internal

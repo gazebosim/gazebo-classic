@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class HeightmapData;
+  }
+
   namespace rendering
   {
     /// \internal
@@ -229,6 +234,75 @@ namespace gazebo
     };
 
     /// \internal
+    /// \brief Custom terrain material generator.
+    /// A custom material generator that lets user specify their own material
+    /// script for rendering the heightmap.
+    class TerrainMaterial : public Ogre::TerrainMaterialGenerator
+    {
+      /// \brief Constructor
+      /// \param[in] _materialName Name of material
+      public: TerrainMaterial(const std::string &_materialName);
+
+      /// \brief Set terrain material
+      /// \param[in] _materialName Name of material
+      public: void setMaterialByName(const std::string &_materialname);
+
+      /// \brief Set the grid size of the terrain, i.e. Number of terrain slots.
+      /// This will be used to determined how the texture will be mapped to the
+      /// terrain
+      /// \param[in] _size Grid size of the terrain
+      public: void setGridSize(const unsigned int _size);
+
+      /// \brief Subclassed to provide profile-specific material generation
+      class Profile : public Ogre::TerrainMaterialGenerator::Profile
+      {
+        /// \brief Constructor
+        /// \param[in] _parent Ogre terrain material generator object
+        /// \param[in] _name Name of the profile
+        /// \param[on] _desc Profile description
+        public: Profile(Ogre::TerrainMaterialGenerator *_parent,
+            const Ogre::String &_name, const Ogre::String &_desc);
+
+        /// \brief Destructor.
+        public: ~Profile();
+
+        // Documentation Inherited
+        public: bool isVertexCompressionSupported() const;
+
+        // Documentation Inherited
+        public: Ogre::MaterialPtr generate(const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: Ogre::MaterialPtr generateForCompositeMap(
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void setLightmapEnabled(bool _enabled);
+
+        // Documentation Inherited
+        public: Ogre::uint8 getMaxLayers(const Ogre::Terrain *_terrain) const;
+
+        // Documentation Inherited
+        public: void updateParams(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void updateParamsForCompositeMap(const Ogre::MaterialPtr& mat,
+            const Ogre::Terrain *_terrain);
+
+        // Documentation Inherited
+        public: void requestOptions(Ogre::Terrain *_terrain);
+      };
+
+      /// \brief Name of material
+      protected: std::string materialName;
+
+      /// \brief Size of grid
+      protected: unsigned int gridSize = 1u;
+    };
+
+
+    /// \internal
     /// \brief Pretends to provide procedural page content to avoid page loading
     class DummyPageProvider : public Ogre::PageProvider
     {
@@ -266,9 +340,6 @@ namespace gazebo
     /// \brief Private data for the Heightmap class
     class HeightmapPrivate
     {
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int numTerrainSubdivisions;
-
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
       /// LoadRadiusFactor is a multiplier applied to the terrain size to create
@@ -308,7 +379,7 @@ namespace gazebo
       public: ignition::math::Vector3d terrainOrigin;
 
       /// \brief Global options.
-      public: Ogre::TerrainGlobalOptions *terrainGlobals;
+      public: Ogre::TerrainGlobalOptions *terrainGlobals = nullptr;
 
       /// \brief Group of terrains.
       public: Ogre::TerrainGroup *terrainGroup;
@@ -335,17 +406,17 @@ namespace gazebo
       public: std::vector<float> heights;
 
       /// \brief Pointer to the terrain material generator.
-      public: GzTerrainMatGen *gzMatGen;
+      public: GzTerrainMatGen *gzMatGen = nullptr;
 
       /// \brief A page provider is needed to use the paging system.
       public: DummyPageProvider dummyPageProvider;
 
       /// \brief Central registration point for extension classes,
       /// such as the PageStrategy, PageContentFactory.
-      public: Ogre::PageManager *pageManager;
+      public: Ogre::PageManager *pageManager = nullptr;
 
       /// \brief Type of paging applied
-      public: Ogre::TerrainPaging *terrainPaging;
+      public: Ogre::TerrainPaging *terrainPaging = nullptr;
 
       /// \brief Collection of world content
       public: Ogre::PagedWorld *world;
@@ -361,6 +432,33 @@ namespace gazebo
 
       /// \brief True if the terrain's hash does not match the image's hash
       public: bool terrainHashChanged;
+
+      /// \brief Name of custom material to use for the terrain. If empty,
+      /// default material with glsl shader will be used.
+      public: std::string materialName;
+
+      /// \brief Filename of the terrain data
+      public: std::string filename;
+
+      /// \brief Pointer to heightmap data
+      public: common::HeightmapData *heightmapData = nullptr;
+
+      /// \brief Number of samples per heightmap datum
+      public: unsigned int sampling = 2u;
+
+      /// \brief Max pixel error allowed for rendering the heightmap. This
+      /// affects the transitions between LOD levels.
+      public: double maxPixelError = 0.0;
+
+      /// \brief True if the terrain need to be split into subterrains
+      public: bool splitTerrain = false;
+
+      /// \brief Number of pieces in which a terrain is subdivided. Used
+      /// for paging and also when heighmap is too large for LOD to work.
+      public: unsigned int numTerrainSubdivisions = 16u;
+
+      /// \brief Event connections
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }
