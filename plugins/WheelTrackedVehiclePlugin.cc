@@ -64,9 +64,12 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
       }
     }
 
-    GZ_ASSERT(jointNames.size() >= 2,
-              ("WheelTrackedVehiclePlugin: At least two " + jointTagName +
-                " tags have to be specified.").c_str());
+    if (jointNames.size() < 2)
+    {
+      gzerr << "WheelTrackedVehiclePlugin: At least two " << jointTagName
+            << " tags have to be specified." << std::endl;
+      return;
+    }
 
     // find the corresponding joint and wheel radius
     for (auto jointName : jointNames)
@@ -74,10 +77,6 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
       LoadWheel(_model, track, jointName);
     }
   }
-
-  gzdbg << "WheelTrackedVehiclePlugin loaded with " <<
-    this->wheels[Tracks::LEFT].size() << " left wheels and " <<
-    this->wheels[Tracks::RIGHT].size() << " right wheels." << std::endl;
 }
 
 void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
@@ -85,16 +84,28 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
 {
   auto joint = _model->GetJoint(_jointName);
 
-  GZ_ASSERT(joint, ("WheelTrackedVehiclePlugin (ns = " +
-        GetRobotNamespace() + ") couldn't get " + this->trackNames[_track] +
-        " joint named \"" + _jointName + "\"").c_str());
+  if (!joint)
+  {
+    gzerr << "WheelTrackedVehiclePlugin (ns = " << this->GetRobotNamespace()
+          << ") couldn't get " << this->trackNames[_track] << " joint named \""
+          << _jointName << "\"" << std::endl;
+    return;
+  }
 
-  GZ_ASSERT(joint->GetType() == physics::Base::HINGE_JOINT, ("Joint " +
-        _jointName + " is not a hinge (revolute) joint.").c_str());
+  if (!(joint->GetType() & physics::Base::HINGE_JOINT))
+  {
+    gzerr << "Joint " << _jointName << " is not a hinge (revolute) joint."
+          << std::endl;
+    return;
+  }
 
   auto childWheel = joint->GetChild();
-  GZ_ASSERT(childWheel, ("Joint " + _jointName + " has no child link that "
-        " could act as the wheel.").c_str());
+  if (!childWheel)
+  {
+    gzerr << "Joint " << _jointName << " has no child link that "
+          << " could act as the wheel.";
+    return;
+  }
 
   if (childWheel->GetSelfCollide())
   {

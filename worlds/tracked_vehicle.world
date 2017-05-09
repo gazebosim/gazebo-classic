@@ -5,7 +5,8 @@
             A demo world for tracked vehicles.
 
             Drive the vehicle by keyboard using arrows, or by publishing the
-            desired velocity to ~/cmd_vel (x and yaw command the motion).
+            desired velocity to ~/<vehicle name>/cmd_vel
+            (x and yaw command the motion).
         -->
         <gui>
             <plugin name="keyboard" filename="libKeyboardGUIPlugin.so"/>
@@ -310,10 +311,10 @@
 
 
             <plugin filename="libSimpleTrackedVehiclePlugin.so" name="simple_tracked_vehicle">
-                <robot_namespace>/gazebo/simple_tracked</robot_namespace>
                 <body>base_link</body>
                 <left_track>left_track</left_track>
                 <right_track>right_track</right_track>
+                <key_controls/>
             </plugin>
 
         </model>
@@ -1288,7 +1289,7 @@
             </joint>
 
             <plugin name='wheel_tracked_vehicle_controller' filename='libWheelTrackedVehiclePlugin.so'>
-                <robot_namespace>/gazebo/wheel_tracked</robot_namespace>
+                <robot_namespace>wheel_tracked</robot_namespace>
                 <left_joint>left_track_wheel1_j</left_joint>
                 <right_joint>right_track_wheel1_j</right_joint>
                 <left_joint>left_track_wheel2_j</left_joint>
@@ -1310,6 +1311,16 @@
                 <!-- It'd be nicer to have a higher value here, but there's bug
                  https://bitbucket.org/osrf/gazebo/issues/2068 -->
                 <track_mu>0.5</track_mu>
+
+                <key_controls>
+                    <!-- WSAD controls + space/Enter for stop -->
+                    <stop>13</stop>
+                    <stop>32</stop>
+                    <accelerate>119</accelerate>
+                    <decelerate>115</decelerate>
+                    <left>97</left>
+                    <right>100</right>
+                </key_controls>
             </plugin>
         </model>
 

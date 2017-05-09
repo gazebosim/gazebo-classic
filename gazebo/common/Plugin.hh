@@ -224,13 +224,13 @@ namespace gazebo
 
               if (!result.second)
               {
-                gzdbg << this->handleName.c_str() << " Plugin missing <"
+                gzmsg << this->handleName.c_str() << " Plugin missing <"
                       << _name.c_str() << ">, defaults to "
                       << result.first << std::endl;
               }
               else
               {
-                gzdbg << this->handleName.c_str() << " Plugin <"
+                gzmsg << this->handleName.c_str() << " Plugin <"
                       << _name.c_str() << "> set to "
                       << result.first << std::endl;
               }

@@ -44,6 +44,9 @@ SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                       sdf::ElementPtr _sdf)
 {
+  GZ_ASSERT(_model, "SimpleTrackedVehiclePlugin: _model pointer is NULL");
+  GZ_ASSERT(_sdf, "SimpleTrackedVehiclePlugin: _sdf pointer is NULL");
+
   if (_model->GetWorld()->Physics()->GetType().compare("ode") != 0)
   {
     gzerr << "Tracked vehicle simulation works only with ODE." << std::endl;
@@ -52,32 +55,52 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
 
   TrackedVehiclePlugin::Load(_model, _sdf);
 
-  GZ_ASSERT(_model, "SimpleTrackedVehiclePlugin _model pointer is NULL");
-  GZ_ASSERT(_sdf, "SimpleTrackedVehiclePlugin _sdf pointer is NULL");
+  if (!_sdf->HasElement("body"))
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <body> tag missing." << std::endl;
+    return;
+  }
 
-  GZ_ASSERT(_sdf->HasElement("body"), "SimpleTrackedVehiclePlugin "
-      "<body> tag missing.");
+  if (!_sdf->HasElement("left_track"))
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <left_track> tag missing."
+          << std::endl;
+    return;
+  }
 
-  GZ_ASSERT(_sdf->HasElement("left_track"), "SimpleTrackedVehiclePlugin "
-      "<left_track> tag missing.");
-
-  GZ_ASSERT(_sdf->HasElement("right_track"), "SimpleTrackedVehiclePlugin "
-      "<right_track> tag missing.");
+  if (!_sdf->HasElement("right_track"))
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <right_track> tag missing."
+          << std::endl;
+    return;
+  }
 
   this->body = _model->GetLink(
       _sdf->GetElement("body")->Get<std::string>());
-  GZ_ASSERT(this->body, "SimpleTrackedVehiclePlugin "
-      "<body> link does not exist.");
+  if (this->body == nullptr)
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <body> link does not exist."
+          << std::endl;
+    return;
+  }
 
   this->tracks[Tracks::LEFT] = _model->GetLink(
       _sdf->GetElement("left_track")->Get<std::string>());
-  GZ_ASSERT(this->tracks[Tracks::LEFT], "SimpleTrackedVehiclePlugin "
-      "<left_track> link does not exist.");
+  if (this->tracks[Tracks::LEFT] == nullptr)
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <left_track> link does not exist."
+          << std::endl;
+    return;
+  }
 
   this->tracks[Tracks::RIGHT] = _model->GetLink(
       _sdf->GetElement("right_track")->Get<std::string>());
-  GZ_ASSERT(this->tracks[Tracks::RIGHT], "SimpleTrackedVehiclePlugin "
-      "<right_track> link does not exist.");
+  if (this->tracks[Tracks::RIGHT] == nullptr)
+  {
+    gzerr << "SimpleTrackedVehiclePlugin: <right_track> link does not exist."
+          << std::endl;
+    return;
+  }
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
                   this->collideWithoutContactBitmask, 1u);

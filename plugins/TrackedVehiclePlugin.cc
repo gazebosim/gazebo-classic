@@ -24,6 +24,24 @@
 
 using namespace gazebo;
 
+class TrackedVehicleKeyboardControls
+{
+  /// \brief Key for zeroing-out the velocity (default is Space, Enter).
+  public: std::vector<unsigned int> stop = { 13, 32 };
+
+  /// \brief Accelerate key (default is up arrow).
+  public: std::vector<unsigned int> accelerate = { 38, 16777235 };
+
+  /// \brief Decelerate key (default is down arrow).
+  public: std::vector<unsigned int> decelerate = { 40, 16777237 };
+
+  /// \brief Left key (default is left arrow).
+  public: std::vector<unsigned int> left = { 37, 16777234 };
+
+  /// \brief Right key (default is right arrow).
+  public: std::vector<unsigned int> right = { 39, 16777236 };
+};
+
 /// \brief Private data class
 class gazebo::TrackedVehiclePluginPrivate
 {
@@ -33,8 +51,11 @@ class gazebo::TrackedVehiclePluginPrivate
   /// \brief SDF for this plugin;
   public: sdf::ElementPtr sdf;
 
-  /// \brief Pointer to a node for communication.
-  public: transport::NodePtr node;
+  /// \brief Pointer to a node with world prefix.
+  public: transport::NodePtr worldNode;
+
+  /// \brief Pointer to a node with robot prefix.
+  public: transport::NodePtr robotNode;
 
   /// \brief Velocity command subscriber.
   public: transport::SubscriberPtr velocitySub;
@@ -65,6 +86,15 @@ class gazebo::TrackedVehiclePluginPrivate
 
   /// \brief Namespace used as a prefix for gazebo topic names.
   public: std::string robotNamespace;
+
+  /// \brief Whether keyboard control should be used for this model.
+  public: bool enableKeyboardControl;
+
+  /// \brief Definition of the keyboard controls.
+  public: TrackedVehicleKeyboardControls keyboardControls;
+
+  /// \brief The message to be sent that is updated by keypresses.
+  public: msgs::PosePtr keyboardControlMessage;
 };
 
 TrackedVehiclePlugin::TrackedVehiclePlugin()
@@ -88,7 +118,8 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
   this->dataPtr->sdf = _sdf;
 
   // Load parameters from SDF plugin contents.
-  this->LoadParam(_sdf, "robot_namespace", this->dataPtr->robotNamespace, "~");
+  this->LoadParam(_sdf, "robot_namespace", this->dataPtr->robotNamespace,
+                  _model->GetName());
   this->LoadParam(_sdf, "steering_efficiency",
                   this->dataPtr->steeringEfficiency, 0.5);
   this->LoadParam(_sdf, "tracks_separation",
@@ -100,32 +131,102 @@ void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
   this->LoadParam(_sdf, "track_mu", this->dataPtr->trackMu, 2.0);
   this->LoadParam(_sdf, "track_mu2", this->dataPtr->trackMu2, 0.5);
 
-  gzdbg << this->handleName.c_str() << ": Loading done." << std::endl;
+  this->dataPtr->enableKeyboardControl = _sdf->HasElement("key_controls");
+
+  // Load keyboard controls.
+  if (this->dataPtr->enableKeyboardControl)
+  {
+    auto const keyControlsElem = _sdf->GetElement("key_controls");
+
+    auto keyControlsEmpty = keyControlsElem->GetFirstElement() ==
+      sdf::ElementPtr();
+
+    gzmsg << this->handleName << " Plugin keyboard control enabled with "
+          << (keyControlsEmpty ? "default" : "custom") << " key assignments"
+          << std::endl;
+
+    // if the <key_controls> tag is empty (but present) keyboard control should
+    // be enabled with the default key assignments
+    if (!keyControlsEmpty)
+    {
+      // Mapping from XML keys to TrackedVehicleKeyboardControls members.
+      const std::map<const std::string, std::vector<unsigned int> &>
+        controlsMapping =
+        {
+          {"stop", this->dataPtr->keyboardControls.stop},
+          {"accelerate", this->dataPtr->keyboardControls.accelerate},
+          {"decelerate", this->dataPtr->keyboardControls.decelerate},
+          {"left", this->dataPtr->keyboardControls.left},
+          {"right", this->dataPtr->keyboardControls.right},
+        };
+
+      for (auto controlsPair : controlsMapping)
+      {
+        const std::string &controlKeyName = controlsPair.first;
+        std::vector<unsigned int> &controlKeyList = controlsPair.second;
+
+        controlKeyList.clear();
+        if (keyControlsElem->HasElement(controlKeyName))
+        {
+          auto controlElem = keyControlsElem->GetElement(controlKeyName);
+          while (controlElem != nullptr)
+          {
+            controlKeyList.push_back(controlElem->Get<unsigned int>());
+            controlElem = controlElem->GetNextElement(controlKeyName);
+          }
+        }
+        else
+        {
+          gzwarn << "Key " << controlKeyName << " has no assigned keycode." <<
+                 std::endl;
+        }
+      }
+    }
+  }
 }
 
 void TrackedVehiclePlugin::Init()
 {
-  // Initialize transport.
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(this->GetRobotNamespace());
+  // Initialize transport nodes.
 
-  this->dataPtr->velocitySub = this->dataPtr->node->Subscribe(
-    this->dataPtr->robotNamespace + "/cmd_vel",
+  this->dataPtr->worldNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->worldNode->Init();
+
+  // Prepend world name to robot namespace if it isn't absolute.
+  auto robotNamespace = this->GetRobotNamespace();
+  if (!robotNamespace.empty() && robotNamespace.at(0) != '/')
+  {
+    robotNamespace = this->dataPtr->model->GetWorld()->Name() +
+      "/" + robotNamespace;
+  }
+  this->dataPtr->robotNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->robotNode->Init(robotNamespace);
+
+  this->dataPtr->velocitySub = this->dataPtr->robotNode->Subscribe("~/cmd_vel",
     &TrackedVehiclePlugin::OnVelMsg, this);
 
   this->dataPtr->tracksVelocityPub =
-    this->dataPtr->node->Advertise<msgs::Vector2d>(
-      this->dataPtr->robotNamespace + "/tracks_speed", 1000);
+    this->dataPtr->robotNode->Advertise<msgs::Vector2d>("~/tracks_speed", 1000);
 
-  this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
-    "/gazebo/default/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress,
-    this, true);
+  if (this->dataPtr->enableKeyboardControl)
+  {
+    this->dataPtr->keyboardControlMessage = msgs::PosePtr(new msgs::Pose());
 
-  gzdbg << this->handleName.c_str() << ": Init done.\n";
+    // Keypresses are published on the world namespace, so we need to subscribe
+    // them through the worldNode.
+    this->dataPtr->keyboardSub = this->dataPtr->worldNode->Subscribe(
+      "~/keyboard/keypress", &TrackedVehiclePlugin::OnKeyPress, this, true);
+  }
 }
 
 void TrackedVehiclePlugin::Reset()
 {
+  // reset the keyboard update message
+  auto message = this->dataPtr->keyboardControlMessage;
+  message->mutable_position()->set_x(0.0);
+  msgs::Set(message->mutable_orientation(),
+            ignition::math::Quaterniond::Identity);
+
   if (this->dataPtr->tracksVelocityPub)
   {
     auto speedMsg = msgs::Vector2d();
@@ -143,16 +244,19 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
 
   const double yaw = msgs::ConvertIgn(_msg->orientation()).Euler().Z();
 
+  // Compute effective linear and angular speed.
   const double linearSpeed =
     _msg->position().x() * this->dataPtr->linearSpeedGain;
   const double angularSpeed = yaw * this->dataPtr->angularSpeedGain;
 
+  // Compute track velocities using the tracked vehicle kinematics model.
   double leftVelocity = linearSpeed + angularSpeed *
     this->dataPtr->tracksSeparation / 2 / this->dataPtr->steeringEfficiency;
 
   double rightVelocity = linearSpeed - angularSpeed *
     this->dataPtr->tracksSeparation / 2 / this->dataPtr->steeringEfficiency;
 
+  // Apply max speed to each of the tracks.
   const double maxLinearSpeed = fabs(this->dataPtr->linearSpeedGain);
   if (fabs(leftVelocity) > maxLinearSpeed)
   {
@@ -163,9 +267,10 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
     rightVelocity = ignition::math::signum(rightVelocity) * maxLinearSpeed;
   }
 
-  // call the descendant handler
+  // Call the descendant handler (which does the actual vehicle control).
   this->SetTrackVelocity(leftVelocity, rightVelocity);
 
+  // Publish the resulting track velocities to anyone who is interested.
   auto speedMsg = msgs::Vector2d();
   speedMsg.set_x(leftVelocity);
   speedMsg.set_y(rightVelocity);
@@ -174,48 +279,95 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
 
 void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
-  const int key = _msg->int_value();
+  const unsigned int key = static_cast<const unsigned int>(_msg->int_value());
 
   double linearVel = 0., angularVel = 0.;
+  bool linearVelSet = false, angularVelSet = false;
 
-  switch (key)
+  const auto &controls = this->dataPtr->keyboardControls;
+
+  auto &message = this->dataPtr->keyboardControlMessage;
+
+  if (std::find(controls.stop.begin(), controls.stop.end(), key) !=
+      controls.stop.end())
   {
-    // ENTER
-    case 13:
-    // SPACE
-    case 32:
-      linearVel = 0.;
-      angularVel = 0.;
-      break;
-    // UP
-    case 38:
-    case 16777235:
+    linearVel = 0.;
+    linearVelSet = true;
+
+    angularVel = 0.;
+    angularVelSet = true;
+  }
+  else
+  {
+    if (std::find(
+      controls.accelerate.begin(), controls.accelerate.end(), key) !=
+      controls.accelerate.end())
+    {
       linearVel = 1.;
-      break;
-    // DOWN
-    case 40:
-    case 16777237:
+      linearVelSet = true;
+    }
+    else if (std::find(
+      controls.decelerate.begin(), controls.decelerate.end(), key) !=
+      controls.decelerate.end())
+    {
       linearVel = -1.;
-      break;
-    // LEFT
-    case 37:
-    case 16777234:
+      linearVelSet = true;
+    }
+
+    if (linearVelSet)
+    {
+      const auto oldLinearVel = message->position().x();
+
+      // transition from forward speed to backward should have more
+      // than 2 states
+      if (!ignition::math::equal(linearVel, oldLinearVel))
+      {
+        linearVel = oldLinearVel + ignition::math::signum(linearVel) * 0.5;
+      }
+    }
+
+    if (std::find(controls.left.begin(), controls.left.end(), key) !=
+      controls.left.end())
+    {
       angularVel = -1.;
-      break;
-    // RIGHT
-    case 39:
-    case 16777236:
+      angularVelSet = true;
+    }
+    else if (std::find(controls.right.begin(), controls.right.end(), key) !=
+      controls.right.end())
+    {
       angularVel = 1.;
-      break;
-    default:
-      return;
+      angularVelSet = true;
+    }
+
+    if (angularVelSet)
+    {
+      const auto oldAngularVel =
+        msgs::ConvertIgn(message->orientation()).Euler().Z();
+
+      // transition from left to right should have more than 2 states
+      if (!ignition::math::equal(angularVel, oldAngularVel))
+      {
+        angularVel = oldAngularVel + ignition::math::signum(angularVel) * 0.5;
+      }
+    }
   }
 
+  if (linearVelSet)
   {
-    msgs::PosePtr message(new msgs::Pose());
     message->mutable_position()->set_x(linearVel);
-    auto yaw = ignition::math::Quaterniond::EulerToQuaternion(0, 0, angularVel);
+  }
+
+  if (angularVelSet)
+  {
+    auto yaw = ignition::math::Quaterniond::EulerToQuaternion(
+      0, 0, angularVel);
     msgs::Set(message->mutable_orientation(), yaw);
+  }
+
+  // start the keyboard update timer if this was the first time a control key
+  // was pressed
+  if (linearVelSet || angularVelSet)
+  {
     this->OnVelMsg(message);
   }
 }

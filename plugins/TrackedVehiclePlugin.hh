@@ -65,6 +65,11 @@ namespace gazebo
   /// <track_mu>  Friction coefficient in the first friction direction.
   /// <track_mu2>  Friction coefficient in the second friction direction.
   /// <robot_namespace>  Namespace used as a prefix for gazebo topic names.
+  /// <key_controls>  If present, enable keyboard control of the vehicle. If
+  ///                 this tag is empty, the default assignment (arrow keys) is
+  ///                 is used; otherwise, the keys can be set using the
+  ///                 (repeatable) subelements <stop>, <accelerate>,
+  ///                 <decelerate>, <left> and <right> containing the keycodes.
   class GAZEBO_VISIBLE TrackedVehiclePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
@@ -85,28 +90,28 @@ namespace gazebo
     public: virtual void Reset();
 
     /// \brief Namespace used as a prefix for gazebo topic names.
-    public: virtual std::string GetRobotNamespace();
+    protected: virtual std::string GetRobotNamespace();
 
     /// \brief Steering efficiency coefficient (between 0.0 and 1.0).
-    public: virtual double GetSteeringEfficiency();
+    protected: virtual double GetSteeringEfficiency();
 
     /// \brief Set steering efficiency coefficient (between 0.0 and 1.0).
     /// \param[in] _steeringEfficiency The new steering efficiency.
-    public: virtual void SetSteeringEfficiency(double _steeringEfficiency);
+    protected: virtual void SetSteeringEfficiency(double _steeringEfficiency);
 
     /// \brief Friction coefficient in the first friction direction.
-    public: virtual double GetTrackMu();
+    protected: virtual double GetTrackMu();
 
     /// \brief Friction coefficient in the first friction direction.
     /// \param[in] _mu The new coefficient.
-    public: virtual void SetTrackMu(double _mu);
+    protected: virtual void SetTrackMu(double _mu);
 
     /// \brief Friction coefficient in the second friction direction.
-    public: virtual double GetTrackMu2();
+    protected: virtual double GetTrackMu2();
 
     /// \brief Friction coefficient in the second friction direction.
     /// \param[in] _mu2 The new coefficient.
-    public: virtual void SetTrackMu2(double _mu2);
+    protected: virtual void SetTrackMu2(double _mu2);
 
     /// \brief Update surface parameters of the tracks to correspond to the
     ///        values set in this plugin.
@@ -119,7 +124,7 @@ namespace gazebo
     protected: void SetLinkMu(const physics::LinkPtr &_link);
 
     /// \brief Distance between the centers of the tracks.
-    public: virtual double GetTracksSeparation();
+    protected: virtual double GetTracksSeparation();
 
     /// \brief Textual lowercase names of the tracks.
     protected: std::unordered_map<Tracks, std::string> trackNames;
