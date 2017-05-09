@@ -17,6 +17,9 @@
 1. Added GpuLaserDataIterator
     * [Pull request #2637](https://bitbucket.org/osrf/gazebo/pull-request/2637)
 
+1. Added possibility to enforce contact computation
+    * [Pull request #2629](https://bitbucket.org/osrf/gazebo/pull-requests/2629/)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
