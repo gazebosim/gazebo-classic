@@ -307,6 +307,12 @@ void Publisher::SetPublication(PublicationPtr _publication)
 }
 
 //////////////////////////////////////////////////
+unsigned int Publisher::GetRemoteSubscriptionCount()
+{
+  return this->publication->GetRemoteSubscriptionCount();
+}
+
+//////////////////////////////////////////////////
 void Publisher::Fini()
 {
   if (!this->messages.empty())

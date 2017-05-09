@@ -21,32 +21,103 @@
 #include <unistd.h>
 #include <iostream>
 
+#include <thread>
+
 using namespace gazebo;
 
+/**
+ * \brief Test class for gtest which forks into parent and child process
+ */
 class TransportMsgCountTest: public ::testing::Test
 {
 protected:
 
   TransportMsgCountTest()
-    :fakeProgramName("TransportMsgCountTest")
+    :fakeProgramName("TransportMsgCountTest"),
+     pid(-1)
   {}
   virtual ~TransportMsgCountTest() {}
 
   virtual void SetUp()
   {
-    // irrelevant to pass fake argv, so make an exception
-    // and pass away constness, so that fakeProgramName can be
-    // initialized easily in constructor.
-    gazebo::setupServer(1, (char**)&fakeProgramName);
+    pid = fork();
+    if (pid > 0)
+    {
+      // parent process
+      // irrelevant to pass fake argv, so make an exception
+      // and pass away constness, so that fakeProgramName can be
+      // initialized easily in constructor.
+      gazebo::setupServer(1, (char**)&fakeProgramName);
+    }
+    else if (pid == 0)
+    {
+      // child process
+      if (!gazebo::transport::init())
+      {
+        gzerr << "Unable to initialize transport.\n";
+      }
+      else
+      {
+        gazebo::transport::run();
+      }
+    }
   }
 
   virtual void TearDown()
   {
+    KillChildProcess();
     gazebo::shutdown();
   }
 
+protected:
+
+  bool IsParent()
+  {
+    return pid > 0;
+  }
+
+  bool IsChild()
+  {
+    return pid == 0;
+  }
+
+  bool ForkSuccess()
+  {
+    return pid >= 0;
+  }
+
+  // \brief can be used from the parent to check if the child is still running
+  // \retval 1 child is still running
+  // \retval 0 child is not running
+  // \retval -1 this is not the parent process
+  int ChildRunning()
+  {
+    if (!IsParent()) return -1;
+    int child_status;
+    // result will be 0 if child is still running
+    pid_t result = waitpid(pid, &child_status, WNOHANG);
+    if (result != 0)
+    {
+      std::cerr << "CHILD STOPPED" << std::endl;
+    }
+    return result == 0;
+  }
+
 private:
+  // kills the child process, if it's the parent process.
+  void KillChildProcess()
+  {
+    if (IsParent())
+    {
+      kill(pid, SIGKILL);
+    }
+  }
+
+  // \brief fake program name as argv for gazebo::setupServer()
   const char * fakeProgramName;
+
+  // \brief PID for child process which will run the remote subscriber
+  pid_t pid;
 };
 
 
@@ -59,54 +130,79 @@ void ReceivePosesStampedMsgCounter(ConstPosesStampedPtr &/*_msg*/)
   ++g_receivedPosesStamped;
 }
 
-// this test needs to be done manually at the moment because it requires
-// you to start up a remote subscriber connection.
-// Once a workaround has been found to simulate a remote connection, this
-// can be added as automated test.
-TEST_F(TransportMsgCountTest, ManualTest)
+TEST_F(TransportMsgCountTest, MsgCount)
 {
-  // register a namespace
-  transport::TopicManager::Instance()->RegisterTopicNamespace("ttest");
+  // only continue if the forking has succeeded
+  ASSERT_EQ(ForkSuccess(), true);
 
-  msgs::PosesStamped msg;
-  msgs::Init(msg, "test");
+  // The test case error (error with the old code) will only be
+  // triggered with remote connections (see code in Publisher.cc
+  // and Publishing.cc). So create a remote subscriber with the child
+  // process.
+  if (IsChild())
+  {
+    // transport system has to have been successfully started for the
+    // child process
+    ASSERT_EQ(gazebo::transport::is_stopped(), false);
 
+    transport::NodePtr nodeRemote(new transport::Node());
+    nodeRemote->Init();
+    // we can use the same callback method for the subscriber as the child
+    // process global variable doesn't interfer with the parent process.
+    transport::SubscriberPtr subRemote =
+      nodeRemote->Subscribe("/gazebo/ttest/test",
+                            &ReceivePosesStampedMsgCounter);
+    // sleep forever until child process is killed
+    while (true) common::Time::MSleep(500);
+    return;
+  }
+
+  // at this point, it can only be the parent process
+  ASSERT_EQ(IsParent(), true);
+  ASSERT_EQ(ChildRunning(), 1);
+
+  // size of the publisher buffer
+  int bufferSize = 10000;
+
+  // Start the publisher in the parent process
   transport::NodePtr node(new transport::Node());
   node->Init();
 
   // create the publisher
-  int bufferSize = 10000;
   transport::PublisherPtr pub =
-    node->Advertise<msgs::PosesStamped>("~/test", bufferSize);
+    node->Advertise<msgs::PosesStamped>("/gazebo/ttest/test", bufferSize);
 
-  // create a subscriber
-
-  // IMPORTANT: The test case error (error with the old code) will only be
-  // triggered with remote connections (see code in Publisher.cc
-  // and Publishing.cc)
-
-  // workaround: start a new remote connection. At some point simulate
-  // a remote connection here.
-  std::cout<<"Run the following command in a new terminal:"<<std::endl;
-  std::cout<<"gz topic -e /gazebo/ttest/test"<<std::endl;
-
-  // wait for the connection
+  // wait for the connection to the remote subscriber started in the
+  // child process
   pub->WaitForConnection();
 
-  // connection received, continue.
-  std::cout<<"Received remote connection."<<std::endl;
+  // connection received, now we can continue with the test..
+  std::cout << "Remote subscription count: "
+            << pub->GetRemoteSubscriptionCount() << std::endl;
+  ASSERT_GE(pub->GetRemoteSubscriptionCount(), 1u);
 
-  // now create an additional subscriber which will count the
+  // Create an additional subscriber which will count the
   // number of messages arrived.
-  g_receivedPosesStamped = 0;
-  transport::SubscriberPtr sceneSub =
-    node->Subscribe("~/test", &ReceivePosesStampedMsgCounter);
+  // This has to be a subscriber in the parent process itself, because the
+  // remote subscriber may actually not get all the messages when we end
+  // this test - this is because of the asynchronous nature of the transport
+  // system itself. This test is designed to chedk that a local subscriber
+  // also receives all the messages while there is a remote subscriber
+  // at the same time. This test would fail before the bug fix in
+  // pull request 2657 (https://bitbucket.org/osrf/gazebo/pull-requests/2657).
+  transport::SubscriberPtr poseSub =
+    node->Subscribe("/gazebo/ttest/test", &ReceivePosesStampedMsgCounter);
 
-  // The dead-end of message reception happens randomly due to multi-threading.
-  // Send a large numer of messages to increase the chance that this happens.
+  msgs::PosesStamped msg;
+  msgs::Init(msg, "test");
+
+  // The "dead-end" of message reception happens randomly due to
+  // multi-threading. So send a large numer of messages to increase the
+  // chance that this happens.
   int numMsgs = 10000;
-  // FIXME we still have a problem when the number of messages sent quickly
-  // is greater than the buffer size
+  // We still have a problem when the number of messages sent quickly
+  // is greater than the buffer size, so allow number of messages
+  // to be not larger than buffersize
   numMsgs = std::max(numMsgs, bufferSize);
   for (int i = 0; i < numMsgs; ++i)
   {
@@ -117,9 +213,9 @@ TEST_F(TransportMsgCountTest, ManualTest)
     pub->Publish(msg, true);
   }
 
-  std::cout<<"Sent out all messages."<<std::endl;
+  std::cout << "Have sent out all messages." << std::endl;
 
-  // Now we actually need to call SendMessage() at least once more
+  // CAVEAT: Now we actually need to call SendMessage() at least once more
   // if not all outgoing messages were already sent.
   // This can happen because the actual sending of messages happens
   // asynchronously. The existing message buffer in Publisher has to be

@@ -73,6 +73,10 @@ namespace gazebo
       /// \param[in] _publication Pointer to the publication object to be set
       public: void SetPublication(PublicationPtr _publication);
 
+      // \brief Get the amount of remote subscribers.
+      // \sa Publication::GetRemoteSubscriptionCount()
+      public: unsigned int GetRemoteSubscriptionCount();
+
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
       /// \param[in] _block Whether to block until the message is actually
