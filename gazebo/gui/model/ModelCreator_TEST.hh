@@ -25,11 +25,23 @@ class ModelCreator_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Tests adding and removing nested models
+  private slots: void NestedModel();
+
   /// \brief Tests changing save states in the model editor
   private slots: void SaveState();
 
   /// \brief Tests selecting links in the model editor
   private slots: void Selection();
+
+  /// \brief Tests adding and removing model plugins
+  private slots: void ModelPlugin();
+
+  /// \brief Tests selecting nested models in the model editor
+  private slots: void NestedModelSelection();
+
+  // \brief Test copy and pasting entites in the model editor.
+  private slots: void CopyPaste();
 };
 
 #endif

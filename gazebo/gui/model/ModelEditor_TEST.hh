@@ -27,6 +27,12 @@ class ModelEditor_TEST : public QTestFixture
 
   /// \brief Tests adding an item to the model editor palette.
   private slots: void AddItemToPalette();
+
+  /// \brief Tests entering and exiting model editor mode.
+  private slots: void OnEdit();
+
+  /// \brief Tests the visibility of the insert tab.
+  private slots: void InsertTab();
 };
 
 #endif

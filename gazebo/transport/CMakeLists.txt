@@ -15,7 +15,7 @@ set (sources
   SubscriptionTransport.cc
   TopicManager.cc
   TransportIface.cc
-) 
+)
 
 set (headers
   CallbackHelper.hh
@@ -60,8 +60,9 @@ target_link_libraries(gazebo_transport
   gazebo_common
   gazebo_msgs
   gazebo_util
+  ${IGNITION-MATH_LIBRARIES}
   ${Boost_LIBRARIES}
-  ${TBB_LIBRARIES} 
+  ${TBB_LIBRARIES}
 )
 if (WIN32)
   target_link_libraries(gazebo_transport ws2_32 Iphlpapi)
@@ -74,4 +75,4 @@ gz_install_includes("transport" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/transport
 set (gtest_sources
   Connection_TEST.cc
 )
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_transport)

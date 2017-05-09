@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+
+    <gui fullscreen='0'>
+      <plugin name='keyboard' filename='libKeyboardGUIPlugin.so'/>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <model name="simple_arm">
+      <include>
+        <uri>model://simple_arm</uri>
+      </include>
+
+      <plugin name='keystojoints' filename='libKeysToJointsPlugin.so'>
+
+        <!-- 6 -->
+        <map key='54' joint='simple_arm::arm_shoulder_pan_joint' scale='0.1' type='velocity' kp='200' ki='0' kd='0'/>
+        <!-- y -->
+        <map key='121' joint='simple_arm::arm_shoulder_pan_joint' scale='0' type='velocity' kp='200' ki='0' kd='0'/>
+        <!-- h -->
+        <map key='104' joint='simple_arm::arm_shoulder_pan_joint' scale='-0.1' type='velocity' kp='200' ki='0' kd='0'/>
+
+        <!-- u -->
+        <map key='117' joint='simple_arm::arm_elbow_pan_joint' scale='1000' type='force'/>
+        <!-- j -->
+        <map key='106' joint='simple_arm::arm_elbow_pan_joint' scale='-1000' type='force'/>
+
+        <!-- i -->
+        <map key='105' joint='simple_arm::arm_wrist_lift_joint' scale='0.1' type='position' kp='1000' ki='0' kd='10'/>
+        <!-- k -->
+        <map key='107' joint='simple_arm::arm_wrist_lift_joint' scale='-0.1' type='position' kp='1000' ki='0' kd='10'/>
+
+        <!-- o -->
+        <map key='111' joint='simple_arm::arm_wrist_roll_joint' scale='0.3' type='position' kp='1' ki='0' kd='0'/>
+        <!-- l -->
+        <map key='108' joint='simple_arm::arm_wrist_roll_joint' scale='-0.3' type='position' kp='1' ki='0' kd='0'/>
+
+      </plugin>
+    </model>
+  </world>
+</sdf>

@@ -62,14 +62,14 @@ void Issue602Test::UnsubscribeTest()
   {
     sensors::SensorPtr sensor1 = sensors::get_sensor(contactSensorName1);
     sensors::ContactSensorPtr contactSensor1 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor1);
     ASSERT_TRUE(contactSensor1 != NULL);
   }
 
   {
     sensors::SensorPtr sensor2 = sensors::get_sensor(contactSensorName2);
     sensors::ContactSensorPtr contactSensor2 =
-        boost::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
+        std::dynamic_pointer_cast<sensors::ContactSensor>(sensor2);
     ASSERT_TRUE(contactSensor2 != NULL);
   }
 

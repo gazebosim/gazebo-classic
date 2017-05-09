@@ -57,20 +57,20 @@ void OriginVisual::Load()
   dPtr->xLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
   dPtr->xLine->setMaterial("Gazebo/Red");
-  dPtr->xLine->AddPoint(math::Vector3::Zero);
-  dPtr->xLine->AddPoint(math::Vector3::UnitX*dPtr->length);
+  dPtr->xLine->AddPoint(ignition::math::Vector3d::Zero);
+  dPtr->xLine->AddPoint(ignition::math::Vector3d::UnitX*dPtr->length);
 
   dPtr->yLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
   dPtr->yLine->setMaterial("Gazebo/Green");
-  dPtr->yLine->AddPoint(math::Vector3::Zero);
-  dPtr->yLine->AddPoint(math::Vector3::UnitY*dPtr->length);
+  dPtr->yLine->AddPoint(ignition::math::Vector3d::Zero);
+  dPtr->yLine->AddPoint(ignition::math::Vector3d::UnitY*dPtr->length);
 
   dPtr->zLine = this->CreateDynamicLine(
       rendering::RENDERING_LINE_LIST);
   dPtr->zLine->setMaterial("Gazebo/Blue");
-  dPtr->zLine->AddPoint(math::Vector3::Zero);
-  dPtr->zLine->AddPoint(math::Vector3::UnitZ*dPtr->length);
+  dPtr->zLine->AddPoint(ignition::math::Vector3d::Zero);
+  dPtr->zLine->AddPoint(ignition::math::Vector3d::UnitZ*dPtr->length);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }

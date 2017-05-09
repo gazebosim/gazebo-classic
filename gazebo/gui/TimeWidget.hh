@@ -28,7 +28,7 @@ namespace gazebo
     class TimeWidgetPrivate;
     class TimePanel;
 
-    class GAZEBO_VISIBLE TimeWidget : public QWidget
+    class GZ_GUI_VISIBLE TimeWidget : public QWidget
     {
       Q_OBJECT
 

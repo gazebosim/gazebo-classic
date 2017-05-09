@@ -552,6 +552,11 @@ QWidget#toolsWidget > QFrame
   background-color: #808080;
 }
 
+QWidget#buildingEditorPaletteScroll
+{
+  background-color: #808080;
+}
+
 QWidget#renderWidget > QWidget
 {
   padding: 0px;
@@ -576,7 +581,7 @@ QWidget#terrainEditorWidget > QWidget
   border-top-right-radius: 10px;
 }
 
-QWidget#toolFrame
+QWidget#topToolbar
 {
   border-bottom: 1px solid #101010;
   background-color: #808080;
@@ -749,13 +754,8 @@ QAbstractSpinBox::down-arrow:hover
   height: 10px;
 }
 
-QLineEdit#logPlayCurrentTime
+QTextEdit#splashVersionTextEdit
 {
-  background-color: #808080;
-        color: #cfcfcf;
-        font-size: 15px;
-}
-QLineEdit#logPlayCurrentTime:focus
-{
-  background-color: #707070;
+  color: #f58113;
+  font-size: 10px;
 }

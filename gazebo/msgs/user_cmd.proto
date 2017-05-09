@@ -1,0 +1,54 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+import "light.proto";
+import "model.proto";
+import "world_control.proto";
+import "wrench.proto";
+
+/// \ingroup gazebo_msgs
+/// \interface UserCmd
+/// \brief Notifies that a new command has been executed by a user
+
+message UserCmd
+{
+  /// \brief Types of user commands
+  enum Type
+  {
+    /// \brief Moving an entity.
+    MOVING = 1;
+
+    /// \brief Controlling the world.
+    WORLD_CONTROL = 2;
+
+    /// \brief Applying wrench.
+    WRENCH = 3;
+
+    /// \brief Scaling an entity.
+    SCALING = 4;
+  }
+
+  /// \brief Unique id for user command.
+  optional uint32 id = 1;
+
+  /// \brief Description for the command.
+  required string description = 2;
+
+  /// \brief Type of command.
+  required Type type = 3;
+
+  /// \brief For model modify commands.
+  repeated Model model = 4;
+
+  /// \brief For light modify commands.
+  repeated Light light = 5;
+
+  /// \brief Name of entity targeted by command
+  optional string entity_name = 6;
+
+  /// \brief For World Control commands.
+  optional WorldControl world_control = 7;
+
+  /// \brief Wrench for apply wrench commands.
+  optional Wrench wrench = 8;
+}

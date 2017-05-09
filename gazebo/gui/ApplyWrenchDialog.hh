@@ -36,9 +36,21 @@ namespace gazebo
 
     /// \class ApplyWrenchDialog ApplyWrenchDialog.hh gui/gui.hh
     /// \brief Dialog for applying force and torque to a model.
-    class GAZEBO_VISIBLE ApplyWrenchDialog : public QDialog
+    class GZ_GUI_VISIBLE ApplyWrenchDialog : public QDialog
     {
       Q_OBJECT
+
+      /// \enum Modes
+      /// \brief Dialog is in one of these modes at each time.
+      public: enum Mode
+      {
+        /// \brief None
+        NONE = 0,
+        /// \brief Force
+        FORCE = 1,
+        /// \brief Torque
+        TORQUE = 2
+      };
 
       /// \brief Constructor.
       /// \param[in] _parent Parent QWidget.
@@ -57,6 +69,10 @@ namespace gazebo
 
       /// \brief Finish the dialog.
       public: void Fini();
+
+      /// \brief Get the mode, either force, torque or none.
+      /// \return Current mode.
+      public: Mode GetMode() const;
 
       /// \brief Set model to which wrench will be applied.
       /// \param[in] _modelName Scoped model name.
@@ -114,6 +130,19 @@ namespace gazebo
       /// \brief Qt callback when the the torque clear button is clicked.
       private slots: void OnTorqueClear();
 
+      /// \brief Qt callback when entering a manipulation mode.
+      private slots: void OnManipulation();
+
+      /// \brief Filter events from other Qt objects.
+      /// param[in] _object Qt object watched by the event filter
+      /// param[in] _event Qt event to be filtered.
+      /// \return True to stop event propagation.
+      private slots: bool eventFilter(QObject *_object, QEvent *_event);
+
+      /// \brief Handle change events related to this dialog.
+      /// param[in] _event Qt event.
+      private slots: void changeEvent(QEvent *_event);
+
       /// \brief Set the value of a specific spin without triggering signals to
       /// avoid recursion loops.
       /// \param[in] _spin Spin whose value will be changed.
@@ -126,11 +155,15 @@ namespace gazebo
 
       /// \brief Set force vector, send it to visuals and update spins.
       /// \param[in] _force New force.
-      private: void SetForce(const math::Vector3 &_force);
+      /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
+      private: void SetForce(const math::Vector3 &_force,
+          const bool _rotatedByMouse = false);
 
       /// \brief Set torque vector, send it to visuals and update spins.
       /// \param[in] _torque New torque.
-      private: void SetTorque(const math::Vector3 &_torque);
+      /// \param[in] _rotatedByMouse Rot tool has been rotated by the mouse.
+      private: void SetTorque(const math::Vector3 &_torque,
+          const bool _rotatedByMouse = false);
 
       /// \brief Callback on prerender to check if target link hasn't been
       /// deleted.
@@ -143,10 +176,39 @@ namespace gazebo
       /// \param[in] _com CoM position in link frame.
       private: void SetCoM(const math::Vector3 &_com);
 
+      /// \brief Callback for a mouse press event.
+      /// \param[in] _event The mouse press event
+      /// \return True if handled by this function.
+      private: bool OnMousePress(const common::MouseEvent &_event);
+
       /// \brief Callback for a mouse release event.
       /// \param[in] _event The mouse release event
       /// \return True if handled by this function.
       private: bool OnMouseRelease(const common::MouseEvent &_event);
+
+      /// \brief Callback for a mouse move event.
+      /// \param[in] _event The mouse move event
+      /// \return True if handled by this function.
+      private: bool OnMouseMove(const common::MouseEvent &_event);
+
+      /// \brief Set the mode to either force, torque or none.
+      /// \param[in] _mode Current mode.
+      private: void SetMode(Mode _mode);
+
+      /// \brief Update force vector with direction given by mouse, magnitude
+      /// from spin.
+      /// \param[in] _dir New direction, doesn't need to be normalized.
+      private: void NewForceDirection(const math::Vector3 &_dir);
+
+      /// \brief Update torque vector with direction given by mouse, magnitude
+      /// from spin.
+      /// \param[in] _dir New direction, doesn't need to be normalized.
+      private: void NewTorqueDirection(const math::Vector3 &_dir);
+
+      /// \brief Set this dialog to be active, visuals visible and mouse
+      /// filters on.
+      /// \param[in] _active True to make it active.
+      private: void SetActive(bool _active);
 
       /// \brief Set this dialog window to be active.
       private: void ActivateWindow();

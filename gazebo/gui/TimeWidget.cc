@@ -124,7 +124,7 @@ TimeWidget::TimeWidget(QWidget *_parent)
   this->dataPtr->fpsEdit->setFixedWidth(90);
   this->dataPtr->fpsEdit->setObjectName("timeWidgetFPS");
 
-  QPushButton *timeResetButton = new QPushButton("Reset");
+  QPushButton *timeResetButton = new QPushButton("Reset Time");
   timeResetButton->setFocusPolicy(Qt::NoFocus);
   connect(timeResetButton, SIGNAL(clicked()), this, SLOT(OnTimeReset()));
 

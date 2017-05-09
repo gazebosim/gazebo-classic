@@ -4,6 +4,9 @@ if (WIN32)
  add_definitions(-DBUILDING_DLL_GZ_COMMON)
 endif()
 
+# tiny obj loader
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/tinyobjloader)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -33,6 +36,7 @@ set (sources
   Animation.cc
   Assert.cc
   AudioDecoder.cc
+  Battery.cc
   Base64.cc
   BVHLoader.cc
   ColladaExporter.cc
@@ -44,8 +48,10 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
+  KeyEvent.cc
   KeyFrame.cc
   Material.cc
   Mesh.cc
@@ -53,7 +59,10 @@ set (sources
   MeshLoader.cc
   MeshManager.cc
   ModelDatabase.cc
+  MouseEvent.cc
+  OBJLoader.cc
   PID.cc
+  SemanticVersion.cc
   SkeletonAnimation.cc
   Skeleton.cc
   SphericalCoordinates.cc
@@ -79,6 +88,7 @@ set (headers
   Animation.hh
   Assert.hh
   AudioDecoder.hh
+  Battery.hh
   Base64.hh
   BVHLoader.hh
   ColladaLoader.hh
@@ -87,6 +97,7 @@ set (headers
   Color.hh
   Console.hh
   Dem.hh
+  EnumIface.hh
   Event.hh
   Events.hh
   Exception.hh
@@ -102,8 +113,10 @@ set (headers
   MeshManager.hh
   ModelDatabase.hh
   MouseEvent.hh
+  OBJLoader.hh
   PID.hh
   Plugin.hh
+  SemanticVersion.hh
   SkeletonAnimation.hh
   Skeleton.hh
   SingletonT.hh
@@ -120,20 +133,26 @@ set (headers
 
 set (gtest_sources
   Animation_TEST.cc
+  Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
   Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
+  EnumIface_TEST.cc
   Exception_TEST.cc
   Event_TEST.cc
+  HeightmapData_TEST.cc
   Image_TEST.cc
   ImageHeightmap_TEST.cc
   Material_TEST.cc
   Mesh_TEST.cc
   MeshManager_TEST.cc
+  MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
+  OBJLoader_TEST.cc
+  SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
   SVGLoader_TEST.cc
@@ -172,7 +191,7 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
 foreach (hdr ${headers})

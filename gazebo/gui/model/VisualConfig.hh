@@ -15,13 +15,11 @@
  *
 */
 
-#ifndef _VISUAL_CONFIG_HH_
-#define _VISUAL_CONFIG_HH_
+#ifndef GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
+#define GAZEBO_GUI_MODEL_VISUALCONFIG_HH_
 
 #include <map>
 #include <string>
-
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/model/ModelData.hh"
@@ -41,6 +39,9 @@ namespace gazebo
     {
       Q_OBJECT
 
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
+
       /// \brief Qt callback when this item's button has been pressed.
       /// \param[in] _checked Whether it was checked or unchecked.
       private slots: void OnToggleItem(bool _checked);
@@ -56,11 +57,15 @@ namespace gazebo
 
       /// \brief Widget associated with this data.
       public: QWidget *widget;
+
+      /// \brief Message containing the data which was in the widget when first
+      /// open.
+      public: msgs::Visual originalDataMsg;
     };
 
     /// \class VisualConfig VisualConfig.hh
     /// \brief A tab for configuring visual properties of a link.
-    class VisualConfig : public QWidget
+    class GZ_GUI_VISIBLE VisualConfig : public QWidget
     {
       Q_OBJECT
 
@@ -69,6 +74,12 @@ namespace gazebo
 
       /// \brief Destructor
       public: ~VisualConfig();
+
+      /// \brief Initialize widget.
+      public: void Init();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      public slots: void RestoreOriginalData();
 
       /// \brief Add a visual widget to the tab.
       /// \param[in] _name Name of visual added.
@@ -90,6 +101,11 @@ namespace gazebo
       /// \return Number of visuals.
       public: unsigned int GetVisualCount() const;
 
+      /// \brief Set the state of a show collision button.
+      /// \param[in] _show If true, button is checked.
+      /// \param[in] _name Name of collision.
+      public: void SetShowVisual(const bool _show, const std::string &_name);
+
       /// \brief Get the msg containing all visual data.
       /// \param[in] _name Name of visual.
       /// \return Visual msg.
@@ -101,6 +117,13 @@ namespace gazebo
       /// \param[in] _uri URI of the geometry.
       public: void SetGeometry(const std::string &_name,
           const math::Vector3 &_size, const std::string &_uri = "");
+
+      /// \brief Get the geometry data of a visual
+      /// \param[in] _name Name of visual.
+      /// \param[in] _size Size of the geometry.
+      /// \param[in] _uri URI of the geometry.
+      public: void Geometry(const std::string &_name,
+          ignition::math::Vector3d &_size, std::string &_uri);
 
       /// \brief Set the material of a visual
       /// \param[in] _name Name of visual.
@@ -114,6 +137,10 @@ namespace gazebo
           const common::Color &_ambient, const common::Color &_diffuse,
           const common::Color &_specular, const common::Color &_emissive);
 
+      /// \brief Get visual config data
+      /// \return Config data for the visuals
+      public: const std::map<int, VisualConfigData *> &ConfigData() const;
+
       /// \brief Qt signal emitted when a visual is removed.
       /// \param[in] _name Name of visual removed.
       Q_SIGNALS: void VisualRemoved(const std::string &_name);
@@ -122,6 +149,14 @@ namespace gazebo
       /// \param[in] _name Name of visual added.
       Q_SIGNALS: void VisualAdded(const std::string &_name);
 
+      /// \brief Qt signal emitted requesting to show/hide a collision.
+      /// \param[in] _show True to show, false to hide.
+      /// \param[in] _name Name of collision removed.
+      Q_SIGNALS: void ShowVisual(const bool _show, const std::string &_name);
+
+      /// \brief Qt signal emitted to indicate that changes should be applied.
+      Q_SIGNALS: void Applied();
+
       /// \brief Qt callback when a visual is to be added.
       private slots: void OnAddVisual();
 
@@ -129,14 +164,66 @@ namespace gazebo
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveVisual(int _id);
 
+      /// \brief Qt callback when a show collision button was pressed.
+      /// \param[in] _id Id of item to be removed.
+      private slots: void OnShowVisual(const int _id);
+
+      /// \brief Qt callback when a pose value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnPoseChanged(const QString &_name,
+          const ignition::math::Pose3d &_value);
+
+      /// \brief Qt callback when a geometry value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New geometry value.
+      /// \param[in] _dimensions New dimensions.
+      /// \param[in] _uri New uri, for meshes.
+      private slots: void OnGeometryChanged(const std::string &_name,
+          const std::string &_value,
+          const ignition::math::Vector3d &_dimensions,
+          const std::string &_uri);
+
+      /// \brief Qt callback when a color value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnColorChanged(const QString &_name,
+          const gazebo::common::Color &_value);
+
+      /// \brief Qt callback when a double value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnDoubleChanged(const QString &_name,
+          const double _value);
+
+      /// \brief Qt callback when a string value has changed.
+      /// \param[in] _name of widget in the config widget that emitted the
+      /// signal.
+      /// \param[in] _value New value.
+      private slots: void OnStringChanged(const QString &_name,
+          const std::string &_value);
+
       /// \brief Map of id to visual config widget.
       private: std::map<int, VisualConfigData *> configs;
+
+      /// \brief Map of visual config widgets which were deleted.
+      private: std::map<int, VisualConfigData *> deletedConfigs;
+
+      /// \brief Map of visual config widgets which were added.
+      private: std::map<int, VisualConfigData *> addedConfigs;
 
       /// \brief Counter for the number of visuals.
       private: int counter;
 
       /// \brief Qt signal mapper for mapping remove button signals.
-      private:  QSignalMapper *signalMapper;
+      private:  QSignalMapper *mapperRemove;
+
+      /// \brief Qt signal mapper for mapping hide button signals.
+      private:  QSignalMapper *mapperShow;
 
       /// \brief Layout which holds all visual items.
       private: QVBoxLayout *listLayout;

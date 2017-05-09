@@ -47,6 +47,58 @@ namespace gazebo
 
       /// \brief View which containes the timeline.
       public: LogPlayView *view;
+
+      /// \brief Node used for communication.
+      public: transport::NodePtr node;
+
+      /// \brief Used to start, stop, and step simulation.
+      public: transport::PublisherPtr logPlaybackControlPub;
+
+      /// \brief Spin box which holds the step size.
+      public: QSpinBox *stepSpin;
+
+      /// \brief Button to play.
+      public: QToolButton *playButton;
+
+      /// \brief Button to pause.
+      public: QToolButton *pauseButton;
+
+      /// \brief Button to step back.
+      public: QToolButton *stepBackButton;
+
+      /// \brief Button to step forward.
+      public: QToolButton *stepForwardButton;
+
+      /// \brief Button to rewind.
+      public: QToolButton *rewindButton;
+
+      /// \brief Button to jump forward.
+      public: QToolButton *forwardButton;
+
+      /// \brief Widget to edit the current day.
+      public: QLineEdit *currentDayEdit;
+
+      /// \brief Widget to edit the current hour.
+      public: QLineEdit *currentHourEdit;
+
+      /// \brief Widget to edit the current minute.
+      public: QLineEdit *currentMinuteEdit;
+
+      /// \brief Widget to edit the current second.
+      public: QLineEdit *currentSecondEdit;
+
+      /// \brief Label for the day unit.
+      public: QLabel *dayLabel;
+
+      /// \brief Label for the hour unit.
+      public: QLabel *hourLabel;
+
+      /// \brief Label for the hour separator.
+      public: QLabel *hourSeparator;
+
+      /// \brief Number of steps pending to be published once the simulation
+      /// is paused.
+      public: int pendingStep = 0;
     };
 
     /// \class LogPlayViewPrivate LogPlayViewPrivate.hh

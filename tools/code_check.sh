@@ -64,9 +64,8 @@ echo "*:gazebo/common/STLLoader.cc:94" > $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:105" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:126" >> $SUPPRESS
 echo "*:gazebo/common/STLLoader.cc:149" >> $SUPPRESS
-echo "*:gazebo/common/SVGLoader.hh:50" >> $SUPPRESS
 # (warning) Redundant code: Found a statement that begins with string constant.
-echo "*:gazebo/common/SVGLoader.cc:688" >> $SUPPRESS
+echo "*:gazebo/common/SVGLoader.cc:869" >> $SUPPRESS
 echo "*:examples/plugins/custom_messages/custom_messages.cc:22" >> $SUPPRESS
 echo "*:examples/stand_alone/test_fixture/gtest/*" >> $SUPPRESS
 
@@ -88,7 +87,7 @@ fi
 #cppcheck.
 # MAKE_JOBS is used in jenkins. If not set or run manually, default to 1
 [ -z $MAKE_JOBS ] && MAKE_JOBS=1
-CPPCHECK_BASE="cppcheck -j$MAKE_JOBS -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
+CPPCHECK_BASE="cppcheck -j$MAKE_JOBS --inline-suppr -DGAZEBO_VISIBLE=1 -q --suppressions-list=$SUPPRESS"
 if [ $CPPCHECK_LT_157 -eq 0 ]; then
   # use --language argument if 1.57 or greater (issue #907)
   CPPCHECK_BASE="$CPPCHECK_BASE --language=c++"

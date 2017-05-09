@@ -53,7 +53,7 @@ namespace gazebo
       /// \brief This flag is used for manual activation of a pad.
       /// It is set to true when a string message that contains
       /// the name of the pad is sent over the activation topic.
-      public: bool activated;
+      public: bool activated = false;
     };
 
     /// \brief World pointer.

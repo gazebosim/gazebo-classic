@@ -1,0 +1,372 @@
+<?xml version="1.0" ?>
+<%
+  # Torsional friction demo world
+  # Create objects with single points of contact and initial velocity
+  # They should decelerate if friction is nonzero
+
+  # Aluminum 2700 kg/m^3
+  density = 2700.0
+  mass = {}
+  ixx = {}
+  iyy = {}
+  izz = {}
+
+  # Geometry and inertial parameters: sphere
+  radius = 0.1
+  mass[:sphere] = density * 4.0 * Math::PI / 3.0 * radius **3
+  ixx[:sphere] = mass[:sphere] * 0.4 * radius**2
+  iyy[:sphere] = ixx[:sphere]
+  izz[:sphere] = ixx[:sphere]
+
+  # Geometry and inertial parameters: box
+  dx = 2 * radius
+  dy, dz = dx, dx
+  dd = Math.sqrt(dx**2 + dy**2 + dz**2)
+  mass[:box] = density * dx * dy * dz
+  ixx[:box] = 1.0 / 12 * mass[:box] * (dy*dy + dz*dz)
+  iyy[:box] = 1.0 / 12 * mass[:box] * (dz*dz + dx*dx)
+  izz[:box] = 1.0 / 12 * mass[:box] * (dx*dx + dy*dy)
+
+  # Geometry and inertial parameters: pinch
+  density_p = 2000.0
+  dx_p = 0.5 * radius
+  dy_p = 0.1 * radius
+  dz_p = 6 * radius
+  dd_p = Math.sqrt(dx_p**2 + dy_p**2 + dz_p**2)
+  mass[:box_p] = density_p * dx * dy * dz
+  ixx[:box_p] = 1.0 / 12 * mass[:box_p] * (dy_p*dy_p + dz_p*dz_p)
+  iyy[:box_p] = 1.0 / 12 * mass[:box_p] * (dz_p*dz_p + dx_p*dx_p)
+  izz[:box_p] = 1.0 / 12 * mass[:box_p] * (dx_p*dx_p + dy_p*dy_p)
+
+  # initial velocity and friction
+  spin0 = 2*Math::PI
+  sphere_friction = [0.0, 0.001, 0.005, 0.01, 1.0]
+  box_friction = [0.0, 0.001, 0.005, 0.01, 1.0]
+  pinch_friction = [0.0, 0.001, 0.005, 0.006, 1.0]
+  pinch_trans_friction = 1000.0
+  patch = 2.0
+%>
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>7 -3 2.5 0 0.27 2.35</pose>
+      </camera>
+    </gui>
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+<%  # Spheres
+    i = 0
+    sphere_friction.each do |f|
+      i = i + 1
+      name = 'sphere_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose><%= radius*4*i %> 0 <%= radius %>  0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass[:sphere] %></mass>
+          <inertia>
+            <ixx><%= ixx[:sphere] %></ixx>
+            <iyy><%= iyy[:sphere] %></iyy>
+            <izz><%= izz[:sphere] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>500000</kp>
+              </ode>
+            </contact>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= radius %></radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/CoM</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+<%  # Boxes
+    i = 0
+    box_friction.each do |f|
+      i = i + 1
+      name = 'box_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose><%= dd*2*i %> 2 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
+      <link name="link">
+        <inertial>
+          <mass><%= mass[:box] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box] %></ixx>
+            <iyy><%= iyy[:box] %></iyy>
+            <izz><%= izz[:box] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+<%  # Boxes with artificially low center of mass
+    i = 0
+    box_friction.each do |f|
+      i = i + 1
+      name = 'box_low_cog_' + i.to_s
+%>
+    <%= "<model name='#{name}'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose><%= dd*2*i %> 4 <%= dd/2 %>  <%= Math::PI/4 %> <%= Math.atan(1.0/Math.sqrt(2)) %> 0</pose>
+      <link name="link">
+        <inertial>
+          <pose>1 -1 -1  0 0 0</pose>
+          <mass><%= mass[:box] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box] %></ixx>
+            <iyy><%= iyy[:box] %></iyy>
+            <izz><%= izz[:box] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= f %></mu>
+                <mu2><%= f %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx %> <%= dy %> <%= dz %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <%= "<plugin name='#{name}' filename='libInitialVelocityPlugin.so'>" %>
+        <linear>0 0 0</linear>
+        <angular>0 0 <%= spin0 %></angular>
+      </plugin>
+    </model>
+<%  end %>
+<%  # Pinch
+    i = 0
+    pinch_friction.each do |f|
+      i = i + 1
+      name = 'pinch_' + i.to_s
+%>
+    <%= "<model name='" + name + "'>" %>
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose><%= dd_p*2*i %> 6 <%= dd_p %> 0 0 0</pose>
+      <link name="box">
+        <self_collide>true</self_collide>
+        <pose><%= - dz_p * 0.4 %> 0 0 0 <%= Math::PI/2 %> 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass><%= mass[:box_p] %></mass>
+          <inertia>
+            <ixx><%= ixx[:box_p] %></ixx>
+            <iyy><%= iyy[:box_p] %></iyy>
+            <izz><%= izz[:box_p] %></izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= dx_p %> <%= dy_p %> <%= dz_p %></size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= dx_p %> <%= dy_p %> <%= dz_p %></size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_1">
+        <pose>0 <%= dy_p * 1.5 %> 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <link name="sphere_2">
+        <pose>0 <%= -dy_p * 1.5 %> 0 0 0 0</pose>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= pinch_trans_friction %></mu>
+                <mu2><%= pinch_trans_friction %></mu2>
+              </ode>
+              <torsional>
+                <coefficient><%= f %></coefficient>
+                <patch_radius><%= patch %></patch_radius>
+              </torsional>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= dy_p %></radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+      <joint name = "joint_1" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_1</child>
+        <axis>
+          <xyz>0 -1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+      <joint name = "joint_2" type="prismatic">
+        <parent>world</parent>
+        <child>sphere_2</child>
+        <axis>
+          <xyz>0 1 0</xyz>
+          <dynamics>
+            <damping>100</damping>
+            <spring_stiffness>1000000</spring_stiffness>
+            <spring_reference>0.002</spring_reference>
+          </dynamics>
+        </axis>
+      </joint>
+    </model>
+<%  end %>
+  </world>
+</sdf>

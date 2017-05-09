@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <memory>
 #include <boost/filesystem.hpp>
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/gui/DataLogger.hh"
@@ -29,7 +30,8 @@ void DataLogger_TEST::RecordButton()
     this->Load("worlds/empty.world");
 
     // Create a new data logger widget
-    gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+    std::unique_ptr<gazebo::gui::DataLogger> dataLogger(
+        new gazebo::gui::DataLogger);
     dataLogger->show();
     QCoreApplication::processEvents();
 
@@ -38,7 +40,7 @@ void DataLogger_TEST::RecordButton()
         "dataLoggerRecordButton");
 
     // Get the destination label
-    QLineEdit *destPathLabel = dataLogger->findChild<QLineEdit *>(
+    QPlainTextEdit *destPathLabel = dataLogger->findChild<QPlainTextEdit *>(
         "dataLoggerDestnationPathLabel");
 
     // Get the time label
@@ -71,7 +73,7 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().find(".log") ==
+    while (destPathLabel->toPlainText().toStdString().find(".log") ==
         std::string::npos)
     {
       // The following line tell QT to process its events. This is vital for
@@ -81,7 +83,7 @@ void DataLogger_TEST::RecordButton()
     }
 
     // Make sure the destination log file is correct.
-    txt = destPathLabel->text().toStdString();
+    txt = destPathLabel->toPlainText().toStdString();
     QVERIFY(txt.find("state.log") != std::string::npos);
 
     // Make sure the status label says "Recording"
@@ -92,7 +94,7 @@ void DataLogger_TEST::RecordButton()
     recordButton->toggle();
 
     // Wait for a log status return message
-    while (destPathLabel->text().toStdString().find(".log") !=
+    while (destPathLabel->toPlainText().toStdString().find(".log") !=
         std::string::npos)
     {
       QCoreApplication::processEvents();
@@ -100,7 +102,7 @@ void DataLogger_TEST::RecordButton()
     }
 
     // Make sure there's no log file (only path)
-    txt = destPathLabel->text().toStdString();
+    txt = destPathLabel->toPlainText().toStdString();
     QVERIFY(txt.find(".log") == std::string::npos);
 
     // Make sure size is back to zero
@@ -171,7 +173,8 @@ void DataLogger_TEST::StressTest()
     pub->Publish(msg);
 
     // Create a new data logger widget
-    gazebo::gui::DataLogger *dataLogger = new gazebo::gui::DataLogger;
+    std::unique_ptr<gazebo::gui::DataLogger> dataLogger(
+        new gazebo::gui::DataLogger);
 
     // Get the record button
     QToolButton *recordButton = dataLogger->findChild<QToolButton*>(

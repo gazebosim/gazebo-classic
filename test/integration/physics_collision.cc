@@ -16,6 +16,7 @@
 */
 #include <map>
 #include <string>
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/ServerFixture.hh"
@@ -23,7 +24,7 @@
 
 using namespace gazebo;
 
-const double g_big = 1e29;
+const double g_big = 1e17;
 const double g_physics_tol = 1e-2;
 
 class PhysicsCollisionTest : public ServerFixture,
@@ -32,6 +33,11 @@ class PhysicsCollisionTest : public ServerFixture,
   /// \brief Test Collision::GetBoundingBox.
   /// \param[in] _physicsEngine Type of physics engine to use.
   public: void GetBoundingBox(const std::string &_physicsEngine);
+
+  /// \brief Spawn identical models with different collision pose offsets
+  /// and verify that they have matching behavior.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  public: void PoseOffsets(const std::string &_physicsEngine);
 };
 
 /////////////////////////////////////////////////
@@ -61,6 +67,105 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
     EXPECT_GT(box.max.x, g_big);
     EXPECT_GT(box.max.y, g_big);
     EXPECT_DOUBLE_EQ(box.max.z, 0.0);
+  }
+}
+
+/////////////////////////////////////////////////
+void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
+{
+  Load("worlds/collision_pose_offset.world", true, _physicsEngine);
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Box size
+  const double dy = 0.4;
+  const double dz = 0.9;
+
+  int modelCount = 0;
+  auto models = world->GetModels();
+  for (auto model : models)
+  {
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
+    {
+      continue;
+    }
+    modelCount++;
+
+    int i = std::stoi(name.substr(4, 5));
+
+    auto link = model->GetLink();
+    ASSERT_TRUE(link != nullptr);
+
+    const unsigned int index = 0;
+    auto collision = link->GetCollision(index);
+    ASSERT_TRUE(collision != nullptr);
+
+    // i=0: rotated model pose
+    //  expect collision pose to match model pose
+    if (i == 0)
+    {
+      EXPECT_EQ(model->GetWorldPose(),
+                collision->GetWorldPose());
+    }
+    // i=1: rotated link pose
+    //  expect collision pose to match link pose
+    else if (i == 1)
+    {
+      EXPECT_EQ(link->GetWorldPose(),
+                collision->GetWorldPose());
+    }
+    // i=2: rotated collision pose
+    //  expect collision position to match link position
+    else if (i == 2)
+    {
+      EXPECT_EQ(link->GetWorldPose().pos,
+                collision->GetWorldPose().pos);
+    }
+    // i=3: offset collision pose
+    //  expect collision postion to match link position plus offset
+    else if (i == 3)
+    {
+      ignition::math::Pose3d collisionPose(0, 0, dz, 0, 0, 0);
+      EXPECT_EQ(link->GetWorldPose().Ign().Pos() + collisionPose.Pos(),
+                collision->GetWorldPose().Ign().Pos());
+    }
+  }
+  EXPECT_EQ(modelCount, 4);
+
+  const double t0 = 1.5;
+  const double dt = 1e-3;
+  const int steps = floor(t0 / dt);
+  world->Step(steps);
+
+  for (auto model : models)
+  {
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
+    {
+      continue;
+    }
+
+    int i = std::stoi(name.substr(4, 5));
+
+    auto link = model->GetLink();
+    ASSERT_TRUE(link != nullptr);
+
+    const unsigned int index = 0;
+    auto collision = link->GetCollision(index);
+    ASSERT_TRUE(collision != nullptr);
+
+    // For 0-2, drop and expect box to rest at specific height
+    if (i <= 2)
+    {
+      EXPECT_NEAR(collision->GetWorldPose().pos.z, dy/2, g_physics_tol);
+    }
+    else
+    {
+      EXPECT_NEAR(collision->GetWorldPose().pos.z, dz/2, g_physics_tol);
+    }
   }
 }
 
@@ -158,6 +263,12 @@ TEST_F(PhysicsCollisionTest, ModelSelfCollide)
 TEST_P(PhysicsCollisionTest, GetBoundingBox)
 {
   GetBoundingBox(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsCollisionTest, PoseOffsets)
+{
+  PoseOffsets(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsCollisionTest,

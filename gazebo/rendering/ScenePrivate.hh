@@ -14,16 +14,16 @@
  * limitations under the License.
  *
 */
-#ifndef _SCENE_PRIVATE_HH_
-#define _SCENE_PRIVATE_HH_
+#ifndef _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
+#define _GAZEBO_RENDERING_SCENE_PRIVATE_HH_
 
 #include <list>
 #include <map>
 #include <string>
 #include <vector>
+#include <mutex>
 
 #include <boost/unordered/unordered_map.hpp>
-#include <boost/thread/recursive_mutex.hpp>
 
 #include <sdf/sdf.hh>
 
@@ -43,11 +43,6 @@ namespace Ogre
 {
   class SceneManager;
   class RaySceneQuery;
-}
-
-namespace boost
-{
-  class mutex;
 }
 
 namespace gazebo
@@ -102,6 +97,7 @@ namespace gazebo
     /// \def Light_M
     /// \brief Map of lights
     typedef std::map<std::string, LightPtr> Light_M;
+
     /// \def SkeletonPoseMsgs_L
     /// \brief List of skeleton messages.
     typedef std::list<boost::shared_ptr<msgs::PoseAnimation const> >
@@ -169,8 +165,11 @@ namespace gazebo
       /// \brief List of collision visual messages to process.
       public: VisualMsgs_L collisionVisualMsgs;
 
-      /// \brief List of light message to process.
-      public: LightMsgs_L lightMsgs;
+      /// \brief List of light factory message to process.
+      public: LightMsgs_L lightFactoryMsgs;
+
+      /// \brief List of light modify message to process.
+      public: LightMsgs_L lightModifyMsgs;
 
       /// \brief List of pose message to process.
       public: PoseMsgs_M poseMsgs;
@@ -203,10 +202,10 @@ namespace gazebo
       public: SkeletonPoseMsgs_L skeletonPoseMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: boost::mutex *receiveMutex;
+      public: std::mutex *receiveMutex;
 
       /// \brief Mutex to lock the pose message buffers.
-      public: boost::recursive_mutex poseMsgMutex;
+      public: std::recursive_mutex poseMsgMutex;
 
       /// \brief Communication Node
       public: transport::NodePtr node;
@@ -223,8 +222,11 @@ namespace gazebo
       /// \brief Subscribe to visual topic
       public: transport::SubscriberPtr visSub;
 
-      /// \brief Subscribe to light topics
-      public: transport::SubscriberPtr lightSub;
+      /// \brief Subscribe to light factory topic
+      public: transport::SubscriberPtr lightFactorySub;
+
+      /// \brief Subscribe to light modify topic
+      public: transport::SubscriberPtr lightModifySub;
 
       /// \brief Subscribe to pose updates
       public: transport::SubscriberPtr poseSub;
@@ -243,9 +245,6 @@ namespace gazebo
 
       /// \brief Subscribe to model info updates
       public: transport::SubscriberPtr modelInfoSub;
-
-      /// \brief Publish light updates.
-      public: transport::PublisherPtr lightPub;
 
       /// \brief Respond to requests.
       public: transport::PublisherPtr responsePub;
@@ -281,6 +280,9 @@ namespace gazebo
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
 
+      /// \brief The heightmap level of detail
+      public: unsigned int heightmapLOD = 0u;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 
@@ -295,6 +297,9 @@ namespace gazebo
 
       /// \brief True when all inertias should be visualized.
       public: bool showInertias;
+
+      /// \brief True when all link frames should be visualized.
+      public: bool showLinkFrames;
 
       /// \brief True when all collisions should be visualized.
       public: bool showCollisions;
@@ -324,6 +329,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Size of shadow texture
+      public: unsigned int shadowTextureSize = 1024u;
     };
   }
 }
