@@ -323,6 +323,9 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief Simulation time of the last log state captured.
+      public: gazebo::common::Time logLastStateTime;
     };
   }
 }

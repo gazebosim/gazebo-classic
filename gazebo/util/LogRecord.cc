@@ -137,6 +137,13 @@ bool LogRecord::Init(const std::string &_subdir)
 }
 
 //////////////////////////////////////////////////
+bool LogRecord::Start(const LogRecordParams &_params)
+{
+  this->dataPtr->period = _params.period;
+  return this->Start(_params.encoding, _params.path);
+}
+
+//////////////////////////////////////////////////
 bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 {
   std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
@@ -305,6 +312,12 @@ bool LogRecord::GetPaused() const
 bool LogRecord::Paused() const
 {
   return this->dataPtr->paused;
+}
+
+//////////////////////////////////////////////////
+double LogRecord::Period() const
+{
+  return this->dataPtr->period;
 }
 
 //////////////////////////////////////////////////

@@ -24,6 +24,8 @@
 using namespace gazebo;
 using namespace physics;
 
+static bool gRecordVelocity = false;
+
 /////////////////////////////////////////////////
 LinkState::LinkState()
 : State()
@@ -362,4 +364,16 @@ void LinkState::SetIterations(const uint64_t _iterations)
 
   for (auto &collisionState : this->collisionStates)
     collisionState.SetIterations(_iterations);
+}
+
+/////////////////////////////////////////////////
+void LinkState::SetRecordVelocity(const bool _record) const
+{
+  gRecordVelocity = _record;
+}
+
+/////////////////////////////////////////////////
+bool LinkState::RecordVelocity() const
+{
+  return gRecordVelocity;
 }

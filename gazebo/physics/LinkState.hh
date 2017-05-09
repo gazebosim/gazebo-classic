@@ -189,28 +189,32 @@ namespace gazebo
                   const gazebo::physics::LinkState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(5)
+        _out << std::defaultfloat
+          << std::setprecision(4)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
+          << ignition::math::precision(_state.pose.pos.x, 4) << " "
+          << ignition::math::precision(_state.pose.pos.y, 4) << " "
+          << ignition::math::precision(_state.pose.pos.z, 4) << " "
+          << ignition::math::precision(q.x, 4) << " "
+          << ignition::math::precision(q.y, 4) << " "
+          << ignition::math::precision(q.z, 4) << " "
           << "</pose>";
 
-        /// Disabling this for efficiency.
-        q = _state.velocity.rot.GetAsEuler();
-         _out << std::fixed <<std::setprecision(4)
-           << "<velocity>"
-           << _state.velocity.pos.x << " "
-           << _state.velocity.pos.y << " "
-           << _state.velocity.pos.z << " "
-           << q.x << " "
-           << q.y << " "
-           << q.z << " "
-           << "</velocity>";
+        if (_state.RecordVelocity())
+        {
+          /// Disabling this for efficiency.
+          q = _state.velocity.rot.GetAsEuler();
+          _out << std::defaultfloat <<std::setprecision(4)
+            << "<velocity>"
+            << ignition::math::precision(_state.velocity.pos.x, 4) << " "
+            << ignition::math::precision(_state.velocity.pos.y, 4) << " "
+            << ignition::math::precision(_state.velocity.pos.z, 4) << " "
+            << ignition::math::precision(q.x, 4) << " "
+            << ignition::math::precision(q.y, 4) << " "
+            << ignition::math::precision(q.z, 4) << " "
+            << "</velocity>";
+        }
         // << "<acceleration>" << _state.acceleration << "</acceleration>"
         // << "<wrench>" << _state.wrench << "</wrench>";
 
@@ -226,6 +230,10 @@ namespace gazebo
 
         return _out;
       }
+
+      public: void SetRecordVelocity(const bool _record) const;
+
+      public: bool RecordVelocity() const;
 
       /// \brief 3D pose of the link relative to the model.
       private: math::Pose pose;
