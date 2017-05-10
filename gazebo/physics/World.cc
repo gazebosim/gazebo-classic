@@ -1178,6 +1178,10 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
   actor->FillMsg(msg);
   this->dataPtr->modelPub->Publish(msg);
 
+  this->EnableAllModels();
+  this->PublishModelPose(actor);
+  this->dataPtr->models.push_back(actor);
+
   return actor;
 }
 
