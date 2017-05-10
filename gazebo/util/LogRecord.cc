@@ -140,6 +140,7 @@ bool LogRecord::Init(const std::string &_subdir)
 bool LogRecord::Start(const LogRecordParams &_params)
 {
   this->dataPtr->period = _params.period;
+  this->dataPtr->filter = _params.filter;
   return this->Start(_params.encoding, _params.path);
 }
 
@@ -318,6 +319,12 @@ bool LogRecord::Paused() const
 double LogRecord::Period() const
 {
   return this->dataPtr->period;
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Filter() const
+{
+  return this->dataPtr->filter;
 }
 
 //////////////////////////////////////////////////

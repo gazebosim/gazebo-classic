@@ -43,6 +43,9 @@ namespace gazebo
       /// \brief Recording period. A value < 0 indicates that every
       /// iteration should be recorded.
       public: double period = -1;
+
+      /// \brief Log filter string
+      public: std::string filter = "";
     };
 
     // Forward declare private data class
@@ -135,6 +138,10 @@ namespace gazebo
       /// \brief Get the log recording period.
       /// \return Log recording period.
       public: double Period() const;
+
+      /// \brief Get the log recording filter string.
+      /// \return Log recording filter string.
+      public: std::string Filter() const;
 
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.

@@ -157,6 +157,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Absolute path in which to store state data")
     ("record_period", po::value<double>()->default_value(-1),
      "Recording period.")
+    ("record_filter", po::value<std::string>()->default_value(""),
+     "Recording filter.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -619,6 +621,7 @@ void Server::ProcessParams()
       params.encoding = this->dataPtr->params["record_encoding"];
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
+      params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
       util::LogRecord::Instance()->Start(params);
     }
   }

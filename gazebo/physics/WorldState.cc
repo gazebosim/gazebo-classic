@@ -23,7 +23,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#include <boost/algorithm/string.hpp>
 
+#include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
@@ -89,13 +91,41 @@ void WorldState::Load(const WorldPtr _world)
   this->realTime = _world->GetRealTime();
   this->iterations = _world->GetIterations();
 
-  // Add a state for all the models
+  std::string filter = util::LogRecord::Instance()->Filter();
+  std::list<std::string> mainParts, parts;
+  boost::split(mainParts, filter, boost::is_any_of("/"));
+
+  // Create the model filter
+  if (!mainParts.empty())
+  {
+    boost::split(parts, mainParts.front(), boost::is_any_of("."));
+    if (parts.empty() && !mainParts.front().empty())
+      parts.push_back(mainParts.front());
+  }
+  std::list<std::string>::iterator partIter = parts.begin();
+
+  // Add a state for all the models that match the filter
   Model_V models = _world->GetModels();
   for (Model_V::const_iterator iter = models.begin();
        iter != models.end(); ++iter)
   {
-    this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
-        this->simTime, this->iterations);
+    bool add = true;
+
+    // The first element in the filter must be a model name or a star.
+    if (partIter != parts.end() && !parts.empty() &&
+        !(*partIter).empty() && (*partIter) != "*")
+    {
+      std::string regexStr = *partIter;
+      boost::replace_all(regexStr, "*", ".*");
+      boost::regex regex(regexStr);
+      add = boost::regex_match((*iter)->GetName(), regex);
+    }
+
+    if (add)
+    {
+      this->modelStates[(*iter)->GetName()].Load(*iter, this->realTime,
+          this->simTime, this->iterations);
+    }
   }
 
   // Remove models that no longer exist. We determine this by check the time

@@ -203,6 +203,9 @@ namespace gazebo
 
       /// \brief Record period.
       public: double period = -1.0;
+
+      /// \brief Record filter string.
+      public: std::string filter = "";
     };
     /// \}
   }
