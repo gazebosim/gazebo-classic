@@ -244,7 +244,9 @@ namespace gazebo
                   const gazebo::physics::ModelState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::defaultfloat << std::setprecision(3)
+        // _out << std::defaultfloat << std::setprecision(3)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
           << ignition::math::precision(_state.pose.pos.x, 3) << " "

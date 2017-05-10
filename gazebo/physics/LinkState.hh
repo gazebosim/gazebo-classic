@@ -21,6 +21,7 @@
 #ifndef _LINKSTATE_HH_
 #define _LINKSTATE_HH_
 
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -189,8 +190,8 @@ namespace gazebo
                   const gazebo::physics::LinkState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::defaultfloat
-          << std::setprecision(4)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(4)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
           << ignition::math::precision(_state.pose.pos.x, 4) << " "
@@ -205,7 +206,9 @@ namespace gazebo
         {
           /// Disabling this for efficiency.
           q = _state.velocity.rot.GetAsEuler();
-          _out << std::defaultfloat <<std::setprecision(4)
+          // _out << std::defaultfloat <<std::setprecision(4)
+          _out.unsetf(std::ios_base::floatfield);
+          _out << std::setprecision(4)
             << "<velocity>"
             << ignition::math::precision(_state.velocity.pos.x, 4) << " "
             << ignition::math::precision(_state.velocity.pos.y, 4) << " "
