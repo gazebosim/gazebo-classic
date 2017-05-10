@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add actors in World as models so they get returned with World::Models()
+    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
     * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
