@@ -345,6 +345,7 @@ sdf::ElementPtr World::GetSDF()
 {
   this->UpdateStateSDF();
   sdf::ElementPtr root(new sdf::Element);
+  root->SetName("sdf");
   std::stringstream version;
   version << SDF_VERSION;
   root->AddAttribute("version", "string", version.str(), true, "version");
