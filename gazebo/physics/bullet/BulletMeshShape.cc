@@ -53,7 +53,7 @@ void BulletMeshShape::Init()
 
   if (!this->submesh && !this->mesh)
   {
-    gzerr << "Cannot load BULLET mesh with no shape initialized.\n";
+    gzerr << "Cannot load Bullet mesh with no shape initialized.\n";
     return;
   }
 
