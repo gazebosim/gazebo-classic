@@ -94,7 +94,7 @@ namespace gazebo
       public: void Load(sdf::ElementPtr _sdf);
 
       /// \brief Get the SDF of the world in the current state.
-      public: sdf::ElementPtr GetSDF();
+      public: sdf::ElementPtr SDF();
 
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.

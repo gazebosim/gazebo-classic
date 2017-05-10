@@ -341,7 +341,7 @@ void World::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-sdf::ElementPtr World::GetSDF()
+sdf::ElementPtr World::SDF()
 {
   this->UpdateStateSDF();
   sdf::ElementPtr root(new sdf::Element);
