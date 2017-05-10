@@ -106,8 +106,14 @@ void BulletLink::Init()
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
       btCollisionShape *shape = collision->GetCollisionShape();
 
+      if (!shape)
+      {
+        gzerr << "No collision shape initialized. Skipping.\n";
+        continue;
+      }
+
       SurfaceParamsPtr surface = collision->GetSurface();
-      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      GZ_ASSERT(surface, "Surface pointer is invalid");
       FrictionPyramidPtr friction = surface->FrictionPyramid();
       GZ_ASSERT(friction, "Friction pointer is invalid");
 
