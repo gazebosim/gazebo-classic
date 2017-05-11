@@ -29,8 +29,12 @@
       <uri>model://ground_plane</uri>
     </include>
 <%
+  require "matrix"
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+
   boxes = {}
-  boxes["box_00"] = {:mu => 0.998,  :slip => 1.0, :x0 => 0}
   boxes["box_01"] = {:mu => 0.998,  :slip => 0,   :x0 => 2}
   boxes["box_02"] = {:mu => 0.9985, :slip => 0,   :x0 => 4}
   boxes["box_03"] = {:mu => 0.999,  :slip => 0,   :x0 => 6}
@@ -40,6 +44,10 @@
   boxes["box_07"] = {:mu => 1.01,   :slip => 0.1, :x0 => 14}
   boxes["box_08"] = {:mu => 1.01,   :slip => 0.3, :x0 => 16}
   boxes["box_09"] = {:mu => 1.01,   :slip => 1.0, :x0 => 18}
+  dx = 1
+  dy = 1
+  dz = 1
+  box_size = Vector[dx, dy, dz]
   boxes.keys.each do |box_prefix|
     mu = boxes[box_prefix][:mu]
     slip = boxes[box_prefix][:slip]
@@ -64,7 +72,7 @@
         <collision name="<%= box_prefix %>_geom">
           <geometry>
             <box>
-              <size>1 1 1</size>
+              <size><%= a_to_s(box_size) %></size>
             </box>
           </geometry>
           <surface>
@@ -91,7 +99,7 @@
         <visual name="<%= box_prefix %>_geom_visual">
           <geometry>
             <box>
-              <size>1 1 1</size>
+              <size><%= a_to_s(box_size) %></size>
             </box>
           </geometry>
           <material>
