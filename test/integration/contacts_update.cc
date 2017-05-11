@@ -35,15 +35,6 @@ void OnContact(ConstContactsPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzwarn << "Disabling TestTwoSpheres for dart.\n";
-    // Take the DART test back in as soon as this fix has been merged:
-    // https://bitbucket.org/JenniferBuehler/gazebo
-    // branch "dart-6-fix-like-PR-2654"
-    return;
-  }
-
   this->Load("worlds/empty.world", true, _physicsEngine);
 
   // Load the spheres into the world.
