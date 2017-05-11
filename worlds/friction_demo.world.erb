@@ -59,6 +59,11 @@
     mu = boxes[box_prefix][:mu]
     slip = boxes[box_prefix][:slip]
     x0 = boxes[box_prefix][:x0]
+
+    # compute inertia
+    ixx = mass/12.0 * (dy**2 + dz**2)
+    iyy = mass/12.0 * (dz**2 + dx**2)
+    izz = mass/12.0 * (dx**2 + dy**2)
 %>
     <model name="<%= box_prefix %>_model">
       <allow_auto_disable>0</allow_auto_disable>
@@ -67,12 +72,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx><%= ixx %></ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy><%= iyy %></iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz><%= izz %></izz>
           </inertia>
           <mass><%= mass %></mass>
         </inertial>

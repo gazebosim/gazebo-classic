@@ -42,12 +42,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -98,12 +98,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -154,12 +154,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -210,12 +210,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -266,12 +266,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -322,12 +322,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -378,12 +378,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -434,12 +434,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
@@ -490,12 +490,12 @@
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
-            <ixx>10</ixx>
+            <ixx>0.16666666666666666</ixx>
             <ixy>0</ixy>
             <ixz>0</ixz>
-            <iyy>10</iyy>
+            <iyy>0.16666666666666666</iyy>
             <iyz>0</iyz>
-            <izz>10</izz>
+            <izz>0.16666666666666666</izz>
           </inertia>
           <mass>1</mass>
         </inertial>
