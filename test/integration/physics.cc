@@ -775,8 +775,9 @@ TEST_F(PhysicsTest, StateInsertion)
   // It should print some errors, but it may or may not have addded the
   // (partly) faulty model.
   std::stringstream newModelStr2;
+  std::string newModelName2("new_model2");
   newModelStr2 << "<sdf version='" << SDF_VERSION << "'>"
-               << "<model name ='" << newModelName << "'>"
+               << "<model name ='" << newModelName2 << "'>"
                << "<link name ='link'>"
                << "  <collision name ='collision'>"
                << "    <geometry>"
