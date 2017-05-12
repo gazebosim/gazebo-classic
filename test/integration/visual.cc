@@ -74,10 +74,10 @@ TEST_F(VisualProperty, CastShadows)
   unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d testPose(
-      ignition::math::Vector3d(0, 0, 0.5), 
+      ignition::math::Vector3d(0, 0, 0.5),
       ignition::math::Quaterniond(0, 1.57, 0));
   ignition::math::Pose3d testPose2(
-      ignition::math::Vector3d(0, 10, 0.5), 
+      ignition::math::Vector3d(0, 10, 0.5),
       ignition::math::Quaterniond(0, 1.57, 0));
 
   SpawnCamera(modelName, cameraName, testPose.Pos(),
@@ -137,7 +137,7 @@ TEST_F(VisualProperty, CastShadows)
   // camera1 image should be darker than camera2 image
   // because the mesh below camera1 is casting shadows
   EXPECT_LT(colorSum, colorSum2);
-  double colorRatio = static_cast<double>(colorSum2-colorSum) / 
+  double colorRatio = static_cast<double>(colorSum2-colorSum) /
       static_cast<double>(colorSum2);
   EXPECT_GT(colorRatio, 0.05);
 
