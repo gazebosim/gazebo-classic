@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
-#define GAZEBO_PHYSICS_DART_DARTBOXSHAPE_HH_
+#ifndef _GAZEBO_DARTBOXSHAPE_HH_
+#define _GAZEBO_DARTBOXSHAPE_HH_
 
 #include "gazebo/physics/BoxShape.hh"
 #include "gazebo/physics/dart/DARTTypes.hh"
@@ -40,6 +40,9 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~DARTBoxShape();
+
+      // Documentation inherited.
+      public: virtual void Init();
 
       // Documentation inherited.
       public: virtual void SetSize(const ignition::math::Vector3d &_size);

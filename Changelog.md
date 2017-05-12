@@ -5,6 +5,9 @@
 1. HarnessPlugin: PIMPL and allow re-attaching
     * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
 
+1. DART: Update contact information also if physics engine is disabled
+    * [Pull request #2704](https://bitbucket.org/osrf/gazebo/pull-requests/2704)
+
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
@@ -20,9 +23,16 @@
 1. Added GpuLaserDataIterator
     * [Pull request #2637](https://bitbucket.org/osrf/gazebo/pull-request/2637)
 
+1. Added possibility to enforce contact computation
+    * [Pull request #2629](https://bitbucket.org/osrf/gazebo/pull-requests/2629/)
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Add actors in World as models so they get returned with World::Models()
+    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
 
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
@@ -294,6 +304,15 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (201X-XX-XX)
+
+## Gazebo 7.7.0 (2017-05-04)
+
+1. Fix race condition during Detach of HarnessPlugin
+    * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
+
+1. Added support for pincushion distortion model; fixed bug where
+   cameras with different distortion models would have the same distortion.
+    * [Pull request 2678](https://bitbucket.org/osrf/gazebo/pull-requests/2678)
 
 1. Added <collide_bitmask> support to bullet
     * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
