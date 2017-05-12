@@ -277,6 +277,8 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+## Gazebo 7.7.0 (2017-05-04)
+
 1. Fix race condition during Detach of HarnessPlugin
     * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
 
