@@ -1,9 +1,9 @@
-#version 130
+#version 120
 
 // params bound by ogre
-in vec4 position;
-in vec2 uv0;
-in vec2 uv1;
+attribute vec4 position;
+attribute vec2 uv0;
+attribute vec2 uv1;
 
 uniform mat4 worldMatrix;
 uniform mat4 viewProjMatrix;
@@ -12,10 +12,10 @@ uniform mat4 texViewProjMatrix0;
 uniform mat4 texViewProjMatrix1;
 uniform mat4 texViewProjMatrix2;
 
-out vec4 uvMisc;
-out vec4 lightSpacePos0;
-out vec4 lightSpacePos1;
-out vec4 lightSpacePos2;
+varying vec4 uvMisc;
+varying vec4 lightSpacePos0;
+varying vec4 lightSpacePos1;
+varying vec4 lightSpacePos2;
 
 void main()
 {
