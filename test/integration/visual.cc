@@ -26,7 +26,6 @@
 #include "gazebo/sensors/CameraSensor.hh"
 
 #include "gazebo/test/ServerFixture.hh"
-#include "scans_cmp.h"
 
 using namespace gazebo;
 class VisualProperty : public ServerFixture
@@ -52,7 +51,6 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
-
 /////////////////////////////////////////////////
 TEST_F(VisualProperty, CastShadows)
 {
@@ -62,7 +60,8 @@ TEST_F(VisualProperty, CastShadows)
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
-    gzerr << "No rendering engine, unable to run camera test\n";
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
     return;
   }
 
@@ -95,8 +94,8 @@ TEST_F(VisualProperty, CastShadows)
 
   imageCount = 0;
   imageCount2 = 0;
-  img = new unsigned char[width * height*3];
-  img2 = new unsigned char[width * height*3];
+  img = new unsigned char[width * height * 3];
+  img2 = new unsigned char[width * height * 3];
 
   event::ConnectionPtr c =
       camSensor->Camera()->ConnectNewImageFrame(
@@ -115,31 +114,38 @@ TEST_F(VisualProperty, CastShadows)
   // wait for images
   int totalImages = 20;
   while (imageCount < totalImages && imageCount2 < totalImages &&
-      timer.GetElapsed().Double() < 4)
+      timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
 
-  unsigned int diffMax = 0, diffSum = 0;
-  double diffAvg = 0.0; 
-  this->ImageCompare(img, img2, width, height, 3,
-                     diffMax, diffSum, diffAvg);
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
 
   // camera1 image should be darker than camera2 image
   // because the mesh below camera1 is casting shadows
-//  EXPECT_NE(diffSum, 0u);
-  // check that the color diff between the images are relatively large 
-  // and not just different due to rendering artifacs. 
-  // computer pixel color diff wrt to a whilte image
-  double colorRatio = static_cast<double>(diffSum) / (width * height * 3 * 255);
-//   EXPECT_GT(colorRatio, 0.1);
-
-  std::cerr << "diffSum, colorRatio " << diffSum << ", " << colorRatio << std::endl;
+  EXPECT_LT(colorSum, colorSum2);
+  double colorRatio = static_cast<double>(colorSum2-colorSum) / 
+      static_cast<double>(colorSum2);
+  EXPECT_GT(colorRatio, 0.05);
 
   camSensor->Camera()->DisconnectNewImageFrame(c);
   camSensor2->Camera()->DisconnectNewImageFrame(c2);
   delete [] img;
   delete [] img2;
 }
-
 
 int main(int argc, char **argv)
 {
@@ -149,5 +155,3 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-
-
