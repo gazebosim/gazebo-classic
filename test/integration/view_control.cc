@@ -40,7 +40,7 @@ void MouseZoom(QWidget *_widget)
 
   // move the cursor in y for a quarter of the widget height
   double destY = 0.25;
-  unsigned int steps = 10;
+  unsigned int steps = 30;
   for (unsigned int i = 0; i < steps; ++i)
   {
     // compute the next y pos to move the mouse cursor to.
@@ -230,7 +230,7 @@ void ViewControlTest::MouseZoomTerrain()
   // make sure the box is visible and not completely occluded
   QVERIFY(cam->IsVisible(boxVis));
   ignition::math::Pose3d boxPt =
-      ignition::math::Pose3d(0.0, -0.5, 0.45, 0.0, 0.0, 0.0) +
+      ignition::math::Pose3d(0.0, -0.5, 0.4, 0.0, 0.0, 0.0) +
       boxVis->GetWorldPose().Ign();
   auto vis = cam->GetVisual(cam->Project(boxPt.Pos()));
   QVERIFY(vis != nullptr);
@@ -247,6 +247,7 @@ void ViewControlTest::MouseZoomTerrain()
   // Make sure the box is still in the frustum but it should now be
   // completely occluded.
   QVERIFY(cam->IsVisible(boxVis));
+  std::cerr << " cam pos " << cam->WorldPose() <<  std::endl;
   vis = cam->GetVisual(cam->Project(boxPt.Pos()));
   QVERIFY(vis == nullptr);
 
