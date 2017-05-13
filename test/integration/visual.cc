@@ -112,27 +112,26 @@ TEST_F(VisualProperty, CastShadows)
   timer.Start();
 
   // wait for images
-  int totalImages = 20;
+  int totalImages = 50;
   while (imageCount < totalImages && imageCount2 < totalImages &&
       timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
 
   unsigned int colorSum = 0;
   unsigned int colorSum2 = 0;
-  for (unsigned int y = 0; y < height; ++y)
+  for (unsigned int i = 0; i < height*width*3; i+=3)
   {
-    for (unsigned int x = 0; x < width*3; x+=3)
-    {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
-      colorSum += r + g + b;
-      unsigned int r2 = img2[(y*width*3) + x];
-      unsigned int g2 = img2[(y*width*3) + x + 1];
-      unsigned int b2 = img2[(y*width*3) + x + 2];
-      colorSum2 += r2 + g2 + b2;
-    }
+    unsigned int r = img[i];
+    unsigned int g = img[i + 1];
+    unsigned int b = img[i + 2];
+    colorSum += r + g + b;
+    unsigned int r2 = img2[i];
+    unsigned int g2 = img2[i + 1];
+    unsigned int b2 = img2[i + 2];
+    colorSum2 += r2 + g2 + b2;
   }
+  std::cerr << "color sum " << colorSum << " vs " << colorSum2
+    << std::endl;
 
   // camera1 image should be darker than camera2 image
   // because the mesh below camera1 is casting shadows
