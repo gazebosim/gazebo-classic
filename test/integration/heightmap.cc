@@ -510,6 +510,22 @@ void HeightmapTest::Material(const std::string _worldName,
     gSum += g;
     bSum += b;
   }
+  // TODO debuggin =====
+  std::string home = common::getEnv("HOME");
+  std::cerr << "home " << home << std::endl;
+//  common::copyFile("/.gazebo/ogre.log", "~/.gazebo/ogre.log.bk");
+  std::string str;
+  std::ifstream infile;
+  infile.open (home + "/.gazebo/ogre.log");
+  if (infile.is_open()){
+  while(!infile.eof())
+  {
+    getline(infile, str);
+    std::cout << str << std::endl;
+  }
+  }
+  infile.close();
+  // ===============
 
   // verify that red is the dominant color in the image
   EXPECT_GT(rSum, gSum);
