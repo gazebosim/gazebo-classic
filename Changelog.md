@@ -5,6 +5,8 @@
 1. Fix disabling mesh cast shadows
     * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
 
+## Gazebo 7.7.0 (2017-05-04)
+
 1. Fix race condition during Detach of HarnessPlugin
     * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
 
@@ -19,7 +21,7 @@
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
-    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
