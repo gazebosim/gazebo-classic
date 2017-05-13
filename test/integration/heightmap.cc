@@ -461,6 +461,27 @@ void HeightmapTest::Material(const std::string _worldName,
     return;
   }
 
+  // path to heightmap cache files
+  std::string heightmapName = "heightmap_bowl";
+  std::string heightmapDir(common::SystemPaths::Instance()->GetLogPath()
+      + "/paging");
+  std::string shaPath = heightmapDir + "/" + heightmapName + "/gzterrain.SHA1";
+  std::string cachePath = heightmapDir +
+      "/" + heightmapName + "/gazebo_terrain_00000000.dat";
+
+  // temporary backup files for testing if cache files exist.
+  std::string shaPathBk = shaPath + ".bk";
+  std::string cachePathBk = cachePath + ".bk";
+  if (common::exists(shaPath))
+    common::moveFile(shaPath, shaPathBk);
+  if (common::exists(cachePath))
+    common::moveFile(cachePath, cachePathBk);
+
+  // there should be no cache files
+  EXPECT_FALSE(common::exists(shaPath));
+  EXPECT_FALSE(common::exists(cachePath));
+
+
   // load a heightmap with red material
   Load(_worldName, false, _physicsEngine);
   physics::ModelPtr heightmap = GetModel("heightmap");
@@ -532,6 +553,14 @@ void HeightmapTest::Material(const std::string _worldName,
   EXPECT_GT(rSum, bSum);
 
   delete [] img;
+
+  // clean up by moving old files back
+  if (common::exists(shaPathBk))
+    common::moveFile(shaPathBk, shaPath);
+  if (common::exists(cachePathBk))
+    common::moveFile(cachePathBk, cachePath);
+  EXPECT_FALSE(common::exists(shaPathBk));
+  EXPECT_FALSE(common::exists(cachePathBk));
 }
 
 /////////////////////////////////////////////////
