@@ -249,7 +249,6 @@ void ViewControlTest::MouseZoomTerrain()
   // Make sure the box is still in the frustum but it should now be
   // completely occluded.
   QVERIFY(cam->IsVisible(boxVis));
-  std::cerr << " cam pos " << cam->WorldPose() <<  std::endl;
   vis = cam->GetVisual(cam->Project(boxPt.Pos()));
   QVERIFY(vis == nullptr);
 
