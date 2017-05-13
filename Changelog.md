@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Fix disabling mesh cast shadows
+    * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
+
 1. Fix race condition during Detach of HarnessPlugin
     * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
 
