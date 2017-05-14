@@ -74,7 +74,7 @@ TEST_F(ModelTest, NestedModelSensorScopedName)
   EXPECT_EQ(imuScopedName[0],
     "default::model_00::model_01::model_02::model_03::imu_link::imu_sensor");
 
-  gzmsg << "Get a inexisting scoped sensor name" << std::endl;
+  gzmsg << "Get a nonexistent scoped sensor name" << std::endl;
 
   const std::vector<std::string> noScopedName =
       model->SensorScopedName("no_sensor");

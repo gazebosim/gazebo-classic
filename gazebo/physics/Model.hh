@@ -344,7 +344,7 @@ namespace gazebo
       /// This will count all the sensors attached to all the links.
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
-      
+
       /// \brief Get scoped sensor name(s) in the model that matches
       /// sensor name.
       ///
