@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Add function to retrieve scoped sensors name in multi-nested model
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
+
 ## Gazebo 7.7.0 (2017-05-04)
 
 1. Fix race condition during Detach of HarnessPlugin
