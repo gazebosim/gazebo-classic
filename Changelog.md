@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Backport wide angle camera VM FSAA fix
+    * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
+
 1. Add function to retrieve scoped sensors name in multi-nested model
     * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
 
