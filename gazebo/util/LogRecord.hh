@@ -144,11 +144,11 @@ namespace gazebo
       public: void SetPeriod(const double _period);
 
       /// \brief Get the log recording filter string.
-      /// \return New log recording filter string.
+      /// \return Log recording filter string.
       public: std::string Filter() const;
 
       /// \brief Set the log recording filter string.
-      /// \param[in] _filter Log record filter regex string
+      /// \param[in] _filter New log record filter regex string
       public: void SetFilter(const std::string &_filter);
 
       /// \brief Get whether the logger is ready to start, which implies
