@@ -136,12 +136,20 @@ namespace gazebo
       public: bool Paused() const;
 
       /// \brief Get the log recording period.
-      /// \return Log recording period.
+      /// \return Log recording period in seconds.
       public: double Period() const;
 
+      /// \brief Set the log recording period.
+      /// \param[in] _period New log recording period in seconds.
+      public: void SetPeriod(const double _period);
+
       /// \brief Get the log recording filter string.
-      /// \return Log recording filter string.
+      /// \return New log recording filter string.
       public: std::string Filter() const;
+
+      /// \brief Set the log recording filter string.
+      /// \param[in] _filter Log record filter regex string
+      public: void SetFilter(const std::string &_filter);
 
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.

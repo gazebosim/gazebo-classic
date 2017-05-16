@@ -322,9 +322,21 @@ double LogRecord::Period() const
 }
 
 //////////////////////////////////////////////////
+void LogRecord::SetPeriod(const double _period)
+{
+  this->dataPtr->period = _period;
+}
+
+//////////////////////////////////////////////////
 std::string LogRecord::Filter() const
 {
   return this->dataPtr->filter;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetFilter(const std::string &_filter)
+{
+  this->dataPtr->filter = _filter;
 }
 
 //////////////////////////////////////////////////
