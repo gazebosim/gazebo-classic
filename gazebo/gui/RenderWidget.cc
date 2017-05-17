@@ -130,7 +130,45 @@ void RenderWidget::Init()
   auto pluginFilenames = common::split(filenames, ":");
 
   // Load each plugin
-  this->AddPlugins(pluginFilenames);
+  for (std::vector<std::string>::const_iterator iter = pluginFilenames.begin();
+       iter != pluginFilenames.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if ((*iter).empty()) continue;
+
+    // create an empty element as this function ignores SDF
+    sdf::ElementPtr elem(new sdf::Element());
+    std::string _filename(*iter);
+
+    if (_filename.empty())
+    {
+      gzerr << "Unable to create gui overlay plugin from an empty file\n";
+      continue;
+    }
+
+    // Try to create the plugin
+    gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename, _filename);
+
+    if (!plugin)
+    {
+      gzerr << "Unable to create gui overlay plugin with filename["
+        << _filename << "]\n";
+      continue;
+    }
+
+    if (plugin->GetType() != gazebo::GUI_PLUGIN)
+    {
+      gzerr << "System is attempting to load "
+        << "a plugin, but detected an incorrect plugin type. "
+        << "Plugin filename[" << _filename << "].\n";
+      continue;
+    }
+
+    this->AddPlugin(plugin, elem);
+
+    gzlog << "Loaded GUI plugin[" << _filename << "]\n";
+  }
+
 }
 
 /////////////////////////////////////////////////
@@ -275,57 +313,6 @@ void RenderWidget::OnFollow(const std::string &_modelName)
     g_translateAct->setEnabled(false);
     g_rotateAct->setEnabled(false);
   }
-}
-
-/////////////////////////////////////////////////
-void RenderWidget::AddPlugins(const std::vector<std::string> &_pluginFilenames)
-{
-  // Load each plugin
-  for (std::vector<std::string>::const_iterator iter = _pluginFilenames.begin();
-       iter != _pluginFilenames.end(); ++iter)
-  {
-    // Make sure the string is not empty
-    if ((*iter).empty())
-      continue;
-
-    // create an empty element as this function ignores SDF
-    sdf::ElementPtr elem(new sdf::Element());
-    this->AddPlugin(*iter, elem);
-  }
-}
-
-/////////////////////////////////////////////////
-bool RenderWidget::AddPlugin(const std::string &_filename,
-                             sdf::ElementPtr _elem)
-{
-  if (_filename.empty())
-  {
-    gzerr << "Unable to create gui overlay plugin from an empty file\n";
-    return false;
-  }
-
-  // Try to create the plugin
-  gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename, _filename);
-
-  if (!plugin)
-  {
-    gzerr << "Unable to create gui overlay plugin with filename["
-      << _filename << "]\n";
-    return false;
-  }
-
-  if (plugin->GetType() != gazebo::GUI_PLUGIN)
-  {
-    gzerr << "System is attempting to load "
-      << "a plugin, but detected an incorrect plugin type. "
-      << "Plugin filename[" << _filename << "].\n";
-    return false;
-  }
-
-  this->AddPlugin(plugin, _elem);
-
-  gzlog << "Loaded GUI plugin[" << _filename << "]\n";
-  return true;
 }
 
 /////////////////////////////////////////////////

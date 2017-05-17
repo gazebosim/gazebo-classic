@@ -191,7 +191,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      g_plugins_to_load.push_back(*iter);
+      gazebo::client::addPlugin(*iter);
     }
   }
 
@@ -364,8 +364,6 @@ bool gui::run(int _argc, char **_argv)
   GZ_ASSERT(mainWindow, "Main Window has to be available!");
   GZ_ASSERT(mainWindow->RenderWidget(),
             "Main window's RenderWidget must have been created");
-
-  mainWindow->RenderWidget()->AddPlugins(g_plugins_to_load);
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for

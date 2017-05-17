@@ -78,24 +78,6 @@ namespace gazebo
       /// \param[in] _elem Plugin sdf parameters.
       public: void AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem);
 
-      /// \brief Add a plugin to the render widget and call GUIPlugin::Load().
-      /// \retval true on success.
-      /// \retval false if the plugin in the file is not of the right type,
-      ///       it needs to be a GUIPlugin. Also returns false if the plugin
-      ///       couldn't be created from this file.
-      /// \param[in] _filename Filename to load the plugin from
-      /// \param[in] _elem Plugin sdf parameters.
-      public: bool AddPlugin(const std::string &_filename,
-                             sdf::ElementPtr _elem);
-
-      /// \brief Add a list of plugins to be loaded from files.
-      ///   This will create a plugin from each file in the list and call
-      ///   AddPlugin(std::string, sdf::ElementPtr with an empty sdf::Element
-      ///   for each. Use AddPlugin(std::string&, sdf::ElementPtr) to load a GUI
-      ///   plugin with an initialized sdf element instead.
-      /// \param[in] _pluginFilenames list of filenames with the plugins
-      public: void AddPlugins(const std::vector<std::string> &_pluginFilenames);
-
       /// \brief Get the toolbar on top of the render widget
       /// \return Toolbar
       public: TopToolbar *GetToolbar() const;
