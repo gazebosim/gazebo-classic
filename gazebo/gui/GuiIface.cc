@@ -191,7 +191,7 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::client::addPlugin(*iter);
+      g_plugins_to_load.push_back(*iter);
     }
   }
 
@@ -364,6 +364,47 @@ bool gui::run(int _argc, char **_argv)
   GZ_ASSERT(mainWindow, "Main Window has to be available!");
   GZ_ASSERT(mainWindow->RenderWidget(),
             "Main window's RenderWidget must have been created");
+
+  // Load each plugin
+  for (auto iter = g_plugins_to_load.begin();
+       iter != g_plugins_to_load.end(); ++iter)
+  {
+    // Make sure the string is not empty
+    if ((*iter).empty()) continue;
+
+    // create an empty element as this function ignores SDF
+    sdf::ElementPtr elem(new sdf::Element());
+    std::string _filename(*iter);
+
+    if (_filename.empty())
+    {
+      gzerr << "Unable to create gui overlay plugin from an empty file\n";
+      continue;
+    }
+
+    // Try to create the plugin
+    gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename,
+                                                            _filename);
+
+    if (!plugin)
+    {
+      gzerr << "Unable to create gui overlay plugin with filename["
+        << _filename << "]\n";
+      continue;
+    }
+
+    if (plugin->GetType() != gazebo::GUI_PLUGIN)
+    {
+      gzerr << "System is attempting to load "
+        << "a plugin, but detected an incorrect plugin type. "
+        << "Plugin filename[" << _filename << "].\n";
+      continue;
+    }
+
+    mainWindow->RenderWidget()->AddPlugin(plugin, elem);
+
+    gzlog << "Loaded GUI plugin[" << _filename << "]\n";
+  }
 
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
