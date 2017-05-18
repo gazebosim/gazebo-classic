@@ -152,7 +152,7 @@ set (headers msgs.hh MsgFactory.hh)
 ###########################################################
 # Append str to a string property of a target.
 # target: string: target name.
-# property: name of targetâ€™s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# property: name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
 # str: string: string to be appended to the property
 macro(my_append_target_property target property str)
   get_target_property(current_property ${target} ${property})
@@ -172,19 +172,12 @@ foreach(FIL ${msgs})
   list(APPEND PROTO_SRCS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc")
   list(APPEND PROTO_HDRS "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h")
 
-  # Need to add .exe to executable in windows
-  if (WIN32)
-     set(gazebomsgs_out_binary "gazebomsgs_out.exe")
-  else()
-     set(gazebomsgs_out_binary "gazebomsgs_out")
-  endif()
-
   add_custom_command(
     OUTPUT
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.cc"
       "${CMAKE_CURRENT_BINARY_DIR}/${FIL_WE}.pb.h"
     COMMAND  ${PROTOBUF_PROTOC_EXECUTABLE}
-    ARGS --plugin=protoc-gen-gazebomsgs=${CMAKE_CURRENT_BINARY_DIR}/${gazebomsgs_out_binary} --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
+    ARGS --plugin=protoc-gen-gazebomsgs=$<TARGET_FILE:gazebomsgs_out> --cpp_out=dllexport_decl=GZ_MSGS_VISIBLE:${CMAKE_CURRENT_BINARY_DIR} --gazebomsgs_out=${CMAKE_CURRENT_BINARY_DIR} --proto_path=${CMAKE_CURRENT_SOURCE_DIR} ${ABS_FIL}
     DEPENDS ${ABS_FIL} gazebomsgs_out
     COMMENT "Running C++ protocol buffer compiler on ${FIL}"
     VERBATIM )

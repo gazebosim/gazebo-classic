@@ -31,7 +31,6 @@ DARTCylinderShape::DARTCylinderShape(DARTCollisionPtr _parent)
   : CylinderShape(_parent),
     dataPtr(new DARTCylinderShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtCylinderShape);
 }
 
 //////////////////////////////////////////////////
@@ -39,6 +38,26 @@ DARTCylinderShape::~DARTCylinderShape()
 {
   delete this->dataPtr;
   this->dataPtr = nullptr;
+}
+
+//////////////////////////////////////////////////
+void DARTCylinderShape::Init()
+{
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
+
+  if (!bodyNode) gzerr << "BodyNode is NULL in init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL in init!");
+
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->ShapeNode());
+
+  CylinderShape::Init();
 }
 
 //////////////////////////////////////////////////
@@ -75,6 +94,6 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
 
   CylinderShape::SetSize(_radius, _length);
 
-  this->dataPtr->dtCylinderShape->setRadius(_radius);
-  this->dataPtr->dtCylinderShape->setHeight(_length);
+  this->dataPtr->Shape()->setRadius(_radius);
+  this->dataPtr->Shape()->setHeight(_length);
 }

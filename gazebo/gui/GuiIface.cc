@@ -18,7 +18,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+     #define snprintf _snprintf
+  #endif
 #endif
 
 #include <signal.h>

@@ -44,7 +44,7 @@ void DARTUniversalJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::UniversalJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -62,6 +62,8 @@ ignition::math::Vector3d DARTUniversalJoint::Anchor(
     return this->dataPtr->GetCached<ignition::math::Vector3d>(
           "Anchor" + std::to_string(_index));
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
                         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
@@ -82,28 +84,32 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
 
   Eigen::Vector3d globalAxis = Eigen::Vector3d::UnitX();
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
-        this->dataPtr->dtJoint->getLocalTransform().inverse() *
+        this->dataPtr->dtJoint->getRelativeTransform().inverse() *
         this->dataPtr->dtJoint->getTransformFromParentBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis1();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis1();
 
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
-    Eigen::Vector3d axis = dtUniveralJoint->getAxis2();
+    Eigen::Vector3d axis = dtUniversalJoint->getAxis2();
 
     globalAxis = T.linear() * axis;
   }
@@ -127,6 +133,8 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
       this->AxisFrameOffset(_index).RotateVector(_axis));
   Eigen::Isometry3d dtTransfJointLeftToParentLink
@@ -135,17 +143,19 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
 
   if (_index == 0)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
-    dtUniveralJoint->setAxis1(dtAxis);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+    dtUniversalJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
   {
-    dart::dynamics::UniversalJoint *dtUniveralJoint =
-        reinterpret_cast<dart::dynamics::UniversalJoint *>(
+    dart::dynamics::UniversalJoint *dtUniversalJoint =
+        dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
-    dtUniveralJoint->setAxis2(dtAxis);
+    GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+    dtUniversalJoint->setAxis2(dtAxis);
   }
   else
   {
@@ -162,6 +172,8 @@ double DARTUniversalJoint::PositionImpl(const unsigned int _index) const
   }
 
   double result = ignition::math::NAN_D;
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
   {
@@ -190,6 +202,8 @@ double DARTUniversalJoint::GetVelocity(unsigned int _index) const
 
   double result = 0.0;
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index == 0)
     result = this->dataPtr->dtJoint->getVelocity(0);
   else if (_index == 1)
@@ -212,6 +226,8 @@ void DARTUniversalJoint::SetVelocity(unsigned int _index, double _vel)
     return;
   }
 
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
   if (_index < this->DOF())
     this->dataPtr->dtJoint->setVelocity(_index, _vel);
   else
@@ -228,6 +244,8 @@ void DARTUniversalJoint::SetForceImpl(unsigned int _index, double _effort)
         boost::bind(&DARTUniversalJoint::SetForceImpl, this, _index, _effort));
     return;
   }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
   if (_index == 0)
     this->dataPtr->dtJoint->setForce(0, _effort);

@@ -58,8 +58,18 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
+}
 
-  // Pose offset
+//////////////////////////////////////////////////
+void DARTCollision::Init()
+{
+  Collision::Init();
+
+  // Create the collision shapes. Since DART6, this has to be done in
+  // Init(), because the BodyNode will only have been created in Load()
+  // and is not guaranteed to exist before.
+
+  // Set the pose offset.
   if (this->dataPtr->dtCollisionShape)
   {
     // TODO: Remove type check once DART completely supports plane shape.
@@ -69,16 +79,10 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
 
     if (!isPlaneShape)
     {
-      this->dataPtr->dtCollisionShape->setLocalTransform(
-            DARTTypes::ConvPose(this->RelativePose()));
+      Eigen::Isometry3d tf = DARTTypes::ConvPose(this->RelativePose());
+      this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void DARTCollision::Init()
-{
-  Collision::Init();
 }
 
 //////////////////////////////////////////////////
@@ -120,21 +124,32 @@ unsigned int DARTCollision::GetCollideBits() const
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
-  ignition::math::Box result(0, 0, 0, 0, 0, 0);
+  GZ_ASSERT(this->dataPtr->dtCollisionShape,
+            "DARTCollision Must have a collision shape");
+  GZ_ASSERT(this->dataPtr->dtCollisionShape->getShape(),
+            "DARTCollision has no shape");
 
-  gzerr << "DART does not provide bounding box info.\n";
+  const dart::math::BoundingBox& bb =
+    this->dataPtr->dtCollisionShape->getShape()->getBoundingBox();
 
+  ignition::math::Box result(bb.getMin().x(),
+                             bb.getMin().y(),
+                             bb.getMin().z(),
+                             bb.getMax().x(),
+                             bb.getMax().y(),
+                             bb.getMax().z());
   return result;
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
+dart::dynamics::BodyNode *DARTCollision::DARTBodyNode() const
 {
-  return boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
+  return boost::static_pointer_cast<DARTLink>(this->link)->DARTBodyNode();
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
+void DARTCollision::SetDARTCollisionShapeNode(
+                                          dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
@@ -142,13 +157,13 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::ShapePtr DARTCollision::DARTCollisionShape() const
+dart::dynamics::ShapeNodePtr DARTCollision::DARTCollisionShapeNode() const
 {
   return this->dataPtr->dtCollisionShape;
 }
 
 /////////////////////////////////////////////////
-DARTSurfaceParamsPtr DARTCollision::GetDARTSurface() const
+DARTSurfaceParamsPtr DARTCollision::DARTSurface() const
 {
   return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }

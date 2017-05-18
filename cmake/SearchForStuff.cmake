@@ -80,8 +80,7 @@ else ()
 endif ()
 
 ########################################
-include (FindHDF5)
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C CXX)
 
 if (NOT HDF5_FOUND)
   BUILD_WARNING("HDF5 not found")
@@ -98,8 +97,22 @@ if (MSVC)
   set (PKG_CONFIG_FOUND TRUE)
 endif()
 
+find_package(CURL)
+if (CURL_FOUND)
+  # FindCURL.cmake distributed with CMake exports 
+  # the CURL_INCLUDE_DIRS variable, while the pkg_check_modules
+  # function exports the CURL_INCLUDEDIR variable.
+  # TODO: once the configure.bat VS2013 based script has been removed, 
+  #       remove the call pkg_check_modules(CURL libcurl) and all the uses of 
+  #       CURL_LIBDIR and CURL_INCLUDEDIR and use directly the variables 
+  #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake 
+  set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
+endif ()
+
 if (PKG_CONFIG_FOUND)
-  pkg_check_modules(CURL libcurl)
+  if (NOT CURL_FOUND)
+    pkg_check_modules(CURL libcurl)
+  endif ()
   if (NOT CURL_FOUND)
     BUILD_ERROR ("Missing: libcurl. Required for connection to model database.")
   endif()
@@ -148,13 +161,14 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  find_package(DARTCore 5.1.1 QUIET)
-  if (DARTCore_FOUND)
-    message (STATUS "Looking for DARTCore - ${DARTCore_VERSION} found")
+  set(DART_MIN_REQUIRED_VERSION 6)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION})
+  if (DART_FOUND)
+    message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
   else()
-    message (STATUS "Looking for DARTCore - not found")
-    BUILD_WARNING ("DART not found, for dart physics engine option, please install libdart-core5-dev.")
+    message (STATUS "Looking for DART - not found")
+    BUILD_WARNING ("DART ${DART_MIN_REQUIRED_VERSION} not found, for dart physics engine option, please install libdart${DART_MIN_REQUIRED_VERSION}-dev.")
     set (HAVE_DART FALSE)
   endif()
 
@@ -337,8 +351,23 @@ if (PKG_CONFIG_FOUND)
   endif ()
 
   pkg_check_modules(OGRE OGRE>=${MIN_OGRE_VERSION})
-  # There are some runtime problems to solve with ogre-1.9.
-  # Please read gazebo issues: 994, 995
+
+  if (NOT OGRE_FOUND)
+    # If OGRE was not found, try with the standard find_package(OGRE)
+    find_package(OGRE COMPONENTS RTShaderSystem Terrain Overlay Paging)
+    # Add each component include directories to OGRE_INCLUDE_DIRS because
+    # some OGRE components headers include without prefix headers contained
+    # in other components (see http://www.ogre3d.org/forums/viewtopic.php?f=2&t=73222)
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_RTShaderSystem_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Terrain_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Overlay_INCLUDE_DIRS})
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_Paging_INCLUDE_DIRS})
+    list(APPEND OGRE_LIBRARIES ${OGRE_RTShaderSystem_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Terrain_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Overlay_LIBRARIES})
+    list(APPEND OGRE_LIBRARIES ${OGRE_Paging_LIBRARIES})
+  endif ()
+
   if (NOT OGRE_FOUND)
     BUILD_ERROR("Missing: Ogre3d version >=${MIN_OGRE_VERSION}(http://www.orge3d.org)")
   else ()

@@ -31,16 +31,41 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTSphereShapePrivate()
-        : dtEllipsoidShape(
-            new dart::dynamics::EllipsoidShape(Eigen::Vector3d(1, 1, 1)))
       {
       }
 
       /// \brief Default destructor
       public: ~DARTSphereShapePrivate() = default;
 
+      // \brief returns the shape
+      public: dart::dynamics::ShapeNodePtr ShapeNode() const
+      {
+        return this->dtSphereShape;
+      }
+
+      // \brief returns the shape
+      public: dart::dynamics::SphereShape* Shape() const
+      {
+        GZ_ASSERT(this->dtSphereShape, "SphereShape is NULL");
+        return static_cast<dart::dynamics::SphereShape*>
+                      (this->dtSphereShape->getShape().get());
+      }
+
+      /// \brief Creates the shape
+      /// \param[in] _bodyNode the body node to use for the shape
+      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
+      {
+        GZ_ASSERT(_bodyNode, "BodyNode is NULL");
+        dart::dynamics::ShapePtr shape(new dart::dynamics::SphereShape(1));
+        dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
+                                      dart::dynamics::VisualAspect,
+                                      dart::dynamics::CollisionAspect,
+                                      dart::dynamics::DynamicsAspect>(shape);
+        this->dtSphereShape.set(node);
+      }
+
       /// \brief DART sphere shape
-      public: std::shared_ptr<dart::dynamics::EllipsoidShape> dtEllipsoidShape;
+      private: dart::dynamics::ShapeNodePtr dtSphereShape;
     };
   }
 }

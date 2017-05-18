@@ -23,12 +23,13 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DARTCore_INCLUDE_DIRS} )
-  link_directories ( ${DARTCore_LIBRARY_DIRS} )
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
 endif()
 
 set(tests
   aero_plugin.cc
+  attach_light_plugin.cc
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
@@ -94,6 +95,7 @@ set(tests
   #state_log.cc
   surface_properties.cc
   swarm.cc
+  touch_plugin.cc
   transceiver.cc
   transport.cc
   transporter.cc
@@ -122,6 +124,7 @@ gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 # Increase timeout, to account for model download time.
 set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
@@ -172,6 +175,7 @@ gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 set(qt_tests
   camera_gui.cc
   collada_visualization.cc
+  force_torque_visualization.cc
   insert_model.cc
   marker.cc
   model_editor.cc
