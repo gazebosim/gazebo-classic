@@ -147,7 +147,8 @@ void RenderWidget::Init()
     }
 
     // Try to create the plugin
-    gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename, _filename);
+    gazebo::GUIPluginPtr plugin = gazebo::GUIPlugin::Create(_filename,
+                                                            _filename);
 
     if (!plugin)
     {
@@ -168,7 +169,6 @@ void RenderWidget::Init()
 
     gzlog << "Loaded GUI plugin[" << _filename << "]\n";
   }
-
 }
 
 /////////////////////////////////////////////////
