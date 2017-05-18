@@ -106,7 +106,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
     physics::ModelPtr model = world->ModelByName("model_tshape");
     ASSERT_TRUE(model != nullptr);
     ignition::math::Box box = model->BoundingBox();
-    std::cout << "BOUNDING BOX: " << box << std::endl;
+    gzdbg << "Bounding box for " << _physicsEngine << ": " << box << std::endl;
     EXPECT_DOUBLE_EQ(box.Min().X(), -0.5);
     EXPECT_DOUBLE_EQ(box.Min().Y(), 0);
     EXPECT_DOUBLE_EQ(box.Min().Z(), -0.05);
