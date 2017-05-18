@@ -121,6 +121,93 @@ unsigned int DARTCollision::GetCollideBits() const
   return this->dataPtr->collideBits;
 }
 
+
+//////////////////////////////////////////////////
+// Helper function to prevent following current limitation of
+// ignition::math::Vector3:
+// operator [] does not return a reference, so can't use the operator for
+// writing the i'th value, and instead have to use X()/Y()/Z() functions.
+// This function should should achieve the same as this expression should:
+// ``v[i] = val;``
+// Given that i = [0..2].
+template<typename Float>
+void SetVector(const size_t i, const Float val,
+               ignition::math::Vector3d& v)
+{
+    if (i == 0)
+    {
+      v.X() =  val;
+    }
+    else if (i == 1)
+    {
+      v.Y() = val;
+    }
+    else
+    {
+      v.Z() =  val;
+    }
+}
+
+//////////////////////////////////////////////////
+// see also: Book "real-time collision detection by Christer Ericson, v. 1,
+// p. 86, function UpdateAABB
+// FIXME: I reckon this should go to ignition::math, as updating an AABB
+// with a transform is generally useful.
+ignition::math::Box UpdateAABB(const ignition::math::Box& a,
+                               const ignition::math::Matrix4d& m)
+{
+  // construct object to be returned.
+  // Attention: If we only use the default ignition::math::Box constructor
+  // and then set min and max individually with Min()/Max(), then
+  // the extent of the box won't be initialized to BoxPrivate::EXTENT_FINITE,
+  // which in turn will lead to failures if this box is used to add onto
+  // another box with ignition::math::Box::operator+=.
+  // To construct a valid return object, use the constructor which takes two
+  // vectors as arguments, the values don't actually matter.
+  // See also issue #72:
+  // https://bitbucket.org/ignitionrobotics/ign-math/issues/72/
+  ignition::math::Vector3d minInit(a.Min().X(), a.Min().Y(), a.Min().Z());
+  ignition::math::Vector3d maxInit(a.Max().X(), a.Max().Y(), a.Max().Z());
+  ignition::math::Box result(minInit, maxInit);
+
+  // for all 3 axes
+  for (size_t i = 0; i < 3; ++i)
+  {
+    // First, add translation.
+    // Use SetVector() until maybe an update to ignition allows the
+    // following:
+    // result.Min()[i] =  m(i, 3);
+    // result.Max()[i] =  m(i, 3);
+    SetVector(i, m(i, 3), result.Min());
+    SetVector(i, m(i, 3), result.Max());
+
+    // Then, sum in larger and smaller terms
+    for (size_t j = 0; j < 3; ++j)
+    {
+      // minimum and maximum coordinate of this axis rotated
+      float minRot = m(i, j) * a.Min()[j];
+      float maxRot = m(i, j) * a.Max()[j];
+      if (minRot < maxRot)
+      {
+        // result.Min()[i] += minRot;
+        // result.Max()[i] += maxRot;
+        SetVector(i, result.Min()[i] + minRot, result.Min());
+        SetVector(i, result.Max()[i] + maxRot, result.Max());
+      }
+      else
+      {
+        // result.Min()[i] += maxRot;
+        // result.Max()[i] += minRot;
+        SetVector(i, result.Min()[i] + maxRot, result.Min());
+        SetVector(i, result.Max()[i] + minRot, result.Max());
+      }
+
+    }
+  }
+  return result;
+}
+
+
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
@@ -138,6 +225,9 @@ ignition::math::Box DARTCollision::BoundingBox() const
                              bb.getMax().x(),
                              bb.getMax().y(),
                              bb.getMax().z());
+
+  result = UpdateAABB(result, ignition::math::Matrix4d(this->RelativePose()));
+
   return result;
 }
 

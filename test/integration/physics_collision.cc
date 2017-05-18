@@ -58,15 +58,24 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 
   // Check bounding box of ground plane
   {
+    double big = g_big;
+    double z = 0.0;
+    if (_physicsEngine == "dart")
+    {
+      // Dart doesn't handle planes yet
+      big = 1049;
+      z = 1050;
+    }
+
     physics::ModelPtr model = world->ModelByName("ground_plane");
     ASSERT_TRUE(model != nullptr);
     ignition::math::Box box = model->BoundingBox();
-    EXPECT_LT(box.Min().X(), -g_big);
-    EXPECT_LT(box.Min().Y(), -g_big);
-    EXPECT_LT(box.Min().Z(), -g_big);
-    EXPECT_GT(box.Max().X(), g_big);
-    EXPECT_GT(box.Max().Y(), g_big);
-    EXPECT_DOUBLE_EQ(box.Max().Z(), 0.0);
+    EXPECT_LT(box.Min().X(), -big);
+    EXPECT_LT(box.Min().Y(), -big);
+    EXPECT_LT(box.Min().Z(), -big);
+    EXPECT_GT(box.Max().X(), big);
+    EXPECT_GT(box.Max().Y(), big);
+    EXPECT_DOUBLE_EQ(box.Max().Z(), z);
   }
 
   // Insert model which forms a t-shape, made up of two long boxes.
@@ -107,12 +116,13 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
     ASSERT_TRUE(model != nullptr);
     ignition::math::Box box = model->BoundingBox();
     gzdbg << "Bounding box for " << _physicsEngine << ": " << box << std::endl;
-    EXPECT_DOUBLE_EQ(box.Min().X(), -0.5);
-    EXPECT_DOUBLE_EQ(box.Min().Y(), 0);
-    EXPECT_DOUBLE_EQ(box.Min().Z(), -0.05);
-    EXPECT_DOUBLE_EQ(box.Max().X(), 0.5);
-    EXPECT_DOUBLE_EQ(box.Max().Y(), 1);
-    EXPECT_DOUBLE_EQ(box.Max().Z(), 0.05);
+    static double tol = 1e-03;
+    EXPECT_NEAR(box.Min().X(), -0.5, tol);
+    EXPECT_NEAR(box.Min().Y(), 0, tol);
+    EXPECT_NEAR(box.Min().Z(), -0.05, tol);
+    EXPECT_NEAR(box.Max().X(), 0.5, tol);
+    EXPECT_NEAR(box.Max().Y(), 1, tol);
+    EXPECT_NEAR(box.Max().Z(), 0.05, tol);
   }
 }
 
