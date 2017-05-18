@@ -17,11 +17,15 @@
 
 1. Deprecate functions to set linear/angular acceleration 
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
+
 1. Added GpuLaserDataIterator
     * [Pull request #2637](https://bitbucket.org/osrf/gazebo/pull-request/2637)
 
 1. Added possibility to enforce contact computation
     * [Pull request #2629](https://bitbucket.org/osrf/gazebo/pull-requests/2629/)
+
+1. Add function to retrieve scoped sensors name in multi-nested model
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2676)
 
 ## Gazebo 8
 
