@@ -43,8 +43,7 @@ class PhysicsCollisionTest : public ServerFixture,
 /////////////////////////////////////////////////
 void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "simbody" ||
-      _physicsEngine == "dart")
+  if (_physicsEngine == "simbody")
   {
     gzerr << "Bounding boxes not yet working with "
           << _physicsEngine
@@ -60,6 +59,7 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   // Check bounding box of ground plane
   {
     physics::ModelPtr model = world->ModelByName("ground_plane");
+    ASSERT_TRUE(model != nullptr);
     ignition::math::Box box = model->BoundingBox();
     EXPECT_LT(box.Min().X(), -g_big);
     EXPECT_LT(box.Min().Y(), -g_big);
@@ -67,6 +67,52 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
     EXPECT_GT(box.Max().X(), g_big);
     EXPECT_GT(box.Max().Y(), g_big);
     EXPECT_DOUBLE_EQ(box.Max().Z(), 0.0);
+  }
+
+  // Insert model which forms a t-shape, made up of two long boxes.
+  // The second box will have to be translated relative to the first to
+  // form the "roof" of the T. This tests whether the relative transforms
+  // of the collision shapes are considered when computing the bounding box.
+  // If they are not, the result would be that of a cross-shape instead.
+
+  std::ostringstream sdfStream;
+  sdfStream << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='model_tshape'>"
+    << "<static> true </static>"
+    << "<pose>0 0 0 0 0 0</pose>"
+    << "<link name=\"link\">"
+      << "<collision name=\"pose\">"
+        << "<pose>0 0.5 0 0 0 0</pose>"
+        << "<geometry>"
+          << "<box>"
+            << "<size>0.1 1 0.1</size>"
+          << "</box>"
+        << "</geometry>"
+      << "</collision>"
+      << "<collision name=\"top\">"
+        << "<pose>0 0.95 0 0 0 0</pose>"
+        << "<geometry>"
+          << "<box>"
+            << "<size>1 0.1 0.1</size>"
+          << "</box>"
+        << "</geometry>"
+      << "</collision>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+  SpawnSDF(sdfStream.str());
+
+  {
+    physics::ModelPtr model = world->ModelByName("model_tshape");
+    ASSERT_TRUE(model != nullptr);
+    ignition::math::Box box = model->BoundingBox();
+    std::cout << "BOUNDING BOX: " << box << std::endl;
+    EXPECT_DOUBLE_EQ(box.Min().X(), -0.5);
+    EXPECT_DOUBLE_EQ(box.Min().Y(), 0);
+    EXPECT_DOUBLE_EQ(box.Min().Z(), -0.05);
+    EXPECT_DOUBLE_EQ(box.Max().X(), 0.5);
+    EXPECT_DOUBLE_EQ(box.Max().Y(), 1);
+    EXPECT_DOUBLE_EQ(box.Max().Z(), 0.05);
   }
 }
 
