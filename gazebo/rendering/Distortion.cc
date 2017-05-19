@@ -362,8 +362,6 @@ void Distortion::CalculateAndApplyDistortionScale()
   }
 }
 
-}
-
 //////////////////////////////////////////////////
 ignition::math::Vector2d Distortion::Distort(
     const ignition::math::Vector2d &_in,
