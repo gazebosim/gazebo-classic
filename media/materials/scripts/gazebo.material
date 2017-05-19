@@ -1487,6 +1487,43 @@ material Gazebo/WideLensMap
   }
 }
 
+
+vertex_program Gazebo/CameraLesnFlareVS glsl
+{
+  source camera_lens_flare_vs.glsl
+}
+
+fragment_program Gazebo/CameraLesnFlareFS glsl
+{
+  source camera_lens_flare_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named time float 0
+    param_named size float2 0 0
+    param_named lightPos float2 0 0
+  }
+}
+
+material Gazebo/CameraLensFlare
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/CameraLesnFlareVS { }
+      fragment_program_ref Gazebo/CameraLesnFlareFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode border
+        filtering linear linear linear
+      }
+    }
+  }
+}
+
 material Gazebo/PointCloud
 {
    technique

@@ -35,6 +35,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
@@ -95,6 +96,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh

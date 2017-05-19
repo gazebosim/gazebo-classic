@@ -691,6 +691,11 @@ namespace gazebo
       /// \param[in] _target Pointer to the render target
       public: virtual void SetRenderTarget(Ogre::RenderTarget *_target);
 
+      /// \brief Add a post processing compositor
+      /// \param[in] _compositor Name of the compositor 
+      public: void AddCompositor(const std::string &_compositor);
+
+
       /// \brief Attach the camera to a scene node
       /// \param[in] _visualName Name of the visual to attach the camera to
       /// \param[in] _inheritOrientation True means camera acquires the visual's

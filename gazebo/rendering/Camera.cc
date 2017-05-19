@@ -52,6 +52,7 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Distortion.hh"
+#include "gazebo/rendering/LensFlare.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
@@ -1672,9 +1673,26 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     if (this->dataPtr->distortion)
       this->dataPtr->distortion->SetCamera(shared_from_this());
 
+    this->dataPtr->lensFlare.reset(new LensFlare);
+    this->dataPtr->lensFlare->SetCamera(shared_from_this());
+//    this->AddCompositor("CameraLensFlare/Default");
+
     if (this->GetScene()->GetSkyX() != NULL)
       this->renderTarget->addListener(this->GetScene()->GetSkyX());
   }
+}
+
+//////////////////////////////////////////////////
+void Camera::AddCompositor(const std::string &_compositor)
+{
+//  this->dataPtr->compositors.push_back
+  auto compositor = 
+      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
+      _compositor);
+
+  // compositor->getTechnique()->getOutputTargetPass()->getPass(0)->setMaterial(
+    
+  compositor->setEnabled(true);
 }
 
 //////////////////////////////////////////////////

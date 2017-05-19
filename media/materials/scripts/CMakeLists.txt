@@ -9,6 +9,7 @@ distortion.compositor
 gazebo.material
 grid.material
 kitchen.material
+lens_flare.compositor
 noise.compositor
 oculus.material
 perpixel.program
