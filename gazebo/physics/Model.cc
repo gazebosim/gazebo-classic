@@ -951,6 +951,32 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::vector<std::string> Model::SensorScopedName(
+  const std::string &_name) const
+{
+  std::vector<std::string> names;
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
+    {
+      const auto sensorName = (*iter)->GetSensorName(j);
+      if (sensorName.size() < _name.size())
+      {
+        continue;
+      }
+      if (sensorName.substr(sensorName.size() - _name.size(), _name.size()) ==
+          _name)
+      {
+        names.push_back(sensorName);
+      }
+    }
+  }
+
+  return names;
+}
+
+//////////////////////////////////////////////////
 void Model::LoadPlugins()
 {
   // Check to see if we need to load any model plugins

@@ -35,6 +35,7 @@
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -636,11 +637,14 @@ bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
 //////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
-  fsaa = 0;
-#endif
+  unsigned int fsaa = 0;
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   this->dataPtr->envCubeMapTexture =
       Ogre::TextureManager::getSingleton().createManual(
@@ -650,7 +654,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           this->dataPtr->envTextureSize,
           this->dataPtr->envTextureSize,
           0,
-          Ogre::PF_A8R8G8B8,
+          static_cast<Ogre::PixelFormat>(this->imageFormat),
           Ogre::TU_RENDERTARGET,
           0,
           false,
