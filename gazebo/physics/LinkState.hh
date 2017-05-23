@@ -206,7 +206,6 @@ namespace gazebo
         {
           /// Disabling this for efficiency.
           q = _state.velocity.rot.GetAsEuler();
-          // _out << std::defaultfloat <<std::setprecision(4)
           _out.unsetf(std::ios_base::floatfield);
           _out << std::setprecision(4)
             << "<velocity>"
@@ -234,8 +233,13 @@ namespace gazebo
         return _out;
       }
 
-      public: void SetRecordVelocity(const bool _record) const;
+      /// \brief Set whether to record link velocity
+      /// \param[in] _record True to record link velocity, false to leave it
+      /// out of the log
+      public: void SetRecordVelocity(const bool _record);
 
+      /// \brief Get whether link velocity is recorded
+      /// \return True if link velocity is recorded
       public: bool RecordVelocity() const;
 
       /// \brief 3D pose of the link relative to the model.
