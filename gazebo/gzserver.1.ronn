@@ -30,9 +30,9 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * --record_path arg :
  Absolute path in which to store state data
 * --record_period arg (=-1) :
- Recording period.
+ Recording period (seconds).
 * --record_filter arg :
- Recording filter.
+ Recording filter (supports wildcard and regular expression).
 * --seed arg :
  Start with a given random number seed.
 * --iters arg :

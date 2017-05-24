@@ -248,17 +248,15 @@ namespace gazebo
         _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << ignition::math::precision(_state.pose.pos.x, 3) << " "
-          << ignition::math::precision(_state.pose.pos.y, 3) << " "
-          << ignition::math::precision(_state.pose.pos.z, 3) << " "
-          << ignition::math::precision(q.x, 3) << " "
-          << ignition::math::precision(q.y, 3) << " "
-          << ignition::math::precision(q.z, 3) << " "
+          << ignition::math::precision(_state.pose.pos.x, 4) << " "
+          << ignition::math::precision(_state.pose.pos.y, 4) << " "
+          << ignition::math::precision(_state.pose.pos.z, 4) << " "
+          << ignition::math::precision(q.x, 4) << " "
+          << ignition::math::precision(q.y, 4) << " "
+          << ignition::math::precision(q.z, 4) << " "
           << "</pose>";
 
-        // Only record scale if it is not the default value of [1, 1, 1].
-        if (_state.scale != ignition::math::Vector3d::One)
-          _out << "<scale>" << _state.scale << "</scale>";
+        _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();

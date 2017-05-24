@@ -156,9 +156,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
     ("record_path", po::value<std::string>()->default_value(""),
      "Absolute path in which to store state data")
     ("record_period", po::value<double>()->default_value(-1),
-     "Recording period.")
+     "Recording period (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
-     "Recording filter.")
+     "Recording filter (supports wildcard and regular expression).")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")

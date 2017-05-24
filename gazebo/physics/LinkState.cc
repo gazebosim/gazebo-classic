@@ -24,6 +24,8 @@
 using namespace gazebo;
 using namespace physics;
 
+// TODO declared here for ABI compatibility
+// move to class member variable when merging forward.
 static bool gRecordVelocity = false;
 
 /////////////////////////////////////////////////
