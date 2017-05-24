@@ -147,7 +147,10 @@ bool parse_args(int _argc, char **_argv)
     ("version,v", "Output version information.")
     ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
-    ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
+    ("gui-client-plugin", po::value<std::vector<std::string> >(),
+     "Load a GUI plugin.")
+    ("gui-plugin,g", po::value<std::vector<std::string> >(),
+     "Load a System plugin (deprected, backwards compatibility reasons.");
 
   po::options_description desc("Options");
   desc.add(v_desc);
@@ -182,16 +185,36 @@ bool parse_args(int _argc, char **_argv)
     gazebo::common::Console::SetQuiet(false);
   }
 
-  /// Load all the plugins specified on the command line
+  /// Load the System plugins specified on the command line
+  /// see https://bitbucket.org/osrf/gazebo/issues/2279 for details
   if (vm.count("gui-plugin"))
   {
+    gzwarn << "g/gui-plugin is really loading a SystemPlugin. "
+           << "To load a GUI plugin please use --gui-client-plugin \n";
+
     std::vector<std::string> pp =
       vm["gui-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      g_plugins_to_load.push_back(*iter);
+      gazebo::SystemPluginPtr plugin =
+        gazebo::SystemPlugin::Create(*iter, *iter);
+
+      gazebo::client::addPlugin(*iter);
+    }
+  }
+
+  /// Load the GUI plugins specified on the command line
+  if (vm.count("gui-client-plugin"))
+  {
+    std::vector<std::string> pp =
+      vm["gui-client-plugin"].as<std::vector<std::string> >();
+
+    for (std::vector<std::string>::iterator iter = pp.begin();
+         iter != pp.end(); ++iter)
+    {
+       g_plugins_to_load.push_back(*iter);
     }
   }
 
