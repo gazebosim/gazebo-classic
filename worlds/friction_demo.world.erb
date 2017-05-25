@@ -29,7 +29,7 @@
         </constraints>
       </ode>
       <real_time_update_rate>0</real_time_update_rate>
-      <max_step_size>0.001</max_step_size>
+      <max_step_size>0.01</max_step_size>
     </physics>
     <include>
       <uri>model://ground_plane</uri>
@@ -47,10 +47,10 @@
   boxes["box_04"] = {:mass => 1, :mu => 0.9995, :slip => 0,   :x0 => 8}
   boxes["box_05"] = {:mass => 1, :mu => 1,      :slip => 0,   :x0 => 10}
   boxes["box_06"] = {:mass => 1, :mu => 1.01,   :slip => 0,   :x0 => 12}
-  boxes["box_07"] = {:mass => 1, :mu => 1.01,   :slip => 0.1, :x0 => 14}
-  boxes["box_08"] = {:mass => 5, :mu => 1.01,   :slip => 0.1, :x0 => 16}
-  boxes["box_09"] = {:mass => 1, :mu => 1.01,   :slip => 0.5, :x0 => 18}
-  boxes["box_10"] = {:mass => 5, :mu => 1.01,   :slip => 0.5, :x0 => 20}
+  boxes["box_slip_01"] = {:mass => 1, :mu => 1.01,   :slip => 0.1, :x0 => 14}
+  boxes["box_slip_02"] = {:mass => 5, :mu => 1.01,   :slip => 0.1, :x0 => 16}
+  boxes["box_slip_03"] = {:mass => 1, :mu => 1.01,   :slip => 0.5, :x0 => 18}
+  boxes["box_slip_04"] = {:mass => 5, :mu => 1.01,   :slip => 0.5, :x0 => 20}
   dx = 1
   dy = 1
   dz = 1

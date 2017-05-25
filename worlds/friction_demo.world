@@ -371,10 +371,10 @@
       </link>
     </model>
 
-    <model name="box_07_model">
+    <model name="box_slip_01_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>14 8 0.5 0 0 0</pose>
-      <link name="box_07_body">
+      <link name="box_slip_01_body">
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
@@ -387,7 +387,7 @@
           </inertia>
           <mass>1</mass>
         </inertial>
-        <collision name="box_07_geom">
+        <collision name="box_slip_01_geom">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -414,7 +414,7 @@
             </contact>
           </surface>
         </collision>
-        <visual name="box_07_geom_visual">
+        <visual name="box_slip_01_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -427,10 +427,10 @@
       </link>
     </model>
 
-    <model name="box_08_model">
+    <model name="box_slip_02_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>16 8 0.5 0 0 0</pose>
-      <link name="box_08_body">
+      <link name="box_slip_02_body">
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
@@ -443,7 +443,7 @@
           </inertia>
           <mass>5</mass>
         </inertial>
-        <collision name="box_08_geom">
+        <collision name="box_slip_02_geom">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -470,7 +470,7 @@
             </contact>
           </surface>
         </collision>
-        <visual name="box_08_geom_visual">
+        <visual name="box_slip_02_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -483,10 +483,10 @@
       </link>
     </model>
 
-    <model name="box_09_model">
+    <model name="box_slip_03_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>18 8 0.5 0 0 0</pose>
-      <link name="box_09_body">
+      <link name="box_slip_03_body">
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
@@ -499,7 +499,7 @@
           </inertia>
           <mass>1</mass>
         </inertial>
-        <collision name="box_09_geom">
+        <collision name="box_slip_03_geom">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -508,8 +508,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>1.01</mu>
-                <mu2>1.01</mu2>
+                <mu>2.01</mu>
+                <mu2>2.01</mu2>
                 <slip1>0.5</slip1>
                 <slip2>0.5</slip2>
               </ode>
@@ -526,7 +526,7 @@
             </contact>
           </surface>
         </collision>
-        <visual name="box_09_geom_visual">
+        <visual name="box_slip_03_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -539,10 +539,10 @@
       </link>
     </model>
 
-    <model name="box_10_model">
+    <model name="box_slip_04_model">
       <allow_auto_disable>0</allow_auto_disable>
       <pose>20 8 0.5 0 0 0</pose>
-      <link name="box_10_body">
+      <link name="box_slip_04_body">
         <inertial>
           <pose>0 0 -0.5 0 0 0</pose>
           <inertia>
@@ -555,7 +555,7 @@
           </inertia>
           <mass>5</mass>
         </inertial>
-        <collision name="box_10_geom">
+        <collision name="box_slip_04_geom">
           <geometry>
             <box>
               <size>1 1 1</size>
@@ -582,7 +582,7 @@
             </contact>
           </surface>
         </collision>
-        <visual name="box_10_geom_visual">
+        <visual name="box_slip_04_geom_visual">
           <geometry>
             <box>
               <size>1 1 1</size>

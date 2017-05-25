@@ -20,6 +20,7 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 
+#include "gazebo/physics/ode/ODESurfaceParams.hh"
 #ifdef HAVE_BULLET
 #include "gazebo/physics/bullet/bullet_math_inc.h"
 #endif
@@ -45,13 +46,17 @@ class PhysicsFrictionTest : public ServerFixture,
   class FrictionDemoBox
   {
     public: FrictionDemoBox(physics::WorldPtr _world, const std::string &_name)
-            : modelName(_name), world(_world), friction(0.0)
+            : modelName(_name), world(_world), friction(0.0), mass(1), slip(0)
             {
               // Get the model pointer
               model = world->GetModel(modelName);
+              physics::LinkPtr link = model->GetLink();
+
+              // Get the mass
+              auto inertial = link->GetInertial();
+              this->mass = inertial->GetMass();
 
               // Get the friction coefficient
-              physics::LinkPtr link = model->GetLink();
               physics::Collision_V collisions = link->GetCollisions();
               physics::Collision_V::iterator iter = collisions.begin();
               if (iter != collisions.end())
@@ -60,6 +65,12 @@ class PhysicsFrictionTest : public ServerFixture,
                 // Use the Secondary friction value,
                 // since gravity has a non-zero component in the y direction
                 this->friction = surf->FrictionPyramid()->MuSecondary();
+
+                auto surfODE = boost::dynamic_pointer_cast<gazebo::physics::ODESurfaceParams>(surf);
+                if (surfODE)
+                {
+                  this->slip = surfODE->slip2;
+                }
               }
             }
     public: ~FrictionDemoBox() {}
@@ -67,6 +78,8 @@ class PhysicsFrictionTest : public ServerFixture,
     public: physics::WorldPtr world;
     public: physics::ModelPtr model;
     public: double friction;
+    public: double mass;
+    public: double slip;
   };
 
   /// \brief Class to hold parameters for spawning joints.
@@ -147,6 +160,12 @@ class PhysicsFrictionTest : public ServerFixture,
                             const std::string &_solverType="quick",
                             const std::string &_worldSolverType="ODE_DANTZIG");
 
+  /// \brief Use the friction_demo world to test slip parameters.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void FrictionSlip(const std::string &_physicsEngine,
+                            const std::string &_solverType="quick",
+                            const std::string &_worldSolverType="ODE_DANTZIG");
+
   /// \brief Friction test of maximum dissipation principle.
   /// Basically test that friction force vector is aligned with
   /// and opposes velocity vector.
@@ -169,7 +188,7 @@ class WorldStepFrictionTest : public PhysicsFrictionTest
 
 /////////////////////////////////////////////////
 // FrictionDemo test:
-// Uses the test_friction world, which has a bunch of boxes on the ground
+// Uses the friction_demo world, which has a bunch of boxes on the ground
 // with a gravity vector to simulate a 45-degree inclined plane. Each
 // box has a different coefficient of friction. These friction coefficients
 // are chosen to be close to the value that would prevent sliding according
@@ -273,9 +292,99 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
       }
     }
   }
-  for (box = boxes.begin(); box != boxes.end(); ++box)
+}
+
+/////////////////////////////////////////////////
+// FrictionSlip:
+// Uses the friction_demo world, which has a bunch of boxes on the ground
+// with a gravity vector to simulate a 45-degree inclined plane.
+// Boxes have a different coefficient of friction or slip.
+// This test focuses on the boxes that have slip parameters set.
+void PhysicsFrictionTest::FrictionSlip(const std::string &_physicsEngine,
+                                       const std::string &_solverType,
+                                       const std::string &_worldSolverType)
+{
+  if (_physicsEngine != "ode")
   {
-    ASSERT_TRUE(box->model != NULL);
+    gzerr << "Aborting test since only ODE has slip parameter implemented"
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/friction_demo.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  auto g = world->Gravity();
+  EXPECT_DOUBLE_EQ(g.X(), 0);
+  EXPECT_DOUBLE_EQ(g.Y(), -1.0);
+  EXPECT_DOUBLE_EQ(g.Z(), -1.0);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  if (_physicsEngine == "ode")
+  {
+    // Set solver type
+    physics->SetParam("solver_type", _solverType);
+    if (_solverType == "world")
+    {
+      physics->SetParam("ode_quiet", true);
+    }
+
+    // Set world step solver type
+    physics->SetParam("world_step_solver", _worldSolverType);
+  }
+
+  std::vector<PhysicsFrictionTest::FrictionDemoBox> boxes;
+  auto models = world->GetModels();
+  for (auto model : models)
+  {
+    auto name = model->GetName();
+    if (0 != name.compare(0, 9, "box_slip_"))
+    {
+      gzerr << name << std::endl;
+      continue;
+    }
+    boxes.push_back(PhysicsFrictionTest::FrictionDemoBox(world, name));
+  }
+  EXPECT_EQ(boxes.size(), 4u);
+
+  // Verify box data structure
+  for (auto box : boxes)
+  {
+    ASSERT_NE(box.model, nullptr);
+    ASSERT_GT(box.friction, 0.0);
+    ASSERT_GT(box.mass, 0.0);
+    ASSERT_GT(box.slip, 0.0);
+  }
+
+  common::Time t = world->GetSimTime();
+  while (t.sec < 10)
+  {
+    world->Step(500);
+    t = world->GetSimTime();
+
+    double yTolerance = g_friction_tolerance;
+    if (_solverType == "world")
+    {
+      if (_worldSolverType == "DART_PGS")
+        yTolerance *= 2;
+      else if (_worldSolverType == "ODE_DANTZIG")
+        yTolerance = 0.84;
+    }
+
+    for (auto box : boxes)
+    {
+      auto vel = box.model->GetWorldLinearVel().Ign();
+      EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+      EXPECT_NEAR(vel.Z(), 0, yTolerance);
+
+      // Expect y velocity = mass * slip
+      EXPECT_NEAR(vel.Y(), box.mass * g.Y() * box.slip, yTolerance);
+    }
   }
 }
 
@@ -502,6 +611,12 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, FrictionSlip)
+{
+  FrictionSlip(GetParam());
 }
 
 /////////////////////////////////////////////////
