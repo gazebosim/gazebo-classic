@@ -150,7 +150,7 @@ bool parse_args(int _argc, char **_argv)
     ("gui-client-plugin", po::value<std::vector<std::string> >(),
      "Load a GUI plugin.")
     ("gui-plugin,g", po::value<std::vector<std::string> >(),
-     "Load a System plugin (deprected, backwards compatibility reasons.");
+     "Load a System plugin (deprecated, backwards compatibility reasons).");
 
   po::options_description desc("Options");
   desc.add(v_desc);

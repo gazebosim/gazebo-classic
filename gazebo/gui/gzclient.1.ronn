@@ -17,10 +17,11 @@ Gazebo GUI client which allows visualization and user interaction.
  Increase the messages written to the terminal.
 * -h, --help :
  Produce this help message.
-* -g, --gui-plugin arg :
- Load a System plugin (deprecated).
 * --gui-client-plugin arg :
  Load a GUI plugin.
+* -g, --gui-plugin arg :
+ Load a System plugin (deprecated, backwards compatibility reasons).
+
 
 ## AUTHOR
   Open Source Robotics Foundation
