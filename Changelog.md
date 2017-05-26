@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. ODE slip parameter example world and test
+    * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
