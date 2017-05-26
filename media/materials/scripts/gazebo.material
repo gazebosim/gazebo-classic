@@ -1496,12 +1496,15 @@ vertex_program Gazebo/CameraLesnFlareVS glsl
 fragment_program Gazebo/CameraLesnFlareFS glsl
 {
   source camera_lens_flare_fs.glsl
+
   default_params
   {
     param_named RT int 0
-    param_named time float 0
-    param_named size float2 0 0
-    param_named lightPos float2 0 0
+    param_named noiseRGBA int 1
+    param_named time float 0.0
+    param_named viewport float2 0.0 0.0
+    param_named lightDir float3 0.0 0.0 0.0
+    param_named viewProj mat4 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
   }
 }
 
@@ -1519,6 +1522,10 @@ material Gazebo/CameraLensFlare
         tex_coord_set 0
         tex_address_mode border
         filtering linear linear linear
+      }
+      texture_unit noiseRGBA
+      {
+        texture noise_rgba.png
       }
     }
   }

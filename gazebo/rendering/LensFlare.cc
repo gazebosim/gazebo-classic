@@ -41,6 +41,9 @@ namespace gazebo
       {
         this->camera = _camera;
         this->light = _light;
+
+        this->dir = ignition::math::Quaterniond(this->light->Rotation()) *
+            this->light->Direction();
       }
   
       /// \brief Callback that OGRE will invoke for us on each render call
@@ -50,9 +53,6 @@ namespace gazebo
                                                 Ogre::MaterialPtr &_mat)
       {
         GZ_ASSERT(!_mat.isNull(), "Null OGRE material");
-        // modify material here (wont alter the base material!), called for
-        // every drawn geometry instance (i.e. compositor render_quad)
-
         // These calls are setting parameters that are declared in two places:
         // 1. media/materials/scripts/gazebo.material, in
         //    fragment_program Gazebo/CameraLensFlareFS
@@ -65,21 +65,32 @@ namespace gazebo
             pass->getFragmentProgramParameters();
         GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
   
+        // used for animating flare
         params->setNamedConstant("time", static_cast<Ogre::Real>(
-            this->camera->GetScene()->SimTime().Double()));
-        params->setNamedConstant("size", 
-            Ogre::Vector2(this->camera->ViewportWidth(),
-            this->camera->ViewportHeight()));
-        ignition::math::Vector2i pos = this->camera->Project(
-            this->light->Position());
-        params->setNamedConstant("lightPos", Ogre::Vector2(pos.X(), pos.Y()));
+            common::Time::GetWallTime().Double()));
+        // for adjust aspect ratio of glare
+        params->setNamedConstant("viewport", 
+            Ogre::Vector2(static_cast<double>(this->camera->ViewportWidth()),
+            static_cast<double>(this->camera->ViewportHeight())));
+        
+        ignition::math::Vector2i pos2d = this->camera->Project(
+            -this->dir * 1000000.0);
+        params->setNamedConstant("lightDir", 
+            Ogre::Vector3(this->dir.X(), this->dir.Y(), this->dir.Z()));
+
+        auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
+          this->camera->OgreCamera()->getViewMatrix();
+        params->setNamedConstant("viewProj", viewProj);
       }
 
       /// \brief Pointer to camera
       private: CameraPtr camera;
 
       /// \brief Pointer to light source 
-      private: LightPtr light;
+      private: LightPtr light; 
+
+      /// \brief Light dir in world frame
+      private: ignition::math::Vector3d dir;
     };
 
     /// \brief Private data class for LensFlare

@@ -1,39 +1,46 @@
 // The input texture, which is set up by the Ogre Compositor infrastructure.
 uniform sampler2D RT;
+uniform sampler2D noiseRGBA;
 
 uniform float time;
-uniform vec2 size;
+uniform vec2 viewport;
 uniform vec2 lightPos;
 
-// uniform sampler2D noise;
-/*
+uniform vec3 lightDir;
+uniform mat4 viewProj;
+
+// project 3d world pos to 2d space
+vec3 project(vec3 p)
+{
+  vec4 pos = viewProj * vec4(p, 1.0);
+  pos.xy /= pos.w;
+  return vec3(pos.x, -pos.y, pos.z);
+}
+
 float noise(float t)
 {
-  return texture(iChannel0,vec2(t, 0.0) / iChannelResolution[0].xy).x;
+  // 256 is the size of noiseRGBA texture
+  return texture2D(noiseRGBA, vec2(t, 0.0) / vec2(256.0)).x;
 }
+
 float noise(vec2 t)
 {
-  return texture(iChannel0,(t + vec2(iGlobalTime)) / iChannelResolution[0].xy).x;
+  return texture2D(noiseRGBA,(t + vec2(time)) / vec2(256.0)).x;
 }
-*/
+
 vec3 lensflare(vec2 uv,vec2 pos)
 {
-  float globalTime = 1.0;
-
   vec2 main = uv-pos;
+
   vec2 uvd = uv*(length(uv));
 
   float ang = atan(main.y, main.x);
   float dist = length(main); dist = pow(dist,.1);
-// float n = noise(vec2((ang-globalTime/9.0)*16.0,dist*32.0));
-
-
-  float n = vec2((ang-globalTime/9.0)*16.0,dist*32.0);
+  float n = noise(vec2((ang-time/9.0)*16.0,dist*32.0));
 	
   float f0 = 1.0/(length(uv-pos)*16.0+1.0);
 	
-  // f0 = f0+f0*(sin((ang+globalTime/18.0 + noise(abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
-  f0 = f0+f0*(sin((ang+globalTime/18.0 + (abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
+  f0 = f0+f0*(sin((ang+time/18.0 + noise(abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
 
   float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos),2.0)),.0)*00.25;
   float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos),2.0)),.0)*00.23;
@@ -65,7 +72,8 @@ vec3 lensflare(vec2 uv,vec2 pos)
   return c;
 }
 
-vec3 cc(vec3 color, float factor, float factor2) // color modifier
+// color modifier
+vec3 cc(vec3 color, float factor, float factor2) 
 {
   float w = color.x+color.y+color.z;
   return mix(color,vec3(w)*factor,w*factor2);
@@ -73,15 +81,28 @@ vec3 cc(vec3 color, float factor, float factor2) // color modifier
 
 void main()
 {
-  // vec2 uv = gl_TexCoord[0].xy / iResolution.xy - 0.5;
-  // uv.x *= iResolution.x/iResolution.y; //fix aspect ratio
-  vec2 uv = gl_TexCoord[0].xy / size.xy - 0.5;
-  //fix aspect ratio
-  uv.x *= size.x/size.y; 
-  vec2 pos = vec2(0, 0);
-  vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv,pos);
+  // set sun pos to be far away
+  vec3 worldPos = -lightDir * 100000.0;
+
+  // get sun pos in clip space
+  vec3 lightPos = project(worldPos);
+
+  // return if light is behind the view
+  if (lightPos.z < 1.0)
+  {
+    gl_FragColor = texture2D(RT, gl_TexCoord[0].xy);
+    return;
+  }
+
+  vec2 uv = gl_TexCoord[0].xy - 0.5;
+  // fix aspect ratio
+  uv.x *= viewport.x/viewport.y;
+
+  // compute lens flare
+  vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv, lightPos.xy);
   color = cc(color,.5,.1);
-  // gl_FragColor = vec4(color,1.0);
+
+  // apply lens flare
   gl_FragColor = texture2D(RT, gl_TexCoord[0].xy) + vec4(color, 1.0);
 }
 
