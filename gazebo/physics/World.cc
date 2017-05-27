@@ -2567,10 +2567,19 @@ void World::LogWorker()
           // moving link may never be captured if only diff state is recorded.
           boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
 
-          auto insertions = diffState.Insertions();
-          this->dataPtr->prevStates[currState].SetInsertions(insertions);
-          auto deletions = diffState.Deletions();
-          this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          // if logRecord filter is not empty, we should not set insertion and
+          // and deletion based on diff against initial world state. The 
+          // diff state deletions may be due to models being filtered out
+          // from the state instead of real deletion events.
+          if (util::LogRecord::Instance()->Filter().empty() || 
+              !this->dataPtr->states[this->dataPtr->currentStateBuffer].empty() ||
+              !util::LogRecord::Instance()->FirstUpdate())
+          {
+            auto insertions = diffState.Insertions();
+            this->dataPtr->prevStates[currState].SetInsertions(insertions);
+            auto deletions = diffState.Deletions();
+            this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          }
 
           this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
               this->dataPtr->prevStates[currState]);
