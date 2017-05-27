@@ -243,6 +243,10 @@ namespace gazebo
       /// \brief Buffer of prev states
       public: WorldState prevStates[2];
 
+      /// \brief Previous unfiltered state. Used for determining insertions
+      /// and deletions
+      public: WorldState prevUnfilteredState;
+
       /// \brief Int used to toggle between prevStates
       public: int stateToggle;
 

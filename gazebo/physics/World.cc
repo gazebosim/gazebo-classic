@@ -2546,20 +2546,50 @@ void World::LogWorker()
 
   while (!this->dataPtr->stop)
   {
-    auto simTime = this->GetSimTime();
+    // get unfiltered world state
+    std::string tmpFilterStr = util::LogRecord::Instance()->Filter();
+    util::LogRecord::Instance()->SetFilter("");
+    WorldState unfilteredState;
+    {
+      boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+      unfilteredState.Load(self);
+    }
+    util::LogRecord::Instance()->SetFilter(tmpFilterStr);
 
+    // compute world state diff and find out about insertions and deletions
+    std::vector<std::string> insertions; 
+    std::vector<std::string> deletions;  
+    bool insertDelete = false;
+    if (this->dataPtr->logLastStateTime != common::Time::Zero) 
+    {
+      WorldState unfilteredDiffState = unfilteredState - 
+          this->dataPtr->prevUnfilteredState;
+      if (!unfilteredDiffState.IsZero())
+      {
+        insertions = unfilteredDiffState.Insertions();
+        deletions = unfilteredDiffState.Deletions();
+        insertDelete = !insertions.empty() || !deletions.empty();
+      }
+    }
+    this->dataPtr->prevUnfilteredState = unfilteredState;
+    
     // Throttle state capture based on log recording frequency.
-    if (simTime - this->dataPtr->logLastStateTime >=
-        util::LogRecord::Instance()->Period())
+    auto simTime = this->GetSimTime();
+    if ((simTime - this->dataPtr->logLastStateTime >=
+        util::LogRecord::Instance()->Period()) || insertDelete)
     {
       int currState = (this->dataPtr->stateToggle + 1) % 2;
 
-      this->dataPtr->prevStates[currState].Load(self);
+      // compute diff for filtered states
+      {
+        boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+        this->dataPtr->prevStates[currState].Load(self);
+      }
       WorldState diffState = this->dataPtr->prevStates[currState] -
-        this->dataPtr->prevStates[this->dataPtr->stateToggle];
+          this->dataPtr->prevStates[this->dataPtr->stateToggle];
       this->dataPtr->logPrevIteration = this->dataPtr->iterations;
 
-      if (!diffState.IsZero())
+      if (!diffState.IsZero() || insertDelete)
       {
         this->dataPtr->stateToggle = currState;
         {
@@ -2567,20 +2597,8 @@ void World::LogWorker()
           // moving link may never be captured if only diff state is recorded.
           boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
 
-          // if logRecord filter is not empty, we should not set insertion and
-          // and deletion based on diff against initial world state. The 
-          // diff state deletions may be due to models being filtered out
-          // from the state instead of real deletion events.
-          if (util::LogRecord::Instance()->Filter().empty() || 
-              !this->dataPtr->states[this->dataPtr->currentStateBuffer].empty() ||
-              !util::LogRecord::Instance()->FirstUpdate())
-          {
-            auto insertions = diffState.Insertions();
-            this->dataPtr->prevStates[currState].SetInsertions(insertions);
-            auto deletions = diffState.Deletions();
-            this->dataPtr->prevStates[currState].SetDeletions(deletions);
-          }
-
+          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          this->dataPtr->prevStates[currState].SetDeletions(deletions);
           this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
               this->dataPtr->prevStates[currState]);
 
