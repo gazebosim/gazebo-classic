@@ -303,8 +303,8 @@ bool gui::load()
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
   {
-    g_argv[i] = new char[strlen("gazebo")];
-    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
+    g_argv[i] = new char[strlen("gazebo") + 1];
+    snprintf(g_argv[i], strlen("gazebo") + 1, "gazebo");
   }
 
   // Register custom message handler
