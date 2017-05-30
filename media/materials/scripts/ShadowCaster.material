@@ -65,19 +65,3 @@ material DeferredRendering/Shadows/RSMCaster_Spot
 		}
 	}
 }
-
-material DeferredRendering/Shadows/RSMCaster_Spot
-{
-	technique
-	{
-		pass
-		{
-			vertex_program_ref DeferredShading/Shadows/RSMCasterVP
-			{
-			}
-			fragment_program_ref DeferredShading/Shadows/RSMCasterFP_Spot
-			{
-			}
-		}
-	}
-}
