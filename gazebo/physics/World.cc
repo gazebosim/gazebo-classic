@@ -778,6 +778,7 @@ void World::Fini()
     this->dataPtr->modelMsgs.clear();
     this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->playbackControlMsgs.clear();
 
     this->dataPtr->poseLocalPub.reset();
     this->dataPtr->posePub.reset();
@@ -1353,41 +1354,53 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+  this->dataPtr->playbackControlMsgs.push_back(*_data);
+}
+
+//////////////////////////////////////////////////
+void World::ProcessPlaybackControlMsgs()
+{
   boost::recursive_mutex::scoped_lock lock(*this->dataPtr->worldUpdateMutex);
 
-  if (_data->has_pause())
-    this->SetPaused(_data->pause());
-
-  if (_data->has_multi_step())
+  for (auto const &msg : this->dataPtr->playbackControlMsgs)
   {
-    // stepWorld is a blocking call so set stepInc directly so that world stats
-    // will still be published
-    this->SetPaused(true);
-    this->dataPtr->stepInc += _data->multi_step();
+    if (msg.has_pause())
+      this->SetPaused(msg.pause());
+
+    if (msg.has_multi_step())
+    {
+      // stepWorld is a blocking call so set stepInc directly so that world stats
+      // will still be published
+      this->SetPaused(true);
+      this->dataPtr->stepInc += msg.multi_step();
+    }
+
+    if (msg.has_seek())
+    {
+      common::Time targetSimTime = msgs::Convert(msg.seek());
+      util::LogPlay::Instance()->Seek(targetSimTime);
+      this->dataPtr->stepInc = 1;
+    }
+
+    if (msg.has_rewind() && msg.rewind())
+    {
+      util::LogPlay::Instance()->Rewind();
+      this->dataPtr->stepInc = 1;
+      if (!util::LogPlay::Instance()->HasIterations())
+        this->dataPtr->iterations = 0;
+    }
+
+    if (msg.has_forward() && msg.forward())
+    {
+      util::LogPlay::Instance()->Forward();
+      this->dataPtr->stepInc = -1;
+      this->SetPaused(true);
+      // ToDo: Update iterations if the log doesn't have it.
+    }
   }
 
-  if (_data->has_seek())
-  {
-    common::Time targetSimTime = msgs::Convert(_data->seek());
-    util::LogPlay::Instance()->Seek(targetSimTime);
-    this->dataPtr->stepInc = 1;
-  }
-
-  if (_data->has_rewind() && _data->rewind())
-  {
-    util::LogPlay::Instance()->Rewind();
-    this->dataPtr->stepInc = 1;
-    if (!util::LogPlay::Instance()->HasIterations())
-      this->dataPtr->iterations = 0;
-  }
-
-  if (_data->has_forward() && _data->forward())
-  {
-    util::LogPlay::Instance()->Forward();
-    this->dataPtr->stepInc = -1;
-    this->SetPaused(true);
-    // ToDo: Update iterations if the log doesn't have it.
-  }
+  this->dataPtr->playbackControlMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -2405,6 +2418,7 @@ void World::ProcessMessages()
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
+    this->ProcessPlaybackControlMsgs();
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();

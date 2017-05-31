@@ -198,6 +198,9 @@ namespace gazebo
       /// \brief Light modify message buffer.
       public: std::list<msgs::Light> lightModifyMsgs;
 
+      /// \brief Playback control message buffer.
+      public: std::list<msgs::LogPlaybackControl> playbackControlMsgs;
+
       /// \brief True to reset the world on next update.
       public: bool needsReset;
 
