@@ -115,6 +115,32 @@
                 </material>
               </visual>
             </link>
+            <link name="imu_link">
+              <inertial>
+                <pose>0 0 0 0 0 0</pose>
+                <mass>0.15</mass>
+                <inertia>
+                  <ixx>0.00001</ixx>
+                  <ixy>0</ixy>
+                  <ixz>0</ixz>
+                  <iyy>0.00002</iyy>
+                  <iyz>0</iyz>
+                  <izz>0.00002</izz>
+                </inertia>
+              </inertial>
+              <sensor name="imu_sensor" type="imu">
+                <pose>0 0 0 3.141593 0 0</pose>
+                <always_on>0</always_on>
+                <update_rate>1000.0</update_rate>
+              </sensor>
+            </link>
+            <joint name="imu_joint" type="revolute">
+              <child>model_01::model_02::model_03::imu_link</child>
+              <parent>model_01::model_02::model_03::link_03</parent>
+              <axis>
+                <xyz>0 0 1</xyz>
+              </axis>
+            </joint>
           </model>
         </model>
       </model>

@@ -5,6 +5,12 @@
 1. Fix disabling mesh cast shadows
     * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
 
+1. Backport wide angle camera VM FSAA fix
+    * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
+
+1. Add function to retrieve scoped sensors name in multi-nested model
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
+
 ## Gazebo 7.7.0 (2017-05-04)
 
 1. Fix race condition during Detach of HarnessPlugin
