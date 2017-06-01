@@ -2547,14 +2547,11 @@ void World::LogWorker()
   while (!this->dataPtr->stop)
   {
     // get unfiltered world state
-    std::string tmpFilterStr = util::LogRecord::Instance()->Filter();
-    util::LogRecord::Instance()->SetFilter("");
     WorldState unfilteredState;
     {
       boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
       unfilteredState.Load(self);
     }
-    util::LogRecord::Instance()->SetFilter(tmpFilterStr);
 
     // compute world state diff and find out about insertions and deletions
     std::vector<std::string> insertions;
@@ -2580,10 +2577,11 @@ void World::LogWorker()
     {
       int currState = (this->dataPtr->stateToggle + 1) % 2;
 
+      std::string filterStr = util::LogRecord::Instance()->Filter();
       // compute diff for filtered states
       {
         boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
-        this->dataPtr->prevStates[currState].Load(self);
+        this->dataPtr->prevStates[currState].LoadWithFilter(self, filterStr);
       }
       WorldState diffState = this->dataPtr->prevStates[currState] -
           this->dataPtr->prevStates[this->dataPtr->stateToggle];

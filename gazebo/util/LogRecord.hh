@@ -38,14 +38,14 @@ namespace gazebo
       public: std::string encoding = "zlib";
 
       /// \brief Path in which to store log files.
-      public: std::string path = "";
+      public: std::string path;
 
       /// \brief Recording period. A value < 0 indicates that every
       /// iteration should be recorded.
       public: double period = -1;
 
       /// \brief Log filter string
-      public: std::string filter = "";
+      public: std::string filter;
     };
 
     // Forward declare private data class

@@ -25,7 +25,6 @@
 #endif
 #include <boost/algorithm/string.hpp>
 
-#include "gazebo/util/LogRecord.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/physics/World.hh"
@@ -36,10 +35,15 @@
 using namespace gazebo;
 using namespace physics;
 
+// TODO added here for ABI compatibility
+// move to class when merging forward
+static std::string worldStateFilter;
+
 /////////////////////////////////////////////////
 WorldState::WorldState()
   : State()
 {
+  worldStateFilter = "";
 }
 
 /////////////////////////////////////////////////
@@ -82,6 +86,13 @@ WorldState::~WorldState()
 }
 
 /////////////////////////////////////////////////
+void WorldState::LoadWithFilter(const WorldPtr _world, const std::string &_filter)
+{
+  worldStateFilter = _filter;
+  this->Load(_world);
+}
+
+/////////////////////////////////////////////////
 void WorldState::Load(const WorldPtr _world)
 {
   this->world = _world;
@@ -91,7 +102,7 @@ void WorldState::Load(const WorldPtr _world)
   this->realTime = _world->GetRealTime();
   this->iterations = _world->GetIterations();
 
-  std::string filter = util::LogRecord::Instance()->Filter();
+  std::string filter = worldStateFilter; 
   std::list<std::string> mainParts, parts;
   boost::split(mainParts, filter, boost::is_any_of("/"));
 
