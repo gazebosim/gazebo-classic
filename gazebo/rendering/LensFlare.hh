@@ -15,7 +15,7 @@
  *
 */
 
-#ifndef GAZEBO_RENDERING_LENSFLARE_HH__
+#ifndef GAZEBO_RENDERING_LENSFLARE_HH_
 #define GAZEBO_RENDERING_LENSFLARE_HH_
 
 #include <memory>
