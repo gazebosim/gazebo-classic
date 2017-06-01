@@ -2557,12 +2557,12 @@ void World::LogWorker()
     util::LogRecord::Instance()->SetFilter(tmpFilterStr);
 
     // compute world state diff and find out about insertions and deletions
-    std::vector<std::string> insertions; 
-    std::vector<std::string> deletions;  
+    std::vector<std::string> insertions;
+    std::vector<std::string> deletions;
     bool insertDelete = false;
-    if (this->dataPtr->logLastStateTime != common::Time::Zero) 
+    if (this->dataPtr->logLastStateTime != common::Time::Zero)
     {
-      WorldState unfilteredDiffState = unfilteredState - 
+      WorldState unfilteredDiffState = unfilteredState -
           this->dataPtr->prevUnfilteredState;
       if (!unfilteredDiffState.IsZero())
       {
@@ -2572,7 +2572,7 @@ void World::LogWorker()
       }
     }
     this->dataPtr->prevUnfilteredState = unfilteredState;
-    
+
     // Throttle state capture based on log recording frequency.
     auto simTime = this->GetSimTime();
     if ((simTime - this->dataPtr->logLastStateTime >=
