@@ -102,7 +102,7 @@ void WorldState::Load(const WorldPtr _world)
   this->realTime = _world->GetRealTime();
   this->iterations = _world->GetIterations();
 
-  std::string filter = worldStateFilter; 
+  std::string filter = worldStateFilter;
   std::list<std::string> mainParts, parts;
   boost::split(mainParts, filter, boost::is_any_of("/"));
 
