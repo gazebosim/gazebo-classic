@@ -3,7 +3,7 @@
 ## Gazebo 8.x.x (2017-xx-xx)
 
 1. Add the option --gui-client-plugin to load GUI plugins. Leave -g to load System Plugins.
-    * [Pull request]()
+    * [Pull request #2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
     * [Issue 2279](https://bitbucket.org/osrf/gazebo/issues/2279)
 
 1. Add actors in World as models so they get returned with World::Models()
