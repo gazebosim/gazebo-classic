@@ -198,9 +198,6 @@ bool parse_args(int _argc, char **_argv)
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      gazebo::SystemPluginPtr plugin =
-        gazebo::SystemPlugin::Create(*iter, *iter);
-
       gazebo::client::addPlugin(*iter);
     }
   }
