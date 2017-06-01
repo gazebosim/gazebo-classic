@@ -428,12 +428,11 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
     // Tell collisions that their current world pose is dirty (needs
     // updating). We set a dirty flag instead of directly updating the
     // value to improve performance.
-    for (Base_V::iterator iterC = this->children.begin();
-        iterC != this->children.end(); ++iterC)
+    for (auto &childPtr : this->children)
     {
-      if ((*iterC)->HasType(COLLISION))
+      if (childPtr->HasType(COLLISION))
       {
-        CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
         entityC->SetWorldPoseDirty();
       }
     }
