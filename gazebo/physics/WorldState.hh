@@ -74,7 +74,7 @@ namespace gazebo
       ///
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
-      /// \param[in] _filter String for filtering models states 
+      /// \param[in] _filter String for filtering models states
       public: void LoadWithFilter(const WorldPtr _world,
           const std::string &_filter);
 
