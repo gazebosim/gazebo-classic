@@ -282,7 +282,8 @@ TEST_F(WorldStateTest, InsertionOfMeshModel)
     << "  <collision name ='collision'>"
     << "    <geometry>"
     << "      <mesh>"
-    << "        <uri>" << std::string(PROJECT_SOURCE_PATH) << "/test/data/box_offset.dae</uri>"
+    << "        <uri>" << std::string(PROJECT_SOURCE_PATH)
+                       << "/test/data/box_offset.dae</uri>"
     << "        <scale>0.2 0.3 0.4</scale>"
     << "      </mesh>"
     << "    </geometry>"
@@ -290,7 +291,8 @@ TEST_F(WorldStateTest, InsertionOfMeshModel)
     << "  <visual name ='visual'>"
     << "    <geometry>"
     << "      <mesh>"
-    << "        <uri>" << std::string(PROJECT_SOURCE_PATH) << "/test/data/box_offset.dae</uri>"
+    << "        <uri>" << std::string(PROJECT_SOURCE_PATH)
+                       << "/test/data/box_offset.dae</uri>"
     << "        <scale>0.5 0.6 0.7</scale>"
     << "      </mesh>"
     << "    </geometry>"
@@ -326,9 +328,9 @@ TEST_F(WorldStateTest, InsertionOfMeshModel)
   EXPECT_EQ(insertions.size(), 1u);
 
   // Check that inserted entity's scale wasn't changed
-  auto insertedStr = insertions[0];
-  EXPECT_TRUE(insertedStr.find("<scale>0.2 0.3 0.4</scale>") != std::string::npos);
-  EXPECT_TRUE(insertedStr.find("<scale>0.5 0.6 0.7</scale>") != std::string::npos);
+  auto inserted = insertions[0];
+  EXPECT_TRUE(inserted.find("<scale>0.2 0.3 0.4</scale>") != std::string::npos);
+  EXPECT_TRUE(inserted.find("<scale>0.5 0.6 0.7</scale>") != std::string::npos);
 }
 
 //////////////////////////////////////////////////
