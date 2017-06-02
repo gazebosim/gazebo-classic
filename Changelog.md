@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Add log record filter options
+    * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
+
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
@@ -24,7 +27,7 @@
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
-    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
