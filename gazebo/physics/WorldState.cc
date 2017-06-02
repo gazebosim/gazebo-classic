@@ -86,7 +86,8 @@ WorldState::~WorldState()
 }
 
 /////////////////////////////////////////////////
-void WorldState::LoadWithFilter(const WorldPtr _world, const std::string &_filter)
+void WorldState::LoadWithFilter(const WorldPtr _world,
+                                const std::string &_filter)
 {
   worldStateFilter = _filter;
   this->Load(_world);
