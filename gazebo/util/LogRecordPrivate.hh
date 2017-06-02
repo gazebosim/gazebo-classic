@@ -200,6 +200,12 @@ namespace gazebo
       /// \brief True if the logger is ready to start, and the previous run
       /// has finished.
       public: bool readyToStart;
+
+      /// \brief Record period.
+      public: double period = -1.0;
+
+      /// \brief Record filter string.
+      public: std::string filter = "";
     };
     /// \}
   }
