@@ -1502,7 +1502,7 @@ fragment_program Gazebo/CameraLesnFlareFS glsl
     param_named RT int 0
     param_named noiseRGBA int 1
     param_named time float 0.0
-    param_named viewport float2 0.0 0.0
+    param_named viewport float3 0.0 0.0 0.0
     param_named lightDir float3 0.0 0.0 0.0
     param_named viewProj mat4 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
   }

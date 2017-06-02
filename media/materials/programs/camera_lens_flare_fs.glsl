@@ -3,8 +3,7 @@ uniform sampler2D RT;
 uniform sampler2D noiseRGBA;
 
 uniform float time;
-uniform vec2 viewport;
-uniform vec2 lightPos;
+uniform vec3 viewport;
 
 uniform vec3 lightDir;
 uniform mat4 viewProj;

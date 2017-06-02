@@ -70,11 +70,9 @@ namespace gazebo
             common::Time::GetWallTime().Double()));
         // for adjust aspect ratio of glare
         params->setNamedConstant("viewport", 
-            Ogre::Vector2(static_cast<double>(this->camera->ViewportWidth()),
-            static_cast<double>(this->camera->ViewportHeight())));
+            Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
+            static_cast<double>(this->camera->ViewportHeight()), 1.0));
         
-        ignition::math::Vector2i pos2d = this->camera->Project(
-            -this->dir * 1000000.0);
         params->setNamedConstant("lightDir", 
             Ogre::Vector3(this->dir.X(), this->dir.Y(), this->dir.Z()));
 
