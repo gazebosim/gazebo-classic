@@ -2139,7 +2139,7 @@ void World::SetState(const WorldState &_state)
       {
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-        // FIXME: We need to publish a light facotry message to update the client,
+        // FIXME: We need to publish a light factory message to update the client,
         // see issue #2288
         // LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
         // light->Init();
@@ -2551,8 +2551,16 @@ void World::LogWorker()
         // moving link may never be captured if only diff state is recorded.
         boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
 
-        auto insertions = diffState.Insertions();
-        this->dataPtr->prevStates[currState].SetInsertions(insertions);
+        static bool firstUpdate = true;
+        if (!firstUpdate)
+        {
+          // The first update thinks there are entities being inserted,
+          // but they're already present in the first world dump
+          auto insertions = diffState.Insertions();
+          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+        }
+        else
+          firstUpdate = false;
         auto deletions = diffState.Deletions();
         this->dataPtr->prevStates[currState].SetDeletions(deletions);
 
