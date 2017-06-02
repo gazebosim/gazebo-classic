@@ -438,7 +438,7 @@ WorldState WorldState::operator-(const WorldState &_state) const
     {
       ModelPtr model = this->world->GetModel(iter->second.GetName());
       if (model)
-        result.insertions.push_back(model->UnscaledSDF()->ToString(""));
+        result.insertions.push_back(model->GetSDF()->ToString(""));
     }
   }
 
