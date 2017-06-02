@@ -100,6 +100,9 @@ namespace gazebo
       /// \brief Publisher for light messages.
       public: transport::PublisherPtr lightPub;
 
+      /// \brief Publisher for light factory messages.
+      public: transport::PublisherPtr lightFactoryPub;
+
       /// \brief Publisher for pose messages.
       public: transport::PublisherPtr posePub;
 

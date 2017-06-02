@@ -787,6 +787,7 @@ void World::Fini()
     this->dataPtr->statPub.reset();
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
+    this->dataPtr->lightFactoryPub.reset();
 
     this->dataPtr->factorySub.reset();
     this->dataPtr->controlSub.reset();
@@ -2138,8 +2139,17 @@ void World::SetState(const WorldState &_state)
       {
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
-        light->Init();
+        // FIXME: We need to publish a light facotry message to update the client,
+        // see issue #2288
+        // LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        // light->Init();
+        if (!this->dataPtr->lightFactoryPub)
+        {
+          this->dataPtr->lightFactoryPub =
+              this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+        }
+        msgs::Light lightMsg = msgs::LightFromSDF(elem);
+        this->dataPtr->lightFactoryPub->Publish(lightMsg);
       }
       catch(...)
       {
