@@ -256,7 +256,9 @@ namespace gazebo
           << ignition::math::precision(q.z, 4) << " "
           << "</pose>";
 
-        _out << "<scale>" << _state.scale << "</scale>";
+        // Only record scale if it is not the default value of [1, 1, 1].
+        if (_state.scale != ignition::math::Vector3d::One)
+          _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
