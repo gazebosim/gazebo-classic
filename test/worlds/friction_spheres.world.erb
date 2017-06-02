@@ -114,20 +114,20 @@
       color = ms[:color]
 
       # inertia
-      ball_mass = mass
+      link_mass = mass
+      ball_mass = link_mass * 1.0/ball_count
       ball_ixx  = 2.0/5.0 * ball_mass * ball_radius**2
       ball_iyy  = 2.0/5.0 * ball_mass * ball_radius**2
       ball_izz  = 2.0/5.0 * ball_mass * ball_radius**2
-      link_mass = ball_mass
 
       # center of mass (com) and lumped inertia of balls
       ball_com = Vector[0, 0, 0]
       ball_locations.keys.each do |k|
         ball_com += ball_locations[k] / ball_count
       end
-      link_ixx = ball_ixx
-      link_iyy = ball_iyy
-      link_izz = ball_izz
+      link_ixx = ball_count * ball_ixx
+      link_iyy = ball_count * ball_iyy
+      link_izz = ball_count * ball_izz
       link_ixy = 0.0
       link_ixz = 0.0
       link_iyz = 0.0
