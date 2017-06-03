@@ -108,7 +108,7 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
-void ContactSensor::SetActive(const bool _value)
+void ContactSensor::SetActiveContactSensor(const bool _value)
 {
   physics::ContactManager *mgr =
       this->world->GetPhysicsEngine()->GetContactManager();
@@ -156,8 +156,6 @@ void ContactSensor::SetActive(const bool _value)
       this->dataPtr->contactsPub->Fini();
     this->dataPtr->contactsPub.reset();
   }
-
-  Sensor::SetActive(_value);
 }
 
 //////////////////////////////////////////////////

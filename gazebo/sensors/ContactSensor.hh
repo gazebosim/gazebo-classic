@@ -64,9 +64,6 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual void SetActive(const bool _value);
-
-      // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
       /// \brief Finalize the sensor.
@@ -187,9 +184,19 @@ namespace gazebo
       /// \brief Callback for contact messages from the physics engine.
       private: void OnContacts(ConstContactsPtr &_msg);
 
+      /// \brief Backwards compatible SetActive implementation, fix when porting
+      /// to Gazebo 9.
+      /// \param[in] _value True for active
+      private: virtual void SetActiveContactSensor(const bool _value);
+
       /// \internal
       /// \brief Private data pointer
       private: std::unique_ptr<ContactSensorPrivate> dataPtr;
+
+      /// \internal
+      /// \brief So that Sensor can call SetActiveContactSensor, remove on
+      /// Gazebo 9
+      private: friend class Sensor;
     };
     /// \}
   }
