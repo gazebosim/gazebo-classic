@@ -211,6 +211,55 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("light");
     }
   }
+
+  // Add insertions
+  this->insertions.clear();
+  if (_elem->HasElement("insertions"))
+  {
+    auto insertionsElem = _elem->GetElement("insertions");
+
+    // Models
+    if (insertionsElem->HasElement("model"))
+    {
+      auto modelElem = insertionsElem->GetElement("model");
+
+      while (modelElem)
+      {
+        this->insertions.push_back(modelElem->ToString(""));
+        modelElem = modelElem->GetNextElement("model");
+      }
+    }
+
+    // Lights
+    if (insertionsElem->HasElement("light"))
+    {
+      auto lightElem = insertionsElem->GetElement("light");
+
+      while (lightElem)
+      {
+        this->insertions.push_back(lightElem->ToString(""));
+        lightElem = lightElem->GetNextElement("light");
+      }
+    }
+  }
+
+  // Add deletions
+  this->deletions.clear();
+  if (_elem->HasElement("deletions"))
+  {
+    auto deletionsElem = _elem->GetElement("deletions");
+
+    if (deletionsElem->HasElement("name"))
+    {
+      auto nameElem = deletionsElem->GetElement("name");
+
+      while (nameElem)
+      {
+        this->deletions.push_back(nameElem->Get<std::string>());
+        nameElem = nameElem->GetNextElement("name");
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////

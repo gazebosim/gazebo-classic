@@ -131,6 +131,26 @@ TEST(gz_log, Echo)
 }
 
 /////////////////////////////////////////////////
+/// Check to make sure that 'gz log -e' returns model and light insertions and
+/// deletions
+TEST(gz_log, EchoInsertionDeletion)
+{
+  std::string echo = custom_exec(std::string("gz log -e -f ") +
+      PROJECT_SOURCE_PATH + "/test/logs/insertion_deletion.log");
+  boost::trim_right(echo);
+
+  EXPECT_TRUE(echo.find("<insertions>\n<model") != std::string::npos);
+  EXPECT_TRUE(echo.find("<insertions>\n<light") != std::string::npos);
+  EXPECT_TRUE(echo.find("</insertions>") != std::string::npos);
+
+  EXPECT_TRUE(echo.find("<deletions>\n<name>unit_box</name>\n</deletions>") !=
+      std::string::npos);
+  EXPECT_TRUE(echo.find(
+      "<deletions>\n<name>user_point_light_0</name>\n</deletions>") !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 /// Check to make sure that 'gz log -e --filter' returns correct information
 TEST(gz_log, EchoFilter)
 {
