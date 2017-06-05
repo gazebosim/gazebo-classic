@@ -90,7 +90,6 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
     // Invalid inertia, load with default scale
     gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
           << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(ignition::math::Pose3d(xyz, q));
   }
   else
   {
