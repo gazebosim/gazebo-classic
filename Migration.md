@@ -5,6 +5,16 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.9.0 to 7.X
+
+### Modifications
+
+1. **gazebo/physics/ode/ODEPhysics.cc**
+   `ODEPhysics::Collide` combines surface slip parameters with a sum
+   instead of `std::min`.
+   Please see [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+   for more details.
+
 ## Gazebo 7.3.1 to 7.X
 
 ### Deprecations

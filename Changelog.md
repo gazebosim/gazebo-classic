@@ -6,6 +6,14 @@
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
     * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
 
+1. ODE slip parameter example world and test
+    * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+
+## Gazebo 7.8.0 (2017-06-02)
+
+1. Add log record filter options
+    * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
+
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
@@ -28,7 +36,7 @@
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
-    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
