@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. ContactSensor creates filters on demand.
+    * [Pull request 2695](https://bitbucket.org/osrf/gazebo/pull-request/2695)
+
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
