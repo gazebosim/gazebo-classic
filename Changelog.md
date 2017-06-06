@@ -2,7 +2,7 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
-1. ContactSensor creates filters on demand.
+1. ContactSensor subscribes to filters on demand.
     * [Pull request 2695](https://bitbucket.org/osrf/gazebo/pull-request/2695)
 
 1. ODE slip parameter example world and test

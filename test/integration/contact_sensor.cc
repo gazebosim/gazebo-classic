@@ -719,20 +719,6 @@ void ContactSensor::Active()
   world->Step(100);
   world->SetPaused(false);
 
-  /*int maxSleep = 100;
-  int sleep = 0;
-
-  auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
-  auto topicsCount = topics.size();
-  while (topicsCount < 3 && sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
-    topicsCount = topics.size();
-
-    sleep++;
-  }*/
-
   auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   auto topicsCount = topics.size();
 
@@ -755,16 +741,6 @@ void ContactSensor::Active()
   topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   topicsCount = topics.size();
 
-  // Check that the 3 topics are still available
-  /*sleep = 0;
-  while (topicsCount > 1 && sleep < maxSleep)
-  {
-    common::Time::MSleep(100);
-    topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
-    topicsCount = topics.size();
-
-    sleep++;
-  }*/
   EXPECT_EQ(topicsCount, 3u);
   EXPECT_NE(std::find(topics.begin(), topics.end(),
     "/gazebo/default/physics/contacts"), topics.end());
