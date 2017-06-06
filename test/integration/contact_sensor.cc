@@ -405,10 +405,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     world->Step(1);
     contacts01 = contactSensor01->Contacts();
     contacts02 = contactSensor02->Contacts();
-    // gzdbg << "steps[" << steps
-    //       << "] contacts01[" << contacts01.contact_size()
-    //       << "] contacts02[" << contacts02.contact_size()
-    //       << "] to be > 0\n";
+    gzdbg << "steps[" << steps
+          << "] contacts01[" << contacts01.contact_size()
+          << "] contacts02[" << contacts02.contact_size()
+          << "] to be > 0\n";
   }
   EXPECT_GT(steps, 0);
 
@@ -715,30 +715,27 @@ void ContactSensor::Active()
   // Check that sensor is not active
   EXPECT_FALSE(contactSensor->IsActive());
 
-  // Check there's only one contact topic (~/physics/contacts)
+  world->SetPaused(true);
+  world->Step(100);
+  world->SetPaused(false);
+
+  /*int maxSleep = 100;
+  int sleep = 0;
+
   auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   auto topicsCount = topics.size();
-  ASSERT_EQ(topicsCount, 1u);
-  EXPECT_TRUE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/physics/contacts") != topics.end());
-
-  // Set sensor active
-  contactSensor->SetActive(true);
-  EXPECT_TRUE(contactSensor->IsActive());
-
-  // Check the sensor has added 2 topics:
-  // * One from the contace manager with filtered contacts
-  // * One from the sensor
-  int maxSleep = 30;
-  int sleep = 0;
-  while (topicsCount < topicsCount + 2 && sleep < maxSleep)
+  while (topicsCount < 3 && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
     topicsCount = topics.size();
 
     sleep++;
-  }
+  }*/
+
+  auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  auto topicsCount = topics.size();
+
   EXPECT_EQ(topicsCount, 3u);
   EXPECT_NE(std::find(topics.begin(), topics.end(),
     "/gazebo/default/physics/contacts"), topics.end());
@@ -751,8 +748,15 @@ void ContactSensor::Active()
   contactSensor->SetActive(false);
   EXPECT_FALSE(contactSensor->IsActive());
 
-  // Check the 2 topics are gone
-  sleep = 0;
+  world->SetPaused(true);
+  world->Step(100);
+  world->SetPaused(false);
+
+  topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
+  topicsCount = topics.size();
+
+  // Check that the 3 topics are still available
+  /*sleep = 0;
   while (topicsCount > 1 && sleep < maxSleep)
   {
     common::Time::MSleep(100);
@@ -760,10 +764,14 @@ void ContactSensor::Active()
     topicsCount = topics.size();
 
     sleep++;
-  }
-  EXPECT_EQ(topicsCount, 1u);
+  }*/
+  EXPECT_EQ(topicsCount, 3u);
   EXPECT_NE(std::find(topics.begin(), topics.end(),
-      "/gazebo/default/physics/contacts"), topics.end());
+    "/gazebo/default/physics/contacts"), topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+    "/gazebo/default/contactModel/body/contactSensor"), topics.end());
+  EXPECT_NE(std::find(topics.begin(), topics.end(),
+    "/gazebo/default/contactModel/body/contactSensor/contacts"), topics.end());
 }
 
 TEST_F(ContactSensor, Active)

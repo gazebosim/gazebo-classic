@@ -187,6 +187,7 @@ namespace gazebo
       /// \brief Backwards compatible SetActive implementation, fix when porting
       /// to Gazebo 9.
       /// \param[in] _value True for active
+      /// (deprecated)
       private: virtual void SetActiveContactSensor(const bool _value);
 
       /// \internal
@@ -196,6 +197,7 @@ namespace gazebo
       /// \internal
       /// \brief So that Sensor can call SetActiveContactSensor, remove on
       /// Gazebo 9
+      // (deprecated)
       private: friend class Sensor;
     };
     /// \}

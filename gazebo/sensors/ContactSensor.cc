@@ -43,6 +43,9 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
+// Deprecated. In gazebo8 replace this with member variable.
+std::map<std::string, std::string> gFilterTopics;
+
 //////////////////////////////////////////////////
 ContactSensor::ContactSensor()
 : Sensor(sensors::OTHER),
@@ -60,8 +63,30 @@ ContactSensor::~ContactSensor()
 void ContactSensor::Load(const std::string &_worldName, sdf::ElementPtr _sdf)
 {
   Sensor::Load(_worldName, _sdf);
-}
 
+  // Create a publisher for the contact information.
+  if (this->sdf->HasElement("contact") &&
+      this->sdf->GetElement("contact")->HasElement("topic") &&
+      this->sdf->GetElement("contact")->Get<std::string>("topic")
+      != "__default_topic__")
+  {
+    // This will create a topic based on the name specified in SDF.
+    this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
+      this->sdf->GetElement("contact")->Get<std::string>("topic"),
+      100);
+  }
+  else
+  {
+    // This will create a topic based on the name of the parent and the
+    // name of the sensor.
+    std::string topicName = "~/";
+    topicName += this->ParentName() + "/" + this->Name();
+    boost::replace_all(topicName, "::", "/");
+
+    this->dataPtr->contactsPub =
+      this->node->Advertise<msgs::Contacts>(topicName, 100);
+  }
+}
 //////////////////////////////////////////////////
 void ContactSensor::Load(const std::string &_worldName)
 {
@@ -90,15 +115,18 @@ void ContactSensor::Load(const std::string &_worldName)
     collisionElem = collisionElem->GetNextElement("collision");
   }
 
-  if (this->dataPtr->collisions.empty())
+  if (!this->dataPtr->collisions.empty())
   {
-    gzerr << "Contact sensor missing collisions, it won't be initialized."
-          << std::endl;
+    // request the contact manager to publish messages to a custom topic for
+    // this sensor
+    physics::ContactManager *mgr =
+        this->world->GetPhysicsEngine()->GetContactManager();
+    gFilterTopics[this->dataPtr->filterName] =
+      mgr->CreateFilter(this->dataPtr->filterName, this->dataPtr->collisions);
+    // Disable transport in case there are no collisions
+    // Create it if it's active, but we only added the collisions now
+    this->SetActive(this->IsActive() && !this->dataPtr->collisions.empty());
   }
-
-  // Disable transport in case there are no collisions
-  // Create it if it's active, but we only added the collisions now
-  this->SetActive(this->IsActive() && !this->dataPtr->collisions.empty());
 }
 
 //////////////////////////////////////////////////
@@ -110,51 +138,18 @@ void ContactSensor::Init()
 //////////////////////////////////////////////////
 void ContactSensor::SetActiveContactSensor(const bool _value)
 {
-  physics::ContactManager *mgr =
-      this->world->GetPhysicsEngine()->GetContactManager();
-
   // Need collisions for filter
   if (_value && !this->dataPtr->collisions.empty() &&
       !this->dataPtr->contactSub)
   {
-    // Create a publisher for the contact information.
-    if (this->sdf->HasElement("contact") &&
-        this->sdf->GetElement("contact")->HasElement("topic") &&
-        this->sdf->GetElement("contact")->Get<std::string>("topic")
-        != "__default_topic__")
-    {
-      // This will create a topic based on the name specified in SDF.
-      this->dataPtr->contactsPub = this->node->Advertise<msgs::Contacts>(
-        this->sdf->GetElement("contact")->Get<std::string>("topic"),
-        100);
-    }
-    else
-    {
-      // This will create a topic based on the name of the parent and the
-      // name of the sensor.
-      std::string topicName = "~/";
-      topicName += this->ParentName() + "/" + this->Name();
-      boost::replace_all(topicName, "::", "/");
-
-      this->dataPtr->contactsPub =
-        this->node->Advertise<msgs::Contacts>(topicName, 100);
-    }
-
-    // Create filter on contact manager
-    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
-        this->dataPtr->collisions);
-
     // Subscribe to contact info
-    this->dataPtr->contactSub = this->node->Subscribe(topic,
+    this->dataPtr->contactSub = this->node->Subscribe(
+        gFilterTopics[this->dataPtr->filterName],
         &ContactSensor::OnContacts, this);
   }
-  else if (!_value)
+  else if (!_value && this->dataPtr->contactSub)
   {
-    mgr->RemoveFilter(this->dataPtr->filterName);
     this->dataPtr->contactSub.reset();
-    if (this->dataPtr->contactsPub)
-      this->dataPtr->contactsPub->Fini();
-    this->dataPtr->contactsPub.reset();
   }
 }
 
@@ -162,6 +157,13 @@ void ContactSensor::SetActiveContactSensor(const bool _value)
 bool ContactSensor::UpdateImpl(const bool /*_force*/)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+
+  if (!this->dataPtr->contactSub && (
+        this->active || (this->dataPtr->contactsPub &&
+        this->dataPtr->contactsPub->HasConnections())))
+  {
+    this->SetActiveContactSensor(true);
+  }
 
   // Don't do anything if there is no new data to process.
   if (this->dataPtr->incomingContacts.empty())
