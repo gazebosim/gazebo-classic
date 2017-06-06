@@ -431,12 +431,11 @@ WorldState WorldState::operator-(const WorldState &_state) const
   }
 
   // Add in the new model states
-  for (ModelState_M::const_iterator iter =
-       this->modelStates.begin(); iter != this->modelStates.end(); ++iter)
+  for (const auto &modelState : this->modelStates)
   {
-    if (!_state.HasModelState(iter->second.GetName()) && this->world)
+    if (!_state.HasModelState(modelState.second.GetName()) && this->world)
     {
-      ModelPtr model = this->world->GetModel(iter->second.GetName());
+      ModelPtr model = this->world->GetModel(modelState.second.GetName());
       if (model)
         result.insertions.push_back(model->UnscaledSDF()->ToString(""));
     }
