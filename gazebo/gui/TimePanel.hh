@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace gazebo
     class TimeWidget;
     class LogPlayWidget;
 
-    class GAZEBO_VISIBLE TimePanel : public QWidget
+    class GZ_GUI_VISIBLE TimePanel : public QWidget
     {
       Q_OBJECT
 
@@ -85,6 +85,9 @@ namespace gazebo
       /// indicates the simulation is running
       public: void SetPaused(bool _paused);
 
+      /// \brief Toggle simulation paused state.
+      public slots: void TogglePause();
+
       /// \brief Qt call back when the step value in the spinbox changed
       /// \param[in] _value New step value.
       public slots: void OnStepValueChanged(int _value);
@@ -114,10 +117,6 @@ namespace gazebo
       /// \brief Called when a world stats message is received.
       /// \param[in] _msg World statistics message.
       private: void OnStats(ConstWorldStatisticsPtr &_msg);
-
-      /// \brief Helper function to format time string.
-      /// \param[in] _msg Time message.
-      private: static std::string FormatTime(const msgs::Time &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

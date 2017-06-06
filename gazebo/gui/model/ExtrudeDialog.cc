@@ -29,6 +29,8 @@ ExtrudeDialog::ExtrudeDialog(const std::string &_filename, QWidget *_parent)
 {
   this->setObjectName("ExtrudeDialog");
   this->setWindowTitle(tr("Extrude Link"));
+  this->setWindowFlags(Qt::Window | Qt::WindowCloseButtonHint |
+      Qt::WindowStaysOnTopHint | Qt::CustomizeWindowHint);
 
   // Title
   QLabel *titleLabel = new QLabel(tr(
@@ -194,20 +196,20 @@ void ExtrudeDialog::UpdateView()
   // Find extreme values to center and scale
   math::Vector2d min(paths[0].polylines[0][0]);
   math::Vector2d max(min);
-  for (auto p : paths)
+  for (const auto &p : paths)
   {
-    for (auto poly : p.polylines)
+    for (const auto &poly : p.polylines)
     {
-      for (auto pt : poly)
+      for (const auto &pt : poly)
       {
-        if (pt.x < min.x)
-          min.x = pt.x;
-        if (pt.y < min.y)
-          min.y = pt.y;
-        if (pt.x > max.x)
-          max.x = pt.x;
-        if (pt.y > max.y)
-          max.y = pt.y;
+        if (pt.X() < min.x)
+          min.x = pt.X();
+        if (pt.Y() < min.y)
+          min.y = pt.Y();
+        if (pt.X() > max.x)
+          max.x = pt.X();
+        if (pt.Y() > max.y)
+          max.y = pt.Y();
       }
     }
   }
@@ -255,37 +257,44 @@ void ExtrudeDialog::UpdateView()
                  QPen(QColor(50, 50, 255), 2));
 
   // Draw polygons
-  for (common::SVGPath p : paths)
+  for (common::SVGPath path : paths)
   {
-    for (std::vector<math::Vector2d> poly : p.polylines)
+    for (std::vector<ignition::math::Vector2d> poly : path.polylines)
     {
-      QVector<QPointF> polygonPts;
-      for (math::Vector2d pt : poly)
+      QPainterPath painterPath;
+      bool firstPoint = true;
+      for (ignition::math::Vector2d pt : poly)
       {
         // Centroid at SVG 0,0
-        pt = pt - min - (max-min)*0.5;
+        pt = pt - min.Ign() - (max-min).Ign()*0.5;
         // Scale to view while keeping aspect ratio
-        pt = math::Vector2d(pt.x * resolutionView, pt.y * resolutionView);
+        pt = ignition::math::Vector2d(
+            pt.X() * resolutionView, pt.Y() * resolutionView);
         // Translate to view center
-        pt.x += this->dataPtr->viewWidth/2.0;
-        pt.y += viewHeight/2.0;
-
-        // Add to polygon
-        polygonPts.push_back(QPointF(pt.x, pt.y));
+        pt.X() += this->dataPtr->viewWidth/2.0;
+        pt.Y() += viewHeight/2.0;
 
         // Draw point
         double pointSize = 5;
         QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
-             pt.x - pointSize/2.0, pt.y - pointSize/2.0, pointSize, pointSize);
+             pt.X() - pointSize/2.0, pt.Y() - pointSize/2.0,
+             pointSize, pointSize);
         ptItem->setBrush(Qt::red);
         ptItem->setZValue(5);
         scene->addItem(ptItem);
+        if (firstPoint)
+        {
+          firstPoint = false;
+          painterPath.moveTo(pt.X(), pt.Y());
+        }
+        else
+        painterPath.lineTo(pt.X(), pt.Y());
       }
+
+      QGraphicsPathItem *pathItem = new QGraphicsPathItem(painterPath);
       // Draw polygon
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(
-          QPolygonF(polygonPts));
-      polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
-      scene->addItem(polyItem);
+      pathItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
+      scene->addItem(pathItem);
     }
   }
 }

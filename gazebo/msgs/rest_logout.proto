@@ -1,0 +1,15 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface RestLogout
+/// \brief Message for login out of a REST service.
+
+message RestLogout
+{
+  /// \brief ID of this request message
+  optional uint32 id       = 1;
+
+  /// \brief the web service url
+  optional string url      = 2;
+}

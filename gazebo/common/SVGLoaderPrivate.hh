@@ -18,10 +18,10 @@
 #ifndef _GAZEBO_SVGLOADER_PRIVATE_HH_
 #define _GAZEBO_SVGLOADER_PRIVATE_HH_
 
-#include <gazebo/math/Vector2d.hh>
+#include <string>
 
-class TiXmlElement;
-class TiXmlNode;
+#include <gazebo/math/Vector2d.hh>
+#include <gazebo/math/Matrix3.hh>
 
 namespace gazebo
 {

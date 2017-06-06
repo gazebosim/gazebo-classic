@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/test/ServerFixture.hh"
-#include "test/integration/helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 #define TOL_GRAVITY 1e-4
 #define TOL_FORCES 1.0
@@ -29,7 +29,7 @@ class Issue940Test : public ServerFixture,
                      public testing::WithParamInterface<const char*>
 {
   public: void ForceTorqueSensorFrameTest(const std::string &_physicsEngine);
-  public: void ExpectForceTorqueMeasure(const std::string & _sensorName,
+  public: void ExpectForceTorqueMeasure(const std::string &_sensorName,
                                         const Vector3 &_expForce,
                                         const Vector3 &_expTorque,
                                         sensors::SensorManager *_mgr);
@@ -53,14 +53,6 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Skipping this test for " << _physicsEngine
-          << " since it consistently gives"
-          << " incorrect force-torque readings."
-          << std::endl;
-    return;
-  }
   bool worldPaused = true;
   Load("worlds/force_torque_frame_test.world", worldPaused, _physicsEngine);
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
@@ -74,7 +66,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // Make sure that the sensors are correctly simulated
+  // Make sure that the sensor are correctly simulated
   world->Step(20);
 
   // Assume gravity on z axis
@@ -91,6 +83,7 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
 
   double cog_y_1 = 3.0;
   double cog_y_0 = -3.0;
+  double delta_x_joint_12 = 1.0;
 
   // For details on the expected answers, check force_torque_frame_test.world
   ExpectForceTorqueMeasure("force_torque_01_parent_and_parent_to_child",
@@ -106,35 +99,38 @@ void Issue940Test::ForceTorqueSensorFrameTest(const std::string &_physicsEngine)
   ExpectForceTorqueMeasure("force_torque_01_sensor_and_child_to_parent",
     Vector3(0, 0, g*mAll), Vector3(g*(m0*cog_y_0+m1*cog_y_1), 0, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_parent_to_child",
-    Vector3(0, 0, -g*m1), Vector3(-g*m1*cog_y_1, 0, 0), mgr);
+    Vector3(0, 0, -g*m1),
+    Vector3(-g*m1*cog_y_1, -g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_parent_and_child_to_parent",
-    Vector3(0, 0, g*m1), Vector3(g*m1*cog_y_1, 0, 0), mgr);
+    Vector3(0, 0, g*m1), Vector3(g*m1*cog_y_1, g*m1*delta_x_joint_12, 0), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_parent_to_child",
-    Vector3(0, -g*m1, 0), Vector3(-g*m1*cog_y_1, 0, 0), mgr);
+    Vector3(0, -g*m1, 0),
+    Vector3(-g*m1*cog_y_1, 0, g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_child_and_child_to_parent",
-    Vector3(0, g*m1, 0), Vector3(g*m1*cog_y_1, 0, 0), mgr);
+    Vector3(0, g*m1, 0), Vector3(g*m1*cog_y_1, 0, -g*m1*delta_x_joint_12), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_parent_to_child",
-    Vector3(0, -g*m1, 0), Vector3(0, 0, g*m1*cog_y_1), mgr);
+    Vector3(0, -g*m1, 0), Vector3(g*m1*delta_x_joint_12, 0, g*m1*cog_y_1), mgr);
   ExpectForceTorqueMeasure("force_torque_12_sensor_and_child_to_parent",
-    Vector3(0, g*m1, 0), Vector3(0, 0, -g*m1*cog_y_1), mgr);
+    Vector3(0, g*m1, 0),
+    Vector3(-g*m1*delta_x_joint_12, 0, -g*m1*cog_y_1), mgr);
 }
 
 ////////////////////////////////////////////////////////////////////
 // \brief Expect force and torque measures for a force torque sensor
-void Issue940Test::ExpectForceTorqueMeasure(const std::string & _sensorName,
+void Issue940Test::ExpectForceTorqueMeasure(const std::string &_sensorName,
                                             const Vector3 &_expForce,
                                             const Vector3 &_expTorque,
                                             sensors::SensorManager *_mgr)
 {
   sensors::ForceTorqueSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
+    std::dynamic_pointer_cast<sensors::ForceTorqueSensor>(
         _mgr->GetSensor(_sensorName));
 
   // Make sure the above dynamic cast worked.
   EXPECT_TRUE(sensor != NULL);
 
-  Vector3 mesForce = sensor->GetForce();
-  Vector3 mesTorque = sensor->GetTorque();
+  ignition::math::Vector3d mesForce = sensor->Force();
+  ignition::math::Vector3d mesTorque = sensor->Torque();
 
   gzdbg << "sensorName: " << _sensorName << std::endl;
   gzdbg << "mesForce :  " << mesForce << std::endl;
@@ -142,13 +138,13 @@ void Issue940Test::ExpectForceTorqueMeasure(const std::string & _sensorName,
   gzdbg << "mesTorque : " << mesTorque << std::endl;
   gzdbg << "expTorque : " << _expTorque << std::endl;
 
-  EXPECT_NEAR(_expForce.x, mesForce.x, TOL_FORCES);
-  EXPECT_NEAR(_expForce.y, mesForce.y, TOL_FORCES);
-  EXPECT_NEAR(_expForce.z, mesForce.z, TOL_FORCES);
+  EXPECT_NEAR(_expForce.x, mesForce.X(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.y, mesForce.Y(), TOL_FORCES);
+  EXPECT_NEAR(_expForce.z, mesForce.Z(), TOL_FORCES);
 
-  EXPECT_NEAR(_expTorque.x, mesTorque.x, TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.y, mesTorque.y, TOL_TORQUES);
-  EXPECT_NEAR(_expTorque.z, mesTorque.z, TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.x, mesTorque.X(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.y, mesTorque.Y(), TOL_TORQUES);
+  EXPECT_NEAR(_expTorque.z, mesTorque.Z(), TOL_TORQUES);
 
   EXPECT_TRUE(sensor->IsActive());
 }

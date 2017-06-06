@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include <math.h>
 #include <iostream>
 #include <cmath>
+#include <ignition/math/Quaternion.hh>
 
 #include "gazebo/math/Helpers.hh"
 #include "gazebo/math/Angle.hh"
@@ -71,12 +72,25 @@ namespace gazebo
     /// \param[in] _qt Quaternion to copy
     public: Quaternion(const Quaternion &_qt);
 
+    /// \brief Copy constructor for ignition::math::Quaterniond
+    /// \param[in] _qt Ignition math quaterniond to copy
+    public: Quaternion(const ignition::math::Quaterniond &_qt);
+
     /// \brief Destructor
     public: ~Quaternion();
 
     /// \brief Equal operator
     /// \param[in] _qt Quaternion to copy
     public: Quaternion &operator =(const Quaternion &_qt);
+
+    /// \brief Convert this quaternion to an ignition::math::Quaterniond.
+    /// \return This quaternion as an ignition::math::Quaterniond.
+    public: ignition::math::Quaterniond Ign() const;
+
+    /// \brief Assignment operator for ignition math
+    /// \param[in] _v a new value
+    /// \return The new quaternion.
+    public: Quaternion &operator =(const ignition::math::Quaterniond &_v);
 
     /// \brief Invert the quaternion
     public: void Invert();

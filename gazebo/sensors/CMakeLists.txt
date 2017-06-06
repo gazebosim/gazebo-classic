@@ -5,6 +5,7 @@ if (WIN32)
 endif()
 
 set (sources
+  AltimeterSensor.cc
   CameraSensor.cc
   ContactSensor.cc
   DepthCameraSensor.cc
@@ -13,6 +14,8 @@ set (sources
   GpsSensor.cc
   GpuRaySensor.cc
   ImuSensor.cc
+  LogicalCameraSensor.cc
+  MagnetometerSensor.cc
   MultiCameraSensor.cc
   Noise.cc
   RaySensor.cc
@@ -22,13 +25,16 @@ set (sources
   Sensor.cc
   SensorFactory.cc
   SensorManager.cc
+  SensorTypes.cc
   SonarSensor.cc
+  WideAngleCameraSensor.cc
   WirelessReceiver.cc
   WirelessTransceiver.cc
   WirelessTransmitter.cc
 )
 
 set (headers
+  AltimeterSensor.hh
   CameraSensor.hh
   ContactSensor.hh
   DepthCameraSensor.hh
@@ -37,6 +43,8 @@ set (headers
   GpsSensor.hh
   GpuRaySensor.hh
   ImuSensor.hh
+  LogicalCameraSensor.hh
+  MagnetometerSensor.hh
   MultiCameraSensor.hh
   Noise.hh
   RaySensor.hh
@@ -48,31 +56,40 @@ set (headers
   SensorFactory.hh
   SensorManager.hh
   SonarSensor.hh
+  WideAngleCameraSensor.hh
   WirelessReceiver.hh
   WirelessTransceiver.hh
   WirelessTransmitter.hh
 )
 
 set (gtest_sources
+  Noise_TEST.cc
+)
+gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_sensors)
+
+set (gtest_fixture_sources
+  AltimeterSensor_TEST.cc
   ForceTorqueSensor_TEST.cc
   GpsSensor_TEST.cc
   ImuSensor_TEST.cc
-  Noise_TEST.cc
+  MagnetometerSensor_TEST.cc
   RaySensor_TEST.cc
   Sensor_TEST.cc
   SonarSensor_TEST.cc
   WirelessReceiver_TEST.cc
   WirelessTransmitter_TEST.cc
 )
-
-gz_build_tests(${gtest_sources})
+gz_build_tests(${gtest_fixture_sources}
+  EXTRA_LIBS gazebo_sensors gazebo_test_fixture)
 
 set (gtest_sources_dri
+  CameraSensor_TEST.cc
+  DepthCameraSensor_TEST.cc
   GpuRaySensor_TEST.cc
   SensorManager_TEST.cc
 )
-
-gz_build_dri_tests(${gtest_sources_dri})
+gz_build_dri_tests(${gtest_sources_dri}
+  EXTRA_LIBS gazebo_sensors gazebo_test_fixture)
 
 set (sensors_headers "" CACHE INTERNAL "sensors headers" FORCE)
 foreach (hdr ${headers})

@@ -1,0 +1,24 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Altimeter
+/// \brief Data from an altimeter sensor
+
+import "time.proto";
+
+/// \brief Altimeter sensor data
+message Altimeter
+{
+  /// \brief Timestamp of the altimeter data
+  required Time time                 = 1;
+
+  /// \brief Vertical position data, in meters.
+  required double vertical_position  = 2;
+
+  /// \brief Vertical velocity data, in meters/second.
+  required double vertical_velocity  = 3;
+
+  /// \brief Vertical reference.
+  required double vertical_reference = 4;
+}

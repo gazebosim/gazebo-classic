@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: A model state
- * Author: Nate Koenig
- */
 
-#ifndef _MODELSTATE_HH_
-#define _MODELSTATE_HH_
+#ifndef _GAZEBO_MODELSTATE_HH_
+#define _GAZEBO_MODELSTATE_HH_
 
 #include <vector>
 #include <string>
 #include <boost/regex.hpp>
 
+#include <ignition/math/Vector3.hh>
 #include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
@@ -59,8 +57,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: ModelState(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Constructor.
       ///
@@ -85,8 +84,9 @@ namespace gazebo
       /// info.
       /// \param[in] _realTime Real time stamp.
       /// \param[in] _simTime Sim time stamp.
+      /// \param[in] _iterations Simulation iterations.
       public: void Load(const ModelPtr _model, const common::Time &_realTime,
-                  const common::Time &_simTime);
+                  const common::Time &_simTime, const uint64_t _iterations);
 
       /// \brief Load state from SDF element.
       ///
@@ -97,6 +97,10 @@ namespace gazebo
       /// \brief Get the stored model pose.
       /// \return The math::Pose of the Model.
       public: const math::Pose &GetPose() const;
+
+      /// \brief Get the stored model scale.
+      /// \return The scale of the Model.
+      public: const ignition::math::Vector3d &Scale() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -171,6 +175,30 @@ namespace gazebo
       /// \return True if the joint exists in the model.
       public: bool HasJointState(const std::string &_jointName) const;
 
+      /// \brief Get the number of model states.
+      ///
+      /// This returns the number of nested model states recorded.
+      /// \return Number of nested ModelState recorded.
+      public: unsigned int NestedModelStateCount() const;
+
+      /// \brief Get a model state by model name
+      ///
+      /// Searches through all nested model states. Returns the model state with
+      /// the matching name, if any.
+      /// \param[in] _modelName Name of the model state
+      /// \return State of the Model.
+      /// \throws common::Exception When _modelName is invalid.
+      public: ModelState NestedModelState(const std::string &_modelName) const;
+
+      /// \brief Return true if there is a nested model with the specified name.
+      /// \param[in] _modelName Name of the model state.
+      /// \return True if the model exists in this model state.
+      public: bool HasNestedModelState(const std::string &_modelName) const;
+
+      /// \brief Get the nested model states.
+      /// \return A map of model names to model states.
+      public: const ModelState_M &NestedModelStates() const;
+
       /// \brief Populate a state SDF element with data from the object.
       /// \param[out] _sdf SDF element to populate.
       public: void FillSDF(sdf::ElementPtr _sdf);
@@ -187,6 +215,11 @@ namespace gazebo
       /// \brief Set the sim time when this state was generated
       /// \param[in] _time Simulation time when the data was recorded.
       public: virtual void SetSimTime(const common::Time &_time);
+
+      /// \brief Set the simulation iterations when this state was generated
+      /// \param[in] _iterations Simulation iterations when the data was
+      /// recorded.
+      public: virtual void SetIterations(const uint64_t _iterations);
 
       /// \brief Assignment operator
       /// \param[in] _state State value
@@ -211,22 +244,32 @@ namespace gazebo
                   const gazebo::physics::ModelState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(3)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
+          << ignition::math::precision(_state.pose.pos.x, 4) << " "
+          << ignition::math::precision(_state.pose.pos.y, 4) << " "
+          << ignition::math::precision(_state.pose.pos.z, 4) << " "
+          << ignition::math::precision(q.x, 4) << " "
+          << ignition::math::precision(q.y, 4) << " "
+          << ignition::math::precision(q.z, 4) << " "
           << "</pose>";
+
+        // Only record scale if it is not the default value of [1, 1, 1].
+        if (_state.scale != ignition::math::Vector3d::One)
+          _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();
             ++iter)
         {
           _out << iter->second;
+        }
+
+        for (const auto &ms : _state.modelStates)
+        {
+          _out << ms.second;
         }
 
         // Output the joint information
@@ -245,11 +288,17 @@ namespace gazebo
       /// \brief Pose of the model.
       private: math::Pose pose;
 
+      /// \brief Scale of the model.
+      private: ignition::math::Vector3d scale;
+
       /// \brief All the link states.
       private: LinkState_M linkStates;
 
       /// \brief All the joint states.
       private: JointState_M jointStates;
+
+      /// \brief All the model states.
+      private: ModelState_M modelStates;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #include "InRegionEventSource.hh"
 #include "ExistenceEventSource.hh"
 #include "OccupiedEventSource.hh"
+#include "JointEventSource.hh"
 
 #include "SimEventsPlugin.hh"
 
@@ -69,9 +70,15 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   // Initialize the node with the world name
   this->node->Init(_parent->GetName());
 
+  // Read topic, if specified
+  std::string topic ="/gazebo/sim_events";
+  if (this->sdf->HasElement("topic"))
+  {
+    topic = this->sdf->Get<std::string>("topic");
+  }
+
   // Create a publisher on the Rest plugin topic
-  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(
-      "/gazebo/sim_events");
+  this->pub = this->node->Advertise<gazebo::msgs::SimEvent>(topic);
 
   // Subscribe to model spawning
   this->spawnSub = this->node->Subscribe("~/model/info",
@@ -81,22 +88,26 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
   this->requestSub = this->node->Subscribe("~/request",
       &SimEventsPlugin::OnRequest, this);
 
-  // regions are defined outside of events, so that they can be shared
-  // between events....
-  // and we read them first
-  sdf::ElementPtr child = this->sdf->GetElement("region");
-  while (child)
+  // read regions, if any
+  if (this->sdf->HasElement("region"))
   {
-    Region *r = new Region;
-    r->Load(child);
-    RegionPtr region;
-    region.reset(r);
-    this->regions[region->name] = region;
-    child = child->GetNextElement("region");
+    // regions are defined outside of events, so that they can be shared
+    // between events....
+    // and we read them first
+    sdf::ElementPtr child = this->sdf->GetElement("region");
+    while (child)
+    {
+      Region *r = new Region;
+      r->Load(child);
+      RegionPtr region;
+      region.reset(r);
+      this->regions[region->name] = region;
+      child = child->GetNextElement("region");
+    }
   }
 
   // Reading events
-  child = this->sdf->GetElement("event");
+  sdf::ElementPtr child = this->sdf->GetElement("event");
   while (child)
   {
     // get name and type of each event
@@ -125,11 +136,15 @@ void SimEventsPlugin::Load(physics::WorldPtr _parent, sdf::ElementPtr _sdf)
     {
       event.reset(new ExistenceEventSource(this->pub, this->world) );
     }
+    else if (eventType == "joint")
+    {
+      event.reset(new JointEventSource(this->pub, this->world));
+    }
     else
     {
       std::string m;
-      m = "Unknown event name: \"" + eventName;
-      m += "\" of type: \"" + eventType + "\" in SimEvents plugin";
+      m = "Event \"" + eventName;
+      m += "\" is of unknown type: \"" + eventType + "\" in SimEvents plugin";
       throw SimEventsException(m.c_str());
     }
 

@@ -3,14 +3,14 @@ link_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   )
 
-set (server_inc 
+set (server_inc
   RestApi.hh
   RestException.hh
   RestWebPlugin.hh
   )
 
 
-set (server_src 
+set (server_src
   RestApi.cc
   RestWebPlugin.cc
   )
@@ -30,7 +30,8 @@ set (client_src
 
 set (qt_headers
     RestUiWidget.hh
-    RestUiLoginDialog.hh)
+    RestUiLoginDialog.hh
+)
 
 include ( ${QT_USE_FILE} )
 

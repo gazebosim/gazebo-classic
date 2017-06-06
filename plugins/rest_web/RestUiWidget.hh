@@ -20,6 +20,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 #ifndef Q_MOC_RUN
@@ -30,6 +31,11 @@
 
 namespace gazebo
 {
+  namespace gui
+  {
+    class TopToolbar;
+  }
+
   /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
   /// \brief REST user interface widget
   class GAZEBO_VISIBLE RestUiWidget : public QWidget
@@ -43,6 +49,8 @@ namespace gazebo
     /// \param[in] _urlLabel Url label.
     /// \param[in] _defaultUrl Default url.
     public: RestUiWidget(QWidget *_parent,
+                         QAction &_login,
+                         QAction &_logout,
                          const std::string &_menuTitle,
                          const std::string &_loginTitle,
                          const std::string &_urlLabel,
@@ -51,16 +59,29 @@ namespace gazebo
     /// \brief Destructor
     public: virtual ~RestUiWidget() = default;
 
-    /// \brief QT callback (from the login menu)
+    /// \brief QT callback (from the window menu)
     public slots: void Login();
+
+    /// \brief QT callback (from the window menu)
+    public slots: void Logout();
 
     /// \brief Called before rendering, from the GUI thread this is called from
     /// the plugin's update.
     public: void Update();
 
-    /// \brief Called everytime a response  message is received.
-    /// \param[in] _msg Rest error message.
-    private: void OnResponse(ConstRestErrorPtr &_msg);
+    /// \brief Called everytime a response message is received.
+    /// \param[in] _msg Rest response message.
+    private: void OnResponse(ConstRestResponsePtr &_msg);
+
+    /// \brief Callback when window mode is changed.
+    /// \param[in] _mode New window mode.
+    private: void OnWindowMode(const std::string &_mode);
+
+    /// \brief Login menu item
+    private: QAction &loginMenuAction;
+
+    /// \brief Logout menu item
+    private: QAction &logoutMenuAction;
 
     /// \brief The title to use when displaying dialog/message windows
     private: std::string title;
@@ -69,18 +90,40 @@ namespace gazebo
     private: gazebo::transport::NodePtr node;
 
     /// \brief Login dialog.
-    private: gui::RestUiLoginDialog dialog;
+    private: gui::RestUiLoginDialog loginDialog;
 
-    /// \brief Gazebo topics publisher
-    private: gazebo::transport::PublisherPtr pub;
+    /// \brief Gazebo login topic publisher
+    private: gazebo::transport::PublisherPtr loginPub;
 
-    /// \brief Gazebo topics subscriber.
-    private: gazebo::transport::SubscriberPtr sub;
+    /// \brief Gazebo logout topic publisher
+    private: gazebo::transport::PublisherPtr logoutPub;
 
-    /// \brief List of unprocessed error messages to be displayed from the gui
-    /// thread.
-    private: std::list<boost::shared_ptr<const gazebo::msgs::RestError>>
+    /// \brief Gazebo response topic subscriber.
+    private: gazebo::transport::SubscriberPtr responseSub;
+
+    /// \brief List of unprocessed response messages to be displayed from the
+    /// gui thread.
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestResponse>>
         msgRespQ;
+
+    /// \brief Gazebo main window toolbar.
+    private: gui::TopToolbar *toolbar;
+
+    /// \brief Label to display name of user who is logged in.
+    private: QLabel *loginLabel;
+
+    /// \brief ID of this rest service client
+    private: unsigned int restID;
+
+    /// \brief Pointer to the Qt action associated with the login label.
+    private: QAction *loginLabelAct;
+
+    /// \brief Pointer to the Qt action associated with the spacer widget
+    /// before the login label.
+    private: QAction *spacerAct;
+
+    /// \brief Event based connections.
+    public: std::vector<event::ConnectionPtr> connections;
   };
 }
 

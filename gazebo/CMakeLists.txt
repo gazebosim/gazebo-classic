@@ -4,6 +4,7 @@ include_directories(SYSTEM
   ${Boost_INCLUDE_DIRS}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
+  ${IGNITION-MATH_INCLUDE_DIRS}
   ${TBB_INCLUDEDIR}
   ${tinyxml_INCLUDE_DIRS}
 )
@@ -41,24 +42,11 @@ add_subdirectory(util)
 add_subdirectory(test)
 
 add_dependencies(gazebo_physics gazebo_msgs)
-add_dependencies(gazebo_physics_ode gazebo_msgs)
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gazebo_rendering gazebo_msgs)
 add_dependencies(gazebo_sensors gazebo_rendering)
 
-if(HAVE_BULLET)
-  add_dependencies(gazebo_physics_bullet gazebo_msgs)
-endif()
-if (HAVE_SIMBODY)
-  add_dependencies(gazebo_physics_simbody gazebo_msgs)
-endif()
-if(HAVE_DART)
-  add_dependencies(gazebo_physics_dart gazebo_msgs)
-endif()
-
-
 gz_add_executable(gzserver server_main.cc)
-gz_add_executable(gazebo gazebo_main.cc)
 
 target_link_libraries(gzserver
   libgazebo
@@ -70,48 +58,40 @@ target_link_libraries(gzserver
   gazebo_rendering
   gazebo_msgs
   # Extra libs needed when linking statically (e.g., on WIN32)
-  gazebo_physics_ode
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
 )
 
-if (HAVE_SIMBODY)
-  target_link_libraries(gzserver gazebo_physics_simbody)
-endif()
-
-if (HAVE_DART)
-  target_link_libraries(gzserver gazebo_physics_dart)
-endif()
-
-if (HAVE_BULLET)
-  target_link_libraries(gzserver gazebo_physics_bullet)
-endif()
-
 if (UNIX)
   target_link_libraries(gzserver pthread)
 endif()
-
-target_link_libraries(gazebo
-  libgazebo
-  libgazebo_client
-  gazebo_common
-  gazebo_util
-  gazebo_transport
-  gazebo_physics
-  gazebo_sensors
-  gazebo_rendering
-  gazebo_msgs
-  gazebo_gui
-)
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "CHECK")
   target_link_libraries(gzserver gcov)
 endif()
 
 gz_install_executable(gzserver)
-gz_install_executable(gazebo)
 manpage(gzserver 1)
-manpage(gazebo 1)
+
+# gazebo executable doesn't yet work on Windows
+if (NOT WIN32)
+  gz_add_executable(gazebo gazebo_main.cc)
+  target_link_libraries(gazebo
+    libgazebo
+    libgazebo_client
+    gazebo_common
+    gazebo_util
+    gazebo_transport
+    gazebo_physics
+    gazebo_sensors
+    gazebo_rendering
+    gazebo_msgs
+    gazebo_gui
+  )
+
+  gz_install_executable(gazebo)
+  manpage(gazebo 1)
+endif()
 
 gz_add_library(libgazebo Server.cc Master.cc gazebo.cc gazebo_shared.cc)
 set_target_properties(libgazebo PROPERTIES OUTPUT_NAME "gazebo")

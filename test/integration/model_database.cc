@@ -1,5 +1,5 @@
  /*
- * Copyright (C) 2013-2015 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,6 @@ class ModelDatabaseTest : public ServerFixture
 void OnModels(const std::map<std::string, std::string> & /*_models*/)
 {
   g_onModels++;
-  g_Connection.reset();
 }
 
 void OnModels1(const std::map<std::string, std::string> & /*_models*/)
@@ -92,6 +91,10 @@ TEST_F(ModelDatabaseTest, GetModelsTwice)
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 1);
 
+
+  // Reset bool reference, so now only g_onModels1 should increment
+  g_Connection.reset();
+
   common::ModelDatabase::Instance()->GetModels(boost::bind(&OnModels, _1));
 
   while (g_onModels1 == 1)
@@ -129,6 +132,10 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   EXPECT_EQ(g_onModels1, 1);
   EXPECT_EQ(g_onModels2, 1);
 
+  // Reset bool reference, so now only g_onModels1 and g_onModels2 should
+  // increment
+  g_Connection.reset();
+
   common::ModelDatabase::Instance()->GetModels(
       boost::bind(&OnModels, _1));
 
@@ -151,6 +158,21 @@ TEST_F(ModelDatabaseTest, GetModelsThrice)
   EXPECT_EQ(g_onModels, 1);
   EXPECT_EQ(g_onModels1, 2);
   EXPECT_EQ(g_onModels2, 3);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ModelDatabaseTest, Version)
+{
+  // add test model cococan to path so that the model database
+  // can pick it up
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+    CMAKE_SOURCE_DIR "/test/models/testdb");
+
+  std::string uri = "model://cococan";
+  std::string model;
+  model = gazebo::common::ModelDatabase::Instance()->GetModelFile(uri);
+  // this model hias multiple sdf files. 1_4 is the correct one
+  EXPECT_TRUE(model.find("model-1_4.sdf") != std::string::npos);
 }
 
 /////////////////////////////////////////////////

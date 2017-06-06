@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,9 @@ namespace gazebo
       /// \param[in] _msg Message describing the camera sensor.
       public: void Load(const msgs::CameraSensor &_msg);
       using Visual::Load;
+
+      // Documentation inherited
+      protected: virtual void Fini();
 
       /// \brief Update the visual
       private: void Update();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <list>
 #include <vector>
 
+#include <boost/function.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -33,6 +34,7 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
 
+#include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -55,6 +57,34 @@ namespace gazebo
     /// \brief Private data for the Visual class
     class VisualPrivate
     {
+      /// \brief Constructor
+      public: VisualPrivate()
+              : sceneNode(NULL),
+                transparency(0),
+                castShadows(true),
+                isStatic(false),
+                staticGeom(NULL),
+                visible(true),
+                ribbonTrail(NULL),
+                skeleton(NULL),
+                animState(NULL),
+                useRTShader(true),
+                initialized(false),
+                boundingBox(NULL),
+                id(0),
+                lighting(true),
+                visibilityFlags(GZ_VISIBILITY_ALL),
+                type(Visual::VT_ENTITY),
+                layer(0),
+                geomSize(ignition::math::Vector3d::One),
+                inheritTransparency(true),
+                wireframe(false)
+      {
+      }
+
+      /// \brief Default destructor
+      public: virtual ~VisualPrivate() = default;
+
       /// \brief Pointer to the visual's scene.
       public: ScenePtr scene;
 
@@ -135,7 +165,7 @@ namespace gazebo
       public: static uint32_t visualIdCount;
 
       /// \brief Scale of visual.
-      public: math::Vector3 scale;
+      public: ignition::math::Vector3d scale;
 
       /// \brief True if lighting will be applied to this visual.
       public: bool lighting;
@@ -164,9 +194,32 @@ namespace gazebo
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;
 
+      /// \brief type
+      public: Visual::VisualType type;
+
       /// \brief Index of the layer to which this visual belongs. Layers
       /// act similar to layers in photoshop.
       public: int32_t layer;
+
+      /// \brief Size of attached geometry
+      public: ignition::math::Vector3d geomSize;
+
+      /// \brief True to inherit transparency from parent.
+      public: bool inheritTransparency;
+
+      /// \brief True if wireframe mode is enabled
+      public: bool wireframe;
+
+      /// \brief Stores the message for this visual according to the visual
+      /// type. For example, VT_LINK will have gazebo::msgs::Link.
+      public: google::protobuf::Message *typeMsg = nullptr;
+
+      /// \brief Vector of visuals which will be generated on demand.
+      public: std::vector<std::pair<Visual::VisualType,
+          google::protobuf::Message *>> pendingChildren;
+
+      /// \brief The initial pose of the visual.
+      public: ignition::math::Pose3d initialRelativePose;
     };
     /// \}
   }

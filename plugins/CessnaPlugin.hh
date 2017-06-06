@@ -128,7 +128,7 @@ namespace gazebo
     private: int32_t propellerMaxRpm = 2500;
 
     /// \brief Next command to be applied to the propeller and control surfaces.
-    private: std::array<float, 7>cmds = {{0, 0, 0, 0, 0, 0, 0}};
+    private: std::array<float, 7>cmds;
 
     /// \brief Velocity PID for the propeller.
     private: common::PID propellerPID;

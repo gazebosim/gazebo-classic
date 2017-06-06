@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,17 @@
 #include <vector>
 #include "gazebo/util/system.hh"
 
-namespace gazebo
+namespace ignition
 {
   namespace math
   {
     class Spline;
     class RotationSpline;
   }
+}
 
+namespace gazebo
+{
   /// \ingroup gazebo_common
   /// \brief Common namespace
 
@@ -153,10 +156,10 @@ namespace gazebo
       protected: void BuildInterpolationSplines() const;
 
       /// \brief smooth interpolation for position
-      private: mutable math::Spline *positionSpline;
+      private: mutable ignition::math::Spline *positionSpline;
 
       /// \brief smooth interpolation for rotation
-      private: mutable math::RotationSpline *rotationSpline;
+      private: mutable ignition::math::RotationSpline *rotationSpline;
     };
     /// \}
 

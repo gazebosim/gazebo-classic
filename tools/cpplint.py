@@ -1355,7 +1355,7 @@ def CheckForNonStandardConstructs(filename, clean_lines, linenum,
   if Search(r'\b(const|volatile|void|char|short|int|long'
             r'|float|double|signed|unsigned'
             r'|schar|u?int8|u?int16|u?int32|u?int64)'
-            r'\s+(auto|register|static|extern|typedef)\b',
+            r'\s+(register|static|extern|typedef)\b',
             line):
     error(filename, linenum, 'build/storage_class', 5,
           'Storage class (static, extern, typedef, etc) should be first.')

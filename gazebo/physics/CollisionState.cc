@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ CollisionState::CollisionState()
 /////////////////////////////////////////////////
 CollisionState::CollisionState(const CollisionPtr _collision)
 : State(_collision->GetName(), _collision->GetWorld()->GetRealTime(),
-        _collision->GetWorld()->GetSimTime())
+        _collision->GetWorld()->GetSimTime(),
+        _collision->GetWorld()->GetIterations())
 {
   this->pose = _collision->GetRelativePose();
 }

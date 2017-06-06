@@ -1,0 +1,19 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Magnetometer
+/// \brief Data from a magnetic field strength sensor
+
+import "time.proto";
+import "vector3d.proto";
+
+/// \brief Message that encapsulates sensor data from a magnetometer.
+message Magnetometer
+{
+  /// \brief Global time at which the magnetic field strength was sampled
+  required Time time                 = 1;
+  
+  /// \brief Magnetic field strength (in Tesla) along body-frame axis
+  required Vector3d field_tesla      = 2;
+}

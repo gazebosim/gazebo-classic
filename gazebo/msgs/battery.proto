@@ -1,0 +1,15 @@
+syntax = "proto2";
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Battery
+/// \brief Message for a battery
+
+message Battery
+{
+  /// \brief Name of the battery
+  required string name    = 1;
+
+  /// \brief Real voltage in volts.
+  required double voltage = 2;
+}
