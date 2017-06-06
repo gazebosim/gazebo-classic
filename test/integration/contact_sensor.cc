@@ -405,10 +405,10 @@ void ContactSensor::StackTest(const std::string &_physicsEngine)
     world->Step(1);
     contacts01 = contactSensor01->Contacts();
     contacts02 = contactSensor02->Contacts();
-    gzdbg << "steps[" << steps
-          << "] contacts01[" << contacts01.contact_size()
-          << "] contacts02[" << contacts02.contact_size()
-          << "] to be > 0\n";
+    // gzdbg << "steps[" << steps
+    //       << "] contacts01[" << contacts01.contact_size()
+    //       << "] contacts02[" << contacts02.contact_size()
+    //       << "] to be > 0\n";
   }
   EXPECT_GT(steps, 0);
 

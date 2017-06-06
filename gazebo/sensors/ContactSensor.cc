@@ -43,7 +43,7 @@ using namespace sensors;
 
 GZ_REGISTER_STATIC_SENSOR("contact", ContactSensor)
 
-// Deprecated. In gazebo8 replace this with member variable.
+// Deprecated. In gazebo8 replace this with a member variable.
 std::map<std::string, std::string> gFilterTopics;
 
 //////////////////////////////////////////////////
