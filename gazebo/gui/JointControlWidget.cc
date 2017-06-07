@@ -63,6 +63,12 @@ void JointForceControl::Reset()
 }
 
 /////////////////////////////////////////////////
+void JointForceControl::SetForce(double _force)
+{
+  this->dataPtr->forceSpin->setValue(_force);
+}
+
+/////////////////////////////////////////////////
 void JointForceControl::OnChanged(double _value)
 {
   emit changed(_value, this->dataPtr->name);
@@ -132,6 +138,30 @@ void JointPIDPosControl::Reset()
   this->dataPtr->pGainSpin->setValue(1.000);
   this->dataPtr->iGainSpin->setValue(0.100);
   this->dataPtr->dGainSpin->setValue(0.010);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetPositionTarget(double _target)
+{
+  this->dataPtr->posSpin->setValue(_target);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetPGain(double _p_gain)
+{
+  this->dataPtr->pGainSpin->setValue(_p_gain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetIGain(double _i_gain)
+{
+  this->dataPtr->iGainSpin->setValue(_i_gain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetDGain(double _d_gain)
+{
+  this->dataPtr->dGainSpin->setValue(_d_gain);
 }
 
 /////////////////////////////////////////////////
@@ -246,6 +276,30 @@ void JointPIDVelControl::Reset()
 }
 
 /////////////////////////////////////////////////
+void JointPIDVelControl::SetVelocityTarget(double _target)
+{
+  this->dataPtr->posSpin->setValue(_target);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetPGain(double _p_gain)
+{
+  this->dataPtr->pGainSpin->setValue(_p_gain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetIGain(double _i_gain)
+{
+  this->dataPtr->iGainSpin->setValue(_i_gain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDVelControl::SetDGain(double _d_gain)
+{
+  this->dataPtr->dGainSpin->setValue(_d_gain);
+}
+
+/////////////////////////////////////////////////
 void JointPIDVelControl::OnChanged(double _value)
 {
   emit changed(_value, this->dataPtr->name);
@@ -307,6 +361,77 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   this->LayoutPositionTab(modelMsg);
 
   this->LayoutVelocityTab(modelMsg);
+
+  // Get joint controller parameters and use them to populate the sliders.
+  ignition::msgs::StringMsg req;
+  ignition::msgs::JointCmd rep;
+  bool result;
+  unsigned int timeout = 5000;
+  bool executed;
+  const std::string service = std::string("/") + _modelName + "/joint_cmd_req";
+
+  // Force control
+  for (auto &slider : this->dataPtr->sliders)
+  {
+    req.set_data(slider.first);
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
+    if (executed && result && rep.has_force())
+    {
+      slider.second->SetForce(rep.force());
+    }
+  }
+
+  // PID position control
+  for (auto &slider : this->dataPtr->pidPosSliders)
+  {
+    req.set_data(slider.first);
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
+    if (executed && result && rep.has_position())
+    {
+      if (rep.position().has_target())
+      {
+        slider.second->SetPositionTarget(rep.position().target());
+      }
+      if (rep.position().has_p_gain())
+      {
+        slider.second->SetPGain(rep.position().p_gain());
+      }
+      if (rep.position().has_i_gain())
+      {
+        slider.second->SetIGain(rep.position().i_gain());
+      }
+      if (rep.position().has_d_gain())
+      {
+        slider.second->SetDGain(rep.position().d_gain());
+      }
+    }
+  }
+
+  // PID velocity control
+  for (auto &slider : this->dataPtr->pidVelSliders)
+  {
+    req.set_data(slider.first);
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
+    if (executed && result && rep.has_velocity())
+    {
+      if (rep.velocity().has_target())
+      {
+        slider.second->SetVelocityTarget(rep.velocity().target());
+      }
+      if (rep.velocity().has_p_gain())
+      {
+        slider.second->SetPGain(rep.velocity().p_gain());
+      }
+      if (rep.velocity().has_i_gain())
+      {
+        slider.second->SetIGain(rep.velocity().i_gain());
+      }
+      if (rep.velocity().has_d_gain())
+      {
+        slider.second->SetDGain(rep.velocity().d_gain());
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////

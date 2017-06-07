@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/transport.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
@@ -39,6 +40,9 @@ namespace gazebo
 
       /// \brief Publisher for joint messages.
       public: transport::PublisherPtr jointPub;
+
+      /// \brief Node for coomunication.
+      public: ignition::transport::Node node_srv;
 
       /// \brief Sliders for force control
       public: std::map<std::string, JointForceControl *> sliders;

@@ -49,6 +49,14 @@ JointController::JointController(ModelPtr _model)
     this->dataPtr->jointCmdSub = this->dataPtr->node->Subscribe(
         std::string("~/") + this->dataPtr->model->GetName() + "/joint_cmd",
         &JointController::OnJointCmd, this);
+
+    const std::string service = std::string("/") + this->dataPtr->model->GetName()
+        + "/joint_cmd_req";
+    if (!this->dataPtr->node_srv.Advertise(service,
+        &JointController::OnJointCmdReq, this))
+    {
+      gzerr << "Error advertising service [" << service << "]" << std::endl;
+    }
   }
   else
   {
@@ -178,6 +186,51 @@ void JointController::Update()
     this->dataPtr->positions.clear();
   }
   */
+}
+
+/////////////////////////////////////////////////
+void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::JointCmd &_rep, bool &_result)
+{
+  const std::string &jointName = _req.data();
+  _rep.set_name(jointName);
+
+  if (this->dataPtr->forces.find(jointName) != this->dataPtr->forces.end())
+  {
+    _rep.set_force(this->dataPtr->forces[jointName]);
+  }
+
+  if (this->dataPtr->positions.find(jointName) != this->dataPtr->positions.end())
+  {
+    _rep.mutable_position()->set_target(this->dataPtr->positions[jointName]);
+  }
+
+  if (this->dataPtr->velocities.find(jointName) != this->dataPtr->velocities.end())
+  {
+    _rep.mutable_velocity()->set_target(this->dataPtr->velocities[jointName]);
+  }
+  
+  if (this->dataPtr->posPids.find(jointName) != this->dataPtr->posPids.end())
+  {
+    _rep.mutable_position()->set_p_gain(this->dataPtr->posPids[jointName].GetPGain(
+        ));
+    _rep.mutable_position()->set_d_gain(this->dataPtr->posPids[jointName].GetDGain(
+        ));
+    _rep.mutable_position()->set_i_gain(this->dataPtr->posPids[jointName].GetIGain(
+        ));
+  }
+
+  if (this->dataPtr->velPids.find(jointName) != this->dataPtr->velPids.end())
+  {
+    _rep.mutable_velocity()->set_p_gain(this->dataPtr->velPids[jointName].GetPGain(
+        ));
+    _rep.mutable_velocity()->set_d_gain(this->dataPtr->velPids[jointName].GetDGain(
+        ));
+    _rep.mutable_velocity()->set_i_gain(this->dataPtr->velPids[jointName].GetIGain(
+        ));
+  }
+
+  _result = true;
 }
 
 /////////////////////////////////////////////////

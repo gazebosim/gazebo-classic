@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <ignition/msgs.hh>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
@@ -132,6 +133,16 @@ namespace gazebo
       /// \return A map<joint_name, position> that contains velocity values
       /// set by the user of the JointController.
       public: std::map<std::string, double> GetVelocities() const;
+
+      /// \brief Callback when a joint command message is received.
+      /// \param[in] _req The service request. The service expects a join
+      /// name.
+      /// \param[out] _rep The service response. The response will contain
+      /// the parameters of the joint controller(s).
+      /// \param[out] _result True when the service request was successfully
+      /// processed.
+      private: void OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::JointCmd &_rep, bool &_result);
 
       /// \brief Callback when a joint command message is received.
       /// \param[in] _msg The received message.

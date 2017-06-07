@@ -164,6 +164,10 @@ namespace gazebo
       /// \brief Reset the controls.
       public: void Reset();
 
+      /// \brief Set the control force.
+      /// \param[in] _force Value of the control force.
+      public: void SetForce(double _force);
+
       /// \brief On force changed callback.
       /// \param[in] _value Value of the changed slider.
       public slots: void OnChanged(double _value);
@@ -199,6 +203,22 @@ namespace gazebo
 
       /// \brief Reset the controls.
       public: void Reset();
+
+      /// \brief Set the PID target position.
+      /// \param[in] _target Target position.
+      public: void SetPositionTarget(double _target);
+
+      /// \brief Set the PID proportional gain.
+      /// \param[in] _p_gain Proportional gain value.
+      public: void SetPGain(double _p_gain);
+
+      /// \brief Set the PID integral gain.
+      /// \param[in] _i_gain Integral gain value.
+      public: void SetIGain(double _i_gain);
+
+      /// \brief Set the PID derivative gain.
+      /// \param[in] _d_gain Derivative gain value.
+      public: void SetDGain(double _d_gain);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -271,6 +291,22 @@ namespace gazebo
 
       /// \brief Reset the controls.
       public: void Reset();
+
+      /// \brief Set the PID target velocity.
+      /// \param[in] _target Target velocity.
+      public: void SetVelocityTarget(double _target);
+
+      /// \brief Set the PID proportional gain.
+      /// \param[in] _p_gain Proportional gain value.
+      public: void SetPGain(double _p_gain);
+
+      /// \brief Set the PID integral gain.
+      /// \param[in] _i_gain Integral gain value.
+      public: void SetIGain(double _i_gain);
+
+      /// \brief Set the PID derivative gain.
+      /// \param[in] _d_gain Derivative gain value.
+      public: void SetDGain(double _d_gain);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.

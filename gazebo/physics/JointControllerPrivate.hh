@@ -19,6 +19,7 @@
 
 #include <string>
 #include <map>
+#include <ignition/transport.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
@@ -60,6 +61,9 @@ namespace gazebo
 
       /// \brief Subscribe to joint command.
       public: transport::SubscriberPtr jointCmdSub;
+
+      /// \brief Node to provide an information service.
+      public: ignition::transport::Node node_srv;
 
       /// \brief Last time the controller was updated.
       public: common::Time prevUpdateTime;
