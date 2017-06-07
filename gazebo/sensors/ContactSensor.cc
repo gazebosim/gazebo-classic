@@ -136,6 +136,10 @@ void ContactSensor::Init()
 }
 
 //////////////////////////////////////////////////
+// Warning: The point of this function is to delay subscription until
+// the sensor is active. It relies on the ContactManager::CreateFilter
+// function establishing a publisher. In Gazebo9 the ContactManager logic
+// has changed. Be careful when merging this class forward.
 void ContactSensor::SetActiveContactSensor(const bool _value)
 {
   // Need collisions for filter
