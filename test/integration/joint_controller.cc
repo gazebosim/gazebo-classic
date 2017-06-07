@@ -91,6 +91,88 @@ TEST_F(JointControllerTest, VelocityControl)
 }
 
 /////////////////////////////////////////////////
+TEST_F(JointControllerTest, JoinCmd)
+{
+  Load("worlds/simple_arm_test.world", true);
+  gazebo::physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
+  gazebo::physics::JointControllerPtr jointController =
+    model->GetJointController();
+
+	// Pick one of the joints
+	const std::string jointName =
+			jointController->GetJoints().begin()->second->GetScopedName();
+
+  // Check the default joint controller parameters
+  std::map<std::string, double> forces = jointController->GetForces();
+  std::map<std::string, double> positions = jointController->GetPositions();
+  std::map<std::string, common::PID> posPids =
+      jointController->GetPositionPIDs();
+  std::map<std::string, double> velocities = jointController->GetVelocities();
+  std::map<std::string, common::PID> velPids =
+      jointController->GetVelocityPIDs();
+
+  EXPECT_EQ(forces.size(), 0u);
+
+  EXPECT_EQ(positions.size(), 0u);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetPGain(), 1);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetIGain(), 0.1);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetDGain(), 0.01);
+
+  EXPECT_EQ(velocities.size(), 0u);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetPGain(), 1);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetIGain(), 0.1);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetDGain(), 0.01);
+
+  // Set the joint controller parameters with a message
+  transport::NodePtr node = transport::NodePtr(new transport::Node());
+  node->Init();
+
+  const std::string topic = std::string("~/") + model->GetName() + "/joint_cmd";
+  transport::PublisherPtr jointPub = node->Advertise<msgs::JointCmd>(topic);
+
+  msgs::JointCmd msg;
+  msg.set_name(jointName);
+  msg.set_force(3);
+
+  msg.mutable_position()->set_target(12.3);
+  msg.mutable_position()->set_p_gain(4);
+  msg.mutable_position()->set_i_gain(1);
+  msg.mutable_position()->set_d_gain(9);
+
+  msg.mutable_velocity()->set_target(3.21);
+  msg.mutable_velocity()->set_p_gain(4);
+  msg.mutable_velocity()->set_i_gain(1);
+  msg.mutable_velocity()->set_d_gain(9);
+
+  jointPub->Publish(msg);
+  world->Step(5000);
+
+  // Check the new joint controller parameters
+  forces = jointController->GetForces();
+  positions = jointController->GetPositions();
+  posPids = jointController->GetPositionPIDs();
+  velocities = jointController->GetVelocities();
+  velPids = jointController->GetVelocityPIDs();
+
+  EXPECT_EQ(forces.size(), 1u);
+  EXPECT_DOUBLE_EQ(forces[jointName], 3);
+
+  EXPECT_EQ(positions.size(), 1u);
+  EXPECT_DOUBLE_EQ(positions[jointName], 12.3);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(posPids[jointName].GetDGain(), 9);
+
+  EXPECT_EQ(velocities.size(), 1u);
+  EXPECT_DOUBLE_EQ(velocities[jointName], 3.21);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetPGain(), 4);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetIGain(), 1);
+  EXPECT_DOUBLE_EQ(velPids[jointName].GetDGain(), 9);
+}
+
+/////////////////////////////////////////////////
 /// Main
 int main(int argc, char **argv)
 {
