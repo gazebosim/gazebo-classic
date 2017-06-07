@@ -49,19 +49,19 @@ JointController::JointController(ModelPtr _model)
     this->dataPtr->jointCmdSub = this->dataPtr->node->Subscribe(
         std::string("~/") + this->dataPtr->model->GetName() + "/joint_cmd",
         &JointController::OnJointCmd, this);
-
-    const std::string service = std::string("/") + this->dataPtr->model->GetName()
-        + "/joint_cmd_req";
-    if (!this->dataPtr->node_srv.Advertise(service,
-        &JointController::OnJointCmdReq, this))
-    {
-      gzerr << "Error advertising service [" << service << "]" << std::endl;
-    }
   }
   else
   {
     gzwarn << "Unable to get world name. "
       << "JointController will not receive commands via messages\n";
+  }
+
+  const std::string service = std::string("/") + this->dataPtr->model->GetName()
+      + "/joint_cmd_req";
+  if (!this->dataPtr->node_srv.Advertise(service,
+      &JointController::OnJointCmdReq, this))
+  {
+    gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
 }
 

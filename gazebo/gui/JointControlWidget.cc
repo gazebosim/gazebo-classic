@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <ignition/msgs.hh>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/GuiIface.hh"
