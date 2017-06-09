@@ -297,7 +297,8 @@ TEST_F(JointControllerTest, JointCmd)
 
   // Get the joint controller parameters through a service
   ignition::transport::Node node_srv;
-  const std::string service = std::string("/") + model->GetName() + "/joint_cmd_req";
+  const std::string service =
+      std::string("/") + model->GetName() + "/joint_cmd_req";
 
   ignition::msgs::StringMsg req;
   ignition::msgs::JointCmd rep;

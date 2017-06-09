@@ -358,7 +358,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   // Get joint controller parameters and use them to populate the sliders.
   ignition::msgs::StringMsg req;
   ignition::msgs::JointCmd rep;
-  bool result;
+  bool ok;
   unsigned int timeout = 5000;
   bool executed;
   const std::string service = std::string("/") + _modelName + "/joint_cmd_req";
@@ -367,8 +367,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->sliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
-    if (executed && result && rep.has_force())
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, ok);
+    if (executed && ok && rep.has_force())
     {
       slider.second->SetForce(rep.force());
     }
@@ -378,8 +378,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->pidPosSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
-    if (executed && result && rep.has_position())
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, ok);
+    if (executed && ok && rep.has_position())
     {
       if (rep.position().has_target())
       {
@@ -404,8 +404,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->pidVelSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, result);
-    if (executed && result && rep.has_velocity())
+    executed = this->dataPtr->node_srv.Request(service, req, timeout, rep, ok);
+    if (executed && ok && rep.has_velocity())
     {
       if (rep.velocity().has_target())
       {
