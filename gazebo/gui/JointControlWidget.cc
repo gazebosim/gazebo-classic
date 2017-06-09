@@ -64,7 +64,6 @@ JointForceControl::~JointForceControl()
 /////////////////////////////////////////////////
 void JointForceControl::Reset()
 {
-  this->dataPtr->forceSpin->setValue(0.0);
   this->SetShowActive(false);
 }
 
@@ -156,10 +155,6 @@ JointPIDPosControl::~JointPIDPosControl()
 /////////////////////////////////////////////////
 void JointPIDPosControl::Reset()
 {
-  this->dataPtr->posSpin->setValue(0.0);
-  this->dataPtr->pGainSpin->setValue(1.000);
-  this->dataPtr->iGainSpin->setValue(0.100);
-  this->dataPtr->dGainSpin->setValue(0.010);
   this->SetShowActive(false);
 }
 
@@ -320,10 +315,6 @@ JointPIDVelControl::~JointPIDVelControl()
 /////////////////////////////////////////////////
 void JointPIDVelControl::Reset()
 {
-  this->dataPtr->posSpin->setValue(0.0);
-  this->dataPtr->pGainSpin->setValue(1.000);
-  this->dataPtr->iGainSpin->setValue(0.100);
-  this->dataPtr->dGainSpin->setValue(0.010);
   this->SetShowActive(false);
 }
 
