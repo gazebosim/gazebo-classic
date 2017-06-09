@@ -100,9 +100,9 @@ TEST_F(JointControllerTest, JoinCmd)
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 
-	// Pick one of the joints
-	const std::string jointName =
-			jointController->GetJoints().begin()->second->GetScopedName();
+  // Pick one of the joints
+  const std::string jointName =
+      jointController->GetJoints().begin()->second->GetScopedName();
 
   // Check the default joint controller parameters
   std::map<std::string, double> forces = jointController->GetForces();
