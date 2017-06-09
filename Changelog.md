@@ -279,7 +279,9 @@
 
 ## Gazebo 7
 
-## Gazebo 7.X.X (201X-XX-XX)
+## Gazebo 7.x.x (2017-xx-xx)
+
+## Gazebo 7.8.1 (2017-06-08)
 
 1. ODE slip parameter example world and test
     * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
