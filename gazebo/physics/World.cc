@@ -2740,7 +2740,7 @@ void World::LogWorker()
     // get unfiltered world state
     WorldState unfilteredState;
     {
-      std::lock_guard<std::mutex> lock(this->dataPtr->entityDeleteMutex);
+      std::lock_guard<std::mutex> dLock(this->dataPtr->entityDeleteMutex);
       unfilteredState.Load(self);
     }
 
@@ -2771,7 +2771,7 @@ void World::LogWorker()
       std::string filterStr = util::LogRecord::Instance()->Filter();
       // compute diff for filtered states
       {
-        std::lock_guard<std::mutex> lock(this->dataPtr->entityDeleteMutex);
+        std::lock_guard<std::mutex> dLock(this->dataPtr->entityDeleteMutex);
         this->dataPtr->prevStates[currState].LoadWithFilter(self, filterStr);
       }
       WorldState diffState = this->dataPtr->prevStates[currState] -
