@@ -168,6 +168,10 @@ namespace gazebo
       /// \param[in] _force Value of the control force.
       public: void SetForce(double _force);
 
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(bool _active);
+
       /// \brief On force changed callback.
       /// \param[in] _value Value of the changed slider.
       public slots: void OnChanged(double _value);
@@ -219,6 +223,10 @@ namespace gazebo
       /// \brief Set the PID derivative gain.
       /// \param[in] _d_gain Derivative gain value.
       public: void SetDGain(double _d_gain);
+
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(bool _active);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -307,6 +315,10 @@ namespace gazebo
       /// \brief Set the PID derivative gain.
       /// \param[in] _d_gain Derivative gain value.
       public: void SetDGain(double _d_gain);
+
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(bool _active);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.
