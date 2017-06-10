@@ -1335,7 +1335,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->ImageWidth(),
       this->ImageHeight(),
       0,
-      (Ogre::PixelFormat)this->imageFormat,
+      static_cast<Ogre::PixelFormat>(this->imageFormat),
       Ogre::TU_RENDERTARGET,
       0,
       false,
