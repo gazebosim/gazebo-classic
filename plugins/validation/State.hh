@@ -58,7 +58,8 @@ namespace gazebo
       this->node.Subscribe(inboundTopic, &State::OnFeedback, this);
 
       // Advertise the current state.
-      this->node.Advertise<gazebo::msgs::GzString>(outboundTopic);
+      this->pubState =
+        this->node.Advertise<gazebo::msgs::GzString>(outboundTopic);
     }
 
     /// \brief Update the state.
@@ -158,7 +159,7 @@ namespace gazebo
     {
       gazebo::msgs::GzString msg;
       msg.set_data(this->name);
-      this->node.Publish(this->outboundTopic, msg);
+      this->pubState.Publish(msg);
       this->lastPublication = common::Time::GetWallTime();
     }
 
@@ -173,6 +174,9 @@ namespace gazebo
 
     /// \brief Transport node.
     protected: ignition::transport::Node node;
+
+    /// \brief Transport publisher for sending the current state.
+    protected: ignition::transport::Node::Publisher pubState;
 
     /// \brief Mutex to protect the feedback message.
     protected: mutable std::mutex mutex;
