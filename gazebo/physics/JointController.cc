@@ -58,7 +58,7 @@ JointController::JointController(ModelPtr _model)
 
   const std::string service = std::string("/") + this->dataPtr->model->GetName()
       + "/joint_cmd_req";
-  if (!this->dataPtr->node_srv.Advertise(service,
+  if (!this->dataPtr->nodeSrv.Advertise(service,
       &JointController::OnJointCmdReq, this))
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;

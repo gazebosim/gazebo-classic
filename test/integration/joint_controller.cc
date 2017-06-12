@@ -91,7 +91,7 @@ TEST_F(JointControllerTest, VelocityControl)
 }
 
 /////////////////////////////////////////////////
-TEST_F(JointControllerTest, JoinCmd)
+TEST_F(JointControllerTest, JointCmd)
 {
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");

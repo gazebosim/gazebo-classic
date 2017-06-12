@@ -42,7 +42,7 @@ namespace gazebo
       public: transport::PublisherPtr jointPub;
 
       /// \brief Node for coomunication.
-      public: ignition::transport::Node node_srv;
+      public: ignition::transport::Node nodeSrv;
 
       /// \brief Sliders for force control
       public: std::map<std::string, JointForceControl *> sliders;

@@ -63,7 +63,7 @@ namespace gazebo
       public: transport::SubscriberPtr jointCmdSub;
 
       /// \brief Node to provide an information service.
-      public: ignition::transport::Node node_srv;
+      public: ignition::transport::Node nodeSrv;
 
       /// \brief Last time the controller was updated.
       public: common::Time prevUpdateTime;

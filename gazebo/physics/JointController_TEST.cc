@@ -296,7 +296,7 @@ TEST_F(JointControllerTest, JointCmd)
   jointController->SetVelocityPID(joint->GetScopedName(), common::PID(4, 1, 9));
 
   // Get the joint controller parameters through a service
-  ignition::transport::Node node_srv;
+  ignition::transport::Node nodeSrv;
   const std::string service =
       std::string("/") + model->GetName() + "/joint_cmd_req";
 
@@ -306,7 +306,7 @@ TEST_F(JointControllerTest, JointCmd)
   unsigned int timeout = 5000;
 
   req.set_data(joint->GetScopedName());
-  bool executed = node_srv.Request(service, req, timeout, rep, result);
+  bool executed = nodeSrv.Request(service, req, timeout, rep, result);
   EXPECT_TRUE(executed && result);
 
   // Check the retrieved joint controller parameters
