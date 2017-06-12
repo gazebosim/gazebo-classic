@@ -135,7 +135,7 @@ namespace gazebo
       public: std::map<std::string, double> GetVelocities() const;
 
       /// \brief Callback for service to request the current control parameters.
-      /// \param[in] _req The service request. The service expects a join
+      /// \param[in] _req The service request. The service expects a joint
       /// name.
       /// \param[out] _rep The service response. The response will contain
       /// the parameters of the joint controller(s).
