@@ -22,6 +22,7 @@
 #endif
 
 #include <ignition/msgs.hh>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -370,7 +371,8 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   bool ok;
   unsigned int timeout = 5000;
   bool executed;
-  const std::string service = std::string("/") + _modelName + "/joint_cmd_req";
+  std::string service = "/" + _modelName + "/joint_cmd_req";
+  boost::replace_all(service, "::", "/");
 
   // Force control
   for (auto &slider : this->dataPtr->sliders)

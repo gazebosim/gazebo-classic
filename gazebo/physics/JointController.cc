@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/physics/Model.hh"
@@ -56,8 +58,9 @@ JointController::JointController(ModelPtr _model)
       << "JointController will not receive commands via messages\n";
   }
 
-  const std::string service = std::string("/") + this->dataPtr->model->GetName()
+  std::string service = "/" + this->dataPtr->model->GetScopedName()
       + "/joint_cmd_req";
+  boost::replace_all(service, "::", "/");
   if (!this->dataPtr->nodeSrv.Advertise(service,
       &JointController::OnJointCmdReq, this))
   {

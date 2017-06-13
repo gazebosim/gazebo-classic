@@ -20,6 +20,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/transport.hh>
 #include <ignition/msgs.hh>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/math/Vector3.hh"
@@ -297,8 +298,8 @@ TEST_F(JointControllerTest, JointCmd)
 
   // Get the joint controller parameters through a service
   ignition::transport::Node nodeSrv;
-  const std::string service =
-      std::string("/") + model->GetName() + "/joint_cmd_req";
+  std::string service = "/" + model->GetScopedName() + "/joint_cmd_req";
+  boost::replace_all(service, "::", "/");
 
   ignition::msgs::StringMsg req;
   ignition::msgs::JointCmd rep;
