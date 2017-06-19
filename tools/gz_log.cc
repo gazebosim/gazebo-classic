@@ -553,7 +553,11 @@ std::string StateFilter::Filter(const std::string &_stateString)
 
   std::ostringstream result;
 
-  if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero)
+  auto insertions = state.Insertions();
+  auto deletions = state.Deletions();
+
+  if (this->hz > 0.0 && this->prevTime != gazebo::common::Time::Zero &&
+      insertions.empty() && deletions.empty())
   {
     if ((state.GetSimTime() - this->prevTime).Double() <
         1.0 / this->hz)
@@ -570,6 +574,20 @@ std::string StateFilter::Filter(const std::string &_stateString)
       << "<real_time>" << state.GetRealTime() << "</real_time>\n"
       << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
       << "<iterations>" << state.GetIterations() << "</iterations>\n";
+
+    if (insertions.size() > 0)
+      result << "<insertions>" << std::endl;
+    for (auto insertion : insertions)
+      result << insertion << std::endl;
+    if (insertions.size() > 0)
+      result << "</insertions>" << std::endl;
+
+    if (deletions.size() > 0)
+      result << "<deletions>" << std::endl;
+    for (auto deletion : deletions)
+      result << "<name>" << deletion << "</name>" << std::endl;
+    if (deletions.size() > 0)
+      result << "</deletions>" << std::endl;
   }
 
   result << this->filter.Filter(state);

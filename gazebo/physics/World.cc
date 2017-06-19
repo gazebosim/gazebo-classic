@@ -567,45 +567,6 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
-        // Process insertions
-        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
-        {
-          sdf::ElementPtr modelElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "insertions")->GetElement("model");
-
-          while (modelElem)
-          {
-            auto name = modelElem->GetAttribute("name")->GetAsString();
-            if (!this->ModelByName(name))
-            {
-              ModelPtr model = this->LoadModel(modelElem,
-                  this->dataPtr->rootElement);
-              model->Init();
-
-              // Disabling plugins on playback
-              // model->LoadPlugins();
-            }
-
-            modelElem = modelElem->GetNextElement("model");
-          }
-        }
-
-        // Process deletions
-        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-        {
-          sdf::ElementPtr nameElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "deletions")->GetElement("name");
-
-          while (nameElem)
-          {
-            transport::requestNoReply(this->Name(), "entity_delete",
-                                      nameElem->Get<std::string>());
-            nameElem = nameElem->GetNextElement("name");
-          }
-        }
-
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
@@ -862,6 +823,7 @@ void World::Fini()
     this->dataPtr->modelMsgs.clear();
     this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->playbackControlMsgs.clear();
 
     this->dataPtr->poseLocalPub.reset();
     this->dataPtr->posePub.reset();
@@ -870,6 +832,7 @@ void World::Fini()
     this->dataPtr->statPub.reset();
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
+    this->dataPtr->lightFactoryPub.reset();
 
     this->dataPtr->factorySub.reset();
     this->dataPtr->controlSub.reset();
@@ -1541,40 +1504,52 @@ void World::OnControl(ConstWorldControlPtr &_data)
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
+  this->dataPtr->playbackControlMsgs.push_back(*_data);
+}
 
-  if (_data->has_pause())
-    this->SetPaused(_data->pause());
+//////////////////////////////////////////////////
+void World::ProcessPlaybackControlMsgs()
+{
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
 
-  if (_data->has_multi_step())
+  for (auto const &msg : this->dataPtr->playbackControlMsgs)
   {
-    // stepWorld is a blocking call so set stepInc directly so that world stats
-    // will still be published
-    this->SetPaused(true);
-    this->dataPtr->stepInc += _data->multi_step();
+    if (msg.has_pause())
+      this->SetPaused(msg.pause());
+
+    if (msg.has_multi_step())
+    {
+      // stepWorld is a blocking call so set stepInc directly so that world stats
+      // will still be published
+      this->SetPaused(true);
+      this->dataPtr->stepInc += msg.multi_step();
+    }
+
+    if (msg.has_seek())
+    {
+      common::Time targetSimTime = msgs::Convert(msg.seek());
+      util::LogPlay::Instance()->Seek(targetSimTime);
+      this->dataPtr->stepInc = 1;
+    }
+
+    if (msg.has_rewind() && msg.rewind())
+    {
+      util::LogPlay::Instance()->Rewind();
+      this->dataPtr->stepInc = 1;
+      if (!util::LogPlay::Instance()->HasIterations())
+        this->dataPtr->iterations = 0;
+    }
+
+    if (msg.has_forward() && msg.forward())
+    {
+      util::LogPlay::Instance()->Forward();
+      this->dataPtr->stepInc = -1;
+      this->SetPaused(true);
+      // ToDo: Update iterations if the log doesn't have it.
+    }
   }
 
-  if (_data->has_seek())
-  {
-    common::Time targetSimTime = msgs::Convert(_data->seek());
-    util::LogPlay::Instance()->Seek(targetSimTime);
-    this->dataPtr->stepInc = 1;
-  }
-
-  if (_data->has_rewind() && _data->rewind())
-  {
-    util::LogPlay::Instance()->Rewind();
-    this->dataPtr->stepInc = 1;
-    if (!util::LogPlay::Instance()->HasIterations())
-      this->dataPtr->iterations = 0;
-  }
-
-  if (_data->has_forward() && _data->forward())
-  {
-    util::LogPlay::Instance()->Forward();
-    this->dataPtr->stepInc = -1;
-    this->SetPaused(true);
-    // ToDo: Update iterations if the log doesn't have it.
-  }
+  this->dataPtr->playbackControlMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -2286,8 +2261,13 @@ void World::SetState(const WorldState &_state)
   {
     this->dataPtr->factorySDF->Root()->ClearElements();
 
+    std::stringstream sdfStr;
+    sdfStr << "<sdf version='" << SDF_VERSION << "'>"
+           << insertion
+           << "</sdf>";
+
     // SDF Parsing happens here
-    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    if (!sdf::readString(sdfStr.str(), this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
       continue;
@@ -2331,19 +2311,32 @@ void World::SetState(const WorldState &_state)
 
     if (isModel)
     {
-      try
+      bool exists = false;
+      for (auto const &m : this->dataPtr->models)
       {
-        std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
+        if (m->GetName() == elem->Get<std::string>("name", "").first)
+        {
+          exists = true;
+          break;
+        }
+      }
 
-        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-        model->Init();
-        model->LoadPlugins();
-      }
-      catch(...)
-      {
-        gzerr << "Loading model from world state insertion failed" <<
-            std::endl;
-      }
+     if (!exists)
+     {
+       try
+       {
+         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
+
+         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+         model->Init();
+         model->LoadPlugins();
+       }
+       catch(...)
+       {
+         gzerr << "Loading model from world state insertion failed" <<
+           std::endl;
+       }
+     }
     }
     else if (isLight)
     {
@@ -2351,7 +2344,17 @@ void World::SetState(const WorldState &_state)
       {
         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
-        LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        // FIXME: We need to publish a light factory message to update the client,
+        // see issue #2288
+        // LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        // light->Init();
+        if (!this->dataPtr->lightFactoryPub)
+        {
+          this->dataPtr->lightFactoryPub =
+              this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+        }
+        msgs::Light lightMsg = msgs::LightFromSDF(elem);
+        this->dataPtr->lightFactoryPub->Publish(lightMsg);
       }
       catch(...)
       {
@@ -2630,6 +2633,7 @@ void World::ProcessMessages()
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
+    this->ProcessPlaybackControlMsgs();
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
@@ -2786,7 +2790,16 @@ void World::LogWorker()
           // moving link may never be captured if only diff state is recorded.
           std::lock_guard<std::mutex> bLock(this->dataPtr->logBufferMutex);
 
-          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          static bool firstUpdate = true;
+          if (!firstUpdate)
+          {
+            // The first update thinks there are entities being inserted,
+            // but they're already present in the first world dump
+            this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          }
+          else
+            firstUpdate = false;
+
           this->dataPtr->prevStates[currState].SetDeletions(deletions);
           this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
               this->dataPtr->prevStates[currState]);
