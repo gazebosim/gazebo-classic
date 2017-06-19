@@ -58,18 +58,21 @@ JointController::JointController(ModelPtr _model)
       << "JointController will not receive commands via messages\n";
   }
 
-  std::string topic = "/" + this->dataPtr->model->GetScopedName()
-      + "/joint_cmd";
-  boost::replace_all(topic, "::", "/");
+  std::string modelName = this->dataPtr->model->GetScopedName();
+  if (modelName.empty())
+  {
+    modelName = this->dataPtr->model->GetName();
+  }
+  boost::replace_all(modelName, "::", "/");
+
+  std::string topic = "/" + modelName + "/joint_cmd";
   if (!this->dataPtr->node.Subscribe(topic,
       &JointController::OnJointCommand, this))
   {
     gzerr << "Error subscribing to topic [" << topic << "]\n";
   }
 
-  std::string service = "/" + this->dataPtr->model->GetScopedName()
-      + "/joint_cmd_req";
-  boost::replace_all(service, "::", "/");
+  std::string service = "/" + modelName + "/joint_cmd_req";
   if (!this->dataPtr->node.Advertise(service,
       &JointController::OnJointCmdReq, this))
   {

@@ -298,8 +298,12 @@ TEST_F(JointControllerTest, JointCmd)
 
   // Get the joint controller parameters through a service
   ignition::transport::Node nodeSrv;
-  std::string service = "/" + model->GetScopedName() + "/joint_cmd_req";
-  boost::replace_all(service, "::", "/");
+  std::string modelName = model->GetScopedName();
+  if (modelName.empty())
+  {
+     modelName = model->GetName();
+  }
+  boost::replace_all(modelName, "::", "/");
 
   ignition::msgs::StringMsg req;
   ignition::msgs::JointCmd rep;
@@ -307,7 +311,8 @@ TEST_F(JointControllerTest, JointCmd)
   unsigned int timeout = 5000;
 
   req.set_data(joint->GetScopedName());
-  bool executed = nodeSrv.Request(service, req, timeout, rep, result);
+  bool executed = nodeSrv.Request("/" + modelName + "/joint_cmd_req",
+      req, timeout, rep, result);
   EXPECT_TRUE(executed && result);
 
   // Check the retrieved joint controller parameters

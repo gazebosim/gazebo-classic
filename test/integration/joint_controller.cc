@@ -41,17 +41,18 @@ TEST_F(JointControllerTest, PositionControl)
 
   world->Step(100);
 
-  gazebo::transport::PublisherPtr pub =
-    this->node->Advertise<gazebo::msgs::JointCmd>(
-        "/gazebo/default/simple_arm/joint_cmd");
+  ignition::transport::Node node;
+  const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
+  ignition::transport::Node::Publisher jointPub =
+      node.Advertise<ignition::msgs::JointCmd>(topic);
 
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_position()->set_target(1.0);
   msg.mutable_position()->set_p_gain(10);
   msg.mutable_position()->set_i_gain(0.1);
   msg.mutable_position()->set_d_gain(4.5);
-  pub->Publish(msg);
+  jointPub.Publish(msg);
 
   world->Step(5000);
 
@@ -72,17 +73,18 @@ TEST_F(JointControllerTest, VelocityControl)
 
   world->Step(100);
 
-  gazebo::transport::PublisherPtr pub =
-    this->node->Advertise<gazebo::msgs::JointCmd>(
-        "/gazebo/default/simple_arm/joint_cmd");
+  ignition::transport::Node node;
+  const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
+  ignition::transport::Node::Publisher jointPub =
+      node.Advertise<ignition::msgs::JointCmd>(topic);
 
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name("simple_arm::arm_shoulder_pan_joint");
   msg.mutable_velocity()->set_target(0.2);
   msg.mutable_velocity()->set_p_gain(10.0);
   msg.mutable_velocity()->set_i_gain(0.1);
   msg.mutable_velocity()->set_d_gain(0.1);
-  pub->Publish(msg);
+  jointPub.Publish(msg);
 
   world->Step(5000);
   double vel = model->GetJoint("arm_shoulder_pan_joint")->GetVelocity(0);
@@ -126,13 +128,12 @@ TEST_F(JointControllerTest, JointCmd)
   EXPECT_DOUBLE_EQ(velPids[jointName].GetDGain(), 0.01);
 
   // Set the joint controller parameters with a message
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
+  ignition::transport::Node node;
+  const std::string topic = "/" + model->GetScopedName() + "/joint_cmd";
+  ignition::transport::Node::Publisher jointPub =
+      node.Advertise<ignition::msgs::JointCmd>(topic);
 
-  const std::string topic = std::string("~/") + model->GetName() + "/joint_cmd";
-  transport::PublisherPtr jointPub = node->Advertise<msgs::JointCmd>(topic);
-
-  msgs::JointCmd msg;
+  ignition::msgs::JointCmd msg;
   msg.set_name(jointName);
   msg.set_force(3);
 
@@ -146,7 +147,7 @@ TEST_F(JointControllerTest, JointCmd)
   msg.mutable_velocity()->set_i_gain(1);
   msg.mutable_velocity()->set_d_gain(9);
 
-  jointPub->Publish(msg);
+  jointPub.Publish(msg);
   world->Step(5000);
 
   // Check the new joint controller parameters
