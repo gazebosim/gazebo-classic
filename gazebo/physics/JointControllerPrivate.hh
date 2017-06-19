@@ -57,13 +57,14 @@ namespace gazebo
       public: std::map<std::string, double> velocities;
 
       /// \brief Node for communication.
-      public: transport::NodePtr node;
+      /// \deprecated See JointControllerPrivate::node.
+      public: transport::NodePtr gznode;
 
       /// \brief Subscribe to joint command.
       public: transport::SubscriberPtr jointCmdSub;
 
-      /// \brief Node to provide an information service.
-      public: ignition::transport::Node nodeSrv;
+      /// \brief Node for communication.
+      public: ignition::transport::Node node;
 
       /// \brief Last time the controller was updated.
       public: common::Time prevUpdateTime;

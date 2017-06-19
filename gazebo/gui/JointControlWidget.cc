@@ -329,12 +329,6 @@ void JointPIDVelControl::OnDChanged(double _value)
 /////////////////////////////////////////////////
 void JointControlWidget::SetModelName(const std::string &_modelName)
 {
-  if (this->dataPtr->jointPub)
-  {
-    this->dataPtr->jointPub->Fini();
-    this->dataPtr->jointPub.reset();
-  }
-
   msgs::Model modelMsg;
 
   this->dataPtr->modelLabel->setText(
@@ -343,8 +337,14 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   // Only request info if the model has a name.
   if (!_modelName.empty())
   {
-    this->dataPtr->jointPub = this->dataPtr->node->Advertise<msgs::JointCmd>(
-        std::string("~/") + _modelName + "/joint_cmd");
+    std::string topic = "/" + _modelName + "/joint_cmd";
+    boost::replace_all(topic, "::", "/");
+    this->dataPtr->jointPub =
+        this->dataPtr->node.Advertise<ignition::msgs::JointCmd>(topic);
+    if (!this->dataPtr->jointPub)
+    {
+      gzerr << "Error advertising topic [" << topic << "]\n";
+    }
 
     boost::shared_ptr<msgs::Response> response = transport::request(
         gui::get_world(), "entity_info", _modelName);
@@ -378,7 +378,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->sliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->nodeSrv.Request(service, req, timeout, rep, ok);
+    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
     if (executed && ok && rep.has_force())
     {
       slider.second->SetForce(rep.force());
@@ -389,7 +389,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->pidPosSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->nodeSrv.Request(service, req, timeout, rep, ok);
+    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
     if (executed && ok && rep.has_position())
     {
       if (rep.position().has_target())
@@ -415,7 +415,7 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->pidVelSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->nodeSrv.Request(service, req, timeout, rep, ok);
+    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
     if (executed && ok && rep.has_velocity())
     {
       if (rep.velocity().has_target())
@@ -446,8 +446,6 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   this->setObjectName("jointControl");
 
   this->setWindowTitle("Joint Control");
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
 
   this->dataPtr->tabWidget = new QTabWidget;
   this->dataPtr->tabWidget->setObjectName("embeddedTab");
@@ -501,10 +499,11 @@ void JointControlWidget::OnReset()
        this->dataPtr->sliders.begin();
        iter != this->dataPtr->sliders.end(); ++iter)
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(iter->first);
     msg.set_reset(true);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
+
     iter->second->Reset();
   }
 
@@ -530,10 +529,10 @@ void JointControlWidget::OnForceChanged(double _value, const std::string &_name)
   iter = this->dataPtr->sliders.find(_name);
   if (iter != this->dataPtr->sliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.set_force(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -545,10 +544,10 @@ void JointControlWidget::OnPIDPosChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_target(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -560,10 +559,10 @@ void JointControlWidget::OnPPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_p_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -575,10 +574,10 @@ void JointControlWidget::OnDPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_d_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -590,10 +589,10 @@ void JointControlWidget::OnIPosGainChanged(double _value,
   iter = this->dataPtr->pidPosSliders.find(_name);
   if (iter != this->dataPtr->pidPosSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_position()->set_i_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -619,10 +618,10 @@ void JointControlWidget::OnPIDVelChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_target(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -634,10 +633,10 @@ void JointControlWidget::OnPVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_p_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -649,10 +648,10 @@ void JointControlWidget::OnDVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_d_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 
@@ -664,10 +663,10 @@ void JointControlWidget::OnIVelGainChanged(double _value,
   iter = this->dataPtr->pidVelSliders.find(_name);
   if (iter != this->dataPtr->pidVelSliders.end())
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name(_name);
     msg.mutable_velocity()->set_i_gain(_value);
-    this->dataPtr->jointPub->Publish(msg);
+    this->dataPtr->jointPub.Publish(msg);
   }
 }
 

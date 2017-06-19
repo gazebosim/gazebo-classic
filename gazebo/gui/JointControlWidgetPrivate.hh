@@ -36,13 +36,10 @@ namespace gazebo
     class JointControlWidgetPrivate
     {
       /// \brief Node for coomunication.
-      public: transport::NodePtr node;
+      public: ignition::transport::Node node;
 
       /// \brief Publisher for joint messages.
-      public: transport::PublisherPtr jointPub;
-
-      /// \brief Node for coomunication.
-      public: ignition::transport::Node nodeSrv;
+      public: ignition::transport::Node::Publisher jointPub;
 
       /// \brief Sliders for force control
       public: std::map<std::string, JointForceControl *> sliders;
