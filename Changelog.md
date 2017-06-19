@@ -1,6 +1,8 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (201X-XX-XX)
+## Gazebo 7.x.x (2017-xx-xx)
+
+## Gazebo 7.8.1 (2017-06-08)
 
 1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
@@ -8,6 +10,9 @@
 
 1. ODE slip parameter example world and test
     * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+
+1. Fix inserted mesh scale during log playback
+    * [Pull request #2723](https://bitbucket.org/osrf/gazebo/pull-request/2723)
 
 ## Gazebo 7.8.0 (2017-06-02)
 

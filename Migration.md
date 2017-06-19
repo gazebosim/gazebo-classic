@@ -15,6 +15,15 @@ release will remove the deprecated code.
    Please see [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
    for more details.
 
+## Gazebo 7.8.0 to 7.X
+
+### Modifications
+
+1. **gz log**
+   Gazebo log files no longer store velocity data and have reduced floating point precision.
+   See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
+   for further details.
+
 ## Gazebo 7.3.1 to 7.X
 
 ### Deprecations
