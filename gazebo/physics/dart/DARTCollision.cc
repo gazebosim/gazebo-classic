@@ -132,20 +132,20 @@ unsigned int DARTCollision::GetCollideBits() const
 // Given that i = [0..2].
 // See also https://bitbucket.org/ignitionrobotics/ign-math/issues/73
 template<typename Float>
-void SetVector(const size_t i, const Float val,
-               ignition::math::Vector3d& v)
+void SetVector(const size_t _i, const Float _val,
+               ignition::math::Vector3d &_v)
 {
-    if (i == 0)
+    if (_i == 0)
     {
-      v.X() =  val;
+      _v.X() =  _val;
     }
-    else if (i == 1)
+    else if (_i == 1)
     {
-      v.Y() = val;
+      _v.Y() = _val;
     }
     else
     {
-      v.Z() =  val;
+      _v.Z() =  _val;
     }
 }
 
@@ -154,8 +154,8 @@ void SetVector(const size_t i, const Float val,
 // p. 86, function UpdateAABB
 // FIXME: I reckon this should go to ignition::math, as updating an AABB
 // with a transform is generally useful.
-ignition::math::Box UpdateAABB(const ignition::math::Box& a,
-                               const ignition::math::Matrix4d& m)
+ignition::math::Box UpdateAABB(const ignition::math::Box &_a,
+                               const ignition::math::Matrix4d &_m)
 {
   // construct object to be returned.
   // Attention: If we only use the default ignition::math::Box constructor
@@ -167,7 +167,7 @@ ignition::math::Box UpdateAABB(const ignition::math::Box& a,
   // vectors as arguments, the values don't actually matter.
   // See also issue #72:
   // https://bitbucket.org/ignitionrobotics/ign-math/issues/72/
-  ignition::math::Box result(a);
+  ignition::math::Box result(_a);
 
   // for all 3 axes
   for (size_t i = 0; i < 3; ++i)
@@ -175,17 +175,17 @@ ignition::math::Box UpdateAABB(const ignition::math::Box& a,
     // First, add translation.
     // Use SetVector() until maybe an update to ignition allows the
     // following:
-    // result.Min()[i] =  m(i, 3);
-    // result.Max()[i] =  m(i, 3);
-    SetVector(i, m(i, 3), result.Min());
-    SetVector(i, m(i, 3), result.Max());
+    // result.Min()[i] =  _m(i, 3);
+    // result.Max()[i] =  _m(i, 3);
+    SetVector(i, _m(i, 3), result.Min());
+    SetVector(i, _m(i, 3), result.Max());
 
     // Then, sum in larger and smaller terms
     for (size_t j = 0; j < 3; ++j)
     {
       // minimum and maximum coordinate of this axis rotated
-      float minRot = m(i, j) * a.Min()[j];
-      float maxRot = m(i, j) * a.Max()[j];
+      float minRot = _m(i, j) * _a.Min()[j];
+      float maxRot = _m(i, j) * _a.Max()[j];
       if (minRot < maxRot)
       {
         // result.Min()[i] += minRot;
