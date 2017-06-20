@@ -5,7 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
-## Gazebo 8.1 to 8.X
+## Gazebo 8.x to 9.x
+
+### -g command line argument to load plugins in gzclient
+
+1. During the gazebo 8.x series the `-g` was used to load System plugins in the
+   client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
+   plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
+   plugins and will remain the exactly the same.   
 
 ### Modifications
 

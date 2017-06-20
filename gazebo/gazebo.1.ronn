@@ -36,6 +36,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
 * --minimal_comms :
  Reduce the TCP/IP traffic output by gazebo.
 * -g, --gui-plugin arg :
+ Load a System plugin (deprecated)
+* --gui-client-plugin arg :
  Load a GUI plugin.
 * -s, --server-plugin arg :
  Load a server plugin.

@@ -172,6 +172,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
     // <some_gui_plugin.so> as a world file.
     ("gui-plugin,g", po::value<std::vector<std::string> >(),
      "Gui plugin ignored.")
+    ("gui-client-plugin", po::value<std::vector<std::string> >(),
+     "Gui plugin ignored.")
     ("world_file", po::value<std::string>(), "SDF world to load.")
     ("pass_through", po::value<std::vector<std::string> >(),
      "not used, passed through to system plugins.");
