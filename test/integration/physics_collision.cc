@@ -56,16 +56,14 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
-  // Check bounding box of ground plane
-  {
+  // Check bounding box of ground plane.
+  // Skip this test for DART because planes aren't handled properly yet.
+  // For this test to pass for DART, the following values would need to be set:
+  //    big = 1049;
+  //    z = 1050;
+  if (_physicsEngine != "dart") {
     double big = g_big;
     double z = 0.0;
-    if (_physicsEngine == "dart")
-    {
-      // Dart doesn't handle planes yet
-      big = 1049;
-      z = 1050;
-    }
 
     physics::ModelPtr model = world->ModelByName("ground_plane");
     ASSERT_TRUE(model != nullptr);
