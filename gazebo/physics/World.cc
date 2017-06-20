@@ -237,6 +237,10 @@ void World::Load(sdf::ElementPtr _sdf)
       this->dataPtr->node->Subscribe("~/light/modify",
       &World::OnLightModifyMsg, this);
 
+  // remove when issue #2288 is fixed
+  this->dataPtr->lightFactoryPub =
+      this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
+
   this->dataPtr->modelSub = this->dataPtr->node->Subscribe<msgs::Model>(
       "~/model/modify", &World::OnModelMsg, this);
 
@@ -2149,11 +2153,6 @@ void World::SetState(const WorldState &_state)
         // see issue #2288
         // LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
         // light->Init();
-        if (!this->dataPtr->lightFactoryPub)
-        {
-          this->dataPtr->lightFactoryPub =
-              this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
-        }
         msgs::Light lightMsg = msgs::LightFromSDF(elem);
         this->dataPtr->lightFactoryPub->Publish(lightMsg);
       }
