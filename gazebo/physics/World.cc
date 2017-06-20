@@ -112,6 +112,9 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  this->dataPtr->initialSdf.reset(new sdf::Element);
+  sdf::initFile("world.sdf", this->dataPtr->initialSdf);
+
   // Keep this in the constructor for performance.
   // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
@@ -172,6 +175,8 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
+
+  this->dataPtr->initialSdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -451,6 +456,7 @@ void World::RunLoop()
   // Get the first state
   this->dataPtr->prevStates[0] = WorldState(shared_from_this());
   this->dataPtr->prevStates[1] = WorldState(shared_from_this());
+
   this->dataPtr->stateToggle = 0;
 
   this->dataPtr->logThread =
@@ -2265,11 +2271,10 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
-    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->dataPtr->sdf->ToString("");
+    _stream << this->dataPtr->initialSdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
@@ -2536,44 +2541,70 @@ void World::LogWorker()
 
   while (!this->dataPtr->stop)
   {
-    int currState = (this->dataPtr->stateToggle + 1) % 2;
-
-    this->dataPtr->prevStates[currState].Load(self);
-    WorldState diffState = this->dataPtr->prevStates[currState] -
-      this->dataPtr->prevStates[this->dataPtr->stateToggle];
-    this->dataPtr->logPrevIteration = this->dataPtr->iterations;
-
-    if (!diffState.IsZero())
+    // get unfiltered world state
+    WorldState unfilteredState;
     {
-      this->dataPtr->stateToggle = currState;
+      boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+      unfilteredState.Load(self);
+    }
+
+    // compute world state diff and find out about insertions and deletions
+    std::vector<std::string> insertions;
+    std::vector<std::string> deletions;
+    bool insertDelete = false;
+    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+    {
+      WorldState unfilteredDiffState = unfilteredState -
+          this->dataPtr->prevUnfilteredState;
+      if (!unfilteredDiffState.IsZero())
       {
-        // Store the entire current state (instead of the diffState). A slow
-        // moving link may never be captured if only diff state is recorded.
-        boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+        insertions = unfilteredDiffState.Insertions();
+        deletions = unfilteredDiffState.Deletions();
+        insertDelete = !insertions.empty() || !deletions.empty();
+      }
+    }
+    this->dataPtr->prevUnfilteredState = unfilteredState;
 
-        static bool firstUpdate = true;
-        if (!firstUpdate)
+    // Throttle state capture based on log recording frequency.
+    auto simTime = this->GetSimTime();
+    if ((simTime - this->dataPtr->logLastStateTime >=
+        util::LogRecord::Instance()->Period()) || insertDelete)
+    {
+      int currState = (this->dataPtr->stateToggle + 1) % 2;
+
+      std::string filterStr = util::LogRecord::Instance()->Filter();
+      // compute diff for filtered states
+      {
+        boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+        this->dataPtr->prevStates[currState].LoadWithFilter(self, filterStr);
+      }
+      WorldState diffState = this->dataPtr->prevStates[currState] -
+          this->dataPtr->prevStates[this->dataPtr->stateToggle];
+      this->dataPtr->logPrevIteration = this->dataPtr->iterations;
+
+      if (!diffState.IsZero() || insertDelete)
+      {
+        this->dataPtr->stateToggle = currState;
         {
-          // The first update thinks there are entities being inserted,
-          // but they're already present in the first world dump
-          auto insertions = diffState.Insertions();
+          // Store the entire current state (instead of the diffState). A slow
+          // moving link may never be captured if only diff state is recorded.
+          boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+
           this->dataPtr->prevStates[currState].SetInsertions(insertions);
-        }
-        else
-          firstUpdate = false;
-        auto deletions = diffState.Deletions();
-        this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
+              this->dataPtr->prevStates[currState]);
 
-        this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
-            this->dataPtr->prevStates[currState]);
-
-        // Tell the logger to update, once the number of states exceeds 1000
-        if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
-            1000)
-        {
-          util::LogRecord::Instance()->Notify();
+          // Tell the logger to update, once the number of states exceeds 1000
+          if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
+              1000)
+          {
+            util::LogRecord::Instance()->Notify();
+          }
         }
       }
+
+      this->dataPtr->logLastStateTime = simTime;
     }
 
     this->dataPtr->logContinueCondition.notify_all();
