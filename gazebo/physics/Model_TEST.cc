@@ -66,7 +66,7 @@ TEST_F(ModelTest, NestedModelSensorScopedName)
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  auto model = world->GetModel("model_03");
+  auto model = world->ModelByName("model_03");
   ASSERT_TRUE(model != nullptr);
 
   gzmsg << "Get a scoped sensor name" << std::endl;

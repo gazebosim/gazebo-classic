@@ -546,7 +546,7 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
   std::map<physics::ModelPtr, double> twoballMassSlip;
   std::map<physics::ModelPtr, double> triballMassSlip;
 
-  auto models = world->GetModels();
+  auto models = world->Models();
   for (auto model : models)
   {
     ASSERT_TRUE(model != nullptr);
@@ -591,7 +591,7 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
   {
     auto model = lowball.first;
     double massSlip = lowball.second;
-    auto vel = model->GetWorldLinearVel().Ign();
+    auto vel = model->WorldLinearVel();
     EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
     EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
     double velExpected = grav.Y() * massSlip / 1.0;
@@ -604,7 +604,7 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
   {
     auto model = twoball.first;
     double massSlip = twoball.second;
-    auto vel = model->GetWorldLinearVel().Ign();
+    auto vel = model->WorldLinearVel();
     EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
     EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
     double velExpected = grav.Y() * massSlip / 2.0;
@@ -617,7 +617,7 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
   {
     auto model = triball.first;
     double massSlip = triball.second;
-    auto vel = model->GetWorldLinearVel().Ign();
+    auto vel = model->WorldLinearVel();
     EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
     EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
     double velExpected = grav.Y() * massSlip / 3.0;

@@ -305,7 +305,7 @@ TEST_F(WorldStateTest, InsertionOfMeshModel)
   this->factoryPub->Publish(msg);
 
   this->WaitUntilEntitySpawn("test_model", 100, 100);
-  ASSERT_TRUE(world->GetModel("test_model") != nullptr);
+  ASSERT_TRUE(world->ModelByName("test_model") != nullptr);
 
   // Create a new world state
   physics::WorldState worldState1(world);
