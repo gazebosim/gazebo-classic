@@ -5,6 +5,20 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 8.1 to 8.X
+
+### Modifications
+
+1. **gazebo/gui/JointControlWidget.hh**
+    + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
+    + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
+
+### Deprecations
+
+1. **gazebo/physics/JointController.hh**
+    + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
+    + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
+
 ## Gazebo 7.X to 8.X
 
 ### Build system

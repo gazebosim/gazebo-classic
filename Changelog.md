@@ -2,6 +2,14 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added and improved communications between the JointControlWidget and JointController
+    * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
+    * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
+
+1. Add actors in World as models so they get returned with World::Models()
+    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+
 1. Add actors in World as models so they get returned with World::Models()
     * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
     * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
