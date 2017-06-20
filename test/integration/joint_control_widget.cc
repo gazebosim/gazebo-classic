@@ -31,7 +31,7 @@ void JointControlWidgetTest::SetGetParameters()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/joint_test.world", true, false, false);
+  this->Load("worlds/nested_joint_test.world", true, false, false);
 
   // Create the main window.
   MainWindow *mainWindow = new MainWindow();
@@ -41,8 +41,8 @@ void JointControlWidgetTest::SetGetParameters()
       mainWindow->findChild<JointControlWidget *>();
   QVERIFY(jointControlWidget != NULL);
 
-  // Select model_1 and get the joint control sliders
-  jointControlWidget->SetModelName("model_1");
+  // Select a model and get the joint control sliders
+  jointControlWidget->SetModelName("model_1::model_2");
 
   JointForceControl *slider =
       jointControlWidget->findChild<JointForceControl *>();
@@ -69,11 +69,11 @@ void JointControlWidgetTest::SetGetParameters()
   pidVelSlider->SetIGain(1.2);
   pidVelSlider->SetDGain(9.2);
 
-  // Switch to model_2 to forget the parameters
-  jointControlWidget->SetModelName("model_2");
+  // Switch to a different model to forget the parameters
+  jointControlWidget->SetModelName("ground_plane");
 
-  // Switch back to model_1
-  jointControlWidget->SetModelName("model_1");
+  // Switch back to the first model
+  jointControlWidget->SetModelName("model_1::model_2");
 
   QList<QDoubleSpinBox *> spinBoxes =
       jointControlWidget->findChildren<QDoubleSpinBox *>();
