@@ -139,7 +139,9 @@ TEST_F(VisualProperty, CastShadows)
   EXPECT_LT(colorSum, colorSum2);
   double colorRatio = static_cast<double>(colorSum2-colorSum) /
       static_cast<double>(colorSum2);
-  EXPECT_GT(colorRatio, 0.05);
+  EXPECT_GT(colorRatio, 0.05)
+    << " colorSum [" << colorSum << "], "
+    << " colorSum2 [" << colorSum2 << "]";
 
   camSensor->Camera()->DisconnectNewImageFrame(c);
   camSensor2->Camera()->DisconnectNewImageFrame(c2);
