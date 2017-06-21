@@ -58,6 +58,8 @@ set (plugins_single_header
   InitialVelocityPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  KeysToLinkCmdsPlugin
+  LinkControllerPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
