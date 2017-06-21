@@ -2313,19 +2313,32 @@ void World::SetState(const WorldState &_state)
 
     if (isModel)
     {
-      try
+      bool exists = false;
+      for (auto const &m : this->dataPtr->models)
       {
-        std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
+        if (m->GetName() == elem->Get<std::string>("name", "").first)
+        {
+          exists = true;
+          break;
+        }
+      }
 
-        ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-        model->Init();
-        model->LoadPlugins();
-      }
-      catch(...)
-      {
-        gzerr << "Loading model from world state insertion failed" <<
-            std::endl;
-      }
+     if (!exists)
+     {
+       try
+       {
+         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
+
+         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
+         model->Init();
+         model->LoadPlugins();
+       }
+       catch(...)
+       {
+         gzerr << "Loading model from world state insertion failed" <<
+           std::endl;
+       }
+     }
     }
     else if (isLight)
     {
@@ -2774,7 +2787,16 @@ void World::LogWorker()
           // moving link may never be captured if only diff state is recorded.
           std::lock_guard<std::mutex> bLock(this->dataPtr->logBufferMutex);
 
-          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          static bool firstUpdate = true;
+          if (!firstUpdate)
+          {
+            // The first update thinks there are entities being inserted,
+            // but they're already present in the first world dump
+            this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          }
+          else
+            firstUpdate = false;
+
           this->dataPtr->prevStates[currState].SetDeletions(deletions);
           this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
               this->dataPtr->prevStates[currState]);

@@ -105,7 +105,7 @@ TEST_P(WorldPlaybackTest, Pause)
 
   // Wait for message to be processed
   int sleep = 0;
-  int maxSleep = 30;
+  int maxSleep = 100;
   while (this->world->IsPaused() && sleep < maxSleep)
   {
     gazebo::common::Time::MSleep(100);

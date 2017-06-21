@@ -341,7 +341,6 @@ else (build_errors)
 
   endif (BUILD_GAZEBO)
 
-
   ########################################
   # Make the package config files
   set (pkgconfig_files gazebo_ode gazebo_transport gazebo)
