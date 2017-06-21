@@ -63,9 +63,6 @@ namespace gazebo
       /// \brief Lens distortion model
       public: DistortionPtr distortion;
 
-      /// \brief Lens Flare
-      public: LensFlarePtr lensFlare;
-
       /// \brief Queue of move positions.
       public: std::deque<std::pair<ignition::math::Pose3d, double> >
               moveToPositionQueue;

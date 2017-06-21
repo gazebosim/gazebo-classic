@@ -52,7 +52,6 @@
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Distortion.hh"
-#include "gazebo/rendering/LensFlare.hh"
 #include "gazebo/rendering/CameraPrivate.hh"
 #include "gazebo/rendering/Camera.hh"
 
@@ -1672,10 +1671,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     if (this->dataPtr->distortion)
       this->dataPtr->distortion->SetCamera(shared_from_this());
-
-    this->dataPtr->lensFlare.reset(new LensFlare);
-    this->dataPtr->lensFlare->SetCamera(shared_from_this());
-//    this->AddCompositor("CameraLensFlare/Default");
 
     if (this->GetScene()->GetSkyX() != NULL)
       this->renderTarget->addListener(this->GetScene()->GetSkyX());
