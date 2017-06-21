@@ -93,9 +93,13 @@ void main()
     return;
   }
 
+  float aspect = viewport.x/viewport.y;
   vec2 uv = gl_TexCoord[0].xy - 0.5;
+  // scale lightPos to be same range as uv
+  lightPos *= 0.5;
   // fix aspect ratio
-  uv.x *= viewport.x/viewport.y;
+  uv.x *= aspect;
+  lightPos.x *= aspect;
 
   // compute lens flare
   vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv, lightPos.xy);
