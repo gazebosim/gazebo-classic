@@ -2,6 +2,10 @@
 
 ## Gazebo 7.X.X (201X-XX-XX)
 
+1. Do not display COM or inertia visualizations for static models
+    * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
+    * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
+
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
