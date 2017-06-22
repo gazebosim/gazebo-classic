@@ -127,13 +127,13 @@ void COMVisual::Load()
     // Unrealistic mass, load with default mass
     if (dPtr->mass < 0)
     {
-    gzlog << "The link " << dPtr->linkName << " has unrealistic mass, "
-          << "unable to visualize sphere of equivalent mass." << std::endl;
+      gzlog << "The link " << dPtr->linkName << " has unrealistic mass, "
+            << "unable to visualize sphere of equivalent mass.\n";
     }
     else
     {
-    gzlog << "The link " << dPtr->linkName << " is static or has mass of 0, "
-          << "so a sphere of equivalent mass will not be shown." << std::endl;
+      gzlog << "The link " << dPtr->linkName << " is static or has mass of 0, "
+            << "so a sphere of equivalent mass will not be shown.\n";
     }
     return;
   }
