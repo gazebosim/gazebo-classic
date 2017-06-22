@@ -16,6 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
