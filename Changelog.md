@@ -1,6 +1,19 @@
 ## Gazebo 7
 
-## Gazebo 7.X.X (201X-XX-XX)
+## Gazebo 7.x.x (2017-xx-xx)
+
+## Gazebo 7.8.1 (2017-06-08)
+
+1. ODE slip parameter example world and test
+    * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+
+1. Fix inserted mesh scale during log playback
+    * [Pull request #2723](https://bitbucket.org/osrf/gazebo/pull-request/2723)
+
+## Gazebo 7.8.0 (2017-06-02)
+
+1. Add log record filter options
+    * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
 
 1. Do not display COM or inertia visualizations for static models
     * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
@@ -28,7 +41,7 @@
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
-    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)   
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
 
 ## Gazebo 7.6.0 (2017-03-20)
 
