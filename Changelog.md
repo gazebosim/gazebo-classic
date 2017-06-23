@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Do not display COM or inertia visualizations for static models
+    * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
+    * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
+
 ## Gazebo 7.8.1 (2017-06-08)
 
 1. ODE slip parameter example world and test
@@ -14,10 +18,6 @@
 
 1. Add log record filter options
     * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
-
-1. Do not display COM or inertia visualizations for static models
-    * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
-    * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
 
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
