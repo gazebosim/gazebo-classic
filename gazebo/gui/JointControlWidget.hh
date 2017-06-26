@@ -209,16 +209,16 @@ namespace gazebo
       public: void SetPositionTarget(const double _target);
 
       /// \brief Set the PID proportional gain.
-      /// \param[in] _p_gain Proportional gain value.
-      public: void SetPGain(const double _p_gain);
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
 
       /// \brief Set the PID integral gain.
-      /// \param[in] _i_gain Integral gain value.
-      public: void SetIGain(const double _i_gain);
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
 
       /// \brief Set the PID derivative gain.
-      /// \param[in] _d_gain Derivative gain value.
-      public: void SetDGain(const double _d_gain);
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -297,16 +297,16 @@ namespace gazebo
       public: void SetVelocityTarget(const double _target);
 
       /// \brief Set the PID proportional gain.
-      /// \param[in] _p_gain Proportional gain value.
-      public: void SetPGain(const double _p_gain);
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
 
       /// \brief Set the PID integral gain.
-      /// \param[in] _i_gain Integral gain value.
-      public: void SetIGain(const double _i_gain);
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
 
       /// \brief Set the PID derivative gain.
-      /// \param[in] _d_gain Derivative gain value.
-      public: void SetDGain(const double _d_gain);
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.

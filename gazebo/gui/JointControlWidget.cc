@@ -151,21 +151,21 @@ void JointPIDPosControl::SetPositionTarget(const double _target)
 }
 
 /////////////////////////////////////////////////
-void JointPIDPosControl::SetPGain(const double _p_gain)
+void JointPIDPosControl::SetPGain(const double _pGain)
 {
-  this->dataPtr->pGainSpin->setValue(_p_gain);
+  this->dataPtr->pGainSpin->setValue(_pGain);
 }
 
 /////////////////////////////////////////////////
-void JointPIDPosControl::SetIGain(const double _i_gain)
+void JointPIDPosControl::SetIGain(const double _iGain)
 {
-  this->dataPtr->iGainSpin->setValue(_i_gain);
+  this->dataPtr->iGainSpin->setValue(_iGain);
 }
 
 /////////////////////////////////////////////////
-void JointPIDPosControl::SetDGain(const double _d_gain)
+void JointPIDPosControl::SetDGain(const double _dGain)
 {
-  this->dataPtr->dGainSpin->setValue(_d_gain);
+  this->dataPtr->dGainSpin->setValue(_dGain);
 }
 
 /////////////////////////////////////////////////
@@ -285,21 +285,21 @@ void JointPIDVelControl::SetVelocityTarget(const double _target)
 }
 
 /////////////////////////////////////////////////
-void JointPIDVelControl::SetPGain(const double _p_gain)
+void JointPIDVelControl::SetPGain(const double _pGain)
 {
-  this->dataPtr->pGainSpin->setValue(_p_gain);
+  this->dataPtr->pGainSpin->setValue(_pGain);
 }
 
 /////////////////////////////////////////////////
-void JointPIDVelControl::SetIGain(const double _i_gain)
+void JointPIDVelControl::SetIGain(const double _iGain)
 {
-  this->dataPtr->iGainSpin->setValue(_i_gain);
+  this->dataPtr->iGainSpin->setValue(_iGain);
 }
 
 /////////////////////////////////////////////////
-void JointPIDVelControl::SetDGain(const double _d_gain)
+void JointPIDVelControl::SetDGain(const double _dGain)
 {
-  this->dataPtr->dGainSpin->setValue(_d_gain);
+  this->dataPtr->dGainSpin->setValue(_dGain);
 }
 
 /////////////////////////////////////////////////
