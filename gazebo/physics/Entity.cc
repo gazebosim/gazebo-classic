@@ -336,10 +336,14 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         else
         {
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
-        }
 
-        if (_publish)
-          entity->PublishPose();
+          // Publish only for non-canonical links,
+          // since local pose of the canonical link does not change,
+          // so there is no need to keep telling everyone about it.
+          // The canonical link will automatically move as the model moves
+          if (_publish)
+            entity->PublishPose();
+        }
 
         if (_notify)
           entity->UpdatePhysicsPose(false);
