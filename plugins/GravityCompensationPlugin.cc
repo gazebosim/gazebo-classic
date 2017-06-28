@@ -67,12 +67,12 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
   // Load a DART skeleton model
   if (_sdf->HasElement("uri"))
   {
-    std::string filename = sdf::findFile(_sdf->Get<std::string>("uri"))
+    std::string modelFile = sdf::findFile(_sdf->Get<std::string>("uri"))
         + "/model.sdf";
-    this->dataPtr->skel = dart::utils::SdfParser::readSkeleton(filename);
+    this->dataPtr->skel = dart::utils::SdfParser::readSkeleton(modelFile);
     if (this->dataPtr->skel == nullptr)
     {
-      gzerr << "Error parsing " << filename << "\n";
+      gzerr << "Error parsing " << modelFile << "\n";
       return;
     }
   }
@@ -128,7 +128,7 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
 }
 
 /////////////////////////////////////////////////
-void GravityCompensationPlugin::Update(const common::UpdateInfo &_info)
+void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
   auto dtRoot = dynamic_cast<dart::dynamics::FreeJoint *>(
       this->dataPtr->skel->getJoint("root"));
