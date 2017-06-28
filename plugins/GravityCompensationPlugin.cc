@@ -101,11 +101,11 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
   }
 
   // Check that for each joint in the model the skeleton has a matching one.
-  dart::dynamics::Joint *dtJoint;
   physics::Joint_V joints = this->dataPtr->model->GetJoints();
   for (auto joint : joints)
   {
-    dtJoint = this->dataPtr->skel->getJoint(joint->GetName());
+    dart::dynamics::Joint *dtJoint =
+        this->dataPtr->skel->getJoint(joint->GetName());
     if (dtJoint == nullptr)
     {
       gzerr << "Missing joint \"" << joint->GetName()
@@ -143,7 +143,7 @@ void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
   ignition::math::Quaterniond rot = pose.Rot();
   // Set skeleton pose
   Eigen::Isometry3d dtPose =
-      Eigen::Translation<double,3>(pos.X(), pos.Y(), pos.Z()) *
+      Eigen::Translation<double, 3>(pos.X(), pos.Y(), pos.Z()) *
       Eigen::Quaterniond(rot.W(), rot.X(), rot.Y(), rot.Z());
   dart::dynamics::FreeJoint::setTransform(dtRoot, dtPose);
 
@@ -151,8 +151,10 @@ void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
   ignition::math::Vector3d linVel = this->dataPtr->model->WorldLinearVel();
   ignition::math::Vector3d angVel = this->dataPtr->model->WorldAngularVel();
   // Set skeleton velocity
-  dtRoot->setLinearVelocity(Eigen::Vector3d(linVel.X(), linVel.Y(), linVel.Z()));
-  dtRoot->setAngularVelocity(Eigen::Vector3d(angVel.X(), angVel.Y(), angVel.Z()));
+  dtRoot->setLinearVelocity(
+      Eigen::Vector3d(linVel.X(), linVel.Y(), linVel.Z()));
+  dtRoot->setAngularVelocity(
+      Eigen::Vector3d(angVel.X(), angVel.Y(), angVel.Z()));
 
   // Set skeleton joint positions and velocities
   dart::dynamics::Joint *dtJoint;
