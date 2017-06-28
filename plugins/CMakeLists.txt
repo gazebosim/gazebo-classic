@@ -148,7 +148,7 @@ foreach (src ${GUIplugins})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
-if (HAVE_DART)
+if (HAVE_DART_URDF)
   foreach (src ${DARTplugins})
     add_library(${src} SHARED ${src}.cc)
     target_link_libraries(${src}
