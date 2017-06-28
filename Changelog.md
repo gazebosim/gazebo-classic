@@ -8,6 +8,10 @@
 
 ## Gazebo 7.8.1 (2017-06-08)
 
+1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
+    * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
+    * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
+
 1. ODE slip parameter example world and test
     * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
 
