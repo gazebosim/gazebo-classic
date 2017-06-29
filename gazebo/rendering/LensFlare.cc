@@ -159,9 +159,6 @@ void LensFlare::Update()
   if (!directionalLight)
     return;
 
-    std::cerr << "Found directional light found for lens flare effect" 
-        << std::endl;
-
   // set up the lens flare instance
   this->dataPtr->lensFlareMaterial =
       Ogre::MaterialManager::getSingleton().getByName(
@@ -176,8 +173,8 @@ void LensFlare::Update()
   this->dataPtr->lensFlareInstance =
       Ogre::CompositorManager::getSingleton().addCompositor(
       this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
-//  this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
-//      getPass(0)->setMaterial(this->dataPtr->lensFlareMaterial);
+  this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
+      getPass(0)->setMaterial(this->dataPtr->lensFlareMaterial);
 
   this->dataPtr->lensFlareInstance->setEnabled(true);
   this->dataPtr->lensFlareInstance->addListener(
