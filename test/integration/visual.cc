@@ -113,7 +113,7 @@ TEST_F(VisualProperty, CastShadows)
 
   // wait for images
   int totalImages = 20;
-  while (imageCount < totalImages && imageCount2 < totalImages &&
+  while ((imageCount < totalImages || imageCount2 < totalImages) && 
       timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
 
