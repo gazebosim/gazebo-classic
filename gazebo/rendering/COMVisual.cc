@@ -122,12 +122,20 @@ void COMVisual::Load()
   COMVisualPrivate *dPtr =
       reinterpret_cast<COMVisualPrivate *>(this->dataPtr);
 
-  if (dPtr->mass < 0)
+  if (dPtr->mass <= 0)
   {
     // Unrealistic mass, load with default mass
-    gzlog << "The link " << dPtr->linkName << " has unrealistic mass, "
-          << "unable to visualize sphere of equivalent mass." << std::endl;
-    dPtr->mass = 1;
+    if (dPtr->mass < 0)
+    {
+      gzlog << "The link " << dPtr->linkName << " has unrealistic mass, "
+            << "unable to visualize sphere of equivalent mass.\n";
+    }
+    else
+    {
+      gzlog << "The link " << dPtr->linkName << " is static or has mass of 0, "
+            << "so a sphere of equivalent mass will not be shown.\n";
+    }
+    return;
   }
 
   // Compute radius of sphere with density of lead and equivalent mass.
