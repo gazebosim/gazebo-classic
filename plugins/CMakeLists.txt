@@ -76,7 +76,9 @@ set (plugins_single_header
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
-  TransporterPlugin)
+  TransporterPlugin
+  WheelSlipPlugin
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}
