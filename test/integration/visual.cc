@@ -117,6 +117,9 @@ TEST_F(VisualProperty, CastShadows)
       timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
 
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
   unsigned int colorSum = 0;
   unsigned int colorSum2 = 0;
   for (unsigned int y = 0; y < height; ++y)
