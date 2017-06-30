@@ -110,7 +110,7 @@ void DARTModel::Init()
     bodyNodeMap[dartLink->GetName()] = bodyNodeBD;
   }
 
-  // map for link name -> parent joint
+  // map for joint name -> joint build information
   DARTModelPrivate::JointMap jointMap;
   Joint_V jointList = this->GetJoints();
   for (auto joint : jointList)
@@ -141,88 +141,105 @@ void DARTModel::Init()
     gzdbg << "Adding to joint map for link " << jointBD.childName
           << ": DART joint " << dartJoint->GetName() << "\n";
 
-    jointMap[jointBD.childName] = jointBD;
+    jointMap[dartJoint->GetName()] = jointBD;
   }
 
   // Iterate through the collected properties and construct the Skeleton from
   // the root nodes downward.
-  DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
-      bodyNodeMap.begin();
-  DARTModelPrivate::JointMap::const_iterator parentJointItr;
-  dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
-
-  while (bodyNodeItr != bodyNodeMap.end())
+  while (!bodyNodeMap.empty())
   {
-    GZ_ASSERT(bodyNodeItr->second.dartLink, "Link is nullptr");
-    // multiple parent joints are not supported (this case should have
-    // been caught before, therefore we make the assertion here).
-    // Should this be supported in future versions of DART, we have to make
-    // sure here that body nodes are created for all links. The
-    // current approach with this loop implementation only considers each
-    // link once (and therefore supports only one parent joint of it).
-    GZ_ASSERT(bodyNodeItr->second.dartLink->GetParentJoints().size() <= 1,
-              "Multiple parent joints for links are not supported in DART");
-
-    DARTModelPrivate::NextResult result =
-        DARTModelPrivate::getNextJointAndNodePair(
-          bodyNodeItr, parentJointItr, dtParentBodyNode,
-          this->dataPtr->dtSkeleton, bodyNodeMap, jointMap);
-
-    if (DARTModelPrivate::BREAK == result)
+    // Iterate through bodyNodeMap and find a bodyNode to be a root
+    DARTModelPrivate::BodyNodeBuildData &bestBodyNodeBD =
+        (bodyNodeMap.begin())->second;
+    size_t nChildren = bestBodyNodeBD.dartLink->GetChildJoints().size();
+    bool haveBodyWithNoParents = false;
+    for (const auto &mapElem : bodyNodeMap)
     {
-      break;
-    }
-    else if (DARTModelPrivate::CONTINUE == result)
-    {
-      // Create the parent before creating the current Joint
-      continue;
-    }
-    else if (DARTModelPrivate::CREATE_FREEJOINT_ROOT == result)
-    {
-      // If a root FreeJoint is needed for the parent of the current joint,
-      // then create it
-      DARTModelPrivate::JointBuildData rootJoint;
-      rootJoint.properties =
-          Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
-            dart::dynamics::Joint::Properties(
-              "root", bodyNodeItr->second.initTransform));
-      rootJoint.type = "free";
-
-      gzdbg << "Building DART BodyNode for link "
-            << bodyNodeItr->second.dartLink->GetName()
-            << " with a free joint.\n";
-
-      if (!DARTModelPrivate::createJointAndNodePair(
-            this->dataPtr->dtSkeleton, nullptr, rootJoint, bodyNodeItr->second))
+      DARTLinkPtr dartLink = mapElem.second.dartLink;
+      GZ_ASSERT(dartLink, "Link is nullptr");
+      if (haveBodyWithNoParents && !dartLink->GetParentJoints().empty())
       {
-        gzdbg << "Could not create joint and node.\n";
-        break;
+        continue;
       }
-
-      bodyNodeMap.erase(bodyNodeItr);
-      bodyNodeItr = bodyNodeMap.begin();
-
-      continue;
+      if (!haveBodyWithNoParents && dartLink->GetParentJoints().empty())
+      {
+        haveBodyWithNoParents = true;
+        bestBodyNodeBD = mapElem.second;
+        nChildren = dartLink->GetChildJoints().size();
+      }
+      else if (dartLink->GetChildJoints().size() > nChildren)
+      {
+        bestBodyNodeBD = mapElem.second;
+        nChildren = dartLink->GetChildJoints().size();
+      }
     }
+
+    // Create free joint for a root bodyNode and add to skeleton
+    DARTModelPrivate::JointBuildData rootJoint;
+    rootJoint.properties =
+        Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
+        dart::dynamics::Joint::Properties(
+        "root", bestBodyNodeBD.initTransform));
+    rootJoint.type = "free";
 
     gzdbg << "Building DART BodyNode for link "
-            << bodyNodeItr->second.dartLink->GetName()
-            << "and joint "
-            << parentJointItr->second.properties->mName << ".\n";
+          << bestBodyNodeBD.dartLink->GetName()
+          << " with a free joint.\n";
 
     if (!DARTModelPrivate::createJointAndNodePair(
-          this->dataPtr->dtSkeleton,
-          dtParentBodyNode,
-          parentJointItr->second,
-          bodyNodeItr->second))
+        this->dataPtr->dtSkeleton, nullptr, rootJoint, bestBodyNodeBD))
     {
       gzdbg << "Could not create joint and node.\n";
       break;
     }
+    bodyNodeMap.erase(bestBodyNodeBD.dartLink->GetName());
 
-    bodyNodeMap.erase(bodyNodeItr);
-    bodyNodeItr = bodyNodeMap.begin();
+    // Add children using BFS
+    std::list<LinkPtr> linkQueue;
+    linkQueue.push_back(bestBodyNodeBD.dartLink);
+    while (!linkQueue.empty())
+    {
+      LinkPtr parentLink = linkQueue.front();
+      linkQueue.pop_front();
+      for (auto joint : parentLink->GetChildJoints())
+      {
+        LinkPtr childLink = joint->GetChild();
+        GZ_ASSERT(childLink, "Link is nullptr");
+
+        auto jointItr = jointMap.find(joint->GetName());
+        GZ_ASSERT(jointItr != jointMap.end(), "Missing joint in map");
+
+        // If child link in map
+        auto bodyNodeItr = bodyNodeMap.find(childLink->GetName());
+        // FIXME: for now multiple parent joints are not supported, so...
+        GZ_ASSERT(bodyNodeItr != bodyNodeMap.end(), "Missing body node in map");
+        if (bodyNodeItr != bodyNodeMap.end())
+        {
+          // Add joint and child link to skeleton
+          gzdbg << "Building DART BodyNode for link "
+                << bodyNodeItr->second.dartLink->GetName()
+                << "and joint "
+                << jointItr->second.properties->mName << ".\n";
+
+          dart::dynamics::BodyNode* dtParentBodyNode =
+              this->dataPtr->dtSkeleton->getBodyNode(
+              jointItr->second.parentName);
+          GZ_ASSERT(dtParentBodyNode, "Could not find parent body node");
+          if (!DARTModelPrivate::createJointAndNodePair(
+              this->dataPtr->dtSkeleton, dtParentBodyNode,
+              jointItr->second, bodyNodeItr->second))
+          {
+            gzdbg << "Could not create joint and node.\n";
+            break; // FIXME: this could cause an infinite loop
+          }
+          jointMap.erase(joint->GetName());
+          bodyNodeMap.erase(childLink->GetName());
+          linkQueue.push_back(childLink);
+        }
+      }
+    }
   }
+  // TODO: process remaining joints
 
   Model::Init();
 
