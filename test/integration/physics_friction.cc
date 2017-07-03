@@ -421,7 +421,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(modelAngles.size(), 44u);
 
   // Pointers to spheres model and its links
-  physics::ModelPtr spheres = world->GetModel("spheres");
+  physics::ModelPtr spheres = world->ModelByName("spheres");
   ASSERT_TRUE(spheres != nullptr);
   auto sphereLinks = spheres->GetLinks();
   EXPECT_EQ(sphereLinks.size(), 2u);
@@ -453,7 +453,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     // the friction direction should be in a body-fixed frame
     // so spinning the spheres should cause them to start rolling
     // check that spheres are spinning about the X axis
-    auto w = link->GetWorldAngularVel().Ign();
+    auto w = link->WorldAngularVel();
     EXPECT_LT(w.X(), -4) << "Checking " << link->GetScopedName() << std::endl;
   }
 }
