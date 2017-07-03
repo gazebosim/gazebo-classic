@@ -795,6 +795,69 @@ TEST_P(FactoryTest, Clone)
 //  ASSERT_EQ(0.0, diffAvg);
 // }
 
+
+//////////////////////////////////////////////////
+TEST_P(FactoryTest, InvalidMeshInsertion)
+{
+  std::string physicsEngine = GetParam();
+  gzerr << "Testing " << GetParam() << std::endl;
+
+  this->Load("worlds/empty.world", true, physicsEngine);
+
+  auto world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+
+  std::string newModelName("new_model");
+  std::string trimeshPath = "file://does-not-exist.stl";
+
+  // Check initial count
+  EXPECT_EQ(1u, world->ModelCount());
+  EXPECT_TRUE(world->ModelByName(newModelName) == NULL);
+
+  // Current world state: Check that it only has the ground floor
+  physics::WorldState worldState(world);
+  EXPECT_EQ(1u, worldState.GetModelStateCount());
+
+  // Try to insert a model with a geometry which references a URI
+  // which doesn't exist. The server should at least not crash, though it
+  // may vary between physics engines whether the model is actually added.
+  // It should print some errors, but it may or may not have addded the
+  // (partly) faulty model.
+  std::stringstream newModelStr;
+  newModelStr << "<sdf version='" << sdf::SDF::Version() << "'>"
+               << "<model name ='" << newModelName << "'>"
+               << "<link name ='link'>"
+               << "  <collision name ='collision'>"
+               << "    <geometry>"
+               << "      <mesh>"
+               << "        <uri>" << trimeshPath << "</uri>"
+               << "        <scale>1 1 1</scale>"
+               << "      </mesh>"
+               /*<< "      <box>"
+               << "        <size>.2 .2 .2</size>"
+               << "      </box>"*/
+               << "    </geometry>"
+               << "  </collision>"
+               << "  <visual name ='visual'>"
+               << "    <geometry>"
+               << "      <mesh>"
+               << "        <uri>" << trimeshPath << "</uri>"
+               << "        <scale>1 1 1</scale>"
+               << "      </mesh>"
+               << "    </geometry>"
+               << "  </visual>"
+               << "</link>"
+               << "</model>"
+               << "</sdf>";
+
+  // Set state which includes insertion
+  std::vector<std::string> insertions;
+  insertions.push_back(newModelStr.str());
+  worldState.SetInsertions(insertions);
+  world->SetState(worldState);
+  world->Step(1);
+}
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////

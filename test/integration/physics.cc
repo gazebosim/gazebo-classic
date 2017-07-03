@@ -768,39 +768,6 @@ TEST_F(PhysicsTest, StateInsertion)
   physics::WorldState newWorldState(world);
   EXPECT_EQ(2u, newWorldState.GetModelStateCount());
   EXPECT_EQ(2u, newWorldState.LightStateCount());
-
-  // Now try to insert a model with a geometry which references a URI
-  // which doesn't exist. The server should at least not crash, though it
-  // may vary between physics engines whether the model is actually added.
-  // It should print some errors, but it may or may not have addded the
-  // (partly) faulty model.
-  std::stringstream newModelStr2;
-  std::string newModelName2("new_model2");
-  newModelStr2 << "<sdf version='" << SDF_VERSION << "'>"
-               << "<model name ='" << newModelName2 << "'>"
-               << "<link name ='link'>"
-               << "  <collision name ='collision'>"
-               << "    <geometry>"
-               << "      <box><size>1 1 1</size></box>"
-               << "    </geometry>"
-               << "  </collision>"
-               << "  <visual name ='visual'>"
-               << "    <geometry>"
-               << "      <mesh>"
-               << "        <uri>file://does-not-exist.stl</uri>"
-               << "        <scale>1 1 1</scale>"
-               << "      </mesh>"
-               << "    </geometry>"
-               << "  </visual>"
-               << "</link>"
-               << "</model>"
-               << "</sdf>";
-
-  insertions.clear;
-  insertions.push_back(newModelStr2.str());
-  newWorldState.SetInsertions(insertions);
-  world->SetState(newWorldState);
-  world->Step(1);
 }
 
 //////////////////////////////////////////////////
