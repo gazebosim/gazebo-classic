@@ -359,6 +359,21 @@ namespace gazebo
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
 
+      /// \brief Get scoped sensor name(s) in the model that matches
+      /// sensor name.
+      ///
+      /// Get the names of sensors in the model where sensor
+      /// name matches the user provided argument.
+      /// \note A Model does not manage or maintain a pointer to a
+      /// sensors::Sensor. Access to a Sensor object
+      /// is accomplished through the sensors::SensorManager. This was done to
+      /// separate the physics engine from the sensor engine.
+      /// \param[in] _name Unscoped sensor name.
+      /// \return The scoped name of the sensor(s),
+      ///         or empty list if not found.
+      public: std::vector<std::string> SensorScopedName(
+        const std::string &_name) const;
+
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
       public: JointControllerPtr GetJointController();
