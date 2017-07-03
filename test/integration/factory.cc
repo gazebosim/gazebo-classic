@@ -800,8 +800,6 @@ TEST_P(FactoryTest, Clone)
 TEST_P(FactoryTest, InvalidMeshInsertion)
 {
   std::string physicsEngine = GetParam();
-  gzerr << "Testing " << GetParam() << std::endl;
-
   this->Load("worlds/empty.world", true, physicsEngine);
 
   auto world = physics::get_world("default");
@@ -810,13 +808,8 @@ TEST_P(FactoryTest, InvalidMeshInsertion)
   std::string newModelName("new_model");
   std::string trimeshPath = "file://does-not-exist.stl";
 
-  // Check initial count
-  EXPECT_EQ(1u, world->ModelCount());
-  EXPECT_TRUE(world->ModelByName(newModelName) == NULL);
-
-  // Current world state: Check that it only has the ground floor
+  // Current world state
   physics::WorldState worldState(world);
-  EXPECT_EQ(1u, worldState.GetModelStateCount());
 
   // Try to insert a model with a geometry which references a URI
   // which doesn't exist. The server should at least not crash, though it
@@ -833,9 +826,6 @@ TEST_P(FactoryTest, InvalidMeshInsertion)
                << "        <uri>" << trimeshPath << "</uri>"
                << "        <scale>1 1 1</scale>"
                << "      </mesh>"
-               /*<< "      <box>"
-               << "        <size>.2 .2 .2</size>"
-               << "      </box>"*/
                << "    </geometry>"
                << "  </collision>"
                << "  <visual name ='visual'>"
