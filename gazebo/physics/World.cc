@@ -347,7 +347,7 @@ sdf::ElementPtr World::SDF()
   sdf::ElementPtr root(new sdf::Element);
   root->SetName("sdf");
   std::stringstream version;
-  version << SDF_VERSION;
+  version << sdf::SDF::Version();
   root->AddAttribute("version", "string", version.str(), true, "version");
   root->InsertElement(this->dataPtr->sdf->Clone());
   return root;
