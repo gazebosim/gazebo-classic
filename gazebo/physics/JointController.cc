@@ -389,8 +389,9 @@ void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
 /////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
-  gzwarn << "Topics of the form \"~/[modelName]/joint_cmd\" are deprecated.\n"
-      << "Use \"/[scopedModelName]/joint_cmd\" instead.\n";
+  gzwarn << "Gazebo topics of the form \"~/[modelName]/joint_cmd\" are "
+      << "deprecated.\nUse ignition::transport topics of the form "
+      << "\"/[scopedModelName]/joint_cmd\" instead.\n";
 
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->dataPtr->joints.find(_msg->name());

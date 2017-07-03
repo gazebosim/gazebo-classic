@@ -21,7 +21,6 @@
   #include <Winsock2.h>
 #endif
 
-#include <ignition/msgs.hh>
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/transport/Node.hh"
@@ -327,6 +326,60 @@ void JointPIDVelControl::OnDChanged(double _value)
 }
 
 /////////////////////////////////////////////////
+void JointControlWidget::OnControllerResponse(
+    const ignition::msgs::JointCmd &_rep, const bool _result)
+{
+  if (_result)
+  {
+    if (_rep.has_force())
+    {
+      auto slider = this->dataPtr->sliders[_rep.name()];
+      slider->SetForce(_rep.force());
+    }
+    if (_rep.has_position())
+    {
+      auto slider = this->dataPtr->pidPosSliders[_rep.name()];
+      if (_rep.position().has_target())
+      {
+        slider->SetPositionTarget(_rep.position().target());
+      }
+      if (_rep.position().has_p_gain())
+      {
+        slider->SetPGain(_rep.position().p_gain());
+      }
+      if (_rep.position().has_i_gain())
+      {
+        slider->SetIGain(_rep.position().i_gain());
+      }
+      if (_rep.position().has_d_gain())
+      {
+        slider->SetDGain(_rep.position().d_gain());
+      }
+    }
+    if (_rep.has_velocity())
+    {
+      auto slider = this->dataPtr->pidVelSliders[_rep.name()];
+      if (_rep.velocity().has_target())
+      {
+        slider->SetVelocityTarget(_rep.velocity().target());
+      }
+      if (_rep.velocity().has_p_gain())
+      {
+        slider->SetPGain(_rep.velocity().p_gain());
+      }
+      if (_rep.velocity().has_i_gain())
+      {
+        slider->SetIGain(_rep.velocity().i_gain());
+      }
+      if (_rep.velocity().has_d_gain())
+      {
+        slider->SetDGain(_rep.velocity().d_gain());
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void JointControlWidget::SetModelName(const std::string &_modelName)
 {
   msgs::Model modelMsg;
@@ -367,10 +420,6 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
 
   // Get joint controller parameters and use them to populate the sliders.
   ignition::msgs::StringMsg req;
-  ignition::msgs::JointCmd rep;
-  bool ok;
-  unsigned int timeout = 5000;
-  bool executed;
   std::string service = "/" + _modelName + "/joint_cmd_req";
   boost::replace_all(service, "::", "/");
 
@@ -378,63 +427,24 @@ void JointControlWidget::SetModelName(const std::string &_modelName)
   for (auto &slider : this->dataPtr->sliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
-    if (executed && ok && rep.has_force())
-    {
-      slider.second->SetForce(rep.force());
-    }
+    this->dataPtr->node.Request(service, req,
+        &JointControlWidget::OnControllerResponse, this);
   }
 
   // PID position control
   for (auto &slider : this->dataPtr->pidPosSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
-    if (executed && ok && rep.has_position())
-    {
-      if (rep.position().has_target())
-      {
-        slider.second->SetPositionTarget(rep.position().target());
-      }
-      if (rep.position().has_p_gain())
-      {
-        slider.second->SetPGain(rep.position().p_gain());
-      }
-      if (rep.position().has_i_gain())
-      {
-        slider.second->SetIGain(rep.position().i_gain());
-      }
-      if (rep.position().has_d_gain())
-      {
-        slider.second->SetDGain(rep.position().d_gain());
-      }
-    }
+    this->dataPtr->node.Request(service, req,
+        &JointControlWidget::OnControllerResponse, this);
   }
 
   // PID velocity control
   for (auto &slider : this->dataPtr->pidVelSliders)
   {
     req.set_data(slider.first);
-    executed = this->dataPtr->node.Request(service, req, timeout, rep, ok);
-    if (executed && ok && rep.has_velocity())
-    {
-      if (rep.velocity().has_target())
-      {
-        slider.second->SetVelocityTarget(rep.velocity().target());
-      }
-      if (rep.velocity().has_p_gain())
-      {
-        slider.second->SetPGain(rep.velocity().p_gain());
-      }
-      if (rep.velocity().has_i_gain())
-      {
-        slider.second->SetIGain(rep.velocity().i_gain());
-      }
-      if (rep.velocity().has_d_gain())
-      {
-        slider.second->SetDGain(rep.velocity().d_gain());
-      }
-    }
+    this->dataPtr->node.Request(service, req,
+        &JointControlWidget::OnControllerResponse, this);
   }
 }
 

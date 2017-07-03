@@ -19,6 +19,8 @@
 
 #include <memory>
 #include <string>
+#include <ignition/msgs.hh>
+#include <ignition/transport.hh>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -57,6 +59,12 @@ namespace gazebo
       /// \brief Set the name of the model to control.
       /// \param[in] _modelName Name of the model.
       public: void SetModelName(const std::string &_modelName);
+
+      /// \brief Populate the text boxes using the parameter from the joint
+      /// controller.
+      /// \param[in] _rep The joint controller's reponse.
+      /// \param[in] _result Whether the information request was successful.
+      private: void OnControllerResponse(const ignition::msgs::JointCmd &_rep, const bool _result);
 
       /// \brief On reset callback.
       private slots: void OnReset();
