@@ -708,13 +708,22 @@ void Model::SetAngularVel(const ignition::math::Vector3d &_vel)
 //////////////////////////////////////////////////
 void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Model::SetLinearAccel() is deprecated and has no effect. "
+         << "Use Link::SetForce() on the link directly instead. \n";
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
+#ifndef _WIN32
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       (*iter)->SetLinearAccel(_accel);
+#ifndef _WIN32
+      #pragma GCC diagnostic pop
+#endif
     }
   }
 }
@@ -722,13 +731,22 @@ void Model::SetLinearAccel(const ignition::math::Vector3d &_accel)
 //////////////////////////////////////////////////
 void Model::SetAngularAccel(const ignition::math::Vector3d &_accel)
 {
+  gzwarn << "Model::SetAngularAccel() is deprecated and has no effect. "
+         << "Use Link::SetTorque() on the link directly instead. \n";
   for (Link_V::iterator iter = this->links.begin();
        iter != this->links.end(); ++iter)
   {
     if (*iter)
     {
       (*iter)->SetEnabled(true);
+#ifndef _WIN32
+      #pragma GCC diagnostic push
+      #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
       (*iter)->SetAngularAccel(_accel);
+#ifndef _WIN32
+      #pragma GCC diagnostic pop
+#endif
     }
   }
 }
@@ -962,6 +980,32 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
       boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
+}
+
+//////////////////////////////////////////////////
+std::vector<std::string> Model::SensorScopedName(
+  const std::string &_name) const
+{
+  std::vector<std::string> names;
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
+    {
+      const auto sensorName = (*iter)->GetSensorName(j);
+      if (sensorName.size() < _name.size())
+      {
+        continue;
+      }
+      if (sensorName.substr(sensorName.size() - _name.size(), _name.size()) ==
+          _name)
+      {
+        names.push_back(sensorName);
+      }
+    }
+  }
+
+  return names;
 }
 
 //////////////////////////////////////////////////

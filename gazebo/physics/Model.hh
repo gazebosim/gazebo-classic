@@ -120,12 +120,16 @@ namespace gazebo
       /// \brief Set the linear acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new linear acceleration.
-      public: void SetLinearAccel(const ignition::math::Vector3d &_vel);
+      /// \deprecated acceleration should be achieved by applying a force.
+      public: void SetLinearAccel(const ignition::math::Vector3d &_vel)
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the angular acceleration of the model, and all its
       /// links.
       /// \param[in] _vel The new angular acceleration
-      public: void SetAngularAccel(const ignition::math::Vector3d &_vel);
+      /// \deprecated acceleration should be achieved by applying a force.
+      public: void SetAngularAccel(const ignition::math::Vector3d &_vel)
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the linear velocity of the entity.
       /// \return ignition::math::Vector3d, set to 0, 0, 0
@@ -354,6 +358,21 @@ namespace gazebo
       /// This will count all the sensors attached to all the links.
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
+
+      /// \brief Get scoped sensor name(s) in the model that matches
+      /// sensor name.
+      ///
+      /// Get the names of sensors in the model where sensor
+      /// name matches the user provided argument.
+      /// \note A Model does not manage or maintain a pointer to a
+      /// sensors::Sensor. Access to a Sensor object
+      /// is accomplished through the sensors::SensorManager. This was done to
+      /// separate the physics engine from the sensor engine.
+      /// \param[in] _name Unscoped sensor name.
+      /// \return The scoped name of the sensor(s),
+      ///         or empty list if not found.
+      public: std::vector<std::string> SensorScopedName(
+        const std::string &_name) const;
 
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.

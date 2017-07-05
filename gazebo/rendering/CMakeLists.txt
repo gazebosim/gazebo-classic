@@ -91,6 +91,8 @@ set (headers
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
+  GpuLaserDataIterator.hh
+  GpuLaserDataIteratorImpl.hh
   Grid.hh
   Heightmap.hh
   InertiaVisual.hh
@@ -152,6 +154,7 @@ if (HAVE_OCULUS)
 endif ()
 
 set (gtest_sources
+  GpuLaserDataIterator_TEST.cc
   RenderingConversions_TEST.cc
 )
 
@@ -164,6 +167,7 @@ set (gtest_sources_dri
   CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
+  Distortion_TEST.cc
   GpuLaser_TEST.cc
   Grid_TEST.cc
   Heightmap_TEST.cc
@@ -227,7 +231,7 @@ if (NOT APPLE AND NOT WIN32)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_rendering rendering_pch.hh)
+  add_pch(gazebo_rendering rendering_pch.hh ${Boost_PKGCONFIG_CFLAGS})
 endif()
 
 gz_install_library(gazebo_rendering)

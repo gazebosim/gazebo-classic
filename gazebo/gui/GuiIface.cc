@@ -18,7 +18,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+     #define snprintf _snprintf
+  #endif
 #endif
 
 #include <signal.h>
@@ -300,8 +303,8 @@ bool gui::load()
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
   {
-    g_argv[i] = new char[strlen("gazebo")];
-    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
+    g_argv[i] = new char[strlen("gazebo") + 1];
+    snprintf(g_argv[i], strlen("gazebo") + 1, "gazebo");
   }
 
   // Register custom message handler

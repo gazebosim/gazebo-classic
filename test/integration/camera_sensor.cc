@@ -38,9 +38,17 @@ std::mutex mutex;
 
 unsigned char* img = NULL;
 unsigned char* img2 = NULL;
+unsigned char* img3 = NULL;
+unsigned char* img4 = NULL;
 int imageCount = 0;
 int imageCount2 = 0;
+int imageCount3 = 0;
+int imageCount4 = 0;
 std::string pixelFormat = "";
+
+
+// list of timestamped images used by the Timestamp test
+std::vector<gazebo::msgs::ImageStamped> g_imagesStamped;
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
@@ -55,6 +63,14 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
+/////////////////////////////////////////////////
+void OnImage(ConstImageStampedPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  gazebo::msgs::ImageStamped imgStamped;
+  imgStamped.CopyFrom(*_msg.get());
+  g_imagesStamped.push_back(imgStamped);
+}
 
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, WorldReset)
@@ -500,7 +516,7 @@ TEST_F(CameraSensor, MultiSenseLow)
 //  math::Pose setPose, testPose(
 //      ignition::math::Vector3d(-5, 0, 5),
 //      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
-//  SpawnCamera(modelName, cameraName, setPose.pos,
+//  SpawnCamera(modelName, cameraName, setPose.Pos(),
 //      setPose.Rot().Euler(), width, height, updateRate);
 //  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
 //  sensors::CameraSensorPtr camSensor =
@@ -612,62 +628,125 @@ TEST_F(CameraSensor, CheckDistortion)
     return;
   }
 
-  // Spawn two cameras in the same location, one with noise and one without.
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
-  std::string modelNameDistorted = "camera_model_distorted";
-  std::string cameraNameDistorted = "camera_sensor_distorted";
+  // Spawn 4 cameras. One has no distortion.
+  // The second has distortion, but all the distortion parameters are set to 0.
+  // The third has barrel (negative k1) distortion.
+  // The fourth has pincushion (positive k1) distortion.
+  std::string modelNameUndistorted = "camera_model_undistorted";
+  std::string cameraNameUndistorted = "camera_sensor_undistorted";
+  std::string modelNameFlat = "camera_model_flat";
+  std::string cameraNameFlat = "camera_sensor_flat";
+  std::string modelNameBarrel = "camera_model_barrel";
+  std::string cameraNameBarrel = "camera_sensor_barrel";
+  std::string modelNamePincushion = "camera_model_pincushion";
+  std::string cameraNamePincushion = "camera_sensor_pincushion";
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 10;
-
-  ignition::math::Pose3d setPose(ignition::math::Vector3d(-5, 0, 5),
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
-  SpawnCamera(modelName, cameraName, setPose.Pos(),
+
+  // spawn an undistorted camera
+  SpawnCamera(modelNameUndistorted, cameraNameUndistorted, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
-  // spawn a camera with barrel distortion
-  SpawnCamera(modelNameDistorted, cameraNameDistorted, setPose.Pos(),
+  // spawn a flat camera
+  SpawnCamera(modelNameFlat, cameraNameFlat, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate,
-      "", 0, 0, true, -0.25349, 0.11868, 0.0, -0.00028, 0.00005, 0.5, 0.5);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  sensor = sensors::get_sensor(cameraNameDistorted);
-  sensors::CameraSensorPtr camSensorDistorted =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+      "", 0, 0, true, 0, 0, 0, 0, 0, 0.5, 0.5);
+  // spawn a camera with barrel distortion
+  SpawnCamera(modelNameBarrel, cameraNameBarrel, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, -0.1349, -0.51868, -0.001, 0, 0, 0.5, 0.5);
+  // spawn a camera with pincushion distortion
+  SpawnCamera(modelNamePincushion, cameraNamePincushion, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate,
+      "", 0, 0, true, 0.1349, 0.51868, 0.001, 0, 0, 0.5, 0.5);
+
+  sensors::SensorPtr sensorUndistorted =
+    sensors::get_sensor(cameraNameUndistorted);
+  sensors::CameraSensorPtr camSensorUndistorted =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorUndistorted);
+  sensors::SensorPtr sensorFlat =
+    sensors::get_sensor(cameraNameFlat);
+  sensors::CameraSensorPtr camSensorFlat =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorFlat);
+  sensors::SensorPtr sensorBarrel =
+      sensors::get_sensor(cameraNameBarrel);
+  sensors::CameraSensorPtr camSensorBarrel =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorBarrel);
+  sensors::SensorPtr sensorPincushion =
+      sensors::get_sensor(cameraNamePincushion);
+  sensors::CameraSensorPtr camSensorPincushion =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorPincushion);
 
   imageCount = 0;
   imageCount2 = 0;
+  imageCount3 = 0;
+  imageCount4 = 0;
   img = new unsigned char[width * height*3];
   img2 = new unsigned char[width * height*3];
+  img3 = new unsigned char[width * height*3];
+  img4 = new unsigned char[width * height*3];
   event::ConnectionPtr c =
-    camSensor->Camera()->ConnectNewImageFrame(
+    camSensorUndistorted->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensorDistorted->Camera()->ConnectNewImageFrame(
+    camSensorFlat->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c3 =
+    camSensorBarrel->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c4 =
+    camSensorPincushion->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount4, img4,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
-  while (imageCount < 10 || imageCount2 < 10)
+  while (imageCount < 10 || imageCount2 < 10 ||
+      imageCount3 < 10 || imageCount4 < 10)
+  {
     common::Time::MSleep(10);
+  }
 
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;
+
+  // We expect that there will be some non-zero difference between the images,
+  // except for the 0.0 distortion camera, which should return a completely
+  // identical camera to the one with no distortion tag in the SDF.
+
   this->ImageCompare(img, img2, width, height, 3,
                      diffMax, diffSum, diffAvg);
+  EXPECT_EQ(diffSum, 0u);
 
-  // We expect that there will be some non-zero difference between the two
-  // images.
+  this->ImageCompare(img, img3, width, height, 3,
+                     diffMax, diffSum, diffAvg);
   EXPECT_NE(diffSum, 0u);
 
-  // Compare colors. Distorted image should have more darker pixels than the
-  // original as the ground plane has been warped to occupy more of the image.
+  this->ImageCompare(img, img4, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  this->ImageCompare(img3, img4, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  // Compare colors. Barrel distorted image should have more darker pixels than
+  // the original as the ground plane has been warped to occupy more of the
+  // image. The same should be true for pincushion distortion, because the
+  // ground plane is still distorted to be larger - just different parts
+  // of the image are distorted.
   unsigned int colorSum = 0;
-  unsigned int colorSum2 = 0;
+  unsigned int colorSum3 = 0;
+  unsigned int colorSum4 = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -676,19 +755,23 @@ TEST_F(CameraSensor, CheckDistortion)
       unsigned int g = img[(y*width*3)+1];
       unsigned int b = img[(y*width*3)+2];
       colorSum += r + g + b;
-      unsigned int r2 = img2[(y*width*3)];
-      unsigned int g2 = img2[(y*width*3)+1];
-      unsigned int b2 = img2[(y*width*3)+2];
-      colorSum2 += r2 + g2 + b2;
+      unsigned int r3 = img3[(y*width*3)];
+      unsigned int g3 = img3[(y*width*3)+1];
+      unsigned int b3 = img3[(y*width*3)+2];
+      colorSum3 += r3 + g3 + b3;
+      unsigned int r4 = img4[(y*width*3)];
+      unsigned int g4 = img4[(y*width*3)+1];
+      unsigned int b4 = img4[(y*width*3)+2];
+      colorSum4 += r4 + g4 + b4;
     }
   }
-  EXPECT_GT(colorSum, colorSum2);
+  EXPECT_GT(colorSum, colorSum3);
+  EXPECT_GT(colorSum, colorSum4);
 
-  // We expect that there will be some non-zero difference between the two
-  // images.
-  EXPECT_NE(diffSum, 0u);
   delete[] img;
   delete[] img2;
+  delete[] img3;
+  delete[] img4;
 }
 
 int main(int argc, char **argv)
@@ -815,3 +898,201 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] prevImg;
   delete[] prevImg2;
 }
+
+/////////////////////////////////////////////////
+// Move a tall thin box across the center of the camera image
+// (from -y to +y) over time and collect camera sensor timestamped images.
+// For every image collected, extract center of box from image, and compare it
+// against analytically computed box position.
+TEST_F(CameraSensor, Timestamp)
+{
+  this->Load("worlds/empty_test.world", true);
+
+  // Make sure the render engine is available.
+  ASSERT_TRUE(rendering::RenderEngine::Instance()->GetRenderPathType() !=
+      rendering::RenderEngine::NONE);
+
+  // variables for testing
+  // camera image width
+  unsigned int width  = 240;
+  // camera image height
+  unsigned int height = 160;
+  unsigned int halfHeight = height * 0.5;
+  // camera sensor update rate
+  double sensorUpdateRate = 10;
+  // Speed at which the box is moved, in meters per second
+  double boxMoveVel = 1.0;
+
+  // world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // set gravity to 0, 0, 0
+  world->SetGravity(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(world->Gravity(), ignition::math::Vector3d::Zero);
+
+  // spawn camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(-5, 0, 0),
+      ignition::math::Quaterniond::Identity);
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, sensorUpdateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(camSensor != nullptr);
+  camSensor->SetActive(true);
+  EXPECT_TRUE(camSensor->IsActive());
+
+  // spawn a tall thin box in front of camera but out of its view at neg y;
+  std::string boxName = "box_0";
+  double initDist = -3;
+  ignition::math::Pose3d boxPose(0, initDist, 0.0, 0, 0, 0);
+  SpawnBox(boxName, ignition::math::Vector3d(0.005, 0.005, 0.1), boxPose.Pos(),
+      boxPose.Rot().Euler());
+
+  gazebo::physics::ModelPtr boxModel = world->ModelByName(boxName);
+  EXPECT_TRUE(boxModel != nullptr);
+
+  // step 100 times - this will be the start time for our experiment
+  int startTimeIt = 100;
+  world->Step(startTimeIt);
+
+  // clear the list of timestamp images
+  g_imagesStamped.clear();
+
+  // verify that time moves forward
+  double t = world->SimTime().Double();
+  EXPECT_GT(t, 0);
+
+  // subscribe to camera topic and collect timestamp images
+  std::string cameraTopic = camSensor->Topic();
+  EXPECT_TRUE(!cameraTopic.empty());
+  transport::SubscriberPtr sub = this->node->Subscribe(cameraTopic, OnImage);
+
+  // get physics engine
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+
+  // move the box for a period of 6 seconds along +y
+  unsigned int period = 6;
+  double stepSize = physics->GetMaxStepSize();
+  unsigned int iterations = static_cast<unsigned int>(period*(1.0/stepSize));
+
+  for (unsigned int i = 0; i < iterations; ++i)
+  {
+    double dist = (i+1)*(boxMoveVel*stepSize);
+    // move the box along y
+    boxModel->SetWorldPose(
+        ignition::math::Pose3d(0, initDist+ dist, 0, 0, 0, 0));
+    world->Step(1);
+    EXPECT_EQ(boxModel->WorldPose().Pos().Y(), initDist + dist);
+  }
+
+  // wait until we get all timestamp images
+  int sleep = 0;
+  int maxSleep = 50;
+  unsigned int imgSampleSize = period / (1.0 / sensorUpdateRate);
+  while (sleep < maxSleep)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (g_imagesStamped.size() >= imgSampleSize)
+      break;
+    sleep++;
+    gazebo::common::Time::MSleep(10);
+  }
+
+  // stop the camera subscriber
+  sub.reset();
+
+  // compute expected 2D pos of box and compare it against the
+  // actual pos of the box found in the timestamp images.
+  unsigned int imgSize = width * height * 3;
+  img = new unsigned char[imgSize];
+  for (const auto &msg : g_imagesStamped)
+  {
+    // time t
+    gazebo::common::Time timestamp = gazebo::msgs::Convert(msg.time());
+    double t = timestamp.Double();
+
+    // calculate expected box pose at time=t
+    int it = t * (1.0 / stepSize) - startTimeIt;
+    double dist = it*(boxMoveVel*stepSize);
+    // project box 3D pos to screen space
+    ignition::math::Vector2i p2 = camSensor->Camera()->Project(
+        ignition::math::Vector3d(0, initDist + dist, 0));
+
+    // find actual box pose at time=t
+    // walk along the middle row of the img and identify center of box
+    int left = -1;
+    int right = -1;
+    bool transition = false;
+    memcpy(img, msg.image().data().c_str(), imgSize);
+    for (unsigned int i = 0; i < width; ++i)
+    {
+      int row = halfHeight * width * 3;
+      int r = img[row + i*3];
+      int g = img[row + i*3+1];
+      int b = img[row + i*3+2];
+
+      // bg color determined experimentally
+      int bgColor = 178;
+
+      if (r < bgColor && g < bgColor && b < bgColor)
+      {
+        if (!transition)
+        {
+          left = i;
+          transition = true;
+        }
+      }
+      else if (transition)
+      {
+        right = i-1;
+        break;
+      }
+    }
+
+    // if box is out of camera view, expect no box found in image
+    if (p2.X() < 0 || p2.X () > static_cast<int>(width))
+    {
+      EXPECT_TRUE(left < 0 || right < 0)
+          << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+    else
+    {
+      double mid = -1;
+      // left and right of box found in image
+      if (left >= 0 && right >= 0)
+      {
+        mid = (left + right) * 0.5;
+      }
+      // edge case - box at edge of image
+      else if (left >= 0 && right < 0)
+      {
+        mid = left;
+      }
+      else
+      {
+        FAIL() << "No box found in image.\n"
+               << "time: " << t << "\n"
+               << "Expected box pos: " << p2 << "\n"
+               << "Actual box left: " << left << ", right: " << right;
+      }
+
+      EXPECT_GE(mid, 0);
+
+      // expected box pos should roughly be equal to actual box pos +- 1 pixel
+      EXPECT_NEAR(mid, p2.X(), 1.0) << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+  }
+
+  delete [] img;
+}
+
