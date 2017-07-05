@@ -15,6 +15,9 @@
  *
 */
 
+#include <list>
+#include <algorithm>
+
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
@@ -116,29 +119,24 @@ void DARTModel::Init()
       gzdbg << "Building DART BodyNode for link " << newRoot->GetName()
             << " with a free joint.\n";
 
-      std::cerr << "1" << std::endl;
       if (!DARTModelPrivate::CreateJointAndNodePair(
           this->dataPtr->dtSkeleton, nullptr, nullptr, newRoot))
       {
         gzdbg << "Could not create joint and node.\n";
         break;
       }
-      std::cerr << "2" << std::endl;
 
       linksToAdd.remove(newRoot);
       linksToProcess.push_back(newRoot);
     }
-    std::cerr << "3" << std::endl;
 
     // Add children using BFS
     while (!linksToProcess.empty())
     {
-      std::cerr << "4" << std::endl;
       LinkPtr parentLink = linksToProcess.front();
       linksToProcess.pop_front();
       for (auto joint : parentLink->GetChildJoints())
       {
-        std::cerr << "5" << std::endl;
         LinkPtr childLink = joint->GetChild();
         if (childLink == nullptr)
         {
@@ -152,7 +150,6 @@ void DARTModel::Init()
             = std::find(linksToAdd.begin(), linksToAdd.end(), childLink);
         if (childLinkItr != linksToAdd.end())
         {
-          std::cerr << "6" << std::endl;
           // Add joint and child link to skeleton
           gzdbg << "Building DART BodyNode for link " << childLink->GetName()
                 << " and joint " << joint->GetName() << ".\n";
@@ -178,7 +175,6 @@ void DARTModel::Init()
         }
       }
     }
-    std::cerr << "7" << std::endl;
   }
   // TODO: process remaining joints
 
