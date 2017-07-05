@@ -38,7 +38,7 @@ namespace gazebo
       public: using JointPropPtr =
           std::shared_ptr<dart::dynamics::Joint::Properties>;
 
-      private: template <typename BodyTypeT>
+      public: template <typename BodyTypeT>
       static std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>
       CreateJointAndNodePair(
           dart::dynamics::SkeletonPtr _skeleton,
