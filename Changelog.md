@@ -6,11 +6,14 @@
     * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
     * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
 
-## Gazebo 7.8.1 (2017-06-08)
-
 1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
     * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
+
+1. Fix orbiting view around heightmap
+    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
+
+## Gazebo 7.8.1 (2017-06-08)
 
 1. ODE slip parameter example world and test
     * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
@@ -28,9 +31,6 @@
 
 1. Add function to retrieve scoped sensors name in multi-nested model
     * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
-
-1. Fix orbiting view around heightmap
-    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
 
 ## Gazebo 7.7.0 (2017-05-04)
 
