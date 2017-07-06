@@ -41,8 +41,8 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set TBB_LIBRARY_DIR=%TBB_PATH%\lib\intel64\vc12
 @set TBB_INCLUDEDIR=%TBB_PATH%\include
 
-@set QWT_PATH=%cd%\..\..\qwt_6.1.0~github_zalf_lsa
-@set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.0-vc12-x64
+@set QWT_PATH=%cd%\..\..\qwt_6.1.2~osrf_qt5
+@set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.2-vc12-x64
 @set QWT_INCLUDEDIR=%QWT_PATH%\include
 
 @set OGRE_VERSION=1.9.0
