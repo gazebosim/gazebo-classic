@@ -36,17 +36,17 @@ vec3 lensflare(vec2 uv,vec2 pos)
   float ang = atan(main.y, main.x);
   float dist = length(main); dist = pow(dist,.1);
   float n = noise(vec2((ang-time/9.0)*16.0,dist*32.0));
-	
+
   float f0 = 1.0/(length(uv-pos)*16.0+1.0);
-	
+
   f0 = f0+f0*(sin((ang+time/18.0 + noise(abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
 
   float f2 = max(1.0/(1.0+32.0*pow(length(uvd+0.8*pos),2.0)),.0)*00.25;
   float f22 = max(1.0/(1.0+32.0*pow(length(uvd+0.85*pos),2.0)),.0)*00.23;
   float f23 = max(1.0/(1.0+32.0*pow(length(uvd+0.9*pos),2.0)),.0)*00.21;
-	
+
   vec2 uvx = mix(uv,uvd,-0.5);
-	
+
   float f4 = max(0.01-pow(length(uvx+0.4*pos),2.4),.0)*6.0;
   float f42 = max(0.01-pow(length(uvx+0.45*pos),2.4),.0)*5.0;
   float f43 = max(0.01-pow(length(uvx+0.5*pos),2.4),.0)*3.0;
@@ -72,7 +72,7 @@ vec3 lensflare(vec2 uv,vec2 pos)
 }
 
 // color modifier
-vec3 cc(vec3 color, float factor, float factor2) 
+vec3 cc(vec3 color, float factor, float factor2)
 {
   float w = color.x+color.y+color.z;
   return mix(color,vec3(w)*factor,w*factor2);

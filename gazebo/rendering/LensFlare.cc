@@ -45,7 +45,7 @@ namespace gazebo
         this->dir = ignition::math::Quaterniond(this->light->Rotation()) *
             this->light->Direction();
       }
-  
+
       /// \brief Callback that OGRE will invoke for us on each render call
       /// \param[in] _passID OGRE material pass ID.
       /// \param[in] _mat Pointer to OGRE material.
@@ -64,16 +64,15 @@ namespace gazebo
         Ogre::GpuProgramParametersSharedPtr params =
             pass->getFragmentProgramParameters();
         GZ_ASSERT(!params.isNull(), "Null OGRE material GPU parameters");
-  
+
         // used for animating flare
         params->setNamedConstant("time", static_cast<Ogre::Real>(
             common::Time::GetWallTime().Double()));
-        // for adjust aspect ratio of glare
-        params->setNamedConstant("viewport", 
+        // for adjusting aspect ratio of flare
+        params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
-        
-        params->setNamedConstant("lightDir", 
+        params->setNamedConstant("lightDir",
             Ogre::Vector3(this->dir.X(), this->dir.Y(), this->dir.Z()));
 
         auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
@@ -84,8 +83,8 @@ namespace gazebo
       /// \brief Pointer to camera
       private: CameraPtr camera;
 
-      /// \brief Pointer to light source 
-      private: LightPtr light; 
+      /// \brief Pointer to light source
+      private: LightPtr light;
 
       /// \brief Light dir in world frame
       private: ignition::math::Vector3d dir;
@@ -95,12 +94,12 @@ namespace gazebo
     class LensFlarePrivate
     {
       /// \brief Pointer to ogre lens flare material
-      public: Ogre::MaterialPtr lensFlareMaterial; 
+      public: Ogre::MaterialPtr lensFlareMaterial;
 
       /// \brief Pointer to ogre lens flare compositor instance
       public: Ogre::CompositorInstance *lensFlareInstance;
 
-      /// \brief Pointer to ogre lens flare compositor listener 
+      /// \brief Pointer to ogre lens flare compositor listener
       public: std::shared_ptr<LensFlareCompositorListener>
           lensFlareCompositorListener;
 

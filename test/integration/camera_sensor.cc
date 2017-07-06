@@ -835,8 +835,10 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     }
 
     // Images from the same camera should be identical
-    EXPECT_EQ(diffSum, 0u);
-    EXPECT_EQ(diffSum2, 0u);
+    // Allow a very small tolerance. There could be a few pixel rgb value
+    // changes between frames
+    EXPECT_LE(diffSum, 10);
+    EXPECT_LE(diffSum2, 10);
 
     // We expect that there will some noticeable difference
     // between the two different camera images.
@@ -850,4 +852,105 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] img2;
   delete[] prevImg;
   delete[] prevImg2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, LensFlare)
+{
+  Load("worlds/lensflare_plugin.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Get the lens flare camera model
+  std::string modelNameLensFlare = "camera_lensflare";
+  std::string cameraNameLensFlare = "camera_sensor_lensflare";
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+  physics::ModelPtr model = world->GetModel(modelNameLensFlare);
+  ASSERT_TRUE(model != nullptr);
+
+  sensors::SensorPtr sensorLensFlare =
+    sensors::get_sensor(cameraNameLensFlare);
+  sensors::CameraSensorPtr camSensorLensFlare =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
+  ASSERT_TRUE(camSensorLensFlare != nullptr);
+
+  // Spawn a camera without lens flare at the same pose as
+  // the camera lens flare model
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = camSensorLensFlare->ImageWidth();
+  unsigned int height = camSensorLensFlare->ImageHeight();
+  double updateRate = camSensorLensFlare->UpdateRate();
+
+  EXPECT_GT(width, 0u);
+  EXPECT_GT(height, 0u);
+  EXPECT_GT(updateRate, 0u);
+
+  ignition::math::Pose3d setPose = model->GetWorldPose().Ign();
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+
+  // get a pointer to the camera lens flare sensor
+  sensors::SensorPtr sensor =
+    sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  ASSERT_TRUE(camSensor != nullptr);
+
+  // collect images from both cameras
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height * 3];
+  img2 = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c2 =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get some images
+  int sleep = 0;
+  while ((imageCount < 10 || imageCount2 < 10) && sleep++ < 1000)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, 10);
+  EXPECT_GE(imageCount2, 10);
+
+  // Compare colors. Camera sensor with lens flare plugin should have a brigher
+  // image than the one without the lens flare plugin.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
+  EXPECT_GT(colorSum, colorSum2) <<
+      "colorSum: " << colorSum << ", " <<
+      "colorSum2: " << colorSum2;
+
+  delete[] img;
+  delete[] img2;
 }
