@@ -1678,19 +1678,6 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 }
 
 //////////////////////////////////////////////////
-void Camera::AddCompositor(const std::string &_compositor)
-{
-//  this->dataPtr->compositors.push_back
-  auto compositor = 
-      Ogre::CompositorManager::getSingleton().addCompositor(this->viewport,
-      _compositor);
-
-  // compositor->getTechnique()->getOutputTargetPass()->getPass(0)->setMaterial(
-    
-  compositor->setEnabled(true);
-}
-
-//////////////////////////////////////////////////
 void Camera::AttachToVisual(const uint32_t _visualId,
                             const bool _inheritOrientation,
                             const double _minDist, const double _maxDist)

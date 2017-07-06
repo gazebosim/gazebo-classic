@@ -15,10 +15,6 @@
  *
 */
 
-#include <sdf/sdf.hh>
-
-#include <ignition/math/Helpers.hh>
-
 #include "gazebo/common/Assert.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"

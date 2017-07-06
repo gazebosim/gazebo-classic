@@ -21,7 +21,6 @@
 #include <memory>
 
 #include <sdf/sdf.hh>
-#include <ignition/math.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
