@@ -64,6 +64,9 @@ namespace gazebo
 
       /// \brief Layout for the velocity controls.
       public: QGridLayout *velocityGridLayout;
+
+      /// \brief Name of currently selected model
+      public: std::string modelName;
     };
 
     /// \brief Private data for the JointForceControl class.

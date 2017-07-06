@@ -17,6 +17,7 @@
 #ifndef GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 #define GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <ignition/msgs.hh>
@@ -60,11 +61,24 @@ namespace gazebo
       /// \param[in] _modelName Name of the model.
       public: void SetModelName(const std::string &_modelName);
 
-      /// \brief Populate the text boxes using the parameter from the joint
-      /// controller.
+      /// \brief Called when the joint controller responds with its parameters.
+      /// \param[in] _modelName The model to which the response refers.
       /// \param[in] _rep The joint controller's reponse.
-      /// \param[in] _result Whether the information request was successful.
-      private: void OnControllerResponse(const ignition::msgs::JointCmd &_rep, const bool _result);
+      /// \param[in] _result Whether the triggering request was successful.
+      private: void ResponseCallback(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep, const bool _result);
+
+      /// \brief On response callback.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      private slots: void OnResponse(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
+
+      /// \brief QT signal, used to report a response from the joint controller.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      Q_SIGNALS: void repReceived(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
 
       /// \brief On reset callback.
       private slots: void OnReset();
