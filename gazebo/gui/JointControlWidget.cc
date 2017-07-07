@@ -444,7 +444,8 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
   connect(this, SIGNAL(repReceived(const std::string &,
       const ignition::msgs::JointCmd &)),
       this, SLOT(OnResponse(const std::string &,
-      const ignition::msgs::JointCmd &)));
+      const ignition::msgs::JointCmd &)),
+      Qt::QueuedConnection);
 }
 
 /////////////////////////////////////////////////

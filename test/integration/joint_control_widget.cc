@@ -43,6 +43,7 @@ void JointControlWidgetTest::SetGetParameters()
 
   // Select a model and get the joint control sliders
   jointControlWidget->SetModelName("model_1::model_2");
+  this->ProcessEventsAndDraw(mainWindow);
 
   JointForceControl *slider =
       jointControlWidget->findChild<JointForceControl *>();
@@ -71,9 +72,11 @@ void JointControlWidgetTest::SetGetParameters()
 
   // Switch to a different model to forget the parameters
   jointControlWidget->SetModelName("ground_plane");
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Switch back to the first model
   jointControlWidget->SetModelName("model_1::model_2");
+  this->ProcessEventsAndDraw(mainWindow);
 
   QList<QDoubleSpinBox *> spinBoxes =
       jointControlWidget->findChildren<QDoubleSpinBox *>();
