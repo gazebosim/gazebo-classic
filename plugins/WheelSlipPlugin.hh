@@ -27,15 +27,40 @@ namespace gazebo
   // Forward declare private data class
   class WheelSlipPluginPrivate;
 
-  /// \brief A plugin that updates the ODE wheel slip parameter
+  /// \brief A plugin that updates ODE wheel slip parameters based
+  /// on wheel center velocity.
+  /// It currently assumes that the fdir1 friction parameter is set
+  /// parallel to the joint axis (often [0 0 1]) and that the link
+  /// origin is on the joint axis.
+  /// The ODE slip parameter is documented as Force-Dependent Slip
+  /// (slip1, slip2) in the ODE user guide:
+  /// http://ode.org/ode-latest-userguide.html#sec_7_3_7
+  /// and it has units of velocity / force (m / s / N),
+  /// similar to the inverse of a viscous damping coefficient.
+  /// The slip_compliance parameters specified in this plugin
+  /// have units of 1/force (1/N), and the wheel center speed
+  /// is multiplied by these compliances at each time step
+  /// to provide a scaled form of slip, that matches how
+  /// slip is often defined for wheel-terrain interaction models.
   ///
   /** \verbatim
     <plugin filename="libWheelSlipPlugin.so" name="wheel_slip">
-      <!-- Names of wheel links -->
-      <link>wheel_front_left</link>
-      <link>wheel_front_right</link>
-      <link>wheel_rear_left</link>
-      <link>wheel_rear_right</link>
+      <wheel link_name="wheel_front_left">
+        <slip_compliance_lateral>0</slip_compliance_lateral>
+        <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+      </wheel>
+      <wheel link_name="wheel_front_right">
+        <slip_compliance_lateral>0</slip_compliance_lateral>
+        <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+      </wheel>
+      <wheel link_name="wheel_rear_left">
+        <slip_compliance_lateral>0</slip_compliance_lateral>
+        <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+      </wheel>
+      <wheel link_name="wheel_rear_right">
+        <slip_compliance_lateral>0</slip_compliance_lateral>
+        <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+      </wheel>
     </plugin>
    \endverbatim */
   class GAZEBO_VISIBLE WheelSlipPlugin : public ModelPlugin

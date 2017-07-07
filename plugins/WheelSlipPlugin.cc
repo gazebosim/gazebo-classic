@@ -51,21 +51,40 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   this->dataPtr->model = _model;
 
-  if (!_sdf->HasElement("link"))
+  if (!_sdf->HasElement("wheel"))
   {
-    gzerr << "No link tags specified, plugin is disabled" << std::endl;
+    gzerr << "No wheel tags specified, plugin is disabled" << std::endl;
     return;
   }
 
-  // Read each link element
-  auto linkElem = _sdf->GetElement("link");
-  while (linkElem)
+  // Read each wheel element
+  auto wheelElem = _sdf->GetElement("wheel");
+  while (wheelElem)
   {
+    if (!wheelElem->HasAttribute("link_name"))
+    {
+      gzerr << "wheel element missing link_name attribute" << std::endl;
+      wheelElem = wheelElem->GetNextElement("wheel");
+      continue;
+    }
+
     // Get link name
-    auto linkName = linkElem->Get<std::string>();
+    auto linkName = wheelElem->Get<std::string>("link_name");
+
+    WheelSlipPluginPrivate::LinkSurfaceParams params;
+    if (wheelElem->HasElement("slip_compliance_lateral"))
+    {
+      params.slipComplianceLateral =
+        wheelElem->Get<double>("slip_compliance_lateral");
+    }
+    if (wheelElem->HasElement("slip_compliance_longitudinal"))
+    {
+      params.slipComplianceLongitudinal =
+        wheelElem->Get<double>("slip_compliance_longitudinal");
+    }
 
     // Get the next link element
-    linkElem = linkElem->GetNextElement("link");
+    wheelElem = wheelElem->GetNextElement("wheel");
 
     auto link = _model->GetLink(linkName);
     if (link == nullptr)
@@ -105,11 +124,12 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       continue;
     }
 
-    this->dataPtr->linkSurfaces[link] = odeSurface;
+    params.surface = odeSurface;
+    this->dataPtr->mapLinkSurfaceParams[link] = params;
   }
 
   // Connect to the update event
-  if (this->dataPtr->linkSurfaces.empty())
+  if (this->dataPtr->mapLinkSurfaceParams.empty())
   {
     gzerr << "No ODE links and surfaces found, plugin is disabled" << std::endl;
     return;
@@ -121,4 +141,12 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
+  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    auto speed = linkSurface.first->GetWorldLinearVel().Ign().Length();
+    linkSurface.second.surface->slip1 =
+        speed * linkSurface.second.slipComplianceLateral;
+    linkSurface.second.surface->slip2 =
+        speed * linkSurface.second.slipComplianceLongitudinal;
+  }
 }
