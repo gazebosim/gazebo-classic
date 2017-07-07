@@ -164,13 +164,9 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     }
   }
 
-  // TODO simbody currently crashes in this test
-  if (_physicsEngine == "simbody")
-  {
-    gzerr << "Skipping part of MoveTool test for Simbody" << std::endl;
-    return;
-  }
-  else
+  // This test block demonstrates issue #2309 titled:
+  // Simbody exception when manipulating object twice while paused
+  // https://bitbucket.org/osrf/gazebo/issues/2309
   {
     transport::PublisherPtr userCmdPub =
         this->node->Advertise<msgs::UserCmd>("~/user_cmd");
@@ -195,6 +191,12 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       while (*iter != model->GetWorldPose())
       {
         common::Time::MSleep(1);
+      }
+      if (_physicsEngine == "simbody")
+      {
+        gzerr << "Relaxing part of MoveTool test for Simbody see issue #2309"
+              << std::endl;
+        world->Step(1);
       }
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
