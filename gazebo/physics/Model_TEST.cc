@@ -59,6 +59,32 @@ TEST_F(ModelTest, Scale)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ModelTest, NestedModelSensorScopedName)
+{
+  this->Load("test/worlds/deeply_nested_models.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->ModelByName("model_03");
+  ASSERT_TRUE(model != nullptr);
+
+  gzmsg << "Get a scoped sensor name" << std::endl;
+
+  const std::vector<std::string> imuScopedName =
+      model->SensorScopedName("imu_sensor");
+  ASSERT_EQ(imuScopedName.size(), static_cast<unsigned int>(1));
+  EXPECT_EQ(imuScopedName[0],
+    "default::model_00::model_01::model_02::model_03::imu_link::imu_sensor");
+
+  gzmsg << "Get a nonexistent scoped sensor name" << std::endl;
+
+  const std::vector<std::string> noScopedName =
+      model->SensorScopedName("no_sensor");
+  ASSERT_EQ(noScopedName.size(), static_cast<unsigned int>(0));
+}
+
+//////////////////////////////////////////////////
 TEST_F(ModelTest, PluginInfoFailures)
 {
   this->Load("worlds/shapes.world", true);
@@ -198,32 +224,6 @@ TEST_F(ModelTest, NestedModelPluginInfo)
   EXPECT_TRUE(success);
   ASSERT_EQ(plugins.plugins_size(), 1);
   EXPECT_EQ(plugins.plugins(0).name(), "region_event_box");
-}
-
-//////////////////////////////////////////////////
-TEST_F(ModelTest, NestedModelSensorScopedName)
-{
-  this->Load("test/worlds/deeply_nested_models.world", true);
-
-  auto world = physics::get_world("default");
-  ASSERT_TRUE(world != nullptr);
-
-  auto model = world->ModelByName("model_03");
-  ASSERT_TRUE(model != nullptr);
-
-  gzmsg << "Get a scoped sensor name" << std::endl;
-
-  const std::vector<std::string> imuScopedName =
-      model->SensorScopedName("imu_sensor");
-  ASSERT_EQ(imuScopedName.size(), static_cast<unsigned int>(1));
-  EXPECT_EQ(imuScopedName[0],
-    "default::model_00::model_01::model_02::model_03::imu_link::imu_sensor");
-
-  gzmsg << "Get a nonexistent scoped sensor name" << std::endl;
-
-  const std::vector<std::string> noScopedName =
-      model->SensorScopedName("no_sensor");
-  ASSERT_EQ(noScopedName.size(), static_cast<unsigned int>(0));
 }
 
 //////////////////////////////////////////////////
