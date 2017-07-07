@@ -163,6 +163,42 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
   }
+
+  // TODO simbody currently crashes in this test
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Skipping part of MoveTool test for Simbody" << std::endl;
+    return;
+  }
+  else
+  {
+    transport::PublisherPtr userCmdPub =
+        this->node->Advertise<msgs::UserCmd>("~/user_cmd");
+
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description("Translate [" + name + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+
+    msgs::Model msg;
+    msg.set_name(name);
+    msg.set_id(model->GetId());
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+
+    for (std::vector<math::Pose>::iterator iter = poses.begin();
+         iter != poses.end(); ++iter)
+    {
+      msgs::Set(modelMsg->mutable_pose(), (*iter).Ign());
+      userCmdPub->Publish(userCmdMsg);
+
+      while (*iter != model->GetWorldPose())
+      {
+        common::Time::MSleep(1);
+      }
+      EXPECT_EQ(*iter, model->GetWorldPose());
+    }
+  }
 }
 
 /////////////////////////////////////////////////
