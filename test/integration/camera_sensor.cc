@@ -594,8 +594,8 @@ TEST_F(CameraSensor, CheckDistortion)
   std::string cameraNameBarrel = "camera_sensor_barrel";
   std::string modelNamePincushion = "camera_model_pincushion";
   std::string cameraNamePincushion = "camera_sensor_pincushion";
-  unsigned int width  = 32;
-  unsigned int height = 24;
+  unsigned int width  = 320;
+  unsigned int height = 240;
   double updateRate = 10;
   math::Pose setPose(
       math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
@@ -700,7 +700,6 @@ TEST_F(CameraSensor, CheckDistortion)
   unsigned int colorSum = 0;
   unsigned int colorSum3 = 0;
   unsigned int colorSum4 = 0;
-  std::cerr << "===== distortion ========= " << std::endl;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -709,7 +708,6 @@ TEST_F(CameraSensor, CheckDistortion)
       unsigned int g = img[(y*width*3) + x + 1];
       unsigned int b = img[(y*width*3) + x + 2];
       colorSum += r + g + b;
-      std::cerr << "(" << r << ", " << g << ", " << b << ") ";
       unsigned int r3 = img3[(y*width*3) + x];
       unsigned int g3 = img3[(y*width*3) + x + 1];
       unsigned int b3 = img3[(y*width*3) + x + 2];
@@ -719,7 +717,6 @@ TEST_F(CameraSensor, CheckDistortion)
       unsigned int b4 = img4[(y*width*3) + x + 2];
       colorSum4 += r4 + g4 + b4;
     }
-    std::cerr << std::endl;
   }
   EXPECT_GT(colorSum, colorSum3);
   EXPECT_GT(colorSum, colorSum4);
@@ -853,125 +850,4 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] img2;
   delete[] prevImg;
   delete[] prevImg2;
-}
-
-
-/////////////////////////////////////////////////
-TEST_F(CameraSensor, CastShadows)
-{
-  Load("worlds/visual_shadows.world");
-
-  // Make sure the render engine is available.
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-  {
-    gzerr << "No rendering engine, unable to run camera test"
-          << std::endl;
-    return;
-  }
-
-  unsigned int width  = 32;
-  unsigned int height = 24;
-  double updateRate = 10;
-
-  // spawn first camera sensor
-  std::string modelName = "camera_model";
-  std::string cameraName = "camera_sensor";
-  ignition::math::Pose3d testPose(
-      ignition::math::Vector3d(0, 0, 0.5),
-      ignition::math::Quaterniond(0, 1.57, 0));
-  SpawnCamera(modelName, cameraName, testPose.Pos(),
-      testPose.Rot().Euler(), width, height, updateRate);
-  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
-  sensors::CameraSensorPtr camSensor =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-
-  imageCount = 0;
-  img = new unsigned char[width * height * 3];
-
-  event::ConnectionPtr c =
-      camSensor->Camera()->ConnectNewImageFrame(
-      std::bind(&::OnNewCameraFrame, &imageCount, img,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
-  common::Timer timer;
-  timer.Start();
-
-  // wait for images
-  int totalImages = 20;
-  while ((imageCount < totalImages || imageCount2 < totalImages) &&
-      timer.GetElapsed().Double() < 5)
-    common::Time::MSleep(10);
-
-  EXPECT_GE(imageCount, totalImages);
-  camSensor->Camera()->DisconnectNewImageFrame(c);
-
-  // spawn second camera sensor
-  ignition::math::Pose3d testPose2(
-      ignition::math::Vector3d(0, 10, 0.5),
-      ignition::math::Quaterniond(0, 1.57, 0));
-  std::string modelName2 = "camera_model2";
-  std::string cameraName2 = "camera_sensor2";
-  SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
-      testPose2.Rot().Euler(), width, height, updateRate);
-
-  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
-  sensors::CameraSensorPtr camSensor2 =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
-
-  imageCount2 = 0;
-  img2 = new unsigned char[width * height * 3];
-
-  event::ConnectionPtr c2 =
-      camSensor2->Camera()->ConnectNewImageFrame(
-      std::bind(&::OnNewCameraFrame, &imageCount2, img2,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
-
-  common::Timer timer2;
-  timer2.Start();
-
-  while (imageCount2 < totalImages && timer2.GetElapsed().Double() < 5)
-    common::Time::MSleep(10);
-
-  EXPECT_GE(imageCount2, totalImages);
-  camSensor2->Camera()->DisconnectNewImageFrame(c2);
-
-  unsigned int colorSum = 0;
-  unsigned int colorSum2 = 0;
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width*3; x+=3)
-    {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
-      colorSum += r + g + b;
-    }
-  }
-
-  for (unsigned int y = 0; y < height; ++y)
-  {
-    for (unsigned int x = 0; x < width*3; x+=3)
-    {
-      unsigned int r2 = img2[(y*width*3) + x];
-      unsigned int g2 = img2[(y*width*3) + x + 1];
-      unsigned int b2 = img2[(y*width*3) + x + 2];
-      colorSum2 += r2 + g2 + b2;
-    }
-  }
-  std::cerr << std::endl;
-
-
-  // camera1 image should be darker than camera2 image
-  // because the mesh below camera1 is casting shadows
-  EXPECT_LT(colorSum, colorSum2);
-  double colorRatio = static_cast<double>(colorSum2-colorSum) /
-      static_cast<double>(colorSum2);
-  EXPECT_GT(colorRatio, 0.05)
-    << " colorSum [" << colorSum << "], "
-    << " colorSum2 [" << colorSum2 << "]";
-
-  delete [] img;
-  delete [] img2;
 }

@@ -19,9 +19,10 @@
 
 #include <ignition/math/Rand.hh>
 
+#include "gazebo/common/Timer.hh"
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/Timer.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/CameraSensor.hh"
 
@@ -65,8 +66,10 @@ TEST_F(VisualProperty, CastShadows)
     return;
   }
 
-  unsigned int width  = 32;
-  unsigned int height = 24;
+  physics::WorldPtr world = physics::get_world();
+
+  unsigned int width  = 320;
+  unsigned int height = 240;
   double updateRate = 10;
 
   // spawn first camera sensor
@@ -81,6 +84,9 @@ TEST_F(VisualProperty, CastShadows)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
+  physics::ModelPtr model = world->GetModel(modelName);
+  EXPECT_EQ(model->GetWorldPose().Ign(), testPose);
+
   imageCount = 0;
   img = new unsigned char[width * height * 3];
 
@@ -94,8 +100,7 @@ TEST_F(VisualProperty, CastShadows)
 
   // wait for images
   int totalImages = 20;
-  while ((imageCount < totalImages || imageCount2 < totalImages) &&
-      timer.GetElapsed().Double() < 5)
+  while (imageCount < totalImages && timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
 
   EXPECT_GE(imageCount, totalImages);
@@ -114,6 +119,9 @@ TEST_F(VisualProperty, CastShadows)
   sensors::CameraSensorPtr camSensor2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
+  physics::ModelPtr model2 = world->GetModel(modelName2);
+  EXPECT_EQ(model2->GetWorldPose().Ign(), testPose2);
+
   imageCount2 = 0;
   img2 = new unsigned char[width * height * 3];
 
@@ -122,7 +130,6 @@ TEST_F(VisualProperty, CastShadows)
       std::bind(&::OnNewCameraFrame, &imageCount2, img2,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
-
   common::Timer timer2;
   timer2.Start();
 
@@ -134,7 +141,6 @@ TEST_F(VisualProperty, CastShadows)
 
   unsigned int colorSum = 0;
   unsigned int colorSum2 = 0;
-  std::cerr << "=========== colorSum ============" << std::endl;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -143,12 +149,9 @@ TEST_F(VisualProperty, CastShadows)
       unsigned int g = img[(y*width*3) + x + 1];
       unsigned int b = img[(y*width*3) + x + 2];
       colorSum += r + g + b;
-      std::cerr << "(" << r << ", " << g << ", " << b << ") ";
     }
-    std::cerr << std::endl;
   }
 
-  std::cerr << "=========== colorSum2 ============" << std::endl;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -157,12 +160,8 @@ TEST_F(VisualProperty, CastShadows)
       unsigned int g2 = img2[(y*width*3) + x + 1];
       unsigned int b2 = img2[(y*width*3) + x + 2];
       colorSum2 += r2 + g2 + b2;
-      std::cerr << "(" << r2 << ", " << g2 << ", " << b2 << ") ";
     }
-    std::cerr << std::endl;
   }
-  std::cerr << std::endl;
-
 
   // camera1 image should be darker than camera2 image
   // because the mesh below camera1 is casting shadows
