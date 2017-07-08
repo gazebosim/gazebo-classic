@@ -44,7 +44,7 @@ namespace gazebo
   /// \{
   /// \class SensorFactor SensorFactory.hh sensors/sensors.hh
   /// \brief The sensor factory; the class is just for namespacing purposes.
-  class GAZEBO_VISIBLE SensorFactory
+  class GZ_SENSORS_VISIBLE SensorFactory
   {
     /// \brief Register all known sensors
     ///  \li sensors::CameraSensor
@@ -86,11 +86,11 @@ namespace gazebo
   /// @param name Sensor type name, as it appears in the world file.
   /// @param classname C++ class name for the sensor.
   #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
-  GAZEBO_VISIBLE Sensor *New##classname() \
+  GZ_SENSORS_VISIBLE Sensor *New##classname() \
   { \
     return new gazebo::sensors::classname(); \
   } \
-  GAZEBO_VISIBLE \
+  GZ_SENSORS_VISIBLE \
   void Register##classname() \
   {\
     SensorFactory::RegisterSensor(name, New##classname);\
