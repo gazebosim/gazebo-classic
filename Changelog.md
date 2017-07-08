@@ -10,6 +10,9 @@
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
     * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
 
+1. Fix orbiting view around heightmap
+    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
+
 ## Gazebo 7.8.1 (2017-06-08)
 
 1. ODE slip parameter example world and test
