@@ -84,7 +84,7 @@ Q_DECLARE_METATYPE(std::string)
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::set<std::string>)
 
-// This makes it possible to use ignition::msgs::JointCmd in QT signals and slots.
+// This makes it possible to use ignition::msgs::JointCmd in signals and slots.
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(ignition::msgs::JointCmd)
 
