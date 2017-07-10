@@ -88,6 +88,13 @@ bool SpaceNav::Load()
   this->dataPtr->buttons[1] = 0;
 
 #ifdef HAVE_SPNAV
+  // Read whether to use spacenav in gui.ini
+  bool enable_spacenav = getINIProperty<bool>("spacenav.enable", true);
+  if (!enable_spacenav) {
+    gzlog << "Spacenav functionality is disabled\n";
+    return result;
+  }
+
   // Read deadband from [spacenav] in gui.ini
   this->dataPtr->deadbandTrans.x = getINIProperty<double>(
       "spacenav.deadband_x", 0.1);
