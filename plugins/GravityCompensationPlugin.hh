@@ -21,6 +21,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <dart/common/LocalResourceRetriever.hpp>
+
 #include <gazebo/transport/TransportTypes.hh>
 #include <gazebo/common/UpdateInfo.hh>
 #include <gazebo/common/Plugin.hh>
@@ -30,6 +32,24 @@ namespace gazebo
 {
   // Forward declare private data class.
   class GravityCompensationPluginPrivate;
+
+  class GAZEBO_VISIBLE ModelResourceRetriever :
+      public virtual dart::common::LocalResourceRetriever
+  {
+    /// \brief Destructor.
+    public: virtual ~ModelResourceRetriever() = default;
+
+    /// \brief Documentation inherited.
+    public: bool exists(const dart::common::Uri &_uri) override;
+
+    /// \brief Documentation inherited.
+    public: dart::common::ResourcePtr retrieve(
+        const dart::common::Uri &_uri) override;
+
+    /// \brief Resolves the model URI into a file path.
+    private: dart::common::Uri resolve(const dart::common::Uri &_uri);
+  };
+  using ModelResourceRetrieverPtr = std::shared_ptr<ModelResourceRetriever>;
 
   /// \brief Plugin that provides gravity compensation.
   class GAZEBO_VISIBLE GravityCompensationPlugin : public ModelPlugin

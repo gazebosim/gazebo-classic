@@ -17,6 +17,8 @@
 
 #include <functional>
 
+#include <boost/filesystem.hpp>
+
 #include <gazebo/transport/Node.hh>
 #include <gazebo/transport/Subscriber.hh>
 #include <gazebo/common/Events.hh>
@@ -45,6 +47,40 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(GravityCompensationPlugin)
 
 /////////////////////////////////////////////////
+bool ModelResourceRetriever::exists(const dart::common::Uri &_uri)
+{
+  return LocalResourceRetriever::exists(this->resolve(_uri));
+}
+
+/////////////////////////////////////////////////
+dart::common::ResourcePtr ModelResourceRetriever::retrieve(
+    const dart::common::Uri &_uri)
+{
+  return LocalResourceRetriever::retrieve(this->resolve(_uri));
+}
+
+/////////////////////////////////////////////////
+dart::common::Uri ModelResourceRetriever::resolve(const dart::common::Uri &_uri)
+{
+  dart::common::Uri uri;
+  if (_uri.mScheme.get_value_or("model") == "model")
+  {
+    uri.mScheme.assign("file");
+    boost::filesystem::path modelPath
+        = sdf::findFile("model://" + _uri.mAuthority.get() + _uri.mPath.get());
+    if (boost::filesystem::exists(modelPath))
+    {
+      if (boost::filesystem::is_directory(modelPath))
+      {
+        modelPath /= "model.sdf";
+      }
+      uri.mPath.assign(modelPath.string());
+    }
+  }
+  return uri;
+}
+
+/////////////////////////////////////////////////
 GravityCompensationPlugin::GravityCompensationPlugin()
   : dataPtr(new GravityCompensationPluginPrivate)
 {
@@ -67,12 +103,12 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
   // Load a DART skeleton model
   if (_sdf->HasElement("uri"))
   {
-    std::string modelFile = sdf::findFile(_sdf->Get<std::string>("uri"))
-        + "/model.sdf";
-    this->dataPtr->skel = dart::utils::SdfParser::readSkeleton(modelFile);
+    const ModelResourceRetrieverPtr retriever(new ModelResourceRetriever);
+    this->dataPtr->skel = dart::utils::SdfParser::readSkeleton(
+        _sdf->Get<std::string>("uri"), retriever);
     if (this->dataPtr->skel == nullptr)
     {
-      gzerr << "Error parsing " << modelFile << "\n";
+      gzerr << "Error parsing " << _sdf->Get<std::string>("uri") << "\n";
       return;
     }
   }
