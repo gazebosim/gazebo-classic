@@ -77,6 +77,12 @@ namespace gazebo
     /// \brief Finalize the master
     public: void Fini();
 
+    /// \brief Send a message to subscribers to a given topic
+    /// \param[in] _topic Name of the topic
+    /// \param[in] _buffer Data to write
+    private: void SendSubscribers(const std::string &_topic,
+                                  const std::string &_buffer);
+
     /// \brief Process a message
     /// \param[in] _connectionIndex Index of the connection which generated the
     /// message
