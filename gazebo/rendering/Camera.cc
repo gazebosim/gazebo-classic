@@ -1551,16 +1551,9 @@ bool Camera::TrackVisualImpl(const std::string &_name)
 {
   VisualPtr visual = this->scene->GetVisual(_name);
   if (visual)
-  {
     return this->TrackVisualImpl(visual);
-  }
-  else
-  {
-    this->camera->setAutoTracking(false);
-    this->dataPtr->trackedVisual.reset();
-    this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
-        Conversions::Convert(this->dataPtr->yawFixedAxis));
-  }
+
+  this->TrackVisualImpl(visual);
 
   if (_name.empty())
     return true;
@@ -1586,6 +1579,8 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
     this->dataPtr->trackedVisual.reset();
     this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
         Conversions::Convert(this->dataPtr->yawFixedAxis));
+    this->SetWorldRotation({1, 0, 0, 0});
+    this->camera->setDirection(1, 0, 0);
   }
 
   return result;
