@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Don't shut down gazebo when removing a world
+    * [Pull request 2515](https://bitbucket.org/osrf/gazebo/pull-request/2515)
+
 1. Do not display COM or inertia visualizations for static models
     * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
     * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
@@ -121,9 +124,6 @@
 
 1. Sim events plugin accepts custom topics
     * [Pull request 2535](https://bitbucket.org/osrf/gazebo/pull-request/2535)
-
-1. Don't shut down gazebo when removing a world
-    * [Pull request 2515](https://bitbucket.org/osrf/gazebo/pull-request/2515)
 
 1. Model Editor: Show / hide collisions
     * [Pull request 2503](https://bitbucket.org/osrf/gazebo/pull-request/2503)
