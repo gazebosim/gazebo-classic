@@ -11,7 +11,7 @@ fi
 for dir in $MODELS_DIR/*/
 do
   dir=${dir%*/}
-  echo "Creating thumbnail for ${dir##*/}"
+  echo -e "\e[93mCreating thumbnails for [${dir##*/}]...\e[39m"
   rm -rf $MODELS_DIR/${dir##*/}/thumbnails
   if [[ -f $MODELS_DIR/${dir##*/}/model.sdf ]]; then
 	  # generate thumbnails with green bg
