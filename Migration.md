@@ -14,6 +14,18 @@ release will remove the deprecated code.
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
    plugins and will remain the exactly the same.   
 
+### Modifications
+
+1. **gazebo/gui/JointControlWidget.hh**
+    + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
+    + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
+
+### Deprecations
+
+1. **gazebo/physics/JointController.hh**
+    + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
+    + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
+
 ## Gazebo 7.X to 8.X
 
 ### Build system
