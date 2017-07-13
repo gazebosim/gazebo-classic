@@ -36,7 +36,7 @@ GZ_REGISTER_SYSTEM_PLUGIN(ModelPropShop)
 /////////////////////////////////////////////
 ModelPropShop::~ModelPropShop()
 {
-  rendering::fini();
+  // rendering::fini();
 }
 
 /////////////////////////////////////////////

@@ -49,7 +49,7 @@ namespace SkyX
 
   MeshManager::~MeshManager()
   {
-    remove();
+    // remove();
   }
 
   void MeshManager::remove()
@@ -70,8 +70,8 @@ namespace SkyX
     mMesh.setNull();
     mSubMesh = 0;
     mEntity = 0;
-    mVertexBuffer.setNull();
-    mIndexBuffer.setNull();
+    // mVertexBuffer.setNull();
+    // mIndexBuffer.setNull();
     mMaterialName = "_NULL_";
 
     delete [] mVertices;

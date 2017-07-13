@@ -131,9 +131,9 @@ namespace SkyX
     }
 
     mCloudsManager->removeAll();
-    mMeshManager->remove();
+    // mMeshManager->remove();
     mMoonManager->remove();
-    mVCloudsManager->remove();
+    // mVCloudsManager->remove();
 
     mCamera = 0;
 

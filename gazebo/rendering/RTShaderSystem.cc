@@ -107,7 +107,7 @@ void RTShaderSystem::Fini()
 #if (OGRE_VERSION < ((1 << 16) | (9 << 8) | 0)) || defined(_WIN32)
     Ogre::RTShader::ShaderGenerator::finalize();
 #else
-    Ogre::RTShader::ShaderGenerator::destroy();
+//    Ogre::RTShader::ShaderGenerator::destroy();
 #endif
     this->dataPtr->shaderGenerator = NULL;
   }
