@@ -19,6 +19,8 @@
 #include <gazebo/rendering/RenderingIface.hh>
 
 #include <gazebo/sensors/CameraSensor.hh>
+#include <gazebo/sensors/MultiCameraSensor.hh>
+
 #include "LensFlareSensorPlugin.hh"
 
 namespace gazebo
@@ -29,7 +31,7 @@ namespace gazebo
   class LensFlareSensorPluginPrivate
   {
     /// \brief Lens flare
-    public: rendering::LensFlarePtr lensFlare;
+    public: std::vector<rendering::LensFlarePtr> lensFlares;
   };
 }
 
@@ -38,7 +40,8 @@ using namespace gazebo;
 GZ_REGISTER_SENSOR_PLUGIN(LensFlareSensorPlugin)
 
 /////////////////////////////////////////////////
-LensFlareSensorPlugin::LensFlareSensorPlugin() : dataPtr(new LensFlareSensorPluginPrivate)
+LensFlareSensorPlugin::LensFlareSensorPlugin()
+    : dataPtr(new LensFlareSensorPluginPrivate)
 {
 }
 
@@ -48,7 +51,8 @@ LensFlareSensorPlugin::~LensFlareSensorPlugin()
 }
 
 /////////////////////////////////////////////////
-void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_sdf*/)
+void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
+    sdf::ElementPtr /*_sdf*/)
 {
   if (!_sensor)
     gzerr << "Invalid sensor pointer." << std::endl;
@@ -56,13 +60,37 @@ void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor, sdf::ElementPtr /*_
   sensors::CameraSensorPtr cameraSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
 
-  if (!cameraSensor)
+  if (cameraSensor)
   {
-    gzerr << "CameraPlugin requires a CameraSensor." << std::endl;
+    this->AddLensFlare(cameraSensor->Camera());
     return;
   }
+  else
+  {
+    sensors::MultiCameraSensorPtr multiCameraSensor =
+      std::dynamic_pointer_cast<sensors::MultiCameraSensor>(_sensor);
+    if (multiCameraSensor)
+    {
+      for (unsigned int i = 0; i < multiCameraSensor->CameraCount(); ++i)
+      {
+        this->AddLensFlare(multiCameraSensor->Camera(i));
+      }
+      return;
+    }
+  }
 
-  this->dataPtr->lensFlare.reset(new rendering::LensFlare);
-  this->dataPtr->lensFlare->SetCamera(cameraSensor->Camera());
+  gzerr << "LensFlarePlugin requires a [Multi]CameraSensor." << std::endl;
+  return;
 }
 
+/////////////////////////////////////////////////
+void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
+{
+  if (!_camera)
+    return;
+
+  rendering::LensFlarePtr lensFlare;
+  lensFlare.reset(new rendering::LensFlare);
+  lensFlare->SetCamera(_camera);
+  this->dataPtr->lensFlares.push_back(lensFlare);
+}

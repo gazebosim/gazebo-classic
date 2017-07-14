@@ -25,7 +25,8 @@ namespace gazebo
   // Forward declare private data class.
   class LensFlareSensorPluginPrivate;
 
-  /// \brief Plugin that adds lens flare effect to a camera sensor
+  /// \brief Plugin that adds lens flare effect to a camera or multicamera
+  /// sensor
   class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor.
@@ -37,6 +38,9 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(sensors::SensorPtr _sensor,
         sdf::ElementPtr _sdf);
+
+    /// \brief Add lens flare effect to a camera
+    private: void AddLensFlare(rendering::CameraPtr _camera);
 
     /// \internal
     /// \brief Private data pointer
