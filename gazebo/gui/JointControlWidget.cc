@@ -73,6 +73,7 @@ void JointForceControl::Reset()
 /////////////////////////////////////////////////
 void JointForceControl::SetForce(const double _force)
 {
+  this->SetShowActive(true);
   this->dataPtr->forceSpin->setValue(_force);
 }
 
@@ -167,6 +168,7 @@ void JointPIDPosControl::Reset()
 /////////////////////////////////////////////////
 void JointPIDPosControl::SetPositionTarget(const double _target)
 {
+  this->SetShowActive(true);
   this->dataPtr->posSpin->setValue(_target);
 }
 
@@ -330,6 +332,7 @@ void JointPIDVelControl::Reset()
 /////////////////////////////////////////////////
 void JointPIDVelControl::SetVelocityTarget(const double _target)
 {
+  this->SetShowActive(true);
   this->dataPtr->posSpin->setValue(_target);
 }
 
