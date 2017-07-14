@@ -20,6 +20,7 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/transport.hh>
 #include <ignition/msgs.hh>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/math/Vector3.hh"
@@ -296,9 +297,13 @@ TEST_F(JointControllerTest, JointCmd)
   jointController->SetVelocityPID(joint->GetScopedName(), common::PID(4, 1, 9));
 
   // Get the joint controller parameters through a service
-  ignition::transport::Node node_srv;
-  const std::string service =
-      std::string("/") + model->GetName() + "/joint_cmd_req";
+  ignition::transport::Node nodeSrv;
+  std::string modelName = model->GetScopedName();
+  if (modelName.empty())
+  {
+     modelName = model->GetName();
+  }
+  boost::replace_all(modelName, "::", "/");
 
   ignition::msgs::StringMsg req;
   ignition::msgs::JointCmd rep;
@@ -306,7 +311,8 @@ TEST_F(JointControllerTest, JointCmd)
   unsigned int timeout = 5000;
 
   req.set_data(joint->GetScopedName());
-  bool executed = node_srv.Request(service, req, timeout, rep, result);
+  bool executed = nodeSrv.Request("/" + modelName + "/joint_cmd_req",
+      req, timeout, rep, result);
   EXPECT_TRUE(executed && result);
 
   // Check the retrieved joint controller parameters

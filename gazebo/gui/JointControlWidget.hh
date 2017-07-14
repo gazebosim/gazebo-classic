@@ -17,8 +17,11 @@
 #ifndef GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 #define GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 
+#include <functional>
 #include <memory>
 #include <string>
+#include <ignition/msgs.hh>
+#include <ignition/transport.hh>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -57,6 +60,25 @@ namespace gazebo
       /// \brief Set the name of the model to control.
       /// \param[in] _modelName Name of the model.
       public: void SetModelName(const std::string &_modelName);
+
+      /// \brief Called when the joint controller responds with its parameters.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      /// \param[in] _result Whether the triggering request was successful.
+      private: void ResponseCallback(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep, const bool _result);
+
+      /// \brief On response callback.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      private slots: void OnResponse(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
+
+      /// \brief QT signal, used to report a response from the joint controller.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      Q_SIGNALS: void repReceived(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
 
       /// \brief On reset callback.
       private slots: void OnReset();
@@ -166,7 +188,7 @@ namespace gazebo
 
       /// \brief Set the control force.
       /// \param[in] _force Value of the control force.
-      public: void SetForce(double _force);
+      public: void SetForce(const double _force);
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
@@ -210,19 +232,19 @@ namespace gazebo
 
       /// \brief Set the PID target position.
       /// \param[in] _target Target position.
-      public: void SetPositionTarget(double _target);
+      public: void SetPositionTarget(const double _target);
 
       /// \brief Set the PID proportional gain.
-      /// \param[in] _p_gain Proportional gain value.
-      public: void SetPGain(double _p_gain);
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
 
       /// \brief Set the PID integral gain.
-      /// \param[in] _i_gain Integral gain value.
-      public: void SetIGain(double _i_gain);
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
 
       /// \brief Set the PID derivative gain.
-      /// \param[in] _d_gain Derivative gain value.
-      public: void SetDGain(double _d_gain);
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
@@ -302,19 +324,19 @@ namespace gazebo
 
       /// \brief Set the PID target velocity.
       /// \param[in] _target Target velocity.
-      public: void SetVelocityTarget(double _target);
+      public: void SetVelocityTarget(const double _target);
 
       /// \brief Set the PID proportional gain.
-      /// \param[in] _p_gain Proportional gain value.
-      public: void SetPGain(double _p_gain);
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
 
       /// \brief Set the PID integral gain.
-      /// \param[in] _i_gain Integral gain value.
-      public: void SetIGain(double _i_gain);
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
 
       /// \brief Set the PID derivative gain.
-      /// \param[in] _d_gain Derivative gain value.
-      public: void SetDGain(double _d_gain);
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
