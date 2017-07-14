@@ -66,15 +66,15 @@ dart::common::Uri ModelResourceRetriever::resolve(const dart::common::Uri &_uri)
   if (_uri.mScheme.get_value_or("model") == "model")
   {
     uri.mScheme.assign("file");
-    boost::filesystem::path modelPath
+    std::string modelPath
         = sdf::findFile("model://" + _uri.mAuthority.get() + _uri.mPath.get());
     if (boost::filesystem::exists(modelPath))
     {
       if (boost::filesystem::is_directory(modelPath))
       {
-        modelPath /= "model.sdf";
+        modelPath = sdf::getModelFilePath(modelPath);
       }
-      uri.mPath.assign(modelPath.string());
+      uri.mPath.assign(modelPath);
     }
   }
   return uri;
