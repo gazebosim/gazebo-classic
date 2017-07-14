@@ -863,6 +863,8 @@ unsigned int Camera::ImageDepth() const
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
+  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16")
+    return 3;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
@@ -958,6 +960,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
+  else if (_format == "R16G16B16" || _format == "RGB_INT16")
+    result = static_cast<int>(Ogre::PF_SHORT_RGB);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
             (_format == "BAYER_GBRG8") ||
