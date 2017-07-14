@@ -65,6 +65,9 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate())
 {
+  this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+    dart::common::make_unique<dart::constraint::PGSLCPSolver>(
+    this->dataPtr->dtWorld->getTimeStep()));
 }
 
 //////////////////////////////////////////////////
