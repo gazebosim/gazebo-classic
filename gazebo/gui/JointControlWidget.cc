@@ -32,8 +32,8 @@
 using namespace gazebo;
 using namespace gui;
 
-const QString activeColor = "#f58113";
-const QString inactiveColor = "#000000";
+const QString activeColor = "#353535";
+const QString inactiveColor = "#737373";
 
 /////////////////////////////////////////////////
 JointForceControl::JointForceControl(const std::string &_name,
@@ -50,6 +50,7 @@ JointForceControl::JointForceControl(const std::string &_name,
   this->dataPtr->forceSpin->setValue(0.000);
 
   _layout->addWidget(this->dataPtr->forceSpin, _index, 2);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->forceSpin, SIGNAL(valueChanged(double)),
           this, SLOT(OnChanged(double)));
@@ -138,6 +139,7 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -197,22 +199,10 @@ void JointPIDPosControl::SetShowActive(bool _active)
   {
     this->dataPtr->posSpin->setStyleSheet(
         "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->pGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->iGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->dGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
   }
   else
   {
     this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->pGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->iGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->dGainSpin->setStyleSheet(
         "QDoubleSpinBox{color: " + inactiveColor + ";}");
   }
 }
@@ -304,6 +294,7 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -361,22 +352,10 @@ void JointPIDVelControl::SetShowActive(bool _active)
   {
     this->dataPtr->posSpin->setStyleSheet(
         "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->pGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->iGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-    this->dataPtr->dGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
   }
   else
   {
     this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->pGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->iGainSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-    this->dataPtr->dGainSpin->setStyleSheet(
         "QDoubleSpinBox{color: " + inactiveColor + ";}");
   }
 }
