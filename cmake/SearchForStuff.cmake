@@ -585,6 +585,10 @@ set (SDFormat_MIN_VERSION 5.0.0)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (NOT SDFormat_FOUND)
+  # try finding both sdformat 5 and 6 until we switch to 6
+  find_package(SDFormat 6)
+endif()
+if (NOT SDFormat_FOUND)
   message (STATUS "Looking for SDFormat - not found")
   BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
 else()
