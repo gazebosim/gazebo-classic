@@ -224,9 +224,10 @@ namespace gazebo
       /// and the vector's magnitude corresponds to the total force.
       /// \param[in] _offset Offset position expressed in the link frame. It
       /// defaults to the link origin.
-      public: virtual void AddLinkForce(const ignition::math::Vector3d &_force,
-          const ignition::math::Vector3d &_offset =
-          ignition::math::Vector3d::Zero) = 0;
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                      ignition::math::Vector3d::Zero) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.

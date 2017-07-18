@@ -582,11 +582,11 @@ void DARTLink::AddForceAtRelativePosition(
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_offset*/)
+void DARTLink::AddLinkForce(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_offset)
 {
-  gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
-        << std::endl;
+  this->AddForceAtRelativePosition(_force, _offset);
 }
 
 /////////////////////////////////////////////////
