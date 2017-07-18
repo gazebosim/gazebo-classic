@@ -260,7 +260,7 @@
       #define GZ_GUI_HIDDEN
     #endif
   #endif
-  
+
   #if defined _WIN32 || defined __CYGWIN__
     #ifdef BUILDING_DLL_GZ_SENSORS
       #ifdef __GNUC__
