@@ -74,7 +74,6 @@ namespace gazebo
 
       /// \brief Height of distortion texture map
       public: unsigned int distortionTexHeight;
-
     };
   }
 }

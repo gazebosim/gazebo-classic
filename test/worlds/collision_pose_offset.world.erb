@@ -183,6 +183,40 @@
           </material>
         </visual>
       </link>
+      <link name='link_2'>
+        <pose>0 1 0  0 0 0</pose>
+        <inertial>
+          <mass><%= box[:mass] %></mass>
+          <inertia>
+            <ixx><%= box[:ixx] %></ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy><%= box[:iyy] %></iyy>
+            <iyz>0</iyz>
+            <izz><%= box[:izz] %></izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size><%= a_to_s(box[:size]) %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <box>
+              <size><%= a_to_s(box[:size]) %></size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
     </model>
     <gui fullscreen='0'>
       <camera name='user_camera'>

@@ -22,6 +22,8 @@ http://www.gnu.org/copyleft/lesser.txt.
 */
 
 #include <vector>
+
+#include <OgrePixelFormat.h>
 #include "VClouds/DataManager.h"
 
 #include "VClouds/VClouds.h"
@@ -689,8 +691,12 @@ namespace SkyX { namespace VClouds
       {
         for (x = pb.left; x < pb.right; x++)
         {
+          Ogre::uint8 *ptr = (Ogre::uint8 *)pb.data +
+                             (x + y * pb.rowPitch + z * pb.slicePitch) *
+                                 Ogre::PixelUtil::getNumElemBytes(pb.format);
+
           Ogre::PixelUtil::packColour(c[x][y][z].dens/* TODO!!!! */,
-              c[x][y][z].light, 0, 0, pb.format, &pbptr[x]);
+              c[x][y][z].light, 0, 0, pb.format, ptr);
         }
         pbptr += pb.rowPitch;
       }
