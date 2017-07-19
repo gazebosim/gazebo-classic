@@ -235,7 +235,7 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() == "End of file")
+                  if (_e.value() == boost::asio::error::eof)
                     this->isOpen = false;
                 }
                 else
@@ -295,7 +295,7 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() == "End of file")
+                  if (_e.value() == boost::asio::error::eof)
                     this->isOpen = false;
                 }
 
