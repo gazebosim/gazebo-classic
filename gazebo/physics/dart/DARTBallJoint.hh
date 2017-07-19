@@ -46,42 +46,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
-
-      // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
           const unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetVelocity(unsigned int _index, double _angle);
-
-      // Documentation inherited
-      public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual double PositionImpl(const unsigned int _index) const;
-
-      // Documentation inherited.
-      protected: void SetForceImpl(unsigned int _index, double _torque);
 
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,
                                    const ignition::math::Vector3d &_axis);
-
-      // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual void SetUpperLimit(const unsigned int _index,
-                                         const double _limit);
-
-      // Documentation inherited.
-      public: virtual void SetLowerLimit(const unsigned int _index,
-                                         const double _limit);
     };
     /// \}
   }

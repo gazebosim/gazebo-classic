@@ -44,14 +44,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Load(sdf::ElementPtr _sdf);
 
-      // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetAnchor(const unsigned int _index,
-                  const ignition::math::Vector3d &_anchor);
-
       // Documentation inherited.
       public: virtual void Init();
 
@@ -84,24 +76,6 @@ namespace gazebo
       public: virtual bool SetParam(const std::string &_key,
                                     unsigned int _index,
                                     const boost::any &_value);
-
-      // Documentation inherited
-      public: virtual double PositionImpl(const unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetVelocity(unsigned int _index, double _vel);
-
-      // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index) const;
-
-      // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index) const;
-
-      // Documentation inherited.
-      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
     /// \}
   }

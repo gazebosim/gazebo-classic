@@ -185,7 +185,74 @@ void DARTJoint::Detach()
 void DARTJoint::SetAnchor(const unsigned int /*_index*/,
     const ignition::math::Vector3d &/*_anchor*/)
 {
-  // nothing to do here for DART.
+  gzerr << "DARTJoint: SetAnchor is not implemented.\n";
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d DARTJoint::Anchor(
+    const unsigned int _index) const
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<ignition::math::Vector3d>(
+          "Anchor" + std::to_string(_index));
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
+  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
+                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
+  Eigen::Vector3d worldOrigin = T.translation();
+
+  return DARTTypes::ConvVec3Ign(worldOrigin);
+}
+
+//////////////////////////////////////////////////
+double DARTJoint::GetVelocity(unsigned int _index) const
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
+  double result = 0.0;
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index < dofs)
+    result = this->dataPtr->dtJoint->getVelocity(
+          static_cast<std::size_t>(_index));
+  else
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetVelocity(unsigned int _index, double _vel)
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Velocity" + std::to_string(_index),
+          boost::bind(&DARTJoint::SetVelocity, this, _index, _vel),
+          _vel);
+    return;
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index < dofs)
+    this->dataPtr->dtJoint->setVelocity(_index, _vel);
+  else
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
 }
 
 //////////////////////////////////////////////////
@@ -280,9 +347,12 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 {
-  if (_index >= this->DOF())
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return;
   }
 
@@ -301,9 +371,12 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 {
-  if (_index >= this->DOF())
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return;
   }
 
@@ -322,9 +395,12 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 double DARTJoint::UpperLimit(const unsigned int _index) const
 {
-  if (_index >= this->DOF())
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return ignition::math::NAN_D;
   }
 
@@ -341,9 +417,12 @@ double DARTJoint::UpperLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 double DARTJoint::LowerLimit(const unsigned int _index) const
 {
-  if (_index >= this->DOF())
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return ignition::math::NAN_D;
   }
 
@@ -460,8 +539,11 @@ ignition::math::Vector3d DARTJoint::LinkTorque(
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                          const boost::any &_value)
 {
-  if (_index >= this->DOF())
-    gzerr << "Invalid index[" << _index << "]\n";
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
 
   if (!this->dataPtr->IsInitialized())
   {
@@ -508,9 +590,12 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if (_index >= this->DOF())
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index >= dofs)
   {
-    gzerr << "Invalid index[" << _index << "]\n";
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return false;
   }
 
@@ -591,6 +676,33 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 /////////////////////////////////////////////////
+bool DARTJoint::SetPosition(unsigned int _index, double _position)
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Position" + std::to_string(_index),
+          boost::bind(&DARTJoint::SetPosition, this, _index, _position),
+          _position);
+    return false;
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is a nullptr.");
+
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index < dofs)
+  {
+    this->dataPtr->dtJoint->setPosition(_index, _position);
+    return true;
+  }
+
+  gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
+  return false;
+}
+
+/////////////////////////////////////////////////
 void DARTJoint::SetForce(unsigned int _index, double _force)
 {
   double force = Joint::CheckAndTruncateForce(_index, _force);
@@ -655,6 +767,56 @@ void DARTJoint::SetDARTJoint(dart::dynamics::Joint *_dtJoint)
 dart::dynamics::Joint *DARTJoint::GetDARTJoint()
 {
   return this->dataPtr->dtJoint;
+}
+
+//////////////////////////////////////////////////
+double DARTJoint::PositionImpl(const unsigned int _index) const
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>("Position" + std::to_string(_index));
+  }
+
+  double result = ignition::math::NAN_D;
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index < dofs)
+  {
+    result = this->dataPtr->dtJoint->getPosition(
+          static_cast<std::size_t>(_index));
+  }
+  else
+  {
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetForceImpl(unsigned int _index, double _force)
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+        "Force" + std::to_string(_index),
+        boost::bind(&DARTJoint::SetForceImpl, this, _index, _force));
+    return;
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
+
+  const unsigned int dofs = static_cast<unsigned int>(
+        this->dataPtr->dtJoint->getNumDofs());
+
+  if (_index < dofs)
+    this->dataPtr->dtJoint->setForce(static_cast<std::size_t>(_index), _force);
+  else
+    gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
 }
 
 /////////////////////////////////////////////////
