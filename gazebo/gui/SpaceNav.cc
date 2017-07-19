@@ -89,8 +89,9 @@ bool SpaceNav::Load()
 
 #ifdef HAVE_SPNAV
   // Read whether to use spacenav in gui.ini
-  bool enable_spacenav = getINIProperty<bool>("spacenav.enable", true);
-  if (!enable_spacenav) {
+  bool enableSpacenav = getINIProperty<bool>("spacenav.enable", true);
+  if (!enableSpacenav)
+  {
     gzlog << "Spacenav functionality is disabled\n";
     return result;
   }
