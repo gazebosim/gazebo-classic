@@ -451,7 +451,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     // velocities of the first axis of each joint start out at zero. If the
     // first axis of either joint exhibits any non-zero position, then these
     // tests will fail.
-    EXPECT_NEAR(pose_01.Rot().Euler().X(), angle_00_0 + angle_01_0, 1e-6);
+    EXPECT_NEAR(0.0, angle_00_0, 1e-6);
+    EXPECT_NEAR(0.0, angle_01_0, 1e-6);
     EXPECT_NEAR(pose_01.Rot().Euler().Y(), angle_00_1 + angle_01_1, 1e-6);
   }
 }
