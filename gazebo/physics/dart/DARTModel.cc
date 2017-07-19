@@ -161,6 +161,7 @@ void DARTModel::Init()
               this->dataPtr->dtSkeleton, dtParentBodyNode, joint, childLink))
           {
             gzdbg << "Could not create joint and node.\n";
+            // Avoid a potential infinite loop
             linksToAdd.clear();
             break;
           }
@@ -177,95 +178,21 @@ void DARTModel::Init()
     }
   }
 
-  // TODO: process remaining joints
-  std::cerr << "ok" << std::endl;
+  // Process remaining joints
   for (auto joint : jointsSkipped)
   {
-    // see Simbody's MultibodyGraphMaker
+    gzdbg << "Building DART BodyNode for link '" << joint->GetChild()->GetName()
+          << "' and loop joint '" << joint->GetName() << "'.\n";
+
     dart::dynamics::BodyNode* dtParentBodyNode =
         this->dataPtr->dtSkeleton->getBodyNode(joint->GetParent()->GetName());
-    GZ_ASSERT(dtParentBodyNode, "Parent body node is null");
 
-    dart::dynamics::BodyNode* dtChildBodyNode =
-        this->dataPtr->dtSkeleton->getBodyNode(joint->GetChild()->GetName());
-    GZ_ASSERT(dtChildBodyNode, "Child body node is null");
-
-#if 1
-    DARTJointPtr dartJoint = boost::dynamic_pointer_cast<DARTJoint>(joint);
-    GZ_ASSERT(dartJoint, "DART joint is null");
-
-    std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*> pair;
-    pair = DARTModelPrivate::CreateJointAndNodePair<dart::dynamics::BodyNode>(
-        this->dataPtr->dtSkeleton,
-        dtParentBodyNode,
-        DARTModelPrivate::GetDARTJointType(dartJoint),
-        dartJoint->DARTProperties(),
-        dart::dynamics::BodyNode::AspectProperties());
-    dartJoint->SetDARTJoint(pair.first);
-
-////  dart::dynamics::BodyNode* bn = pair.second;
-////  dart::dynamics::ShapePtr shape = std::make_shared<
-////      dart::dynamics::EllipsoidShape>(0.01*Eigen::Vector3d::Ones());
-////  bn->createShapeNodeWith<dart::dynamics::VisualAspect,
-////      dart::dynamics::CollisionAspect,
-////      dart::dynamics::DynamicsAspect>(shape);
-////  dart::dynamics::Inertia inertia;
-////  inertia.setMass(1.0);
-////  inertia.setMoment(shape->computeInertia(1.0));
-////  bn->setInertia(inertia);
-////  bn->setRestitutionCoeff(0.6);
-
-    dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
-//    dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(dtChildBodyNode));
-    dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
-        dtChildBodyNode, pair.second));
-    this->DARTWorld()->getConstraintSolver()->addConstraint(dtWeldJointConst);
-#endif
-
-////  Eigen::Vector3d offset = Eigen::Vector3d(0, 0, 0);
-////  offset = dtChildBodyNode->getWorldTransform() * offset;
-//
-////  dart::constraint::BallJointConstraintPtr dtBallJointConst;
-////  dtBallJointConst.reset(new dart::constraint::BallJointConstraint(
-////      dtParentBodyNode, dtChildBodyNode, offset));
-////  this->DARTWorld()->getConstraintSolver()->addConstraint(dtBallJointConst);
-
-
-#if 0
-    // This approach has issues because the dummy body node has the same
-    // excent as the true body node, so it ends up in collisions, but then the
-    // corresponding Gazebo link cannot be found
-  	sdf::ElementPtr dummyElem = joint->GetChild()->GetSDF()->Clone();
-    GZ_ASSERT(dummyElem->HasAttribute("name"), "Link sdf element has no name");
-    dummyElem->GetAttribute("name")->Set<std::string>("dummy_link");
-
-    LinkPtr dummyLink(new DARTLink(
-        boost::static_pointer_cast<Model>(shared_from_this())));
-    dummyLink->Load(dummyElem);
-
-    // Add joint and child link to skeleton
-    gzdbg << "Building DART BodyNode for link '" << dummyLink->GetName()
-          << "' (shadows link '" << joint->GetChild()->GetName()
-          << "') and joint '" << joint->GetName() << "'.\n";
-
-    if (!DARTModelPrivate::CreateJointAndNodePair(
-        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, dummyLink))
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->DARTWorld(),
+        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
     {
-      gzdbg << "Could not create joint and node.\n";
+      gzdbg << "Could not create loop joint and node.\n";
       break;
     }
-
-    dart::dynamics::BodyNode* dtDummy =
-        this->dataPtr->dtSkeleton->getBodyNode("dummy_link");
-    GZ_ASSERT(dtDummy, "Dummy body node is null");
-
-    dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
-    dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
-        dtChildBodyNode, dtDummy));
-    this->DARTWorld()->getConstraintSolver()->addConstraint(dtWeldJointConst);
-
-    dummyLink->Init();
-#endif
   }
 
   Model::Init();

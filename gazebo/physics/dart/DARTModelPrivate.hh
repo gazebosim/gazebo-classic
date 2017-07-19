@@ -20,6 +20,7 @@
 
 #include <string>
 #include <utility>
+#include <memory>
 
 #include "gazebo/physics/dart/dart_inc.h"
 
@@ -38,7 +39,7 @@ namespace gazebo
       public: using JointPropPtr =
           std::shared_ptr<dart::dynamics::Joint::Properties>;
 
-      public: template <typename BodyTypeT>
+      private: template <typename BodyTypeT>
       static std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*>
       CreateJointAndNodePair(
           dart::dynamics::SkeletonPtr _skeleton,
@@ -126,6 +127,40 @@ namespace gazebo
         }
       }
 
+      public: static bool CreateLoopJointAndNodePair(
+          dart::simulation::WorldPtr _world,
+          dart::dynamics::SkeletonPtr _skeleton,
+          dart::dynamics::BodyNode* _parent,
+          JointPtr _joint,
+          LinkPtr _link)
+      {
+        dart::dynamics::BodyNode* dtChildBodyNode =
+            _skeleton->getBodyNode(_link->GetName());
+        GZ_ASSERT(dtChildBodyNode, "Child body node is null");
+
+        DARTJointPtr dartJoint = boost::dynamic_pointer_cast<DARTJoint>(_joint);
+        GZ_ASSERT(dartJoint, "DART joint is null");
+
+        std::pair<dart::dynamics::Joint*, dart::dynamics::BodyNode*> pair =
+            DARTModelPrivate::CreateJointAndNodePair<dart::dynamics::BodyNode>(
+            _skeleton, _parent, GetDARTJointType(dartJoint),
+            dartJoint->DARTProperties(),
+            dart::dynamics::BodyNode::AspectProperties());
+
+        if (pair.first == nullptr || pair.second == nullptr)
+          return false;
+
+        dartJoint->SetDARTJoint(pair.first);
+        pair.second->setCollidable(false);
+
+        dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
+        dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
+            dtChildBodyNode, pair.second));
+        _world->getConstraintSolver()->addConstraint(dtWeldJointConst);
+
+        return true;
+      }
+
       public: static bool CreateJointAndNodePair(
           dart::dynamics::SkeletonPtr _skeleton,
           dart::dynamics::BodyNode* _parent,
@@ -142,7 +177,7 @@ namespace gazebo
         {
           jointType = "free";
           jointProperties =
-              Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
+              std::make_shared<dart::dynamics::FreeJoint::Properties>(
               dart::dynamics::Joint::Properties("root",
               DARTTypes::ConvPose(dartLink->WorldPose())));
         }
