@@ -1,0 +1,31 @@
+<?xml version="1.0"?> 
+<sdf version="1.5">
+  <world name="default">
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://double_pendulum_with_base</uri>
+			<plugin name="init_joint_control" filename="libJointControlPlugin.so">
+        <controller type="position">
+          <joint>upper_joint</joint>
+          <joint>lower_joint</joint>
+          <target>1.0</target>
+          <pid_gains>10 1 2</pid_gains>
+        </controller>
+        <controller type="velocity">
+          <joint>(.*)_joint</joint>
+          <target>0.0</target>
+          <pid_gains>2 0 0.1</pid_gains>
+        </controller>
+      </plugin>
+    </include>
+
+  </world>
+</sdf>
