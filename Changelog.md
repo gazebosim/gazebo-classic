@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Fix disabling mesh cast shadows
+    * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
+
 1. Do not display COM or inertia visualizations for static models
     * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
     * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
