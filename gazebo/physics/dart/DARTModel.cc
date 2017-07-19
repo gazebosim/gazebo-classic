@@ -184,8 +184,12 @@ void DARTModel::Init()
     gzdbg << "Building DART BodyNode for link '" << joint->GetChild()->GetName()
           << "' and loop joint '" << joint->GetName() << "'.\n";
 
-    dart::dynamics::BodyNode* dtParentBodyNode =
-        this->dataPtr->dtSkeleton->getBodyNode(joint->GetParent()->GetName());
+    dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
+    if (joint->GetParent() != nullptr)
+    {
+      dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
+          joint->GetParent()->GetName());
+    }
 
     if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->DARTWorld(),
         this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
