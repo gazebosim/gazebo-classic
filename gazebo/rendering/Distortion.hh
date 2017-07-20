@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@
 #define _GAZEBO_RENDERING_DISTORTION_HH_
 
 #include <sdf/sdf.hh>
+#include <ignition/math.hh>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -34,8 +35,7 @@ namespace gazebo
     /// \{
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
-    /// \brief Camera distortion based on Brown's model. Note that the current
-    /// implementation only supports barrel distortion.
+    /// \brief Camera distortion based on the Brown-Conrady model.
     class GZ_RENDERING_VISIBLE Distortion
     {
       /// \brief Constructor
@@ -77,6 +77,11 @@ namespace gazebo
       /// \return Distortion coefficient p2.
       public: double GetP2() const;
 
+      /// \brief Get whether or not the camera is being cropped to
+      /// account for black borders created by barrel distortion.
+      /// \return Distortion crop value.
+      public: bool Crop() const;
+
       /// \brief Get the distortion center.
       /// \return Distortion center.
       public: math::Vector2d GetCenter() const;
@@ -90,9 +95,22 @@ namespace gazebo
       /// \param[in] _p1 Tangential distortion coefficient p1.
       /// \param[in] _p2 Tangential distortion coefficient p2.
       /// \return Distorted coordinate.
-      public: static math::Vector2d Distort(const math::Vector2d &_in,
-        const math::Vector2d &_center, double _k1, double _k2, double _k3,
-        double _p1, double _p2);
+      public: static math::Vector2d Distort(
+        const math::Vector2d &_in,
+        const math::Vector2d &_center, double _k1, double _k2,
+        double _k3, double _p1, double _p2);
+
+      /// \brief get the distortion map value.
+      /// \return the distortion map value at the specified index,
+      /// or (-1, -1) if the index
+      /// is out of bounds.
+      protected: ignition::math::Vector2d
+        DistortionMapValueClamped(const int x, const int y) const;
+
+      /// \brief calculate the correct scale factor to "zoom" the render,
+      /// cutting off black borders caused by distortion (only if the crop
+      /// flag has been set).
+      protected: void CalculateAndApplyDistortionScale();
 
       /// \brief Distortion SDF values.
       protected: sdf::ElementPtr sdf;

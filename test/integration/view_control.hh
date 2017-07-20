@@ -30,6 +30,9 @@ class ViewControlTest : public QTestFixture
 
   /// \brief Test zooming in on a model in model editor
   private slots: void MouseZoomModelEditor();
+
+  /// \brief Test zooming in on a model behind the terrain
+  private slots: void MouseZoomTerrain();
 };
 
 #endif

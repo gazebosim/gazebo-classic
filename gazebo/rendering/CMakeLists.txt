@@ -152,6 +152,7 @@ gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
   COMVisual_TEST.cc
+  Distortion_TEST.cc
   GpuLaser_TEST.cc
   Heightmap_TEST.cc
   InertiaVisual_TEST.cc

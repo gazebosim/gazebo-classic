@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -244,19 +244,21 @@ namespace gazebo
                   const gazebo::physics::ModelState &_state)
       {
         math::Vector3 q(_state.pose.rot.GetAsEuler());
-        _out << std::fixed <<std::setprecision(3)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.pos.x << " "
-          << _state.pose.pos.y << " "
-          << _state.pose.pos.z << " "
-          << q.x << " "
-          << q.y << " "
-          << q.z << " "
-          << "</pose>"
-          << "<scale>"
-          << _state.scale
-          << "</scale>";
+          << ignition::math::precision(_state.pose.pos.x, 4) << " "
+          << ignition::math::precision(_state.pose.pos.y, 4) << " "
+          << ignition::math::precision(_state.pose.pos.z, 4) << " "
+          << ignition::math::precision(q.x, 4) << " "
+          << ignition::math::precision(q.y, 4) << " "
+          << ignition::math::precision(q.z, 4) << " "
+          << "</pose>";
+
+        // Only record scale if it is not the default value of [1, 1, 1].
+        if (_state.scale != ignition::math::Vector3d::One)
+          _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();

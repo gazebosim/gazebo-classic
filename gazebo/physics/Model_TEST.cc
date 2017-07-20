@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,32 @@ TEST_F(ModelTest, Scale)
 
   // Cleanup
   modelPtr.reset();
+}
+
+//////////////////////////////////////////////////
+TEST_F(ModelTest, NestedModelSensorScopedName)
+{
+  this->Load("test/worlds/deeply_nested_models.world", true);
+
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  auto model = world->GetModel("model_03");
+  ASSERT_TRUE(model != nullptr);
+
+  gzmsg << "Get a scoped sensor name" << std::endl;
+
+  const std::vector<std::string> imuScopedName =
+      model->SensorScopedName("imu_sensor");
+  ASSERT_EQ(imuScopedName.size(), static_cast<unsigned int>(1));
+  EXPECT_EQ(imuScopedName[0],
+    "default::model_00::model_01::model_02::model_03::imu_link::imu_sensor");
+
+  gzmsg << "Get a nonexistent scoped sensor name" << std::endl;
+
+  const std::vector<std::string> noScopedName =
+      model->SensorScopedName("no_sensor");
+  ASSERT_EQ(noScopedName.size(), static_cast<unsigned int>(0));
 }
 
 //////////////////////////////////////////////////

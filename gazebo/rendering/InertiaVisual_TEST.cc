@@ -84,6 +84,9 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     "box010409_z45::link_INERTIA_VISUAL__"
   };
 
+  // Generate inertia visuals
+  scene->ShowInertias(true);
+
   // Wait until all models are inserted
   int sleep = 0;
   const int maxSleep = 50;
@@ -110,6 +113,7 @@ TEST_F(InertiaVisual_TEST, InertiaRotation)
     common::Time::MSleep(200);
     sleep++;
   }
+  EXPECT_LT(sleep, maxSleep);
 
   // expect bounding box of size 0.1 x 0.4 x 0.9
   const ignition::math::Box box(-0.05, -0.2, -0.45,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -134,6 +134,14 @@ bool LogRecord::Init(const std::string &_subdir)
   this->dataPtr->readyToStart = true;
 
   return true;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::Start(const LogRecordParams &_params)
+{
+  this->dataPtr->period = _params.period;
+  this->dataPtr->filter = _params.filter;
+  return this->Start(_params.encoding, _params.path);
 }
 
 //////////////////////////////////////////////////
@@ -305,6 +313,30 @@ bool LogRecord::GetPaused() const
 bool LogRecord::Paused() const
 {
   return this->dataPtr->paused;
+}
+
+//////////////////////////////////////////////////
+double LogRecord::Period() const
+{
+  return this->dataPtr->period;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetPeriod(const double _period)
+{
+  this->dataPtr->period = _period;
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Filter() const
+{
+  return this->dataPtr->filter;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetFilter(const std::string &_filter)
+{
+  this->dataPtr->filter = _filter;
 }
 
 //////////////////////////////////////////////////

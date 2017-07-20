@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,11 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#include "gazebo/rendering/ogre_gazebo.h"
+
+#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Vector2d.hh"
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
@@ -30,18 +31,24 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/common/Skeleton.hh"
-#include "gazebo/rendering/RenderEvents.hh"
-#include "gazebo/rendering/WireBox.hh"
+
+#include "gazebo/rendering/COMVisual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/DynamicLines.hh"
-#include "gazebo/rendering/Scene.hh"
-#include "gazebo/rendering/RTShaderSystem.hh"
-#include "gazebo/rendering/RenderEngine.hh"
-#include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/InertiaVisual.hh"
+#include "gazebo/rendering/JointVisual.hh"
+#include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
 #include "gazebo/rendering/MovableText.hh"
-#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEngine.hh"
+#include "gazebo/rendering/RenderEvents.hh"
+#include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/Scene.hh"
+#include "gazebo/rendering/SelectionObj.hh"
 #include "gazebo/rendering/Visual.hh"
+#include "gazebo/rendering/VisualPrivate.hh"
+#include "gazebo/rendering/WireBox.hh"
 
 using namespace gazebo;
 using namespace rendering;
@@ -200,6 +207,8 @@ Visual::~Visual()
   this->dataPtr->sdf.reset();
   this->dataPtr->parent.reset();
   this->dataPtr->children.clear();
+
+  delete this->dataPtr->typeMsg;
 
   delete this->dataPtr;
   this->dataPtr = 0;
@@ -371,6 +380,7 @@ void Visual::Load()
 
   // Set the pose of the scene node
   this->SetPose(pose);
+  this->dataPtr->initialRelativePose = pose.Ign();
 
   // Get the size of the mesh
   if (obj)
@@ -1762,6 +1772,12 @@ math::Pose Visual::GetPose() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Pose3d Visual::InitialRelativePose() const
+{
+  return this->dataPtr->initialRelativePose;
+}
+
+//////////////////////////////////////////////////
 void Visual::SetWorldPose(const math::Pose &_pose)
 {
   this->SetWorldPosition(_pose.pos);
@@ -2353,13 +2369,18 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = _msg->geometry().mesh().filename();
+    {
+      std::string filename = _msg->geometry().mesh().filename();
+      newGeometryName = common::find_file(filename);
+    }
 
     if (newGeometryType != geometryType ||
-        (newGeometryType == "mesh" && newGeometryName != geometryName))
+        (newGeometryType == "mesh" && !newGeometryName.empty() &&
+        newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
+      bool origCastShadows = this->dataPtr->castShadows;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2377,7 +2398,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else if (newGeometryType == "mesh")
       {
         std::string filename = _msg->geometry().mesh().filename();
-        std::string meshName = common::find_file(filename);
+        std::string meshName = newGeometryName;
         std::string submeshName;
         bool centerSubmesh = false;
 
@@ -2408,6 +2429,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       }
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
+      this->SetCastShadows(origCastShadows);
     }
 
     math::Vector3 geomScale(1, 1, 1);
@@ -2729,7 +2751,7 @@ std::string Visual::GetMeshName() const
       else
         return std::string();
     }
-    else if (geomElem->HasElement("mesh") || geomElem->HasElement("heightmap"))
+    else if (geomElem->HasElement("mesh"))
     {
       sdf::ElementPtr tmpElem = geomElem->GetElement("mesh");
       std::string filename;
@@ -2905,14 +2927,64 @@ ScenePtr Visual::GetScene() const
 //////////////////////////////////////////////////
 void Visual::ShowCollision(bool _show)
 {
-  if (this->GetName().find("__COLLISION_VISUAL__") != std::string::npos)
-    this->SetVisible(_show);
-
-  std::vector<VisualPtr>::iterator iter;
-  for (iter = this->dataPtr->children.begin();
-      iter != this->dataPtr->children.end(); ++iter)
+  // If this is a collision visual, set it visible
+  if (this->dataPtr->type == VT_COLLISION)
   {
-    (*iter)->ShowCollision(_show);
+    this->SetVisible(_show);
+  }
+  // If this is a link, check if there are pending collision visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_COLLISION)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = dynamic_cast<msgs::Visual *>(it->second);
+      if (!msg)
+      {
+        gzerr << "Wrong message to generate collision visual." << std::endl;
+      }
+      else if (!this->dataPtr->scene->GetVisual(msg->name()))
+      {
+        // Set orange transparent material
+        msg->mutable_material()->mutable_script()->add_uri(
+            "file://media/materials/scripts/gazebo.material");
+        msg->mutable_material()->mutable_script()->set_name(
+            "Gazebo/OrangeTransparent");
+        msg->set_cast_shadows(false);
+
+        // Create visual
+        VisualPtr visual;
+        visual.reset(new Visual(msg->name(), shared_from_this()));
+
+        if (msg->has_id())
+          visual->SetId(msg->id());
+
+        auto msgPtr = new ConstVisualPtr(msg);
+        visual->LoadFromMsg(*msgPtr);
+
+        visual->SetType(it->first);
+        visual->SetVisible(_show);
+        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+        visual->SetWireframe(this->dataPtr->scene->Wireframe());
+      }
+
+      delete msg;
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
+
+
+  // Show for children
+  for (auto &child : this->dataPtr->children)
+  {
+    child->ShowCollision(_show);
   }
 }
 
@@ -2966,9 +3038,50 @@ void Visual::SetVisibilityFlags(uint32_t _flags)
 //////////////////////////////////////////////////
 void Visual::ShowJoints(bool _show)
 {
+  // If this is a joint visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("JOINT_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link, check if there are pending joint visuals
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->pendingChildren.empty())
+  {
+    auto it = std::begin(this->dataPtr->pendingChildren);
+    while (it != std::end(this->dataPtr->pendingChildren))
+    {
+      if (it->first != VT_PHYSICS)
+      {
+        ++it;
+        continue;
+      }
+
+      auto msg = dynamic_cast<const msgs::Joint *>(it->second);
+      if (!msg)
+      {
+        ++it;
+        continue;
+      }
+
+      std::string jointVisName = msg->name() + "_JOINT_VISUAL__";
+      if (!this->dataPtr->scene->GetVisual(jointVisName))
+      {
+        JointVisualPtr jointVis(new JointVisual(jointVisName,
+            shared_from_this()));
+
+        auto msgPtr = new ConstJointPtr(msg);
+        jointVis->Load(*msgPtr);
+
+        jointVis->SetVisible(_show);
+        if (msg->has_id())
+          jointVis->SetId(msg->id());
+      }
+
+      delete msg;
+      this->dataPtr->pendingChildren.erase(it);
+    }
+  }
 
   for (auto &child : this->dataPtr->children)
   {
@@ -2979,10 +3092,32 @@ void Visual::ShowJoints(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowCOM(bool _show)
 {
+  // If this is a COM visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("COM_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without COM visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + "_COM_VISUAL__"))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
 
+    COMVisualPtr vis(new COMVisual(this->GetName() + "_COM_VISUAL__",
+        shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowCOM(_show);
@@ -2992,10 +3127,34 @@ void Visual::ShowCOM(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowInertia(bool _show)
 {
-  if (this->dataPtr->type == VT_PHYSICS &&
-     this->GetName().find("INERTIA_VISUAL__") != std::string::npos)
-    this->SetVisible(_show);
+  std::string suffix("_INERTIA_VISUAL__");
 
+  // If this is an inertia visual, set it visible
+  if (this->dataPtr->type == VT_PHYSICS &&
+      this->GetName().find(suffix) != std::string::npos)
+  {
+    this->SetVisible(_show);
+  }
+  // If this is a link without inertia visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
+      !this->dataPtr->scene->GetVisual(this->GetName() + suffix))
+  {
+    auto msg = dynamic_cast<msgs::Link *>(this->dataPtr->typeMsg);
+    if (!msg)
+    {
+      gzerr << "Couldn't get link message for visual [" << this->GetName() <<
+          "]" << std::endl;
+      return;
+    }
+    auto msgPtr = new ConstLinkPtr(msg);
+
+    InertiaVisualPtr vis(new InertiaVisual(this->GetName() +
+        suffix, shared_from_this()));
+    vis->Load(*msgPtr);
+    vis->SetVisible(_show);
+  }
+
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowInertia(_show);
@@ -3005,10 +3164,23 @@ void Visual::ShowInertia(bool _show)
 //////////////////////////////////////////////////
 void Visual::ShowLinkFrame(bool _show)
 {
+  // If this is a link frame visual, set it visible
   if (this->dataPtr->type == VT_PHYSICS &&
       this->GetName().find("LINK_FRAME_VISUAL__") != std::string::npos)
+  {
     this->SetVisible(_show);
+  }
+  // If this is a link without link frame visuals, create them
+  else if (_show && this->dataPtr->type == VT_LINK && this->dataPtr->typeMsg &&
+    !this->dataPtr->scene->GetVisual(this->GetName() + "_LINK_FRAME_VISUAL__"))
+  {
+    LinkFrameVisualPtr vis(new LinkFrameVisual(this->GetName() +
+        "_LINK_FRAME_VISUAL__", shared_from_this()));
+    vis->Load();
+    vis->SetVisible(_show);
+  }
 
+  // Show for children
   for (auto &child : this->dataPtr->children)
   {
     child->ShowLinkFrame(_show);
@@ -3245,4 +3417,27 @@ msgs::Visual::Type Visual::ConvertVisualType(const Visual::VisualType &_type)
 bool Visual::UseRTShader() const
 {
   return this->dataPtr->useRTShader;
+}
+
+//////////////////////////////////////////////////
+void Visual::SetTypeMsg(const google::protobuf::Message *_msg)
+{
+  if (!_msg)
+  {
+    gzerr << "Null type message." << std::endl;
+    return;
+  }
+  this->dataPtr->typeMsg = _msg->New();
+  this->dataPtr->typeMsg->CopyFrom(*_msg);
+}
+
+//////////////////////////////////////////////////
+void Visual::AddPendingChild(std::pair<VisualType,
+    const google::protobuf::Message *> _pair)
+{
+  // Copy msg
+  auto msg = _pair.second->New();
+  msg->CopyFrom(*_pair.second);
+
+  this->dataPtr->pendingChildren.push_back(std::make_pair(_pair.first, msg));
 }

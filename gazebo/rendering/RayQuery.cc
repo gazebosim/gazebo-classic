@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,6 +75,9 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
       const common::SubMesh *submesh = mesh->GetSubMesh(j);
       for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
       {
+        if (submesh->GetVertexCount() < 3u)
+          continue;
+
         ignition::math::Vector3d vertexA =
           submesh->Vertex(submesh->GetIndex(k));
         ignition::math::Vector3d vertexB =

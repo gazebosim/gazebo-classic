@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ std::string GetVisualSDFString(const std::string &_name,
 {
   std::stringstream visualString;
   visualString
-      << "<sdf version='1.5'>"
+      << "<sdf version='" << SDF_VERSION << "'>"
       << "  <visual name='" << _name << "'>"
       << "    <pose>" << _pose << "</pose>"
       << "    <geometry>";
@@ -126,12 +126,6 @@ TEST_F(Visual_TEST, BoundingBox)
   SpawnBox("box", math::Vector3(1, 1, 1), math::Vector3(10, 10, 1),
       math::Vector3(0, 0, 0));
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
-
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
 
@@ -140,6 +134,10 @@ TEST_F(Visual_TEST, BoundingBox)
   rendering::VisualPtr visual;
   while (!visual && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     visual = scene->GetVisual("box");
     common::Time::MSleep(1000);
     sleep++;
@@ -426,12 +424,6 @@ TEST_F(Visual_TEST, DerivedTransparency)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
@@ -442,6 +434,10 @@ TEST_F(Visual_TEST, DerivedTransparency)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -1477,12 +1473,6 @@ TEST_F(Visual_TEST, Scale)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
@@ -1493,6 +1483,10 @@ TEST_F(Visual_TEST, Scale)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -1776,12 +1770,6 @@ TEST_F(Visual_TEST, VisibilityFlags)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  math::Pose cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.pos, cameraStartPose.rot.GetAsEuler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != NULL);
@@ -1792,6 +1780,10 @@ TEST_F(Visual_TEST, VisibilityFlags)
   rendering::VisualPtr cylinder;
   while ((!cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     cylinder = scene->GetVisual("cylinder");
     common::Time::MSleep(1000);
     sleep++;
@@ -1858,6 +1850,48 @@ TEST_F(Visual_TEST, VisibilityFlags)
           visualPair.first->GetChild(i), visualPair.second->GetChild(i)));
     }
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Visual_TEST, Pose)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // parent box vis
+  ignition::math::Pose3d boxPose(0.0, 1.0, 2.0, 0.0, 0.0, 0.0);
+  sdf::ElementPtr boxSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", boxSDF);
+  sdf::readString(GetVisualSDFString("visual_box", "box",
+      ignition::math::Vector3d::One, boxPose), boxSDF);
+  gazebo::rendering::VisualPtr boxVis(
+      new gazebo::rendering::Visual("box_visual", scene));
+  boxVis->Load(boxSDF);
+  EXPECT_EQ(boxVis->GetPose().Ign(), boxPose);
+  EXPECT_EQ(boxVis->GetWorldPose(), boxPose);
+  EXPECT_EQ(boxVis->InitialRelativePose(), boxPose);
+
+  // child sphere vis
+  ignition::math::Pose3d spherePose(0.0, 5.0, 5.0, 1.57, 0.0, 0.0);
+  sdf::ElementPtr sphereSDF(new sdf::Element);
+  sdf::initFile("visual.sdf", sphereSDF);
+  sdf::readString(GetVisualSDFString("visual_sphere", "sphere",
+      ignition::math::Vector3d::One, spherePose), sphereSDF);
+  gazebo::rendering::VisualPtr sphereVis(
+      new gazebo::rendering::Visual("sphere_visual", boxVis));
+  sphereVis->Load(sphereSDF);
+  EXPECT_EQ(sphereVis->GetPose().Ign(), spherePose);
+  EXPECT_EQ(sphereVis->GetWorldPose(), spherePose + boxPose);
+  EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
+
+  // set new sphere pose and verify
+  ignition::math::Pose3d newSpherePose(1.0, 20.0, 0.0, 0.0, 0.0, 1.57);
+  sphereVis->SetPose(newSpherePose);
+  EXPECT_EQ(sphereVis->GetPose().Ign(), newSpherePose);
+  EXPECT_EQ(sphereVis->GetWorldPose(), newSpherePose + boxPose);
+  EXPECT_EQ(sphereVis->InitialRelativePose(), spherePose);
 }
 
 /////////////////////////////////////////////////
