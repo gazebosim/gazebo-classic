@@ -34,7 +34,7 @@ ActorPlugin::ActorPlugin()
 /////////////////////////////////////////////////
 void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
-  this->sdf = sdf;
+  this->sdf = _sdf;
   this->actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
   this->world = this->actor->GetWorld();
 
@@ -75,6 +75,18 @@ void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       modelElem = modelElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ActorPlugin::Reset()
+{
+  this->velocity = 0.8;
+  this->lastUpdate = 0;
+
+  if (this->sdf && this->sdf->HasElement("target"))
+    this->target = this->sdf->Get<ignition::math::Vector3d>("target");
+  else
+    this->target = ignition::math::Vector3d(0, -5, 1.2138);
 
   auto skelAnims = this->actor->SkeletonAnimations();
   if (skelAnims.find(WALKING_ANIMATION) == skelAnims.end())
@@ -90,18 +102,6 @@ void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
     this->actor->SetCustomTrajectory(this->trajectoryInfo);
   }
-}
-
-/////////////////////////////////////////////////
-void ActorPlugin::Reset()
-{
-  this->velocity = 0.8;
-  this->lastUpdate = 0;
-
-  if (this->sdf && this->sdf->HasElement("target"))
-    this->target = this->sdf->Get<ignition::math::Vector3d>("target");
-  else
-    this->target = ignition::math::Vector3d(0, -5, 1.2138);
 }
 
 /////////////////////////////////////////////////

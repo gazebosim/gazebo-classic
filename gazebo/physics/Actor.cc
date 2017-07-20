@@ -794,14 +794,14 @@ const sdf::ElementPtr Actor::GetSDF()
 //////////////////////////////////////////////////
 void Actor::Reset()
 {
-  Model::Reset();
-
   this->Stop();
   this->ResetCustomTrajectory();
   this->playStartTime = this->world->SimTime();
   this->pathLength = 0.0;
   this->lastTraj = 1e+5;
   this->Init();
+
+  Model::Reset();
 }
 
 //////////////////////////////////////////////////
