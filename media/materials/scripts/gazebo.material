@@ -1504,7 +1504,7 @@ fragment_program Gazebo/CameraLesnFlareFS glsl
     param_named time float 0.0
     param_named viewport float3 0.0 0.0 0.0
     param_named lightDir float3 0.0 0.0 0.0
-    param_named viewProj mat4 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1
+    param_named lightPos float3 0 0 0
   }
 }
 

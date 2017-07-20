@@ -28,7 +28,8 @@ namespace gazebo
   namespace rendering
   {
     // We'll create an instance of this class for each camera, to be used to
-    // inject time each render call.
+    // inject dir light clip pos and time (for animating flare) and in each
+    // render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
     {
@@ -73,7 +74,15 @@ namespace gazebo
 
         auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
           this->camera->OgreCamera()->getViewMatrix();
-        params->setNamedConstant("viewProj", viewProj);
+        // set light world pos to be far away
+        auto worldPos = -this->dir * 100000.0;
+        // project 3d world space to 2d clip space
+        auto pos = viewProj * Ogre::Vector4(Conversions::Convert(worldPos));
+        // normalize x and y, and flip y
+        // keep z which is used for visibility test
+        pos.x /= pos.w;
+        pos.y /= -pos.w;
+        params->setNamedConstant("lightPos", pos);
       }
 
       /// \brief Pointer to camera

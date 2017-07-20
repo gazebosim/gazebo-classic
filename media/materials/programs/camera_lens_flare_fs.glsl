@@ -6,15 +6,9 @@ uniform float time;
 uniform vec3 viewport;
 
 uniform vec3 lightDir;
-uniform mat4 viewProj;
 
-// project 3d world pos to 2d space
-vec3 project(vec3 p)
-{
-  vec4 pos = viewProj * vec4(p, 1.0);
-  pos.xy /= pos.w;
-  return vec3(pos.x, -pos.y, pos.z);
-}
+// light pos in clip space
+uniform vec3 lightPos;
 
 float noise(float t)
 {
@@ -80,12 +74,6 @@ vec3 cc(vec3 color, float factor, float factor2)
 
 void main()
 {
-  // set sun pos to be far away
-  vec3 worldPos = -lightDir * 100000.0;
-
-  // get sun pos in clip space
-  vec3 lightPos = project(worldPos);
-
   // return if light is behind the view
   if (lightPos.z < 1.0)
   {
