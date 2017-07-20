@@ -97,7 +97,10 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   //
   // However, other simulation engines (such as DART) might clear out their
   // force information after each simulation step, so it should not necessarily
-  // be called for each engine.
+  // be called for each engine. If this test is enabled for another engine (such
+  // as SimBody or Bullet), then that engine should perform its simulation step
+  // either in this if-statement or the one below depending on how its
+  // simulation procedure works.
   if ("ode" == _physicsEngine)
   {
     _world->Step(1);
@@ -543,17 +546,11 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
         link->SetTorque(ignition::math::Vector3d(100, 0, 0));
         world->Step(1);
       }
-      if (_physicsEngine.compare("dart") == 0)
-      {
-        gzerr << "Dart fails this portion of the test (#1090)" << std::endl;
-      }
-      else
-      {
-        ignition::math::Vector3d vel = link->WorldAngularVel();
-        EXPECT_NEAR(vel.X(),  0.0703, g_tolerance);
-        EXPECT_NEAR(vel.Y(), -0.0049, g_tolerance);
-        EXPECT_NEAR(vel.Z(),  0.0000, g_tolerance);
-      }
+
+      ignition::math::Vector3d vel = link->WorldAngularVel();
+      EXPECT_NEAR(vel.X(),  0.0703, g_tolerance);
+      EXPECT_NEAR(vel.Y(), -0.0049, g_tolerance);
+      EXPECT_NEAR(vel.Z(),  0.0000, g_tolerance);
     }
   }
 }
