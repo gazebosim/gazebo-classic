@@ -141,10 +141,14 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   ignition::math::Vector3d oneStepLinearVel = linearVelWorld0 +
     dt*oneStepLinearAccel;
 
-  // Dev note (MXG): DART does not produce quite the same result as the expected
-  // value for CoG linear velocity. It might be worth investigating whether this
-  // is ordinary numerical error or if DART should be tweaked to be more
-  // precise.
+  // Dev note (MXG): DART does not always produce quite the same result as the
+  // expected value for CoG linear velocity. It might be worth investigating
+  // whether this is ordinary numerical error or if DART should be tweaked to be
+  // more precise.
+  //
+  // This test succeeds for a tolerance as low as 1e-6 in all trials except
+  // "World != link != inertial frame". This makes me suspect that the
+  // inaccuracy is a result of cummulative matrix multiplications.
   VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), 2e-3);
 
   ignition::math::Vector3d oneStepAngularVel = angularVelWorld0 +
@@ -163,6 +167,8 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   EXPECT_EQ(ignition::math::Vector3d::Zero, _link->WorldAngularAccel());
 
   // Check that velocity hasn't changed
+  // Dev note (MXG): Same note as above regarding the tolerance that is used
+  // here. Everything but "World != link != inertial frame" succeeds with 1e-6.
   VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), 2e-3);
   EXPECT_EQ(oneStepAngularVel, _link->WorldAngularVel());
 
