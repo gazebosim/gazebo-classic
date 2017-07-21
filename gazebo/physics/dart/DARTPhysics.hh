@@ -125,6 +125,13 @@ namespace gazebo
       // Documentation inherited
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
+      /// \brief Get the step type.
+      /// \return The step type (pgs or dantzig).
+      public: virtual std::string GetStepType() const;
+
+      /// \brief Set the step type.
+      /// \param[in] _type The step type (pgs or dantzig).
+      public: virtual void SetStepType(const std::string &_type);
 
       // Documentation inherited
       public: virtual void SetGravity(const ignition::math::Vector3d &_gravity);
