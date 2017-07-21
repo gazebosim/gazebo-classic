@@ -65,9 +65,6 @@ GZ_REGISTER_PHYSICS_ENGINE("dart", DARTPhysics)
 DARTPhysics::DARTPhysics(WorldPtr _world)
     : PhysicsEngine(_world), dataPtr(new DARTPhysicsPrivate())
 {
-  this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
-    dart::common::make_unique<dart::constraint::PGSLCPSolver>(
-    this->dataPtr->dtWorld->getTimeStep()));
 }
 
 //////////////////////////////////////////////////
@@ -88,6 +85,8 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
+
+  this->SetStepType(this->GetStepType());
 }
 
 //////////////////////////////////////////////////
@@ -526,6 +525,37 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::GetStepType() const
+{
+  sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
+  return elem->Get<std::string>("type");
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::SetStepType(const std::string &_type)
+{
+  sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
+  elem->GetElement("type")->Set(_type);
+
+  if (_type == "dantzig")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else if (_type == "pgs")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::PGSLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else
+  {
+    gzerr << "Invalid step type[" << _type << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->world->SetGravitySDF(_gravity);
@@ -652,6 +682,9 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   // This should be done first so that the profile settings
   // can be over-ridden by other message parameters.
   PhysicsEngine::OnPhysicsMsg(_msg);
+
+  if (_msg->has_solver_type())
+    this->SetStepType(_msg->solver_type());
 
   if (_msg->has_enable_physics())
     this->world->SetPhysicsEnabled(_msg->enable_physics());
