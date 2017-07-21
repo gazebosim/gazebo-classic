@@ -73,7 +73,7 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
 
   // Approximate expected configuration
   EXPECT_NEAR(joint1->Position(), 0.61, 0.1);
-  EXPECT_NEAR(joint2->Position(), -1.25, 0.25);
+  EXPECT_NEAR(joint2->Position(), -1.25, 0.1);
   EXPECT_NEAR(joint3->Position(), 0.82, 0.1);
   EXPECT_NEAR(joint4->Position(), 0.19, 0.1);
 }

@@ -151,6 +151,11 @@ namespace gazebo
           return false;
 
         dartJoint->SetDARTJoint(pair.first);
+
+        // FIXME the dummy body node should not add mass/inertia to the model
+        pair.second->setMomentOfInertia(1e-2, 1e-2, 1e-2, 0.0, 0.0, 0.0);
+        pair.second->setMass(1e-2);
+        pair.second->setGravityMode(false);
         pair.second->setCollidable(false);
 
         dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
