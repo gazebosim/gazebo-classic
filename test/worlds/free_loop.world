@@ -1,6 +1,13 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
   <world name="default">
+    <physics type="dart">
+      <dart>
+        <solver>
+          <type>pgs</type>
+        </solver>
+      </dart>
+    </physics>
 
     <include>
       <uri>model://ground_plane</uri>
