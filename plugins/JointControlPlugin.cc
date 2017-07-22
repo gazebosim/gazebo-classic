@@ -115,8 +115,10 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                 grandchild->Get<std::string>());
             std::vector<std::string> matches(jointNames.size());
             auto iter = std::copy_if(jointNames.begin(), jointNames.end(),
-                matches.begin(), [&](std::string const& name) {
-                return std::regex_match(name, exp);});
+                matches.begin(), [&](std::string const& name)
+                {
+                return std::regex_match(name, exp);
+                });
             matches.resize(std::distance(matches.begin(), iter));
 
             if (matches.empty())
