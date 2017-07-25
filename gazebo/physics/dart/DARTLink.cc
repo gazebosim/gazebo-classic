@@ -276,8 +276,8 @@ void DARTLink::UpdateMass()
         *ignition::math::Matrix3d(R_inertial.Inverse());
 
     this->dataPtr->dtBodyNode->setMomentOfInertia(
-        I_link(0,0), I_link(1,1), I_link(2,2),
-        I_link(0,1), I_link(0,2), I_link(1,2));
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
 
     const auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
