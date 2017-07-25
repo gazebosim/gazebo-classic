@@ -314,7 +314,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
 
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
-        (this->writeQueue.back().size()+_buffer.size() > 4096))
+        (this->writeQueue.back().size() + HEADER_LENGTH + _buffer.size() >
+         4096))
     {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
       this->callbacks.push_back({std::make_pair(_cb, _id)});
