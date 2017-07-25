@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add option in gui.ini to disable the use of spacenav
+    * [Pull request 2754](https://bitbucket.org/osrf/gazebo/pull-requests/2754)
+
 1. Fix disabling mesh cast shadows
     * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
 
