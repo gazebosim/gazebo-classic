@@ -23,7 +23,8 @@ using namespace gazebo;
 
 class JointStateTest : public gazebo::testing::AutoLogFixture { };
 
-TEST_F(JointStateTest, DefaultConstructedJointStateHasNoAngles) {
+TEST_F(JointStateTest, DefaultConstructedJointStateHasNoAngles)
+{
   physics::JointState jointState;
 
   EXPECT_EQ(0u, jointState.GetAngleCount());
@@ -31,7 +32,8 @@ TEST_F(JointStateTest, DefaultConstructedJointStateHasNoAngles) {
   EXPECT_TRUE(ignition::math::isnan(jointState.Position(0)));
 }
 
-TEST_F(JointStateTest, LoadFromSdfSingleAxis) {
+TEST_F(JointStateTest, LoadFromSdfSingleAxis)
+{
   std::ostringstream sdfStr;
   sdfStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<world name='default'>"
@@ -65,7 +67,8 @@ TEST_F(JointStateTest, LoadFromSdfSingleAxis) {
   EXPECT_TRUE(ignition::math::isnan(jointState.Position(1)));
 }
 
-TEST_F(JointStateTest, LoadFromSdfMultiAxis) {
+TEST_F(JointStateTest, LoadFromSdfMultiAxis)
+{
   std::ostringstream sdfStr;
   sdfStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<world name='default'>"
@@ -101,7 +104,8 @@ TEST_F(JointStateTest, LoadFromSdfMultiAxis) {
   EXPECT_TRUE(ignition::math::isnan(jointState.Position(2)));
 }
 
-TEST_F(JointStateTest, StreamDefaultConstructed) {
+TEST_F(JointStateTest, StreamDefaultConstructed)
+{
   physics::JointState defaultJointState;
 
   std::ostringstream sdfStr;
@@ -134,8 +138,8 @@ TEST_F(JointStateTest, StreamDefaultConstructed) {
   EXPECT_EQ(0u, sdfJointState.GetAngleCount());
 }
 
-TEST_F(JointStateTest, StreamSingleAxis) {
-
+TEST_F(JointStateTest, StreamSingleAxis)
+{
   physics::JointState initialJointState;
   {
     std::ostringstream sdfStr;
@@ -197,8 +201,8 @@ TEST_F(JointStateTest, StreamSingleAxis) {
   EXPECT_DOUBLE_EQ(1.57, sdfJointState.Position(0));
 }
 
-TEST_F(JointStateTest, StreamMultiAxis) {
-
+TEST_F(JointStateTest, StreamMultiAxis)
+{
   physics::JointState initialJointState;
   {
     std::ostringstream sdfStr;
