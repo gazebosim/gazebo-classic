@@ -204,10 +204,6 @@ void DARTLink::Init()
   // Visual
   this->visuals;
 
-  // COG offset
-  ignition::math::Vector3d cog = this->inertial->CoG();
-  this->dataPtr->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
-
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 
