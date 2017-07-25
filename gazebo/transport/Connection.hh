@@ -392,7 +392,7 @@ namespace gazebo
 
       /// \brief List of callbacks, paired with writeQueue. The callbacks
       /// are used to notify a publisher when a message is successfully sent.
-      private: std::deque<std::vector<
+      private: std::deque< std::vector<
                std::pair<boost::function<void(uint32_t)>, uint32_t> > >
                  callbacks;
 
