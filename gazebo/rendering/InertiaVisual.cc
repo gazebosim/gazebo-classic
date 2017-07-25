@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,9 +88,8 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
   if (!m.EquivalentBox(boxScale, boxRot))
   {
     // Invalid inertia, load with default scale
-    gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
-          << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(ignition::math::Pose3d(xyz, q));
+    gzlog << "The link " << _msg->name() << " is static or has unrealistic "
+          << "inertia, so the equivalent inertia box will not be shown.\n";
   }
   else
   {

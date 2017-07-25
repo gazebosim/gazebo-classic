@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -218,6 +218,18 @@ namespace gazebo
 
       /// \brief Generate the SDF from model link and joint visuals.
       public: void GenerateSDF();
+
+      /// \brief Show or hide collision visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowCollisions(const bool _show);
+
+      /// \brief Show or hide visual visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowVisuals(const bool _show);
+
+      /// \brief Show or hide link frame visuals.
+      /// \param[in] _show True to show, false to hide.
+      public slots: void ShowLinkFrames(const bool _show);
 
       /// \brief Helper function to generate link sdf from link data.
       /// \param[in] _link Link data used to generate the sdf.

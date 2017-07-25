@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,12 +36,18 @@ void LinkInspector_TEST::RemoveButton()
   QList<QToolButton *> toolButtons =
       linkInspector->findChildren<QToolButton *>();
 
-  // 3 tool buttons: remove link, remove visual, remove collision
-  QVERIFY(toolButtons.size() == 3);
-  QVERIFY(toolButtons[0]->text() == "");
+  // 6 tool buttons:
+  // show collisions,
+  // show visuals,
+  // show link frames,
+  // remove link,
+  // remove visual,
+  // remove collision
+  QVERIFY(toolButtons.size() == 6);
+  QVERIFY(toolButtons[3]->text() == "");
 
   // Trigger remove
-  toolButtons[0]->click();
+  toolButtons[3]->click();
 
   // Check link inspector disappeared
   QVERIFY(!linkInspector->isVisible());

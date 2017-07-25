@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,6 +92,28 @@ TEST_F(Heightmap_TEST, splitTerrain)
   }
 }
 
+/////////////////////////////////////////////////
+/// \brief Test terrain's level of detail API
+TEST_F(Heightmap_TEST, LOD)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_TRUE(scene != nullptr);
+
+  gazebo::rendering::Heightmap *heightmap =
+      new gazebo::rendering::Heightmap(scene);
+
+  // test basic API
+  EXPECT_EQ(heightmap->LOD(), 0u);
+  heightmap->SetLOD(3u);
+  EXPECT_EQ(heightmap->LOD(), 3u);
+
+  // try 0 LOD
+  heightmap->SetLOD(0u);
+  EXPECT_EQ(heightmap->LOD(), 0u);
+}
+
 #ifdef HAVE_GDAL
 /////////////////////////////////////////////////
 /// \brief Test Loading a terrain from a DEM file
@@ -137,7 +159,7 @@ TEST_F(Heightmap_TEST, LoadDEM)
   // and the actual elevation data (dem.GetElevation)
   common::Dem dem;
   EXPECT_EQ(dem.Load(path.string()), 0);
-  EXPECT_DOUBLE_EQ(heightmap->Height(0, 0),
+  EXPECT_FLOAT_EQ(heightmap->Height(0, 0),
       dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2));
 
   delete heightmap;

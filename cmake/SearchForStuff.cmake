@@ -80,8 +80,7 @@ else ()
 endif ()
 
 ########################################
-include (FindHDF5)
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C CXX)
 
 if (NOT HDF5_FOUND)
   BUILD_WARNING("HDF5 not found")
@@ -544,7 +543,7 @@ endif()
 
 ########################################
 # Find QT
-find_package(Qt4 COMPONENTS QtWebKit QtCore QtGui QtXml QtXmlPatterns REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui QtXml QtXmlPatterns REQUIRED)
 if (NOT QT4_FOUND)
   BUILD_ERROR("Missing: Qt4")
 endif()

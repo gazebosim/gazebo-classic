@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ void ContactSensor::Load(const std::string &_worldName)
 
   std::string entityName =
       this->world->GetEntity(this->ParentName())->GetScopedName();
-  std::string filterName = entityName + "::" + this->Name();
+  this->dataPtr->filterName = entityName + "::" + this->Name();
 
   // Get all the collision elements
   while (collisionElem)
@@ -119,7 +119,7 @@ void ContactSensor::Load(const std::string &_worldName)
     // this sensor
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    std::string topic = mgr->CreateFilter(filterName,
+    std::string topic = mgr->CreateFilter(this->dataPtr->filterName,
         this->dataPtr->collisions);
     if (!this->dataPtr->contactSub)
     {
@@ -215,13 +215,9 @@ void ContactSensor::Fini()
 {
   if (this->world && this->world->GetRunning())
   {
-    std::string entityName =
-        this->world->GetEntity(this->ParentName())->GetScopedName();
-    std::string filterName = entityName + "::" + this->Name();
-
     physics::ContactManager *mgr =
         this->world->GetPhysicsEngine()->GetContactManager();
-    mgr->RemoveFilter(filterName);
+    mgr->RemoveFilter(this->dataPtr->filterName);
   }
 
   this->dataPtr->contactSub.reset();

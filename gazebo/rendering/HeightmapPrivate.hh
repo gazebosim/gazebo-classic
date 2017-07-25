@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -247,6 +247,12 @@ namespace gazebo
       /// \param[in] _materialName Name of material
       public: void setMaterialByName(const std::string &_materialname);
 
+      /// \brief Set the grid size of the terrain, i.e. Number of terrain slots.
+      /// This will be used to determined how the texture will be mapped to the
+      /// terrain
+      /// \param[in] _size Grid size of the terrain
+      public: void setGridSize(const unsigned int _size);
+
       /// \brief Subclassed to provide profile-specific material generation
       class Profile : public Ogre::TerrainMaterialGenerator::Profile
       {
@@ -290,6 +296,9 @@ namespace gazebo
 
       /// \brief Name of material
       protected: std::string materialName;
+
+      /// \brief Size of grid
+      protected: unsigned int gridSize = 1u;
     };
 
 
@@ -331,9 +340,6 @@ namespace gazebo
     /// \brief Private data for the Heightmap class
     class HeightmapPrivate
     {
-      /// \brief Number of pieces in which a terrain is subdivided for paging.
-      public: static const unsigned int numTerrainSubdivisions;
-
       /// \brief The terrain pages are loaded if the distance from the camera is
       /// within the loadRadius. See Ogre::TerrainPaging::createWorldSection().
       /// LoadRadiusFactor is a multiplier applied to the terrain size to create
@@ -436,6 +442,23 @@ namespace gazebo
 
       /// \brief Pointer to heightmap data
       public: common::HeightmapData *heightmapData = nullptr;
+
+      /// \brief Number of samples per heightmap datum
+      public: unsigned int sampling = 2u;
+
+      /// \brief Max pixel error allowed for rendering the heightmap. This
+      /// affects the transitions between LOD levels.
+      public: double maxPixelError = 0.0;
+
+      /// \brief True if the terrain need to be split into subterrains
+      public: bool splitTerrain = false;
+
+      /// \brief Number of pieces in which a terrain is subdivided. Used
+      /// for paging and also when heighmap is too large for LOD to work.
+      public: unsigned int numTerrainSubdivisions = 16u;
+
+      /// \brief Event connections
+      public: std::vector<event::ConnectionPtr> connections;
     };
   }
 }

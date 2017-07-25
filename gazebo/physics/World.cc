@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -451,6 +451,7 @@ void World::RunLoop()
   // Get the first state
   this->dataPtr->prevStates[0] = WorldState(shared_from_this());
   this->dataPtr->prevStates[1] = WorldState(shared_from_this());
+
   this->dataPtr->stateToggle = 0;
 
   this->dataPtr->logThread =
@@ -2545,36 +2546,70 @@ void World::LogWorker()
 
   while (!this->dataPtr->stop)
   {
-    int currState = (this->dataPtr->stateToggle + 1) % 2;
-
-    this->dataPtr->prevStates[currState].Load(self);
-    WorldState diffState = this->dataPtr->prevStates[currState] -
-      this->dataPtr->prevStates[this->dataPtr->stateToggle];
-    this->dataPtr->logPrevIteration = this->dataPtr->iterations;
-
-    if (!diffState.IsZero())
+    // get unfiltered world state
+    WorldState unfilteredState;
     {
-      this->dataPtr->stateToggle = currState;
+      boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+      unfilteredState.Load(self);
+    }
+
+    // compute world state diff and find out about insertions and deletions
+    std::vector<std::string> insertions;
+    std::vector<std::string> deletions;
+    bool insertDelete = false;
+    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+    {
+      WorldState unfilteredDiffState = unfilteredState -
+          this->dataPtr->prevUnfilteredState;
+      if (!unfilteredDiffState.IsZero())
       {
-        // Store the entire current state (instead of the diffState). A slow
-        // moving link may never be captured if only diff state is recorded.
-        boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+        insertions = unfilteredDiffState.Insertions();
+        deletions = unfilteredDiffState.Deletions();
+        insertDelete = !insertions.empty() || !deletions.empty();
+      }
+    }
+    this->dataPtr->prevUnfilteredState = unfilteredState;
 
-        auto insertions = diffState.Insertions();
-        this->dataPtr->prevStates[currState].SetInsertions(insertions);
-        auto deletions = diffState.Deletions();
-        this->dataPtr->prevStates[currState].SetDeletions(deletions);
+    // Throttle state capture based on log recording frequency.
+    auto simTime = this->GetSimTime();
+    if ((simTime - this->dataPtr->logLastStateTime >=
+        util::LogRecord::Instance()->Period()) || insertDelete)
+    {
+      int currState = (this->dataPtr->stateToggle + 1) % 2;
 
-        this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
-            this->dataPtr->prevStates[currState]);
+      std::string filterStr = util::LogRecord::Instance()->Filter();
+      // compute diff for filtered states
+      {
+        boost::mutex::scoped_lock dLock(this->dataPtr->entityDeleteMutex);
+        this->dataPtr->prevStates[currState].LoadWithFilter(self, filterStr);
+      }
+      WorldState diffState = this->dataPtr->prevStates[currState] -
+          this->dataPtr->prevStates[this->dataPtr->stateToggle];
+      this->dataPtr->logPrevIteration = this->dataPtr->iterations;
 
-        // Tell the logger to update, once the number of states exceeds 1000
-        if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
-            1000)
+      if (!diffState.IsZero() || insertDelete)
+      {
+        this->dataPtr->stateToggle = currState;
         {
-          util::LogRecord::Instance()->Notify();
+          // Store the entire current state (instead of the diffState). A slow
+          // moving link may never be captured if only diff state is recorded.
+          boost::mutex::scoped_lock bLock(this->dataPtr->logBufferMutex);
+
+          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
+              this->dataPtr->prevStates[currState]);
+
+          // Tell the logger to update, once the number of states exceeds 1000
+          if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
+              1000)
+          {
+            util::LogRecord::Instance()->Notify();
+          }
         }
       }
+
+      this->dataPtr->logLastStateTime = simTime;
     }
 
     this->dataPtr->logContinueCondition.notify_all();
