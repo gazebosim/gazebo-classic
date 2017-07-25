@@ -86,7 +86,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 
-  this->SetStepType(this->GetStepType());
+  this->SetSolverType(this->GetSolverType());
 }
 
 //////////////////////////////////////////////////
@@ -525,14 +525,14 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
-std::string DARTPhysics::GetStepType() const
+std::string DARTPhysics::GetSolverType() const
 {
   sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
   return elem->Get<std::string>("type");
 }
 
 //////////////////////////////////////////////////
-void DARTPhysics::SetStepType(const std::string &_type)
+void DARTPhysics::SetSolverType(const std::string &_type)
 {
   sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
   elem->GetElement("type")->Set(_type);
@@ -684,7 +684,7 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   PhysicsEngine::OnPhysicsMsg(_msg);
 
   if (_msg->has_solver_type())
-    this->SetStepType(_msg->solver_type());
+    this->SetSolverType(_msg->solver_type());
 
   if (_msg->has_enable_physics())
     this->world->SetPhysicsEnabled(_msg->enable_physics());
