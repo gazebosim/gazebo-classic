@@ -223,9 +223,8 @@ namespace gazebo
                   const ignition::math::Vector3d &_relPos) = 0;
 
       /// \brief Add a force expressed in the link frame.
-      /// \param[in] _force Direction vector expressed in the link frame. Each
-      /// component corresponds to the force which will be added in that axis
-      /// and the vector's magnitude corresponds to the total force.
+      /// \param[in] _force Force to add. The force must be expressed in the
+      /// link-fixed reference frame.
       /// \param[in] _offset Offset position expressed in coordinates of the
       /// link frame with respect to the link frame's origin. It defaults to the
       /// link origin.
