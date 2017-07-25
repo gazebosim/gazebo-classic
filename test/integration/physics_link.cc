@@ -191,7 +191,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
 /////////////////////////////////////////////////
 void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
 {
-  // TODO bullet, dart and simbody currently fail this test
+  // TODO bullet and simbody currently fail this test
   if (_physicsEngine != "ode" && _physicsEngine != "dart")
   {
     gzerr << "Aborting AddForce test for Bullet and Simbody. "
