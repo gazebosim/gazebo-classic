@@ -352,7 +352,6 @@ math::Angle BulletSliderJoint::GetAngleImpl(unsigned int _index) const
   math::Vector3 offset = this->GetWorldPose().pos
                  - this->GetParentWorldPose().pos;
   math::Vector3 axis = this->GetGlobalAxis(_index);
-  math::Pose poseParent = this->GetWorldPose();
   return math::Angle(axis.Dot(offset));
 }
 
