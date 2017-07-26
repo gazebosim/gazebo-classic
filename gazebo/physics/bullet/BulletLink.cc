@@ -131,9 +131,8 @@ void BulletLink::Init()
       hackMu1 = friction->MuPrimary();
       hackMu2 = friction->MuSecondary();
 
-      auto relativePose =
-        - this->inertial->GetPose().Ign()
-        + collision->GetRelativePose().Ign();
+      auto relativePose = collision->GetRelativePose().Ign()
+          - this->inertial->GetPose().Ign();
       if (!this->compoundShape)
         this->compoundShape = new btCompoundShape();
       dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(

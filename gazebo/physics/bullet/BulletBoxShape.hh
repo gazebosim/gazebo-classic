@@ -108,8 +108,8 @@ namespace gazebo
 
                     compoundShape->removeChildShape(shape);
                     auto relativePose =
-                        - bLink->GetInertial()->GetPose().Ign()
-                        + this->collisionParent->GetRelativePose().Ign();
+                        this->collisionParent->GetRelativePose().Ign()
+                        - bLink->GetInertial()->GetPose().Ign();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }
