@@ -80,11 +80,11 @@ void BulletHingeJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
     pivotParent = pose.rot.RotateVectorReverse(pivotParent);
     axisParent = pose.rot.RotateVectorReverse(axis);
     axisParent = axisParent.Normalize();
@@ -92,11 +92,11 @@ void BulletHingeJoint::Init()
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.rot.RotateVectorReverse(pivotChild);
     axisChild = pose.rot.RotateVectorReverse(axis);
     axisChild = axisChild.Normalize();

@@ -162,11 +162,11 @@ void BulletScrewJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
     pivotParent = pose.rot.RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
     axisParent = pose.rot.RotateVectorReverse(axis);
@@ -181,11 +181,11 @@ void BulletScrewJoint::Init()
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.rot.RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
     axisChild = pose.rot.RotateVectorReverse(axis);
