@@ -201,6 +201,11 @@ void BulletScrewJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    pose = math::Pose(pivotChild,
+        this->childLink->GetWorldInertialPose().rot.GetInverse() *
+        this->parentLink->GetWorldInertialPose().rot *
+        BulletTypes::ConvertPose(frameParent).rot);
+    frameChild = BulletTypes::ConvertPose(pose);
     this->bulletScrew = new btScrewConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),

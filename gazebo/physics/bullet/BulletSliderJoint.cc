@@ -104,7 +104,7 @@ void BulletSliderJoint::Init()
     pose = this->childLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed inertla frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.rot.RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
     axisChild = pose.rot.RotateVectorReverse(axis);
@@ -120,6 +120,11 @@ void BulletSliderJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    pose = math::Pose(pivotChild,
+        this->childLink->GetWorldInertialPose().rot.GetInverse() *
+        this->parentLink->GetWorldInertialPose().rot *
+        BulletTypes::ConvertPose(frameParent).rot);
+    frameChild = BulletTypes::ConvertPose(pose);
     this->bulletSlider = new btSliderConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),
