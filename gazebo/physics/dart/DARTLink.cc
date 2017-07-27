@@ -201,9 +201,6 @@ void DARTLink::Init()
   // Inertia
   UpdateMass();
 
-  // Visual
-  this->visuals;
-
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
 

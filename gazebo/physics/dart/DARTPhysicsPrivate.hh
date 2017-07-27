@@ -30,7 +30,8 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTPhysicsPrivate()
-        : dtWorld(new dart::simulation::World())
+        : dtWorld(new dart::simulation::World()),
+          resetAllForcesAfterSimulationStep(true)
       {
       }
 
@@ -44,6 +45,8 @@ namespace gazebo
 
       /// \brief Pointer to DART World associated with this DART Physics.
       public: dart::simulation::WorldPtr dtWorld;
+
+      public: bool resetAllForcesAfterSimulationStep;
     };
   }
 }

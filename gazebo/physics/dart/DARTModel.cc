@@ -312,6 +312,10 @@ void DARTModel::Fini()
     // So instead, for now we will just step() the world, which will also
     // update the last collision result used in DARTPhysics::UpdateCollision().
     _world->step();
+
+    // Note (MXG): Stepping forward without rolling back any Skeleton states
+    // may cause unexpected fast-forwarding in the simulation. Is this really
+    // desirable behavior?
   }
 }
 

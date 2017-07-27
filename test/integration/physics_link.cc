@@ -44,8 +44,10 @@ class PhysicsLinkTest : public ServerFixture,
   /// \param[in] _force Force expressed in link frame.
   /// \param[in] _offset Offset expressed in link frame, defaults to link
   /// origin.
-  public: void AddLinkForceTwoWays(
-      const std::string &_physicsEngine, physics::WorldPtr _world,
+  public: void AddLinkForceTwoWays(const std::string &_physicsEngine,
+      const bool _world_equals_link,
+      const bool _link_equals_inertial,
+      physics::WorldPtr _world,
       physics::LinkPtr _link, ignition::math::Vector3d _force,
       ignition::math::Vector3d _offset = ignition::math::Vector3d::Zero);
 
@@ -73,6 +75,8 @@ class PhysicsLinkTest : public ServerFixture,
 /////////////////////////////////////////////////
 void PhysicsLinkTest::AddLinkForceTwoWays(
     const std::string& _physicsEngine,
+    const bool _world_equals_link,
+    const bool _link_equals_inertial,
     physics::WorldPtr _world,
     physics::LinkPtr _link, ignition::math::Vector3d _force,
     ignition::math::Vector3d _offset)
@@ -92,15 +96,17 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   const double dt = _world->Physics()->GetMaxStepSize();
 
   // Note: This step must be performed before checking the link forces when ODE
-  // is the physics engine, because otherwise the force and torque quantities
-  // will not be available.
+  // is the physics engine, because otherwise the link accelerations will not be
+  // computed, and therefore the result of WorldForce and WorldTorque (which
+  // depend on the current accelerations) will be zero.
   //
-  // However, other simulation engines (such as DART) might clear out their
-  // force information after each simulation step, so it should not necessarily
-  // be called for each engine. If this test is enabled for another engine (such
-  // as SimBody or Bullet), then that engine should perform its simulation step
-  // either in this if-statement or the one below depending on how its
-  // simulation procedure works.
+  // However, other simulation engines (such as DART) maintain the link forces
+  // and torques as part of the current state, and the values (might) get
+  // cleared out after each simulation step (depending on the engine's current
+  // settings), so it should not necessarily be called for each engine. If this
+  // test is enabled for another engine (such as SimBody or Bullet), then that
+  // engine should perform its simulation step either in this if-statement or
+  // the one below depending on how its simulation procedure works.
   if ("ode" == _physicsEngine)
   {
     _world->Step(1);
@@ -146,10 +152,16 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   // whether this is ordinary numerical error or if DART should be tweaked to be
   // more precise.
   //
-  // This test succeeds for a tolerance as low as 1e-6 in all trials except
+  // The tests succeed for a tolerance as low as 1e-6 in all trials except
   // "World != link != inertial frame". This makes me suspect that the
   // inaccuracy is a result of cummulative matrix multiplications.
-  VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), 2e-3);
+  double tolerance = 1e-6;
+  if("dart" == _physicsEngine && !_world_equals_link && !_link_equals_inertial)
+  {
+    tolerance = 2e-3;
+  }
+
+  VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), tolerance);
 
   ignition::math::Vector3d oneStepAngularVel = angularVelWorld0 +
     dt*oneStepAngularAccel;
@@ -169,7 +181,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   // Check that velocity hasn't changed
   // Dev note (MXG): Same note as above regarding the tolerance that is used
   // here. Everything but "World != link != inertial frame" succeeds with 1e-6.
-  VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), 2e-3);
+  VEC_EXPECT_NEAR(oneStepLinearVel, _link->WorldCoGLinearVel(), tolerance);
   EXPECT_EQ(oneStepAngularVel, _link->WorldAngularVel());
 
   // Add opposing force in link frame and check that link is back to initial
@@ -233,7 +245,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   gzdbg << "World == link == inertial frames, no offset" << std::endl;
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldInertialPose());
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, true, true, world, link,
                             ignition::math::Vector3d(1, 20, 31));
 
   gzdbg << "World != link == inertial frames, no offset" << std::endl;
@@ -242,14 +254,14 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
         ignition::math::Quaterniond(0, IGN_PI/2.0, 1)), link);
   EXPECT_NE(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(link->WorldPose(), link->WorldInertialPose());
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, false, true, world, link,
                             ignition::math::Vector3d(-1, 10, 5));
 
   gzdbg << "World == link == inertial frames, with offset" << std::endl;
   model->SetLinkWorldPose(ignition::math::Pose3d::Zero, link);
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldInertialPose());
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, true, true, world, link,
                             ignition::math::Vector3d(5, 4, 3),
                             ignition::math::Vector3d(-2, 1, 0));
 
@@ -262,7 +274,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   link->UpdateMass();
   EXPECT_EQ(ignition::math::Pose3d::Zero, link->WorldPose());
   EXPECT_EQ(inertialPose, link->WorldInertialPose());
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, true, false, world, link,
                             ignition::math::Vector3d(1, 2, 1));
 
   gzdbg << "World != link != inertial frames, with offset" << std::endl;
@@ -273,7 +285,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
       ignition::math::Quaterniond(0, 2.0*IGN_PI, IGN_PI/3));
   link->GetInertial()->SetCoG(inertialPose);
   link->UpdateMass();
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, false, false, world, link,
                             ignition::math::Vector3d(1, 2, 1),
                             ignition::math::Vector3d(-2, 0.5, 1));
 
@@ -289,7 +301,7 @@ void PhysicsLinkTest::AddForce(const std::string &_physicsEngine)
   link->UpdateMass();
   link->SetLinearVel(ignition::math::Vector3d(2, -0.1, 5));
   link->SetAngularVel(ignition::math::Vector3d(-IGN_PI/10, 0, 0.0001));
-  this->AddLinkForceTwoWays(_physicsEngine, world, link,
+  this->AddLinkForceTwoWays(_physicsEngine, false, false, world, link,
                             ignition::math::Vector3d(-3, 2.5, -15),
                             ignition::math::Vector3d(-6, -1, -0.2));
 }
@@ -564,12 +576,11 @@ void PhysicsLinkTest::GetWorldInertia(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
 {
-  // TODO bullet, dart and simbody currently fail this test
-  if (_physicsEngine != "ode")
+  // TODO bullet and simbody currently fail this test
+  if (_physicsEngine != "ode" && _physicsEngine != "dart")
   {
-    gzerr << "Aborting OnWrenchMsg test for Bullet, DART and Simbody. "
-          << "Because of issues #1476, #1477, and #1478."
-          << std::endl;
+    gzerr << "Aborting OnWrenchMsg test for Bullet and Simbody. "
+          << "Because of issues #1476 and #1478." << std::endl;
     return;
   }
 
@@ -636,6 +647,18 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   torques.push_back(ignition::math::Vector3d(-0.2, 5, 0));
   forceOffsets.push_back(ignition::math::Vector3d(-1, -4, -0.8));
 
+  // When DART is the phyiscs engine, in order to pass this test, we need to
+  // turn off the default behavior of clearing the forces and torques after
+  // each simulation step. The force and torques that are sent over messages
+  // don't get received by the simulation engine until the update step occurs,
+  // but the update step will also simulate forward, and DART's default behavior
+  // would then clear out the forces and torques. Setting this parameter
+  // overrides that behavior.
+  if("dart" == _physicsEngine)
+  {
+    physics->SetParam("auto_reset_forces", false);
+  }
+
   for (unsigned int i = 0; i < forces.size(); ++i)
   {
     gzdbg << "Testing force: " << forces[i].X() << ", "
@@ -664,17 +687,28 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
     ignition::math::Vector3d torqueWorld =
       worldOffset.Cross(forces[i]) + torques[i];
 
+    double tolerance = 1e-6;
+    // Note: Similar to the issue in AddLinkForceTwoWays, DART experiences some
+    // inaccuracies when returning the WorldForce. I suspect this is because of
+    // numerical inaccuracies built up through matrix multiplications. Perhaps
+    // we should check on the accuracy of the matrix quantities that we provide
+    // to DART.
+    if("dart" == _physicsEngine)
+    {
+      tolerance = 2e-3;
+    }
+
     // Wait for message to be received
-    while (link->WorldForce() != forceWorld ||
-           link->WorldTorque() != torqueWorld)
+    while (!link->WorldForce().Equal(forceWorld, tolerance) ||
+           !link->WorldTorque().Equal(torqueWorld, 1e-6) )
     {
       world->Step(1);
       common::Time::MSleep(1);
     }
 
     // Check force and torque (at CoG?) in world frame
-    EXPECT_EQ(link->WorldForce(), forceWorld);
-    EXPECT_EQ(link->WorldTorque(), torqueWorld);
+    VEC_EXPECT_NEAR(link->WorldForce(), forceWorld, tolerance);
+    VEC_EXPECT_NEAR(link->WorldTorque(), torqueWorld, 1e-6);
 
     // Reset link's physics states
     link->ResetPhysicsStates();
