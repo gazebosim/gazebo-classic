@@ -120,6 +120,8 @@ void BulletSliderJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    // Parent and child frames generated with btPlaneSpace1 may not match, so
+    // we explicitly align the child frame to the parent frame here.
     pose = math::Pose(pivotChild,
         this->childLink->GetWorldInertialPose().rot.GetInverse() *
         this->parentLink->GetWorldInertialPose().rot *
