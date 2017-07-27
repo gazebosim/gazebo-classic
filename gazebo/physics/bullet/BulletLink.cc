@@ -235,11 +235,8 @@ void BulletLink::Fini()
 /////////////////////////////////////////////////////////////////////
 void BulletLink::UpdateMass()
 {
-  if (this->rigidLink && this->inertial)
-  {
-    this->rigidLink->setMassProps(this->inertial->GetMass(),
-        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
-  }
+  gzerr << "UpdateMass is not implemented for Bullet. The inertial properties "
+    << "of the Gazebo link and Bullet rigid body may now be inconsistent.\n";
 }
 
 //////////////////////////////////////////////////
