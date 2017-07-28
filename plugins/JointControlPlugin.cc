@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <regex>
+#include <boost/algorithm/string.hpp>
 
 #include <gazebo/common/Assert.hh>
 #include <gazebo/physics/Model.hh>
@@ -44,9 +45,10 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   ignition::transport::Node node;
-  const std::string topic = "/" + _model->GetScopedName() + "/joint_cmd";
+  std::string modelName = _model->GetScopedName();
+  boost::replace_all(modelName, "::", "/");
   ignition::transport::Node::Publisher jointPub =
-      node.Advertise<ignition::msgs::JointCmd>(topic);
+      node.Advertise<ignition::msgs::JointCmd>("/" + modelName + "/joint_cmd");
 
   // Loop over controller definitions
   sdf::ElementPtr child = _sdf->GetFirstElement();
