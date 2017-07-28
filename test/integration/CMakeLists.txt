@@ -47,6 +47,7 @@ set(tests
   imu.cc
   info_services.cc
   introspection_items.cc
+  joint_control_plugin.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc

@@ -15,14 +15,18 @@
 			<plugin name="init_joint_control" filename="libJointControlPlugin.so">
         <controller type="position">
           <joint>upper_joint</joint>
+          <target>-1.5708</target>
+          <pid_gains>100 2 10</pid_gains>
+        </controller>
+        <controller type="position">
           <joint>lower_joint</joint>
-          <target>1.0</target>
-          <pid_gains>10 1 2</pid_gains>
+          <target>-2.7124</target>
+          <pid_gains>100 2 10</pid_gains>
         </controller>
         <controller type="velocity">
           <joint>(.*)_joint</joint>
           <target>0.0</target>
-          <pid_gains>2 0 0.1</pid_gains>
+          <pid_gains>10 0 0</pid_gains>
         </controller>
       </plugin>
     </include>
