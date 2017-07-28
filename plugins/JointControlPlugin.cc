@@ -59,9 +59,9 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       if (child->HasAttribute("type"))
       {
         ignition::msgs::JointCmd msg;
-        std::string type = child->Get<std::string>("type");
+        std::string controllerType = child->Get<std::string>("type");
 
-        if (type == "force")
+        if (controllerType == "force")
         {
           if (child->HasElement("target"))
           {
@@ -72,7 +72,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
             gzwarn << "PID gains not used for force controllers.\n";
           }
         }
-        else if (type == "position")
+        else if (controllerType == "position")
         {
           if (child->HasElement("target"))
           {
@@ -86,7 +86,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
             msg.mutable_position()->set_d_gain(gains.Z());
           }
         }
-        else if (type == "velocity")
+        else if (controllerType == "velocity")
         {
           if (child->HasElement("target"))
           {
@@ -102,7 +102,8 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
         }
         else
         {
-          gzerr << "Unrecognized controller type \"" << type << "\".\n";
+          gzerr << "Unrecognized controller type \""
+                << controllerType << "\".\n";
           continue;
         }
 
