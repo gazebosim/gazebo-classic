@@ -581,11 +581,11 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 5.0.0 QUIET)
+set (SDFormat_MIN_VERSION 5 QUIET)
 find_package(SDFormat ${SDFormat_MIN_VERSION})
 
 if (SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat 5 - found")
+  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
 else ()
   # try finding both sdformat 5 and 6 until we switch to 6
   find_package(SDFormat 6)
