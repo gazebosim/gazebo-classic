@@ -418,9 +418,9 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   // velocities to zero, however DART's behavior does not satisfy that
   // assumption (by design), so we set these position and velocity values to
   // zero so that we do not violate the assumptions of the next test.
-  for(const physics::JointPtr& j : {joint_00, joint_01})
+  for (const physics::JointPtr &j : {joint_00, joint_01})
   {
-    for(size_t k=0; k < 2; ++k)
+    for (std::size_t k = 0; k < 2; ++k)
     {
       j->SetVelocity(k, 0.0);
       j->SetPosition(k, 0.0);
@@ -453,6 +453,7 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     // tests will fail.
     EXPECT_NEAR(0.0, angle_00_0, 1e-6);
     EXPECT_NEAR(0.0, angle_01_0, 1e-6);
+    EXPECT_NEAR(0.0, pose_01.Rot().Euler().X(), 1e-6);
     EXPECT_NEAR(pose_01.Rot().Euler().Y(), angle_00_1 + angle_01_1, 1e-6);
   }
 }

@@ -774,7 +774,8 @@ double DARTJoint::PositionImpl(const unsigned int _index) const
 {
   if (!this->dataPtr->IsInitialized())
   {
-    return this->dataPtr->GetCached<double>("Position" + std::to_string(_index));
+    return this->dataPtr->GetCached<double>(
+          "Position" + std::to_string(_index));
   }
 
   double result = ignition::math::NAN_D;
