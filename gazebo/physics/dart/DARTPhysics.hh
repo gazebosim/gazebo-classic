@@ -126,11 +126,11 @@ namespace gazebo
       public: virtual ShapePtr CreateShape(const std::string &_shapeType,
                                            CollisionPtr _collision);
       /// \brief Get the constraint LCP solver type.
-      /// \return The solver type (pgs or dantzig).
+      /// \return The solver type: dantzig (default) or pgs.
       public: std::string GetSolverType() const;
 
       /// \brief Set the constraint LCP solver type.
-      /// \param[in] _type The solver type (pgs or dantzig).
+      /// \param[in] _type The solver type (dantzig or pgs).
       public: void SetSolverType(const std::string &_type);
 
       // Documentation inherited

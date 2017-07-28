@@ -527,15 +527,30 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 //////////////////////////////////////////////////
 std::string DARTPhysics::GetSolverType() const
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
-  return elem->Get<std::string>("type");
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      return dartElem->GetElement("solver")->Get<std::string>("solver_type");
+    }
+  }
+  return "dantzig";
 }
 
 //////////////////////////////////////////////////
 void DARTPhysics::SetSolverType(const std::string &_type)
 {
-  sdf::ElementPtr elem = this->sdf->GetElement("dart")->GetElement("solver");
-  elem->GetElement("type")->Set(_type);
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
+    }
+  }
 
   if (_type == "dantzig")
   {
@@ -589,7 +604,11 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
   // physics dart element not yet added to sdformat
   GZ_ASSERT(dartElem, "DART SDF element does not exist");
 
-  if (_key == "max_contacts")
+  if (_key == "solver_type")
+  {
+    _value = this->GetSolverType();
+  }
+  else if (_key == "max_contacts")
   {
     _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
@@ -611,7 +630,11 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   /// \TODO fill this out, see issue #1115
   try
   {
-    if (_key == "max_contacts")
+    if(_key == "solver_type")
+    {
+      this->SetSolverType(boost::any_cast<std::string>(_value));
+    }
+    else if (_key == "max_contacts")
     {
       int value = boost::any_cast<int>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
