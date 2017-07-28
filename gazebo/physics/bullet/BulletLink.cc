@@ -78,8 +78,6 @@ void BulletLink::Init()
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  this->initInertialPose.reset(new ignition::math::Pose3d(
-      this->inertial->Ign().Pose()));
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
@@ -98,9 +96,6 @@ void BulletLink::Init()
 
     this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
     this->inertial->SetCoG(inertialPose);
-
-    this->initInertialPose->Rot() = inertialPose.Rot();
-    this->initInertialPose->Pos() = inertialPose.Pos();
   }
 
   /// \todo FIXME:  Friction Parameters
@@ -227,7 +222,6 @@ void BulletLink::Fini()
   this->rigidLink = NULL;
 
   this->motionState.reset();
-  this->initInertialPose.reset();
 
   if (this->compoundShape)
     delete this->compoundShape;
@@ -241,27 +235,10 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
-    auto inertiald = this->inertial->Ign();
-    auto m = inertiald.MassMatrix();
-    auto Idiag = m.PrincipalMoments();
-    auto inertialPose = inertiald.Pose();
-    inertialPose.Rot() *= m.PrincipalAxesOffset();
-
-    if (*(this->initInertialPose) == inertialPose)
-    {
-      this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
-      this->inertial->SetCoG(inertialPose);
-    }
-    else
+    if (this->inertial->GetProductsofInertia() != math::Vector3::Zero)
     {
       gzwarn << "UpdateMass is ignoring off-diagonal inertia terms.\n";
-      if (*(this->initInertialPose) != inertiald.Pose())
-      {
-        gzerr << "New inertial pose differs from initial pose. Gazebo link "
-            << "and Bullet rigid body frames may now be inconsistent.\n";
-      }
     }
-
     this->rigidLink->setMassProps(this->inertial->GetMass(),
         BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
   }
