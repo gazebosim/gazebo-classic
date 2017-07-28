@@ -22,6 +22,9 @@
 #ifndef _BULLETLINK_HH_
 #define _BULLETLINK_HH_
 
+#include <ignition/math/Pose3.hh>
+#include <boost/shared_ptr.hpp>
+
 #include "gazebo/physics/bullet/bullet_inc.h"
 #include "gazebo/physics/bullet/BulletTypes.hh"
 #include "gazebo/physics/Link.hh"
@@ -176,6 +179,9 @@ namespace gazebo
 
       /// \brief Pointer to the bullet physics engine.
       private: BulletPhysicsPtr bulletPhysics;
+
+      /// \brief Initial inertial pose to which bullet rigid body is aligned.
+      private: boost::shared_ptr<ignition::math::Pose3d> initInertialPose;
     };
     /// \}
   }
