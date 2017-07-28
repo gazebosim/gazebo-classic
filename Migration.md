@@ -5,7 +5,7 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
-## Gazebo 8.X to 9.X
+## Gazebo 8.x to 9.x
 
 ### -g command line argument to load plugins in gzclient
 
@@ -16,6 +16,9 @@ release will remove the deprecated code.
 
 ### Modifications
 
+1. **gazebo/gui/JointControlWidget.hh**
+    + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
+    + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
 1. **gazebo/physics/Link.hh**
     + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -31,6 +34,9 @@ release will remove the deprecated code.
 
 ### Deprecations
 
+1. **gazebo/physics/JointController.hh**
+    + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
+    + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 1. **gazebo/physics/Link.hh**
     + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
