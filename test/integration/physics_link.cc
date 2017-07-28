@@ -39,12 +39,16 @@ class PhysicsLinkTest : public ServerFixture,
 
   /// \brief Use AddLinkForce on the given direction and then the opposite
   /// direction so they cancel out.
+  /// \param[in] _physicsEngine Name of the physics engine that is being used
+  /// \param[in] _world_equals_link World Frame == Link Frame
+  /// \param[in] _link_equals_inertial Link Frame == Inertial Frame
   /// \param[in] _world World pointer.
   /// \param[in] _link Link pointer.
   /// \param[in] _force Force expressed in link frame.
   /// \param[in] _offset Offset expressed in link frame, defaults to link
   /// origin.
-  public: void AddLinkForceTwoWays(const std::string &_physicsEngine,
+  public: void AddLinkForceTwoWays(
+      const std::string &_physicsEngine,
       const bool _world_equals_link,
       const bool _link_equals_inertial,
       physics::WorldPtr _world,
