@@ -37,7 +37,7 @@ namespace gazebo
     /// \param[in] _sdf Pointer to the plugin's SDF elements.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
-    // Documentation Unherited.
+    // Documentation Inherited.
     public: virtual void Reset();
 
     /// \brief Function that is called every update cycle.
