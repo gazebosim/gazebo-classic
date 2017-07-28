@@ -240,8 +240,6 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     this->dataPtr->publishers.push_back(std::make_pair(pub, conn));
 
-    SubList::iterator iter;
-
     this->SendSubscribers(pub.topic(),
         msgs::Package("publisher_advertise", pub));
   }
