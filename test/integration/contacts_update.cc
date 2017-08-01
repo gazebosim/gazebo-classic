@@ -65,8 +65,27 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   world->Step(1);
 
   gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
 
-  ASSERT_GT(contactManager->GetContactCount(), 0u);
+  contactManager->ResetCount();
+
+  world->SetPhysicsEnabled(true);
+  // Enable the engine and do one step.
+  // The contacts should be available with the engine enabled.
+  world->Step(1);
+
+  gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
+
+  // Bullet does not currently pass this part of the test.
+  if(_physicsEngine != "bullet")
+  {
+    world->RemoveModel("sphere2");
+    // There should be no more contacts reported after sphere2 is removed.
+    world->Step(1);
+
+    EXPECT_EQ(contactManager->GetContactCount(), 0u);
+  }
 }
 
 TEST_P(ContactsUpdate, TestTwoSpheres)
