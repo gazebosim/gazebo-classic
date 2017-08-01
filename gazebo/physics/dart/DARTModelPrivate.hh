@@ -128,7 +128,6 @@ namespace gazebo
       }
 
       public: static bool CreateLoopJointAndNodePair(
-          dart::simulation::WorldPtr _world,
           dart::dynamics::SkeletonPtr _skeleton,
           dart::dynamics::BodyNode* _parent,
           JointPtr _joint,
@@ -156,11 +155,6 @@ namespace gazebo
         dartJoint->SetDARTJoint(pair.first);
         pair.second->setCollidable(false);
         dartLink->AddSlaveBodyNode(pair.second);
-
-        dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
-        dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
-            dtChildBodyNode, pair.second));
-        _world->getConstraintSolver()->addConstraint(dtWeldJointConst);
 
         return true;
       }

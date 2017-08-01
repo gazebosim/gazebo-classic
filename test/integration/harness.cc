@@ -78,6 +78,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
     EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
     EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
   }
+  common::Time::MSleep(20000);
 
   // Detach message harness via transport topic
   auto detachPub =
@@ -128,7 +129,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
 TEST_P(Harness, DetachPaused)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
@@ -204,7 +205,7 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
 TEST_P(Harness, DetachUnpaused)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
@@ -287,7 +288,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
 TEST_P(Harness, LowerStopRaise)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
