@@ -270,8 +270,8 @@ void DARTLink::UpdateMass()
 {
   if (this->dataPtr->dtBodyNode && this->inertial)
   {
-		double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
-		double mass = this->inertial->Mass()/nFragments;
+    double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
+    double mass = this->inertial->Mass()/nFragments;
     this->dataPtr->dtBodyNode->setMass(mass);
 
     const ignition::math::Quaterniond R_inertial = this->inertial->Pose().Rot();
@@ -280,11 +280,11 @@ void DARTLink::UpdateMass()
         ignition::math::Matrix3d(R_inertial)
         *this->inertial->MOI()
         *ignition::math::Matrix3d(R_inertial.Inverse())
-				*(1.0/nFragments);
+        *(1.0/nFragments);
 
     this->dataPtr->dtBodyNode->setMomentOfInertia(
-        I_link(0,0), I_link(1,1), I_link(2,2),
-        I_link(0,1), I_link(0,2), I_link(1,2));
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
 
     const auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
@@ -293,8 +293,8 @@ void DARTLink::UpdateMass()
     {
       slaveNode->setMass(mass);
       slaveNode->setMomentOfInertia(
-        I_link(0,0), I_link(1,1), I_link(2,2),
-        I_link(0,1), I_link(0,2), I_link(1,2));
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
       slaveNode->setLocalCOM(cog);
     }
   }
