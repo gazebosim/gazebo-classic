@@ -32,8 +32,10 @@
 using namespace gazebo;
 using namespace gui;
 
-const QString activeColor = "#353535";
-const QString inactiveColor = "#737373";
+const QString activeStyle =
+"QDoubleSpinBox{background: #404040; color: #ffffff;}";
+const QString inactiveStyle =
+"QDoubleSpinBox{background: #737373; color: #353535;}";
 
 /////////////////////////////////////////////////
 JointForceControl::JointForceControl(const std::string &_name,
@@ -50,7 +52,6 @@ JointForceControl::JointForceControl(const std::string &_name,
   this->dataPtr->forceSpin->setValue(0.000);
 
   _layout->addWidget(this->dataPtr->forceSpin, _index, 2);
-  this->SetShowActive(false);
 
   connect(this->dataPtr->forceSpin, SIGNAL(valueChanged(double)),
           this, SLOT(OnChanged(double)));
@@ -79,18 +80,10 @@ void JointForceControl::SetForce(const double _force)
 }
 
 /////////////////////////////////////////////////
-void JointForceControl::SetShowActive(bool _active)
+void JointForceControl::SetShowActive(const bool _active)
 {
-  if (_active)
-  {
-    this->dataPtr->forceSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-  }
-  else
-  {
-    this->dataPtr->forceSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-  }
+  this->dataPtr->forceSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
@@ -195,16 +188,14 @@ void JointPIDPosControl::SetDGain(const double _dGain)
 /////////////////////////////////////////////////
 void JointPIDPosControl::SetShowActive(bool _active)
 {
-  if (_active)
-  {
-    this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-  }
-  else
-  {
-    this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-  }
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
@@ -348,16 +339,14 @@ void JointPIDVelControl::SetDGain(const double _dGain)
 /////////////////////////////////////////////////
 void JointPIDVelControl::SetShowActive(bool _active)
 {
-  if (_active)
-  {
-    this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + activeColor + ";}");
-  }
-  else
-  {
-    this->dataPtr->posSpin->setStyleSheet(
-        "QDoubleSpinBox{color: " + inactiveColor + ";}");
-  }
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
