@@ -198,18 +198,8 @@ void DARTLink::Init()
   std::string bodyName = this->GetName();
   this->dataPtr->dtBodyNode->setName(bodyName);
 
-  // Mass
-  double mass = this->inertial->Mass();
-  this->dataPtr->dtBodyNode->setMass(mass);
-
   // Inertia
-  double Ixx = this->inertial->IXX();
-  double Iyy = this->inertial->IYY();
-  double Izz = this->inertial->IZZ();
-  double Ixy = this->inertial->IXY();
-  double Ixz = this->inertial->IXZ();
-  double Iyz = this->inertial->IYZ();
-  this->dataPtr->dtBodyNode->setMomentOfInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
+  this->UpdateMass();
 
   // Visual
   this->visuals;
@@ -280,14 +270,33 @@ void DARTLink::UpdateMass()
 {
   if (this->dataPtr->dtBodyNode && this->inertial)
   {
-    this->dataPtr->dtBodyNode->setMass(this->inertial->Mass());
-    auto Ixxyyzz = this->inertial->PrincipalMoments();
-    auto Ixyxzyz = this->inertial->ProductsOfInertia();
+		double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
+		double mass = this->inertial->Mass()/nFragments;
+    this->dataPtr->dtBodyNode->setMass(mass);
+
+    const ignition::math::Quaterniond R_inertial = this->inertial->Pose().Rot();
+
+    const ignition::math::Matrix3d I_link =
+        ignition::math::Matrix3d(R_inertial)
+        *this->inertial->MOI()
+        *ignition::math::Matrix3d(R_inertial.Inverse())
+				*(1.0/nFragments);
+
     this->dataPtr->dtBodyNode->setMomentOfInertia(
-        Ixxyyzz[0], Ixxyyzz[1], Ixxyyzz[2],
-        Ixyxzyz[0], Ixyxzyz[1], Ixyxzyz[2]);
-    auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
+        I_link(0,0), I_link(1,1), I_link(2,2),
+        I_link(0,1), I_link(0,2), I_link(1,2));
+
+    const auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
+
+    for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+    {
+      slaveNode->setMass(mass);
+      slaveNode->setMomentOfInertia(
+        I_link(0,0), I_link(1,1), I_link(2,2),
+        I_link(0,1), I_link(0,2), I_link(1,2));
+      slaveNode->setLocalCOM(cog);
+    }
   }
 }
 
@@ -719,6 +728,10 @@ void DARTLink::SetGravityMode(bool _mode)
   }
 
   this->dataPtr->dtBodyNode->setGravityMode(_mode);
+  for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+  {
+    slaveNode->setGravityMode(_mode);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -982,6 +995,12 @@ DARTBodyNodePropPtr DARTLink::DARTProperties() const
 void DARTLink::SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 {
   this->dataPtr->dtBodyNode = _dtBodyNode;
+}
+
+//////////////////////////////////////////////////
+void DARTLink::AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
+{
+  this->dataPtr->dtSlaveNodes.push_back(_dtBodyNode);
 }
 
 //////////////////////////////////////////////////
