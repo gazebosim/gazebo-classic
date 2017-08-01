@@ -360,3 +360,28 @@ dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
   if (!physics) return nullptr;
   return physics->DARTWorld();
 }
+
+//////////////////////////////////////////////////
+JointPtr DARTModel::CreateJoint(
+    const std::string &_name, const std::string &_type,
+    physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  auto joint = Model::CreateJoint(_name, _type, _parent, _child);
+  // TODO
+  return joint;
+}
+
+//////////////////////////////////////////////////
+JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
+{
+  auto joint = Model::CreateJoint(_sdf);
+  // TODO
+  return joint;
+}
+
+//////////////////////////////////////////////////
+bool DARTModel::RemoveJoint(const std::string &_name)
+{
+  // TODO
+  return Model::RemoveJoint(_name);
+}

@@ -58,6 +58,18 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void Fini();
 
+      // Documentation inherited.
+      public: virtual gazebo::physics::JointPtr CreateJoint(
+        const std::string &_name, const std::string &_type,
+        physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      // Documentation inherited.
+      public: virtual gazebo::physics::JointPtr CreateJoint(
+        sdf::ElementPtr _sdf);
+
+      // Documentation inherited.
+      public: virtual bool RemoveJoint(const std::string &_name);
+
       /// \brief
       public: void BackupState();
 
