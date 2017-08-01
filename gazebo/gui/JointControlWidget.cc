@@ -186,7 +186,7 @@ void JointPIDPosControl::SetDGain(const double _dGain)
 }
 
 /////////////////////////////////////////////////
-void JointPIDPosControl::SetShowActive(bool _active)
+void JointPIDPosControl::SetShowActive(const bool _active)
 {
   this->dataPtr->posSpin->setStyleSheet(
       _active ? activeStyle : inactiveStyle);
@@ -337,7 +337,7 @@ void JointPIDVelControl::SetDGain(const double _dGain)
 }
 
 /////////////////////////////////////////////////
-void JointPIDVelControl::SetShowActive(bool _active)
+void JointPIDVelControl::SetShowActive(const bool _active)
 {
   this->dataPtr->posSpin->setStyleSheet(
       _active ? activeStyle : inactiveStyle);

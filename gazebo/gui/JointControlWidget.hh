@@ -192,7 +192,7 @@ namespace gazebo
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
-      public: void SetShowActive(bool _active);
+      public: void SetShowActive(const bool _active);
 
       /// \brief On force changed callback.
       /// \param[in] _value Value of the changed slider.
@@ -248,7 +248,7 @@ namespace gazebo
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
-      public: void SetShowActive(bool _active);
+      public: void SetShowActive(const bool _active);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -340,7 +340,7 @@ namespace gazebo
 
       /// \brief Indicate whether controls are active by highlighting them.
       /// \param[in] _active Whether the joint control is active or not.
-      public: void SetShowActive(bool _active);
+      public: void SetShowActive(const bool _active);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.
