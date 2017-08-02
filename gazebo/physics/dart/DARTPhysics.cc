@@ -85,8 +85,6 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
-
-  this->SetSolverType(this->GetSolverType());
 }
 
 //////////////////////////////////////////////////
