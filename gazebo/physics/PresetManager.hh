@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \class Preset PresetManager.hh gazebo/physics/PresetManager.hh
     /// \brief Representation of a preset physics profile
-    class GAZEBO_VISIBLE Preset
+    class GZ_PHYSICS_VISIBLE Preset
     {
       /// \brief Constructor.
       public: Preset();
@@ -101,7 +101,7 @@ namespace gazebo
 
     /// \class PresetManager PresetManager.hh gazebo/physics/PresetManager.hh
     /// \brief Class to manage preset physics profiles.
-    class GAZEBO_VISIBLE PresetManager
+    class GZ_PHYSICS_VISIBLE PresetManager
     {
       /// \brief Constructor
       /// \param[in] _physicsEngine Pointer to the world physics engine.

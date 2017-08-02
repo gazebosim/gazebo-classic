@@ -41,7 +41,7 @@ namespace gazebo
 
     /// \class ForceTorqueSensor ForceTorqueSensor.hh sensors/sensors.hh
     /// \brief Sensor for measure force and torque on a joint.
-    class GAZEBO_VISIBLE ForceTorqueSensor: public Sensor
+    class GZ_SENSORS_VISIBLE ForceTorqueSensor: public Sensor
     {
       /// \brief Constructor.
       public: ForceTorqueSensor();
