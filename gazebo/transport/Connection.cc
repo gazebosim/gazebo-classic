@@ -314,11 +314,17 @@ void Connection::EnqueueMsg(const std::string &_buffer,
 
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
-        (this->writeQueue.back().size()+_buffer.size() > 4096))
+        (this->writeQueue.back().size() + HEADER_LENGTH + _buffer.size() >
+         4096))
+    {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->callbacks.push_back({std::make_pair(_cb, _id)});
+    }
     else
+    {
       this->writeQueue.back() += std::string(headerBuffer) + _buffer;
-    this->callbacks.push_back(std::make_pair(_cb, _id));
+      this->callbacks.back().push_back(std::make_pair(_cb, _id));
+    }
   }
 
   if (_force)
@@ -356,7 +362,6 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    this->callbackIndex = this->callbacks.size();
     boost::asio::async_write(*this->socket,
         boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
@@ -376,12 +381,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
       this->Shutdown();
     }
 
-    // Call the callback, in not NULL
-    if (!this->callbacks.front().first.empty())
-      this->callbacks.front().first(this->callbacks.front().second);
-
-    this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 }
 
@@ -398,24 +398,29 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
+void Connection::PostWrite()
+{
+  // Call the callbacks, if not NULL
+  if (!this->callbacks.empty())
+  {
+    for (auto const &callback : this->callbacks.front())
+      if (!callback.first.empty())
+        callback.first(callback.second);
+    this->callbacks.pop_front();
+  }
+
+  if (!this->writeQueue.empty())
+    this->writeQueue.pop_front();
+  this->writeCount--;
+}
+
+//////////////////////////////////////////////////
 void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    for (unsigned int i = 0; i < this->callbackIndex; ++i)
-    {
-      if (!this->callbacks.empty())
-      {
-        if (!this->callbacks.front().first.empty())
-          this->callbacks.front().first(this->callbacks.front().second);
-        this->callbacks.pop_front();
-      }
-    }
-
-    if (!this->writeQueue.empty())
-      this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 
   if (_e)

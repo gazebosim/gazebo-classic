@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class WirelessTransmitter WirelessTransmitter.hh sensors/sensors.hh
     /// \brief Transmitter to send wireless signals
-    class GAZEBO_VISIBLE WirelessTransmitter: public WirelessTransceiver
+    class GZ_SENSORS_VISIBLE WirelessTransmitter: public WirelessTransceiver
     {
       /// \brief Constructor.
       public: WirelessTransmitter();
