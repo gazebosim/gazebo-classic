@@ -42,7 +42,7 @@ namespace gazebo
     /// \class ContactSensor ContactSensor.hh sensors/sensors.hh
     /// \brief Contact sensor. This sensor detects and reports contacts between
     ///  objects
-    class GAZEBO_VISIBLE ContactSensor: public Sensor
+    class GZ_SENSORS_VISIBLE ContactSensor: public Sensor
     {
       /// \brief Constructor.
       public: ContactSensor();

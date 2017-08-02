@@ -39,7 +39,7 @@ namespace gazebo
     /// \{
 
     /// \brief AltimeterSensor to provide vertical position and velocity
-    class GAZEBO_VISIBLE AltimeterSensor: public Sensor
+    class GZ_SENSORS_VISIBLE AltimeterSensor: public Sensor
     {
       /// \brief Constructor.
       public: AltimeterSensor();

@@ -40,7 +40,7 @@ namespace gazebo
     /// \{
     /// \brief Depth camera sensor
     /// This sensor is used for simulating standard monocular cameras
-    class GAZEBO_VISIBLE DepthCameraSensor : public CameraSensor
+    class GZ_SENSORS_VISIBLE DepthCameraSensor : public CameraSensor
     {
       /// \brief Constructor
       public: DepthCameraSensor();
