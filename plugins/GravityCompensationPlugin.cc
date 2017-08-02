@@ -26,6 +26,7 @@
 #include <gazebo/physics/World.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/Link.hh>
+#include <gazebo/physics/dart/DARTTypes.hh>
 
 #include <dart/dart.hpp>
 #include <dart/utils/utils.hpp>
@@ -192,34 +193,30 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
 /////////////////////////////////////////////////
 void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
 {
-  auto dtRoot = dynamic_cast<dart::dynamics::FreeJoint *>(
-      this->dataPtr->skel->getJoint("root"));
-  if (dtRoot == nullptr)
+  dart::dynamics::Joint *dtJoint = this->dataPtr->skel->getRootJoint();
+  if (dtJoint == nullptr)
   {
     gzerr << "Failed to find root joint of DART skeleton\n";
   }
 
-  // Get model pose
-  ignition::math::Pose3d pose = this->dataPtr->model->WorldPose();
-  ignition::math::Vector3d pos = pose.Pos();
-  ignition::math::Quaterniond rot = pose.Rot();
-  // Set skeleton pose
-  Eigen::Isometry3d dtPose =
-      Eigen::Translation<double, 3>(pos.X(), pos.Y(), pos.Z()) *
-      Eigen::Quaterniond(rot.W(), rot.X(), rot.Y(), rot.Z());
-  dart::dynamics::FreeJoint::setTransform(dtRoot, dtPose);
-
-  // Get model velocity
-  ignition::math::Vector3d linVel = this->dataPtr->model->WorldLinearVel();
-  ignition::math::Vector3d angVel = this->dataPtr->model->WorldAngularVel();
-  // Set skeleton velocity
-  dtRoot->setLinearVelocity(
-      Eigen::Vector3d(linVel.X(), linVel.Y(), linVel.Z()));
-  dtRoot->setAngularVelocity(
-      Eigen::Vector3d(angVel.X(), angVel.Y(), angVel.Z()));
+  // A free (root) joint won't be in the Gazebo model, so handle it seperately.
+  auto dtFreeJoint = dynamic_cast<dart::dynamics::FreeJoint *>(dtJoint);
+  if (dtFreeJoint != nullptr)
+  {
+    // Set skeleton pose
+    dtFreeJoint->setTransform(
+        physics::DARTTypes::ConvPose(this->dataPtr->model->WorldPose()));
+    // Get model velocity
+    ignition::math::Vector3d linVel = this->dataPtr->model->WorldLinearVel();
+    ignition::math::Vector3d angVel = this->dataPtr->model->WorldAngularVel();
+    // Set skeleton velocity
+    dtFreeJoint->setLinearVelocity(
+        Eigen::Vector3d(linVel.X(), linVel.Y(), linVel.Z()));
+    dtFreeJoint->setAngularVelocity(
+        Eigen::Vector3d(angVel.X(), angVel.Y(), angVel.Z()));
+  }
 
   // Set skeleton joint positions and velocities
-  dart::dynamics::Joint *dtJoint;
   physics::Joint_V joints = this->dataPtr->model->GetJoints();
   for (auto joint : joints)
   {
@@ -232,7 +229,7 @@ void GravityCompensationPlugin::Update(const common::UpdateInfo &/*_info*/)
   }
 
   // Gravity compensation
-  Eigen::VectorXd forces = this->dataPtr->skel->getGravityForces();
+  Eigen::VectorXd forces = this->dataPtr->skel->getCoriolisAndGravityForces();
   for (auto joint : joints)
   {
     dtJoint = this->dataPtr->skel->getJoint(joint->GetName());
