@@ -140,7 +140,7 @@ void UpdateContacts(btDynamicsWorld *_world, btScalar _timeStep)
         _world->getDispatcher()->getManifoldByIndexInternal(i);
 
     const int numContacts = contactManifold->getNumContacts();
-    if(0 == numContacts)
+    if (0 == numContacts)
       continue;
 
     const btCollisionObject *obA =
