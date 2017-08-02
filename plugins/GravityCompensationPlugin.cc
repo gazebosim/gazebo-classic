@@ -129,9 +129,9 @@ void GravityCompensationPlugin::Load(physics::ModelPtr _model,
   // Load a DART skeleton model
   if (_sdf->HasElement("uri"))
   {
-    const ModelResourceRetrieverPtr retriever(new ModelResourceRetriever);
     this->dataPtr->skel = dart::utils::SdfParser::readSkeleton(
-        _sdf->Get<std::string>("uri"), retriever);
+        _sdf->Get<std::string>("uri"),
+        std::make_shared<ModelResourceRetriever>());
     if (this->dataPtr->skel == nullptr)
     {
       gzerr << "Error parsing " << _sdf->Get<std::string>("uri") << "\n";
