@@ -5,6 +5,18 @@
 1. Added support for tracked vehicles
     * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
 
+1. Added and improved communications between the JointControlWidget and JointController
+    * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
+    * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
+
+1. Add the option --gui-client-plugin to load GUI plugins. Leave -g to load System Plugins.
+    * [Pull request #2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
+    * [Issue 2279](https://bitbucket.org/osrf/gazebo/issues/2279)
+
+1. Add actors in World as models so they get returned with World::Models()
+    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
     * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
