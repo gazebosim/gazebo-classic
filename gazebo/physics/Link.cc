@@ -250,6 +250,8 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
+  this->updateConnection.reset();
+
   this->attachedModels.clear();
   this->parentJoints.clear();
   this->childJoints.clear();
