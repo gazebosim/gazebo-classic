@@ -38,13 +38,39 @@
 
 #include <sdf/sdf.hh>
 
-#include "GravityCompensationPluginPrivate.hh"
 #include "GravityCompensationPlugin.hh"
 
 
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(GravityCompensationPlugin)
+
+namespace gazebo
+{
+  /// \internal
+  /// \brief Private data for the GravityCompensationPlugin.
+  class GravityCompensationPluginPrivate
+  {
+    public: GravityCompensationPluginPrivate()
+            {
+            }
+
+    /// \brief The gazebo model.
+    public: physics::ModelPtr model;
+
+    /// \brief A DART skeleton for the model.
+    public: dart::dynamics::SkeletonPtr skel;
+
+    /// \brief Connects to world update event.
+    public: event::ConnectionPtr updateConnection;
+
+    /// \brief Node for communication.
+    public: transport::NodePtr node;
+
+    /// \brief Subscribe to the "~/physics" topic.
+    public: transport::SubscriberPtr physicsSub;
+  };
+}
 
 /////////////////////////////////////////////////
 bool ModelResourceRetriever::exists(const dart::common::Uri &_uri)

@@ -157,7 +157,6 @@ if (HAVE_DART_URDF)
     )
     install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
     gz_install_includes("plugins" ${src}.hh)
-    gz_install_includes("plugins" ${src}Private.hh)
   endforeach ()
 endif()
 
