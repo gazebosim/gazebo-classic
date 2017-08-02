@@ -16,6 +16,7 @@
 */
 
 #include <list>
+#include <queue>
 #include <algorithm>
 
 #include "gazebo/common/Assert.hh"
@@ -88,7 +89,7 @@ void DARTModel::Init()
     }
   }
 
-  Joint_V jointsSkipped;
+  Joint_V loopJoints;
   Link_V allLinks = this->GetLinks();
 
   std::list<LinkPtr> linksToAdd;
@@ -97,8 +98,8 @@ void DARTModel::Init()
     linksToAdd.push_back(link);
   }
 
-  std::list<LinkPtr> linksToProcess;
-  linksToProcess.push_back(worldLink);
+  std::queue<LinkPtr> linksToProcess;
+  linksToProcess.push(worldLink);
 
   while (!linksToAdd.empty())
   {
@@ -127,14 +128,14 @@ void DARTModel::Init()
       }
 
       linksToAdd.remove(newRoot);
-      linksToProcess.push_back(newRoot);
+      linksToProcess.push(newRoot);
     }
 
     // Add children using BFS
     while (!linksToProcess.empty())
     {
       LinkPtr parentLink = linksToProcess.front();
-      linksToProcess.pop_front();
+      linksToProcess.pop();
       for (auto joint : parentLink->GetChildJoints())
       {
         LinkPtr childLink = joint->GetChild();
@@ -167,19 +168,19 @@ void DARTModel::Init()
           }
 
           linksToAdd.erase(childLinkItr);
-          linksToProcess.push_back(childLink);
+          linksToProcess.push(childLink);
         }
         else
         {
           // Child link has already been added to skeleton
-          jointsSkipped.push_back(joint);
+          loopJoints.push_back(joint);
         }
       }
     }
   }
 
   // Process remaining joints
-  for (auto joint : jointsSkipped)
+  for (auto joint : loopJoints)
   {
     gzdbg << "Building DART BodyNode for link '" << joint->GetChild()->GetName()
           << "' and loop joint '" << joint->GetName() << "'.\n";
