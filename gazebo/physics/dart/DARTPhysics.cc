@@ -591,10 +591,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
-    else if (_key == "max_step_size")
-    {
-      this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
-    }
     else if (_key == "auto_reset_forces")
     {
       this->dataPtr->resetAllForcesAfterSimulationStep =
@@ -602,6 +598,14 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     }
     else
     {
+      // Note: This is nested in the else statement intentionally so that the
+      // base PhysicsEngine class will also be updated about the change to the
+      // max_step_size parameter.
+      if (_key == "max_step_size")
+      {
+        this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
+      }
+
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
