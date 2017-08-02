@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

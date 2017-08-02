@@ -66,9 +66,8 @@ void InertiaVisual::Load(ConstLinkPtr &_msg)
   if (!m.EquivalentBox(boxScale, boxRot))
   {
     // Invalid inertia, load with default scale
-    gzlog << "The link " << _msg->name() << " has unrealistic inertia, "
-          << "unable to visualize box of equivalent inertia." << std::endl;
-    this->Load(ignition::math::Pose3d(xyz, q));
+    gzlog << "The link " << _msg->name() << " is static or has unrealistic "
+          << "inertia, so the equivalent inertia box will not be shown.\n";
   }
   else
   {

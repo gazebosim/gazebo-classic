@@ -17,8 +17,11 @@
 #ifndef GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 #define GAZEBO_GUI_JOINTCONTROLWIDGET_HH_
 
+#include <functional>
 #include <memory>
 #include <string>
+#include <ignition/msgs.hh>
+#include <ignition/transport.hh>
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
@@ -57,6 +60,25 @@ namespace gazebo
       /// \brief Set the name of the model to control.
       /// \param[in] _modelName Name of the model.
       public: void SetModelName(const std::string &_modelName);
+
+      /// \brief Called when the joint controller responds with its parameters.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      /// \param[in] _result Whether the triggering request was successful.
+      private: void ResponseCallback(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep, const bool _result);
+
+      /// \brief On response callback.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      private slots: void OnResponse(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
+
+      /// \brief QT signal, used to report a response from the joint controller.
+      /// \param[in] _modelName The model to which the response refers.
+      /// \param[in] _rep The joint controller's reponse.
+      Q_SIGNALS: void repReceived(const std::string &_modelName,
+          const ignition::msgs::JointCmd &_rep);
 
       /// \brief On reset callback.
       private slots: void OnReset();
@@ -164,6 +186,10 @@ namespace gazebo
       /// \brief Reset the controls.
       public: void Reset();
 
+      /// \brief Set the control force.
+      /// \param[in] _force Value of the control force.
+      public: void SetForce(const double _force);
+
       /// \brief On force changed callback.
       /// \param[in] _value Value of the changed slider.
       public slots: void OnChanged(double _value);
@@ -199,6 +225,22 @@ namespace gazebo
 
       /// \brief Reset the controls.
       public: void Reset();
+
+      /// \brief Set the PID target position.
+      /// \param[in] _target Target position.
+      public: void SetPositionTarget(const double _target);
+
+      /// \brief Set the PID proportional gain.
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
+
+      /// \brief Set the PID integral gain.
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
+
+      /// \brief Set the PID derivative gain.
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -271,6 +313,22 @@ namespace gazebo
 
       /// \brief Reset the controls.
       public: void Reset();
+
+      /// \brief Set the PID target velocity.
+      /// \param[in] _target Target velocity.
+      public: void SetVelocityTarget(const double _target);
+
+      /// \brief Set the PID proportional gain.
+      /// \param[in] _pGain Proportional gain value.
+      public: void SetPGain(const double _pGain);
+
+      /// \brief Set the PID integral gain.
+      /// \param[in] _iGain Integral gain value.
+      public: void SetIGain(const double _iGain);
+
+      /// \brief Set the PID derivative gain.
+      /// \param[in] _dGain Derivative gain value.
+      public: void SetDGain(const double _dGain);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.

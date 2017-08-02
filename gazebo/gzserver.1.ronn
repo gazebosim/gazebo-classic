@@ -29,6 +29,10 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Compression encoding format for log data (zlib|bz2|txt).
 * --record_path arg :
  Absolute path in which to store state data
+* --record_period arg (=-1) :
+ Recording period (seconds).
+* --record_filter arg :
+ Recording filter (supports wildcard and regular expression).
 * --seed arg :
  Start with a given random number seed.
 * --iters arg :

@@ -25,7 +25,7 @@
       int64_t tv_sec;
       int64_t tv_nsec;
     };
-  #endif 
+  #endif
 #else
   #include <unistd.h>
   #include <sys/time.h>

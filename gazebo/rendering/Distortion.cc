@@ -74,7 +74,6 @@ namespace gazebo
 
       /// \brief Height of distortion texture map
       public: unsigned int distortionTexHeight;
-
     };
   }
 }
@@ -360,8 +359,6 @@ void Distortion::CalculateAndApplyDistortionScale()
           1.0/this->dataPtr->distortionScale.Y(), 1.0));
     }
   }
-}
-
 }
 
 //////////////////////////////////////////////////

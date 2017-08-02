@@ -34,19 +34,14 @@ ActorPlugin::ActorPlugin()
 /////////////////////////////////////////////////
 void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  this->sdf = _sdf;
   this->actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
   this->world = this->actor->GetWorld();
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
           std::bind(&ActorPlugin::OnUpdate, this, std::placeholders::_1)));
 
-  this->velocity = 0.8;
-
-  // Read in the first target location
-  if (_sdf->HasElement("target"))
-    this->target = _sdf->Get<ignition::math::Vector3d>("target");
-  else
-    this->target = ignition::math::Vector3d(0, -5, 1.2138);
+  this->Reset();
 
   // Read in the target weight
   if (_sdf->HasElement("target_weight"))
@@ -80,6 +75,18 @@ void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       modelElem = modelElem->GetNextElement("model");
     }
   }
+}
+
+/////////////////////////////////////////////////
+void ActorPlugin::Reset()
+{
+  this->velocity = 0.8;
+  this->lastUpdate = 0;
+
+  if (this->sdf && this->sdf->HasElement("target"))
+    this->target = this->sdf->Get<ignition::math::Vector3d>("target");
+  else
+    this->target = ignition::math::Vector3d(0, -5, 1.2138);
 
   auto skelAnims = this->actor->SkeletonAnimations();
   if (skelAnims.find(WALKING_ANIMATION) == skelAnims.end())
