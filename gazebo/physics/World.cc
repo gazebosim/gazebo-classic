@@ -764,7 +764,7 @@ void World::Update()
 
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
-  // This must be called before PhysicsEngine::UpdatePhysics.
+  // This must be called before PhysicsEngine::UpdatePhysics for ODE.
   this->dataPtr->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
