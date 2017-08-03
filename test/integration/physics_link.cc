@@ -160,7 +160,7 @@ void PhysicsLinkTest::AddLinkForceTwoWays(
   // "World != link != inertial frame". This makes me suspect that the
   // inaccuracy is a result of cummulative matrix multiplications.
   double tolerance = 1e-6;
-  if("dart" == _physicsEngine && !_world_equals_link && !_link_equals_inertial)
+  if ("dart" == _physicsEngine && !_world_equals_link && !_link_equals_inertial)
   {
     tolerance = 2e-3;
   }
@@ -658,7 +658,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
   // but the update step will also simulate forward, and DART's default behavior
   // would then clear out the forces and torques. Setting this parameter
   // overrides that behavior.
-  if("dart" == _physicsEngine)
+  if ("dart" == _physicsEngine)
   {
     physics->SetParam("auto_reset_forces", false);
   }
@@ -697,7 +697,7 @@ void PhysicsLinkTest::OnWrenchMsg(const std::string &_physicsEngine)
     // numerical inaccuracies built up through matrix multiplications. Perhaps
     // we should check on the accuracy of the matrix quantities that we provide
     // to DART.
-    if("dart" == _physicsEngine)
+    if ("dart" == _physicsEngine)
     {
       tolerance = 2e-3;
     }
