@@ -1101,8 +1101,6 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   _position = ignition::math::Vector3d::Zero;
 
   ignition::math::Vector3d origin;
