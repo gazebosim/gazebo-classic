@@ -83,8 +83,8 @@ TEST_F(VisualProperty, CastShadows)
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
 
-  physics::ModelPtr model = world->GetModel(modelName);
-  EXPECT_EQ(model->GetWorldPose().Ign(), testPose);
+  physics::ModelPtr model = world->ModelByName(modelName);
+  EXPECT_EQ(model->WorldPose(), testPose);
 
   imageCount = 0;
   img = new unsigned char[width * height * 3];
@@ -103,7 +103,7 @@ TEST_F(VisualProperty, CastShadows)
     common::Time::MSleep(10);
 
   EXPECT_GE(imageCount, totalImages);
-  camSensor->Camera()->DisconnectNewImageFrame(c);
+  c.reset();
 
   // spawn second camera sensor
   ignition::math::Pose3d testPose2(
@@ -118,8 +118,8 @@ TEST_F(VisualProperty, CastShadows)
   sensors::CameraSensorPtr camSensor2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
 
-  physics::ModelPtr model2 = world->GetModel(modelName2);
-  EXPECT_EQ(model2->GetWorldPose().Ign(), testPose2);
+  physics::ModelPtr model2 = world->ModelByName(modelName2);
+  EXPECT_EQ(model2->WorldPose(), testPose2);
 
   imageCount2 = 0;
   img2 = new unsigned char[width * height * 3];
@@ -136,7 +136,7 @@ TEST_F(VisualProperty, CastShadows)
     common::Time::MSleep(10);
 
   EXPECT_GE(imageCount2, totalImages);
-  camSensor2->Camera()->DisconnectNewImageFrame(c2);
+  c2.reset();
 
   unsigned int colorSum = 0;
   unsigned int colorSum2 = 0;
