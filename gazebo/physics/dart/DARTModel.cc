@@ -16,6 +16,7 @@
 */
 
 #include <list>
+#include <queue>
 #include <algorithm>
 
 #include "gazebo/common/Assert.hh"
@@ -88,7 +89,7 @@ void DARTModel::Init()
     }
   }
 
-  Joint_V jointsSkipped;
+  Joint_V loopJoints;
   Link_V allLinks = this->GetLinks();
 
   std::list<LinkPtr> linksToAdd;
@@ -97,8 +98,8 @@ void DARTModel::Init()
     linksToAdd.push_back(link);
   }
 
-  std::list<LinkPtr> linksToProcess;
-  linksToProcess.push_back(worldLink);
+  std::queue<LinkPtr> linksToProcess;
+  linksToProcess.push(worldLink);
 
   while (!linksToAdd.empty())
   {
@@ -127,14 +128,14 @@ void DARTModel::Init()
       }
 
       linksToAdd.remove(newRoot);
-      linksToProcess.push_back(newRoot);
+      linksToProcess.push(newRoot);
     }
 
     // Add children using BFS
     while (!linksToProcess.empty())
     {
       LinkPtr parentLink = linksToProcess.front();
-      linksToProcess.pop_front();
+      linksToProcess.pop();
       for (auto joint : parentLink->GetChildJoints())
       {
         LinkPtr childLink = joint->GetChild();
@@ -167,19 +168,19 @@ void DARTModel::Init()
           }
 
           linksToAdd.erase(childLinkItr);
-          linksToProcess.push_back(childLink);
+          linksToProcess.push(childLink);
         }
         else
         {
           // Child link has already been added to skeleton
-          jointsSkipped.push_back(joint);
+          loopJoints.push_back(joint);
         }
       }
     }
   }
 
   // Process remaining joints
-  for (auto joint : jointsSkipped)
+  for (auto joint : loopJoints)
   {
     gzdbg << "Building DART BodyNode for link '" << joint->GetChild()->GetName()
           << "' and loop joint '" << joint->GetName() << "'.\n";
@@ -267,26 +268,6 @@ void DARTModel::Fini()
   if (_world && this->dataPtr->dtSkeleton)
   {
     _world->removeSkeleton(this->dataPtr->dtSkeleton);
-  }
-
-  // update the world which now does not have the removed model an more
-  if (_world)
-  {
-    // We need to clear the last collision result because the next call of
-    // DARTPhysics::UpdateCollision() crashes if the last collision result
-    // still contains the removed model.
-    // Unfortunately, we cannot use
-    // _world->getLastCollisionResult().clear()
-    // (DARTPhysics::UpdateCollision() uses world->getLastCollisionResult())
-    // because it returns a const pointer.
-    // We could instead use
-    // _world->getConstraintSolver()->getLastCollisionResult().clear();
-    // (which works as well, as tested with DART-6)
-    // but that could conflict with future versions of DART and different
-    // handling in DARTPhysics::UpdateCollision() and here.
-    // So instead, for now we will just step() the world, which will also
-    // update the last collision result used in DARTPhysics::UpdateCollision().
-    _world->step();
   }
 }
 

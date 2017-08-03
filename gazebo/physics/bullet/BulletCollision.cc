@@ -141,7 +141,8 @@ ignition::math::Box BulletCollision::BoundingBox() const
   if (this->collisionShape)
   {
     btVector3 btMin, btMax;
-    this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
+    btTransform relPose = BulletTypes::ConvertPose(this->RelativePose());
+    this->collisionShape->getAabb(relPose, btMin, btMax);
 
     result = ignition::math::Box(
         ignition::math::Vector3d(btMin.x(), btMin.y(), btMin.z()),

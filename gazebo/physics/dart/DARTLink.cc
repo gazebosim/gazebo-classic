@@ -199,14 +199,7 @@ void DARTLink::Init()
   this->dataPtr->dtBodyNode->setName(bodyName);
 
   // Inertia
-  this->UpdateMass();
-
-  // Visual
-  this->visuals;
-
-  // COG offset
-  ignition::math::Vector3d cog = this->inertial->CoG();
-  this->dataPtr->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
+  UpdateMass();
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -585,17 +578,30 @@ void DARTLink::AddForceAtRelativePosition(
     return;
   }
 
-  this->dataPtr->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force),
-                                DARTTypes::ConvVec3(_relpos),
-                                true, true);
+  this->dataPtr->dtBodyNode->addExtForce(
+        DARTTypes::ConvVec3(_force),
+        DARTTypes::ConvVec3(_relpos) + this->dataPtr->dtBodyNode->getLocalCOM(),
+        false, true);
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_offset*/)
+void DARTLink::AddLinkForce(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_offset)
 {
-  gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
-        << std::endl;
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "AddLinkForce",
+          std::bind(
+            &DARTLink::AddLinkForce, this, _force, _offset));
+    return;
+  }
+
+  this->dataPtr->dtBodyNode->addExtForce(
+        DARTTypes::ConvVec3(_force),
+        DARTTypes::ConvVec3(_offset),
+        true, true);
 }
 
 /////////////////////////////////////////////////
@@ -701,18 +707,19 @@ ignition::math::Vector3d DARTLink::WorldTorque() const
   if (!this->dataPtr->IsInitialized())
     return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldTorque");
 
-  // TODO: Need verification
-  ignition::math::Vector3d torque;
+  // DART uses spatial forces which express the torque in the first three
+  // components of the 6D vector
+  const Eigen::Vector6d f = this->dataPtr->dtBodyNode->getExternalForceGlobal();
 
-  Eigen::Isometry3d W = this->dataPtr->dtBodyNode->getTransform();
-  Eigen::Matrix6d G   = this->dataPtr->dtBodyNode->getSpatialInertia();
-  Eigen::VectorXd V   = this->dataPtr->dtBodyNode->getSpatialVelocity();
-  Eigen::VectorXd dV  = this->dataPtr->dtBodyNode->getSpatialAcceleration();
-  Eigen::Vector6d F   = G * dV - dart::math::dad(V, G * V);
+  Eigen::Isometry3d tf_com = Eigen::Isometry3d::Identity();
+  // We use the negative of the global COM location in order to transform the
+  // spatial vector to be with respect to the the body's center of mass.
+  tf_com.translation() = -this->dataPtr->dtBodyNode->getCOM(
+        dart::dynamics::Frame::World());
 
-  torque = DARTTypes::ConvVec3Ign(W.linear() * F.head<3>());
+  const Eigen::Vector6d f_com = dart::math::dAdInvT(tf_com, f);
 
-  return torque;
+  return DARTTypes::ConvVec3Ign(f_com.head<3>());
 }
 
 //////////////////////////////////////////////////

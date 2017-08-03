@@ -4,7 +4,7 @@
     <physics type="dart">
       <dart>
         <solver>
-          <type>pgs</type>
+          <solver_type>pgs</solver_type>
         </solver>
       </dart>
     </physics>
