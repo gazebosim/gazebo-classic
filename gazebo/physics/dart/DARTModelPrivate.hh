@@ -131,7 +131,8 @@ namespace gazebo
           dart::dynamics::SkeletonPtr _skeleton,
           dart::dynamics::BodyNode* _parent,
           JointPtr _joint,
-          LinkPtr _link)
+          LinkPtr _link,
+          bool initializeJoint)
       {
         DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(_link);
         GZ_ASSERT(dartLink, "DART link is null");
@@ -154,6 +155,10 @@ namespace gazebo
 
         dartJoint->SetDARTJoint(pair.first);
         pair.second->setCollidable(false);
+        if (initializeJoint)
+        {
+          dartJoint->Init();
+        }
         dartLink->AddSlaveBodyNode(pair.second);
 
         return true;

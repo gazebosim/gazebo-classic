@@ -191,8 +191,8 @@ void DARTModel::Init()
           joint->GetParent()->GetName());
     }
 
-    if (!DARTModelPrivate::CreateLoopJointAndNodePair(
-        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+        dtParentBodyNode, joint, joint->GetChild(), false))
     {
       gzdbg << "Could not create loop joint and node.\n";
       break;
@@ -337,6 +337,7 @@ dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
 }
 
 //////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
 JointPtr DARTModel::CreateJoint(
     const std::string &_name, const std::string &_type,
     physics::LinkPtr _parent, physics::LinkPtr _child)
@@ -358,8 +359,8 @@ JointPtr DARTModel::CreateJoint(
       return JointPtr();
     }
 
-    if (!DARTModelPrivate::CreateLoopJointAndNodePair(
-        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+          dtParentBodyNode, joint, joint->GetChild(), true))
     {
       gzdbg << "Could not create loop joint and node.\n";
       return JointPtr();
@@ -369,6 +370,7 @@ JointPtr DARTModel::CreateJoint(
 }
 
 //////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
 JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
 {
   auto joint = Model::CreateJoint(_sdf);
@@ -388,8 +390,8 @@ JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
       return JointPtr();
     }
 
-    if (!DARTModelPrivate::CreateLoopJointAndNodePair(
-        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+          dtParentBodyNode, joint, joint->GetChild(), true))
     {
       gzdbg << "Could not create loop joint and node.\n";
       return JointPtr();
