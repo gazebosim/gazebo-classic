@@ -219,6 +219,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
     {
       gzmsg << "Detaching harness joint" << std::endl;
       this->Detach();
+      return;
     }
     gzerr << "No known winch joint to control" << std::endl;
     return;
