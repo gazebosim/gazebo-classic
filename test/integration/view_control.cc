@@ -231,7 +231,7 @@ void ViewControlTest::MouseZoomTerrain()
   ignition::math::Pose3d boxPt =
       ignition::math::Pose3d(0.0, -0.5, 0.4, 0.0, 0.0, 0.0) +
       boxVis->WorldPose();
-  auto vis = cam->GetVisual(cam->Project(boxPt.Pos()));
+  auto vis = cam->Visual(cam->Project(boxPt.Pos()));
   QVERIFY(vis != nullptr);
   QCOMPARE(vis->GetRootVisual(), boxVis);
 

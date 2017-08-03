@@ -185,13 +185,12 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
     auto modelMsg = userCmdMsg.add_model();
     modelMsg->CopyFrom(msg);
 
-    for (std::vector<math::Pose>::iterator iter = poses.begin();
-         iter != poses.end(); ++iter)
+    for (const auto &pose : poses)
     {
-      msgs::Set(modelMsg->mutable_pose(), (*iter).Ign());
+      msgs::Set(modelMsg->mutable_pose(), pose);
       userCmdPub->Publish(userCmdMsg);
 
-      while (*iter != model->GetWorldPose())
+      while (pose != model->WorldPose())
       {
         common::Time::MSleep(1);
       }
@@ -201,7 +200,7 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
               << std::endl;
         world->Step(1);
       }
-      EXPECT_EQ(*iter, model->GetWorldPose());
+      EXPECT_EQ(pose, model->WorldPose());
     }
   }
 }
