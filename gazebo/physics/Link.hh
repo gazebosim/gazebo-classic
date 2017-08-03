@@ -210,23 +210,28 @@ namespace gazebo
                   const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_pos) = 0;
 
-      /// \brief Add a force to the body at position expressed to the body's
-      /// own frame of reference.
-      /// \param[in] _force Force to add.
-      /// \param[in] _relPos Position on the link to add the force.
+      /// \brief Add a force (in world frame coordinates) to the body at a
+      /// position relative to the center of mass which is expressed in the
+      /// link's own frame of reference.
+      /// \param[in] _force Force to add. The force must be expressed in the
+      /// world reference frame.
+      /// \param[in] _relPos Position on the link to add the force. This
+      /// position must be expressed in the link's coordinates with respect to
+      /// the link's center of mass.
       public: virtual void AddForceAtRelativePosition(
                   const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_relPos) = 0;
 
       /// \brief Add a force expressed in the link frame.
-      /// \param[in] _force Direction vector expressed in the link frame. Each
-      /// component corresponds to the force which will be added in that axis
-      /// and the vector's magnitude corresponds to the total force.
-      /// \param[in] _offset Offset position expressed in the link frame. It
-      /// defaults to the link origin.
-      public: virtual void AddLinkForce(const ignition::math::Vector3d &_force,
-          const ignition::math::Vector3d &_offset =
-          ignition::math::Vector3d::Zero) = 0;
+      /// \param[in] _force Force to add. The force must be expressed in the
+      /// link-fixed reference frame.
+      /// \param[in] _offset Offset position expressed in coordinates of the
+      /// link frame with respect to the link frame's origin. It defaults to the
+      /// link origin.
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                      ignition::math::Vector3d::Zero) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
@@ -325,7 +330,8 @@ namespace gazebo
       /// \return Torque applied to the body.
       public: ignition::math::Vector3d RelativeTorque() const;
 
-      /// \brief Get the torque applied to the body in the world frame.
+      /// \brief Get the torque applied to the body about the center of mass in
+      /// world frame coordinates.
       /// \return Torque applied to the body in the world frame.
       public: virtual ignition::math::Vector3d WorldTorque() const = 0;
 
