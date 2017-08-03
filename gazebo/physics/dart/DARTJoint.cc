@@ -347,6 +347,14 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "UpperLimit"+std::to_string(_index),
+          boost::bind(&DARTJoint::SetUpperLimit, this, _index, _limit), _limit);
+    return;
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
@@ -371,6 +379,14 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "LowerLimit"+std::to_string(_index),
+          boost::bind(&DARTJoint::SetLowerLimit, this, _index, _limit), _limit);
+    return;
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
@@ -395,6 +411,12 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 double DARTJoint::UpperLimit(const unsigned int _index) const
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "UpperLimit"+std::to_string(_index));
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
@@ -417,6 +439,12 @@ double DARTJoint::UpperLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 double DARTJoint::LowerLimit(const unsigned int _index) const
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "LowerLimit"+std::to_string(_index));
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
@@ -539,6 +567,15 @@ ignition::math::Vector3d DARTJoint::LinkTorque(
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                          const boost::any &_value)
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "Param_"+_key+std::to_string(_index),
+          boost::bind(&DARTJoint::SetParam, this, _key, _index, _value),
+          _value);
+    return false;
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
@@ -590,6 +627,12 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
+  if(!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Param_"+_key+std::to_string(_index));
+  }
+
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
