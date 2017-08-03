@@ -222,7 +222,7 @@ void ViewControlTest::MouseZoomTerrain()
   // move camera so that it faces the box but partially occluded by terrain
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(62.93, -65.14, 9.49),
-      ignition::math::Vector3d(0, -0.5, 1.57)));
+      ignition::math::Quaterniond(0, -0.5, 1.57)));
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -230,7 +230,7 @@ void ViewControlTest::MouseZoomTerrain()
   QVERIFY(cam->IsVisible(boxVis));
   ignition::math::Pose3d boxPt =
       ignition::math::Pose3d(0.0, -0.5, 0.4, 0.0, 0.0, 0.0) +
-      boxVis->GetWorldPose().Ign();
+      boxVis->WorldPose();
   auto vis = cam->GetVisual(cam->Project(boxPt.Pos()));
   QVERIFY(vis != nullptr);
   QCOMPARE(vis->GetRootVisual(), boxVis);
@@ -246,7 +246,7 @@ void ViewControlTest::MouseZoomTerrain()
   // Make sure the box is still in the frustum but it should now be
   // completely occluded.
   QVERIFY(cam->IsVisible(boxVis));
-  vis = cam->GetVisual(cam->Project(boxPt.Pos()));
+  vis = cam->Visual(cam->Project(boxPt.Pos()));
   QVERIFY(vis == nullptr);
 
   cam->Fini();
