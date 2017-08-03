@@ -27,8 +27,8 @@ int main(int _argc, char **_argv)
   if (_argc <= 1)
   {
     std::cerr << "Invalid usage.\n\n"
-      << "Usage:\n    harness <float_value>\n\n"
-      << "Example:\n    harness -0.1\n";
+      << "Usage:\n    harness_velocity <float_value>\n\n"
+      << "Example:\n    harness_velocity -0.1\n";
     return -1;
   }
 

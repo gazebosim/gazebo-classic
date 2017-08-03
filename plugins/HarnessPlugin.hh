@@ -37,7 +37,7 @@ namespace gazebo
   /// which can be the same joint as the winch joint, is detached on a given
   /// signal.
   ///
-  /// Two topics are created:
+  /// Three topics are created:
   ///
   ///  1. ~/<plugin_model_name>/harness/velocity
   ///      - Message Type: GzString, expected to be a float
