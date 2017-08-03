@@ -22,10 +22,11 @@
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 class Harness : public ServerFixture,
-                public testing::WithParamInterface<const char*>
+                public ::testing::WithParamInterface<const char*>
 {
   /// \brief Detach the box and expect it to fall.
   /// \param[in] _physicsEngine Physics engine to use.
@@ -75,7 +76,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
 
     // Take a few steps and confirm that the model remains in place
     world->Step(50);
-    EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
+    EXPECT_NEAR(joint->GetVelocity(0), 0.0, 2e-2);
     EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
   }
   common::Time::MSleep(20000);
@@ -106,11 +107,11 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   world->Step(fallTime / dt - 1);
 
   const auto vel = model->WorldLinearVel();
-  EXPECT_NEAR(vel.X(), 0, 2e-3);
-  EXPECT_NEAR(vel.Y(), 0, 2e-3);
-  EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 2e-3);
-  EXPECT_EQ(model->WorldPose().Pos(),
-            initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2));
+  EXPECT_NEAR(vel.X(), 0, 1e-2);
+  EXPECT_NEAR(vel.Y(), 0, 1e-2);
+  EXPECT_NEAR(vel.Z(), fallTime * gravity.Z(), 1e-2);
+  VEC_EXPECT_NEAR(model->WorldPose().Pos(),
+            initialPose.Pos() + 0.5*gravity * std::pow(fallTime, 2), 1e-2);
 
   // Send another detach command and take some more world steps
   // to confirm it doesn't crash
