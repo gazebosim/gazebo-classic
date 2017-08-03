@@ -30,7 +30,8 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTPhysicsPrivate()
-        : dtWorld(new dart::simulation::World())
+        : dtWorld(new dart::simulation::World()),
+          resetAllForcesAfterSimulationStep(true)
       {
       }
 
@@ -44,6 +45,11 @@ namespace gazebo
 
       /// \brief Pointer to DART World associated with this DART Physics.
       public: dart::simulation::WorldPtr dtWorld;
+
+      /// \brief This flag determines whether DART will reset all of its forces
+      /// and torques (both internal and external) after completing a simulation
+      /// step. Default value is true.
+      public: bool resetAllForcesAfterSimulationStep;
     };
   }
 }
