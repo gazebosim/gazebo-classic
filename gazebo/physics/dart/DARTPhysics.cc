@@ -423,7 +423,8 @@ void DARTPhysics::UpdatePhysics()
   // common::Time currTime =  this->world->GetRealTime();
 
   this->dataPtr->dtWorld->setTimeStep(this->maxStepSize);
-  this->dataPtr->dtWorld->step();
+  this->dataPtr->dtWorld->step(
+        this->dataPtr->resetAllForcesAfterSimulationStep);
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
@@ -628,12 +629,21 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
+    else if (_key == "auto_reset_forces")
+    {
+      this->dataPtr->resetAllForcesAfterSimulationStep =
+          boost::any_cast<bool>(_value);
+    }
     else
     {
+      // Note: This is nested in the else statement intentionally so that the
+      // base PhysicsEngine class will also be updated about the change to the
+      // max_step_size parameter.
       if (_key == "max_step_size")
       {
         this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
       }
+
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
