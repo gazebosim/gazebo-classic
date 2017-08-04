@@ -347,7 +347,7 @@ void DARTJoint::SetStiffnessDamping(unsigned int _index,
 //////////////////////////////////////////////////
 void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "UpperLimit"+std::to_string(_index),
@@ -379,7 +379,7 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "LowerLimit"+std::to_string(_index),
@@ -411,7 +411,7 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
 //////////////////////////////////////////////////
 double DARTJoint::UpperLimit(const unsigned int _index) const
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     return this->dataPtr->GetCached<double>(
           "UpperLimit"+std::to_string(_index));
@@ -439,7 +439,7 @@ double DARTJoint::UpperLimit(const unsigned int _index) const
 //////////////////////////////////////////////////
 double DARTJoint::LowerLimit(const unsigned int _index) const
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     return this->dataPtr->GetCached<double>(
           "LowerLimit"+std::to_string(_index));
@@ -567,7 +567,7 @@ ignition::math::Vector3d DARTJoint::LinkTorque(
 bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
                          const boost::any &_value)
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "Param_"+_key+std::to_string(_index),
@@ -627,7 +627,7 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
 //////////////////////////////////////////////////
 double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
 {
-  if(!this->dataPtr->IsInitialized())
+  if (!this->dataPtr->IsInitialized())
   {
     return this->dataPtr->GetCached<double>(
           "Param_"+_key+std::to_string(_index));

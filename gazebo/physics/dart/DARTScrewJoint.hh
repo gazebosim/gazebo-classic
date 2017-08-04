@@ -76,6 +76,9 @@ namespace gazebo
       public: virtual bool SetParam(const std::string &_key,
                                     unsigned int _index,
                                     const boost::any &_value);
+
+      public: virtual double PositionImpl(
+        const unsigned int _index = 0) const override;
     };
     /// \}
   }

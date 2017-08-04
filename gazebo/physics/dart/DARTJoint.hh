@@ -143,7 +143,7 @@ namespace gazebo
 
       // Documentation inherited.
       protected: virtual double PositionImpl(const unsigned int _index = 0)
-            const override final;
+            const override;
 
       // Documentation inherited.
       public: virtual void ApplyDamping();

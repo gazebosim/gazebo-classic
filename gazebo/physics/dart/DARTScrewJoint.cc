@@ -293,3 +293,31 @@ bool DARTScrewJoint::SetParam(const std::string &_key,
 
   return DARTJoint::SetParam(_key, _index, _value);
 }
+
+//////////////////////////////////////////////////
+double DARTScrewJoint::PositionImpl(const unsigned int _index) const
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Position" + std::to_string(_index));
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr");
+
+  if (0 == _index)
+  {
+    return this->dataPtr->dtJoint->getPosition(
+          static_cast<std::size_t>(_index));
+  }
+  else if (1 == _index)
+  {
+    const double q0 = this->dataPtr->dtJoint->getPosition(0);
+
+    dart::dynamics::ScrewJoint* sj =
+        static_cast<dart::dynamics::ScrewJoint*>(this->dataPtr->dtJoint);
+    return q0 * sj->getPitch() / (2.0*IGN_PI);
+  }
+
+  return ignition::math::NAN_D;
+}
