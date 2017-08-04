@@ -199,7 +199,7 @@ void DARTLink::Init()
   this->dataPtr->dtBodyNode->setName(bodyName);
 
   // Inertia
-  UpdateMass();
+  this->UpdateMass();
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));

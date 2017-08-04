@@ -105,8 +105,11 @@ void DARTModel::Init()
   {
     if (linksToProcess.empty())
     {
-      // Find a link without parents if possible
+      // Developer note (PCH): Initializing the new root as the first link
+      // ensures that a link is added even if all links have parents, such
+      // as in a ring.
       LinkPtr newRoot = linksToAdd.front();
+      // Find a link without parents if possible
       for (auto link : linksToAdd)
       {
         if (link->GetParentJoints().empty())
