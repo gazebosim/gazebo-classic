@@ -1013,6 +1013,7 @@ void DARTLink::AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
   this->DARTWorld()->getConstraintSolver()->addConstraint(dtWeldJointConst);
   this->dataPtr->dtSlaveNodes.push_back(std::pair<dart::dynamics::BodyNode *,
       dart::constraint::WeldJointConstraintPtr>(_dtBodyNode, dtWeldJointConst));
+  this->UpdateMass();
 }
 
 //////////////////////////////////////////////////

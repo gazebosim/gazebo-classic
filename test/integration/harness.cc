@@ -247,7 +247,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
 
   // Take a few steps and confirm that the model remains in place
   world->Step(50);
-  EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
+  EXPECT_NEAR(joint->GetVelocity(0), 0.0, 2e-2);
   EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   // Prepare harness publisher
@@ -262,8 +262,8 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   velocityPub->Publish(msg);
   common::Time::MSleep(30);
   world->Step(3.0 / dt);
-  EXPECT_NEAR(joint->GetVelocity(0), -0.113, 1e-3);
-  EXPECT_NEAR(joint->Position(0), -0.3375, 1e-4);
+  EXPECT_NEAR(joint->GetVelocity(0), -0.113, 1e-2);
+  EXPECT_NEAR(joint->Position(0), -0.3375, 2e-2);
 
   // Stop and verify that it holds position
   const double stopPosition = joint->Position(0);
@@ -283,7 +283,7 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   world->Step(1.0 / dt);
 
   EXPECT_NEAR(joint->GetVelocity(0), upVel, 2e-2);
-  EXPECT_NEAR(joint->Position(0), -0.145, 1e-3);
+  EXPECT_NEAR(joint->Position(0), -0.145, 2e-2);
 }
 
 TEST_P(Harness, LowerStopRaise)
