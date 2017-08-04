@@ -200,7 +200,6 @@ ignition::math::Box UpdateAABB(const ignition::math::Box &_a,
         SetVector(i, result.Min()[i] + maxRot, result.Min());
         SetVector(i, result.Max()[i] + minRot, result.Max());
       }
-
     }
   }
   return result;
