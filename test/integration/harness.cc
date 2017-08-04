@@ -298,7 +298,7 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
       break;
     }
     common::Time::MSleep(10);
-  };
+  }
   EXPECT_EQ(model->GetJoint("joint1"), nullptr);
 }
 
