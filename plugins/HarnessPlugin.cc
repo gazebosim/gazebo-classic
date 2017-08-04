@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <boost/thread/recursive_mutex.hpp>
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/PID.hh"
@@ -498,6 +499,9 @@ void HarnessPlugin::OnVelocity(ConstGzStringPtr &_msg)
 /////////////////////////////////////////////////
 void HarnessPlugin::OnAttach(ConstPosePtr &_msg)
 {
+  // Block physics updates during harness attachment
+  boost::recursive_mutex::scoped_lock lock(
+      *this->dataPtr->model->GetWorld()->Physics()->GetPhysicsUpdateMutex());
   this->Attach(msgs::ConvertIgn(*_msg));
 }
 
