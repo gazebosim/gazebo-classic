@@ -61,7 +61,8 @@ void PhysicsCollisionTest::GetBoundingBox(const std::string &_physicsEngine)
   // For this test to pass for DART, the following values would need to be set:
   //    big = 1049;
   //    z = 1050;
-  if (_physicsEngine != "dart") {
+  if (_physicsEngine != "dart")
+  {
     double big = g_big;
     double z = 0.0;
 

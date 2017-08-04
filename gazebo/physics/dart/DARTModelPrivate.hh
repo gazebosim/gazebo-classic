@@ -157,6 +157,12 @@ namespace gazebo
         pair.second->setCollidable(false);
         dartLink->AddSlaveBodyNode(pair.second);
 
+        // Developer note (PCH): We can assume that the body nodes have the same
+        // frame here because their parent joint transforms will not be set
+        // until Model::Init is called.
+        // Free joint transforms have been set, but free joints are only created
+        // for links with 0 parent joints while loop joints are only created for
+        // links with >1 parent joints, so the two conditions will not overlap.
         dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
         dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
             dtChildBodyNode, pair.second));
@@ -180,6 +186,9 @@ namespace gazebo
         if (_joint == nullptr)
         {
           jointType = "free";
+          // Developer note (PCH): We set free joint transforms here because the
+          // free joints do not have corresponding Gazebo DARTJoints and so will
+          // not be initialized with the others when Model::Init is called.
           jointProperties =
               std::make_shared<dart::dynamics::FreeJoint::Properties>(
               dart::dynamics::Joint::Properties("root",
