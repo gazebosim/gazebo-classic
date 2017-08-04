@@ -290,6 +290,7 @@ endif()
 
 if (HDF5_FOUND AND HDF5_INSTRUMENT)
   message(STATUS "HDF5 Found and Instrument enabled")
+  include_directories(${HDF5_INCLUDE_DIRS})
   target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
 endif()
 
