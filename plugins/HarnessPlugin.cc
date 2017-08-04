@@ -237,7 +237,6 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   double vError = this->dataPtr->joints[winchIndex]->GetVelocity(0) -
     this->dataPtr->winchTargetVel;
 
-
   // Use the PID controller to compute the joint force
   double winchPosForce = this->dataPtr->winchPosPID.Update(pError, dt);
   double winchVelForce = this->dataPtr->winchVelPID.Update(vError, dt);

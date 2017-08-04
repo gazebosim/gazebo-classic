@@ -22,10 +22,11 @@
 #include "gazebo/common/common.hh"
 #include "scans_cmp.h"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "test/util.hh"
 
 using namespace gazebo;
 class Harness : public ServerFixture,
-                public testing::WithParamInterface<const char*>
+                public ::testing::WithParamInterface<const char*>
 {
   /// \brief Detach the box and expect it to fall, then attach it again.
   /// \param[in] _physicsEngine Physics engine to use.
@@ -137,7 +138,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   attachPub->Publish(msgPose);
   world->Step(150);
   EXPECT_NE(model->GetJoint("joint1"), nullptr);
-  EXPECT_TRUE(newPose.Pos().Equal(model->WorldPose().Pos(), 2e-2));
+  VEC_EXPECT_NEAR(newPose.Pos(), model->WorldPose().Pos(), 2e-2);
   EXPECT_EQ(newPose.Rot(), model->WorldPose().Rot());
 }
 
@@ -222,7 +223,7 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
   attachPub->Publish(msgPose);
   world->Step(150);
   EXPECT_NE(model->GetJoint("joint1"), nullptr);
-  EXPECT_TRUE(newPose.Pos().Equal(link->WorldPose().Pos(), 2e-2));
+  VEC_EXPECT_NEAR(newPose.Pos(), link->WorldPose().Pos(), 2e-2);
   EXPECT_EQ(newPose.Rot(), link->WorldPose().Rot());
 }
 
