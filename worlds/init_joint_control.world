@@ -12,7 +12,7 @@
 
     <include>
       <uri>model://double_pendulum_with_base</uri>
-			<plugin name="init_joint_control" filename="libJointControlPlugin.so">
+      <plugin name="init_joint_control" filename="libJointControlPlugin.so">
         <controller type="position">
           <joint>upper_joint</joint>
           <target>-1.5708</target>
