@@ -113,6 +113,11 @@ void DARTJoint::Init()
 void DARTJoint::Reset()
 {
   Joint::Reset();
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
+  for (unsigned int i = 0; i < this->DOF(); ++i)
+  {
+    this->dataPtr->dtJoint->setPosition(i, 0.0);
+  }
 }
 
 //////////////////////////////////////////////////

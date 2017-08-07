@@ -262,9 +262,7 @@ namespace gazebo
 
       /// \brief Constructor
       public: DARTModelPrivate()
-        : dtSkeleton(dart::dynamics::Skeleton::create()),
-          genPositions(Eigen::VectorXd()),
-          genVelocities(Eigen::VectorXd())
+        : dtSkeleton(dart::dynamics::Skeleton::create())
       {
       }
 
@@ -273,12 +271,6 @@ namespace gazebo
 
       /// \brief Pointer to DART Skeleton
       public: dart::dynamics::SkeletonPtr dtSkeleton;
-
-      /// \brief Generalized positions
-      public: Eigen::VectorXd genPositions;
-
-      /// \brief Generalized velocities
-      public: Eigen::VectorXd genVelocities;
 
       // To get byte-aligned Eigen vectors
       public: EIGEN_MAKE_ALIGNED_OPERATOR_NEW

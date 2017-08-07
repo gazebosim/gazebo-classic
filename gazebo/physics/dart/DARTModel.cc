@@ -244,10 +244,6 @@ void DARTModel::Init()
     this->dataPtr->dtSkeleton->setAdjacentBodyCheck(false);
   }
 
-  // Note: This function should be called after the skeleton is added to the
-  //       world.
-  this->BackupState();
-
   // Add the skeleton to the world
   this->DARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
 }
@@ -272,30 +268,6 @@ void DARTModel::Fini()
   {
     _world->removeSkeleton(this->dataPtr->dtSkeleton);
   }
-}
-
-//////////////////////////////////////////////////
-void DARTModel::BackupState()
-{
-  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
-  this->dataPtr->genPositions = this->dataPtr->dtSkeleton->getPositions();
-  this->dataPtr->genVelocities = this->dataPtr->dtSkeleton->getVelocities();
-}
-
-//////////////////////////////////////////////////
-void DARTModel::RestoreState()
-{
-  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
-
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genPositions.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genVelocities.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
-
-  this->dataPtr->dtSkeleton->setPositions(this->dataPtr->genPositions);
-  this->dataPtr->dtSkeleton->setVelocities(this->dataPtr->genVelocities);
 }
 
 //////////////////////////////////////////////////

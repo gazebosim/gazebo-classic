@@ -70,12 +70,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual bool RemoveJoint(const std::string &_name);
 
-      /// \brief
-      public: void BackupState();
-
-      /// \brief
-      public: void RestoreState();
-
       /// \brief Get pointer to DART Skeleton.
       /// \return The pointer to DART Skeleton.
       public: dart::dynamics::SkeletonPtr DARTSkeleton();
