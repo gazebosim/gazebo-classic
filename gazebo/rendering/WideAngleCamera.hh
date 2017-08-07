@@ -150,6 +150,8 @@ namespace gazebo
       public: void SetCutOffAngle(const double _angle);
 
       /// \brief Sets whether the image should be scaled to fit horizontal FOV
+      /// If True, the projection will compute a new focal length for achieving
+      /// the desired FOV
       /// \param[in] _scale true if it should,
       ///   note: c1 and f parameters are ignored in this case
       public: void SetScaleToHFOV(const bool _scale);
@@ -224,6 +226,12 @@ namespace gazebo
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
       public: bool SetBackgroundColor(const common::Color &_color);
+
+      /// \brief Project 3D world coordinates to screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return Screen coordinates. Positive Z means point is visible.
+      public: ignition::math::Vector3d Project(
+          const ignition::math::Vector3d &_pt) const;
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture

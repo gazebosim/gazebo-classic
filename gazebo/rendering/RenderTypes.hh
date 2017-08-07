@@ -197,7 +197,7 @@ namespace gazebo
     typedef boost::shared_ptr<Distortion> DistortionPtr;
 
     /// \def LensFlarePtr
-    /// \brief Shared pointer to LensFlare 
+    /// \brief Shared pointer to LensFlare
     typedef std::shared_ptr<LensFlare> LensFlarePtr;
 
 #ifdef HAVE_OCULUS

@@ -5,8 +5,6 @@ uniform sampler2D noiseRGBA;
 uniform float time;
 uniform vec3 viewport;
 
-uniform vec3 lightDir;
-
 // light pos in clip space
 uniform vec3 lightPos;
 
@@ -75,11 +73,14 @@ vec3 cc(vec3 color, float factor, float factor2)
 void main()
 {
   // return if light is behind the view
-  if (lightPos.z < 1.0)
+  if (lightPos.z < 0.0)
   {
     gl_FragColor = texture2D(RT, gl_TexCoord[0].xy);
     return;
   }
+
+  // flip y
+  lightPos.y *= -1;
 
   float aspect = viewport.x/viewport.y;
   vec2 uv = gl_TexCoord[0].xy - 0.5;
@@ -96,4 +97,3 @@ void main()
   // apply lens flare
   gl_FragColor = texture2D(RT, gl_TexCoord[0].xy) + vec4(color, 1.0);
 }
-

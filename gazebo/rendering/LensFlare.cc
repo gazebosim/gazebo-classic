@@ -22,6 +22,7 @@
 #include "gazebo/rendering/Light.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/LensFlare.hh"
+#include "gazebo/rendering/WideAngleCamera.hh"
 
 namespace gazebo
 {
@@ -69,20 +70,42 @@ namespace gazebo
         params->setNamedConstant("viewport",
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
-        params->setNamedConstant("lightDir",
-            Ogre::Vector3(this->dir.X(), this->dir.Y(), this->dir.Z()));
 
-        auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
-          this->camera->OgreCamera()->getViewMatrix();
         // set light world pos to be far away
         auto worldPos = -this->dir * 100000.0;
-        // project 3d world space to 2d clip space
-        auto pos = viewProj * Ogre::Vector4(Conversions::Convert(worldPos));
-        // normalize x and y, and flip y
-        // keep z which is used for visibility test
-        pos.x /= pos.w;
-        pos.y /= -pos.w;
-        params->setNamedConstant("lightPos", pos);
+
+        Ogre::Vector3 lightPos;
+        // cast to wide angle camera and use project function
+        auto wideAngleCam =
+            boost::dynamic_pointer_cast<WideAngleCamera>(this->camera);
+        if (wideAngleCam)
+        {
+          // project camera into screen space
+          double viewportWidth =
+              static_cast<double>(wideAngleCam->ViewportWidth());
+          double viewportHeight =
+              static_cast<double>(wideAngleCam->ViewportHeight());
+          auto imagePos = wideAngleCam->Project(worldPos);
+
+          // convert to normalized device coordinates
+          // keep z for visibility test
+          lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
+          lightPos.y = 2.0 * (1.0 - (imagePos.Y() / viewportHeight) - 0.5);
+          lightPos.z = imagePos.Z();
+        }
+        else
+        {
+          // project 3d world space to clip space
+          auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
+            this->camera->OgreCamera()->getViewMatrix();
+          auto pos = viewProj * Ogre::Vector4(Conversions::Convert(worldPos));
+          // normalize x and y
+          // keep z for visibility test
+          lightPos.x = pos.x / pos.w;
+          lightPos.y = pos.y / pos.w;
+          lightPos.z = pos.z;
+        }
+        params->setNamedConstant("lightPos", lightPos);
       }
 
       /// \brief Pointer to camera
