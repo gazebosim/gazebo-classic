@@ -351,7 +351,6 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->dataPtr->root)
   {
-    this->dataPtr->root->shutdown();
     /*const Ogre::Root::PluginInstanceList ll =
      this->dataPtr->root->getInstalledPlugins();
 
