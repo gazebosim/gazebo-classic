@@ -54,6 +54,9 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited.
+      public: virtual void SetName(const std::string &_name);
+
+      // Documentation inherited.
       public: virtual void Reset();
 
       // Documentation inherited.

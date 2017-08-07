@@ -30,6 +30,9 @@ using namespace physics;
 DARTUniversalJoint::DARTUniversalJoint(BasePtr _parent)
   : UniversalJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::UniversalJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -41,10 +44,6 @@ DARTUniversalJoint::~DARTUniversalJoint()
 void DARTUniversalJoint::Load(sdf::ElementPtr _sdf)
 {
   UniversalJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::UniversalJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

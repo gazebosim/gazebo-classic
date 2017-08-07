@@ -30,6 +30,9 @@ using namespace physics;
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
   : BallJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::BallJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -41,10 +44,6 @@ DARTBallJoint::~DARTBallJoint()
 void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 {
   BallJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::BallJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

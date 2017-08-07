@@ -42,12 +42,6 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
     gzerr << "Aborting test for Simbody, see issue #862.\n";
     return;
   }
-  /// \TODO: dart not complete for this test
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for DART, see issue #903.\n";
-    return;
-  }
 
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
@@ -70,8 +64,8 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   physics::LinkPtr parentLink;
   physics::LinkPtr childLink(link);
   physics::JointPtr joint;
-  ignition::math::Pose3d anchor;
   ignition::math::Vector3d axis(1, 0, 0);
+  std::string jointName = "world_" + childLink->GetName() + "_joint";
   double lower = -M_PI;
 
   double residentLast = 0, shareLast = 0;
@@ -85,45 +79,13 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
   for (unsigned int i = 0; i < cyclesMax; ++i)
   {
     // try creating a joint
-    {
-      joint = world->Physics()->CreateJoint(
-        "revolute", model);
-      joint->Attach(parentLink, childLink);
-      // load adds the joint to a vector of shared pointers kept
-      // in parent and child links, preventing joint from being destroyed.
-      joint->Load(parentLink, childLink, anchor);
-      // joint->SetAnchor(0, anchor);
-      joint->SetLowerLimit(0, lower);
-
-      if (parentLink)
-        joint->SetName(parentLink->GetName() + std::string("_") +
-                       childLink->GetName() + std::string("_joint"));
-      else
-        joint->SetName(std::string("world_") +
-                       childLink->GetName() + std::string("_joint"));
-      joint->Init();
-      joint->SetAxis(0, axis);
-    }
+    joint = model->CreateJoint(jointName, "revolute", parentLink, childLink);
+    joint->Init();
+    joint->SetLowerLimit(0, lower);
+    joint->SetAxis(0, axis);
 
     // remove the joint
-    {
-      bool paused = world->IsPaused();
-      world->SetPaused(true);
-      if (joint)
-      {
-        // reenable collision between the link pair
-        physics::LinkPtr parent = joint->GetParent();
-        physics::LinkPtr child = joint->GetChild();
-        if (parent)
-          parent->SetCollideMode("all");
-        if (child)
-          child->SetCollideMode("all");
-
-        joint->Detach();
-        joint.reset();
-      }
-      world->SetPaused(paused);
-    }
+    model->RemoveJoint(jointName);
 
     world->Step(200);
 
@@ -397,11 +359,11 @@ void JointTest::SpringDamperTest(const std::string &_physicsEngine)
 void JointTest::DynamicJointVisualization(const std::string &_physicsEngine)
 {
   /// \TODO: simbody not complete for this test
-  if (_physicsEngine == "simbody" || _physicsEngine == "dart")
+  if (_physicsEngine == "simbody")
   {
     gzerr << "Aborting test for "
           << _physicsEngine
-          << ", see issues #862 and #903."
+          << ", see issue #862."
           << std::endl;
     return;
   }

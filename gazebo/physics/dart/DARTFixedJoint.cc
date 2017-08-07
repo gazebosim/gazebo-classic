@@ -31,6 +31,9 @@ using namespace physics;
 DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
   : FixedJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::WeldJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTFixedJoint::~DARTFixedJoint()
 void DARTFixedJoint::Load(sdf::ElementPtr _sdf)
 {
   FixedJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::WeldJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

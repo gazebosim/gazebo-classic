@@ -31,6 +31,9 @@ using namespace physics;
 DARTHinge2Joint::DARTHinge2Joint(BasePtr _parent)
   : Hinge2Joint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::UniversalJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTHinge2Joint::~DARTHinge2Joint()
 void DARTHinge2Joint::Load(sdf::ElementPtr _sdf)
 {
   Hinge2Joint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::UniversalJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////

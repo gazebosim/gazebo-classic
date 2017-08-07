@@ -33,6 +33,9 @@ using namespace physics;
 DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
   : ScrewJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::ScrewJoint::Properties(
+      *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -45,10 +48,6 @@ void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<DARTJoint>::Load(_sdf);
   this->SetThreadPitch(0, this->threadPitch);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::ScrewJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////

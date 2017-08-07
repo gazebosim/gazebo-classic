@@ -31,6 +31,9 @@ using namespace physics;
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
   : SliderJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::PrismaticJoint::Properties(
+      *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTSliderJoint::~DARTSliderJoint()
 void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::PrismaticJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
