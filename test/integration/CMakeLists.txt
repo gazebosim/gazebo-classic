@@ -177,6 +177,7 @@ set(qt_tests
   collada_visualization.cc
   force_torque_visualization.cc
   insert_model.cc
+  joint_control_widget.cc
   marker.cc
   model_editor.cc
   model_editor_undo.cc

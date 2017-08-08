@@ -284,6 +284,10 @@ target_link_libraries(gazebo_ode
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
+if (HAVE_DART)
+  target_link_libraries(gazebo_ode ${DART_LIBRARIES})
+endif()
+
 if (HDF5_FOUND AND HDF5_INSTRUMENT)
   message(STATUS "HDF5 Found and Instrument enabled")
   target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})

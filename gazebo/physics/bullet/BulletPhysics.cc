@@ -138,6 +138,11 @@ void UpdateContacts(btDynamicsWorld *_world, btScalar _timeStep)
   {
     btPersistentManifold *contactManifold =
         _world->getDispatcher()->getManifoldByIndexInternal(i);
+
+    const int numContacts = contactManifold->getNumContacts();
+    if (0 == numContacts)
+      continue;
+
     const btCollisionObject *obA =
         static_cast<const btCollisionObject *>(contactManifold->getBody0());
     const btCollisionObject *obB =
@@ -183,7 +188,6 @@ void UpdateContacts(btDynamicsWorld *_world, btScalar _timeStep)
     ignition::math::Vector3d localTorque1;
     ignition::math::Vector3d localTorque2;
 
-    int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
     {
       btManifoldPoint &pt = contactManifold->getContactPoint(j);
