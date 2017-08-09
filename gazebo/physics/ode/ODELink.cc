@@ -415,6 +415,18 @@ void ODELink::UpdateMass()
   // In case the center of mass changed:
   this->UpdateCollisionOffsets();
   this->OnPoseChange();
+
+  // Fix joint offsets
+  for (JointPtr joint : this->GetParentJoints())
+  {
+    joint->Attach(joint->GetParent(), joint->GetChild());
+    joint->SetAnchor(0, joint->GetWorldPose().pos);
+  }
+  for (JointPtr joint : this->GetChildJoints())
+  {
+    joint->Attach(joint->GetParent(), joint->GetChild());
+  }
+
 }
 
 //////////////////////////////////////////////////
