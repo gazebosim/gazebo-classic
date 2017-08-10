@@ -563,7 +563,6 @@ void RenderEngine::SetupResources()
 
   std::list<std::string> mediaDirs;
   mediaDirs.push_back("media");
-  mediaDirs.push_back("Media");
 
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
@@ -586,6 +585,10 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix, "General"));
       archNames.push_back(
           std::make_pair(prefix + "/skyx", "SkyX"));
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0) && !defined(__APPLE__))
+      archNames.push_back(
+          std::make_pair(prefix + "/rtshaderlib150", "General"));
+#endif
       archNames.push_back(
           std::make_pair(prefix + "/rtshaderlib", "General"));
       archNames.push_back(
