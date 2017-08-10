@@ -68,7 +68,7 @@ math::Angle ODESliderJoint::GetAngleImpl(unsigned int /*_index*/) const
 {
   math::Angle result;
   if (this->jointId)
-    result = dJointGetSliderPosition(this->jointId);
+    result = dJointGetSliderPosition(this->jointId) + this->angleOffset[0];
   else
     gzerr << "ODE Joint ID is invalid\n";
 

@@ -50,6 +50,8 @@ ODEJoint::ODEJoint(BasePtr _parent)
   this->useImplicitSpringDamper = false;
   this->stopERP = 0.0;
   this->stopCFM = 0.0;
+  this->angleOffset[0] = 0.0;
+  this->angleOffset[1] = 0.0;
 }
 
 //////////////////////////////////////////////////
@@ -179,6 +181,22 @@ double ODEJoint::GetParam(unsigned int /*parameter*/) const
 //////////////////////////////////////////////////
 void ODEJoint::Attach(LinkPtr _parent, LinkPtr _child)
 {
+  if ((_parent == this->parentLink) && (_child == this->childLink))
+  {
+    // Keep angle relative to previous attachment configuration
+    if (this->GetAngleCount() >= 1)
+      this->angleOffset[0] = this->GetAngle(0).Radian();
+    if (this->GetAngleCount() >= 2)
+      this->angleOffset[1] = this->GetAngle(1).Radian();
+  }
+  else
+  {
+    // Reset angle for current attachment configuration
+    if (this->GetAngleCount() >= 1)
+      this->angleOffset[0] = 0.0;
+    if (this->GetAngleCount() >= 2)
+      this->angleOffset[1] = 0.0;
+  }
   Joint::Attach(_parent, _child);
 
   ODELinkPtr odechild = boost::dynamic_pointer_cast<ODELink>(this->childLink);
@@ -286,10 +304,10 @@ bool ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamHiStop, _angle.Radian());
+      this->SetParam(dParamHiStop, _angle.Radian() + this->angleOffset[0]);
       return true;
     case 1:
-      this->SetParam(dParamHiStop2, _angle.Radian());
+      this->SetParam(dParamHiStop2, _angle.Radian() + this->angleOffset[1]);
       return true;
     case 2:
       this->SetParam(dParamHiStop3, _angle.Radian());
@@ -307,10 +325,10 @@ bool ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamLoStop, _angle.Radian());
+      this->SetParam(dParamLoStop, _angle.Radian() + this->angleOffset[0]);
       return true;
     case 1:
-      this->SetParam(dParamLoStop2, _angle.Radian());
+      this->SetParam(dParamLoStop2, _angle.Radian() + this->angleOffset[1]);
       return true;
     case 2:
       this->SetParam(dParamLoStop3, _angle.Radian());
@@ -468,11 +486,27 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     }
     else if (_key == "hi_stop")
     {
-      this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+      if (_index < MAX_JOINT_AXIS)
+      {
+        this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value) +
+            this->angleOffset[_index]);
+      }
+      else
+      {
+        this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value));
+      }
     }
     else if (_key == "lo_stop")
     {
-      this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+      if (_index < MAX_JOINT_AXIS)
+      {
+        this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value) +
+            this->angleOffset[_index]);
+      }
+      else
+      {
+        this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value));
+      }
     }
     else if (_key == "thread_pitch")
     {
@@ -586,11 +620,17 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else if (_key == "hi_stop")
     {
-          return this->GetParam(dParamHiStop | group);
+      if (_index < MAX_JOINT_AXIS)
+        return this->GetParam(dParamHiStop | group) - this->angleOffset[_index];
+      else
+        return this->GetParam(dParamHiStop | group);
     }
     else if (_key == "lo_stop")
     {
-          return this->GetParam(dParamLoStop | group);
+      if (_index < MAX_JOINT_AXIS)
+        return this->GetParam(dParamLoStop | group) - this->angleOffset[_index];
+      else
+        return this->GetParam(dParamLoStop | group);
     }
     else if (_key == "thread_pitch")
     {

@@ -430,7 +430,7 @@ void ODELink::UpdateMass()
     // Fix joint offsets if necessary
     ignition::math::Vector3d v1(oldPos[0], oldPos[1], oldPos[2]);
     ignition::math::Vector3d v2(newPos[0], newPos[1], newPos[2]);
-    if (v1.Equal(v2, 1e-3))
+    if (true)//(v1.Equal(v2, 1e-3))
     {
       for (JointPtr joint : this->GetParentJoints())
       {
@@ -439,6 +439,13 @@ void ODELink::UpdateMass()
         {
           joint->Attach(joint->GetParent(), joint->GetChild());
           joint->SetAnchor(0, joint->GetWorldPose().pos);
+          // Fix the joint limits
+          for (size_t i = 0; i < joint->GetAngleCount() && i < 2; ++i)
+          {
+            joint->SetHighStop(i, joint->GetHighStop(i));
+            joint->SetLowStop(i, joint->GetLowStop(i));
+            joint->SetHighStop(i, joint->GetHighStop(i));
+          }
         }
       }
       for (JointPtr joint : this->GetChildJoints())
@@ -447,10 +454,16 @@ void ODELink::UpdateMass()
         if (link != nullptr && link->linkId != nullptr)
         {
           joint->Attach(joint->GetParent(), joint->GetChild());
+          // Fix the joint limits
+          for (size_t i = 0; i < joint->GetAngleCount() && i < 2; ++i)
+          {
+            joint->SetHighStop(i, joint->GetHighStop(i));
+            joint->SetLowStop(i, joint->GetLowStop(i));
+            joint->SetHighStop(i, joint->GetHighStop(i));
+          }
         }
       }
     }
-
   }
 }
 
