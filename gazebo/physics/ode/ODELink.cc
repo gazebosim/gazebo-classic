@@ -435,7 +435,7 @@ void ODELink::UpdateMass()
       for (JointPtr joint : this->GetParentJoints())
       {
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetParent());
-        if (link != nullptr && link->linkId != nullptr)
+        if (link == nullptr || link->linkId != nullptr)
         {
           joint->Attach(joint->GetParent(), joint->GetChild());
           joint->SetAnchor(0, joint->GetWorldPose().pos);
@@ -451,7 +451,7 @@ void ODELink::UpdateMass()
       for (JointPtr joint : this->GetChildJoints())
       {
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetChild());
-        if (link != nullptr && link->linkId != nullptr)
+        if (link == nullptr || link->linkId != nullptr)
         {
           joint->Attach(joint->GetParent(), joint->GetChild());
           // Fix the joint limits
