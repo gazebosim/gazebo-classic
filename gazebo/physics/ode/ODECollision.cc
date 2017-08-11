@@ -215,10 +215,6 @@ void ODECollision::OnPoseChangeGlobal()
   // Transform into global pose since a static collision does not have a link
   math::Pose localPose = this->GetWorldPose();
 
-  // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
-
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
   q[2] = localPose.rot.y;
@@ -236,17 +232,12 @@ void ODECollision::OnPoseChangeRelative()
   // Transform into CoM relative Pose
   math::Pose localPose = this->GetRelativePose();
 
-  // un-offset cog location
-  math::Vector3 cog_vec = this->link->GetInertial()->GetCoG();
-  localPose.pos = localPose.pos - cog_vec;
-
   q[0] = localPose.rot.w;
   q[1] = localPose.rot.x;
   q[2] = localPose.rot.y;
   q[3] = localPose.rot.z;
 
-  // Set the pose of the encapsulated collision; this is always relative
-  // to the CoM
+  // Set the pose of the encapsulated collision
   dGeomSetOffsetPosition(this->collisionId, localPose.pos.x, localPose.pos.y,
       localPose.pos.z);
   dGeomSetOffsetQuaternion(this->collisionId, q);
