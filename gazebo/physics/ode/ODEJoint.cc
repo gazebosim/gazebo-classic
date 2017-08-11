@@ -304,10 +304,10 @@ bool ODEJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamHiStop, _angle.Radian() + this->angleOffset[0]);
+      this->SetParam(dParamHiStop, _angle.Radian() - this->angleOffset[0]);
       return true;
     case 1:
-      this->SetParam(dParamHiStop2, _angle.Radian() + this->angleOffset[1]);
+      this->SetParam(dParamHiStop2, _angle.Radian() - this->angleOffset[1]);
       return true;
     case 2:
       this->SetParam(dParamHiStop3, _angle.Radian());
@@ -325,10 +325,10 @@ bool ODEJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
   switch (_index)
   {
     case 0:
-      this->SetParam(dParamLoStop, _angle.Radian() + this->angleOffset[0]);
+      this->SetParam(dParamLoStop, _angle.Radian() - this->angleOffset[0]);
       return true;
     case 1:
-      this->SetParam(dParamLoStop2, _angle.Radian() + this->angleOffset[1]);
+      this->SetParam(dParamLoStop2, _angle.Radian() - this->angleOffset[1]);
       return true;
     case 2:
       this->SetParam(dParamLoStop3, _angle.Radian());
@@ -488,7 +488,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       if (_index < MAX_JOINT_AXIS)
       {
-        this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value) +
+        this->SetParam(dParamHiStop | group, boost::any_cast<double>(_value) -
             this->angleOffset[_index]);
       }
       else
@@ -500,7 +500,7 @@ bool ODEJoint::SetParam(const std::string &_key, unsigned int _index,
     {
       if (_index < MAX_JOINT_AXIS)
       {
-        this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value) +
+        this->SetParam(dParamLoStop | group, boost::any_cast<double>(_value) -
             this->angleOffset[_index]);
       }
       else
@@ -621,14 +621,14 @@ double ODEJoint::GetParam(const std::string &_key, unsigned int _index)
     else if (_key == "hi_stop")
     {
       if (_index < MAX_JOINT_AXIS)
-        return this->GetParam(dParamHiStop | group) - this->angleOffset[_index];
+        return this->GetParam(dParamHiStop | group) + this->angleOffset[_index];
       else
         return this->GetParam(dParamHiStop | group);
     }
     else if (_key == "lo_stop")
     {
       if (_index < MAX_JOINT_AXIS)
-        return this->GetParam(dParamLoStop | group) - this->angleOffset[_index];
+        return this->GetParam(dParamLoStop | group) + this->angleOffset[_index];
       else
         return this->GetParam(dParamLoStop | group);
     }
