@@ -437,15 +437,8 @@ void ODELink::UpdateMass()
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetParent());
         if (link == nullptr || link->linkId != nullptr)
         {
-          joint->Attach(joint->GetParent(), joint->GetChild());
+          joint->Init();
           joint->SetAnchor(0, joint->GetWorldPose().pos);
-          // Fix the joint limits
-          for (size_t i = 0; i < joint->GetAngleCount() && i < 2; ++i)
-          {
-            joint->SetHighStop(i, joint->GetHighStop(i));
-            joint->SetLowStop(i, joint->GetLowStop(i));
-            joint->SetHighStop(i, joint->GetHighStop(i));
-          }
         }
       }
       for (JointPtr joint : this->GetChildJoints())
@@ -453,14 +446,7 @@ void ODELink::UpdateMass()
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetChild());
         if (link == nullptr || link->linkId != nullptr)
         {
-          joint->Attach(joint->GetParent(), joint->GetChild());
-          // Fix the joint limits
-          for (size_t i = 0; i < joint->GetAngleCount() && i < 2; ++i)
-          {
-            joint->SetHighStop(i, joint->GetHighStop(i));
-            joint->SetLowStop(i, joint->GetLowStop(i));
-            joint->SetHighStop(i, joint->GetHighStop(i));
-          }
+          joint->Init();
         }
       }
     }
