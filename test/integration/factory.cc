@@ -848,6 +848,16 @@ TEST_P(FactoryTest, InvalidMeshInsertion)
   world->Step(1);
 }
 
+//////////////////////////////////////////////////
+TEST_P(FactoryTest, InvalidMeshInsertionWithWorld)
+{
+  std::string physicsEngine = GetParam();
+  this->Load("test/worlds/invalid_mesh_uri.world", true, physicsEngine);
+  auto world = physics::get_world("default");
+  EXPECT_TRUE(world != NULL);
+  world->Step(1);
+}
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
 
 /////////////////////////////////////////////////
