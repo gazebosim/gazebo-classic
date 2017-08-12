@@ -628,7 +628,7 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   /// \TODO fill this out, see issue #1115
   try
   {
-    if(_key == "solver_type")
+    if (_key == "solver_type")
     {
       this->SetSolverType(boost::any_cast<std::string>(_value));
     }
