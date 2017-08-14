@@ -314,6 +314,9 @@ void InertiaMsgsTest::SetCoGComplex(const std::string &_physicsEngine,
       modelPub->Publish(msg, true);
     }
     EXPECT_EQ(inertial->GetCoG().Ign(), newCoG);
+
+    // The seesaw may have shifted while waiting for the message
+    world->Reset();
   }
 
   world->Step(1000);
