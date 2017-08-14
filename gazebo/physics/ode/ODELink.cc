@@ -415,8 +415,44 @@ void ODELink::UpdateMass()
     gzthrow("Setting custom link " + this->GetScopedName() + "mass to zero!");
 
   // In case the center of mass changed:
-  this->UpdateCollisionOffsets();
-  this->OnPoseChange();
+  {
+    this->UpdateCollisionOffsets();
+
+    // Block physics updates
+    boost::recursive_mutex::scoped_lock lock(
+        *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+
+    // Update ODE body pose
+    dVector3 oldPos;
+    dBodyCopyPosition(this->linkId, oldPos);
+    this->OnPoseChange();
+    dVector3 newPos;
+    dBodyCopyPosition(this->linkId, newPos);
+
+    // Fix joint offsets if necessary
+    ignition::math::Vector3d v1(oldPos[0], oldPos[1], oldPos[2]);
+    ignition::math::Vector3d v2(newPos[0], newPos[1], newPos[2]);
+    if (!v1.Equal(v2, 1e-3))
+    {
+      for (JointPtr joint : this->GetParentJoints())
+      {
+        auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetParent());
+        if (link == nullptr || link->linkId != nullptr)
+        {
+          joint->Init();
+          joint->SetAnchor(0, joint->GetWorldPose().pos);
+        }
+      }
+      for (JointPtr joint : this->GetChildJoints())
+      {
+        auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetChild());
+        if (link == nullptr || link->linkId != nullptr)
+        {
+          joint->Init();
+        }
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
