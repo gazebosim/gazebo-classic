@@ -430,7 +430,7 @@ void ODELink::UpdateMass()
     // Fix joint offsets if necessary
     ignition::math::Vector3d v1(oldPos[0], oldPos[1], oldPos[2]);
     ignition::math::Vector3d v2(newPos[0], newPos[1], newPos[2]);
-    if (true)//(v1.Equal(v2, 1e-3))
+    if (!v1.Equal(v2, 1e-3))
     {
       for (JointPtr joint : this->GetParentJoints())
       {
