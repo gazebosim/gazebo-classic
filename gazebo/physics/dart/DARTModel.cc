@@ -299,8 +299,8 @@ JointPtr DARTModel::CreateJoint(
     physics::LinkPtr _parent, physics::LinkPtr _child)
 {
   auto joint = Model::CreateJoint(_name, _type, _parent, _child);
-	if (joint != nullptr)
-	{
+  if (joint != nullptr)
+  {
     dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
     if (joint->GetParent() != nullptr)
     {
@@ -330,8 +330,8 @@ JointPtr DARTModel::CreateJoint(
 JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
 {
   auto joint = Model::CreateJoint(_sdf);
-	if (joint != nullptr)
-	{
+  if (joint != nullptr)
+  {
     dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
     if (joint->GetParent() != nullptr)
     {

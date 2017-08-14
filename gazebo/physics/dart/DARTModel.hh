@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_DARTMODEL_HH_
 #define _GAZEBO_DARTMODEL_HH_
 
+#include <string>
+
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/physics/Model.hh"
