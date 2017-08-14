@@ -430,14 +430,14 @@ void ODELink::UpdateMass()
     // Fix joint offsets if necessary
     ignition::math::Vector3d v1(oldPos[0], oldPos[1], oldPos[2]);
     ignition::math::Vector3d v2(newPos[0], newPos[1], newPos[2]);
-    if (true)//(v1.Equal(v2, 1e-3))
+    if (!v1.Equal(v2, 1e-3))
     {
       for (JointPtr joint : this->GetParentJoints())
       {
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetParent());
         if (link == nullptr || link->linkId != nullptr)
         {
-          joint->Init();
+          joint->Attach(joint->GetParent(), joint->GetChild());
           joint->SetAnchor(0, joint->GetWorldPose().pos);
         }
       }
@@ -446,7 +446,7 @@ void ODELink::UpdateMass()
         auto link = boost::dynamic_pointer_cast<ODELink>(joint->GetChild());
         if (link == nullptr || link->linkId != nullptr)
         {
-          joint->Init();
+          joint->Attach(joint->GetParent(), joint->GetChild());
         }
       }
     }

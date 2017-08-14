@@ -290,9 +290,6 @@ namespace gazebo
       /// \brief Save time at which force is applied by user
       /// This will let us know if it's time to clean up forceApplied.
       private: common::Time forceAppliedTime;
-
-      /// \brief Joint angle(s) when ODE joint has angle 0.
-      protected: double angleOffset[MAX_JOINT_AXIS];
     };
     /// \}
   }

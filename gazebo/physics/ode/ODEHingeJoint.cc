@@ -117,7 +117,7 @@ math::Angle ODEHingeJoint::GetAngleImpl(unsigned int /*index*/) const
 {
   math::Angle result;
   if (this->jointId)
-    result = dJointGetHingeAngle(this->jointId) + this->angleOffset[0];
+    result = dJointGetHingeAngle(this->jointId);
   else
     gzerr << "ODE Joint ID is invalid\n";
 

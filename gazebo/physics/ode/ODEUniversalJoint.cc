@@ -123,9 +123,9 @@ math::Angle ODEUniversalJoint::GetAngleImpl(unsigned int _index) const
   {
     // flipping axis 1 and 2 around
     if (_index == UniversalJoint::AXIS_CHILD)
-      result = dJointGetUniversalAngle1(this->jointId) + this->angleOffset[0];
+      result = dJointGetUniversalAngle1(this->jointId);
     else if (_index == UniversalJoint::AXIS_PARENT)
-      result = dJointGetUniversalAngle2(this->jointId) + this->angleOffset[1];
+      result = dJointGetUniversalAngle2(this->jointId);
     else
       gzerr << "Joint index out of bounds.\n";
   }
