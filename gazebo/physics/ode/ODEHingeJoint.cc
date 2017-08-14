@@ -129,7 +129,7 @@ double ODEHingeJoint::PositionImpl(const unsigned int /*index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->jointId)
-    result = dJointGetHingeAngle(this->jointId);
+    result = dJointGetHingeAngle(this->jointId) + this->angleOffset[0];
   else
     gzerr << "ODE Joint ID is invalid\n";
 

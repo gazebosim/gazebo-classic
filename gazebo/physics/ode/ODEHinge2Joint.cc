@@ -149,7 +149,7 @@ double ODEHinge2Joint::PositionImpl(const unsigned int _index) const
   {
     /// \todo Return position of axis 1
     if (_index == 0)
-      result = dJointGetHinge2Angle1(this->jointId);
+      result = dJointGetHinge2Angle1(this->jointId) + this->angleOffset[0];
   }
   else
     gzerr << "ODE Joint ID is invalid\n";

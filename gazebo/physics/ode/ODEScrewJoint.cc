@@ -149,9 +149,9 @@ double ODEScrewJoint::PositionImpl(const unsigned int _index) const
     if (_index < this->DOF())
     {
       if (_index == 0)
-        result = dJointGetScrewAngle(this->jointId);
+        result = dJointGetScrewAngle(this->jointId) + this->angleOffset[0];
       else if (_index == 1)
-        result = dJointGetScrewPosition(this->jointId);
+        result = dJointGetScrewPosition(this->jointId) + this->angleOffset[1];
     }
     else
     {
