@@ -417,6 +417,7 @@ void ODELink::UpdateMass()
   // In case the center of mass changed:
   {
     this->UpdateCollisionOffsets();
+    this->UpdateCOMVisual();
 
     // Block physics updates
     boost::recursive_mutex::scoped_lock lock(

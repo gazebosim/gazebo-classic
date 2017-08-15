@@ -1291,6 +1291,21 @@ bool Link::SetVisualPose(const uint32_t _id,
 }
 
 //////////////////////////////////////////////////
+void Link::UpdateCOMVisual()
+{
+  msgs::Visual visual;
+  visual.set_parent_name(this->GetScopedName());
+  visual.set_parent_id(this->GetId());
+  msgs::Set(visual.mutable_pose(), this->GetInertial()->Pose());
+
+  visual.set_name(this->GetScopedName() + "_COM_VISUAL__");
+  this->visPub->Publish(visual);
+
+  visual.set_name(this->GetScopedName() + "_INERTIA_VISUAL__");
+  this->visPub->Publish(visual);
+}
+
+//////////////////////////////////////////////////
 void Link::OnCollision(ConstContactsPtr &_msg)
 {
   std::string collisionName1;

@@ -2720,6 +2720,12 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     {
       return false;
     }
+    // Do not create COM or Inertia visuals here
+    if ((_msg->name().find("_COM_VISUAL__") != std::string::npos) ||
+        (_msg->name().find("_INERTIA_VISUAL__") != std::string::npos))
+    {
+      return false;
+    }
 
     visual.reset(new Visual(_msg->name(), iter->second));
   }

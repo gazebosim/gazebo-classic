@@ -633,6 +633,9 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+      /// \brief Update the pose of the COM and inertia visuals.
+      protected: void UpdateCOMVisual();
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 
