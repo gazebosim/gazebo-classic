@@ -909,8 +909,8 @@ TEST_F(CameraSensor, PointCloud)
 
   // verify point cloud xyz data for a unit box at 1.0m in front of
   // point cloud camera.
-  // camera uses openni_kinect plugin frame convention, see comments in
-  // issue #2323: x right, y up, z forward
+  // camera uses openni kinect optical frame convention, see comments in
+  // issue #2323: x right, y down, z forward
   float boxHalfWidth = 0.5;
   float distToBox = 0.5;
   for (unsigned int i = 0; i < height; ++i)
@@ -924,12 +924,12 @@ TEST_F(CameraSensor, PointCloud)
 
     // first x value is on the left side of camera
     EXPECT_LE(prevX, 0);
-    // all y values on the top half of camera should be positive and
-    // all y values on the bottom half of camera should be negative
-    if (i < height/2.0)
-      EXPECT_GE(rowY, 0.0);
+    // all y values on the top half of camera should be negative and
+    // all y values on the bottom half of camera should be positve
+    if (i < height/2)
+      EXPECT_LE(rowY, 0.0);
     else
-      EXPECT_LT(rowY, 0.0);
+      EXPECT_GT(rowY, 0.0);
     EXPECT_FLOAT_EQ(distToBox, rowZ);
     // loop through the remaining values
     for (unsigned int j = 4; j < width * 4; j+=4)
@@ -945,7 +945,7 @@ TEST_F(CameraSensor, PointCloud)
       EXPECT_GT(x, prevX);
       // all x values on the left side of camera should be negative and
       // all x values on the right side of camera should be positive
-      if (j < width*4.0/2.0)
+      if (j < width*4/2)
         EXPECT_LE(x, 0.0);
       else
         EXPECT_GT(x, 0.0);
