@@ -46,6 +46,8 @@ int imageCount3 = 0;
 int imageCount4 = 0;
 std::string pixelFormat = "";
 
+float* depthImg = nullptr;
+
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
@@ -59,6 +61,19 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
+/////////////////////////////////////////////////
+void OnNewRGBPointCloud(int* _imageCounter, float* _imageDest,
+                  const float *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &_format)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  pixelFormat = _format;
+  float f;
+  memcpy(_imageDest, _image, _width * _height * sizeof(f) * _depth * 4);
+  *_imageCounter += 1;
+}
 
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, WorldReset)
@@ -850,4 +865,102 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] img2;
   delete[] prevImg;
   delete[] prevImg2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, PointCloud)
+{
+  Load("worlds/pointcloud_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get point cloud depth camera ssensor
+  std::string modelName = "pointcloud_camera";
+  std::string cameraName = "pointcloud_camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::DepthCameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+  rendering::DepthCameraPtr depthCam = camSensor->DepthCamera();
+  EXPECT_TRUE(depthCam != nullptr);
+
+  unsigned int width  = depthCam->ImageWidth();
+  unsigned int height = depthCam->ImageHeight();
+  EXPECT_GT(width, 0u);
+  EXPECT_GT(height, 0u);
+
+  imageCount = 0;
+  depthImg = new float[width * height * 4];
+
+  event::ConnectionPtr c = depthCam->ConnectNewRGBPointCloud(
+        std::bind(&::OnNewRGBPointCloud, &imageCount, depthImg,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int total_images = 5;
+  while (imageCount < total_images)
+    common::Time::MSleep(10);
+
+  // verify point cloud xyz data for a unit box at 1.0m in front of
+  // point cloud camera.
+  // camera outputs openni frame convention, see comments in issue #2323
+  // x right, y up, z forward
+  float boxHalfWidth = 0.5;
+  float distToBox = 0.5;
+  for (unsigned int i = 0; i < height; ++i)
+  {
+    // get the first set of xyz/rgb values
+    float prevX = depthImg[i*width*4];
+    float rowY = depthImg[i*width*4 + 1];
+    float rowZ = depthImg[i*width*4 + 2];
+    // rgb values not valid, see issue #1865
+    // int boxRgb = depthImg[i*width*4 + 3];
+
+    // first x value is on the left side of camera
+    EXPECT_LE(prevX, 0);
+    // all y values on the top half of camera should be positive and
+    // all y values on the bottom half of camera should be negative
+    if (i < height/2.0)
+      EXPECT_GE(rowY, 0.0);
+    else
+      EXPECT_LT(rowY, 0.0);
+    EXPECT_FLOAT_EQ(distToBox, rowZ);
+    // loop through the remaining values
+    for (unsigned int j = 4; j < width * 4; j+=4)
+    {
+      int idx = i * width * 4 + j;
+      float x = depthImg[idx];
+      float y = depthImg[idx+1];
+      float z = depthImg[idx+2];
+      // rgb values not valid, see issue #1865
+      // int rgb = depthImg[idx+3];
+
+      // x should be increasing
+      EXPECT_GT(x, prevX);
+      // all x values on the left side of camera should be negative and
+      // all x values on the right side of camera should be positive
+      if (j < width*4.0/2.0)
+        EXPECT_LE(x, 0.0);
+      else
+        EXPECT_GT(x, 0.0);
+      // x should be within the width of box
+      EXPECT_GE(x, -boxHalfWidth);
+      EXPECT_LE(x, boxHalfWidth);
+      prevX = x;
+      // all y values should be the same in each row
+      EXPECT_NEAR(rowY, y, 1e-4);
+      // distance from camera to box face should always be the same
+      EXPECT_FLOAT_EQ(distToBox, z);
+    }
+  }
+  depthCam->DisconnectNewRGBPointCloud(c);
+
+  delete [] depthImg;
 }
