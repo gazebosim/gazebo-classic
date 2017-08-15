@@ -420,7 +420,7 @@ void ODELink::UpdateMass()
 
     // Block physics updates
     boost::recursive_mutex::scoped_lock lock(
-        *this->GetWorld()->GetPhysicsEngine()->GetPhysicsUpdateMutex());
+        *this->GetWorld()->Physics()->GetPhysicsUpdateMutex());
 
     // Update ODE body pose
     dVector3 oldPos;
@@ -440,7 +440,7 @@ void ODELink::UpdateMass()
         if (link == nullptr || link->linkId != nullptr)
         {
           joint->Init();
-          joint->SetAnchor(0, joint->GetWorldPose().pos);
+          joint->SetAnchor(0, joint->WorldPose().Pos());
         }
       }
       for (JointPtr joint : this->GetChildJoints())

@@ -132,14 +132,14 @@ TEST_F(ODEJoint_TEST, JointLimitsMoveCoG)
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
+  EXPECT_EQ(world->Gravity(), ignition::math::Vector3d(0, 0, -9.8));
 
   // Verify physics
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), "ode");
-  EXPECT_EQ(physics->GetGravity(), ignition::math::Vector3d(0, 0, -9.8));
 
-  physics::ModelPtr model= world->GetModel("model");
+  physics::ModelPtr model= world->ModelByName("model");
   ASSERT_TRUE(model != nullptr);
   physics::LinkPtr link = model->GetLink("link");
   ASSERT_TRUE(link != nullptr);
@@ -147,28 +147,28 @@ TEST_F(ODEJoint_TEST, JointLimitsMoveCoG)
   ASSERT_TRUE(joint != nullptr);
 
   // Initial link pose
-  EXPECT_EQ(link->GetWorldPose().Ign(),
+  EXPECT_EQ(link->WorldPose(),
       ignition::math::Pose3d(0.0, 0.5, 1.5, 0.0, 0.0, 0.0));
-  EXPECT_EQ(joint->GetAngle(0), math::Angle(0.0));
+  EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   // Let the link rotate until the joint hits its limit
   world->Step(1000);
-  EXPECT_EQ(link->GetWorldPose().Ign(),
+  EXPECT_EQ(link->WorldPose(),
       ignition::math::Pose3d(0, 0.5*std::sqrt(2.0), 1, -0.785398, 0, 0));
-  EXPECT_EQ(joint->GetAngle(0), math::Angle(-0.785398));
+  EXPECT_NEAR(joint->Position(0), -0.785398, 1e-3);
 
   // Update the link's center of mgravity
   physics::InertialPtr inertial = link->GetInertial();
-  math::Pose cogPose = inertial->GetPose();
-  cogPose.pos.y += 1.0;
+  ignition::math::Pose3d cogPose = inertial->Pose();
+  cogPose.Pos().Y() += 1.0;
   inertial->SetCoG(cogPose);
   link->UpdateMass();
 
   // Check that the link's pose is unchanged
   world->Step(1000);
-  EXPECT_EQ(link->GetWorldPose().Ign(),
+  EXPECT_EQ(link->WorldPose(),
       ignition::math::Pose3d(0, 0.5*std::sqrt(2.0), 1, -0.785398, 0, 0));
-  EXPECT_EQ(joint->GetAngle(0), math::Angle(-0.785398));
+  EXPECT_NEAR(joint->Position(0), -0.785398, 1e-3);
 }
 
 int main(int argc, char **argv)

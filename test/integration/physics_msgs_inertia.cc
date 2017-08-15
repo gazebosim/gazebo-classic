@@ -259,34 +259,34 @@ void InertiaMsgsTest::SetCoGComplex(const std::string &_physicsEngine,
   //
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
-  math::Vector3 g = physics->GetGravity();
-  EXPECT_EQ(g, math::Vector3(0, 0, -9.8));
+  ignition::math::Vector3d g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("plank");
-  auto model = world->GetModel(modelName);
-  ASSERT_TRUE(model != NULL);
+  auto model = world->ModelByName(modelName);
+  ASSERT_TRUE(model != nullptr);
 
   // only alter the CoG in the unstable world
   if (!_loadStableWorld)
   {
     auto link = model->GetLink();
-    ASSERT_TRUE(link != NULL);
+    ASSERT_TRUE(link != nullptr);
     auto inertial = link->GetInertial();
-    ASSERT_TRUE(inertial != NULL);
-    const double mass = inertial->GetMass();
-    const math::Vector3 cog = inertial->GetCoG();
-    const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-    const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+    ASSERT_TRUE(inertial != nullptr);
+    const double mass = inertial->Mass();
+    const ignition::math::Vector3d cog = inertial->CoG();
+    const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+    const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
     EXPECT_DOUBLE_EQ(mass, 120);
-    EXPECT_EQ(cog, math::Vector3::Zero);
-    EXPECT_EQ(Ixxyyzz, math::Vector3(2.564, 360.064, 362.5));
-    EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+    EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+    EXPECT_EQ(Ixxyyzz, ignition::math::Vector3d(2.564, 360.064, 362.5));
+    EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
     // new center of mass
     msgs::Model msg;
@@ -307,13 +307,13 @@ void InertiaMsgsTest::SetCoGComplex(const std::string &_physicsEngine,
     modelPub->WaitForConnection();
     modelPub->Publish(msg, true);
 
-    while (newCoG != inertial->GetCoG().Ign())
+    while (newCoG != inertial->CoG())
     {
       world->Step(1);
       common::Time::MSleep(1);
       modelPub->Publish(msg, true);
     }
-    EXPECT_EQ(inertial->GetCoG().Ign(), newCoG);
+    EXPECT_EQ(inertial->CoG(), newCoG);
 
     // The seesaw may have shifted while waiting for the message
     world->Reset();
@@ -322,8 +322,8 @@ void InertiaMsgsTest::SetCoGComplex(const std::string &_physicsEngine,
   world->Step(1000);
 
   // If the system was balanced, it did not move or rotate.
-  EXPECT_NEAR(0.0, model->GetWorldPose().pos.x, 1e-3);
-  EXPECT_NEAR(0.0, model->GetWorldPose().rot.GetAsEuler().y, 1e-3);
+  EXPECT_NEAR(0.0, model->WorldPose().Pos().X(), 1e-3);
+  EXPECT_NEAR(0.0, model->WorldPose().Rot().Euler().Y(), 1e-3);
 }
 
 /////////////////////////////////////////////////
