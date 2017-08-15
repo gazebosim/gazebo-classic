@@ -881,7 +881,6 @@ TEST_F(CameraSensor, PointCloud)
   }
 
   // get point cloud depth camera ssensor
-  std::string modelName = "pointcloud_camera";
   std::string cameraName = "pointcloud_camera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::DepthCameraSensorPtr camSensor =
