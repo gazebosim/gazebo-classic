@@ -17,9 +17,8 @@
 #include <mutex>
 #include <functional>
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/rendering/Camera.hh"
 
 #include "gazebo/test/ServerFixture.hh"

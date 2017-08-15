@@ -65,57 +65,78 @@ TEST_F(VisualProperty, CastShadows)
     return;
   }
 
-  // spawn sensors of various sizes to test speed
-  std::string modelName = "camera_model";
-  std::string modelName2 = "camera_model2";
-  std::string cameraName = "camera_sensor";
-  std::string cameraName2 = "camera_sensor2";
+  physics::WorldPtr world = physics::get_world();
+
   unsigned int width  = 320;
   unsigned int height = 240;
   double updateRate = 10;
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
   ignition::math::Pose3d testPose(
       ignition::math::Vector3d(0, 0, 0.5),
       ignition::math::Quaterniond(0, 1.57, 0));
-  ignition::math::Pose3d testPose2(
-      ignition::math::Vector3d(0, 10, 0.5),
-      ignition::math::Quaterniond(0, 1.57, 0));
-
   SpawnCamera(modelName, cameraName, testPose.Pos(),
       testPose.Rot().Euler(), width, height, updateRate);
-  SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
-      testPose2.Rot().Euler(), width, height, updateRate);
-
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
-  sensors::CameraSensorPtr camSensor2 =
-    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+
+  physics::ModelPtr model = world->GetModel(modelName);
+  EXPECT_EQ(model->GetWorldPose().Ign(), testPose);
 
   imageCount = 0;
-  imageCount2 = 0;
   img = new unsigned char[width * height * 3];
-  img2 = new unsigned char[width * height * 3];
 
   event::ConnectionPtr c =
       camSensor->Camera()->ConnectNewImageFrame(
       std::bind(&::OnNewCameraFrame, &imageCount, img,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
-  event::ConnectionPtr c2 =
-      camSensor2->Camera()->ConnectNewImageFrame(
-      std::bind(&::OnNewCameraFrame, &imageCount2, img2,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
-
   common::Timer timer;
   timer.Start();
 
   // wait for images
   int totalImages = 20;
-  while (imageCount < totalImages && imageCount2 < totalImages &&
-      timer.GetElapsed().Double() < 5)
+  while (imageCount < totalImages && timer.GetElapsed().Double() < 5)
     common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
+
+  // spawn second camera sensor
+  ignition::math::Pose3d testPose2(
+      ignition::math::Vector3d(0, 10, 0.5),
+      ignition::math::Quaterniond(0, 1.57, 0));
+  std::string modelName2 = "camera_model2";
+  std::string cameraName2 = "camera_sensor2";
+  SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
+      testPose2.Rot().Euler(), width, height, updateRate);
+
+  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
+  sensors::CameraSensorPtr camSensor2 =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+
+  physics::ModelPtr model2 = world->GetModel(modelName2);
+  EXPECT_EQ(model2->GetWorldPose().Ign(), testPose2);
+
+  imageCount2 = 0;
+  img2 = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c2 =
+      camSensor2->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer2;
+  timer2.Start();
+
+  while (imageCount2 < totalImages && timer2.GetElapsed().Double() < 5)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount2, totalImages);
+  camSensor2->Camera()->DisconnectNewImageFrame(c2);
 
   unsigned int colorSum = 0;
   unsigned int colorSum2 = 0;
@@ -139,10 +160,10 @@ TEST_F(VisualProperty, CastShadows)
   EXPECT_LT(colorSum, colorSum2);
   double colorRatio = static_cast<double>(colorSum2-colorSum) /
       static_cast<double>(colorSum2);
-  EXPECT_GT(colorRatio, 0.05);
+  EXPECT_GT(colorRatio, 0.05)
+    << " colorSum [" << colorSum << "], "
+    << " colorSum2 [" << colorSum2 << "]";
 
-  camSensor->Camera()->DisconnectNewImageFrame(c);
-  camSensor2->Camera()->DisconnectNewImageFrame(c2);
   delete [] img;
   delete [] img2;
 }

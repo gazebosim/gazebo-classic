@@ -2371,8 +2371,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
     {
       std::string filename = _msg->geometry().mesh().filename();
-      std::string meshName = common::find_file(filename);
-      newGeometryName = meshName;
+      newGeometryName = common::find_file(filename);
     }
 
     if (newGeometryType != geometryType ||
