@@ -910,8 +910,8 @@ TEST_F(CameraSensor, PointCloud)
 
   // verify point cloud xyz data for a unit box at 1.0m in front of
   // point cloud camera.
-  // camera outputs openni frame convention, see comments in issue #2323
-  // x right, y up, z forward
+  // camera uses openni_kinect plugin frame convention, see comments in
+  // issue #2323: x right, y up, z forward
   float boxHalfWidth = 0.5;
   float distToBox = 0.5;
   for (unsigned int i = 0; i < height; ++i)
