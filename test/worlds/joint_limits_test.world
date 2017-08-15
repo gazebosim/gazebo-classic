@@ -39,6 +39,7 @@
           </limit>
         </axis>
       </joint>
+      <plugin name="moveCoG" filename="libMoveCoGPlugin.so"/>
     </model>
   </world>
 </sdf>

@@ -69,6 +69,7 @@ set (plugins_single_header
   LinearBatteryPlugin
   LinkPlot3DPlugin
   ModelPropShop
+  MoveCoGPlugin
   MudPlugin
   PlaneDemoPlugin
   PressurePlugin
