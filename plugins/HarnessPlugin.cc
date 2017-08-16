@@ -45,10 +45,10 @@ namespace gazebo
     public: std::vector<physics::JointPtr> joints;
 
     /// \brief Index into the joints vector that specifies the winch joint.
-    public: int winchIndex = 0;
+    public: int winchIndex = -1;
 
     /// \brief Index into the joints vector that specifies the joint to detach.
-    public: int detachIndex = 0;
+    public: int detachIndex = -1;
 
     /// \brief Name of child link of detach joint.
     /// This is used when re-attaching.
