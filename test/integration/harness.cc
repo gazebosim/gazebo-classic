@@ -92,6 +92,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   detachPub->Publish(msg);
 
   // Need to take world step before joint can be deleted
+  common::Time::MSleep(10);
   world->Step(1);
   for (int i = 0; i < 1000; ++i)
   {
@@ -202,6 +203,7 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
   detachPub->Publish(msg);
 
   // Need to take world step before joint can be deleted
+  common::Time::MSleep(10);
   world->Step(1);
   for (int i = 0; i < 1000; ++i)
   {
