@@ -210,8 +210,8 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   common::Time dt = _info.simTime - this->dataPtr->prevSimTime;
 
   // store winchIndex in local variable since it can change in callback
-  int joints_size = static_cast<int>(this->dataPtr->joints.size());
-  int winchIndex = this->dataPtr->winchIndex;
+  const int joints_size = static_cast<int>(this->dataPtr->joints.size());
+  const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
       winchIndex >= joints_size)
   {
@@ -403,7 +403,7 @@ void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
-  int joints_size = static_cast<int>(this->dataPtr->joints.size());
+  const int joints_size = static_cast<int>(this->dataPtr->joints.size());
   if (this->dataPtr->detachIndex < 0 ||
       this->dataPtr->detachIndex >= joints_size)
   {
@@ -437,8 +437,7 @@ void HarnessPlugin::Detach()
 /////////////////////////////////////////////////
 double HarnessPlugin::WinchVelocity() const
 {
-  // store winchIndex in local variable since it can change in callback
-  int winchIndex = this->dataPtr->winchIndex;
+  const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
       winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
@@ -452,7 +451,7 @@ double HarnessPlugin::WinchVelocity() const
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
   // store winchIndex in local variable since it can change in callback
-  int winchIndex = this->dataPtr->winchIndex;
+  const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
       winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
   {
