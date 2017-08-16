@@ -14,6 +14,7 @@
  * limitations under the License.
  *
 */
+#include <mutex>
 #include <boost/thread/recursive_mutex.hpp>
 #include <sdf/sdf.hh>
 
@@ -35,7 +36,7 @@ namespace gazebo
   /// \brief Private data for the HarnessPlugin class
   class HarnessPluginPrivate
   {
-    /// \brief sdf pointer
+    /// \brief sdf pointer to the <plugin> block
     public: sdf::ElementPtr sdf;
 
     /// \brief model pointer
@@ -43,6 +44,9 @@ namespace gazebo
 
     /// \brief Vector of joints
     public: std::vector<physics::JointPtr> joints;
+
+    /// \brief Mutex guarding access to joints vector and index variables.
+    public: std::recursive_mutex jointsMutex;
 
     /// \brief Index into the joints vector that specifies the winch joint.
     public: int winchIndex = -1;
@@ -209,7 +213,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
   }
   common::Time dt = _info.simTime - this->dataPtr->prevSimTime;
 
-  // store winchIndex in local variable since it can change in callback
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   const int joints_size = static_cast<int>(this->dataPtr->joints.size());
   const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
@@ -255,6 +259,7 @@ void HarnessPlugin::OnUpdate(const common::UpdateInfo &_info)
 /////////////////////////////////////////////////
 void HarnessPlugin::Attach()
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   // Load all the harness joints
   sdf::ElementPtr jointElem = this->dataPtr->sdf->GetElement("joint");
   while (jointElem)
@@ -371,6 +376,7 @@ void HarnessPlugin::Attach()
 /////////////////////////////////////////////////
 void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   if (this->dataPtr->detachIndex >= 0 || this->dataPtr->winchIndex >= 0)
   {
     gzerr << "Winch or detach joints already exist, unable to attach new joint"
@@ -403,6 +409,7 @@ void HarnessPlugin::Attach(const ignition::math::Pose3d &_pose)
 /////////////////////////////////////////////////
 void HarnessPlugin::Detach()
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   const int joints_size = static_cast<int>(this->dataPtr->joints.size());
   if (this->dataPtr->detachIndex < 0 ||
       this->dataPtr->detachIndex >= joints_size)
@@ -437,6 +444,7 @@ void HarnessPlugin::Detach()
 /////////////////////////////////////////////////
 double HarnessPlugin::WinchVelocity() const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
       winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
@@ -450,7 +458,7 @@ double HarnessPlugin::WinchVelocity() const
 /////////////////////////////////////////////////
 void HarnessPlugin::SetWinchVelocity(const float _value)
 {
-  // store winchIndex in local variable since it can change in callback
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   const int winchIndex = this->dataPtr->winchIndex;
   if (winchIndex < 0 ||
       winchIndex >= static_cast<int>(this->dataPtr->joints.size()))
@@ -472,6 +480,7 @@ void HarnessPlugin::SetWinchVelocity(const float _value)
 /////////////////////////////////////////////////
 int HarnessPlugin::JointIndex(const std::string &_name) const
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
   // Find the given joint in our list of joints
   for (size_t i = 0; i < this->dataPtr->joints.size(); ++i)
   {
@@ -511,6 +520,7 @@ void HarnessPlugin::OnDetach(ConstGzStringPtr &_msg)
       _msg->data() == "TRUE" ||
       _msg->data() == "True")
   {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->jointsMutex);
     this->dataPtr->winchIndex = -1;
   }
 }
