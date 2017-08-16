@@ -211,7 +211,7 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
     }
     common::Time::MSleep(10);
   }
-  EXPECT_EQ(model->GetJoint("joint1"), nullptr);
+  EXPECT_EQ(nullptr, model->GetJoint("joint1"));
 
   // Now re-attach it at a new location
   auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
@@ -300,7 +300,7 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
     }
     common::Time::MSleep(10);
   }
-  EXPECT_EQ(model->GetJoint("joint1"), nullptr);
+  EXPECT_EQ(nullptr, model->GetJoint("joint1"));
 
   // Now re-attach it at a new location
   auto attachPub = this->node->Advertise<msgs::Pose>("~/box/harness/attach");
