@@ -48,8 +48,14 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
   auto model = world->ModelByName("anchored_loop");
   ASSERT_TRUE(model != nullptr);
 
-  // Simulate 15s assuming 1ms step size
-  world->Step(15*1000);
+  // Unthrottle update rate
+  auto physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  physics->SetRealTimeUpdateRate(0.0);
+
+  // Simulate 15s
+  const double dt = physics->GetMaxStepSize();
+  world->Step(15.0/dt);
 
   auto joint1 = model->GetJoint("joint1");
   auto joint2 = model->GetJoint("joint2");
@@ -82,8 +88,14 @@ void KinematicLoopTest::FreeLoop(const std::string &_physicsEngine)
   auto model = world->ModelByName("free_loop");
   ASSERT_TRUE(model != nullptr);
 
-  // Simulate 15s assuming 1ms step size
-  world->Step(15*1000);
+  // Unthrottle update rate
+  auto physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  physics->SetRealTimeUpdateRate(0.0);
+
+  // Simulate 15s
+  const double dt = physics->GetMaxStepSize();
+  world->Step(15.0/dt);
 
   auto joint1 = model->GetJoint("joint_0_1");
   auto joint2 = model->GetJoint("joint_1_2");
