@@ -562,6 +562,52 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::GetSolverType() const
+{
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      return dartElem->GetElement("solver")->Get<std::string>("solver_type");
+    }
+  }
+  return "dantzig";
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::SetSolverType(const std::string &_type)
+{
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
+    }
+  }
+
+  if (_type == "dantzig")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else if (_type == "pgs")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::PGSLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else
+  {
+    gzerr << "Invalid step type[" << _type << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->world->SetGravitySDF(_gravity);
@@ -595,7 +641,11 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
   // physics dart element not yet added to sdformat
   GZ_ASSERT(dartElem, "DART SDF element does not exist");
 
-  if (_key == "max_contacts")
+  if (_key == "solver_type")
+  {
+    _value = this->GetSolverType();
+  }
+  else if (_key == "max_contacts")
   {
     _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
@@ -617,7 +667,11 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   /// \TODO fill this out, see issue #1115
   try
   {
-    if (_key == "max_contacts")
+    if (_key == "solver_type")
+    {
+      this->SetSolverType(boost::any_cast<std::string>(_value));
+    }
+    else if (_key == "max_contacts")
     {
       int value = boost::any_cast<int>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
@@ -697,6 +751,9 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   // This should be done first so that the profile settings
   // can be over-ridden by other message parameters.
   PhysicsEngine::OnPhysicsMsg(_msg);
+
+  if (_msg->has_solver_type())
+    this->SetSolverType(_msg->solver_type());
 
   if (_msg->has_enable_physics())
     this->world->SetPhysicsEnabled(_msg->enable_physics());
