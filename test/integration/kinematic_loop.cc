@@ -48,11 +48,6 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
   auto model = world->ModelByName("anchored_loop");
   ASSERT_TRUE(model != nullptr);
 
-  // Set gravity to point in the -y direction
-  const ignition::math::Vector3d gravity(0, -10, 0);
-  world->SetGravity(gravity);
-  EXPECT_EQ(gravity, world->Gravity());
-
   // Simulate 15s assuming 1ms step size
   world->Step(15*1000);
 
@@ -86,10 +81,6 @@ void KinematicLoopTest::FreeLoop(const std::string &_physicsEngine)
   ASSERT_TRUE(world != nullptr);
   auto model = world->ModelByName("free_loop");
   ASSERT_TRUE(model != nullptr);
-
-  // Expect gravity to point in the -z direction
-  const ignition::math::Vector3d gravity(0, 0, -9.8);
-  EXPECT_EQ(gravity, world->Gravity());
 
   // Simulate 15s assuming 1ms step size
   world->Step(15*1000);

@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version='1.6'>
   <world name="default">
+    <gravity>0 0 -9.8</gravity>
     <physics type="dart">
       <dart>
         <solver>
