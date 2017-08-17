@@ -79,6 +79,7 @@ void DARTModel::Init()
   // MultibodyGraphMaker.
   //----------------------------------------------------------------
 
+  // Create a local link for joints with the world as their parent.
   LinkPtr worldLink(new DARTLink(
       boost::static_pointer_cast<Model>(shared_from_this())));
   for (auto joint : this->GetJoints())
@@ -89,20 +90,24 @@ void DARTModel::Init()
     }
   }
 
+  // Joints that complete kinematic loops
   Joint_V loopJoints;
-  Link_V allLinks = this->GetLinks();
 
+  // Links that need to be added to the DART skeleton
   std::list<LinkPtr> linksToAdd;
-  for (auto link : allLinks)
+  for (auto link : this->GetLinks())
   {
     linksToAdd.push_back(link);
   }
 
+  // Links that have been added and whose child joints need to be processed
   std::queue<LinkPtr> linksToProcess;
+  // Start with joints attached to the world
   linksToProcess.push(worldLink);
 
   while (!linksToAdd.empty())
   {
+    // Find a link to process if none are queued
     if (linksToProcess.empty())
     {
       // Developer note (PCH): Initializing the new root as the first link
@@ -123,6 +128,8 @@ void DARTModel::Init()
       gzdbg << "Building DART BodyNode for link '" << newRoot->GetName()
             << "' with a free joint.\n";
 
+      // A nullptr for the parent (arg 2) indicates that the world is the parent
+      // A nullptr for the Gazebo joint (arg 3) indicates to create a free joint
       if (!DARTModelPrivate::CreateJointAndNodePair(
           this->dataPtr->dtSkeleton, nullptr, nullptr, newRoot))
       {
@@ -150,6 +157,7 @@ void DARTModel::Init()
           continue;
         }
 
+        // Check if the child link has already been added to the skeleton
         auto childLinkItr
             = std::find(linksToAdd.begin(), linksToAdd.end(), childLink);
         if (childLinkItr != linksToAdd.end())
@@ -195,6 +203,7 @@ void DARTModel::Init()
           joint->GetParent()->GetName());
     }
 
+    // Loop joint completes a kinematic loop
     if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->DARTWorld(),
         this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
     {
@@ -220,7 +229,7 @@ void DARTModel::Init()
   // Check whether there exist at least one pair of self collidable links.
   int numSelfCollidableLinks = 0;
   bool hasPairOfSelfCollidableLinks = false;
-  for (auto link : allLinks)
+  for (auto link : this->GetLinks())
   {
     if (link->GetSelfCollide())
     {
