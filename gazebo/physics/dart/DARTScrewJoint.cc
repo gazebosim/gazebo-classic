@@ -58,6 +58,34 @@ void DARTScrewJoint::Init()
 }
 
 //////////////////////////////////////////////////
+double DARTScrewJoint::GetVelocity(unsigned int _index) const
+{
+  if (!this->dataPtr->IsInitialized())
+  {
+    return this->dataPtr->GetCached<double>(
+          "Velocity" + std::to_string(_index));
+  }
+
+  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr");
+
+  if (0 == _index)
+  {
+    return this->dataPtr->dtJoint->getVelocity(
+          static_cast<std::size_t>(_index));
+  }
+  else if (1 == _index)
+  {
+    const double v0 = this->dataPtr->dtJoint->getVelocity(0u);
+
+    dart::dynamics::ScrewJoint* sj =
+        static_cast<dart::dynamics::ScrewJoint*>(this->dataPtr->dtJoint);
+    return v0 * sj->getPitch() / (2.0*IGN_PI);
+  }
+
+  return 0.0;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Vector3d DARTScrewJoint::GlobalAxis(
     const unsigned int _index) const
 {
@@ -312,7 +340,7 @@ double DARTScrewJoint::PositionImpl(const unsigned int _index) const
   }
   else if (1 == _index)
   {
-    const double q0 = this->dataPtr->dtJoint->getPosition(0);
+    const double q0 = this->dataPtr->dtJoint->getPosition(0u);
 
     dart::dynamics::ScrewJoint* sj =
         static_cast<dart::dynamics::ScrewJoint*>(this->dataPtr->dtJoint);

@@ -48,6 +48,9 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
+      public: virtual double GetVelocity(unsigned int _index) const override;
+
+      // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
           const unsigned int _index) const;
 

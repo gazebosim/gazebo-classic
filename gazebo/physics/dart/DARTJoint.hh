@@ -92,7 +92,7 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index)
-            const override final;
+            const override;
 
       // Documentation inherited.
       public: virtual void SetForce(unsigned int _index, double _force);
