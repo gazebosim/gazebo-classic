@@ -750,29 +750,30 @@ ignition::math::Vector3d WideAngleCamera::Project(
   for (int i = 0; i < 6; ++i)
   {
     // project world point to camera clip space.
-    Ogre::Vector4 pos = this->dataPtr->envCameras[i]->getProjectionMatrix() *
-        this->dataPtr->envCameras[i]->getViewMatrix() *
-        Ogre::Vector4(Conversions::Convert(_pt));
+    auto viewProj = this->dataPtr->envCameras[i]->getProjectionMatrix() *
+        this->dataPtr->envCameras[i]->getViewMatrix();
+    auto pos = viewProj * Ogre::Vector4(Conversions::Convert(_pt));
     pos.x /= pos.w;
     pos.y /= pos.w;
     // check if point is visible
     if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
     {
       // determine dir vector to projected point from env camera
-      // work in y up, z forward, x right coordinate system
+      // work in y up, z forward, x right clip space
       ignition::math::Vector3d dir(pos.x, pos.y, 1);
       ignition::math::Quaterniond rot = ignition::math::Quaterniond::Identity;
 
       // rotate dir vector into wide angle camera frame based on the
-      // face of the cube
+      // face of the cube. Note: operate in clip space so
+      // left handed coordinate system rotation
       if (i == 0)
-        rot = ignition::math::Quaterniond(0.0, -M_PI*0.5, 0.0);
-      else if (i == 1)
         rot = ignition::math::Quaterniond(0.0, M_PI*0.5, 0.0);
+      else if (i == 1)
+        rot = ignition::math::Quaterniond(0.0, -M_PI*0.5, 0.0);
       else if (i == 2)
-        rot = ignition::math::Quaterniond(M_PI*0.5, 0.0, 0.0);
-      else if (i == 3)
         rot = ignition::math::Quaterniond(-M_PI*0.5, 0.0, 0.0);
+      else if (i == 3)
+        rot = ignition::math::Quaterniond(M_PI*0.5, 0.0, 0.0);
       else if (i == 5)
         rot = ignition::math::Quaterniond(0.0, M_PI, 0.0);
       dir = rot * dir;
