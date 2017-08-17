@@ -364,14 +364,6 @@ void DARTJoint::SetUpperLimit(const unsigned int _index, const double _limit)
     return;
   }
 
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-          "HighStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetUpperLimit, this, _index, _limit));
-    return;
-  }
-
   GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   this->dataPtr->dtJoint->setPositionUpperLimit(_index, _limit);
 }
@@ -393,14 +385,6 @@ void DARTJoint::SetLowerLimit(const unsigned int _index, const double _limit)
   if (_index >= dofs)
   {
     gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
-    return;
-  }
-
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-          "LowStop" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetLowerLimit, this, _index, _limit));
     return;
   }
 
@@ -426,12 +410,6 @@ double DARTJoint::UpperLimit(const unsigned int _index) const
     return ignition::math::NAN_D;
   }
 
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<double>(
-          "HighStop" + std::to_string(_index));
-  }
-
   GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
   return this->dataPtr->dtJoint->getPositionUpperLimit(_index);
 }
@@ -452,12 +430,6 @@ double DARTJoint::LowerLimit(const unsigned int _index) const
   {
     gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return ignition::math::NAN_D;
-  }
-
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<double>(
-          "LowStop" + std::to_string(_index));
   }
 
   GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
@@ -582,14 +554,6 @@ bool DARTJoint::SetParam(const std::string &_key, unsigned int _index,
   if (_index >= dofs)
     gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
 
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-          _key + std::to_string(_index),
-          boost::bind(&DARTJoint::SetParam, this, _key, _index, _value));
-    return true;
-  }
-
   // try because boost::any_cast can throw
   try
   {
@@ -641,9 +605,6 @@ double DARTJoint::GetParam(const std::string &_key, unsigned int _index)
     gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
     return false;
   }
-
-  if (!this->dataPtr->IsInitialized())
-    return this->dataPtr->GetCached<double>(_key + std::to_string(_index));
 
   try
   {

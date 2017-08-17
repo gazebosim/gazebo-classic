@@ -389,14 +389,14 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     EXPECT_GT(pose_00.Rot().Euler().X(), -0.05);
   }
 
-  // lock joint at this location by setting lower limit here too
+  // Lock joint_00 at this location by setting the upper limit here too
   joint_00->SetUpperLimit(0, 0.0);
 
-  // set joint_01 upper limit to 1.0
+  // Lock joint_01-0, but let joint_01-1 go up to 2.0
   joint_01->SetUpperLimit(0, 0.0);
   joint_01->SetLowerLimit(0, 0.0);
   joint_01->SetUpperLimit(1, 2.0);
-  // push joint_01 until limit is reached
+  // Push joint_01 until limit is reached
   count = 0;
   while (joint_01->Position(1) < 2.1 && count < 2700)
   {
