@@ -2,6 +2,12 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add option in gui.ini to disable the use of spacenav
+    * [Pull request 2754](https://bitbucket.org/osrf/gazebo/pull-requests/2754)
+
+1. Fix disabling mesh cast shadows
+    * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
+
 1. Do not display COM or inertia visualizations for static models
     * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
     * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
@@ -9,6 +15,9 @@
 1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
     * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
+
+1. Fix orbiting view around heightmap
+    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
 
 ## Gazebo 7.8.1 (2017-06-08)
 
