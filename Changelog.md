@@ -2,6 +2,10 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Plugin to initialize joint controller parameters
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo/issues/1766)
+
 1. HarnessPlugin: PIMPL and allow re-attaching
     * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
 
