@@ -14,6 +14,11 @@ release will remove the deprecated code.
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
    plugins and will remain the exactly the same.   
 
+### Additions
+
+1. **gazebo/physics/Link.hh**
+    + protected: void UpdateCOMVisual();
+
 ### Modifications
 
 1. **gazebo/gui/JointControlWidget.hh**
