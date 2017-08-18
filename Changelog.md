@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. HarnessPlugin: PIMPL and allow re-attaching
+    * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
+
 1. DART: Update contact information also if physics engine is disabled
     * [Pull request #2704](https://bitbucket.org/osrf/gazebo/pull-requests/2704)
 
