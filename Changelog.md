@@ -6,6 +6,9 @@
     * [Pull request #2768](https://bitbucket.org/osrf/gazebo/pull-requests/2768)
     * [Issue #1981](https://bitbucket.org/osrf/gazebo/issues/1981)
 
+1. HarnessPlugin: PIMPL and allow re-attaching
+    * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
+
 1. DART: Update contact information also if physics engine is disabled
     * [Pull request #2704](https://bitbucket.org/osrf/gazebo/pull-requests/2704)
 
