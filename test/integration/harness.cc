@@ -232,12 +232,12 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
 TEST_P(Harness, DetachNonCanonical)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
           << " since it doesn't support dynamic creation/destruction of joints"
-          << ", see issues #862, #903."
+          << ", see issue #862."
           << std::endl;
     return;
   }
