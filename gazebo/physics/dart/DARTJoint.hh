@@ -69,39 +69,46 @@ namespace gazebo
       public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
 
       // Documentation inherited.
-      public: virtual void CacheForceTorque();
-
-      // Documentation inherited.
       public: virtual void Detach();
-
-      /// \brief Set the anchor point
-      public: virtual void SetAnchor(const unsigned int /*_index*/,
-          const ignition::math::Vector3d &/*_anchor*/);
 
       // Documentation inherited
       public: virtual void SetDamping(unsigned int _index, double _damping);
-
-      // Documentation inherited.
-      public: virtual void SetStiffness(unsigned int _index,
-                  const double _stiffness);
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
         double _stiffness, double _damping, double _reference = 0);
 
       // Documentation inherited.
-      public: virtual void SetUpperLimit(const unsigned int _index,
-                                         const double _limit);
+      public: virtual void SetStiffness(unsigned int _index,
+                  const double _stiffness);
+
+      /// \brief Set the anchor point
+      public: virtual void SetAnchor(const unsigned int /*_index*/,
+          const ignition::math::Vector3d &/*_anchor*/);
+
+      public: virtual ignition::math::Vector3d Anchor(
+            const unsigned int /*_index*/) const override final;
+
+      // Documentation inherited
+      public: virtual void SetVelocity(unsigned int _index, double _vel)
+            override final;
+
+      // Documentation inherited
+      public: virtual double GetVelocity(unsigned int _index)
+            const override;
 
       // Documentation inherited.
-      public: virtual void SetLowerLimit(const unsigned int _index,
-                                         const double _limit);
+      public: virtual void SetForce(unsigned int _index, double _force);
 
       // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index) const;
+      public: virtual double GetForce(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index) const;
+      public: virtual JointWrench GetForceTorque(unsigned int _index);
+
+      // Documentation inherited.
+      public: virtual bool SetPosition(unsigned int _index, double _position)
+            override final;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(
@@ -121,13 +128,25 @@ namespace gazebo
                                           unsigned int _index);
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      public: virtual double LowerLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetForce(unsigned int _index, double _force);
+      public: virtual double UpperLimit(const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual void SetLowerLimit(const unsigned int _index,
+                                         const double _limit);
+
+      // Documentation inherited.
+      public: virtual void SetUpperLimit(const unsigned int _index,
+                                         const double _limit);
+
+      // Documentation inherited.
+      public: virtual void CacheForceTorque();
+
+      // Documentation inherited.
+      protected: virtual double PositionImpl(const unsigned int _index = 0)
+            const override;
 
       // Documentation inherited.
       public: virtual void ApplyDamping();
@@ -140,8 +159,7 @@ namespace gazebo
       /// step will accumulate forces on that Joint).
       /// \param[in] _index Index of the axis.
       /// \param[in] _force Force value.
-      protected: virtual void SetForceImpl(unsigned int _index,
-                     double _force) = 0;
+      protected: void SetForceImpl(unsigned int _index, double _force);
 
       /// \brief Save external forces applied to this Joint.
       /// \param[in] _index Index of the axis.

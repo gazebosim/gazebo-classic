@@ -308,9 +308,8 @@ void DARTLink::OnPoseChange()
   // DART body node always have its parent joint.
   dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
-  dart::dynamics::FreeJoint *freeJoint =
-      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
-  if (freeJoint)
+  if (dart::dynamics::FreeJoint *freeJoint =
+          dynamic_cast<dart::dynamics::FreeJoint*>(joint))
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->WorldPose());
@@ -335,7 +334,7 @@ void DARTLink::OnPoseChange()
   else
   {
     gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not free joint (6-dof).\n";
+          << "is not a FreeJoint (6-dof).\n";
   }
 }
 

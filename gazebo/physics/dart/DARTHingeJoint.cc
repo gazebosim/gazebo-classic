@@ -54,25 +54,6 @@ void DARTHingeJoint::Init()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d DARTHingeJoint::Anchor(
-    const unsigned int _index) const
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<ignition::math::Vector3d>(
-          "Anchor" + std::to_string(_index));
-  }
-
-  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
-
-  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
-                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
-  Eigen::Vector3d worldOrigin = T.translation();
-
-  return DARTTypes::ConvVec3Ign(worldOrigin);
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d DARTHingeJoint::GlobalAxis(
     const unsigned int _index) const
 {
@@ -144,87 +125,4 @@ void DARTHingeJoint::SetAxis(const unsigned int _index,
   {
     gzerr << "Invalid index[" << _index << "]\n";
   }
-}
-
-//////////////////////////////////////////////////
-double DARTHingeJoint::PositionImpl(const unsigned int _index) const
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<double>("Angle" + std::to_string(_index));
-  }
-
-  double result = ignition::math::NAN_D;
-
-  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
-
-  if (_index == 0)
-  {
-    result = this->dataPtr->dtJoint->getPosition(0);
-  }
-  else
-  {
-    gzerr << "Invalid index[" << _index << "]\n";
-  }
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetVelocity(unsigned int _index, double _vel)
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-        "Velocity" + std::to_string(_index),
-        boost::bind(&DARTHingeJoint::SetVelocity, this, _index, _vel));
-    return;
-  }
-
-  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
-
-  if (_index == 0)
-    this->dataPtr->dtJoint->setVelocity(0, _vel);
-  else
-    gzerr << "Invalid index[" << _index << "]\n";
-}
-
-//////////////////////////////////////////////////
-double DARTHingeJoint::GetVelocity(unsigned int _index) const
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<double>(
-          "Velocity" + std::to_string(_index));
-  }
-
-  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
-
-  double result = 0.0;
-
-  if (_index == 0)
-    result = this->dataPtr->dtJoint->getVelocity(0);
-  else
-    gzerr << "Invalid index[" << _index << "]\n";
-
-  return result;
-}
-
-//////////////////////////////////////////////////
-void DARTHingeJoint::SetForceImpl(unsigned int _index, double _effort)
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    this->dataPtr->Cache(
-        "Force" + std::to_string(_index),
-        boost::bind(&DARTHingeJoint::SetForceImpl, this, _index, _effort));
-    return;
-  }
-
-  GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
-
-  if (_index == 0)
-    this->dataPtr->dtJoint->setForce(0, _effort);
-  else
-    gzerr << "Invalid index[" << _index << "]\n";
 }

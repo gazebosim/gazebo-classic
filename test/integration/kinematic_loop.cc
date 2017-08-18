@@ -48,13 +48,14 @@ void KinematicLoopTest::AnchoredLoop(const std::string &_physicsEngine)
   auto model = world->ModelByName("anchored_loop");
   ASSERT_TRUE(model != nullptr);
 
-  // Set gravity to point in the -y direction
-  const ignition::math::Vector3d gravity(0, -10, 0);
-  world->SetGravity(gravity);
-  EXPECT_EQ(gravity, world->Gravity());
+  // Unthrottle update rate
+  auto physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  physics->SetRealTimeUpdateRate(0.0);
 
-  // Simulate 15s assuming 1ms step size
-  world->Step(15*1000);
+  // Simulate 15s
+  const double dt = physics->GetMaxStepSize();
+  world->Step(15.0/dt);
 
   auto joint1 = model->GetJoint("joint1");
   auto joint2 = model->GetJoint("joint2");
@@ -87,12 +88,14 @@ void KinematicLoopTest::FreeLoop(const std::string &_physicsEngine)
   auto model = world->ModelByName("free_loop");
   ASSERT_TRUE(model != nullptr);
 
-  // Expect gravity to point in the -z direction
-  const ignition::math::Vector3d gravity(0, 0, -9.8);
-  EXPECT_EQ(gravity, world->Gravity());
+  // Unthrottle update rate
+  auto physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+  physics->SetRealTimeUpdateRate(0.0);
 
-  // Simulate 15s assuming 1ms step size
-  world->Step(15*1000);
+  // Simulate 15s
+  const double dt = physics->GetMaxStepSize();
+  world->Step(15.0/dt);
 
   auto joint1 = model->GetJoint("joint_0_1");
   auto joint2 = model->GetJoint("joint_1_2");
@@ -108,16 +111,22 @@ void KinematicLoopTest::FreeLoop(const std::string &_physicsEngine)
   ignition::math::Vector3d normal = model->WorldPose().Rot()*zHat;
   EXPECT_NEAR(normal.Dot(zHat), 0.0, 0.7071);
 
-  // Approximate expected velocity (is not flying)
-  EXPECT_NEAR(model->WorldLinearVel().Length(), 0.0, 1.0);
+  // Should be approximately at rest
+  EXPECT_NEAR(model->WorldLinearVel().Length(), 0.0, 0.5);
+  EXPECT_NEAR(model->WorldAngularVel().Length(), 0.0, 0.5);
+  EXPECT_NEAR(joint1->GetVelocity(0), 0.0, 0.1);
+  EXPECT_NEAR(joint2->GetVelocity(0), 0.0, 0.1);
+  EXPECT_NEAR(joint3->GetVelocity(0), 0.0, 0.1);
+  EXPECT_NEAR(joint4->GetVelocity(0), 0.0, 0.1);
 
   // Expected configuration
+  double dAngle = IGN_PI/2.0 - 2.0*atan2(0.1, 0.8);
   if (_physicsEngine == "simbody")
   {
     gzerr << "Self-collision not implemented for " << _physicsEngine << ".\n";
-    return;
+    // Joint limit
+    dAngle = 1.4;
   }
-  double dAngle = IGN_PI/2.0 - 2.0*atan2(0.1, 0.8);
   EXPECT_NEAR(joint1->Position(), dAngle, g_tolerance);
   EXPECT_NEAR(joint2->Position(), -dAngle, g_tolerance);
   EXPECT_NEAR(joint3->Position(), dAngle, g_tolerance);
