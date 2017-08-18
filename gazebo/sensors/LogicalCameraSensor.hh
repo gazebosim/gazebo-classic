@@ -39,7 +39,7 @@ namespace gazebo
     /// of rendering a scene. This camera finds models in the sensor's
     /// vicinity, and transmits information about the models on the sensor's
     /// topic.
-    class GAZEBO_VISIBLE LogicalCameraSensor : public Sensor
+    class GZ_SENSORS_VISIBLE LogicalCameraSensor : public Sensor
     {
       /// \brief Constructor
       public: LogicalCameraSensor();

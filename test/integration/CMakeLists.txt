@@ -59,6 +59,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   keys_to_joints.cc
+  kinematic_loop.cc
   laser.cc
   link.cc
   logical_camera_sensor.cc
@@ -168,6 +169,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )

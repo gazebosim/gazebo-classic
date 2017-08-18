@@ -690,6 +690,11 @@ ignition::math::Vector3d Link::RelativeLinearAccel() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Link::WorldLinearAccel() const
 {
+  // Developer note (MXG): The meaning of WorldForce seems to vary between
+  // engines. In particular, ODE sees it as the net force on a body, whereas
+  // DART sees it as the net of the external forces (which excludes internal
+  // forces caused by joint constraints). These will be equivalent for bodies
+  // that have no joints, but they will not be equivalent in general.
   return this->WorldForce() / this->inertial->Mass();
 }
 
