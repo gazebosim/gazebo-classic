@@ -71,13 +71,14 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WheelSlipPlugin
+)
 
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
   TransporterPlugin
-  WheelSlipPlugin
 )
 
 if (HAVE_USB AND UNIX AND NOT APPLE)

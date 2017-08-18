@@ -14,18 +14,54 @@
  * limitations under the License.
  *
 */
-#include <gazebo/common/Events.hh>
+#include <map>
+
 #include <gazebo/common/Assert.hh>
+#include <gazebo/common/CommonTypes.hh>
 #include <gazebo/common/Console.hh>
+#include <gazebo/common/Events.hh>
 
 #include <gazebo/physics/Collision.hh>
 #include <gazebo/physics/Link.hh>
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/SurfaceParams.hh>
 #include <gazebo/physics/ode/ODESurfaceParams.hh>
+#include <gazebo/physics/ode/ODETypes.hh>
 
-#include "plugins/WheelSlipPluginPrivate.hh"
 #include "plugins/WheelSlipPlugin.hh"
+
+namespace gazebo
+{
+  class WheelSlipPluginPrivate
+  {
+    public: class LinkSurfaceParams
+    {
+      /// \brief Pointer to ODESurfaceParams object.
+      public: physics::ODESurfaceParamsPtr surface = nullptr;
+
+      /// \brief Lateral wheel slip compliance, with units 1/N.
+      /// The parameter should be non-negative,
+      /// with a value of zero allowing no slip
+      /// and larger values allowing increasing slip.
+      public: double slipComplianceLateral = 0;
+
+      /// \brief Longitudinal wheel slip compliance, with units 1/N.
+      /// The parameter should be non-negative,
+      /// with a value of zero allowing no slip
+      /// and larger values allowing increasing slip.
+      public: double slipComplianceLongitudinal = 0;
+    };
+
+    /// \brief Model pointer.
+    public: physics::ModelPtr model;
+
+    /// \brief Link and surface pointers to update.
+    public: std::map<physics::LinkPtr, LinkSurfaceParams> mapLinkSurfaceParams;
+
+    /// \brief Pointer to the update event connection
+    public: event::ConnectionPtr updateConnection;
+  };
+}
 
 using namespace gazebo;
 
