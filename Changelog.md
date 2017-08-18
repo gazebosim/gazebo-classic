@@ -2,6 +2,10 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Dart harness
+    * [Pull request #2762](https://bitbucket.org/osrf/gazebo/pull-requests/2762)
+    * [Issue #903](https://bitbucket.org/osrf/gazebo/issues/903)
+
 1. HarnessPlugin: PIMPL and allow re-attaching
     * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
 

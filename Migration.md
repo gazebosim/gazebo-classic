@@ -14,6 +14,16 @@ release will remove the deprecated code.
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
    plugins and will remain the exactly the same.   
 
+### Additions
+1. **gazebo/physics/dart/DARTLink.hh**
+    + public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+    + public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + public: virtual void SetName(const std::string &_name);
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + public: std::string GetSolverType() const;
+    + public: void SetSolverType(const std::string &_type);
+
 ### Modifications
 
 1. **gazebo/gui/JointControlWidget.hh**
@@ -29,8 +39,9 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
-
+1. **gazebo/physics/Model.hh**
+    + Made `CreateJoint` virtual
+    + Made `RemoveJoint` virtual
 
 ### Deprecations
 
