@@ -74,10 +74,8 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
 
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
-        this->dataPtr->dtJoint->getRelativeTransform().inverse() *
-        this->dataPtr->dtJoint->getTransformFromParentBodyNode();
+        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = dtUniversalJoint->getAxis1();
-
     globalAxis = T.linear() * axis;
   }
   else if (_index == 1)
@@ -90,7 +88,6 @@ ignition::math::Vector3d DARTUniversalJoint::GlobalAxis(
     Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
         this->dataPtr->dtJoint->getTransformFromChildBodyNode();
     Eigen::Vector3d axis = dtUniversalJoint->getAxis2();
-
     globalAxis = T.linear() * axis;
   }
   else
@@ -115,18 +112,15 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
 
   GZ_ASSERT(this->dataPtr->dtJoint, "DART joint is nullptr.");
 
-  Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
-      this->AxisFrameOffset(_index).RotateVector(_axis));
-  Eigen::Isometry3d dtTransfJointLeftToParentLink
-      = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
-  dtAxis = dtTransfJointLeftToParentLink.linear() * dtAxis;
-
   if (_index == 0)
   {
     dart::dynamics::UniversalJoint *dtUniversalJoint =
         dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+
+    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
+        this->AxisFrameOffset(_index).RotateVector(_axis));
     dtUniversalJoint->setAxis1(dtAxis);
   }
   else if (_index == 1)
@@ -135,6 +129,9 @@ void DARTUniversalJoint::SetAxis(const unsigned int _index,
         dynamic_cast<dart::dynamics::UniversalJoint *>(
           this->dataPtr->dtJoint);
     GZ_ASSERT(dtUniversalJoint, "UniversalJoint is NULL");
+
+    Eigen::Vector3d dtAxis = DARTTypes::ConvVec3(
+        this->AxisFrameOffset(_index).RotateVector(_axis));
     dtUniversalJoint->setAxis2(dtAxis);
   }
   else

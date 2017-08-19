@@ -110,10 +110,6 @@ void DARTSliderJoint::SetAxis(const unsigned int _index,
 
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
         this->AxisFrameOffset(0).RotateVector(_axis));
-    Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
-    dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
-
     dtPrismaticJoint->setAxis(dartVec3);
   }
   else
