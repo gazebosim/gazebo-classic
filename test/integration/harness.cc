@@ -82,6 +82,10 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
     world->Step(50);
     EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
     EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
+
+    // Verify correct global axis
+    VEC_EXPECT_NEAR(sqrt(3) / 3.0 * ignition::math::Vector3d::One,
+                    joint->GlobalAxis(0), 1e-6);
   }
 
   // Detach message harness via transport topic
@@ -138,7 +142,13 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
   world->Step(150);
-  EXPECT_NE(model->GetJoint("joint1"), nullptr);
+
+  auto joint = model->GetJoint("joint1");
+  ASSERT_NE(joint, nullptr);
+  // Verify new global axis
+  VEC_EXPECT_NEAR(ignition::math::Vector3d(0.507807, 0.698073, 0.504803),
+                  joint->GlobalAxis(0), 1e-6);
+  // Verify new pose
   VEC_EXPECT_NEAR(newPose.Pos(), model->WorldPose().Pos(), 2e-2);
   EXPECT_EQ(newPose.Rot(), model->WorldPose().Rot());
 }
