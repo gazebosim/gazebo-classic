@@ -18,7 +18,7 @@
         <controller type="position">
           <joint>joint</joint>
           <target>1</target>
-          <pid_gains>2 0 0</pid_gains>
+          <pid_gains>10 0 0</pid_gains>
         </controller>
       </plugin>
     </include>

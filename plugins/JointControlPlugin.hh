@@ -37,7 +37,7 @@ namespace gazebo
   ///
   ///        <!-- Name of a joint for which to apply this controller. -->
   ///        <joint>joint_0</joint>
-  ///        <!-- Multiple joints may be speicifed. -->
+  ///        <!-- Multiple joints may be specified. -->
   ///        <joint>joint_1</joint>
   ///        <!-- C++ regular expressions may be used. -->
   ///        <joint>joint_(.*)</joint>
