@@ -307,47 +307,29 @@ JointPtr DARTModel::CreateJoint(
     const std::string &_name, const std::string &_type,
     physics::LinkPtr _parent, physics::LinkPtr _child)
 {
-  auto joint = Model::CreateJoint(_name, _type, _parent, _child);
-  if (joint != nullptr)
-  {
-    dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
-    if (joint->GetParent() != nullptr)
-    {
-      dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
-          joint->GetParent()->GetName());
-    }
-    if (joint->GetChild() == nullptr)
-    {
-      gzerr << "DART does not allow joint without child link. "
-            << "Please see issue #914. "
-            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
-      return JointPtr();
-    }
-
-    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
-          dtParentBodyNode, joint, joint->GetChild(), true))
-    {
-      gzdbg << "Could not create loop joint and node.\n";
-      return JointPtr();
-    }
-  }
-  return joint;
+  return this->CreateJointHelper(Model::CreateJoint(
+        _name, _type, _parent, _child));
 }
 
 //////////////////////////////////////////////////
 // Note: Should only be called after all existing joints have been initialized.
 JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
 {
-  auto joint = Model::CreateJoint(_sdf);
-  if (joint != nullptr)
+  return this->CreateJointHelper(Model::CreateJoint(_sdf));
+}
+
+//////////////////////////////////////////////////
+JointPtr DARTModel::CreateJointHelper(JointPtr _joint)
+{
+  if (_joint != nullptr)
   {
     dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
-    if (joint->GetParent() != nullptr)
+    if (_joint->GetParent() != nullptr)
     {
       dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
-          joint->GetParent()->GetName());
+          _joint->GetParent()->GetName());
     }
-    if (joint->GetChild() == nullptr)
+    if (_joint->GetChild() == nullptr)
     {
       gzerr << "DART does not allow joint without child link. "
             << "Please see issue #914. "
@@ -356,13 +338,13 @@ JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
     }
 
     if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
-          dtParentBodyNode, joint, joint->GetChild(), true))
+          dtParentBodyNode, _joint, _joint->GetChild(), true))
     {
       gzdbg << "Could not create loop joint and node.\n";
       return JointPtr();
     }
   }
-  return joint;
+  return _joint;
 }
 
 //////////////////////////////////////////////////

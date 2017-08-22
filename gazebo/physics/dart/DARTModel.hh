@@ -61,13 +61,15 @@ namespace gazebo
       public: virtual void Fini();
 
       // Documentation inherited.
-      public: virtual gazebo::physics::JointPtr CreateJoint(
-        const std::string &_name, const std::string &_type,
-        physics::LinkPtr _parent, physics::LinkPtr _child);
+      public: virtual JointPtr CreateJoint(
+          const std::string &_name, const std::string &_type,
+          physics::LinkPtr _parent, physics::LinkPtr _child);
 
       // Documentation inherited.
-      public: virtual gazebo::physics::JointPtr CreateJoint(
-        sdf::ElementPtr _sdf);
+      public: virtual JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
+      // DART-specific joint construction used by both versions of CreateJoint.
+      private: virtual JointPtr CreateJointHelper(JointPtr _joint);
 
       // Documentation inherited.
       public: virtual bool RemoveJoint(const std::string &_name);
