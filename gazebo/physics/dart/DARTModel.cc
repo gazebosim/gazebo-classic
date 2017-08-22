@@ -280,6 +280,38 @@ void DARTModel::Fini()
 }
 
 //////////////////////////////////////////////////
+void DARTModel::BackupState()
+{
+  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
+  this->dataPtr->genPositions = this->dataPtr->dtSkeleton->getPositions();
+  this->dataPtr->genVelocities = this->dataPtr->dtSkeleton->getVelocities();
+}
+
+//////////////////////////////////////////////////
+void DARTModel::RestoreState()
+{
+  GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
+
+  if (static_cast<size_t>(this->dataPtr->genPositions.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized positions has changed.\n";
+    return;
+  }
+  if (static_cast<size_t>(this->dataPtr->genVelocities.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized velocities has changed.\n";
+    return;
+  }
+
+  this->dataPtr->dtSkeleton->setPositions(this->dataPtr->genPositions);
+  this->dataPtr->dtSkeleton->setVelocities(this->dataPtr->genVelocities);
+}
+
+//////////////////////////////////////////////////
 dart::dynamics::SkeletonPtr DARTModel::DARTSkeleton()
 {
   return this->dataPtr->dtSkeleton;
