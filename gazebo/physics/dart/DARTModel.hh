@@ -69,7 +69,7 @@ namespace gazebo
       public: virtual JointPtr CreateJoint(sdf::ElementPtr _sdf);
 
       // DART-specific joint construction used by both versions of CreateJoint.
-      private: virtual JointPtr CreateJointHelper(JointPtr _joint);
+      private: JointPtr CreateJointHelper(JointPtr _joint);
 
       // Documentation inherited.
       public: virtual bool RemoveJoint(const std::string &_name);
