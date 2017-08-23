@@ -114,7 +114,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           if (grandchild->GetName() == "joint")
           {
             // Find joint(s) matching given name or regex
-            std::regex exp(_model->GetName() + "::" +
+            std::regex exp(_model->GetScopedName() + "::" +
                 grandchild->Get<std::string>());
             std::vector<std::string> matches(jointNames.size());
             auto iter = std::copy_if(jointNames.begin(), jointNames.end(),
