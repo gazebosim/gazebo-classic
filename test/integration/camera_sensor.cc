@@ -959,7 +959,7 @@ TEST_F(CameraSensor, PointCloud)
       EXPECT_FLOAT_EQ(distToBox, z);
     }
   }
-  depthCam->DisconnectNewRGBPointCloud(c);
+  c.reset();
 
   delete [] depthImg;
 }
