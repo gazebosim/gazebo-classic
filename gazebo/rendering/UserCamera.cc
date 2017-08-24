@@ -117,7 +117,7 @@ void UserCamera::Init()
 
   // Don't yaw along variable axis, causes leaning
   this->SetFixedYawAxis(true, ignition::math::Vector3d::UnitZ);
-  this->camera->setDirection(1, 0, 0);
+  this->sceneNode->setDirection(1, 0, 0);
   this->camera->setAutoAspectRatio(false);
 
   // Right camera
