@@ -1079,6 +1079,9 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
 
+  // msg should contain scoped name (consistent with other entities)
+  msg->set_name(light->GetScopedName());
+
   return light;
 }
 
@@ -1475,6 +1478,11 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
       msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
+    else if (_entity->HasType(Entity::LIGHT))
+    {
+      msgs::Light *lightMsg = _scene.add_light();
+      boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
+    }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
     {
@@ -1728,6 +1736,7 @@ void World::ProcessRequestMsgs()
     else if (requestMsg.request() == "scene_info")
     {
       this->dataPtr->sceneMsg.clear_model();
+      this->dataPtr->sceneMsg.clear_light();
       this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -1822,16 +1831,6 @@ void World::ProcessLightModifyMsgs()
     }
     else
     {
-      // Update in scene message
-      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-      {
-        if (this->dataPtr->sceneMsg.light(i).name() == lightModifyMsg.name())
-        {
-          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightModifyMsg);
-          break;
-        }
-      }
-
       // Update light object
       light->ProcessMsg(lightModifyMsg);
     }
@@ -2384,6 +2383,20 @@ void World::ProcessMessages()
           }
         }
 
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the light's pose
+          poseMsg->set_name(light->GetScopedName());
+          // \todo Change to relative once lights can be attached to links
+          // on the rendering side
+          // \todo Hack: we use empty id to indicate it's pose of a light
+          // Need to add an id field to light.proto
+          // poseMsg->set_id(light->GetId());
+          msgs::Set(poseMsg, light->GetWorldPose().Ign());
+        }
+
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
           this->dataPtr->posePub->Publish(msg);
       }
@@ -2446,26 +2459,6 @@ void World::ProcessMessages()
     this->ProcessLightFactoryMsgs();
     this->ProcessLightModifyMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
-  }
-
-  // Process light poses after light factory
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-
-    if (!this->dataPtr->publishLightPoses.empty() && this->dataPtr->lightPub &&
-        this->dataPtr->lightPub->HasConnections())
-    {
-      for (auto const &light : this->dataPtr->publishLightPoses)
-      {
-        // Publish the light's world pose
-        // \todo Change to relative once lights can be attached to links
-        msgs::Light lightMsg;
-        lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
-        this->dataPtr->lightPub->Publish(lightMsg);
-      }
-    }
-    this->dataPtr->publishLightPoses.clear();
   }
 }
 

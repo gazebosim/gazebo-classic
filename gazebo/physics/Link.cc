@@ -130,6 +130,19 @@ void Link::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  // Load the lights
+  if (this->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr lightElem = this->sdf->GetElement("light");
+    while (lightElem)
+    {
+      // Create and Load a light
+      this->world->LoadLight(lightElem, shared_from_this());
+      lightElem = lightElem->GetNextElement("light");
+    }
+  }
+
+
   if (!this->IsStatic())
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));

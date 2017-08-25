@@ -2145,6 +2145,23 @@ void Scene::PreRender()
         ++pIter;
     }
 
+    // process light pose messages
+    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
+    while (lpIter != this->dataPtr->lightPoseMsgs.end())
+    {
+      auto lIter = this->dataPtr->lights.find(lpIter->first);
+      if (lIter != this->dataPtr->lights.end())
+      {
+        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
+        lIter->second->SetPosition(pose.Pos());
+        lIter->second->SetRotation(pose.Rot());
+        auto prev = lpIter++;
+        this->dataPtr->lightPoseMsgs.erase(prev);
+      }
+      else
+        lpIter++;
+    }
+
     // process skeleton pose msgs
     spIter = this->dataPtr->skeletonPoseMsgs.begin();
     while (spIter != this->dataPtr->skeletonPoseMsgs.end())
@@ -2870,13 +2887,25 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
-    if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg->pose(i));
+    auto p = _msg->pose(i);
+    /// Hack: empty id used to indicate it's pose of a light
+    if (p.has_id())
+    {
+      PoseMsgs_M::iterator iter =
+          this->dataPtr->poseMsgs.find(p.id());
+      if (iter != this->dataPtr->poseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
+    }
     else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+    {
+      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
+      if (iter != this->dataPtr->lightPoseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
+    }
   }
 }
 
