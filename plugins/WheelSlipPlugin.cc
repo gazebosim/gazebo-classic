@@ -36,6 +36,9 @@ namespace gazebo
   {
     public: class LinkSurfaceParams
     {
+      /// \brief Pointer to wheel spin joint.
+      public: physics::JointPtr joint = nullptr;
+
       /// \brief Pointer to ODESurfaceParams object.
       public: physics::ODESurfaceParamsPtr surface = nullptr;
 
@@ -50,6 +53,10 @@ namespace gazebo
       /// with a value of zero allowing no slip
       /// and larger values allowing increasing slip.
       public: double slipComplianceLongitudinal = 0;
+
+      /// \brief Wheel radius extracted from collision shape if not
+      /// specified as xml parameter.
+      public: double wheelRadius = 0;
     };
 
     /// \brief Model pointer.
@@ -118,6 +125,10 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       params.slipComplianceLongitudinal =
         wheelElem->Get<double>("slip_compliance_longitudinal");
     }
+    if (wheelElem->HasElement("wheel_radius"))
+    {
+      params.wheelRadius = wheelElem->Get<double>("wheel_radius");
+    }
 
     // Get the next link element
     wheelElem = wheelElem->GetNextElement("wheel");
@@ -132,13 +143,15 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
 
     auto collisions = link->GetCollisions();
-    if (collisions.empty())
+    if (collisions.empty() || collisions.size() != 1)
     {
-      gzerr << "Could not find collision in link named [" << linkName
+      gzerr << "There should be 1 collision in link named [" << linkName
             << "] in model [" << _model->GetScopedName() << "]"
+            << ", but " << collisions.size() << " were found"
             << std::endl;
+      continue;
     }
-    auto collision = *(collisions.begin());
+    auto collision = collisions.front();
     if (collision == nullptr)
     {
       gzerr << "Could not find collision in link named [" << linkName
@@ -159,8 +172,39 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
             << std::endl;
       continue;
     }
-
     params.surface = odeSurface;
+
+    auto joints = link->GetParentJoints();
+    if (joints.empty() || joints.size() != 1)
+    {
+      gzerr << "There should be 1 parent joint for link named [" << linkName
+            << "] in model [" << _model->GetScopedName() << "]"
+            << ", but " << joints.size() << " were found"
+            << std::endl;
+      continue;
+    }
+    auto joint = joints.front();
+    if (joint == nullptr)
+    {
+      gzerr << "Could not find parent joint for link named [" << linkName
+            << "] in model [" << _model->GetScopedName() << "]"
+            << std::endl;
+      continue;
+    }
+    params.joint = joint;
+
+    if (params.wheelRadius <= 0)
+    {
+      // TODO: get collision shape and try to extract radius
+      // if it is a cylinder or sphere
+      gzerr << "Found wheel radius [" << params.wheelRadius
+            << "], which is not positive"
+            << " in link named [" << linkName
+            << "] in model [" << _model->GetScopedName() << "]"
+            << std::endl;
+      continue;
+    }
+
     this->dataPtr->mapLinkSurfaceParams[link] = params;
   }
 
@@ -179,10 +223,11 @@ void WheelSlipPlugin::Update()
 {
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
-    auto speed = linkSurface.first->GetWorldLinearVel().Ign().Length();
-    linkSurface.second.surface->slip1 =
-        speed * linkSurface.second.slipComplianceLateral;
-    linkSurface.second.surface->slip2 =
-        speed * linkSurface.second.slipComplianceLongitudinal;
+    auto params = linkSurface.second;
+    auto omega = params.joint->GetVelocity(0);
+    double speed = std::abs(omega) * params.wheelRadius;
+    // auto speed = linkSurface.first->GetWorldLinearVel().Ign().Length();
+    params.surface->slip1 = speed * params.slipComplianceLateral;
+    params.surface->slip2 = speed * params.slipComplianceLongitudinal;
   }
 }
