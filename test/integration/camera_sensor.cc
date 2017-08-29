@@ -870,6 +870,8 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, PointCloud)
 {
+  // world contains a point cloud camera looking at 4 boxes whose faces have
+  // different depth in each quadrant of the image
   Load("worlds/pointcloud_camera.world");
 
   // Make sure the render engine is available.
@@ -903,36 +905,40 @@ TEST_F(CameraSensor, PointCloud)
           std::placeholders::_4, std::placeholders::_5));
 
   // wait for a few images
-  int total_images = 5;
+  int total_images = 10;
   while (imageCount < total_images)
     common::Time::MSleep(10);
 
-  // verify point cloud xyz data for a unit box at 1.0m in front of
-  // point cloud camera.
+  // get the world
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // get the boxes
+  physics::ModelPtr boxTR = world->GetModel("tr_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxTL = world->GetModel("tl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+  physics::ModelPtr boxBR = world->GetModel("br_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxBL = world->GetModel("bl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+
+  // get distance to boxes
+  float boxWidth = 1.0;
+  float boxHalfWidth = boxWidth * 0.5;
+  float distToBoxTR = boxTR->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxTL = boxTL->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxBR = boxBR->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxBL = boxBL->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+
+  // verify point cloud xyz data for four unit boxes at different distance
+  // in front of the point cloud camera.
   // camera uses openni kinect optical frame convention, see comments in
   // issue #2323: x right, y down, z forward
-  float boxHalfWidth = 0.5;
-  float distToBox = 0.5;
   for (unsigned int i = 0; i < height; ++i)
   {
-    // get the first set of xyz/rgb values
-    float prevX = depthImg[i*width*4];
-    float rowY = depthImg[i*width*4 + 1];
-    float rowZ = depthImg[i*width*4 + 2];
-    // rgb values not valid, see issue #1865
-    // int boxRgb = depthImg[i*width*4 + 3];
-
-    // first x value is on the left side of camera
-    EXPECT_LE(prevX, 0);
-    // all y values on the top half of camera should be negative and
-    // all y values on the bottom half of camera should be positve
-    if (i < height/2)
-      EXPECT_LE(rowY, 0.0);
-    else
-      EXPECT_GT(rowY, 0.0);
-    EXPECT_FLOAT_EQ(distToBox, rowZ);
-    // loop through the remaining values
-    for (unsigned int j = 4; j < width * 4; j+=4)
+    // loop through the pixel values
+    for (unsigned int j = 0; j < width * 4; j+=4)
     {
       int idx = i * width * 4 + j;
       float x = depthImg[idx];
@@ -941,22 +947,49 @@ TEST_F(CameraSensor, PointCloud)
       // rgb values not valid, see issue #1865
       // int rgb = depthImg[idx+3];
 
-      // x should be increasing
-      EXPECT_GT(x, prevX);
-      // all x values on the left side of camera should be negative and
-      // all x values on the right side of camera should be positive
+      // left
       if (j < width*4/2)
+      {
+        // all x values on the left side of camera should be negative and
         EXPECT_LE(x, 0.0);
+
+        // top left
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTL, 1e-4);
+        }
+        // bottom left
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBL, 1e-4);
+        }
+      }
+      // right
       else
+      {
+        // all x values on the right side of camera should be positive
         EXPECT_GT(x, 0.0);
-      // x should be within the width of box
-      EXPECT_GE(x, -boxHalfWidth);
-      EXPECT_LE(x, boxHalfWidth);
-      prevX = x;
-      // all y values should be the same in each row
-      EXPECT_NEAR(rowY, y, 1e-4);
-      // distance from camera to box face should always be the same
-      EXPECT_FLOAT_EQ(distToBox, z);
+
+        // top right
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTR, 1e-4);
+        }
+        // bottom right
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBR, 1e-4);
+        }
+      }
+      // x and y should be within the width of 2 boxes
+      EXPECT_GE(x, -boxWidth);
+      EXPECT_LE(x, boxWidth);
+      EXPECT_GE(y, -boxWidth);
+      EXPECT_LE(y, boxWidth);
     }
   }
   c.reset();
