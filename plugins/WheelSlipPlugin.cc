@@ -22,8 +22,11 @@
 #include <gazebo/common/Events.hh>
 
 #include <gazebo/physics/Collision.hh>
+#include <gazebo/physics/CylinderShape.hh>
 #include <gazebo/physics/Link.hh>
 #include <gazebo/physics/Model.hh>
+#include <gazebo/physics/Shape.hh>
+#include <gazebo/physics/SphereShape.hh>
 #include <gazebo/physics/SurfaceParams.hh>
 #include <gazebo/physics/ode/ODESurfaceParams.hh>
 #include <gazebo/physics/ode/ODETypes.hh>
@@ -195,14 +198,35 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
     if (params.wheelRadius <= 0)
     {
-      // TODO: get collision shape and try to extract radius
-      // if it is a cylinder or sphere
-      gzerr << "Found wheel radius [" << params.wheelRadius
-            << "], which is not positive"
-            << " in link named [" << linkName
-            << "] in model [" << _model->GetScopedName() << "]"
-            << std::endl;
-      continue;
+      // get collision shape and extract radius if it is a cylinder or sphere
+      auto shape = collision->GetShape();
+      if (shape->HasType(physics::Base::CYLINDER_SHAPE))
+      {
+        auto cyl = boost::dynamic_pointer_cast<physics::CylinderShape>(shape);
+        if (cyl != nullptr)
+        {
+          params.wheelRadius = cyl->GetRadius();
+        }
+      }
+      else if (shape->HasType(physics::Base::SPHERE_SHAPE))
+      {
+        auto sphere = boost::dynamic_pointer_cast<physics::SphereShape>(shape);
+        if (sphere != nullptr)
+        {
+          params.wheelRadius = sphere->GetRadius();
+        }
+      }
+
+      // if that still didn't work, skip this link
+      if (params.wheelRadius <= 0)
+      {
+        gzerr << "Found wheel radius [" << params.wheelRadius
+              << "], which is not positive"
+              << " in link named [" << linkName
+              << "] in model [" << _model->GetScopedName() << "]"
+              << std::endl;
+        continue;
+      }
     }
 
     this->dataPtr->mapLinkSurfaceParams[link] = params;
