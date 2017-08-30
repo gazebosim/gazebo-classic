@@ -28,7 +28,7 @@ namespace gazebo
   class WheelSlipPluginPrivate;
 
   /// \brief A plugin that updates ODE wheel slip parameters based
-  /// on wheel center velocity.
+  /// on wheel spin velocity (radius * spin rate).
   /// It currently assumes that the fdir1 friction parameter is set
   /// parallel to the joint axis (often [0 0 1]) and that the link
   /// origin is on the joint axis.
@@ -38,7 +38,7 @@ namespace gazebo
   /// and it has units of velocity / force (m / s / N),
   /// similar to the inverse of a viscous damping coefficient.
   /// The slip_compliance parameters specified in this plugin
-  /// have units of 1/force (1/N), and the wheel center speed
+  /// have units of 1/force (1/N), and the wheel spin velocity
   /// is multiplied by these compliances at each time step
   /// to provide a scaled form of slip, that matches how
   /// slip is often defined for wheel-terrain interaction models.
