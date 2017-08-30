@@ -39,7 +39,7 @@ namespace gazebo
 
     /// \class RFIDSensor RFIDSensor.hh sensors/sensors.hh
     /// \brief Sensor class for RFID type of sensor
-    class GAZEBO_VISIBLE RFIDSensor: public Sensor
+    class GZ_SENSORS_VISIBLE RFIDSensor: public Sensor
     {
       /// \brief Constructor
       public: RFIDSensor();

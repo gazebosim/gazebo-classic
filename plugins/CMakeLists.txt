@@ -29,7 +29,8 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (HAVE_UUID)
@@ -103,6 +104,10 @@ set (GUIplugins
   TimerGUIPlugin
 )
 
+set (DARTplugins
+  GravityCompensationPlugin
+)
+
 set(GAZEBO_PLUGIN_INSTALL_DIR
   ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins/
 )
@@ -143,6 +148,18 @@ foreach (src ${GUIplugins})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
+
+if (HAVE_DART_URDF)
+  foreach (src ${DARTplugins})
+    add_library(${src} SHARED ${src}.cc)
+    target_link_libraries(${src}
+      libgazebo
+      ${DART_LIBRARIES}
+    )
+    install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+    gz_install_includes("plugins" ${src}.hh)
+  endforeach ()
+endif()
 
 add_subdirectory(events)
 

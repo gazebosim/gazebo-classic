@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class RFIDTag RFIDTag.hh sensors/sensors.hh
     /// \brief RFIDTag to interact with RFIDTagSensors
-    class GAZEBO_VISIBLE RFIDTag: public Sensor
+    class GZ_SENSORS_VISIBLE RFIDTag: public Sensor
     {
       /// \brief Constructor.
       public: RFIDTag();

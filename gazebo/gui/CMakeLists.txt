@@ -232,7 +232,7 @@ if (SPNAV_LIBRARY)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_gui gui_pch.hh)
+  add_pch(gazebo_gui gui_pch.hh ${Boost_PKGCONFIG_CFLAGS} "-I${PROTOBUF_INCLUDE_DIR}")
 endif()
 
 set (gtest_sources

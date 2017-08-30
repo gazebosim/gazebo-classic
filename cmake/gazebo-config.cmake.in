@@ -20,6 +20,9 @@ set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
 # Set whether Gazebo was built with Simbody support
 set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
 
+# Set whether Gazebo was built with Simbody support
+set (GAZEBO_HAS_DART @HAVE_DART@)
+set (GAZEBO_DART_MIN_REQUIRED_VERSION @DART_MIN_REQUIRED_VERSION@)
 include (FindPkgConfig)
 
 #################################################
@@ -111,6 +114,12 @@ if (GAZEBO_HAS_SIMBODY)
   find_package(Simbody REQUIRED)
   list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Simbody_INCLUDE_DIR})
   list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
+endif()
+
+if (GAZEBO_HAS_DART)
+  find_package(DART ${GAZEBO_DART_MIN_REQUIRED_VERSION} REQUIRED)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${DART_INCLUDE_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARIES ${DART_LIBRARIES})
 endif()
 
 # Visual Studio enables c++11 support by default

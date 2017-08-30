@@ -39,7 +39,7 @@ namespace gazebo
   {
     /// \cond
     /// \brief A simulation time event
-    class GAZEBO_VISIBLE SimTimeEvent
+    class GZ_SENSORS_VISIBLE SimTimeEvent
     {
       /// \brief The time at which to trigger the condition.
       public: common::Time time;
@@ -50,7 +50,7 @@ namespace gazebo
 
     /// \brief Monitors simulation time, and notifies conditions when
     /// a specified time has been reached.
-    class GAZEBO_VISIBLE SimTimeEventHandler
+    class GZ_SENSORS_VISIBLE SimTimeEventHandler
     {
       /// \brief Constructor
       public: SimTimeEventHandler();
@@ -85,7 +85,7 @@ namespace gazebo
     /// \{
     /// \class SensorManager SensorManager.hh sensors/sensors.hh
     /// \brief Class to manage and update all sensors
-    class GAZEBO_VISIBLE SensorManager : public SingletonT<SensorManager>
+    class GZ_SENSORS_VISIBLE SensorManager : public SingletonT<SensorManager>
     {
       /// \brief This is a singletone class. Use SensorManager::Instance()
       /// to get a pointer to this class.

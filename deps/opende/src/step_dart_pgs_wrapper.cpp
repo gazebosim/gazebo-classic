@@ -29,7 +29,7 @@
 #include "gazebo/gazebo_config.h"
 
 #ifdef HAVE_DART
-#include "dart/constraint/PGSLCPSolver.h"
+#include <dart/constraint/PGSLCPSolver.hpp>
 #include "step_dart_pgs_wrapper.h"
 
 void dSolveLCP_dart_pgs(int m, int mskip, dReal *A, dReal *x, dReal *b,

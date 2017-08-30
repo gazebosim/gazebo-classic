@@ -58,8 +58,18 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
     this->SetCategoryBits(GZ_FIXED_COLLIDE);
     this->SetCollideBits(~GZ_FIXED_COLLIDE);
   }
+}
 
-  // Pose offset
+//////////////////////////////////////////////////
+void DARTCollision::Init()
+{
+  Collision::Init();
+
+  // Create the collision shapes. Since DART6, this has to be done in
+  // Init(), because the BodyNode will only have been created in Load()
+  // and is not guaranteed to exist before.
+
+  // Set the pose offset.
   if (this->dataPtr->dtCollisionShape)
   {
     // TODO: Remove type check once DART completely supports plane shape.
@@ -69,16 +79,10 @@ void DARTCollision::Load(sdf::ElementPtr _sdf)
 
     if (!isPlaneShape)
     {
-      this->dataPtr->dtCollisionShape->setLocalTransform(
-            DARTTypes::ConvPose(this->RelativePose()));
+      Eigen::Isometry3d tf = DARTTypes::ConvPose(this->RelativePose());
+      this->dataPtr->dtCollisionShape->setRelativeTransform(tf);
     }
   }
-}
-
-//////////////////////////////////////////////////
-void DARTCollision::Init()
-{
-  Collision::Init();
 }
 
 //////////////////////////////////////////////////
@@ -117,24 +121,123 @@ unsigned int DARTCollision::GetCollideBits() const
   return this->dataPtr->collideBits;
 }
 
+
+//////////////////////////////////////////////////
+// Helper function to prevent following current limitation of
+// ignition::math::Vector3:
+// operator [] does not return a reference, so can't use the operator for
+// writing the i'th value, and instead have to use X()/Y()/Z() functions.
+// This function should should achieve the same as this expression should:
+// ``v[i] = val;``
+// Given that i = [0..2].
+// See also https://bitbucket.org/ignitionrobotics/ign-math/issues/73
+template<typename Float>
+void SetVector(const size_t _i, const Float _val,
+               ignition::math::Vector3d &_v)
+{
+    if (_i == 0)
+    {
+      _v.X() =  _val;
+    }
+    else if (_i == 1)
+    {
+      _v.Y() = _val;
+    }
+    else
+    {
+      _v.Z() =  _val;
+    }
+}
+
+//////////////////////////////////////////////////
+// see also: Book "real-time collision detection by Christer Ericson, v. 1,
+// p. 86, function UpdateAABB
+// FIXME: I reckon this should go to ignition::math, as updating an AABB
+// with a transform is generally useful.
+ignition::math::Box UpdateAABB(const ignition::math::Box &_a,
+                               const ignition::math::Matrix4d &_m)
+{
+  // construct object to be returned.
+  // Attention: If we only use the default ignition::math::Box constructor
+  // and then set min and max individually with Min()/Max(), then
+  // the extent of the box won't be initialized to BoxPrivate::EXTENT_FINITE,
+  // which in turn will lead to failures if this box is used to add onto
+  // another box with ignition::math::Box::operator+=.
+  // To construct a valid return object, use the constructor which takes two
+  // vectors as arguments, the values don't actually matter.
+  // See also issue #72:
+  // https://bitbucket.org/ignitionrobotics/ign-math/issues/72/
+  ignition::math::Box result(_a);
+
+  // for all 3 axes
+  for (size_t i = 0; i < 3; ++i)
+  {
+    // First, add translation.
+    // Use SetVector() until maybe an update to ignition allows the
+    // following:
+    // result.Min()[i] =  _m(i, 3);
+    // result.Max()[i] =  _m(i, 3);
+    SetVector(i, _m(i, 3), result.Min());
+    SetVector(i, _m(i, 3), result.Max());
+
+    // Then, sum in larger and smaller terms
+    for (size_t j = 0; j < 3; ++j)
+    {
+      // minimum and maximum coordinate of this axis rotated
+      float minRot = _m(i, j) * _a.Min()[j];
+      float maxRot = _m(i, j) * _a.Max()[j];
+      if (minRot < maxRot)
+      {
+        // result.Min()[i] += minRot;
+        // result.Max()[i] += maxRot;
+        SetVector(i, result.Min()[i] + minRot, result.Min());
+        SetVector(i, result.Max()[i] + maxRot, result.Max());
+      }
+      else
+      {
+        // result.Min()[i] += maxRot;
+        // result.Max()[i] += minRot;
+        SetVector(i, result.Min()[i] + maxRot, result.Min());
+        SetVector(i, result.Max()[i] + minRot, result.Max());
+      }
+    }
+  }
+  return result;
+}
+
+
 //////////////////////////////////////////////////
 ignition::math::Box DARTCollision::BoundingBox() const
 {
-  ignition::math::Box result(0, 0, 0, 0, 0, 0);
+  GZ_ASSERT(this->dataPtr->dtCollisionShape,
+            "DARTCollision Must have a collision shape");
+  GZ_ASSERT(this->dataPtr->dtCollisionShape->getShape(),
+            "DARTCollision has no shape");
 
-  gzerr << "DART does not provide bounding box info.\n";
+  const dart::math::BoundingBox& bb =
+    this->dataPtr->dtCollisionShape->getShape()->getBoundingBox();
+
+  ignition::math::Box result(bb.getMin().x(),
+                             bb.getMin().y(),
+                             bb.getMin().z(),
+                             bb.getMax().x(),
+                             bb.getMax().y(),
+                             bb.getMax().z());
+
+  result = UpdateAABB(result, ignition::math::Matrix4d(this->RelativePose()));
 
   return result;
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode *DARTCollision::GetDARTBodyNode() const
+dart::dynamics::BodyNode *DARTCollision::DARTBodyNode() const
 {
-  return boost::static_pointer_cast<DARTLink>(this->link)->GetDARTBodyNode();
+  return boost::static_pointer_cast<DARTLink>(this->link)->DARTBodyNode();
 }
 
 //////////////////////////////////////////////////
-void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
+void DARTCollision::SetDARTCollisionShapeNode(
+                                          dart::dynamics::ShapeNodePtr _shape,
                                           bool _placeable)
 {
   Collision::SetCollision(_placeable);
@@ -142,13 +245,13 @@ void DARTCollision::SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::ShapePtr DARTCollision::DARTCollisionShape() const
+dart::dynamics::ShapeNodePtr DARTCollision::DARTCollisionShapeNode() const
 {
   return this->dataPtr->dtCollisionShape;
 }
 
 /////////////////////////////////////////////////
-DARTSurfaceParamsPtr DARTCollision::GetDARTSurface() const
+DARTSurfaceParamsPtr DARTCollision::DARTSurface() const
 {
   return boost::dynamic_pointer_cast<DARTSurfaceParams>(this->surface);
 }
