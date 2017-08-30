@@ -46,6 +46,8 @@ int imageCount3 = 0;
 int imageCount4 = 0;
 std::string pixelFormat = "";
 
+float* depthImg = nullptr;
+
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
@@ -59,6 +61,19 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   *_imageCounter += 1;
 }
 
+/////////////////////////////////////////////////
+void OnNewRGBPointCloud(int* _imageCounter, float* _imageDest,
+                  const float *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &_format)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  pixelFormat = _format;
+  float f;
+  memcpy(_imageDest, _image, _width * _height * sizeof(f) * _depth * 4);
+  *_imageCounter += 1;
+}
 
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, WorldReset)
@@ -850,4 +865,134 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] img2;
   delete[] prevImg;
   delete[] prevImg2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, PointCloud)
+{
+  // world contains a point cloud camera looking at 4 boxes whose faces have
+  // different depth in each quadrant of the image
+  Load("worlds/pointcloud_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get point cloud depth camera ssensor
+  std::string cameraName = "pointcloud_camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::DepthCameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+  rendering::DepthCameraPtr depthCam = camSensor->DepthCamera();
+  EXPECT_TRUE(depthCam != nullptr);
+
+  unsigned int width  = depthCam->ImageWidth();
+  unsigned int height = depthCam->ImageHeight();
+  EXPECT_GT(width, 0u);
+  EXPECT_GT(height, 0u);
+
+  imageCount = 0;
+  depthImg = new float[width * height * 4];
+
+  event::ConnectionPtr c = depthCam->ConnectNewRGBPointCloud(
+        std::bind(&::OnNewRGBPointCloud, &imageCount, depthImg,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int total_images = 10;
+  while (imageCount < total_images)
+    common::Time::MSleep(10);
+
+  // get the world
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // get the boxes
+  physics::ModelPtr boxTR = world->GetModel("tr_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxTL = world->GetModel("tl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+  physics::ModelPtr boxBR = world->GetModel("br_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxBL = world->GetModel("bl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+
+  // get distance to boxes
+  float boxWidth = 1.0;
+  float boxHalfWidth = boxWidth * 0.5;
+  float distToBoxTR = boxTR->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxTL = boxTL->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxBR = boxBR->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+  float distToBoxBL = boxBL->GetWorldPose().Ign().Pos().X() - boxHalfWidth;
+
+  // verify point cloud xyz data for four unit boxes at different distance
+  // in front of the point cloud camera.
+  // camera uses openni kinect optical frame convention, see comments in
+  // issue #2323: x right, y down, z forward
+  for (unsigned int i = 0; i < height; ++i)
+  {
+    // loop through the pixel values
+    for (unsigned int j = 0; j < width * 4; j+=4)
+    {
+      int idx = i * width * 4 + j;
+      float x = depthImg[idx];
+      float y = depthImg[idx+1];
+      float z = depthImg[idx+2];
+      // rgb values not valid, see issue #1865
+      // int rgb = depthImg[idx+3];
+
+      // left
+      if (j < width*4/2)
+      {
+        // all x values on the left side of camera should be negative and
+        EXPECT_LE(x, 0.0);
+
+        // top left
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTL, 1e-4);
+        }
+        // bottom left
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBL, 1e-4);
+        }
+      }
+      // right
+      else
+      {
+        // all x values on the right side of camera should be positive
+        EXPECT_GT(x, 0.0);
+
+        // top right
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTR, 1e-4);
+        }
+        // bottom right
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBR, 1e-4);
+        }
+      }
+      // x and y should be within the width of 2 boxes
+      EXPECT_GE(x, -boxWidth);
+      EXPECT_LE(x, boxWidth);
+      EXPECT_GE(y, -boxWidth);
+      EXPECT_LE(y, boxWidth);
+    }
+  }
+  c.reset();
+
+  delete [] depthImg;
 }
