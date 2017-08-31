@@ -2043,6 +2043,7 @@ void World::ProcessFactoryMsgs()
       boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
       LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      light->Init();
     }
     catch(...)
     {
@@ -2160,6 +2161,7 @@ void World::SetState(const WorldState &_state)
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        light->Init();
       }
       catch(...)
       {

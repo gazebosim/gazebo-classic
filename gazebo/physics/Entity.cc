@@ -255,11 +255,11 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->GetWorldPose();
+    return this->GetWorldPose() - this->parentEntity->GetWorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->GetWorldPose();
   }
 }
 
@@ -367,7 +367,6 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
                 boost::static_pointer_cast<Light>(*iterC);
             entityC->SetWorldPoseDirty();
           }
-
         }
       }
       else if (entity->HasType(MODEL))
@@ -452,7 +451,6 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
         LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
         entityC->SetWorldPoseDirty();
       }
-
     }
   }
 }

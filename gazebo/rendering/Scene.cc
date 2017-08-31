@@ -2888,7 +2888,8 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     auto p = _msg->pose(i);
-    /// Hack: empty id used to indicate it's pose of a light
+    /// TODO: empty id used to indicate it's pose of a light
+    /// remove this check once light.proto has an id field
     if (p.has_id())
     {
       PoseMsgs_M::iterator iter =
