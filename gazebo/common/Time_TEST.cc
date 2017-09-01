@@ -15,6 +15,18 @@
  *
 */
 
+#ifdef _WIN32
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    struct timespec
+    {
+      int64_t tv_sec;
+      int64_t tv_nsec;
+    };
+  #endif
+#else
+  #include <sys/time.h>
+#endif
+
 #include <gtest/gtest.h>
 
 #include "gazebo/common/Time.hh"
