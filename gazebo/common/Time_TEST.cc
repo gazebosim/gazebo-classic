@@ -16,6 +16,7 @@
 */
 
 #ifdef _WIN32
+  #include <cstdint>
   #if defined(_MSC_VER) && (_MSC_VER < 1900)
     struct timespec
     {
