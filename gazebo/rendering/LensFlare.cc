@@ -91,7 +91,11 @@ namespace gazebo
           // keep z for visibility test
           lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
           lightPos.y = 2.0 * (1.0 - (imagePos.Y() / viewportHeight) - 0.5);
-          lightPos.z = imagePos.Z();
+          // imagePos.Z() is the distance of point from camera optical center
+          // if it's > 1.0 than the point is outside of camera view
+          // but allow some tol to avoid sharp dropoff of lens flare at
+          // edge of image frame. tol = 0.75
+          lightPos.z = (imagePos.Z() > 1.75) ? -1 : 1;
         }
         else
         {

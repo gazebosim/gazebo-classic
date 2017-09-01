@@ -812,9 +812,8 @@ ignition::math::Vector3d WideAngleCamera::Project(
       screenPos.X() = ((x / 2.0) + 0.5) * this->ViewportWidth();
       screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight();
 
-      // if point is not visible (outside of image) then return neg z
-      // TODO determine a more useful z value to return for fisheye projection.
-      screenPos.Z() = r > 1.0 ? -1.0 : 1.0;
+      // r will be > 1.0 if point is not visible (outside of image)
+      screenPos.Z() = r;
       return screenPos;
     }
   }

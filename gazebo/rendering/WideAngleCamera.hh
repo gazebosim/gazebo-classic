@@ -229,7 +229,8 @@ namespace gazebo
 
       /// \brief Project 3D world coordinates to screen coordinates
       /// \param[in] _pt 3D world coodinates
-      /// \return Screen coordinates. Positive Z means point is visible.
+      /// \return Screen coordinates. Z is the distance of point from camera
+      /// optical center.
       public: ignition::math::Vector3d Project(
           const ignition::math::Vector3d &_pt) const;
 
