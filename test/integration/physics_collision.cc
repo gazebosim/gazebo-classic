@@ -138,10 +138,10 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto link = model->GetLink();
     ASSERT_TRUE(link != nullptr);
 
-    // The following line used to be 
+    // The following line used to be
     // const unsigned int index = 0;
-    // but for some reason that version caused a C2666 error 
-    // (overloading ambiguity) in Visual Studio 2015 in the following call: 
+    // but for some reason that version caused a C2666 error
+    // (overloading ambiguity) in Visual Studio 2015 in the following call:
     // auto collision = link->GetCollision(index);
     unsigned int index = 0;
     auto collision = link->GetCollision(index);
