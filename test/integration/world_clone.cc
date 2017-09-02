@@ -15,6 +15,7 @@
  *
 */
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
@@ -110,7 +111,7 @@ TEST_F(WorldClone, CloneUnknownWorld)
   ASSERT_FALSE(worldCloned);
 
   // Save the value of GAZEBO_MASTER_URI.
-  char* master = getenv("GAZEBO_MASTER_URI");
+  char* master = common::getEnv("GAZEBO_MASTER_URI");
 
   // Change GAZEBO_MASTER_URI to be able to see the topics of the new server.
   setenv("GAZEBO_MASTER_URI", "http://localhost:11346", 1);

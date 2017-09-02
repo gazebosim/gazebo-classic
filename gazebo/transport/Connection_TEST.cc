@@ -21,6 +21,7 @@
 
 #include "gazebo/transport/Connection.hh"
 #include "test/util.hh"
+#include "test_config.h"
 
 using namespace gazebo;
 

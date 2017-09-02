@@ -31,6 +31,7 @@
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "test_config.h"
 
 /////////////////////////////////////////////////
 QTestFixture::QTestFixture()

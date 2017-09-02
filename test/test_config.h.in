@@ -4,3 +4,29 @@
 #define TEST_PATH "${PROJECT_SOURCE_DIR}/test"
 #define PROJECT_SOURCE_PATH "${PROJECT_SOURCE_DIR}"
 #define PROJECT_BINARY_PATH "${PROJECT_BINARY_DIR}"
+
+/*
+ * setenv/unstenv are not present in Windows. Define them to make the code
+ * portable
+ */
+#if (_MSC_VER >= 1400) // Visual Studio 2005
+# ifndef GAZEBO_TEST_SETENV_
+# define GAZEBO_TEST_SETENV_
+# include <sstream>
+
+int setenv(const char * name, const char * value, int /*rewrite*/)
+{
+  std::stringstream sstr;
+  sstr << *name << '=' << value;
+  return _putenv(sstr.str().c_str());
+}
+
+void unsetenv(const char * name)
+{
+  std::stringstream sstr;
+  sstr << *name << '=';
+  _putenv(sstr.str().c_str());
+  return;
+}
+# endif
+#endif

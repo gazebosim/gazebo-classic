@@ -16,6 +16,7 @@
 */
 
 #include <unistd.h>
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -726,7 +727,7 @@ TEST_F(TransportTest, Errors)
                testNode->EncodeTopicName("/gazebo/default/factory").c_str());
 
   // Get the original URI
-  char *uri = getenv("GAZEBO_MASTER_URI");
+  char *uri = common::getEnv("GAZEBO_MASTER_URI");
   std::string origURI = "GAZEBO_MASTER_URI=";
   if (uri)
     origURI += uri;
