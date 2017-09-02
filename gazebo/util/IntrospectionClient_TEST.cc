@@ -75,7 +75,7 @@ class IntrospectionClientTest : public ::testing::Test
   /// \brief Initialize the test.
   public: void SetUp()
   {
-    this->topicsSubscribed = {};
+    this->topicsSubscribed.clear();
 
     // A callback for updating items.
     auto func = []()
@@ -180,7 +180,7 @@ TEST_F(IntrospectionClientTest, RemoveAllFilters)
   std::string topic;
 
   // Let's create a filter for receiving updates on "item1" and "item2".
-  std::set<std::string> items = {"item1", "item2"};
+  std::set<std::string> items = {std::string("item1"), std::string("item2")};
   EXPECT_TRUE(this->client.NewFilter(this->managerId, items, filterId1, topic));
 
   // Subscribe to my custom topic for receiving updates.
@@ -239,7 +239,7 @@ TEST_F(IntrospectionClientTest, NewFilterAsync)
   };
 
   // Let's create a filter for receiving updates on "item1" and "item2".
-  std::set<std::string> items = {"item1", "item2"};
+  std::set<std::string> items = {std::string("item1"), std::string("item2")};
   EXPECT_TRUE(this->client.NewFilter(this->managerId, items, cb2));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
 
