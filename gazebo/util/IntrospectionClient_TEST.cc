@@ -261,7 +261,7 @@ TEST_F(IntrospectionClientTest, UpdateFilter)
   EXPECT_TRUE(this->client.NewFilter(this->managerId, items, filterId, topic));
 
   // Update the filter. We're interested on "item1" and "item2".
-  items = {"item1", "item2"};
+  items = decltype(items){"item1", "item2"};
   EXPECT_TRUE(this->client.UpdateFilter(this->managerId, filterId, items));
 
   // Try to update a filter with an incorrect manager ID.
@@ -332,7 +332,7 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
   };
 
   // Update the filter. We're interested on "item1" and "item2".
-  items = {"item1", "item2"};
+  items = decltype(items){"item1", "item2"};
   EXPECT_TRUE(this->client.UpdateFilter(this->managerId, filterId, items,
     cbUpdate));
   std::this_thread::sleep_for(std::chrono::milliseconds(300));
