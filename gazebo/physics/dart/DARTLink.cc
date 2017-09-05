@@ -199,7 +199,7 @@ void DARTLink::Init()
   this->dataPtr->dtBodyNode->setName(bodyName);
 
   // Inertia
-  UpdateMass();
+  this->UpdateMass();
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -263,14 +263,17 @@ void DARTLink::UpdateMass()
 {
   if (this->dataPtr->dtBodyNode && this->inertial)
   {
-    this->dataPtr->dtBodyNode->setMass(this->inertial->Mass());
+    double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
+    double mass = this->inertial->Mass()/nFragments;
+    this->dataPtr->dtBodyNode->setMass(mass);
 
     const ignition::math::Quaterniond R_inertial = this->inertial->Pose().Rot();
 
     const ignition::math::Matrix3d I_link =
         ignition::math::Matrix3d(R_inertial)
         *this->inertial->MOI()
-        *ignition::math::Matrix3d(R_inertial.Inverse());
+        *ignition::math::Matrix3d(R_inertial.Inverse())
+        *(1.0/nFragments);
 
     this->dataPtr->dtBodyNode->setMomentOfInertia(
         I_link(0, 0), I_link(1, 1), I_link(2, 2),
@@ -278,6 +281,15 @@ void DARTLink::UpdateMass()
 
     const auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
+
+    for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+    {
+      slaveNode->setMass(mass);
+      slaveNode->setMomentOfInertia(
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
+      slaveNode->setLocalCOM(cog);
+    }
   }
 }
 
@@ -296,9 +308,8 @@ void DARTLink::OnPoseChange()
   // DART body node always have its parent joint.
   dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
-  dart::dynamics::FreeJoint *freeJoint =
-      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
-  if (freeJoint)
+  if (dart::dynamics::FreeJoint *freeJoint =
+          dynamic_cast<dart::dynamics::FreeJoint*>(joint))
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->WorldPose());
@@ -323,7 +334,7 @@ void DARTLink::OnPoseChange()
   else
   {
     gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not free joint (6-dof).\n";
+          << "is not a FreeJoint (6-dof).\n";
   }
 }
 
@@ -723,6 +734,10 @@ void DARTLink::SetGravityMode(bool _mode)
   }
 
   this->dataPtr->dtBodyNode->setGravityMode(_mode);
+  for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+  {
+    slaveNode->setGravityMode(_mode);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -986,6 +1001,12 @@ DARTBodyNodePropPtr DARTLink::DARTProperties() const
 void DARTLink::SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 {
   this->dataPtr->dtBodyNode = _dtBodyNode;
+}
+
+//////////////////////////////////////////////////
+void DARTLink::AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
+{
+  this->dataPtr->dtSlaveNodes.push_back(_dtBodyNode);
 }
 
 //////////////////////////////////////////////////

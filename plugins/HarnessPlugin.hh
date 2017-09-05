@@ -17,16 +17,17 @@
 #ifndef GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 #define GAZEBO_PLUGINS_HARNESSPLUGIN_HH_
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <ignition/transport/Node.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/common/PID.hh"
 #include "gazebo/common/Plugin.hh"
 
 namespace gazebo
 {
+  // Forward declare private data class
+  class HarnessPluginPrivate;
+
   /// \brief This plugin is designed to lower a model at a controlled rate.
   /// Joints between a harness model and a model to lower are created
   /// according to SDF provided to this plugin.
@@ -36,7 +37,7 @@ namespace gazebo
   /// which can be the same joint as the winch joint, is detached on a given
   /// signal.
   ///
-  /// Two topics are created:
+  /// Three topics are created:
   ///
   ///  1. ~/<plugin_model_name>/harness/velocity
   ///      - Message Type: GzString, expected to be a float
@@ -45,6 +46,11 @@ namespace gazebo
   ///  2. ~/<plugin_model_name>/harness/detach
   ///      - Message Type: GzString, expected to be a bool ("true")
   ///      - Purpose: Detach the <detach> joint.
+  ///
+  ///  3. ~/<plugin_model_name>/harness/attach
+  ///      - Message Type: Pose, world pose to be set for child link
+  ///        before attaching
+  ///      - Purpose: Attach the joint at the specified world pose
   ///
   /// For an example refer to:
   ///   - World file: worlds/harness.world
@@ -71,9 +77,18 @@ namespace gazebo
     /// \return Velocity of the winch joint
     public: double WinchVelocity() const;
 
+    /// \brief Move the child link to the specified pose and recreate the
+    /// harness joint.
+    /// \param[in] _pose Desired world pose of child link before harnessing
+    public: void Attach(const ignition::math::Pose3d &_pose);
+
     /// \brief Detach the <detach> joint. Once the joint is detached, it
-    /// cannot be reattached.
+    /// can be reattached with the Attach method.
     public: void Detach();
+
+    /// \brief Attach harness joints at current robot pose.
+    /// \param[in] _model Pointer to parent model.
+    private: void Attach();
 
     /// \brief Callback for World Update events.
     /// \param[in] _info Update information
@@ -83,7 +98,11 @@ namespace gazebo
     /// \param[in] _msg Message data, interpreted as a float
     private: void OnVelocity(ConstGzStringPtr &_msg);
 
-    /// \brief Detach control callback.
+    /// \brief Attach callback.
+    /// \param[in] _msg Pose where attachment should occur.
+    private: void OnAttach(ConstPosePtr &_msg);
+
+    /// \brief Detach callback.
     /// \param[in] _msg Message data, interpreted as a bool
     private: void OnDetach(ConstGzStringPtr &_msg);
 
@@ -92,50 +111,9 @@ namespace gazebo
     /// \return Index into this->jointsto
     private: int JointIndex(const std::string &_name) const;
 
-    /// \brief Vector of joints
-    private: std::vector<physics::JointPtr> joints;
-
-    /// \brief Index into the joints vector that specifies the winch joint.
-    private: int winchIndex = 0;
-
-    /// \brief Index into the joints vector that specifies the joint to detach.
-    private: int detachIndex = 0;
-
-    /// \brief Position PID controller for the winch
-    private: common::PID winchPosPID;
-
-    /// \brief Velocity PID controller for the winch
-    private: common::PID winchVelPID;
-
-    /// \brief Target winch position
-    private: float winchTargetPos = 0.0;
-
-    /// \brief Target winch velocity
-    private: float winchTargetVel = 0.0;
-
-    /// \brief Previous simulation time
-    private: common::Time prevSimTime = common::Time::Zero;
-
-    /// \brief Communication node
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::NodePtr node;
-
-    /// \brief Velocity control subscriber
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::SubscriberPtr velocitySub;
-
-    /// \brief Detach control subscriber
-    /// \todo: Transition to ignition-transport in gazebo8
-    private: transport::SubscriberPtr detachSub;
-
-    /// \brief Connection to World Update events.
-    private: event::ConnectionPtr updateConnection;
-
-    // Place ignition::transport objects at the end of this file to
-    // guarantee they are destructed first.
-
-    /// \brief Ignition Communication node
-    private: ignition::transport::Node nodeIgn;
+    /// \internal
+    /// \brief Pointer to private data.
+    private: std::unique_ptr<HarnessPluginPrivate> dataPtr;
   };
 }
 #endif
