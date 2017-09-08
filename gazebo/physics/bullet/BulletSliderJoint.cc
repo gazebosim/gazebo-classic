@@ -60,7 +60,7 @@ void BulletSliderJoint::Init()
 
   // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = this->initialWorldAxis;
-  irf (axis == math::Vector3::Zero)
+  if (axis == math::Vector3::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
