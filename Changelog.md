@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Support off-diagonal inertia terms in bullet
+    * [Pull request 2757](https://bitbucket.org/osrf/gazebo/pull-requests/2757)
+
 1. Add option in gui.ini to disable the use of spacenav
     * [Pull request 2754](https://bitbucket.org/osrf/gazebo/pull-requests/2754)
 
