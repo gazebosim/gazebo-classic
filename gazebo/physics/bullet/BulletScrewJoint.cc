@@ -201,8 +201,12 @@ void BulletScrewJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
-    // Parent and child frames generated with btPlaneSpace1 may not match, so
-    // we explicitly align the child frame to the parent frame here.
+    // Parent and child constraint frames generated with btPlaneSpace1 may
+    // differ by 90 degrees because they are underdetermined (only one axis
+    // given). Here we set the child constraint frame by taking the parent
+    // constraint frame (in the frame of the parrent Bullet link) and rotating
+    // it into the frame of the child Bullet link. This ensures that the
+    // constraint frames are initially aligned.
     pose = math::Pose(pivotChild,
         this->childLink->GetWorldInertialPose().rot.GetInverse() *
         this->parentLink->GetWorldInertialPose().rot *
