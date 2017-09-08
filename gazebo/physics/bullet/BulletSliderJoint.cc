@@ -60,7 +60,7 @@ void BulletSliderJoint::Init()
 
   // Get axis unit vector (expressed in world frame).
   math::Vector3 axis = this->initialWorldAxis;
-  if (axis == math::Vector3::Zero)
+  irf (axis == math::Vector3::Zero)
   {
     gzerr << "axis must have non-zero length, resetting to 0 0 1\n";
     axis.Set(0, 0, 1);
@@ -123,7 +123,7 @@ void BulletSliderJoint::Init()
     // Parent and child constraint frames generated with btPlaneSpace1 may
     // differ by 90 degrees because they are underdetermined (only one axis
     // given). Here we set the child constraint frame by taking the parent
-    // constraint frame (in the frame of the parrent Bullet link) and rotating
+    // constraint frame (in the frame of the parent Bullet link) and rotating
     // it into the frame of the child Bullet link. This ensures that the
     // constraint frames are initially aligned.
     pose = math::Pose(pivotChild,
