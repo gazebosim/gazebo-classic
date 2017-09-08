@@ -45,17 +45,21 @@ namespace gazebo
       /// \brief Pointer to ODESurfaceParams object.
       public: physics::ODESurfaceParamsPtr surface = nullptr;
 
-      /// \brief Lateral wheel slip compliance, with units 1/N.
+      /// \brief Unitless wheel slip compliance in lateral direction.
       /// The parameter should be non-negative,
       /// with a value of zero allowing no slip
       /// and larger values allowing increasing slip.
       public: double slipComplianceLateral = 0;
 
-      /// \brief Longitudinal wheel slip compliance, with units 1/N.
+      /// \brief Unitless wheel slip compliance in longitudinal direction.
       /// The parameter should be non-negative,
       /// with a value of zero allowing no slip
       /// and larger values allowing increasing slip.
       public: double slipComplianceLongitudinal = 0;
+
+      /// \brief Wheel normal force estimate used to compute slip
+      /// compliance for ODE, which takes units of 1/N.
+      public: double wheelNormalForce = 0;
 
       /// \brief Wheel radius extracted from collision shape if not
       /// specified as xml parameter.
@@ -128,6 +132,11 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       params.slipComplianceLongitudinal =
         wheelElem->Get<double>("slip_compliance_longitudinal");
     }
+    if (wheelElem->HasElement("wheel_normal_force"))
+    {
+      params.wheelNormalForce = wheelElem->Get<double>("wheel_normal_force");
+    }
+
     if (wheelElem->HasElement("wheel_radius"))
     {
       params.wheelRadius = wheelElem->Get<double>("wheel_radius");
@@ -229,6 +238,16 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
     }
 
+    if (params.wheelNormalForce <= 0)
+    {
+      gzerr << "Found wheel normal force [" << params.wheelNormalForce
+            << "], which is not positive"
+            << " in link named [" << linkName
+            << "] in model [" << _model->GetScopedName() << "]"
+            << std::endl;
+      continue;
+    }
+
     this->dataPtr->mapLinkSurfaceParams[link] = params;
   }
 
@@ -248,10 +267,11 @@ void WheelSlipPlugin::Update()
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     auto params = linkSurface.second;
+    double force = params.wheelNormalForce;
     auto omega = params.joint->GetVelocity(0);
     double speed = std::abs(omega) * params.wheelRadius;
     // auto speed = linkSurface.first->GetWorldLinearVel().Ign().Length();
-    params.surface->slip1 = speed * params.slipComplianceLateral;
-    params.surface->slip2 = speed * params.slipComplianceLongitudinal;
+    params.surface->slip1 = speed / force * params.slipComplianceLateral;
+    params.surface->slip2 = speed / force * params.slipComplianceLongitudinal;
   }
 }
