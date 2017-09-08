@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  * limitations under the License.
  *
 */
-#include <string.h>
+#include <cmath>
+#include <string>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -160,6 +161,12 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
+
+  /// \brief Test ode slip parameter on models with 1-3 spheres
+  /// and varying mass.
+  /// Expect motion to depend on mass, slip, and number of contact points.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void SphereSlip(const std::string &_physicsEngine);
 };
 
 class WorldStepFrictionTest : public PhysicsFrictionTest
@@ -204,6 +211,10 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
   {
     // Set solver type
     physics->SetParam("solver_type", _solverType);
+    if (_solverType == "world")
+    {
+      physics->SetParam("ode_quiet", true);
+    }
 
     // Set world step solver type
     physics->SetParam("world_step_solver", _worldSolverType);
@@ -276,14 +287,13 @@ void PhysicsFrictionTest::FrictionDemo(const std::string &_physicsEngine,
 
 /////////////////////////////////////////////////
 // MaximumDissipation test:
-// Start with empty world,
-// spawn a bunch of boxes,
-// sets box velocities to different angles,
+// Start with friction_cone world, which has a circle of boxes,
+// set box velocities to different angles,
 // expect velocity unit vectors to stay constant while in motion.
 void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
 {
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/friction_cone.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -292,61 +302,42 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  // get the gravity vector
-  // small positive y component
-  math::Vector3 g = physics->GetGravity();
+  // Expect friction cone model
+  {
+    std::string frictionModel;
+    EXPECT_NO_THROW(frictionModel = boost::any_cast<std::string>(
+                                      physics->GetParam("friction_model")));
+    EXPECT_EQ("cone_model", frictionModel);
+  }
 
-  // Set friction model
-  // "cone_model", "pyramid_model", "box_model"
-  const std::string frictionModel = "cone_model";
-  physics->SetParam("friction_model", frictionModel);
-
-  // Spawn concentric semi-circles of boxes
-  int boxes = 32;
-  double dx = 0.5;
-  double dy = 0.5;
-  double dz = 0.2;
+  // Get pointers to boxes and their polar coordinate angle
   std::map<physics::ModelPtr, double> modelAngles;
 
-  for (int ring = 0; ring < 5; ++ring)
+  auto models = world->GetModels();
+  for (auto model : models)
   {
-    gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
-    for (int i = 0; i < boxes; ++i)
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
     {
-      // Set box size and anisotropic friction
-      SpawnFrictionBoxOptions opt;
-      opt.size.Set(dx, dy, dz);
-      opt.friction1 = 0.3;
-      opt.friction2 = opt.friction1;
-
-      // Compute angle for each box
-      double radius = 9.0 + ring;
-      double angle = 2*M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
-
-      if (ring == 0)
-        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
-      else if (ring < 4)
-        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
-
-      if (ring == 1)
-        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 2)
-        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 3)
-        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
-
-      physics::ModelPtr model = SpawnBox(opt);
-      ASSERT_TRUE(model != NULL);
-      modelAngles[model] = angle;
-
-      // Set velocity, larger for outer rings.
-      model->SetLinearVel(
-          radius * ignition::math::Vector3d(cos(angle), sin(angle), 0));
+      continue;
     }
+    auto pos = model->GetWorldPose().Ign().Pos();
+    double angle = std::atan2(pos.Y(), pos.X());
+    modelAngles[model] = angle;
+
+    // Expect radius of 9 m
+    pos.Z(0);
+    double radius = pos.Length();
+    EXPECT_NEAR(9.0, radius, 1e-5);
+
+    // Radial velocity should already be set
+    auto vel = model->GetWorldLinearVel().Ign();
+    EXPECT_GE(vel.Length(), radius*0.95);
+    EXPECT_NEAR(angle, atan2(vel.Y(), vel.X()), 1e-6);
   }
+
+  EXPECT_EQ(modelAngles.size(), 32u);
 
   world->Step(1500);
 
@@ -354,13 +345,19 @@ void PhysicsFrictionTest::MaximumDissipation(const std::string &_physicsEngine)
   std::map<physics::ModelPtr, double>::iterator iter;
   for (iter = modelAngles.begin(); iter != modelAngles.end(); ++iter)
   {
-    double cosAngle = cos(iter->second);
-    double sinAngle = sin(iter->second);
-    math::Vector3 pos = iter->first->GetWorldPose().pos;
-    double cosPosAngle = pos.x / pos.GetLength();
-    double sinPosAngle = pos.y / pos.GetLength();
-    EXPECT_NEAR(cosAngle, cosPosAngle, 1e-2);
-    EXPECT_NEAR(sinAngle, sinPosAngle, 1e-2);
+    double angle = iter->second;
+    ignition::math::Vector3d pos = iter->first->GetWorldPose().Ign().Pos();
+    pos.Z(0);
+    double radius = pos.Length();
+    double polarAngle = atan2(pos.Y(), pos.X());
+    // expect polar angle to remain constant
+    EXPECT_NEAR(angle, polarAngle, 1e-2)
+      << "model " << iter->first->GetScopedName()
+      << std::endl;
+    // make sure the boxes are moving outward
+    EXPECT_GT(radius, 13)
+      << "model " << iter->first->GetScopedName()
+      << std::endl;
   }
 }
 
@@ -392,7 +389,7 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   }
 
   // Load an empty world
-  Load("worlds/empty.world", true, _physicsEngine);
+  Load("worlds/friction_dir_test.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -402,50 +399,37 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // set the gravity vector
-  math::Vector3 g(0.0, 1.0, -9.81);
-  physics->SetGravity(g);
+  ignition::math::Vector3d g(0.0, 1.0, -9.81);
+  world->SetGravity(g);
 
-  // Spawn concentric semi-circles of boxes
-  int boxes = 10;
-  double dx = 0.5;
-  double dy = 0.5;
-  double dz = 0.2;
+  // Pointers and location of concentric semi-circles of boxes
   std::map<physics::ModelPtr, double> modelAngles;
 
-  for (int ring = 0; ring < 4; ++ring)
+  auto models = world->GetModels();
+  for (auto model : models)
   {
-    gzdbg << "Spawn ring " << ring+1 << " of boxes" << std::endl;
-    for (int i = 0; i <= boxes; ++i)
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(0, 4, "box_"))
     {
-      // Set box size and anisotropic friction
-      SpawnFrictionBoxOptions opt;
-      opt.size.Set(dx, dy, dz);
-      opt.friction1 = 100.0;
-      opt.friction2 = 0.0;
-
-      // Compute angle for each box
-      double radius = 5.0 + ring;
-      double angle = M_PI*static_cast<double>(i) / static_cast<double>(boxes);
-      opt.modelPose.Pos().Set(radius*cos(angle), radius*sin(angle), dz/2);
-
-      if (ring == 0)
-        opt.direction1 = ignition::math::Vector3d(-sin(angle), cos(angle), 0);
-      else
-        opt.direction1 = ignition::math::Vector3d(0.0, 1.0, 0.0);
-
-      if (ring == 1)
-        opt.collisionPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 2)
-        opt.linkPose.Rot().Euler(0.0, 0.0, angle);
-
-      if (ring == 3)
-        opt.modelPose.Rot().Euler(0.0, 0.0, angle);
-
-      physics::ModelPtr model = SpawnBox(opt);
-      ASSERT_TRUE(model != NULL);
-      modelAngles[model] = angle;
+      continue;
     }
+    auto pos = model->GetWorldPose().Ign().Pos();
+    double angle = std::atan2(pos.Y(), pos.X());
+    modelAngles[model] = angle;
+  }
+  EXPECT_EQ(modelAngles.size(), 44u);
+
+  // Pointers to spheres model and its links
+  physics::ModelPtr spheres = world->GetModel("spheres");
+  ASSERT_TRUE(spheres != nullptr);
+  auto sphereLinks = spheres->GetLinks();
+  EXPECT_EQ(sphereLinks.size(), 2u);
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // spin spheres about vertical axis
+    link->SetAngularVel(ignition::math::Vector3d::UnitZ);
   }
 
   // Step forward
@@ -458,10 +442,19 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   {
     double cosAngle = cos(iter->second);
     double sinAngle = sin(iter->second);
-    double velMag = g.y * sinAngle * t;
-    math::Vector3 vel = iter->first->GetWorldLinearVel();
-    EXPECT_NEAR(velMag*cosAngle, vel.x, 5*g_friction_tolerance);
-    EXPECT_NEAR(velMag*sinAngle, vel.y, 5*g_friction_tolerance);
+    double velMag = g.Y() * sinAngle * t;
+    ignition::math::Vector3d vel = iter->first->GetWorldLinearVel().Ign();
+    EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
+    EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
+  }
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // the friction direction should be in a body-fixed frame
+    // so spinning the spheres should cause them to start rolling
+    // check that spheres are spinning about the X axis
+    auto w = link->GetWorldAngularVel().Ign();
+    EXPECT_LT(w.X(), -4) << "Checking " << link->GetScopedName() << std::endl;
   }
 }
 
@@ -533,6 +526,129 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test since there's an issue with bullet's friction"
+          << " parameters (#1045)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since there's an issue with simbody's friction"
+          << " parameters (#989)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test since there's an issue with dart's friction"
+          << " parameters (#1000)"
+          << std::endl;
+    return;
+  }
+
+  // Load an empty world
+  Load("worlds/friction_spheres.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  // small positive y component
+  ignition::math::Vector3d grav = world->Gravity();
+  EXPECT_NEAR(grav.X(), 0, 1e-6);
+  EXPECT_NEAR(grav.Y(), 2, 1e-6);
+  EXPECT_NEAR(grav.Z(), -9.81, 1e-6);
+
+  // Get pointers to models and their mass-slip product
+  std::map<physics::ModelPtr, double> lowballMassSlip;
+  std::map<physics::ModelPtr, double> twoballMassSlip;
+  std::map<physics::ModelPtr, double> triballMassSlip;
+
+  auto models = world->GetModels();
+  for (auto model : models)
+  {
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(3, 5, "ball_"))
+    {
+      continue;
+    }
+    double massSlip = std::stod(name.substr(8, 3));
+    if (0 == name.compare(0, 3, "low"))
+    {
+      lowballMassSlip[model] = massSlip;
+    }
+    else if (0 == name.compare(0, 3, "two"))
+    {
+      twoballMassSlip[model] = massSlip;
+    }
+    else if (0 == name.compare(0, 3, "tri"))
+    {
+      triballMassSlip[model] = massSlip;
+    }
+  }
+
+  EXPECT_EQ(lowballMassSlip.size(), 6u);
+  EXPECT_EQ(twoballMassSlip.size(), 6u);
+  EXPECT_EQ(triballMassSlip.size(), 6u);
+
+  world->Step(5000);
+
+  // With constant lateral gravity and non-zero slip,
+  // expect a steady-state lateral velocity that is proportional
+  // to the product of slip and mass divided by the number of contact points.
+  //
+  // The contact points act like viscous dampers in parallel.
+  // The slip parameter is defined as:
+  //   slip = lateral_velocity / (lateral_force / contact_points)
+  // and the velocity is then:
+  //   lateral_velocity = lateral_force * slip / contact_points
+  //   lateral_velocity = gravity * mass * slip / contact_points
+  gzdbg << "Checking velocity of lowball models" << std::endl;
+  for (auto lowball : lowballMassSlip)
+  {
+    auto model = lowball.first;
+    double massSlip = lowball.second;
+    auto vel = model->GetWorldLinearVel().Ign();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 1.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << lowball.first->GetScopedName()
+      << std::endl;
+  }
+  gzdbg << "Checking velocity of twoball models" << std::endl;
+  for (auto twoball : twoballMassSlip)
+  {
+    auto model = twoball.first;
+    double massSlip = twoball.second;
+    auto vel = model->GetWorldLinearVel().Ign();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 2.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << twoball.first->GetScopedName()
+      << std::endl;
+  }
+  gzdbg << "Checking velocity of triball models" << std::endl;
+  for (auto triball : triballMassSlip)
+  {
+    auto model = triball.first;
+    double massSlip = triball.second;
+    auto vel = model->GetWorldLinearVel().Ign();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 3.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << triball.first->GetScopedName()
+      << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
@@ -579,6 +695,21 @@ TEST_P(PhysicsFrictionTest, BoxDirectionRing)
 TEST_P(PhysicsFrictionTest, DirectionNaN)
 {
   DirectionNaN(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, SphereSlip)
+{
+  if (std::string("ode").compare(GetParam()) == 0)
+  {
+    SphereSlip(GetParam());
+  }
+  else
+  {
+    gzerr << "Skipping test for physics engine "
+          << GetParam()
+          << std::endl;
+  }
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,

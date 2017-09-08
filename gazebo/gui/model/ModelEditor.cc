@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,6 +123,20 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   this->dataPtr->exitAct->setCheckable(false);
   connect(this->dataPtr->exitAct, SIGNAL(triggered()), this, SLOT(Exit()));
 
+  this->dataPtr->showCollisionsAct = new QAction(tr("Collisions"), this);
+  this->dataPtr->showCollisionsAct->setStatusTip(tr("Show Collisions"));
+  this->dataPtr->showCollisionsAct->setCheckable(true);
+  this->dataPtr->showCollisionsAct->setChecked(true);
+  this->connect(this->dataPtr->showCollisionsAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowCollisions(bool)));
+
+  this->dataPtr->showVisualsAct = new QAction(tr("Visuals"), this);
+  this->dataPtr->showVisualsAct->setStatusTip(tr("Show Visuals"));
+  this->dataPtr->showVisualsAct->setCheckable(true);
+  this->dataPtr->showVisualsAct->setChecked(true);
+  this->connect(this->dataPtr->showVisualsAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowVisuals(bool)));
+
   this->dataPtr->showJointsAct = new QAction(tr("Joints"), this);
   this->dataPtr->showJointsAct->setStatusTip(tr("Show Joints"));
   this->dataPtr->showJointsAct->setCheckable(true);
@@ -130,6 +144,13 @@ ModelEditor::ModelEditor(MainWindow *_mainWindow)
   connect(this->dataPtr->showJointsAct, SIGNAL(toggled(bool)),
       this->dataPtr->modelPalette->ModelCreator()->JointMaker(),
       SLOT(ShowJoints(bool)));
+
+  this->dataPtr->showLinkFramesAct = new QAction(tr("Link Frames"), this);
+  this->dataPtr->showLinkFramesAct->setStatusTip(tr("Show Link Frames"));
+  this->dataPtr->showLinkFramesAct->setCheckable(true);
+  this->dataPtr->showLinkFramesAct->setChecked(true);
+  this->connect(this->dataPtr->showLinkFramesAct, SIGNAL(toggled(bool)),
+      this->dataPtr->modelPalette->ModelCreator(), SLOT(ShowLinkFrames(bool)));
 
   // Clone actions from main window
   this->dataPtr->showToolbarsAct =
@@ -353,7 +374,10 @@ void ModelEditor::CreateMenus()
   cameraMenu->addAction(this->dataPtr->cameraPerspectiveAct);
 
   QMenu *viewMenu = this->dataPtr->menuBar->addMenu(tr("&View"));
+  viewMenu->addAction(this->dataPtr->showCollisionsAct);
+  viewMenu->addAction(this->dataPtr->showVisualsAct);
   viewMenu->addAction(this->dataPtr->showJointsAct);
+  viewMenu->addAction(this->dataPtr->showLinkFramesAct);
 
   QMenu *windowMenu = this->dataPtr->menuBar->addMenu(tr("&Window"));
   if (this->dataPtr->schematicViewAct)

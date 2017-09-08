@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _WRENCHVISUAL_PRIVATE_HH_
-#define _WRENCHVISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_WRENCHVISUALPRIVATE_HH_
+#define GAZEBO_RENDERING_WRENCHVISUALPRIVATE_HH_
 
 #include <vector>
 
@@ -48,8 +48,8 @@ namespace gazebo
       /// \brief Scene node for Z torque visualization.
       public: Ogre::SceneNode *coneZNode;
 
-      /// \brief Scene node for force visualization.
-      public: Ogre::SceneNode *forceNode;
+      /// \brief Visual for force visualization.
+      public: VisualPtr forceVisual;
 
       /// \brief Line to visualize force
       public: DynamicLines *forceLine;

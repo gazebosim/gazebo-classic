@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,30 +80,25 @@ void BulletLink::Init()
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
   {
-    mass = 0;
+    this->inertial->SetMass(0);
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
-
-  // diagonalize inertia matrix and add inertial pose rotation
+  else
   {
+    // Diagonalize inertia matrix and add inertial pose rotation
     auto inertiald = this->inertial->Ign();
     auto m = inertiald.MassMatrix();
     auto Idiag = m.PrincipalMoments();
-    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
-
     auto inertialPose = inertiald.Pose();
-    inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
+    inertialPose.Rot() *= m.PrincipalAxesOffset();
+
+    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
     this->inertial->SetCoG(inertialPose);
   }
-  auto fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
-  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
-                                   fallInertia.z(), 0, 0, 0);
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -135,9 +130,8 @@ void BulletLink::Init()
       hackMu1 = friction->MuPrimary();
       hackMu2 = friction->MuSecondary();
 
-      auto relativePose =
-        - this->inertial->GetPose().Ign()
-        + collision->GetRelativePose().Ign();
+      auto relativePose = collision->GetRelativePose().Ign()
+          - this->inertial->GetPose().Ign();
       if (!this->compoundShape)
         this->compoundShape = new btCompoundShape();
       dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(
@@ -151,8 +145,9 @@ void BulletLink::Init()
 
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
-    rigidLinkCI(mass, this->motionState.get(), this->compoundShape,
-    fallInertia);
+      rigidLinkCI(this->inertial->GetMass(), this->motionState.get(),
+      this->compoundShape, BulletTypes::ConvertVector3(
+      this->inertial->GetPrincipalMoments()));
 
   rigidLinkCI.m_linearDamping = this->GetLinearDamping();
   rigidLinkCI.m_angularDamping = this->GetAngularDamping();
@@ -174,7 +169,7 @@ void BulletLink::Init()
   // math::Vector3 size = this->GetBoundingBox().GetSize();
   // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
-  if (mass <= 0.0)
+  if (this->inertial->GetMass() <= 0.0)
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
@@ -183,7 +178,6 @@ void BulletLink::Init()
   // bullet supports setting bits to a rigid body but not individual
   // shapes/collisions so find the first child collision and set rigid body to
   // use its category and collision bits.
-  unsigned int categortyBits = GZ_ALL_COLLIDE;
   unsigned int collideBits = GZ_ALL_COLLIDE;
   BulletCollisionPtr collision;
   for (Base_V::iterator iter = this->children.begin();
@@ -192,12 +186,11 @@ void BulletLink::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       collision = boost::static_pointer_cast<BulletCollision>(*iter);
-      categortyBits = collision->GetCategoryBits();
       collideBits = collision->GetCollideBits();
       break;
     }
   }
-  bulletWorld->addRigidBody(this->rigidLink, categortyBits, collideBits);
+  bulletWorld->addRigidBody(this->rigidLink, collideBits, collideBits);
 
   // Only use auto disable if no joints and no sensors are present
   this->rigidLink->setActivationState(DISABLE_DEACTIVATION);
@@ -244,26 +237,12 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
-    gzerr << "pose0 " << this->GetWorldInertialPose() << std::endl;
-    gzerr << "inertia0 " << this->GetWorldInertiaMatrix() << std::endl;
-    // diagonalize inertia matrix and add inertial pose rotation
-    auto inertialPose = this->inertial->GetPose().Ign();
-    ignition::math::Vector3d Idiag;
+    if (this->inertial->GetProductsofInertia() != math::Vector3::Zero)
     {
-      ignition::math::MassMatrix3d m(this->inertial->GetMass(),
-        this->inertial->GetPrincipalMoments().Ign(),
-        this->inertial->GetProductsofInertia().Ign());
-      Idiag = m.PrincipalMoments();
-      this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
-      inertialPose.Rot() = inertialPose.Rot() * m.PrincipalAxesOffset();
-      this->inertial->SetCoG(inertialPose);
+      gzwarn << "UpdateMass is ignoring off-diagonal inertia terms.\n";
     }
-    auto bulletInertia = BulletTypes::ConvertVector3(Idiag);
-
-    this->OnPoseChange();
-    this->rigidLink->setMassProps(this->inertial->GetMass(), bulletInertia);
-    gzerr << "pose1 " << this->GetWorldInertialPose() << std::endl;
-    gzerr << "inertia1 " << this->GetWorldInertiaMatrix() << std::endl;
+    this->rigidLink->setMassProps(this->inertial->GetMass(),
+        BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
   }
 }
 
@@ -535,6 +514,29 @@ math::Vector3 BulletLink::GetWorldTorque() const
 btRigidBody *BulletLink::GetBulletLink() const
 {
   return this->rigidLink;
+}
+
+
+//////////////////////////////////////////////////
+void BulletLink::RemoveAndAddBody() const
+{
+  GZ_ASSERT(nullptr != this->rigidLink, "Must add body to world first");
+
+  btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
+  bulletWorld->removeRigidBody(this->rigidLink);
+
+  unsigned int collideBits = GZ_ALL_COLLIDE;
+  for (auto iter = this->children.begin(); iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::COLLISION))
+    {
+      auto collision = boost::static_pointer_cast<BulletCollision>(*iter);
+      collideBits = collision->GetCollideBits();
+      break;
+    }
+  }
+
+  bulletWorld->addRigidBody(this->rigidLink, collideBits, collideBits);
 }
 
 //////////////////////////////////////////////////

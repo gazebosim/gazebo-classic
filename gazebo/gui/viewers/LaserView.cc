@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -485,6 +485,11 @@ void LaserView::LaserItem::Update(double _angleMin, double _angleMax,
         -hitRange * this->scale * sin(angle));
     this->points[i] = pt;
     double noHitRange = std::isinf(r) ? this->rangeMax : hitRange;
+    if (r < this->rangeMin)
+    {
+        // Display -inf as very close
+        noHitRange = 0;
+    }
     QPointF noHitPt(noHitRange * this->scale * cos(angle),
         -noHitRange * this->scale * sin(angle));
     this->noHitPoints[i] = noHitPt;

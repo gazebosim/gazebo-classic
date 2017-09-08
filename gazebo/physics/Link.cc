@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,6 +135,11 @@ void Link::Load(sdf::ElementPtr _sdf)
   if (!this->IsStatic())
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
+  }
+  else
+  {
+    this->inertial->SetMass(0.0);
+    this->inertial->SetInertiaMatrix(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   }
 
 #ifdef HAVE_OPENAL

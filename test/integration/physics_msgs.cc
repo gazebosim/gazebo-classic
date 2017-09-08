@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,6 +161,44 @@ void PhysicsMsgsTest::MoveTool(const std::string &_physicsEngine)
       // this change to the test.
       world->Step(10);
 
+      EXPECT_EQ(*iter, model->GetWorldPose());
+    }
+  }
+
+  // This test block demonstrates issue #2309 titled:
+  // Simbody exception when manipulating object twice while paused
+  // https://bitbucket.org/osrf/gazebo/issues/2309
+  {
+    transport::PublisherPtr userCmdPub =
+        this->node->Advertise<msgs::UserCmd>("~/user_cmd");
+
+    msgs::UserCmd userCmdMsg;
+    userCmdMsg.set_description("Translate [" + name + "]");
+    userCmdMsg.set_type(msgs::UserCmd::MOVING);
+
+    msgs::Model msg;
+    msg.set_name(name);
+    msg.set_id(model->GetId());
+
+    auto modelMsg = userCmdMsg.add_model();
+    modelMsg->CopyFrom(msg);
+
+    for (std::vector<math::Pose>::iterator iter = poses.begin();
+         iter != poses.end(); ++iter)
+    {
+      msgs::Set(modelMsg->mutable_pose(), (*iter).Ign());
+      userCmdPub->Publish(userCmdMsg);
+
+      while (*iter != model->GetWorldPose())
+      {
+        common::Time::MSleep(1);
+      }
+      if (_physicsEngine == "simbody")
+      {
+        gzerr << "Relaxing part of MoveTool test for Simbody see issue #2309"
+              << std::endl;
+        world->Step(1);
+      }
       EXPECT_EQ(*iter, model->GetWorldPose());
     }
   }

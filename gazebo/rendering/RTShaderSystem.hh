@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,6 +142,16 @@ namespace gazebo
 
       /// \brief Update the RT shaders. This should not be called frequently.
       public: void Update();
+
+      /// \brief Set the shadow texture size.
+      /// \param[in] _size Size of shadow texture to set to. This must be a
+      /// power of 2. The default size is 1024.
+      /// \return True if size is set successfully, false otherwise.
+      public: bool SetShadowTextureSize(const unsigned int _size);
+
+      /// \brief Get the shadow texture size.
+      /// \return Size of the shadow texture. The default size is 1024.
+      public: unsigned int ShadowTextureSize() const;
 
       /// \brief Get paths for the shader system
       /// \param[out] _coreLibsPath Path to the core libraries.

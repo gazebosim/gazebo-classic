@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,6 +155,10 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Compression encoding format for log data (zlib|bz2|txt).")
     ("record_path", po::value<std::string>()->default_value(""),
      "Absolute path in which to store state data")
+    ("record_period", po::value<double>()->default_value(-1),
+     "Recording period (seconds).")
+    ("record_filter", po::value<std::string>()->default_value(""),
+     "Recording filter (supports wildcard and regular expression).")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -252,9 +256,9 @@ bool Server::ParseArgs(int _argc, char **_argv)
   if (this->dataPtr->vm.count("record"))
   {
     this->dataPtr->params["record"] =
-        this->dataPtr->vm["record_path"].as<std::string>();
+      this->dataPtr->vm["record_path"].as<std::string>();
     this->dataPtr->params["record_encoding"] =
-        this->dataPtr->vm["record_encoding"].as<std::string>();
+      this->dataPtr->vm["record_encoding"].as<std::string>();
   }
 
   if (this->dataPtr->vm.count("iters"))
@@ -612,8 +616,13 @@ void Server::ProcessParams()
     }
     else if (iter->first == "record")
     {
-      util::LogRecord::Instance()->Start(
-          this->dataPtr->params["record_encoding"], iter->second);
+      util::LogRecordParams params;
+
+      params.encoding = this->dataPtr->params["record_encoding"];
+      params.path = iter->second;
+      params.period = this->dataPtr->vm["record_period"].as<double>();
+      params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
+      util::LogRecord::Instance()->Start(params);
     }
   }
 }
