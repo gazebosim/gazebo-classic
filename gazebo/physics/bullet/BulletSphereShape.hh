@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,9 +99,9 @@ namespace gazebo
                         bLink->GetBulletLink()->getCollisionShape());
 
                     compoundShape->removeChildShape(shape);
-                    math::Pose relativePose =
-                        this->collisionParent->GetRelativePose();
-                    relativePose.pos -= bLink->GetInertial()->GetCoG();
+                    auto relativePose =
+                        this->collisionParent->GetRelativePose().Ign()
+                        - bLink->GetInertial()->GetPose().Ign();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

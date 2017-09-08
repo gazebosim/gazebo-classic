@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,10 @@
 
 using namespace gazebo;
 using namespace physics;
+
+// TODO declared here for ABI compatibility
+// move to class member variable when merging forward.
+static bool gRecordVelocity = false;
 
 /////////////////////////////////////////////////
 LinkState::LinkState()
@@ -362,4 +366,16 @@ void LinkState::SetIterations(const uint64_t _iterations)
 
   for (auto &collisionState : this->collisionStates)
     collisionState.SetIterations(_iterations);
+}
+
+/////////////////////////////////////////////////
+void LinkState::SetRecordVelocity(const bool _record)
+{
+  gRecordVelocity = _record;
+}
+
+/////////////////////////////////////////////////
+bool LinkState::RecordVelocity() const
+{
+  return gRecordVelocity;
 }

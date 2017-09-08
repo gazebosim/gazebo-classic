@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2299,6 +2299,7 @@ TEST_F(MsgsTest, GeometryToSDF)
       ignition::math::Vector3d(100, 200, 30));
   msgs::Set(heightmapGeom->mutable_origin(),
       ignition::math::Vector3d(50, 100, 15));
+  heightmapGeom->set_sampling(1);
   heightmapGeom->set_use_terrain_paging(true);
 
   msgs::HeightmapGeom_Texture *texture1 = heightmapGeom->add_texture();
@@ -2323,6 +2324,11 @@ TEST_F(MsgsTest, GeometryToSDF)
       ignition::math::Vector3d(100, 200, 30));
   EXPECT_TRUE(heightmapElem->Get<ignition::math::Vector3d>("pos") ==
       ignition::math::Vector3d(50, 100, 15));
+  // fix test while we wait for new sdformat4 version to be released
+  if (heightmapElem->HasElementDescription("sampling"))
+  {
+    EXPECT_EQ(heightmapElem->Get<unsigned int>("sampling"), 1u);
+  }
   EXPECT_TRUE(heightmapElem->Get<bool>("use_terrain_paging"));
 
   sdf::ElementPtr textureElem1 = heightmapElem->GetElement("texture");

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,12 @@ namespace gazebo
 
     /// \brief Finalize the master
     public: void Fini();
+
+    /// \brief Send a message to subscribers to a given topic
+    /// \param[in] _topic Name of the topic
+    /// \param[in] _buffer Data to write
+    private: void SendSubscribers(const std::string &_topic,
+                                  const std::string &_buffer);
 
     /// \brief Process a message
     /// \param[in] _connectionIndex Index of the connection which generated the

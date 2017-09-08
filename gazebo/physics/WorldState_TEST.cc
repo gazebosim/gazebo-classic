@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -259,6 +259,78 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
   // Check states are equal
   EXPECT_EQ(worldState0.GetName(), worldState1.GetName());
   EXPECT_TRUE((worldState0 - worldState1).IsZero());
+}
+
+//////////////////////////////////////////////////
+TEST_F(WorldStateTest, InsertionOfMeshModel)
+{
+  // Load a world
+  this->Load("worlds/empty.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+
+  // Create a world state
+  physics::WorldState worldState0(world);
+
+  // Insert a model with a scaled mesh
+  msgs::Factory msg;
+  std::ostringstream newModelStr;
+
+  newModelStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<model name ='test_model'>"
+    << "<pose>2 2 2 0.1 0.1 0.1</pose>"
+    << "<link name ='link'>"
+    << "  <collision name ='collision'>"
+    << "    <geometry>"
+    << "      <mesh>"
+    << "        <uri>" << std::string(PROJECT_SOURCE_PATH)
+                       << "/test/data/box_offset.dae</uri>"
+    << "        <scale>0.2 0.3 0.4</scale>"
+    << "      </mesh>"
+    << "    </geometry>"
+    << "  </collision>"
+    << "  <visual name ='visual'>"
+    << "    <geometry>"
+    << "      <mesh>"
+    << "        <uri>" << std::string(PROJECT_SOURCE_PATH)
+                       << "/test/data/box_offset.dae</uri>"
+    << "        <scale>0.5 0.6 0.7</scale>"
+    << "      </mesh>"
+    << "    </geometry>"
+    << "  </visual>"
+    << "</link>"
+    << "</model>"
+    << "</sdf>";
+
+  msg.set_sdf(newModelStr.str());
+  this->factoryPub->Publish(msg);
+
+  this->WaitUntilEntitySpawn("test_model", 100, 100);
+  ASSERT_TRUE(world->GetModel("test_model") != nullptr);
+
+  // Create a new world state
+  physics::WorldState worldState1(world);
+
+  // Check that the 2nd state has more entities
+  EXPECT_EQ(worldState0.GetModelStateCount(), 1u);
+  EXPECT_EQ(worldState1.GetModelStateCount(), 2u);
+
+  // Difference between states to generate insertion
+  auto worldState2 = worldState1 - worldState0;
+  EXPECT_FALSE(worldState2.IsZero());
+
+  // Check there were no deletions
+  auto deletions = worldState2.Deletions();
+  EXPECT_EQ(deletions.size(), 0u);
+
+  // Check the old entity disappears and the new entity appears as insertion
+  EXPECT_EQ(worldState2.GetModelStateCount(), 0u);
+  auto insertions = worldState2.Insertions();
+  EXPECT_EQ(insertions.size(), 1u);
+
+  // Check that inserted entity's scale wasn't changed
+  auto inserted = insertions[0];
+  EXPECT_TRUE(inserted.find("<scale>0.2 0.3 0.4</scale>") != std::string::npos);
+  EXPECT_TRUE(inserted.find("<scale>0.5 0.6 0.7</scale>") != std::string::npos);
 }
 
 //////////////////////////////////////////////////

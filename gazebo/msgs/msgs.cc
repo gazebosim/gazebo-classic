@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -966,6 +966,12 @@ namespace gazebo
 
         msgs::Set(result.mutable_heightmap()->mutable_origin(),
             geomElem->Get<ignition::math::Vector3d>("pos"));
+
+        if (geomElem->HasElement("sampling"))
+        {
+          result.mutable_heightmap()->set_sampling(
+              geomElem->Get<unsigned int>("sampling"));
+        }
 
         sdf::ElementPtr textureElem = geomElem->GetElement("texture");
         while (textureElem)
@@ -2419,6 +2425,14 @@ namespace gazebo
         {
           geom->GetElement("pos")->Set(ConvertIgn(heightmapGeom.origin()));
         }
+        if (heightmapGeom.has_sampling())
+        {
+          // check if old version of sdformat is in use
+          if (geom->HasElementDescription("sampling"))
+          {
+            geom->GetElement("sampling")->Set(heightmapGeom.sampling());
+          }
+        }
         if (heightmapGeom.has_use_terrain_paging())
         {
           geom->GetElement("use_terrain_paging")->Set(
@@ -2531,7 +2545,7 @@ namespace gazebo
       }
 
       // Use the SDF parser to read all the inner xml.
-      std::string tmp = "<sdf version='1.5'>";
+      std::string tmp = "<sdf version='" + std::string(SDF_VERSION) + "'>";
       tmp += "<plugin name='" + _msg.name() + "' filename='" +
         _msg.filename() + "'>";
       tmp += _msg.innerxml();

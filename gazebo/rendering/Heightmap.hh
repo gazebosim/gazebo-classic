@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -293,6 +293,19 @@ namespace gazebo
       /// \return Custom material name.
       public: std::string MaterialName() const;
 
+      /// \brief Set the Level Of Detail (LOD) for the heightmap.
+      /// \param[in] _value A render-engine specific value used to compute LOD.
+      /// In Ogre, this is the max pixel error that should be allowed when
+      /// rendering the heightmap. Default is 0, i.e. LOD is disabled.
+      /// Note: enabling LOD means that the rendering engine will be allowed to
+      /// morph mesh vertices, resulting in a simplified visual that may be
+      /// different from the collision.
+      public: void SetLOD(const unsigned int _value);
+
+      /// \brief Get the heightmap Level of Detail (LOD) value
+      /// \return Value used to compute LOD.
+      public: unsigned int LOD() const;
+
       /// \brief Create terrain material generator. There are two types:
       /// custom material generator that support user material scripts,
       /// and a default material generator that uses our own glsl shader
@@ -336,14 +349,16 @@ namespace gazebo
       private: void UpdateTerrainHash(const std::string &_hash,
           const boost::filesystem::path &_terrainDir);
 
-      /// \brief It checks if the terrain was previously loaded. In negative
-      /// case, it splits the original terrain into pieces and creates a hash
-      /// file.
+      /// \brief Checks if the terrain was previously loaded by comparing its
+      /// hash against the one stored in the terrain directory
       /// \param[in] _terrainDirPath Path to the directory containing the
-      /// terrain pages and hash.
+      /// terrain files and hash.
       /// \return True if the terrain requires to regenerate the terrain files.
-      private: bool PrepareTerrainPaging(
-        const boost::filesystem::path &_terrainDirPath);
+      private: bool PrepareTerrain(
+          const boost::filesystem::path &_terrainDirPath);
+
+      /// \brief Save the heightmap tiles to disk
+      private: void SaveHeightmap();
 
       /// \internal
       /// \brief Pointer to private data.

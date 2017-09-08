@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
 #include "gazebo/rendering/skyx/include/SkyX.h"
 
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -607,13 +608,43 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
+bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+{
+  bool retVal = true;
+  Ogre::ColourValue clr = Conversions::Convert(_color);
+  if (this->OgreViewport())
+  {
+    this->OgreViewport()->setBackgroundColour(clr);
+    for (int i = 0; i < 6; ++i)
+    {
+      if (this->dataPtr->envViewports[i])
+      {
+        this->dataPtr->envViewports[i]->setBackgroundColour(clr);
+      }
+      else
+      {
+        retVal = false;
+      }
+    }
+  }
+  else
+  {
+    retVal = false;
+  }
+  return retVal;
+}
+
+//////////////////////////////////////////////////
 void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
-
-#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
-  fsaa = 0;
-#endif
+  unsigned int fsaa = 0;
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   this->dataPtr->envCubeMapTexture =
       Ogre::TextureManager::getSingleton().createManual(
@@ -623,7 +654,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
           this->dataPtr->envTextureSize,
           this->dataPtr->envTextureSize,
           0,
-          Ogre::PF_A8R8G8B8,
+          static_cast<Ogre::PixelFormat>(this->imageFormat),
           Ogre::TU_RENDERTARGET,
           0,
           false,
@@ -633,6 +664,7 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
   {
     Ogre::RenderTarget *rtt;
     rtt = this->dataPtr->envCubeMapTexture->getBuffer(i)->getRenderTarget();
+    rtt->setAutoUpdated(false);
 
     Ogre::Viewport *vp = rtt->addViewport(this->dataPtr->envCameras[i]);
     vp->setClearEveryFrame(true);
@@ -699,4 +731,11 @@ void WideAngleCamera::notifyMaterialRender(Ogre::uint32 /*_pass_id*/,
   // suppose that this function was invoked in a thread that has OpenGL context
   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 #endif
+}
+
+//////////////////////////////////////////////////
+void WideAngleCamera::UpdateFOV()
+{
+  // override to prevent parent class from updating fov as
+  // it'll be handled here in this class.
 }

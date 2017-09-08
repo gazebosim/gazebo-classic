@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,6 +114,7 @@ void RTShaderSystem::Fini()
 
   this->dataPtr->pssmSetup.setNull();
   this->dataPtr->scenes.clear();
+  this->dataPtr->shadowsApplied = false;
   this->dataPtr->initialized = false;
 }
 
@@ -491,9 +492,16 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
   sceneMgr->setShadowTextureCount(3);
-  sceneMgr->setShadowTextureConfig(0, 1024, 1024, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(1, 512, 512, Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(2, 512, 512, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(0,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
+      Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(1,
+      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(2,
+      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      Ogre::PF_FLOAT32_R);
+
   sceneMgr->setShadowTextureSelfShadow(false);
   sceneMgr->setShadowCasterRenderBackFaces(true);
 
@@ -589,4 +597,24 @@ void RTShaderSystem::Update()
     }
   }
   this->dataPtr->updateShaders = false;
+}
+
+/////////////////////////////////////////////////
+bool RTShaderSystem::SetShadowTextureSize(const unsigned int _size)
+{
+  // check if texture size is a power of 2
+  if (!ignition::math::isPowerOfTwo(_size))
+  {
+    gzerr << "Shadow texture size must be a power of 2" << std::endl;
+    return false;
+  }
+
+  this->dataPtr->shadowTextureSize = _size;
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int RTShaderSystem::ShadowTextureSize() const
+{
+  return this->dataPtr->shadowTextureSize;
 }

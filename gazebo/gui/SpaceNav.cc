@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,6 +88,14 @@ bool SpaceNav::Load()
   this->dataPtr->buttons[1] = 0;
 
 #ifdef HAVE_SPNAV
+  // Read whether to use spacenav in gui.ini
+  bool enableSpacenav = getINIProperty<bool>("spacenav.enable", true);
+  if (!enableSpacenav)
+  {
+    gzlog << "Spacenav functionality is disabled\n";
+    return result;
+  }
+
   // Read deadband from [spacenav] in gui.ini
   this->dataPtr->deadbandTrans.x = getINIProperty<double>(
       "spacenav.deadband_x", 0.1);

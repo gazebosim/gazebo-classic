@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ struct CollisionFilter : public btOverlapFilterCallback
       GZ_ASSERT(_proxy0 != NULL && _proxy1 != NULL,
           "Bullet broadphase overlapping pair proxies are NULL");
 
+      // BulletRayShape uses these, TODO remove in favor of collideBits
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
       collide = collide && (_proxy1->m_collisionFilterGroup
@@ -101,6 +102,21 @@ struct CollisionFilter : public btOverlapFilterCallback
       BulletLink *link1 = static_cast<BulletLink *>(
           rb1->getUserPointer());
       GZ_ASSERT(link1 != NULL, "Link1 in collision pair is NULL");
+
+      const Collision_V &cols0 = link0->GetCollisions();
+      const Collision_V &cols1 = link1->GetCollisions();
+
+      if (cols0.size() == 0 || cols1.size() == 0)
+      {
+        // no collision on the link? It can't collide
+        return false;
+      }
+
+      // use first collision, BulletLink expects all to have same bits
+      SurfaceParamsPtr surf0 = cols0[0]->GetSurface();
+      SurfaceParamsPtr surf1 = cols1[0]->GetSurface();
+
+      collide = surf0->collideBitmask & surf1->collideBitmask;
 
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
@@ -157,8 +173,6 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     math::Pose body1Pose = link1->GetWorldPose();
     math::Pose body2Pose = link2->GetWorldPose();
-    math::Vector3 cg1Pos = link1->GetInertial()->GetPose().pos;
-    math::Vector3 cg2Pos = link2->GetInertial()->GetPose().pos;
     math::Vector3 localForce1;
     math::Vector3 localForce2;
     math::Vector3 localTorque1;

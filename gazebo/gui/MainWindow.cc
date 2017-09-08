@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <QDesktopServices>
 #include <functional>
 
 #include <sdf/sdf.hh>
@@ -48,7 +49,6 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/GuiPlugin.hh"
-#include "gazebo/gui/HotkeyDialog.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
 #include "gazebo/gui/LayersWidget.hh"
 #include "gazebo/gui/ModelListWidget.hh"
@@ -241,9 +241,6 @@ MainWindow::MainWindow()
   this->dataPtr->dataLogger = new gui::DataLogger(this);
   connect(this->dataPtr->dataLogger, SIGNAL(rejected()), this, SLOT(
     OnDataLoggerClosed()));
-
-  // Hotkey dialog
-  this->dataPtr->hotkeyDialog = NULL;
 
   this->show();
 }
@@ -625,13 +622,7 @@ void MainWindow::About()
 /////////////////////////////////////////////////
 void MainWindow::HotkeyChart()
 {
-  // Opening for the first time
-  if (!this->dataPtr->hotkeyDialog)
-  {
-    this->dataPtr->hotkeyDialog = new HotkeyDialog(this);
-  }
-
-  this->dataPtr->hotkeyDialog->show();
+  QDesktopServices::openUrl(QUrl("http://gazebosim.org/hotkeys.html"));
 }
 
 /////////////////////////////////////////////////
@@ -1096,7 +1087,7 @@ void MainWindow::CreateActions()
   connect(g_cloneAct, SIGNAL(triggered()), this, SLOT(Clone()));
 
   g_hotkeyChartAct = new QAction(tr("&Hotkey Chart"), this);
-  g_hotkeyChartAct->setStatusTip(tr("Show the hotkey chart"));
+  g_hotkeyChartAct->setStatusTip(tr("Open hotkey chart in a browser"));
   connect(g_hotkeyChartAct, SIGNAL(triggered()), this, SLOT(HotkeyChart()));
 
   g_aboutAct = new QAction(tr("&About"), this);

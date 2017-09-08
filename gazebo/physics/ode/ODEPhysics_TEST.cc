@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,6 +299,26 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
     EXPECT_NO_THROW(param = boost::any_cast<std::string>(
       odePhysics->GetParam("friction_model")));
     EXPECT_EQ(param, frictionModel);
+  }
+
+  // Test ode_quiet
+  // convenient for disabling LCP internal error messages from world solver
+  {
+    // ode_quiet should be off by default
+    bool odeQuiet = true;
+    EXPECT_NO_THROW(
+      odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+    EXPECT_FALSE(odeQuiet);
+
+    // try turning it on, then off again
+    std::vector<bool> bools = {true, false};
+    for (const bool odeQuietSet : bools)
+    {
+      odePhysics->SetParam("ode_quiet", odeQuietSet);
+      EXPECT_NO_THROW(
+        odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
+      EXPECT_EQ(odeQuiet, odeQuietSet);
+    }
   }
 
   // Test world step solvers

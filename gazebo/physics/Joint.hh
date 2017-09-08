@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -605,8 +605,8 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
-      /// child frame specified in the parent link frame
+      /// \brief Anchor pose.  This is the xyz position of the joint frame
+      /// specified in the world frame.
       protected: math::Vector3 anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.

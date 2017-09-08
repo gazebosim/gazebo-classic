@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,10 @@ void JointTestRevolute::RevoluteJoint(const std::string &_physicsEngine,
 
   // Set solver type
   physics->SetParam("solver_type", _solverType);
+  if (_solverType == "world")
+  {
+    physics->SetParam("ode_quiet", true);
+  }
 
   // Model names
   std::vector<std::string> modelNames;

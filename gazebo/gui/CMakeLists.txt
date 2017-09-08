@@ -144,7 +144,6 @@ set (qt_tests
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelListWidget_TEST.cc
