@@ -704,17 +704,17 @@ TEST_F(CameraSensor, CheckDistortion)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
     {
-      unsigned int r = img[(y*width*3)];
-      unsigned int g = img[(y*width*3)+1];
-      unsigned int b = img[(y*width*3)+2];
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
       colorSum += r + g + b;
-      unsigned int r3 = img3[(y*width*3)];
-      unsigned int g3 = img3[(y*width*3)+1];
-      unsigned int b3 = img3[(y*width*3)+2];
+      unsigned int r3 = img3[(y*width*3) + x];
+      unsigned int g3 = img3[(y*width*3) + x + 1];
+      unsigned int b3 = img3[(y*width*3) + x + 2];
       colorSum3 += r3 + g3 + b3;
-      unsigned int r4 = img4[(y*width*3)];
-      unsigned int g4 = img4[(y*width*3)+1];
-      unsigned int b4 = img4[(y*width*3)+2];
+      unsigned int r4 = img4[(y*width*3) + x];
+      unsigned int g4 = img4[(y*width*3) + x + 1];
+      unsigned int b4 = img4[(y*width*3) + x + 2];
       colorSum4 += r4 + g4 + b4;
     }
   }

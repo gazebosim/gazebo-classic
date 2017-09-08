@@ -2369,13 +2369,18 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = _msg->geometry().mesh().filename();
+    {
+      std::string filename = _msg->geometry().mesh().filename();
+      newGeometryName = common::find_file(filename);
+    }
 
     if (newGeometryType != geometryType ||
-        (newGeometryType == "mesh" && newGeometryName != geometryName))
+        (newGeometryType == "mesh" && !newGeometryName.empty() &&
+        newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
       float origTransparency = this->dataPtr->transparency;
+      bool origCastShadows = this->dataPtr->castShadows;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2393,7 +2398,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       else if (newGeometryType == "mesh")
       {
         std::string filename = _msg->geometry().mesh().filename();
-        std::string meshName = common::find_file(filename);
+        std::string meshName = newGeometryName;
         std::string submeshName;
         bool centerSubmesh = false;
 
@@ -2424,6 +2429,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
       }
       this->SetTransparency(origTransparency);
       this->SetMaterial(origMaterial);
+      this->SetCastShadows(origCastShadows);
     }
 
     math::Vector3 geomScale(1, 1, 1);
