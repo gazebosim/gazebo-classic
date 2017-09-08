@@ -84,11 +84,11 @@ void BulletSliderJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->WorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.Pos();
-    // Rotate pivot offset and axis into body-fixed frame of parent.
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
     pivotParent = pose.Rot().RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
     axisParent = pose.Rot().RotateVectorReverse(axis);
@@ -103,11 +103,11 @@ void BulletSliderJoint::Init()
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->WorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->WorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.Pos();
-    // Rotate pivot offset and axis into body-fixed frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.Rot().RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
     axisChild = pose.Rot().RotateVectorReverse(axis);
@@ -123,6 +123,17 @@ void BulletSliderJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    // Parent and child constraint frames generated with btPlaneSpace1 may
+    // differ by 90 degrees because they are underdetermined (only one axis
+    // given). Here we set the child constraint frame by taking the parent
+    // constraint frame (in the frame of the parent Bullet link) and rotating
+    // it into the frame of the child Bullet link. This ensures that the
+    // constraint frames are initially aligned.
+    pose = ignition::math::Pose3d(pivotChild,
+        this->childLink->WorldInertialPose().Rot().Inverse() *
+        this->parentLink->WorldInertialPose().Rot() *
+        BulletTypes::ConvertPoseIgn(frameParent).Rot());
+    frameChild = BulletTypes::ConvertPose(pose);
     this->bulletSlider = new btSliderConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),
@@ -352,7 +363,6 @@ double BulletSliderJoint::PositionImpl(const unsigned int _index) const
   auto offset = this->WorldPose().Pos()
               - this->ParentWorldPose().Pos();
   auto axis = this->GlobalAxis(_index);
-  auto poseParent = this->WorldPose();
   return axis.Dot(offset);
 }
 

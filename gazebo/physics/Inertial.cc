@@ -84,6 +84,24 @@ Inertial::Inertial(const double _m)
 }
 
 //////////////////////////////////////////////////
+Inertial::Inertial(const ignition::math::Inertiald &_inertial)
+  : dataPtr(new InertialPrivate)
+{
+  this->dataPtr->sdf.reset(new sdf::Element);
+  initFile("inertial.sdf", this->dataPtr->sdf);
+
+  this->SetMass(_inertial.MassMatrix().Mass());
+  this->SetCoG(_inertial.Pose());
+  this->SetInertiaMatrix(
+      _inertial.MassMatrix().IXX(),
+      _inertial.MassMatrix().IYY(),
+      _inertial.MassMatrix().IZZ(),
+      _inertial.MassMatrix().IXY(),
+      _inertial.MassMatrix().IXZ(),
+      _inertial.MassMatrix().IYZ());
+}
+
+//////////////////////////////////////////////////
 Inertial::Inertial(const Inertial &_inertial)
   : dataPtr(new InertialPrivate)
 {
@@ -640,3 +658,26 @@ ignition::math::Pose3d Inertial::Pose() const
 {
   return ignition::math::Pose3d(this->dataPtr->cog);
 }
+
+//////////////////////////////////////////////////
+ignition::math::Inertiald Inertial::Ign() const
+{
+  return ignition::math::Inertiald(
+          ignition::math::MassMatrix3d(
+            this->Mass(),
+            this->PrincipalMoments(),
+            this->ProductsOfInertia()),
+          this->dataPtr->cog);
+}
+
+//////////////////////////////////////////////////
+Inertial &Inertial::operator=(const ignition::math::Inertiald &_inertial)
+{
+  this->dataPtr->mass = _inertial.MassMatrix().Mass();
+  this->dataPtr->cog = _inertial.Pose();
+  this->dataPtr->principals = _inertial.MassMatrix().DiagonalMoments();
+  this->dataPtr->products = _inertial.MassMatrix().OffDiagonalMoments();
+
+  return *this;
+}
+

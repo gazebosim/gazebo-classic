@@ -859,8 +859,8 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
-      /// child frame specified in the parent link frame
+      /// \brief Anchor pose.  This is the xyz position of the joint frame
+      /// specified in the world frame.
       protected: ignition::math::Vector3d anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.
