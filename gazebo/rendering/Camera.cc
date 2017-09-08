@@ -199,7 +199,6 @@ void Camera::Init()
 
   this->CreateCamera();
 
-  this->sceneNode->attachObject(this->camera);
   this->camera->setAutoAspectRatio(true);
 
   this->sceneNode->setInheritScale(false);
@@ -257,6 +256,7 @@ void Camera::Fini()
   }
 
   this->sceneNode = NULL;
+  this->cameraNode = nullptr;
   this->viewport = NULL;
 
   this->scene.reset();
@@ -684,7 +684,7 @@ void Camera::SetClipDist(const float _near, const float _far)
 void Camera::SetFixedYawAxis(const bool _useFixed,
     const ignition::math::Vector3d &_fixedAxis)
 {
-  this->sceneNode->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
+  this->cameraNode->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
   this->dataPtr->yawFixed = _useFixed;
   this->dataPtr->yawFixedAxis = _fixedAxis;
 }
@@ -1345,13 +1345,16 @@ void Camera::CreateCamera()
 {
   this->camera = this->scene->OgreSceneManager()->createCamera(
       this->scopedUniqueName);
+  this->cameraNode = this->sceneNode->createChildSceneNode(
+      this->scopedUniqueName + "_cameraNode");
+  this->cameraNode->attachObject(this->camera);
 
   if (this->sdf->HasElement("projection_type"))
     this->SetProjectionType(this->sdf->Get<std::string>("projection_type"));
 
   this->SetFixedYawAxis(false);
-  this->camera->yaw(Ogre::Degree(-90.0));
-  this->camera->roll(Ogre::Degree(-90.0));
+  this->cameraNode->yaw(Ogre::Degree(-90.0));
+  this->cameraNode->roll(Ogre::Degree(-90.0));
 }
 
 //////////////////////////////////////////////////
@@ -1568,23 +1571,27 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   if (_visual)
   {
     this->dataPtr->trackedVisual = _visual;
-    this->camera->yaw(Ogre::Degree(90.0));
-    this->camera->roll(Ogre::Degree(90.0));
-    this->sceneNode->setAutoTracking(true, _visual->GetSceneNode());
-    this->sceneNode->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
-
+    this->cameraNode->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
+    this->cameraNode->setAutoTracking(true, _visual->GetSceneNode());
     result = true;
   }
-  else if (this->sceneNode->getAutoTrackTarget() != 0)
+  else if (this->cameraNode->getAutoTrackTarget() != 0)
   {
-    this->sceneNode->setAutoTracking(false);
+    this->cameraNode->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
-    this->camera->roll(Ogre::Degree(-90.0));
-    this->camera->yaw(Ogre::Degree(-90.0));
-    Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation() *
-      this->camera->getOrientation().Inverse();
+    auto cameraNodeDerivedRot = this->cameraNode->_getDerivedOrientation();
+    // reset cameraNode to initial pose
+    this->cameraNode->setFixedYawAxis(false);
+    this->cameraNode->setOrientation(Ogre::Quaternion::IDENTITY);
+    this->cameraNode->yaw(Ogre::Degree(-90.0));
+    this->cameraNode->roll(Ogre::Degree(-90.0));
+    // compensate for the pose change after resetting cameraNode
+    // so that the derived camera orientation remains the same
+    auto rot = cameraNodeDerivedRot *
+        this->cameraNode->_getDerivedOrientation().Inverse() *
+        this->sceneNode->_getDerivedOrientation();
     this->SetWorldPose({this->WorldPosition(), {rot.w, rot.x, rot.y, rot.z}});
-    this->sceneNode->setFixedYawAxis(this->dataPtr->yawFixed,
+    this->cameraNode->setFixedYawAxis(this->dataPtr->yawFixed,
         Conversions::Convert(this->dataPtr->yawFixedAxis));
   }
 
