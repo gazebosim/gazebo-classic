@@ -173,8 +173,6 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     auto body1Pose = link1->WorldPose();
     auto body2Pose = link2->WorldPose();
-    auto cg1Pos = link1->GetInertial()->Pose().Pos();
-    auto cg2Pos = link2->GetInertial()->Pose().Pos();
     ignition::math::Vector3d localForce1;
     ignition::math::Vector3d localForce2;
     ignition::math::Vector3d localTorque1;
