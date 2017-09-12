@@ -17,6 +17,7 @@
 
 #include <google/protobuf/descriptor.h>
 #include <algorithm>
+#include <ignition/math/MassMatrix3.hh>
 #include <ignition/math/Rand.hh>
 
 #include "gazebo/common/CommonIface.hh"
@@ -2599,21 +2600,14 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromBox(_mass, _size))
       {
-        double dx = _size.X();
-        double dy = _size.Y();
-        double dz = _size.Z();
-        double ixx = _mass/12.0 * (dy*dy + dz*dz);
-        double iyy = _mass/12.0 * (dz*dz + dx*dx);
-        double izz = _mass/12.0 * (dx*dx + dy*dy);
-        inertial->set_ixx(ixx);
-        inertial->set_iyy(iyy);
-        inertial->set_izz(izz);
-        inertial->set_ixy(0.0);
-        inertial->set_ixz(0.0);
-        inertial->set_iyz(0.0);
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
       }
     }
 
@@ -2632,17 +2626,15 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double r2 = _radius * _radius;
-      const double ixx = _mass * (0.25 * r2 + _length*_length / 12.0);
-      const double izz = _mass * 0.5 * r2;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(izz);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromCylinderZ(_mass, _length, _radius))
+      {
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
+      }
     }
 
     ////////////////////////////////////////////////////////
@@ -2657,15 +2649,15 @@ namespace gazebo
       int linkCount = _model.link_size();
       auto link = _model.mutable_link(linkCount-1);
 
-      auto inertial = link->mutable_inertial();
-      inertial->set_mass(_mass);
-      const double ixx = _mass * 0.4 * _radius * _radius;
-      inertial->set_ixx(ixx);
-      inertial->set_iyy(ixx);
-      inertial->set_izz(ixx);
-      inertial->set_ixy(0.0);
-      inertial->set_ixz(0.0);
-      inertial->set_iyz(0.0);
+      ignition::math::MassMatrix3d m;
+      if (!m.SetFromSphere(_mass, _radius))
+      {
+        gzerr << "Error computing inertia, not setting" << std::endl;
+      }
+      else
+      {
+        msgs::Set(link->mutable_inertial(), m);
+      }
     }
 
     ////////////////////////////////////////////////////////

@@ -10,6 +10,95 @@
     </include>
     <gravity>0 1 -9.81</gravity>
 
+    <model name='spheres'>
+      <pose>0 3 0.25  0 0 0</pose>
+      <link name='link_1'>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.025</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.025</iyy>
+            <iyz>0</iyz>
+            <izz>0.025</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>0</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <link name='link_2'>
+        <pose>0 1 0  0 0 0</pose>
+        <inertial>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.025</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.025</iyy>
+            <iyz>0</iyz>
+            <izz>0.025</izz>
+          </inertia>
+        </inertial>
+        <collision name='collision'>
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>0</mu2>
+                <fdir1>1 0 0</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='visual'>
+          <geometry>
+            <sphere>
+              <radius>0.25</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Grey</name>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
     <model name='box_fdir_0'>
       <pose>5.0 0.0 0.1 0 -0 0</pose>
       <link name='link_1'>
@@ -553,6 +642,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 0.0</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -600,6 +690,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 0.3141592653589793</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -647,6 +738,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 0.6283185307179586</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -694,6 +786,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 0.9424777960769379</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -741,6 +834,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 1.2566370614359172</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -788,6 +882,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 1.5707963267948966</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -835,6 +930,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 1.8849555921538759</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -882,6 +978,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 2.199114857512855</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -929,6 +1026,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 2.5132741228718345</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -976,6 +1074,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 2.827433388230814</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
@@ -1023,6 +1122,7 @@
               <size>0.5 0.5 0.2</size>
             </box>
           </geometry>
+          <pose>0 0 0  0 0 3.141592653589793</pose>
           <material>
             <script>
               <name>Gazebo/Grey</name>
