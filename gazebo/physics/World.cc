@@ -244,6 +244,8 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
+  this->dataPtr->lightFactoryPub = this->dataPtr->node->Advertise<msgs::Light>(
+      "~/factory/light");
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -1082,6 +1084,13 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // msg should contain scoped name (consistent with other entities)
   msg->set_name(light->GetScopedName());
 
+  // publish after adding light to the lights vector
+  // we also process light factory msg in World so this avoids creating a
+  // duplicate light
+  // Note: models uses /model/info topic. We can consider adding a
+  // /light/info topic for this
+  this->dataPtr->lightFactoryPub->Publish(*msg);
+
   return light;
 }
 
@@ -1852,8 +1861,6 @@ void World::ProcessLightFactoryMsgs()
 
     if (light)
     {
-      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
-          << " Use topic ~/light/modify to modify it." << std::endl;
       continue;
     }
     else
