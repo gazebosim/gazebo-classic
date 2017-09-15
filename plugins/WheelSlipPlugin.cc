@@ -262,6 +262,30 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
+physics::ModelPtr WheelSlipPlugin::GetParentModel() const
+{
+  return this->dataPtr->model;
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
+{
+  for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    linkSurface.second.slipComplianceLateral = _compliance;
+  }
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
+{
+  for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    linkSurface.second.slipComplianceLongitudinal = _compliance;
+  }
+}
+
+/////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)

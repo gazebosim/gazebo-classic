@@ -74,6 +74,18 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    /// \brief Get parent model.
+    /// \return pointer to parent model.
+    public: physics::ModelPtr GetParentModel() const;
+
+    /// \brief Set unitless lateral slip compliance for all wheels.
+    /// \param[in] _compliance unitless slip compliance to set.
+    public: void SetSlipComplianceLateral(const double _compliance);
+
+    /// \brief Set unitless longitudinal slip compliance for all wheels.
+    /// \param[in] _compliance unitless slip compliance to set.
+    public: void SetSlipComplianceLongitudinal(const double _compliance);
+
     /// \brief Update the plugin. This is updated every iteration of
     /// simulation.
     private: void Update();
