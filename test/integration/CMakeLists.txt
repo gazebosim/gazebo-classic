@@ -167,6 +167,7 @@ set(dri_tests
   projector.cc
   rendering_sensor.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )
