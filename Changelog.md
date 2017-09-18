@@ -2,6 +2,8 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Parallelize ODE physics with threaded islands parameter
+    * [Pull request ____](https://bitbucket.org/osrf/gazebo/pull-requests/____)
 1. Support off-diagonal inertia terms in bullet
     * [Pull request 2757](https://bitbucket.org/osrf/gazebo/pull-requests/2757)
 
