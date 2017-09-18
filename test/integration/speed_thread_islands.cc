@@ -18,7 +18,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/physics/physics.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
 const double g_tolerance = 1e-2;
