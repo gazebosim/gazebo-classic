@@ -137,9 +137,8 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
             << "\t Max[" << threadMaxTime << "]\n"
             << "\t Min[" << threadMinTime << "]\n";
 
-  // Expect computational time to decrease
+  // Expect best-case computational time to decrease
   EXPECT_LT(threadMinTime, baseMinTime);
-  EXPECT_LT(threadAvgTime, baseAvgTime);
 }
 
 TEST_F(SpeedThreadIslandsTest, RevoluteJointQuickStep)
