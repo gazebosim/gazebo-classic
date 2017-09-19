@@ -101,6 +101,28 @@ TEST_F(LogicalCameraSensor, Box)
 }
 
 /////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, NestedModels)
+{
+  Load("test/worlds/logical_camera_nested_models.world");
+
+  // Wait until the sensor has been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  // Get the logical camera sensor
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  // Force the update
+  cam->Update(true);
+
+  // We should now detect the nested model
+  ASSERT_EQ(1, cam->Image().model_size());
+  EXPECT_EQ("base_target::nested_target", cam->Image().model(0).name());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
