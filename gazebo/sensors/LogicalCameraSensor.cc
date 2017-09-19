@@ -72,9 +72,12 @@ std::string LogicalCameraSensor::GetTopic() const
 //////////////////////////////////////////////////
 std::string LogicalCameraSensor::Topic() const
 {
-  std::string topicName = "~/" + this->ParentName() + "/" + this->Name() +
-    "/models";
-  boost::replace_all(topicName, "::", "/");
+  std::string topicName = Sensor::Topic();
+  if (topicName.empty())
+  {
+    topicName = "~/" + this->ParentName() + "/" + this->Name() + "/models";
+    boost::replace_all(topicName, "::", "/");
+  }
 
   return topicName;
 }
