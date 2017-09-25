@@ -30,7 +30,7 @@ TEST_F(LogicalCameraSensor, GroundPlane)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -62,7 +62,7 @@ TEST_F(LogicalCameraSensor, TopicNotSpecified)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -78,7 +78,7 @@ TEST_F(LogicalCameraSensor, TopicSpecified)
 {
   Load("test/worlds/logical_camera_specify_topic.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -94,7 +94,7 @@ TEST_F(LogicalCameraSensor, Box)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
