@@ -15,13 +15,13 @@
       <entity>drill</entity>
       <namespace>gazebo/default/drill</namespace>
       <size>1 1 2</size>
-      <pose>10 10 1 0 0 0.8</pose>
+      <pose>10 10 0.5 0 0 0.8</pose>
     </plugin>
 
     <!-- Box visual for demonstration -->
     <model name="box">
       <static>true</static>
-      <pose>10 10 1 0 0 0.8</pose>
+      <pose>10 10 0.5 0 0 0.8</pose>
       <link name="link">
         <visual name="visual">
           <geometry>

@@ -63,9 +63,6 @@ namespace gazebo
 
     /// \brief Whether contains or not
     public: int contains = -1;
-
-    /// \brief Previous update time.
-    public: common::Time prevTime;
   };
 }
 

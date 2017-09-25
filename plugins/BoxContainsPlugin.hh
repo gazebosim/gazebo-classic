@@ -30,7 +30,8 @@ namespace gazebo
   class BoxContainsPluginPrivate;
 
   /// \brief Plugin which emits gazebo transport messages according to whether
-  /// an entity's origin is inside or outside an oriented box.
+  /// an entity's origin is inside or outside an oriented box. A message is only
+  /// published when the state changes.
   ///
   /// Example usage:
   ///
