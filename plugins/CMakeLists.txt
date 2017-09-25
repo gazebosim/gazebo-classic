@@ -42,6 +42,7 @@ set (plugins_single_header
   AttachLightPlugin
   BlinkVisualPlugin
   BreakableJointPlugin
+  BoxContainsPlugin
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
