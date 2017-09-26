@@ -496,10 +496,10 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1,
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2,
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
 
   sceneMgr->setShadowTextureSelfShadow(false);
@@ -522,30 +522,24 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   if (this->dataPtr->pssmSetup.isNull())
   {
     this->dataPtr->pssmSetup =
-        Ogre::ShadowCameraSetupPtr(new Ogre::PSSMShadowCameraSetup());
+        Ogre::ShadowCameraSetupPtr(new Ogre::CustomPSSMShadowCameraSetup());
   }
 
   double shadowFarDistance = 500;
   double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
-  Ogre::PSSMShadowCameraSetup *cameraSetup =
-      dynamic_cast<Ogre::PSSMShadowCameraSetup*>(
+  Ogre::CustomPSSMShadowCameraSetup *cameraSetup =
+      dynamic_cast<Ogre::CustomPSSMShadowCameraSetup*>(
       this->dataPtr->pssmSetup.get());
 
   cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  cameraSetup->setSplitPadding(4);
+  cameraSetup->setSplitPadding(2);
   cameraSetup->setOptimalAdjustFactor(0, 2);
   cameraSetup->setOptimalAdjustFactor(1, 1);
   cameraSetup->setOptimalAdjustFactor(2, .5);
 
   sceneMgr->setShadowCameraSetup(this->dataPtr->pssmSetup);
-
-  // These values do not seem to help at all. Leaving here until I have time
-  // to properly fix shadow z-fighting.
-  // cameraSetup->setOptimalAdjustFactor(0, 4);
-  // cameraSetup->setOptimalAdjustFactor(1, 1);
-  // cameraSetup->setOptimalAdjustFactor(2, 0.5);
 
   this->dataPtr->shadowRenderState =
       this->dataPtr->shaderGenerator->createSubRenderState(
@@ -576,9 +570,9 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
-Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
+Ogre::CustomPSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
-  return dynamic_cast<Ogre::PSSMShadowCameraSetup *>(
+  return dynamic_cast<Ogre::CustomPSSMShadowCameraSetup *>(
       this->dataPtr->pssmSetup.get());
 }
 

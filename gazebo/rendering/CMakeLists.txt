@@ -24,6 +24,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -84,6 +85,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh

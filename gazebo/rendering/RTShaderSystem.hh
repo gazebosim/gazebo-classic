@@ -22,6 +22,7 @@
 #include <string>
 
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 #include "gazebo/gazebo_config.h"
 
 #include "gazebo/rendering/Camera.hh"
@@ -138,7 +139,7 @@ namespace gazebo
 
       /// \brief Get the Ogre PSSM Shadows camera setup.
       /// \return The Ogre PSSM Shadows camera setup.
-      public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
+      public: Ogre::CustomPSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
 
       /// \brief Update the RT shaders. This should not be called frequently.
       public: void Update();
