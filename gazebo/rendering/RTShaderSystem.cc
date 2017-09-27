@@ -542,7 +542,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
         Ogre::ShadowCameraSetupPtr(new Ogre::CustomPSSMShadowCameraSetup());
   }
 
-  double shadowFarDistance = 500;
+  double shadowFarDistance = 100;
   double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
@@ -550,7 +550,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       dynamic_cast<Ogre::CustomPSSMShadowCameraSetup*>(
       this->dataPtr->pssmSetup.get());
 
-  cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
+  cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance, 0.8);
   cameraSetup->setSplitPadding(2);
 
   sceneMgr->setShadowCameraSetup(this->dataPtr->pssmSetup);
