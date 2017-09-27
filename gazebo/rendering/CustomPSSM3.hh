@@ -48,14 +48,6 @@ public:
 	*/
 	virtual const String& getType() const;
 
-  /**
-  @see SubRenderState::updateGpuProgramsParams.
-  @remarks This is a duplicate of the method from the parent class with one
-  line changed to add the shadow far distance as a split point. Without this,
-  there is no way for the shader to know where shadows end.
-  */
-  virtual void updateGpuProgramsParams(Renderable* rend, Pass* pass, const AutoParamDataSource* source, const LightList* pLightList);
-
 protected:
 	/** 
 	@see SubRenderState::resolveParameters.
