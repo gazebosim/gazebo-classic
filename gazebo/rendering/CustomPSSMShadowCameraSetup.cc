@@ -242,11 +242,11 @@ namespace Ogre
     // calculate LVS so it does not need to be calculated twice
     // calculate the body L \cap V \cap S to make sure all returned points are in
     // front of the camera
-    mPointListBodyLVS.reset();
-    calculateLVS(*sm, *cam, *light, sceneBB, &mPointListBodyLVS);
+    //mPointListBodyLVS.reset();
+    //calculateLVS(*sm, *cam, *light, sceneBB, &mPointListBodyLVS);
 
     // fetch the viewing direction
-    const Vector3 viewDir = getLSProjViewDir(LProj * LView, *cam, mPointListBodyLVS);
+    //const Vector3 viewDir = getLSProjViewDir(LProj * LView, *cam, mPointListBodyLVS);
 
     // The light space will be rotated in such a way, that the projected light view
     // always points upwards, so the up-vector is the y-axis (we already prepared the
