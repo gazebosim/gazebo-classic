@@ -42,6 +42,33 @@ const String& CustomPSSM3::getType() const
 }
 
 //-----------------------------------------------------------------------
+void CustomPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
+                       const AutoParamDataSource* source,
+                       const LightList* pLightList)
+{
+  ShadowTextureParamsIterator it = mShadowTextureParamsList.begin();
+  size_t shadowIndex = 0;
+
+  while(it != mShadowTextureParamsList.end())
+  {
+    it->mWorldViewProjMatrix->setGpuParameter(source->getTextureWorldViewProjMatrix(shadowIndex));
+    it->mInvTextureSize->setGpuParameter(source->getInverseTextureSize(it->mTextureSamplerIndex));
+
+    ++it;
+    ++shadowIndex;
+  }
+
+  Vector4 vSplitPoints;
+
+  vSplitPoints.x = mShadowTextureParamsList[0].mMaxRange;
+  vSplitPoints.y = mShadowTextureParamsList[1].mMaxRange;
+  vSplitPoints.z = mShadowTextureParamsList[2].mMaxRange;  // This is "0.0" in IntegratedPSSM3
+  vSplitPoints.w = 0.0;
+
+  mPSSplitPoints->setGpuParameter(vSplitPoints);
+}
+
+//-----------------------------------------------------------------------
 bool CustomPSSM3::resolveParameters(ProgramSet* programSet)
 {
 	Program* vsProgram = programSet->getCpuVertexProgram();

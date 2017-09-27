@@ -100,6 +100,7 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
                                    in vec4 invShadowMapSize2,
                                    out float oShadowFactor)
 {
+  oShadowFactor = 1.0;
   if (fDepth  <= vSplitPoints.x)
   {
     oShadowFactor =
@@ -110,7 +111,12 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
     oShadowFactor =
       _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
   }
-  else
+  // If we don't do this comparison, everything outside the farthest shadow map
+  // will appear shadowed. It would be better to skip this comparison so the
+  // entire far shadow map is used. But then we would need to find another way
+  // to keep everything outside that map in light instead of shadow, which
+  // appears to be a difficult problem.
+  else if (fDepth <= vSplitPoints.z)
   {
     oShadowFactor =
       _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
