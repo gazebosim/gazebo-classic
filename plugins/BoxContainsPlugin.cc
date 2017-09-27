@@ -156,13 +156,15 @@ void BoxContainsPlugin::Enable(ConstIntPtr &_msg)
 
     this->dataPtr->containsPub = this->dataPtr->node->Advertise<msgs::Int>(
         "/" + this->dataPtr->ns + "/box/contains");
-    gzmsg << "Started box contains plugin [" << this->dataPtr->ns << "]" << std::endl;
+    gzmsg << "Started box contains plugin [" << this->dataPtr->ns << "]"
+          << std::endl;
   }
   // Stop
   else
   {
     this->dataPtr->updateConnection.reset();
-    gzmsg << "Stopped box contains plugin [" << this->dataPtr->ns << "]" << std::endl;
+    gzmsg << "Stopped box contains plugin [" << this->dataPtr->ns << "]"
+          << std::endl;
   }
 }
 
