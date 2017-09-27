@@ -47,6 +47,10 @@ namespace Ogre
     artifacts by letting stretched shadow texels form long rectangles instead
     instead of sawtooth patterns on most surfaces such as terrain and man-made
     objects.
+  @note
+    Because we are deriving from LiSPSM but not using all its functionality, the
+    following member functions will have no effect: setOptimalAdjustFactor(),
+    setUseSimpleOptimalAdjust(), setCameraLightDirectionThreshold().
 	*/
   class _OgreExport CustomPSSMShadowCameraSetup : public PSSMShadowCameraSetup
 	{
