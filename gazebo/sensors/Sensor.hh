@@ -48,7 +48,8 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class GAZEBO_VISIBLE Sensor : public std::enable_shared_from_this<Sensor>
+    class GZ_SENSORS_VISIBLE Sensor
+    : public std::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _cat Category of the sensor

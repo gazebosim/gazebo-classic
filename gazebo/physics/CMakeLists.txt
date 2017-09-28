@@ -198,6 +198,7 @@ set (gtest_sources
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
+  JointState_TEST.cc
   ModelState_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc
