@@ -71,7 +71,7 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
       _minTime = timeLap;
   }
 
-  _avgTime = _avgTime.Double() / (repetitions * steps);
+  _avgTime = _avgTime.Double() / repetitions;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
                                            const std::string &_solverType)
 {
   // Load world
-  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  Load("worlds/revolute_joint_test_with_large_gap.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -119,10 +119,10 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
   // Turn on island threads
   {
     int threads;
-    physics->SetParam("island_threads", 2);
+    physics->SetParam("island_threads", 4);
     EXPECT_NO_THROW(
       threads = boost::any_cast<int>(physics->GetParam("island_threads")));
-    EXPECT_EQ(2, threads);
+    EXPECT_EQ(4, threads);
   }
 
   // Take 500 steps to warm up.
