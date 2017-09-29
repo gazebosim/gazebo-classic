@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Replaced use of ignition::msgs::ImageStamped with ignition::msgs::Image
+    * [Pull request #2781](https://bitbucket.org/osrf/gazebo/pull-request/2781)
+
 1. HarnessPlugin: PIMPL and allow re-attaching
     * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
 
