@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Logical camera uses <topic>
+    * [Pull request 2777](https://bitbucket.org/osrf/gazebo/pull-requests/2777)
+
 1. Support off-diagonal inertia terms in bullet
     * [Pull request 2757](https://bitbucket.org/osrf/gazebo/pull-requests/2757)
 

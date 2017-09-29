@@ -30,7 +30,7 @@ TEST_F(LogicalCameraSensor, GroundPlane)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -58,11 +58,43 @@ TEST_F(LogicalCameraSensor, GroundPlane)
 }
 
 /////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, TopicNotSpecified)
+{
+  Load("worlds/logical_camera.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  EXPECT_EQ("~/box/link/logical_camera/models", cam->Topic());
+}
+
+/////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, TopicSpecified)
+{
+  Load("test/worlds/logical_camera_specify_topic.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  EXPECT_EQ("/publish/to/this/topic", cam->Topic());
+}
+
+/////////////////////////////////////////////////
 TEST_F(LogicalCameraSensor, Box)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
