@@ -756,7 +756,7 @@ if (NOT ignition-math3_FOUND)
     message(STATUS "Looking for ignition-math4-config.cmake - found")
   endif()
 else()
-  message(STATUS "Looking for ignition-math4-config.cmake - found")
+  message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
 
 ########################################
