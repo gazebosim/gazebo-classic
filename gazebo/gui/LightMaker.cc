@@ -24,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"

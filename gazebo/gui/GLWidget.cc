@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <math.h>
 
 #include <ignition/math/Matrix4.hh>
