@@ -2,7 +2,7 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
-1. Fix missing includesfor boost lexical cast
+1. Fix missing includes for boost lexical cast
     * [Pull request #2784](https://bitbucket.org/osrf/gazebo/pull-request/2784)
 
 1. Try finding both sdformat 5 and 6 until we switch to 6
