@@ -5,6 +5,12 @@
 1. Replaced use of ignition::msgs::ImageStamped with ignition::msgs::Image
     * [Pull request #2781](https://bitbucket.org/osrf/gazebo/pull-request/2781)
 
+1. Fix missing includes for boost lexical cast
+    * [Pull request #2784](https://bitbucket.org/osrf/gazebo/pull-request/2784)
+
+1. Try finding both sdformat 5 and 6 until we switch to 6
+    * [Pull request #2750](https://bitbucket.org/osrf/gazebo/pull-request/2750)
+
 1. HarnessPlugin: PIMPL and allow re-attaching
     * [Pull request #2697](https://bitbucket.org/osrf/gazebo/pull-request/2697)
 
