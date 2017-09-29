@@ -50,7 +50,8 @@ namespace gazebo
       /// \deprecated use ignition::math::Color
       public: static bool GetMaterialAsColor(const std::string &_materialName,
           common::Color &_ambient, common::Color &_diffuse,
-          common::Color &_specular, common::Color &_emissive);
+          common::Color &_specular, common::Color &_emissive)
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the color of the material.
       /// \param[in] _materialName Name of the material.
