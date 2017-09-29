@@ -17,7 +17,11 @@
 #ifndef GAZEBO_WHEEL_SLIP_PLUGIN_HH_
 #define GAZEBO_WHEEL_SLIP_PLUGIN_HH_
 
+#include <map>
 #include <memory>
+#include <string>
+
+#include <ignition/math/Vector3.hh>
 
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
@@ -77,6 +81,14 @@ namespace gazebo
     /// \brief Get parent model.
     /// \return pointer to parent model.
     public: physics::ModelPtr GetParentModel() const;
+
+    /// \brief Get wheel slip measurements.
+    /// \param[out] _out Map of wheel name to a Vector3 of slip velocities.
+    /// The Vector3.X value is the longitudinal slip in m/s,
+    /// the Vector3.Y value is the lateral slip in m/s, and
+    /// the Vector3.Z value is the product of radius and spin rate in m/s.
+    public: void GetSlips(std::map<std::string, ignition::math::Vector3d> &_out)
+            const;
 
     /// \brief Set unitless lateral slip compliance for all wheels.
     /// \param[in] _compliance unitless slip compliance to set.

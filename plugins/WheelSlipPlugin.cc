@@ -268,6 +268,29 @@ physics::ModelPtr WheelSlipPlugin::GetParentModel() const
 }
 
 /////////////////////////////////////////////////
+void WheelSlipPlugin::GetSlips(
+        std::map<std::string, ignition::math::Vector3d> &_out) const
+{
+  auto chassisWorldPose = this->GetParentModel()->GetWorldPose().Ign();
+  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    auto link = linkSurface.first;
+    auto params = linkSurface.second;
+
+    auto name = link->GetName();
+    double radiusOmega = params.wheelRadius * params.joint->GetVelocity(0);
+    auto wheelWorldLinearVel = link->GetWorldLinearVel().Ign();
+    auto wheelChassisLinearVel =
+      chassisWorldPose.Rot().RotateVectorReverse(wheelWorldLinearVel);
+    ignition::math::Vector3d slip;
+    slip.X(wheelChassisLinearVel.X() - radiusOmega);
+    slip.Y(wheelChassisLinearVel.Y());
+    slip.Z(radiusOmega);
+    _out[name] = slip;
+  }
+}
+
+/////////////////////////////////////////////////
 void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
 {
   for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
