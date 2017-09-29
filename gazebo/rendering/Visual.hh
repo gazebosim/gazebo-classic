@@ -25,6 +25,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Box.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
@@ -223,42 +224,90 @@ namespace gazebo
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the ambient color of the visual.
+      /// \param[in] _color The ambient color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the diffuse color of the visual.
+      /// \param[in] _color Set the diffuse color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the specular color of the visual.
+      /// \param[in] _color Specular color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true);
+
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
+      /// \deprecated use ignition::math::Color instead
       public: common::Color GetAmbient() const;
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: ignition::math::Color Ambient() const;
 
       /// \brief Get the diffuse color of the visual.
       /// \return Diffuse color.
+      /// \deprecated use ignition::math::Color instead
       public: common::Color GetDiffuse() const;
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: ignition::math::Color Diffuse() const;
 
       /// \brief Get the specular color of the visual.
       /// \return Specular color.
+      /// \deprecated use ignition::math::Color instead
       public: common::Color GetSpecular() const;
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: ignition::math::Color Specular() const;
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
+      /// \deprecated use ignition::math::Color instead
       public: common::Color GetEmissive() const;
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: ignition::math::Color Emissive() const;
 
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
@@ -399,9 +448,18 @@ namespace gazebo
       /// \param[in] _value True to enable ribbon trail.
       /// \param[in] _initialColor The initial color of the ribbon trail.
       /// \param[in] _changeColor Color to change too as the trail grows.
+      /// \deprecated use ignition::math::Color instead
       public: void SetRibbonTrail(bool _value,
                   const common::Color &_initialColor,
                   const common::Color &_changeColor);
+
+      /// \brief True on or off a ribbon trail.
+      /// \param[in] _value True to enable ribbon trail.
+      /// \param[in] _initialColor The initial color of the ribbon trail.
+      /// \param[in] _changeColor Color to change too as the trail grows.
+      public: void SetRibbonTrail(bool _value,
+                  const ignition::math::Color &_initialColor,
+                  const ignition::math::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.

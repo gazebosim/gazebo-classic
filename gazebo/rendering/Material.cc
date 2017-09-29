@@ -194,6 +194,24 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
           common::Color &_ambient, common::Color &_diffuse,
           common::Color &_specular, common::Color &_emissive)
 {
+  ignition::math::Color ambient;
+  ignition::math::Color diffuse;
+  ignition::math::Color specular;
+  ignition::math::Color emissive;
+  bool success = MaterialAsColor(_materialName, ambient, diffuse, specular,
+      emissive);
+  _ambient.Set(ambient.R(), ambient.G(), ambient.B(), ambient.A());
+  _diffuse.Set(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
+  _specular.Set(specular.R(), specular.G(), specular.B(), specular.A());
+  _emissive.Set(emissive.R(), emissive.G(), emissive.B(), emissive.A());
+  return success;
+}
+
+//////////////////////////////////////////////////
+bool Material::MaterialAsColor(const std::string &_materialName,
+          ignition::math::Color &_ambient, ignition::math::Color &_diffuse,
+          ignition::math::Color &_specular, ignition::math::Color &_emissive)
+{
   Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(_materialName))
@@ -210,10 +228,10 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
       Ogre::Pass *pass = technique->getPass(0);
       if (pass)
       {
-        _ambient = Conversions::Convert(pass->getAmbient());
-        _diffuse = Conversions::Convert(pass->getDiffuse());
-        _specular = Conversions::Convert(pass->getSpecular());
-        _emissive = Conversions::Convert(pass->getSelfIllumination());
+        _ambient = Conversions::ConvertIgn(pass->getAmbient());
+        _diffuse = Conversions::ConvertIgn(pass->getDiffuse());
+        _specular = Conversions::ConvertIgn(pass->getSpecular());
+        _emissive = Conversions::ConvertIgn(pass->getSelfIllumination());
         return true;
       }
     }
