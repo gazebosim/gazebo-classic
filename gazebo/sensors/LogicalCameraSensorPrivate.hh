@@ -32,7 +32,7 @@ namespace gazebo
     /// \brief Logical camera sensor private data.
     class LogicalCameraSensorPrivate
     {
-      /// \brief return models that are visible to the logical camera
+      /// \brief Add models that are visible to the camera to a vector of models
       /// \param[in] _myPose pose of the logical camera
       /// \param[in] _models list of models to test against frustum
       public: void AddVisibleModels(ignition::math::Pose3d &_myPose,
