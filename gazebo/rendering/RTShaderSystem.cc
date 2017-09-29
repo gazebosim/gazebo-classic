@@ -542,16 +542,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
         Ogre::ShadowCameraSetupPtr(new Ogre::CustomPSSMShadowCameraSetup());
   }
 
-  double shadowFarDistance = 100;
-  double cameraNearClip = 0.01;
-  sceneMgr->setShadowFarDistance(shadowFarDistance);
+  sceneMgr->setShadowFarDistance(this->dataPtr->shadowFar);
 
   Ogre::CustomPSSMShadowCameraSetup *cameraSetup =
       dynamic_cast<Ogre::CustomPSSMShadowCameraSetup*>(
       this->dataPtr->pssmSetup.get());
 
-  cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance, 0.75);
-  cameraSetup->setSplitPadding(2);
+  cameraSetup->calculateSplitPoints(3, this->dataPtr->shadowNear,
+    this->dataPtr->shadowFar, this->dataPtr->shadowSplitLambda);
+  cameraSetup->setSplitPadding(this->dataPtr->shadowSplitPadding);
 
   sceneMgr->setShadowCameraSetup(this->dataPtr->pssmSetup);
 
@@ -581,6 +580,19 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   this->UpdateShaders();
 
   this->dataPtr->shadowsApplied = true;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::ReapplyShadows()
+{
+  if (this->dataPtr->shadowsApplied)
+  {
+    for (unsigned int i = 0; i < this->dataPtr->scenes.size(); i++)
+    {
+      RemoveShadows(this->dataPtr->scenes[i]);
+      ApplyShadows(this->dataPtr->scenes[i]);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -625,4 +637,50 @@ bool RTShaderSystem::SetShadowTextureSize(const unsigned int _size)
 unsigned int RTShaderSystem::ShadowTextureSize() const
 {
   return this->dataPtr->shadowTextureSize;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::SetShadowClipDist(const double _near, const double _far)
+{
+  this->dataPtr->shadowNear = _near;
+  this->dataPtr->shadowFar = _far;
+  ReapplyShadows();
+}
+
+/////////////////////////////////////////////////
+double RTShaderSystem::ShadowNearClip() const
+{
+  return this->dataPtr->shadowNear;
+}
+
+/////////////////////////////////////////////////
+double RTShaderSystem::ShadowFarClip() const
+{
+  return this->dataPtr->shadowFar;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::SetShadowSplitLambda(const double _lambda)
+{
+  this->dataPtr->shadowSplitLambda = _lambda;
+  ReapplyShadows();
+}
+
+/////////////////////////////////////////////////
+double RTShaderSystem::ShadowSplitLambda() const
+{
+  return this->dataPtr->shadowSplitLambda;
+}
+
+/////////////////////////////////////////////////
+void RTShaderSystem::SetShadowSplitPadding(const double _padding)
+{
+  this->dataPtr->shadowSplitPadding = _padding;
+  ReapplyShadows();
+}
+
+/////////////////////////////////////////////////
+double RTShaderSystem::ShadowSplitPadding() const
+{
+  return this->dataPtr->shadowSplitPadding;
 }
