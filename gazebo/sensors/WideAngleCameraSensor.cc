@@ -150,7 +150,7 @@ void WideAngleCameraSensor::Load(const std::string &_worldName)
 
   ignition::transport::AdvertiseMessageOptions opts;
   opts.SetMsgsPerSec(50);
-  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::Image>(
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
       this->TopicIgn(), opts);
 
   sdf::ElementPtr lensSdf =
