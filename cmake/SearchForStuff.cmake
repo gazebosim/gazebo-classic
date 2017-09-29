@@ -745,18 +745,18 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math3 QUIET)
-if (NOT ignition-math3_FOUND)
-  message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  find_package(ignition-math4 QUIET)
-  if (NOT ignition-math4_FOUND)
-    message(STATUS "Looking for ignition-math4-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev or libignition-math4-dev)")
+find_package(ignition-math4 QUIET)
+if (NOT ignition-math4_FOUND)
+  message(STATUS "Looking for ignition-math4-config.cmake - not found")
+  find_package(ignition-math3 QUIET)
+  if (NOT ignition-math3_FOUND)
+    message(STATUS "Looking for ignition-math3-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math (libignition-math4-dev or libignition-math3-dev)")
   else()
-    message(STATUS "Looking for ignition-math4-config.cmake - found")
+    message(STATUS "Looking for ignition-math3-config.cmake - found")
   endif()
 else()
-  message(STATUS "Looking for ignition-math3-config.cmake - found")
+  message(STATUS "Looking for ignition-math4-config.cmake - found")
 endif()
 
 ########################################
