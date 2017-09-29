@@ -47,9 +47,8 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
 1. **gazebo/rendering/GpuLaser.hh**
-    + ***Deprecation:*** const float* LaserData() const
+    + ***Deprecation:*** const float\* LaserData() const
     + ***Replacement:*** Call GpuLaser::DataIter LaserDataBegin() const
         iterate until reaching GpuLaser::DataIter LaserDataEnd() const
 
