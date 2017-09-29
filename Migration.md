@@ -51,6 +51,34 @@ release will remove the deprecated code.
     + ***Deprecation:*** const float\* LaserData() const
     + ***Replacement:*** Call GpuLaser::DataIter LaserDataBegin() const
         iterate until reaching GpuLaser::DataIter LaserDataEnd() const
+1. **gazebo/rendering/Conversions.hh**
+    + ***Deprecation:*** Ogre::ColourValue Convert(const common::Color &_clr)
+    + ***Replacement:*** Ogre::ColourValue Convert(const ignition::math::Color &_clr)
+    + ***Deprecation:*** common::Color Convert(const Ogre::ColourValue &_clr)
+    + ***Replacement:*** ignition::math::Color ConvertIgn(const Ogre::ColourValue &_clr)
+1. **gazebo/rendering/Material.hh**
+    + ***Deprecation:*** bool GetMaterialAsColor(const std::string &_materialName, common::Color &_ambient, common::Color &_diffuse, common::Color &_specular, common::Color &_emissive)
+    + ***Replacement:*** bool MaterialAsColor(const std::string &_materialName, ignition::math::Color &_ambient, ignition::math::Color &_diffuse, ignition::math::Color &_specular, ignition::math::Color &_emissive)
+1. **gazebo/rendering/Visual.hh**
+    + ***Deprecation:*** void SetAmbient(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetAmbient(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetDiffuse(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetDiffuse(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetSpecular(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetSpecular(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** void SetEmissive(const common::Color &_color, const bool _cascade = true)
+    + ***Replacement:*** void SetEmissive(const ignition::math::Color &_color, const bool _cascade = true)
+    + ***Deprecation:*** common::Color GetAmbient() const
+    + ***Replacement:*** ignition::math::Color Ambient() const
+    + ***Deprecation:*** common::Color GetDiffuse() const
+    + ***Replacement:*** ignition::math::Color Diffuse()
+    + ***Deprecation:*** common::Color GetSpecular() const
+    + ***Replacement:*** ignition::math::Color Specular()
+    + ***Deprecation:*** common::Color GetEmissive() const
+    + ***Replacement:*** ignition::math::Color Emissive()
+    + ***Deprecation:*** void SetRibbonTrail(bool _value, const common::Color &_initialColor, const common::Color &_changeColor)
+    + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
+
 
 ## Gazebo 7.X to 8.X
 
