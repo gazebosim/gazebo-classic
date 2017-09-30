@@ -55,14 +55,14 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float texture2DCompare(sampler2D depths, vec2 uv, float compare)
+float texture2DCompare(sampler2DShadow depths, vec2 uv, float compare)
 {
-  float depth = texture2D(depths, uv).r;
+  float depth = shadow2D(depths, uv).r;
   return (step(compare, depth) >= 1.0) ? 1.0 : 0.4;
 }
 
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
+float _SGX_ShadowPCF4(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 offset)
 {
   // Interpolated 3x3 PCF
   // Adapted from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
@@ -118,9 +118,9 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 lightPosition0,
 							in vec4 lightPosition1,
 							in vec4 lightPosition2,
-							in sampler2D shadowMap0,
-							in sampler2D shadowMap1,
-							in sampler2D shadowMap2,
+							in sampler2DShadow shadowMap0,
+							in sampler2DShadow shadowMap1,
+							in sampler2DShadow shadowMap2,
 							in vec4 invShadowMapSize0,
 							in vec4 invShadowMapSize1,
 							in vec4 invShadowMapSize2,

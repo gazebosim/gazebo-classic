@@ -32,6 +32,8 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RTShaderSystemPrivate.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/CustomPSSM3.hh"
+#include <RenderSystems/GL/OgreGLTexture.h>
 
 #define MINOR_VERSION 7
 using namespace gazebo;
@@ -84,6 +86,9 @@ void RTShaderSystem::Init()
     this->dataPtr->shaderGenerator->setShaderCachePath(cachePath);
 
     this->dataPtr->shaderGenerator->setTargetLanguage("glsl");
+
+    Ogre::RTShader::SubRenderStateFactory* factory = OGRE_NEW Ogre::RTShader::CustomPSSM3Factory;
+    this->dataPtr->shaderGenerator->addSubRenderStateFactory(factory);
   }
   else
     gzerr << "RT Shader system failed to initialize\n";
@@ -496,11 +501,23 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1,
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize/2,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2,
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize/2,
       Ogre::PF_FLOAT32_R);
+
+  // Enable shadow map comparison, so shader can use float texture(sampler2DShadow,
+  // vec3, [float]) instead of vec4 texture(sampler2D, vec2, [float]).
+  // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
+  // a driver hack that softens shadow edges with 4-sample interpolation.
+  for (size_t i=0; i<sceneMgr->getShadowTextureCount(); i++) {
+    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
+    // This will fail if not using OpenGL as the rendering backend. Is that a problem?
+    Ogre::GLTexture* gltex = static_cast<Ogre::GLTexture *>(tex.get());
+    glBindTexture(GL_TEXTURE_2D, gltex->getGLID());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  }
 
   sceneMgr->setShadowTextureSelfShadow(false);
   sceneMgr->setShadowCasterRenderBackFaces(true);
