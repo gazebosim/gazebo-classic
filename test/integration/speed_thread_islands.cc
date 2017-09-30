@@ -33,16 +33,26 @@ class SpeedThreadIslandsTest : public ServerFixture,
   /// \param[in] _solverType Type of solver to use.
   public: void RevoluteJoint(const std::string &_physicsEngine,
                              const std::string &_solverType="quick");
+
+  /// \brief Load dual PR2 robots.
+  /// Unthrottle update rate, set island threads, and check
+  /// changes in required computational time.
+  /// \param[in] _physicsEngine Type of physics engine to use.
+  /// \param[in] _solverType Type of solver to use.
+  public: void DualPR2(const std::string &_physicsEngine,
+                       const std::string &_solverType="quick");
+
 };
 
 /////////////////////////////////////////////////
 // copied from speed_thread_pr2.cc
 // Get timing information from World::Step()
 // \param[in] _world Pointer to the world
+// \param[in] _steps Number of steps to run
 // \param[out] _avgTime Average duration of a World::Step
 // \param[out] _maxTime Max duration of a World::Step
 // \param[out] _minTime Min duration of a World::Step
-void stats(physics::WorldPtr _world, common::Time &_avgTime,
+void stats(physics::WorldPtr _world, const int _steps, common::Time &_avgTime,
     common::Time &_maxTime, common::Time &_minTime)
 {
   common::Timer timer;
@@ -53,7 +63,7 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
   _minTime.Set(GZ_INT32_MAX, 0);
 
   int repetitions = 3;
-  int steps = 5000;
+  int steps = _steps;
 
   for (int i = 0; i < repetitions; ++i)
   {
@@ -109,7 +119,7 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
 
   // Collect base-line statistics (no threading)
   common::Time baseAvgTime, baseMaxTime, baseMinTime;
-  stats(world, baseAvgTime, baseMaxTime, baseMinTime);
+  stats(world, 5000, baseAvgTime, baseMaxTime, baseMinTime);
 
   std::cout << "Base Time\n";
   std::cout << "\t Avg[" << baseAvgTime << "]\n"
@@ -130,7 +140,74 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
 
   // Collect threaded statistics
   common::Time threadAvgTime, threadMaxTime, threadMinTime;
-  stats(world, threadAvgTime, threadMaxTime, threadMinTime);
+  stats(world, 5000, threadAvgTime, threadMaxTime, threadMinTime);
+
+  std::cout << "Thread Time\n";
+  std::cout << "\t Avg[" << threadAvgTime << "]\n"
+            << "\t Max[" << threadMaxTime << "]\n"
+            << "\t Min[" << threadMinTime << "]\n";
+
+  // Expect best-case computational time to decrease
+  EXPECT_LT(threadMinTime, baseMinTime);
+}
+
+////////////////////////////////////////////////////////////////////////
+void SpeedThreadIslandsTest::DualPR2(const std::string &_physicsEngine,
+                                     const std::string &_solverType)
+{
+  // Load world
+  Load("worlds/dual_pr2.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != NULL);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // Set solver type and unthrottle update rate
+  physics->SetParam("solver_type", _solverType);
+  if (_solverType == "world")
+  {
+    physics->SetParam("ode_quiet", true);
+  }
+  physics->SetRealTimeUpdateRate(0.0);
+
+  // Expect no island threads by default
+  {
+    int threads;
+    EXPECT_NO_THROW(
+      threads = boost::any_cast<int>(physics->GetParam("island_threads")));
+    EXPECT_EQ(0, threads);
+  }
+
+  // Take 10 steps to warm up.
+  world->Step(50);
+
+  // Collect base-line statistics (no threading)
+  common::Time baseAvgTime, baseMaxTime, baseMinTime;
+  stats(world, 500, baseAvgTime, baseMaxTime, baseMinTime);
+
+  std::cout << "Base Time\n";
+  std::cout << "\t Avg[" << baseAvgTime << "]\n"
+            << "\t Max[" << baseMaxTime << "]\n"
+            << "\t Min[" << baseMinTime << "]\n";
+
+  // Turn on island threads
+  {
+    int threads;
+    physics->SetParam("island_threads", 2);
+    EXPECT_NO_THROW(
+      threads = boost::any_cast<int>(physics->GetParam("island_threads")));
+    EXPECT_EQ(2, threads);
+  }
+
+  // Take 10 steps to warm up.
+  world->Step(50);
+
+  // Collect threaded statistics
+  common::Time threadAvgTime, threadMaxTime, threadMinTime;
+  stats(world, 500, threadAvgTime, threadMaxTime, threadMinTime);
 
   std::cout << "Thread Time\n";
   std::cout << "\t Avg[" << threadAvgTime << "]\n"
@@ -149,6 +226,16 @@ TEST_F(SpeedThreadIslandsTest, RevoluteJointQuickStep)
 TEST_F(SpeedThreadIslandsTest, RevoluteJointWorldStep)
 {
   RevoluteJoint("ode", "world");
+}
+
+TEST_F(SpeedThreadIslandsTest, DualPR2QuickStep)
+{
+  DualPR2("ode", "quick");
+}
+
+TEST_F(SpeedThreadIslandsTest, DualPR2WorldStep)
+{
+  DualPR2("ode", "world");
 }
 
 int main(int argc, char **argv)
