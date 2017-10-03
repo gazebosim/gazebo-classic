@@ -25,6 +25,9 @@
 1. Fix orbiting view around heightmap
     * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
 
+1. Logical Camera sees nested models
+    * [Pull request 2776](https://bitbucket.org/osrf/gazebo/pull-request/2776)
+
 ## Gazebo 7.8.1 (2017-06-08)
 
 1. ODE slip parameter example world and test
