@@ -501,10 +501,10 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1,
-      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2,
-      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
       Ogre::PF_FLOAT32_R);
 
   // Enable shadow map comparison, so shader can use float texture(sampler2DShadow,
@@ -566,15 +566,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   this->dataPtr->shadowRenderState =
       this->dataPtr->shaderGenerator->createSubRenderState(
-      Ogre::RTShader::IntegratedPSSM3::Type);
-  Ogre::RTShader::IntegratedPSSM3 *pssm3SubRenderState =
-      static_cast<Ogre::RTShader::IntegratedPSSM3*>(
+      Ogre::RTShader::CustomPSSM3::Type);
+  Ogre::RTShader::CustomPSSM3 *pssm3SubRenderState =
+      static_cast<Ogre::RTShader::CustomPSSM3*>(
       this->dataPtr->shadowRenderState);
 
   const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
     cameraSetup->getSplitPoints();
 
-  Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+  Ogre::RTShader::CustomPSSM3::SplitPointList dstSplitPoints;
 
   for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
   {
