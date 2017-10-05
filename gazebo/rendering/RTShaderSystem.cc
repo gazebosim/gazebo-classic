@@ -516,7 +516,10 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
     // This will fail if not using OpenGL as the rendering backend. Is that a problem?
     Ogre::GLTexture* gltex = static_cast<Ogre::GLTexture *>(tex.get());
     glBindTexture(GL_TEXTURE_2D, gltex->getGLID());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
   }
 
   sceneMgr->setShadowTextureSelfShadow(false);
@@ -539,15 +542,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   if (this->dataPtr->pssmSetup.isNull())
   {
     this->dataPtr->pssmSetup =
-        Ogre::ShadowCameraSetupPtr(new Ogre::PSSMShadowCameraSetup());
+        Ogre::ShadowCameraSetupPtr(new Ogre::CustomPSSMShadowCameraSetup());
   }
 
   double shadowFarDistance = 500;
   double cameraNearClip = 0.01;
   sceneMgr->setShadowFarDistance(shadowFarDistance);
 
-  Ogre::PSSMShadowCameraSetup *cameraSetup =
-      dynamic_cast<Ogre::PSSMShadowCameraSetup*>(
+  Ogre::CustomPSSMShadowCameraSetup *cameraSetup =
+      dynamic_cast<Ogre::CustomPSSMShadowCameraSetup*>(
       this->dataPtr->pssmSetup.get());
 
   cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
@@ -571,7 +574,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       static_cast<Ogre::RTShader::CustomPSSM3*>(
       this->dataPtr->shadowRenderState);
 
-  const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
+  const Ogre::CustomPSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
     cameraSetup->getSplitPoints();
 
   Ogre::RTShader::CustomPSSM3::SplitPointList dstSplitPoints;
@@ -593,9 +596,9 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 }
 
 /////////////////////////////////////////////////
-Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
+Ogre::CustomPSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
-  return dynamic_cast<Ogre::PSSMShadowCameraSetup *>(
+  return dynamic_cast<Ogre::CustomPSSMShadowCameraSetup *>(
       this->dataPtr->pssmSetup.get());
 }
 
