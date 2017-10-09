@@ -27,14 +27,6 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(WheelTrackedVehiclePlugin)
 
-WheelTrackedVehiclePlugin::WheelTrackedVehiclePlugin()
-{
-}
-
-WheelTrackedVehiclePlugin::~WheelTrackedVehiclePlugin()
-{
-}
-
 void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                      sdf::ElementPtr _sdf)
 {
@@ -42,10 +34,10 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
 
   this->world = _model->GetWorld();
 
-  this->LoadParam(_sdf, "max_torque", this->maxTorque, 5.0);
+  this->LoadParam(_sdf, "default_wheel_radius", this->defaultWheelRadius, 0.5);
 
   // load the wheels
-  for (auto trackPair : this->trackNames)
+  for (const auto &trackPair : this->trackNames)
   {
     auto track(trackPair.first);
     const auto &trackName(trackPair.second);
@@ -68,11 +60,11 @@ void WheelTrackedVehiclePlugin::Load(physics::ModelPtr _model,
     {
       gzerr << "WheelTrackedVehiclePlugin: At least two " << jointTagName
             << " tags have to be specified." << std::endl;
-      return;
+      throw std::runtime_error("WheelTrackedVehiclePlugin: Load() failed.");
     }
 
     // find the corresponding joint and wheel radius
-    for (auto jointName : jointNames)
+    for (const auto &jointName : jointNames)
     {
       LoadWheel(_model, track, jointName);
     }
@@ -89,14 +81,14 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
     gzerr << "WheelTrackedVehiclePlugin (ns = " << this->GetRobotNamespace()
           << ") couldn't get " << this->trackNames[_track] << " joint named \""
           << _jointName << "\"" << std::endl;
-    return;
+    throw std::runtime_error("WheelTrackedVehiclePlugin: Load() failed.");
   }
 
   if (!(joint->GetType() & physics::Base::HINGE_JOINT))
   {
     gzerr << "Joint " << _jointName << " is not a hinge (revolute) joint."
           << std::endl;
-    return;
+    throw std::runtime_error("WheelTrackedVehiclePlugin: Load() failed.");
   }
 
   auto childWheel = joint->GetChild();
@@ -104,7 +96,7 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
   {
     gzerr << "Joint " << _jointName << " has no child link that "
           << " could act as the wheel.";
-    return;
+    throw std::runtime_error("WheelTrackedVehiclePlugin: Load() failed.");
   }
 
   if (childWheel->GetSelfCollide())
@@ -135,9 +127,17 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
     // This assumes that the largest dimension of the wheel is the diameter
     auto bb = childWheel->BoundingBox();
     radius = bb.Size().Max() * 0.5;
+
+    // Some engines do not provide bounding box, but return a 0-0-0 box
+    if (radius < 1e-6)
+    {
+      gzlog << "Using default radius of " << this->defaultWheelRadius <<
+               " meters for wheel " << childWheel->GetName() << std::endl;
+      radius = this->defaultWheelRadius;
+    }
   }
 
-  WheelInfoPtr wheel = WheelInfoPtr(new WheelInfo);
+  WheelInfoPtr wheel = std::make_shared<WheelInfo>();
   wheel->joint = joint;
   wheel->jointName = _jointName;
   wheel->radius = radius;
@@ -148,16 +148,6 @@ void WheelTrackedVehiclePlugin::LoadWheel(physics::ModelPtr &_model,
 void WheelTrackedVehiclePlugin::Init()
 {
   TrackedVehiclePlugin::Init();
-
-  for (auto trackPair : this->trackNames)
-  {
-    auto track(trackPair.first);
-
-    for (auto wheel : this->wheels[track])
-    {
-      wheel->joint->SetParam("fmax", 0, this->maxTorque);
-    }
-  }
 
   // set "cone_model" friction model
   auto physics = this->world->Physics();
@@ -184,53 +174,52 @@ void WheelTrackedVehiclePlugin::Init()
   // set the desired friction to tracks (override the values set in the
   // SDF model)
   this->UpdateTrackSurface();
+
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    std::bind(&WheelTrackedVehiclePlugin::OnUpdate, this));
 }
 
 void WheelTrackedVehiclePlugin::Reset()
 {
-  std::lock_guard<std::mutex> lock(this->mutex);
-
-  for (auto trackPair : this->trackNames)
-  {
-    auto track(trackPair.first);
-
-    for (auto wheel : this->wheels[track])
-    {
-      wheel->joint->SetParam("vel", 0, 0.);
-    }
-  }
-
   TrackedVehiclePlugin::Reset();
 }
 
-void WheelTrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
+void WheelTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
+                                                     double _right)
 {
   std::lock_guard<std::mutex> lock(this->mutex);
 
   this->trackVelocity[Tracks::LEFT] = _left;
   this->trackVelocity[Tracks::RIGHT] = _right;
-
-  for (auto trackPair : this->trackNames)
-  {
-    auto track(trackPair.first);
-
-    for (auto wheel : this->wheels[track])
-    {
-      double angularVelocity = this->trackVelocity[track] / wheel->radius;
-      wheel->joint->SetParam("vel", 0, angularVelocity);
-    }
-  }
 }
 
 void WheelTrackedVehiclePlugin::UpdateTrackSurface()
 {
+  std::lock_guard<std::mutex> lock(this->mutex);
+
   for (auto trackPair : this->trackNames)
   {
     auto track(trackPair.first);
-    for (auto wheel : this->wheels[track])
+    for (const auto &wheel : this->wheels[track])
     {
       auto wheelLink = wheel->joint->GetChild();
       this->SetLinkMu(wheelLink);
+    }
+  }
+}
+
+void WheelTrackedVehiclePlugin::OnUpdate()
+{
+  std::lock_guard<std::mutex> lock(this->mutex);
+
+  for (auto trackPair : this->trackNames)
+  {
+    auto track(trackPair.first);
+
+    for (const auto &wheel : this->wheels[track])
+    {
+      double angularVelocity = this->trackVelocity[track] / wheel->radius;
+      wheel->joint->SetVelocity(0, angularVelocity);
     }
   }
 }

@@ -33,24 +33,16 @@ using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(SimpleTrackedVehiclePlugin)
 
-SimpleTrackedVehiclePlugin::SimpleTrackedVehiclePlugin()
-{
-}
-
-SimpleTrackedVehiclePlugin::~SimpleTrackedVehiclePlugin()
-{
-}
-
 void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
                                       sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "SimpleTrackedVehiclePlugin: _model pointer is NULL");
   GZ_ASSERT(_sdf, "SimpleTrackedVehiclePlugin: _sdf pointer is NULL");
 
-  if (_model->GetWorld()->Physics()->GetType().compare("ode") != 0)
+  if (_model->GetWorld()->Physics()->GetType() != "ode")
   {
     gzerr << "Tracked vehicle simulation works only with ODE." << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   TrackedVehiclePlugin::Load(_model, _sdf);
@@ -58,21 +50,21 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   if (!_sdf->HasElement("body"))
   {
     gzerr << "SimpleTrackedVehiclePlugin: <body> tag missing." << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   if (!_sdf->HasElement("left_track"))
   {
     gzerr << "SimpleTrackedVehiclePlugin: <left_track> tag missing."
           << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   if (!_sdf->HasElement("right_track"))
   {
     gzerr << "SimpleTrackedVehiclePlugin: <right_track> tag missing."
           << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   this->body = _model->GetLink(
@@ -81,7 +73,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   {
     gzerr << "SimpleTrackedVehiclePlugin: <body> link does not exist."
           << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   this->tracks[Tracks::LEFT] = _model->GetLink(
@@ -90,7 +82,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   {
     gzerr << "SimpleTrackedVehiclePlugin: <left_track> link does not exist."
           << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   this->tracks[Tracks::RIGHT] = _model->GetLink(
@@ -99,7 +91,7 @@ void SimpleTrackedVehiclePlugin::Load(physics::ModelPtr _model,
   {
     gzerr << "SimpleTrackedVehiclePlugin: <right_track> link does not exist."
           << std::endl;
-    return;
+    throw std::runtime_error("SimpleTrackedVehiclePlugin: Load() failed.");
   }
 
   this->LoadParam(_sdf, "collide_without_contact_bitmask",
@@ -116,14 +108,6 @@ void SimpleTrackedVehiclePlugin::Init()
 
   // set correct categories and collide bitmasks
   this->SetGeomCategories();
-  for (auto link : model->GetLinks())
-  {
-    for (auto collision : link->GetCollisions())
-    {
-      collision->GetSurface()->collideWithoutContactBitmask =
-          this->collideWithoutContactBitmask;
-    }
-  }
 
   // set the desired friction to tracks (override the values set in the
   // SDF model)
@@ -138,6 +122,7 @@ void SimpleTrackedVehiclePlugin::Init()
   // topic. We do not handle the received contacts in any way, because we need
   // to process them earlier than the message is published (which is done in
   // DriveTracks()).
+  // TODO This hack is no longer needed in Gazebo 9
   this->contactsSubscriber = this->node->Subscribe("~/physics/contacts",
       &SimpleTrackedVehiclePlugin::IgnoreContacts, this);
 
@@ -149,18 +134,14 @@ void SimpleTrackedVehiclePlugin::Init()
 
 void SimpleTrackedVehiclePlugin::Reset()
 {
-  for (auto track: this->tracks)
-  {
-    this->trackVelocity[track.first] = 0;
-  }
-
   TrackedVehiclePlugin::Reset();
 }
 
-void SimpleTrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
+void SimpleTrackedVehiclePlugin::SetTrackVelocityImpl(double _left,
+                                                      double _right)
 {
-  this->trackVelocity[Tracks::LEFT] = -_left;
-  this->trackVelocity[Tracks::RIGHT] = -_right;
+  this->trackVelocity[Tracks::LEFT] = _left;
+  this->trackVelocity[Tracks::RIGHT] = _right;
 }
 
 void SimpleTrackedVehiclePlugin::UpdateTrackSurface()
@@ -186,17 +167,22 @@ void SimpleTrackedVehiclePlugin::SetGeomCategories()
     linksToProcess.insert(linksToProcess.end(), childLinks.begin(),
                           childLinks.end());
 
-    for (auto collision : link->GetCollisions())
+    for (auto const &collision : link->GetCollisions())
     {
       collision->SetCategoryBits(ROBOT_CATEGORY);
       collision->SetCollideBits(GZ_FIXED_COLLIDE);
+
+      GZ_ASSERT(collision->GetSurface() != nullptr,
+                "Collision surface is nullptr");
+      collision->GetSurface()->collideWithoutContactBitmask =
+        this->collideWithoutContactBitmask;
     }
   }
 
   for (auto track : this->tracks)
   {
     auto trackLink = track.second;
-    for (auto collision : trackLink->GetCollisions())
+    for (auto const &collision : trackLink->GetCollisions())
     {
       auto bits = ROBOT_CATEGORY | BELT_CATEGORY;
       if (track.first == Tracks::LEFT)
@@ -217,32 +203,31 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
   // Calculate the desired center of rotation
   /////////////////////////////////////////////
 
-  const auto leftBeltSpeed = this->trackVelocity[Tracks::LEFT];
-  const auto rightBeltSpeed = this->trackVelocity[Tracks::RIGHT];
+  const auto leftBeltSpeed = -this->trackVelocity[Tracks::LEFT];
+  const auto rightBeltSpeed = -this->trackVelocity[Tracks::RIGHT];
 
   // the desired linear and angular speeds (set by desired track velocities)
   const auto linearSpeed = (leftBeltSpeed + rightBeltSpeed) / 2;
-  // for whatever reason, the angular speed needs to be negated here
   const auto angularSpeed = -(leftBeltSpeed - rightBeltSpeed) *
-      this->GetSteeringEfficiency() / this->GetTracksSeparation();
+    this->GetSteeringEfficiency() / this->GetTracksSeparation();
 
   // radius of the turn the robot is doing
   const auto desiredRotationRadiusSigned =
-      (fabs(angularSpeed) < 0.1) ?
-        // is driving straight
-        dInfinity :
-        (
-          (fabs(linearSpeed) < 0.1) ?
-            // is rotating about a single point
-            0 :
-            // general movement
-            linearSpeed / angularSpeed);
+                               (fabs(angularSpeed) < 0.1) ?
+                               // is driving straight
+                               dInfinity :
+                               (
+                                 (fabs(linearSpeed) < 0.1) ?
+                                 // is rotating about a single point
+                                 0 :
+                                 // general movement
+                                 linearSpeed / angularSpeed);
 
   const auto bodyPose = this->body->WorldPose();
   const auto bodyYAxisGlobal =
-      bodyPose.Rot().RotateVector(ignition::math::Vector3d(0, 1, 0));
+    bodyPose.Rot().RotateVector(ignition::math::Vector3d(0, 1, 0));
   const auto centerOfRotation =
-      (bodyYAxisGlobal * desiredRotationRadiusSigned) + bodyPose.Pos();
+    (bodyYAxisGlobal * desiredRotationRadiusSigned) + bodyPose.Pos();
 
   ////////////////////////////////////////////////////////////////////////
   // For each contact, compute the friction force direction and speed of
@@ -260,11 +245,11 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
     ++i;
 
     if (contact->collision1->GetSurface()->collideWithoutContact ||
-        contact->collision2->GetSurface()->collideWithoutContact)
+      contact->collision2->GetSurface()->collideWithoutContact)
       continue;
 
     if (!contact->collision1->GetLink()->GetEnabled() ||
-        !contact->collision2->GetLink()->GetEnabled())
+      !contact->collision2->GetLink()->GetEnabled())
       continue;
 
     if (contact->collision1->IsStatic() && contact->collision2->IsStatic())
@@ -275,15 +260,15 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
     }
 
     dBodyID body1 = dynamic_cast<physics::ODELink&>(
-        *contact->collision1->GetLink()).GetODEId();
+      *contact->collision1->GetLink()).GetODEId();
     dBodyID body2 = dynamic_cast<physics::ODELink& >(
-        *contact->collision2->GetLink()).GetODEId();
+      *contact->collision2->GetLink()).GetODEId();
     dGeomID geom1 = dynamic_cast<physics::ODECollision& >(
-        *contact->collision1).GetCollisionId();
+      *contact->collision1).GetCollisionId();
     dGeomID geom2 = dynamic_cast<physics::ODECollision& >(
-        *contact->collision2).GetCollisionId();
+      *contact->collision2).GetCollisionId();
 
-    if (body1 == 0)
+    if (body1 == nullptr)
     {
       std::swap(body1, body2);
       std::swap(geom1, geom2);
@@ -297,9 +282,10 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       continue;
 
     // speed and geometry of the track in collision
-    const dGeomID trackGeom = (isGeom1Track ? geom1 : geom2);
-    const dReal beltSpeed = (dGeomGetCategoryBits(trackGeom) & LEFT_CATEGORY) ?
-                            leftBeltSpeed : rightBeltSpeed;
+    const auto trackGeom = (isGeom1Track ? geom1 : geom2);
+    const dReal beltSpeed =
+      (dGeomGetCategoryBits(trackGeom) & LEFT_CATEGORY) != 0 ?
+      leftBeltSpeed : rightBeltSpeed;
 
     // remember if we've found at least one contact joint (we should!)
     bool foundContact = false;
@@ -313,7 +299,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       foundContact = true;
 
       const ignition::math::Vector3d contactNormal(odeContact->geom.normal[0],
-        odeContact->geom.normal[1], odeContact->geom.normal[2]);
+                                                   odeContact->geom.normal[1],
+                                                   odeContact->geom.normal[2]);
 
       // vector tangent to the belt pointing in the belt's movement direction
       auto beltDirection(contactNormal.Cross(bodyYAxisGlobal));
@@ -335,6 +322,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       odeContact->fdir1[1] = frictionDirection.Y();
       odeContact->fdir1[2] = frictionDirection.Z();
 
+
       // use friction direction and motion1 to simulate the track movement
       odeContact->surface.mode |= dContactFDir1 | dContactMotion1;
 
@@ -345,7 +333,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
     if (!foundContact)
     {
       gzwarn << "No ODE contact joint found for contact " <<
-        contact->DebugString() << std::endl;
+             contact->DebugString() << std::endl;
       continue;
     }
   }
@@ -439,15 +427,17 @@ SimpleTrackedVehiclePlugin::ContactIterator::operator++()
   for (; this->jointIndex < static_cast<size_t>(dBodyGetNumJoints(this->body));
          this->jointIndex++)
   {
-    const dJointID joint = dBodyGetJoint(this->body,
-                                         static_cast<int>(this->jointIndex));
+    const auto joint = dBodyGetJoint(this->body,
+                                     static_cast<int>(this->jointIndex));
 
     // only interested in contact joints
     if (dJointGetType(joint) != dJointTypeContact)
       continue;
 
     // HACK here we unfortunately have to access private ODE data
-     dContact* odeContact = &(static_cast<dxJointContact*>(joint)->contact);
+    // It must really be static_cast here; if dynamic_cast is used, the runtime
+    // cannot find RTTI for dxJointContact and its predecessors.
+    dContact* odeContact = &(static_cast<dxJointContact*>(joint)->contact);
 
     if (!(
             odeContact->geom.g1 == this->geom1 &&
@@ -489,13 +479,15 @@ SimpleTrackedVehiclePlugin::ContactIterator::operator++()
 }
 
 SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator()
-    : currentContact(nullptr), jointIndex(0), body(0), geom1(0), geom2(0),
-    initialized(false)
+    : currentContact(nullptr), jointIndex(0), body(nullptr), geom1(nullptr),
+      geom2(nullptr), initialized(false)
 {
 }
 
 SimpleTrackedVehiclePlugin::ContactIterator::ContactIterator(
-    bool _initialized) : currentContact(nullptr), initialized(_initialized)
+    bool _initialized) : currentContact(nullptr), jointIndex(0), body(nullptr),
+                         geom1(nullptr), geom2(nullptr),
+                         initialized(_initialized)
 {
 }
 

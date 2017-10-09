@@ -67,28 +67,28 @@ class gazebo::TrackedVehiclePluginPrivate
   public: transport::PublisherPtr tracksVelocityPub;
 
   /// \brief Distance between the centers of the tracks.
-  public: double tracksSeparation;
+  public: double tracksSeparation = 0.1;
 
   /// \brief Steering efficiency coefficient (between 0.0 and 1.0).
-  public: double steeringEfficiency;
+  public: double steeringEfficiency = 0.5;
 
   /// \brief Coefficient that converts velocity command units to track velocity.
-  public: double linearSpeedGain;
+  public: double linearSpeedGain = 1.0;
 
   /// \brief Coefficient that converts velocity command units to track velocity.
-  public: double angularSpeedGain;
+  public: double angularSpeedGain = 1.0;
 
   /// \brief Friction coefficient in the first friction direction.
-  public: double trackMu;
+  public: double trackMu = 1.0;
 
   /// \brief Friction coefficient in the second friction direction.
-  public: double trackMu2;
+  public: double trackMu2 = 1.0;
 
   /// \brief Namespace used as a prefix for gazebo topic names.
   public: std::string robotNamespace;
 
   /// \brief Whether keyboard control should be used for this model.
-  public: bool enableKeyboardControl;
+  public: bool enableKeyboardControl = false;
 
   /// \brief Definition of the keyboard controls.
   public: TrackedVehicleKeyboardControls keyboardControls;
@@ -104,9 +104,7 @@ TrackedVehiclePlugin::TrackedVehiclePlugin()
   this->trackNames[Tracks::RIGHT] = "right";
 }
 
-TrackedVehiclePlugin::~TrackedVehiclePlugin()
-{
-}
+TrackedVehiclePlugin::~TrackedVehiclePlugin() = default;
 
 void TrackedVehiclePlugin::Load(physics::ModelPtr _model,
                      sdf::ElementPtr _sdf)
@@ -222,20 +220,29 @@ void TrackedVehiclePlugin::Init()
 void TrackedVehiclePlugin::Reset()
 {
   // reset the keyboard update message
-  auto message = this->dataPtr->keyboardControlMessage;
-  message->mutable_position()->set_x(0.0);
-  msgs::Set(message->mutable_orientation(),
-            ignition::math::Quaterniond::Identity);
-
-  if (this->dataPtr->tracksVelocityPub)
+  if (this->dataPtr->enableKeyboardControl)
   {
-    auto speedMsg = msgs::Vector2d();
-    speedMsg.set_x(0);
-    speedMsg.set_y(0);
-    this->dataPtr->tracksVelocityPub->Publish(speedMsg);
+    auto message = this->dataPtr->keyboardControlMessage;
+    message->mutable_position()->set_x(0.0);
+    msgs::Set(message->mutable_orientation(),
+              ignition::math::Quaterniond::Identity);
   }
 
+  this->SetTrackVelocity(0., 0.);
+
   ModelPlugin::Reset();
+}
+
+void TrackedVehiclePlugin::SetTrackVelocity(double _left, double _right)
+{
+  // Call the descendant custom handler of the subclass.
+  this->SetTrackVelocityImpl(_left, _right);
+
+  // Publish the resulting track velocities to anyone who is interested.
+  auto speedMsg = msgs::Vector2d();
+  speedMsg.set_x(_left);
+  speedMsg.set_y(_right);
+  this->dataPtr->tracksVelocityPub->Publish(speedMsg);
 }
 
 void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
@@ -267,19 +274,13 @@ void TrackedVehiclePlugin::OnVelMsg(ConstPosePtr &_msg)
     rightVelocity = ignition::math::signum(rightVelocity) * maxLinearSpeed;
   }
 
-  // Call the descendant handler (which does the actual vehicle control).
+  // Call the track velocity handler (which does the actual vehicle control).
   this->SetTrackVelocity(leftVelocity, rightVelocity);
-
-  // Publish the resulting track velocities to anyone who is interested.
-  auto speedMsg = msgs::Vector2d();
-  speedMsg.set_x(leftVelocity);
-  speedMsg.set_y(rightVelocity);
-  this->dataPtr->tracksVelocityPub->Publish(speedMsg);
 }
 
 void TrackedVehiclePlugin::OnKeyPress(ConstAnyPtr &_msg)
 {
-  const unsigned int key = static_cast<const unsigned int>(_msg->int_value());
+  const auto key = static_cast<const unsigned int>(_msg->int_value());
 
   double linearVel = 0., angularVel = 0.;
   bool linearVelSet = false, angularVelSet = false;
@@ -420,9 +421,17 @@ void TrackedVehiclePlugin::SetTrackMu2(double _mu2)
 
 void TrackedVehiclePlugin::SetLinkMu(const physics::LinkPtr &_link)
 {
-  for (auto collision : _link->GetCollisions())
+  for (auto const &collision : _link->GetCollisions())
     {
       auto frictionPyramid = collision->GetSurface()->FrictionPyramid();
+      if (frictionPyramid == nullptr)
+      {
+        gzwarn << "This dynamics engine doesn't support setting mu/mu2 friction"
+          " parameters. Use its dedicated friction setting mechanism to set the"
+          " wheel friction." << std::endl;
+        break;
+      }
+
       double mu = this->GetTrackMu();
       double mu2 = this->GetTrackMu2();
 

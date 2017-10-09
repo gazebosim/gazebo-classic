@@ -54,34 +54,35 @@ namespace gazebo {
   /// <left_track>  The left track link's name.
   /// <right_track>  The right track link's name.
   /// <collide_without_contact_bitmask> Collision bitmask that will be set to
-  ///     the whole vehicle.
+  ///     the whole vehicle (default is 1u).
 
-  class SimpleTrackedVehiclePlugin : public TrackedVehiclePlugin
+  class SimpleTrackedVehiclePlugin :
+    public TrackedVehiclePlugin
   {
-    public: SimpleTrackedVehiclePlugin();
+    public: SimpleTrackedVehiclePlugin() = default;
 
-    public: virtual ~SimpleTrackedVehiclePlugin();
+    public: virtual ~SimpleTrackedVehiclePlugin() = default;
 
     /// \brief Called when the plugin is loaded
     /// \param[in] model Pointer to the model for which the plugin is loaded
     /// \param[in] _sdf Pointer to the SDF for _model
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) override;
 
     /// \brief Initialize the plugin.
-    public: virtual void Init();
+    public: void Init() override;
 
     /// \brief Reset the plugin.
-    public: virtual void Reset();
+    public: void Reset() override;
 
     /// \brief Set new target velocity for the tracks.
     ///
     /// \param[in] _left Velocity of left track.
     /// \param[in] _right Velocity of right track.
-    protected: virtual void SetTrackVelocity(double _left, double _right);
+    protected: void SetTrackVelocityImpl(double _left, double _right) override;
 
     /// \brief Update surface parameters of the tracks to correspond to the
     ///        values set in this plugin.
-    protected: virtual void UpdateTrackSurface();
+    protected: void UpdateTrackSurface() override;
 
     /// \brief Body of the robot.
     protected: physics::LinkPtr body;
@@ -114,8 +115,8 @@ namespace gazebo {
     /// \param[in] _beltDirection World-frame forward direction of the belt.
     /// \return Direction of the friction force in world frame.
     protected: ignition::math::Vector3d ComputeFrictionDirection(
-      const double _linearSpeed, const double _angularSpeed,
-      const bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
+      double _linearSpeed, double _angularSpeed,
+      bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
       const ignition::math::Vector3d &_bodyYAxisGlobal,
       const ignition::math::Vector3d &_centerOfRotation,
       const dContact *_odeContact,
@@ -125,7 +126,7 @@ namespace gazebo {
     /// \param[in] _beltSpeed The desired belt speed.
     /// \param[in] _beltDirection Forward direction of the belt.
     /// \param[in] _frictionDirection First friction direction.
-    protected: double ComputeSurfaceMotion(const double _beltSpeed,
+    protected: double ComputeSurfaceMotion(double _beltSpeed,
       const ignition::math::Vector3d &_beltDirection,
       const ignition::math::Vector3d &_frictionDirection) const;
 
@@ -170,7 +171,7 @@ namespace gazebo {
 
       // Constructors.
       public: ContactIterator();
-      public: ContactIterator(bool _initialized);
+      public: explicit ContactIterator(bool _initialized);
       public: ContactIterator(const ContactIterator &_rhs);
       public: ContactIterator(dBodyID _body, dGeomID _geom1, dGeomID _geom2);
 

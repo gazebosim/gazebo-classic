@@ -70,7 +70,7 @@ namespace gazebo
   ///                 is used; otherwise, the keys can be set using the
   ///                 (repeatable) subelements <stop>, <accelerate>,
   ///                 <decelerate>, <left> and <right> containing the keycodes.
-  class GAZEBO_VISIBLE TrackedVehiclePlugin : public ModelPlugin
+  class TrackedVehiclePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
     public: TrackedVehiclePlugin();
@@ -81,13 +81,13 @@ namespace gazebo
     /// \brief Called when the plugin is loaded
     /// \param[in] _model Pointer to the model for which the plugin is loaded
     /// \param[in] _sdf Pointer to the SDF for _model
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) override;
 
     /// \brief Initialize the plugin.
-    public: virtual void Init();
+    public: void Init() override;
 
     /// \brief Reset the plugin.
-    public: virtual void Reset();
+    public: void Reset() override;
 
     /// \brief Namespace used as a prefix for gazebo topic names.
     protected: virtual std::string GetRobotNamespace();
@@ -133,13 +133,24 @@ namespace gazebo
     ///
     /// Descendant classes need to implement this function.
     ///
+    /// Do not call this function directly, instead call SetTrackVelocity().
+    ///
     /// \param[in] _left Velocity of left track.
     /// \param[in] _right Velocity of right track.
-    protected: virtual void SetTrackVelocity(double _left, double _right) = 0;
+    protected: virtual void SetTrackVelocityImpl(double _left,
+                                                 double _right) = 0;
+
+    /// \brief Set new target velocity for the tracks.
+    ///
+    /// Descendant classes need to implement this function.
+    ///
+    /// \param[in] _left Velocity of left track.
+    /// \param[in] _right Velocity of right track.
+    protected: virtual void SetTrackVelocity(double _left, double _right);
 
     /// \brief Callback for setting desired body velocity.
     ///
-    /// Normally, this callback converts the x/y/yaw message to track velocities
+    /// Normally, this callback converts the x/yaw message to track velocities
     /// and calls SetTrackVelocity().
     ///
     /// \param[in] _msg Pose message from external publisher

@@ -44,34 +44,35 @@ namespace gazebo
   ///               appear multiple times, once for each left wheel).
   /// <right_joint>  Name of the revolute joint connecting a right wheel (should
   ///               appear multiple times, once for each right wheel).
-  /// <max_torque>  Maximum torque applied to wheels to achieve the desired
-  ///               velocity (default is 5.0).
-  class WheelTrackedVehiclePlugin : public TrackedVehiclePlugin
+  /// <default_wheel_radius>  The radius used for wheels where radius
+  ///                         autodetection fails (default is 0.5 meters).
+  class WheelTrackedVehiclePlugin :
+    public TrackedVehiclePlugin
   {
-    public: WheelTrackedVehiclePlugin();
+    public: WheelTrackedVehiclePlugin() = default;
 
-    public: virtual ~WheelTrackedVehiclePlugin();
+    public: virtual ~WheelTrackedVehiclePlugin() = default;
 
     /// \brief Called when the plugin is loaded
     /// \param[in] model Pointer to the model for which the plugin is loaded
     /// \param[in] _sdf Pointer to the SDF for _model
-    public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
+    public: void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf) override;
 
     /// \brief Initialize the plugin.
-    public: virtual void Init();
+    public: void Init() override;
 
     /// \brief Reset the plugin.
-    public: virtual void Reset();
+    public: void Reset() override;
 
     /// \brief Set new target velocity for the tracks.
     ///
     /// \param[in] _left Velocity of left track.
     /// \param[in] _right Velocity of right track.
-    protected: virtual void SetTrackVelocity(double _left, double _right);
+    protected: void SetTrackVelocityImpl(double _left, double _right) override;
 
     /// \brief Update surface parameters of the tracks to correspond to the
     ///        values set in this plugin.
-    protected: virtual void UpdateTrackSurface();
+    protected: void UpdateTrackSurface() override ;
 
     /// \brief Load a wheel connected to joint named jointName and append it to
     ///        this->wheels[track]
@@ -105,14 +106,18 @@ namespace gazebo
     /// \brief Desired velocities of the tracks.
     protected: std::unordered_map<Tracks, double> trackVelocity;
 
-    /// \brief Maximum torque applied to wheels to achieve the desired velocity.
-    protected: double maxTorque;
+    /// \brief The radius (in meters) used for wheels where autodetection fails.
+    protected: double defaultWheelRadius;
 
     /// \brief Pointer to the world the model lives in.
     protected: physics::WorldPtr world;
 
     /// \brief Mutex to protect updates
     protected: std::mutex mutex;
+
+    private: event::ConnectionPtr updateConnection;
+
+    private: void OnUpdate();
   };
 }
 

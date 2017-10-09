@@ -210,7 +210,7 @@ namespace gazebo
 
     /// \brief Load parameter value from _sdf and store it to the given
     ///        reference, using the supplied default value if the element in
-    ///        _sdf is not found. A message is written using gzdbg reporting
+    ///        _sdf is not found. A message is written using gzmsg reporting
     ///       whether the default value was used or not.
     /// \param[in] _sdf The SDF element of the plugin.
     /// \param[in] _name Name of a tag inside the SDF.
@@ -239,7 +239,7 @@ namespace gazebo
 
     /// \brief Load parameter value from _sdf and store it to the given
     ///        reference, using the supplied default value if the element in
-    ///        _sdf is not found. A message is written using gzdbg reporting
+    ///        _sdf is not found. A message is written using gzmsg reporting
     ///        whether the default value was used or not. String specialization
     ///        to allow accepting const char* values for std::string parameters.
     /// \param[in] _sdf The SDF element of the plugin.

@@ -179,3 +179,36 @@ add_subdirectory(events)
 if (NOT WIN32)
   add_subdirectory(rest_web)
 endif()
+
+
+# unit tests
+
+gz_build_tests(TrackedVehiclePlugin_TEST.cc EXTRA_LIBS
+        gazebo_physics
+        gazebo_test_fixture
+        TrackedVehiclePlugin
+)
+
+# Linking to the built dynamic library is not possible since it doesn't export
+# all the symbols we need for the tests. And exporting these symbols causes
+# weird segfaults...
+set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS WheelTrackedVehiclePlugin.cc)
+gz_build_tests(WheelTrackedVehiclePlugin_TEST.cc EXTRA_LIBS
+        gazebo_physics
+        gazebo_test_fixture
+        TrackedVehiclePlugin
+)
+
+# Linking to the built dynamic library is not possible since it doesn't export
+# all the symbols we need for the tests. And exporting these symbols causes
+# weird segfaults...
+set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS SimpleTrackedVehiclePlugin.cc)
+gz_build_tests(SimpleTrackedVehiclePlugin_TEST.cc EXTRA_LIBS
+        gazebo_physics
+        gazebo_test_fixture
+        TrackedVehiclePlugin
+)
+if (HAVE_DART)
+  target_include_directories(UNIT_SimpleTrackedVehiclePlugin_TEST
+          PRIVATE ${DARTCore_INCLUDE_DIRS})
+endif()

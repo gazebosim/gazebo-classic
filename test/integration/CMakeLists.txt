@@ -66,6 +66,7 @@ set(tests
   nested_model.cc
   noise.cc
   nondefault_world.cc
+  plugin_interface.cc
   physics.cc
   physics_base.cc
   physics_basic_controller_response.cc
@@ -95,6 +96,7 @@ set(tests
   surface_properties.cc
   swarm.cc
   touch_plugin.cc
+  tracked_vehicles.cc
   transceiver.cc
   transport.cc
   transporter.cc
@@ -142,6 +144,7 @@ endif()
 
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
 
 set(display_tests
 )
