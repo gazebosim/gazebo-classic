@@ -35,9 +35,9 @@ class WheelTrackedVehiclePluginTest : public ServerFixture
   protected: physics::WorldPtr world;
 };
 
-class WheelTrackedVehiclePluginTestParametrized :
-  public WheelTrackedVehiclePluginTest,
-  public ::testing::WithParamInterface<const char*>
+class WheelTrackedVehiclePluginTestParametrized
+  : public WheelTrackedVehiclePluginTest,
+    public ::testing::WithParamInterface<const char*>
 {
   public: WheelTrackedVehiclePluginTestParametrized() :
     WheelTrackedVehiclePluginTest(GetParam())
@@ -109,11 +109,11 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadCorrectModel)
   msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
-  
+
   msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(1., 1., 1.));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
-  
+
   AddWheel(modelMsg, "fl_wheel", bodyLink, -1, 1);
   AddWheel(modelMsg, "fr_wheel", bodyLink, 1, 1);
   AddWheel(modelMsg, "rl_wheel", bodyLink, -1, -1);
@@ -122,7 +122,7 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadCorrectModel)
   this->SpawnModel(modelMsg);
   this->WaitUntilEntitySpawn("model", 10, 100);
   physics::ModelPtr model = this->world->ModelByName("model");
-  
+
   std::ostringstream pluginStr;
   pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='model'>"
@@ -162,7 +162,7 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadWheelNotFound)
   bodyLink->set_name("body");
 
   AddWheel(modelMsg, "fl_wheel", bodyLink, -1, 1);
-  //AddWheel(modelMsg, "fr_wheel", bodyLink, 1, 1); // This wheel is missing.
+  // AddWheel(modelMsg, "fr_wheel", bodyLink, 1, 1); // This wheel is missing.
   AddWheel(modelMsg, "rl_wheel", bodyLink, -1, -1);
   AddWheel(modelMsg, "rr_wheel", bodyLink, 1, -1);
 
@@ -272,7 +272,7 @@ TEST_F(WheelTrackedVehiclePluginTest, LoadAtLeastTwoWheels)
             << "<model name='model'>"
             << "  <plugin name='test' filename='notimportant'>"
             << "    <left_joint>fl_wheel_j</left_joint>"
-            //<< "    <left_joint>rl_wheel_j</left_joint>" // The missing wheel.
+            // << "    <left_joint>rl_wheel_j</left_joint>"// The missing wheel.
             << "    <right_joint>fr_wheel_j</right_joint>"
             << "    <right_joint>rr_wheel_j</right_joint>"
             << "  </plugin>"
@@ -385,7 +385,8 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized, Init)
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 42.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 24.0);
 
-  if (physicsType == "ode") {
+  if (physicsType == "ode")
+  {
     auto odePhysics = boost::dynamic_pointer_cast<physics::ODEPhysics>(
       this->world->Physics());
     ASSERT_NE(odePhysics, nullptr);

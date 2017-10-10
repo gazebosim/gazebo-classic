@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#include "plugins/PluginInterfaceTest.hh"
 #include <gazebo/physics/Model.hh>
 #include <gazebo/physics/World.hh>
+
+#include "plugins/PluginInterfaceTest.hh"
 
 using namespace gazebo;
 
@@ -116,7 +117,9 @@ void PluginInterfaceTest::Init()
   if (!this->partResultListener->failedTests.empty())
   {
     this->model->SetName("failure");
-  } else {
+  }
+  else
+  {
     this->model->SetName("success");
   }
 }

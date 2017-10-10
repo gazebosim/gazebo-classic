@@ -72,7 +72,7 @@ namespace gazebo
 
     /// \brief Update surface parameters of the tracks to correspond to the
     ///        values set in this plugin.
-    protected: void UpdateTrackSurface() override ;
+    protected: void UpdateTrackSurface() override;
 
     /// \brief Load a wheel connected to joint named jointName and append it to
     ///        this->wheels[track]

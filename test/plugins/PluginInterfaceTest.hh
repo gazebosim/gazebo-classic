@@ -18,15 +18,15 @@
 #define _GAZEBO_PLUGIN_INTERFACE_TEST_HH_
 
 #include <string>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/gazebo.hh"
 
-#include <gtest/gtest.h>
-
 namespace gazebo
 {
-
   /// \brief Helper class to allow "bubbling up" GTest failures from the
   ///        thread running the plugin to the main test thread.
   class GtestPartResultListener : public ::testing::EmptyTestEventListener

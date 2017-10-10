@@ -15,6 +15,8 @@
  *
 */
 
+#include <stdint.h>
+
 #include "plugins/SimpleTrackedVehiclePlugin.hh"
 #include "gazebo/physics/ode/ODEPhysics.hh"
 #include "gazebo/test/helper_physics_generator.hh"
@@ -40,9 +42,9 @@ class SimpleTrackedVehiclePluginTest : public ServerFixture
   protected: physics::WorldPtr world;
 };
 
-class SimpleTrackedVehiclePluginTestParametrized :
-  public SimpleTrackedVehiclePluginTest,
-  public ::testing::WithParamInterface<const char*>
+class SimpleTrackedVehiclePluginTestParametrized
+  : public SimpleTrackedVehiclePluginTest,
+    public ::testing::WithParamInterface<const char*>
 {
   public: SimpleTrackedVehiclePluginTestParametrized() :
     SimpleTrackedVehiclePluginTest(GetParam())
@@ -130,9 +132,9 @@ void AddTrack(msgs::Model &_model, const std::string &_name,
   joint->set_child(link->name());
 }
 
-unsigned long GetCategoryBits(const std::string& _physicsEngine,
-                              physics::ModelPtr _model,
-                              const std::string& _linkName)
+uint64_t GetCategoryBits(const std::string& _physicsEngine,
+                         physics::ModelPtr _model,
+                         const std::string& _linkName)
 {
   if (_physicsEngine == "ode" || _physicsEngine == "")
   {
@@ -163,18 +165,18 @@ TEST_F(SimpleTrackedVehiclePluginTest, LoadCorrectModel)
   msgs::Model modelMsg;
   modelMsg.set_name("model");
   modelMsg.set_is_static(false);
-  
+
   msgs::AddBoxLink(modelMsg, 10., ignition::math::Vector3d(0.5, 0.25, 0.14));
   auto bodyLink = modelMsg.mutable_link(modelMsg.link_size()-1);
   bodyLink->set_name("body");
-  
+
   AddTrack(modelMsg, "left_track", bodyLink, 0, 0.2);
   AddTrack(modelMsg, "right_track", bodyLink, 0, -0.2);
 
   this->SpawnModel(modelMsg);
   this->WaitUntilEntitySpawn("model", 10, 100);
   physics::ModelPtr model = this->world->ModelByName("model");
-  
+
   std::ostringstream pluginStr;
   pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='model'>"
@@ -730,7 +732,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
     centerOfRotation, &odeContact, beltDirection);
-  expectedDir = ignition::math::Vector3d(cos(atan2(1,2)), sin(atan2(1,2)), 0);
+  expectedDir = ignition::math::Vector3d(cos(atan2(1, 2)), sin(atan2(1, 2)), 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
   // ... and is inverted when going backwards.
@@ -750,7 +752,6 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
     centerOfRotation, &odeContact, beltDirection);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
-
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines,

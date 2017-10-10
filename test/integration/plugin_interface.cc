@@ -16,9 +16,9 @@
 */
 
 #include <cmath>
-#include "gazebo/test/ServerFixture.hh"
-
 #include <gtest/gtest-spi.h>
+
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 
@@ -30,8 +30,7 @@ TEST_F(PluginInterface, LoadParams)
 {
   // most of the tests are acutally done in PluginInterfaceTest#Load()
   EXPECT_NO_FATAL_FAILURE(
-    this->Load("worlds/plugin_interface_test.world", true)
-  );
+    this->Load("worlds/plugin_interface_test.world", true));
 
   physics::WorldPtr world = physics::get_world();
   ASSERT_NE(world, nullptr);

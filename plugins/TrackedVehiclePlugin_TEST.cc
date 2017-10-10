@@ -36,7 +36,6 @@ class TrackedVehiclePluginTest : public ServerFixture
 ///        TrackedVehiclePlugin.
 class TestTrackedVehiclePlugin : public TrackedVehiclePlugin
 {
-
   public: double lastLeftVelocity = 0.0;
   public: double lastRightVelocity = 0.0;
 
@@ -96,7 +95,7 @@ TEST_F(TrackedVehiclePluginTest, Load)
   this->SpawnEmptyLink("model");
   this->WaitUntilEntitySpawn("model", 10, 100);
   physics::ModelPtr model = this->world->ModelByName("model");
-  
+
   std::ostringstream pluginStr;
   pluginStr << "<sdf version ='" << SDF_VERSION << "'>"
     << "<model name='model'>"

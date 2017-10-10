@@ -23,7 +23,7 @@ using namespace gazebo;
 
 class PluginTest : public gazebo::testing::AutoLogFixture
 {
- protected: virtual void SetUp()
+  protected: virtual void SetUp()
   {
     gazebo::testing::AutoLogFixture::SetUp();
 
