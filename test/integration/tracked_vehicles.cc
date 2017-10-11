@@ -55,7 +55,7 @@ class WheeledTrackedVehiclesTest : public TrackedVehiclesTest
 // Test that the SimpleTracked vehicle is moving as expected.
 TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
 {
-  ASSERT_NE(this->world->ModelCount(), 0);
+  ASSERT_NE(this->world->ModelCount(), 0u);
   physics::ModelPtr model = this->world->ModelByName("simple_tracked");
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "simple_tracked");
@@ -159,7 +159,7 @@ TEST_F(SimpleTrackedVehiclesTest, SimpleTracked)
 //// Test that the WheelTracked vehicle is moving as expected.
 TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
 {
-  ASSERT_NE(this->world->ModelCount(), 0);
+  ASSERT_NE(this->world->ModelCount(), 0u);
   physics::ModelPtr model = this->world->ModelByName("wheel_tracked");
   ASSERT_NE(model, nullptr);
   ASSERT_EQ(model->GetName(), "wheel_tracked");
@@ -228,7 +228,7 @@ TEST_F(WheeledTrackedVehiclesTest, WheelTracked)
   EXPECT_NEAR(model->WorldPose().Rot().Pitch(), lastPose.Rot().Pitch(), 1e-2);
   EXPECT_NEAR(model->WorldPose().Rot().Yaw(),
               lastPose.Rot().Yaw() - 0.37,
-              0.4);  // TODO lower to 0.2 when merged with gazebo8
+              0.4);  // TODO lower to 0.2 when directional friction is fixed
 
   // Test driving on staircase - should climb to its front part.
 

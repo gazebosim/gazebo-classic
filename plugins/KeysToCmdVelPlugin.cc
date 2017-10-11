@@ -27,24 +27,39 @@ namespace gazebo
 class CmdVelKeyboardControls
 {
   /// \brief Key for zeroing-out the velocity (default is Space, Enter).
- public:
-  std::vector<unsigned int> stop = {13, 32};
+  public: std::vector<unsigned int> stop;
 
   /// \brief Accelerate key (default is up arrow).
- public:
-  std::vector<unsigned int> accelerate = {38, 16777235};
+  public: std::vector<unsigned int> accelerate;
 
   /// \brief Decelerate key (default is down arrow).
- public:
-  std::vector<unsigned int> decelerate = {40, 16777237};
+  public: std::vector<unsigned int> decelerate;
 
   /// \brief Left key (default is left arrow).
- public:
-  std::vector<unsigned int> left = {37, 16777234};
+  public: std::vector<unsigned int> left;
 
   /// \brief Right key (default is right arrow).
- public:
-  std::vector<unsigned int> right = {39, 16777236};
+  public: std::vector<unsigned int> right;
+
+  public: CmdVelKeyboardControls()
+  {
+    this->stop.push_back(13);
+    this->stop.push_back(32);
+
+    this->accelerate.push_back(38);
+    this->accelerate.push_back(16777235);
+
+    this->decelerate.push_back(40);
+    this->decelerate.push_back(16777237);
+
+    this->left.push_back(37);
+    this->left.push_back(16777234);
+
+    this->right.push_back(39);
+    this->right.push_back(16777236);
+  }
+
+  public: virtual ~CmdVelKeyboardControls() = default;
 };
 }
 

@@ -242,7 +242,8 @@ void TrackedVehiclePlugin::SetTrackMu2(double _mu2)
 
 void TrackedVehiclePlugin::SetLinkMu(const physics::LinkPtr &_link)
 {
-  if (!this->GetTrackMu() && !this->GetTrackMu2())
+  if (!this->GetTrackMu().is_initialized() &&
+    !this->GetTrackMu2().is_initialized())
   {
     return;
   }
@@ -259,7 +260,7 @@ void TrackedVehiclePlugin::SetLinkMu(const physics::LinkPtr &_link)
       }
 
 
-      if (this->GetTrackMu())
+      if (this->GetTrackMu().is_initialized())
       {
         double mu = this->GetTrackMu().get();
         if (!ignition::math::equal(frictionPyramid->MuPrimary(), mu, 1e-6))
@@ -271,7 +272,7 @@ void TrackedVehiclePlugin::SetLinkMu(const physics::LinkPtr &_link)
         frictionPyramid->SetMuPrimary(mu);
       }
 
-      if (this->GetTrackMu2())
+      if (this->GetTrackMu2().is_initialized())
       {
         double mu2 = this->GetTrackMu2().get();
         if (!ignition::math::equal(frictionPyramid->MuSecondary(), mu2, 1e-6))

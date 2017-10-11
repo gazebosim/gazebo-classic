@@ -448,8 +448,8 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
 
   EXPECT_FALSE(nullptr != transport::TopicManager::Instance()->FindPublication(
     tracksVelTopic));
-  EXPECT_FALSE(plugin.lastTrackMu);
-  EXPECT_FALSE(plugin.lastTrackMu2);
+  EXPECT_FALSE(plugin.lastTrackMu.is_initialized());
+  EXPECT_FALSE(plugin.lastTrackMu2.is_initialized());
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 1.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 1.0);
 
@@ -457,9 +457,9 @@ TEST_P(SimpleTrackedVehiclePluginTestParametrized, Init)
 
   EXPECT_TRUE(nullptr != transport::TopicManager::Instance()->FindPublication(
     tracksVelTopic));
-  EXPECT_TRUE(plugin.lastTrackMu);
+  EXPECT_TRUE(plugin.lastTrackMu.is_initialized());
   EXPECT_DOUBLE_EQ(plugin.lastTrackMu.get(), 42.0);
-  EXPECT_TRUE(plugin.lastTrackMu2);
+  EXPECT_TRUE(plugin.lastTrackMu2.is_initialized());
   EXPECT_DOUBLE_EQ(plugin.lastTrackMu2.get(), 24.0);
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 42.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 24.0);

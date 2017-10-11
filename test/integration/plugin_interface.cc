@@ -35,11 +35,11 @@ TEST_F(PluginInterface, LoadParams)
   physics::WorldPtr world = physics::get_world();
   ASSERT_NE(world, nullptr);
 
-  ASSERT_NE(world->ModelCount(), 0);
+  ASSERT_NE(world->ModelCount(), 0u);
   physics::ModelPtr model = world->Models()[0];
   ASSERT_NE(model, nullptr);
 
-  ASSERT_EQ(model->GetPluginCount(), 1);
+  ASSERT_EQ(model->GetPluginCount(), 1u);
 
   // HACK The ASSERTs inside the plugin's Load() method are actually running
   // in a separate thread which can't be captured by GTest (so far). So we

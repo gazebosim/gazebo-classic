@@ -124,8 +124,8 @@ TEST_F(TrackedVehiclePluginTest, Load)
   EXPECT_EQ("testNamespace", plugin.GetRobotNamespace());
   EXPECT_EQ(0.397, plugin.GetTracksSeparation());
   EXPECT_EQ(0.1, plugin.GetSteeringEfficiency());
-  EXPECT_FALSE(plugin.GetTrackMu());
-  EXPECT_TRUE(plugin.GetTrackMu2());
+  EXPECT_FALSE(plugin.GetTrackMu().is_initialized());
+  EXPECT_TRUE(plugin.GetTrackMu2().is_initialized());
   EXPECT_EQ(1.0, plugin.GetTrackMu2().get());
 }
 
