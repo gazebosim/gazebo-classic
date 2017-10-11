@@ -265,7 +265,12 @@
                 <body>base_link</body>
                 <left_track>left_track</left_track>
                 <right_track>right_track</right_track>
-                <key_controls/>
+                <track_mu>2</track_mu>
+                <track_mu2>0.5</track_mu2>
+            </plugin>
+
+            <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
+                <cmd_vel_topic>~/simple_tracked/cmd_vel</cmd_vel_topic>
             </plugin>
 
         </model>

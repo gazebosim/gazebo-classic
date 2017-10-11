@@ -94,6 +94,7 @@ namespace gazebo
       std::string jointName;
 
       /// \brief Radius of the wheel (used to convert linear to angular speed).
+      // cppcheck-suppress unusedStructMember
       double radius;
     };
 

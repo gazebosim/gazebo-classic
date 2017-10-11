@@ -21,6 +21,8 @@
 #include <unordered_map>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/optional.hpp>
+
 #include <gazebo/physics/ode/ODELink.hh>
 #include <gazebo/physics/ode/ODECollision.hh>
 
@@ -57,19 +59,21 @@ namespace gazebo
   ///
   /// The plugin processes the following parameters (all have defaults):
   /// <steering_efficiency>  Steering efficiency coefficient (0.0 to 1.0).
+  ///                        Default is 0.5.
   /// <tracks_separation>  Distance between the centers of the tracks.
-  /// <linear_speed_gain>  Coefficient that converts velocity command units to
-  ///                      track velocity.
-  /// <angular_speed_gain>  Coefficient that converts velocity command units to
-  ///                       track velocity.
-  /// <track_mu>  Friction coefficient in the first friction direction.
-  /// <track_mu2>  Friction coefficient in the second friction direction.
+  ///                      Default is 0.4. Implementation may try to autodetect
+  ///                      this value.
+  /// <max_linear_speed>  Max linear velocity in m/s. Also max track velocity.
+  ///                     Default is 1.0.
+  /// <max_angular_speed>  Max angular speed in rad/s. Default is 1.0.
+  /// <track_mu>  Friction coefficient in the first friction direction. If not
+  ///             set, mu of the tracks is not changed, so the values from model
+  ///             definition are used.
+  /// <track_mu2>  Friction coefficient in the second friction direction. If not
+  ///             set, mu of the tracks is not changed, so the values from model
+  ///             definition are used.
   /// <robot_namespace>  Namespace used as a prefix for gazebo topic names.
-  /// <key_controls>  If present, enable keyboard control of the vehicle. If
-  ///                 this tag is empty, the default assignment (arrow keys) is
-  ///                 is used; otherwise, the keys can be set using the
-  ///                 (repeatable) subelements <stop>, <accelerate>,
-  ///                 <decelerate>, <left> and <right> containing the keycodes.
+  ///                    Default is the name of the model.
   class TrackedVehiclePlugin : public ModelPlugin
   {
     /// \brief Default Contstuctor
@@ -100,14 +104,14 @@ namespace gazebo
     protected: virtual void SetSteeringEfficiency(double _steeringEfficiency);
 
     /// \brief Friction coefficient in the first friction direction.
-    protected: virtual double GetTrackMu();
+    protected: virtual boost::optional<double> GetTrackMu();
 
     /// \brief Friction coefficient in the first friction direction.
     /// \param[in] _mu The new coefficient.
     protected: virtual void SetTrackMu(double _mu);
 
     /// \brief Friction coefficient in the second friction direction.
-    protected: virtual double GetTrackMu2();
+    protected: virtual boost::optional<double> GetTrackMu2();
 
     /// \brief Friction coefficient in the second friction direction.
     /// \param[in] _mu2 The new coefficient.
@@ -155,10 +159,6 @@ namespace gazebo
     ///
     /// \param[in] _msg Pose message from external publisher
     protected: virtual void OnVelMsg(ConstPosePtr &_msg);
-
-    /// \brief Callback each time a key message is received.
-    /// \param[in] _msg Keypress message.
-    protected: virtual void OnKeyPress(ConstAnyPtr &_msg);
 
     /// \brief Mutex to protect updates
     protected: std::mutex mutex;

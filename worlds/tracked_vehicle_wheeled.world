@@ -1011,7 +1011,11 @@
                  https://bitbucket.org/osrf/gazebo/issues/2068
                  TODO fixed in gazebo8 -->
                 <track_mu>1.0</track_mu>
+                <track_mu2>0.5</track_mu2>
+            </plugin>
 
+            <plugin filename="libKeysToCmdVelPlugin.so" name="keyboard_control">
+                <cmd_vel_topic>~/wheel_tracked/cmd_vel</cmd_vel_topic>
                 <key_controls>
                     <!-- WSAD controls + space/Enter for stop -->
                     <stop>13</stop>

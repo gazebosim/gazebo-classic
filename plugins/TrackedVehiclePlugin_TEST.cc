@@ -66,12 +66,12 @@ class TestTrackedVehiclePlugin : public TrackedVehiclePlugin
     return TrackedVehiclePlugin::GetSteeringEfficiency();
   }
 
-  public: double GetTrackMu() override
+  public: boost::optional<double> GetTrackMu() override
   {
     return TrackedVehiclePlugin::GetTrackMu();
   }
 
-  public: double GetTrackMu2() override
+  public: boost::optional<double> GetTrackMu2() override
   {
     return TrackedVehiclePlugin::GetTrackMu2();
   }
@@ -104,7 +104,6 @@ TEST_F(TrackedVehiclePluginTest, Load)
     << "    <tracks_separation>0.397</tracks_separation>"
     << "    <steering_efficiency>0.1</steering_efficiency>"
     << "    <track_mu2>1.0</track_mu2>"
-    << "    <key_controls/>"
     << "  </plugin>"
     << "</model>"
     << "</sdf>";
@@ -125,8 +124,9 @@ TEST_F(TrackedVehiclePluginTest, Load)
   EXPECT_EQ("testNamespace", plugin.GetRobotNamespace());
   EXPECT_EQ(0.397, plugin.GetTracksSeparation());
   EXPECT_EQ(0.1, plugin.GetSteeringEfficiency());
-  EXPECT_EQ(2.0, plugin.GetTrackMu());
-  EXPECT_EQ(1.0, plugin.GetTrackMu2());
+  EXPECT_FALSE(plugin.GetTrackMu());
+  EXPECT_TRUE(plugin.GetTrackMu2());
+  EXPECT_EQ(1.0, plugin.GetTrackMu2().get());
 }
 
 /// \brief Test that the plugin initializes the ~/tracks_speed publisher.
@@ -184,6 +184,7 @@ TEST_F(TrackedVehiclePluginTest, ResetAndTrackVelocityPublishersWork)
             << "<model name='model'>"
             << "  <plugin name='test' filename='notimportant'>"
             << "    <robot_namespace>testNamespace</robot_namespace>"
+            << "    <max_linear_speed>2.0</max_linear_speed>"
             << "  </plugin>"
             << "</model>"
             << "</sdf>";

@@ -52,8 +52,8 @@ class TestWheelTrackedVehiclePlugin : public WheelTrackedVehiclePlugin
   public: double lastLeftVelocity = 0.0;
   public: double lastRightVelocity = 0.0;
 
-  public: double lastTrackMu = 0.0;
-  public: double lastTrackMu2 = 0.0;
+  public: boost::optional<double> lastTrackMu;
+  public: boost::optional<double> lastTrackMu2;
 
   public: void SetTrackVelocityImpl(double _left, double _right) override
   {
@@ -371,8 +371,8 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized, Init)
 
   EXPECT_FALSE(nullptr != transport::TopicManager::Instance()->FindPublication(
     tracksVelTopic));
-  EXPECT_DOUBLE_EQ(plugin.lastTrackMu, 0.0);
-  EXPECT_DOUBLE_EQ(plugin.lastTrackMu2, 0.0);
+  EXPECT_FALSE(plugin.lastTrackMu);
+  EXPECT_FALSE(plugin.lastTrackMu2);
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 1.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 1.0);
 
@@ -380,8 +380,10 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized, Init)
 
   EXPECT_TRUE(nullptr != transport::TopicManager::Instance()->FindPublication(
     tracksVelTopic));
-  EXPECT_DOUBLE_EQ(plugin.lastTrackMu, 42.0);
-  EXPECT_DOUBLE_EQ(plugin.lastTrackMu2, 24.0);
+  EXPECT_TRUE(plugin.lastTrackMu);
+  EXPECT_DOUBLE_EQ(plugin.lastTrackMu.get(), 42.0);
+  EXPECT_TRUE(plugin.lastTrackMu2);
+  EXPECT_DOUBLE_EQ(plugin.lastTrackMu2.get(), 24.0);
   EXPECT_DOUBLE_EQ(friction->MuPrimary(), 42.0);
   EXPECT_DOUBLE_EQ(friction->MuSecondary(), 24.0);
 
@@ -443,7 +445,10 @@ TEST_P(WheelTrackedVehiclePluginTestParametrized,
             << "    <left_joint>rl_wheel_j</left_joint>"
             << "    <right_joint>fr_wheel_j</right_joint>"
             << "    <right_joint>rr_wheel_j</right_joint>"
+            << "    <max_linear_speed>2.0</max_linear_speed>"
             << "    <robot_namespace>testNamespace</robot_namespace>"
+            << "    <track_mu>2.0</track_mu>"
+            << "    <track_mu2>0.5</track_mu2>"
             << "  </plugin>"
             << "</model>"
             << "</sdf>";
