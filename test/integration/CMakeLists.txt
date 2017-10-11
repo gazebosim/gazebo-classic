@@ -169,6 +169,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )

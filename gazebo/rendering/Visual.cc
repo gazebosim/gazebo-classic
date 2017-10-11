@@ -2568,12 +2568,17 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = common::find_file(_msg->geometry().mesh().filename());
+    {
+      std::string filename = _msg->geometry().mesh().filename();
+      newGeometryName = common::find_file(filename);
+    }
 
     if (newGeometryType != geometryType ||
-        (newGeometryType == "mesh" && newGeometryName != geometryName))
+        (newGeometryType == "mesh" && !newGeometryName.empty() &&
+        newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
+      bool origCastShadows = this->dataPtr->castShadows;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2626,6 +2631,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         this->dataPtr->skeleton = ent->getSkeleton();
       this->SetMaterial(origMaterial, false);
       this->UpdateTransparency(true);
+      this->SetCastShadows(origCastShadows);
     }
 
     ignition::math::Vector3d geomScale(1, 1, 1);
