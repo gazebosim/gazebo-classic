@@ -15,6 +15,8 @@ directional_shadow_receiver_fp.glsl
 directional_shadow_receiver_vp.glsl
 grid_fp.glsl
 grid_vp.glsl
+heightmap_custom_fp.glsl
+heightmap_custom_vp.glsl
 laser_1st_pass_dbg.frag
 laser_1st_pass.frag
 laser_1st_pass.vert

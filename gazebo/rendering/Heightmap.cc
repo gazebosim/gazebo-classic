@@ -1255,6 +1255,54 @@ void Heightmap::SetMaterial(const std::string &_materialName)
 }
 
 /////////////////////////////////////////////////
+void Heightmap::PSSMCallback()
+{
+// THE MATERIAL NAME IS ALWAYS "irg/HermiteA_HighlandsAve2_5-4096", WHICH SEEMS REASONABLE
+  // Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(this->dataPtr->materialName);
+
+  Ogre::Terrain *terrain = this->dataPtr->terrainGroup->getTerrain(0, 0);
+  if (!terrain)
+    return;
+  Ogre::MaterialPtr mat = terrain->getMaterial();
+
+  for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *tech = mat->getTechnique(i);
+    for (unsigned int j = 0; j < tech->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = tech->getPass(j);
+
+      // check if there is a fragment shader
+      if (!pass->hasFragmentProgram())
+        continue;
+
+      Ogre::GpuProgramParametersSharedPtr params =
+          pass->getFragmentProgramParameters();
+      if (params.isNull())
+        continue;
+
+      // Ogre::CustomPSSMShadowCameraSetup* pssm =
+          // RTShaderSystem::Instance()->GetPSSMShadowCameraSetup();
+
+// GetPSSMShadowCameraSetup() RETURNS TWO DIFFERENT ADDRESSES.
+// THAT'S PRETTY WEIRD SINCE RTSHADERSYSTEM IS A SINGLETON.
+// MOST OF THE TIME IT IS A PSSM THAT HAS NOT HAD FRUSTUM SIZES COMPUTED.
+      // if (pssm->getFrustumSizeCount() == 0)
+        // continue;
+
+      // set up uniforms for frustum sizes to be used by Percentage Closer
+      // Soft Shadows (PCSS)
+// THESE VALUES WILL PRINT HERE CORRECTLY BUT THE SHADER RECEIVES ALL ZEROES
+      // params->setNamedConstant("shadowFrustumSize0", pssm->getFrustumSize(0));
+      // params->setNamedConstant("shadowFrustumSize1", pssm->getFrustumSize(1));
+      // params->setNamedConstant("shadowFrustumSize2", pssm->getFrustumSize(2));
+      double t = fmod(this->dataPtr->scene->SimTime().Double(), 1.0);
+      params->setNamedConstant("abc", Ogre::Vector3(0, t, 0));
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 std::string Heightmap::MaterialName() const
 {
   return this->dataPtr->materialName;
@@ -1274,6 +1322,11 @@ void Heightmap::CreateMaterial()
     terrainMaterialGenerator.bind(terrainMaterial);
     this->dataPtr->terrainGlobals->setDefaultMaterialGenerator(
         terrainMaterialGenerator);
+
+// MY CALLBACK IS SET HERE
+    this->dataPtr->connections.push_back(
+      event::Events::ConnectPreRender(
+      std::bind(&Heightmap::PSSMCallback, this)));
   }
   else
   {

@@ -312,6 +312,8 @@ namespace gazebo
       /// and supports PSSM shadows.
       private: void CreateMaterial();
 
+      private: void PSSMCallback();
+
       /// \brief Modify the height at a specific point.
       /// \param[in] _pos Position in world coordinates.
       /// \param[in] _outsideRadius Controls the radius of effect.

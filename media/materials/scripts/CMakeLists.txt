@@ -6,6 +6,7 @@ deferred_post.material
 deferred_post_minilight.material
 deferred_post.program
 distortion.compositor
+heightmap_custom.material
 gazebo.material
 grid.material
 kitchen.material
