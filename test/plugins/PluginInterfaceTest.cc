@@ -48,8 +48,16 @@ void PluginInterfaceTest::Load(physics::ModelPtr _model,
   EXPECT_EQ(this->type, PluginType::MODEL_PLUGIN);
   EXPECT_EQ(this->GetType(), PluginType::MODEL_PLUGIN);
 
-  EXPECT_EQ(this->filename, "libPluginInterfaceTest.so");
-  EXPECT_EQ(this->GetFilename(), "libPluginInterfaceTest.so");
+#ifdef __APPLE__
+  const std::string pluginFilename = "libPluginInterfaceTest.dylib";
+#elif _WIN32
+  const std::string pluginFilename = "PluginInterfaceTest.dll";
+#else
+  const std::string pluginFilename = "libPluginInterfaceTest.so";
+#endif  // ifdef __APPLE__
+
+  EXPECT_EQ(this->filename, pluginFilename);
+  EXPECT_EQ(this->GetFilename(), pluginFilename);
 
   EXPECT_EQ(this->handleName, "pluginInterfaceTest");
   EXPECT_EQ(this->GetHandle(), "pluginInterfaceTest");
