@@ -20,6 +20,7 @@
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -44,10 +45,22 @@ namespace gazebo
       /// \return Ogre color value
       public: static Ogre::ColourValue Convert(const common::Color &_clr);
 
+      /// \brief Return the equivalent ogre color
+      /// \param[in] _clr ignition::math::Color to convert
+      /// \return Ogre color value
+      public: static Ogre::ColourValue Convert(
+                  const ignition::math::Color &_clr);
+
       /// \brief Return the equivalent gazebo color
       /// \param[in] _clr Ogre color to convert
       /// \return Gazebo color value
       public: static common::Color Convert(const Ogre::ColourValue &_clr);
+
+      /// \brief Return the equivalent ignition::math::Color
+      /// \param[in] _clr Ogre color to convert
+      /// \return Ignition math color value
+      public: static ignition::math::Color ConvertIgn(
+                  const Ogre::ColourValue &_clr);
 
       /// \brief Return ignition::math::Vector3d from Ogre Vector3.
       /// \param[in] _v Ogre Vector3
