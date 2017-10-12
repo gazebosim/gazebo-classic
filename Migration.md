@@ -29,7 +29,10 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
+1. **gazebo/sensors/CameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
+1. **gazebo/sensors/WideAngleCameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 
 
 ### Deprecations
