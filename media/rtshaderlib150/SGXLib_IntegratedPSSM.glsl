@@ -55,7 +55,7 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize)
+float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize)
 {
   // Remove shadow outside shadow maps so that all that area appears lit
   if (shadowMapPos.z < 0.0 || shadowMapPos.z > 1.0)
@@ -65,15 +65,15 @@ float _SGX_ShadowPCF4(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShad
 
   // 9-sample poisson disk blur
   vec2 poissonDisk[9] = vec2[](
-    vec2( -0.676, 0.517 ),
-    vec2( 0.943, -0.221 ),
-    vec2( -0.223, -0.957 ),
-    vec2( 0.184, 0.797 ),
-    vec2( -0.228, -0.228 ),
-    vec2( 0.424, -0.815 ),
-    vec2( -0.854, -0.445 ),
-    vec2( 0.825, 0.482 ),
-    vec2( 0.179, 0.164 )
+    vec2( 0.0, 0.0 ),
+    vec2( -0.987, 0.127 ),
+    vec2( -0.168, -0.924 ),
+    vec2( 0.637, 0.633 ),
+    vec2( 0.888, -0.296 ),
+    vec2( 0.516, 0.0664 ),
+    vec2( -0.408, -0.332 ),
+    vec2( -0.491, 0.263 ),
+    vec2( 0.061, 0.851 )
   );
   for (int i = 0; i < 9; i++)
   {
@@ -107,16 +107,16 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
   if (fDepth  <= vSplitPoints.x)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+      _SGX_ShadowPoisson9(shadowMap0, lightPosition0, invShadowMapSize0.xy);
   }
   else if (fDepth <= vSplitPoints.y)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+      _SGX_ShadowPoisson9(shadowMap1, lightPosition1, invShadowMapSize1.xy);
   }
   else
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
+      _SGX_ShadowPoisson9(shadowMap2, lightPosition2, invShadowMapSize2.xy);
   }
 }

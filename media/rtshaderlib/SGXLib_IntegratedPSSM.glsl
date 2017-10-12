@@ -62,7 +62,7 @@ float texture2DCompare(sampler2D depths, vec2 uv, float compare)
 }
 
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
+float _SGX_ShadowPoisson9(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
 {
   // Interpolated 3x3 PCF
   // Adapted from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
@@ -129,16 +129,16 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
   if (fDepth  <= vSplitPoints.x)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+      _SGX_ShadowPoisson9(shadowMap0, lightPosition0, invShadowMapSize0.xy);
   }
   else if (fDepth <= vSplitPoints.y)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+      _SGX_ShadowPoisson9(shadowMap1, lightPosition1, invShadowMapSize1.xy);
   }
   else
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
+      _SGX_ShadowPoisson9(shadowMap2, lightPosition2, invShadowMapSize2.xy);
   }
 }
