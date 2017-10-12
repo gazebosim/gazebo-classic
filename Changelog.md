@@ -5,6 +5,12 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
+1. Try finding both ignition math 3 or 4 until we switch to 4
+    * [Pull request #2783](https://bitbucket.org/osrf/gazebo/pull-request/2783)
+
+1. Replaced use of ignition::msgs::ImageStamped with ignition::msgs::Image
+    * [Pull request #2781](https://bitbucket.org/osrf/gazebo/pull-request/2781)
+
 1. Fix missing includes for boost lexical cast
     * [Pull request #2784](https://bitbucket.org/osrf/gazebo/pull-request/2784)
 
