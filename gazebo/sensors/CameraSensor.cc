@@ -99,7 +99,7 @@ void CameraSensor::Load(const std::string &_worldName)
 
   ignition::transport::AdvertiseMessageOptions opts;
   opts.SetMsgsPerSec(50);
-  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::ImageStamped>(
+  this->imagePubIgn = this->nodeIgn.Advertise<ignition::msgs::Image>(
       this->TopicIgn(), opts);
 }
 
@@ -240,20 +240,20 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
 
     if (this->imagePubIgn.HasConnections())
     {
-      ignition::msgs::ImageStamped msg;
-      msg.mutable_time()->set_sec(simTime.sec);
-      msg.mutable_time()->set_nsec(simTime.nsec);
+      ignition::msgs::Image msg;
+      msg.mutable_header()->mutable_stamp()->set_sec(simTime.sec);
+      msg.mutable_header()->mutable_stamp()->set_nsec(simTime.nsec);
 
-      msg.mutable_image()->set_width(this->camera->ImageWidth());
-      msg.mutable_image()->set_height(this->camera->ImageHeight());
-      msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
+      msg.set_width(this->camera->ImageWidth());
+      msg.set_height(this->camera->ImageHeight());
+      msg.set_pixel_format(common::Image::ConvertPixelFormat(
             this->camera->ImageFormat()));
 
-      msg.mutable_image()->set_step(this->camera->ImageWidth() *
+      msg.set_step(this->camera->ImageWidth() *
           this->camera->ImageDepth());
-      msg.mutable_image()->set_data(this->camera->ImageData(),
-          msg.image().width() * this->camera->ImageDepth() *
-          msg.image().height());
+      msg.set_data(this->camera->ImageData(),
+          msg.width() * this->camera->ImageDepth() *
+          msg.height());
 
       this->imagePubIgn.Publish(msg);
     }

@@ -173,9 +173,9 @@ void TimerGUIPlugin::Load(sdf::ElementPtr _elem)
   // Time is read in SDF as (seconds nanosecnds)
   if (_elem->HasElement("countdown_time"))
   {
-    common::Time maxTime =
-        _elem->GetElement("countdown_time")->Get<common::Time>();
-    this->timer = common::Timer(maxTime, true);
+    sdf::Time maxTime =
+        _elem->GetElement("countdown_time")->Get<sdf::Time>();
+    this->timer = common::Timer(common::Time(maxTime.sec, maxTime.nsec), true);
   }
 
   // Check if there is a start button
