@@ -584,21 +584,20 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 5 QUIET)
-find_package(SDFormat ${SDFormat_MIN_VERSION})
-
+# try finding both sdformat 5 and 6 until we switch to 6
+set (SDFormat_MIN_VERSION 5)
+find_package(SDFormat 6 QUIET)
 if (SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
+  message (STATUS "Looking for SDFormat 6 - found")
 else ()
   # try finding both sdformat 5 and 6 until we switch to 6
-  find_package(SDFormat 6)
-endif()
-
-if (NOT SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat 5 or 6 - not found")
-  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION} <= 6. Required for reading and writing SDF files.")
-else()
-  message (STATUS "Looking for SDFormat 6 - found")
+  find_package(SDFormat ${SDFormat_MIN_VERSION})
+  if (NOT SDFormat_FOUND)
+    message (STATUS "Looking for SDFormat 5 or 6 - not found")
+    BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION} <= 6. Required for reading and writing SDF files.")
+  else()
+    message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
+  endif()
 endif()
 
 ########################################
@@ -748,7 +747,13 @@ endif()
 find_package(ignition-math3 QUIET)
 if (NOT ignition-math3_FOUND)
   message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
+  find_package(ignition-math4 QUIET)
+  if (NOT ignition-math4_FOUND)
+    message(STATUS "Looking for ignition-math4-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev or libignition-math4-dev)")
+  else()
+    message(STATUS "Looking for ignition-math4-config.cmake - found")
+  endif()
 else()
   message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()
