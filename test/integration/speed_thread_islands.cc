@@ -114,7 +114,7 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
     EXPECT_EQ(0, threads);
   }
 
-  // Take 500 steps to warm up.
+  // Take some steps to warm up.
   world->Step(500);
 
   // Collect base-line statistics (no threading)
@@ -135,7 +135,7 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
     EXPECT_EQ(4, threads);
   }
 
-  // Take 500 steps to warm up.
+  // Take some steps to warm up.
   world->Step(500);
 
   // Collect threaded statistics
@@ -181,7 +181,7 @@ void SpeedThreadIslandsTest::DualPR2(const std::string &_physicsEngine,
     EXPECT_EQ(0, threads);
   }
 
-  // Take 10 steps to warm up.
+  // Take some steps to warm up.
   world->Step(50);
 
   // Collect base-line statistics (no threading)
@@ -202,7 +202,7 @@ void SpeedThreadIslandsTest::DualPR2(const std::string &_physicsEngine,
     EXPECT_EQ(2, threads);
   }
 
-  // Take 10 steps to warm up.
+  // Take some steps to warm up.
   world->Step(50);
 
   // Collect threaded statistics
