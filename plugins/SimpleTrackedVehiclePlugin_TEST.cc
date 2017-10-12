@@ -94,7 +94,7 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
     this->lastTracksVelMsg = *_msg;
   }
 
-  public: uint GetCollideWithoutContactBitmask() const
+  public: unsigned int GetCollideWithoutContactBitmask() const
   {
     return this->collideWithoutContactBitmask;
   }

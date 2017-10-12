@@ -137,13 +137,13 @@ namespace gazebo {
     private: transport::SubscriberPtr contactsSubscriber;
 
     /// \brief This bitmask will be set to the whole vehicle body.
-    protected: uint collideWithoutContactBitmask;
+    protected: unsigned int collideWithoutContactBitmask;
     /// \brief Category for the non-track parts of the robot.
-    protected: static const uint ROBOT_CATEGORY = 0x10000000;
+    protected: static const unsigned int ROBOT_CATEGORY = 0x10000000;
     /// \brief Category for tracks.
-    protected: static const uint BELT_CATEGORY = 0x20000000;
+    protected: static const unsigned int BELT_CATEGORY = 0x20000000;
     /// \brief Category for all items on the left side.
-    protected: static const uint LEFT_CATEGORY = 0x40000000;
+    protected: static const unsigned int LEFT_CATEGORY = 0x40000000;
 
     private: physics::ContactManager *contactManager;
 
