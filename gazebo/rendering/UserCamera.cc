@@ -900,9 +900,11 @@ bool UserCamera::SetProjectionType(const std::string &_type)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i UserCamera::Project(
+ignition::math::Vector3d UserCamera::Project(
     const ignition::math::Vector3d &_pt) const
 {
   auto pt = Camera::Project(_pt);
-  return pt / this->dataPtr->devicePixelRatio;
+  pt.X() /= this->dataPtr->devicePixelRatio;
+  pt.Y() /= this->dataPtr->devicePixelRatio;
+  return pt;
 }

@@ -219,6 +219,13 @@ namespace gazebo
       // Documentation inherited
       public: bool SetBackgroundColor(const common::Color &_color) override;
 
+      /// \brief Project 3D world coordinates to screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return Screen coordinates. Z is the distance of point from camera
+      /// optical center.
+      public: ignition::math::Vector3d Project(
+          const ignition::math::Vector3d &_pt) const;
+      
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);

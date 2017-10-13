@@ -1985,16 +1985,17 @@ void Camera::SetTrackInheritYaw(const bool _inheritYaw)
 }
 
 /////////////////////////////////////////////////
-ignition::math::Vector2i Camera::Project(
+ignition::math::Vector3d Camera::Project(
     const ignition::math::Vector3d &_pt) const
 {
   // Convert from 3D world pos to 2D screen pos
   Ogre::Vector3 pos = this->OgreCamera()->getProjectionMatrix() *
       this->OgreCamera()->getViewMatrix() * Conversions::Convert(_pt);
 
-  ignition::math::Vector2i screenPos;
+  ignition::math::Vector3d screenPos;
   screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
   screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
+  screenPos.Z() = pos.z; 
 
   return screenPos;
 }
