@@ -123,7 +123,8 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
 
     // Changed to enable hardware PCF
     // it->mTextureSampler = psProgram->resolveParameter(
-    //     GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL,
+    //     Ogre::GCT_SAMPLER2D, it->mTextureSamplerIndex,
+    //     static_cast<Ogre::uint16>(Ogre::GPV_GLOBAL),
     //     "shadow_map");
     it->mTextureSampler = psProgram->resolveParameter(
         Ogre::GCT_SAMPLER2DSHADOW, it->mTextureSamplerIndex,

@@ -596,9 +596,9 @@ void RTShaderSystem::ReapplyShadows()
 }
 
 /////////////////////////////////////////////////
-CustomPSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
+Ogre::PSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
-  return dynamic_cast<CustomPSSMShadowCameraSetup *>(
+  return dynamic_cast<Ogre::PSSMShadowCameraSetup *>(
       this->dataPtr->pssmSetup.get());
 }
 

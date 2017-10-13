@@ -142,7 +142,7 @@ namespace gazebo
 
       /// \brief Get the Ogre PSSM Shadows camera setup.
       /// \return The Ogre PSSM Shadows camera setup.
-      public: CustomPSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
+      public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
 
       /// \brief Update the RT shaders. This should not be called frequently.
       public: void Update();

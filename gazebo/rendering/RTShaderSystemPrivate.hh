@@ -56,7 +56,7 @@ namespace gazebo
 
       /// \brief Size of the Parallel Split Shadow Map (PSSM) shadow texture
       /// at closest layer.
-      public: unsigned int shadowTextureSize = 1024u;
+      public: unsigned int shadowTextureSize = 2048u;
 
       /// \brief Parallel Split Shadow Map (PSSM) near clip distance.
       public: double shadowNear = 0.01;
