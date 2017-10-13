@@ -18,13 +18,17 @@
 #ifndef _GAZEBO_OCULUS_WINDOW_HH_
 #define _GAZEBO_OCULUS_WINDOW_HH_
 
+#ifndef Q_MOC_RUN
 #include <boost/thread.hpp>
+#endif
 #include <string>
 
+#ifndef Q_MOC_RUN
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
+#endif
 
 namespace gazebo
 {
