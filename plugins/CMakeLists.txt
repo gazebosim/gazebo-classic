@@ -64,6 +64,7 @@ set (plugins_single_header
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  JoyPlugin
   KeysToJointsPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin

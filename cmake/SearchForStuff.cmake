@@ -733,12 +733,12 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs0 0.4 QUIET)
-if (NOT ignition-msgs0_FOUND)
-  message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition msgs0 library.")
+find_package(ignition-msgs1 1.0 QUIET)
+if (NOT ignition-msgs1_FOUND)
+  message(STATUS "Looking for ignition-msgs1-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs1 library.")
 else()
-  message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  message(STATUS "Looking for ignition-msgs1-config.cmake - found")
   include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
   link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
