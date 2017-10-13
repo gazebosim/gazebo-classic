@@ -18,6 +18,7 @@
 #include <fcntl.h>
 #include <thread>
 #include <sys/stat.h>
+#include <ignition/math/Helpers.hh>
 
 #include "plugins/JoyPlugin.hh"
 
@@ -32,13 +33,18 @@ JoyPlugin::JoyPlugin()
 /////////////////////////////////////////////////
 JoyPlugin::~JoyPlugin()
 {
+  this->stop = true;
+  if (this->runThread)
+    this->runThread->join();
+
   close(this->joyFd);
 }
 
 /////////////////////////////////////////////////
-void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr /*_sdf*/)
+void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
 {
-  std::string deviceFilename = "/dev/input/js0";
+  std::string deviceFilename = _sdf->Get<std::string>("dev",
+      "/dev/input/js0").first;
 
   bool opened = false;
   this->joyFd == -1;
@@ -72,214 +78,208 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr /*_sdf*/)
     return;
   }
 
-  float deadzone = ignition::math::clamp(0.05, 0.0f, 0.9f);
-  this->unscaledDeadzone = 32767f * deadzone;
-  this->axisScale = -1f / (1f - deadzone) / 32767f;
+  this->stickyButtons = _sdf->Get<bool>("sticky_buttons",
+                                        this->stickyButtons).first;
+
+  float deadzone = ignition::math::clamp(
+      _sdf->Get<float>("dead_zone", 0.05f).first,
+      0.0f, 0.9f);
+
+  float intervalRate = _sdf->Get<float>("rate", 0).first;
+  float accumulationRate = _sdf->Get<float>("accumulation_rate", 1000).first;
+
+  if (intervalRate <= 0)
+    this->interval = 1.0f;
+  else
+    this->interval = 1.0f / intervalRate;
+
+  if (accumulationRate <= 0)
+    this->accumulationInterval = 0.0f;
+  else
+    this->accumulationInterval = 1.0f / accumulationRate;
+
+  if (this->interval > this->accumulationInterval)
+  {
+    gzwarn << "Interval rate of [" << 1.0 / this->interval
+      << " Hz] is greater than the accumulation rate of ["
+      << 1.0 / this->accumulationInterval
+      << " Hz]. Timing behavior is ill defined.\n";
+  }
+
+  this->unscaledDeadzone = 32767.0f * deadzone;
+  this->axisScale = -1.0f / (1.0f - deadzone) / 32767.0f;
 
   // Create the publisher of joy messages
-  this->pub = this->node.Advertise<ignition::msgs::Joystick>("/joy");
+  this->pub = this->node.Advertise<ignition::msgs::Joy>("/joy");
 
   // Connect to the world update
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      std::bind(&JoyPlugin::Update, this));
+  this->runThread = new std::thread(std::bind(&JoyPlugin::Run, this));
 }
 
 /////////////////////////////////////////////////
-void JoyPlugin::Update()
+void JoyPlugin::Run()
 {
-  // bool publishNow = false;
-  // bool publishSoon = false;
-
   fd_set set;
   struct timeval tv;
+  bool timeoutSet = false;
+  bool accumulate = false;
+  bool accumulating = false;
 
-  FD_ZERO(&set);
-  FD_SET(this->joyFd, &set);
-
-  int selectOut = select(this->joyFd+1, &set, NULL, NULL, &tv);
-
-  if (selectOut == -1)
+  while (!this->stop)
   {
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
+    FD_ZERO(&set);
+    FD_SET(this->joyFd, &set);
 
-    gzdbg << "Joystick might be closed\n";
-    return;
-  }
+    int selectOut = select(this->joyFd+1, &set, NULL, NULL, &tv);
 
-  js_event event;
-
-  bool tvSet = false;
-
-  if (FD_ISSET(this->joyFd, &set))
-  {
-    if (read(this->joyFd, &event, sizeof(js_event)) == -1 && errno != EAGAIN)
+    if (selectOut == -1)
     {
-      gzdbg << "Joystick read failed, might be closed\n";
-      return;
+      tv.tv_sec = 0;
+      tv.tv_usec = 0;
+
+      gzdbg << "Joystick might be closed\n";
+      if (!this->stop)
+        continue;
+      else
+        break;
     }
+    else if (this->stop)
+      break;
 
-    // joyMsg.mutable_header()->set_stamp();
-    // this->count++;
+    js_event event;
 
-    switch(event.type)
+    if (FD_ISSET(this->joyFd, &set))
     {
-      case JS_EVENT_BUTTON:
-      case JS_EVENT_BUTTON | JS_EVENT_INIT:
-        {
-          std::cerr << "Button Event\n";
-          /*
-          // Update number of buttons
-          if(event.number >= this->joyMsg.buttons.size())
-          {
-            int oldSize = this->joyMsg.buttons.size();
-            this->joyMsg.buttons.resize(event.number+1);
-
-            // last_published_joy_msg.buttons.resize(event.number+1);
-            // sticky_buttons_joy_msg.buttons.resize(event.number+1);
-
-            for(unsigned int i = oldSize; i< this->joyMsg.buttons.size(); ++i)
-            {
-              this->joyMsg.buttons[i] = 0.0;
-              // last_published_joy_msg.buttons[i] = 0.0;
-              // sticky_buttons_joy_msg.buttons[i] = 0.0;
-            }
-          }
-
-          // Update the button
-          this->joyMsg.buttons[event.number] = (event.value ? 1 : 0);
-
-          // For initial events, wait a bit before sending to try to catch
-          // all the initial events.
-          if (!(event.type & JS_EVENT_INIT))
-            publishNow = true;
-          else
-            publishSoon = true;
-
-            */
-          break;
-        }
-
-      case JS_EVENT_AXIS:
-      case JS_EVENT_AXIS | JS_EVENT_INIT:
-        {
-          std::cout << "axis event[" << event.value << "]\n";
-          float val = event.value;
-
-          if (event.number >= this->joyMsg.axes_size())
-          {
-            int oldSize = this->joyMsg.axes_size();
-            // this->joyMsg.axes.resize(event.number+1);
-            // this->lastJoyMsg.axes.resize(event.number+1);
-            // this->stickyButtonsJoyMsg.axes.resize(event.number+1);
-
-            for (unsigned int i = oldSize; i <= event.number; ++i)
-            {
-              this->joyMsg.set_axes(i, 0.0);
-              this->lastJoyMsg.set_axes(i, 0.0);
-              this->stickyButtonsJoyMsg.set_axes(i, 0.0);
-            }
-          }
-
-          // Smooth the deadzone
-          if (val < -this->unscaledDeadzone)
-            val += this->unscaledDeadzone;
-          else if (val > this->unscaledDeadzone)
-            val -= this->unscaledDeadzone;
-          else
-            val = 0f;
-
-          this->joyMsg.set_axes(event.number, val * this->axisScale);
-
-          // Will wait a bit before sending to try to combine events.
-          publishSoon = true;
-          break;
-        }
-      default:
-        {
-          gzwarn << "Unknown event type: time[" << event.time << "] "
-            << "value[" << event.value << "] "
-            << "type[" << event.type << "h] "
-            << "number["<< event.number << "]" << std::endl;
-          break;
-        }
-    // End case statement
-    }
-  }
-  // Assume that the timer has expired.
-  /*else if (tvSet)
-    publishNow = true;
-    */
-
-
-  /*if (publishNow)
-  {
-    if (stickyButtons)
-    {
-      // process each button
-      for (size_t i = 0; i < joy_msg.buttons.size(); ++i)
+      if (read(this->joyFd, &event, sizeof(js_event)) == -1 && errno != EAGAIN)
       {
-        // change button state only on transition from 0 to 1
-        if (this->joyMsg.buttons[i] == 1 &&
-            this->lastJoyMsg.buttons[i] == 0)
-        {
-          this->stickyButtonsJoyMsg.buttons[i] =
-            this->stickyButtonsJoyMsg.buttons[i] ? 0 : 1;
-        }
-        else
-        {
-          // do not change the message sate
-        }
+        gzdbg << "Joystick read failed, might be closed\n";
+        return;
       }
 
-      // update last published message
-      this->lastJoyMsg = this->joyMsg;
+      // Set the time stamp
+      gazebo::common::Time time = gazebo::common::Time::GetWallTime();
+      joyMsg.mutable_header()->mutable_stamp()->set_sec(time.sec);
+      joyMsg.mutable_header()->mutable_stamp()->set_nsec(time.nsec);
 
-      // fill rest of sticky_buttons_joy_msg (time stamps, axes, etc)
-      this->stickyButtonsJoyMsg.header.stamp.nsec = joy_msg.header.stamp.nsec;
-      this->stickyButtonsJoyMsg.header.stamp.sec  = joy_msg.header.stamp.sec;
-      this->stickyButtonsJoyMsg.header.frame_id   = joy_msg.header.frame_id;
-
-      for(size_t i = 0; i < this->joyMsg.axes.size(); ++i)
+      float value = event.value;
+      switch(event.type)
       {
-        this->stickyButtonsJoyMsg.axes[i] = this->joyMsg.axes[i];
+        case JS_EVENT_BUTTON:
+        case JS_EVENT_BUTTON | JS_EVENT_INIT:
+          {
+            std::cerr << "Button Event\n";
+            // Update number of buttons
+            if(event.number >= this->joyMsg.buttons_size())
+            {
+              this->joyMsg.mutable_buttons()->Resize(event.number+1, 0.0f);
+              this->lastJoyMsg.mutable_buttons()->Resize(event.number+1, 0.0f);
+              this->stickyButtonsJoyMsg.mutable_buttons()->Resize(
+                  event.number+1, 0.0f);
+            }
+
+            // Update the button
+            this->joyMsg.set_buttons(event.number,
+                !ignition::math::equal(value, 0.0f) ? 1 : 0);
+
+            // For initial events, wait a bit before sending to try to catch
+            // all the initial events.
+            if (!(event.type & JS_EVENT_INIT))
+              accumulate = true;
+            else
+              accumulate = false;
+            break;
+          }
+        case JS_EVENT_AXIS:
+        case JS_EVENT_AXIS | JS_EVENT_INIT:
+          {
+            if (event.number >= this->joyMsg.axes_size())
+            {
+              this->joyMsg.mutable_axes()->Resize(event.number+1, 0.0f);
+              this->lastJoyMsg.mutable_axes()->Resize(event.number+1, 0.0f);
+              this->stickyButtonsJoyMsg.mutable_axes()->Resize(
+                  event.number+1, 0.0f);
+            }
+
+            // Smooth the deadzone
+            if (value < -this->unscaledDeadzone)
+              value += this->unscaledDeadzone;
+            else if (value > this->unscaledDeadzone)
+              value -= this->unscaledDeadzone;
+            else
+              value = 0.0f;
+
+            this->joyMsg.set_axes(event.number, value * this->axisScale);
+
+            // Will wait a bit before sending to try to combine events.
+            accumulate = true;
+            break;
+          }
+        default:
+          {
+            gzwarn << "Unknown event type: time[" << event.time << "] "
+              << "value[" << value << "] "
+              << "type[" << event.type << "h] "
+              << "number["<< event.number << "]" << std::endl;
+            break;
+          }
+      }
+    }
+    // Assume that the timer has expired.
+    else if (timeoutSet)
+      accumulate = false;
+
+    if (!accumulate)
+    {
+      if (this->stickyButtons)
+      {
+        // process each button
+        for (int i = 0; i < this->joyMsg.buttons_size(); ++i)
+        {
+          // change button state only on transition from 0 to 1
+          if (this->joyMsg.buttons(i) == 1 &&
+              this->lastJoyMsg.buttons(i) == 0)
+          {
+            this->stickyButtonsJoyMsg.set_buttons(i,
+              this->stickyButtonsJoyMsg.buttons(i) ? 0 : 1);
+          }
+        }
+
+        // update last published message
+        this->lastJoyMsg = this->joyMsg;
+
+        // Copy the axis
+        this->stickyButtonsJoyMsg.mutable_axes()->CopyFrom(this->joyMsg.axes());
+
+        // Publish the stick buttons message
+        this->pub.Publish(this->stickyButtonsJoyMsg);
+      }
+      else
+      {
+        // Publish the normal joy message
+        this->pub.Publish(this->joyMsg);
       }
 
-      this->pub.Publish(this->stickyButtonsJoyMsg);
+      timeoutSet = false;
+      accumulating = false;
+      accumulate = false;
     }
-    else
+
+    // If an axis event occurred, start a timer to combine with other
+    // events.
+    if (!accumulating && accumulate)
     {
-      this->pub.Publish(this->joyMsg);
+      tv.tv_sec = trunc(this->accumulationInterval);
+      tv.tv_usec = (this->accumulationInterval - tv.tv_sec) * 1e6;
+      accumulating = true;
+      timeoutSet = true;
     }
 
-    publishNow = false;
-    tvSet = false;
-    publicationPending = false;
-    publishSoon = false;
+    // Set a timeout for the signal call at the beginning of this loop.
+    if (!timeoutSet)
+    {
+      tv.tv_sec = trunc(this->interval);
+      tv.tv_usec = (this->interval - tv.tv_sec) * 1e6;
+      timeoutSet = true;
+    }
   }
-
-  // If an axis event occurred, start a timer to combine with other
-  // events.
-  if (!publicationPending && publishSoon)
-  {
-    tv.tv_sec = trunc(coalesce_interval_);
-    tv.tv_usec = (coalesce_interval_ - tv.tv_sec) * 1e6;
-    publication_pending = true;
-    tvSet = true;
-  }
-
-  // If nothing is going on, start a timer to do autorepeat.
-  if (!tvSet && autorepeat_rate_ > 0)
-  {
-    tv.tv_sec = trunc(autorepeat_interval);
-    tv.tv_usec = (autorepeat_interval - tv.tv_sec) * 1e6;
-    tvSet = true;
-  }
-
-  if (!tvSet)
-  {
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-  }
-  */
 }

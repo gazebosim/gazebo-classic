@@ -34,8 +34,8 @@ namespace gazebo
     // Documentation Inherited.
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
-    /// \brief Update the joystick data.
-    private: void Update();
+    /// \brief Collect and publish joystick data.
+    private: void Run();
 
     /// \brief Joystick device file descriptor
     private: int joyFd;
@@ -54,6 +54,13 @@ namespace gazebo
     private: ignition::msgs::Joy stickyButtonsJoyMsg;
     private: float unscaledDeadzone;
     private: float axisScale;
+    private: bool stickyButtons = false;
+
+    private: bool stop = false;
+    private: std::thread *runThread = nullptr;
+
+    private: float interval = 1.0;
+    private: float accumulationInterval = 0.001;
   };
 }
 #endif

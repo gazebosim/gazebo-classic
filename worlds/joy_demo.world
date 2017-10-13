@@ -12,27 +12,11 @@
     </include>
 
     <!-- Load the plugin for Razer Hydra -->
-    <plugin name="joy" filename="libJoyPlugin.so"></plugin>
-
-    <!-- A sphere controlled by Hydra-->
-    <model name="sphere">
-      <pose>0 0 0 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <sphere>
-              <radius>0.5</radius>
-            </sphere>
-          </geometry>
-        </visual>
-      </link>
-    </model>
+    <plugin name="joy" filename="libJoyPlugin.so">
+      <sticky_buttons>false</sticky_buttons>
+      <dead_zone>0.05</dead_zone>
+      <rate>60</rate>
+      <accumulation_rate>1000</accumulation_rate>
+    </plugin>
 </world>
 </sdf>
