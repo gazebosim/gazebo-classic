@@ -521,7 +521,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   if (this->dataPtr->pssmSetup.isNull())
   {
     this->dataPtr->pssmSetup =
-        Ogre::ShadowCameraSetupPtr(new Ogre::PSSMShadowCameraSetup());
+        Ogre::ShadowCameraSetupPtr(new CustomPSSMShadowCameraSetup());
   }
 
   double shadowFar = 100;
