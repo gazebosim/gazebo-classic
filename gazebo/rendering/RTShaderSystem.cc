@@ -505,7 +505,12 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2,
+#if defined(__APPLE__)
+      // workaround a weird crash on OSX if all texture sizes are the same
+      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+#else
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
+#endif
       Ogre::PF_FLOAT32_R);
 
   // Enable shadow map comparison, so shader can use float texture(sampler2DShadow,

@@ -80,7 +80,7 @@ float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 inv
     vec4 newUV = shadowMapPos;
     newUV.xy += poissonDisk[i] * invShadowMapSize;
     // Divide by w necessary for LiSPMS, which is no longer in use
-    //newUV = newUV / newUV.w;
+    // newUV = newUV / newUV.w;
     // This texture() does the depth compare and provides Hardware PCF as a driver hack.
     shadow += texture(shadowMap, newUV.xyz);
   }
