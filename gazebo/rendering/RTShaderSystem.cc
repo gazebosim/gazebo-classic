@@ -87,7 +87,8 @@ void RTShaderSystem::Init()
 
     this->dataPtr->shaderGenerator->setTargetLanguage("glsl");
 
-    Ogre::RTShader::SubRenderStateFactory* factory = OGRE_NEW Ogre::RTShader::CustomPSSM3Factory;
+    Ogre::RTShader::SubRenderStateFactory* factory =
+        OGRE_NEW CustomPSSM3Factory;
     this->dataPtr->shaderGenerator->addSubRenderStateFactory(factory);
   }
   else
@@ -539,13 +540,13 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   if (this->dataPtr->pssmSetup.isNull())
   {
     this->dataPtr->pssmSetup =
-        Ogre::ShadowCameraSetupPtr(new Ogre::CustomPSSMShadowCameraSetup());
+        Ogre::ShadowCameraSetupPtr(new CustomPSSMShadowCameraSetup());
   }
 
   sceneMgr->setShadowFarDistance(this->dataPtr->shadowFar);
 
-  Ogre::CustomPSSMShadowCameraSetup *cameraSetup =
-      dynamic_cast<Ogre::CustomPSSMShadowCameraSetup*>(
+  CustomPSSMShadowCameraSetup *cameraSetup =
+      dynamic_cast<CustomPSSMShadowCameraSetup*>(
       this->dataPtr->pssmSetup.get());
 
   cameraSetup->calculateSplitPoints(3, this->dataPtr->shadowNear,
@@ -556,15 +557,14 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   this->dataPtr->shadowRenderState =
       this->dataPtr->shaderGenerator->createSubRenderState(
-      Ogre::RTShader::CustomPSSM3::Type);
-  Ogre::RTShader::CustomPSSM3 *pssm3SubRenderState =
-      static_cast<Ogre::RTShader::CustomPSSM3*>(
-      this->dataPtr->shadowRenderState);
+      CustomPSSM3::Type);
+  CustomPSSM3 *pssm3SubRenderState =
+      static_cast<CustomPSSM3 *>(this->dataPtr->shadowRenderState);
 
   const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
     cameraSetup->getSplitPoints();
 
-  Ogre::RTShader::CustomPSSM3::SplitPointList dstSplitPoints;
+  CustomPSSM3::SplitPointList dstSplitPoints;
 
   for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
   {
@@ -596,9 +596,9 @@ void RTShaderSystem::ReapplyShadows()
 }
 
 /////////////////////////////////////////////////
-Ogre::CustomPSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
+CustomPSSMShadowCameraSetup *RTShaderSystem::GetPSSMShadowCameraSetup() const
 {
-  return dynamic_cast<Ogre::CustomPSSMShadowCameraSetup *>(
+  return dynamic_cast<CustomPSSMShadowCameraSetup *>(
       this->dataPtr->pssmSetup.get());
 }
 

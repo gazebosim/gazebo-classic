@@ -1,95 +1,68 @@
 /*
------------------------------------------------------------------------------
-This source file is part of OGRE
-(Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org/
-
-Copyright (c) 2000-2014 Torus Knot Software Ltd
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
------------------------------------------------------------------------------
+ * Copyright (C) 2017 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
 */
-#ifndef _CUSTOMPSSM3_HH_
-#define _CUSTOMPSSM3_HH_
 
-#include <OgreShaderExIntegratedPSSM3.h>
+#ifndef GAZEBO_RENDERING_CUSTOMPSSM3_HH_
+#define GAZEBO_RENDERING_CUSTOMPSSM3_HH_
 
-namespace Ogre {
-namespace RTShader {
+#include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/util/system.hh"
 
-
-/** Custom PSSM shadow receiver that overrides one deficient method in
-IntegratedPSSM3.
-*/
-class _OgreRTSSExport CustomPSSM3 : public IntegratedPSSM3
+namespace gazebo
 {
-public:
-	/** Class default constructor */	
-	CustomPSSM3() {}
+  namespace rendering
+  {
+    /// \brief Custom PSSM shadow receiver that overrides one deficient method
+    /// in IntegratedPSSM3.
+    class GAZEBO_VISIBLE CustomPSSM3 : public Ogre::RTShader::IntegratedPSSM3
+    {
+      /// \brief Constructor
+      public: CustomPSSM3() {}
 
-	/** 
-	@see SubRenderState::getType.
-	*/
-	virtual const String& getType() const;
+      // Documentation inherited
+    	public: virtual const Ogre::String &getType() const;
 
-protected:
-	/** 
-	@see SubRenderState::resolveParameters.
-  @remarks This is a duplicate of the method from the parent class with one
-  line changed to use sampler2DShadow, enabling hardware PCF in GLSL.
-  Couldn't find a way with Ogre's API to simply call the parent class method
-  and then modify the one uniform type.
-	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
-};
+      /// \brief This is a duplicate of the method from the parent class with
+      /// one line changed to use sampler2DShadow, enabling hardware PCF in
+      /// GLSL. Couldn't find a way with Ogre's API to simply call the parent
+      /// class method and then modify the one uniform type.
+    	/// \sa SubRenderState::resolveParameters.
+    	protected: virtual bool resolveParameters(
+                  Ogre::RTShader::ProgramSet *_programSet);
+    };
 
+    /// \brief A factory that enables creation of CustomPSSM3 instances.
+    /// Sub class of SubRenderStateFactory
+    class GAZEBO_VISIBLE CustomPSSM3Factory :
+        public Ogre::RTShader::SubRenderStateFactory
+    {
+      // Documentation inherited.
+      public: virtual const Ogre::String &getType() const;
 
-/** 
-A factory that enables creation of CustomPSSM3 instances.
-@remarks Sub class of SubRenderStateFactory
-*/
-class _OgreRTSSExport CustomPSSM3Factory : public SubRenderStateFactory
-{
-public:
+      // Documentation inherited.
+      public: virtual Ogre::RTShader::SubRenderState *createInstance(
+                  Ogre::ScriptCompiler *_compiler,
+                  Ogre::PropertyAbstractNode *_prop,
+                  Ogre::Pass *_pass,
+                  Ogre::RTShader::SGScriptTranslator *_translator);
 
-  /** 
-  @see SubRenderStateFactory::getType.
-  */
-  virtual const String& getType() const;
-
-  /** 
-  @see SubRenderStateFactory::createInstance.
-  */
-  virtual SubRenderState* createInstance(ScriptCompiler* compiler, PropertyAbstractNode* prop, Pass* pass, SGScriptTranslator* translator);
-
-protected:
-
-  /** 
-  @see SubRenderStateFactory::createInstanceImpl.
-  */
-  virtual SubRenderState* createInstanceImpl();
-};
-
-
+      // Documentation inherited
+      protected: virtual Ogre::RTShader::SubRenderState *createInstanceImpl();
+    };
+  }
 }
-}
-
-//#endif
 #endif
 
