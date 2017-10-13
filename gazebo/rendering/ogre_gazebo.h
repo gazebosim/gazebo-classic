@@ -63,6 +63,7 @@
 #include <OGRE/Terrain/OgreTerrain.h>
 #include <OGRE/Terrain/OgreTerrainGroup.h>
 
+
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
 #endif

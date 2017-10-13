@@ -32,6 +32,10 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RTShaderSystemPrivate.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
+#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
+
+#include "gazebo/rendering/CustomPSSM3.hh"
+#include <OGRE/RenderSystems/GL/OgreGLTexture.h>
 
 #define MINOR_VERSION 7
 using namespace gazebo;
@@ -84,6 +88,10 @@ void RTShaderSystem::Init()
     this->dataPtr->shaderGenerator->setShaderCachePath(cachePath);
 
     this->dataPtr->shaderGenerator->setTargetLanguage("glsl");
+
+    Ogre::RTShader::SubRenderStateFactory* factory =
+        OGRE_NEW CustomPSSM3Factory;
+    this->dataPtr->shaderGenerator->addSubRenderStateFactory(factory);
   }
   else
     gzerr << "RT Shader system failed to initialize\n";
@@ -471,11 +479,27 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(1,
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
   sceneMgr->setShadowTextureConfig(2,
+#if defined(__APPLE__)
       this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
+#else
+      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
+#endif
       Ogre::PF_FLOAT32_R);
+
+  // Enable shadow map comparison, so shader can use float texture(sampler2DShadow,
+  // vec3, [float]) instead of vec4 texture(sampler2D, vec2, [float]).
+  // NVidia, AMD, and Intel all take this as a cue to provide "hardware PCF",
+  // a driver hack that softens shadow edges with 4-sample interpolation.
+  for (size_t i=0; i<sceneMgr->getShadowTextureCount(); i++) {
+    const Ogre::TexturePtr tex = sceneMgr->getShadowTexture(i);
+    // This will fail if not using OpenGL as the rendering backend. Is that a problem?
+    Ogre::GLTexture* gltex = static_cast<Ogre::GLTexture*>(tex.get());
+    glBindTexture(GL_TEXTURE_2D, gltex->getGLID());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  }
 
   sceneMgr->setShadowTextureSelfShadow(false);
   sceneMgr->setShadowCasterRenderBackFaces(true);
@@ -500,19 +524,19 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
         Ogre::ShadowCameraSetupPtr(new Ogre::PSSMShadowCameraSetup());
   }
 
-  double shadowFarDistance = 500;
-  double cameraNearClip = 0.01;
-  sceneMgr->setShadowFarDistance(shadowFarDistance);
+  double shadowFar = 100;
+  double shadowNear = 0.01;
+  double shadowSplitLambda = 0.75;
+  double shadowSplitPadding = 2.0;
+  sceneMgr->setShadowFarDistance(shadowFar);
 
-  Ogre::PSSMShadowCameraSetup *cameraSetup =
-      dynamic_cast<Ogre::PSSMShadowCameraSetup*>(
+  CustomPSSMShadowCameraSetup *cameraSetup =
+      dynamic_cast<CustomPSSMShadowCameraSetup *>(
       this->dataPtr->pssmSetup.get());
 
-  cameraSetup->calculateSplitPoints(3, cameraNearClip, shadowFarDistance);
-  cameraSetup->setSplitPadding(4);
-  cameraSetup->setOptimalAdjustFactor(0, 2);
-  cameraSetup->setOptimalAdjustFactor(1, 1);
-  cameraSetup->setOptimalAdjustFactor(2, .5);
+  cameraSetup->calculateSplitPoints(3, shadowNear,
+      shadowFar, shadowSplitLambda);
+  cameraSetup->setSplitPadding(shadowSplitPadding);
 
   sceneMgr->setShadowCameraSetup(this->dataPtr->pssmSetup);
 
@@ -524,15 +548,15 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
 
   this->dataPtr->shadowRenderState =
       this->dataPtr->shaderGenerator->createSubRenderState(
-      Ogre::RTShader::IntegratedPSSM3::Type);
-  Ogre::RTShader::IntegratedPSSM3 *pssm3SubRenderState =
-      static_cast<Ogre::RTShader::IntegratedPSSM3*>(
+      CustomPSSM3::Type);
+  CustomPSSM3 *pssm3SubRenderState =
+      static_cast<CustomPSSM3 *>(
       this->dataPtr->shadowRenderState);
 
   const Ogre::PSSMShadowCameraSetup::SplitPointList &srcSplitPoints =
     cameraSetup->getSplitPoints();
 
-  Ogre::RTShader::IntegratedPSSM3::SplitPointList dstSplitPoints;
+  CustomPSSM3::SplitPointList dstSplitPoints;
 
   for (unsigned int i = 0; i < srcSplitPoints.size(); ++i)
   {
