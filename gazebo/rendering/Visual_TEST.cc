@@ -988,18 +988,6 @@ TEST_F(Visual_TEST, Color)
     cylinderVis2->SetDiffuse(color);
     EXPECT_EQ(cylinderVis2->GetDiffuse(), color);
   }
-  // test with color values that are out of range but should still work,
-  // rendering engine should clamp the values internally
-  {
-    common::Color color(5.0, 5.0, 5.5, 5.1);
-    cylinderVis2->SetSpecular(color);
-    EXPECT_EQ(cylinderVis2->GetSpecular(), color);
-  }
-  {
-    common::Color color(-5.0, -5.0, -5.5, -5.1);
-    cylinderVis2->SetEmissive(color);
-    EXPECT_EQ(cylinderVis2->GetEmissive(), color);
-  }
 }
 
 /////////////////////////////////////////////////
