@@ -15,7 +15,7 @@
     <plugin name="joy" filename="libJoyPlugin.so">
       <sticky_buttons>false</sticky_buttons>
       <dead_zone>0.05</dead_zone>
-      <rate>60</rate>
+      <rate>100</rate>
       <accumulation_rate>1000</accumulation_rate>
     </plugin>
 </world>

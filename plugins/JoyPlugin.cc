@@ -167,7 +167,6 @@ void JoyPlugin::Run()
         case JS_EVENT_BUTTON:
         case JS_EVENT_BUTTON | JS_EVENT_INIT:
           {
-            std::cerr << "Button Event\n";
             // Update number of buttons
             if(event.number >= this->joyMsg.buttons_size())
             {

@@ -74,6 +74,7 @@ set (plugins_single_header
   MudPlugin
   PlaneDemoPlugin
   PressurePlugin
+  PriusHybridPlugin
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
