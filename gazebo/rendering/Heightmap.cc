@@ -26,6 +26,7 @@
 #include <string.h>
 #include <math.h>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include <boost/filesystem.hpp>
@@ -731,8 +732,11 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
+    auto const &gzDiffuse = directionalLight->DiffuseColor();
+    ignition::math::Color diffuse(gzDiffuse.r, gzDiffuse.g, gzDiffuse.b,
+        gzDiffuse.a);
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->DiffuseColor()));
+        Conversions::Convert(diffuse));
   }
   else
   {

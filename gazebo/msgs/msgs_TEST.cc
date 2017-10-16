@@ -2826,6 +2826,14 @@ TEST_F(MsgsTest, MaterialToSDF)
   const common::Color diffuse(.4, .5, .6, 1.0);
   const common::Color emissive(.5, .5, .5, 0.5);
   const common::Color specular(.7, .8, .9, 1.0);
+  ignition::math::Color ambientIgn(ambient.r, ambient.g, ambient.b,
+      ambient.a);
+  ignition::math::Color diffuseIgn(diffuse.r, diffuse.g, diffuse.b,
+      diffuse.a);
+  ignition::math::Color specularIgn(specular.r, specular.g, specular.b,
+      specular.a);
+  ignition::math::Color emissiveIgn(emissive.r, emissive.g, emissive.b,
+      emissive.a);
 
   msg.mutable_script()->set_name(name);
   msg.mutable_script()->add_uri();
@@ -2860,13 +2868,13 @@ TEST_F(MsgsTest, MaterialToSDF)
   }
 
   EXPECT_TRUE(materialSDF->HasElement("ambient"));
-  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
+  EXPECT_EQ(ambientIgn, materialSDF->Get<ignition::math::Color>("ambient"));
   EXPECT_TRUE(materialSDF->HasElement("diffuse"));
-  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
+  EXPECT_EQ(diffuseIgn, materialSDF->Get<ignition::math::Color>("diffuse"));
   EXPECT_TRUE(materialSDF->HasElement("emissive"));
-  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
+  EXPECT_EQ(emissiveIgn, materialSDF->Get<ignition::math::Color>("emissive"));
   EXPECT_TRUE(materialSDF->HasElement("specular"));
-  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
+  EXPECT_EQ(specularIgn, materialSDF->Get<ignition::math::Color>("specular"));
 }
 
 /////////////////////////////////////////////////

@@ -1964,8 +1964,9 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
-                            const common::Color &_changeColor)
+void Visual::SetRibbonTrail(bool _value,
+    const ignition::math::Color &_initialColor,
+    const ignition::math::Color &_changeColor)
 {
   if (this->dataPtr->ribbonTrail == nullptr)
   {
@@ -2005,6 +2006,18 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
     this->dataPtr->ribbonTrail->clearChain(0);
   }
   this->dataPtr->ribbonTrail->setVisible(_value);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRibbonTrail(bool _value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor)
+{
+  ignition::math::Color initial(_initialColor.r, _initialColor.g,
+      _initialColor.b, _initialColor.a);
+  ignition::math::Color change(_changeColor.r, _changeColor.g,
+      _changeColor.b, _changeColor.a);
+  this->SetRibbonTrail(_value, initial, change);
 }
 
 //////////////////////////////////////////////////
