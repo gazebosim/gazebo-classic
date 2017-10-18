@@ -41,7 +41,7 @@ namespace gazebo
     public: std::string id;
 
     /// \brief Center point of the fiducial in the image
-    public: ignition::math::Vector2i pt;
+    public: ignition::math::Vector3d pt;
   };
 
   class FiducialCameraPluginPrivate
@@ -210,7 +210,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     if (!this->dataPtr->camera->IsVisible(vis))
       continue;
 
-    ignition::math::Vector2i pt =
+    ignition::math::Vector3d pt =
         this->dataPtr->camera->Project(vis->WorldPose().Pos());
 
     // use selection buffer to check if visual is occluded by other entities

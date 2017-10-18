@@ -23,6 +23,8 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSM3.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -34,6 +36,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   MarkerManager.cc
   MarkerVisual.cc
@@ -85,6 +88,8 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSM3.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -98,6 +103,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
