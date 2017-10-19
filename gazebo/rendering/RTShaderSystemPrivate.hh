@@ -62,7 +62,7 @@ namespace gazebo
       public: double shadowNear = 0.01;
 
       /// \brief Parallel Split Shadow Map (PSSM) far clip distance.
-      public: double shadowFar = 100.0;
+      public: double shadowFar = 200.0;
 
       /// \brief Parallel Split Shadow Map (PSSM) split modifier. 0.0 = linear
       /// splits. 1.0 = logarithmic splits.
