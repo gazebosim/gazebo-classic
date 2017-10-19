@@ -304,7 +304,7 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
   // Test island_threads
   {
     // island_threads should be 0 by default
-    int islandThreads;
+    int islandThreads = 1;
     EXPECT_NO_THROW(islandThreads =
       boost::any_cast<int>(odePhysics->GetParam("island_threads")));
     EXPECT_FALSE(islandThreads);

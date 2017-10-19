@@ -21,7 +21,6 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-const double g_tolerance = 1e-2;
 
 class SpeedThreadIslandsTest : public ServerFixture,
                                public testing::WithParamInterface<const char*>
