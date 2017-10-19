@@ -51,6 +51,7 @@ namespace gazebo
     class DynamicLines;
     class Visual;
     class LaserVisual;
+    class LensFlare;
     class LogicalCameraVisual;
     class SonarVisual;
     class WrenchVisual;
@@ -119,6 +120,10 @@ namespace gazebo
     /// \def LaserVisualPtr
     /// \brief Shared pointer to LaserVisual
     typedef std::shared_ptr<LaserVisual> LaserVisualPtr;
+
+    /// \def LensFlarePtr
+    /// \brief Shared pointer to LensFlare
+    typedef std::shared_ptr<LensFlare> LensFlarePtr;
 
     /// \def SonarVisualPtr
     /// \brief Shared pointer to SonarVisual
