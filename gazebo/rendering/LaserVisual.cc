@@ -55,6 +55,64 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 
   dPtr->connection = event::Events::ConnectPreRender(
         boost::bind(&LaserVisual::Update, this));
+
+  double factor = 0.005;
+  dPtr->boxPoints =
+  {
+    // -z side
+    {-1*factor, 1*factor, -1*factor},
+    {1*factor, 1*factor, -1*factor},
+    {1*factor, -1*factor, -1*factor},
+
+    {1*factor, -1*factor, -1*factor},
+    {-1*factor, -1*factor, -1*factor},
+    {-1*factor, 1*factor, -1*factor},
+
+    // +z side
+    {-1*factor, 1*factor, 1*factor},
+    {1*factor, 1*factor, 1*factor},
+    {1*factor, -1*factor, 1*factor},
+
+    {1*factor, -1*factor, 1*factor},
+    {-1*factor, -1*factor, 1*factor},
+    {-1*factor, 1*factor, 1*factor},
+
+    // +x side
+    {1*factor, -1*factor, 1*factor},
+    {1*factor, 1*factor, 1*factor},
+    {1*factor, 1*factor, -1*factor},
+
+    {1*factor, 1*factor, -1*factor},
+    {1*factor, -1*factor, -1*factor},
+    {1*factor, -1*factor, 1*factor},
+
+    // -x side
+    {-1*factor, -1*factor, 1*factor},
+    {-1*factor, 1*factor, 1*factor},
+    {-1*factor, 1*factor, -1*factor},
+
+    {-1*factor, 1*factor, -1*factor},
+    {-1*factor, -1*factor, -1*factor},
+    {-1*factor, -1*factor, 1*factor},
+
+    // +y side
+    {-1*factor, 1*factor, 1*factor},
+    {1*factor, 1*factor, 1*factor},
+    {1*factor, 1*factor, -1*factor},
+
+    {1*factor, 1*factor, -1*factor},
+    {-1*factor, 1*factor, -1*factor},
+    {-1*factor, 1*factor, 1*factor},
+
+    // -y side
+    {-1*factor, -1*factor, 1*factor},
+    {1*factor, -1*factor, 1*factor},
+    {1*factor, -1*factor, -1*factor},
+
+    {1*factor, -1*factor, -1*factor},
+    {-1*factor, -1*factor, -1*factor},
+    {-1*factor, -1*factor, 1*factor},
+  };
 }
 
 /////////////////////////////////////////////////
@@ -75,10 +133,18 @@ LaserVisual::~LaserVisual()
   for (auto ray : dPtr->rayLines)
     this->DeleteDynamicLine(ray);
 
+  for (auto point : dPtr->points)
+    this->DeleteDynamicLine(point);
+  for (auto point : dPtr->noHitPoints)
+    this->DeleteDynamicLine(point);
+
+
   dPtr->rayStrips.clear();
   dPtr->noHitRayStrips.clear();
   dPtr->deadzoneRayFans.clear();
   dPtr->rayLines.clear();
+  dPtr->points.clear();
+  dPtr->noHitPoints.clear();
 }
 
 /////////////////////////////////////////////////
@@ -125,8 +191,20 @@ void LaserVisual::Update()
   // Process each ray fan
   for (unsigned int j = 0; j < vertCount; ++j)
   {
+    if (j+1 > dPtr->points.size())
+    {
+      dPtr->points.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
+      dPtr->points[j]->setMaterial("Gazebo/BlueLaser");
+
+      dPtr->noHitPoints.push_back(
+          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
+      dPtr->noHitPoints[j]->setMaterial("Gazebo/RedLaser");
+
+    }
+
     // Create a new render objects, if there are not enough already allocated.
-    if (j+1 > dPtr->rayStrips.size())
+    /*if (j+1 > dPtr->rayStrips.size())
     {
       // Ray strips fill in-between the ray lines in areas that have
       // intersected an object.
@@ -155,6 +233,7 @@ void LaserVisual::Update()
       this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
     }
     dPtr->deadzoneRayFans[j]->SetPoint(0, offset.Pos());
+    */
 
     double angle = dPtr->laserMsg->scan().angle_min();
     unsigned int count = dPtr->laserMsg->scan().count();
@@ -182,7 +261,7 @@ void LaserVisual::Update()
       double hitRange = inf ? 0 : r;
 
       // Compute the start point of the ray
-      ignition::math::Vector3d startPt = (axis * minRange) + offset.Pos();
+      // ignition::math::Vector3d startPt = (axis * minRange) + offset.Pos();
 
       // Compute the end point of the ray
       ignition::math::Vector3d pt = (axis * hitRange) + offset.Pos();
@@ -192,8 +271,36 @@ void LaserVisual::Update()
       // Compute the end point of the no-hit ray
       ignition::math::Vector3d noHitPt = (axis * noHitRange) + offset.Pos();
 
+      if (i >= dPtr->points[j]->GetPointCount()/36)
+      {
+        if (inf)
+        {
+          for (const auto &p : dPtr->boxPoints)
+            dPtr->noHitPoints[j]->AddPoint(noHitPt+p);
+        }
+        else
+        {
+          for (const auto &p : dPtr->boxPoints)
+            dPtr->points[j]->AddPoint(pt+p);
+        }
+      }
+      else
+      {
+        int index = i*36;
+        if (inf)
+        {
+          for (const auto &p : dPtr->boxPoints)
+            dPtr->noHitPoints[j]->SetPoint(index++, noHitPt+p);
+        }
+        else
+        {
+          for (const auto &p : dPtr->boxPoints)
+            dPtr->points[j]->SetPoint(index++, pt+p);
+        }
+      }
+
       // Draw the lines and strips that represent each simulated ray
-      if (i >= dPtr->rayLines[j]->GetPointCount()/2)
+      /*if (i >= dPtr->rayLines[j]->GetPointCount()/2)
       {
         dPtr->rayLines[j]->AddPoint(startPt);
         dPtr->rayLines[j]->AddPoint(inf ? noHitPt : pt);
@@ -221,6 +328,7 @@ void LaserVisual::Update()
         dPtr->deadzoneRayFans[j]->AddPoint(startPt);
       else
         dPtr->deadzoneRayFans[j]->SetPoint(i+1, startPt);
+        */
 
       angle += dPtr->laserMsg->scan().angle_step();
     }

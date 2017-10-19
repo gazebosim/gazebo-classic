@@ -51,6 +51,10 @@ namespace gazebo
       /// \brief Renders the laser data as a line list.
       public: std::vector<DynamicLines *> rayLines;
 
+      /// \brief Renders the laser data as a line list.
+      public: std::vector<DynamicLines *> points;
+      public: std::vector<DynamicLines *> noHitPoints;
+
       /// \brief Mutex to protect the contact message.
       public: boost::mutex mutex;
 
@@ -62,6 +66,8 @@ namespace gazebo
 
       /// \brief Pre render connection.
       public: event::ConnectionPtr connection;
+
+      public: std::vector<ignition::math::Vector3d> boxPoints;
     };
   }
 }
