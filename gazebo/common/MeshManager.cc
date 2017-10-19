@@ -23,6 +23,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Mesh.hh"
+#include "gazebo/common/FBXLoader.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/ColladaExporter.hh"
 #include "gazebo/common/STLLoader.hh"
@@ -49,6 +50,7 @@ MeshManager::MeshManager()
   this->colladaLoader = new ColladaLoader();
   this->colladaExporter = new ColladaExporter();
   this->stlLoader = new STLLoader();
+  this->fbxLoader = new FBXLoader();
 
   // Create some basic shapes
   this->CreatePlane("unit_plane",
@@ -81,6 +83,7 @@ MeshManager::MeshManager()
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
   this->fileExtensions.push_back("obj");
+  this->fileExtensions.push_back("fbx");
 }
 
 //////////////////////////////////////////////////
@@ -88,6 +91,7 @@ MeshManager::~MeshManager()
 {
   delete this->colladaLoader;
   delete this->colladaExporter;
+  delete this->fbxLoader;
   delete this->stlLoader;
   std::map<std::string, Mesh*>::iterator iter;
   for (iter = this->meshes.begin(); iter != this->meshes.end(); ++iter)
@@ -139,6 +143,8 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = this->colladaLoader;
     else if (extension == "obj")
       loader = &objLoader;
+    else if (extension == "fbx")
+      loader = this->fbxLoader;
     else
     {
       gzerr << "Unsupported mesh format for file[" << _filename << "]\n";

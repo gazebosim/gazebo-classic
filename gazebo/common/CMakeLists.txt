@@ -46,6 +46,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  FBXLoader.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc

@@ -905,6 +905,22 @@ void SubMesh::Translate(const ignition::math::Vector3d &_vec)
 }
 
 //////////////////////////////////////////////////
+void SubMesh::Rotate(const ignition::math::Vector3d &_vec)
+{
+  ignition::math::Quaterniond q(_vec);
+
+  for (auto &vert : this->vertices)
+    vert = q.RotateVector(vert);
+}
+
+//////////////////////////////////////////////////
+void SubMesh::Transform(const ignition::math::Matrix4d &_mat)
+{
+  for (auto &vert : this->vertices)
+    vert = _mat * vert;
+}
+
+//////////////////////////////////////////////////
 void SubMesh::SetName(const std::string &_n)
 {
   this->name = _n;
@@ -921,3 +937,4 @@ NodeAssignment::NodeAssignment()
   : vertexIndex(0), nodeIndex(0), weight(0.0)
 {
 }
+
