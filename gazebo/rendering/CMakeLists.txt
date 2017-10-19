@@ -24,7 +24,6 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
-  CustomPSSM3.cc
   CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
@@ -86,7 +85,6 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
-  CustomPSSM3.hh
   CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh

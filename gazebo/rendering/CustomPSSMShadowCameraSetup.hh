@@ -26,7 +26,45 @@ namespace gazebo
 {
   namespace rendering
   {
-  	/// \brief Parallel Split Shadow Map (PSSM) shadow camera setup.
+    /// \brief Custom PSSM shadow receiver that overrides one deficient method
+    /// in IntegratedPSSM3.
+    class GAZEBO_VISIBLE CustomPSSM3 : public Ogre::RTShader::IntegratedPSSM3
+    {
+      /// \brief Constructor
+      public: CustomPSSM3() {}
+
+      // Documentation inherited
+      public: virtual const Ogre::String &getType() const;
+
+      /// \brief This is a duplicate of the method from the parent class with
+      /// one line changed to use sampler2DShadow, enabling hardware PCF in
+      /// GLSL. Couldn't find a way with Ogre's API to simply call the parent
+      /// class method and then modify the one uniform type.
+      /// \sa SubRenderState::resolveParameters.
+      protected: virtual bool resolveParameters(
+                  Ogre::RTShader::ProgramSet *_programSet);
+    };
+
+    /// \brief A factory that enables creation of CustomPSSM3 instances.
+    /// Sub class of SubRenderStateFactory
+    class GAZEBO_VISIBLE CustomPSSM3Factory :
+        public Ogre::RTShader::SubRenderStateFactory
+    {
+      // Documentation inherited.
+      public: virtual const Ogre::String &getType() const;
+
+      // Documentation inherited.
+      public: virtual Ogre::RTShader::SubRenderState *createInstance(
+                  Ogre::ScriptCompiler *_compiler,
+                  Ogre::PropertyAbstractNode *_prop,
+                  Ogre::Pass *_pass,
+                  Ogre::RTShader::SGScriptTranslator *_translator);
+
+      // Documentation inherited
+      protected: virtual Ogre::RTShader::SubRenderState *createInstanceImpl();
+    };
+
+    /// \brief Parallel Split Shadow Map (PSSM) shadow camera setup.
     /// Ogre's LiSPSM algorithm makes buggy shadow frusta that often put high
     /// resolution areas in the wrong places. To fix this we subclass a new
     /// ShadowCameraSetup class that does not use LiSPSM.
@@ -46,9 +84,9 @@ namespace gazebo
     /// setCameraLightDirectionThreshold().
     class GAZEBO_VISIBLE CustomPSSMShadowCameraSetup
           : public Ogre::PSSMShadowCameraSetup
-  	{
-  		/// \brief Constructor, defaults to 3 splits
-  		public: CustomPSSMShadowCameraSetup();
+    {
+      /// \brief Constructor, defaults to 3 splits
+      public: CustomPSSMShadowCameraSetup();
 
       /// \brief Destructor
       public: ~CustomPSSMShadowCameraSetup();

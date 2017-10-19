@@ -15,12 +15,246 @@
  *
 */
 
+// Code in this file has been adapted from Ogre's RTShader::IntegratedPSSM3,
+// and different ShadowCameraSetup classes. The original Ogre's licence and
+// copyright headers are copied below:
+
+/*
+-----------------------------------------------------------------------------
+This source file is part of OGRE
+(Object-oriented Graphics Rendering Engine)
+For the latest info, see http://www.ogre3d.org/
+
+Copyright (c) 2000-2014 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
 
 #include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 
 using namespace gazebo;
 using namespace rendering;
+
+Ogre::String Ogre::RTShader::IntegratedPSSM3::Type = "CustomPSSM3";
+
+//////////////////////////////////////////////////
+const Ogre::String &CustomPSSM3::getType() const
+{
+  return Type;
+}
+
+//////////////////////////////////////////////////
+bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
+{
+  Ogre::RTShader::Program* vsProgram = _programSet->getCpuVertexProgram();
+  Ogre::RTShader::Program* psProgram = _programSet->getCpuFragmentProgram();
+  Ogre::RTShader::Function* vsMain = vsProgram->getEntryPointFunction();
+  Ogre::RTShader::Function* psMain = psProgram->getEntryPointFunction();
+
+  // Get input position parameter.
+  mVSInPos = vsMain->getParameterBySemantic(vsMain->getInputParameters(),
+      Ogre::RTShader::Parameter::SPS_POSITION, 0);
+
+  // Get output position parameter.
+  mVSOutPos = vsMain->getParameterBySemantic(vsMain->getOutputParameters(),
+      Ogre::RTShader::Parameter::SPS_POSITION, 0);
+
+  // Resolve vertex shader output depth.
+  mVSOutDepth = vsMain->resolveOutputParameter(
+      Ogre::RTShader::Parameter::SPS_TEXTURE_COORDINATES, -1,
+      Ogre::RTShader::Parameter::SPC_DEPTH_VIEW_SPACE,
+      Ogre::GCT_FLOAT1);
+
+  // Resolve input depth parameter.
+  mPSInDepth = psMain->resolveInputParameter(
+      Ogre::RTShader::Parameter::SPS_TEXTURE_COORDINATES,
+      mVSOutDepth->getIndex(),
+      mVSOutDepth->getContent(),
+      Ogre::GCT_FLOAT1);
+
+  // Get in/local diffuse parameter.
+  mPSDiffuse = psMain->getParameterBySemantic(psMain->getInputParameters(),
+      Ogre::RTShader::Parameter::SPS_COLOR, 0);
+  if (mPSDiffuse.get() == NULL)
+  {
+    mPSDiffuse = psMain->getParameterBySemantic(
+        psMain->getLocalParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
+        0);
+  }
+
+  // Resolve output diffuse parameter.
+  mPSOutDiffuse = psMain->resolveOutputParameter(
+      Ogre::RTShader::Parameter::SPS_COLOR, 0,
+      Ogre::RTShader::Parameter::SPC_COLOR_DIFFUSE, Ogre::GCT_FLOAT4);
+
+  // Get in/local specular parameter.
+  mPSSpecualr = psMain->getParameterBySemantic(
+      psMain->getInputParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
+      1);
+  if (mPSSpecualr.get() == nullptr)
+  {
+    mPSSpecualr = psMain->getParameterBySemantic(
+        psMain->getLocalParameters(), Ogre::RTShader::Parameter::SPS_COLOR,
+        1);
+  }
+
+  // Resolve computed local shadow colour parameter.
+  mPSLocalShadowFactor = psMain->resolveLocalParameter(
+      Ogre::RTShader::Parameter::SPS_UNKNOWN, 0, "lShadowFactor",
+      Ogre::GCT_FLOAT1);
+
+  // Resolve computed local shadow colour parameter.
+  mPSSplitPoints = psProgram->resolveParameter(Ogre::GCT_FLOAT4, -1,
+      (Ogre::uint16)Ogre::GPV_GLOBAL, "pssm_split_points");
+
+  // Get derived scene colour.
+  mPSDerivedSceneColour = psProgram->resolveAutoParameterInt(
+      Ogre::GpuProgramParameters::ACT_DERIVED_SCENE_COLOUR, 0);
+
+  auto it = mShadowTextureParamsList.begin();
+  int lightIndex = 0;
+
+  while (it != mShadowTextureParamsList.end())
+  {
+    it->mWorldViewProjMatrix = vsProgram->resolveParameter(
+        Ogre::GCT_MATRIX_4X4, -1,
+        static_cast<Ogre::uint16>(Ogre::GPV_PER_OBJECT),
+        "world_texture_view_proj");
+
+    it->mVSOutLightPosition = vsMain->resolveOutputParameter(
+        Ogre::RTShader::Parameter::SPS_TEXTURE_COORDINATES, -1,
+        Ogre::RTShader::Parameter::Content(
+          Ogre::RTShader::Parameter::SPC_POSITION_LIGHT_SPACE0 + lightIndex),
+        Ogre::GCT_FLOAT4);
+
+    it->mPSInLightPosition = psMain->resolveInputParameter(
+        Ogre::RTShader::Parameter::SPS_TEXTURE_COORDINATES,
+        it->mVSOutLightPosition->getIndex(),
+        it->mVSOutLightPosition->getContent(),
+        Ogre::GCT_FLOAT4);
+
+    // Changed to enable hardware PCF
+    // it->mTextureSampler = psProgram->resolveParameter(
+    //     Ogre::GCT_SAMPLER2D, it->mTextureSamplerIndex,
+    //     static_cast<Ogre::uint16>(Ogre::GPV_GLOBAL),
+    //     "shadow_map");
+    it->mTextureSampler = psProgram->resolveParameter(
+        Ogre::GCT_SAMPLER2DSHADOW, it->mTextureSamplerIndex,
+        static_cast<Ogre::uint16>(Ogre::GPV_GLOBAL), "shadow_map");
+
+    it->mInvTextureSize = psProgram->resolveParameter(Ogre::GCT_FLOAT4, -1,
+        static_cast<Ogre::uint16>(Ogre::GPV_GLOBAL), "inv_shadow_texture_size");
+
+    if (!(it->mInvTextureSize.get()) || !(it->mTextureSampler.get()) ||
+        !(it->mPSInLightPosition.get()) ||
+        !(it->mVSOutLightPosition.get()) ||
+        !(it->mWorldViewProjMatrix.get()))
+    {
+      OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR,
+        "Not all parameters could be constructed for the sub-render state.",
+        "IntegratedPSSM3::resolveParameters");
+    }
+
+    ++lightIndex;
+    ++it;
+  }
+
+  if (!(mVSInPos.get()) || !(mVSOutPos.get()) || !(mVSOutDepth.get()) ||
+    !(mPSInDepth.get()) || !(mPSDiffuse.get()) || !(mPSOutDiffuse.get()) ||
+    !(mPSSpecualr.get()) || !(mPSLocalShadowFactor.get()) ||
+    !(mPSSplitPoints.get()) || !(mPSDerivedSceneColour.get()))
+  {
+    OGRE_EXCEPT(Ogre::Exception::ERR_INTERNAL_ERROR,
+        "Not all parameters could be constructed for the sub-render state.",
+        "IntegratedPSSM3::resolveParameters");
+  }
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+const Ogre::String &CustomPSSM3Factory::getType() const
+{
+  return Ogre::RTShader::IntegratedPSSM3::Type;
+}
+
+//////////////////////////////////////////////////
+Ogre::RTShader::SubRenderState *CustomPSSM3Factory::createInstance(
+    Ogre::ScriptCompiler *_compiler,
+    Ogre::PropertyAbstractNode *_prop, Ogre::Pass * /*_pass*/,
+    Ogre::RTShader::SGScriptTranslator *_translator)
+{
+  if (_prop->name == "integrated_pssm4")
+  {
+    if (_prop->values.size() != 4)
+    {
+       _compiler->addError(Ogre::ScriptCompiler::CE_INVALIDPARAMETERS,
+          _prop->file, _prop->line);
+    }
+    else
+    {
+      CustomPSSM3::SplitPointList splitPointList;
+
+      Ogre::AbstractNodeList::const_iterator it = _prop->values.begin();
+      Ogre::AbstractNodeList::const_iterator itEnd = _prop->values.end();
+
+      while (it != itEnd)
+      {
+        Ogre::Real curSplitValue;
+
+        if (false == Ogre::RTShader::SGScriptTranslator::getReal(
+            *it, &curSplitValue))
+        {
+          _compiler->addError(Ogre::ScriptCompiler::CE_INVALIDPARAMETERS,
+              _prop->file,  _prop->line);
+          break;
+        }
+
+        splitPointList.push_back(curSplitValue);
+
+        ++it;
+      }
+
+      if (splitPointList.size() == 4)
+      {
+        Ogre::RTShader::SubRenderState *subRenderState =
+            this->createOrRetrieveInstance(_translator);
+        CustomPSSM3 *pssmSubRenderState =
+            static_cast<CustomPSSM3 *>(subRenderState);
+
+        pssmSubRenderState->setSplitPoints(splitPointList);
+
+        return pssmSubRenderState;
+      }
+    }
+  }
+
+  return nullptr;
+}
+
+//////////////////////////////////////////////////
+Ogre::RTShader::SubRenderState *CustomPSSM3Factory::createInstanceImpl()
+{
+  return OGRE_NEW CustomPSSM3;
+}
 
 //////////////////////////////////////////////////
 CustomPSSMShadowCameraSetup::CustomPSSMShadowCameraSetup()
@@ -64,7 +298,7 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
       }
       *_outView = this->buildViewMatrix(pos,
         _light.getDerivedDirection(),
-        //cam.getDerivedUp());
+        // cam.getDerivedUp());
         // Modified for z-up light frusta
         Ogre::Vector3::UNIT_Z);
     }
@@ -73,7 +307,7 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
     if (_outProj != nullptr)
     {
       *_outProj = Ogre::Matrix4::getScale(1, 1, -1);
-      //*_outProj = Matrix4::IDENTITY;
+      // *_outProj = Matrix4::IDENTITY;
     }
 
     // set up camera if requested
@@ -182,12 +416,11 @@ Ogre::Matrix4 CustomPSSMShadowCameraSetup::buildViewMatrix(
   upN.normalise();
 
   // Modified for z-up light frusta
-  Ogre::Matrix4 m(xN.x,		xN.y,		xN.z,		-xN.dotProduct(_pos),
-    _dir.x,		_dir.y,	_dir.z,	-_dir.dotProduct(_pos),
-    upN.x,		upN.y,		upN.z,		-upN.dotProduct(_pos),
-    // -dir.x,		-dir.y,	-dir.z,	dir.dotProduct(_pos),
-    0.0,			0.0,		0.0,		1.0
-    );
+  Ogre::Matrix4 m(xN.x,   xN.y,   xN.z,   -xN.dotProduct(_pos),
+    _dir.x,   _dir.y, _dir.z, -_dir.dotProduct(_pos),
+    upN.x,    upN.y,    upN.z,    -upN.dotProduct(_pos),
+    // -dir.x,    -dir.y, -dir.z, dir.dotProduct(_pos),
+    0.0,      0.0,    0.0,    1.0);
 
   return m;
 }
@@ -273,7 +506,7 @@ void CustomPSSMShadowCameraSetup::getZUpFocusedShadowCamera(
 
   // transform from light space to normal space: y -> z, z -> -y
   // Commented out for z-up light frusta
-  //LProj = msLightSpaceToNormal * LProj;
+  // LProj = msLightSpaceToNormal * LProj;
 
   // set the two custom matrices
   _texCam->setCustomViewMatrix(true, LView);
@@ -285,31 +518,31 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
     const Ogre::Camera *_cam, const Ogre::Viewport *_vp,
     const Ogre::Light *_light, Ogre::Camera *_texCam, size_t _iteration) const
 {
-	// apply the right clip distance.
-	Ogre::Real nearDist = mSplitPoints[_iteration];
-	Ogre::Real farDist = mSplitPoints[_iteration + 1];
+  // apply the right clip distance.
+  Ogre::Real nearDist = mSplitPoints[_iteration];
+  Ogre::Real farDist = mSplitPoints[_iteration + 1];
 
-	// Add a padding factor to internal distances so that the connecting
+  // Add a padding factor to internal distances so that the connecting
   // split point will not have bad artifacts.
-	if (_iteration > 0)
-	{
+  if (_iteration > 0)
+  {
     nearDist -= mSplitPadding;
-    nearDist = std::max( nearDist, mSplitPoints[0] );
-	}
-	if (_iteration < mSplitCount - 1)
-	{
-		farDist += mSplitPadding;
-	}
+    nearDist = std::max(nearDist, mSplitPoints[0]);
+  }
+  if (_iteration < mSplitCount - 1)
+  {
+    farDist += mSplitPadding;
+  }
 
-	mCurrentIteration = _iteration;
+  mCurrentIteration = _iteration;
 
-	// Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM / Focused
-	// functionality right now without major changes
-	Ogre::Camera *cam = const_cast<Ogre::Camera *>(_cam);
-	Ogre::Real oldNear = _cam->getNearClipDistance();
+  // Ouch, I know this is hacky, but it's the easiest way to re-use LiSPSM /
+  // Focused functionality right now without major changes
+  Ogre::Camera *cam = const_cast<Ogre::Camera *>(_cam);
+  Ogre::Real oldNear = _cam->getNearClipDistance();
   Ogre::Real oldFar = _cam->getFarClipDistance();
-	cam->setNearClipDistance(nearDist);
-	cam->setFarClipDistance(farDist);
+  cam->setNearClipDistance(nearDist);
+  cam->setFarClipDistance(farDist);
 
   // Replaced LiSPSMShadowCameraSetup::getShadowCamera() with
   // FocusedShadowCameraSetup::getShadowCamera(). This is the same solution
@@ -322,7 +555,7 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   //     _sm, _cam, _vp, light, _texCam, _iteration);
   this->getZUpFocusedShadowCamera(_sm, _cam, _vp, _light, _texCam, _iteration);
 
-	// restore near/far
-	cam->setNearClipDistance(oldNear);
-	cam->setFarClipDistance(oldFar);
+  // restore near/far
+  cam->setNearClipDistance(oldNear);
+  cam->setFarClipDistance(oldFar);
 }
