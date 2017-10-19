@@ -39,7 +39,6 @@ class SpeedThreadIslandsTest : public ServerFixture,
                              const std::string &_worldFile,
                              const int _threads,
                              const int _warmUpSteps);
-
 };
 
 /////////////////////////////////////////////////
