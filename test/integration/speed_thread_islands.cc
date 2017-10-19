@@ -156,23 +156,23 @@ void SpeedThreadIslandsTest::ThreadSpeedup(const std::string &_physicsEngine,
 TEST_F(SpeedThreadIslandsTest, MultiplePendulumQuickStep)
 {
   ThreadSpeedup("ode", "quick",
-    "worlds/revolute_joint_test_with_large_gap.world", 500, 4);
+    "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
 }
 
 TEST_F(SpeedThreadIslandsTest, MultiplePendulumWorldStep)
 {
   ThreadSpeedup("ode", "world",
-    "worlds/revolute_joint_test_with_large_gap.world", 500, 4);
+    "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
 }
 
 TEST_F(SpeedThreadIslandsTest, DualPR2QuickStep)
 {
-  ThreadSpeedup("ode", "quick", "worlds/dual_pr2.world", 50, 2);
+  ThreadSpeedup("ode", "quick", "worlds/dual_pr2.world", 2, 50);
 }
 
 TEST_F(SpeedThreadIslandsTest, DualPR2WorldStep)
 {
-  ThreadSpeedup("ode", "world", "worlds/dual_pr2.world", 50, 2);
+  ThreadSpeedup("ode", "world", "worlds/dual_pr2.world", 2, 50);
 }
 
 int main(int argc, char **argv)
