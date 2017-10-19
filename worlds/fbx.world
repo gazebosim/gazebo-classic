@@ -16,7 +16,8 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>file:///data/gazebo/worlds/spider.fbx</uri>
+            <scale>0.0254 0.0254 0.0254</scale>
+            <uri>file:///data/gazebo/worlds/bmw.fbx</uri>
           </mesh>
         </geometry>
       </visual>
