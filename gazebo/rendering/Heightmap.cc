@@ -1922,12 +1922,12 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     if (_terrain->getSceneManager()->getFogMode() == Ogre::FOG_LINEAR)
     {
       _outStream <<
-        "  fogVal = clamp((oPos.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
+        "  fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
     }
     else
     {
       _outStream <<
-        "  fogVal = 1 - clamp(1 / (exp(oPos.z * fogParams.x)), 0.0, 1.0);\n";
+        "  fogVal = 1 - clamp(1 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
     }
   }
 
@@ -2457,7 +2457,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
     else
     {
       // Apply specular
-      _outStream << "  outputCol.xyz += litRes.z * lightSpecularColour * "
+
+      _outStream << "specular=0.1;  outputCol.xyz += litRes.z * lightSpecularColour * "
                     "specular * shadow;\n";
 
       if (_prof->getParent()->getDebugLevel())
