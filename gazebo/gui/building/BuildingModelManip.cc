@@ -81,6 +81,13 @@ double BuildingModelManip::Transparency() const
 /////////////////////////////////////////////////
 common::Color BuildingModelManip::Color() const
 {
+  auto const &ignColor = this->dataPtr->color;
+  return common::Color(ignColor.R(), ignColor.G(), ignColor.B(), ignColor.A());
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color BuildingModelManip::ColorIgn() const
+{
   return this->dataPtr->color;
 }
 
@@ -313,7 +320,8 @@ void BuildingModelManip::SetSize(double _width, double _depth, double _height)
 /////////////////////////////////////////////////
 void BuildingModelManip::SetColor(QColor _color)
 {
-  common::Color newColor(_color.red(), _color.green(), _color.blue());
+  ignition::math::Color newColor(_color.red(), _color.green(), _color.blue(),
+      1.0f);
   this->dataPtr->color = newColor;
   this->dataPtr->visual->SetAmbient(this->dataPtr->color);
   this->dataPtr->maker->BuildingChanged();

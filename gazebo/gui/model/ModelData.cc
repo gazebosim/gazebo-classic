@@ -1181,14 +1181,14 @@ bool LinkData::Apply()
         msgs::Material *matMsg = updateMsg->mutable_material();
         msgs::Material::Script *scriptMsg = matMsg->mutable_script();
 
-        common::Color emptyColor;
-        common::Color matAmbient;
-        common::Color matDiffuse;
-        common::Color matSpecular;
-        common::Color matEmissive;
-        rendering::Material::GetMaterialAsColor(scriptMsg->name(), matAmbient,
+        ignition::math::Color matAmbient;
+        ignition::math::Color matDiffuse;
+        ignition::math::Color matSpecular;
+        ignition::math::Color matEmissive;
+        rendering::Material::MaterialAsColor(scriptMsg->name(), matAmbient,
             matDiffuse, matSpecular, matEmissive);
 
+        common::Color emptyColor;
         common::Color ambient = msgs::Convert(matMsg->ambient());
         common::Color diffuse = msgs::Convert(matMsg->diffuse());
         common::Color specular = msgs::Convert(matMsg->specular());
@@ -1197,22 +1197,26 @@ bool LinkData::Apply()
         if (ambient == emptyColor)
         {
           matMsg->clear_ambient();
-          ambient = matAmbient;
+          ambient.Set(matAmbient.R(), matAmbient.G(), matAmbient.B(),
+              matAmbient.A());
         }
         if (diffuse == emptyColor)
         {
           matMsg->clear_diffuse();
-          diffuse = matDiffuse;
+          diffuse.Set(matDiffuse.R(), matDiffuse.G(), matDiffuse.B(),
+              matDiffuse.A());
         }
         if (specular == emptyColor)
         {
           matMsg->clear_specular();
-          specular = matSpecular;
+          specular.Set(matSpecular.R(), matSpecular.G(), matSpecular.B(),
+              matSpecular.A());
         }
         if (emissive == emptyColor)
         {
           matMsg->clear_emissive();
-          emissive = matEmissive;
+          emissive.Set(matEmissive.R(), matEmissive.G(), matEmissive.B(),
+              matEmissive.A());
         }
 
         visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,

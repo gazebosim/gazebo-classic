@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -59,7 +60,7 @@ namespace gazebo
       public: double transparency;
 
       /// \brief Visual's color.
-      public: common::Color color;
+      public: ignition::math::Color color;
 
       /// \brief Visual's texture.
       public: std::string texture;

@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Rand.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>

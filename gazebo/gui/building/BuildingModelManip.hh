@@ -68,7 +68,12 @@ namespace gazebo
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      public: common::Color Color() const;
+      /// \deprecated using ColorIgn() instead
+      public: common::Color Color() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the color of the manip.
+      /// \return Color.
+      public: ignition::math::Color ColorIgn() const;
 
       /// \brief Get the texture of the manip.
       /// \return Texture.

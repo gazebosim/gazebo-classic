@@ -23,6 +23,7 @@
 
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gazebo_config.h"
 
@@ -817,7 +818,7 @@ void BuildingMaker::GenerateSDF()
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
             visualElem->GetElement("material")->GetElement("ambient")->
-                Set(buildingModelManip->Color());
+                Set(buildingModelManip->ColorIgn());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
             visualElem->GetElement("meta")->GetElement("layer")
@@ -840,7 +841,7 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->Scale());
           visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->Color());
+              Set(buildingModelManip->ColorIgn());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
           visualElem->GetElement("meta")->GetElement("layer")
@@ -931,7 +932,7 @@ void BuildingMaker::GenerateSDF()
             collisionElem->GetElement("geometry")->GetElement("box")->
                 GetElement("size")->Set(blockSize);
             visualElem->GetElement("material")->GetElement("ambient")->
-                Set(buildingModelManip->Color());
+                Set(buildingModelManip->ColorIgn());
             visualElem->GetElement("material")->GetElement("script")
                 ->GetElement("name")->Set(buildingModelManip->Texture());
             visualElem->GetElement("meta")->GetElement("layer")
@@ -954,7 +955,7 @@ void BuildingMaker::GenerateSDF()
           collisionElem->GetElement("geometry")->GetElement("box")->
               GetElement("size")->Set(visual->Scale());
           visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->Color());
+              Set(buildingModelManip->ColorIgn());
           visualElem->GetElement("material")->GetElement("script")
               ->GetElement("name")->Set(buildingModelManip->Texture());
           visualElem->GetElement("meta")->GetElement("layer")
@@ -990,7 +991,7 @@ void BuildingMaker::GenerateSDF()
         collisionElem->GetElement("geometry")->GetElement("box")->
             GetElement("size")->Set(visual->Scale()*childVisual->Scale());
         visualElem->GetElement("material")->GetElement("ambient")->
-              Set(buildingModelManip->Color());
+              Set(buildingModelManip->ColorIgn());
         visualElem->GetElement("material")->GetElement("script")
             ->GetElement("name")->Set(buildingModelManip->Texture());
         visualElem->GetElement("meta")->GetElement("layer")
@@ -1774,9 +1775,10 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
       this->dataPtr->hoverVis = vis;
       if (this->dataPtr->selectedColor.isValid())
       {
-        common::Color newColor(this->dataPtr->selectedColor.red(),
+        ignition::math::Color newColor(this->dataPtr->selectedColor.red(),
                                this->dataPtr->selectedColor.green(),
-                               this->dataPtr->selectedColor.blue());
+                               this->dataPtr->selectedColor.blue(),
+                               1.0f);
         this->dataPtr->hoverVis->SetAmbient(newColor);
       }
       else if (this->dataPtr->selectedTexture != "")
@@ -1791,7 +1793,7 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
 
         // Must set material before color, otherwise color is overwritten
         this->dataPtr->hoverVis->SetMaterial(material);
-        this->dataPtr->hoverVis->SetAmbient((*it).second->Color());
+        this->dataPtr->hoverVis->SetAmbient((*it).second->ColorIgn());
       }
 
       this->dataPtr->hoverVis->SetTransparency(0);
@@ -1910,7 +1912,7 @@ void BuildingMaker::ResetHoverVis()
       BuildingModelManip *manip = this->dataPtr->allItems[hoverName];
       // Must set material before color, otherwise color is overwritten
       this->dataPtr->hoverVis->SetMaterial(manip->Texture());
-      this->dataPtr->hoverVis->SetAmbient(manip->Color());
+      this->dataPtr->hoverVis->SetAmbient(manip->ColorIgn());
       this->dataPtr->hoverVis->SetTransparency(manip->Transparency());
     }
     this->dataPtr->hoverVis.reset();

@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include "gazebo/common/MeshManager.hh"
@@ -114,11 +115,13 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
   // Force text
-  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-  rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
+  ignition::math::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::MaterialAsColor(dPtr->unselectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
+  common::Color gzAmbient(matAmbient.R(), matAmbient.G(), matAmbient.B(),
+      matAmbient.A());
   dPtr->forceText.Load(this->Name()+"__FORCE_TEXT__",
-      "0N", "Arial", 0.03, matAmbient);
+      "0N", "Arial", 0.03, gzAmbient);
   dPtr->forceText.SetShowOnTop(true);
 
   dPtr->forceText.MovableObject::getUserObjectBindings().setUserAny(
@@ -180,7 +183,7 @@ void ApplyWrenchVisual::Load()
 
   // Torque text
   dPtr->torqueText.Load(this->Name()+"__TORQUE_TEXT__",
-      "0Nm", "Arial", 0.03, matAmbient);
+      "0Nm", "Arial", 0.03, gzAmbient);
   dPtr->torqueText.SetShowOnTop(true);
 
   dPtr->torqueText.MovableObject::getUserObjectBindings().setUserAny(
