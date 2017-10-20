@@ -43,7 +43,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletCollision : public Collision
     {
       /// \brief Constructor
-      public: BulletCollision(LinkPtr _parent);
+      public: explicit BulletCollision(LinkPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletCollision();
