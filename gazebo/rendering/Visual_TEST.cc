@@ -114,8 +114,10 @@ void CreateColorMaterial(const std::string &_materialName,
       pass->setDiffuse(rendering::Conversions::Convert(_diffuse));
       pass->setSpecular(rendering::Conversions::Convert(_specular));
       pass->setSelfIllumination(rendering::Conversions::Convert(_emissive));
-      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getAmbient()), _ambient);
-      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getDiffuse()), _diffuse);
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getAmbient()),
+          _ambient);
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getDiffuse()),
+          _diffuse);
       EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getSpecular()),
           _specular);
       EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getSelfIllumination()),
