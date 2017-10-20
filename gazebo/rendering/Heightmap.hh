@@ -256,6 +256,8 @@ namespace gazebo
       /// \brief Save the heightmap tiles to disk
       private: void SaveHeightmap();
 
+      private: void ToggleLayer(const int32_t _layer);
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<HeightmapPrivate> dataPtr;

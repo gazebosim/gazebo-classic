@@ -111,7 +111,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
 
     {1*factor, -1*factor, -1*factor},
     {-1*factor, -1*factor, -1*factor},
-    {-1*factor, -1*factor, 1*factor},
+    {-1*factor, -1*factor, 1*factor}
   };
 }
 
@@ -196,11 +196,6 @@ void LaserVisual::Update()
       dPtr->points.push_back(
           this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
       dPtr->points[j]->setMaterial("Gazebo/BlueLaser");
-
-      dPtr->noHitPoints.push_back(
-          this->CreateDynamicLine(rendering::RENDERING_TRIANGLE_LIST));
-      dPtr->noHitPoints[j]->setMaterial("Gazebo/RedLaser");
-
     }
 
     // Create a new render objects, if there are not enough already allocated.
@@ -271,32 +266,17 @@ void LaserVisual::Update()
       // Compute the end point of the no-hit ray
       ignition::math::Vector3d noHitPt = (axis * noHitRange) + offset.Pos();
 
+      //std::cout << "PointCount[" << j << "][" << dPtr->points[j]->GetPointCount() << "]\n";
       if (i >= dPtr->points[j]->GetPointCount()/36)
       {
-        if (inf)
-        {
-          for (const auto &p : dPtr->boxPoints)
-            dPtr->noHitPoints[j]->AddPoint(noHitPt+p);
-        }
-        else
-        {
-          for (const auto &p : dPtr->boxPoints)
-            dPtr->points[j]->AddPoint(pt+p);
-        }
+        for (const auto &p : dPtr->boxPoints)
+          dPtr->points[j]->AddPoint(pt+p);
       }
       else
       {
         int index = i*36;
-        if (inf)
-        {
-          for (const auto &p : dPtr->boxPoints)
-            dPtr->noHitPoints[j]->SetPoint(index++, noHitPt+p);
-        }
-        else
-        {
-          for (const auto &p : dPtr->boxPoints)
-            dPtr->points[j]->SetPoint(index++, pt+p);
-        }
+        for (const auto &p : dPtr->boxPoints)
+          dPtr->points[j]->SetPoint(index++, pt+p);
       }
 
       // Draw the lines and strips that represent each simulated ray

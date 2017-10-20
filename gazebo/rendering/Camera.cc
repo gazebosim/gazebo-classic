@@ -212,7 +212,7 @@ void Camera::Init()
   this->dataPtr->trackUseModelFrame = true;
   this->dataPtr->trackMinDistance = 8.0;
   this->dataPtr->trackMaxDistance = 8.0;
-  this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 3.0);
+  this->dataPtr->trackPos = ignition::math::Vector3d(-5.0, 0.0, 10.0);
   this->dataPtr->trackInheritYaw = false;
 }
 
@@ -306,6 +306,7 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
+      std::cout << "Track visual\n";
       if (this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
@@ -371,6 +372,7 @@ void Camera::Update()
     double scaling = 0;
     ignition::math::Vector3d direction =
       this->dataPtr->trackedVisual->WorldPose().Pos() - this->WorldPose().Pos();
+    direction.Z(0);
 
     if (!this->dataPtr->trackIsStatic)
     {
@@ -1574,6 +1576,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   bool result = false;
   if (_visual)
   {
+    std::cout << "Set auto tracking A\n";
     this->dataPtr->trackedVisual = _visual;
     this->camera->setAutoTracking(true, _visual->GetSceneNode());
     this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
@@ -1582,6 +1585,7 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   }
   else
   {
+    std::cout << "Set auto tracking off\n";
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
     this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
@@ -1995,7 +1999,7 @@ ignition::math::Vector3d Camera::Project(
   ignition::math::Vector3d screenPos;
   screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
   screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
-  screenPos.Z() = pos.z; 
+  screenPos.Z() = pos.z;
 
   return screenPos;
 }

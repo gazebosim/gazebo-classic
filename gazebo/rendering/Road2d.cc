@@ -70,6 +70,7 @@ using namespace rendering;
 Road2d::Road2d()
   : Visual(*new Road2dPrivate, "roads", rendering::get_scene())
 {
+  this->MakeStatic();
 }
 
 /////////////////////////////////////////////////
@@ -79,7 +80,8 @@ Road2d::Road2d(const std::string &_name, VisualPtr _parent)
   Road2dPrivate *dPtr =
       reinterpret_cast<Road2dPrivate *>(this->dataPtr);
 
-  dPtr->type = VT_VISUAL;
+  this->MakeStatic();
+  dPtr->type = VT_ENTITY;
 }
 
 /////////////////////////////////////////////////

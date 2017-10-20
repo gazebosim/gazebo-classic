@@ -322,6 +322,7 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual,
     const bool _inheritOrientation,
     const double /*_minDist*/, const double /*_maxDist*/)
 {
+  std::cout << "Attach to Visual\n";
   Camera::AttachToVisualImpl(_visual, _inheritOrientation);
   if (_visual)
   {
@@ -343,7 +344,8 @@ bool UserCamera::AttachToVisualImpl(VisualPtr _visual,
 
     auto bb = _visual->BoundingBox();
     auto pos = bb.Center();
-    pos.Z(bb.Max().Z());
+    // pos.Z(bb.Max().Z());
+    pos.Z(40);
 
     this->SetViewController(OrbitViewController::GetTypeString(), pos);
   }

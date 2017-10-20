@@ -39,6 +39,7 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
@@ -63,6 +64,7 @@ static std::string vpOutStr = "out";
 static std::string fpInStr = "in";
 static std::string fpOutStr = "out";
 static std::string textureStr = "texture";
+static bool gVisible = true;
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)
@@ -78,6 +80,64 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->dataPtr->gzPagingDir =
       common::SystemPaths::Instance()->GetLogPath() /
       this->dataPtr->pagingDirname;
+
+}
+
+/////////////////////////////////////////////////
+void Heightmap::ToggleLayer(const int32_t _layer)
+{
+  if (_layer == 0)
+  {
+    Ogre::TerrainGroup::TerrainIterator ti =
+      this->dataPtr->terrainGroup->getTerrainIterator();
+    while (ti.hasMoreElements())
+    {
+      Ogre::Terrain *terrain = ti.getNext()->instance;
+      GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
+
+      Ogre::Material *material = terrain->getMaterial().get();
+
+      unsigned int techniqueCount, passCount, unitStateCount;
+      Ogre::Technique *technique;
+      Ogre::Pass *pass;
+
+      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
+          ++techniqueCount)
+      {
+        technique = material->getTechnique(techniqueCount);
+
+        for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
+        {
+          pass = technique->getPass(passCount);
+          pass->setDepthWriteEnabled(false);
+          Ogre::ColourValue dc = pass->getDiffuse();
+          float alpha = dc.a > 0 ? 0.0f : 1.0f;
+          dc.a = alpha;
+          pass->setDiffuse(dc);
+          Ogre::String fpName = pass->getFragmentProgramName();
+
+          if (alpha <= 0)
+            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
+          else
+            pass->setSceneBlending(Ogre::SBT_REPLACE);
+
+          for (unitStateCount = 0; unitStateCount <
+              pass->getNumTextureUnitStates(); ++unitStateCount)
+          {
+            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
+
+            if (textureUnitState->getColourBlendMode().operation ==
+                Ogre::LBX_SOURCE1)
+            {
+              textureUnitState->setAlphaOperation(
+                  Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
+                  alpha);
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -662,6 +722,10 @@ void Heightmap::Load()
         event::Events::ConnectPreRender(
         std::bind(&Heightmap::SaveHeightmap, this)));
   }
+
+  this->dataPtr->connections.push_back(
+      rendering::Events::ConnectToggleLayer(
+        std::bind(&Heightmap::ToggleLayer, this, std::placeholders::_1)));
 }
 
 ///////////////////////////////////////////////////
@@ -2128,6 +2192,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   _outStream <<
     // Only 1 light supported in this version
     // deferred shading profile / generator later, ok? :)
+    "uniform bool visible;\n"
     "uniform vec3 ambient;\n"
     "uniform vec4 lightPosObjSpace;\n"
     "uniform vec3 lightDiffuseColour;\n"
@@ -2473,6 +2538,8 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
   {
     _outStream << "  outputCol.xyz = mix(outputCol.xyz, fogColour, fogVal);\n";
   }
+
+  _outStream << "  outputCol.a = visible ? 1 : 0;\n";
 
   if (glslVersion == "120")
     _outStream << "  gl_FragColor = outputCol;\n";
