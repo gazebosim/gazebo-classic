@@ -76,11 +76,14 @@ release will remove the deprecated code.
     + ***Deprecation:*** common::Color GetDiffuse() const
     + ***Replacement:*** ignition::math::Color Diffuse()
     + ***Deprecation:*** common::Color GetSpecular() const
-    + ***Replacement:*** ignition::math::Color Specular()
+    + ***Replacement:*** ignition::math::Color Specular() const
     + ***Deprecation:*** common::Color GetEmissive() const
     + ***Replacement:*** ignition::math::Color Emissive()
     + ***Deprecation:*** void SetRibbonTrail(bool _value, const common::Color &_initialColor, const common::Color &_changeColor)
     + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
+1. **gazebo/gui/building/BuildingModelManip.hh**
+    + ***Deprecation:*** common::Color Color() const
+    + ***Replacement:*** ignition::math::Color ColorIGN() const
 
 
 ## Gazebo 7.X to 8.X
