@@ -32,7 +32,7 @@ class Visual_TEST : public RenderingFixture
 };
 
 
-using namespace ignmath = ignition::math;
+namespace ignmath = ignition::math;
 
 
 /////////////////////////////////////////////////
