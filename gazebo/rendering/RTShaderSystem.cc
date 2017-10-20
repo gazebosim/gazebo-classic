@@ -524,7 +524,7 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
         Ogre::ShadowCameraSetupPtr(new CustomPSSMShadowCameraSetup());
   }
 
-  double shadowFar = 100;
+  double shadowFar = 300;
   double shadowNear = 0.01;
   double shadowSplitLambda = 0.75;
   double shadowSplitPadding = 2.0;
