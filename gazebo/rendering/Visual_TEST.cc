@@ -114,11 +114,11 @@ void CreateColorMaterial(const std::string &_materialName,
       pass->setDiffuse(rendering::Conversions::Convert(_diffuse));
       pass->setSpecular(rendering::Conversions::Convert(_specular));
       pass->setSelfIllumination(rendering::Conversions::Convert(_emissive));
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()), _ambient);
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()), _diffuse);
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()),
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getAmbient()), _ambient);
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getDiffuse()), _diffuse);
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getSpecular()),
           _specular);
-      EXPECT_EQ(rendering::Conversions::Convert(pass->getSelfIllumination()),
+      EXPECT_EQ(rendering::Conversions::ConvertIgn(pass->getSelfIllumination()),
           _emissive);
     }
   }
@@ -395,7 +395,7 @@ TEST_F(Visual_TEST, Transparency)
   boxVis->Load(boxSDF);
   EXPECT_FLOAT_EQ(boxVis->DerivedTransparency(), trans);
   // check diffuse to verify they have the correct alpha value
-  EXPECT_FLOAT_EQ(boxVis->GetDiffuse().a, 1.0f-trans);
+  EXPECT_FLOAT_EQ(boxVis->Diffuse().A(), 1.0f-trans);
 }
 
 /////////////////////////////////////////////////
@@ -942,10 +942,10 @@ TEST_F(Visual_TEST, Color)
   gazebo::rendering::VisualPtr cylinderVis(
       new gazebo::rendering::Visual("cylinder_visual", scene));
   cylinderVis->Load(cylinderSDF);
-  EXPECT_EQ(cylinderVis->GetAmbient(), ignmath::Color::Black);
-  EXPECT_EQ(cylinderVis->GetDiffuse(), ignmath::Color::Black);
-  EXPECT_EQ(cylinderVis->GetSpecular(), ignmath::Color::Black);
-  EXPECT_EQ(cylinderVis->GetEmissive(), ignmath::Color::Black);
+  EXPECT_EQ(cylinderVis->Ambient(), ignmath::Color::Black);
+  EXPECT_EQ(cylinderVis->Diffuse(), ignmath::Color::Black);
+  EXPECT_EQ(cylinderVis->Specular(), ignmath::Color::Black);
+  EXPECT_EQ(cylinderVis->Emissive(), ignmath::Color::Black);
 
   sdf::ElementPtr cylinderSDF2(new sdf::Element);
   sdf::initFile("visual.sdf", cylinderSDF2);
@@ -956,42 +956,42 @@ TEST_F(Visual_TEST, Color)
   gazebo::rendering::VisualPtr cylinderVis2(
       new gazebo::rendering::Visual("cylinder_visual2", scene));
   cylinderVis2->Load(cylinderSDF2);
-  EXPECT_EQ(cylinderVis2->GetAmbient(), ignmath::Color::Green);
-  EXPECT_EQ(cylinderVis2->GetDiffuse(), ignmath::Color::Blue);
-  EXPECT_EQ(cylinderVis2->GetSpecular(), ignmath::Color::Red);
-  EXPECT_EQ(cylinderVis2->GetEmissive(), ignmath::Color::Yellow);
+  EXPECT_EQ(cylinderVis2->Ambient(), ignmath::Color::Green);
+  EXPECT_EQ(cylinderVis2->Diffuse(), ignmath::Color::Blue);
+  EXPECT_EQ(cylinderVis2->Specular(), ignmath::Color::Red);
+  EXPECT_EQ(cylinderVis2->Emissive(), ignmath::Color::Yellow);
 
   // test changing ambient/diffuse/specular colors
   {
     ignmath::Color color(0.1, 0.2, 0.3, 0.4);
     cylinderVis->SetAmbient(color);
-    EXPECT_EQ(cylinderVis->GetAmbient(), color);
+    EXPECT_EQ(cylinderVis->Ambient(), color);
   }
   {
     ignmath::Color color(1.0, 1.0, 1.0, 1.0);
     cylinderVis->SetDiffuse(color);
-    EXPECT_EQ(cylinderVis->GetDiffuse(), color);
+    EXPECT_EQ(cylinderVis->Diffuse(), color);
   }
   {
     ignmath::Color color(0.5, 0.6, 0.4, 0.0);
     cylinderVis->SetSpecular(color);
-    EXPECT_EQ(cylinderVis->GetSpecular(), color);
+    EXPECT_EQ(cylinderVis->Specular(), color);
   }
   {
     ignmath::Color color(0.9, 0.8, 0.7, 0.6);
     cylinderVis->SetEmissive(color);
-    EXPECT_EQ(cylinderVis->GetEmissive(), color);
+    EXPECT_EQ(cylinderVis->Emissive(), color);
   }
 
   {
     ignmath::Color color(0.0, 0.0, 0.0, 0.0);
     cylinderVis2->SetAmbient(color);
-    EXPECT_EQ(cylinderVis2->GetAmbient(), color);
+    EXPECT_EQ(cylinderVis2->Ambient(), color);
   }
   {
     ignmath::Color color(1.0, 1.0, 1.0, 1.0);
     cylinderVis2->SetDiffuse(color);
-    EXPECT_EQ(cylinderVis2->GetDiffuse(), color);
+    EXPECT_EQ(cylinderVis2->Diffuse(), color);
   }
 }
 
@@ -1015,86 +1015,86 @@ TEST_F(Visual_TEST, ChildColor)
   vis2->Load();
 
   // Check default colors
-  EXPECT_EQ(vis1->GetAmbient(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetEmissive(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetSpecular(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis1->GetDiffuse(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetAmbient(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetEmissive(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetSpecular(), gazebo::ignmath::Color(0, 0, 0, 0));
-  EXPECT_EQ(vis2->GetDiffuse(), gazebo::ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Ambient(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Emissive(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Specular(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Diffuse(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Ambient(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Emissive(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Specular(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Diffuse(), ignmath::Color(0, 0, 0, 0));
 
   // Set vis1's color with default cascade
-  gazebo::ignmath::Color defaultCascadeAmbient(0.1, 0, 0, 1);
-  gazebo::ignmath::Color defaultCascadeEmissive(0.2, 0, 0, 1);
-  gazebo::ignmath::Color defaultCascadeSpecular(0.3, 0, 0, 1);
-  gazebo::ignmath::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
+  ignmath::Color defaultCascadeAmbient(0.1, 0, 0, 1);
+  ignmath::Color defaultCascadeEmissive(0.2, 0, 0, 1);
+  ignmath::Color defaultCascadeSpecular(0.3, 0, 0, 1);
+  ignmath::Color defaultCascadeDiffuse(0.4, 0, 0, 1);
   vis1->SetAmbient(defaultCascadeAmbient);
   vis1->SetEmissive(defaultCascadeEmissive);
   vis1->SetSpecular(defaultCascadeSpecular);
   vis1->SetDiffuse(defaultCascadeDiffuse);
-  EXPECT_EQ(vis1->GetAmbient(), defaultCascadeAmbient);
-  EXPECT_EQ(vis1->GetEmissive(), defaultCascadeEmissive);
-  EXPECT_EQ(vis1->GetSpecular(), defaultCascadeSpecular);
-  EXPECT_EQ(vis1->GetDiffuse(), defaultCascadeDiffuse);
-  EXPECT_EQ(vis2->GetAmbient(), defaultCascadeAmbient);
-  EXPECT_EQ(vis2->GetEmissive(), defaultCascadeEmissive);
-  EXPECT_EQ(vis2->GetSpecular(), defaultCascadeSpecular);
-  EXPECT_EQ(vis2->GetDiffuse(), defaultCascadeDiffuse);
+  EXPECT_EQ(vis1->Ambient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis1->Emissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis1->Specular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis1->Diffuse(), defaultCascadeDiffuse);
+  EXPECT_EQ(vis2->Ambient(), defaultCascadeAmbient);
+  EXPECT_EQ(vis2->Emissive(), defaultCascadeEmissive);
+  EXPECT_EQ(vis2->Specular(), defaultCascadeSpecular);
+  EXPECT_EQ(vis2->Diffuse(), defaultCascadeDiffuse);
 
   // Set vis1's color with explicit cascade
-  gazebo::ignmath::Color explicitCascadeAmbient(0, 0.1, 0, 1);
-  gazebo::ignmath::Color explicitCascadeEmissive(0, 0.2, 0, 1);
-  gazebo::ignmath::Color explicitCascadeSpecular(0, 0.3, 0, 1);
-  gazebo::ignmath::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
+  ignmath::Color explicitCascadeAmbient(0, 0.1, 0, 1);
+  ignmath::Color explicitCascadeEmissive(0, 0.2, 0, 1);
+  ignmath::Color explicitCascadeSpecular(0, 0.3, 0, 1);
+  ignmath::Color explicitCascadeDiffuse(0, 0.4, 0, 1);
   vis1->SetAmbient(explicitCascadeAmbient, true);
   vis1->SetEmissive(explicitCascadeEmissive, true);
   vis1->SetSpecular(explicitCascadeSpecular, true);
   vis1->SetDiffuse(explicitCascadeDiffuse, true);
-  EXPECT_EQ(vis1->GetAmbient(), explicitCascadeAmbient);
-  EXPECT_EQ(vis1->GetEmissive(), explicitCascadeEmissive);
-  EXPECT_EQ(vis1->GetSpecular(), explicitCascadeSpecular);
-  EXPECT_EQ(vis1->GetDiffuse(), explicitCascadeDiffuse);
-  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
-  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
-  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
-  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+  EXPECT_EQ(vis1->Ambient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis1->Emissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis1->Specular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis1->Diffuse(), explicitCascadeDiffuse);
+  EXPECT_EQ(vis2->Ambient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->Emissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->Specular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->Diffuse(), explicitCascadeDiffuse);
 
   // Set vis1's color with no cascade
-  gazebo::ignmath::Color noCascadeAmbient(0, 0, 0.1, 1);
-  gazebo::ignmath::Color noCascadeEmissive(0, 0, 0.2, 1);
-  gazebo::ignmath::Color noCascadeSpecular(0, 0, 0.3, 1);
-  gazebo::ignmath::Color noCascadeDiffuse(0, 0, 0.4, 1);
+  ignmath::Color noCascadeAmbient(0, 0, 0.1, 1);
+  ignmath::Color noCascadeEmissive(0, 0, 0.2, 1);
+  ignmath::Color noCascadeSpecular(0, 0, 0.3, 1);
+  ignmath::Color noCascadeDiffuse(0, 0, 0.4, 1);
   vis1->SetAmbient(noCascadeAmbient, false);
   vis1->SetEmissive(noCascadeEmissive, false);
   vis1->SetSpecular(noCascadeSpecular, false);
   vis1->SetDiffuse(noCascadeDiffuse, false);
-  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
-  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
-  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
-  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
-  EXPECT_EQ(vis2->GetAmbient(), explicitCascadeAmbient);
-  EXPECT_EQ(vis2->GetEmissive(), explicitCascadeEmissive);
-  EXPECT_EQ(vis2->GetSpecular(), explicitCascadeSpecular);
-  EXPECT_EQ(vis2->GetDiffuse(), explicitCascadeDiffuse);
+  EXPECT_EQ(vis1->Ambient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->Emissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->Specular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->Diffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->Ambient(), explicitCascadeAmbient);
+  EXPECT_EQ(vis2->Emissive(), explicitCascadeEmissive);
+  EXPECT_EQ(vis2->Specular(), explicitCascadeSpecular);
+  EXPECT_EQ(vis2->Diffuse(), explicitCascadeDiffuse);
 
   // Set vis2's color
-  gazebo::ignmath::Color vis2Ambient(0.1, 0.1, 0.1, 1);
-  gazebo::ignmath::Color vis2Emissive(0.1, 0.2, 0.2, 1);
-  gazebo::ignmath::Color vis2Specular(0.1, 0.3, 0.3, 1);
-  gazebo::ignmath::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
+  ignmath::Color vis2Ambient(0.1, 0.1, 0.1, 1);
+  ignmath::Color vis2Emissive(0.1, 0.2, 0.2, 1);
+  ignmath::Color vis2Specular(0.1, 0.3, 0.3, 1);
+  ignmath::Color vis2Diffuse(0.1, 0.4, 0.4, 1);
   vis2->SetAmbient(vis2Ambient);
   vis2->SetEmissive(vis2Emissive);
   vis2->SetSpecular(vis2Specular);
   vis2->SetDiffuse(vis2Diffuse);
-  EXPECT_EQ(vis1->GetAmbient(), noCascadeAmbient);
-  EXPECT_EQ(vis1->GetEmissive(), noCascadeEmissive);
-  EXPECT_EQ(vis1->GetSpecular(), noCascadeSpecular);
-  EXPECT_EQ(vis1->GetDiffuse(), noCascadeDiffuse);
-  EXPECT_EQ(vis2->GetAmbient(), vis2Ambient);
-  EXPECT_EQ(vis2->GetEmissive(), vis2Emissive);
-  EXPECT_EQ(vis2->GetSpecular(), vis2Specular);
-  EXPECT_EQ(vis2->GetDiffuse(), vis2Diffuse);
+  EXPECT_EQ(vis1->Ambient(), noCascadeAmbient);
+  EXPECT_EQ(vis1->Emissive(), noCascadeEmissive);
+  EXPECT_EQ(vis1->Specular(), noCascadeSpecular);
+  EXPECT_EQ(vis1->Diffuse(), noCascadeDiffuse);
+  EXPECT_EQ(vis2->Ambient(), vis2Ambient);
+  EXPECT_EQ(vis2->Emissive(), vis2Emissive);
+  EXPECT_EQ(vis2->Specular(), vis2Specular);
+  EXPECT_EQ(vis2->Diffuse(), vis2Diffuse);
 }
 
 /////////////////////////////////////////////////
@@ -1144,18 +1144,18 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones specified in
   // the material script
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), ignmath::Color(0.7, 0.7, 0.7, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color::Black);
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->Diffuse(), ignmath::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color::Black);
 
   // test changing diffuse colors and verify color again.
   ignmath::Color redColor(1.0, 0.0, 0.0, 1.0);
   boxVis->SetDiffuse(redColor);
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), redColor);
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color::Black);
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->Diffuse(), redColor);
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color::Black);
 
   // test setting a different material name
   std::string greenMaterialName = "Test/Green";
@@ -1168,10 +1168,10 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones in the new
   // material script
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(0.0, 1.0, 0.0, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), ignmath::Color(0.0, 1.0, 0.0, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.1, 0.1, 0.1, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color::Black);
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->Diffuse(), ignmath::Color(0.0, 1.0, 0.0, 1.0));
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.1, 0.1, 0.1, 1.0));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color::Black);
 
   // test setting back to original material color
   boxVis->SetMaterial(materialName);
@@ -1180,10 +1180,10 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones in the
   // original material script
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
-  EXPECT_EQ(boxVis->GetDiffuse(), ignmath::Color(0.7, 0.7, 0.7, 1.0));
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color::Black);
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(0.3, 0.3, 0.3, 1.0));
+  EXPECT_EQ(boxVis->Diffuse(), ignmath::Color(0.7, 0.7, 0.7, 1.0));
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.01, 0.01, 0.01, 1.0));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color::Black);
 
   // test with a semi-transparent color material
   std::string redTransparentMaterialName = "Test/RedTransparent";
@@ -1196,18 +1196,18 @@ TEST_F(Visual_TEST, ColorMaterial)
 
   // Verify the visual color components are the same as the ones in the new
   // material script
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(1.0, 0.0, 0.0, 0.2));
-  EXPECT_EQ(boxVis->GetDiffuse(), ignmath::Color(1.0, 0.0, 0.0, 0.4));
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.1, 0.1, 0.1, 0.6));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color(1.0, 0.0, 0.0, 0.8));
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->Diffuse(), ignmath::Color(1.0, 0.0, 0.0, 0.4));
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color(1.0, 0.0, 0.0, 0.8));
 
   // update transparency and verify diffuse alpha value has changed
   boxVis->SetTransparency(0.5f);
   EXPECT_DOUBLE_EQ(boxVis->GetTransparency(), 0.5f);
-  EXPECT_EQ(boxVis->GetAmbient(), ignmath::Color(1.0, 0.0, 0.0, 0.2));
-  EXPECT_EQ(boxVis->GetDiffuse(), ignmath::Color(1.0, 0.0, 0.0, 0.5));
-  EXPECT_EQ(boxVis->GetSpecular(), ignmath::Color(0.1, 0.1, 0.1, 0.6));
-  EXPECT_EQ(boxVis->GetEmissive(), ignmath::Color(1.0, 0.0, 0.0, 0.8));
+  EXPECT_EQ(boxVis->Ambient(), ignmath::Color(1.0, 0.0, 0.0, 0.2));
+  EXPECT_EQ(boxVis->Diffuse(), ignmath::Color(1.0, 0.0, 0.0, 0.5));
+  EXPECT_EQ(boxVis->Specular(), ignmath::Color(0.1, 0.1, 0.1, 0.6));
+  EXPECT_EQ(boxVis->Emissive(), ignmath::Color(1.0, 0.0, 0.0, 0.8));
 }
 
 /////////////////////////////////////////////////

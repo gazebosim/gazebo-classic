@@ -87,7 +87,7 @@ TEST_F(Material_TEST, Update)
     EXPECT_EQ(diffuseIgn,
         rendering::Conversions::ConvertIgn(pass->getDiffuse()));
     EXPECT_EQ(specularIgn,
-        rendering::Conversions::ConvertIgn(pass->getSpecular());
+        rendering::Conversions::ConvertIgn(pass->getSpecular()));
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);
@@ -104,6 +104,14 @@ TEST_F(Material_TEST, Update)
     common::Color diffuse(0.4, 0.3, 0.2, 0.3);
     common::Color specular(0.2, 0.8, 0.0, 1.0);
     common::Color emissive(0.7, 0.5, 0.3, 1.0);
+    ignition::math::Color ambientIgn(ambient.r, ambient.g, ambient.b,
+        ambient.a);
+    ignition::math::Color diffuseIgn(diffuse.r, diffuse.g, diffuse.b,
+        diffuse.a);
+    ignition::math::Color specularIgn(specular.r, specular.g, specular.b,
+        specular.a);
+    ignition::math::Color emissiveIgn(emissive.r, emissive.g, emissive.b,
+        emissive.a);
     float transparency = 0.5;
     float shininess = 0.2;
     bool depthWrite = false;
@@ -138,10 +146,11 @@ TEST_F(Material_TEST, Update)
         rendering::Conversions::ConvertIgn(pass->getAmbient()));
     // diffuse alpha value should be overwritten based on material transparency
     ignition::math::Color newDiffuse = diffuseIgn;
-    newDiffuse.a(1.0f-transparency);
+    newDiffuse.A(1.0f-transparency);
     EXPECT_EQ(newDiffuse,
         rendering::Conversions::ConvertIgn(pass->getDiffuse()));
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()), specular);
+    EXPECT_EQ(rendering::Conversions::ConvertIgn(
+          pass->getSpecular()), specularIgn);
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);
