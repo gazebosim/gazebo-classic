@@ -394,8 +394,6 @@ void Scene::Init()
       << "will not work.\n";
   }
 
-  float planeSize = 3000;
-
   this->dataPtr->particleSystem = this->dataPtr->manager->createParticleSystem(
       "rain", "Examples/Water/Rain");
   this->dataPtr->particleEmitter = this->dataPtr->particleSystem->getEmitter(0);
@@ -3548,7 +3546,13 @@ void Scene::ToggleLayer(const int32_t _layer)
     this->dataPtr->layerState[_layer] = false;
 
   if (_layer == 0)
+  {
     this->dataPtr->skyx->setVisible(this->dataPtr->layerState[0]);
+    if (this->dataPtr->layerState[0])
+      this->dataPtr->particleEmitter->setEmissionRate(1000);
+    else
+      this->dataPtr->particleEmitter->setEmissionRate(0);
+  }
 
   for (auto visual : this->dataPtr->visuals)
   {

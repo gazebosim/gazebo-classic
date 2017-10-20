@@ -306,7 +306,6 @@ void Camera::Update()
     bool erase = false;
     if ((*iter).request() == "track_visual")
     {
-      std::cout << "Track visual\n";
       if (this->TrackVisualImpl((*iter).data()))
         erase = true;
     }
@@ -1576,7 +1575,6 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   bool result = false;
   if (_visual)
   {
-    std::cout << "Set auto tracking A\n";
     this->dataPtr->trackedVisual = _visual;
     this->camera->setAutoTracking(true, _visual->GetSceneNode());
     this->camera->setFixedYawAxis(true, Ogre::Vector3::UNIT_Z);
@@ -1585,7 +1583,6 @@ bool Camera::TrackVisualImpl(VisualPtr _visual)
   }
   else
   {
-    std::cout << "Set auto tracking off\n";
     this->camera->setAutoTracking(false);
     this->dataPtr->trackedVisual.reset();
     this->camera->setFixedYawAxis(this->dataPtr->yawFixed,
