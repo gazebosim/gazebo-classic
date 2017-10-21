@@ -19,7 +19,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
-#include "OgreBillboardParticleRenderer.h"
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -393,21 +392,6 @@ void Scene::Init()
     gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
       << "will not work.\n";
   }
-
-  this->dataPtr->particleSystem = this->dataPtr->manager->createParticleSystem(
-      "rain", "Examples/Water/Rain");
-  this->dataPtr->particleEmitter = this->dataPtr->particleSystem->getEmitter(0);
-  this->dataPtr->particleEmitter->setEmissionRate(1000);
-  Ogre::SceneNode *rainNode =
-    this->dataPtr->manager->getRootSceneNode()->createChildSceneNode();
-  rainNode->translate(0, 0, 75);
-  rainNode->attachObject(this->dataPtr->particleSystem);
-  // Fast-forward the rain so it looks more natural
-  this->dataPtr->particleSystem->fastForward(10);
-  // It can't be set in .particle file, and we need it ;)
-   static_cast<Ogre::BillboardParticleRenderer*>(
-     this->dataPtr->particleSystem->getRenderer())->setBillboardOrigin(
-     Ogre::BBO_BOTTOM_CENTER);
 }
 
 //////////////////////////////////////////////////
@@ -3548,10 +3532,6 @@ void Scene::ToggleLayer(const int32_t _layer)
   if (_layer == 0)
   {
     this->dataPtr->skyx->setVisible(this->dataPtr->layerState[0]);
-    if (this->dataPtr->layerState[0])
-      this->dataPtr->particleEmitter->setEmissionRate(1000);
-    else
-      this->dataPtr->particleEmitter->setEmissionRate(0);
   }
 
   for (auto visual : this->dataPtr->visuals)

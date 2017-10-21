@@ -353,9 +353,6 @@ namespace gazebo
       /// \brief State of each layer where key is the layer id, and value is
       /// the layer's visibility.
       public: std::map<int32_t, bool> layerState;
-
-      public: Ogre::ParticleSystem *particleSystem;
-      public: Ogre::ParticleEmitter *particleEmitter;
     };
   }
 }
