@@ -1,4 +1,5 @@
 set (files
+  basic_droplet.png
   beigeWall.jpg
   building_frame.png
   bricks.png

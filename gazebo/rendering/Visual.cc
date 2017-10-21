@@ -717,6 +717,9 @@ VisualPtr Visual::GetChild(unsigned int _num)
 //////////////////////////////////////////////////
 void Visual::MakeStatic()
 {
+  this->dataPtr->isStatic = true;
+  this->dataPtr->layer = 0;
+  rendering::Events::newLayer(this->dataPtr->layer);
   /*if (!this->staticGeom)
     this->staticGeom =
     this->dataPtr->sceneNode->getCreator()->createStaticGeometry(
@@ -2418,9 +2421,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 {
   // TODO: Put back in, and check for performance improvements.
-  /*if (msg->has_is_static() && msg->is_static())
+  if (_msg->has_is_static() && _msg->is_static())
     this->MakeStatic();
-    */
 
   // Set meta information
   if (_msg->has_meta())
