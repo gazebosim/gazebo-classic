@@ -48,7 +48,7 @@ namespace gazebo
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Return the equivalent ogre color
-      /// \param[in] _clr Gazebo color to convert
+      /// \param[in] _clr color to convert
       /// \return Ogre color value
       public: static Ogre::ColourValue Convert(
                   const ignition::math::Color &_clr);
@@ -60,7 +60,7 @@ namespace gazebo
       public: static common::Color Convert(const Ogre::ColourValue &_clr)
               GAZEBO_DEPRECATED(9.0);
 
-      /// \brief Return the equivalent gazebo color
+      /// \brief Return the equivalent color
       /// \param[in] _clr Ogre color to convert
       /// \return igntion math color value
       public: static ignition::math::Color ConvertIgn(
