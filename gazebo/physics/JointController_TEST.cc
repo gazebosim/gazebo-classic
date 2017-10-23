@@ -34,7 +34,7 @@ class JointControllerTest : public gazebo::testing::AutoLogFixture { };
 
 class FakeJoint : public physics::Joint
 {
-  public: FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
+  public: explicit FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
           {}
 
   public: virtual physics::LinkPtr GetJointLink(unsigned int) const

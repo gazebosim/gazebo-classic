@@ -152,7 +152,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.
-      public: QuadNode(QuadNode *_parent)
+      public: explicit QuadNode(QuadNode *_parent)
               : x(0), y(0), width(0), height(0)
               {
                 parent = _parent;
