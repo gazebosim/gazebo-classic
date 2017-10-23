@@ -344,13 +344,7 @@ void World::Load(sdf::ElementPtr _sdf)
 sdf::ElementPtr World::SDF()
 {
   this->UpdateStateSDF();
-  sdf::ElementPtr root(new sdf::Element);
-  root->SetName("sdf");
-  std::stringstream version;
-  version << sdf::SDF::Version();
-  root->AddAttribute("version", "string", version.str(), true, "version");
-  root->InsertElement(this->dataPtr->sdf->Clone());
-  return root;
+  return this->dataPtr->sdf->Clone();
 }
 
 //////////////////////////////////////////////////
