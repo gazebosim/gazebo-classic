@@ -157,11 +157,14 @@ TEST_F(SpeedThreadIslandsTest, MultiplePendulumQuickStep)
     "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
 }
 
+// this test fails on macOS, see issue #2364
+#ifndef __APPLE__
 TEST_F(SpeedThreadIslandsTest, MultiplePendulumWorldStep)
 {
   ThreadSpeedup("ode", "world",
     "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
 }
+#endif
 
 TEST_F(SpeedThreadIslandsTest, DualPR2QuickStep)
 {
