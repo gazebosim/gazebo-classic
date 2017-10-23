@@ -341,10 +341,10 @@ void World::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-sdf::ElementPtr World::SDF()
+const sdf::ElementPtr World::SDF()
 {
   this->UpdateStateSDF();
-  return this->dataPtr->sdf->Clone();
+  return this->dataPtr->sdf;
 }
 
 //////////////////////////////////////////////////

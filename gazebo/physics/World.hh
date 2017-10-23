@@ -95,7 +95,7 @@ namespace gazebo
 
       /// \brief Get the SDF of the world in the current state.
       /// \return The SDF
-      public: sdf::ElementPtr SDF();
+      public: const sdf::ElementPtr SDF();
 
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
