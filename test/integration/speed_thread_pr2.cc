@@ -59,7 +59,7 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
       _minTime = timeLap;
   }
 
-  _avgTime = _avgTime.Double() / (repetitions * steps);
+  _avgTime = _avgTime.Double() / repetitions;
 }
 
 /////////////////////////////////////////////////
