@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
-      public: ODEJoint(BasePtr _parent);
+      public: explicit ODEJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~ODEJoint();
