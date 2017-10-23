@@ -114,6 +114,10 @@ namespace gazebo
       /// \return Pointer to the SDF values.
       public: virtual const sdf::ElementPtr GetSDF();
 
+      /// \brief Reset the actor.
+      public: void Reset();
+      using Model::Reset;
+
       /// \brief Set the current script time.
       /// \param[in] _time Time in seconds from the beginning of the current
       /// script loop.

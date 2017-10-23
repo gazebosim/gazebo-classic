@@ -5,10 +5,20 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
-## Gazebo 8.X to 9.X
+## Gazebo 8.x to 9.x
+
+### -g command line argument to load plugins in gzclient
+
+1. During the gazebo 8.x series the `-g` was used to load System plugins in the
+   client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
+   plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
+   plugins and will remain the exactly the same.   
 
 ### Modifications
 
+1. **gazebo/gui/JointControlWidget.hh**
+    + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
+    + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
 1. **gazebo/physics/Link.hh**
     + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -19,11 +29,17 @@ release will remove the deprecated code.
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-
+1. **gazebo/sensors/CameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
+1. **gazebo/sensors/WideAngleCameraSensor.cc**
+    + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 
 
 ### Deprecations
 
+1. **gazebo/physics/JointController.hh**
+    + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
+    + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 1. **gazebo/physics/Link.hh**
     + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -1164,6 +1180,25 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
+
+## Gazebo 7.9.0 to 7.X
+
+### Modifications
+
+1. **gazebo/physics/ode/ODEPhysics.cc**
+   `ODEPhysics::Collide` combines surface slip parameters with a sum
+   instead of `std::min`.
+   Please see [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+   for more details.
+
+## Gazebo 7.8.0 to 7.X
+
+### Modifications
+
+1. **gz log**
+   Gazebo log files no longer store velocity data and have reduced floating point precision.
+   See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
+   for further details.
 
 ## Gazebo 7.3.1 to 7.4
 

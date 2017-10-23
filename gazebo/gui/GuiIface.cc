@@ -87,6 +87,10 @@ Q_DECLARE_METATYPE(std::string)
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::set<std::string>)
 
+// This makes it possible to use ignition::msgs::JointCmd in signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(ignition::msgs::JointCmd)
+
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -150,7 +154,10 @@ bool parse_args(int _argc, char **_argv)
     ("version,v", "Output version information.")
     ("verbose", "Increase the messages written to the terminal.")
     ("help,h", "Produce this help message.")
-    ("gui-plugin,g", po::value<std::vector<std::string> >(), "Load a plugin.");
+    ("gui-client-plugin", po::value<std::vector<std::string> >(),
+     "Load a GUI plugin.")
+    ("gui-plugin,g", po::value<std::vector<std::string> >(),
+     "Load a System plugin (deprecated, backwards compatibility reasons).");
 
   po::options_description desc("Options");
   desc.add(v_desc);
@@ -185,16 +192,33 @@ bool parse_args(int _argc, char **_argv)
     gazebo::common::Console::SetQuiet(false);
   }
 
-  /// Load all the plugins specified on the command line
+  /// Load the System plugins specified on the command line
+  /// see https://bitbucket.org/osrf/gazebo/issues/2279 for details
   if (vm.count("gui-plugin"))
   {
+    gzwarn << "g/gui-plugin is really loading a SystemPlugin. "
+           << "To load a GUI plugin please use --gui-client-plugin \n";
+
     std::vector<std::string> pp =
       vm["gui-plugin"].as<std::vector<std::string> >();
 
     for (std::vector<std::string>::iterator iter = pp.begin();
          iter != pp.end(); ++iter)
     {
-      g_plugins_to_load.push_back(*iter);
+      gazebo::client::addPlugin(*iter);
+    }
+  }
+
+  /// Load the GUI plugins specified on the command line
+  if (vm.count("gui-client-plugin"))
+  {
+    std::vector<std::string> pp =
+      vm["gui-client-plugin"].as<std::vector<std::string> >();
+
+    for (std::vector<std::string>::iterator iter = pp.begin();
+         iter != pp.end(); ++iter)
+    {
+       g_plugins_to_load.push_back(*iter);
     }
   }
 
@@ -454,6 +478,10 @@ bool gui::register_metatypes()
   // Register std::set<std::string> as a type that can be used in signals and
   // slots. Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType< std::set<std::string> >();
+
+  // Register ignition::msgs::JointCmd as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<ignition::msgs::JointCmd>();
 
   return true;
 }

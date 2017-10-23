@@ -582,8 +582,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         visualElem = visualElem->GetNextElement("visual");
@@ -626,8 +625,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         collisionElem = collisionElem->GetNextElement("collision");

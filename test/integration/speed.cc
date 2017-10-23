@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 

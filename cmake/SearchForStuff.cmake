@@ -99,13 +99,13 @@ endif()
 
 find_package(CURL)
 if (CURL_FOUND)
-  # FindCURL.cmake distributed with CMake exports 
+  # FindCURL.cmake distributed with CMake exports
   # the CURL_INCLUDE_DIRS variable, while the pkg_check_modules
   # function exports the CURL_INCLUDEDIR variable.
-  # TODO: once the configure.bat VS2013 based script has been removed, 
-  #       remove the call pkg_check_modules(CURL libcurl) and all the uses of 
-  #       CURL_LIBDIR and CURL_INCLUDEDIR and use directly the variables 
-  #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake 
+  # TODO: once the configure.bat VS2013 based script has been removed,
+  #       remove the call pkg_check_modules(CURL libcurl) and all the uses of
+  #       CURL_LIBDIR and CURL_INCLUDEDIR and use directly the variables
+  #       CURL_INCLUDE_DIRS and CURL_LIBRARIES provided by FindCURL.cmake
   set(CURL_INCLUDEDIR ${CURL_INCLUDE_DIRS})
 endif ()
 
@@ -162,10 +162,13 @@ if (PKG_CONFIG_FOUND)
   #################################################
   # Find DART
   set(DART_MIN_REQUIRED_VERSION 6)
-  find_package(DART ${DART_MIN_REQUIRED_VERSION})
+  find_package(DART ${DART_MIN_REQUIRED_VERSION} OPTIONAL_COMPONENTS utils-urdf)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
+    if (DART_utils-urdf_FOUND)
+      set (HAVE_DART_URDF TRUE)
+    endif()
   else()
     message (STATUS "Looking for DART - not found")
     BUILD_WARNING ("DART ${DART_MIN_REQUIRED_VERSION} not found, for dart physics engine option, please install libdart${DART_MIN_REQUIRED_VERSION}-dev.")
@@ -581,14 +584,20 @@ endif ()
 
 ########################################
 # Find SDFormat
-set (SDFormat_MIN_VERSION 5.0.0)
-find_package(SDFormat ${SDFormat_MIN_VERSION})
-
-if (NOT SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat - not found")
-  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
-else()
-  message (STATUS "Looking for SDFormat - found")
+# try finding both sdformat 5 and 6 until we switch to 6
+set (SDFormat_MIN_VERSION 5)
+find_package(SDFormat 6 QUIET)
+if (SDFormat_FOUND)
+  message (STATUS "Looking for SDFormat 6 - found")
+else ()
+  # try finding both sdformat 5 and 6 until we switch to 6
+  find_package(SDFormat ${SDFormat_MIN_VERSION})
+  if (NOT SDFormat_FOUND)
+    message (STATUS "Looking for SDFormat 5 or 6 - not found")
+    BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION} <= 6. Required for reading and writing SDF files.")
+  else()
+    message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
+  endif()
 endif()
 
 ########################################
@@ -738,7 +747,13 @@ endif()
 find_package(ignition-math3 QUIET)
 if (NOT ignition-math3_FOUND)
   message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev)")
+  find_package(ignition-math4 QUIET)
+  if (NOT ignition-math4_FOUND)
+    message(STATUS "Looking for ignition-math4-config.cmake - not found")
+    BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev or libignition-math4-dev)")
+  else()
+    message(STATUS "Looking for ignition-math4-config.cmake - found")
+  endif()
 else()
   message(STATUS "Looking for ignition-math3-config.cmake - found")
 endif()

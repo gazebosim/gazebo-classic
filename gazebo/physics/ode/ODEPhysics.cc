@@ -1159,13 +1159,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
                                  surf2->FrictionPyramid()->MuTorsion());
 
-  // Set the slip values
-  contact.surface.slip1 = std::min(surf1->slip1,
-                                   surf2->slip1);
-  contact.surface.slip2 = std::min(surf1->slip2,
-                                   surf2->slip2);
-  contact.surface.slip3 = std::min(surf1->slipTorsion,
-                                   surf2->slipTorsion);
+  // Combine the slip values
+  // The slip is equivalent to the inverse of a viscous damping term
+  // To combine dampers in series, the inverse of damping is summed
+  // So the sum of slip parameters is used to combine them
+  contact.surface.slip1 = surf1->slip1 + surf2->slip1;
+  contact.surface.slip2 = surf1->slip2 + surf2->slip2;
+  contact.surface.slip3 = surf1->slipTorsion + surf2->slipTorsion;
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =

@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \brief A universal joint.
     class GZ_PHYSICS_VISIBLE DARTUniversalJoint :
-      public UniversalJoint<DARTJoint>
+        public UniversalJoint<DARTJoint>
     {
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the Link that is the joint' parent
@@ -47,28 +47,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
-
-      // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
           const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(const unsigned int _index,
                   const ignition::math::Vector3d &_axis);
-
-      // Documentation inherited
-      public: virtual double PositionImpl(const unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetVelocity(unsigned int _index, double _vel);
-
-      // Documentation inherited
-      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
     /// \}
   }

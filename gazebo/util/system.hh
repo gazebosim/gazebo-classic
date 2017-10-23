@@ -33,6 +33,7 @@
   #define GZ_UTIL_VISIBLE
   #define GZ_PHYSICS_VISIBLE
   #define GZ_GUI_VISIBLE
+  #define GZ_SENSORS_VISIBLE
   #define GAZEBO_HIDDEN
 #else
   #if defined _WIN32 || defined __CYGWIN__
@@ -257,6 +258,31 @@
     #else
       #define GZ_GUI_VISIBLE
       #define GZ_GUI_HIDDEN
+    #endif
+  #endif
+
+  #if defined _WIN32 || defined __CYGWIN__
+    #ifdef BUILDING_DLL_GZ_SENSORS
+      #ifdef __GNUC__
+        #define GZ_SENSORS_VISIBLE __attribute__ ((dllexport))
+      #else
+        #define GZ_SENSORS_VISIBLE __declspec(dllexport)
+      #endif
+    #else
+      #ifdef __GNUC__
+        #define GZ_SENSORS_VISIBLE __attribute__ ((dllimport))
+      #else
+        #define GZ_SENSORS_VISIBLE __declspec(dllimport)
+      #endif
+    #endif
+    #define GZ_SENSORS_HIDDEN
+  #else
+    #if __GNUC__ >= 4
+      #define GZ_SENSORS_VISIBLE __attribute__ ((visibility ("default")))
+      #define GZ_SENSORS_HIDDEN  __attribute__ ((visibility ("hidden")))
+    #else
+      #define GZ_SENSORS_VISIBLE
+      #define GZ_SENSORS_HIDDEN
     #endif
   #endif
 

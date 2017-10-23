@@ -37,6 +37,9 @@ namespace gazebo
     /// \param[in] _sdf Pointer to the plugin's SDF elements.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    // Documentation Inherited.
+    public: virtual void Reset();
+
     /// \brief Function that is called every update cycle.
     /// \param[in] _info Timing information
     private: void OnUpdate(const common::UpdateInfo &_info);
@@ -55,6 +58,9 @@ namespace gazebo
 
     /// \brief Pointer to the world, for convenience.
     private: physics::WorldPtr world;
+
+    /// \brief Pointer to the sdf element.
+    private: sdf::ElementPtr sdf;
 
     /// \brief Velocity of the actor
     private: ignition::math::Vector3d velocity;
