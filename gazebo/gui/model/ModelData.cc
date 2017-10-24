@@ -22,6 +22,7 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/MassMatrix3.hh>
 
 #include "gazebo/rendering/LinkFrameVisual.hh"
 #include "gazebo/rendering/Material.hh"
@@ -285,10 +286,11 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   double volumeRatio = 1;
   double newVol = 0;
   double oldVol = 0;
+  ignition::math::Vector3d newSize;
   for (auto const &it : this->collisions)
   {
     ignition::math::Vector3d oldSize = colOldSizes[it.first->GetName()];
-    ignition::math::Vector3d newSize = colNewSizes[it.first->GetName()];
+    newSize = colNewSizes[it.first->GetName()];
     std::string geomStr = it.first->GetGeometryType();
     if (geomStr == "sphere")
     {
@@ -328,7 +330,6 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   volumeRatio = newVol / oldVol;
 
   // set new mass
-  double oldMass = this->mass;
   double newMass = this->mass * volumeRatio;
   this->mass = newMass;
   linkConfig->SetMass(newMass);
@@ -346,73 +347,53 @@ void LinkData::SetScale(const ignition::math::Vector3d &_scale)
   double newIxx = ixx;
   double newIyy = iyy;
   double newIzz = izz;
-
-  ignition::math::Vector3d dInertiaScale;
+  ignition::math::MassMatrix3d m;
 
   // we can compute better estimates of inertia values if the link only has
   // one collision made up of a simple shape
   // otherwise assume box geom
-  bool boxInertia = false;
+  bool boxInertia = true;
   if (this->collisions.size() == 1u)
   {
     auto const &it = this->collisions.begin();
     std::string geomStr = it->first->GetGeometryType();
-    dInertiaScale = colNewSizes[it->first->GetName()] /
-        colOldSizes[it->first->GetName()];
     if (geomStr == "sphere")
     {
-      // solve for r^2
-      double r2 = ixx / (oldMass * 0.4);
-
-      // compute new inertia values based on new mass and radius
-      newIxx = newMass * 0.4 * (dInertiaScale.X() * dInertiaScale.X()) * r2;
-      newIyy = newIxx;
-      newIzz = newIxx;
+      boxInertia = false;
+      double r = newSize.X() * 0.5;
+      // Get inertia properties of uniform sphere
+      if (!m.SetFromSphere(newMass, r))
+      {
+        gzerr << "Error computing inertia, not re-scaling" << std::endl;
+      }
     }
     else if (geomStr == "cylinder")
     {
-      // solve for r^2 and l^2
-      double r2 = izz / (oldMass * 0.5);
-      double l2 = (ixx / oldMass - 0.25 * r2) * 12.0;
-
-      // compute new inertia values based on new mass, radius and length
-      newIxx = newMass * (0.25 * (dInertiaScale.X() * dInertiaScale.X() * r2) +
-          (dInertiaScale.Z() * dInertiaScale.Z() * l2) / 12.0);
-      newIyy = newIxx;
-      newIzz = newMass * 0.5 * (dInertiaScale.X() * dInertiaScale.X() * r2);
+      boxInertia = false;
+      double newL = newSize.Z();
+      double newR = newSize.X() * 0.5;
+      // Get inertia properties of uniform cylinder
+      if (!m.SetFromCylinderZ(newMass, newL, newR))
+      {
+        gzerr << "Error computing inertia, not re-scaling" << std::endl;
+      }
     }
-    else
-    {
-      boxInertia = true;
-    }
-  }
-  else
-  {
-    boxInertia = true;
   }
 
   if (boxInertia)
   {
-    // solve for box inertia size: dx^2, dy^2, dz^2,
-    // assuming solid box with uniform density
-    double mc = 12.0 / oldMass;
-    double ixxMc = ixx * mc;
-    double iyyMc = iyy * mc;
-    double izzMc = izz * mc;
-    double dz2 = (iyyMc - izzMc + ixxMc) * 0.5;
-    double dx2 = izzMc - (ixxMc - dz2);
-    double dy2 = ixxMc - dz2;
+    // Get inertia properties of uniform box
+    if (!m.SetFromBox(newMass, newSize))
+    {
+      gzerr << "Error computing inertia, not re-scaling" << std::endl;
+    }
+  }
 
-    // scale inertia size
-    double newDx2 = dInertiaScale.X() * dInertiaScale.X() * dx2;
-    double newDy2 = dInertiaScale.Y() * dInertiaScale.Y() * dy2;
-    double newDz2 = dInertiaScale.Z() * dInertiaScale.Z() * dz2;
-
-    // compute new inertia values based on new inertia size
-    double newMassConstant = newMass / 12.0;
-    newIxx = newMassConstant * (newDy2 + newDz2);
-    newIyy = newMassConstant * (newDx2 + newDz2);
-    newIzz = newMassConstant * (newDx2 + newDy2);
+  if (m.IsValid())
+  {
+    newIxx = m.IXX();
+    newIyy = m.IYY();
+    newIzz = m.IZZ();
   }
 
   // update inspector inertia
