@@ -3371,6 +3371,7 @@ void Visual::ToggleLayer(const int32_t _layer)
 //////////////////////////////////////////////////
 void Visual::SetLayer(const int32_t _layer)
 {
+  rendering::Events::newLayer(this->dataPtr->layer);
   this->dataPtr->layer = _layer;
 
   // Set invisible if this visual's layer is not active

@@ -56,7 +56,9 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
   dPtr->connection = event::Events::ConnectPreRender(
         boost::bind(&LaserVisual::Update, this));
 
-  double factor = 0.005;
+
+  this->SetLayer(1);
+  double factor = 0.01;
   dPtr->boxPoints =
   {
     // -z side
