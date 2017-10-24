@@ -650,7 +650,7 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
-    const auto & gzBgColor = this->scene->BackgroundColor();
+    const auto &gzBgColor = this->scene->BackgroundColor();
     ignition::math::Color bgColor(gzBgColor.r, gzBgColor.g, gzBgColor.b,
         gzBgColor.a);
     this->dataPtr->rightViewport->setBackgroundColour(
