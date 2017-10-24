@@ -512,20 +512,18 @@ void RTShaderSystem::ApplyShadows(ScenePtr _scene)
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_POINT, 0);
   sceneMgr->setShadowTextureCountPerLightType(Ogre::Light::LT_SPOTLIGHT, 0);
   sceneMgr->setShadowTextureCount(3);
+
+  unsigned int texSize = this->dataPtr->shadowTextureSize;
+#if defined(__APPLE__)
+  // workaround a weird but on OSX if texture size at 2 and 3 splits are not
+  // halved
+  texSize = this->dataPtr->shadowTextureSize/2;
+#endif
   sceneMgr->setShadowTextureConfig(0,
       this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
       Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(1,
-      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
-      Ogre::PF_FLOAT32_R);
-  sceneMgr->setShadowTextureConfig(2,
-#if defined(__APPLE__)
-      // workaround a weird crash on OSX if all texture sizes are the same
-      this->dataPtr->shadowTextureSize/2, this->dataPtr->shadowTextureSize/2,
-#else
-      this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
-#endif
-      Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(1, texSize, texSize, Ogre::PF_FLOAT32_R);
+  sceneMgr->setShadowTextureConfig(2, texSize, texSize, Ogre::PF_FLOAT32_R);
 
 #if defined(HAVE_OPENGL)
   // Enable shadow map comparison, so shader can use
