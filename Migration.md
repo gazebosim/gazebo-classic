@@ -83,7 +83,7 @@ release will remove the deprecated code.
     + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + ***Deprecation:*** common::Color Color() const
-    + ***Replacement:*** ignition::math::Color ColorIGN() const
+    + ***Replacement:*** ignition::math::Color ColorIgn() const
 
 
 ## Gazebo 7.X to 8.X
