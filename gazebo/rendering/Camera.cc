@@ -1393,8 +1393,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
-
-    auto const & gzBG = this->scene->BackgroundColor();
+    auto const &gzBG = this->scene->BackgroundColor();
     ignition::math::Color bgColor(gzBG.r, gzBG.g, gzBG.b, gzBG.a);
     this->viewport->setBackgroundColour(Conversions::Convert(bgColor));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
