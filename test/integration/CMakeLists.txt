@@ -88,6 +88,7 @@ set(tests
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
@@ -166,6 +167,7 @@ set(dri_tests
   projector.cc
   rendering_sensor.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )

@@ -78,16 +78,25 @@ void BulletLink::Init()
   this->SetKinematic(this->sdf->Get<bool>("kinematic"));
 
   GZ_ASSERT(this->inertial != NULL, "Inertial pointer is NULL");
-  btScalar mass = this->inertial->GetMass();
   // The bullet dynamics solver checks for zero mass to identify static and
   // kinematic bodies.
   if (this->IsStatic() || this->GetKinematic())
   {
-    mass = 0;
+    this->inertial->SetMass(0);
     this->inertial->SetInertiaMatrix(0, 0, 0, 0, 0, 0);
   }
-  btVector3 fallInertia(0, 0, 0);
-  math::Vector3 cogVec = this->inertial->GetCoG();
+  else
+  {
+    // Diagonalize inertia matrix and add inertial pose rotation
+    auto inertiald = this->inertial->Ign();
+    auto m = inertiald.MassMatrix();
+    auto Idiag = m.PrincipalMoments();
+    auto inertialPose = inertiald.Pose();
+    inertialPose.Rot() *= m.PrincipalAxesOffset();
+
+    this->inertial->SetInertiaMatrix(Idiag[0], Idiag[1], Idiag[2], 0, 0, 0);
+    this->inertial->SetCoG(inertialPose);
+  }
 
   /// \todo FIXME:  Friction Parameters
   /// Currently, gazebo uses btCompoundShape to store multiple
@@ -118,12 +127,9 @@ void BulletLink::Init()
 
       hackMu1 = friction->MuPrimary();
       hackMu2 = friction->MuSecondary();
-      // gzerr << "link[" << this->GetName()
-      //       << "] mu[" << hackMu1
-      //       << "] mu2[" << hackMu2 << "]\n";
 
-      math::Pose relativePose = collision->GetRelativePose();
-      relativePose.pos -= cogVec;
+      auto relativePose = collision->GetRelativePose().Ign()
+          - this->inertial->GetPose().Ign();
       if (!this->compoundShape)
         this->compoundShape = new btCompoundShape();
       dynamic_cast<btCompoundShape *>(this->compoundShape)->addChildShape(
@@ -135,17 +141,11 @@ void BulletLink::Init()
   if (!this->compoundShape)
     this->compoundShape = new btEmptyShape();
 
-  // this->compoundShape->calculateLocalInertia(mass, fallInertia);
-  fallInertia = BulletTypes::ConvertVector3(
-    this->inertial->GetPrincipalMoments());
-  // TODO: inertia products not currently used
-  this->inertial->SetInertiaMatrix(fallInertia.x(), fallInertia.y(),
-                                   fallInertia.z(), 0, 0, 0);
-
   // Create a construction info object
   btRigidBody::btRigidBodyConstructionInfo
-    rigidLinkCI(mass, this->motionState.get(), this->compoundShape,
-    fallInertia);
+      rigidLinkCI(this->inertial->GetMass(), this->motionState.get(),
+      this->compoundShape, BulletTypes::ConvertVector3(
+      this->inertial->GetPrincipalMoments()));
 
   rigidLinkCI.m_linearDamping = this->GetLinearDamping();
   rigidLinkCI.m_angularDamping = this->GetAngularDamping();
@@ -167,7 +167,7 @@ void BulletLink::Init()
   // math::Vector3 size = this->GetBoundingBox().GetSize();
   // this->rigidLink->setCcdSweptSphereRadius(size.GetMax()*0.8);
 
-  if (mass <= 0.0)
+  if (this->inertial->GetMass() <= 0.0)
     this->rigidLink->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
 
   btDynamicsWorld *bulletWorld = this->bulletPhysics->GetDynamicsWorld();
@@ -235,6 +235,10 @@ void BulletLink::UpdateMass()
 {
   if (this->rigidLink && this->inertial)
   {
+    if (this->inertial->GetProductsofInertia() != math::Vector3::Zero)
+    {
+      gzwarn << "UpdateMass is ignoring off-diagonal inertia terms.\n";
+    }
     this->rigidLink->setMassProps(this->inertial->GetMass(),
         BulletTypes::ConvertVector3(this->inertial->GetPrincipalMoments()));
   }
@@ -324,7 +328,7 @@ void BulletLink::OnPoseChange()
 
   // this->SetEnabled(true);
 
-  const math::Pose myPose = this->GetWorldCoGPose();
+  const math::Pose myPose = this->GetWorldInertialPose();
 
   this->rigidLink->setCenterOfMassTransform(
     BulletTypes::ConvertPose(myPose));
