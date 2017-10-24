@@ -55,15 +55,7 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float texture2DCompare(sampler2D depths, vec2 uv, float compare)
-{
-  float depth = texture2D(depths, uv).r;
-  float minShadowFactor = 0.2;
-  return (step(compare, depth) >= 1.0) ? 1.0 : minShadowFactor;
-}
-
-//-----------------------------------------------------------------------------
-float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 offset)
+float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize)
 {
   // Remove shadow outside shadow maps so that all that area appears lit
   if (shadowMapPos.z < 0.0 || shadowMapPos.z > 1.0)
@@ -94,7 +86,8 @@ float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 off
     // driver hack.
     // shadow += shadow2D(shadowMap, newUV.xyz).r;
     float d = shadow2D(shadowMap, newUV.xyz).r;
-    shadow += step(shadowMapPos.z, d) >= 1.0) ? 1.0 : 0.4;
+    float minShadowFactor = 0.2;
+    shadow += (step(shadowMapPos.z, d) >= 1.0) ? 1.0 : minShadowFactor;
   }
   shadow /= 9.0;
 
