@@ -64,7 +64,6 @@ static std::string vpOutStr = "out";
 static std::string fpInStr = "in";
 static std::string fpOutStr = "out";
 static std::string textureStr = "texture";
-static bool gVisible = true;
 
 //////////////////////////////////////////////////
 Heightmap::Heightmap(ScenePtr _scene)

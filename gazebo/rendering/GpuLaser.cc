@@ -155,6 +155,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
+    std::cerr << " creating laser tex " << i << std::endl;
     std::stringstream texName;
     texName << _textureName << "first_pass_" << i;
     this->dataPtr->firstPassTextures[i] =
@@ -167,6 +168,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
         this->dataPtr->firstPassTextures[i]->getBuffer()->getRenderTarget(), i);
 
     this->dataPtr->firstPassTargets[i]->setAutoUpdated(false);
+    std::cerr << " done creating laser tex " << i << std::endl;
   }
 
   this->dataPtr->matFirstPass = (Ogre::Material*)(
@@ -174,6 +176,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 
   this->dataPtr->matFirstPass->load();
 
+    std::cerr << " creating 2nd laser tex " <<  std::endl;
   this->dataPtr->secondPassTexture =
       Ogre::TextureManager::getSingleton().createManual(
       _textureName + "second_pass",
@@ -182,6 +185,8 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
       this->ImageWidth(), this->ImageHeight(), 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
+
+    std::cerr << " done creating 2nd laser tex " << std::endl;
 
   this->Set2ndPassTarget(
       this->dataPtr->secondPassTexture->getBuffer()->getRenderTarget());
