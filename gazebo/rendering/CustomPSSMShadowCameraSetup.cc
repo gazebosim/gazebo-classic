@@ -236,7 +236,12 @@ Ogre::RTShader::SubRenderState *CustomPSSM3Factory::createInstance(
       if (splitPointList.size() == 4)
       {
         Ogre::RTShader::SubRenderState *subRenderState =
+
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 7
+            this->createInstance();
+#else
             this->createOrRetrieveInstance(_translator);
+#endif
         CustomPSSM3 *pssmSubRenderState =
             static_cast<CustomPSSM3 *>(subRenderState);
 
