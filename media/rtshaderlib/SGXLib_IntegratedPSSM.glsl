@@ -58,7 +58,8 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 float texture2DCompare(sampler2D depths, vec2 uv, float compare)
 {
   float depth = texture2D(depths, uv).r;
-  return (step(compare, depth) >= 1.0) ? 1.0 : 0.4;
+  float minShadowFactor = 0.2;
+  return (step(compare, depth) >= 1.0) ? 1.0 : minShadowFactor;
 }
 
 //-----------------------------------------------------------------------------

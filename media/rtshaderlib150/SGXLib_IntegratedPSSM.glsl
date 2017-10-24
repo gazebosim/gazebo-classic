@@ -87,7 +87,11 @@ float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 inv
   shadow /= 9.0;
 
   // smoothstep makes shadow edges appear more crisp and hides Mach bands
-  return smoothstep(0.0, 1.0, shadow);
+  float s = smoothstep(0.0, 1.0, shadow);
+  // make shadow lighter color
+  float minShadowFactor = 0.2;
+  s = s * (1.0 - minShadowFactor) + minShadowFactor;
+  return s;
 }
 
 //-----------------------------------------------------------------------------
