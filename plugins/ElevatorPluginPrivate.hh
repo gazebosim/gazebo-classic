@@ -69,7 +69,7 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _doorJoint Pointer to the joint that should be
       /// controlled.
-      public: DoorController(physics::JointPtr _doorJoint);
+      public: explicit DoorController(physics::JointPtr _doorJoint);
 
       /// \brief Destructor
       public: virtual ~DoorController() = default;
@@ -200,7 +200,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _ctrl Elevator door controller
-      public: CloseState(ElevatorPluginPrivate::DoorController *_ctrl);
+      public: explicit CloseState(ElevatorPluginPrivate::DoorController *_ctrl);
 
       // Documentation inherited
       public: virtual void Start();
@@ -217,7 +217,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _ctrl Elevator door controller
-      public: OpenState(ElevatorPluginPrivate::DoorController *_ctrl);
+      public: explicit OpenState(ElevatorPluginPrivate::DoorController *_ctrl);
 
       // Documentation inherited
       public: virtual void Start();
@@ -255,7 +255,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _waitTime Length of the wait state
-      public: WaitState(const common::Time &_waitTime);
+      public: explicit WaitState(const common::Time &_waitTime);
 
       // Documentation inherited
       public: virtual void Start();
