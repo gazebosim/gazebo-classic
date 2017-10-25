@@ -39,7 +39,7 @@ namespace SkyX { namespace VClouds {
     /** Constructor
       @param vc VClouds pointer
      */
-    GeometryManager(VClouds* vc);
+    explicit GeometryManager(VClouds* vc);
 
     /** Destructor
      */
