@@ -207,6 +207,7 @@ void VisualConfig_TEST::Restore()
   // Remove a visual and restore
   auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
   QVERIFY(button);
+  QTimer::singleShot(3000, this, SLOT(Confirm()));
   button->click();
 
   QCOMPARE(vc.GetVisualCount(), 1u);
@@ -219,6 +220,34 @@ void VisualConfig_TEST::Restore()
   QVERIFY(vc.GetData("v1") != NULL);
   QVERIFY(vc.GetData("v2") != NULL);
   QVERIFY(vc.GetData("v3") == NULL);
+}
+
+/////////////////////////////////////////////////
+void VisualConfig_TEST::Confirm()
+{
+  auto w = QApplication::activeModalWidget();
+  if (w)
+  {
+    w->setFocus();
+    QTest::keyClick(w, Qt::Key_Enter);
+    return;
+  }
+
+  w = QApplication::focusWidget();
+  if (w)
+  {
+    QTest::keyClick(w, Qt::Key_Enter);
+    return;
+  }
+
+  auto list = QApplication::topLevelWidgets();
+  for (auto i : list)
+  {
+    if (i->inherits("QMessageBox"))
+    {
+      QTest::keyClick(i, Qt::Key_Enter);
+    }
+  }
 }
 
 // Generate a main function for the test

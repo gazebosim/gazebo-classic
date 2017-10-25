@@ -198,6 +198,7 @@ void CollisionConfig_TEST::Restore()
   // Remove a collision and restore
   auto button = cc.findChild<QToolButton *>("removeCollisionButton_0");
   QVERIFY(button);
+  QTimer::singleShot(3000, this, SLOT(Confirm()));
   button->click();
 
   QCOMPARE(cc.GetCollisionCount(), 1u);
@@ -210,6 +211,34 @@ void CollisionConfig_TEST::Restore()
   QVERIFY(cc.GetData("c1") != NULL);
   QVERIFY(cc.GetData("c2") != NULL);
   QVERIFY(cc.GetData("c3") == NULL);
+}
+
+/////////////////////////////////////////////////
+void CollisionConfig_TEST::Confirm()
+{
+  auto w = QApplication::activeModalWidget();
+  if (w)
+  {
+    w->setFocus();
+    QTest::keyClick(w, Qt::Key_Enter);
+    return;
+  }
+
+  w = QApplication::focusWidget();
+  if (w)
+  {
+    QTest::keyClick(w, Qt::Key_Enter);
+    return;
+  }
+
+  auto list = QApplication::topLevelWidgets();
+  for (auto i : list)
+  {
+    if (i->inherits("QMessageBox"))
+    {
+      QTest::keyClick(i, Qt::Key_Enter);
+    }
+  }
 }
 
 // Generate a main function for the test
