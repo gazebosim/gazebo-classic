@@ -46,6 +46,7 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
+  FuelModelDatabase.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
@@ -102,6 +103,7 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
+  FuelModelDatabase.hh
   MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
@@ -242,6 +244,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
+  ${IGNITION-FUEL-TOOLS_LIBRARIES}
 )
 
 if (UNIX)

@@ -31,6 +31,7 @@
 
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/common/Console.hh"
+#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/ModelDatabase.hh"
 
 #include "gazebo/rendering/RenderingIface.hh"
@@ -54,7 +55,8 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
   this->setObjectName("insertModel");
-  this->dataPtr->modelDatabaseItem = NULL;
+  this->dataPtr->modelDatabaseItem = nullptr;
+  this->dataPtr->modelFuelItem = nullptr;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->fileTreeWidget = new QTreeWidget();
@@ -98,6 +100,13 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->dataPtr->fileTreeWidget->addTopLevelItem(
       this->dataPtr->modelDatabaseItem);
 
+  // Create a top-level tree item for the models hosted in Ignition Fuel.
+  this->dataPtr->modelFuelItem =
+    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+        QStringList(QString("Connecting to Fuel database...")));
+  this->dataPtr->fileTreeWidget->addTopLevelItem(
+      this->dataPtr->modelFuelItem);
+
   // Also insert additional paths from gui.ini
   std::string additionalPaths =
       gui::getINIProperty<std::string>("model_paths.filenames", "");
@@ -135,9 +144,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     common::ModelDatabase::Instance()->GetModels(
         boost::bind(&InsertModelWidget::OnModels, this, _1));
 
+  /// Non-blocking call to get all the models in the database.
+  this->dataPtr->getModelsConnectionFuel =
+    common::FuelModelDatabase::Instance()->GetModels(
+        boost::bind(&InsertModelWidget::OnModelsFuel, this, _1));
+
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
+  QTimer::singleShot(1000, this, SLOT(UpdateFuel()));
 }
 
 /////////////////////////////////////////////////
@@ -214,7 +229,41 @@ void InsertModelWidget::Update()
     QTimer::singleShot(1000, this, SLOT(Update()));
 }
 
+/////////////////////////////////////////////////
+void InsertModelWidget::UpdateFuel()
+{
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
 
+  // If the model database has call the OnModels callback function, then
+  // add all the models from the database.
+  if (!this->dataPtr->modelBufferFuel.empty())
+  {
+    std::string uri = common::FuelModelDatabase::Instance()->GetURI();
+    this->dataPtr->modelFuelItem->setText(0,
+        QString("%1").arg(QString::fromStdString(uri)));
+
+    if (!this->dataPtr->modelBufferFuel.empty())
+    {
+      for (std::map<std::string, std::string>::const_iterator iter =
+          this->dataPtr->modelBufferFuel.begin();
+          iter != this->dataPtr->modelBufferFuel.end(); ++iter)
+      {
+        // Add a child item for the model
+        QTreeWidgetItem *childItem = new QTreeWidgetItem(
+            this->dataPtr->modelFuelItem,
+            QStringList(QString("%1").arg(
+                QString::fromStdString(iter->second))));
+        childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
+        this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
+      }
+    }
+
+    this->dataPtr->modelBufferFuel.clear();
+    this->dataPtr->getModelsConnectionFuel.reset();
+  }
+  else
+    QTimer::singleShot(1000, this, SLOT(UpdateFuel()));
+}
 
 /////////////////////////////////////////////////
 void InsertModelWidget::OnModels(
@@ -222,6 +271,14 @@ void InsertModelWidget::OnModels(
 {
   boost::mutex::scoped_lock lock(this->dataPtr->mutex);
   this->dataPtr->modelBuffer = _models;
+}
+
+/////////////////////////////////////////////////
+void InsertModelWidget::OnModelsFuel(
+    const std::map<std::string, std::string> &_models)
+{
+  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  this->dataPtr->modelBufferFuel = _models;
 }
 
 /////////////////////////////////////////////////

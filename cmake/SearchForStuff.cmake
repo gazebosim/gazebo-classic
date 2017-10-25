@@ -771,6 +771,12 @@ else()
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
+# Find the Ignition Fuel Tools library
+find_package(ignition-fuel-tools0 QUIET REQUIRED)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-FUEL-TOOLS_CXX_FLAGS}")
+include_directories(${IGNITION-FUEL-TOOLS_INCLUDE_DIRS})
+link_directories(${IGNITION-FUEL-TOOLS_LIBRARY_DIRS})
+
 ################################################
 # Find Valgrind for checking memory leaks in the
 # tests

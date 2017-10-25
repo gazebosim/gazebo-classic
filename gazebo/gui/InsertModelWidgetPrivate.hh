@@ -42,17 +42,26 @@ namespace gazebo
       /// \brief Tree item that is populated with models from the ModelDatabase.
       public: QTreeWidgetItem *modelDatabaseItem;
 
+      /// \brief Tree item that is populated with models from Ignition Fuel.
+      public: QTreeWidgetItem *modelFuelItem;
+
       /// \brief Mutex to protect the modelBuffer.
       public: boost::mutex mutex;
 
       /// \brief Buffer to hold the results from ModelDatabase::GetModels.
       public: std::map<std::string, std::string> modelBuffer;
 
+      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
+      public: std::map<std::string, std::string> modelBufferFuel;
+
       /// \brief A file/directory watcher.
       public: QFileSystemWatcher *watcher;
 
       /// \brief Callback reference count for retrieving models.
       public: event::ConnectionPtr getModelsConnection;
+
+      /// \brief Callback reference count for retrieving models.
+      public: event::ConnectionPtr getModelsConnectionFuel;
 
       /// \brief Cache for the names added to fileTreeWidget
       public: std::set<std::string> localFilenameCache;

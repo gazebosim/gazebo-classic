@@ -57,6 +57,12 @@ namespace gazebo
       private: void OnModels(
                    const std::map<std::string, std::string> &_models);
 
+      /// \brief Callback triggered when the ModelDatabase has returned
+      /// the list of models.
+      /// \param[in] _models The map of all models in the database.
+      private: void OnModelsFuel(
+                   const std::map<std::string, std::string> &_models);
+
       /// \brief Callback triggered when a request to update the model database
       /// is received.
       /// \param[i] _localPath The model path that was updated.
@@ -68,6 +74,10 @@ namespace gazebo
       /// \brief An update function that lets this widget add in the results
       /// from ModelDatabase::GetModels.
       private slots: void Update();
+
+      /// \brief An update function that lets this widget add in the results
+      /// from ModelDatabase::GetModels.
+      private slots: void UpdateFuel();
 
       /// \brief QT callback when a path is changed.
       /// \param[in] _path The path that was changed.
