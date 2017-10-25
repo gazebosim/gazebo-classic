@@ -31,9 +31,7 @@ class Visual_TEST : public RenderingFixture
 {
 };
 
-
 namespace ignmath = ignition::math;
-
 
 /////////////////////////////////////////////////
 std::string GetVisualSDFString(const std::string &_name,

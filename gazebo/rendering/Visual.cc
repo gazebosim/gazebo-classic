@@ -1386,7 +1386,7 @@ void Visual::SetEmissive(const ignition::math::Color &_color,
 /////////////////////////////////////////////////
 common::Color Visual::GetAmbient() const
 {
-  auto & ambient = this->dataPtr->ambient;
+  auto &ambient = this->dataPtr->ambient;
   return common::Color(ambient.R(), ambient.G(), ambient.B(), ambient.A());
 }
 
@@ -1399,7 +1399,7 @@ ignition::math::Color Visual::Ambient() const
 /////////////////////////////////////////////////
 common::Color Visual::GetDiffuse() const
 {
-  auto & diffuse = this->dataPtr->diffuse;
+  auto &diffuse = this->dataPtr->diffuse;
   return common::Color(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
 }
 
@@ -1412,7 +1412,7 @@ ignition::math::Color Visual::Diffuse() const
 /////////////////////////////////////////////////
 common::Color Visual::GetSpecular() const
 {
-  auto & specular = this->dataPtr->specular;
+  auto &specular = this->dataPtr->specular;
   return common::Color(specular.R(), specular.G(), specular.B(), specular.A());
 }
 
@@ -1425,7 +1425,7 @@ ignition::math::Color Visual::Specular() const
 /////////////////////////////////////////////////
 common::Color Visual::GetEmissive() const
 {
-  auto & emissive = this->dataPtr->emissive;
+  auto &emissive = this->dataPtr->emissive;
   return common::Color(emissive.R(), emissive.G(), emissive.B(), emissive.A());
 }
 
