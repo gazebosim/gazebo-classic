@@ -23,7 +23,7 @@
 /////////////////////////////////////////////////
 void TimePanel_TEST::SetPaused()
 {
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create a new time panel widget
   gazebo::gui::TimePanel *timePanel = new gazebo::gui::TimePanel;
@@ -47,7 +47,7 @@ void TimePanel_TEST::SpaceBar()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();

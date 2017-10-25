@@ -43,7 +43,7 @@ void LayersWidget_TEST::ToggleLayers()
 
   cam->SetCaptureData(true);
 
-  this->ProcessEventsAndDraw(mainWindow);
+  this->ProcessEventsAndDraw(mainWindow, 20);
 
   const unsigned char *data = cam->ImageData();
   unsigned int width = cam->ImageWidth();
