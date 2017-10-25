@@ -40,7 +40,8 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _name The name of the preset profile.
-      public: explicit Preset(const std::string & _name);
+      // cppcheck-suppress noExplicitConstructor
+      public: Preset(const std::string & _name);
 
       /// \brief Destructor.
       public: ~Preset();
