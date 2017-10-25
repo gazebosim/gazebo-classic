@@ -118,7 +118,7 @@ void RenderEngine::Load()
     // Make the root
     try
     {
-      this->dataPtr->root = new Ogre::Root();
+      this->dataPtr->root = new Ogre::Root("", "");
     }
     catch(Ogre::Exception &e)
     {
