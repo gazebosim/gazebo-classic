@@ -89,6 +89,7 @@ set(tests
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
