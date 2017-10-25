@@ -113,10 +113,6 @@ namespace gazebo
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;
 
-      /// \brief List of colors
-      /// \deprecated This info is now stored in the private implementation
-      private: std::vector<common::Color> colors;
-
       /// \brief private implementation
       private: std::unique_ptr<DynamicLinesPrivate> dataPtr;
     };
