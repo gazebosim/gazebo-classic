@@ -49,7 +49,7 @@ class TopicManagerConnectionTask : public tbb::task
 {
   /// \brief Constructor.
   /// \param[in] _pub Publish message
-  public: TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
+  public: explicit TopicManagerConnectionTask(msgs::Publish _pub) : pub(_pub) {}
 
   /// Implements the necessary execute function
   public: tbb::task *execute()
