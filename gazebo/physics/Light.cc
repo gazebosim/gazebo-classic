@@ -102,6 +102,7 @@ void Light::OnPoseChange()
 /////////////////////////////////////////////////
 const math::Pose &Light::GetWorldPose() const
 {
+  // TODO add and use worldPoseDirty member variable
   // If true, compute a new world pose value.
   // if (this->worldPoseDirty)
   EntityPtr parentEnt = boost::dynamic_pointer_cast<Entity>(this->parent);

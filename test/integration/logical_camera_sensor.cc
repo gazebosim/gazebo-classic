@@ -30,7 +30,7 @@ TEST_F(LogicalCameraSensor, GroundPlane)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -58,11 +58,43 @@ TEST_F(LogicalCameraSensor, GroundPlane)
 }
 
 /////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, TopicNotSpecified)
+{
+  Load("worlds/logical_camera.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  EXPECT_EQ("~/box/link/logical_camera/models", cam->Topic());
+}
+
+/////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, TopicSpecified)
+{
+  Load("test/worlds/logical_camera_specify_topic.world");
+
+  // Wait until the sensors have been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  EXPECT_EQ("/publish/to/this/topic", cam->Topic());
+}
+
+/////////////////////////////////////////////////
 TEST_F(LogicalCameraSensor, Box)
 {
   Load("worlds/logical_camera.world");
 
-  /// \brief Wait until the sensors have been initialized
+  // Wait until the sensors have been initialized
   while (!sensors::SensorManager::Instance()->SensorsInitialized())
     common::Time::MSleep(1000);
 
@@ -98,6 +130,28 @@ TEST_F(LogicalCameraSensor, Box)
   cameraModel->SetWorldPose(math::Pose(0, 0, 0, 0, 0, 1.5707));
   cam->Update(true);
   ASSERT_EQ(cam->Image().model_size(), 1);
+}
+
+/////////////////////////////////////////////////
+TEST_F(LogicalCameraSensor, NestedModels)
+{
+  Load("test/worlds/logical_camera_nested_models.world");
+
+  // Wait until the sensor has been initialized
+  while (!sensors::SensorManager::Instance()->SensorsInitialized())
+    common::Time::MSleep(1000);
+
+  // Get the logical camera sensor
+  sensors::LogicalCameraSensorPtr cam = std::dynamic_pointer_cast<
+    sensors::LogicalCameraSensor>(sensors::get_sensor("logical_camera"));
+  ASSERT_TRUE(cam != NULL);
+
+  // Force the update
+  cam->Update(true);
+
+  // We should now detect the nested model
+  ASSERT_EQ(1, cam->Image().model_size());
+  EXPECT_EQ("base_target::nested_target", cam->Image().model(0).name());
 }
 
 /////////////////////////////////////////////////

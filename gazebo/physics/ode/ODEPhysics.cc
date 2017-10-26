@@ -1512,6 +1512,20 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
         boost::any_cast<int>(_value));
     }
+    else if (_key == "island_threads")
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
+      }
+      dWorldSetIslandThreads(this->dataPtr->worldId, value);
+    }
     else if (_key == "ode_quiet")
     {
       bool odeQuiet = boost::any_cast<bool>(_value);
@@ -1611,6 +1625,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "island_threads")
+    _value = dWorldGetIslandThreads(this->dataPtr->worldId);
   else if (_key == "ode_quiet")
     _value = dGetMessageHandler() != 0;
   else if (_key == "world_step_solver")
