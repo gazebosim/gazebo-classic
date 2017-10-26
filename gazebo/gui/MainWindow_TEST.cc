@@ -571,10 +571,6 @@ void MainWindow_TEST::UserCameraJoystick()
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
