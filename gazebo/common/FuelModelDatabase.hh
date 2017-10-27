@@ -17,21 +17,13 @@
 #ifndef _GAZEBO_COMMON_FUELMODELDATABASE_HH_
 #define _GAZEBO_COMMON_FUELMODELDATABASE_HH_
 
-#include <string>
+#include <functional>
 #include <map>
-#include <utility>
+#include <memory>
+#include <string>
 
-#include <boost/function.hpp>
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/SingletonT.hh"
-#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
-
-/// \brief The file name of model XML configuration.
-#define GZ_MODEL_MANIFEST_FILENAME "model.config"
-
-/// \brief The file name of model database XML configuration.
-#define GZ_MODEL_DB_MANIFEST_FILENAME "database.config"
 
 namespace gazebo
 {
@@ -47,51 +39,46 @@ namespace gazebo
     /// \brief Connects to model database, and has utility functions to find
     /// models.
     class GZ_COMMON_VISIBLE FuelModelDatabase
-      : public SingletonT<FuelModelDatabase>
     {
       /// \brief Constructor. This will update the model cache
-      private: FuelModelDatabase();
+      /// \param[in] _server The Ignition Fuel server.
+      public: FuelModelDatabase(const std::string &_server);
 
       /// \brief Destructor
-      private: virtual ~FuelModelDatabase();
+      public: virtual ~FuelModelDatabase();
 
       /// \brief Start the model database.
-      /// \param[in] _fetchImmediately True to fetch the models without
-      /// waiting.
-      public: void Start(bool _fetchImmediately = false);
+      /// \param[in] _fetchImmediately True to fetch the models without waiting.
+      public: void Start(const bool _fetchImmediately = false);
 
       /// \brief Returns the the global model database URI.
       /// \return the URI.
-      public: std::string GetURI();
+      public: std::string URI() const;
 
       /// \brief Get the dictionary of all model names via a callback.
       ///
       /// This is the non-blocking version of ModelDatabase::GetModels
-      /// \param[in] _func Callback function that receives the list of
-      /// models.
+      /// \param[in] _func Callback function that receives the list of models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: event::ConnectionPtr GetModels(boost::function<
-                  void (const std::map<std::string, std::string> &)> _func);
+      public: event::ConnectionPtr Models(
+        std::function<void(const std::map<std::string, std::string> &)> _func);
+
+      public: std::map<std::string, std::string> Models2();
+
+      public: void Models2Async(
+        std::function<void(const std::map<std::string, std::string> &)> &_func);
 
       /// \brief Used by a thread to update the model cache.
-      /// \param[in] _fetchImmediately True to fetch the models without
-      /// waiting.
+      /// \param[in] _fetchImmediately True to fetch the models without waiting.
       private: void UpdateModelCache(bool _fetchImmediately);
 
-      /// \brief Used by ModelDatabase::UpdateModelCache,
+      /// \brief Used by ModelDatabase::UpdateModelCache.
       /// no one else should use this function.
       private: bool UpdateModelCacheImpl();
 
       /// \brief Private data.
-      private: FuelModelDatabasePrivate *dataPtr;
-
-      /// \brief Singleton implementation
-      private: friend class SingletonT<FuelModelDatabase>;
-
-      /// \brief Handy trick to automatically call a singleton's
-      /// constructor.
-      private: static FuelModelDatabase *myself;
+      private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
     };
   }
 }

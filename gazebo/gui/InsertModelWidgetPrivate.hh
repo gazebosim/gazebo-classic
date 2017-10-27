@@ -17,12 +17,15 @@
 #ifndef _INSERT_MODEL_WIDGET_PRIVATE_HH_
 #define _INSERT_MODEL_WIDGET_PRIVATE_HH_
 
-#include <string>
+#include <future>
 #include <map>
 #include <set>
+#include <string>
 #include <boost/thread/mutex.hpp>
+#include <ignition/fuel-tools.hh>
 
 #include "gazebo/common/Event.hh"
+#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/util/system.hh"
 
 class QTreeWidget;
@@ -33,8 +36,17 @@ namespace gazebo
 {
   namespace gui
   {
+    class FuelDatabaseDetails
+    {
+      public: QTreeWidgetItem *modelFuelItem = nullptr;
+
+      public: std::unique_ptr<common::FuelModelDatabase> fuelDB;
+
+      public: std::map<std::string, std::string> modelBuffer;
+    };
+
     /// \brief Private class attributes for InsertModelWidget.
-    class GZ_GUI_VISIBLE InsertModelWidgetPrivate
+    class InsertModelWidgetPrivate
     {
       /// \brief Widget that display all the models that can be inserted.
       public: QTreeWidget *fileTreeWidget;
@@ -42,8 +54,8 @@ namespace gazebo
       /// \brief Tree item that is populated with models from the ModelDatabase.
       public: QTreeWidgetItem *modelDatabaseItem;
 
-      /// \brief Tree item that is populated with models from Ignition Fuel.
-      public: QTreeWidgetItem *modelFuelItem;
+      /// \brief ToDo.
+      public: std::map<std::string, FuelDatabaseDetails> fuelDetails;
 
       /// \brief Mutex to protect the modelBuffer.
       public: boost::mutex mutex;
@@ -52,7 +64,7 @@ namespace gazebo
       public: std::map<std::string, std::string> modelBuffer;
 
       /// \brief Buffer to hold the results from ModelDatabase::GetModels.
-      public: std::map<std::string, std::string> modelBufferFuel;
+      //public: std::map<std::string, std::string> modelBufferFuel;
 
       /// \brief A file/directory watcher.
       public: QFileSystemWatcher *watcher;
@@ -65,6 +77,9 @@ namespace gazebo
 
       /// \brief Cache for the names added to fileTreeWidget
       public: std::set<std::string> localFilenameCache;
+
+      /// \brief A client for using Ignition Fuel services.
+      public: std::unique_ptr<ignition::fuel_tools::FuelClient> fuelClient;
     };
   }
 }

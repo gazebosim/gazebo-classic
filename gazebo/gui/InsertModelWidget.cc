@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <future>
 #include <fstream>
 
 #include <boost/bind.hpp>
@@ -56,7 +57,6 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
 {
   this->setObjectName("insertModel");
   this->dataPtr->modelDatabaseItem = nullptr;
-  this->dataPtr->modelFuelItem = nullptr;
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   this->dataPtr->fileTreeWidget = new QTreeWidget();
@@ -100,12 +100,40 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   this->dataPtr->fileTreeWidget->addTopLevelItem(
       this->dataPtr->modelDatabaseItem);
 
-  // Create a top-level tree item for the models hosted in Ignition Fuel.
-  this->dataPtr->modelFuelItem =
-    new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
-        QStringList(QString("Connecting to Fuel database...")));
-  this->dataPtr->fileTreeWidget->addTopLevelItem(
-      this->dataPtr->modelFuelItem);
+  // Instantiate the Ignition Fuel client.
+  // Read the configuration directly from a yaml file.
+  ignition::fuel_tools::ClientConfig conf;
+  ignition::fuel_tools::ServerConfig srv;
+  srv.URL("https://staging-api.ignitionfuel.org");
+  srv.LocalName("ignitionfuel");
+  conf.AddServer(srv);
+  this->dataPtr->fuelClient.reset(
+    new ignition::fuel_tools::FuelClient(conf));
+
+  // Get the list of Ignition Fuel servers.
+  auto servers = this->dataPtr->fuelClient->Config().Servers();
+
+  // Populate the list of Ignition Fuel servers.
+  for (auto i = 0u; i < servers.size(); ++i)
+  {
+    std::string url = servers.at(i).URL();
+    this->dataPtr->fuelDetails[url];
+
+    // Instantiate a FuelModelDatabase for the specific server.
+    this->dataPtr->fuelDetails[url].fuelDB.reset(
+        new common::FuelModelDatabase(url));
+
+    // Create a top-level tree item for the models hosted in this
+    // Ignition Fuel server.
+    std::string label = "Connecting to " + url + "...";
+    this->dataPtr->fuelDetails[url].modelFuelItem =
+        new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
+            QStringList(QString::fromStdString(label)));
+
+    // Add the new entry.
+    this->dataPtr->fileTreeWidget->addTopLevelItem(
+        this->dataPtr->fuelDetails[url].modelFuelItem);
+  }
 
   // Also insert additional paths from gui.ini
   std::string additionalPaths =
@@ -139,20 +167,44 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
           common::SystemPaths::Instance()->updateModelRequest.Connect(
             boost::bind(&InsertModelWidget::OnModelUpdateRequest, this, _1)));
 
-  /// Non-blocking call to get all the models in the database.
+  // Non-blocking call to get all the models in the database.
   this->dataPtr->getModelsConnection =
     common::ModelDatabase::Instance()->GetModels(
         boost::bind(&InsertModelWidget::OnModels, this, _1));
 
-  /// Non-blocking call to get all the models in the database.
-  this->dataPtr->getModelsConnectionFuel =
-    common::FuelModelDatabase::Instance()->GetModels(
-        boost::bind(&InsertModelWidget::OnModelsFuel, this, _1));
+  // Use a signal/slot to populate the Ignition Fuel servers within the QT
+  // thread.
+  this->connect(this, SIGNAL(UpdateFuel(const std::string &)),
+      this, SLOT(OnUpdateFuel(const std::string &)));
+
+  // Populate the list of Ignition Fuel servers.
+  for (auto i = 0u; i < servers.size(); ++i)
+  {
+    std::string url = servers.at(i).URL();
+
+    std::function<void(const std::map<std::string, std::string> &)> f =
+        [url, this](const std::map<std::string, std::string> &_models)
+        {
+          std::cout << "Callback" << std::endl;
+          this->dataPtr->fuelDetails[url].modelBuffer = _models;
+          // Emit the signal that populates the models for this server.
+          this->UpdateFuel(url);
+        };
+
+    /// Non-blocking call to get all the models in the database.
+    //this->dataPtr->getModelsConnectionFuel =
+    //    this->dataPtr->fuelDetails[url].fuelDB->Models(
+    //        std::bind(f, std::placeholders::_1));
+    //this->dataPtr->fuelDetails[url].result =
+    this->dataPtr->fuelDetails[url].fuelDB->Models2Async(f);
+    //std::thread t(&common::FuelModelDatabase::Models2,
+    //  this->dataPtr->fuelDetails[url].fuelDB.get(), f);
+    //t.detach();
+  }
 
   // Start a timer to check for the results from the ModelDatabase. We need
   // to do this so that the QT elements get added in the main thread.
   QTimer::singleShot(1000, this, SLOT(Update()));
-  QTimer::singleShot(1000, this, SLOT(UpdateFuel()));
 }
 
 /////////////////////////////////////////////////
@@ -230,39 +282,30 @@ void InsertModelWidget::Update()
 }
 
 /////////////////////////////////////////////////
-void InsertModelWidget::UpdateFuel()
+void InsertModelWidget::OnUpdateFuel(const std::string &_server)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  this->dataPtr->fuelDetails[_server].modelFuelItem->setText(0,
+      QString("%1").arg(QString::fromStdString(_server)));
 
-  // If the model database has call the OnModels callback function, then
-  // add all the models from the database.
-  if (!this->dataPtr->modelBufferFuel.empty())
+  if (!this->dataPtr->fuelDetails[_server].modelBuffer.empty())
   {
-    std::string uri = common::FuelModelDatabase::Instance()->GetURI();
-    this->dataPtr->modelFuelItem->setText(0,
-        QString("%1").arg(QString::fromStdString(uri)));
-
-    if (!this->dataPtr->modelBufferFuel.empty())
+    for (std::map<std::string, std::string>::const_iterator iter =
+        this->dataPtr->fuelDetails[_server].modelBuffer.begin();
+        iter != this->dataPtr->fuelDetails[_server].modelBuffer.end();
+        ++iter)
     {
-      for (std::map<std::string, std::string>::const_iterator iter =
-          this->dataPtr->modelBufferFuel.begin();
-          iter != this->dataPtr->modelBufferFuel.end(); ++iter)
-      {
-        // Add a child item for the model
-        QTreeWidgetItem *childItem = new QTreeWidgetItem(
-            this->dataPtr->modelFuelItem,
-            QStringList(QString("%1").arg(
-                QString::fromStdString(iter->second))));
-        childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-        this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
-      }
+      // Add a child item for the model
+      QTreeWidgetItem *childItem = new QTreeWidgetItem(
+          this->dataPtr->fuelDetails[_server].modelFuelItem,
+          QStringList(QString("%1").arg(
+              QString::fromStdString(iter->second))));
+      childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
+      this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
     }
-
-    this->dataPtr->modelBufferFuel.clear();
-    this->dataPtr->getModelsConnectionFuel.reset();
   }
-  else
-    QTimer::singleShot(1000, this, SLOT(UpdateFuel()));
+
+  this->dataPtr->fuelDetails[_server].modelBuffer.clear();
+  this->dataPtr->getModelsConnectionFuel.reset();
 }
 
 /////////////////////////////////////////////////
@@ -274,30 +317,19 @@ void InsertModelWidget::OnModels(
 }
 
 /////////////////////////////////////////////////
-void InsertModelWidget::OnModelsFuel(
-    const std::map<std::string, std::string> &_models)
-{
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
-  this->dataPtr->modelBufferFuel = _models;
-}
-
-/////////////////////////////////////////////////
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
   if (_item)
   {
-    std::string path, filename;
-
-    if (_item->parent())
-      path = _item->parent()->text(0).toStdString() + "/";
-
-    path = _item->data(0, Qt::UserRole).toString().toStdString();
+    std::string path = _item->data(0, Qt::UserRole).toString().toStdString();
 
     if (!path.empty())
     {
       QApplication::setOverrideCursor(Qt::BusyCursor);
-      filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
+      std::string filename =
+        common::ModelDatabase::Instance()->GetModelFile(path);
       gui::Events::createEntity("model", filename);
 
       {
