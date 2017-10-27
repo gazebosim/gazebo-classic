@@ -43,6 +43,9 @@ class CollisionConfig_TEST : public QTestFixture
   /// \brief Slot that receives Applied signals.
   private slots: void OnApply();
 
+  /// \brief Key click to close modal dialog.
+  private slots: void Confirm();
+
   /// \brief Test restoring original data.
   private slots: void Restore();
 

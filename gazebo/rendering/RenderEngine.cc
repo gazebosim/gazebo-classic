@@ -328,6 +328,7 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault on shutdown
   // Windows are created on load so clear them even
   // if render engine is not initialized
+  // Close all the windows first;
   this->dataPtr->windowManager->Fini();
 
   if (!this->dataPtr->initialized)
