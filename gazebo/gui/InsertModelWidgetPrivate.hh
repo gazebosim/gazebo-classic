@@ -14,18 +14,21 @@
  * limitations under the License.
  *
 */
-#ifndef _INSERT_MODEL_WIDGET_PRIVATE_HH_
-#define _INSERT_MODEL_WIDGET_PRIVATE_HH_
+#ifndef GAZEBO_GUI_INSERTMODELWIDGETPRIVATE_HH_
+#define GAZEBO_GUI_INSERTMODELWIDGETPRIVATE_HH_
 
-#include <future>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
 #include <boost/thread/mutex.hpp>
-#include <ignition/fuel-tools.hh>
+
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  #include <ignition/fuel-tools.hh>
+  #include "gazebo/common/FuelModelDatabase.hh"
+#endif
 
 #include "gazebo/common/Event.hh"
-#include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/util/system.hh"
 
 class QTreeWidget;
@@ -36,14 +39,23 @@ namespace gazebo
 {
   namespace gui
   {
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+    /// \brief Details to manage an Ignition Fuel server.
     class FuelDatabaseDetails
     {
+      /// \brief Tree item that is populated with models from a Fuel server.
       public: QTreeWidgetItem *modelFuelItem = nullptr;
 
-      public: std::unique_ptr<common::FuelModelDatabase> fuelDB;
+      /// \brief A FuelModelDatabase instance to interact with a Fuel server.
+      public: std::unique_ptr<common::FuelModelDatabase> fuelDB = nullptr;
 
+      /// \brief a buffer of models.
+      /// The key is the unique name (containing the full path in the server,
+      /// owner and model name) and the value is just the model name.
+      /// E.g.: https://api.ignitionfuel.org/caguero/Beer -> Beer
       public: std::map<std::string, std::string> modelBuffer;
     };
+#endif
 
     /// \brief Private class attributes for InsertModelWidget.
     class InsertModelWidgetPrivate
@@ -54,17 +66,11 @@ namespace gazebo
       /// \brief Tree item that is populated with models from the ModelDatabase.
       public: QTreeWidgetItem *modelDatabaseItem;
 
-      /// \brief ToDo.
-      public: std::map<std::string, FuelDatabaseDetails> fuelDetails;
-
       /// \brief Mutex to protect the modelBuffer.
       public: boost::mutex mutex;
 
       /// \brief Buffer to hold the results from ModelDatabase::GetModels.
       public: std::map<std::string, std::string> modelBuffer;
-
-      /// \brief Buffer to hold the results from ModelDatabase::GetModels.
-      //public: std::map<std::string, std::string> modelBufferFuel;
 
       /// \brief A file/directory watcher.
       public: QFileSystemWatcher *watcher;
@@ -72,14 +78,18 @@ namespace gazebo
       /// \brief Callback reference count for retrieving models.
       public: event::ConnectionPtr getModelsConnection;
 
-      /// \brief Callback reference count for retrieving models.
-      public: event::ConnectionPtr getModelsConnectionFuel;
-
       /// \brief Cache for the names added to fileTreeWidget
       public: std::set<std::string> localFilenameCache;
 
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+      /// \brief Stores details about all Fuel servers providing assets.
+      /// The key is the server name and the value is the class that captures
+      /// multiple information about the server.
+      public: std::map<std::string, FuelDatabaseDetails> fuelDetails;
+
       /// \brief A client for using Ignition Fuel services.
       public: std::unique_ptr<ignition::fuel_tools::FuelClient> fuelClient;
+#endif
     };
   }
 }

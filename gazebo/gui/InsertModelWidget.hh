@@ -99,6 +99,14 @@ namespace gazebo
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
 
+      /// \brief Populate the model tree widget with the list of all available
+      /// Ignition Fuel servers providing models.
+      private: void InitializeFuelServers();
+
+      /// \brief Populate each Ignition Fuel server in the tree widget with its
+      /// list of models.
+      private: void PopulateFuelServers();
+
       /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
 

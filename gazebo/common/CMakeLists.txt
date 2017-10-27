@@ -46,7 +46,6 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
-  FuelModelDatabase.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
@@ -103,7 +102,6 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
-  FuelModelDatabase.hh
   MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
@@ -198,6 +196,16 @@ endif()
 if (HAVE_FFMPEG)
   set (gtest_sources ${gtest_sources}
                      AudioDecoder_TEST.cc)
+endif()
+
+if (HAVE_IGNITION_FUEL_TOOLS)
+  set (headers ${headers}
+    FuelModelDatabase.hh
+  )
+
+  set (sources ${sources}
+    FuelModelDatabase.cc
+  )
 endif()
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)

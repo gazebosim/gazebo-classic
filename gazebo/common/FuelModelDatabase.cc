@@ -15,10 +15,11 @@
  *
 */
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
-
+#include <thread>
 #include <ignition/fuel-tools.hh>
 
 #include "gazebo/common/FuelModelDatabase.hh"
@@ -42,10 +43,10 @@ FuelModelDatabase::FuelModelDatabase(const std::string &_server)
 {
   this->dataPtr->server = _server;
 
-  // Create a ClientConfig, TODO create this from a yaml file.
+  // ToDo: Remove this block when Ignition Fuel Tools supports parsing
+  // a configuration file.
   ignition::fuel_tools::ServerConfig srv;
   srv.URL(this->dataPtr->server);
-  srv.LocalName("ignitionfuel");
   ignition::fuel_tools::ClientConfig conf;
   conf.AddServer(srv);
 
@@ -59,14 +60,27 @@ FuelModelDatabase::~FuelModelDatabase()
 
 /////////////////////////////////////////////////
 void FuelModelDatabase::Models(
-    std::function<void (const std::map<std::string, std::string> &)> _func)
+    std::function<void (const std::map<std::string, std::string> &)> &_func)
+{
+  std::thread t([this, _func]
+  {
+    // Run the callback passing the list of models.
+    _func(this->Models());
+  });
+  t.detach();
+}
+
+/////////////////////////////////////////////////
+std::map<std::string, std::string> FuelModelDatabase::Models()
 {
   std::map<std::string, std::string> models;
   for (auto iter = this->dataPtr->fuelClient->Models(); iter; ++iter)
   {
-    std::string name = iter->Identification().Name();
-    models[name] = name;
+    std::string fullURI = iter->Identification().UniqueName();
+    std::string modelName = iter->Identification().Name();
+
+    models[fullURI] = modelName;
   }
 
-  _func(models);
+  return models;
 }
