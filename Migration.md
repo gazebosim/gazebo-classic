@@ -19,6 +19,8 @@ release will remove the deprecated code.
 1. **gazebo/gui/JointControlWidget.hh**
     + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
     + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
+1. **gazebo/physics/**
+    + ***Modified:*** Many constructors with 1 argument in physics classes were marked as explicit.
 1. **gazebo/physics/Link.hh**
     + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
