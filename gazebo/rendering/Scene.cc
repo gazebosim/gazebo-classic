@@ -2960,8 +2960,9 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
   else
   {
     gzerr << "Light [" << _msg->name() << "] already exists."
-        << " Use topic ~/light/modify to modify it." << std::endl;
-    return false;
+          << " Use topic ~/light/modify to modify it." << std::endl;
+    // we don't want to return false because it keeps the msg in the
+    // list and causes it to be processed again and again.
   }
 
   return true;
