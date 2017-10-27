@@ -148,7 +148,6 @@ bool ModelDatabase::HasModel(const std::string &_modelURI)
   }
 
   boost::replace_first(uri, "model://", ModelDatabase::GetURI());
-
   uri = uri.substr(0, uri.find("/", ModelDatabase::GetURI().size()));
 
   std::map<std::string, std::string> models = ModelDatabase::GetModels();
@@ -249,7 +248,6 @@ bool ModelDatabase::UpdateModelCacheImpl()
     }
 
     TiXmlElement *uriElem;
-
     for (uriElem = modelsElem->FirstChildElement("uri");
          uriElem != nullptr && !this->dataPtr->stop;
          uriElem = uriElem->NextSiblingElement("uri"))
