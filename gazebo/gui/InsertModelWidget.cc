@@ -185,21 +185,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
     std::function<void(const std::map<std::string, std::string> &)> f =
         [url, this](const std::map<std::string, std::string> &_models)
         {
-          std::cout << "Callback" << std::endl;
           this->dataPtr->fuelDetails[url].modelBuffer = _models;
           // Emit the signal that populates the models for this server.
           this->UpdateFuel(url);
         };
 
-    /// Non-blocking call to get all the models in the database.
-    //this->dataPtr->getModelsConnectionFuel =
-    //    this->dataPtr->fuelDetails[url].fuelDB->Models(
-    //        std::bind(f, std::placeholders::_1));
-    //this->dataPtr->fuelDetails[url].result =
-    this->dataPtr->fuelDetails[url].fuelDB->Models2Async(f);
-    //std::thread t(&common::FuelModelDatabase::Models2,
-    //  this->dataPtr->fuelDetails[url].fuelDB.get(), f);
-    //t.detach();
+    // Non-blocking call to get all the models in the database.
+    std::thread t(&common::FuelModelDatabase::Models,
+      this->dataPtr->fuelDetails[url].fuelDB.get(), f);
+    t.detach();
   }
 
   // Start a timer to check for the results from the ModelDatabase. We need

@@ -47,35 +47,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~FuelModelDatabase();
 
-      /// \brief Start the model database.
-      /// \param[in] _fetchImmediately True to fetch the models without waiting.
-      public: void Start(const bool _fetchImmediately = false);
-
-      /// \brief Returns the the global model database URI.
-      /// \return the URI.
-      public: std::string URI() const;
-
       /// \brief Get the dictionary of all model names via a callback.
       ///
       /// This is the non-blocking version of ModelDatabase::GetModels
       /// \param[in] _func Callback function that receives the list of models.
       /// \return A boost shared pointer. This pointer must remain valid in
       /// order to receive the callback.
-      public: event::ConnectionPtr Models(
+      public: void Models(
         std::function<void(const std::map<std::string, std::string> &)> _func);
-
-      public: std::map<std::string, std::string> Models2();
-
-      public: void Models2Async(
-        std::function<void(const std::map<std::string, std::string> &)> &_func);
-
-      /// \brief Used by a thread to update the model cache.
-      /// \param[in] _fetchImmediately True to fetch the models without waiting.
-      private: void UpdateModelCache(bool _fetchImmediately);
-
-      /// \brief Used by ModelDatabase::UpdateModelCache.
-      /// no one else should use this function.
-      private: bool UpdateModelCacheImpl();
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
