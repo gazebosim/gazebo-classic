@@ -71,7 +71,7 @@ void FuelModelDatabase::Models(
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, std::string> FuelModelDatabase::Models()
+std::map<std::string, std::string> FuelModelDatabase::Models() const
 {
   std::map<std::string, std::string> models;
   for (auto iter = this->dataPtr->fuelClient->Models(); iter; ++iter)

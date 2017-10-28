@@ -64,7 +64,7 @@ namespace gazebo
 
       /// \brief A signal to trigger the model population of an Ignition Fuel
       /// server.
-      /// \param[in] _visualName Name of the visual to attach the camera to.
+      /// \param[in] server The name of the server containing the models.
       signals: void UpdateFuel(const std::string &_server);
 
       /// \brief Received model selection user input
@@ -76,7 +76,7 @@ namespace gazebo
 
       /// \brief An update function that lets this widget add in the results
       /// from ModelDatabase::GetModels.
-      /// \param[in] _server ToDo.
+      /// \param[in] _server The name of the server containing the models.
       private slots: void OnUpdateFuel(const std::string &_server);
 
       /// \brief QT callback when a path is changed.

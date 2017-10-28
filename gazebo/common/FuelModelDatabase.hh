@@ -55,7 +55,7 @@ namespace gazebo
       /// The parameter of the callback is a map, where the key is the unique
       /// name (containing the full path in the server, owner and model name)
       /// and the value is the model name.
-      /// E.g.: https://api.ignitionfuel.org/caguero/Beer -> Beer
+      /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
       public: virtual void Models(
         std::function<void(const std::map<std::string, std::string> &)> &_func);
 
@@ -66,8 +66,8 @@ namespace gazebo
       /// The key of the returned map is the unique name (containing the full
       /// path in the server, owner and model name) and the value is the
       /// model name.
-      /// E.g.: https://api.ignitionfuel.org/caguero/Beer -> Beer
-      public: virtual std::map<std::string, std::string> Models();
+      /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
+      public: virtual std::map<std::string, std::string> Models() const;
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
