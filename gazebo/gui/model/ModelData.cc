@@ -1197,26 +1197,22 @@ bool LinkData::Apply()
         if (ambient == emptyColor)
         {
           matMsg->clear_ambient();
-          ambient.Set(matAmbient.R(), matAmbient.G(), matAmbient.B(),
-              matAmbient.A());
+          ambient = matAmbient;
         }
         if (diffuse == emptyColor)
         {
           matMsg->clear_diffuse();
-          diffuse.Set(matDiffuse.R(), matDiffuse.G(), matDiffuse.B(),
-              matDiffuse.A());
+          diffuse = matDiffuse;
         }
         if (specular == emptyColor)
         {
           matMsg->clear_specular();
-          specular.Set(matSpecular.R(), matSpecular.G(), matSpecular.B(),
-              matSpecular.A());
+          specular = matSpecular;
         }
         if (emissive == emptyColor)
         {
           matMsg->clear_emissive();
-          emissive.Set(matEmissive.R(), matEmissive.G(), matEmissive.B(),
-              matEmissive.A());
+          emissive = matEmissive;
         }
 
         visualConfig->SetMaterial(leafName, scriptMsg->name(), ambient,
