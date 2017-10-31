@@ -231,8 +231,7 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
     ignition::math::Color matEmissive;
     rendering::Material::MaterialAsColor(materialName, matAmbient,
         matDiffuse, matSpecular, matEmissive);
-    edgeColor.Set(matDiffuse.R(), matDiffuse.G(), matDiffuse.B(),
-        matDiffuse.A());
+    edgeColor = matDiffuse;
   }
 
   this->scene->SetEdgeColor(_id, edgeColor);
