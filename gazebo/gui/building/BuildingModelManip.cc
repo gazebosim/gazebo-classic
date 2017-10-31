@@ -79,14 +79,7 @@ double BuildingModelManip::Transparency() const
 }
 
 /////////////////////////////////////////////////
-common::Color BuildingModelManip::Color() const
-{
-  auto const &ignColor = this->dataPtr->color;
-  return common::Color(ignColor.R(), ignColor.G(), ignColor.B(), ignColor.A());
-}
-
-/////////////////////////////////////////////////
-ignition::math::Color BuildingModelManip::ColorIgn() const
+ignition::math::Color BuildingModelManip::Color() const
 {
   return this->dataPtr->color;
 }

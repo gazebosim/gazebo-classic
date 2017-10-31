@@ -18,6 +18,7 @@
 #define _GAZEBO_COLOR_HH_
 
 #include <iostream>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -74,6 +75,14 @@ namespace gazebo
       /// \param[in] _b Blue value (range 0 to 1
       /// \param[in] _a Alpha value (0=transparent, 1=opaque)
       public: Color(float _r, float _g, float _b, float _a = 1.0);
+
+      /// \brief Converting constructor
+      /// \param[in] _color Color class from ignition library
+      public: Color(const ignition::math::Color &_color);
+
+      /// \brief Converting assignment operator
+      /// \param[in] _color Color class from ignition library
+      public: Color &operator=(const ignition::math::Color &_color);
 
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
