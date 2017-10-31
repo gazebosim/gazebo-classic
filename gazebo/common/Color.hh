@@ -78,6 +78,7 @@ namespace gazebo
 
       /// \brief Converting constructor
       /// \param[in] _color Color class from ignition library
+      // cppcheck-suppress noExplicitConstructor
       public: Color(const ignition::math::Color &_color);
 
       /// \brief Converting assignment operator
