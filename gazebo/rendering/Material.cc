@@ -228,10 +228,10 @@ bool Material::MaterialAsColor(const std::string &_materialName,
       Ogre::Pass *pass = technique->getPass(0);
       if (pass)
       {
-        _ambient = Conversions::ConvertIgn(pass->getAmbient());
-        _diffuse = Conversions::ConvertIgn(pass->getDiffuse());
-        _specular = Conversions::ConvertIgn(pass->getSpecular());
-        _emissive = Conversions::ConvertIgn(pass->getSelfIllumination());
+        _ambient = Conversions::Convert(pass->getAmbient());
+        _diffuse = Conversions::Convert(pass->getDiffuse());
+        _specular = Conversions::Convert(pass->getSpecular());
+        _emissive = Conversions::Convert(pass->getSelfIllumination());
         return true;
       }
     }

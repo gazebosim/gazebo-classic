@@ -481,7 +481,7 @@ void Scene::SetAmbientColor(const common::Color &_color)
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->dataPtr->manager &&Conversions::ConvertIgn(
+  if (this->dataPtr->manager &&Conversions::Convert(
         this->dataPtr->manager->getAmbientLight()) != color)
   {
     this->dataPtr->manager->setAmbientLight(Conversions::Convert(color));

@@ -1599,7 +1599,7 @@ void Visual::SetTransparencyInnerLoop(Ogre::SceneNode *_sceneNode)
           dc = pass->getDiffuse();
           dc.a = (1.0f - passDerivedTransparency);
           pass->setDiffuse(dc);
-          this->dataPtr->diffuse = Conversions::ConvertIgn(dc);
+          this->dataPtr->diffuse = Conversions::Convert(dc);
 
           for (unitStateCount = 0; unitStateCount <
               pass->getNumTextureUnitStates(); ++unitStateCount)
