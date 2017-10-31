@@ -57,8 +57,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Conversions.hh**
     + ***Deprecation:*** Ogre::ColourValue Convert(const common::Color &_clr)
     + ***Replacement:*** Ogre::ColourValue Convert(const ignition::math::Color &_clr)
-    + ***Deprecation:*** common::Color Convert(const Ogre::ColourValue &_clr)
-    + ***Replacement:*** ignition::math::Color ConvertIgn(const Ogre::ColourValue &_clr)
+    + common::Color Convert(const Ogre::ColourValue &_clr) now returns ignition::math::Color
 1. **gazebo/rendering/Material.hh**
     + ***Deprecation:*** bool GetMaterialAsColor(const std::string &_materialName, common::Color &_ambient, common::Color &_diffuse, common::Color &_specular, common::Color &_emissive)
     + ***Replacement:*** bool MaterialAsColor(const std::string &_materialName, ignition::math::Color &_ambient, ignition::math::Color &_diffuse, ignition::math::Color &_specular, ignition::math::Color &_emissive)
