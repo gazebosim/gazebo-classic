@@ -83,11 +83,11 @@ TEST_F(Material_TEST, Update)
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
     EXPECT_EQ(ambientIgn,
-        rendering::Conversions::ConvertIgn(pass->getAmbient()));
+        rendering::Conversions::Convert(pass->getAmbient()));
     EXPECT_EQ(diffuseIgn,
-        rendering::Conversions::ConvertIgn(pass->getDiffuse()));
+        rendering::Conversions::Convert(pass->getDiffuse()));
     EXPECT_EQ(specularIgn,
-        rendering::Conversions::ConvertIgn(pass->getSpecular()));
+        rendering::Conversions::Convert(pass->getSpecular()));
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);
@@ -143,13 +143,13 @@ TEST_F(Material_TEST, Update)
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
     EXPECT_EQ(ambientIgn,
-        rendering::Conversions::ConvertIgn(pass->getAmbient()));
+        rendering::Conversions::Convert(pass->getAmbient()));
     // diffuse alpha value should be overwritten based on material transparency
     ignition::math::Color newDiffuse = diffuseIgn;
     newDiffuse.A(1.0f-transparency);
     EXPECT_EQ(newDiffuse,
-        rendering::Conversions::ConvertIgn(pass->getDiffuse()));
-    EXPECT_EQ(rendering::Conversions::ConvertIgn(
+        rendering::Conversions::Convert(pass->getDiffuse()));
+    EXPECT_EQ(rendering::Conversions::Convert(
           pass->getSpecular()), specularIgn);
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);

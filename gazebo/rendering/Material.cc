@@ -200,10 +200,10 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
   ignition::math::Color emissive;
   bool success = MaterialAsColor(_materialName, ambient, diffuse, specular,
       emissive);
-  _ambient.Set(ambient.R(), ambient.G(), ambient.B(), ambient.A());
-  _diffuse.Set(diffuse.R(), diffuse.G(), diffuse.B(), diffuse.A());
-  _specular.Set(specular.R(), specular.G(), specular.B(), specular.A());
-  _emissive.Set(emissive.R(), emissive.G(), emissive.B(), emissive.A());
+  _ambient = ambient;
+  _diffuse = diffuse;
+  _specular = specular;
+  _emissive = emissive;
   return success;
 }
 

@@ -185,10 +185,7 @@ void Grid::Init()
   this->dataPtr->material->setReceiveShadows(false);
   this->dataPtr->material->getTechnique(0)->setLightingEnabled(false);
 
-  gazebo::common::Color gzColor(this->dataPtr->color.R(),
-      this->dataPtr->color.G(), this->dataPtr->color.B(),
-      this->dataPtr->color.A());
-  this->SetColor(gzColor);
+  this->SetColor(this->dataPtr->color);
 }
 
 //////////////////////////////////////////////////
@@ -285,10 +282,7 @@ VisualPtr Grid::GridVisual() const
 //////////////////////////////////////////////////
 common::Color Grid::Color() const
 {
-  gazebo::common::Color gzColor(this->dataPtr->color.R(),
-      this->dataPtr->color.G(), this->dataPtr->color.B(),
-      this->dataPtr->color.A());
-  return gzColor;
+  return this->dataPtr->color;
 }
 
 //////////////////////////////////////////////////
