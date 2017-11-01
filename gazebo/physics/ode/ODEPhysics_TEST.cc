@@ -372,44 +372,6 @@ TEST_F(ODEPhysics_TEST, PhysicsParam)
       odePhysics->GetParam("world_step_solver")));
     EXPECT_EQ(param, worldSolverType);
   }
-  // Test island_threads
-  {
-    // island_threads should be 0 by default
-    int islandThreads;
-    EXPECT_NO_THROW(islandThreads =
-      boost::any_cast<int>(odePhysics->GetParam("island_threads")));
-    EXPECT_FALSE(islandThreads);
-
-    // try turning it off, then on again
-    std::vector<int> threads = {1, 2, 3, 0};
-    for (auto const islandThreadsSet : threads)
-    {
-      odePhysics->SetParam("island_threads", islandThreadsSet);
-      EXPECT_NO_THROW(islandThreads =
-        boost::any_cast<int>(odePhysics->GetParam("island_threads")));
-      EXPECT_EQ(islandThreads, islandThreadsSet);
-    }
-  }
-
-  // Test ode_quiet
-  // convenient for disabling LCP internal error messages from world solver
-  {
-    // ode_quiet should be off by default
-    bool odeQuiet;
-    EXPECT_NO_THROW(
-      odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
-    EXPECT_FALSE(odeQuiet);
-
-    // try turning it off, then on again
-    std::vector<bool> bools = {true, false};
-    for (const bool odeQuietSet : bools)
-    {
-      odePhysics->SetParam("ode_quiet", odeQuietSet);
-      EXPECT_NO_THROW(
-        odeQuiet = boost::any_cast<bool>(odePhysics->GetParam("ode_quiet")));
-      EXPECT_EQ(odeQuiet, odeQuietSet);
-    }
-  }
 }
 
 /////////////////////////////////////////////////
