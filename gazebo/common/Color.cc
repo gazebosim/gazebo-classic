@@ -73,6 +73,7 @@ Color &Color::operator=(const ignition::math::Color &_color)
   this->g = _color.G();
   this->b = _color.B();
   this->a = _color.A();
+  return *this;
 }
 
 //////////////////////////////////////////////////
