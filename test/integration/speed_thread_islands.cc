@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2017 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,31 +18,37 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/Timer.hh"
 #include "gazebo/physics/physics.hh"
-#include "helper_physics_generator.hh"
+#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-const double g_tolerance = 1e-2;
 
 class SpeedThreadIslandsTest : public ServerFixture,
                                public testing::WithParamInterface<const char*>
 {
-  /// \brief Load 8 double pendulums arranged in a circle.
+  /// \brief Load a world file and test the thread speedup using _threads
   /// Unthrottle update rate, set island threads, and check
   /// changes in required computational time.
   /// \param[in] _physicsEngine Type of physics engine to use.
   /// \param[in] _solverType Type of solver to use.
-  public: void RevoluteJoint(const std::string &_physicsEngine,
-                             const std::string &_solverType="quick");
+  /// \param[in] _worldFile The world file to load into physics engine.
+  /// \param[in] _threads The number of threads to use for speedup test.
+  /// \param[in] _warmUpSteps The numebr of warm up simulation steps.
+  public: void ThreadSpeedup(const std::string &_physicsEngine,
+                             const std::string &_solverType,
+                             const std::string &_worldFile,
+                             const int _threads,
+                             const int _warmUpSteps);
 };
 
 /////////////////////////////////////////////////
 // copied from speed_thread_pr2.cc
 // Get timing information from World::Step()
 // \param[in] _world Pointer to the world
+// \param[in] _steps Number of steps to run
 // \param[out] _avgTime Average duration of a World::Step
 // \param[out] _maxTime Max duration of a World::Step
 // \param[out] _minTime Min duration of a World::Step
-void stats(physics::WorldPtr _world, common::Time &_avgTime,
+void Stats(physics::WorldPtr _world, const int _steps, common::Time &_avgTime,
     common::Time &_maxTime, common::Time &_minTime)
 {
   common::Timer timer;
@@ -53,7 +59,7 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
   _minTime.Set(GZ_INT32_MAX, 0);
 
   int repetitions = 3;
-  int steps = 5000;
+  int steps = _steps;
 
   for (int i = 0; i < repetitions; ++i)
   {
@@ -71,21 +77,24 @@ void stats(physics::WorldPtr _world, common::Time &_avgTime,
       _minTime = timeLap;
   }
 
-  _avgTime = _avgTime.Double() / (repetitions * steps);
+  _avgTime = _avgTime.Double() / repetitions;
 }
 
 ////////////////////////////////////////////////////////////////////////
-void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
-                                           const std::string &_solverType)
+void SpeedThreadIslandsTest::ThreadSpeedup(const std::string &_physicsEngine,
+                                           const std::string &_solverType,
+                                           const std::string &_worldFile,
+                                           const int _threads,
+                                           const int _warmUpSteps)
 {
   // Load world
-  Load("worlds/revolute_joint_test.world", true, _physicsEngine);
+  Load(_worldFile, true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // Set solver type and unthrottle update rate
@@ -104,12 +113,12 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
     EXPECT_EQ(0, threads);
   }
 
-  // Take 500 steps to warm up.
-  world->Step(500);
+  // Take some steps to warm up.
+  world->Step(_warmUpSteps);
 
   // Collect base-line statistics (no threading)
   common::Time baseAvgTime, baseMaxTime, baseMinTime;
-  stats(world, baseAvgTime, baseMaxTime, baseMinTime);
+  Stats(world, 10*_warmUpSteps, baseAvgTime, baseMaxTime, baseMinTime);
 
   std::cout << "Base Time\n";
   std::cout << "\t Avg[" << baseAvgTime << "]\n"
@@ -119,37 +128,52 @@ void SpeedThreadIslandsTest::RevoluteJoint(const std::string &_physicsEngine,
   // Turn on island threads
   {
     int threads;
-    physics->SetParam("island_threads", 2);
+    physics->SetParam("island_threads", _threads);
     EXPECT_NO_THROW(
       threads = boost::any_cast<int>(physics->GetParam("island_threads")));
-    EXPECT_EQ(2, threads);
+    EXPECT_EQ(_threads, threads);
   }
 
-  // Take 500 steps to warm up.
-  world->Step(500);
+  // Take some steps to warm up.
+  world->Step(_warmUpSteps);
 
   // Collect threaded statistics
   common::Time threadAvgTime, threadMaxTime, threadMinTime;
-  stats(world, threadAvgTime, threadMaxTime, threadMinTime);
+  Stats(world, 10*_warmUpSteps, threadAvgTime, threadMaxTime, threadMinTime);
 
   std::cout << "Thread Time\n";
   std::cout << "\t Avg[" << threadAvgTime << "]\n"
             << "\t Max[" << threadMaxTime << "]\n"
             << "\t Min[" << threadMinTime << "]\n";
 
-  // Expect computational time to decrease
+  // Expect best-case computational time to decrease
   EXPECT_LT(threadMinTime, baseMinTime);
-  EXPECT_LT(threadAvgTime, baseAvgTime);
 }
 
-TEST_F(SpeedThreadIslandsTest, RevoluteJointQuickStep)
+
+TEST_F(SpeedThreadIslandsTest, MultiplePendulumQuickStep)
 {
-  RevoluteJoint("ode", "quick");
+  ThreadSpeedup("ode", "quick",
+    "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
 }
 
-TEST_F(SpeedThreadIslandsTest, RevoluteJointWorldStep)
+// this test fails on macOS, see issue #2364
+#ifndef __APPLE__
+TEST_F(SpeedThreadIslandsTest, MultiplePendulumWorldStep)
 {
-  RevoluteJoint("ode", "world");
+  ThreadSpeedup("ode", "world",
+    "worlds/revolute_joint_test_with_large_gap.world", 4, 500);
+}
+#endif
+
+TEST_F(SpeedThreadIslandsTest, DualPR2QuickStep)
+{
+  ThreadSpeedup("ode", "quick", "worlds/dual_pr2.world", 2, 50);
+}
+
+TEST_F(SpeedThreadIslandsTest, DualPR2WorldStep)
+{
+  ThreadSpeedup("ode", "world", "worlds/dual_pr2.world", 2, 50);
 }
 
 int main(int argc, char **argv)
