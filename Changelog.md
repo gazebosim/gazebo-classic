@@ -3,6 +3,7 @@
 ## Gazebo 9.x.x (2018-xx-xx)
 
 1. Mark constructors as explicit to fix cppcheck warnings
+    * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
     * [Pull request #2795](https://bitbucket.org/osrf/gazebo/pull-request/2795)
 
 1. Try finding both ignition math 3 or 4 until we switch to 4
@@ -332,12 +333,6 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
-1. Parallelize ODE physics with threaded islands parameter
-    * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
-
-1. Logical camera uses <topic>
-    * [Pull request 2777](https://bitbucket.org/osrf/gazebo/pull-requests/2777)
-
 1. Support off-diagonal inertia terms in bullet
     * [Pull request 2757](https://bitbucket.org/osrf/gazebo/pull-requests/2757)
 
@@ -357,9 +352,6 @@
 
 1. Fix orbiting view around heightmap
     * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
-
-1. Logical Camera sees nested models
-    * [Pull request 2776](https://bitbucket.org/osrf/gazebo/pull-request/2776)
 
 ## Gazebo 7.8.1 (2017-06-08)
 
