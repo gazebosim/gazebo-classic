@@ -230,9 +230,13 @@ void InsertModelWidget::Update()
 }
 
 /////////////////////////////////////////////////
+
+#ifndef HAVE_IGNITION_FUEL_TOOLS
+void InsertModelWidget::OnUpdateFuel(const std::string &/*_server*/)
+{
+#else
 void InsertModelWidget::OnUpdateFuel(const std::string &_server)
 {
-#ifdef HAVE_IGNITION_FUEL_TOOLS
   this->dataPtr->fuelDetails[_server].modelFuelItem->setText(0,
       QString("%1").arg(QString::fromStdString(_server)));
 

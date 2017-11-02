@@ -206,6 +206,10 @@ if (HAVE_IGNITION_FUEL_TOOLS)
   set (sources ${sources}
     FuelModelDatabase.cc
   )
+
+  set (gtest_sources ${gtest_sources}
+    FuelModelDatabase_TEST.cc
+  )
 endif()
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
