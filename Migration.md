@@ -16,8 +16,7 @@ release will remove the deprecated code.
 
 ### Modifications
 
-1. **gazebo/gui/**
-    + ***Modified:*** Many constructors with 1 argument in GUI classes marked as explicit.
+1. ***Modified:*** Many constructors with 1 argument were marked as explicit.
 1. **gazebo/gui/JointControlWidget.hh**
     + ***Removed:*** gazebo::transport::Publisher for topic(s) `~/.../joint_cmd`
     + ***Replacement:*** ignition::transport::Publisher for topic(s) `/.../joint_cmd`
