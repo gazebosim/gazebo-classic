@@ -153,7 +153,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _name Name of the timer
-      public: DiagnosticTimer(const std::string &_name);
+      public: explicit DiagnosticTimer(const std::string &_name);
 
       /// \brief Destructor
       public: virtual ~DiagnosticTimer();
