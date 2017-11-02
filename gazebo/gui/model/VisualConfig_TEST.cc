@@ -21,6 +21,9 @@
 
 #include "test_config.h"
 
+/// \brief variable for testing closing modal dialogs
+bool g_confirmed = false;
+
 using namespace gazebo;
 using namespace gui;
 
@@ -205,10 +208,13 @@ void VisualConfig_TEST::Restore()
   QVERIFY(vc.GetData("v3") == NULL);
 
   // Remove a visual and restore
+  QVERIFY(!g_confirmed);
   auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
   QVERIFY(button);
-  QTimer::singleShot(3000, this, SLOT(Confirm()));
+  VisualConfigTestHelper helper;
+  QTimer::singleShot(3000, &helper, SLOT(Confirm()));
   button->click();
+  QVERIFY(g_confirmed);
 
   QCOMPARE(vc.GetVisualCount(), 1u);
   QVERIFY(vc.GetData("v1") == NULL);
@@ -223,31 +229,13 @@ void VisualConfig_TEST::Restore()
 }
 
 /////////////////////////////////////////////////
-void VisualConfig_TEST::Confirm()
+void VisualConfigTestHelper::Confirm()
 {
   auto w = QApplication::activeModalWidget();
-  if (w)
-  {
-    w->setFocus();
-    QTest::keyClick(w, Qt::Key_Enter);
-    return;
-  }
-
-  w = QApplication::focusWidget();
-  if (w)
-  {
-    QTest::keyClick(w, Qt::Key_Enter);
-    return;
-  }
-
-  auto list = QApplication::topLevelWidgets();
-  for (auto i : list)
-  {
-    if (i->inherits("QMessageBox"))
-    {
-      QTest::keyClick(i, Qt::Key_Enter);
-    }
-  }
+  QVERIFY(w != nullptr);
+  w->setFocus();
+  QTest::keyClick(w, Qt::Key_Enter);
+  g_confirmed = true;
 }
 
 // Generate a main function for the test
