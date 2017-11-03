@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the mainwindow.
-      public: TerrainEditor(MainWindow *_mainWindow);
+      public: explicit TerrainEditor(MainWindow *_mainWindow);
 
       /// \brief Destuctor.
       public: virtual ~TerrainEditor();

@@ -37,7 +37,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ModelPluginInspector(QWidget *_parent = 0);
+      public: explicit ModelPluginInspector(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelPluginInspector();
