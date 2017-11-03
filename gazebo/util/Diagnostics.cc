@@ -406,6 +406,7 @@ void DiagnosticTimer::InsertData(const std::string &_name,
     ignition::math::SignalStats newStat;
     newStat.InsertStatistics("mean,maxAbs,min,var");
     this->dataPtr->stats[_name] = newStat;
+    iter = this->dataPtr->stats.find(_name);
   }
   iter->second.InsertData(_time.Double());
 }
