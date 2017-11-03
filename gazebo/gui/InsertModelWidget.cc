@@ -230,7 +230,6 @@ void InsertModelWidget::Update()
 }
 
 /////////////////////////////////////////////////
-
 #ifndef HAVE_IGNITION_FUEL_TOOLS
 void InsertModelWidget::OnUpdateFuel(const std::string &/*_server*/)
 {
@@ -273,6 +272,9 @@ void InsertModelWidget::OnModels(
 void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
                                          int /*_column*/)
 {
+  if (!_item || !_item->parent())
+    return;
+
   if (_item)
   {
     std::string path = _item->data(0, Qt::UserRole).toString().toStdString();
@@ -281,8 +283,23 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     {
       QApplication::setOverrideCursor(Qt::BusyCursor);
 
-      std::string filename =
-        common::ModelDatabase::Instance()->GetModelFile(path);
+      // Check if this is a model from an Ignition Fuel server.
+      bool fuelModelSelected = false;
+      for (auto const &serverEntry : this->dataPtr->fuelDetails)
+      {
+        if (serverEntry.second.modelFuelItem == _item->parent())
+        {
+          fuelModelSelected = true;
+          break;
+        }
+      }
+
+      std::string filename;
+      if (fuelModelSelected)
+        filename = common::FuelModelDatabase::Instance()->ModelFile(path);
+      else
+        filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
       gui::Events::createEntity("model", filename);
 
       {
@@ -485,40 +502,23 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 void InsertModelWidget::InitializeFuelServers()
 {
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-  // Instantiate the Ignition Fuel client.
-  // ToDo: Remove this block when Ignition Fuel Tools supports parsing
-  // a configuration file.
-  ignition::fuel_tools::ServerConfig srv;
-  srv.URL("https://staging-api.ignitionfuel.org");
-  ignition::fuel_tools::ClientConfig conf;
-  conf.AddServer(srv);
-
-  this->dataPtr->fuelClient.reset(
-    new ignition::fuel_tools::FuelClient(conf));
-
   // Get the list of Ignition Fuel servers.
-  auto servers = this->dataPtr->fuelClient->Config().Servers();
+  auto servers = common::FuelModelDatabase::Instance()->Servers();
 
   // Populate the list of Ignition Fuel servers.
-  for (auto i = 0u; i < servers.size(); ++i)
+  for (auto server : servers)
   {
-    std::string url = servers.at(i).URL();
-    this->dataPtr->fuelDetails[url];
+    this->dataPtr->fuelDetails[server];
 
-    // Instantiate a FuelModelDatabase for the specific server.
-    this->dataPtr->fuelDetails[url].fuelDB.reset(
-        new common::FuelModelDatabase(url));
-
-    // Create a top-level tree item for the models hosted in this
-    // Ignition Fuel server.
-    std::string label = "Connecting to " + url + "...";
-    this->dataPtr->fuelDetails[url].modelFuelItem =
+    // Create a top-level tree item for the models hosted in this Fuel server.
+    std::string label = "Connecting to " + server + "...";
+    this->dataPtr->fuelDetails[server].modelFuelItem =
         new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
             QStringList(QString::fromStdString(label)));
 
     // Add the new entry.
     this->dataPtr->fileTreeWidget->addTopLevelItem(
-        this->dataPtr->fuelDetails[url].modelFuelItem);
+        this->dataPtr->fuelDetails[server].modelFuelItem);
   }
 #endif
 }
@@ -528,23 +528,20 @@ void InsertModelWidget::PopulateFuelServers()
 {
 #ifdef  HAVE_IGNITION_FUEL_TOOLS
   // Get the list of Ignition Fuel servers.
-  auto servers = this->dataPtr->fuelClient->Config().Servers();
-
-  for (auto i = 0u; i < servers.size(); ++i)
+  auto servers = common::FuelModelDatabase::Instance()->Servers();
+  for (auto server : servers)
   {
-    std::string url = servers.at(i).URL();
-
     // This lamda will be executed asynchronously when we get the list of models
     // from this Ignition Fuel Server.
     std::function<void(const std::map<std::string, std::string> &)> f =
-        [url, this](const std::map<std::string, std::string> &_models)
+        [server, this](const std::map<std::string, std::string> &_models)
         {
-          this->dataPtr->fuelDetails[url].modelBuffer = _models;
+          this->dataPtr->fuelDetails[server].modelBuffer = _models;
           // Emit the signal that populates the models for this server.
-          this->UpdateFuel(url);
+          this->UpdateFuel(server);
         };
 
-    this->dataPtr->fuelDetails[url].fuelDB->Models(f);
+    common::FuelModelDatabase::Instance()->Models(server, f);
   }
 #endif
 }
