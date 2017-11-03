@@ -27,7 +27,6 @@ class DiagnosticsTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(DiagnosticsTest, Diagnostics)
 {
-#ifdef ENABLE_DIAGNOSTICS
   util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
 
@@ -42,7 +41,6 @@ TEST_F(DiagnosticsTest, Diagnostics)
 
   EXPECT_TRUE(mgr->Time(0) == mgr->Time("test"));
   EXPECT_TRUE(mgr->Time(0) <= after - prev);
-#endif
 }
 
 
