@@ -33,9 +33,14 @@ class QPushButton;
 
 namespace gazebo
 {
+  namespace common
+  {
+    // Forward declaration.
+    class FuelModelDatabase;
+  }
   namespace gui
   {
-    /// \brief Private
+    // Forward declaration.
     class InsertModelWidgetPrivate;
 
     class GZ_GUI_VISIBLE InsertModelWidget : public QWidget

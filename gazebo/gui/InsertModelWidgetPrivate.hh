@@ -46,9 +46,6 @@ namespace gazebo
       /// \brief Tree item that is populated with models from a Fuel server.
       public: QTreeWidgetItem *modelFuelItem = nullptr;
 
-      /// \brief A FuelModelDatabase instance to interact with a Fuel server.
-      public: std::unique_ptr<common::FuelModelDatabase> fuelDB = nullptr;
-
       /// \brief a buffer of models.
       /// The key is the unique name (containing the full path in the server,
       /// owner and model name) and the value is just the model name.

@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <thread>
+#include <vector>
 #include <ignition/fuel-tools.hh>
 
 #include "gazebo/common/FuelModelDatabase.hh"
@@ -27,26 +28,23 @@
 using namespace gazebo;
 using namespace common;
 
+FuelModelDatabase *FuelModelDatabase::myself = FuelModelDatabase::Instance();
+
 /// \brief Private class attributes for FuelModelDatabase.
 class gazebo::common::FuelModelDatabasePrivate
 {
-  /// \brief The server name.
-  public: std::string server;
-
   /// \brief A client to interact with Ignition Fuel.
   public: std::unique_ptr<ignition::fuel_tools::FuelClient> fuelClient;
 };
 
 /////////////////////////////////////////////////
-FuelModelDatabase::FuelModelDatabase(const std::string &_server)
+FuelModelDatabase::FuelModelDatabase()
   : dataPtr(new FuelModelDatabasePrivate)
 {
-  this->dataPtr->server = _server;
-
   // ToDo: Remove this block when Ignition Fuel Tools supports parsing
   // a configuration file.
   ignition::fuel_tools::ServerConfig srv;
-  srv.URL(this->dataPtr->server);
+  srv.URL("https://staging-api.ignitionfuel.org");
   ignition::fuel_tools::ClientConfig conf;
   conf.AddServer(srv);
 
@@ -59,21 +57,51 @@ FuelModelDatabase::~FuelModelDatabase()
 }
 
 /////////////////////////////////////////////////
-void FuelModelDatabase::Models(
+std::vector<std::string> FuelModelDatabase::Servers() const
+{
+  auto servers = this->dataPtr->fuelClient->Config().Servers();
+  std::vector<std::string> res;
+  for (const auto &server : servers)
+    res.push_back(server.URL());
+
+  return res;
+}
+
+/////////////////////////////////////////////////
+void FuelModelDatabase::Models(const std::string &_server,
     std::function<void (const std::map<std::string, std::string> &)> &_func)
 {
-  std::thread t([this, _func]
+  std::thread t([this, _func, _server]
   {
     // Run the callback passing the list of models.
-    _func(this->Models());
+    _func(this->Models(_server));
   });
   t.detach();
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, std::string> FuelModelDatabase::Models() const
+std::map<std::string, std::string> FuelModelDatabase::Models(
+    const std::string &_server) const
 {
   std::map<std::string, std::string> models;
+
+  // Sanity check: Verity that the server is correct.
+  auto servers = this->dataPtr->fuelClient->Config().Servers();
+  bool serverFound = false;
+  for (const auto &server : servers)
+  {
+    if (server.URL() == _server)
+    {
+      serverFound = true;
+      break;
+    }
+  }
+  if (!serverFound)
+    return models;
+
+
+  // ToDo: Pass the server name when Ignition Fuel Tools supports multiple
+  // servers.
   for (auto iter = this->dataPtr->fuelClient->Models(); iter; ++iter)
   {
     std::string fullURI = iter->Identification().UniqueName();

@@ -21,7 +21,9 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
+#include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -38,39 +40,51 @@ namespace gazebo
     /// \brief Connects to an Igniiton Fuel model database, and has utility
     /// functions to find models.
     class GZ_COMMON_VISIBLE FuelModelDatabase
+      : public SingletonT<FuelModelDatabase>
     {
       /// \brief Constructor.
-      /// \param[in] _server The server name.
-      /// E.g.: https://api.ignitionfuel.org
-      public: FuelModelDatabase(const std::string &_server);
+      private: FuelModelDatabase();
 
       /// \brief Destructor
-      public: virtual ~FuelModelDatabase();
+      private: virtual ~FuelModelDatabase();
+
+      /// \brief Get all the Ignition Fuel servers.
+      /// \return A collection of Ignition Fuel servers.
+      public: std::vector<std::string> Servers() const;
 
       /// \brief Get the dictionary of all model names via a callback.
       ///
       /// This is a non-blocking function. Your callback will be executed from
       /// a separate thread.
+      /// \param[in] _server The Ignition Fuel server URL.
       /// \param[in] _func Callback function that receives the list of models.
       /// The parameter of the callback is a map, where the key is the unique
       /// name (containing the full path in the server, owner and model name)
       /// and the value is the model name.
       /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
-      public: virtual void Models(
+      public: virtual void Models(const std::string &_server,
         std::function<void(const std::map<std::string, std::string> &)> &_func);
 
       /// \brief Get the dictionary of all model names.
       ///
       /// This is a blocking function.
+      /// \param[in] _server The Ignition Fuel server URL.
       /// \return The list of models.
       /// The key of the returned map is the unique name (containing the full
       /// path in the server, owner and model name) and the value is the
       /// model name.
       /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
-      public: virtual std::map<std::string, std::string> Models() const;
+      public: virtual std::map<std::string, std::string> Models(
+        const std::string &_server) const;
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
+
+      /// \brief Singleton implementation
+      private: friend class SingletonT<FuelModelDatabase>;
+
+      /// \brief Handy trick to automatically call a singleton's constructor.
+      private: static FuelModelDatabase *myself;
     };
   }
 }
