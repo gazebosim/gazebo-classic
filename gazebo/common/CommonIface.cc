@@ -396,18 +396,19 @@ bool common::copyDir(const boost::filesystem::path &_source,
     if (!fs::create_directory(_destination))
     {
       gzwarn << "Unable to create the destination directory "
-        << _destination.string() << ", please check the permission." << std::endl;
+        << _destination.string() << ", please check the permission.\n";
         return false;
     }
   }
-  catch (fs::filesystem_error const &e)
+  catch(fs::filesystem_error const &e)
   {
     gzwarn << e.what() << std::endl;
     return false;
   }
 
   // Start copy from source to destination directory
-  for (fs::directory_iterator file(_source); file != fs::directory_iterator(); ++file)
+  for (fs::directory_iterator file(_source);
+       file != fs::directory_iterator(); ++file)
   {
     try
     {
@@ -424,7 +425,7 @@ bool common::copyDir(const boost::filesystem::path &_source,
         fs::copy_file(current, _destination / current.filename());
       }
     }
-    catch (fs::filesystem_error const &e)
+    catch(fs::filesystem_error const &e)
     {
       gzwarn << e.what() << std::endl;
       return false;

@@ -211,7 +211,7 @@ TEST_F(CommonIface_TEST, replaceAll)
 
 TEST_F(CommonIface_TEST, directoryOps)
 {
-   // Cleanup test directory.
+  // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
   boost::filesystem::path testPath(paths->DefaultTestPath());
   boost::filesystem::remove_all(testPath);

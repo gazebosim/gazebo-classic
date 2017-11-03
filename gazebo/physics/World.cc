@@ -2330,61 +2330,64 @@ bool World::OnLog(std::ostringstream &_stream)
     _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
 
-    const std::string modelPrefix = "model://";
-    for (auto const &model : this->dataPtr->models)
+    if (util::LogRecord::Instance()->RecordWithModel())
     {
-      bool modelFound = false;
-      sdf::ElementPtr modelElem = model->GetSDF();
-      if (modelElem->HasElement("link"))
+      const std::string modelPrefix = "model://";
+      for (auto const &model : this->dataPtr->models)
       {
-        sdf::ElementPtr linkElem = modelElem->GetElement("link");
-        while(linkElem)
+        sdf::ElementPtr modelElem = model->GetSDF();
+        if (modelElem->HasElement("link"))
         {
-          if (linkElem->HasElement("visual"))
+          sdf::ElementPtr linkElem = modelElem->GetElement("link");
+          bool modelFound = false;
+          while (linkElem)
           {
-            sdf::ElementPtr visualElem = linkElem->GetElement("visual");
-            while (visualElem)
+            if (linkElem->HasElement("visual"))
             {
-              sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
-              if (geomElem->HasElement("mesh"))
+              sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+              while (visualElem)
               {
-                const std::string meshUri = geomElem->GetElement("mesh")->Get<std::string>("uri");
-
-                if (boost::starts_with(meshUri, modelPrefix))
+                sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+                if (geomElem->HasElement("mesh"))
                 {
-                  std::string modelName = meshUri.substr(modelPrefix.size(),
-                    meshUri.find_first_of("/", modelPrefix.size()) - modelPrefix.size());
+                  const std::string meshUri = geomElem->GetElement("mesh")
+                    ->Get<std::string>("uri");
+                  if (boost::starts_with(meshUri, modelPrefix))
+                  {
+                    std::string modelName = meshUri.substr(modelPrefix.size(),
+                      meshUri.find_first_of("/", modelPrefix.size())
+                      - modelPrefix.size());
+                    modelNames.insert(modelName);
+                    modelFound = true;
+                    break;
+                  }
+                }
+                const std::string matUri = visualElem->GetElement("material")
+                  ->GetElement("script")->Get<std::string>("uri");
+                if (!matUri.empty() && boost::starts_with(matUri, modelPrefix))
+                {
+                  std::string modelName = matUri.substr(modelPrefix.size(),
+                    matUri.find_first_of("/", modelPrefix.size())
+                    - modelPrefix.size());
                   modelNames.insert(modelName);
                   modelFound = true;
                   break;
                 }
+                visualElem = visualElem->GetNextElement("visual");
               }
-
-              const std::string matUri = visualElem->GetElement("material")
-                ->GetElement("script")->Get<std::string>("uri");
-              if (!matUri.empty() && boost::starts_with(matUri, modelPrefix))
-              {
-                std::string modelName = matUri.substr(modelPrefix.size(),
-                  matUri.find_first_of("/", modelPrefix.size()) - modelPrefix.size());
-                modelNames.insert(modelName);
-                modelFound = true;
-                break;
-              }
-              visualElem = visualElem->GetNextElement("visual");
             }
+            if (modelFound)
+            {
+              break;
+            }
+            linkElem = linkElem->GetNextElement("link");
           }
-          if (modelFound)
-          {
-            break;
-          }
-          linkElem = linkElem->GetNextElement("link");
         }
       }
-    }
-
-    if (!util::LogRecord::Instance()->SaveModels(modelNames))
-    {
-      gzwarn << "Save models failed during logging\n";
+      if (!util::LogRecord::Instance()->SaveModels(modelNames))
+      {
+        gzwarn << "Save models failed during logging\n";
+      }
     }
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
