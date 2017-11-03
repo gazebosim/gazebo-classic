@@ -34,7 +34,7 @@ enum {POSITION_BINDING, TEXCOORD_BINDING};
 /// \brief Private implementation
 class gazebo::rendering::DynamicLinesPrivate
 {
-  /// \brief list of colorsat each point
+  /// \brief list of colors at each point
   public: std::vector<ignition::math::Color> colors;
 };
 
