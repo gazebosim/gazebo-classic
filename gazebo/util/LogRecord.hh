@@ -19,6 +19,8 @@
 
 #include <fstream>
 #include <string>
+#include <unordered_set>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -197,6 +199,10 @@ namespace gazebo
       /// \brief Return true if an Update has not yet been completed.
       /// \return True if an Update has not yet been completed.
       public: bool FirstUpdate() const;
+
+      /// \brief Return true if successfully saved all the models.
+      /// \return True if all the models are saved successfully to the log folder.
+      public: bool SaveModels(std::unordered_set<std::string> models);
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.

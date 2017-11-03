@@ -206,6 +206,9 @@ namespace gazebo
 
       /// \brief Record filter string.
       public: std::string filter = "";
+
+      /// \brief Model path.
+      public: std::list<std::string> modelPaths;
     };
     /// \}
   }
