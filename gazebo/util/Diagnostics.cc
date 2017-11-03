@@ -73,7 +73,7 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  this->dataPtr->updateConnection.reset();
 }
 
 //////////////////////////////////////////////////
