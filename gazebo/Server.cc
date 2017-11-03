@@ -280,9 +280,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
     }
   }
 
-  if (this->dataPtr->vm.count("pause"))
-    this->dataPtr->params["pause"] = "true";
-
   if (!this->PreLoad())
   {
     gzerr << "Unable to load gazebo\n";
@@ -587,18 +584,14 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
+  bool p = this->dataPtr->vm.count("pause") > 0 ? true : false;
+  physics::pause_worlds(p);
   common::StrStr_M::const_iterator iter;
-  bool p = false;
   for (iter = this->dataPtr->params.begin();
        iter != this->dataPtr->params.end();
        ++iter)
   {
-    if (iter->first == "pause")
-    {
-      p = true;
-      physics::pause_worlds(p);
-    }
-    else if (iter->first == "record")
+    if (iter->first == "record")
     {
       util::LogRecordParams params;
 
