@@ -275,40 +275,36 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
   if (!_item || !_item->parent())
     return;
 
-  if (_item)
+  std::string path = _item->data(0, Qt::UserRole).toString().toStdString();
+  if (!path.empty())
   {
-    std::string path = _item->data(0, Qt::UserRole).toString().toStdString();
+    QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    if (!path.empty())
+    // Check if this is a model from an Ignition Fuel server.
+    bool fuelModelSelected = false;
+    for (auto const &serverEntry : this->dataPtr->fuelDetails)
     {
-      QApplication::setOverrideCursor(Qt::BusyCursor);
-
-      // Check if this is a model from an Ignition Fuel server.
-      bool fuelModelSelected = false;
-      for (auto const &serverEntry : this->dataPtr->fuelDetails)
+      if (serverEntry.second.modelFuelItem == _item->parent())
       {
-        if (serverEntry.second.modelFuelItem == _item->parent())
-        {
-          fuelModelSelected = true;
-          break;
-        }
+        fuelModelSelected = true;
+        break;
       }
-
-      std::string filename;
-      if (fuelModelSelected)
-        filename = common::FuelModelDatabase::Instance()->ModelFile(path);
-      else
-        filename = common::ModelDatabase::Instance()->GetModelFile(path);
-
-      gui::Events::createEntity("model", filename);
-
-      {
-        boost::mutex::scoped_lock lock(this->dataPtr->mutex);
-        this->dataPtr->fileTreeWidget->clearSelection();
-      }
-
-      QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
+
+    std::string filename;
+    if (fuelModelSelected)
+      filename = common::FuelModelDatabase::Instance()->ModelFile(path);
+    else
+      filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
+    gui::Events::createEntity("model", filename);
+
+    {
+      boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+      this->dataPtr->fileTreeWidget->clearSelection();
+    }
+
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
   }
 }
 
@@ -506,7 +502,7 @@ void InsertModelWidget::InitializeFuelServers()
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 
   // Populate the list of Ignition Fuel servers.
-  for (auto server : servers)
+  for (auto const &server : servers)
   {
     this->dataPtr->fuelDetails[server];
 
@@ -529,7 +525,7 @@ void InsertModelWidget::PopulateFuelServers()
 #ifdef  HAVE_IGNITION_FUEL_TOOLS
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
-  for (auto server : servers)
+  for (auto const &server : servers)
   {
     // This lamda will be executed asynchronously when we get the list of models
     // from this Ignition Fuel Server.

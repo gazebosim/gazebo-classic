@@ -108,8 +108,7 @@ namespace gazebo
       /// \brief Singleton implementation
       private: friend class SingletonT<FuelModelDatabase>;
 
-      /// \brief Handy trick to automatically call a singleton's
-      /// constructor.
+      /// \brief Handy trick to automatically call a singleton's constructor.
       private: static FuelModelDatabase *myself;
     };
   }

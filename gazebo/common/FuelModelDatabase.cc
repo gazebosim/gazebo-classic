@@ -92,6 +92,8 @@ void FuelModelDatabase::Models(const std::string &_server,
 std::map<std::string, std::string> FuelModelDatabase::Models(
     const std::string &_server) const
 {
+  std::map<std::string, std::string> models;
+
   // Sanity check: Verity that the server is correct.
   auto servers = this->dataPtr->fuelClient->Config().Servers();
   bool serverFound = false;
@@ -103,10 +105,10 @@ std::map<std::string, std::string> FuelModelDatabase::Models(
       break;
     }
   }
-  if (! serverFound)
-    return {};
+  if (!serverFound)
+    return models;
 
-  std::map<std::string, std::string> models;
+
   // ToDo: Pass the server name when Ignition Fuel Tools supports multiple
   // servers.
   for (auto iter = this->dataPtr->fuelClient->Models(); iter; ++iter)
