@@ -581,6 +581,7 @@ void RenderEngine::SetupResources()
     {
       std::string prefix = (*iter) + "/" + (*mediaIter);
 
+      archNames.clear();
       archNames.push_back(
           std::make_pair(prefix, "General"));
       archNames.push_back(
