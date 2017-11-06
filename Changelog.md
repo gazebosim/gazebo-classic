@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Don't use lib prefix for ogre plugins as of ogre1.9
+    * [Pull request #2803](https://bitbucket.org/osrf/gazebo/pull-request/2803)
+
 1. Added and improved communications between the JointControlWidget and JointController
     * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
     * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
