@@ -584,7 +584,7 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
-  bool p = this->dataPtr->vm.count("pause") > 0 ? true : false;
+  bool p = this->dataPtr->vm.count("pause") > 0;
   physics::pause_worlds(p);
   common::StrStr_M::const_iterator iter;
   for (iter = this->dataPtr->params.begin();
