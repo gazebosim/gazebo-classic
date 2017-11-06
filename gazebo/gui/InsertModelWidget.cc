@@ -280,8 +280,10 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    // Check if this is a model from an Ignition Fuel server.
+    std::string filename;
+#ifndef HAVE_IGNITION_FUEL_TOOLS
     bool fuelModelSelected = false;
+    // Check if this is a model from an Ignition Fuel server.
     for (auto const &serverEntry : this->dataPtr->fuelDetails)
     {
       if (serverEntry.second.modelFuelItem == _item->parent())
@@ -291,10 +293,10 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
       }
     }
 
-    std::string filename;
     if (fuelModelSelected)
       filename = common::FuelModelDatabase::Instance()->ModelFile(path);
     else
+#endif
       filename = common::ModelDatabase::Instance()->GetModelFile(path);
 
     gui::Events::createEntity("model", filename);
@@ -500,7 +502,6 @@ void InsertModelWidget::InitializeFuelServers()
 #ifdef HAVE_IGNITION_FUEL_TOOLS
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
-
   // Populate the list of Ignition Fuel servers.
   for (auto const &server : servers)
   {
