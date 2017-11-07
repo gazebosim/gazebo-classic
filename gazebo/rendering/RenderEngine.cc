@@ -581,7 +581,6 @@ void RenderEngine::SetupResources()
     {
       std::string prefix = (*iter) + "/" + (*mediaIter);
 
-      archNames.clear();
       archNames.push_back(
           std::make_pair(prefix, "General"));
       archNames.push_back(
@@ -616,18 +615,18 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
 
-    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  }
+  for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  {
+    try
     {
-      try
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            aiter->first, "FileSystem", aiter->second);
-      }
-      catch(Ogre::Exception &/*_e*/)
-      {
-        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
-            "in the world file is set correctly.");
-      }
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          aiter->first, "FileSystem", aiter->second);
+    }
+    catch(Ogre::Exception &/*_e*/)
+    {
+      gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+          "in the world file is set correctly.");
     }
   }
 }
