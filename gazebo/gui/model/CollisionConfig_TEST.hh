@@ -50,4 +50,13 @@ class CollisionConfig_TEST : public QTestFixture
   private: unsigned int g_appliedSignalCount = 0;
 };
 
+/// \brief A help class for closing collision config modal dialog
+class CollisionConfigTestHelper : public QObject
+{
+  Q_OBJECT
+
+  /// \brief Key click to close modal dialog.
+  private slots: void Confirm();
+};
+
 #endif
