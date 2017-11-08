@@ -256,7 +256,7 @@ void MainWindow_TEST::UserCameraFPS()
     std::cerr << "Skipping lower bound FPS check" << std::endl;
     skipFPSTest = true;
   }
-  unsigned int iterations = skipFPSTest ? 50 : 5000;
+  unsigned int iterations = skipFPSTest ? 500 : 5000;
   double lowerFPSBound = skipFPSTest ? 0 : 45;
 
   // Wait a little bit for the average FPS to even out.
@@ -422,7 +422,7 @@ void MainWindow_TEST::Wireframe()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_dark_plane.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
   gazebo::transport::NodePtr node;
   gazebo::transport::SubscriberPtr sub;
 
@@ -515,7 +515,7 @@ void MainWindow_TEST::NonDefaultWorld()
 
   boost::filesystem::path path = TEST_PATH;
   path = path / "worlds" / "empty_different_name.world";
-  this->Load(path.string(), false, false, true);
+  this->Load(path.string(), false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -571,10 +571,6 @@ void MainWindow_TEST::UserCameraJoystick()
   QVERIFY(mainWindow != NULL);
   // Create the main window.
   mainWindow->Load();
-
-  gazebo::rendering::create_scene(
-      gazebo::physics::get_world()->GetName(), false);
-
   mainWindow->Init();
   mainWindow->show();
 
@@ -660,7 +656,7 @@ void MainWindow_TEST::ActionCreationDestruction()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", false, false, true);
+  this->Load("worlds/empty.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
