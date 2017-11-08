@@ -1840,6 +1840,16 @@ void World::ProcessLightModifyMsgs()
     }
     else
     {
+      // Update in scene message
+      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+      {
+        if (this->dataPtr->sceneMsg.light(i).name() == lightModifyMsg.name())
+        {
+          this->dataPtr->sceneMsg.mutable_light(i)->MergeFrom(lightModifyMsg);
+          break;
+        }
+      }
+
       // Update light object
       light->ProcessMsg(lightModifyMsg);
     }
