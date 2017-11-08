@@ -16,10 +16,6 @@
 */
 #include <math.h>
 
-#ifdef  __APPLE__
-# include <QtCore/qglobal.h>
-#endif
-
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Events.hh"
@@ -63,6 +59,22 @@ void WindowManager::Fini()
     (*iter)->removeAllViewports();
     (*iter)->destroy();
   }*/
+
+  // ogre 1.9 crashses when deleting the render window on destruction on osx
+  // so detach first before deleting ogre root
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0)) && defined(__APPLE__)
+  if (!this->dataPtr->windows.empty())
+  {
+    auto root = RenderEngine::Instance()->Root();
+    for (auto iter = this->dataPtr->windows.begin();
+        iter != this->dataPtr->windows.end(); iter++)
+    {
+      auto w = root->detachRenderTarget((*iter)->getName());
+      w->setActive(false);
+      w->removeAllViewports();
+    }
+  }
+#endif
   this->dataPtr->windows.clear();
 }
 
@@ -71,7 +83,7 @@ void WindowManager::SetCamera(int _windowId, CameraPtr _camera)
 {
   if (static_cast<unsigned int>(_windowId) < this->dataPtr->windows.size() &&
       this->dataPtr->windows[_windowId])
-    this->dataPtr->windows[_windowId]->removeAllViewports();
+  this->dataPtr->windows[_windowId]->removeAllViewports();
   _camera->SetRenderTarget(this->dataPtr->windows[_windowId]);
 }
 
@@ -85,7 +97,7 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   Ogre::RenderWindow *window = NULL;
 
   // Mac and Windows *must* use externalWindow handle.
-#if defined(Q_OS_MAC) || defined(_MSC_VER)
+#if defined(__APPLE__) || defined(_MSC_VER)
   params["externalWindowHandle"] = _ogreHandle;
 #else
   params["parentWindowHandle"] = _ogreHandle;
@@ -93,13 +105,9 @@ int WindowManager::CreateWindow(const std::string &_ogreHandle,
   params["FSAA"] = "4";
   params["stereoMode"] = "Frame Sequential";
 
-  // Set the macAPI for Ogre based on the Qt implementation
-#ifdef QT_MAC_USE_COCOA
+  // Set the macAPI for Ogre
   params["macAPI"] = "cocoa";
   params["macAPICocoaUseNSView"] = "true";
-#else
-  params["macAPI"] = "carbon";
-#endif
 
   // Hide window if dimensions are less than or equal to one.
   if (_width <= 1 && _height <=1)
