@@ -85,6 +85,9 @@ namespace gazebo
       /// \param[in] _color Color class from ignition library
       public: Color &operator=(const ignition::math::Color &_color);
 
+      /// \brief Convert to ignition type
+      public: ignition::math::Color Ign() const;
+
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
       public: Color(const Color &_clr);

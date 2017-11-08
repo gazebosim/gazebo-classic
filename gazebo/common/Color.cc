@@ -77,6 +77,12 @@ Color &Color::operator=(const ignition::math::Color &_color)
 }
 
 //////////////////////////////////////////////////
+ignition::math::Color Color::Ign() const
+{
+  return ignition::math::Color(this->r, this->g, this->b, this->a);
+}
+
+//////////////////////////////////////////////////
 void Color::Reset()
 {
   this->r = this->g = this->b = this->a = 0;
