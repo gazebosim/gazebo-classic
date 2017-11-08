@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
+
 1. Parallelize ODE physics with threaded islands parameter
     * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
 
@@ -43,9 +46,6 @@
 
 1. Add log record filter options
     * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
-
-1. Fix disabling mesh cast shadows
-    * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
 
 1. Backport wide angle camera VM FSAA fix
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)

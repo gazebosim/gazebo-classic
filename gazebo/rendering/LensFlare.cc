@@ -29,7 +29,7 @@ namespace gazebo
   namespace rendering
   {
     // We'll create an instance of this class for each camera, to be used to
-    // inject dir light clip pos and time (for animating flare) and in each
+    // inject dir light clip space pos and time (for animating flare) in each
     // render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
