@@ -37,17 +37,9 @@ TEST_F(Material_TEST, Update)
   {
     // create an opaque common::Material
     common::Color ambient(0.1, 0.2, 0.3, 1.0);
-    ignition::math::Color ambientIgn(ambient.r, ambient.g, ambient.b,
-        ambient.a);
     common::Color diffuse(0.4, 0.3, 0.2, 1.0);
-    ignition::math::Color diffuseIgn(diffuse.r, diffuse.g, diffuse.b,
-        diffuse.a);
     common::Color specular(0.2, 0.8, 0.0, 1.0);
-    ignition::math::Color specularIgn(specular.r, specular.g, specular.b,
-        specular.a);
     common::Color emissive(0.7, 0.5, 0.3, 1.0);
-    ignition::math::Color emissiveIgn(emissive.r, emissive.g, emissive.b,
-        emissive.a);
     float transparency = 0.0;
     float shininess = 0.5;
     bool depthWrite = true;
@@ -82,11 +74,11 @@ TEST_F(Material_TEST, Update)
     EXPECT_EQ(technique->getNumPasses(), 1);
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
-    EXPECT_EQ(ambientIgn,
+    EXPECT_EQ(ambient.Ign(),
         rendering::Conversions::Convert(pass->getAmbient()));
-    EXPECT_EQ(diffuseIgn,
+    EXPECT_EQ(diffuse.Ign(),
         rendering::Conversions::Convert(pass->getDiffuse()));
-    EXPECT_EQ(specularIgn,
+    EXPECT_EQ(specular.Ign(),
         rendering::Conversions::Convert(pass->getSpecular()));
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
@@ -104,14 +96,6 @@ TEST_F(Material_TEST, Update)
     common::Color diffuse(0.4, 0.3, 0.2, 0.3);
     common::Color specular(0.2, 0.8, 0.0, 1.0);
     common::Color emissive(0.7, 0.5, 0.3, 1.0);
-    ignition::math::Color ambientIgn(ambient.r, ambient.g, ambient.b,
-        ambient.a);
-    ignition::math::Color diffuseIgn(diffuse.r, diffuse.g, diffuse.b,
-        diffuse.a);
-    ignition::math::Color specularIgn(specular.r, specular.g, specular.b,
-        specular.a);
-    ignition::math::Color emissiveIgn(emissive.r, emissive.g, emissive.b,
-        emissive.a);
     float transparency = 0.5;
     float shininess = 0.2;
     bool depthWrite = false;
@@ -142,15 +126,15 @@ TEST_F(Material_TEST, Update)
     EXPECT_EQ(technique->getNumPasses(), 1);
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
-    EXPECT_EQ(ambientIgn,
+    EXPECT_EQ(ambient.Ign(),
         rendering::Conversions::Convert(pass->getAmbient()));
     // diffuse alpha value should be overwritten based on material transparency
-    ignition::math::Color newDiffuse = diffuseIgn;
+    ignition::math::Color newDiffuse = diffuse.Ign();
     newDiffuse.A(1.0f-transparency);
     EXPECT_EQ(newDiffuse,
         rendering::Conversions::Convert(pass->getDiffuse()));
     EXPECT_EQ(rendering::Conversions::Convert(
-          pass->getSpecular()), specularIgn);
+          pass->getSpecular()), specular.Ign());
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);

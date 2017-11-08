@@ -69,9 +69,8 @@ const Ogre::String &DynamicLines::getMovableType() const
 void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
                             const common::Color &_color)
 {
-  ignition::math::Color color(_color.r, _color.g, _color.b, _color.a);
   this->points.push_back(_pt);
-  this->dataPtr->colors.push_back(color);
+  this->dataPtr->colors.push_back(_color.Ign());
   this->dirty = true;
 }
 
@@ -101,8 +100,7 @@ void DynamicLines::SetPoint(const unsigned int _index,
 /////////////////////////////////////////////////
 void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 {
-  ignition::math::Color color(_color.r, _color.g, _color.b, _color.a);
-  this->dataPtr->colors[_index] = color;
+  this->dataPtr->colors[_index] = _color.Ign();
   this->dirty = true;
 }
 

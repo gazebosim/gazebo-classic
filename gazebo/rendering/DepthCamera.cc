@@ -147,10 +147,9 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
         this->dataPtr->pcdTarget->addViewport(this->camera);
     this->dataPtr->pcdViewport->setClearEveryFrame(true);
 
-    auto const &gzBG = this->scene->BackgroundColor();
-    ignition::math::Color bgColor(gzBG.r, gzBG.g, gzBG.b, gzBG.a);
+    common::Color const &gzBG = this->scene->BackgroundColor();
     this->dataPtr->pcdViewport->setBackgroundColour(
-        Conversions::Convert(bgColor));
+        Conversions::Convert(gzBG.Ign()));
     this->dataPtr->pcdViewport->setOverlaysEnabled(false);
     this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
@@ -387,9 +386,8 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     // Setup the viewport to use the texture
     this->depthViewport = this->depthTarget->addViewport(this->camera);
     this->depthViewport->setClearEveryFrame(true);
-    auto const &gzBG = this->scene->BackgroundColor();
-    ignition::math::Color bgColor(gzBG.r, gzBG.g, gzBG.b, gzBG.a);
-    this->depthViewport->setBackgroundColour(Conversions::Convert(bgColor));
+    common::Color const &gzBG = this->scene->BackgroundColor();
+    this->depthViewport->setBackgroundColour(Conversions::Convert(gzBG.Ign()));
     this->depthViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 

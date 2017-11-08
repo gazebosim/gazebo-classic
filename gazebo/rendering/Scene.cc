@@ -477,7 +477,7 @@ std::string Scene::Name() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
-  ignition::math::Color color(_color.r, _color.g, _color.b, _color.a);
+  ignition::math::Color color(_color.Ign());
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
@@ -1303,8 +1303,7 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
 
   if (this->dataPtr->manager)
   {
-    ignition::math::Color color(_color.r, _color.g, _color.b, _color.a);
-    this->dataPtr->manager->setFog(fogType, Conversions::Convert(color),
+    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color.Ign()),
                            _density, _start, _end);
   }
 }
