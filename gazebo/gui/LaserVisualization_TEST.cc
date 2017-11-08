@@ -138,7 +138,7 @@ void LaserVisualization_TEST::Hit()
       int b = data[y*(width*depth) + x+2];
 
       // See issue #2027
-#ifndef __APPLE__
+#if !defined(__APPLE__) || (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
       QVERIFY(r > 118 && r < 126);
       QVERIFY(g > 118 && g < 126);
       QVERIFY(b == 255);
@@ -193,7 +193,7 @@ void LaserVisualization_TEST::Nohit()
       int b = data[y*(width*depth) + x+2];
 
       // See issue #2027
-#ifndef __APPLE__
+#if !defined(__APPLE__) || (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
       QVERIFY(r > 200 && r < 208);
       QVERIFY(g > 200 && g < 208);
       QVERIFY(b == 255);
@@ -248,7 +248,7 @@ void LaserVisualization_TEST::Deadzone()
       int b = data[y*(width*depth) + x+2];
 
       // See issue #2027
-#ifndef __APPLE__
+#if !defined(__APPLE__) || (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
       QVERIFY(r > 124 && r < 132);
       QVERIFY(g > 124 && g < 132);
       QVERIFY(b > 124 && b < 132);
