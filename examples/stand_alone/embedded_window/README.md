@@ -22,7 +22,7 @@ From this directory:
 
 * Then from the build directory above, run the example client:
 
-        ./embeded_window
+        ./embedded_window
 
 * You'll see a gzclient window embedded into a custom window which has other
   widgets:
