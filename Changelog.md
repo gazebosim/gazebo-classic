@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add light as child of link
+    * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+
 1. Parallelize ODE physics with threaded islands parameter
     * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
 
