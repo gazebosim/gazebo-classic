@@ -143,7 +143,7 @@ TEST_F(WideAngleCameraSensor, Projection)
   rendering::WideAngleCameraPtr camera =
       boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
       camSensor->Camera());
-  EXPECT_TRUE(camera != nullptr);
+  ASSERT_NE(camera, nullptr);
 
   // point directly in front of camera
   auto worldPoint = ignition::math::Vector3d::UnitX;
