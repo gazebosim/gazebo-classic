@@ -57,18 +57,15 @@ FuelModelDatabase::~FuelModelDatabase()
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> FuelModelDatabase::Servers() const
+std::vector<ignition::fuel_tools::ServerConfig> FuelModelDatabase::Servers()
+  const
 {
-  auto servers = this->dataPtr->fuelClient->Config().Servers();
-  std::vector<std::string> res;
-  for (const auto &server : servers)
-    res.push_back(server.URL());
-
-  return res;
+  return this->dataPtr->fuelClient->Config().Servers();
 }
 
 /////////////////////////////////////////////////
-void FuelModelDatabase::Models(const std::string &_server,
+void FuelModelDatabase::Models(
+    const ignition::fuel_tools::ServerConfig &_server,
     std::function<void (const std::map<std::string, std::string> &)> &_func)
 {
   std::thread t([this, _func, _server]
@@ -81,28 +78,11 @@ void FuelModelDatabase::Models(const std::string &_server,
 
 /////////////////////////////////////////////////
 std::map<std::string, std::string> FuelModelDatabase::Models(
-    const std::string &_server) const
+    const ignition::fuel_tools::ServerConfig &_server) const
 {
   std::map<std::string, std::string> models;
 
-  // Sanity check: Verity that the server is correct.
-  auto servers = this->dataPtr->fuelClient->Config().Servers();
-  bool serverFound = false;
-  for (const auto &server : servers)
-  {
-    if (server.URL() == _server)
-    {
-      serverFound = true;
-      break;
-    }
-  }
-  if (!serverFound)
-    return models;
-
-
-  // ToDo: Pass the server name when Ignition Fuel Tools supports multiple
-  // servers.
-  for (auto iter = this->dataPtr->fuelClient->Models(); iter; ++iter)
+  for (auto iter = this->dataPtr->fuelClient->Models(_server); iter; ++iter)
   {
     std::string fullURI = iter->Identification().UniqueName();
     std::string modelName = iter->Identification().Name();

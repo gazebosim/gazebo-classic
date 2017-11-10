@@ -52,7 +52,9 @@ TEST(FuelModelDatabaseTest, FuelDown)
           cv.notify_all();
         };
 
-  fuelDB->Models("___bad_server___", cb);
+  ignition::fuel_tools::ServerConfig srv;
+  srv.URL("___bad_server___");
+  fuelDB->Models(srv, cb);
 
   // We now wait for a while unless the callback is executed and wake us up.
   std::unique_lock<std::mutex> lk(mutex);
