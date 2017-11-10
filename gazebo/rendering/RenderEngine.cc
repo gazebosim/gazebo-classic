@@ -614,8 +614,8 @@ void RenderEngine::SetupResources()
       archNames.push_back(
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
-
   }
+
   for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
   {
     try
