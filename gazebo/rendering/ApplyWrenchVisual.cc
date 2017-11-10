@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include "gazebo/common/MeshManager.hh"
@@ -114,8 +115,8 @@ void ApplyWrenchVisual::Load()
   dPtr->forceVisual->GetSceneNode()->setInheritScale(false);
 
   // Force text
-  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-  rendering::Material::GetMaterialAsColor(dPtr->unselectedMaterial,
+  ignition::math::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::MaterialAsColor(dPtr->unselectedMaterial,
       matAmbient, matDiffuse, matSpecular, matEmissive);
   dPtr->forceText.Load(this->Name()+"__FORCE_TEXT__",
       "0N", "Arial", 0.03, matAmbient);

@@ -68,7 +68,7 @@ namespace gazebo
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      public: common::Color Color() const;
+      public: ignition::math::Color Color() const;
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
