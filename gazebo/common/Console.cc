@@ -149,7 +149,11 @@ FileLogger::FileLogger(const std::string &_filename)
 /////////////////////////////////////////////////
 FileLogger::~FileLogger()
 {
-  delete this->rdbuf();
+  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer *>(
+      this->rdbuf());
+
+  delete buf->stream;
+  delete buf;
 }
 
 /////////////////////////////////////////////////
@@ -182,8 +186,11 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
-  if (buf->stream)
-    delete buf->stream;
+  if (buf->stream && buf->stream->is_open())
+  {
+    buf->stream->flush();
+    buf->stream->close();
+  }
 
   // If the logPath is a directory, just rename it.
   if (boost::filesystem::is_directory(logPath))
@@ -202,7 +209,11 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
     }
   }
 
-  buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+  if (!buf->stream)
+    buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+  else
+    buf->stream->open(logPath.string().c_str(), std::ios::out);
+
   if (!buf->stream->is_open())
     std::cerr << "Error opening log file: " << logPath << std::endl;
 
