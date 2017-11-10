@@ -852,8 +852,8 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     // Images from the same camera should be identical
     // Allow a very small tolerance. There could be a few pixel rgb value
     // changes between frames
-    EXPECT_LE(diffSum, 10);
-    EXPECT_LE(diffSum2, 10);
+    EXPECT_LE(diffSum, 10u);
+    EXPECT_LE(diffSum2, 10u);
 
     // We expect that there will some noticeable difference
     // between the two different camera images.
