@@ -502,20 +502,22 @@ void InsertModelWidget::InitializeFuelServers()
 #ifdef HAVE_IGNITION_FUEL_TOOLS
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
+
   // Populate the list of Ignition Fuel servers.
   for (auto const &server : servers)
   {
-    this->dataPtr->fuelDetails[server];
+    std::string serverURL = server.URL();
+    this->dataPtr->fuelDetails[serverURL];
 
     // Create a top-level tree item for the models hosted in this Fuel server.
-    std::string label = "Connecting to " + server + "...";
-    this->dataPtr->fuelDetails[server].modelFuelItem =
+    std::string label = "Connecting to " + serverURL + "...";
+    this->dataPtr->fuelDetails[serverURL].modelFuelItem =
         new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
             QStringList(QString::fromStdString(label)));
 
     // Add the new entry.
     this->dataPtr->fileTreeWidget->addTopLevelItem(
-        this->dataPtr->fuelDetails[server].modelFuelItem);
+        this->dataPtr->fuelDetails[serverURL].modelFuelItem);
   }
 #endif
 }
@@ -526,16 +528,19 @@ void InsertModelWidget::PopulateFuelServers()
 #ifdef  HAVE_IGNITION_FUEL_TOOLS
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
+
   for (auto const &server : servers)
   {
+    std::string serverURL = server.URL();
+
     // This lamda will be executed asynchronously when we get the list of models
     // from this Ignition Fuel Server.
     std::function<void(const std::map<std::string, std::string> &)> f =
-        [server, this](const std::map<std::string, std::string> &_models)
+        [serverURL, this](const std::map<std::string, std::string> &_models)
         {
-          this->dataPtr->fuelDetails[server].modelBuffer = _models;
+          this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
           // Emit the signal that populates the models for this server.
-          this->UpdateFuel(server);
+          this->UpdateFuel(serverURL);
         };
 
     common::FuelModelDatabase::Instance()->Models(server, f);
