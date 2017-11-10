@@ -55,6 +55,10 @@ AttachLightPlugin::AttachLightPlugin()
 /////////////////////////////////////////////////
 void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  gzwarn << "The AttachLightPlugin is being deprecated. Consider using the "
+         << "new SDF spec that allows <light> to be added as a child of <link> "
+         << "elements" << std::endl;
+
   this->dataPtr->model = _model;
   this->dataPtr->world = _model->GetWorld();
 

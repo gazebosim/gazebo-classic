@@ -34,6 +34,7 @@ class AttachLightTest : public ServerFixture,
 };
 
 
+/////////////////////////////////////////////////
 void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
 {
   // Test plugin for attaching lights to links
@@ -99,6 +100,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
   EXPECT_EQ(iteration, 1000);
 }
 
+/////////////////////////////////////////////////
 void AttachLightTest::LinkLight(const std::string &_physicsEngine)
 {
   // Test plugin for attaching lights to links
@@ -107,14 +109,14 @@ void AttachLightTest::LinkLight(const std::string &_physicsEngine)
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
 
-  // Get the double pendulum model
-  physics::ModelPtr pendulumModel =
+  // Get the sphere model
+  physics::ModelPtr sphereModel =
       world->GetModel("sphere_with_light");
-  ASSERT_TRUE(pendulumModel != nullptr);
+  ASSERT_TRUE(sphereModel != nullptr);
 
   // Get the link
   physics::LinkPtr sphereLink =
-      pendulumModel->GetLink("link");
+      sphereModel->GetLink("link");
   ASSERT_TRUE(sphereLink != nullptr);
 
   // Get the light in the link
@@ -151,11 +153,13 @@ void AttachLightTest::LinkLight(const std::string &_physicsEngine)
   EXPECT_EQ(iteration, 1500);
 }
 
+/////////////////////////////////////////////////
 TEST_P(AttachLightTest, AttachLightPlugin)
 {
   AttachLightPlugin(GetParam());
 }
 
+/////////////////////////////////////////////////
 TEST_P(AttachLightTest, LinkLight)
 {
   LinkLight(GetParam());
