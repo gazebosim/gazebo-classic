@@ -5,6 +5,9 @@
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
 
+1. Diagnostics: enable test and don't create so many empty folders
+    * [Pull request 2798](https://bitbucket.org/osrf/gazebo/pull-requests/2798)
+
 1. Parallelize ODE physics with threaded islands parameter
     * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
 
