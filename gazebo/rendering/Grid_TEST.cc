@@ -82,13 +82,14 @@ TEST_F(Grid_TEST, SetSize)
           << std::endl;
 
       // Check size
-      const Ogre::AxisAlignedBox& box = manualObject->getBoundingBox();
-      const Ogre::Vector3& actual_min = box.getMinimum();
-      const Ogre::Vector3& actual_max = box.getMaximum();
-      Ogre::Vector3 expected_min(-count * length / 2, -count * length / 2, 0.015);
-      Ogre::Vector3 expected_max(count * length / 2, count * length / 2, 0.015);
-      EXPECT_TRUE(actual_min.positionEquals(expected_min));
-      EXPECT_TRUE(actual_max.positionEquals(expected_max));
+      const Ogre::AxisAlignedBox &box = manualObject->getBoundingBox();
+      const Ogre::Vector3 &actualMin = box.getMinimum();
+      const Ogre::Vector3 &actualMax = box.getMaximum();
+      Ogre::Vector3 expectedMin(-count * length / 2,
+                                -count * length / 2, 0.015);
+      Ogre::Vector3 expectedMax(count * length / 2, count * length / 2, 0.015);
+      EXPECT_TRUE(actualMin.positionEquals(expectedMin));
+      EXPECT_TRUE(actualMax.positionEquals(expectedMax));
     }
   }
 
