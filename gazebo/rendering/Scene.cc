@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -476,13 +477,14 @@ std::string Scene::Name() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
+  ignition::math::Color color(_color.Ign());
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->dataPtr->manager &&
-      Conversions::Convert(this->dataPtr->manager->getAmbientLight()) != _color)
+  if (this->dataPtr->manager && Conversions::Convert(
+        this->dataPtr->manager->getAmbientLight()) != color)
   {
-    this->dataPtr->manager->setAmbientLight(Conversions::Convert(_color));
+    this->dataPtr->manager->setAmbientLight(Conversions::Convert(color));
   }
 }
 
@@ -1300,8 +1302,10 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   elem->GetElement("end")->Set(_end);
 
   if (this->dataPtr->manager)
-    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color),
+  {
+    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color.Ign()),
                            _density, _start, _end);
+  }
 }
 
 //////////////////////////////////////////////////

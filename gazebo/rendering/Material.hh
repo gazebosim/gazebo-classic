@@ -18,7 +18,8 @@
 #define _RENDERING_MATERIAL_HH_
 
 #include <string>
-#include <ignition/math.hh>
+
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/Material.hh"
 #include "gazebo/util/system.hh"
@@ -46,9 +47,11 @@ namespace gazebo
       /// \param[out] _specular Specular color of the material.
       /// \param[out] _emissive Emissive color of the material.
       /// \return True if the material found, false otherwise.
+      /// \deprecated use ignition::math::Color
       public: static bool GetMaterialAsColor(const std::string &_materialName,
           common::Color &_ambient, common::Color &_diffuse,
-          common::Color &_specular, common::Color &_emissive);
+          common::Color &_specular, common::Color &_emissive)
+              GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the color of the material.
       /// \param[in] _materialName Name of the material.
@@ -60,7 +63,6 @@ namespace gazebo
       public: static bool MaterialAsColor(const std::string &_materialName,
           ignition::math::Color &_ambient, ignition::math::Color &_diffuse,
           ignition::math::Color &_specular, ignition::math::Color &_emissive);
-
     };
   }
 }

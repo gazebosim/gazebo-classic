@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent of the widget.
-      public: JointControlWidget(QWidget *_parent = 0);
+      public: explicit JointControlWidget(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~JointControlWidget();

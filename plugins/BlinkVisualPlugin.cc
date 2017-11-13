@@ -18,6 +18,7 @@
 #include <mutex>
 
 #include <ignition/math/Color.hh>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Time.hh>
 #include <gazebo/msgs/msgs.hh>

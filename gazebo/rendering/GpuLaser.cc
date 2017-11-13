@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -751,7 +752,7 @@ void GpuLaser::CreateCanvas()
   this->dataPtr->visual->SetPose(pose);
 
   this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }
