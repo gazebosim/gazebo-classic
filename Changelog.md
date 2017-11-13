@@ -5,6 +5,9 @@
 1. Add light as child of link
     * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
 
+1. Diagnostics: enable test and don't create so many empty folders
+    * [Pull request 2798](https://bitbucket.org/osrf/gazebo/pull-requests/2798)
+
 1. Parallelize ODE physics with threaded islands parameter
     * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
 
