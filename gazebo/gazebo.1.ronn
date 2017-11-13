@@ -33,6 +33,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Recording period (seconds).
 * --record_filter arg :
  Recording filter (supports wildcard and regular expression).
+* --record_with_model arg (=false):
+ Recording with model meshes and materials.
 * --seed arg :
  Start with a given random number seed.
 * --iters arg :

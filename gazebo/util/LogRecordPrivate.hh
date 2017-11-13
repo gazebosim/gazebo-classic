@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <list>
 #include <thread>
 #include <functional>
 #include <condition_variable>
@@ -206,6 +207,9 @@ namespace gazebo
 
       /// \brief Record filter string.
       public: std::string filter = "";
+
+      /// \brief Record with models.
+      public: bool recordWithModel = false;
 
       /// \brief Model path.
       public: std::list<std::string> modelPaths;

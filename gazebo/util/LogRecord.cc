@@ -145,6 +145,7 @@ bool LogRecord::Start(const LogRecordParams &_params)
 {
   this->dataPtr->period = _params.period;
   this->dataPtr->filter = _params.filter;
+  this->dataPtr->recordWithModel = _params.recordWithModel;
   return this->Start(_params.encoding, _params.path);
 }
 
@@ -347,6 +348,12 @@ void LogRecord::SetFilter(const std::string &_filter)
 bool LogRecord::GetRunning() const
 {
   return this->Running();
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::RecordWithModel() const
+{
+  return this->dataPtr->recordWithModel;
 }
 
 //////////////////////////////////////////////////
@@ -564,7 +571,8 @@ bool LogRecord::SaveModels(std::unordered_set<std::string> models)
       if (boost::filesystem::exists(srcModelPath))
       {
         modelFound = true;
-        boost::filesystem::path destModelPath = this->dataPtr->logCompletePath / model;
+        boost::filesystem::path destModelPath =
+          this->dataPtr->logCompletePath / model;
         if (!gazebo::common::copyDir(srcModelPath, destModelPath))
         {
           return false;

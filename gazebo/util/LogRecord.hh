@@ -20,7 +20,6 @@
 #include <fstream>
 #include <string>
 #include <unordered_set>
-#include <boost/filesystem.hpp>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -48,6 +47,10 @@ namespace gazebo
 
       /// \brief Log filter string
       public: std::string filter;
+
+      /// \brief Recording with modles. True will record state logs
+      /// together with model meshes and materials.
+      public: bool recordWithModel = false;
     };
 
     // Forward declare private data class
@@ -153,6 +156,10 @@ namespace gazebo
       /// \param[in] _filter New log record filter regex string
       public: void SetFilter(const std::string &_filter);
 
+      /// \brief Get whether save the model meshes and materials when recording.
+      /// \return True if save the model meshes and materials.
+      public: bool RecordWithModel() const;
+
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
       // \return True if logger is ready to start.
@@ -247,7 +254,7 @@ namespace gazebo
       public: bool FirstUpdate() const;
 
       /// \brief Return true if successfully saved all the models.
-      /// \return True if all the models are saved successfully to the log folder.
+      /// \return True if all the models are saved successfully.
       public: bool SaveModels(std::unordered_set<std::string> models);
 
       /// \brief Write all logs.
