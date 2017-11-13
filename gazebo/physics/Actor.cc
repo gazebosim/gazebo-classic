@@ -504,6 +504,7 @@ void Actor::Init()
 {
   this->scriptTime = 0;
   this->prevFrameTime = this->world->SimTime();
+  // this->prevFrameTime = common::Time::GetWallTime();
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
@@ -514,6 +515,7 @@ void Actor::Play()
 {
   this->active = true;
   this->playStartTime = this->world->SimTime();
+  // this->playStartTime = common::Time::GetWallTime();
 }
 
 //////////////////////////////////////////////////
@@ -538,6 +540,7 @@ void Actor::Update()
     return;
 
   common::Time currentTime = this->world->SimTime();
+  // common::Time currentTime = common::Time::GetWallTime();
 
   // do not refresh animation faster than 30 Hz sim time
   if ((currentTime - this->prevFrameTime).Double() < (1.0 / 30.0))
@@ -797,6 +800,7 @@ void Actor::Reset()
   this->Stop();
   this->ResetCustomTrajectory();
   this->playStartTime = this->world->SimTime();
+  // this->playStartTime = common::Time::GetWallTime();
   this->pathLength = 0.0;
   this->lastTraj = 1e+5;
   this->Init();

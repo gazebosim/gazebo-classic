@@ -40,6 +40,7 @@ LaserVisual::LaserVisual(const std::string &_name, VisualPtr _vis,
                          const std::string &_topicName)
 : Visual(*new LaserVisualPrivate, _name, _vis)
 {
+  return;
   LaserVisualPrivate *dPtr =
       reinterpret_cast<LaserVisualPrivate *>(this->dataPtr);
 
