@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: BuildingEditorPalette(QWidget *_parent = 0);
+      public: explicit BuildingEditorPalette(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~BuildingEditorPalette();

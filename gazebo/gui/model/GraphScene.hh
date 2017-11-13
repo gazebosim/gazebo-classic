@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: GraphScene(QWidget *_parent = 0);
+      public: explicit GraphScene(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~GraphScene() = default;

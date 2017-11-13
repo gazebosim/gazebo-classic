@@ -17,6 +17,7 @@
 #ifndef GAZEBO_RENDERING_DYNAMICLINES_HH
 #define GAZEBO_RENDERING_DYNAMICLINES_HH
 
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -31,6 +32,9 @@ namespace gazebo
   {
     /// \addtogroup gazebo_rendering
     /// \{
+
+    /// \brief Forward declaration
+    class DynamicLinesPrivate;
 
     /// \class DynamicLines DynamicLines.hh rendering/rendering.hh
     /// \brief Class for drawing lines that can change
@@ -109,8 +113,8 @@ namespace gazebo
       /// \brief Used to indicate if the lines require an update
       private: bool dirty;
 
-      /// \brief List of colors
-      private: std::vector<common::Color> colors;
+      /// \brief private implementation
+      private: std::unique_ptr<DynamicLinesPrivate> dataPtr;
     };
     /// \}
   }

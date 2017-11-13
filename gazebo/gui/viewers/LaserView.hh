@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Pointer to the parent widget.
-      public: LaserView(QWidget *_parent = NULL);
+      public: explicit LaserView(QWidget *_parent = NULL);
 
       /// \brief Destructor
       public: virtual ~LaserView();
@@ -192,7 +192,7 @@ namespace gazebo
                {
                  /// \brief Constructor
                  /// \param[in] _parent Pointer to the parent widget.
-                 public: CustomView(QWidget *_parent)
+                 public: explicit CustomView(QWidget *_parent)
                          : QGraphicsView(_parent), viewZoomed(false) {}
 
                  /// \brief QT callback. Used when a wheel event occurs.
