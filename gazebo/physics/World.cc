@@ -38,7 +38,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <unordered_set>
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
 #include "gazebo/math/Rand.hh"
 
@@ -2276,12 +2278,70 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
+    std::unordered_set<std::string> modelNames;
     this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
     _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
+
+    const std::string modelPrefix = "model://";
+    for (auto const &model : this->dataPtr->models)
+    {
+      bool modelFound = false;
+      sdf::ElementPtr modelElem = model->GetSDF();
+      if (modelElem->HasElement("link"))
+      {
+        sdf::ElementPtr linkElem = modelElem->GetElement("link");
+        while(linkElem)
+        {
+          if (linkElem->HasElement("visual"))
+          {
+            sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+            while (visualElem)
+            {
+              sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+              if (geomElem->HasElement("mesh"))
+              {
+                const std::string meshUri = geomElem->GetElement("mesh")->Get<std::string>("uri");
+
+                if (boost::starts_with(meshUri, modelPrefix))
+                {
+                  std::string modelName = meshUri.substr(modelPrefix.size(),
+                    meshUri.find_first_of("/", modelPrefix.size()) - modelPrefix.size());
+                  modelNames.insert(modelName);
+                  modelFound = true;
+                  break;
+                }
+              }
+
+              const std::string matUri = visualElem->GetElement("material")
+                ->GetElement("script")->Get<std::string>("uri");
+              if (!matUri.empty() && boost::starts_with(matUri, modelPrefix))
+              {
+                std::string modelName = matUri.substr(modelPrefix.size(),
+                  matUri.find_first_of("/", modelPrefix.size()) - modelPrefix.size());
+                modelNames.insert(modelName);
+                modelFound = true;
+                break;
+              }
+              visualElem = visualElem->GetNextElement("visual");
+            }
+          }
+          if (modelFound)
+          {
+            break;
+          }
+          linkElem = linkElem->GetNextElement("link");
+        }
+      }
+    }
+
+    if (!util::LogRecord::Instance()->SaveModels(modelNames))
+    {
+      gzwarn << "Save models failed during logging\n";
+    }
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
   {

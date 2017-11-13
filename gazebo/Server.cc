@@ -291,7 +291,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // this->dataPtr->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
-  // world description, so don't try to reead the world file from the
+  // world description, so don't try to read the world file from the
   // command line.
   if (this->dataPtr->vm.count("play"))
   {

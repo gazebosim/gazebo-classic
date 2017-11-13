@@ -82,14 +82,18 @@ LogRecord::LogRecord()
 #endif
 
   GZ_ASSERT(homePath, "HOME environment variable is missing");
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  std::list<std::string> modelPaths = paths->GetModelPaths();
+  this->dataPtr->modelPaths = modelPaths;
 
   if (!homePath)
   {
-    common::SystemPaths *paths = common::SystemPaths::Instance();
     this->dataPtr->logBasePath = paths->GetTmpPath() + "/gazebo";
   }
   else
+  {
     this->dataPtr->logBasePath = boost::filesystem::path(homePath);
+  }
 
   this->dataPtr->logBasePath /= "/.gazebo/log/";
 
@@ -545,6 +549,36 @@ bool LogRecord::GetFirstUpdate() const
 bool LogRecord::FirstUpdate() const
 {
   return this->dataPtr->firstUpdate;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::SaveModels(std::unordered_set<std::string> models)
+{
+  for (auto &model : models)
+  {
+    bool modelFound = false;
+    for (auto &modelPath : this->dataPtr->modelPaths)
+    {
+      boost::filesystem::path srcModelPath(modelPath);
+      srcModelPath /= model;
+      if (boost::filesystem::exists(srcModelPath))
+      {
+        modelFound = true;
+        boost::filesystem::path destModelPath = this->dataPtr->logCompletePath / model;
+        if (!gazebo::common::copyDir(srcModelPath, destModelPath))
+        {
+          return false;
+        }
+        break;
+      }
+    }
+    if (!modelFound)
+    {
+      gzlog << "Model: " << model << " meshes definitions does not exist"
+        << ", please check the value of env variable GAZEBO_MODEL_PATH\n";
+    }
+  }
+  return true;
 }
 
 //////////////////////////////////////////////////

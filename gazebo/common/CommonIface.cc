@@ -276,3 +276,63 @@ bool common::copyFile(const std::string &_existingFilename,
   return offset == statBuf.st_size;
 #endif
 }
+
+/////////////////////////////////////////////////
+bool common::copyDir(const boost::filesystem::path &_source,
+                     const boost::filesystem::path &_destination)
+{
+  namespace fs = boost::filesystem;
+  try
+  {
+    // Check whether source directory exists
+    if (!fs::exists(_source) || !fs::is_directory(_source))
+    {
+      gzwarn << "Source directory " << _source.string()
+        << " does not exist or is not a directory." << std::endl;
+      return false;
+    }
+
+    if (fs::exists(_destination))
+    {
+      fs::remove_all(_destination);
+    }
+    // Create the destination directory
+    if (!fs::create_directory(_destination))
+    {
+      gzwarn << "Unable to create the destination directory "
+        << _destination.string() << ", please check the permission." << std::endl;
+        return false;
+    }
+  }
+  catch (fs::filesystem_error const &e)
+  {
+    gzwarn << e.what() << std::endl;
+    return false;
+  }
+
+  // Start copy from source to destination directory
+  for (fs::directory_iterator file(_source); file != fs::directory_iterator(); ++file)
+  {
+    try
+    {
+      fs::path current(file->path());
+      if (fs::is_directory(current))
+      {
+        if (!copyDir(current, _destination / current.filename()))
+        {
+          return false;
+        }
+      }
+      else
+      {
+        fs::copy_file(current, _destination / current.filename());
+      }
+    }
+    catch (fs::filesystem_error const &e)
+    {
+      gzwarn << e.what() << std::endl;
+      return false;
+    }
+  }
+  return true;
+}
