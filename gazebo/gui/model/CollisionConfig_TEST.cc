@@ -21,9 +21,6 @@
 
 #include "test_config.h"
 
-/// \brief variable for testing closing modal dialogs
-bool g_confirmed = false;
-
 using namespace gazebo;
 using namespace gui;
 
@@ -199,13 +196,11 @@ void CollisionConfig_TEST::Restore()
   QVERIFY(cc.GetData("c3") == NULL);
 
   // Remove a collision and restore
-  QVERIFY(!g_confirmed);
   auto button = cc.findChild<QToolButton *>("removeCollisionButton_0");
   QVERIFY(button);
-  CollisionConfigTestHelper helper;
-  QTimer::singleShot(3000, &helper, SLOT(Confirm()));
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
   button->click();
-  QVERIFY(g_confirmed);
 
   QCOMPARE(cc.GetCollisionCount(), 1u);
   QVERIFY(cc.GetData("c1") == NULL);
@@ -217,16 +212,6 @@ void CollisionConfig_TEST::Restore()
   QVERIFY(cc.GetData("c1") != NULL);
   QVERIFY(cc.GetData("c2") != NULL);
   QVERIFY(cc.GetData("c3") == NULL);
-}
-
-/////////////////////////////////////////////////
-void CollisionConfigTestHelper::Confirm()
-{
-  auto w = QApplication::activeModalWidget();
-  QVERIFY(w != nullptr);
-  w->setFocus();
-  QTest::keyClick(w, Qt::Key_Enter);
-  g_confirmed = true;
 }
 
 // Generate a main function for the test

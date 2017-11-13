@@ -21,9 +21,6 @@
 
 #include "test_config.h"
 
-/// \brief variable for testing closing modal dialogs
-bool g_confirmed = false;
-
 using namespace gazebo;
 using namespace gui;
 
@@ -208,13 +205,11 @@ void VisualConfig_TEST::Restore()
   QVERIFY(vc.GetData("v3") == NULL);
 
   // Remove a visual and restore
-  QVERIFY(!g_confirmed);
   auto button = vc.findChild<QToolButton *>("removeVisualButton_0");
   QVERIFY(button);
-  VisualConfigTestHelper helper;
-  QTimer::singleShot(3000, &helper, SLOT(Confirm()));
+
+  // Note that the confirmation dialog has been disabled for tests (issue #1963)
   button->click();
-  QVERIFY(g_confirmed);
 
   QCOMPARE(vc.GetVisualCount(), 1u);
   QVERIFY(vc.GetData("v1") == NULL);
@@ -226,16 +221,6 @@ void VisualConfig_TEST::Restore()
   QVERIFY(vc.GetData("v1") != NULL);
   QVERIFY(vc.GetData("v2") != NULL);
   QVERIFY(vc.GetData("v3") == NULL);
-}
-
-/////////////////////////////////////////////////
-void VisualConfigTestHelper::Confirm()
-{
-  auto w = QApplication::activeModalWidget();
-  QVERIFY(w != nullptr);
-  w->setFocus();
-  QTest::keyClick(w, Qt::Key_Enter);
-  g_confirmed = true;
 }
 
 // Generate a main function for the test
