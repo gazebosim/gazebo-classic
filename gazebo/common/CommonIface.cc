@@ -34,6 +34,7 @@
 #include <gazebo/gazebo_config.h>
 #include <gazebo/common/ffmpeg_inc.h>
 
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
