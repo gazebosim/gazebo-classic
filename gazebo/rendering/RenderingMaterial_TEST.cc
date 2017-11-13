@@ -16,6 +16,7 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Conversions.hh"
@@ -73,9 +74,12 @@ TEST_F(Material_TEST, Update)
     EXPECT_EQ(technique->getNumPasses(), 1);
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()), ambient);
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()), diffuse);
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()), specular);
+    EXPECT_EQ(ambient.Ign(),
+        rendering::Conversions::Convert(pass->getAmbient()));
+    EXPECT_EQ(diffuse.Ign(),
+        rendering::Conversions::Convert(pass->getDiffuse()));
+    EXPECT_EQ(specular.Ign(),
+        rendering::Conversions::Convert(pass->getSpecular()));
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);
@@ -122,12 +126,15 @@ TEST_F(Material_TEST, Update)
     EXPECT_EQ(technique->getNumPasses(), 1);
     Ogre::Pass *pass = technique->getPass(0);
     EXPECT_TRUE(pass != nullptr);
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getAmbient()), ambient);
+    EXPECT_EQ(ambient.Ign(),
+        rendering::Conversions::Convert(pass->getAmbient()));
     // diffuse alpha value should be overwritten based on material transparency
-    common::Color newDiffuse = diffuse;
-    newDiffuse.a = 1.0f-transparency;
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getDiffuse()), newDiffuse);
-    EXPECT_EQ(rendering::Conversions::Convert(pass->getSpecular()), specular);
+    ignition::math::Color newDiffuse = diffuse.Ign();
+    newDiffuse.A(1.0f-transparency);
+    EXPECT_EQ(newDiffuse,
+        rendering::Conversions::Convert(pass->getDiffuse()));
+    EXPECT_EQ(rendering::Conversions::Convert(
+          pass->getSpecular()), specular.Ign());
     EXPECT_FLOAT_EQ(pass->getShininess(), shininess);
     EXPECT_EQ(pass->getDepthWriteEnabled(), depthWrite);
     EXPECT_EQ(pass->getLightingEnabled(), lighting);

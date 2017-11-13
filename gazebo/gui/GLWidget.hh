@@ -50,7 +50,7 @@ namespace gazebo
                   LINK
                 };
 
-      public: GLWidget(QWidget *_parent = 0);
+      public: explicit GLWidget(QWidget *_parent = 0);
       public: virtual ~GLWidget();
 
       /// \brief View a scene in this widget.
