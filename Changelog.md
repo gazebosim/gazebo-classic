@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Fix compile error with due to using gazebo::common::Color with sdformat 6
+    * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
+
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
     * [Pull request #2792](https://bitbucket.org/osrf/gazebo/pull-request/2792)
