@@ -189,7 +189,6 @@ void LensFlare::SetCamera(CameraPtr _camera)
   this->dataPtr->camera = _camera;
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&LensFlare::Update, this));
-
 }
 
 //////////////////////////////////////////////////
@@ -264,8 +263,6 @@ void LensFlare::Update()
   // listen for delete events to remove lens flare if light gets deleted.
   this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
       &LensFlare::OnRequest, this);
-
-
 }
 
 //////////////////////////////////////////////////
