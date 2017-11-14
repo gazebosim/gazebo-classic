@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_LENSFLARESENSORPLUGIN_HH_
-#define GAZEBO_LENSFLARESENSORPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_LENSFLARESENSORPLUGIN_HH_
+#define GAZEBO_PLUGINS_LENSFLARESENSORPLUGIN_HH_
 
 #include <memory>
 #include <gazebo/common/Plugin.hh>
@@ -40,6 +40,7 @@ namespace gazebo
         sdf::ElementPtr _sdf);
 
     /// \brief Add lens flare effect to a camera
+    /// \param[in] _camera Camera to add the lens flare effect to.
     private: void AddLensFlare(rendering::CameraPtr _camera);
 
     /// \internal

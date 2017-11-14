@@ -15,7 +15,12 @@
  *
 */
 
+#include <mutex>
+
 #include "gazebo/common/Assert.hh"
+
+#include "gazebo/transport/Node.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -28,9 +33,9 @@ namespace gazebo
 {
   namespace rendering
   {
-    // We'll create an instance of this class for each camera, to be used to
-    // inject dir light clip space pos and time (for animating flare) in each
-    // render call.
+    /// \brief We'll create an instance of this class for each camera, to be
+    /// used to inject dir light clip space pos and time (for animating flare)
+    /// in each render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
     {
@@ -38,10 +43,15 @@ namespace gazebo
       public: LensFlareCompositorListener(CameraPtr _camera, LightPtr _light)
       {
         this->camera = _camera;
-        this->light = _light;
+        this->SetLight(_light);
+      }
 
-        this->dir = ignition::math::Quaterniond(this->light->Rotation()) *
-            this->light->Direction();
+      /// \brief Set directional light that generates lens flare
+      /// \param[in] _light Pointer to directional light
+      public: void SetLight(LightPtr _light)
+      {
+        this->dir = ignition::math::Quaterniond(_light->Rotation()) *
+            _light->Direction();
       }
 
       /// \brief Callback that OGRE will invoke for us on each render call
@@ -115,9 +125,6 @@ namespace gazebo
       /// \brief Pointer to camera
       private: CameraPtr camera;
 
-      /// \brief Pointer to light source
-      private: LightPtr light;
-
       /// \brief Light dir in world frame
       private: ignition::math::Vector3d dir;
     };
@@ -125,11 +132,8 @@ namespace gazebo
     /// \brief Private data class for LensFlare
     class LensFlarePrivate
     {
-      /// \brief Pointer to ogre lens flare material
-      public: Ogre::MaterialPtr lensFlareMaterial;
-
       /// \brief Pointer to ogre lens flare compositor instance
-      public: Ogre::CompositorInstance *lensFlareInstance;
+      public: Ogre::CompositorInstance *lensFlareInstance = nullptr;
 
       /// \brief Pointer to ogre lens flare compositor listener
       public: std::shared_ptr<LensFlareCompositorListener>
@@ -140,6 +144,21 @@ namespace gazebo
 
       /// \brief Pointer to camera
       public: CameraPtr camera;
+
+      /// \brief Name of directional light
+      public: std::string lightName;
+
+      /// \brief Communication Node
+      public: transport::NodePtr node;
+
+      /// \brief Subscribe to the request topic
+      public: transport::SubscriberPtr requestSub;
+
+      /// \brief Flag to indicate whether or not to remove lens flare effect.
+      public: bool removeLensFlare = false;
+
+      /// \brief Mutex to protect handling of light deletion
+      public: std::mutex mutex;
     };
   }
 }
@@ -170,11 +189,24 @@ void LensFlare::SetCamera(CameraPtr _camera)
   this->dataPtr->camera = _camera;
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&LensFlare::Update, this));
+
 }
 
 //////////////////////////////////////////////////
 void LensFlare::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  // remove lens flare if we got a delete msg
+  if (this->dataPtr->removeLensFlare)
+  {
+    this->dataPtr->requestSub.reset();
+    this->dataPtr->lensFlareInstance->setEnabled(false);
+    this->dataPtr->removeLensFlare = false;
+    this->dataPtr->lightName = "";
+    return;
+  }
+
+
   // Get the first directional light
   LightPtr directionalLight;
   for (unsigned int i = 0; i < this->dataPtr->camera->GetScene()->LightCount();
@@ -190,27 +222,61 @@ void LensFlare::Update()
   if (!directionalLight)
     return;
 
-  // set up the lens flare instance
-  this->dataPtr->lensFlareMaterial =
-      Ogre::MaterialManager::getSingleton().getByName(
-          "Gazebo/CameraLensFlare");
-  this->dataPtr->lensFlareMaterial =
-      this->dataPtr->lensFlareMaterial->clone(
-          "Gazebo/" + this->dataPtr->camera->Name() + "_CameraLensFlare");
+  this->dataPtr->lightName = directionalLight->Name();
 
-  this->dataPtr->lensFlareCompositorListener.reset(new
-        LensFlareCompositorListener(this->dataPtr->camera, directionalLight));
+  if (!this->dataPtr->lensFlareInstance)
+  {
+    // set up the lens flare instance
+    Ogre::MaterialPtr lensFlareMaterial =
+        Ogre::MaterialManager::getSingleton().getByName(
+            "Gazebo/CameraLensFlare");
+    lensFlareMaterial = lensFlareMaterial->clone(
+            "Gazebo/" + this->dataPtr->camera->Name() + "_CameraLensFlare");
 
-  this->dataPtr->lensFlareInstance =
-      Ogre::CompositorManager::getSingleton().addCompositor(
-      this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
-  this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
-      getPass(0)->setMaterial(this->dataPtr->lensFlareMaterial);
+    this->dataPtr->lensFlareCompositorListener.reset(new
+          LensFlareCompositorListener(this->dataPtr->camera, directionalLight));
 
-  this->dataPtr->lensFlareInstance->setEnabled(true);
-  this->dataPtr->lensFlareInstance->addListener(
-      this->dataPtr->lensFlareCompositorListener.get());
+    this->dataPtr->lensFlareInstance =
+        Ogre::CompositorManager::getSingleton().addCompositor(
+        this->dataPtr->camera->OgreViewport(), "CameraLensFlare/Default");
+    this->dataPtr->lensFlareInstance->getTechnique()->getOutputTargetPass()->
+        getPass(0)->setMaterial(lensFlareMaterial);
+
+    this->dataPtr->lensFlareInstance->setEnabled(true);
+    this->dataPtr->lensFlareInstance->addListener(
+        this->dataPtr->lensFlareCompositorListener.get());
+  }
+  else
+  {
+    this->dataPtr->lensFlareCompositorListener->SetLight(directionalLight);
+    this->dataPtr->lensFlareInstance->setEnabled(true);
+  }
 
   // disconnect
   this->dataPtr->preRenderConnection.reset();
+
+  if (!this->dataPtr->node)
+  {
+    this->dataPtr->node = transport::NodePtr(new transport::Node());
+    this->dataPtr->node->Init();
+  }
+
+  // listen for delete events to remove lens flare if light gets deleted.
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
+      &LensFlare::OnRequest, this);
+
+
+}
+
+//////////////////////////////////////////////////
+void LensFlare::OnRequest(ConstRequestPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (_msg->request() == "entity_delete" &&
+      _msg->data() == this->dataPtr->lightName)
+  {
+    this->dataPtr->removeLensFlare = true;
+    this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
+      std::bind(&LensFlare::Update, this));
+  }
 }
