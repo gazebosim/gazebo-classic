@@ -141,11 +141,21 @@ bool LogRecord::Init(const std::string &_subdir)
 }
 
 //////////////////////////////////////////////////
+bool LogRecord::Start(const LogRecordParams &_params,
+                      const bool _recordWithModel)
+{
+  this->dataPtr->recordWithModel = _recordWithModel;
+  this->dataPtr->period = _params.period;
+  this->dataPtr->filter = _params.filter;
+  return this->Start(_params.encoding, _params.path);
+}
+
+//////////////////////////////////////////////////
+// TO BE DEPRECATED
 bool LogRecord::Start(const LogRecordParams &_params)
 {
   this->dataPtr->period = _params.period;
   this->dataPtr->filter = _params.filter;
-  this->dataPtr->recordWithModel = _params.recordWithModel;
   return this->Start(_params.encoding, _params.path);
 }
 

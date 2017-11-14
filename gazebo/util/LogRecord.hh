@@ -47,10 +47,6 @@ namespace gazebo
 
       /// \brief Log filter string
       public: std::string filter;
-
-      /// \brief Recording with modles. True will record state logs
-      /// together with model meshes and materials.
-      public: bool recordWithModel = false;
     };
 
     // Forward declare private data class
@@ -165,6 +161,13 @@ namespace gazebo
 
       /// \brief Start the logger.
       /// \params[in] _params Log recording parameters.
+      /// \params[in] _recordWithModel Save the model when logging if true.
+      public: bool Start(const LogRecordParams &_params,
+                         const bool _recordWithModel = false);
+
+      /// \brief Start the logger.
+      /// \params[in] _params Log recording parameters.
+      /// TO BE DEPRECATED
       public: bool Start(const LogRecordParams &_params);
 
       /// \brief Start the logger.
