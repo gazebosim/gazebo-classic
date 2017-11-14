@@ -69,7 +69,7 @@ namespace gazebo
 
       /// \brief Constructor with surface type input.
       /// \param[in] _type SurfaceType specification.
-      public: SphericalCoordinates(const SurfaceType _type);
+      public: explicit SphericalCoordinates(const SurfaceType _type);
 
       /// \brief Constructor with surface type, angle, and elevation inputs.
       /// \param[in] _type SurfaceType specification.
