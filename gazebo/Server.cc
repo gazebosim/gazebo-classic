@@ -159,7 +159,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Recording period (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
-    ("record_with_model", "Record state data with model meshes and materials.")
+    ("record_with_model", "Recording with model meshes and materials.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -625,11 +625,8 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      if (this->dataPtr->params.count("record_with_model") > 0)
-      {
-        params.recordWithModel = true;
-      }
-      util::LogRecord::Instance()->Start(params);
+      util::LogRecord::Instance()->Start(params,
+        this->dataPtr->params.count("record_with_model") > 0);
     }
   }
 }
