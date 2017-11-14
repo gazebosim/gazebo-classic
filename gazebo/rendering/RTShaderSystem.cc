@@ -43,6 +43,7 @@
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
+#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 #include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Visual.hh"
@@ -99,6 +100,13 @@ void RTShaderSystem::Init()
     // Set shader cache path.
     this->dataPtr->shaderGenerator->setShaderCachePath(cachePath);
 
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR <= 8
+    this->dataPtr->programWriterFactory =
+        OGRE_NEW CustomGLSLProgramWriterFactory();
+    Ogre::RTShader::ProgramWriterManager::getSingletonPtr()->addFactory(
+        this->dataPtr->programWriterFactory);
+#endif
+
     this->dataPtr->shaderGenerator->setTargetLanguage("glsl");
 
     Ogre::RTShader::SubRenderStateFactory* factory =
@@ -129,6 +137,10 @@ void RTShaderSystem::Fini()
 #else
     Ogre::RTShader::ShaderGenerator::destroy();
 #endif
+
+    if (this->dataPtr->programWriterFactory)
+      delete this->dataPtr->programWriterFactory;
+
     this->dataPtr->shaderGenerator = NULL;
   }
 

@@ -564,3 +564,28 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   cam->setNearClipDistance(oldNear);
   cam->setFarClipDistance(oldFar);
 }
+
+//////////////////////////////////////////////////
+CustomGLSLProgramWriter::CustomGLSLProgramWriter()
+  : Ogre::RTShader::GLSLProgramWriter()
+{
+  mGpuConstTypeMap[Ogre::GCT_SAMPLER2DSHADOW] = "sampler2DShadow";
+}
+
+//////////////////////////////////////////////////
+CustomGLSLProgramWriterFactory::CustomGLSLProgramWriterFactory()
+    : mLanguage("glsl")
+{
+}
+
+//////////////////////////////////////////////////
+const Ogre::String &CustomGLSLProgramWriterFactory::getTargetLanguage() const
+{
+  return mLanguage;
+}
+
+//////////////////////////////////////////////////
+Ogre::RTShader::ProgramWriter *CustomGLSLProgramWriterFactory::create()
+{
+  return OGRE_NEW CustomGLSLProgramWriter();
+}

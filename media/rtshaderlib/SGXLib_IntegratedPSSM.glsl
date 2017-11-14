@@ -55,7 +55,7 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize)
+float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize, bool hardwarePCF)
 {
   // Remove shadow outside shadow maps so that all that area appears lit
   if (shadowMapPos.z < 0.0 || shadowMapPos.z > 1.0)
@@ -86,13 +86,19 @@ float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 inv
     // driver hack.
     // shadow += shadow2D(shadowMap, newUV.xyz).r;
     float d = shadow2D(shadowMap, newUV.xyz).r;
-    float minShadowFactor = 0.2;
-    shadow += (step(shadowMapPos.z, d) >= 1.0) ? 1.0 : minShadowFactor;
+    if (hardwarePCF)
+      shadow += d;
+    else
+      shadow += step(shadowMapPos.z, d);
   }
   shadow /= 9.0;
 
   // smoothstep makes shadow edges appear more crisp and hides Mach bands
-  return smoothstep(0.0, 1.0, shadow);
+  float s = smoothstep(0.0, 1.0, shadow);
+  // make shadow lighter color
+  float minShadowFactor = 0.2;
+  s = s * (1.0 - minShadowFactor) + minShadowFactor;
+  return s;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,19 +115,25 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 invShadowMapSize2,
 							out float oShadowFactor)
 {
+  // hack! On OSX the shadow size is halved so we use this as a hint to
+  // turn off hardware PCF.
+  bool hardwarePCF = false;
+  if (invShadowMapSize0.x == invShadowMapSize1.x)
+    hardwarePCF = true;
+
   if (fDepth  <= vSplitPoints.x)
   {
     oShadowFactor =
-      _SGX_ShadowPoisson9(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+      _SGX_ShadowPoisson9(shadowMap0, lightPosition0, invShadowMapSize0.xy, hardwarePCF);
   }
   else if (fDepth <= vSplitPoints.y)
   {
     oShadowFactor =
-      _SGX_ShadowPoisson9(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+      _SGX_ShadowPoisson9(shadowMap1, lightPosition1, invShadowMapSize1.xy, hardwarePCF);
   }
   else
   {
     oShadowFactor =
-      _SGX_ShadowPoisson9(shadowMap2, lightPosition2, invShadowMapSize2.xy);
+      _SGX_ShadowPoisson9(shadowMap2, lightPosition2, invShadowMapSize2.xy, hardwarePCF);
   }
 }

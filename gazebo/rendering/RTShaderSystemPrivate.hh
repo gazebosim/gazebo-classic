@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 
+#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/gazebo_config.h"
 
@@ -70,6 +72,10 @@ namespace gazebo
 
       /// \brief Parallel Split Shadow Map (PSSM) overlap between splits.
       public: double shadowSplitPadding = 2.0;
+
+      /// \brief Custom program writer factory that supports sampler2DShadow,
+      /// only used in ogre versions <= 1.8
+      public: CustomGLSLProgramWriterFactory *programWriterFactory = nullptr;
     };
   }
 }

@@ -119,6 +119,41 @@ namespace gazebo
           const Ogre::Light *_light, Ogre::Camera *_texCam, size_t _iteration)
           const;
     };
+
+    /// \brief This overrides ogre's default GLSLProgramWriter to fix
+    /// a bug in ogre versions <= 1.8 where 'sampler2DShadow' sampler type
+    /// is missing
+    class GAZEBO_VISIBLE CustomGLSLProgramWriter :
+        public Ogre::RTShader::GLSLProgramWriter
+    {
+      /// \brief Constructor
+      public: CustomGLSLProgramWriter();
+
+      /// \brief Destructor
+      public: ~CustomGLSLProgramWriter() = default;
+    };
+
+    /// \brief A factory to create our own CustomGLSLProgramWriter.
+    class GAZEBO_VISIBLE CustomGLSLProgramWriterFactory :
+        public Ogre::RTShader::ProgramWriterFactory
+    {
+      /// \brief Constructor
+      public: CustomGLSLProgramWriterFactory();
+
+      /// \brief Destructor
+      public: ~CustomGLSLProgramWriterFactory() = default;
+
+      /// \brief Get shader language supported by this factory
+      /// \return Language supported - "glsl"
+      public: const Ogre::String &getTargetLanguage() const;
+
+      /// \brief Creates the GLSLProgramWriter
+      /// \return Ogre's program writer
+      public: virtual Ogre::RTShader::ProgramWriter* create();
+
+      /// \brief supported shader language
+      private: Ogre::String mLanguage;
+    };
   }
 }
 

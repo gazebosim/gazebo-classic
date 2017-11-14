@@ -22,7 +22,6 @@
 #include <string>
 
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 #include "gazebo/gazebo_config.h"
 
 #include "gazebo/rendering/Camera.hh"
