@@ -582,6 +582,8 @@ QTreeWidgetItem *ModelListWidget::ListItem(const std::string &_name,
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->dataPtr->modelTreeWidget->itemAt(_pt);
+  if (!item)
+    return;
 
   // Check to see if the selected item is a model
   int i = this->dataPtr->modelsItem->indexOfChild(item);

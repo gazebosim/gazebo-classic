@@ -115,8 +115,8 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 invShadowMapSize2,
 							out float oShadowFactor)
 {
-  // hack! On OSX the shadow size is halved so we use this as a hint to
-  // turn off hardware PCF.
+  // hack! On OSX the shadow map size is halved so we use this as a hint
+  // that hardware PCF is not enabled.
   bool hardwarePCF = false;
   if (invShadowMapSize0.x == invShadowMapSize1.x)
     hardwarePCF = true;
