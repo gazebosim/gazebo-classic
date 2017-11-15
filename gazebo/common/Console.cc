@@ -149,11 +149,7 @@ FileLogger::FileLogger(const std::string &_filename)
 /////////////////////////////////////////////////
 FileLogger::~FileLogger()
 {
-  FileLogger::Buffer *buf = static_cast<FileLogger::Buffer *>(
-      this->rdbuf());
-
-  delete buf->stream;
-  delete buf;
+  delete this->rdbuf();
 }
 
 /////////////////////////////////////////////////
@@ -284,6 +280,7 @@ FileLogger::Buffer::~Buffer()
   {
     if (this->stream)
       static_cast<std::ofstream*>(this->stream)->close();
+    delete this->stream;
   }
   catch(...)
   {
