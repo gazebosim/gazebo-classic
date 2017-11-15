@@ -77,6 +77,9 @@ namespace gazebo
 
       /// \brief Timer used to timeout confirmation dialog.
       public: QTimer *confirmationTimer;
+
+      /// \brief Check box for whether to save models.
+      public: QCheckBox *saveModelBox;
     };
   }
 }

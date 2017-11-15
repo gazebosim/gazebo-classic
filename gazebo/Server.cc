@@ -629,8 +629,8 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      util::LogRecord::Instance()->Start(params,
-        this->dataPtr->params.count("record_with_model") > 0);
+      params.recordWithModel = this->dataPtr->params.count("record_with_model") > 0;
+      util::LogRecord::Instance()->Start(params);
     }
   }
 }

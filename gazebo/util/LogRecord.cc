@@ -141,21 +141,11 @@ bool LogRecord::Init(const std::string &_subdir)
 }
 
 //////////////////////////////////////////////////
-bool LogRecord::Start(const LogRecordParams &_params,
-                      const bool _recordWithModel)
-{
-  this->dataPtr->recordWithModel = _recordWithModel;
-  this->dataPtr->period = _params.period;
-  this->dataPtr->filter = _params.filter;
-  return this->Start(_params.encoding, _params.path);
-}
-
-//////////////////////////////////////////////////
-// TO BE DEPRECATED
 bool LogRecord::Start(const LogRecordParams &_params)
 {
   this->dataPtr->period = _params.period;
   this->dataPtr->filter = _params.filter;
+  this->dataPtr->recordWithModel = _params.recordWithModel;
   return this->Start(_params.encoding, _params.path);
 }
 
@@ -854,6 +844,10 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   {
     this->SetPaused(_data->paused());
   }
+  else if (_data->has_save_model())
+  {
+    this->dataPtr->recordWithModel = true;
+  }
 
   // Output the new log status
   this->PublishLogStatus();
@@ -882,6 +876,9 @@ void LogRecord::PublishLogStatus()
 
   // Set the URI of th log file
   msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
+
+  // Set whether to save model
+  msg.mutable_log_file()->set_save_model(this->dataPtr->recordWithModel);
 
   // Get the size of the log file
   size = this->FileSize();
