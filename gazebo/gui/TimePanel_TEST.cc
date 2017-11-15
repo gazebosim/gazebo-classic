@@ -92,7 +92,8 @@ void TimePanel_TEST::SpaceBar()
   }
   QVERIFY(!timePanel->IsPaused());
 
-  delete timePanel;
+  mainWindow->close();
+  delete mainWindow;
 }
 
 // Generate a main function for the test
