@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Image Viewer: fix QImage::Format used to display grayscale images
+    * [Pull request #2813](https://bitbucket.org/osrf/gazebo/pull-requests/2813)
+
 1. Joint control menu highlight active
     * [Pull request #2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
     * [Issue #2307](https://bitbucket.org/osrf/gazebo/issues/2307)
