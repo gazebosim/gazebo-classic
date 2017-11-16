@@ -90,8 +90,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
-      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()) ||
-      qFormat != this->dataPtr->image.format())
+      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
+      || qFormat != this->dataPtr->image.format())
   {
     QImage qimage(_msg.width(), _msg.height(), qFormat);
     this->dataPtr->image = qimage.copy();
