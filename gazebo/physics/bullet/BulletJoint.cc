@@ -579,7 +579,8 @@ double BulletJoint::GetParam(const std::string &_key,
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::SetPosition(unsigned int _index, double _position)
+bool BulletJoint::SetPosition(unsigned int _index, double _position,
+                              bool _preserveWorldVelocity)
 {
-  return Joint::SetPositionMaximal(_index, _position);
+  return Joint::SetPositionMaximal(_index, _position, _preserveWorldVelocity);
 }

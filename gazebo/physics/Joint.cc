@@ -688,7 +688,8 @@ double Joint::Position(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+bool Joint::SetPosition(unsigned int /*_index*/, double _position,
+                        bool /*_preserveWorldVelocity*/)
 {
   // parent class doesn't do much, derived classes do all the work.
   if (this->model)
@@ -707,7 +708,8 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(unsigned int _index, double _position)
+bool Joint::SetPositionMaximal(unsigned int _index, double _position,
+                               bool _preserveWorldVelocity)
 {
   // check if index is within bounds
   if (_index >= this->DOF())
@@ -789,7 +791,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose,
+              _preserveWorldVelocity);
 
             // debug
             // gzerr << "moved " << (*li)->GetName()
