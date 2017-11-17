@@ -399,7 +399,7 @@ bool PresetManager::CreateProfile(const std::string &_name)
     gzwarn << "Warning: profile [" << _name << "] already exists! Overwriting."
            << std::endl;
   }
-  this->dataPtr->presetProfiles.emplace(_name, _name);
+  this->dataPtr->presetProfiles.emplace(_name, Preset(_name));
 
   if (!this->ProfileSDF(_name, this->dataPtr->physicsEngine->GetSDF()))
     return false;
