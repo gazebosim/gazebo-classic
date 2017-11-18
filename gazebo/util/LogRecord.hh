@@ -173,12 +173,12 @@ namespace gazebo
       /// \brief Start the logger.
       /// \params[in] _params Log recording parameters.
       /// \params[in] _recordWithModel Save the model when logging if true.
+      // TO BE DEPRECATED: after recordWithModel added to LogRecordParams
       public: bool Start(const LogRecordParams &_params,
-                         const bool _recordWithModel = false);
+                         const bool _recordWithModel);
 
       /// \brief Start the logger.
       /// \params[in] _params Log recording parameters.
-      /// TO BE DEPRECATED
       public: bool Start(const LogRecordParams &_params);
 
       /// \brief Start the logger.
