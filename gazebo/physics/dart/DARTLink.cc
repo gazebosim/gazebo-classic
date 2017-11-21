@@ -480,7 +480,7 @@ void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
+    gzdbg << "DARTLink::SetAngularVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
