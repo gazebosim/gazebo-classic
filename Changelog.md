@@ -4,7 +4,7 @@
 
 
 
-## Gazebo 7.9.0 (2017-11-21)
+## Gazebo 7.9.0 (2017-11-22)
 
 1. Diagnostics: enable test and don't create so many empty folders
     * [Pull request 2798](https://bitbucket.org/osrf/gazebo/pull-requests/2798)
