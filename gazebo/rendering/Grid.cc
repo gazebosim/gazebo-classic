@@ -16,6 +16,7 @@
 */
 
 #include <sstream>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -46,7 +47,7 @@ namespace gazebo
       public: float lineWidth;
 
       /// \brief Line color.
-      public: common::Color color;
+      public: ignition::math::Color color;
 
       /// \brief Height offset.
       public: float heightOffset;
@@ -81,7 +82,7 @@ Grid::Grid(Scene *_scene, const unsigned int _cellCount,
   this->dataPtr->cellCount = _cellCount;
   this->dataPtr->cellLength = _cellLength;
   this->dataPtr->lineWidth = _lineWidth;
-  this->dataPtr->color = _color;
+  this->dataPtr->color = _color.Ign();
   this->dataPtr->heightOffset = 0.015;
 
   static uint32_t gridCount = 0;
@@ -127,7 +128,7 @@ void Grid::SetLineWidth(const float _width)
 //////////////////////////////////////////////////
 void Grid::SetColor(const common::Color &_color)
 {
-  this->dataPtr->color = _color;
+  this->dataPtr->color = _color.Ign();
 
   this->dataPtr->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
   this->dataPtr->material->setAmbient(_color.r, _color.g, _color.b);

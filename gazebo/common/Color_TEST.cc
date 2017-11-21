@@ -150,6 +150,14 @@ TEST_F(Color, Color)
   EXPECT_TRUE(ignition::math::equal(0.3f, clr.a));
 }
 
+TEST_F(Color, Ign)
+{
+  auto clr = common::Color(0.1, 0.2, 0.3, 0.4).Ign();
+  EXPECT_FLOAT_EQ(0.1, clr.R());
+  EXPECT_FLOAT_EQ(0.2, clr.G());
+  EXPECT_FLOAT_EQ(0.3, clr.B());
+  EXPECT_FLOAT_EQ(0.4, clr.A());
+}
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
