@@ -21,32 +21,6 @@ class SDFTest : public ServerFixture
 {
 };
 
-/*
-TEST_F(PR2Test, Param)
-{
-  sdf::ParamT<char> charP("c", 'a', 0);
-  sdf::ParamT<bool> boolP("b", true, 0);
-  sdf::ParamT<float> floatP("f", 1.0, 0);
-  sdf::ParamT<double> doubleP("d", 1.0, 0);
-  sdf::ParamT<int> intP("i", 1, 0);
-  sdf::ParamT<unsigned int> uintP("ui", 1, 0);
-  sdf::ParamT<std::string> stringP("s", "default", 0);
-  sdf::ParamT<common::Color> colorP("c", common::Color(.1, .2, .3, 1), 0);
-  sdf::ParamT<ignition::math::Vector3d> vec3P("v3",
-      ignition::math::Vector3d(1, 2, 3), 0);
-  sdf::ParamT<ignition::math::Pose3d> poseP("v3", ignition:math::Posed(
-      ignition::math::Vector3d(1, 2, 3),
-      ignition::math::Quaterniond(0, 0, M_PI)), 0);
-
-  EXPECT_TRUE(boolP.IsBool());
-  EXPECT_TRUE(intP.IsInt());
-  EXPECT_TRUE(uintP.IsUInt());
-  EXPECT_TRUE(floatP.IsFloat());
-  EXPECT_TRUE(doubleP.IsDouble());
-  EXPECT_TRUE(doubleP.IsDouble());
-}
-*/
-
 TEST_F(SDFTest, WorldGetSDF)
 {
   // load the empty world
