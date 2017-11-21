@@ -58,6 +58,31 @@ Color::~Color()
 }
 
 //////////////////////////////////////////////////
+Color::Color(const ignition::math::Color &_color)
+{
+  this->r = _color.R();
+  this->g = _color.G();
+  this->b = _color.B();
+  this->a = _color.A();
+}
+
+//////////////////////////////////////////////////
+Color &Color::operator=(const ignition::math::Color &_color)
+{
+  this->r = _color.R();
+  this->g = _color.G();
+  this->b = _color.B();
+  this->a = _color.A();
+  return *this;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Color::Ign() const
+{
+  return ignition::math::Color(this->r, this->g, this->b, this->a);
+}
+
+//////////////////////////////////////////////////
 void Color::Reset()
 {
   this->r = this->g = this->b = this->a = 0;

@@ -16,6 +16,7 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -481,13 +482,13 @@ void Visual::Load()
     }
 
     if (matElemClone->HasElement("ambient"))
-      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
+      this->SetAmbient(matElemClone->Get<ignition::math::Color>("ambient"));
     if (matElemClone->HasElement("diffuse"))
-      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
+      this->SetDiffuse(matElemClone->Get<ignition::math::Color>("diffuse"));
     if (matElemClone->HasElement("specular"))
-      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
+      this->SetSpecular(matElemClone->Get<ignition::math::Color>("specular"));
     if (matElemClone->HasElement("emissive"))
-      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
+      this->SetEmissive(matElemClone->Get<ignition::math::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -974,11 +975,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  common::Color matAmbient;
-  common::Color matDiffuse;
-  common::Color matSpecular;
-  common::Color matEmissive;
-  bool matColor = rendering::Material::GetMaterialAsColor(
+  ignition::math::Color matAmbient;
+  ignition::math::Color matDiffuse;
+  ignition::math::Color matSpecular;
+  ignition::math::Color matEmissive;
+  bool matColor = rendering::Material::MaterialAsColor(
       _materialName, matAmbient, matDiffuse, matSpecular, matEmissive);
 
   if (_unique)
@@ -989,10 +990,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         _materialName;
 
     if (this->GetMaterialName() == newMaterialName &&
-        matAmbient == this->GetAmbient() &&
-        matDiffuse == this->GetDiffuse() &&
-        matSpecular == this->GetSpecular() &&
-        matEmissive == this->GetEmissive())
+        matAmbient == this->Ambient() &&
+        matDiffuse == this->Diffuse() &&
+        matSpecular == this->Specular() &&
+        matEmissive == this->Emissive())
       return;
 
     this->dataPtr->myMaterialName = newMaterialName;
@@ -1102,6 +1103,13 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 /////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 {
+  this->SetAmbient(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetAmbient(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   if (!this->dataPtr->lighting)
     return;
 
@@ -1165,6 +1173,13 @@ void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 
 /////////////////////////////////////////////////
 void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
+{
+  this->SetDiffuse(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetDiffuse(const ignition::math::Color &_color,
+    const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1235,6 +1250,13 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 /////////////////////////////////////////////////
 void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 {
+  this->SetSpecular(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSpecular(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   if (!this->dataPtr->lighting)
     return;
 
@@ -1299,6 +1321,13 @@ void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 {
+  this->SetEmissive(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1357,7 +1386,19 @@ common::Color Visual::GetAmbient() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Color Visual::Ambient() const
+{
+  return this->dataPtr->ambient;
+}
+
+/////////////////////////////////////////////////
 common::Color Visual::GetDiffuse() const
+{
+  return this->dataPtr->diffuse;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Diffuse() const
 {
   return this->dataPtr->diffuse;
 }
@@ -1369,7 +1410,19 @@ common::Color Visual::GetSpecular() const
 }
 
 /////////////////////////////////////////////////
+ignition::math::Color Visual::Specular() const
+{
+  return this->dataPtr->specular;
+}
+
+/////////////////////////////////////////////////
 common::Color Visual::GetEmissive() const
+{
+  return this->dataPtr->emissive;
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Emissive() const
 {
   return this->dataPtr->emissive;
 }
@@ -1903,8 +1956,9 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
-                            const common::Color &_changeColor)
+void Visual::SetRibbonTrail(bool _value,
+    const ignition::math::Color &_initialColor,
+    const ignition::math::Color &_changeColor)
 {
   if (this->dataPtr->ribbonTrail == nullptr)
   {
@@ -1944,6 +1998,14 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
     this->dataPtr->ribbonTrail->clearChain(0);
   }
   this->dataPtr->ribbonTrail->setVisible(_value);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRibbonTrail(bool _value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor)
+{
+  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -2390,12 +2452,17 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = common::find_file(_msg->geometry().mesh().filename());
+    {
+      std::string filename = _msg->geometry().mesh().filename();
+      newGeometryName = common::find_file(filename);
+    }
 
     if (newGeometryType != geometryType ||
-        (newGeometryType == "mesh" && newGeometryName != geometryName))
+        (newGeometryType == "mesh" && !newGeometryName.empty() &&
+        newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
+      bool origCastShadows = this->dataPtr->castShadows;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2448,6 +2515,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         this->dataPtr->skeleton = ent->getSkeleton();
       this->SetMaterial(origMaterial, false);
       this->UpdateTransparency(true);
+      this->SetCastShadows(origCastShadows);
     }
 
     ignition::math::Vector3d geomScale(1, 1, 1);
@@ -3435,28 +3503,28 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 
   if (_msg.has_ambient())
   {
-    this->SetAmbient(common::Color(
+    this->SetAmbient(ignition::math::Color(
           _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
           _msg.ambient().a()));
   }
 
   if (_msg.has_diffuse())
   {
-    this->SetDiffuse(common::Color(
+    this->SetDiffuse(ignition::math::Color(
           _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
           _msg.diffuse().a()));
   }
 
   if (_msg.has_specular())
   {
-    this->SetSpecular(common::Color(
+    this->SetSpecular(ignition::math::Color(
           _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
           _msg.specular().a()));
   }
 
   if (_msg.has_emissive())
   {
-    this->SetEmissive(common::Color(
+    this->SetEmissive(ignition::math::Color(
           _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
           _msg.emissive().a()));
   }
@@ -3503,25 +3571,25 @@ void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
     _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
   }
 
-  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
-  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
-  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
-  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.R());
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.G());
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.B());
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.A());
 
-  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
-  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
-  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
-  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.R());
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.G());
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.B());
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.A());
 
-  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
-  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
-  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
-  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.R());
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.G());
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.B());
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.A());
 
-  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
-  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
-  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
-  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.R());
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.G());
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.B());
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.A());
 
   if (!this->GetNormalMap().empty())
     _msg.set_normal_map(this->GetNormalMap());

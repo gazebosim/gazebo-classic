@@ -38,7 +38,7 @@ namespace gazebo
 
       /// \brief Constuctor.
       /// \param[in] _mainWindow Pointer to the main window.
-      public: Editor(MainWindow *_mainWindow);
+      public: explicit Editor(MainWindow *_mainWindow);
 
       /// \brief Destuctor
       public: virtual ~Editor();

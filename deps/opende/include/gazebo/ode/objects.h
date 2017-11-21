@@ -95,6 +95,13 @@ ODE_API void dWorldDestroy (dWorldID world);
 ODE_API void dWorldSetGravity (dWorldID, dReal x, dReal y, dReal z);
 
 /**
+ * @brief Get the number of thread pool threads for islands
+ *
+ * @ingroup world
+ */
+ODE_API int dWorldGetIslandThreads (dWorldID);
+
+/**
  * @brief Set the number of thread pool threads for islands
  *
  * @ingroup world

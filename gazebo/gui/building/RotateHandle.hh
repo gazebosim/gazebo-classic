@@ -38,7 +38,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// param[in] _parent Parent graphics item.
-      public: RotateHandle(QGraphicsItem *_parent = 0);
+      public: explicit RotateHandle(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
       public: ~RotateHandle();

@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
 #include <ignition/math/Kmeans.hh>
 #include <ignition/math/Rand.hh>

@@ -26,9 +26,11 @@
 #include <string.h>
 #include <math.h>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -730,8 +732,9 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
+    common::Color const &gzDiffuse = directionalLight->DiffuseColor();
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->DiffuseColor()));
+        Conversions::Convert(gzDiffuse.Ign()));
   }
   else
   {

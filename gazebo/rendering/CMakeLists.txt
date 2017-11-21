@@ -167,6 +167,7 @@ set (gtest_sources_dri
   CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
+  Distortion_TEST.cc
   GpuLaser_TEST.cc
   Grid_TEST.cc
   Heightmap_TEST.cc

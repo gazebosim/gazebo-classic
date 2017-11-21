@@ -1,0 +1,139 @@
+<?xml version="1.0" ?>
+<sdf version='1.6'>
+  <world name="default">
+    <gravity>0 0 -9.8</gravity>
+    <physics type="dart">
+      <dart>
+        <solver>
+          <solver_type>pgs</solver_type>
+        </solver>
+      </dart>
+    </physics>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name='free_loop'>
+      <self_collide>1</self_collide>
+      <pose>0 0 0.8 1.5708 0.7854 0</pose>
+
+      <link name='link_0'>
+        <pose>-0.4 0 0 0 0 0</pose>
+        <visual name='vis_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name='col_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+      <link name='link_1'>
+        <pose>0 0.4 0.1 0 0 -1.5708</pose>
+        <visual name='vis_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name='col_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+      <link name='link_2'>
+        <pose>0.4 0 0 0 0 -3.14159</pose>
+        <visual name='vis_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name='col_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+      <link name='link_3'>
+        <pose>0 -0.4 0.1 0 0 1.5708</pose>
+        <visual name='vis_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <collision name='col_body'>
+          <geometry>
+            <box>
+              <size>0.2 1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+
+      <joint name='joint_0_1' type='revolute'>
+        <parent>link_0</parent>
+        <child>link_1</child>
+        <pose>0 -0.4 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>1.4</upper>
+            <lower>-1.4</lower>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint name='joint_1_2' type='revolute'>
+        <parent>link_1</parent>
+        <child>link_2</child>
+        <pose>0 -0.4 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <joint name='joint_2_3' type='revolute'>
+        <parent>link_2</parent>
+        <child>link_3</child>
+        <pose>0 -0.4 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+
+      <joint name='joint_3_0' type='revolute'>
+        <parent>link_3</parent>
+        <child>link_0</child>
+        <pose>0 -0.4 0 0 0 0</pose>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+
+  </world>
+</sdf>

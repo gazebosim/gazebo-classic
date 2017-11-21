@@ -582,8 +582,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         visualElem = visualElem->GetNextElement("visual");
@@ -626,8 +625,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         collisionElem = collisionElem->GetNextElement("collision");
@@ -980,6 +978,32 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
       boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
+}
+
+//////////////////////////////////////////////////
+std::vector<std::string> Model::SensorScopedName(
+  const std::string &_name) const
+{
+  std::vector<std::string> names;
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
+    {
+      const auto sensorName = (*iter)->GetSensorName(j);
+      if (sensorName.size() < _name.size())
+      {
+        continue;
+      }
+      if (sensorName.substr(sensorName.size() - _name.size(), _name.size()) ==
+          _name)
+      {
+        names.push_back(sensorName);
+      }
+    }
+  }
+
+  return names;
 }
 
 //////////////////////////////////////////////////

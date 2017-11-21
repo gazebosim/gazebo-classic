@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
@@ -1322,7 +1323,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->ImageWidth(),
       this->ImageHeight(),
       0,
-      (Ogre::PixelFormat)this->imageFormat,
+      static_cast<Ogre::PixelFormat>(this->imageFormat),
       Ogre::TU_RENDERTARGET,
       0,
       false,
@@ -1392,8 +1393,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
-    this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    common::Color const &gzBG = this->scene->BackgroundColor();
+    this->viewport->setBackgroundColour(Conversions::Convert(gzBG.Ign()));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -1885,7 +1886,8 @@ bool Camera::SetBackgroundColor(const common::Color &_color)
 {
   if (this->OgreViewport())
   {
-    this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
+    this->OgreViewport()->setBackgroundColour(
+        Conversions::Convert(_color.Ign()));
     return true;
   }
   return false;

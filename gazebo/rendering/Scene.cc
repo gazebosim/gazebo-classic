@@ -18,6 +18,7 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -59,6 +60,7 @@
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/RayQuery.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -475,13 +477,14 @@ std::string Scene::Name() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
+  ignition::math::Color color(_color.Ign());
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->dataPtr->manager &&
-      Conversions::Convert(this->dataPtr->manager->getAmbientLight()) != _color)
+  if (this->dataPtr->manager && Conversions::Convert(
+        this->dataPtr->manager->getAmbientLight()) != color)
   {
-    this->dataPtr->manager->setAmbientLight(Conversions::Convert(_color));
+    this->dataPtr->manager->setAmbientLight(Conversions::Convert(color));
   }
 }
 
@@ -1100,8 +1103,6 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  bool valid = false;
-
   _position = ignition::math::Vector3d::Zero;
 
   ignition::math::Vector3d origin;
@@ -1135,52 +1136,35 @@ bool Scene::FirstContact(CameraPtr _camera,
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve
-      size_t vertexCount;
-      size_t indexCount;
-      Ogre::Vector3 *vertices;
-      uint64_t *indices;
-
-      // Get the mesh information
-      this->MeshInformation(ogreEntity->getMesh().get(), vertexCount,
-          vertices, indexCount, indices,
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedPosition()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedOrientation()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedScale()));
-
-      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      VisualPtr vis;
+      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
       {
-        // when indices size is not divisible by 3
-        if (i+2 >= static_cast<int>(indexCount))
-          break;
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
-            vertices[indices[i]],
-            vertices[indices[i+1]],
-            vertices[indices[i+2]],
-            true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
+        try
         {
-          if ((distance < 0.0f) || (hit.second < distance))
-          {
-            // this is the closest so far, save it off
-            distance = hit.second;
-          }
+          vis = this->GetVisual(Ogre::any_cast<std::string>(
+              ogreEntity->getUserObjectBindings().getUserAny()));
         }
+        catch(Ogre::Exception &e)
+        {
+          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+          continue;
+        }
+        if (!vis)
+          continue;
+
+        RayQuery rayQuery(_camera);
+        ignition::math::Vector3d intersect;
+        ignition::math::Triangle3d vertices;
+        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+            intersect, vertices);
+        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+            intersect);
       }
-      delete [] vertices;
-      delete [] indices;
     }
   }
 
-  // If nothing was hit, then check the terrain.
-  if (distance <= 0.0 && this->dataPtr->terrain)
+  // Check intersection with the terrain
+  if (this->dataPtr->terrain)
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
@@ -1188,20 +1172,27 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
-      _position = Conversions::ConvertIgn(terrainResult.position);
-      valid = true;
+      double terrainHitDist =
+          mouseRay.getOrigin().distance(terrainResult.position);
+
+      if (terrainHitDist > 0.0 &&
+          (distance <= 0.0 || terrainHitDist < distance))
+      {
+        _position = Conversions::ConvertIgn(terrainResult.position);
+        return true;
+      }
     }
   }
 
-  // Compute the interesection point using the mouse ray and a distance
-  // value.
-  if (_position == ignition::math::Vector3d::Zero && distance > 0.0)
+  // if no terrain intersection, return position of intersection point with
+  // closest entity
+  if (distance > 0.0)
   {
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
-    valid = true;
+    return true;
   }
 
-  return valid;
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1311,8 +1302,10 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   elem->GetElement("end")->Set(_end);
 
   if (this->dataPtr->manager)
-    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color),
+  {
+    this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color.Ign()),
                            _density, _start, _end);
+  }
 }
 
 //////////////////////////////////////////////////
