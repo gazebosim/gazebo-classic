@@ -309,7 +309,7 @@ void DARTLink::OnPoseChange()
   dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
   if (dart::dynamics::FreeJoint *freeJoint =
-      dynamic_cast<dart::dynamics::FreeJoint*>(joint))
+          dynamic_cast<dart::dynamics::FreeJoint*>(joint))
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->WorldPose());
