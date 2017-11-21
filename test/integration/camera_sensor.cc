@@ -185,10 +185,10 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   std::string sensorScopedName2 =
       "default::" + modelName2 + "::body::" + cameraName;
   sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
-  EXPECT_TRUE(sensor2 != NULL);
+  ASSERT_NE(nullptr, sensor2);
   sensors::CameraSensorPtr camSensor2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
-  EXPECT_TRUE(camSensor2 != NULL);
+  ASSERT_NE(nullptr, camSensor2);
   rendering::CameraPtr camera2 = camSensor2->Camera();
   EXPECT_TRUE(camera2 != NULL);
 
@@ -198,7 +198,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
 
   // get camera scene and verify camera count
   rendering::ScenePtr scene = camera->GetScene();
-  EXPECT_TRUE(scene != NULL);
+  ASSERT_NE(nullptr, scene);
   EXPECT_EQ(scene->CameraCount(), 2u);
 
   // remove the second camera sensor first and check that it does not remove
