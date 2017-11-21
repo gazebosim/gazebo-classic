@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Joint control menu highlight active
+    * [Pull request #2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
+    * [Issue #2307](https://bitbucket.org/osrf/gazebo/issues/2307)
+
 1. Don't use lib prefix for ogre plugins as of ogre1.9
     * [Pull request #2803](https://bitbucket.org/osrf/gazebo/pull-request/2803)
 
