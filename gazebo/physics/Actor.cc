@@ -227,19 +227,20 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
     if (bone->IsRootNode())
     {
       this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue", Color::Blue);
+          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue",
+          ignition::math::Color::Blue);
     }
     else if (bone->GetChildCount() == 0)
     {
       this->AddSphereVisual(linkSdf, bone->GetName() +
           "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
-          "Gazebo/Yellow", Color::Yellow);
+          "Gazebo/Yellow", ignition::math::Color::Yellow);
     }
     else
     {
       this->AddSphereVisual(linkSdf, bone->GetName() +
           "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
-          "Gazebo/Red", Color::Red);
+          "Gazebo/Red", ignition::math::Color::Red);
     }
 
     // Create a box visual representing each bone
@@ -267,7 +268,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
         this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
           curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
           ignition::math::Vector3d(0.02, 0.02, length),
-          "Gazebo/Green", Color::Green);
+          "Gazebo/Green", ignition::math::Color::Green);
       }
     }
   }
@@ -872,7 +873,7 @@ void Actor::AddSphereCollision(const sdf::ElementPtr &_linkSdf,
 void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     const double _radius, const std::string &_material,
-    const common::Color &_ambient)
+    const ignition::math::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->GetElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);
@@ -891,7 +892,7 @@ void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
 void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     const ignition::math::Vector3d &_size, const std::string &_material,
-    const common::Color &_ambient)
+    const ignition::math::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);

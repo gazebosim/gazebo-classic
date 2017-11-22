@@ -21,6 +21,8 @@
 #include <map>
 #include <vector>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/common/Animation.hh"
@@ -31,7 +33,6 @@ namespace gazebo
   namespace common
   {
     class Mesh;
-    class Color;
     class Skeleton;
   }
 
@@ -202,7 +203,8 @@ namespace gazebo
       private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose, const double _radius,
-                   const std::string &_material, const common::Color &_ambient);
+                   const std::string &_material,
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a box visual object.
       /// \param[in] _linkSdf Link to add the visual to.
@@ -216,7 +218,7 @@ namespace gazebo
                    const ignition::math::Pose3d &_pose,
                    const ignition::math::Vector3d &_size,
                    const std::string &_material,
-                   const common::Color &_ambient);
+                   const ignition::math::Color &_ambient);
 
       /// \brief Add a visual to the given link which holds the actor's skin.
       /// \param[in] _linkSdf Link to add the visual to.

@@ -118,8 +118,15 @@ namespace gazebo
     /// \brief Convert a common::Color to a msgs::Any
     /// \param[in] _c The color to convert.
     /// \return A msgs::Any object.
+    /// \deprecated See function that uses ignition::math
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const common::Color &_c);
+    msgs::Any ConvertAny(const common::Color &_c) GAZEBO_DEPRECATED(9.0);
+
+    /// \brief Convert an ignition::math::Color to a msgs::Any
+    /// \param[in] _c The color to convert.
+    /// \return A msgs::Any object.
+    GAZEBO_VISIBLE
+    msgs::Any ConvertAny(const ignition::math::Color &_c);
 
     /// \brief Convert an ignition::math::Pose3d to a msgs::Any
     /// \param[in] _p The pose to convert.
@@ -166,8 +173,15 @@ namespace gazebo
     /// \brief Convert a common::Color to a msgs::Color
     /// \param[in] _c The color to convert
     /// \return A msgs::Color object
+    /// \deprecated See function that uses ignition::math
     GAZEBO_VISIBLE
-    msgs::Color Convert(const common::Color &_c);
+    msgs::Color Convert(const common::Color &_c) GAZEBO_DEPRECATED(9.0);
+
+    /// \brief Convert an ignition::math::Color to a msgs::Color
+    /// \param[in] _c The color to convert
+    /// \return A msgs::Color object
+    GAZEBO_VISIBLE
+    msgs::Color Convert(const ignition::math::Color &_c);
 
     /// \brief Convert a common::Time to a msgs::Time
     /// \param[in] _t The time to convert
@@ -255,11 +269,11 @@ namespace gazebo
     GAZEBO_VISIBLE
     void Set(common::Image &_img, const msgs::Image &_msg);
 
-    /// \brief Convert a msgs::Color to a common::Color
+    /// \brief Convert a msgs::Color to a ignition::math::Color
     /// \param[in] _c The color to convert
     /// \return A common::Color object
     GAZEBO_VISIBLE
-    common::Color Convert(const msgs::Color &_c);
+    ignition::math::Color Convert(const msgs::Color &_c);
 
     /// \brief Convert a msgs::Time to a common::Time
     /// \param[in] _t The time to convert
@@ -306,8 +320,15 @@ namespace gazebo
     /// \brief Set a msgs::Color from a common::Color
     /// \param[out] _p A msgs::Color pointer
     /// \param[in] _v A common::Color reference
+    /// \deprecated See function that uses ignition::math
     GAZEBO_VISIBLE
-    void Set(msgs::Color *_c, const common::Color &_v);
+    void Set(msgs::Color *_c, const common::Color &_v) GAZEBO_DEPRECATED(9.0);
+
+    /// \brief Set a msgs::Color from an ignition::math::Color
+    /// \param[out] _p A msgs::Color pointer
+    /// \param[in] _v An ignition::math::Color reference
+    GAZEBO_VISIBLE
+    void Set(msgs::Color *_c, const ignition::math::Color &_v);
 
     /// \brief Set a msgs::Time from a common::Time
     /// \param[out] _p A msgs::Time pointer

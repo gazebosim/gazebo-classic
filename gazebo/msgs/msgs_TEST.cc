@@ -150,7 +150,7 @@ TEST_F(MsgsTest, ConvertVector3dToAny)
 
 TEST_F(MsgsTest, ConvertColorToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(common::Color(.1, .2, .3, 1.0));
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Color(.1, .2, .3, 1.0));
   EXPECT_EQ(msg.type(), msgs::Any::COLOR);
   ASSERT_TRUE(msg.has_color_value());
 
@@ -278,7 +278,7 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
+  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
 
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
@@ -288,8 +288,8 @@ TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 {
-  msgs::Color msg = msgs::Convert(common::Color(.1, .2, .3, 1.0));
-  common::Color v = msgs::Convert(msg);
+  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
+  auto v = msgs::Convert(msg);
 
   EXPECT_FLOAT_EQ(0.1f, v.r);
   EXPECT_FLOAT_EQ(0.2f, v.g);
@@ -513,7 +513,7 @@ TEST_F(MsgsTest, SetPose)
 TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
-  msgs::Set(&msg, common::Color(.1, .2, .3, 1.0));
+  msgs::Set(&msg, ignition::math::Color(.1, .2, .3, 1.0));
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
   EXPECT_FLOAT_EQ(0.3f, msg.b());
@@ -2822,10 +2822,10 @@ TEST_F(MsgsTest, MaterialToSDF)
   const msgs::Material::ShaderType type = msgs::Material::VERTEX;
   const std::string normalMap("normalMap");
   const bool lighting = true;
-  const common::Color ambient(.1, .2, .3, 1.0);
-  const common::Color diffuse(.4, .5, .6, 1.0);
-  const common::Color emissive(.5, .5, .5, 0.5);
-  const common::Color specular(.7, .8, .9, 1.0);
+  const ignition::math::Color ambient(.1, .2, .3, 1.0);
+  const ignition::math::Color diffuse(.4, .5, .6, 1.0);
+  const ignition::math::Color emissive(.5, .5, .5, 0.5);
+  const ignition::math::Color specular(.7, .8, .9, 1.0);
 
   msg.mutable_script()->set_name(name);
   msg.mutable_script()->add_uri();
