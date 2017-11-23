@@ -35,7 +35,7 @@ CameraPlugin::CameraPlugin()
 /////////////////////////////////////////////////
 CameraPlugin::~CameraPlugin()
 {
-  this->camera->DisconnectNewImageFrame(this->newFrameConnection);
+  this->newFrameConnection.reset();
   this->parentSensor.reset();
   this->camera.reset();
 }
