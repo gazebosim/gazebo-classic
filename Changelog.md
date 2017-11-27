@@ -7,23 +7,23 @@
     * [Issue 2377](https://bitbucket.org/osrf/gazebo/issues/2377)
 
 1. Joint control menu highlight active
-    * [Pull request #2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
-    * [Issue #2307](https://bitbucket.org/osrf/gazebo/issues/2307)
+    * [Pull request 2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
+    * [Issue 2307](https://bitbucket.org/osrf/gazebo/issues/2307)
 
 1. Don't use lib prefix for ogre plugins as of ogre1.9
-    * [Pull request #2803](https://bitbucket.org/osrf/gazebo/pull-request/2803)
+    * [Pull request 2803](https://bitbucket.org/osrf/gazebo/pull-request/2803)
 
 1. RenderEngine::SetupResources(): Fix resource locations being added multiple times
-    * [Pull request #2801](https://bitbucket.org/osrf/gazebo/pull-request/2801)
+    * [Pull request 2801](https://bitbucket.org/osrf/gazebo/pull-request/2801)
 
 1. Added and improved communications between the JointControlWidget and JointController
-    * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
-    * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
+    * [Pull request 2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
+    * [Issue 295](https://bitbucket.org/osrf/gazebo/issues/295)
 
 ## Gazebo 8.1.1 (2017-06-05)
 
 1. Add the option --gui-client-plugin to load GUI plugins. Leave -g to load System Plugins.
-    * [Pull request #2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
+    * [Pull request 2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
     * [Issue 2279](https://bitbucket.org/osrf/gazebo/issues/2279)
 
 1. Remove duplicate material block in ShadowCaster.material
@@ -37,8 +37,11 @@
     * [Pull request 2678](https://bitbucket.org/osrf/gazebo/pull-requests/2678)
 
 1. Add actors in World as models so they get returned with World::Models()
-    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
-    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+    * [Pull request 2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue 2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+
+1. Refactor tests to use models from world file instead of dynamically spawning models
+    * [Pull request 2689](https://bitbucket.org/osrf/gazebo/pull-request/2689)
 
 ## Gazebo 8.1.0 (2017-05-04)
 
@@ -53,6 +56,7 @@
 
 1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
+    * [Issue 1841](https://bitbucket.org/osrf/gazebo/issues/1841)
 
 1. Force / torque sensor visualization using WrenchVisual
     * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
@@ -71,6 +75,7 @@
 
 1. Fix deprecated sdf warnings produced by PluginToSDF
     * [Pull request 2646](https://bitbucket.org/osrf/gazebo/pull-request/2646)
+    * [Issue 2202](https://bitbucket.org/osrf/gazebo/issues/2202)
 
 1. Added TouchPlugin, which checks if a model has been in contact with another
    model exclusively for a certain time.
@@ -84,16 +89,21 @@
 
 1. Fix examples compilation (#2177)
     * [Pull request 2634](https://bitbucket.org/osrf/gazebo/pull-request/2634)
+    * [Issue 2177](https://bitbucket.org/osrf/gazebo/issues/2177)
 
 1. Fix loading gui plugins and OSX framerate issue
-    * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
-    * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
-    * [Issue #2133](https://bitbucket.org/osrf/gazebo/issues/2133)
+    * [Pull request 2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
+    * [Issue 1311](https://bitbucket.org/osrf/gazebo/issues/1311)
+    * [Issue 2133](https://bitbucket.org/osrf/gazebo/issues/2133)
 
 1. Fix ign-math3 deprecation warnings
     * [Pull request 2612](https://bitbucket.org/osrf/gazebo/pull-request/2612)
     * [Pull request 2626](https://bitbucket.org/osrf/gazebo/pull-request/2626)
     * [Pull request 2648](https://bitbucket.org/osrf/gazebo/pull-request/2648)
+
+1. Re-order some gui tests to fix osx failures
+    * [Pull request 2650](https://bitbucket.org/osrf/gazebo/pull-request/2650)
+    * [Issue 2197](https://bitbucket.org/osrf/gazebo/issues/2197)
 
 
 ## Gazebo 8.0.0 (2017-01-25)
@@ -457,6 +467,7 @@
 
 1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
+    * [Issue 1841](https://bitbucket.org/osrf/gazebo/issues/1841)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
     * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
@@ -471,6 +482,7 @@
 
 1. Add plugin for attaching lights to links in a model
     * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
+    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Support Heightmap LOD
     * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
