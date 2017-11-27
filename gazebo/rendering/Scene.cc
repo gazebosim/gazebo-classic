@@ -59,6 +59,7 @@
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/RayQuery.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -1112,8 +1113,6 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  bool valid = false;
-
   _position = ignition::math::Vector3d::Zero;
 
   ignition::math::Vector3d origin;
@@ -1147,52 +1146,35 @@ bool Scene::FirstContact(CameraPtr _camera,
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve
-      size_t vertexCount;
-      size_t indexCount;
-      Ogre::Vector3 *vertices;
-      uint64_t *indices;
-
-      // Get the mesh information
-      this->MeshInformation(ogreEntity->getMesh().get(), vertexCount,
-          vertices, indexCount, indices,
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedPosition()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedOrientation()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedScale()));
-
-      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      VisualPtr vis;
+      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
       {
-        // when indices size is not divisible by 3
-        if (i+2 >= static_cast<int>(indexCount))
-          break;
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
-            vertices[indices[i]],
-            vertices[indices[i+1]],
-            vertices[indices[i+2]],
-            true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
+        try
         {
-          if ((distance < 0.0f) || (hit.second < distance))
-          {
-            // this is the closest so far, save it off
-            distance = hit.second;
-          }
+          vis = this->GetVisual(Ogre::any_cast<std::string>(
+              ogreEntity->getUserObjectBindings().getUserAny()));
         }
+        catch(Ogre::Exception &e)
+        {
+          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+          continue;
+        }
+        if (!vis)
+          continue;
+
+        RayQuery rayQuery(_camera);
+        ignition::math::Vector3d intersect;
+        ignition::math::Triangle3d vertices;
+        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+            intersect, vertices);
+        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+            intersect);
       }
-      delete [] vertices;
-      delete [] indices;
     }
   }
 
-  // If nothing was hit, then check the terrain.
-  if (distance <= 0.0 && this->dataPtr->terrain)
+  // Check intersection with the terrain
+  if (this->dataPtr->terrain)
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
@@ -1200,20 +1182,27 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
-      _position = Conversions::ConvertIgn(terrainResult.position);
-      valid = true;
+      double terrainHitDist =
+          mouseRay.getOrigin().distance(terrainResult.position);
+
+      if (terrainHitDist > 0.0 &&
+          (distance <= 0.0 || terrainHitDist < distance))
+      {
+        _position = Conversions::ConvertIgn(terrainResult.position);
+        return true;
+      }
     }
   }
 
-  // Compute the interesection point using the mouse ray and a distance
-  // value.
-  if (_position == ignition::math::Vector3d::Zero && distance > 0.0)
+  // if no terrain intersection, return position of intersection point with
+  // closest entity
+  if (distance > 0.0)
   {
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
-    valid = true;
+    return true;
   }
 
-  return valid;
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1404,7 +1393,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) || !added_shared)
+    if (!submesh->useSharedVertices || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2123,6 +2112,12 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
     if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
+      if (this->dataPtr->joints.find(_msg->parent()) ==
+          this->dataPtr->joints.end())
+      {
+        return false;
+      }
+
       ConstJointPtr jointMsg = this->dataPtr->joints[_msg->parent()];
 
       if (!jointMsg)
@@ -2306,6 +2301,9 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   // If this needs to be added, make sure it is called after all of the visuals
   // the childVis link have been loaded
   // childVis->ShowJoints(this->dataPtr->showJoints);
+
+  ConstJointPtr msgCopy(_msg);
+  this->dataPtr->joints[_msg->name()] = msgCopy;
 
   return true;
 }
@@ -2653,27 +2651,35 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
     }
     else
     {
-        if (!this->dataPtr->terrain)
+      if (!this->dataPtr->terrain)
+      {
+        // create a dummy visual for loading heightmap visual plugin
+        // TODO make heightmap a visual to avoid special treatment here?
+        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        auto m = *_msg.get();
+        m.clear_material();
+        visual->Load(msgs::VisualToSDF(m));
+
+        this->dataPtr->terrain = new Heightmap(shared_from_this());
+        // check the material fields and set material if it is specified
+        if (_msg->has_material())
         {
-          this->dataPtr->terrain = new Heightmap(shared_from_this());
-          // check the material fields and set material if it is specified
-          if (_msg->has_material())
+          auto matMsg = _msg->material();
+          if (matMsg.has_script())
           {
-            auto matMsg = _msg->material();
-            if (matMsg.has_script())
+            auto scriptMsg = matMsg.script();
+            for (auto const uri : scriptMsg.uri())
             {
-              auto scriptMsg = matMsg.script();
-              for (auto const uri : scriptMsg.uri())
-              {
-                if (!uri.empty())
-                  RenderEngine::Instance()->AddResourcePath(uri);
-              }
-              std::string matName = scriptMsg.name();
-              this->dataPtr->terrain->SetMaterial(matName);
+              if (!uri.empty())
+                RenderEngine::Instance()->AddResourcePath(uri);
             }
+            std::string matName = scriptMsg.name();
+            this->dataPtr->terrain->SetMaterial(matName);
           }
-          this->dataPtr->terrain->LoadFromMsg(_msg);
         }
+        this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        this->dataPtr->terrain->LoadFromMsg(_msg);
+      }
     }
     return true;
   }
@@ -2842,8 +2848,11 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    // commented out for now as sometimes physics light messages could arrive
+    // before the rendering light is created, e.g. light pose updates.
+    // See issue #1778
+    // gzerr << "Light [" << _msg->name() << "] not found."
+    //     << " Use topic ~/factory/light to spawn a new light." << std::endl;
     return false;
   }
   else
@@ -3041,7 +3050,8 @@ void Scene::SetShadowsEnabled(bool _value)
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->dataPtr->manager->setShadowTextureConfig(0, 1024, 1024,
+    this->dataPtr->manager->setShadowTextureConfig(0,
+        this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
         Ogre::PF_FLOAT32_RGBA, 0, 2);
     this->dataPtr->manager->setShadowDirectionalLightExtrusionDistance(75);
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
@@ -3061,7 +3071,8 @@ void Scene::SetShadowsEnabled(bool _value)
   else
   {
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
-    this->dataPtr->manager->setShadowTextureSize(512);
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
 
     // The default shadows.
     if (_value && this->dataPtr->manager->getShadowTechnique()
@@ -3079,6 +3090,49 @@ void Scene::SetShadowsEnabled(bool _value)
 bool Scene::ShadowsEnabled() const
 {
   return this->dataPtr->sdf->Get<bool>("shadows");
+}
+
+/////////////////////////////////////////////////
+bool Scene::SetShadowTextureSize(const unsigned int _size)
+{
+  // check if texture size is a power of 2
+  if (!ignition::math::isPowerOfTwo(_size))
+  {
+    gzerr << "Shadow texture size must be a power of 2" << std::endl;
+    return false;
+  }
+  this->dataPtr->shadowTextureSize = _size;
+
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+  {
+    // RT Shader shadows
+    if (!RTShaderSystem::Instance()->SetShadowTextureSize(_size))
+      return false;
+
+    if (this->ShadowsEnabled())
+    {
+      // re-enable the shadows to take effect
+      this->SetShadowsEnabled(false);
+      this->SetShadowsEnabled(true);
+    }
+  }
+  else
+  {
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::ShadowTextureSize() const
+{
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+    return RTShaderSystem::Instance()->ShadowTextureSize();
+  else
+    return this->dataPtr->shadowTextureSize;
 }
 
 /////////////////////////////////////////////////
@@ -3208,6 +3262,23 @@ Heightmap *Scene::GetHeightmap() const
 {
   std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
   return this->dataPtr->terrain;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapLOD(const unsigned int _value)
+{
+  this->dataPtr->heightmapLOD = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::HeightmapLOD() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->LOD();
+
+  return this->dataPtr->heightmapLOD;
 }
 
 /////////////////////////////////////////////////
@@ -3490,4 +3561,16 @@ bool Scene::HasLayer(const int32_t _layer) const
 {
   return _layer < 0 ||
     this->dataPtr->layerState.find(_layer) != this->dataPtr->layerState.end();
+}
+
+/////////////////////////////////////////////////
+void Scene::EnableVisualizations(const bool _enable)
+{
+  this->dataPtr->enableVisualizations = _enable;
+}
+
+/////////////////////////////////////////////////
+bool Scene::EnableVisualizations() const
+{
+  return this->dataPtr->enableVisualizations;
 }

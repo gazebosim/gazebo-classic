@@ -30,6 +30,24 @@ namespace gazebo
 {
   namespace util
   {
+    /// \brief Log recording parameters.
+    /// \sa LogRecord::Start
+    class LogRecordParams
+    {
+      /// \brief The type of encoding (txt, zlib, or bz2).
+      public: std::string encoding = "zlib";
+
+      /// \brief Path in which to store log files.
+      public: std::string path;
+
+      /// \brief Recording period. A value < 0 indicates that every
+      /// iteration should be recorded.
+      public: double period = -1;
+
+      /// \brief Log filter string
+      public: std::string filter;
+    };
+
     // Forward declare private data class
     class LogRecordPrivate;
 
@@ -111,6 +129,22 @@ namespace gazebo
       /// \sa LogRecord::SetPaused
       public: bool Paused() const;
 
+      /// \brief Get the log recording period.
+      /// \return Log recording period in seconds.
+      public: double Period() const;
+
+      /// \brief Set the log recording period.
+      /// \param[in] _period New log recording period in seconds.
+      public: void SetPeriod(const double _period);
+
+      /// \brief Get the log recording filter string.
+      /// \return Log recording filter string.
+      public: std::string Filter() const;
+
+      /// \brief Set the log recording filter string.
+      /// \param[in] _filter New log record filter regex string
+      public: void SetFilter(const std::string &_filter);
+
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
       // \return True if logger is ready to start.
@@ -119,6 +153,10 @@ namespace gazebo
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
       public: bool Running() const;
+
+      /// \brief Start the logger.
+      /// \params[in] _params Log recording parameters.
+      public: bool Start(const LogRecordParams &_params);
 
       /// \brief Start the logger.
       /// \param[in] _encoding The type of encoding (txt, zlib, or bz2).

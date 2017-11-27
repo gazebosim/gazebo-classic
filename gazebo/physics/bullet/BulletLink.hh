@@ -106,6 +106,9 @@ namespace gazebo
       /// \return Pointer to bullet rigid body object.
       public: btRigidBody *GetBulletLink() const;
 
+      /// \brief Remove and re-add this rigid body from the world.
+      public: void RemoveAndAddBody() const;
+
       /// \internal
       /// \brief Clear bullet collision cache needed when the body is resized.
       public: void ClearCollisionCache();

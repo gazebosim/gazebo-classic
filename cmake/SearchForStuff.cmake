@@ -80,8 +80,7 @@ else ()
 endif ()
 
 ########################################
-include (FindHDF5)
-find_package(HDF5)
+find_package(HDF5 COMPONENTS C CXX)
 
 if (NOT HDF5_FOUND)
   BUILD_WARNING("HDF5 not found")

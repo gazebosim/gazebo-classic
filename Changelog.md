@@ -2,6 +2,28 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Joint control menu highlight active
+    * [Pull request #2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
+    * [Issue #2307](https://bitbucket.org/osrf/gazebo/issues/2307)
+
+1. Don't use lib prefix for ogre plugins as of ogre1.9
+    * [Pull request #2803](https://bitbucket.org/osrf/gazebo/pull-request/2803)
+
+1. RenderEngine::SetupResources(): Fix resource locations being added multiple times
+    * [Pull request #2801](https://bitbucket.org/osrf/gazebo/pull-request/2801)
+
+1. Added and improved communications between the JointControlWidget and JointController
+    * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
+    * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
+
+1. Add the option --gui-client-plugin to load GUI plugins. Leave -g to load System Plugins.
+    * [Pull request #2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
+    * [Issue 2279](https://bitbucket.org/osrf/gazebo/issues/2279)
+
+1. Add actors in World as models so they get returned with World::Models()
+    * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
+    * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
+
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
     * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
@@ -273,6 +295,110 @@
         * [Issue #1698](https://bitbucket.org/osrf/gazebo/issues/1698)
 
 ## Gazebo 7
+
+## Gazebo 7.x.x (2017-xx-xx)
+
+1. Diagnostics: enable test and don't create so many empty folders
+    * [Pull request 2798](https://bitbucket.org/osrf/gazebo/pull-requests/2798)
+
+1. Parallelize ODE physics with threaded islands parameter
+    * [Pull request 2775](https://bitbucket.org/osrf/gazebo/pull-requests/2775)
+
+1. Logical camera uses <topic>
+    * [Pull request 2777](https://bitbucket.org/osrf/gazebo/pull-requests/2777)
+
+1. Support off-diagonal inertia terms in bullet
+    * [Pull request 2757](https://bitbucket.org/osrf/gazebo/pull-requests/2757)
+
+1. Add option in gui.ini to disable the use of spacenav
+    * [Pull request 2754](https://bitbucket.org/osrf/gazebo/pull-requests/2754)
+
+1. Fix disabling mesh cast shadows
+    * [Pull request 2710](https://bitbucket.org/osrf/gazebo/pull-request/2710)
+
+1. Do not display COM or inertia visualizations for static models
+    * [Pull request 2727](https://bitbucket.org/osrf/gazebo/pull-request/2727)
+    * [Issue 2286](https://bitbucket.org/osrf/gazebo/issues/2286)
+
+1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
+    * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
+    * [Issue 2068](https://bitbucket.org/osrf/gazebo/issues/2068)
+
+1. Fix orbiting view around heightmap
+    * [Pull request 2688](https://bitbucket.org/osrf/gazebo/pull-request/2688)
+
+1. Logical Camera sees nested models
+    * [Pull request 2776](https://bitbucket.org/osrf/gazebo/pull-request/2776)
+
+## Gazebo 7.8.1 (2017-06-08)
+
+1. ODE slip parameter example world and test
+    * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+
+1. Fix inserted mesh scale during log playback
+    * [Pull request #2723](https://bitbucket.org/osrf/gazebo/pull-request/2723)
+
+## Gazebo 7.8.0 (2017-06-02)
+
+1. Add log record filter options
+    * [Pull request 2715](https://bitbucket.org/osrf/gazebo/pull-request/2715)
+
+1. Backport wide angle camera VM FSAA fix
+    * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
+
+1. Add function to retrieve scoped sensors name in multi-nested model
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
+
+## Gazebo 7.7.0 (2017-05-04)
+
+1. Fix race condition during Detach of HarnessPlugin
+    * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
+
+1. Added support for pincushion distortion model; fixed bug where
+   cameras with different distortion models would have the same distortion.
+    * [Pull request 2678](https://bitbucket.org/osrf/gazebo/pull-requests/2678)
+
+1. Added <collide_bitmask> support to bullet
+    * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
+
+1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
+    * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
+
+1. Subdivide large heightmaps to fix LOD and support global texture mapping
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
+
+## Gazebo 7.6.0 (2017-03-20)
+
+1. Force / torque sensor visualization using WrenchVisual
+    * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
+
+1. Cache heightmap tile data
+    * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
+
+1. Add plugin for attaching lights to links in a model
+    * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
+
+1. Support setting shadow texture size
+    * [Pull request 2644](https://bitbucket.org/osrf/gazebo/pull-request/2644)
+
+1. Fix deprecated sdf warnings produced by PluginToSDF
+    * [Pull request 2646](https://bitbucket.org/osrf/gazebo/pull-request/2646)
+
+1. Added TouchPlugin, which checks if a model has been in contact with another
+   model exclusively for a certain time.
+    * [Pull request 2651](https://bitbucket.org/osrf/gazebo/pull-request/2651)
+
+1. Fixes -inf laser reading being displayed as +inf
+    * [Pull request 2641](https://bitbucket.org/osrf/gazebo/pull-request/2641)
+
+1. Fix memory leaks in tests
+    * [Pull request 2639](https://bitbucket.org/osrf/gazebo/pull-request/2639)
+
+1. Remove end year from copyright
+    * [Pull request 2614](https://bitbucket.org/osrf/gazebo/pull-request/2614)
 
 ## Gazebo 7.5.0 (2017-01-11)
 

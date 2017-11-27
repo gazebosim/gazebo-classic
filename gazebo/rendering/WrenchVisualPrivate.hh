@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _WRENCHVISUAL_PRIVATE_HH_
-#define _WRENCHVISUAL_PRIVATE_HH_
+#ifndef GAZEBO_RENDERING_WRENCHVISUALPRIVATE_HH_
+#define GAZEBO_RENDERING_WRENCHVISUALPRIVATE_HH_
 
 #include <vector>
 
@@ -48,6 +48,9 @@ namespace gazebo
 
       /// \brief Torque Z visual.
       public: VisualPtr coneZVis;
+
+      /// \brief Visual for force visualization.
+      public: VisualPtr forceVisual;
 
       /// \brief Line to visualize force
       public: DynamicLines *forceLine;

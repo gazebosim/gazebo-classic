@@ -59,8 +59,13 @@ namespace gazebo
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the encapsulated collision object.
+      /// Has a side effect of changing the collision bit masks
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
+
+      /// \brief Set if this object is moveable
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetPlaceable(const bool _placeable);
 
       /// \brief Return whether this collision is movable.
       /// Example on an immovable object is a ray.

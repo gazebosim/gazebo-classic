@@ -79,6 +79,7 @@ struct CollisionFilter : public btOverlapFilterCallback
       GZ_ASSERT(_proxy0 != nullptr && _proxy1 != nullptr,
           "Bullet broadphase overlapping pair proxies are null");
 
+      // BulletRayShape uses these, TODO remove in favor of collideBits
       bool collide = (_proxy0->m_collisionFilterGroup
           & _proxy1->m_collisionFilterMask) != 0;
       collide = collide && (_proxy1->m_collisionFilterGroup
@@ -101,6 +102,21 @@ struct CollisionFilter : public btOverlapFilterCallback
       BulletLink *link1 = static_cast<BulletLink *>(
           rb1->getUserPointer());
       GZ_ASSERT(link1 != nullptr, "Link1 in collision pair is null");
+
+      const Collision_V &cols0 = link0->GetCollisions();
+      const Collision_V &cols1 = link1->GetCollisions();
+
+      if (cols0.size() == 0 || cols1.size() == 0)
+      {
+        // no collision on the link? It can't collide
+        return false;
+      }
+
+      // use first collision, BulletLink expects all to have same bits
+      SurfaceParamsPtr surf0 = cols0[0]->GetSurface();
+      SurfaceParamsPtr surf1 = cols1[0]->GetSurface();
+
+      collide = surf0->collideBitmask & surf1->collideBitmask;
 
       if (!link0->GetSelfCollide() || !link1->GetSelfCollide())
       {
@@ -157,8 +173,6 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     auto body1Pose = link1->WorldPose();
     auto body2Pose = link2->WorldPose();
-    auto cg1Pos = link1->GetInertial()->Pose().Pos();
-    auto cg2Pos = link2->GetInertial()->Pose().Pos();
     ignition::math::Vector3d localForce1;
     ignition::math::Vector3d localForce2;
     ignition::math::Vector3d localTorque1;

@@ -137,6 +137,11 @@ void Link::Load(sdf::ElementPtr _sdf)
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
   }
+  else
+  {
+    this->inertial->SetMass(0.0);
+    this->inertial->SetInertiaMatrix(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+  }
 
 #ifdef HAVE_OPENAL
   if (_sdf->HasElement("audio_source"))

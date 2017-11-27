@@ -1,0 +1,86 @@
+vertex_program Gazebo/HeightmapVS glsl
+{
+  source heightmap_custom_vp.glsl
+
+  default_params
+  {
+    param_named_auto worldMatrix world_matrix
+    param_named_auto viewProjMatrix viewproj_matrix
+
+    // lod morph factor. This is a custom param that will be set by the ogre
+    // terrain component.
+    param_named_auto lodMorph custom 1001
+
+    param_named_auto texViewProjMatrix0 texture_viewproj_matrix 0
+    param_named_auto texViewProjMatrix1 texture_viewproj_matrix 1
+    param_named_auto texViewProjMatrix2 texture_viewproj_matrix 2
+  }
+}
+
+fragment_program Gazebo/HeightmapFS glsl
+{
+  source heightmap_custom_fp.glsl
+
+  default_params
+  {
+    // Shadow map textures.
+    // The number at the end corresponds to the index of the texture_unit
+    // defined in Gazebo/CustomHeightmapShader
+    param_named shadowMap0 int 0
+    param_named shadowMap1 int 1
+    param_named shadowMap2 int 2
+
+    param_named_auto inverseShadowmapSize0  inverse_texture_size 0
+    param_named_auto inverseShadowmapSize1  inverse_texture_size 1
+    param_named_auto inverseShadowmapSize2  inverse_texture_size 2
+
+    // texture map - here we are just reusing the heightmap image to help shade
+    // the whole terrain
+    param_named texMap int 3
+
+    // UV coordinate transform. If the terrain is subdivided into multiple
+    // slots, apply the transform to texture-map the terrain as a whole
+    // instead of repeating the same textures for each terrain slot.
+    param_named uvTransform matrix4x4 1 0 0 0  0 1 0 0  0 0 1 0  0 0 0 1
+  }
+}
+
+material Gazebo/CustomHeightmapShader
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/HeightmapVS
+      {
+      }
+
+      fragment_program_ref Gazebo/HeightmapFS
+      {
+      }
+
+      texture_unit shadowMap0
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap1
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit shadowMap2
+      {
+        content_type shadow
+        tex_address_mode clamp
+      }
+      texture_unit
+      {
+        texture heightmap_bowl.png 2d
+        filtering anisotropic anisotropic linear
+        max_anisotropy 16
+        tex_address_mode clamp
+      }
+    }
+  }
+}

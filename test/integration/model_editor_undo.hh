@@ -25,6 +25,9 @@ class ModelEditorUndoTest : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Test undo/redo link scaling.
+  private slots: void LinkScaling();
+
   /// \brief Test undo/redo link insertion using the mouse.
   private slots: void LinkInsertionByMouse();
 
@@ -47,9 +50,6 @@ class ModelEditorUndoTest : public QTestFixture
 
   /// \brief Test undo/redo link translation.
   private slots: void LinkTranslation();
-
-  /// \brief Test undo/redo link scaling.
-  private slots: void LinkScaling();
 
   /// \brief Test undo/redo nested model align.
   private slots: void NestedModelAlign();

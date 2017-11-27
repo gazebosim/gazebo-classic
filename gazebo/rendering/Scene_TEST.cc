@@ -105,12 +105,6 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
@@ -121,6 +115,10 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   rendering::VisualPtr box, sphere, cylinder;
   while ((!box || !sphere || !cylinder) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -185,6 +183,10 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   sleep = 0;
   while (box && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     common::Time::MSleep(1000);
     sleep++;
@@ -204,12 +206,6 @@ TEST_F(Scene_TEST, VisualType)
   // Load a world containing 3 simple shapes
   Load("worlds/shapes.world");
 
-  // FIXME need a camera otherwise test produces a gl vertex buffer error
-  ignition::math::Pose3d cameraStartPose(0, 0, 0, 0, 0, 0);
-  std::string cameraName = "test_camera";
-  SpawnCamera("test_camera_model", cameraName,
-      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
-
   // Get the scene
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_TRUE(scene != nullptr);
@@ -227,6 +223,10 @@ TEST_F(Scene_TEST, VisualType)
   rendering::VisualPtr box, sphere, cylinder, newBox;
   while ((!box || !sphere || !cylinder || !newBox) && sleep < maxSleep)
   {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
     box = scene->GetVisual("box");
     cylinder = scene->GetVisual("cylinder");
     sphere = scene->GetVisual("sphere");
@@ -331,6 +331,37 @@ TEST_F(Scene_TEST, VisualType)
     // Verify type is VT_PHYSICS
     EXPECT_TRUE(v->GetType() == rendering::Visual::VT_PHYSICS);
   }
+}
+
+/////////////////////////////////////////////////
+TEST_F(Scene_TEST, Shadows)
+{
+  Load("worlds/shapes.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // Test API for enabling and disabling shadows
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  scene->SetShadowsEnabled(false);
+  EXPECT_FALSE(scene->ShadowsEnabled());
+
+  scene->SetShadowsEnabled(true);
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  // Test API for updating shadow texture size
+  EXPECT_GT(scene->ShadowTextureSize(), 0u);
+
+  EXPECT_TRUE(scene->SetShadowTextureSize(256u));
+  EXPECT_EQ(256u, scene->ShadowTextureSize());
+  EXPECT_TRUE(scene->ShadowsEnabled());
+
+  // setting a shadow texture size of 0 should not work
+  EXPECT_FALSE(scene->SetShadowTextureSize(0u));
+  EXPECT_EQ(256u, scene->ShadowTextureSize());
+  EXPECT_TRUE(scene->ShadowsEnabled());
 }
 
 /////////////////////////////////////////////////

@@ -29,6 +29,7 @@ endif()
 
 set(tests
   aero_plugin.cc
+  attach_light_plugin.cc
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
@@ -88,11 +89,13 @@ set(tests
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
   swarm.cc
+  touch_plugin.cc
   transceiver.cc
   transport.cc
   transporter.cc
@@ -121,6 +124,7 @@ gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
 # Increase timeout, to account for model download time.
 set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
+set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
@@ -163,6 +167,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )
@@ -171,7 +176,9 @@ gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
 set(qt_tests
   camera_gui.cc
   collada_visualization.cc
+  force_torque_visualization.cc
   insert_model.cc
+  joint_control_widget.cc
   marker.cc
   model_editor.cc
   model_editor_undo.cc

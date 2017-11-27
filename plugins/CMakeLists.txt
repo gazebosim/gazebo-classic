@@ -43,6 +43,7 @@ set (plugins_single_header
   ActuatorPlugin
   ArduCopterPlugin
   ArrangePlugin
+  AttachLightPlugin
   BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
@@ -58,6 +59,7 @@ set (plugins_single_header
   GimbalSmall2dPlugin
   GpuRayPlugin
   HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
@@ -76,6 +78,7 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TouchPlugin
   VehiclePlugin
   WindPlugin
 )

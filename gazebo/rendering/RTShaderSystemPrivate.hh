@@ -53,6 +53,10 @@ namespace gazebo
 
       /// \brief Flag to indicate that shaders need to be updated.
       public: bool updateShaders;
+
+      /// \brief Size of the Parallel Split Shadow Map (PSSM) shadow texture
+      /// at closest layer.
+      public: unsigned int shadowTextureSize = 1024u;
     };
   }
 }
