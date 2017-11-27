@@ -24,10 +24,61 @@
     * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
     * [Issue #2271](https://bitbucket.org/osrf/gazebo/issues/2271)
 
+## Gazebo 8.1.0 (2017-05-04)
+
+1. Fixed precompiled headers to work in more use-cases.
+    * [Pull request 2662](https://bitbucket.org/osrf/gazebo/pull-request/2662)
+
+1. Subdivide large heightmaps to fix LOD and support global texture mapping
+    * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
+
+1. Added <collide_bitmask> support to bullet
+    * [Pull request 2649](https://bitbucket.org/osrf/gazebo/pull-request/2649)
+
+1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
+    * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
+
+1. Force / torque sensor visualization using WrenchVisual
+    * [Pull request 2653](https://bitbucket.org/osrf/gazebo/pull-request/2653)
+
+1. Cache heightmap tile data
+    * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
+
+1. Add plugin for attaching lights to links in a model
+    * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
+
+1. Support Heightmap LOD
+    * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
+
+1. Support setting shadow texture size
+    * [Pull request 2644](https://bitbucket.org/osrf/gazebo/pull-request/2644)
+
+1. Fix deprecated sdf warnings produced by PluginToSDF
+    * [Pull request 2646](https://bitbucket.org/osrf/gazebo/pull-request/2646)
+
+1. Added TouchPlugin, which checks if a model has been in contact with another
+   model exclusively for a certain time.
+    * [Pull request 2651](https://bitbucket.org/osrf/gazebo/pull-request/2651)
+
+1. Fixes -inf laser reading being displayed as +inf
+    * [Pull request 2641](https://bitbucket.org/osrf/gazebo/pull-request/2641)
+
+1. Proper exception handling for animated box example
+    * [Pull request 2618](https://bitbucket.org/osrf/gazebo/pull-request/2618)
+
+1. Fix examples compilation (#2177)
+    * [Pull request 2634](https://bitbucket.org/osrf/gazebo/pull-request/2634)
+
 1. Fix loading gui plugins and OSX framerate issue
     * [Pull request #2631](https://bitbucket.org/osrf/gazebo/pull-request/2631)
     * [Issue #1311](https://bitbucket.org/osrf/gazebo/issues/1311)
     * [Issue #2133](https://bitbucket.org/osrf/gazebo/issues/2133)
+
+1. Fix ign-math3 deprecation warnings
+    * [Pull request 2612](https://bitbucket.org/osrf/gazebo/pull-request/2612)
+    * [Pull request 2626](https://bitbucket.org/osrf/gazebo/pull-request/2626)
+    * [Pull request 2648](https://bitbucket.org/osrf/gazebo/pull-request/2648)
+
 
 ## Gazebo 8.0.0 (2017-01-25)
 
