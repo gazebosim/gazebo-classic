@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Fix right-click segfault
+    * [Pull request 2809](https://bitbucket.org/osrf/gazebo/pull-request/2809)
+    * [Issue 2377](https://bitbucket.org/osrf/gazebo/issues/2377)
+
 1. Joint control menu highlight active
     * [Pull request #2747](https://bitbucket.org/osrf/gazebo/pull-requests/2747)
     * [Issue #2307](https://bitbucket.org/osrf/gazebo/issues/2307)
