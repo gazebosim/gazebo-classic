@@ -16,9 +16,21 @@
     * [Pull request #2730](https://bitbucket.org/osrf/gazebo/pull-request/2730)
     * [Issue #295](https://bitbucket.org/osrf/gazebo/issues/295)
 
+## Gazebo 8.1.1 (2017-06-05)
+
 1. Add the option --gui-client-plugin to load GUI plugins. Leave -g to load System Plugins.
     * [Pull request #2716](https://bitbucket.org/osrf/gazebo/pull-requests/2716)
     * [Issue 2279](https://bitbucket.org/osrf/gazebo/issues/2279)
+
+1. Remove duplicate material block in ShadowCaster.material
+    * [Pull request 2721](https://bitbucket.org/osrf/gazebo/pull-request/2721)
+
+1. Fix race condition during Detach of HarnessPlugin
+    * [Pull request 2696](https://bitbucket.org/osrf/gazebo/pull-request/2696)
+
+1. Added support for pincushion distortion model; fixed bug where
+   cameras with different distortion models would have the same distortion.
+    * [Pull request 2678](https://bitbucket.org/osrf/gazebo/pull-requests/2678)
 
 1. Add actors in World as models so they get returned with World::Models()
     * [Pull request #2706](https://bitbucket.org/osrf/gazebo/pull-request/2706)
