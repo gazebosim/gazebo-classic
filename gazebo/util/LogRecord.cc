@@ -567,12 +567,12 @@ bool LogRecord::FirstUpdate() const
 }
 
 //////////////////////////////////////////////////
-bool LogRecord::SaveModels(std::unordered_set<std::string> models)
+bool LogRecord::SaveModels(std::unordered_set<std::string> _models)
 {
-  for (auto &model : models)
+  for (auto &model : _models)
   {
     bool modelFound = false;
-    for (auto &modelPath : this->dataPtr->modelPaths)
+    for (const auto &modelPath : this->dataPtr->modelPaths)
     {
       boost::filesystem::path srcModelPath(modelPath);
       srcModelPath /= model;
@@ -590,7 +590,7 @@ bool LogRecord::SaveModels(std::unordered_set<std::string> models)
     }
     if (!modelFound)
     {
-      gzlog << "Model: " << model << " meshes definitions does not exist"
+      gzwarn << "Model: " << model << " meshes definitions does not exist"
         << ", please check the value of env variable GAZEBO_MODEL_PATH\n";
     }
   }

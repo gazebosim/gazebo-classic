@@ -175,6 +175,7 @@ TEST_F(CommonIface_TEST, replaceAll)
   EXPECT_EQ(test, "1234****67*");
 }
 
+/////////////////////////////////////////////////
 TEST_F(CommonIface_TEST, directoryOps)
 {
   // Cleanup test directory.
