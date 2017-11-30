@@ -7,6 +7,11 @@
       <grid>false</grid>
     </scene>
 
+    <!-- light added due to weird MainWindow_TEST ogre 1.9 segfault on osx -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
     <!-- place user camera -->
     <gui>
       <camera name="user_camera">

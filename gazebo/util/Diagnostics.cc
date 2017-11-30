@@ -291,7 +291,10 @@ DiagnosticTimer::DiagnosticTimer(const std::string &_name)
 
   // Make sure the path exists.
   if (!boost::filesystem::exists(logPath))
+  {
+    gzmsg << "Creating diagnostics folder " << logPath << std::endl;
     boost::filesystem::create_directories(logPath);
+  }
 
   logPath /= (_name + ".log");
   this->dataPtr->log.open(logPath.string().c_str(),
