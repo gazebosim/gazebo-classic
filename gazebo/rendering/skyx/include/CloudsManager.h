@@ -129,7 +129,7 @@ namespace SkyX
     /** Default onstructor
         @param s SkyX parent pointer
      */
-    CloudLayer(SkyX *s);
+    explicit CloudLayer(SkyX *s);
 
     /** Constructor
         @param s SkyX parent pointer
@@ -228,7 +228,7 @@ namespace SkyX
     /** Constructor
         @param s SkyX parent pointer
      */
-    CloudsManager(SkyX *h);
+    explicit CloudsManager(SkyX *h);
 
     /** Destructor
      */

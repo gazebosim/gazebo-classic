@@ -16,6 +16,12 @@ Gazebo cmake parameters available at configuring time:
 
  - BUILD_TESTING (boot) [default False]
    Include the testsuite compilation in the default make call (make all)
+ - ENABLE_DIAGNOSTICS
+   If this is defined, it will enable diagnostic timers using the macros
+   from Diagnostics.hh (see also the standalone diagnostics example):
+   DIAG_TIMER_START("name")
+   DIAG_TIMER_LAP("name")
+   DIAG_TIMER_STOP("name")
  - USE_HOST_CFLAGS (bool) [default True]
    Check the building machine for supported compiler optimizations and use
    them to build the software.

@@ -96,14 +96,15 @@ InsertModelWidget::InsertModelWidget(QWidget *_parent)
   // Update the list of models on the local system.
   this->UpdateAllLocalPaths();
 
+  // Create a top-level tree item for the Fuel models
+  this->InitializeFuelServers();
+
   // Create a top-level tree item for the path
   this->dataPtr->modelDatabaseItem =
     new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
         QStringList(QString("Connecting to model database...")));
   this->dataPtr->fileTreeWidget->addTopLevelItem(
       this->dataPtr->modelDatabaseItem);
-
-  this->InitializeFuelServers();
 
   // Also insert additional paths from gui.ini
   std::string additionalPaths =

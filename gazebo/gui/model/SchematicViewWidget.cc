@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/common/Events.hh"
@@ -223,12 +225,11 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
   common::Color edgeColor = common::Color::Black;
   if (!materialName.empty())
   {
-    common::Color emptyColor;
-    common::Color matAmbient;
-    common::Color matDiffuse;
-    common::Color matSpecular;
-    common::Color matEmissive;
-    rendering::Material::GetMaterialAsColor(materialName, matAmbient,
+    ignition::math::Color matAmbient;
+    ignition::math::Color matDiffuse;
+    ignition::math::Color matSpecular;
+    ignition::math::Color matEmissive;
+    rendering::Material::MaterialAsColor(materialName, matAmbient,
         matDiffuse, matSpecular, matEmissive);
     edgeColor = matDiffuse;
   }

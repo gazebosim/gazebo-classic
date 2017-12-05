@@ -2860,13 +2860,15 @@ TEST_F(MsgsTest, MaterialToSDF)
   }
 
   EXPECT_TRUE(materialSDF->HasElement("ambient"));
-  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
+  EXPECT_EQ(ambient.Ign(), materialSDF->Get<ignition::math::Color>("ambient"));
   EXPECT_TRUE(materialSDF->HasElement("diffuse"));
-  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
+  EXPECT_EQ(diffuse.Ign(), materialSDF->Get<ignition::math::Color>("diffuse"));
   EXPECT_TRUE(materialSDF->HasElement("emissive"));
-  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
+  EXPECT_EQ(emissive.Ign(),
+      materialSDF->Get<ignition::math::Color>("emissive"));
   EXPECT_TRUE(materialSDF->HasElement("specular"));
-  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
+  EXPECT_EQ(specular.Ign(),
+      materialSDF->Get<ignition::math::Color>("specular"));
 }
 
 /////////////////////////////////////////////////
