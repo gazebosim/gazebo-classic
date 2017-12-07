@@ -771,6 +771,7 @@ else()
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
+################################################################################
 # Find the Ignition Fuel Tools library
 find_package(ignition-fuel-tools0 QUIET)
 if (NOT ignition-fuel-tools0_FOUND)
@@ -783,6 +784,21 @@ else()
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-FUEL-TOOLS_CXX_FLAGS}")
   include_directories(${IGNITION-FUEL-TOOLS_INCLUDE_DIRS})
   link_directories(${IGNITION-FUEL-TOOLS_LIBRARY_DIRS})
+endif()
+
+################################################################################
+# Ignition common is needed only if Ignition Fuel support is enabled
+if (ignition-fuel-tools0_FOUND)
+  find_package(ignition-common0 QUIET)
+  if (NOT ignition-common0_FOUND)
+    BUILD_WARNING ("Ignition Common not found, Fuel support will be disabled")
+    set (HAVE_IGNITION_FUEL_TOOLS OFF CACHE BOOL "HAVE HAVE_IGNITION_FUEL_TOOLS" FORCE)
+  else()
+    message (STATUS "Found Ignition Common")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-COMMON_CXX_FLAGS}")
+    include_directories(${IGNITION-COMMON_INCLUDE_DIRS})
+    link_directories(${IGNITION-COMMON_LIBRARY_DIRS})
+  endif()
 endif()
 
 ################################################

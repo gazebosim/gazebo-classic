@@ -103,7 +103,6 @@ namespace gazebo
       public: std::string ModelPath(const std::string &_uri,
         bool _forceDownload = false);
 
-
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
 

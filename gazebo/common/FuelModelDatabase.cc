@@ -25,7 +25,7 @@
 #include <thread>
 #include <vector>
 
-#include <boost/filesystem.hpp>
+#include <ignition/common/Filesystem.hh>
 #include <ignition/fuel-tools.hh>
 #include <sdf/sdf.hh>
 
@@ -109,22 +109,21 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 
   // This will download the model if necessary
   std::string path = this->ModelPath(_uri);
-
-  boost::filesystem::path manifestPath = path;
+  std::string manifestPath =
+    ignition::common::joinPaths(path, GZ_MODEL_MANIFEST_FILENAME);
 
   // Get the GZ_MODEL_MANIFEST_FILENAME.
-  if (boost::filesystem::exists(manifestPath / GZ_MODEL_MANIFEST_FILENAME))
-    manifestPath /= GZ_MODEL_MANIFEST_FILENAME;
-  else
+  if (!ignition::common::exists(manifestPath))
   {
     gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
-      << " for model " << manifestPath << "\n";
+          << " for model " << path << "\n";
+    return result;
   }
 
   TiXmlDocument xmlDoc;
   SemanticVersion sdfParserVersion(SDF_VERSION);
   std::string bestVersionStr = "0.0";
-  if (xmlDoc.LoadFile(manifestPath.string()))
+  if (xmlDoc.LoadFile(manifestPath))
   {
     TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
     if (modelXML)

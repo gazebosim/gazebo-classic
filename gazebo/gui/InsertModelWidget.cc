@@ -282,8 +282,9 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
     std::string filename;
-#ifndef HAVE_IGNITION_FUEL_TOOLS
+#ifdef HAVE_IGNITION_FUEL_TOOLS
     bool fuelModelSelected = false;
+
     // Check if this is a model from an Ignition Fuel server.
     for (auto const &serverEntry : this->dataPtr->fuelDetails)
     {
