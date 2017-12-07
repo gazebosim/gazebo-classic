@@ -688,11 +688,15 @@ TEST_P(HeightmapTest, Material)
   Material("worlds/heightmap_material.world", GetParam());
 }
 
+// This test fails on OSX
+// It uses glsl 130 which is not supported yet
+#ifndef __APPLE__
 /////////////////////////////////////////////////
 TEST_P(HeightmapTest, MaterialShader)
 {
   Material("worlds/heightmap_material_shader.world", GetParam());
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, NoVisual)

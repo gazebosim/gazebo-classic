@@ -134,6 +134,7 @@ void BuildingMaker_TEST::Layers()
   QCOMPARE(count, levelCount);
 
   delete buildingMaker;
+  delete mainWindow;
 }
 
 // Generate a main function for the test
