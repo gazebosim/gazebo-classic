@@ -2,6 +2,8 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Diagnostics: record timing statistics instead of all timestamps
+    * [Pull request 2821](https://bitbucket.org/osrf/gazebo/pull-requests/2821)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
