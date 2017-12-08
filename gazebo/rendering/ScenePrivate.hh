@@ -66,11 +66,11 @@ namespace gazebo
     /// \brief List of light messages.
     typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
 
-    /// \def PoseMsgs_M.
+    /// \typedef PoseMsgs_M.
     /// \brief List of messages.
     typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
 
-    /// \def LightPoseMsgs_M.
+    /// \typedef LightPoseMsgs_M.
     /// \brief List of messages.
     typedef std::map<std::string, msgs::Pose> LightPoseMsgs_M;
 
