@@ -2662,13 +2662,16 @@ void World::RemoveModel(const std::string &_name)
     }
   }
 
+  // Remove from SDF
   if (this->dataPtr->sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
     while (childElem && childElem->Get<std::string>("name") != _name)
       childElem = childElem->GetNextElement("model");
     if (childElem)
+    {
       this->dataPtr->sdf->RemoveChild(childElem);
+    }
   }
 
   if (this->dataPtr->sdf->HasElement("light"))
@@ -2678,49 +2681,60 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
-      // Remove light object
-      for (auto light = this->dataPtr->lights.begin();
-          light != this->dataPtr->lights.end(); ++light)
-      {
-        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
-        {
-          this->dataPtr->lights.erase(light);
-          break;
-        }
-      }
-
-      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
-
-      // Find the light by name in the scene msg, and remove it.
-      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-      {
-        if (this->dataPtr->sceneMsg.light(i).name() == _name)
-        {
-          this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
-              this->dataPtr->sceneMsg.light_size()-1);
-          this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
-          break;
-        }
-      }
     }
   }
 
+  // remove objects in world
   {
     boost::recursive_mutex::scoped_lock lock(
         *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-    this->dataPtr->rootElement->RemoveChild(_name);
-
+    // Remove model object
     for (auto model = this->dataPtr->models.begin();
              model != this->dataPtr->models.end(); ++model)
     {
       if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
       {
         this->dataPtr->models.erase(model);
+        this->dataPtr->rootElement->RemoveChild(_name);
         break;
       }
     }
+
+    // Remove light object
+    for (auto light = this->dataPtr->lights.begin();
+        light != this->dataPtr->lights.end(); ++light)
+    {
+      if ((*light)->GetScopedName() == _name)
+      {
+        if ((*light)->GetParent())
+        {
+          // Avoid calling: this->dataPtr->rootElement->RemoveChild(_name);
+          // which removes the first child it finds with _name, ignoring
+          // entity type (model or light) and scoping of names,
+          // e.g. In a world with "point" and "parent::point" entities,
+          // removing "point" will remove "parent::child" if it's first in the
+          // list
+          (*light)->GetParent()->RemoveChild(*light);
+        }
+        this->dataPtr->lights.erase(light);
+        break;
+      }
+    }
+
+    // Find the light by name in the scene msg, and remove it.
+    for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+    {
+      if (this->dataPtr->sceneMsg.light(i).name() == _name)
+      {
+        this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
+            this->dataPtr->sceneMsg.light_size()-1);
+        this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
+        break;
+      }
+    }
+
   }
 
   // Cleanup the publishModelPoses list.
