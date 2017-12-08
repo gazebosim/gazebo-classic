@@ -2734,7 +2734,6 @@ void World::RemoveModel(const std::string &_name)
         break;
       }
     }
-
   }
 
   // Cleanup the publishModelPoses list.
