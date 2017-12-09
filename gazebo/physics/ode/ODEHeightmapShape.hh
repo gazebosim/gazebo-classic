@@ -36,7 +36,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Collision parent.
-      public: ODEHeightmapShape(CollisionPtr _parent);
+      public: explicit ODEHeightmapShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~ODEHeightmapShape();

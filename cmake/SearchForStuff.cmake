@@ -771,6 +771,20 @@ else()
   link_directories(${IGNITION-TRANSPORT_LIBRARY_DIRS})
 endif()
 
+# Find the Ignition Fuel Tools library
+find_package(ignition-fuel-tools0 QUIET)
+if (NOT ignition-fuel-tools0_FOUND)
+  message (STATUS "Looking for libignition-fuel-tools0 - not found")
+  BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")
+  set (HAVE_IGNITION_FUEL_TOOLS OFF CACHE BOOL "HAVE HAVE_IGNITION_FUEL_TOOLS" FORCE)
+else()
+  message (STATUS "Looking for libignition-fuel-tools0 - found")
+  set (HAVE_IGNITION_FUEL_TOOLS ON CACHE BOOL "HAVE HAVE_IGNITION_FUEL_TOOLS" FORCE)
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-FUEL-TOOLS_CXX_FLAGS}")
+  include_directories(${IGNITION-FUEL-TOOLS_INCLUDE_DIRS})
+  link_directories(${IGNITION-FUEL-TOOLS_LIBRARY_DIRS})
+endif()
+
 ################################################
 # Find Valgrind for checking memory leaks in the
 # tests
