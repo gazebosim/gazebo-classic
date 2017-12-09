@@ -291,10 +291,10 @@ TEST_F(MsgsTest, ConvertMsgsColorToCommon)
   msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
   auto v = msgs::Convert(msg);
 
-  EXPECT_FLOAT_EQ(0.1f, v.r);
-  EXPECT_FLOAT_EQ(0.2f, v.g);
-  EXPECT_FLOAT_EQ(0.3f, v.b);
-  EXPECT_FLOAT_EQ(1.0f, v.a);
+  EXPECT_FLOAT_EQ(0.1f, v.R());
+  EXPECT_FLOAT_EQ(0.2f, v.G());
+  EXPECT_FLOAT_EQ(0.3f, v.B());
+  EXPECT_FLOAT_EQ(1.0f, v.A());
 }
 
 TEST_F(MsgsTest, ConvertCommonTimeToMsgs)
@@ -2860,15 +2860,13 @@ TEST_F(MsgsTest, MaterialToSDF)
   }
 
   EXPECT_TRUE(materialSDF->HasElement("ambient"));
-  EXPECT_EQ(ambient.Ign(), materialSDF->Get<ignition::math::Color>("ambient"));
+  EXPECT_EQ(ambient, materialSDF->Get<ignition::math::Color>("ambient"));
   EXPECT_TRUE(materialSDF->HasElement("diffuse"));
-  EXPECT_EQ(diffuse.Ign(), materialSDF->Get<ignition::math::Color>("diffuse"));
+  EXPECT_EQ(diffuse, materialSDF->Get<ignition::math::Color>("diffuse"));
   EXPECT_TRUE(materialSDF->HasElement("emissive"));
-  EXPECT_EQ(emissive.Ign(),
-      materialSDF->Get<ignition::math::Color>("emissive"));
+  EXPECT_EQ(emissive, materialSDF->Get<ignition::math::Color>("emissive"));
   EXPECT_TRUE(materialSDF->HasElement("specular"));
-  EXPECT_EQ(specular.Ign(),
-      materialSDF->Get<ignition::math::Color>("specular"));
+  EXPECT_EQ(specular, materialSDF->Get<ignition::math::Color>("specular"));
 }
 
 /////////////////////////////////////////////////
