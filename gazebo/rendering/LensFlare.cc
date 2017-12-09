@@ -139,14 +139,17 @@ namespace gazebo
       public: std::shared_ptr<LensFlareCompositorListener>
           lensFlareCompositorListener;
 
-      /// \brief Connection for the pre render event.
-      public: event::ConnectionPtr preRenderConnection;
-
       /// \brief Pointer to camera
       public: CameraPtr camera;
 
       /// \brief Name of directional light
       public: std::string lightName;
+
+      /// \brief Flag to indicate whether or not to remove lens flare effect.
+      public: bool removeLensFlare = false;
+
+      /// \brief Mutex to protect handling of light deletion
+      public: std::mutex mutex;
 
       /// \brief Communication Node
       public: transport::NodePtr node;
@@ -154,11 +157,8 @@ namespace gazebo
       /// \brief Subscribe to the request topic
       public: transport::SubscriberPtr requestSub;
 
-      /// \brief Flag to indicate whether or not to remove lens flare effect.
-      public: bool removeLensFlare = false;
-
-      /// \brief Mutex to protect handling of light deletion
-      public: std::mutex mutex;
+      /// \brief Connection for the pre render event.
+      public: event::ConnectionPtr preRenderConnection;
     };
   }
 }
