@@ -41,7 +41,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletJoint : public Joint
     {
       /// \brief Constructor
-      public: BulletJoint(BasePtr _parent);
+      public: explicit BulletJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletJoint();

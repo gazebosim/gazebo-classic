@@ -7,6 +7,7 @@
 
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
+    * [Pull request #2792](https://bitbucket.org/osrf/gazebo/pull-request/2792)
     * [Pull request #2795](https://bitbucket.org/osrf/gazebo/pull-request/2795)
 
 1. Try finding both ignition math 3 or 4 until we switch to 4
