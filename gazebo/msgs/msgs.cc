@@ -317,6 +317,8 @@ namespace gazebo
     /////////////////////////////////////////////////
     msgs::Any ConvertAny(const common::Color &_c)
     {
+      gzwarn << "ConvertAny(common::Color) is deprecated, use "
+             << "ConvertAny(ignition::math::Color) instead" << std::endl;
       return ConvertAny(_c.Ign());
     }
 
