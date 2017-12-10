@@ -5,7 +5,7 @@
 
 
 
-## Gazebo 8.2.0 (2017-12-01)
+## Gazebo 8.2.0 (2017-12-10)
 
 1. Fix Collision::GetWorldPose for non-canonical links (and friction directions)
     * [Pull request 2702](https://bitbucket.org/osrf/gazebo/pull-request/2702)
