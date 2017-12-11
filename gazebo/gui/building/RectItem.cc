@@ -847,7 +847,7 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(Conversions::Convert(this->borderColor));
+  rectPen.setColor(Conversions::Convert(this->borderColor.Ign()));
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);

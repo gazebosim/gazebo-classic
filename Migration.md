@@ -93,6 +93,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** void Set(msgs::Color *_c, const common::Color &_v)
     + ***Replacement:*** void Set(msgs::Color *_c, const ignition::math::Color &_v)
     + Convert(const msgs::Color &_c) now returns ignition::math::Color()
+1. **gazebo/gui/Conversions.hh**
+    + ***Deprecation:*** QColor Convert(const common::Color &_clr)
+    + ***Replacement:*** QColor Convert(const ignition::math::Color &_clr)
+    + common::Color Convert(const QColor &_clr) now returns ignition::math::Color
 
 ## Gazebo 7.X to 8.X
 

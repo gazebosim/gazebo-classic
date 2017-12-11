@@ -3572,7 +3572,7 @@ void ModelListWidget::FillGrid()
   topItem->addSubProperty(item);
 
   // Line color
-  auto color = grid->Color();
+  auto color = grid->Color().Ign();
   item = this->dataPtr->variantManager->addProperty(QVariant::Color,
       tr("line color"));
   item->setValue(gui::Conversions::Convert(color));

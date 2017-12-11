@@ -231,7 +231,7 @@ PlotCurve::PlotCurve(const std::string &_label)
       % ColorPalette::ColorCount;
   this->dataPtr->colorCounter++;
   QColor penColor =
-      Conversions::Convert(ColorPalette::Colors[colorGroup][color]);
+      Conversions::Convert(ColorPalette::Colors[colorGroup][color].Ign());
 
   QPen pen(penColor);
   pen.setWidth(1.0);

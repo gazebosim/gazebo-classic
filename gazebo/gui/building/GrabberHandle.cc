@@ -211,7 +211,7 @@ void GrabberHandle::paint(QPainter *_painter,
 
   QPen borderPen;
   borderPen.setWidth(1);
-  borderPen.setColor(Conversions::Convert(this->dataPtr->handleColor));
+  borderPen.setColor(Conversions::Convert(this->dataPtr->handleColor.Ign()));
 
   borderPen.setCapStyle(Qt::SquareCap);
   borderPen.setStyle(Qt::SolidLine);
@@ -226,9 +226,9 @@ void GrabberHandle::paint(QPainter *_painter,
   QRectF rect(topLeft, bottomRight);
 
   QBrush brush(Qt::SolidPattern);
-  brush.setColor(Conversions::Convert(this->dataPtr->borderColor));
+  brush.setColor(Conversions::Convert(this->dataPtr->borderColor.Ign()));
   _painter->fillRect(borderRect, brush);
-  brush.setColor(Conversions::Convert(this->dataPtr->handleColor));
+  brush.setColor(Conversions::Convert(this->dataPtr->handleColor.Ign()));
   _painter->fillRect(rect, brush);
 
   _painter->restore();

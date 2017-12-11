@@ -123,7 +123,7 @@ void RotateHandle::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_options*/, QWidget */*_widget*/)
 {
   QPen borderPen;
-  borderPen.setColor(Conversions::Convert(this->dataPtr->borderColor));
+  borderPen.setColor(Conversions::Convert(this->dataPtr->borderColor.Ign()));
 
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);

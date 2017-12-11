@@ -127,7 +127,7 @@ void WindowItem::paint(QPainter *_painter,
 
   QPen windowPen;
   windowPen.setStyle(Qt::SolidLine);
-  windowPen.setColor(Conversions::Convert(this->borderColor));
+  windowPen.setColor(Conversions::Convert(this->borderColor.Ign()));
   _painter->setPen(windowPen);
 
   _painter->drawLine(topLeft, bottomLeft);

@@ -149,7 +149,6 @@ void FloorItem::Update()
   this->FloorChanged();
 }
 
-
 /////////////////////////////////////////////////
 void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {
@@ -178,7 +177,7 @@ void FloorItem::paint(QPainter *_painter,
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(Conversions::Convert(this->borderColor));
+  rectPen.setColor(Conversions::Convert(this->borderColor.Ign()));
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);

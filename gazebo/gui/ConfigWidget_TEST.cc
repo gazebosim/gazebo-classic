@@ -655,13 +655,13 @@ void ConfigWidget_TEST::VisualMsgWidget()
     // material
     QVERIFY(visualConfigWidget->StringWidgetValue("material::normal_map") ==
         "test_normal_map_updated");
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::ambient"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::ambient").Ign(),
         ignition::math::Color(0.2, 0.3, 0.4, 0.5));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::diffuse"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::diffuse").Ign(),
         ignition::math::Color(0.1, 0.8, 0.6, 0.4));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::specular"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::specular").Ign(),
         ignition::math::Color(0.5, 0.4, 0.3, 0.2));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::emissive"),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::emissive").Ign(),
         ignition::math::Color(0.4, 0.6, 0.8, 0.1));
     QCOMPARE(visualConfigWidget->BoolWidgetValue("material::lighting"),
         false);
@@ -1218,7 +1218,7 @@ void ConfigWidget_TEST::CreatedExternally()
   QCOMPARE(configWidget->BoolWidgetValue("bool"), boolValue);
   QCOMPARE(configWidget->Vector3dWidgetValue("vector3d"),
       ignition::math::Vector3d(vector3dValue));
-  QCOMPARE(configWidget->ColorWidgetValue("color"), colorValue);
+  QCOMPARE(configWidget->ColorWidgetValue("color").Ign(), colorValue);
   QCOMPARE(configWidget->PoseWidgetValue("pose"),
       ignition::math::Pose3d(poseValue));
   QCOMPARE(configWidget->EnumWidgetValue("enum"), enumValue);
@@ -1616,8 +1616,8 @@ void ConfigWidget_TEST::ChildColorSignal()
       SLOT(OnColorValueChanged(const QString, const gazebo::common::Color)));
 
   // Check default color
-  QVERIFY(configWidget->ColorWidgetValue("color") ==
-      gazebo::common::Color());
+  QCOMPARE(configWidget->ColorWidgetValue("color").Ign(),
+      ignition::math::Color(0, 0, 0, 0));
 
   // Get signal emitting widgets
   QList<QDoubleSpinBox *> spins =
@@ -1637,7 +1637,7 @@ void ConfigWidget_TEST::OnColorValueChanged(const QString &_name,
     const gazebo::common::Color &_color)
 {
   QVERIFY(_name == "color");
-  QVERIFY(_color == gazebo::common::Color(0.5, 0.0, 0.0, 0.0));
+  QCOMPARE(_color.Ign(), ignition::math::Color(0.5, 0.0, 0.0, 0.0));
   g_colorSignalReceived = true;
 }
 

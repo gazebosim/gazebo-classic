@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_CONVERSIONS_HH_
-#define _GAZEBO_GUI_CONVERSIONS_HH_
+#ifndef GAZEBO_GUI_CONVERSIONS_HH_
+#define GAZEBO_GUI_CONVERSIONS_HH_
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -44,12 +45,19 @@ namespace gazebo
       /// \brief Return the equivalent qt color
       /// \param[in] _color Gazebo color to convert
       /// \return Qt color value
-      public: static QColor Convert(const common::Color &_color);
+      /// \deprecated See function that uses ignition::math::Color
+      public: static QColor Convert(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
 
-      /// \brief Return the equivalent gazebo color
+      /// \brief Return the equivalent qt color
+      /// \param[in] _color Gazebo color to convert
+      /// \return Qt color value
+      public: static QColor Convert(const ignition::math::Color &_color);
+
+      /// \brief Return the equivalent Ignition Math color
       /// \param[in] _color Qt color to convert
-      /// \return Gazebo color value
-      public: static common::Color Convert(const QColor &_color);
+      /// \return Ignition math color value
+      public: static ignition::math::Color Convert(const QColor &_color);
 
       /// \brief Return the equivalent QPointF.
       /// \param[in] _point Ignition vector to convert.
