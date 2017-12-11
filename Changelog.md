@@ -9,6 +9,7 @@
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
     * [Pull request #2792](https://bitbucket.org/osrf/gazebo/pull-request/2792)
     * [Pull request #2795](https://bitbucket.org/osrf/gazebo/pull-request/2795)
+    * [Pull request #2822](https://bitbucket.org/osrf/gazebo/pull-request/2822)
 
 1. Try finding both ignition math 3 or 4 until we switch to 4
     * [Pull request #2783](https://bitbucket.org/osrf/gazebo/pull-request/2783)
