@@ -35,6 +35,7 @@
 
 #include <ignition/math/Rand.hh>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
