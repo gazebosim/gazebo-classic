@@ -479,6 +479,8 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
 
 
 ## Gazebo 7.9.0 (2017-11-22)

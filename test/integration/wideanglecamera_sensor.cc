@@ -17,9 +17,8 @@
 #include <mutex>
 #include <functional>
 
-#include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/sensors.hh"
-#include "gazebo/common/common.hh"
+#include "gazebo/common/Time.hh"
 #include "gazebo/rendering/Camera.hh"
 
 #include "gazebo/test/ServerFixture.hh"
@@ -111,5 +110,118 @@ TEST_F(WideAngleCameraSensor, Background)
   EXPECT_DOUBLE_EQ(bSum, 0.0);
 
   delete [] img;
+#endif
+}
+
+/////////////////////////////////////////////////
+TEST_F(WideAngleCameraSensor, Projection)
+{
+#if not defined(__APPLE__)
+  Load("worlds/usercamera_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run wide angle camera test\n";
+    return;
+  }
+
+  // Spawn a wide angle camera
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose = ignition::math::Pose3d::Zero;
+  SpawnWideAngleCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate, 6.0);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::WideAngleCameraSensorPtr camSensor =
+      std::dynamic_pointer_cast<sensors::WideAngleCameraSensor>(sensor);
+
+  rendering::WideAngleCameraPtr camera =
+      boost::dynamic_pointer_cast<rendering::WideAngleCamera>(
+      camSensor->Camera());
+  ASSERT_NE(camera, nullptr);
+
+  // point directly in front of camera
+  auto worldPoint = ignition::math::Vector3d::UnitX;
+  auto screenPt = camera->Project(worldPoint);
+  EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
+  EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point behind camera
+  worldPoint = -ignition::math::Vector3d::UnitX;
+  screenPt = camera->Project(worldPoint);
+  // z is distance of point from image center
+  // in this case it'll be outside of image so greater than 1.0
+  EXPECT_GT(screenPt.Z(), 1.0);
+
+  // point at right side of camera image
+  worldPoint = ignition::math::Vector3d(1, -0.5, 0.0);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at left side of camera image
+  worldPoint = ignition::math::Vector3d(1, 0.5, 0.0);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at top half of camera image
+  worldPoint = ignition::math::Vector3d(1, 0.0, 0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
+  EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at bottom half of camera image
+  worldPoint = ignition::math::Vector3d(1, 0.0, -0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
+  EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at top left quadrant of camera image
+  worldPoint = ignition::math::Vector3d(1, 0.5, 0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at top right quadrant of camera image
+  worldPoint = ignition::math::Vector3d(1, -0.5, 0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at bottom left quadrant of camera image
+  worldPoint = ignition::math::Vector3d(1, 0.5, -0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
+
+  // point at bottom right quadrant of camera image
+  worldPoint = ignition::math::Vector3d(1, -0.5, -0.5);
+  screenPt = camera->Project(worldPoint);
+  EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
+  EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
+  EXPECT_GT(screenPt.Z(), 0.0);
+  EXPECT_LT(screenPt.Z(), 1.0);
 #endif
 }
