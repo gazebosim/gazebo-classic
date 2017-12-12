@@ -123,7 +123,7 @@ namespace gazebo
     /// when using templates with ConvertAny, so only a runtime warning is
     /// added.
     GAZEBO_VISIBLE
-    msgs::Any ConvertAny(const common::Color &_c); // GAZEBO_DEPRECATED(9.0);
+    msgs::Any ConvertAny(const common::Color &_c);  // GAZEBO_DEPRECATED(9.0);
 
     /// \brief Convert an ignition::math::Color to a msgs::Any
     /// \param[in] _c The color to convert.
