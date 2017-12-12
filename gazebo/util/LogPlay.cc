@@ -42,6 +42,7 @@
 
 #include <ignition/math/Rand.hh>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Base64.hh"
@@ -125,8 +126,13 @@ void LogPlay::Open(const std::string &_logFile)
   {
     gzerr << "Unable to load file[" << _logFile << "]. "
       << "Check the Gazebo server log file for more information.\n";
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char *errorStr1 = this->dataPtr->xmlDoc.ErrorStr();
+    const char *errorStr2 = nullptr;
+#else
     const char *errorStr1 = this->dataPtr->xmlDoc.GetErrorStr1();
     const char *errorStr2 = this->dataPtr->xmlDoc.GetErrorStr2();
+#endif
     if (errorStr1)
       gzlog << "Log Error 1:\n" << errorStr1 << std::endl;
     if (errorStr2)
