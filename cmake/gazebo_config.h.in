@@ -33,6 +33,7 @@
 #cmakedefine HDF5_INSTRUMENT 1
 #cmakedefine HAVE_GRAPHVIZ 1
 #cmakedefine HAVE_UUID 1
+#cmakedefine TINYXML2_MAJOR_VERSION_GE_6
 #cmakedefine USE_EXTERNAL_TINYXML2 1
 #cmakedefine HAVE_OSVR 1
 
