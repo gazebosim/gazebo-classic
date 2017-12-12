@@ -223,7 +223,7 @@ void ViewControlTest::MouseZoomTerrain()
   // move camera so that it faces the box but partially occluded by terrain
   cam->SetWorldPose(ignition::math::Pose3d(
       ignition::math::Vector3d(62.93, -65.14, 9.49),
-      ignition::math::Vector3d(0, -0.5, 1.57)));
+      ignition::math::Quaterniond(0, -0.5, 1.57)));
 
   this->ProcessEventsAndDraw(mainWindow);
 
