@@ -245,6 +245,11 @@ if (PKG_CONFIG_FOUND)
       include_directories(${tinyxml2_INCLUDE_DIRS})
       link_directories(${tinyxml2_LIBRARY_DIRS})
     endif()
+
+    if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
+      message(STATUS "tinyxml2_VERSION ${tinyxml2_VERSION}")
+      set(TINYXML2_MAJOR_VERSION_GE_6 True)
+    endif()
   else()
     # Needed in WIN32 since in UNIX the flag is added in the code installed
     message (STATUS "Skipping search for tinyxml2")
