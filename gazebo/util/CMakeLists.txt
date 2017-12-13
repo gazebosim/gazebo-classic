@@ -89,6 +89,14 @@ target_link_libraries(gazebo_util
   ${IGNITION-MSGS_LIBRARIES}
 )
 
+# define if tinxml2 major version >= 6
+# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "tinyxml2_VERSION ${tinyxml2_VERSION} >= 6.0.0")
+  target_compile_definitions(gazebo_util
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
+endif()
+
 if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
   set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
