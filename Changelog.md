@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Fix gazebo8 homebrew build (support tinyxml2 6.0.0)
+    * [Pull request 2823](https://bitbucket.org/osrf/gazebo/pull-request/2823)
+    * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
 
 
 
