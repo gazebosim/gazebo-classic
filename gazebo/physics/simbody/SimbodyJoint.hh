@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
-      public: SimbodyJoint(BasePtr _parent);
+      public: explicit SimbodyJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyJoint();

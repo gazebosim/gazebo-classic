@@ -45,7 +45,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world A reference to the world.
-      public: WindPrivate(physics::World &_world)
+      public: explicit WindPrivate(physics::World &_world)
         : world(_world)
       {
       }

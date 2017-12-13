@@ -198,6 +198,20 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
+if (HAVE_IGNITION_FUEL_TOOLS)
+  set (headers ${headers}
+    FuelModelDatabase.hh
+  )
+
+  set (sources ${sources}
+    FuelModelDatabase.cc
+  )
+
+  set (gtest_sources ${gtest_sources}
+    FuelModelDatabase_TEST.cc
+  )
+endif()
+
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
@@ -242,6 +256,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
+  ${IGNITION-FUEL-TOOLS_LIBRARIES}
 )
 
 if (UNIX)

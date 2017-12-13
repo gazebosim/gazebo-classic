@@ -38,10 +38,10 @@ namespace gazebo
     class DARTJointPrivate
     {
       /// \brief Constructor
-      public: DARTJointPrivate(const DARTPhysicsPtr &_dartPhysicsEngine)
+      public: explicit DARTJointPrivate(const DARTPhysicsPtr &_engine)
         : forceApplied {0.0, 0.0},
           forceAppliedTime(),
-          dartPhysicsEngine(_dartPhysicsEngine),
+          dartPhysicsEngine(_engine),
           dtProperties(nullptr),
           dtJoint(nullptr),
           dtChildBodyNode(nullptr)
@@ -70,6 +70,7 @@ namespace gazebo
                 << this->dtProperties->mName << std::endl;
         }
         GZ_ASSERT(this->dtJoint, "dtJoint is null pointer.\n");
+
         for (auto func : mFuncs)
           func();
 

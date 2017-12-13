@@ -38,7 +38,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyLink : public Link
     {
       /// \brief Constructor
-      public: SimbodyLink(EntityPtr _parent);
+      public: explicit SimbodyLink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyLink();
