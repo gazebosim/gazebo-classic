@@ -18,7 +18,7 @@
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/gazebo_config.h"
-//#include "gazebo/common/Console.hh"
+#include "gazebo/common/Console.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/dart/DARTJointPrivate.hh"
 #include "gazebo/physics/dart/DARTBallJoint.hh"
