@@ -78,7 +78,7 @@ namespace gazebo
           const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual void SetPosition(unsigned int _index, double _position,
+      public: virtual bool SetPosition(unsigned int _index, double _position,
                                        bool _preserveWorldVelocity) override;
 
       // Documentation inherited.
