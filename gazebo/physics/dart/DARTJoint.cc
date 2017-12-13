@@ -680,13 +680,15 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 /////////////////////////////////////////////////
-bool DARTJoint::SetPosition(unsigned int _index, double _position)
+bool DARTJoint::SetPosition(unsigned int _index, double _position,
+                            const bool _preserveWorldVelocity)
 {
   if (!this->dataPtr->IsInitialized())
   {
     this->dataPtr->Cache(
           "Position" + std::to_string(_index),
-          boost::bind(&DARTJoint::SetPosition, this, _index, _position),
+          boost::bind(&DARTJoint::SetPosition, this, _index, _position,
+                      _preserveWorldVelocity),
           _position);
     return false;
   }
@@ -700,6 +702,13 @@ bool DARTJoint::SetPosition(unsigned int _index, double _position)
   {
     this->dataPtr->dtJoint->setPosition(_index, _position);
     return true;
+  }
+
+  if (_preserveWorldVelocity)
+  {
+    gzwarn << "[DARTJoint::SetPosition] You requested _preserveWorldVelocity "
+           << "to be true, but this is not supported in DART. The world "
+           << "velocity of the child link will not be preserved\n";
   }
 
   gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";

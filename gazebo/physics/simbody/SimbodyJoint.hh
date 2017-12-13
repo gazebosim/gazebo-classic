@@ -78,6 +78,10 @@ namespace gazebo
           const unsigned int _index) const;
 
       // Documentation inherited.
+      public: virtual void SetPosition(unsigned int _index, double _position,
+                                       bool _preserveWorldVelocity) override;
+
+      // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(
           const unsigned int _index) const;
 

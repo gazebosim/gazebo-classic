@@ -104,7 +104,8 @@ namespace gazebo
       public: virtual JointWrench GetForceTorque(unsigned int _index);
 
       // Documentation inherited.
-      public: virtual bool SetPosition(unsigned int _index, double _position)
+      public: virtual bool SetPosition(unsigned int _index, double _position,
+                                       bool _preserveWorldVelocity = false)
             override final;
 
       // Documentation inherited.

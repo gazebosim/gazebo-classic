@@ -351,8 +351,14 @@ namespace gazebo
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
       /// unspecified, pure kinematic teleportation.
-      /// \param[in] _preserveWorldVelocity True if to preserve the world
-      /// velocity before set position, default is false.
+      /// \param[in] _preserveWorldVelocity If true, the velocity of the child
+      /// link with respect to the world frame will remain the same after
+      /// setting the position. By default this is false, which means there are
+      /// no guarantees about what the child link's world velocity will be after
+      /// the position is changed (the behavior is determined by the underlying
+      /// physics engine).
+      ///
+      /// \note{Only ODE and Bullet support _preserveWorldVelocity being true.}
       /// \return returns true if operation succeeds, false if it fails.
       public: virtual bool SetPosition(unsigned int _index, double _position,
                                        bool _preserveWorldVelocity = false);
