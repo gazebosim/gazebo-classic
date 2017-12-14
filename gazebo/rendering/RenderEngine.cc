@@ -418,20 +418,17 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string>::iterator piter;
 
 #ifdef __APPLE__
-    std::string prefix = "lib";
     std::string extension = ".dylib";
 #elif defined(_WIN32)
-    std::string prefix = "";
     std::string extension = ".dll";
 #else
-    std::string prefix = "";
     std::string extension = ".so";
 #endif
 
-    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
-    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
-    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
-    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+    plugins.push_back(path+"/RenderSystem_GL");
+    plugins.push_back(path+"/Plugin_ParticleFX");
+    plugins.push_back(path+"/Plugin_BSPSceneManager");
+    plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
 #ifdef HAVE_OCULUS
     plugins.push_back(path+"/Plugin_CgProgramManager");
@@ -614,19 +611,19 @@ void RenderEngine::SetupResources()
       archNames.push_back(
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
+  }
 
-    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  {
+    try
     {
-      try
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            aiter->first, "FileSystem", aiter->second);
-      }
-      catch(Ogre::Exception &/*_e*/)
-      {
-        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
-            "in the world file is set correctly.");
-      }
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          aiter->first, "FileSystem", aiter->second);
+    }
+    catch(Ogre::Exception &/*_e*/)
+    {
+      gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+          "in the world file is set correctly.");
     }
   }
 }

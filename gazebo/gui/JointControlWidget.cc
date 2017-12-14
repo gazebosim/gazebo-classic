@@ -32,6 +32,11 @@
 using namespace gazebo;
 using namespace gui;
 
+const QString activeStyle =
+"QDoubleSpinBox{background: #404040; color: #ffffff;}";
+const QString inactiveStyle =
+"QDoubleSpinBox{background: #737373; color: #353535;}";
+
 /////////////////////////////////////////////////
 JointForceControl::JointForceControl(const std::string &_name,
     QGridLayout *_layout, QWidget *_parent, int _index)
@@ -61,6 +66,7 @@ JointForceControl::~JointForceControl()
 /////////////////////////////////////////////////
 void JointForceControl::Reset()
 {
+  this->SetShowActive(false);
   bool blockSignalsPrev = this->dataPtr->forceSpin->blockSignals(true);
   this->dataPtr->forceSpin->setValue(0.0);
   this->dataPtr->forceSpin->blockSignals(blockSignalsPrev);
@@ -69,12 +75,21 @@ void JointForceControl::Reset()
 /////////////////////////////////////////////////
 void JointForceControl::SetForce(const double _force)
 {
+  this->SetShowActive(true);
   this->dataPtr->forceSpin->setValue(_force);
+}
+
+/////////////////////////////////////////////////
+void JointForceControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->forceSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
 void JointForceControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   emit changed(_value, this->dataPtr->name);
 }
 
@@ -117,6 +132,7 @@ JointPIDPosControl::JointPIDPosControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -138,6 +154,7 @@ JointPIDPosControl::~JointPIDPosControl()
 /////////////////////////////////////////////////
 void JointPIDPosControl::Reset()
 {
+  this->SetShowActive(false);
   bool blockSignalsPrev = this->dataPtr->posSpin->blockSignals(true);
   this->dataPtr->posSpin->setValue(0.0);
   this->dataPtr->posSpin->blockSignals(blockSignalsPrev);
@@ -146,6 +163,7 @@ void JointPIDPosControl::Reset()
 /////////////////////////////////////////////////
 void JointPIDPosControl::SetPositionTarget(const double _target)
 {
+  this->SetShowActive(true);
   this->dataPtr->posSpin->setValue(_target);
 }
 
@@ -165,6 +183,19 @@ void JointPIDPosControl::SetIGain(const double _iGain)
 void JointPIDPosControl::SetDGain(const double _dGain)
 {
   this->dataPtr->dGainSpin->setValue(_dGain);
+}
+
+/////////////////////////////////////////////////
+void JointPIDPosControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
 }
 
 /////////////////////////////////////////////////
@@ -190,6 +221,7 @@ void JointPIDPosControl::SetToRadians()
 /////////////////////////////////////////////////
 void JointPIDPosControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   if (this->dataPtr->radians)
     emit changed(_value, this->dataPtr->name);
   else
@@ -253,6 +285,7 @@ JointPIDVelControl::JointPIDVelControl(const std::string &_name,
   _layout->addWidget(this->dataPtr->pGainSpin, _index, 3);
   _layout->addWidget(this->dataPtr->iGainSpin, _index, 4);
   _layout->addWidget(this->dataPtr->dGainSpin, _index, 5);
+  this->SetShowActive(false);
 
   connect(this->dataPtr->posSpin, SIGNAL(valueChanged(double)),
         this, SLOT(OnChanged(double)));
@@ -272,6 +305,7 @@ JointPIDVelControl::~JointPIDVelControl()
 /////////////////////////////////////////////////
 void JointPIDVelControl::Reset()
 {
+  this->SetShowActive(false);
   bool blockSignalsPrev = this->dataPtr->posSpin->blockSignals(true);
   this->dataPtr->posSpin->setValue(0.0);
   this->dataPtr->posSpin->blockSignals(blockSignalsPrev);
@@ -280,6 +314,7 @@ void JointPIDVelControl::Reset()
 /////////////////////////////////////////////////
 void JointPIDVelControl::SetVelocityTarget(const double _target)
 {
+  this->SetShowActive(true);
   this->dataPtr->posSpin->setValue(_target);
 }
 
@@ -302,8 +337,22 @@ void JointPIDVelControl::SetDGain(const double _dGain)
 }
 
 /////////////////////////////////////////////////
+void JointPIDVelControl::SetShowActive(const bool _active)
+{
+  this->dataPtr->posSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->pGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->iGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+  this->dataPtr->dGainSpin->setStyleSheet(
+      _active ? activeStyle : inactiveStyle);
+}
+
+/////////////////////////////////////////////////
 void JointPIDVelControl::OnChanged(double _value)
 {
+  this->SetShowActive(true);
   emit changed(_value, this->dataPtr->name);
 }
 
