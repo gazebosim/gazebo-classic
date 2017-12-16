@@ -225,7 +225,7 @@ namespace gazebo
       /// \param[in] _pt 3D world coodinates
       /// \return Screen coordinates. Z is the distance of point from camera
       /// optical center.
-      public: ignition::math::Vector3d Project(
+      public: ignition::math::Vector3d Project3d(
           const ignition::math::Vector3d &_pt) const;
 
       /// \brief Set the camera's render target

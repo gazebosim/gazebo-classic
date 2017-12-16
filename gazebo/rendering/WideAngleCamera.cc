@@ -745,7 +745,7 @@ void WideAngleCamera::UpdateFOV()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d WideAngleCamera::Project(
+ignition::math::Vector3d WideAngleCamera::Project3d(
     const ignition::math::Vector3d &_pt) const
 {
   // project onto cubemap face then onto
