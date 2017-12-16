@@ -27,6 +27,7 @@ float r = length(frag_pos);
 
 vec3 map(float th)
 {
+  // spherical to cartesian conversion
   return vec3(-sin(th)*frag_pos.x/r, sin(th)*frag_pos.y/r, cos(th));
 }
 
