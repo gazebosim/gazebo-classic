@@ -859,6 +859,8 @@ unsigned int Camera::ImageDepth() const
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
+  else if (imgFmt == "L16" || imgFmt == "L_INT16")
+    return 1;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
@@ -952,6 +954,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
 
   if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
+  else if (_format == "L16" || _format == "L_INT16")
+    result = static_cast<int>(Ogre::PF_L16);
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8" || _format == "BGR_INT8")
