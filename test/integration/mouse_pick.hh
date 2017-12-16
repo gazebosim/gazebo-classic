@@ -33,6 +33,9 @@ class MousePickingTest : public QTestFixture
 
   /// \brief Verify models can be picked.
   private slots: void Transparency();
+
+  /// \brief Testing picking a visual with invalid mesh.
+  private slots: void InvalidMesh();
 };
 
 #endif
