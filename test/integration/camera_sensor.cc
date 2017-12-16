@@ -1053,7 +1053,7 @@ TEST_F(CameraSensor, LensFlare)
 
   physics::WorldPtr world = physics::get_world();
   ASSERT_TRUE(world != nullptr);
-  physics::ModelPtr model = world->GetModel(modelNameLensFlare);
+  physics::ModelPtr model = world->ModelByName(modelNameLensFlare);
   ASSERT_TRUE(model != nullptr);
 
   sensors::SensorPtr sensorLensFlare =
@@ -1074,7 +1074,7 @@ TEST_F(CameraSensor, LensFlare)
   EXPECT_GT(height, 0u);
   EXPECT_GT(updateRate, 0u);
 
-  ignition::math::Pose3d setPose = model->GetWorldPose().Ign();
+  ignition::math::Pose3d setPose = model->WorldPose();
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
 
