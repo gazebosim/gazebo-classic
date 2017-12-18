@@ -97,6 +97,9 @@ release will remove the deprecated code.
     + ***Deprecation:*** QColor Convert(const common::Color &_clr)
     + ***Replacement:*** QColor Convert(const ignition::math::Color &_clr)
     + common::Color Convert(const QColor &_clr) now returns ignition::math::Color
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** SpawnLight function that accepts common::Color
+    + ***Replacement:*** SpawnLight function that accepts ignition::math::Color
 
 ## Gazebo 7.X to 8.X
 
