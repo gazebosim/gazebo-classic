@@ -38,7 +38,7 @@ TEST_F(RTShaderSystem_TEST, Shadows)
   scene->SetShadowsEnabled(true);
   EXPECT_TRUE(scene->ShadowsEnabled());
 
-  rendering::RTShaderSystem* shaderSys =
+  rendering::RTShaderSystem *shaderSys =
       rendering::RTShaderSystem::Instance();
 
   shaderSys->SetShadowTextureSize(128u);
