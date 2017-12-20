@@ -563,7 +563,7 @@
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
 1. Add function to retrieve scoped sensors name in multi-nested model
-    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
+    * [Pull request 2674](https://bitbucket.org/osrf/gazebo/pull-request/2674)
 
 ## Gazebo 7.7.0 (2017-05-04)
 
