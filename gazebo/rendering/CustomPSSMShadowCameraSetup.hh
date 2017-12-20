@@ -34,7 +34,7 @@ namespace gazebo
       public: CustomPSSM3() {}
 
       // Documentation inherited
-      public: virtual const Ogre::String &getType() const;
+      public: virtual const Ogre::String &getType() const override;
 
       /// \brief This is a duplicate of the method from the parent class with
       /// one line changed to use sampler2DShadow, enabling hardware PCF in
@@ -42,7 +42,7 @@ namespace gazebo
       /// class method and then modify the one uniform type.
       /// \sa SubRenderState::resolveParameters.
       protected: virtual bool resolveParameters(
-                  Ogre::RTShader::ProgramSet *_programSet);
+                  Ogre::RTShader::ProgramSet *_programSet) override;
     };
 
     /// \brief A factory that enables creation of CustomPSSM3 instances.
@@ -51,17 +51,18 @@ namespace gazebo
         public Ogre::RTShader::SubRenderStateFactory
     {
       // Documentation inherited.
-      public: virtual const Ogre::String &getType() const;
+      public: virtual const Ogre::String &getType() const override;
 
       // Documentation inherited.
       public: virtual Ogre::RTShader::SubRenderState *createInstance(
                   Ogre::ScriptCompiler *_compiler,
                   Ogre::PropertyAbstractNode *_prop,
                   Ogre::Pass *_pass,
-                  Ogre::RTShader::SGScriptTranslator *_translator);
+                  Ogre::RTShader::SGScriptTranslator *_translator) override;
 
       // Documentation inherited
-      protected: virtual Ogre::RTShader::SubRenderState *createInstanceImpl();
+      protected: virtual Ogre::RTShader::SubRenderState *createInstanceImpl()
+                  override;
     };
 
     /// \brief Parallel Split Shadow Map (PSSM) shadow camera setup.
@@ -117,7 +118,7 @@ namespace gazebo
       public: virtual void getShadowCamera(const Ogre::SceneManager *_sm,
           const Ogre::Camera *_cam, const Ogre::Viewport *_vp,
           const Ogre::Light *_light, Ogre::Camera *_texCam, size_t _iteration)
-          const;
+          const override;
     };
 
     /// \brief This overrides ogre's default GLSLProgramWriter to fix
@@ -145,14 +146,11 @@ namespace gazebo
 
       /// \brief Get shader language supported by this factory
       /// \return Language supported - "glsl"
-      public: const Ogre::String &getTargetLanguage() const;
+      public: const Ogre::String &getTargetLanguage() const override;
 
       /// \brief Creates the GLSLProgramWriter
       /// \return Ogre's program writer
-      public: virtual Ogre::RTShader::ProgramWriter* create();
-
-      /// \brief supported shader language
-      private: Ogre::String mLanguage;
+      public: virtual Ogre::RTShader::ProgramWriter* create() override;
     };
   }
 }

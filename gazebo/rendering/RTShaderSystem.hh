@@ -136,9 +136,6 @@ namespace gazebo
       /// \param[in] _scene The scene to remove shadows from.
       public: void RemoveShadows(ScenePtr _scene);
 
-      /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
-      private: void ReapplyShadows();
-
       /// \brief Get the Ogre PSSM Shadows camera setup.
       /// \return The Ogre PSSM Shadows camera setup.
       public: Ogre::PSSMShadowCameraSetup *GetPSSMShadowCameraSetup() const;
@@ -196,6 +193,9 @@ namespace gazebo
       /// \brief Update the shaders for a visual.
       /// \param[in] _vis Pointer to the visual to update.
       private: void UpdateShaders(VisualPtr _vis);
+
+      /// \brief Re-apply shadows. Call this if a shadow paramenter is changed.
+      private: void ReapplyShadows();
 
       /// \brief Make the RTShader system a singleton.
       private: friend class SingletonT<RTShaderSystem>;

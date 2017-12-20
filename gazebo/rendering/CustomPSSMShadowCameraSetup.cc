@@ -303,7 +303,6 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
       }
       *_outView = this->buildViewMatrix(pos,
         _light.getDerivedDirection(),
-        // cam.getDerivedUp());
         // Modified for z-up light frusta
         Ogre::Vector3::UNIT_Z);
     }
@@ -312,7 +311,6 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
     if (_outProj != nullptr)
     {
       *_outProj = Ogre::Matrix4::getScale(1, 1, -1);
-      // *_outProj = Matrix4::IDENTITY;
     }
 
     // set up camera if requested
@@ -424,7 +422,6 @@ Ogre::Matrix4 CustomPSSMShadowCameraSetup::buildViewMatrix(
   Ogre::Matrix4 m(xN.x,   xN.y,   xN.z,   -xN.dotProduct(_pos),
     _dir.x,   _dir.y, _dir.z, -_dir.dotProduct(_pos),
     upN.x,    upN.y,    upN.z,    -upN.dotProduct(_pos),
-    // -dir.x,    -dir.y, -dir.z, dir.dotProduct(_pos),
     0.0,      0.0,    0.0,    1.0);
 
   return m;
@@ -554,10 +551,6 @@ void CustomPSSMShadowCameraSetup::getShadowCamera(const Ogre::SceneManager *_sm,
   // they reached for Ogre 2.1 after realizing how buggy LiSPSM is.
   // However, unlike Ogre 2.1, we are using a modified method that makes a
   // shadow camera frustum aligned with the z-axis because Gazebo is z-up.
-  // LiSPSMShadowCameraSetup::getShadowCamera(
-  //     _sm, _cam, _vp, light, _texCam, _iteration);
-  // FocusedShadowCameraSetup::getShadowCamera(
-  //     _sm, _cam, _vp, light, _texCam, _iteration);
   this->getZUpFocusedShadowCamera(_sm, _cam, _vp, _light, _texCam, _iteration);
 
   // restore near/far
@@ -574,14 +567,13 @@ CustomGLSLProgramWriter::CustomGLSLProgramWriter()
 
 //////////////////////////////////////////////////
 CustomGLSLProgramWriterFactory::CustomGLSLProgramWriterFactory()
-    : mLanguage("glsl")
 {
 }
 
 //////////////////////////////////////////////////
 const Ogre::String &CustomGLSLProgramWriterFactory::getTargetLanguage() const
 {
-  return mLanguage;
+  return Ogre::String("glsl");
 }
 
 //////////////////////////////////////////////////
