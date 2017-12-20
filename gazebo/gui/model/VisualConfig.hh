@@ -137,8 +137,10 @@ namespace gazebo
       /// \param[in] _emissive Emissive color of visual.
       public: void SetMaterial(const std::string &_name,
           const std::string &_materialName,
-          const ignition::math::Color &_ambient, const ignition::math::Color &_diffuse,
-          const ignition::math::Color &_specular, const ignition::math::Color &_emissive);
+          const ignition::math::Color &_ambient,
+          const ignition::math::Color &_diffuse,
+          const ignition::math::Color &_specular,
+          const ignition::math::Color &_emissive);
 
       /// \brief Get visual config data
       /// \return Config data for the visuals

@@ -512,7 +512,8 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
 }
 
 /////////////////////////////////////////////////
-ignition::math::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
+ignition::math::Color ConfigWidget::ColorWidgetValue(const std::string &_name)
+    const
 {
   ignition::math::Color value;
   auto iter = this->dataPtr->configWidgets.find(_name);

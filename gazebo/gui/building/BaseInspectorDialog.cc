@@ -15,8 +15,8 @@
  *
 */
 
-#include "gazebo/common/Assert.hh"
 #include <ignition/math/Color.hh>
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"

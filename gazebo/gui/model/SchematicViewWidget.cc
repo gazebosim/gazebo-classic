@@ -20,7 +20,6 @@
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/common/Events.hh"
-#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
