@@ -16,7 +16,7 @@
 */
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
@@ -58,7 +58,7 @@ void BaseInspectorDialog::InitColorComboBox()
       QColor(111, 203, 172, 255)));
   for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
   {
-    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.at(i).Ign()));
+    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.at(i)));
     this->colorComboBox->addItem(colorIcon, QString(""));
   }
 }
@@ -85,7 +85,7 @@ void BaseInspectorDialog::InitTextureComboBox()
 }
 
 /////////////////////////////////////////////////
-common::Color BaseInspectorDialog::Color() const
+ignition::math::Color BaseInspectorDialog::Color() const
 {
   return this->dataPtr->colorList[this->colorComboBox->currentIndex()];
 }
@@ -104,7 +104,7 @@ std::string BaseInspectorDialog::Texture() const
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetColor(const common::Color &_color)
+void BaseInspectorDialog::SetColor(const ignition::math::Color &_color)
 {
   int index = -1;
   for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
@@ -121,8 +121,7 @@ void BaseInspectorDialog::SetColor(const common::Color &_color)
     // Add a new color
     this->dataPtr->colorList.push_back(_color);
     QPixmap colorIcon(15, 15);
-    colorIcon.fill(Conversions::Convert(
-        this->dataPtr->colorList.back().Ign()));
+    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.back()));
     this->colorComboBox->addItem(colorIcon, QString(""));
     index = this->colorComboBox->count()-1;
   }

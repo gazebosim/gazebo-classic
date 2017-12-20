@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_CONFIGWIDGET_TEST_HH_
-#define _GAZEBO_CONFIGWIDGET_TEST_HH_
+#ifndef GAZEBO_GUI_CONFIGWIDGET_TEST_HH_
+#define GAZEBO_GUI_CONFIGWIDGET_TEST_HH_
 
 #include <string>
 
@@ -131,7 +131,7 @@ class ConfigWidget_TEST : public QTestFixture
   /// \param[in] _name Scoped name of child widget which sent signal.
   /// \param[in] _value New value.
   private slots: void OnColorValueChanged(const QString &_name,
-      const gazebo::common::Color &_value);
+      const ignition::math::Color &_value);
 
   /// \brief Slot that receives pose signals from child widgets.
   /// \param[in] _name Scoped name of child widget which sent signal.

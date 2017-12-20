@@ -25,7 +25,7 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 #include "gazebo/common/CommonTypes.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
