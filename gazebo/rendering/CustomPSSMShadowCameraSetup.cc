@@ -573,7 +573,8 @@ CustomGLSLProgramWriterFactory::CustomGLSLProgramWriterFactory()
 //////////////////////////////////////////////////
 const Ogre::String &CustomGLSLProgramWriterFactory::getTargetLanguage() const
 {
-  return Ogre::String("glsl");
+  static const Ogre::String targetLanguageGLSL("glsl");
+  return targetLanguageGLSL;
 }
 
 //////////////////////////////////////////////////
