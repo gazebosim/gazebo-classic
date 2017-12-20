@@ -95,7 +95,7 @@ namespace gazebo
               static_cast<double>(wideAngleCam->ViewportWidth());
           double viewportHeight =
               static_cast<double>(wideAngleCam->ViewportHeight());
-          auto imagePos = wideAngleCam->Project(worldPos);
+          auto imagePos = wideAngleCam->Project3d(worldPos);
 
           // convert to normalized device coordinates
           // keep z for visibility test
