@@ -246,6 +246,8 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
+  this->dataPtr->lightFactoryPub = this->dataPtr->node->Advertise<msgs::Light>(
+      "~/factory/light");
 
   // This should come before loading of entities
   sdf::ElementPtr physicsElem = this->dataPtr->sdf->GetElement("physics");
@@ -1081,6 +1083,16 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
 
+  // msg should contain scoped name (consistent with other entities)
+  msg->set_name(light->GetScopedName());
+
+  // publish after adding light to the lights vector
+  // we also process light factory msg in World so this avoids creating a
+  // duplicate light
+  // Note: models uses /model/info topic. We can consider adding a
+  // /light/info topic for this
+  this->dataPtr->lightFactoryPub->Publish(*msg);
+
   return light;
 }
 
@@ -1477,6 +1489,11 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
       msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
+    else if (_entity->HasType(Entity::LIGHT))
+    {
+      msgs::Light *lightMsg = _scene.add_light();
+      boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
+    }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
     {
@@ -1730,6 +1747,7 @@ void World::ProcessRequestMsgs()
     else if (requestMsg.request() == "scene_info")
     {
       this->dataPtr->sceneMsg.clear_model();
+      this->dataPtr->sceneMsg.clear_light();
       this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -1855,8 +1873,6 @@ void World::ProcessLightFactoryMsgs()
 
     if (light)
     {
-      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
-          << " Use topic ~/light/modify to modify it." << std::endl;
       continue;
     }
     else
@@ -2046,6 +2062,7 @@ void World::ProcessFactoryMsgs()
       boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
       LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      light->Init();
     }
     catch(...)
     {
@@ -2163,6 +2180,7 @@ void World::SetState(const WorldState &_state)
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        light->Init();
       }
       catch(...)
       {
@@ -2447,6 +2465,20 @@ void World::ProcessMessages()
           }
         }
 
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the light's pose
+          poseMsg->set_name(light->GetScopedName());
+          // \todo Change to relative once lights can be attached to links
+          // on the rendering side
+          // \todo Hack: we use empty id to indicate it's pose of a light
+          // Need to add an id field to light.proto
+          // poseMsg->set_id(light->GetId());
+          msgs::Set(poseMsg, light->GetWorldPose().Ign());
+        }
+
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
           this->dataPtr->posePub->Publish(msg);
       }
@@ -2509,26 +2541,6 @@ void World::ProcessMessages()
     this->ProcessLightFactoryMsgs();
     this->ProcessLightModifyMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
-  }
-
-  // Process light poses after light factory
-  {
-    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-
-    if (!this->dataPtr->publishLightPoses.empty() && this->dataPtr->lightPub &&
-        this->dataPtr->lightPub->HasConnections())
-    {
-      for (auto const &light : this->dataPtr->publishLightPoses)
-      {
-        // Publish the light's world pose
-        // \todo Change to relative once lights can be attached to links
-        msgs::Light lightMsg;
-        lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->GetWorldPose().Ign());
-        this->dataPtr->lightPub->Publish(lightMsg);
-      }
-    }
-    this->dataPtr->publishLightPoses.clear();
   }
 }
 
@@ -2713,13 +2725,16 @@ void World::RemoveModel(const std::string &_name)
     }
   }
 
+  // Remove from SDF
   if (this->dataPtr->sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
     while (childElem && childElem->Get<std::string>("name") != _name)
       childElem = childElem->GetNextElement("model");
     if (childElem)
+    {
       this->dataPtr->sdf->RemoveChild(childElem);
+    }
   }
 
   if (this->dataPtr->sdf->HasElement("light"))
@@ -2729,46 +2744,56 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
-      // Remove light object
-      for (auto light = this->dataPtr->lights.begin();
-          light != this->dataPtr->lights.end(); ++light)
-      {
-        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
-        {
-          this->dataPtr->lights.erase(light);
-          break;
-        }
-      }
-
-      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
-
-      // Find the light by name in the scene msg, and remove it.
-      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-      {
-        if (this->dataPtr->sceneMsg.light(i).name() == _name)
-        {
-          this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
-              this->dataPtr->sceneMsg.light_size()-1);
-          this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
-          break;
-        }
-      }
     }
   }
 
+  // remove objects in world
   {
     boost::recursive_mutex::scoped_lock lock(
         *this->GetPhysicsEngine()->GetPhysicsUpdateMutex());
 
-    this->dataPtr->rootElement->RemoveChild(_name);
-
+    // Remove model object
     for (auto model = this->dataPtr->models.begin();
              model != this->dataPtr->models.end(); ++model)
     {
       if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
       {
         this->dataPtr->models.erase(model);
+        this->dataPtr->rootElement->RemoveChild(_name);
+        break;
+      }
+    }
+
+    // Remove light object
+    for (auto light = this->dataPtr->lights.begin();
+        light != this->dataPtr->lights.end(); ++light)
+    {
+      if ((*light)->GetScopedName() == _name)
+      {
+        if ((*light)->GetParent())
+        {
+          // Avoid calling: this->dataPtr->rootElement->RemoveChild(_name);
+          // which removes the first child it finds with _name, ignoring
+          // entity type (model or light) and scoping of names,
+          // e.g. In a world with "point" and "parent::point" entities,
+          // removing "point" will remove "parent::child" if it's first in the
+          // list
+          (*light)->GetParent()->RemoveChild(*light);
+        }
+        this->dataPtr->lights.erase(light);
+        break;
+      }
+    }
+
+    // Find the light by name in the scene msg, and remove it.
+    for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+    {
+      if (this->dataPtr->sceneMsg.light(i).name() == _name)
+      {
+        this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
+            this->dataPtr->sceneMsg.light_size()-1);
+        this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
         break;
       }
     }
