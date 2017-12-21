@@ -19,6 +19,7 @@
 using namespace gazebo;
 using namespace rendering;
 
+
 //////////////////////////////////////////////////
 Ogre::ColourValue Conversions::Convert(const common::Color &_color)
 {

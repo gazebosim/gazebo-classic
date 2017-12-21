@@ -273,30 +273,6 @@ namespace gazebo
       public: virtual void SetEmissive(const ignition::math::Color &_color,
           const bool _cascade = true);
 
-      /// \brief Set the ambient color of the visual.
-      /// \param[in] _color The ambient color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetAmbient(const ignition::math::Color &_color,
-          const bool _cascade = true);
-
-      /// \brief Set the diffuse color of the visual.
-      /// \param[in] _color Set the diffuse color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetDiffuse(const ignition::math::Color &_color,
-          const bool _cascade = true);
-
-      /// \brief Set the specular color of the visual.
-      /// \param[in] _color Specular color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      public: void SetSpecular(const ignition::math::Color &_color,
-          const bool _cascade = true);
-
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      public: virtual void SetEmissive(const ignition::math::Color &_color,
-          const bool _cascade = true);
-
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
       /// \deprecated use ignition::math::Color instead
@@ -328,22 +304,6 @@ namespace gazebo
       /// \return Emissive color.
       /// \deprecated use ignition::math::Color instead
       public: common::Color GetEmissive() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the emissive color of the visual.
-      /// \return Emissive color.
-      public: ignition::math::Color Emissive() const;
-
-      /// \brief Get the ambient color of the visual.
-      /// \return Ambient color.
-      public: ignition::math::Color Ambient() const;
-
-      /// \brief Get the diffuse color of the visual.
-      /// \return Diffuse color.
-      public: ignition::math::Color Diffuse() const;
-
-      /// \brief Get the specular color of the visual.
-      /// \return Specular color.
-      public: ignition::math::Color Specular() const;
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
