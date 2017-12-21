@@ -27,15 +27,19 @@ namespace gazebo
     struct GpuLaserData
     {
       /// \brief The distance of the reading in meters
+      // cppcheck-suppress unusedStructMember
       double range;
 
       /// \brief The intensity reading
+      // cppcheck-suppress unusedStructMember
       double intensity;
 
       /// \brief Which plane or cone this reading belongs to [0, vRes)
+      // cppcheck-suppress unusedStructMember
       unsigned int beam;
 
       /// \brief the index of areading in a plane or cone[0, hRes)
+      // cppcheck-suppress unusedStructMember
       unsigned int reading;
     };
 

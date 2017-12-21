@@ -59,6 +59,7 @@ namespace gazebo
 
       /// \brief Constructor from ignition::math::Inertial.
       /// \param[in] _inertial Ignition inertial object to copy.
+      // cppcheck-suppress noExplicitConstructor
       public: Inertial(const ignition::math::Inertiald &_inertial);
 
       /// \brief Copy constructor.

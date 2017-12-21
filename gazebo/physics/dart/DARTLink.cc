@@ -331,11 +331,6 @@ void DARTLink::OnPoseChange()
     // conversion.
     freeJoint->setPositions(dart::dynamics::FreeJoint::convertToPositions(Q));
   }
-  else
-  {
-    gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not a FreeJoint (6-dof).\n";
-  }
 }
 
 //////////////////////////////////////////////////
@@ -484,7 +479,7 @@ void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
+    gzdbg << "DARTLink::SetAngularVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
