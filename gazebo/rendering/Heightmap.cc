@@ -3340,9 +3340,9 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
       Ogre::Vector4 splitPoints;
       const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
           pssm->getSplitPoints();
-      // populate from split point 1 not 0
-      for (unsigned int t = 1u; t < numTextures; ++t)
-        splitPoints[t-1] = splitPointList[t];
+      // populate from split point 1 not 0, and include shadowFarDistance
+      for (unsigned int t = 0u; t < numTextures; ++t)
+        splitPoints[t] = splitPointList[t+1];
       params->setNamedConstant("pssmSplitPoints", splitPoints);
 
       // set up uv transform

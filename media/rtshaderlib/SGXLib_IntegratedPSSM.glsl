@@ -1,4 +1,24 @@
 /*
+ * Copyright (C) 2017 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
+
+// Code in this file has been adapted from Ogre. The original Ogre's licence and
+// copyright headers are copied below:
+
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
@@ -55,61 +75,50 @@ void SGX_ApplyShadowFactor_Diffuse(in vec4 ambient,
 }
 
 //-----------------------------------------------------------------------------
-float texture2DCompare(sampler2D depths, vec2 uv, float compare)
+float _SGX_ShadowPoisson9(sampler2DShadow shadowMap, vec4 shadowMapPos, vec2 invShadowMapSize, bool hardwarePCF)
 {
-  float depth = texture2D(depths, uv).r;
-  return (step(compare, depth) >= 1.0) ? 1.0 : 0.4;
-}
-
-//-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2D shadowMap, vec4 shadowMapPos, vec2 offset)
-{
-  // Interpolated 3x3 PCF
-  // Adapted from http://www.ogre3d.org/forums/viewtopic.php?f=1&t=78834
-
-  if (offset.x <= 0.0 || offset.y <= 0.0 || shadowMapPos.w <= 0.0)
+  // Remove shadow outside shadow maps so that all that area appears lit
+  if (shadowMapPos.z < 0.0 || shadowMapPos.z > 1.0)
     return 1.0;
 
-  shadowMapPos = shadowMapPos / shadowMapPos.w;
-  vec2 uv = shadowMapPos.xy;
+  float shadow = 0.0;
 
-  vec2 texelSize = offset;
-  vec2 size = 1.0 / offset;
-  vec2 centroidUV = floor(uv * size + 0.5) / size;
-  vec2 f = fract(uv * size + 0.5);
+  // 9-sample poisson disk blur
+  vec2 poissonDisk[9] = vec2[](
+    vec2( 0.0, 0.0 ),
+    vec2( -0.987, 0.127 ),
+    vec2( -0.168, -0.924 ),
+    vec2( 0.637, 0.633 ),
+    vec2( 0.888, -0.296 ),
+    vec2( 0.516, 0.0664 ),
+    vec2( -0.408, -0.332 ),
+    vec2( -0.491, 0.263 ),
+    vec2( 0.061, 0.851 )
+  );
 
-  // 3 x 3 kernel
-  const int   X = 3;
-
-  vec2 topLeft = centroidUV - texelSize * 1.5;
-
-  // load all pixels needed for the computation
-  // this way a pixel won't be loaded twice
-  float kernel[9];
-  for (int i = 0; i < X; ++i)
+  for (int i = 0; i < 9; i++)
   {
-    for (int j = 0; j < X; ++j)
-    {
-       kernel[i * X + j] = texture2DCompare(shadowMap,
-          topLeft + vec2(i, j) * texelSize, shadowMapPos.z);
-    }
+    vec4 newUV = shadowMapPos;
+    newUV.xy += poissonDisk[i] * invShadowMapSize;
+    // Divide by w necessary for LiSPMS, which is no longer in use
+    // newUV = newUV / newUV.w;
+    // This texture() does the depth compare and provides Hardware PCF as a
+    // driver hack.
+    // shadow += shadow2D(shadowMap, newUV.xyz).r;
+    float d = shadow2D(shadowMap, newUV.xyz).r;
+    if (hardwarePCF)
+      shadow += d;
+    else
+      shadow += step(shadowMapPos.z, d);
   }
+  shadow /= 9.0;
 
-  float kernel_interpolated[4];
-
-  kernel_interpolated[0] = kernel[0] + kernel[1] + kernel[3] + kernel[4];
-  kernel_interpolated[0] /= 4.0;
-  kernel_interpolated[1] = kernel[1] + kernel[2] + kernel[4] + kernel[5];
-  kernel_interpolated[1] /= 4.0;
-  kernel_interpolated[2] = kernel[3] + kernel[4] + kernel[6] + kernel[7];
-  kernel_interpolated[2] /= 4.0;
-  kernel_interpolated[3] = kernel[4] + kernel[5] + kernel[7] + kernel[8];
-  kernel_interpolated[3] /= 4.0;
-
-  float a = mix(kernel_interpolated[0], kernel_interpolated[1], f.y);
-  float b = mix(kernel_interpolated[2], kernel_interpolated[3], f.y);
-  float c = mix(a, b, f.x);
-  return c;
+  // smoothstep makes shadow edges appear more crisp and hides Mach bands
+  float s = smoothstep(0.0, 1.0, shadow);
+  // make shadow lighter color
+  float minShadowFactor = 0.2;
+  s = s * (1.0 - minShadowFactor) + minShadowFactor;
+  return s;
 }
 
 //-----------------------------------------------------------------------------
@@ -118,27 +127,33 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in vec4 lightPosition0,
 							in vec4 lightPosition1,
 							in vec4 lightPosition2,
-							in sampler2D shadowMap0,
-							in sampler2D shadowMap1,
-							in sampler2D shadowMap2,
+							in sampler2DShadow shadowMap0,
+							in sampler2DShadow shadowMap1,
+							in sampler2DShadow shadowMap2,
 							in vec4 invShadowMapSize0,
 							in vec4 invShadowMapSize1,
 							in vec4 invShadowMapSize2,
 							out float oShadowFactor)
 {
+  // hack! On OSX the shadow map size is halved so we use this as a hint
+  // that hardware PCF is not enabled.
+  bool hardwarePCF = false;
+  if (invShadowMapSize0.x == invShadowMapSize1.x)
+    hardwarePCF = true;
+
   if (fDepth  <= vSplitPoints.x)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap0, lightPosition0, invShadowMapSize0.xy);
+      _SGX_ShadowPoisson9(shadowMap0, lightPosition0, invShadowMapSize0.xy, hardwarePCF);
   }
   else if (fDepth <= vSplitPoints.y)
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap1, lightPosition1, invShadowMapSize1.xy);
+      _SGX_ShadowPoisson9(shadowMap1, lightPosition1, invShadowMapSize1.xy, hardwarePCF);
   }
   else
   {
     oShadowFactor =
-      _SGX_ShadowPCF4(shadowMap2, lightPosition2, invShadowMapSize2.xy);
+      _SGX_ShadowPoisson9(shadowMap2, lightPosition2, invShadowMapSize2.xy, hardwarePCF);
   }
 }
