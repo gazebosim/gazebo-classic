@@ -69,6 +69,7 @@ set (plugins_single_header
   RaySensorNoisePlugin
   RubblePlugin
   SkidSteerDrivePlugin
+  StaticMapPlugin
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
