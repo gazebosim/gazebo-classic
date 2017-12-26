@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
+    * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
+
 1. Image Viewer: fix QImage::Format used to display grayscale images
     * [Pull request #2813](https://bitbucket.org/osrf/gazebo/pull-requests/2813)
 
@@ -484,6 +488,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
+    * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
