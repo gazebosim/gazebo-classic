@@ -18,8 +18,10 @@
 #include <curl/curl.h>
 #include <boost/filesystem.hpp>
 
-#include <ignition/math/Vector2.hh>
+#include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/SphericalCoordinates.hh>
+#include <ignition/math/Vector2.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/CommonIface.hh>
 #include <gazebo/transport/Node.hh>
@@ -28,22 +30,74 @@
 
 namespace gazebo
 {
+  /// \brief Class to provide helper functions for Web Mercator projection
+  class MercatorProjection
+  {
+    /// \brief Convert point in world coordinates to latitude and longitude
+    /// \param[in] _point Point in world coordinates
+    /// \return Latitude and longitude coorindates
+    public: static ignition::math::SphericalCoordinates PointToLatLon(
+        const ignition::math::Vector2d &_point);
+
+    /// \brief Convert latitdue and longitude to point in world coordinates
+    /// \param[in] Latitude and longitude coorindates
+    /// \return Point in world coordinates
+    public: static ignition::math::Vector2d LatLonToPoint(
+        const ignition::math::SphericalCoordinates &_latLon);
+
+    /// \brief Google map base level tile size
+    public: static const unsigned int TILE_SIZE;
+
+    /// \brief Origin of tile in base level
+//    public: static const ignition::math::Vector2d pixelOrigin;
+
+    /// \brief Number of pixels per longitude degree
+//    public: static const double pixelsPerLonDegree;
+
+    /// \brief Number of pixels per longitude radian
+//    public: static double pixelsPerLonRadian;
+  };
+
+
+  /// \brief Private data class for StaticMapPlugin
   class StaticMapPluginPrivate
   {
     /// \brief Download map tiles.
-    public: std::vector<std::string> DownloadMapTiles(const double _centerLat, 
-        const double _centerLon, const double _zoom, const unsigned int _tileSizePx,
+    /// \param[in] _centerLat Latitude of center point of map
+    /// \param[in] _centerLon Longitude of center point of map
+    /// \param[in] _zoom Map zoom level between 0 (entire world) and 21+
+    /// (streets).
+    /// \param[in] _tileSizePx Size of each map tile in pixels. Tiles will be
+    /// square.
+    /// \param[in] _worldSize Size of map in the world in meters.
+    /// \param[in] _apiKey Google API key
+    /// \param[in] _saveDirPath Location in local filesystem to save tile
+    /// images.
+    public: std::vector<std::string> DownloadMapTiles(const double _centerLat,
+        const double _centerLon, const unsigned int _zoom,
+        const unsigned int _tileSizePx,
         const ignition::math::Vector2d &_worldSize, const std::string &_apiKey,
-        const std::string &_saveLocation);
+        const std::string &_saveDirPath);
 
-    /// \brief Create the textured map object and insert into world.
+    /// \brief Create the textured map model and spawn it into world.
+    /// \param[in] _name Name of map model
+    /// \param[in] _tileWorldSize Size of map tiles in meters
+    /// \param[in] _xNumTiles Number of tiles in x direction
+    /// \param[in] _yNumTiles Number of tiles in y direction
+    /// \param[in] _tiles Tile image filenames
+    /// \param[in] _modelPath Path to model directory
     public: void CreateMapTileModel(
-        const std::string &_name, 
+        const std::string &_name,
         const double _tileWorldSize,
         const unsigned int xNumTiles, const unsigned int yNumTiles,
         const std::vector<std::string> &_tiles, const std::string &_modelPath);
 
-    public: double GroundResolution(const double _lat, 
+    /// \brief Get the ground resolution at the specified latitude and zoom
+    /// level.
+    /// \param[in] _lat Latitude
+    /// \param[in] _zoom Map zoom Level
+    /// \return Ground resolution in meters per pixel.
+    public: double GroundResolution(const double _lat,
         const unsigned int _zoom);
 
     /// \brief Spawn a model into the world
@@ -51,26 +105,48 @@ namespace gazebo
 
     /// \brief Pointer to world.
     public: physics::WorldPtr world;
-    public: std::string modelName;
-    public: double centerLat = 0.0;
-    public: double centerLon = 0.0;
-    public: ignition::math::Vector2d worldSize;
-    public: unsigned int zoom = 21u;
-    public: unsigned int tileSizePx = 640u; 
-    public: std::string apiKey;
-    public: std::vector<std::string> mapTileFilenames;
 
+    /// \brief Name of map model
+    public: std::string modelName;
+
+    /// \brief Latitude and Longitude of map center
+    public: ignition::math::Vector2d center;
+
+    /// \brief Size of map in the world in meters
+    public: ignition::math::Vector2d worldSize;
+
+    /// \brief Map zoom level. From 0 (entire world) to 21+ (streets)
+    public: unsigned int zoom = 21u;
+
+    /// \brief Size of map tile in pixels. 640 is max resolution for users of
+    /// standard API
+    public: unsigned int tileSizePx = 640u;
+
+    /// \brief True to use cached model and image data from gazebo model path.
+    /// False to redownload image tiles and recreate model sdf and config
+    // files.
+    public: bool useCache = false;
+
+    /// \brief Google API key
+    public: std::string apiKey;
+
+    /// \brief Filenames of map tile images
+    public: std::vector<std::string> mapTileFilenames;
 
     /// \brief Pointer to a node for communication.
     public: transport::NodePtr node;
 
     /// \brief Factory publisher.
     public: transport::PublisherPtr factoryPub;
+
+    /// \brief True if the plugin is loaded successfully
+    public: bool loaded = false;
   };
 }
 
 using namespace gazebo;
 
+const unsigned int MercatorProjection::TILE_SIZE = 256;
 
 GZ_REGISTER_WORLD_PLUGIN(StaticMapPlugin)
 
@@ -83,9 +159,8 @@ size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream)
   return written;
 }
 
-
 /////////////////////////////////////////////////
-bool GetStaticMap(const std::string &_url, const std::string &_outputFile)
+bool DownloadStaticMap(const std::string &_url, const std::string &_outputFile)
 {
   if (_url.empty())
     return false;
@@ -137,52 +212,47 @@ bool GetStaticMap(const std::string &_url, const std::string &_outputFile)
   return true;
 }
 
-const static unsigned int TILE_SIZE = 256;
-ignition::math::Vector2d pixelOrigin(TILE_SIZE / 2, TILE_SIZE / 2);
-double pixelsPerLonDegree = TILE_SIZE / 360.0;
-double pixelsPerLonRadian = TILE_SIZE / (2.0 * M_PI);
-
-
 
 /////////////////////////////////////////////////
-ignition::math::Vector2d LatLonToPoint(
+ignition::math::Vector2d MercatorProjection::LatLonToPoint(
     const ignition::math::SphericalCoordinates &_latLon)
 {
 	ignition::math::Vector2d point;
-	ignition::math::Vector2d origin = pixelOrigin;
-	
-	point.X() = origin.X() + _latLon.LongitudeReference().Degree() * 
-      pixelsPerLonDegree;
-	
 	// Truncating to 0.9999 effectively limits latitude to 89.189. This is
 	// about a third of a tile past the edge of the world tile.
 	double siny = std::min(std::max(std::sin(
       _latLon.LatitudeReference().Radian()), -0.9999), 0.9999);
-	point.Y() = origin.Y() + 0.5 * std::log((1 + siny) / (1 - siny)) * 
-      -pixelsPerLonRadian;
-	
+
+	point.X() = TILE_SIZE * (0.5 + _latLon.LongitudeReference().Degree()/ 360);
+	point.Y() = TILE_SIZE * (0.5 - std::log((1 + siny) / (1 - siny)) /
+          (4 * IGN_PI));
+
+//	point.Y() = pixelOrigin.Y() + 0.5 * std::log((1 + siny) / (1 - siny)) *
+//      -pixelsPerLonRadian;
+
 	return point;
 }
 
 /////////////////////////////////////////////////
-ignition::math::SphericalCoordinates PointToLatLon(
+ignition::math::SphericalCoordinates MercatorProjection::PointToLatLon(
     const ignition::math::Vector2d &_point)
 {
-	ignition::math::Vector2d origin = pixelOrigin;
-
   ignition::math::SphericalCoordinates latLon;
   ignition::math::Angle lonAngle;
   ignition::math::Angle latAngle;
 
-  double lon = (_point.X() - origin.X()) / pixelsPerLonDegree;
-  double latRadians = (_point.Y() - origin.Y()) / -pixelsPerLonRadian;
+  double lonDegrees = (_point.X() / TILE_SIZE - 0.5) * 360;
+  double latRadians = (_point.Y() - TILE_SIZE/2.0) /
+        -(TILE_SIZE/(2*IGN_PI));
 
-  lonAngle.Degree(lon);
-  latAngle.Radian(2 * std::atan(std::exp(latRadians)) - M_PI / 2.0);	
+//  double lon = (_point.X() - pixelOrigin.X()) / pixelsPerLonDegree;
+//  double latRadians = (_point.Y() - pixelOrigin.Y()) / -pixelsPerLonRadian;
 
-  latLon.SetLongitudeReference(lonAngle); 
-  latLon.SetLatitudeReference(latAngle); 
+  lonAngle.Degree(lonDegrees);
+  latAngle.Radian(2 * std::atan(std::exp(latRadians)) - IGN_PI / 2.0);
 
+  latLon.SetLongitudeReference(lonAngle);
+  latLon.SetLatitudeReference(latAngle);
 	return latLon;
 }
 
@@ -197,29 +267,83 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   this->dataPtr->world = _world;
 
+  if (!_sdf->HasElement("api_key"))
+  {
+    gzerr << "Missing Google API key needed to download map tiles" << std::endl;
+    return;
+  }
+
+  if (!_sdf->HasElement("center"))
+  {
+    gzerr << "Please specify latitude and longitude coordinates of map center"
+          << std::endl;
+    return;
+  }
+
+  if (!_sdf->HasElement("world_size"))
+  {
+    gzerr << "Please specify size of map in meters" << std::endl;
+    return;
+
+  }
+
   this->dataPtr->apiKey = _sdf->Get<std::string>("api_key");
-  this->dataPtr->centerLat = _sdf->Get<double>("center_lat");
-  this->dataPtr->centerLon = _sdf->Get<double>("center_lon");
-  this->dataPtr->worldSize = _sdf->Get<ignition::math::Vector2d>("world_size");
+  ignition::math::Vector2d center =
+      _sdf->Get<ignition::math::Vector2d>("center");
+  double wSize = _sdf->Get<double>("world_size");
+  if (wSize > 0)
+  {
+    // support only square map for now
+    this->dataPtr->worldSize.X() = wSize;
+    this->dataPtr->worldSize.Y() = wSize;
+  }
+  else
+  {
+    gzerr << "World size must be greater than 0 meters" << std::endl;
+  }
+
+  // optional params
+  if (_sdf->HasElement("zoom"))
+    this->dataPtr->zoom = _sdf->Get<unsigned int>("zoom");
+
+  if (_sdf->HasElement("tile_size"))
+  {
+    unsigned int tSize = _sdf->Get<unsigned int>("tile_size");
+    if (ignition::math::isPowerOfTwo(tSize))
+      this->dataPtr->tileSizePx= tSize;
+    else
+    {
+      gzerr << "Tile size must be a power of 2! Reverting to default: "
+            << this->dataPtr->tileSizePx << std::endl;
+    }
+  }
+
+  if (_sdf->HasElement("use_cache"))
+    this->dataPtr->useCache = _sdf->Get<bool>("use_cache");
+
   if (_sdf->HasElement("model_name"))
     this->dataPtr->modelName = _sdf->Get<std::string>("model_name");
   else
   {
     // generate name based on input
     std::stringstream name;
-    name << "tile_" << std::setprecision(12) << this->dataPtr->centerLat << "_" 
-         << this->dataPtr->centerLon
-         << "_" << this->dataPtr->worldSize.X() << "_" 
+    name << "tile_" << std::setprecision(12) << center.X() << "_"
+         << center.Y() << "_" << this->dataPtr->worldSize.X() << "_"
          << this->dataPtr->worldSize.Y();
     this->dataPtr->modelName = name.str();
   }
+  this->dataPtr->loaded = true;
 }
 
 /////////////////////////////////////////////////
 void StaticMapPlugin::Init()
 {
+  // don't init if params are not loaded successfully
+  if (!this->dataPtr->loaded)
+    return;
+
   // check if model exists locally
-  auto basePath = common::SystemPaths::Instance()->GetLogPath() / 
+  auto basePath = common::SystemPaths::Instance()->GetLogPath() /
         boost::filesystem::path("map_tiles");
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -228,11 +352,11 @@ void StaticMapPlugin::Init()
       this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
 
   boost::filesystem::path modelPath = basePath / this->dataPtr->modelName;
-  if (common::exists(modelPath.string()))
+  if (this->dataPtr->useCache && common::exists(modelPath.string()))
   {
     // add to gazebo model path so model can be found
-    common::SystemPaths::Instance()->AddModelPaths(basePath.string());
-    gzwarn << "Model: '" << this->dataPtr->modelName << "' exists! " 
+    // common::SystemPaths::Instance()->AddModelPaths(basePath.string());
+    gzmsg << "Model: '" << this->dataPtr->modelName << "' exists. "
            << "Spawning existing model..";
     // this->dataPtr->SpawnModel(uri);
     return;
@@ -244,10 +368,11 @@ void StaticMapPlugin::Init()
   boost::filesystem::path texturesPath(modelPath / "materials" / "textures");
   boost::filesystem::create_directories(texturesPath);
 
+  // download map tile images into model/materials/textures
   std::vector<std::string> tiles = this->dataPtr->DownloadMapTiles(
-      this->dataPtr->centerLat,
-      this->dataPtr->centerLon, 
-      this->dataPtr->zoom, 
+      this->dataPtr->center.X(),
+      this->dataPtr->center.Y(),
+      this->dataPtr->zoom,
       this->dataPtr->tileSizePx,
       this->dataPtr->worldSize,
       this->dataPtr->apiKey,
@@ -258,56 +383,56 @@ void StaticMapPlugin::Init()
   unsigned int yNumTiles = xNumTiles;
 
   double tileWorldSize = this->dataPtr->GroundResolution(
-    this->dataPtr->centerLat / 180 * M_PI, this->dataPtr->zoom) 
-    * this->dataPtr->tileSizePx;
+      IGN_DTOR(this->dataPtr->center.X()), this->dataPtr->zoom)
+      * this->dataPtr->tileSizePx;
   this->dataPtr->CreateMapTileModel(
       this->dataPtr->modelName, tileWorldSize,
       xNumTiles, yNumTiles, tiles, modelPath.string());
 }
 
 /////////////////////////////////////////////////
-double StaticMapPluginPrivate::GroundResolution(const double _lat, 
+double StaticMapPluginPrivate::GroundResolution(const double _lat,
     const unsigned int _zoom)
 {
   double earthEquatorialRadius = 6378137;
-  double metersPerPx = 2 * M_PI * earthEquatorialRadius * 
-      std::cos(_lat) / (TILE_SIZE * std::pow(2, _zoom));
+  double metersPerPx = 2 * IGN_PI * earthEquatorialRadius *
+      std::cos(_lat) / (MercatorProjection::TILE_SIZE * std::pow(2, _zoom));
   return metersPerPx;
 }
 
 /////////////////////////////////////////////////
 std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
-    const double _centerLat, const double _centerLon, 
-    const double _zoom, const unsigned int _tileSizePx,
+    const double _centerLat, const double _centerLon,
+    const unsigned int _zoom, const unsigned int _tileSizePx,
     const ignition::math::Vector2d &_worldSize, const std::string &_apiKey,
-    const std::string &_saveLocation)
+    const std::string &_saveDirPath)
 {
   ignition::math::Angle lonAngle;
   ignition::math::Angle latAngle;
   latAngle.Degree(_centerLat);
   lonAngle.Degree(_centerLon);
   ignition::math::SphericalCoordinates centerLatLon;
-  centerLatLon.SetLatitudeReference(latAngle); 
-  centerLatLon.SetLongitudeReference(lonAngle); 
+  centerLatLon.SetLatitudeReference(latAngle);
+  centerLatLon.SetLongitudeReference(lonAngle);
 
   // ground resolution - varies by latitude and zoom level
-  double metersPerPx = 
+  double metersPerPx =
     this->GroundResolution(centerLatLon.LatitudeReference().Radian(), _zoom);
 
   // determine number of tiles necessary to cover specified world size
   unsigned int xNumTiles = static_cast<unsigned int>(
-      std::ceil(_worldSize.X() / metersPerPx / 
+      std::ceil(_worldSize.X() / metersPerPx /
       _tileSizePx));
   // y is only approximate because ground resolution is based on latitude
   unsigned int yNumTiles = static_cast<unsigned int>(
-      std::ceil(_worldSize.Y() / metersPerPx / 
+      std::ceil(_worldSize.Y() / metersPerPx /
       _tileSizePx));
 
   // scale for converting between pixel and world point
-  double scale = std::pow(2, this->zoom);
+  double scale = std::pow(2, _zoom);
 
-  ignition::math::Vector2d centerPx = 
-      LatLonToPoint(centerLatLon) * scale;
+  ignition::math::Vector2d centerPx =
+      MercatorProjection::LatLonToPoint(centerLatLon) * scale;
 
   // compute starting x, y values in pixel coordinates
   double halfWidthPx = _tileSizePx * std::floor(xNumTiles / 2);
@@ -326,12 +451,12 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
   for (unsigned int i = 0; i < yNumTiles; ++i)
   {
     for (unsigned int j = 0; j < xNumTiles; ++j)
-    { 
+    {
       // convert from pixels to world point
       auto px = ignition::math::Vector2d(x, y);
       auto point = px / scale;
       // convert world point to lat lon
-      auto latLon = PointToLatLon(point);    
+      auto latLon = MercatorProjection::PointToLatLon(point);
 
       // download tile image
       std::stringstream query;
@@ -346,16 +471,16 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
       std::string fullURL = url + query.str();
       std::stringstream filename;
       filename << "tile_"
-               << std::setprecision(12) << latLon.LatitudeReference().Degree() << "_" 
-               << latLon.LongitudeReference().Degree() << ".png";
-      std::string fullPath = _saveLocation + "/" + filename.str();
-      GetStaticMap(fullURL, fullPath);
+               << std::setprecision(12) << latLon.LatitudeReference().Degree()
+               << "_" << latLon.LongitudeReference().Degree() << ".png";
+      std::string fullPath = _saveDirPath + "/" + filename.str();
+      DownloadStaticMap(fullURL, fullPath);
       //std::cerr << " outputFile " << filename.str() << std::endl;
       //std::cerr << " query " << query.str() << std::endl;
       gzmsg << "Downloading map tile: " << filename.str() << std::endl;
       mapTileFilenames.push_back(filename.str());
 
-      x += _tileSizePx;  
+      x += _tileSizePx;
     }
     x = startx;
     y += _tileSizePx;
@@ -365,7 +490,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
 
 /////////////////////////////////////////////////
 void StaticMapPluginPrivate::CreateMapTileModel(
-    const std::string &_name, 
+    const std::string &_name,
     const double _tileWorldSize,
     const unsigned int _xNumTiles, const unsigned int _yNumTiles,
     const std::vector<std::string> &_tiles, const std::string &_modelPath)
@@ -376,7 +501,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   {
     for (unsigned int j = 0; j < _xNumTiles; ++j)
     {
-      materialScriptStr << 
+      materialScriptStr <<
         "material " << _name << "/" << i << "_" << j << "\n"
         "{\n"
         "  technique\n"
@@ -398,13 +523,14 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   // std::cerr << materialScriptStr.str() << std::endl;
 
   boost::filesystem::path scriptFilePath(_modelPath);
-  scriptFilePath = scriptFilePath / "materials" / "scripts" 
+  scriptFilePath = scriptFilePath / "materials" / "scripts"
       / "map_tiles.material";
   std::ofstream scriptFile;
   scriptFile.open(scriptFilePath.string().c_str());
   if (!scriptFile.is_open())
   {
-    gzerr << "Couldn't open file for writing: " << scriptFilePath.string() << std::endl;
+    gzerr << "Couldn't open file for writing: " << scriptFilePath.string()
+          << std::endl;
     return;
   }
   scriptFile << materialScriptStr.str();
@@ -414,11 +540,11 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   double sizeX = _tileWorldSize;
   double sizeY = _tileWorldSize;
 
-  ignition::math::Vector2d center(0, 0);
+  ignition::math::Vector2d wCenter(0, 0);
   double halfTileWorldWidth = sizeX * std::floor(_xNumTiles / 2);
   double halfTileWorldHeight = sizeY * std::floor(_yNumTiles / 2);
-  double x = center.X() - halfTileWorldWidth;
-  double y = center.Y() + halfTileWorldHeight;
+  double x = wCenter.X() - halfTileWorldWidth;
+  double y = wCenter.Y() + halfTileWorldHeight;
   double halfTileWorldSizeX = sizeX / 2.0;
   double halfTileWorldSizeY = sizeY / 2.0;
   if (_xNumTiles % 2 == 0u)
@@ -427,8 +553,8 @@ void StaticMapPluginPrivate::CreateMapTileModel(
     y -= halfTileWorldSizeY;
   double startx = x;
 
-  // rotate around z to line up textures 
-  ignition::math::Vector3d rot(0, 0, M_PI / 2.0);
+  // rotate around z to line up textures
+  ignition::math::Vector3d rot(0, 0, IGN_PI / 2.0);
 
   std::stringstream newModelStr;
 
@@ -474,7 +600,6 @@ void StaticMapPluginPrivate::CreateMapTileModel(
     "</model>\n"
     "</sdf>";
 
- 
   //std::cerr << " ===== newModelStr " << std::endl;
   //std::cerr << newModelStr.str() << std::endl;
 
@@ -484,7 +609,8 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   modelSDFFile.open(modelSDFFilePath.string().c_str());
   if (!modelSDFFile.is_open())
   {
-    gzerr << "Couldn't open file for writing: " << modelSDFFilePath.string() << std::endl;
+    gzerr << "Couldn't open file for writing: " << modelSDFFilePath.string()
+          << std::endl;
     return;
   }
   modelSDFFile << newModelStr.str();
@@ -515,7 +641,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   modelConfigFile.open(modelConfigFilePath.string().c_str());
   if (!modelConfigFile.is_open())
   {
-    gzerr << "Couldn't open file for writing: " 
+    gzerr << "Couldn't open file for writing: "
         << modelConfigFilePath.string() << std::endl;
     return;
   }
@@ -525,7 +651,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   // publish to factory topic to create the model
   // add to gazebo model path so model can be found
   boost::filesystem::path modelPath(_modelPath);
-  common::SystemPaths::Instance()->AddModelPaths(modelPath.parent_path().string());
+//  common::SystemPaths::Instance()->AddModelPaths(modelPath.parent_path().string());
   msgs::Factory msg;
   msg.set_sdf_filename("model://" + _name);
   // this->factoryPub->Publish(msg);
