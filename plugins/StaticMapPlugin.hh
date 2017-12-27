@@ -36,12 +36,15 @@ namespace gazebo
   /// world.
   ///
   /// The plugin requires the following parameters:
-  /// <center>     Center (longitude and latitude) of map
-  /// <world_size> Size of map in the world in meters
+  /// <center>     Center (latitude and longitude) of map
+  /// <world_size> Target size of world to cover (in meters). The plugin will
+  ///              fetch enough tiles to create a model that is larger than
+  ///              the specified size.
   /// <api_key>    Google API key
   ///
   /// optional parameters:
   /// <model_name> Name of map model
+  /// <pose>       Pose of map model in the world
   /// <zoom>       Zoom level from 0 (entire world) to 21+ (streets)
   /// <tile_size>  Size of map tiles in pixels. Must be power of 2.
   /// <use_cache>  Use model in gazebo model path if exists, otherwise

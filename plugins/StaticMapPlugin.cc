@@ -47,15 +47,6 @@ namespace gazebo
 
     /// \brief Google map base level tile size
     public: static const unsigned int TILE_SIZE;
-
-    /// \brief Origin of tile in base level
-//    public: static const ignition::math::Vector2d pixelOrigin;
-
-    /// \brief Number of pixels per longitude degree
-//    public: static const double pixelsPerLonDegree;
-
-    /// \brief Number of pixels per longitude radian
-//    public: static double pixelsPerLonRadian;
   };
 
 
@@ -79,14 +70,16 @@ namespace gazebo
         const ignition::math::Vector2d &_worldSize, const std::string &_apiKey,
         const std::string &_saveDirPath);
 
-    /// \brief Create the textured map model and spawn it into world.
+    /// \brief Create textured map model and save it in specified path.
     /// \param[in] _name Name of map model
     /// \param[in] _tileWorldSize Size of map tiles in meters
     /// \param[in] _xNumTiles Number of tiles in x direction
     /// \param[in] _yNumTiles Number of tiles in y direction
     /// \param[in] _tiles Tile image filenames
     /// \param[in] _modelPath Path to model directory
-    public: void CreateMapTileModel(
+    /// \param[in] _pose Pose of model to be spawned in the world
+    /// \return True if map tile model has been successfully created.
+    public: bool CreateMapTileModel(
         const std::string &_name,
         const double _tileWorldSize,
         const unsigned int xNumTiles, const unsigned int yNumTiles,
@@ -101,7 +94,10 @@ namespace gazebo
         const unsigned int _zoom);
 
     /// \brief Spawn a model into the world
-    public: void SpawnModel(const std::string &_name);
+    /// \param[in] _name Name of model
+    /// \param[in] _pose Pose of model
+    public: void SpawnModel(const std::string &_name,
+        const ignition::math::Pose3d &_pose);
 
     /// \brief Pointer to world.
     public: physics::WorldPtr world;
@@ -109,10 +105,13 @@ namespace gazebo
     /// \brief Name of map model
     public: std::string modelName;
 
+    /// \brief Pose of map model
+    public: ignition::math::Pose3d modelPose;
+
     /// \brief Latitude and Longitude of map center
     public: ignition::math::Vector2d center;
 
-    /// \brief Size of map in the world in meters
+    /// \brief Target size of world to be covered by map in meters.
     public: ignition::math::Vector2d worldSize;
 
     /// \brief Map zoom level. From 0 (entire world) to 21+ (streets)
@@ -217,20 +216,16 @@ bool DownloadStaticMap(const std::string &_url, const std::string &_outputFile)
 ignition::math::Vector2d MercatorProjection::LatLonToPoint(
     const ignition::math::SphericalCoordinates &_latLon)
 {
-	ignition::math::Vector2d point;
-	// Truncating to 0.9999 effectively limits latitude to 89.189. This is
-	// about a third of a tile past the edge of the world tile.
-	double siny = std::min(std::max(std::sin(
+  ignition::math::Vector2d point;
+  // Truncating to 0.9999 effectively limits latitude to 89.189. This is
+  // about a third of a tile past the edge of the world tile.
+  double siny = std::min(std::max(std::sin(
       _latLon.LatitudeReference().Radian()), -0.9999), 0.9999);
 
-	point.X() = TILE_SIZE * (0.5 + _latLon.LongitudeReference().Degree()/ 360);
-	point.Y() = TILE_SIZE * (0.5 - std::log((1 + siny) / (1 - siny)) /
+  point.X() = TILE_SIZE * (0.5 + _latLon.LongitudeReference().Degree()/ 360.0);
+  point.Y() = TILE_SIZE * (0.5 - std::log((1 + siny) / (1 - siny)) /
           (4 * IGN_PI));
-
-//	point.Y() = pixelOrigin.Y() + 0.5 * std::log((1 + siny) / (1 - siny)) *
-//      -pixelsPerLonRadian;
-
-	return point;
+  return point;
 }
 
 /////////////////////////////////////////////////
@@ -245,15 +240,12 @@ ignition::math::SphericalCoordinates MercatorProjection::PointToLatLon(
   double latRadians = (_point.Y() - TILE_SIZE/2.0) /
         -(TILE_SIZE/(2*IGN_PI));
 
-//  double lon = (_point.X() - pixelOrigin.X()) / pixelsPerLonDegree;
-//  double latRadians = (_point.Y() - pixelOrigin.Y()) / -pixelsPerLonRadian;
-
   lonAngle.Degree(lonDegrees);
   latAngle.Radian(2 * std::atan(std::exp(latRadians)) - IGN_PI / 2.0);
 
   latLon.SetLongitudeReference(lonAngle);
   latLon.SetLatitudeReference(latAngle);
-	return latLon;
+  return latLon;
 }
 
 /////////////////////////////////////////////////
@@ -282,13 +274,12 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   if (!_sdf->HasElement("world_size"))
   {
-    gzerr << "Please specify size of map in meters" << std::endl;
+    gzerr << "Please specify size of map to cover in meters" << std::endl;
     return;
-
   }
 
   this->dataPtr->apiKey = _sdf->Get<std::string>("api_key");
-  ignition::math::Vector2d center =
+  this->dataPtr->center =
       _sdf->Get<ignition::math::Vector2d>("center");
   double wSize = _sdf->Get<double>("world_size");
   if (wSize > 0)
@@ -300,6 +291,7 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   else
   {
     gzerr << "World size must be greater than 0 meters" << std::endl;
+    return;
   }
 
   // optional params
@@ -321,17 +313,21 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   if (_sdf->HasElement("use_cache"))
     this->dataPtr->useCache = _sdf->Get<bool>("use_cache");
 
+  if (_sdf->HasElement("pose"))
+    this->dataPtr->modelPose = _sdf->Get<ignition::math::Pose3d>("pose");
+
   if (_sdf->HasElement("model_name"))
     this->dataPtr->modelName = _sdf->Get<std::string>("model_name");
   else
   {
     // generate name based on input
     std::stringstream name;
-    name << "tile_" << std::setprecision(12) << center.X() << "_"
-         << center.Y() << "_" << this->dataPtr->worldSize.X() << "_"
-         << this->dataPtr->worldSize.Y();
+    name << "map_" << std::setprecision(9) << this->dataPtr->center.X() << "_"
+         << this->dataPtr->center.Y() << "_" << this->dataPtr->worldSize.X()
+         << "_" << this->dataPtr->worldSize.Y();
     this->dataPtr->modelName = name.str();
   }
+
   this->dataPtr->loaded = true;
 }
 
@@ -344,7 +340,7 @@ void StaticMapPlugin::Init()
 
   // check if model exists locally
   auto basePath = common::SystemPaths::Instance()->GetLogPath() /
-        boost::filesystem::path("map_tiles");
+        boost::filesystem::path("models");
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
@@ -354,18 +350,20 @@ void StaticMapPlugin::Init()
   boost::filesystem::path modelPath = basePath / this->dataPtr->modelName;
   if (this->dataPtr->useCache && common::exists(modelPath.string()))
   {
-    // add to gazebo model path so model can be found
-    // common::SystemPaths::Instance()->AddModelPaths(basePath.string());
     gzmsg << "Model: '" << this->dataPtr->modelName << "' exists. "
-           << "Spawning existing model..";
-    // this->dataPtr->SpawnModel(uri);
+          << "Spawning existing model.." << std::endl;
+    this->dataPtr->SpawnModel("model://" + this->dataPtr->modelName,
+        this->dataPtr->modelPose);
     return;
   }
 
-  // create model dir structure
-  boost::filesystem::path scriptsPath(modelPath / "materials" / "scripts");
+
+  // create tmp dir to save model files
+  boost::filesystem::path tmpModelPath =
+      boost::filesystem::temp_directory_path() / this->dataPtr->modelName;
+  boost::filesystem::path scriptsPath(tmpModelPath / "materials" / "scripts");
   boost::filesystem::create_directories(scriptsPath);
-  boost::filesystem::path texturesPath(modelPath / "materials" / "textures");
+  boost::filesystem::path texturesPath(tmpModelPath / "materials" / "textures");
   boost::filesystem::create_directories(texturesPath);
 
   // download map tile images into model/materials/textures
@@ -385,9 +383,27 @@ void StaticMapPlugin::Init()
   double tileWorldSize = this->dataPtr->GroundResolution(
       IGN_DTOR(this->dataPtr->center.X()), this->dataPtr->zoom)
       * this->dataPtr->tileSizePx;
-  this->dataPtr->CreateMapTileModel(
+
+  // create model tile model and spawn it into the world
+  if (this->dataPtr->CreateMapTileModel(
       this->dataPtr->modelName, tileWorldSize,
-      xNumTiles, yNumTiles, tiles, modelPath.string());
+      xNumTiles, yNumTiles, tiles, tmpModelPath.string()))
+  {
+    // verify model dir is created
+    if (common::exists(tmpModelPath.string()))
+    {
+      // remove existing map model
+      if (common::exists(modelPath.string()))
+        boost::filesystem::remove_all(modelPath);
+
+      // move new map model to gazebo model path
+      boost::filesystem::rename(tmpModelPath, modelPath);
+
+      // spawn the model
+      this->dataPtr->SpawnModel("model://" + this->dataPtr->modelName,
+          this->dataPtr->modelPose);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -417,7 +433,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
 
   // ground resolution - varies by latitude and zoom level
   double metersPerPx =
-    this->GroundResolution(centerLatLon.LatitudeReference().Radian(), _zoom);
+      this->GroundResolution(centerLatLon.LatitudeReference().Radian(), _zoom);
 
   // determine number of tiles necessary to cover specified world size
   unsigned int xNumTiles = static_cast<unsigned int>(
@@ -461,7 +477,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
       // download tile image
       std::stringstream query;
       query << "?center="
-            << std::setprecision(12)
+            << std::setprecision(9)
             << latLon.LatitudeReference().Degree() << ","
             << latLon.LongitudeReference().Degree()
             << "&zoom=" << _zoom
@@ -471,12 +487,10 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
       std::string fullURL = url + query.str();
       std::stringstream filename;
       filename << "tile_"
-               << std::setprecision(12) << latLon.LatitudeReference().Degree()
+               << std::setprecision(9) << latLon.LatitudeReference().Degree()
                << "_" << latLon.LongitudeReference().Degree() << ".png";
       std::string fullPath = _saveDirPath + "/" + filename.str();
       DownloadStaticMap(fullURL, fullPath);
-      //std::cerr << " outputFile " << filename.str() << std::endl;
-      //std::cerr << " query " << query.str() << std::endl;
       gzmsg << "Downloading map tile: " << filename.str() << std::endl;
       mapTileFilenames.push_back(filename.str());
 
@@ -489,7 +503,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
 }
 
 /////////////////////////////////////////////////
-void StaticMapPluginPrivate::CreateMapTileModel(
+bool StaticMapPluginPrivate::CreateMapTileModel(
     const std::string &_name,
     const double _tileWorldSize,
     const unsigned int _xNumTiles, const unsigned int _yNumTiles,
@@ -511,17 +525,14 @@ void StaticMapPluginPrivate::CreateMapTileModel(
         "      texture_unit\n"
         "      {\n"
         "        texture " << _tiles[j + i * _xNumTiles] << "\n"
-//        "        filtering anistropic\n"
-//        "        max_anisotropy 16\n"
         "      }\n"
         "    }\n"
         "  }\n"
         "}\n\n";
     }
   }
-  // std::cerr << " ======== material script: " << std::endl;
-  // std::cerr << materialScriptStr.str() << std::endl;
 
+  // save material script file to disk
   boost::filesystem::path scriptFilePath(_modelPath);
   scriptFilePath = scriptFilePath / "materials" / "scripts"
       / "map_tiles.material";
@@ -531,7 +542,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   {
     gzerr << "Couldn't open file for writing: " << scriptFilePath.string()
           << std::endl;
-    return;
+    return false;
   }
   scriptFile << materialScriptStr.str();
   scriptFile.close();
@@ -554,10 +565,11 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   double startx = x;
 
   // rotate around z to line up textures
-  ignition::math::Vector3d rot(0, 0, IGN_PI / 2.0);
+  ignition::math::Vector3d tileRot(0, 0, IGN_PI / 2.0);
 
+  // Model will have boxed-shaped tiles with z size of 1.0
+  // Surface of model will be at z=1.0
   std::stringstream newModelStr;
-
   newModelStr << "<sdf version='" << SDF_VERSION << "'>\n"
     "<model name='" << _name << "'>\n"
     "  <static>true</static>\n"
@@ -568,7 +580,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
     {
       newModelStr <<
         "    <collision name='collision" << i << "_" << j <<"'>\n"
-        "      <pose>" << x << " " << y << " 0.0 " << rot << "</pose>\n"
+        "      <pose>" << x << " " << y << " -0.5 " << tileRot << "</pose>\n"
         "      <geometry>\n"
         "        <box>\n"
         "          <size>" << sizeX << " " << sizeY << " " << 1 << "</size>\n"
@@ -576,7 +588,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
         "      </geometry>\n"
         "    </collision>\n"
         "    <visual name='visual" << i << "_" << j <<"'>\n"
-        "      <pose>" << x << " " << y << " 0.0 " << rot << "</pose>\n"
+        "      <pose>" << x << " " << y << " -0.5 " << tileRot << "</pose>\n"
         "      <geometry>\n"
         "        <box>\n"
         "          <size>" << sizeX << " " << sizeY << " " << 1 << "</size>\n"
@@ -600,9 +612,7 @@ void StaticMapPluginPrivate::CreateMapTileModel(
     "</model>\n"
     "</sdf>";
 
-  //std::cerr << " ===== newModelStr " << std::endl;
-  //std::cerr << newModelStr.str() << std::endl;
-
+  // save model.sdf file to disk
   boost::filesystem::path modelSDFFilePath(_modelPath);
   modelSDFFilePath /= "model.sdf";
   std::ofstream modelSDFFile;
@@ -611,30 +621,29 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   {
     gzerr << "Couldn't open file for writing: " << modelSDFFilePath.string()
           << std::endl;
-    return;
+    return false;
   }
   modelSDFFile << newModelStr.str();
   modelSDFFile.close();
-
-  // this->world->InsertModelString(newModelStr.str());
 
   // create model.config file
   std::ostringstream modelConfigStr;
   modelConfigStr << "<?xml version=\"1.0\"?>\n"
   << "<model>\n"
-  <<   "<name>" << _name << "</name>\n"
-  <<   "<version>1.0</version>\n"
-  <<   "<sdf version=\"" << SDF_VERSION << "\">model.sdf</sdf>\n"
-  <<   "<author>\n"
-  <<     "<name>gazebo</name>\n"
-  <<     "<email></email>\n"
-  <<   "</author>\n"
-  <<   "<description>Made with Gazebo Static Map Plugin</description>\n"
+  << "  <name>" << _name << "</name>\n"
+  << "  <version>1.0</version>\n"
+  << "  <sdf version=\"" << SDF_VERSION << "\">model.sdf</sdf>\n"
+  << "  <author>\n"
+  << "    <name>gazebo</name>\n"
+  << "    <email></email>\n"
+  << "  </author>\n"
+  << "  <description>\n"
+  << "    Made with Gazebo using Google Static Map API. "
+  <<     "https://developers.google.com/maps/documentation/static-maps\n"
+  << "  </description>\n"
   << "</model>";
 
-  // std::cerr << " ===== modelConfigStr " << std::endl;
-  // std::cerr << modelConfigStr.str() << std::endl;
-
+  // save model.config file to disk
   boost::filesystem::path modelConfigFilePath(_modelPath);
   modelConfigFilePath /= "model.config";
   std::ofstream modelConfigFile;
@@ -643,17 +652,21 @@ void StaticMapPluginPrivate::CreateMapTileModel(
   {
     gzerr << "Couldn't open file for writing: "
         << modelConfigFilePath.string() << std::endl;
-    return;
+    return false;
   }
   modelConfigFile << modelConfigStr.str();
   modelConfigFile.close();
 
-  // publish to factory topic to create the model
-  // add to gazebo model path so model can be found
-  boost::filesystem::path modelPath(_modelPath);
-//  common::SystemPaths::Instance()->AddModelPaths(modelPath.parent_path().string());
-  msgs::Factory msg;
-  msg.set_sdf_filename("model://" + _name);
-  // this->factoryPub->Publish(msg);
+  return true;
 }
 
+/////////////////////////////////////////////////
+void StaticMapPluginPrivate::SpawnModel(const std::string &_uri,
+    const ignition::math::Pose3d &_pose)
+{
+  // publish to factory topic to spawn the model
+  msgs::Factory msg;
+  msg.set_sdf_filename(_uri);
+  msgs::Set(msg.mutable_pose(), _pose);
+  this->factoryPub->Publish(msg);
+}
