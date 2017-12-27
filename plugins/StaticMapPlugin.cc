@@ -157,10 +157,10 @@ GZ_REGISTER_WORLD_PLUGIN(StaticMapPlugin)
 
 
 /////////////////////////////////////////////////
-size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t WriteData(void *_ptr, size_t _size, size_t _nmemb, FILE *_stream)
 {
   size_t written;
-  written = fwrite(ptr, size, nmemb, stream);
+  written = fwrite(_ptr, _size, _nmemb, _stream);
   return written;
 }
 

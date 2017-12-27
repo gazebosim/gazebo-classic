@@ -47,7 +47,9 @@ namespace gazebo
   /// <pose>       Pose of map model in the world
   /// <zoom>       Zoom level from 0 (entire world) to 21+ (streets)
   /// <map_type>   Type of map to use: roadmap, satellite, terrain, hybrid
-  /// <tile_size>  Size of map tiles in pixels. Must be power of 2.
+  /// <tile_size>  Size of map tiles in pixels. Must be power of 2. Max
+  ///              of 640 for standard usage and 2048 for premium usage.
+  ///              See Google Static Maps API documentation for more details.
   /// <use_cache>  Use model in gazebo model path if exists, otherwise
   ///              recreate the model and save it in <HOME>/.gazebo/models
   class GAZEBO_VISIBLE StaticMapPlugin : public WorldPlugin
