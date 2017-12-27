@@ -394,7 +394,7 @@ void StaticMapPlugin::Init()
       IGN_DTOR(this->dataPtr->center.X()), this->dataPtr->zoom)
       * this->dataPtr->tileSizePx;
 
-  // create model tile model and spawn it into the world
+  // create model and spawn it into the world
   if (this->dataPtr->CreateMapTileModel(
       this->dataPtr->modelName, tileWorldSize,
       xNumTiles, yNumTiles, tiles, tmpModelPath.string()))
