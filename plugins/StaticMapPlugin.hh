@@ -46,6 +46,7 @@ namespace gazebo
   /// <model_name> Name of map model
   /// <pose>       Pose of map model in the world
   /// <zoom>       Zoom level from 0 (entire world) to 21+ (streets)
+  /// <map_type>   Type of map to use: roadmap, satellite, terrain, hybrid
   /// <tile_size>  Size of map tiles in pixels. Must be power of 2.
   /// <use_cache>  Use model in gazebo model path if exists, otherwise
   ///              recreate the model and save it in <HOME>/.gazebo/models

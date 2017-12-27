@@ -61,13 +61,16 @@ namespace gazebo
     /// \param[in] _tileSizePx Size of each map tile in pixels. Tiles will be
     /// square.
     /// \param[in] _worldSize Size of map in the world in meters.
+    /// \param[in] _mapType Type of map to download: roadmap, satellite,
+    /// terrain, hybrid
     /// \param[in] _apiKey Google API key
     /// \param[in] _saveDirPath Location in local filesystem to save tile
     /// images.
     public: std::vector<std::string> DownloadMapTiles(const double _centerLat,
         const double _centerLon, const unsigned int _zoom,
         const unsigned int _tileSizePx,
-        const ignition::math::Vector2d &_worldSize, const std::string &_apiKey,
+        const ignition::math::Vector2d &_worldSize,
+        const std::string &_mapType, const std::string &_apiKey,
         const std::string &_saveDirPath);
 
     /// \brief Create textured map model and save it in specified path.
@@ -91,7 +94,7 @@ namespace gazebo
     /// \param[in] _zoom Map zoom Level
     /// \return Ground resolution in meters per pixel.
     public: double GroundResolution(const double _lat,
-        const unsigned int _zoom);
+        const unsigned int _zoom) const;
 
     /// \brief Spawn a model into the world
     /// \param[in] _name Name of model
@@ -120,6 +123,9 @@ namespace gazebo
     /// \brief Size of map tile in pixels. 640 is max resolution for users of
     /// standard API
     public: unsigned int tileSizePx = 640u;
+
+    /// \brief Type of map to use as texture: roadmap, satellite terrain, hybrid
+    public: std::string mapType = "satellite";
 
     /// \brief True to use cached model and image data from gazebo model path.
     /// False to redownload image tiles and recreate model sdf and config
@@ -159,7 +165,7 @@ size_t WriteData(void *ptr, size_t size, size_t nmemb, FILE *stream)
 }
 
 /////////////////////////////////////////////////
-bool DownloadStaticMap(const std::string &_url, const std::string &_outputFile)
+bool DownloadFile(const std::string &_url, const std::string &_outputFile)
 {
   if (_url.empty())
     return false;
@@ -310,6 +316,9 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     }
   }
 
+  if (_sdf->HasElement("map_type"))
+    this->dataPtr->mapType= _sdf->Get<std::string>("map_type");
+
   if (_sdf->HasElement("use_cache"))
     this->dataPtr->useCache = _sdf->Get<bool>("use_cache");
 
@@ -373,6 +382,7 @@ void StaticMapPlugin::Init()
       this->dataPtr->zoom,
       this->dataPtr->tileSizePx,
       this->dataPtr->worldSize,
+      this->dataPtr->mapType,
       this->dataPtr->apiKey,
       texturesPath.string());
 
@@ -408,7 +418,7 @@ void StaticMapPlugin::Init()
 
 /////////////////////////////////////////////////
 double StaticMapPluginPrivate::GroundResolution(const double _lat,
-    const unsigned int _zoom)
+    const unsigned int _zoom) const
 {
   double earthEquatorialRadius = 6378137;
   double metersPerPx = 2 * IGN_PI * earthEquatorialRadius *
@@ -420,8 +430,8 @@ double StaticMapPluginPrivate::GroundResolution(const double _lat,
 std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
     const double _centerLat, const double _centerLon,
     const unsigned int _zoom, const unsigned int _tileSizePx,
-    const ignition::math::Vector2d &_worldSize, const std::string &_apiKey,
-    const std::string &_saveDirPath)
+    const ignition::math::Vector2d &_worldSize, const std::string &_mapType,
+    const std::string &_apiKey, const std::string &_saveDirPath)
 {
   ignition::math::Angle lonAngle;
   ignition::math::Angle latAngle;
@@ -482,7 +492,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
             << latLon.LongitudeReference().Degree()
             << "&zoom=" << _zoom
             << "&size=" << _tileSizePx << "x" << _tileSizePx
-            << "&maptype=satellite"
+            << "&maptype=" << _mapType
             << "&key=" << _apiKey;
       std::string fullURL = url + query.str();
       std::stringstream filename;
@@ -490,7 +500,7 @@ std::vector<std::string> StaticMapPluginPrivate::DownloadMapTiles(
                << std::setprecision(9) << latLon.LatitudeReference().Degree()
                << "_" << latLon.LongitudeReference().Degree() << ".png";
       std::string fullPath = _saveDirPath + "/" + filename.str();
-      DownloadStaticMap(fullURL, fullPath);
+      DownloadFile(fullURL, fullPath);
       gzmsg << "Downloading map tile: " << filename.str() << std::endl;
       mapTileFilenames.push_back(filename.str());
 

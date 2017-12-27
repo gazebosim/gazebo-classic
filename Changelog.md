@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
 
