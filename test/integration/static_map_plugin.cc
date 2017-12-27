@@ -17,21 +17,16 @@
 
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/physics.hh"
-#include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class StaticMapTest : public ServerFixture,
-                      public testing::WithParamInterface<const char*>
+class StaticMapTest : public ServerFixture
 {
-  /// \brief Test StaticMapPlugin and verify model sdf and resource
-  /// files have been successfully created.
-  /// \param[in] _physicsEngine Name of physics engine
-  public: void StaticMapPlugin(const std::string &_physicsEngine);
 };
 
-
 /////////////////////////////////////////////////
-void StaticMapTest::StaticMapPlugin(const std::string &_physicsEngine)
+/// \brief Test StaticMapPlugin and verify model sdf and resource
+/// files have been successfully created.
+TEST_F(StaticMapTest, StaticMapPlugin)
 {
   // temporary back up files for testing if cache exists
   std::string modelName = "map_37.386491_-122.065255_100_100";
@@ -49,7 +44,7 @@ void StaticMapTest::StaticMapPlugin(const std::string &_physicsEngine)
   EXPECT_FALSE(common::exists(modelPath));
 
   // Test plugin for creating textured map model
-  this->Load("worlds/static_map_plugin.world", false, _physicsEngine);
+  this->Load("worlds/static_map_plugin.world");
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
@@ -96,14 +91,6 @@ void StaticMapTest::StaticMapPlugin(const std::string &_physicsEngine)
     EXPECT_FALSE(common::exists(modelBackupPath));
   }
 }
-
-/////////////////////////////////////////////////
-TEST_P(StaticMapTest, StaticMapPlugin)
-{
-  StaticMapPlugin(GetParam());
-}
-
-INSTANTIATE_TEST_CASE_P(PhysicsEngines, StaticMapTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
 {

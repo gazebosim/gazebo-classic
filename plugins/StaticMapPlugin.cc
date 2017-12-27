@@ -80,7 +80,6 @@ namespace gazebo
     /// \param[in] _yNumTiles Number of tiles in y direction
     /// \param[in] _tiles Tile image filenames
     /// \param[in] _modelPath Path to model directory
-    /// \param[in] _pose Pose of model to be spawned in the world
     /// \return True if map tile model has been successfully created.
     public: bool CreateMapTileModel(
         const std::string &_name,
@@ -124,12 +123,13 @@ namespace gazebo
     /// standard API
     public: unsigned int tileSizePx = 640u;
 
-    /// \brief Type of map to use as texture: roadmap, satellite terrain, hybrid
+    /// \brief Type of map to use as texture: roadmap, satellite, terrain,
+    /// hybrid
     public: std::string mapType = "satellite";
 
     /// \brief True to use cached model and image data from gazebo model path.
     /// False to redownload image tiles and recreate model sdf and config
-    // files.
+    /// files.
     public: bool useCache = false;
 
     /// \brief Google API key
@@ -222,6 +222,9 @@ bool DownloadFile(const std::string &_url, const std::string &_outputFile)
 ignition::math::Vector2d MercatorProjection::LatLonToPoint(
     const ignition::math::SphericalCoordinates &_latLon)
 {
+  // Adapted from:
+  // https://developers.google.com/maps/documentation/javascript/examples/map-coordinates
+
   ignition::math::Vector2d point;
   // Truncating to 0.9999 effectively limits latitude to 89.189. This is
   // about a third of a tile past the edge of the world tile.
@@ -413,6 +416,8 @@ void StaticMapPlugin::Init()
       this->dataPtr->SpawnModel("model://" + this->dataPtr->modelName,
           this->dataPtr->modelPose);
     }
+    else
+      gzerr << "Failed to create model: " << tmpModelPath.string() << std::endl;
   }
 }
 
@@ -560,6 +565,7 @@ bool StaticMapPluginPrivate::CreateMapTileModel(
   // create model.sdf file
   double sizeX = _tileWorldSize;
   double sizeY = _tileWorldSize;
+  double sizeZ = 1.0;
 
   ignition::math::Vector2d wCenter(0, 0);
   double halfTileWorldWidth = sizeX * std::floor(_xNumTiles / 2);
@@ -573,9 +579,12 @@ bool StaticMapPluginPrivate::CreateMapTileModel(
   if (_yNumTiles % 2 == 0u)
     y -= halfTileWorldSizeY;
   double startx = x;
+  double zPos = -sizeZ / 2.0;
 
   // rotate around z to line up textures
   ignition::math::Vector3d tileRot(0, 0, IGN_PI / 2.0);
+  ignition::math::Vector3d colSize(sizeX * _xNumTiles, sizeY * _yNumTiles,
+      sizeZ);
 
   // Model will have boxed-shaped tiles with z size of 1.0
   // Surface of model will be at z=0.0
@@ -583,25 +592,27 @@ bool StaticMapPluginPrivate::CreateMapTileModel(
   newModelStr << "<sdf version='" << SDF_VERSION << "'>\n"
     "<model name='" << _name << "'>\n"
     "  <static>true</static>\n"
-    "  <link name='link'>\n";
+    "  <link name='link'>\n"
+    "    <collision name='collision'>\n"
+    "      <pose>0 0 " << zPos << " 0 0 0</pose>\n"
+    "      <geometry>\n"
+    "        <box>\n"
+    "          <size>" << colSize << "</size>\n"
+    "        </box>\n"
+    "      </geometry>\n"
+    "    </collision>\n";
   for (unsigned int i = 0; i < _yNumTiles; ++i)
   {
     for (unsigned int j = 0; j < _xNumTiles; ++j)
     {
       newModelStr <<
-        "    <collision name='collision" << i << "_" << j <<"'>\n"
-        "      <pose>" << x << " " << y << " -0.5 " << tileRot << "</pose>\n"
-        "      <geometry>\n"
-        "        <box>\n"
-        "          <size>" << sizeX << " " << sizeY << " " << 1 << "</size>\n"
-        "        </box>\n"
-        "      </geometry>\n"
-        "    </collision>\n"
         "    <visual name='visual" << i << "_" << j <<"'>\n"
-        "      <pose>" << x << " " << y << " -0.5 " << tileRot << "</pose>\n"
+        "      <pose>" << x << " " << y << " " << zPos
+                       << " " << tileRot << "</pose>\n"
         "      <geometry>\n"
         "        <box>\n"
-        "          <size>" << sizeX << " " << sizeY << " " << 1 << "</size>\n"
+        "          <size>" << sizeX << " " << sizeY << " " << sizeZ
+                           << "</size>\n"
         "        </box>\n"
         "      </geometry>\n"
         "      <material>\n"
