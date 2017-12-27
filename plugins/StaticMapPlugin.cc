@@ -578,7 +578,7 @@ bool StaticMapPluginPrivate::CreateMapTileModel(
   ignition::math::Vector3d tileRot(0, 0, IGN_PI / 2.0);
 
   // Model will have boxed-shaped tiles with z size of 1.0
-  // Surface of model will be at z=1.0
+  // Surface of model will be at z=0.0
   std::stringstream newModelStr;
   newModelStr << "<sdf version='" << SDF_VERSION << "'>\n"
     "<model name='" << _name << "'>\n"
