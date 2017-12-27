@@ -308,16 +308,7 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     this->dataPtr->zoom = _sdf->Get<unsigned int>("zoom");
 
   if (_sdf->HasElement("tile_size"))
-  {
-    unsigned int tSize = _sdf->Get<unsigned int>("tile_size");
-    if (ignition::math::isPowerOfTwo(tSize))
-      this->dataPtr->tileSizePx= tSize;
-    else
-    {
-      gzerr << "Tile size must be a power of 2! Reverting to default: "
-            << this->dataPtr->tileSizePx << std::endl;
-    }
-  }
+    this->dataPtr->tileSizePx = _sdf->Get<unsigned int>("tile_size");
 
   if (_sdf->HasElement("map_type"))
     this->dataPtr->mapType= _sdf->Get<std::string>("map_type");
