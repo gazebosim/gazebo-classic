@@ -100,7 +100,7 @@ void Light::OnPoseChange()
 }
 
 /////////////////////////////////////////////////
-const math::Pose &Light::GetWorldPose() const
+const math::Pose Light::GetWorldPose() const
 {
   // TODO add and use worldPoseDirty member variable
   // If true, compute a new world pose value.

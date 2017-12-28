@@ -66,7 +66,7 @@ namespace gazebo
       public: void SetWorldPoseDirty();
 
       // Documentation inherited.
-      public: virtual const math::Pose &GetWorldPose() const;
+      public: virtual const math::Pose GetWorldPose() const;
     };
     /// \}
   }
