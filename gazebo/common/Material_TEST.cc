@@ -25,9 +25,9 @@ class MaterialTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(MaterialTest, Material)
 {
-  common::Material mat(common::Color(1.0, 0.5, 0.2, 1.0));
-  EXPECT_TRUE(mat.GetAmbient() == common::Color(1.0, 0.5, 0.2, 1.0));
-  EXPECT_TRUE(mat.GetDiffuse() == common::Color(1.0, 0.5, 0.2, 1.0));
+  common::Material mat(ignition::math::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.Ambient() == ignition::math::Color(1.0, 0.5, 0.2, 1.0));
+  EXPECT_TRUE(mat.Diffuse() == ignition::math::Color(1.0, 0.5, 0.2, 1.0));
   EXPECT_STREQ("gazebo_material_0", mat.GetName().c_str());
 
   mat.SetTextureImage("texture_image");
@@ -36,17 +36,17 @@ TEST_F(MaterialTest, Material)
   mat.SetTextureImage("texture_image", "/path");
   EXPECT_TRUE(mat.GetTextureImage().empty());
 
-  mat.SetAmbient(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.GetAmbient() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetAmbient(ignition::math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Ambient() == ignition::math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetDiffuse(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.GetDiffuse() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetDiffuse(ignition::math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Diffuse() == ignition::math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetSpecular(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.GetSpecular() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetSpecular(ignition::math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Specular() == ignition::math::Color(0.1, 0.2, 0.3, 0.4));
 
-  mat.SetEmissive(common::Color(0.1, 0.2, 0.3, 0.4));
-  EXPECT_TRUE(mat.GetEmissive() == common::Color(0.1, 0.2, 0.3, 0.4));
+  mat.SetEmissive(ignition::math::Color(0.1, 0.2, 0.3, 0.4));
+  EXPECT_TRUE(mat.Emissive() == ignition::math::Color(0.1, 0.2, 0.3, 0.4));
 
   mat.SetTransparency(0.2);
   EXPECT_DOUBLE_EQ(0.2, mat.GetTransparency());

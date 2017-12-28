@@ -732,7 +732,7 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
-    auto const &ignDiffuse = directionalLight->DiffuseColor().Ign();
+    auto const &ignDiffuse = directionalLight->DiffuseColor();
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
         Conversions::Convert(ignDiffuse));
   }

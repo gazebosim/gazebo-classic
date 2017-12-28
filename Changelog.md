@@ -9,6 +9,7 @@
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
     * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
+    * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
 
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
