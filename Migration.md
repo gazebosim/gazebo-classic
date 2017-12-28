@@ -84,6 +84,34 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Color Emissive()
     + ***Deprecation:*** void SetRibbonTrail(bool _value, const common::Color &_initialColor, const common::Color &_changeColor)
     + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
+1. **gazebo/rendering/LaserVisual.hh**
+    + virtual void SetEmissive(const common::Color &_color, const bool _cascade = true) now accepts ignition::math::Color
+1. **gazebo/rendering/Scene.hh**
+    + ***Deprecation:*** void SetAmbientColor(const common::Color &_color)
+    + ***Replacement:*** void SetAmbientColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** SetBackgroundColor(const common::Color &_color)
+    + ***Replacement:*** void SetBackgroundColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
+    + ***Replacement:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetFog(const std::string &_type, const common::Color &_color, const double _density, const double _start, const double _end)
+    + ***Replacement:*** void SetFog(const std::string &_type, const ignition::math::Color &_color, const double _density, const double _start, const double _end)
+    + common::Color AmbientColor() const now returns ignition::math::Color
+    + common::Color BackgroundColor() const now returns ignition::math::Color
+1. **gazebo/rendering/Camera.hh**
+    + ***Deprecation:*** virtual bool SetBackgroundColor(const common::Color &_color)
+    + ***Replacement:*** virtual bool SetBackgroundColor(const ignition::math::Color &_color)
+1. **gazebo/rendering/WideAngleCamera.hh**
+    + bool SetBackgroundColor(const common::Color &_color) now accepts ignition::math::Color
+1. **gazebo/rendering/Grid.hh**
+    + ***Deprecation:*** Grid(Scene *_scene, const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
+    + ***Replacement:*** Grid(Scene *_scene, const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetColor(const common::Color &_color)
+    + ***Replacement:*** void SetColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetLineWidth(const float _width)
+    + ***Replacement:*** None, grid lines are always 1px wide.
+    + ***Deprecation:*** float LineWidth() const
+    + ***Replacement:*** None, grid lines are always 1px wide.
+    + common::Color Color() const now returns ignition::math::Color
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
 1. **gazebo/msgs/msgs.hh**

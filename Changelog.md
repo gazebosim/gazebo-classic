@@ -5,6 +5,11 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
+1. Deprecate gazebo::common::Color
+    * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
+    * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
+    * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
+
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
     * [Pull request #2792](https://bitbucket.org/osrf/gazebo/pull-request/2792)
@@ -42,7 +47,7 @@
 1. Bullet: sending feedback on contact points on depth 0 as well
     * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
 
-1. Deprecate functions to set linear/angular acceleration 
+1. Deprecate functions to set linear/angular acceleration
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 1. Added GpuLaserDataIterator
