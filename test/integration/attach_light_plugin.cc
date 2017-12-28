@@ -111,7 +111,7 @@ void AttachLightTest::LinkLight(const std::string &_physicsEngine)
 
   // Get the sphere model
   physics::ModelPtr sphereModel =
-      world->GetModel("sphere_with_light");
+      world->ModelByName("sphere_with_light");
   ASSERT_TRUE(sphereModel != nullptr);
 
   // Get the link
@@ -120,8 +120,9 @@ void AttachLightTest::LinkLight(const std::string &_physicsEngine)
   ASSERT_TRUE(sphereLink != nullptr);
 
   // Get the light in the link
-  // TODO change this to link->Light("point") when API is added
-  physics::LightPtr pointLight = world->Light("sphere_with_light::link::point");
+  // TODO change this to link->LightByName("point") when API is added
+  physics::LightPtr pointLight =
+      world->LightByName("sphere_with_light::link::point");
   ASSERT_TRUE(pointLight != nullptr);
 
   // step the world
