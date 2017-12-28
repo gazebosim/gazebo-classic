@@ -2604,7 +2604,7 @@ void World::ProcessMessages()
           // \todo Hack: we use empty id to indicate it's pose of a light
           // Need to add an id field to light.proto
           // poseMsg->set_id(light->GetId());
-          msgs::Set(poseMsg, light->GetWorldPose().Ign());
+          msgs::Set(poseMsg, light->WorldPose());
         }
 
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())

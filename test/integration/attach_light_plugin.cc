@@ -77,7 +77,7 @@ void AttachLightTest::AttachLightPlugin(const std::string &_physicsEngine)
 
   // verify light pose against link pose.
   // NOTE: there seem to be race condition when verifying pose using
-  // GetWorldPose in the test thread so do the verification in the update
+  // WorldPose in the test thread so do the verification in the update
   // callback which is guaranteed to be done in the physics thread
   int iteration = 0;
   auto verifyPose = [&]()
@@ -128,19 +128,19 @@ void AttachLightTest::LinkLight(const std::string &_physicsEngine)
   world->Step(1);
 
   // Get the initial light pose offset relative to link
-  ignition::math::Pose3d pointLightPose = pointLight->GetRelativePose().Ign();
+  ignition::math::Pose3d pointLightPose = pointLight->RelativePose();
 
   // verify light pose against link pose.
   // NOTE: there seem to be race condition when verifying pose using
-  // GetWorldPose in the test thread so do the verification in the update
+  // WorldPose in the test thread so do the verification in the update
   // callback which is guaranteed to be done in the physics thread
   int iteration = 0;
   auto verifyPose = [&]()
   {
-    ignition::math::Pose3d sphereLinkPose = sphereLink->GetWorldPose().Ign();
+    ignition::math::Pose3d sphereLinkPose = sphereLink->WorldPose();
 
     EXPECT_EQ(pointLightPose + sphereLinkPose,
-        pointLight->GetWorldPose().Ign());
+        pointLight->WorldPose());
     iteration++;
   };
   auto connection = event::Events::ConnectWorldUpdateEnd(std::bind(verifyPose));

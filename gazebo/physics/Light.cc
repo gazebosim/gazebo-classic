@@ -99,8 +99,20 @@ void Light::OnPoseChange()
 {
 }
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 /////////////////////////////////////////////////
-const math::Pose &Light::GetWorldPose() const
+const math::Pose Light::GetWorldPose() const
+{
+  return this->WorldPose();
+}
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+
+const ignition::math::Pose3d &Light::WorldPose() const
 {
   // TODO add and use worldPoseDirty member variable
   // If true, compute a new world pose value.
@@ -108,8 +120,8 @@ const math::Pose &Light::GetWorldPose() const
   EntityPtr parentEnt = boost::dynamic_pointer_cast<Entity>(this->parent);
   if (!this->worldPose.IsFinite() && parentEnt)
   {
-    this->worldPose = this->GetInitialRelativePose() +
-                      parentEnt->GetWorldPose();
+    this->worldPose = this->InitialRelativePose() +
+                      parentEnt->WorldPose();
     // this->worldPoseDirty = false;
   }
 
@@ -126,7 +138,7 @@ void Light::SetWorldPoseDirty()
   // instead of making the pose infinite. It was done to avoid breaking ABI
   // this->worldPoseDirty = true;
   double v = std::numeric_limits<double>::infinity();
-  this->worldPose.pos.Set(v, v, v);
+  this->worldPose.Pos().Set(v, v, v);
 
   /// TODO The following line is added as a workaround to update light pose on
   /// the rendering side without breaking the API/ABI. Later we should update
