@@ -1637,7 +1637,7 @@ void ConfigWidget::OnCustomColorDialog()
     return;
 
   // Current color
-  auto color = Conversions::Convert(this->ColorWidgetValue(widget));
+  auto color = Conversions::Convert(this->ColorWidgetValue(widget).Ign());
 
   auto dialog = widget->findChild<QColorDialog *>();
   if (!dialog)

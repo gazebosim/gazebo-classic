@@ -12,7 +12,7 @@ release will remove the deprecated code.
 1. During the gazebo 8.x series the `-g` was used to load System plugins in the
    client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
-   plugins and will remain the exactly the same.   
+   plugins and will remain the exactly the same.
 
 ### Modifications
 
@@ -23,7 +23,7 @@ release will remove the deprecated code.
 1. **gazebo/physics/**
     + ***Modified:*** Many constructors with 1 argument in physics classes were marked as explicit.
 1. **gazebo/physics/Link.hh**
-    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
     + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -44,7 +44,7 @@ release will remove the deprecated code.
     + ***Deprecation:*** private: void OnJointCmd(ConstJointCmdPtr &_msg);
     + ***Replacement:*** private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 1. **gazebo/physics/Link.hh**
-    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel); 
+    + ***Deprecation:*** void SetLinearAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
     + ***Deprecation:***  void SetAngularAccel(const ignition::math::Vector3d &_accel);
     + ***Replacement:***  None. Doesn't do anything, acceleration should be achieved by setting force.
@@ -85,7 +85,18 @@ release will remove the deprecated code.
     + ***Replacement:*** void SetRibbonTrail(bool _value, const ignition::math::Color &_initialColor, const ignition::math::Color &_changeColor)
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
-
+1. **gazebo/msgs/msgs.hh**
+    + ***Deprecation:*** msgs::Any ConvertAny(const common::Color &_c)
+    + ***Replacement:*** msgs::Any ConvertAny(const ignition::math::Color &_c)
+    + ***Deprecation:*** msgs::Color Convert(const common::Color &_c)
+    + ***Replacement:*** msgs::Color Convert(const ignition::math::Color &_c)
+    + ***Deprecation:*** void Set(msgs::Color *_c, const common::Color &_v)
+    + ***Replacement:*** void Set(msgs::Color *_c, const ignition::math::Color &_v)
+    + Convert(const msgs::Color &_c) now returns ignition::math::Color()
+1. **gazebo/gui/Conversions.hh**
+    + ***Deprecation:*** QColor Convert(const common::Color &_clr)
+    + ***Replacement:*** QColor Convert(const ignition::math::Color &_clr)
+    + common::Color Convert(const QColor &_clr) now returns ignition::math::Color
 
 ## Gazebo 7.X to 8.X
 

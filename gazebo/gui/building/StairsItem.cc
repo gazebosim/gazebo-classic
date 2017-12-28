@@ -212,7 +212,7 @@ void StairsItem::paint(QPainter *_painter,
 
   QPen stairsPen;
   stairsPen.setStyle(Qt::SolidLine);
-  stairsPen.setColor(Conversions::Convert(this->borderColor));
+  stairsPen.setColor(Conversions::Convert(this->borderColor.Ign()));
   _painter->setPen(stairsPen);
 
   QPointF drawStepLeft = topLeft;

@@ -615,8 +615,8 @@ void Light::FillMsg(msgs::Light &_msg) const
   msgs::Set(_msg.mutable_pose()->mutable_position(), this->Position());
   msgs::Set(_msg.mutable_pose()->mutable_orientation(),
       this->Rotation());
-  msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor());
-  msgs::Set(_msg.mutable_specular(), this->SpecularColor());
+  msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor().Ign());
+  msgs::Set(_msg.mutable_specular(), this->SpecularColor().Ign());
   msgs::Set(_msg.mutable_direction(), this->Direction());
 
   _msg.set_cast_shadows(this->dataPtr->light->getCastShadows());

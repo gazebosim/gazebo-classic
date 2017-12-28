@@ -58,7 +58,7 @@ void BaseInspectorDialog::InitColorComboBox()
       QColor(111, 203, 172, 255)));
   for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)
   {
-    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.at(i)));
+    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.at(i).Ign()));
     this->colorComboBox->addItem(colorIcon, QString(""));
   }
 }
@@ -121,7 +121,8 @@ void BaseInspectorDialog::SetColor(const common::Color &_color)
     // Add a new color
     this->dataPtr->colorList.push_back(_color);
     QPixmap colorIcon(15, 15);
-    colorIcon.fill(Conversions::Convert(this->dataPtr->colorList.back()));
+    colorIcon.fill(Conversions::Convert(
+        this->dataPtr->colorList.back().Ign()));
     this->colorComboBox->addItem(colorIcon, QString(""));
     index = this->colorComboBox->count()-1;
   }

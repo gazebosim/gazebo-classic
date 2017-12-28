@@ -115,7 +115,7 @@ void DoorItem::paint(QPainter *_painter,
 
   QPen doorPen;
   doorPen.setStyle(Qt::SolidLine);
-  doorPen.setColor(Conversions::Convert(this->borderColor));
+  doorPen.setColor(Conversions::Convert(this->borderColor.Ign()));
   _painter->setPen(doorPen);
 
   _painter->drawLine(topLeft, bottomLeft + QPointF(0, this->drawingWidth));
