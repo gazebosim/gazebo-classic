@@ -159,7 +159,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Recording period (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
-    ("record_with_model", "Recording with model meshes and materials.")
+    ("record_resources", "Recording with model meshes and materials.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -260,8 +260,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
       this->dataPtr->vm["record_path"].as<std::string>();
     this->dataPtr->params["record_encoding"] =
       this->dataPtr->vm["record_encoding"].as<std::string>();
-    if (this->dataPtr->vm.count("record_with_model"))
-      this->dataPtr->params["record_with_model"] = "true";
+    if (this->dataPtr->vm.count("record_resources"))
+      this->dataPtr->params["record_resources"] = "true";
   }
 
   if (this->dataPtr->vm.count("iters"))
@@ -625,8 +625,11 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      util::LogRecord::Instance()->Start(params,
-        this->dataPtr->params.count("record_with_model") > 0);
+      // TODO Remove call to SetRecordResources function and update to use
+      // params.record_resources instead.
+      util::LogRecord::Instance()->SetRecordResources(
+          this->dataPtr->params.count("record_resources") > 0);
+      util::LogRecord::Instance()->Start(params);
     }
   }
 }

@@ -544,6 +544,9 @@ namespace gazebo
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 
+      /// \brief Log model resources. .
+      private: void LogModelResources();
+
       /// \brief Process all incoming messages.
       private: void ProcessMessages();
 

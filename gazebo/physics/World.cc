@@ -38,7 +38,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include <unordered_set>
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
@@ -2290,79 +2289,118 @@ void World::UpdateStateSDF()
 }
 
 //////////////////////////////////////////////////
+void World::LogModelResources()
+{
+  if (!util::LogRecord::Instance()->RecordResources())
+    return;
+
+  std::set<std::string> modelNames;
+  std::set<std::string> fileNames;
+  auto addModelResource = [&](const std::string &_uri)
+  {
+    if (_uri.empty())
+      return;
+
+    const std::string modelPrefix = "model://";
+    const std::string filePrefix = "file://";
+    std::string prefix;
+    if (_uri.find(modelPrefix) == 0)
+    {
+      std::string modelName = _uri.substr(modelPrefix.size(),
+        _uri.find("/", modelPrefix.size()) - modelPrefix.size());
+      modelNames.insert(modelName);
+    }
+    else if (_uri.find(filePrefix) == 0 || _uri[0] == '/')
+    {
+      fileNames.insert(_uri);
+    }
+  };
+
+  // record model resources if option is enabled.
+  for (auto const &model : this->dataPtr->models)
+  {
+    sdf::ElementPtr modelElem = model->GetSDF();
+    if (modelElem->HasElement("link"))
+    {
+      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      while (linkElem)
+      {
+        if (linkElem->HasElement("visual"))
+        {
+          sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+          while (visualElem)
+          {
+            sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+            if (geomElem->HasElement("mesh"))
+            {
+              const std::string meshUri = geomElem->GetElement("mesh")
+                  ->Get<std::string>("uri");
+              if (!meshUri.empty())
+              {
+                addModelResource(meshUri);
+              }
+            }
+            if (visualElem->HasElement("material"))
+            {
+              sdf::ElementPtr matElem = visualElem->GetElement("material");
+              if (matElem->HasElement("script"))
+              {
+                sdf::ElementPtr scriptElem = matElem->GetElement("script");
+                if (scriptElem->HasElement("uri"))
+                {
+                  std::string matUri = scriptElem->Get<std::string>("uri");
+                  if (!matUri.empty())
+                  {
+                    addModelResource(matUri);
+                  }
+                }
+              }
+            }
+            visualElem = visualElem->GetNextElement("visual");
+          }
+        }
+        if (linkElem->HasElement("collision"))
+        {
+          sdf::ElementPtr collisionElem = linkElem->GetElement("collision");
+          while (collisionElem)
+          {
+            sdf::ElementPtr geomElem = collisionElem->GetElement("geometry");
+            if (geomElem->HasElement("mesh"))
+            {
+              const std::string meshUri = geomElem->GetElement("mesh")
+                  ->Get<std::string>("uri");
+              if (!meshUri.empty())
+              {
+                addModelResource(meshUri);
+              }
+            }
+            collisionElem = collisionElem->GetNextElement("collision");
+          }
+        }
+        linkElem = linkElem->GetNextElement("link");
+      }
+    }
+  }
+  if (!util::LogRecord::Instance()->SaveModels(modelNames) ||
+      !util::LogRecord::Instance()->SaveFiles(fileNames))
+  {
+    gzwarn << "Failed to save model resources during logging\n";
+  }
+}
+
+//////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
-    std::unordered_set<std::string> modelNames;
     this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
     _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
-
-    if (util::LogRecord::Instance()->RecordWithModel())
-    {
-      const std::string modelPrefix = "model://";
-      for (auto const &model : this->dataPtr->models)
-      {
-        sdf::ElementPtr modelElem = model->GetSDF();
-        if (modelElem->HasElement("link"))
-        {
-          sdf::ElementPtr linkElem = modelElem->GetElement("link");
-          bool modelFound = false;
-          while (linkElem)
-          {
-            if (linkElem->HasElement("visual"))
-            {
-              sdf::ElementPtr visualElem = linkElem->GetElement("visual");
-              while (visualElem)
-              {
-                sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
-                if (geomElem->HasElement("mesh"))
-                {
-                  const std::string meshUri = geomElem->GetElement("mesh")
-                    ->Get<std::string>("uri");
-                  if (boost::starts_with(meshUri, modelPrefix))
-                  {
-                    std::string modelName = meshUri.substr(modelPrefix.size(),
-                      meshUri.find_first_of("/", modelPrefix.size())
-                      - modelPrefix.size());
-                    modelNames.insert(modelName);
-                    modelFound = true;
-                    break;
-                  }
-                }
-                const std::string matUri = visualElem->GetElement("material")
-                  ->GetElement("script")->Get<std::string>("uri");
-                if (!matUri.empty() && boost::starts_with(matUri, modelPrefix))
-                {
-                  std::string modelName = matUri.substr(modelPrefix.size(),
-                    matUri.find_first_of("/", modelPrefix.size())
-                    - modelPrefix.size());
-                  modelNames.insert(modelName);
-                  modelFound = true;
-                  break;
-                }
-                visualElem = visualElem->GetNextElement("visual");
-              }
-            }
-            if (modelFound)
-            {
-              break;
-            }
-            linkElem = linkElem->GetNextElement("link");
-          }
-        }
-      }
-      if (!util::LogRecord::Instance()->SaveModels(modelNames))
-      {
-        gzwarn << "Save models failed during logging\n";
-      }
-    }
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
   {
@@ -2412,6 +2450,8 @@ bool World::OnLog(std::ostringstream &_stream)
     this->dataPtr->prevStates[0] = WorldState();
     this->dataPtr->prevStates[1] = WorldState();
   }
+
+  this->LogModelResources();
 
   return true;
 }

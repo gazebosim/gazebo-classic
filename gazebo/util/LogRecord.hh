@@ -18,8 +18,8 @@
 #define _GAZEBO_UTIL_LOGRECORD_HH_
 
 #include <fstream>
+#include <set>
 #include <string>
-#include <unordered_set>
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/common/SingletonT.hh"
@@ -152,9 +152,14 @@ namespace gazebo
       /// \param[in] _filter New log record filter regex string
       public: void SetFilter(const std::string &_filter);
 
-      /// \brief Get whether save the model meshes and materials when recording.
-      /// \return True if save the model meshes and materials.
-      public: bool RecordWithModel() const;
+      /// \brief Get whether the model meshes and materials are saved when
+      /// recording.
+      /// \return True if model meshes and materials are saved when recording.
+      public: bool RecordResources() const;
+
+      /// \brief Set whether to save model meshes and materials when recording.
+      /// \param[in] _record True to save model resources when recording.
+      public: void SetRecordResources(const bool _record);
 
       /// \brief Get whether the logger is ready to start, which implies
       /// that any previous runs have finished.
@@ -169,13 +174,6 @@ namespace gazebo
       /// \brief Get whether logging is running.
       /// \return True if logging has been started.
       public: bool Running() const;
-
-      /// \brief Start the logger.
-      /// \params[in] _params Log recording parameters.
-      /// \params[in] _recordWithModel Save the model when logging if true.
-      // TO BE DEPRECATED: after recordWithModel added to LogRecordParams
-      public: bool Start(const LogRecordParams &_params,
-                         const bool _recordWithModel);
 
       /// \brief Start the logger.
       /// \params[in] _params Log recording parameters.
@@ -256,9 +254,13 @@ namespace gazebo
       /// \return True if an Update has not yet been completed.
       public: bool FirstUpdate() const;
 
-      /// \brief Return true if successfully saved all the models.
+      /// \brief Return true if all the models are saved successfully.
       /// \return True if all the models are saved successfully.
-      public: bool SaveModels(std::unordered_set<std::string> models);
+      public: bool SaveModels(const std::set<std::string> &models);
+
+      /// \brief Return true if all the files are saved successfully.
+      /// \return True if all the files are saved successfully.
+      public: bool SaveFiles(const std::set<std::string> &resources);
 
       /// \brief Write all logs.
       /// \param[in] _force True to skip waiting on dataAvailableCondition.
