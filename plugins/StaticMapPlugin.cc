@@ -325,8 +325,9 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   {
     // generate name based on input
     std::stringstream name;
-    name << "map_" << std::setprecision(9) << this->dataPtr->center.X() << "_"
-         << this->dataPtr->center.Y() << "_" << this->dataPtr->worldSize.X()
+    name << "map_" << this->dataPtr->mapType << "_" << std::setprecision(9)
+         << this->dataPtr->center.X() << "_" << this->dataPtr->center.Y()
+         << "_" << this->dataPtr->worldSize.X()
          << "_" << this->dataPtr->worldSize.Y();
     this->dataPtr->modelName = name.str();
   }

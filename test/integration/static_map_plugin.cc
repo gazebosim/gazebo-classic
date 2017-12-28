@@ -29,7 +29,7 @@ class StaticMapTest : public ServerFixture
 TEST_F(StaticMapTest, StaticMapPlugin)
 {
   // temporary back up files for testing if cache exists
-  std::string modelName = "map_37.386491_-122.065255_100_100";
+  std::string modelName = "map_satellite_37.386491_-122.065255_100_100";
   std::string basePath = common::SystemPaths::Instance()->GetLogPath();
   std::string modelPath = basePath + "/models/" + modelName;
   std::string modelBackupPath = modelPath + "_bk";
@@ -50,7 +50,7 @@ TEST_F(StaticMapTest, StaticMapPlugin)
   ASSERT_TRUE(world != nullptr);
 
   // check that map model is spawned into the world by plugin
-  WaitUntilEntitySpawn(modelName, 300, 100);
+  WaitUntilEntitySpawn(modelName, 300, 300);
   physics::ModelPtr mapModel =
       world->GetModel(modelName);
   ASSERT_TRUE(mapModel != nullptr);
