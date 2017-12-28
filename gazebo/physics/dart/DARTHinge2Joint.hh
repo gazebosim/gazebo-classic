@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
-      public: DARTHinge2Joint(BasePtr _parent);
+      public: explicit DARTHinge2Joint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTHinge2Joint();

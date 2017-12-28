@@ -71,9 +71,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   switch (_msg.pixel_format())
   {
     case common::Image::PixelFormat::L_INT8:
-    case common::Image::PixelFormat::L_INT16:
     {
-      qFormat = QImage::Format_Mono;
+      qFormat = QImage::Format_Grayscale8;
       break;
     }
     case common::Image::PixelFormat::R_FLOAT16:
@@ -91,7 +90,8 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   }
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
-      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
+      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
+      || qFormat != this->dataPtr->image.format())
   {
     QImage qimage(_msg.width(), _msg.height(), qFormat);
     this->dataPtr->image = qimage.copy();
