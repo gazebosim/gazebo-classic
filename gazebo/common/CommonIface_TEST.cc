@@ -215,8 +215,8 @@ TEST_F(CommonIface_TEST, directoryOps)
   EXPECT_TRUE(boost::filesystem::exists(srcFile2Path));
 
   EXPECT_TRUE(common::copyDir(src, dest));
-  EXPECT_TRUE(boost::filesystem::exists(destFile2Path));
-  EXPECT_FALSE(boost::filesystem::exists(destFilePath));
+  EXPECT_TRUE(common::exists(destFile2Path.string()));
+  EXPECT_FALSE(common::exists(destFilePath.string()));
 }
 
 /////////////////////////////////////////////////
