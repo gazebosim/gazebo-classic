@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"
@@ -212,7 +212,7 @@ void StairsItem::paint(QPainter *_painter,
 
   QPen stairsPen;
   stairsPen.setStyle(Qt::SolidLine);
-  stairsPen.setColor(Conversions::Convert(this->borderColor.Ign()));
+  stairsPen.setColor(Conversions::Convert(this->borderColor));
   _painter->setPen(stairsPen);
 
   QPointF drawStepLeft = topLeft;

@@ -36,7 +36,8 @@ release will remove the deprecated code.
     + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 1. **gazebo/sensors/WideAngleCameraSensor.cc**
     + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
-
+1. **gazebo/gui/ConfigWidget.hh**
+    + ColorValueChanged signal now uses ignition::math::Color instead of gazebo::common::Color
 
 ### Deprecations
 
@@ -97,6 +98,10 @@ release will remove the deprecated code.
     + ***Deprecation:*** QColor Convert(const common::Color &_clr)
     + ***Replacement:*** QColor Convert(const ignition::math::Color &_clr)
     + common::Color Convert(const QColor &_clr) now returns ignition::math::Color
+1. **gazebo/gui/ConfigWidget.hh**
+    + ***Deprecation:*** bool SetColorWidgetValue(const std::string &_name, const common::Color &_value)
+    + ***Replacement:*** bool SetColorWidgetValue(const std::string &_name, const ignition::math::Color &_value)
+    + common::Color ColorWidgetValue(const std::string &_name) const now returns ignition::math::Color
 
 ## Gazebo 7.X to 8.X
 

@@ -177,7 +177,7 @@ void FloorItem::paint(QPainter *_painter,
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(Conversions::Convert(this->borderColor.Ign()));
+  rectPen.setColor(Conversions::Convert(this->borderColor));
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);

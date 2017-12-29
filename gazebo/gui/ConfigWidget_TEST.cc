@@ -655,13 +655,13 @@ void ConfigWidget_TEST::VisualMsgWidget()
     // material
     QVERIFY(visualConfigWidget->StringWidgetValue("material::normal_map") ==
         "test_normal_map_updated");
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::ambient").Ign(),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::ambient"),
         ignition::math::Color(0.2, 0.3, 0.4, 0.5));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::diffuse").Ign(),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::diffuse"),
         ignition::math::Color(0.1, 0.8, 0.6, 0.4));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::specular").Ign(),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::specular"),
         ignition::math::Color(0.5, 0.4, 0.3, 0.2));
-    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::emissive").Ign(),
+    QCOMPARE(visualConfigWidget->ColorWidgetValue("material::emissive"),
         ignition::math::Color(0.4, 0.6, 0.8, 0.1));
     QCOMPARE(visualConfigWidget->BoolWidgetValue("material::lighting"),
         false);
@@ -1218,7 +1218,7 @@ void ConfigWidget_TEST::CreatedExternally()
   QCOMPARE(configWidget->BoolWidgetValue("bool"), boolValue);
   QCOMPARE(configWidget->Vector3dWidgetValue("vector3d"),
       ignition::math::Vector3d(vector3dValue));
-  QCOMPARE(configWidget->ColorWidgetValue("color").Ign(), colorValue);
+  QCOMPARE(configWidget->ColorWidgetValue("color"), colorValue);
   QCOMPARE(configWidget->PoseWidgetValue("pose"),
       ignition::math::Pose3d(poseValue));
   QCOMPARE(configWidget->EnumWidgetValue("enum"), enumValue);
@@ -1611,12 +1611,12 @@ void ConfigWidget_TEST::ChildColorSignal()
 
   // Connect signals
   connect(configWidget,
-      SIGNAL(ColorValueChanged(const QString, const gazebo::common::Color)),
+      SIGNAL(ColorValueChanged(const QString, const ignition::math::Color)),
       this,
-      SLOT(OnColorValueChanged(const QString, const gazebo::common::Color)));
+      SLOT(OnColorValueChanged(const QString, const ignition::math::Color)));
 
   // Check default color
-  QCOMPARE(configWidget->ColorWidgetValue("color").Ign(),
+  QCOMPARE(configWidget->ColorWidgetValue("color"),
       ignition::math::Color(0, 0, 0, 0));
 
   // Get signal emitting widgets
@@ -1634,10 +1634,10 @@ void ConfigWidget_TEST::ChildColorSignal()
 
 /////////////////////////////////////////////////
 void ConfigWidget_TEST::OnColorValueChanged(const QString &_name,
-    const gazebo::common::Color &_color)
+    const ignition::math::Color &_color)
 {
   QVERIFY(_name == "color");
-  QCOMPARE(_color.Ign(), ignition::math::Color(0.5, 0.0, 0.0, 0.0));
+  QCOMPARE(_color, ignition::math::Color(0.5, 0.0, 0.0, 0.0));
   g_colorSignalReceived = true;
 }
 
