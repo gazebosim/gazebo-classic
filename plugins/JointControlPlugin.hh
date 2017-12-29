@@ -42,7 +42,9 @@ namespace gazebo
   ///        <!-- C++ regular expressions may be used. -->
   ///        <joint>joint_(.*)</joint>
   ///
-  ///        <!-- Target joint controller force, position, or velocity. -->
+  ///        <!-- Joint controller effort (force or torque),
+  ///             target position (distance or radians), or
+  ///             target velocity(distance/second or radians/second). -->
   ///        <target>1.0</target>
   ///
   ///        <!-- PID controller gains (for position or velocity control). -->

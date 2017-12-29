@@ -17,7 +17,6 @@
 
 #include <algorithm>
 #include <regex>
-#include <boost/algorithm/string.hpp>
 
 #include <gazebo/common/Assert.hh>
 #include <gazebo/physics/Model.hh>
@@ -46,7 +45,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   ignition::transport::Node node;
   std::string modelName = _model->GetScopedName();
-  boost::replace_all(modelName, "::", "/");
+  modelName = std::regex_replace(modelName, std::regex("::"), "/");
   ignition::transport::Node::Publisher jointPub =
       node.Advertise<ignition::msgs::JointCmd>("/" + modelName + "/joint_cmd");
 
@@ -118,9 +117,9 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
                 grandchild->Get<std::string>());
             std::vector<std::string> matches(jointNames.size());
             auto iter = std::copy_if(jointNames.begin(), jointNames.end(),
-                matches.begin(), [&](std::string const& name)
+                matches.begin(), [&](const std::string &_name)
                 {
-                return std::regex_match(name, exp);
+                    return std::regex_match(_name, exp);
                 });
             matches.resize(std::distance(matches.begin(), iter));
 
@@ -129,7 +128,7 @@ void JointControlPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
               gzwarn << "No joints found matching \""
                      << grandchild->Get<std::string>() << "\".\n";
             }
-            for (auto match : matches)
+            for (const auto match : matches)
             {
               msg.set_name(match);
               jointPub.Publish(msg);
