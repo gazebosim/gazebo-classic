@@ -2,6 +2,8 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Added World::GetSDF()
+    * [Pull request #2708](https://bitbucket.org/osrf/gazebo/pull-requests/2708)
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
