@@ -46,9 +46,10 @@ int imageCount3 = 0;
 int imageCount4 = 0;
 std::string pixelFormat = "";
 
-
 // list of timestamped images used by the Timestamp test
 std::vector<gazebo::msgs::ImageStamped> g_imagesStamped;
+
+float *depthImg = nullptr;
 
 /////////////////////////////////////////////////
 void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
@@ -70,6 +71,20 @@ void OnImage(ConstImageStampedPtr &_msg)
   gazebo::msgs::ImageStamped imgStamped;
   imgStamped.CopyFrom(*_msg.get());
   g_imagesStamped.push_back(imgStamped);
+}
+
+/////////////////////////////////////////////////
+void OnNewRGBPointCloud(int* _imageCounter, float* _imageDest,
+                  const float *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &_format)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  pixelFormat = _format;
+  float f;
+  memcpy(_imageDest, _image, _width * _height * sizeof(f) * _depth * 4);
+  *_imageCounter += 1;
 }
 
 /////////////////////////////////////////////////
@@ -183,10 +198,10 @@ TEST_F(CameraSensor, MultipleCameraSameName)
   std::string sensorScopedName2 =
       "default::" + modelName2 + "::body::" + cameraName;
   sensors::SensorPtr sensor2 = sensors::get_sensor(sensorScopedName2);
-  EXPECT_TRUE(sensor2 != NULL);
+  ASSERT_NE(nullptr, sensor2);
   sensors::CameraSensorPtr camSensor2 =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
-  EXPECT_TRUE(camSensor2 != NULL);
+  ASSERT_NE(nullptr, camSensor2);
   rendering::CameraPtr camera2 = camSensor2->Camera();
   EXPECT_TRUE(camera2 != NULL);
 
@@ -196,7 +211,7 @@ TEST_F(CameraSensor, MultipleCameraSameName)
 
   // get camera scene and verify camera count
   rendering::ScenePtr scene = camera->GetScene();
-  EXPECT_TRUE(scene != NULL);
+  ASSERT_NE(nullptr, scene);
   EXPECT_EQ(scene->CameraCount(), 2u);
 
   // remove the second camera sensor first and check that it does not remove
@@ -882,8 +897,10 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
     }
 
     // Images from the same camera should be identical
-    EXPECT_EQ(diffSum, 0u);
-    EXPECT_EQ(diffSum2, 0u);
+    // Allow a very small tolerance. There could be a few pixel rgb value
+    // changes between frames
+    EXPECT_LE(diffSum, 10u);
+    EXPECT_LE(diffSum2, 10u);
 
     // We expect that there will some noticeable difference
     // between the two different camera images.
@@ -897,6 +914,237 @@ TEST_F(CameraSensor, CompareSideBySideCamera)
   delete[] img2;
   delete[] prevImg;
   delete[] prevImg2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, PointCloud)
+{
+  // world contains a point cloud camera looking at 4 boxes whose faces have
+  // different depth in each quadrant of the image
+  Load("worlds/pointcloud_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get point cloud depth camera ssensor
+  std::string cameraName = "pointcloud_camera_sensor";
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::DepthCameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+  rendering::DepthCameraPtr depthCam = camSensor->DepthCamera();
+  EXPECT_TRUE(depthCam != nullptr);
+
+  unsigned int width  = depthCam->ImageWidth();
+  unsigned int height = depthCam->ImageHeight();
+  EXPECT_GT(width, 0u);
+  EXPECT_GT(height, 0u);
+
+  imageCount = 0;
+  depthImg = new float[width * height * 4];
+
+  event::ConnectionPtr c = depthCam->ConnectNewRGBPointCloud(
+        std::bind(&::OnNewRGBPointCloud, &imageCount, depthImg,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int total_images = 10;
+  while (imageCount < total_images)
+    common::Time::MSleep(10);
+
+  // get the world
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  // get the boxes
+  physics::ModelPtr boxTR = world->ModelByName("tr_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxTL = world->ModelByName("tl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+  physics::ModelPtr boxBR = world->ModelByName("br_box");
+  ASSERT_TRUE(boxTR != nullptr);
+  physics::ModelPtr boxBL = world->ModelByName("bl_box");
+  ASSERT_TRUE(boxTL != nullptr);
+
+  // get distance to boxes
+  float boxWidth = 1.0;
+  float boxHalfWidth = boxWidth * 0.5;
+  float distToBoxTR = boxTR->WorldPose().Pos().X() - boxHalfWidth;
+  float distToBoxTL = boxTL->WorldPose().Pos().X() - boxHalfWidth;
+  float distToBoxBR = boxBR->WorldPose().Pos().X() - boxHalfWidth;
+  float distToBoxBL = boxBL->WorldPose().Pos().X() - boxHalfWidth;
+
+  // verify point cloud xyz data for four unit boxes at different distance
+  // in front of the point cloud camera.
+  // camera uses openni kinect optical frame convention, see comments in
+  // issue #2323: x right, y down, z forward
+  for (unsigned int i = 0; i < height; ++i)
+  {
+    // loop through the pixel values
+    for (unsigned int j = 0; j < width * 4; j+=4)
+    {
+      int idx = i * width * 4 + j;
+      float x = depthImg[idx];
+      float y = depthImg[idx+1];
+      float z = depthImg[idx+2];
+      // rgb values not valid, see issue #1865
+      // int rgb = depthImg[idx+3];
+
+      // left
+      if (j < width*4/2)
+      {
+        // all x values on the left side of camera should be negative and
+        EXPECT_LE(x, 0.0);
+
+        // top left
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTL, 1e-4);
+        }
+        // bottom left
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBL, 1e-4);
+        }
+      }
+      // right
+      else
+      {
+        // all x values on the right side of camera should be positive
+        EXPECT_GT(x, 0.0);
+
+        // top right
+        if (i < height/2)
+        {
+          EXPECT_LE(y, 0.0);
+          EXPECT_NEAR(z, distToBoxTR, 1e-4);
+        }
+        // bottom right
+        else
+        {
+          EXPECT_GT(y, 0.0);
+          EXPECT_NEAR(z, distToBoxBR, 1e-4);
+        }
+      }
+      // x and y should be within the width of 2 boxes
+      EXPECT_GE(x, -boxWidth);
+      EXPECT_LE(x, boxWidth);
+      EXPECT_GE(y, -boxWidth);
+      EXPECT_LE(y, boxWidth);
+    }
+  }
+  c.reset();
+
+  delete [] depthImg;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, LensFlare)
+{
+  Load("worlds/lensflare_plugin.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Get the lens flare camera model
+  std::string modelNameLensFlare = "camera_lensflare";
+  std::string cameraNameLensFlare = "camera_sensor_lensflare";
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+  physics::ModelPtr model = world->ModelByName(modelNameLensFlare);
+  ASSERT_TRUE(model != nullptr);
+
+  sensors::SensorPtr sensorLensFlare =
+    sensors::get_sensor(cameraNameLensFlare);
+  sensors::CameraSensorPtr camSensorLensFlare =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
+  ASSERT_TRUE(camSensorLensFlare != nullptr);
+
+  // Spawn a camera without lens flare at the same pose as
+  // the camera lens flare model
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = camSensorLensFlare->ImageWidth();
+  unsigned int height = camSensorLensFlare->ImageHeight();
+  double updateRate = camSensorLensFlare->UpdateRate();
+
+  EXPECT_GT(width, 0u);
+  EXPECT_GT(height, 0u);
+  EXPECT_GT(updateRate, 0u);
+
+  ignition::math::Pose3d setPose = model->WorldPose();
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+
+  // get a pointer to the camera lens flare sensor
+  sensors::SensorPtr sensor =
+    sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  ASSERT_TRUE(camSensor != nullptr);
+
+  // collect images from both cameras
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[width * height * 3];
+  img2 = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c2 =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get some images
+  int sleep = 0;
+  while ((imageCount < 10 || imageCount2 < 10) && sleep++ < 1000)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, 10);
+  EXPECT_GE(imageCount2, 10);
+
+  // Compare colors. Camera sensor with lens flare plugin should have a brigher
+  // image than the one without the lens flare plugin.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
+  EXPECT_GT(colorSum, colorSum2) <<
+      "colorSum: " << colorSum << ", " <<
+      "colorSum2: " << colorSum2;
+
+  delete[] img;
+  delete[] img2;
 }
 
 /////////////////////////////////////////////////

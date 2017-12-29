@@ -94,7 +94,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _world The World that uses this physics engine.
-      public: ODEPhysics(WorldPtr _world);
+      public: explicit ODEPhysics(WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~ODEPhysics();

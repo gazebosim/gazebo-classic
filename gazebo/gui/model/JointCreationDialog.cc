@@ -995,16 +995,16 @@ void JointCreationDialog::OnType(const int _typeInt)
   this->dataPtr->axis2Widget->setVisible(axisCount > 1);
 
   // Change parent icon color according to type
-  common::Color matAmbient, matDiffuse, matSpecular, matEmissive;
-  rendering::Material::GetMaterialAsColor(
+  ignition::math::Color matAmbient, matDiffuse, matSpecular, matEmissive;
+  rendering::Material::MaterialAsColor(
       this->dataPtr->jointMaker->jointMaterials[type],
       matAmbient, matDiffuse, matSpecular, matEmissive);
 
   std::ostringstream sheet;
   sheet << "QLabel{background-color: rgb(" <<
-          (matAmbient[0] * 255) << ", " <<
-          (matAmbient[1] * 255) << ", " <<
-          (matAmbient[2] * 255) << "); }";
+          (matAmbient.R() * 255) << ", " <<
+          (matAmbient.G() * 255) << ", " <<
+          (matAmbient.B() * 255) << "); }";
 
   this->dataPtr->parentIcon->setStyleSheet(QString::fromStdString(sheet.str()));
 }

@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
-      public: DARTBallJoint(BasePtr _parent);
+      public: explicit DARTBallJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTBallJoint();

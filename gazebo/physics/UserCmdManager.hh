@@ -78,7 +78,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _world Pointer to the world.
-      public: UserCmdManager(const WorldPtr _world);
+      public: explicit UserCmdManager(const WorldPtr _world);
 
       /// \brief Destructor.
       public: virtual ~UserCmdManager();

@@ -47,7 +47,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _world The World that uses this atmosphere model.
-      public: AdiabaticAtmosphere(physics::World &_world);
+      public: explicit AdiabaticAtmosphere(physics::World &_world);
 
       /// \brief Destructor.
       public: virtual ~AdiabaticAtmosphere();

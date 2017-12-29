@@ -194,6 +194,24 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
           common::Color &_ambient, common::Color &_diffuse,
           common::Color &_specular, common::Color &_emissive)
 {
+  ignition::math::Color ambient;
+  ignition::math::Color diffuse;
+  ignition::math::Color specular;
+  ignition::math::Color emissive;
+  bool success = MaterialAsColor(_materialName, ambient, diffuse, specular,
+      emissive);
+  _ambient = ambient;
+  _diffuse = diffuse;
+  _specular = specular;
+  _emissive = emissive;
+  return success;
+}
+
+//////////////////////////////////////////////////
+bool Material::MaterialAsColor(const std::string &_materialName,
+          ignition::math::Color &_ambient, ignition::math::Color &_diffuse,
+          ignition::math::Color &_specular, ignition::math::Color &_emissive)
+{
   Ogre::MaterialPtr matPtr;
 
   if (Ogre::MaterialManager::getSingleton().resourceExists(_materialName))

@@ -29,6 +29,7 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
+  include_directories(${DART_INCLUDE_DIRS})
   link_directories(${DART_LIBRARY_DIRS})
 endif()
 
@@ -65,6 +66,7 @@ set (plugins_single_header
   JointControlPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin

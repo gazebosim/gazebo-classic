@@ -2860,13 +2860,15 @@ TEST_F(MsgsTest, MaterialToSDF)
   }
 
   EXPECT_TRUE(materialSDF->HasElement("ambient"));
-  EXPECT_EQ(ambient, materialSDF->Get<common::Color>("ambient"));
+  EXPECT_EQ(ambient.Ign(), materialSDF->Get<ignition::math::Color>("ambient"));
   EXPECT_TRUE(materialSDF->HasElement("diffuse"));
-  EXPECT_EQ(diffuse, materialSDF->Get<common::Color>("diffuse"));
+  EXPECT_EQ(diffuse.Ign(), materialSDF->Get<ignition::math::Color>("diffuse"));
   EXPECT_TRUE(materialSDF->HasElement("emissive"));
-  EXPECT_EQ(emissive, materialSDF->Get<common::Color>("emissive"));
+  EXPECT_EQ(emissive.Ign(),
+      materialSDF->Get<ignition::math::Color>("emissive"));
   EXPECT_TRUE(materialSDF->HasElement("specular"));
-  EXPECT_EQ(specular, materialSDF->Get<common::Color>("specular"));
+  EXPECT_EQ(specular.Ign(),
+      materialSDF->Get<ignition::math::Color>("specular"));
 }
 
 /////////////////////////////////////////////////
@@ -3444,9 +3446,9 @@ TEST_F(MsgsTest, AddBoxLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {
@@ -3513,9 +3515,9 @@ TEST_F(MsgsTest, AddCylinderLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {
@@ -3583,9 +3585,9 @@ TEST_F(MsgsTest, AddSphereLink)
     EXPECT_DOUBLE_EQ(ixz, 0.0);
     EXPECT_DOUBLE_EQ(iyz, 0.0);
     // triangle inequality
-    EXPECT_GT(ixx + iyy, izz);
-    EXPECT_GT(iyy + izz, ixx);
-    EXPECT_GT(izz + ixx, iyy);
+    EXPECT_GE(ixx + iyy, izz);
+    EXPECT_GE(iyy + izz, ixx);
+    EXPECT_GE(izz + ixx, iyy);
 
     EXPECT_EQ(link.collision_size(), 1);
     {

@@ -23,6 +23,7 @@
 
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gazebo_config.h"
 
@@ -1774,9 +1775,10 @@ bool BuildingMaker::On3dMouseMove(const common::MouseEvent &_event)
       this->dataPtr->hoverVis = vis;
       if (this->dataPtr->selectedColor.isValid())
       {
-        common::Color newColor(this->dataPtr->selectedColor.red(),
+        ignition::math::Color newColor(this->dataPtr->selectedColor.red(),
                                this->dataPtr->selectedColor.green(),
-                               this->dataPtr->selectedColor.blue());
+                               this->dataPtr->selectedColor.blue(),
+                               1.0f);
         this->dataPtr->hoverVis->SetAmbient(newColor);
       }
       else if (this->dataPtr->selectedTexture != "")

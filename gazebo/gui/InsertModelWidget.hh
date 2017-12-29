@@ -33,9 +33,14 @@ class QPushButton;
 
 namespace gazebo
 {
+  namespace common
+  {
+    // Forward declaration.
+    class FuelModelDatabase;
+  }
   namespace gui
   {
-    /// \brief Private
+    // Forward declaration.
     class InsertModelWidgetPrivate;
 
     class GZ_GUI_VISIBLE InsertModelWidget : public QWidget
@@ -43,7 +48,7 @@ namespace gazebo
       Q_OBJECT
 
       /// \brief Constructor
-      public: InsertModelWidget(QWidget *_parent = 0);
+      public: explicit InsertModelWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~InsertModelWidget();
@@ -62,12 +67,22 @@ namespace gazebo
       /// \param[i] _localPath The model path that was updated.
       private: void OnModelUpdateRequest(const std::string &_localPath);
 
+      /// \brief A signal to trigger the model population of an Ignition Fuel
+      /// server.
+      /// \param[in] server The name of the server containing the models.
+      signals: void UpdateFuel(const std::string &_server);
+
       /// \brief Received model selection user input
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
 
       /// \brief An update function that lets this widget add in the results
       /// from ModelDatabase::GetModels.
       private slots: void Update();
+
+      /// \brief An update function that lets this widget add in the results
+      /// from ModelDatabase::GetModels.
+      /// \param[in] _server The name of the server containing the models.
+      private slots: void OnUpdateFuel(const std::string &_server);
 
       /// \brief QT callback when a path is changed.
       /// \param[in] _path The path that was changed.
@@ -88,6 +103,14 @@ namespace gazebo
       /// \brief Update a specific path.
       /// \param[in] _path The path to update.
       private: void UpdateLocalPath(const std::string &_path);
+
+      /// \brief Populate the model tree widget with the list of all available
+      /// Ignition Fuel servers providing models.
+      private: void InitializeFuelServers();
+
+      /// \brief Populate each Ignition Fuel server in the tree widget with its
+      /// list of models.
+      private: void PopulateFuelServers();
 
       /// \brief Vector to store event connections.
       private: std::vector<event::ConnectionPtr> connections;
