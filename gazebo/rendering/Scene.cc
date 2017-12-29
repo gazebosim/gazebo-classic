@@ -3249,7 +3249,7 @@ void Scene::SetGrid(const bool _enabled)
   if (_enabled && this->dataPtr->grids.empty())
   {
     Grid *grid = new Grid(this, 20, 1,
-        ignition::math::Color(0.3, 0.3, 0.3, 0.5));
+        ignition::math::Color(0.3f, 0.3f, 0.3f, 0.5f));
     grid->Init();
     this->dataPtr->grids.push_back(grid);
   }
