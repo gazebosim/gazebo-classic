@@ -20,7 +20,7 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 namespace gazebo
 {
@@ -40,7 +40,7 @@ namespace gazebo
       public: double mouseDownY;
 
       /// \brief Border color of the rotate handle.
-      public: common::Color borderColor;
+      public: ignition::math::Color borderColor;
 
       /// \brief Size of the rotate handle in pixels.
       public: double handleSize;

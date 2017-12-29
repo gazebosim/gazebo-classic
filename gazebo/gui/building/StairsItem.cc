@@ -15,7 +15,7 @@
  *
  */
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BuildingEditorWidget.hh"

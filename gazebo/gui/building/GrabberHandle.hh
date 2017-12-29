@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_GRABBER_HANDLE_HH_
-#define _GAZEBO_GUI_GRABBER_HANDLE_HH_
+#ifndef GAZEBO_GUI_BUILDING_GRABBERHANDLE_HH_
+#define GAZEBO_GUI_BUILDING_GRABBERHANDLE_HH_
 
 #include <vector>
 #include <memory>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/gui/qt.h"
@@ -29,11 +30,6 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Color;
-  }
-
   namespace gui
   {
     // Forward declare private data class.
@@ -78,7 +74,7 @@ namespace gazebo
 
       /// \brief Get the fill color of the grabber handle.
       /// \return _color Fill color.
-      public: common::Color Color() const;
+      public: ignition::math::Color Color() const;
 
       /// \brief Set the current mouse state.
       /// \param[in] _state Current mouse state.
@@ -102,11 +98,11 @@ namespace gazebo
 
       /// \brief Set the fill color of the grabber handle.
       /// \param[in] _color Fill Color.
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Set the border color of the grabber handle.
       /// \param[in] _borderColor Border Color.
-      public: void SetBorderColor(const common::Color &_borderColor);
+      public: void SetBorderColor(const ignition::math::Color &_borderColor);
 
       /// \brief Get the bounding box of the grabber handle.
       /// \return The grabber handle bounding box.

@@ -177,8 +177,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
       manip, SLOT(OnRotationChanged(double, double, double)));
   QObject::connect(_item, SIGNAL(LevelChanged(int)),
       manip, SLOT(OnLevelChanged(int)));
-  QObject::connect(_item, SIGNAL(ColorChanged(common::Color)),
-      manip, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(_item, SIGNAL(ColorChanged(ignition::math::Color)),
+      manip, SLOT(OnColorChanged(ignition::math::Color)));
   QObject::connect(_item, SIGNAL(TextureChanged(std::string)),
       manip, SLOT(OnTextureChanged(std::string)));
   QObject::connect(_item, SIGNAL(TransparencyChanged(float)),
@@ -201,8 +201,8 @@ void BuildingMaker::ConnectItem(const std::string &_partName,
   QObject::connect(_item, SIGNAL(ItemDeleted()), manip, SLOT(OnDeleted()));
 
   // manip changes -> item changes
-  QObject::connect(manip, SIGNAL(ColorChanged(common::Color)),
-      _item, SLOT(OnColorChanged(common::Color)));
+  QObject::connect(manip, SIGNAL(ColorChanged(ignition::math::Color)),
+      _item, SLOT(OnColorChanged(ignition::math::Color)));
   QObject::connect(manip, SIGNAL(TextureChanged(std::string)),
       _item, SLOT(OnTextureChanged(std::string)));
 }
@@ -323,7 +323,7 @@ std::string BuildingMaker::AddWall(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
   auto scaledSize = BuildingMaker::ConvertSize(_size.x(), _size.y(), _size.z());
@@ -478,7 +478,7 @@ std::string BuildingMaker::AddStairs(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
 
   // Relative size of each step within the parent visual
@@ -543,7 +543,7 @@ std::string BuildingMaker::AddFloor(const QVector3D &_size,
       ->GetElement("model")->GetElement("link")->GetElement("visual");
   visualElem->GetElement("material")->ClearElements();
   visualElem->GetElement("material")->AddElement("ambient")
-      ->Set(gazebo::common::Color(1, 1, 1));
+      ->Set(ignition::math::Color(1, 1, 1));
   visualElem->AddElement("cast_shadows")->Set(false);
   visVisual->Load(visualElem);
 
