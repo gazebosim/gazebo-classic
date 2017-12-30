@@ -53,12 +53,12 @@ THE SOFTWARE.
 using namespace gazebo;
 using namespace rendering;
 
-Ogre::String Ogre::RTShader::IntegratedPSSM3::Type = "CustomPSSM3";
+Ogre::String CustomPSSM3::Type = "CustomPSSM3";
 
 //////////////////////////////////////////////////
 const Ogre::String &CustomPSSM3::getType() const
 {
-  return Type;
+  return CustomPSSM3::Type;
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +193,7 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
 //////////////////////////////////////////////////
 const Ogre::String &CustomPSSM3Factory::getType() const
 {
-  return Ogre::RTShader::IntegratedPSSM3::Type;
+  return CustomPSSM3::Type;
 }
 
 //////////////////////////////////////////////////
