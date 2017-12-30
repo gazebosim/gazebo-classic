@@ -181,7 +181,8 @@ namespace gazebo
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
       /// \return The color of the given pixel
-      public: ignition::math::Color Pixel(unsigned int _x, unsigned int _y) const;
+      public: ignition::math::Color
+              Pixel(unsigned int _x, unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
