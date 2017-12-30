@@ -67,7 +67,8 @@ void MovableTextDemo::Load(sdf::ElementPtr /*_elem*/)
   this->text.Load("DEMO_TEXT", "Gazebo");
 
   // Visual to hold text
-  rendering::VisualPtr vis(new rendering::Visual("DEMO_TEXT_VIS", worldVis, false));
+  rendering::VisualPtr vis(new rendering::Visual(
+      "DEMO_TEXT_VIS", worldVis, false));
   vis->Load();
   vis->GetSceneNode()->attachObject(&(this->text));
   vis->GetSceneNode()->setInheritScale(false);

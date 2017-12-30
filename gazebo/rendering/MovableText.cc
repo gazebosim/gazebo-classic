@@ -194,8 +194,8 @@ void MovableText::SetFontName(const std::string &_newFontName)
     Ogre::MaterialManager::getSingleton().remove(this->mName + "Material");
   }
 
-  if (this->dataPtr->fontName != _newFontName || this->dataPtr->material.isNull()
-      || !this->dataPtr->font)
+  if (this->dataPtr->fontName != _newFontName ||
+      this->dataPtr->material.isNull() || !this->dataPtr->font)
   {
     auto font = (Ogre::Font*)Ogre::FontManager::getSingleton()
         .getByName(_newFontName).getPointer();
