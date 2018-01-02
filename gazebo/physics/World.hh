@@ -632,7 +632,7 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+      public: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
           const BasePtr &_parent);
 
       /// \brief Load an actor.
