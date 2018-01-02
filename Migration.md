@@ -38,6 +38,7 @@ release will remove the deprecated code.
     + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 1. **gazebo/gui/ConfigWidget.hh**
     + ColorValueChanged signal now uses ignition::math::Color instead of gazebo::common::Color
+1. `BUILD_TYPE_*` macros moved from `gazebo/gazebo_config.h` to `gazebo/test/test_config.h`
 
 ### Deprecations
 
