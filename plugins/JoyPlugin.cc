@@ -210,8 +210,12 @@ void JoyPluginPrivate::Run()
 
       // Set the time stamp
       gazebo::common::Time time = gazebo::common::Time::GetWallTime();
-      joyMsg.mutable_header()->mutable_stamp()->set_sec(time.sec);
-      joyMsg.mutable_header()->mutable_stamp()->set_nsec(time.nsec);
+      this->joyMsg.mutable_header()->mutable_stamp()->set_sec(time.sec);
+      this->joyMsg.mutable_header()->mutable_stamp()->set_nsec(time.nsec);
+      this->stickyButtonsJoyMsg.mutable_header()->mutable_stamp()->set_sec(
+          time.sec);
+      this->stickyButtonsJoyMsg.mutable_header()->mutable_stamp()->set_nsec(
+          time.nsec);
 
       float value = event.value;
       switch (event.type)
