@@ -13,6 +13,9 @@
     * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
     * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
 
+1. Updates to MovableText
+    * [Pull request #2839](https://bitbucket.org/osrf/gazebo/pull-request/2839)
+
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
     * [Pull request #2792](https://bitbucket.org/osrf/gazebo/pull-request/2792)
