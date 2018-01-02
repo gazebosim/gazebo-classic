@@ -266,7 +266,14 @@ unsigned int Image::GetBPP() const
 //////////////////////////////////////////////////
 Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Pixel(_x, _y);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -322,7 +329,14 @@ ignition::math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
 //////////////////////////////////////////////////
 Color Image::GetAvgColor()
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->AvgColor();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -354,7 +368,14 @@ ignition::math::Color Image::AvgColor()
 //////////////////////////////////////////////////
 Color Image::GetMaxColor() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->MaxColor();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

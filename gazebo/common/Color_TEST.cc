@@ -20,6 +20,10 @@
 #include "gazebo/common/Color.hh"
 #include "test/util.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Color : public gazebo::testing::AutoLogFixture { };
@@ -165,3 +169,6 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif

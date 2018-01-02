@@ -20,6 +20,10 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Color.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace common;
 
@@ -537,3 +541,6 @@ void Color::Clamp()
   this->b = this->b < 0 ? 0: this->b;
   this->b = this->b > 1 ? this->b/255.0: this->b;
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif

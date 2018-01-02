@@ -291,7 +291,14 @@ void MovableText::SetColor(const ignition::math::Color &_newColor)
 const common::Color MovableText::GetColor() const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Color();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////

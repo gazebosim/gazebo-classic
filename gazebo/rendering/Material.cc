@@ -200,10 +200,17 @@ bool Material::GetMaterialAsColor(const std::string &_materialName,
   ignition::math::Color emissive;
   bool success = MaterialAsColor(_materialName, ambient, diffuse, specular,
       emissive);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   _ambient = ambient;
   _diffuse = diffuse;
   _specular = specular;
   _emissive = emissive;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
   return success;
 }
 
