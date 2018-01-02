@@ -654,6 +654,8 @@ QTreeWidgetItem *ModelListWidget::ListItem(const std::string &_name,
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->dataPtr->modelTreeWidget->itemAt(_pt);
+  if (!item)
+    return;
 
   // Check to see if the selected item is a model
   int i = this->dataPtr->modelsItem->indexOfChild(item);
@@ -3572,7 +3574,7 @@ void ModelListWidget::FillGrid()
   topItem->addSubProperty(item);
 
   // Line color
-  auto color = grid->Color().Ign();
+  auto color = grid->Color();
   item = this->dataPtr->variantManager->addProperty(QVariant::Color,
       tr("line color"));
   item->setValue(gui::Conversions::Convert(color));

@@ -1437,14 +1437,14 @@ void ServerFixture::SpawnLight(const std::string &_name,
     const ignition::math::Color &_diffuse,
     const ignition::math::Color &_specular,
     const ignition::math::Vector3d &_direction,
-    double _attenuationRange,
-    double _attenuationConstant,
-    double _attenuationLinear,
-    double _attenuationQuadratic,
-    double _spotInnerAngle,
-    double _spotOuterAngle,
-    double _spotFallOff,
-    bool _castShadows)
+    const double _attenuationRange,
+    const double _attenuationConstant,
+    const double _attenuationLinear,
+    const double _attenuationQuadratic,
+    const double _spotInnerAngle,
+    const double _spotOuterAngle,
+    const double _spotFallOff,
+    const bool _castShadows)
 {
   msgs::Factory msg;
   std::ostringstream newLightStr;

@@ -31,7 +31,7 @@ RotateHandle::RotateHandle(QGraphicsItem *_parent)
   this->dataPtr->handleSize = 6;
   this->dataPtr->handleOffsetHeight = 10;
   this->dataPtr->origin = ignition::math::Vector2d(0, 0);
-  this->dataPtr->borderColor = common::Color::Black;
+  this->dataPtr->borderColor = ignition::math::Color::Black;
   this->dataPtr->handleOffset = this->dataPtr->origin -
       ignition::math::Vector2d(0, this->dataPtr->handleOffsetHeight);
 }
@@ -98,14 +98,14 @@ void RotateHandle::mouseMoveEvent(QGraphicsSceneMouseEvent *_event)
 /////////////////////////////////////////////////
 void RotateHandle::hoverLeaveEvent(QGraphicsSceneHoverEvent *)
 {
-  this->dataPtr->borderColor = common::Color::Black;
+  this->dataPtr->borderColor = ignition::math::Color::Black;
   this->update();
 }
 
 /////////////////////////////////////////////////
 void RotateHandle::hoverEnterEvent(QGraphicsSceneHoverEvent *)
 {
-  this->dataPtr->borderColor = common::Color::Red;
+  this->dataPtr->borderColor = ignition::math::Color::Red;
   this->update();
 }
 
@@ -123,7 +123,7 @@ void RotateHandle::paint(QPainter *_painter,
     const QStyleOptionGraphicsItem */*_options*/, QWidget */*_widget*/)
 {
   QPen borderPen;
-  borderPen.setColor(Conversions::Convert(this->dataPtr->borderColor.Ign()));
+  borderPen.setColor(Conversions::Convert(this->dataPtr->borderColor));
 
   borderPen.setStyle(Qt::SolidLine);
   _painter->setPen(borderPen);

@@ -643,14 +643,14 @@ namespace gazebo
                                                 ignition::math::Color::White,
                    const ignition::math::Vector3d &_direction =
                                                -ignition::math::Vector3d::UnitZ,
-                   double _attenuationRange = 20,
-                   double _attenuationConstant = 0.5,
-                   double _attenuationLinear = 0.01,
-                   double _attenuationQuadratic = 0.001,
-                   double _spotInnerAngle = 0,
-                   double _spotOuterAngle = 0,
-                   double _spotFallOff = 0,
-                   bool _castShadows = true);
+                   const double _attenuationRange = 20,
+                   const double _attenuationConstant = 0.5,
+                   const double _attenuationLinear = 0.01,
+                   const double _attenuationQuadratic = 0.001,
+                   const double _spotInnerAngle = 0,
+                   const double _spotOuterAngle = 0,
+                   const double _spotFallOff = 0,
+                   const bool _castShadows = true);
 
     /// \brief Spawn a cylinder
     /// \param[in] _name Name for the model.

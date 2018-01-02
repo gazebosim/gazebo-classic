@@ -20,6 +20,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/rendering/Conversions.hh"
@@ -59,16 +60,32 @@ namespace gazebo
       /// \brief Add a point to the point list
       /// \param[in] _pt ignition::math::Vector3d point
       /// \param[in] _color common::Color Point color
+      /// \deprecated See function that accepts ignition::math::Color
       public: void AddPoint(const ignition::math::Vector3d &_pt,
-            const common::Color &_color = common::Color::White);
+            const common::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Add a point to the point list
+      /// \param[in] _pt ignition::math::Vector3d point
+      /// \param[in] _color ignition::math::Color Point color
+      public: void AddPoint(const ignition::math::Vector3d &_pt,
+            const ignition::math::Color &_color = ignition::math::Color::White);
 
       /// \brief Add a point to the point list.
       /// \param[in] _x X position
       /// \param[in] _y Y position
       /// \param[in] _z Z position
       /// \param[in] _color common::Color Point color
+      /// \deprecated See function that accepts ignition::math::Color
       public: void AddPoint(double _x, double _y, double _z,
-            const common::Color &_color = common::Color::White);
+            const common::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Add a point to the point list.
+      /// \param[in] _x X position
+      /// \param[in] _y Y position
+      /// \param[in] _z Z position
+      /// \param[in] _color ignition::math::Color Point color
+      public: void AddPoint(const double _x, const double _y, const double _z,
+            const ignition::math::Color &_color = ignition::math::Color::White);
 
       /// \brief Change the location of an existing point in the point list
       /// \param[in] _index Index of the point to set
@@ -79,7 +96,16 @@ namespace gazebo
       /// \brief Change the color of an existing point in the point list
       /// \param[in] _index Index of the point to set
       /// \param[in] _color common::Color Pixelcolor color to set the point to
-      public: void SetColor(unsigned int _index, const common::Color &_color);
+      /// \deprecated See function that accepts ignition::math::Color
+      public: void SetColor(unsigned int _index, const common::Color &_color)
+            GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Change the color of an existing point in the point list
+      /// \param[in] _index Index of the point to set
+      /// \param[in] _color ignition::math::Color Pixelcolor color to set the
+      /// point to
+      public: void SetColor(const unsigned int _index,
+                            const ignition::math::Color &_color);
 
       /// \brief Return the location of an existing point in the point list
       /// \param[in] _index Number of the point to return

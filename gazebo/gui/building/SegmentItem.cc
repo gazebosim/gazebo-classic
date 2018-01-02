@@ -152,10 +152,10 @@ void SegmentItem::SetScale(const double _scale)
 }
 
 /////////////////////////////////////////////////
-void SegmentItem::SetColor(const common::Color &_color)
+void SegmentItem::SetColor(const ignition::math::Color &_color)
 {
   QPen segPen = this->pen();
-  segPen.setColor(Conversions::Convert(_color.Ign()));
+  segPen.setColor(Conversions::Convert(_color));
   this->setPen(segPen);
 }
 

@@ -47,7 +47,7 @@ RectItem::RectItem() : EditorItem(), dataPtr(new RectItemPrivate())
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
-  this->borderColor = common::Color::Black;
+  this->borderColor = ignition::math::Color::Black;
 
   for (int i = 0; i < 8; ++i)
   {
@@ -847,7 +847,7 @@ void RectItem::paint(QPainter *_painter, const QStyleOptionGraphicsItem *,
 
   QPen rectPen;
   rectPen.setStyle(Qt::SolidLine);
-  rectPen.setColor(Conversions::Convert(this->borderColor.Ign()));
+  rectPen.setColor(Conversions::Convert(this->borderColor));
   _painter->setPen(rectPen);
 
   _painter->drawLine(topLeft, topRight);

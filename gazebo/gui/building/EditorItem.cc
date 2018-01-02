@@ -68,7 +68,7 @@ std::string EditorItem::Name() const
 }
 
 /////////////////////////////////////////////////
-common::Color EditorItem::Color3d() const
+ignition::math::Color EditorItem::Color3d() const
 {
   return this->visual3dColor;
 }
@@ -86,14 +86,14 @@ void EditorItem::SetName(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void EditorItem::SetColor3d(const common::Color &_color)
+void EditorItem::SetColor3d(const ignition::math::Color &_color)
 {
   this->visual3dColor = _color;
   emit ColorChanged(this->visual3dColor);
 }
 
 /////////////////////////////////////////////////
-void EditorItem::OnColorChanged(const common::Color &_color)
+void EditorItem::OnColorChanged(const ignition::math::Color &_color)
 {
   this->visual3dColor = _color;
 }
