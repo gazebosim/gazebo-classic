@@ -391,7 +391,9 @@ void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
   gzwarn << "Gazebo topics of the form \"~/[modelName]/joint_cmd\" are "
       << "deprecated.\nUse ignition::transport topics of the form "
-      << "\"/[scopedModelName]/joint_cmd\" instead.\n";
+      << "\"/[scopedModelName]/joint_cmd\" instead. You will also need "
+      << "to use an ignition::transport::Node instead of a "
+      << "gazebo::transport::Node.\n";
 
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->dataPtr->joints.find(_msg->name());
