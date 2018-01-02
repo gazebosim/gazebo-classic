@@ -17,8 +17,6 @@
 #ifndef GAZEBO_PLUGINS_JOYPLUGIN_HH_
 #define GAZEBO_PLUGINS_JOYPLUGIN_HH_
 
-#include <ignition/transport/Node.hh>
-#include <gazebo/common/Events.hh>
 #include <gazebo/common/Plugin.hh>
 
 namespace gazebo
@@ -26,9 +24,8 @@ namespace gazebo
   class JoyPluginPrivate;
 
   /// \brief The JoyPlugin connects to a joystick or gamepad, and transmits
-  /// data from the joystick over a topic. The default topic is /joy, and
-  /// the message type is ignition.msgs.Joy. Ingition Transport is used
-  /// for communication.
+  /// data from the joystick over an Ignition Transport topic. The default
+  /// topic name is /joy, and the message type is ignition.msgs.Joy.
   ///
   /// Another plugin or application can listen to the joystick messages, and
   /// then take actions based on the data.

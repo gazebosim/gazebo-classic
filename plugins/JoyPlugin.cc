@@ -16,8 +16,9 @@
 */
 #include <linux/joystick.h>
 #include <fcntl.h>
-#include <thread>
 #include <sys/stat.h>
+#include <thread>
+#include <ignition/transport/Node.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "plugins/JoyPlugin.hh"
@@ -85,17 +86,22 @@ JoyPlugin::~JoyPlugin()
   if (this->dataPtr->runThread)
     this->dataPtr->runThread->join();
 
+  // Close the joystick
   close(this->dataPtr->joyFd);
+
+  delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
 void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
 {
+  // Get the name of the joystick device.
   std::string deviceFilename = _sdf->Get<std::string>("dev",
       "/dev/input/js0").first;
 
   bool opened = false;
-  this->dataPtr->joyFd == -1;
+  this->dataPtr->joyFd = -1;
 
   // Attempt to open the joystick
   for (int i = 0; i < 10 && !opened; ++i)
@@ -121,31 +127,36 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   // Stop if we couldn't open the joystick after N attempts
   if (this->dataPtr->joyFd == -1)
   {
-    gzerr << "Unable  to open joystick at " << deviceFilename
+    gzerr << "Unable to open joystick at " << deviceFilename
           << ". The joystick will not work.\n";
     return;
   }
 
   this->dataPtr->stickyButtons = _sdf->Get<bool>("sticky_buttons",
-                                        this->dataPtr->stickyButtons).first;
+      this->dataPtr->stickyButtons).first;
 
+  // Read the amount of dead zone for the analog joystick
   float deadzone = ignition::math::clamp(
       _sdf->Get<float>("dead_zone", 0.05f).first,
       0.0f, 0.9f);
 
+  // Read the rate at which data should be published
   float intervalRate = _sdf->Get<float>("rate", 0).first;
-  float accumulationRate = _sdf->Get<float>("accumulation_rate", 1000).first;
-
   if (intervalRate <= 0)
     this->dataPtr->interval = 1.0f;
   else
     this->dataPtr->interval = 1.0f / intervalRate;
 
+  // Read the rate at which joystick data should be accumulated into
+  // a message.
+  float accumulationRate = _sdf->Get<float>("accumulation_rate", 1000).first;
   if (accumulationRate <= 0)
     this->dataPtr->accumulationInterval = 0.0f;
   else
     this->dataPtr->accumulationInterval = 1.0f / accumulationRate;
 
+  // Check that we are not publishing faster than accumulating data. This is
+  // not a critical error, but doesn't make a whole lot of sense.
   if (this->dataPtr->interval < this->dataPtr->accumulationInterval)
   {
     gzwarn << "Interval rate of [" << 1.0 / this->dataPtr->interval

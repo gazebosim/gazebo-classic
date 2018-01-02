@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Added a joystick plugin that reads data from a joystick or gamepad.
+    * [Pull request #xxx](https://bitbucket.org/osrf/gazebo/pull-request/xxx)
+
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
