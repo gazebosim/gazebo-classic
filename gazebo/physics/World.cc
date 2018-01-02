@@ -341,6 +341,13 @@ void World::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+const sdf::ElementPtr World::SDF()
+{
+  this->UpdateStateSDF();
+  return this->dataPtr->sdf;
+}
+
+//////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
   this->UpdateStateSDF();

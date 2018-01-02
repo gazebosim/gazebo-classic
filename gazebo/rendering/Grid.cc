@@ -47,13 +47,13 @@ namespace gazebo
       public: ignition::math::Color color;
 
       /// \brief Height offset.
-      public: float heightOffset = 0.015;
+      public: float heightOffset = 0.015f;
 
       /// \brief Grid name.
       public: std::string name;
 
       /// \brief Number of cells in the normal direction.
-      public: uint32_t height = 0;
+      public: uint32_t height = 0u;
 
       /// \brief Pointer to the scene.
       public: Scene *scene = nullptr;

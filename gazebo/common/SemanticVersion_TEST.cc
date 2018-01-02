@@ -15,7 +15,6 @@
  *
 */
 
-#include <sys/time.h>
 #include <gtest/gtest.h>
 
 #include "gazebo/common/SemanticVersion.hh"

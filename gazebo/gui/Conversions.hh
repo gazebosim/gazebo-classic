@@ -42,14 +42,14 @@ namespace gazebo
     /// data types
     class GZ_GUI_VISIBLE Conversions
     {
-      /// \brief Return the equivalent qt color
+      /// \brief Return the equivalent Qt color
       /// \param[in] _color Gazebo color to convert
       /// \return Qt color value
       /// \deprecated See function that uses ignition::math::Color
       public: static QColor Convert(const common::Color &_color)
           GAZEBO_DEPRECATED(9.0);
 
-      /// \brief Return the equivalent qt color
+      /// \brief Return the equivalent Qt color
       /// \param[in] _color Gazebo color to convert
       /// \return Qt color value
       public: static QColor Convert(const ignition::math::Color &_color);
