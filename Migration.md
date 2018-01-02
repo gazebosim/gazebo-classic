@@ -193,6 +193,8 @@ release will remove the deprecated code.
 1. **gazebo/test/ServerFixture.hh**
     + ***Deprecation:*** SpawnLight function that accepts common::Color
     + ***Replacement:*** SpawnLight function that accepts ignition::math::Color
+1. **gazebo/common/Color.hh**
+    + gazebo::common::Color is deprecated, use ignition::math::Color instead.
 
 ## Gazebo 7.X to 8.X
 

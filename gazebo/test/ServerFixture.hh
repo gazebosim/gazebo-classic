@@ -598,11 +598,9 @@ namespace gazebo
     /// \deprecated See SpawnLight version with ignition::math::Color.
     protected: void SpawnLight(const std::string &_name,
                    const std::string &_type,
-                   const ignition::math::Vector3d &_pos =
-                   ignition::math::Vector3d::Zero,
-                   const ignition::math::Vector3d &_rpy =
-                   ignition::math::Vector3d::Zero,
-                   const common::Color &_diffuse = common::Color::White,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
+                   const common::Color &_diffuse,
                    const common::Color &_specular = common::Color::White,
                    const ignition::math::Vector3d &_direction =
                                                -ignition::math::Vector3d::UnitZ,
