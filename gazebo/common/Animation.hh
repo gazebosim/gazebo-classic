@@ -20,15 +20,8 @@
 #include <string>
 #include <vector>
 #include "gazebo/util/system.hh"
-
-namespace ignition
-{
-  namespace math
-  {
-    class Spline;
-    class RotationSpline;
-  }
-}
+#include "ignition/math/Spline.hh"
+#include "ignition/math/RotationSpline.hh"
 
 namespace gazebo
 {

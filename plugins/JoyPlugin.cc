@@ -25,19 +25,67 @@
 using namespace gazebo;
 GZ_REGISTER_WORLD_PLUGIN(JoyPlugin)
 
+// Private data for the JoyPlugin
+class gazebo::JoyPluginPrivate
+{
+  /// \brief Collect and publish joystick data.
+  public: void Run();
+
+  /// \brief Joystick device file descriptor
+  public: int joyFd = 0;
+
+  /// \brief Ingnition communication node pointer.
+  public: ignition::transport::Node node;
+
+  /// \brief Publisher pointer used to publish the messages.
+  public: ignition::transport::Node::Publisher pub;
+
+  /// \brief This non-sticky button joystick message.
+  public: ignition::msgs::Joy joyMsg;
+
+  /// \brief Previous joystick message, used to help computer the sticky
+  /// buttons.
+  public: ignition::msgs::Joy lastJoyMsg;
+
+  /// \brief Sticky button joystick message.
+  public: ignition::msgs::Joy stickyButtonsJoyMsg;
+
+  /// \brief The unscaled deadzone, based on the <dead_zone>.
+  public: float unscaledDeadzone = 0.0f;
+
+  /// \brief Axis scaling, which is based on the <dead_zone>.
+  public: float axisScale = 0.0f;
+
+  /// \brief True when the buttons should act like toggle buttons.
+  public: bool stickyButtons = false;
+
+  /// \brief True to stop the plugin.
+  public: bool stop = false;
+
+  /// \brief Thread in which to run the joystick aggregator and publisher.
+  public: std::thread *runThread = nullptr;
+
+  /// \brief Publication time interval
+  public: float interval = 1.0;
+
+  /// \brief Data accumulation time interval
+  public: float accumulationInterval = 0.001;
+};
+
 /////////////////////////////////////////////////
 JoyPlugin::JoyPlugin()
+  : dataPtr(new JoyPluginPrivate)
 {
 }
 
 /////////////////////////////////////////////////
 JoyPlugin::~JoyPlugin()
 {
-  this->stop = true;
-  if (this->runThread)
-    this->runThread->join();
+  this->dataPtr->stop = true;
+  if (this->dataPtr->runThread)
+    this->dataPtr->runThread->join();
 
-  close(this->joyFd);
+  close(this->dataPtr->joyFd);
 }
 
 /////////////////////////////////////////////////
@@ -47,18 +95,18 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
       "/dev/input/js0").first;
 
   bool opened = false;
-  this->joyFd == -1;
+  this->dataPtr->joyFd == -1;
 
   // Attempt to open the joystick
   for (int i = 0; i < 10 && !opened; ++i)
   {
-    this->joyFd = open(deviceFilename.c_str(), O_RDONLY);
+    this->dataPtr->joyFd = open(deviceFilename.c_str(), O_RDONLY);
 
-    if (joyFd != -1)
+    if (this->dataPtr->joyFd != -1)
     {
       // Close and open the device to get a better intitial state.
-      close(joyFd);
-      joyFd = open(deviceFilename.c_str(), O_RDONLY);
+      close(this->dataPtr->joyFd);
+      this->dataPtr->joyFd = open(deviceFilename.c_str(), O_RDONLY);
       opened = true;
     }
     else
@@ -71,15 +119,15 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   }
 
   // Stop if we couldn't open the joystick after N attempts
-  if (this->joyFd == -1)
+  if (this->dataPtr->joyFd == -1)
   {
     gzerr << "Unable  to open joystick at " << deviceFilename
           << ". The joystick will not work.\n";
     return;
   }
 
-  this->stickyButtons = _sdf->Get<bool>("sticky_buttons",
-                                        this->stickyButtons).first;
+  this->dataPtr->stickyButtons = _sdf->Get<bool>("sticky_buttons",
+                                        this->dataPtr->stickyButtons).first;
 
   float deadzone = ignition::math::clamp(
       _sdf->Get<float>("dead_zone", 0.05f).first,
@@ -89,35 +137,39 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   float accumulationRate = _sdf->Get<float>("accumulation_rate", 1000).first;
 
   if (intervalRate <= 0)
-    this->interval = 1.0f;
+    this->dataPtr->interval = 1.0f;
   else
-    this->interval = 1.0f / intervalRate;
+    this->dataPtr->interval = 1.0f / intervalRate;
 
   if (accumulationRate <= 0)
-    this->accumulationInterval = 0.0f;
+    this->dataPtr->accumulationInterval = 0.0f;
   else
-    this->accumulationInterval = 1.0f / accumulationRate;
+    this->dataPtr->accumulationInterval = 1.0f / accumulationRate;
 
-  if (this->interval > this->accumulationInterval)
+  if (this->dataPtr->interval < this->dataPtr->accumulationInterval)
   {
-    gzwarn << "Interval rate of [" << 1.0 / this->interval
+    gzwarn << "Interval rate of [" << 1.0 / this->dataPtr->interval
       << " Hz] is greater than the accumulation rate of ["
-      << 1.0 / this->accumulationInterval
+      << 1.0 / this->dataPtr->accumulationInterval
       << " Hz]. Timing behavior is ill defined.\n";
   }
 
-  this->unscaledDeadzone = 32767.0f * deadzone;
-  this->axisScale = -1.0f / (1.0f - deadzone) / 32767.0f;
+  this->dataPtr->unscaledDeadzone = 32767.0f * deadzone;
+  this->dataPtr->axisScale = -1.0f / (1.0f - deadzone) / 32767.0f;
+
+  std::string topic = _sdf->Get<std::string>("topic", "/joy").first;
 
   // Create the publisher of joy messages
-  this->pub = this->node.Advertise<ignition::msgs::Joy>("/joy");
+  this->dataPtr->pub =
+    this->dataPtr->node.Advertise<ignition::msgs::Joy>(topic);
 
   // Connect to the world update
-  this->runThread = new std::thread(std::bind(&JoyPlugin::Run, this));
+  this->dataPtr->runThread = new std::thread(
+      std::bind(&JoyPluginPrivate::Run, this->dataPtr));
 }
 
 /////////////////////////////////////////////////
-void JoyPlugin::Run()
+void JoyPluginPrivate::Run()
 {
   fd_set set;
   struct timeval tv;
@@ -162,14 +214,13 @@ void JoyPlugin::Run()
       joyMsg.mutable_header()->mutable_stamp()->set_nsec(time.nsec);
 
       float value = event.value;
-      switch(event.type)
+      switch (event.type)
       {
         case JS_EVENT_BUTTON:
         case JS_EVENT_BUTTON | JS_EVENT_INIT:
           {
-            std::cerr << "Button Event\n";
             // Update number of buttons
-            if(event.number >= this->joyMsg.buttons_size())
+            if (event.number >= this->joyMsg.buttons_size())
             {
               this->joyMsg.mutable_buttons()->Resize(event.number+1, 0.0f);
               this->lastJoyMsg.mutable_buttons()->Resize(event.number+1, 0.0f);
@@ -236,8 +287,7 @@ void JoyPlugin::Run()
         for (int i = 0; i < this->joyMsg.buttons_size(); ++i)
         {
           // change button state only on transition from 0 to 1
-          if (this->joyMsg.buttons(i) == 1 &&
-              this->lastJoyMsg.buttons(i) == 0)
+          if (this->joyMsg.buttons(i) == 1 && this->lastJoyMsg.buttons(i) == 0)
           {
             this->stickyButtonsJoyMsg.set_buttons(i,
               this->stickyButtonsJoyMsg.buttons(i) ? 0 : 1);

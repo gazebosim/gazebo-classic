@@ -23,6 +23,64 @@
 
 namespace gazebo
 {
+  class JoyPluginPrivate;
+
+  /// \brief The JoyPlugin connects to a joystick or gamepad, and transmits
+  /// data from the joystick over a topic. The default topic is /joy, and
+  /// the message type is ignition.msgs.Joy. Ingition Transport is used
+  /// for communication.
+  ///
+  /// Another plugin or application can listen to the joystick messages, and
+  /// then take actions based on the data.
+  ///
+  /// # Example
+  ///
+  /// 1. Connect a joystick to the computer.
+  ///
+  /// 2. Run the Gazebo demo: gazebo worlds/joy_demo.world
+  ///
+  /// 3. Echo the joy data to a terminal: ign topic -e -t /joy
+  ///
+  /// # Usage
+  ///
+  /// The plugin is loaded via a world plugin. In SDF this looks like:
+  ///
+  /// \code
+  /// <plugin name="joy" filename="libJoyPlugin.so">
+  ///    <sticky_buttons>false</sticky_buttons>
+  ///    <dead_zone>0.05</dead_zone>
+  ///    <rate>60</rate>
+  ///    <accumulation_rate>1000</accumulation_rate>
+  ///  </plugin>
+  /// \endcode
+  ///
+  ///
+  /// See worlds/joy_demo.world for an example.
+  ///
+  /// # Configuration
+  ///
+  /// Options that can be specified in the plugin include:
+  ///
+  /// 1. <dev>(string): Name of the joystick device. The default value is
+  /// /dev/input/js0.
+  ///
+  /// 2. <topic>(string): Name of the topic on which to publish joy
+  /// messages. The default is /joy.
+  ///
+  /// 3. <sticky_buttons>(true/false): When true the buttons values change
+  /// state only on a transition from 0 to 1. This makes the button act like
+  /// toggle buttons. False is the default
+  ///
+  /// 4. <dead_zone>(float between 0 and 0.9): A larger number increases the
+  /// distance the joystick has to move before registering a value. The
+  /// default is 0.05;
+  ///
+  /// 5. <rate>(float): The rate at which joystick messages are published,
+  /// in Hz.
+  ///
+  /// 6. <accumulation_rate>(float): The rate at which data is collected
+  /// from the joystick device.
+  ///
   class GAZEBO_VISIBLE JoyPlugin : public WorldPlugin
   {
     /// \brief Constructor.
@@ -34,33 +92,8 @@ namespace gazebo
     // Documentation Inherited.
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
 
-    /// \brief Collect and publish joystick data.
-    private: void Run();
-
-    /// \brief Joystick device file descriptor
-    private: int joyFd;
-
-    /// \brief Ingnition communication node pointer.
-    private: ignition::transport::Node node;
-
-    /// \brief Publisher pointer used to publish the messages.
-    private: ignition::transport::Node::Publisher pub;
-
-    // Pointer to the update event connection
-    private: event::ConnectionPtr updateConnection;
-
-    private: ignition::msgs::Joy joyMsg;
-    private: ignition::msgs::Joy lastJoyMsg;
-    private: ignition::msgs::Joy stickyButtonsJoyMsg;
-    private: float unscaledDeadzone;
-    private: float axisScale;
-    private: bool stickyButtons = false;
-
-    private: bool stop = false;
-    private: std::thread *runThread = nullptr;
-
-    private: float interval = 1.0;
-    private: float accumulationInterval = 0.001;
+    /// \brief Private data pointer.
+    private: JoyPluginPrivate *dataPtr = nullptr;
   };
 }
 #endif

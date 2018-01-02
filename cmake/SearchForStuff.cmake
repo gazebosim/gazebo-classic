@@ -744,27 +744,21 @@ endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math3 QUIET)
-if (NOT ignition-math3_FOUND)
-  message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  find_package(ignition-math4 QUIET)
-  if (NOT ignition-math4_FOUND)
+find_package(ignition-math4 QUIET)
+if (NOT ignition-math4_FOUND)
     message(STATUS "Looking for ignition-math4-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev or libignition-math4-dev)")
-  else()
-    message(STATUS "Looking for ignition-math4-config.cmake - found")
-  endif()
+    BUILD_ERROR ("Missing: Ignition math (libignition-math4-dev)")
 else()
-  message(STATUS "Looking for ignition-math3-config.cmake - found")
+  message(STATUS "Looking for ignition-math4-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport3 QUIET)
-if (NOT ignition-transport3_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport3-dev)")
+find_package(ignition-transport4 QUIET)
+if (NOT ignition-transport4_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport4-dev)")
 else()
-  message(STATUS "Looking for ignition-transport3-config.cmake - found")
+  message(STATUS "Looking for ignition-transport4-config.cmake - found")
 
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
