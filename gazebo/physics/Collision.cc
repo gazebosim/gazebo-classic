@@ -74,8 +74,6 @@ Collision::Collision(LinkPtr _link)
   this->sdf->Copy(g_SDFInit.collisionSDF);
 
   this->collisionVisualId = physics::getUniqueId();
-
-  this->laserRetro = 0.0;
 }
 
 //////////////////////////////////////////////////
