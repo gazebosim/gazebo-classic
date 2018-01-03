@@ -141,7 +141,7 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
       0.0f, 0.9f);
 
   // Read the rate at which data should be published
-  float intervalRate = _sdf->Get<float>("rate", 0).first;
+  float intervalRate = _sdf->Get<float>("rate", 1.0f).first;
   if (intervalRate <= 0)
     this->dataPtr->interval = 1.0f;
   else

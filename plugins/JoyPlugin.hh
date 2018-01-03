@@ -76,10 +76,10 @@ namespace gazebo
   /// default is 0.05;
   ///
   /// 5. <rate>(float): The rate at which joystick messages are published,
-  /// in Hz. The default value is 0.
+  /// in Hz. The default value is 1Hz.
   ///
   /// 6. <accumulation_rate>(float): The rate at which data is collected
-  /// from the joystick device. The default value is 1000.
+  /// from the joystick device. The default value is 1000Hz.
   ///
   class GAZEBO_VISIBLE JoyPlugin : public WorldPlugin
   {
