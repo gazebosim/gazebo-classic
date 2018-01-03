@@ -99,19 +99,7 @@ void Light::OnPoseChange()
 {
 }
 
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 /////////////////////////////////////////////////
-const math::Pose Light::GetWorldPose() const
-{
-  return this->WorldPose();
-}
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-
 const ignition::math::Pose3d &Light::WorldPose() const
 {
   // TODO add and use worldPoseDirty member variable
@@ -131,7 +119,7 @@ const ignition::math::Pose3d &Light::WorldPose() const
 /////////////////////////////////////////////////
 void Light::SetWorldPoseDirty()
 {
-  // Tell the light object that the next call to ::GetWorldPose should
+  // Tell the light object that the next call to ::WorldPose should
   // compute a new worldPose value.
 
   // TODO add and use worldPoseDirty member variable
