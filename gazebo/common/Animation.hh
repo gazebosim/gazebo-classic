@@ -19,9 +19,9 @@
 
 #include <string>
 #include <vector>
+#include <ignition/math/Spline.hh>
+#include <ignition/math/RotationSpline.hh>
 #include "gazebo/util/system.hh"
-#include "ignition/math/Spline.hh"
-#include "ignition/math/RotationSpline.hh"
 
 namespace gazebo
 {

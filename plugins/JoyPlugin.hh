@@ -38,6 +38,9 @@ namespace gazebo
   ///
   /// 3. Echo the joy data to a terminal: ign topic -e -t /joy
   ///
+  ///    Note: You will need
+  /// [ign-tools](https://bitbucket.org/ignitionrobotics/ign-tools)
+  ///
   /// # Usage
   ///
   /// The plugin is loaded via a world plugin. In SDF this looks like:
@@ -87,7 +90,7 @@ namespace gazebo
     public: virtual ~JoyPlugin();
 
     // Documentation Inherited.
-    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf) override;
 
     /// \brief Private data pointer.
     private: JoyPluginPrivate *dataPtr = nullptr;
