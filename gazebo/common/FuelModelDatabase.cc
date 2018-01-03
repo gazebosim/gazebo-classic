@@ -50,13 +50,8 @@ class gazebo::common::FuelModelDatabasePrivate
 FuelModelDatabase::FuelModelDatabase()
   : dataPtr(new FuelModelDatabasePrivate)
 {
-  // ToDo: Remove this block when Ignition Fuel Tools supports parsing
-  // a configuration file.
-  ignition::fuel_tools::ServerConfig srv;
-  srv.URL("https://staging-api.ignitionfuel.org");
   ignition::fuel_tools::ClientConfig conf;
-  conf.AddServer(srv);
-
+  conf.LoadConfig();
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
 }
 
