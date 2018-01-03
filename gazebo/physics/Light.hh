@@ -59,6 +59,17 @@ namespace gazebo
 
       /// \brief Light message container.
       private: msgs::Light msg;
+
+      /// \brief Indicate that the world pose should be recalculated.
+      /// The recalculation will be done when Light::GetWorldPose is
+      /// called.
+      public: void SetWorldPoseDirty();
+
+      // Documentation inherited.
+      public: virtual const math::Pose GetWorldPose() const;
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
     };
     /// \}
   }
