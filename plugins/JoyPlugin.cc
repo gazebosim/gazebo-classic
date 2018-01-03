@@ -249,10 +249,7 @@ void JoyPluginPrivate::Run()
 
             // For initial events, wait a bit before sending to try to catch
             // all the initial events.
-            if (!(event.type & JS_EVENT_INIT))
-              accumulate = true;
-            else
-              accumulate = false;
+            accumulate = !(event.type & JS_EVENT_INIT);
             break;
           }
         case JS_EVENT_AXIS:
