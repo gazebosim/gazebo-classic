@@ -35,10 +35,10 @@ class gazebo::JoyPluginPrivate
   /// \brief Joystick device file descriptor
   public: int joyFd = 0;
 
-  /// \brief Ingnition communication node pointer.
+  /// \brief Ignition communication node.
   public: ignition::transport::Node node;
 
-  /// \brief Publisher pointer used to publish the messages.
+  /// \brief Publisher used to publish the messages.
   public: ignition::transport::Node::Publisher pub;
 
   /// \brief This non-sticky button joystick message.
@@ -67,10 +67,10 @@ class gazebo::JoyPluginPrivate
   public: std::thread *runThread = nullptr;
 
   /// \brief Publication time interval
-  public: float interval = 1.0;
+  public: float interval = 1.0f;
 
   /// \brief Data accumulation time interval
-  public: float accumulationInterval = 0.001;
+  public: float accumulationInterval = 0.001f;
 };
 
 /////////////////////////////////////////////////
@@ -110,15 +110,15 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
 
     if (this->dataPtr->joyFd != -1)
     {
-      // Close and open the device to get a better intitial state.
+      // Close and open the device to get a better initial state.
       close(this->dataPtr->joyFd);
       this->dataPtr->joyFd = open(deviceFilename.c_str(), O_RDONLY);
       opened = true;
     }
     else
     {
-      gzdbg << "Unable  to open joystick at " << deviceFilename
-        << "Attemping again in 1 second\n";
+      gzdbg << "Unable to open joystick at [" << deviceFilename
+        << "] Attemping again in 1 second\n";
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -127,8 +127,8 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   // Stop if we couldn't open the joystick after N attempts
   if (this->dataPtr->joyFd == -1)
   {
-    gzerr << "Unable to open joystick at " << deviceFilename
-          << ". The joystick will not work.\n";
+    gzerr << "Unable to open joystick at [" << deviceFilename
+          << "]. The joystick will not work.\n";
     return;
   }
 
