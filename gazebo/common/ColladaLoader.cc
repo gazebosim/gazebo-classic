@@ -295,7 +295,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
       // translate *= this->dataPtr->meter;
-      transform.Translate(translate);
+      transform.SetTranslation(translate);
     }
 
     TiXmlElement *rotateXml = _elem->FirstChildElement("rotate");
@@ -728,7 +728,7 @@ void ColladaLoader::SetSkeletonNodeTransform(TiXmlElement *_elem,
       ignition::math::Vector3d translate;
       translate = boost::lexical_cast<ignition::math::Vector3d>(transStr);
       // translate *= this->dataPtr->meter;
-      transform.Translate(translate);
+      transform.SetTranslation(translate);
 
       NodeTransform nt(transform);
       if (_elem->FirstChildElement("translate")->Attribute("sid"))
@@ -997,7 +997,7 @@ void ColladaLoader::LoadNormals(const std::string &_id,
   }
 
   ignition::math::Matrix4d rotMat = _transform;
-  rotMat.Translate(ignition::math::Vector3d::Zero);
+  rotMat.SetTranslation(ignition::math::Vector3d::Zero);
 
   TiXmlElement *normalsXml = this->GetElementId("source", _id);
   if (!normalsXml)
