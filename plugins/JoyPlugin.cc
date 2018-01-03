@@ -174,7 +174,7 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   this->dataPtr->pub =
     this->dataPtr->node.Advertise<ignition::msgs::Joy>(topic);
 
-  // Connect to the world update
+  // Create thread in which to run the joystick aggregator and publisher
   this->dataPtr->runThread = new std::thread(
       std::bind(&JoyPluginPrivate::Run, this->dataPtr));
 }
