@@ -35,10 +35,10 @@ class gazebo::JoyPluginPrivate
   /// \brief Joystick device file descriptor
   public: int joyFd = 0;
 
-  /// \brief Ingnition communication node pointer.
+  /// \brief Ignition communication node.
   public: ignition::transport::Node node;
 
-  /// \brief Publisher pointer used to publish the messages.
+  /// \brief Publisher used to publish the messages.
   public: ignition::transport::Node::Publisher pub;
 
   /// \brief This non-sticky button joystick message.
@@ -67,10 +67,10 @@ class gazebo::JoyPluginPrivate
   public: std::thread *runThread = nullptr;
 
   /// \brief Publication time interval
-  public: float interval = 1.0;
+  public: float interval = 1.0f;
 
   /// \brief Data accumulation time interval
-  public: float accumulationInterval = 0.001;
+  public: float accumulationInterval = 0.001f;
 };
 
 /////////////////////////////////////////////////
