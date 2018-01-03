@@ -159,7 +159,7 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
   // not a critical error, but doesn't make a whole lot of sense.
   if (this->dataPtr->interval < this->dataPtr->accumulationInterval)
   {
-    gzwarn << "Interval rate of [" << 1.0 / this->dataPtr->interval
+    gzwarn << "The publication rate of [" << 1.0 / this->dataPtr->interval
       << " Hz] is greater than the accumulation rate of ["
       << 1.0 / this->dataPtr->accumulationInterval
       << " Hz]. Timing behavior is ill defined.\n";
