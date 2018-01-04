@@ -70,7 +70,7 @@ void SpeedTest::BallTest(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.02);
 #else
   EXPECT_GT(speedRatio, 0.01);
@@ -109,7 +109,7 @@ void SpeedTest::ShapesWorld(const std::string &_physicsEngine)
   std::cout << "Speed: Empty[" << emptySpeed << "] Loaded["
             << loadedSpeed << "] Ratio[" << speedRatio << "]\n";
 
-#ifdef BUILD_TYPE_RELEASE
+#ifdef GAZEBO_BUILD_TYPE_RELEASE
   EXPECT_GT(speedRatio, 0.08);
 #else
   EXPECT_GT(speedRatio, 0.01);

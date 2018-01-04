@@ -12,10 +12,10 @@
 
 #define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION_FULL}\nCopyright (C) 2012 Open Source Robotics Foundation.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
 
-#cmakedefine BUILD_TYPE_PROFILE 1
-#cmakedefine BUILD_TYPE_DEBUG 1
-#cmakedefine BUILD_TYPE_RELEASE 1
-#cmakedefine BUILD_TYPE_COVERAGE 1
+#cmakedefine GAZEBO_BUILD_TYPE_PROFILE 1
+#cmakedefine GAZEBO_BUILD_TYPE_DEBUG 1
+#cmakedefine GAZEBO_BUILD_TYPE_RELEASE 1
+#cmakedefine GAZEBO_BUILD_TYPE_COVERAGE 1
 #cmakedefine HAVE_OPENAL 1
 #cmakedefine HAVE_FFMPEG 1
 #cmakedefine HAVE_AVDEVICE 1
@@ -37,7 +37,7 @@
 #cmakedefine HAVE_OSVR 1
 #cmakedefine HAVE_IGNITION_FUEL_TOOLS 1
 
-#ifdef BUILD_TYPE_PROFILE
+#ifdef GAZEBO_BUILD_TYPE_PROFILE
 #include <gperftools/heap-checker.h>
 #endif
 
