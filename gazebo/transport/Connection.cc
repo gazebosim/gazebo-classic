@@ -303,7 +303,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+  char headerBufferLocal[HEADER_LENGTH + 1];
+  snprintf(headerBufferLocal, HEADER_LENGTH + 1, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {
@@ -312,9 +313,9 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
         (this->writeQueue.back().size()+_buffer.size() > 4096))
-      this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->writeQueue.push_back(std::string(headerBufferLocal) + _buffer);
     else
-      this->writeQueue.back() += std::string(headerBuffer) + _buffer;
+      this->writeQueue.back() += std::string(headerBufferLocal) + _buffer;
     this->callbacks.push_back(std::make_pair(_cb, _id));
   }
 
