@@ -94,7 +94,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Scene.hh**
     + ***Deprecation:*** void SetAmbientColor(const common::Color &_color)
     + ***Replacement:*** void SetAmbientColor(const ignition::math::Color &_color)
-    + ***Deprecation:*** SetBackgroundColor(const common::Color &_color)
+    + ***Deprecation:*** void SetBackgroundColor(const common::Color &_color)
     + ***Replacement:*** void SetBackgroundColor(const ignition::math::Color &_color)
     + ***Deprecation:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
     + ***Replacement:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)

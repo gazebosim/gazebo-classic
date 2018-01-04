@@ -459,9 +459,6 @@ namespace gazebo
       /// \brief Comma separated list of valid IP addresses.
       private: std::string ipWhiteList;
 
-      /// \brief Buffer for header information.
-      private: char *headerBuffer;
-
       /// \brief Used to prevent too many log messages.
       private: bool dropMsgLogged;
 
