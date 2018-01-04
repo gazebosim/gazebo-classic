@@ -150,6 +150,10 @@ release will remove the deprecated code.
     + ***Replacement:*** float Baseline() const
     + ***Deprecation:*** bool GetShowOnTop() const
     + ***Replacement:*** bool ShowOnTop() const
+    + ***Deprecation:*** void _setupGeometry()
+    + ***Replacement:*** void SetupGeometry()
+    + ***Deprecation:*** void _updateColors()
+    + ***Replacement:*** void UpdateColors()
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
 1. **gazebo/msgs/msgs.hh**

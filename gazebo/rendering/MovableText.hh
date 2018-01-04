@@ -227,13 +227,19 @@ namespace gazebo
       public: virtual void visitRenderables(Ogre::Renderable::Visitor *_visitor,
           bool _debug = false) override;
 
-      /// \internal
-      /// \brief setup the geometry.
-      protected: void _setupGeometry();
+      /// \brief Setup the geometry.
+      /// \deprecated Use SetupGeometry instead
+      protected: void _setupGeometry() GAZEBO_DEPRECATED(9.0);
 
-      /// \internal
-      /// \brief update the color.
-      protected: void _updateColors();
+      /// \brief Setup the geometry.
+      protected: void SetupGeometry();
+
+      /// \brief Update colors.
+      /// \deprecated Use UpdateColors instead
+      protected: void _updateColors() GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Update colors.
+      protected: void UpdateColors();
 
       /// \internal
       /// \brief Get the world transform (from MovableObject)
@@ -249,21 +255,6 @@ namespace gazebo
           override;
 
       /// \internal
-      private: const Ogre::Quaternion &getWorldOrientation() const;
-      /// \internal
-      private: const Ogre::Vector3 &getWorldPosition() const;
-      /// \internal
-      private: const Ogre::AxisAlignedBox &getBoundingBox() const override;
-      /// \internal
-      private: const Ogre::String &getMovableType() const override;
-
-      /// \internal
-      private: void _notifyCurrentCamera(Ogre::Camera *_cam) override;
-
-      /// \internal
-      private: void _updateRenderQueue(Ogre::RenderQueue *_queue) override;
-
-      /// \internal
       /// \brief Get the render operation
       protected: void getRenderOperation(Ogre::RenderOperation &_op) override;
 
@@ -275,6 +266,18 @@ namespace gazebo
       /// \brief Get the lights
       /// \deprecated Function has never returned meaningful values
       protected: const Ogre::LightList &getLights() const override;
+
+      /// \internal
+      private: const Ogre::AxisAlignedBox &getBoundingBox() const override;
+
+      /// \internal
+      private: const Ogre::String &getMovableType() const override;
+
+      /// \internal
+      private: void _notifyCurrentCamera(Ogre::Camera *_cam) override;
+
+      /// \internal
+      private: void _updateRenderQueue(Ogre::RenderQueue *_queue) override;
 
       /// \internal
       /// \brief Private data pointer

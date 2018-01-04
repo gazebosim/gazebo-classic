@@ -170,7 +170,7 @@ void MovableText::Load(const std::string &_name,
 
   this->SetFontName(this->dataPtr->fontName);
 
-  this->_setupGeometry();
+  this->SetupGeometry();
 }
 
 //////////////////////////////////////////////////
@@ -178,7 +178,7 @@ void MovableText::Update()
 {
   if (this->dataPtr->dirty)
   {
-    this->_setupGeometry();
+    this->SetupGeometry();
     this->dataPtr->dirty = false;
   }
 }
@@ -438,6 +438,12 @@ ignition::math::Box MovableText::AABB()
 
 //////////////////////////////////////////////////
 void MovableText::_setupGeometry()
+{
+  this->SetupGeometry();
+}
+
+//////////////////////////////////////////////////
+void MovableText::SetupGeometry()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
@@ -762,13 +768,19 @@ void MovableText::_setupGeometry()
   this->dataPtr->radius = Ogre::Math::Sqrt(maxSquaredRadius);
 
   if (this->dataPtr->updateColors)
-    this->_updateColors();
+    this->UpdateColors();
 
   this->dataPtr->needUpdate = false;
 }
 
 //////////////////////////////////////////////////
-void MovableText::_updateColors(void)
+void MovableText::_updateColors()
+{
+  this->UpdateColors();
+}
+
+//////////////////////////////////////////////////
+void MovableText::UpdateColors()
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
 
@@ -798,24 +810,6 @@ void MovableText::_updateColors(void)
 
   vbuf->unlock();
   this->dataPtr->updateColors = false;
-}
-
-//////////////////////////////////////////////////
-const Ogre::Quaternion & MovableText::getWorldOrientation(void) const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  GZ_ASSERT(this->dataPtr->camera, "camera class member is null");
-  return const_cast<Ogre::Quaternion &>(
-      this->dataPtr->camera->getDerivedOrientation());
-  // return mParentNode->_getDerivedOrientation();
-}
-
-//////////////////////////////////////////////////
-const Ogre::Vector3 & MovableText::getWorldPosition(void) const
-{
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
-  GZ_ASSERT(mParentNode, "mParentNode class member is null");
-  return mParentNode->_getDerivedPosition();
 }
 
 //////////////////////////////////////////////////
@@ -882,9 +876,9 @@ void MovableText::getRenderOperation(Ogre::RenderOperation & op)
   if (this->isVisible())
   {
     if (this->dataPtr->needUpdate)
-      this->_setupGeometry();
+      this->SetupGeometry();
     if (this->dataPtr->updateColors)
-      this->_updateColors();
+      this->UpdateColors();
     op = this->dataPtr->renderOp;
   }
 }
@@ -919,10 +913,10 @@ void MovableText::_updateRenderQueue(Ogre::RenderQueue* queue)
   if (this->isVisible())
   {
     if (this->dataPtr->needUpdate)
-      this->_setupGeometry();
+      this->SetupGeometry();
 
     if (this->dataPtr->updateColors)
-      this->_updateColors();
+      this->UpdateColors();
 
     queue->addRenderable(this, mRenderQueueID,
                          OGRE_RENDERABLE_DEFAULT_PRIORITY);
