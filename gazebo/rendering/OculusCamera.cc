@@ -469,7 +469,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor().Ign()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
@@ -483,7 +483,7 @@ void OculusCamera::SetRenderTarget(Ogre::RenderTarget *_target)
   rt->getViewport(0)->setShadowsEnabled(true);
   rt->getViewport(0)->setOverlaysEnabled(false);
   rt->getViewport(0)->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor().Ign()));
+        Conversions::Convert(this->scene->BackgroundColor()));
   rt->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   RTShaderSystem::AttachViewport(rt->getViewport(0), this->GetScene());
