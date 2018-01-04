@@ -72,5 +72,13 @@ target_link_libraries(gazebo_util
   ${tinyxml2_LIBRARIES}
 )
 
+# define if tinxml2 major version >= 6
+# https://bitbucket.org/ignitionrobotics/ign-common/issues/28
+if (NOT tinyxml2_VERSION VERSION_LESS "6.0.0")
+  message(STATUS "tinyxml2_VERSION ${tinyxml2_VERSION} >= 6.0.0")
+  target_compile_definitions(gazebo_util
+    PRIVATE "TINYXML2_MAJOR_VERSION_GE_6")
+endif()
+
 gz_install_library(gazebo_util)
 gz_install_includes("util" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/util.hh)
