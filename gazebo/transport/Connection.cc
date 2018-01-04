@@ -86,6 +86,7 @@ Connection::Connection()
 {
   this->isOpen = false;
   this->dropMsgLogged = false;
+  this->headerBuffer = new char[HEADER_LENGTH+1];
 
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -121,6 +122,9 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
+  delete [] this->headerBuffer;
+  this->headerBuffer = NULL;
+
   this->Shutdown();
 
   if (iomanager)
