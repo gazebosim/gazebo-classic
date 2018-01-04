@@ -5,6 +5,9 @@
 1. Add Static Map Plugin for creating textured map model
     * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
 
+1. Move Connection header buffer from heap to stack to avoid race condition.
+    * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
+
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
 
