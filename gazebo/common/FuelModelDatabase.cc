@@ -183,22 +183,14 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::ModelPath(const std::string &_uri,
-    bool _forceDownload)
+    bool /*_forceDownload*/)
 {
   std::string path;
 
-  if (!_forceDownload)
-    path = SystemPaths::Instance()->FindFileURI(_uri);
-
-  struct stat st;
-  if (path.empty() || stat(path.c_str(), &st) != 0 )
+  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
   {
-    // Try to download the model.
-    if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
-    {
-      gzerr << "Unable to download model[" << _uri << "]" << std::endl;
-      return std::string();
-    }
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+    return std::string();
   }
 
   return path;
