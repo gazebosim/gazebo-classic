@@ -69,14 +69,28 @@ const Ogre::String &DynamicLines::getMovableType() const
 void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
                             const common::Color &_color)
 {
+  this->AddPoint(_pt, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
+                            const ignition::math::Color &_color)
+{
   this->points.push_back(_pt);
-  this->dataPtr->colors.push_back(_color.Ign());
+  this->dataPtr->colors.push_back(_color);
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(double _x, double _y, double _z,
                             const common::Color &_color)
+{
+  this->AddPoint(_x, _y, _z, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(const double _x, const double _y, const double _z,
+                            const ignition::math::Color &_color)
 {
   this->AddPoint(ignition::math::Vector3d(_x, _y, _z), _color);
 }
@@ -100,7 +114,14 @@ void DynamicLines::SetPoint(const unsigned int _index,
 /////////////////////////////////////////////////
 void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 {
-  this->dataPtr->colors[_index] = _color.Ign();
+  this->SetColor(_index, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::SetColor(const unsigned int _index,
+                            const ignition::math::Color &_color)
+{
+  this->dataPtr->colors[_index] = _color;
   this->dirty = true;
 }
 
