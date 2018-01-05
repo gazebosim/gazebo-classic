@@ -12,6 +12,9 @@
 
 #define GAZEBO_VERSION_HEADER "Gazebo multi-robot simulator, version ${GAZEBO_VERSION_FULL}\nCopyright (C) 2012 Open Source Robotics Foundation.\nReleased under the Apache 2 License.\nhttp://gazebosim.org\n\n"
 
+// Warning: the GAZEBO_BUILD_TYPE_* macros are unreliable.
+// They can change each time you install a new version of gazebo.
+// They should not be used and will be removed in the future.
 #cmakedefine GAZEBO_BUILD_TYPE_PROFILE 1
 #cmakedefine GAZEBO_BUILD_TYPE_DEBUG 1
 #cmakedefine GAZEBO_BUILD_TYPE_RELEASE 1
