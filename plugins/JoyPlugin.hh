@@ -81,6 +81,11 @@ namespace gazebo
   /// 6. <accumulation_rate>(float): The rate at which data is collected
   /// from the joystick device. The default value is 1000Hz.
   ///
+  /// # Troubleshooting
+  ///
+  /// 1. Playstation joysticks may require a press of the center "Ps" button
+  /// before they work.
+  ///
   class GAZEBO_VISIBLE JoyPlugin : public WorldPlugin
   {
     /// \brief Constructor.
