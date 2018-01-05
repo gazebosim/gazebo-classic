@@ -38,6 +38,11 @@ release will remove the deprecated code.
     + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 1. **gazebo/gui/ConfigWidget.hh**
     + ColorValueChanged signal now uses ignition::math::Color instead of gazebo::common::Color
+1. **gazebo/common/Material.hh**
+    + Changed `protected: Color ambient;` to `protected: ignition::math::Color ambient;`
+    + Changed `protected: Color diffuse;` to `protected: ignition::math::Color diffuse;`
+    + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
+    + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
 1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
 
 ### Deprecations
@@ -113,6 +118,20 @@ release will remove the deprecated code.
     + ***Deprecation:*** float LineWidth() const
     + ***Replacement:*** None, grid lines are always 1px wide.
     + common::Color Color() const now returns ignition::math::Color
+1. **gazebo/rendering/Light.hh**
+    + ***Deprecation:*** void SetDiffuseColor(const common::Color &_color)
+    + ***Replacement:*** void SetDiffuseColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** void SetSpecularColor(const common::Color &_color)
+    + ***Replacement:*** void SetSpecularColor(const ignition::math::Color &_color)
+    + common::Color DiffuseColor() const now returns ignition::math::Color DiffuseColor() const
+    + common::Color SpecularColor() const now returns ignition::math::Color SpecularColor() const
+1. **gazebo/rendering/DynamicLines.hh**
+    + ***Deprecation:*** void AddPoint(const ignition::math::Vector3d &_pt, const common::Color &_color)
+    + ***Replacement:*** void AddPoint(const ignition::math::Vector3d &_pt, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** void AddPoint(double _x, double _y, double _z, const common::Color &_color)
+    + ***Replacement:*** void AddPoint(const double _x, const double _y, const double _z, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** void SetColor(unsigned int _index, const common::Color &_color)
+    + ***Replacement:*** void SetColor(const unsigned int _index, const ignition::math::Color &_color)
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
 1. **gazebo/msgs/msgs.hh**
@@ -131,6 +150,28 @@ release will remove the deprecated code.
     + ***Deprecation:*** bool SetColorWidgetValue(const std::string &_name, const common::Color &_value)
     + ***Replacement:*** bool SetColorWidgetValue(const std::string &_name, const ignition::math::Color &_value)
     + common::Color ColorWidgetValue(const std::string &_name) const now returns ignition::math::Color
+1. **gazebo/common/Material.hh**
+    + ***Deprecation:*** explicit Material(const Color &_clr)
+    + ***Replacement:*** explicit Material(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetAmbient(const Color &_clr)
+    + ***Replacement:*** void SetAmbient(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetDiffuse(const Color &_clr)
+    + ***Replacement:*** void SetDiffuse(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetSpecular(const Color &_clr)
+    + ***Replacement:*** void SetSpecular(const ignition::math::Color &_clr)
+    + ***Deprecation:*** void SetEmissive(const Color &_clr)
+    + ***Replacement:*** void SetEmissive(const ignition::math::Color &_clr)
+    + Color GetAmbient() const now returns ignition::math::Color
+    + Color GetDiffuse() const now returns ignition::math::Color
+    + Color GetSpecular() const now returns ignition::math::Color
+    + Color GetEmissive() const now returns ignition::math::Color
+1. **gazebo/common/Image.hh**
+    + ***Deprecation:*** Color GetPixel(unsigned int _x, unsigned int _y) const
+    + ***Replacement:*** ignition::math::Color Pixel(unsigned int _x, unsigned int _y) const
+    + ***Deprecation:*** Color GetAvgColor()
+    + ***Replacement:*** ignition::math::Color AvgColor()
+    + ***Deprecation:*** Color GetMaxColor() const
+    + ***Replacement:*** ignition::math::Color MaxColor() const
 
 ## Gazebo 7.X to 8.X
 
@@ -1257,6 +1298,14 @@ release will remove the deprecated code.
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
@@ -1276,7 +1325,7 @@ release will remove the deprecated code.
    See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
    for further details.
 
-## Gazebo 7.3.1 to 7.4
+## Gazebo 7.3.1 to 7.X
 
 ### Deprecations
 

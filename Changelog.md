@@ -16,6 +16,7 @@
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
     * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
+    * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
 
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
@@ -69,6 +70,13 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Shadow improvements
+    * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
+
+1. Add light as child of link
+    * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
@@ -555,6 +563,13 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2017-xx-xx)
+
+1. Shadow improvements
+    * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
+
+1. Add light as child of link
+    * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
