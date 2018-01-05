@@ -183,7 +183,7 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::ModelPath(const std::string &_uri,
-    bool /*_forceDownload*/)
+    const bool /*_forceDownload*/)
 {
   std::string path;
 

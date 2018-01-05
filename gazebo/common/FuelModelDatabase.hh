@@ -101,7 +101,7 @@ namespace gazebo
       /// \param[in] _forceDownload True to skip searching local paths.
       /// \return path to a model directory
       public: std::string ModelPath(const std::string &_uri,
-        bool _forceDownload = false);
+        const bool _forceDownload = false);
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
