@@ -53,7 +53,7 @@ TEST_F(MovableText_TEST, MovableTextTest)
   VisualPtr vis(new Visual("TEST_TEXT_VIS", worldVis, false));
   ASSERT_NE(nullptr, vis);
   vis->Load();
-  vis->GetSceneNode()->attachObject(&(text));
+  vis->AttachObject(&(text));
   vis->GetSceneNode()->setInheritScale(false);
 
   // Check default values

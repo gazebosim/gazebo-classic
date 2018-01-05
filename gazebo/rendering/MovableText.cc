@@ -94,7 +94,7 @@ class gazebo::rendering::MovableTextPrivate
   public: Ogre::RenderOperation renderOp;
 
   /// \brief Axis aligned box
-  public: Ogre::AxisAlignedBox *aabb;
+  public: Ogre::AxisAlignedBox *aabb = nullptr;
 
   /// \brief Pointer to camera which the text is facing - never set.
   public: Ogre::Camera *camera = nullptr;
@@ -828,7 +828,7 @@ const Ogre::String &MovableText::getMovableType() const
 }
 
 //////////////////////////////////////////////////
-void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
+void MovableText::getWorldTransforms(Ogre::Matrix4 *_xform) const
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->mutex);
   if (this->isVisible() && this->dataPtr->camera)
@@ -849,8 +849,8 @@ void MovableText::getWorldTransforms(Ogre::Matrix4 * xform) const
     scale3x3[2][2] = mParentNode->_getDerivedScale().z / 2;
 
     // apply all transforms to xform
-    *xform = (rot3x3 * scale3x3);
-    xform->setTrans(ppos);
+    *_xform = (rot3x3 * scale3x3);
+    _xform->setTrans(ppos);
   }
 }
 
