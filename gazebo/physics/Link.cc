@@ -26,13 +26,11 @@
 #include <mutex>
 #include <sstream>
 
-#include "gazebo/msgs/msgs.hh"
-
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -50,6 +48,8 @@
 #include "gazebo/physics/Wind.hh"
 
 #include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
+#include "gazebo/util/UtilTypes.hh"
 
 /// \brief Private data for the Link class
 class gazebo::physics::LinkPrivate

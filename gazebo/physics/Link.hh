@@ -29,9 +29,7 @@
 #include <ignition/math/Matrix3.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -43,12 +41,6 @@
 
 namespace gazebo
 {
-  namespace util
-  {
-    class OpenALSource;
-    class OpenALSink;
-  }
-
   namespace physics
   {
     class Model;
