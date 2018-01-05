@@ -96,7 +96,6 @@ namespace gazebo
       /// \brief Update the collision.
       /// \param[in] _info Update information.
       public: void Update(const common::UpdateInfo &_info);
-      using Base::Update;
 
       /// \brief Set the scale of the link.
       /// \param[in] _scale Scale to set the link to.
@@ -437,9 +436,8 @@ namespace gazebo
       /// \brief Connect to the add entity signal
       /// \param[in] _subscriber Subsciber callback function.
       /// \return Pointer to the connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectEnabled(T _subscriber)
-              {return enabledSignal.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectEnabled(
+          std::function<void (bool)> _subscriber);
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
@@ -703,70 +701,7 @@ namespace gazebo
       protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief This flag is set to true when the link is initialized.
-      protected: bool initialized;
-
-      /// \brief Event used when the link is enabled or disabled.
-      private: event::EventT<void (bool)> enabledSignal;
-
-      /// \brief This flag is used to trigger the enabled
-      private: bool enabled;
-
-      /// \brief Names of all the sensors attached to the link.
-      private: std::vector<std::string> sensors;
-
-      /// \brief All the parent joints.
-      private: std::vector<JointPtr> parentJoints;
-
-      /// \brief All the child joints.
-      private: std::vector<JointPtr> childJoints;
-
-      /// \brief All the attached models.
-      private: std::vector<ModelPtr> attachedModels;
-
-      /// \brief Link data publisher
-      private: transport::PublisherPtr dataPub;
-
-      /// \brief Link data message
-      private: msgs::LinkData linkDataMsg;
-
-      /// \brief True to publish data, false otherwise
-      private: bool publishData;
-
-      /// \brief Mutex to protect the publishData variable
-      private: boost::recursive_mutex *publishDataMutex;
-
-      /// \brief Cached list of collisions. This is here for performance.
-      private: Collision_V collisions;
-
-      /// \brief Wrench subscriber.
-      private: transport::SubscriberPtr wrenchSub;
-
-      /// \brief Vector of wrench messages to be processed.
-      private: std::vector<msgs::Wrench> wrenchMsgs;
-
-      /// \brief Mutex to protect the wrenchMsgs variable.
-      private: boost::mutex wrenchMsgMutex;
-
-      /// \brief Wind velocity.
-      private: ignition::math::Vector3d windLinearVel;
-
-      /// \brief Update connection to calculate wind velocity.
-      private: event::ConnectionPtr updateConnection;
-
-      /// \brief All the attached batteries.
-      private: std::vector<common::BatteryPtr> batteries;
-
-#ifdef HAVE_OPENAL
-      /// \brief All the audio sources
-      private: std::vector<util::OpenALSourcePtr> audioSources;
-
-      /// \brief An audio sink
-      private: util::OpenALSinkPtr audioSink;
-
-      /// \brief Subscriber to contacts with this collision. Used for audio
-      /// playback.
-      private: transport::SubscriberPtr audioContactsSub;
-#endif
+      protected: bool initialized = false;
 
       /// \brief Pointer to private data
       private: std::unique_ptr<LinkPrivate> dataPtr;
