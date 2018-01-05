@@ -54,6 +54,7 @@ namespace gazebo
     class Model;
     class Collision;
     class Battery;
+    class LinkPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -766,6 +767,9 @@ namespace gazebo
       /// playback.
       private: transport::SubscriberPtr audioContactsSub;
 #endif
+
+      /// \brief Pointer to private data
+      private: std::unique_ptr<LinkPrivate> dataPtr;
     };
     /// \}
   }

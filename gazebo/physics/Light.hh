@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_PHYSICS_LIGHT_HH_
-#define _GAZEBO_PHYSICS_LIGHT_HH_
+#ifndef GAZEBO_PHYSICS_LIGHT_HH_
+#define GAZEBO_PHYSICS_LIGHT_HH_
 
+#include <memory>
 #include "gazebo/physics/Entity.hh"
 
 namespace gazebo
@@ -25,6 +26,7 @@ namespace gazebo
   namespace physics
   {
     class LightState;
+    class LightPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -35,6 +37,9 @@ namespace gazebo
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
       public: explicit Light(BasePtr _parent);
+
+      /// \brief Destructor
+      public: virtual ~Light();
 
       /// \brief Initialize the light.
       public: void Init();
@@ -57,9 +62,6 @@ namespace gazebo
       /// \brief Publish the pose.
       private: void PublishPose();
 
-      /// \brief Light message container.
-      private: msgs::Light msg;
-
       /// \brief Indicate that the world pose should be recalculated.
       /// The recalculation will be done when Light::WorldPose is
       /// called.
@@ -67,6 +69,9 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual const ignition::math::Pose3d &WorldPose() const;
+
+      /// \brief Pointer to private data
+      private: std::unique_ptr<LightPrivate> dataPtr;
     };
     /// \}
   }

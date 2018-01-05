@@ -51,12 +51,17 @@
 
 #include "gazebo/util/IntrospectionManager.hh"
 
+/// \brief Private data for the Link class
+class gazebo::physics::LinkPrivate
+{
+};
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent), initialized(false)
+    : Entity(_parent), initialized(false), dataPtr(new LinkPrivate)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
