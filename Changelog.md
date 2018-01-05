@@ -3,7 +3,7 @@
 ## Gazebo 9.x.x (2018-xx-xx)
 
 1. Rename `BUILD_TYPE_*` macros to `GAZEBO_BUILD_TYPE_*`
-    * [Pull request #2840](https://bitbucket.org/osrf/gazebo/pull-requests/2840)
+    * [Pull request #2846](https://bitbucket.org/osrf/gazebo/pull-requests/2846)
     * [Issue 2343](https://bitbucket.org/osrf/gazebo/issues/2343)
 
 1. Added World::SDF()
