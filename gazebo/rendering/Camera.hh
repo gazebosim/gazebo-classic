@@ -28,6 +28,7 @@
 #include <deque>
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
@@ -568,7 +569,15 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      public: virtual bool SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: virtual bool SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(
+          const ignition::math::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix

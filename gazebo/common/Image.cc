@@ -30,7 +30,6 @@
 using namespace gazebo;
 using namespace common;
 
-
 int Image::count = 0;
 
 //////////////////////////////////////////////////
@@ -267,7 +266,14 @@ unsigned int Image::GetBPP() const
 //////////////////////////////////////////////////
 Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 {
-  Color clr;
+  return this->Pixel(_x, _y);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Image::Pixel(const unsigned int _x,
+                                   const unsigned int _y) const
+{
+  ignition::math::Color clr;
 
   if (!this->Valid())
     return clr;
@@ -317,19 +323,25 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 //////////////////////////////////////////////////
 Color Image::GetAvgColor()
 {
+  return this->AvgColor();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Image::AvgColor()
+{
   unsigned int x, y;
   double rsum, gsum, bsum;
-  common::Color pixel;
+  ignition::math::Color pixel;
 
   rsum = gsum = bsum = 0.0;
   for (y = 0; y < this->GetHeight(); ++y)
   {
     for (x = 0; x < this->GetWidth(); ++x)
     {
-      pixel = this->GetPixel(x, y);
-      rsum += pixel.r;
-      gsum += pixel.g;
-      bsum += pixel.b;
+      pixel = this->Pixel(x, y);
+      rsum += pixel.R();
+      gsum += pixel.G();
+      bsum += pixel.B();
     }
   }
 
@@ -337,15 +349,21 @@ Color Image::GetAvgColor()
   gsum /= (this->GetWidth() * this->GetHeight());
   bsum /= (this->GetWidth() * this->GetHeight());
 
-  return Color(rsum, gsum, bsum);
+  return ignition::math::Color(rsum, gsum, bsum);
 }
 
 //////////////////////////////////////////////////
 Color Image::GetMaxColor() const
 {
+  return this->MaxColor();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Image::MaxColor() const
+{
   unsigned int x, y;
-  Color clr;
-  Color maxClr;
+  ignition::math::Color clr;
+  ignition::math::Color maxClr;
 
   maxClr.Set(0, 0, 0, 0);
 
@@ -353,9 +371,9 @@ Color Image::GetMaxColor() const
   {
     for (x = 0; x < this->GetWidth(); x++)
     {
-      clr = this->GetPixel(x, y);
+      clr = this->Pixel(x, y);
 
-      if (clr.r + clr.g + clr.b > maxClr.r + maxClr.g + maxClr.b)
+      if (clr.R() + clr.G() + clr.B() > maxClr.R() + maxClr.G() + maxClr.B())
       {
         maxClr = clr;
       }

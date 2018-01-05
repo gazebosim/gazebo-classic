@@ -89,7 +89,6 @@ Connection::Connection()
 {
   this->isOpen = false;
   this->dropMsgLogged = false;
-  this->headerBuffer = new char[HEADER_LENGTH+1];
 
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -125,9 +124,6 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  delete [] this->headerBuffer;
-  this->headerBuffer = NULL;
-
   this->Shutdown();
 
   if (iomanager)
@@ -306,7 +302,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+  char headerBuffer[HEADER_LENGTH + 1];
+  snprintf(headerBuffer, HEADER_LENGTH + 1, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {

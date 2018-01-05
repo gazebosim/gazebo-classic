@@ -236,7 +236,7 @@ void BuildingModelManip::OnLevelChanged(int _level)
 }
 
 /////////////////////////////////////////////////
-void BuildingModelManip::OnColorChanged(const common::Color &_color)
+void BuildingModelManip::OnColorChanged(const ignition::math::Color &_color)
 {
   this->SetColor(Conversions::Convert(_color));
   this->dataPtr->maker->BuildingChanged();

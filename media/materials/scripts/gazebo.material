@@ -134,7 +134,7 @@ material Gazebo/Grey
     {
       ambient .3 .3 .3  1.0
       diffuse .7 .7 .7  1.0
-      specular 0.01 0.01 0.01 1.000000 32.00000
+      specular 0.01 0.01 0.01 1.000000 1.500000
     }
   }
 }
@@ -795,41 +795,17 @@ material Gazebo/BlueLaser
 
       ambient 0.0 0.0 1.0 1
       diffuse 0.0 0.0 1.0 1
-      emissive 0.0 0.0 1.0 1
 
-      // texture_unit
-      // {
-      //   colour_op_ex source1 src_current src_current 0 1 0
-      //   alpha_op_ex source1 src_manual src_current 0.4
-      // }
+      texture_unit
+      {
+        colour_op_ex source1 src_current src_current 0 1 0
+        alpha_op_ex source1 src_manual src_current 0.4
+      }
+
     }
   }
 }
 
-material Gazebo/RedLaser
-{
-  receive_shadows off
-
-  technique
-  {
-    pass
-    {
-      scene_blend alpha_blend
-      depth_write off
-      cull_hardware none
-
-      ambient 1.0 0.0 0.0 1
-      diffuse 1.0 0.0 0.0 1
-      emissive 1.0 0.0 0.0 1
-
-      // texture_unit
-      // {
-      //   colour_op_ex source1 src_current src_current 0 1 0
-      //   alpha_op_ex source1 src_manual src_current 0.4
-      // }
-    }
-  }
-}
 material Gazebo/OrangeTransparent
 {
   receive_shadows off
@@ -1517,6 +1493,7 @@ material Gazebo/WideLensMap
     }
   }
 }
+
 
 vertex_program Gazebo/CameraLesnFlareVS glsl
 {

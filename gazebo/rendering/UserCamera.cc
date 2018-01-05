@@ -650,9 +650,9 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
-    common::Color const &gzBgColor = this->scene->BackgroundColor();
+    auto const &ignBgColor = this->scene->BackgroundColor();
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(gzBgColor.Ign()));
+        Conversions::Convert(ignBgColor));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);

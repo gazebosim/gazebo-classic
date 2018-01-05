@@ -614,10 +614,10 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+bool WideAngleCamera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   bool retVal = true;
-  Ogre::ColourValue clr = Conversions::Convert(_color.Ign());
+  Ogre::ColourValue clr = Conversions::Convert(_color);
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(clr);
@@ -679,8 +679,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     RTShaderSystem::AttachViewport(vp, this->GetScene());
 
-    common::Color const &gzBgColor = this->scene->BackgroundColor();
-    vp->setBackgroundColour(Conversions::Convert(gzBgColor.Ign()));
+    auto const &gzBgColor = this->scene->BackgroundColor();
+    vp->setBackgroundColour(Conversions::Convert(gzBgColor));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -747,7 +747,7 @@ void WideAngleCamera::UpdateFOV()
 }
 
 //////////////////////////////////////////////////
-ignition::math::Vector3d WideAngleCamera::Project(
+ignition::math::Vector3d WideAngleCamera::Project3d(
     const ignition::math::Vector3d &_pt) const
 {
   // project onto cubemap face then onto

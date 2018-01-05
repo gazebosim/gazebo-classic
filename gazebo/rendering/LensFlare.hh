@@ -20,7 +20,8 @@
 
 #include <memory>
 
-#include <sdf/sdf.hh>
+#include "gazebo/msgs/msgs.hh"
+
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
@@ -36,7 +37,11 @@ namespace gazebo
     /// \{
 
     /// \class LensFlare LensFlare.hh rendering/rendering.hh
-    /// \brief Camera lens flare compositor.
+    /// \brief Camera lens flare compositor. This lens flare effect does not
+    /// perform any depth checking so if the directional light is occluded by an
+    /// object in the scene, lens flare will pass through the object. The lens
+    /// flare's color is set by the shaders and not exposed through an API in
+    /// this class.
     class GZ_RENDERING_VISIBLE LensFlare
     {
       /// \brief Constructor
@@ -51,6 +56,10 @@ namespace gazebo
 
       /// \brief Update function to search light source
       private: void Update();
+
+      /// \brief Request callback
+      /// \param[in] _msg The message data.
+      private: void OnRequest(ConstRequestPtr &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

@@ -40,7 +40,6 @@
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/rendering/RenderEvents.hh"
 #include "gazebo/rendering/RTShaderSystem.hh"
 #include "gazebo/rendering/Scene.hh"
 #include "gazebo/rendering/Light.hh"
@@ -80,64 +79,6 @@ Heightmap::Heightmap(ScenePtr _scene)
   this->dataPtr->gzPagingDir =
       common::SystemPaths::Instance()->GetLogPath() /
       this->dataPtr->pagingDirname;
-
-}
-
-/////////////////////////////////////////////////
-void Heightmap::ToggleLayer(const int32_t _layer)
-{
-  if (_layer == 0)
-  {
-    Ogre::TerrainGroup::TerrainIterator ti =
-      this->dataPtr->terrainGroup->getTerrainIterator();
-    while (ti.hasMoreElements())
-    {
-      Ogre::Terrain *terrain = ti.getNext()->instance;
-      GZ_ASSERT(terrain != nullptr, "Unable to get a valid terrain pointer");
-
-      Ogre::Material *material = terrain->getMaterial().get();
-
-      unsigned int techniqueCount, passCount, unitStateCount;
-      Ogre::Technique *technique;
-      Ogre::Pass *pass;
-
-      for (techniqueCount = 0; techniqueCount < material->getNumTechniques();
-          ++techniqueCount)
-      {
-        technique = material->getTechnique(techniqueCount);
-
-        for (passCount = 0; passCount < technique->getNumPasses(); ++passCount)
-        {
-          pass = technique->getPass(passCount);
-          pass->setDepthWriteEnabled(false);
-          Ogre::ColourValue dc = pass->getDiffuse();
-          float alpha = dc.a > 0 ? 0.0f : 1.0f;
-          dc.a = alpha;
-          pass->setDiffuse(dc);
-          Ogre::String fpName = pass->getFragmentProgramName();
-
-          if (alpha <= 0)
-            pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-          else
-            pass->setSceneBlending(Ogre::SBT_REPLACE);
-
-          for (unitStateCount = 0; unitStateCount <
-              pass->getNumTextureUnitStates(); ++unitStateCount)
-          {
-            auto textureUnitState = pass->getTextureUnitState(unitStateCount);
-
-            if (textureUnitState->getColourBlendMode().operation ==
-                Ogre::LBX_SOURCE1)
-            {
-              textureUnitState->setAlphaOperation(
-                  Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL, Ogre::LBS_CURRENT,
-                  alpha);
-            }
-          }
-        }
-      }
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -722,10 +663,6 @@ void Heightmap::Load()
         event::Events::ConnectPreRender(
         std::bind(&Heightmap::SaveHeightmap, this)));
   }
-
-  this->dataPtr->connections.push_back(
-      rendering::Events::ConnectToggleLayer(
-        std::bind(&Heightmap::ToggleLayer, this, std::placeholders::_1)));
 }
 
 ///////////////////////////////////////////////////
@@ -795,9 +732,9 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
-    common::Color const &gzDiffuse = directionalLight->DiffuseColor();
+    auto const &ignDiffuse = directionalLight->DiffuseColor();
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(gzDiffuse.Ign()));
+        Conversions::Convert(ignDiffuse));
   }
   else
   {
@@ -1987,12 +1924,12 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateVpFooter(
     if (_terrain->getSceneManager()->getFogMode() == Ogre::FOG_LINEAR)
     {
       _outStream <<
-        "  fogVal = clamp((gl_Position.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
+        "  fogVal = clamp((oPos.z - fogParams.y) * fogParams.w, 0.0, 1.0);\n";
     }
     else
     {
       _outStream <<
-        "  fogVal = 1 - clamp(1 / (exp(gl_Position.z * fogParams.x)), 0.0, 1.0);\n";
+        "  fogVal = 1 - clamp(1 / (exp(oPos.z * fogParams.x)), 0.0, 1.0);\n";
     }
   }
 
@@ -2193,7 +2130,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpHeader(
   _outStream <<
     // Only 1 light supported in this version
     // deferred shading profile / generator later, ok? :)
-    "uniform bool visible;\n"
     "uniform vec3 ambient;\n"
     "uniform vec4 lightPosObjSpace;\n"
     "uniform vec3 lightDiffuseColour;\n"
@@ -2523,8 +2459,7 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
     else
     {
       // Apply specular
-
-      _outStream << "specular=0.1;  outputCol.xyz += litRes.z * lightSpecularColour * "
+      _outStream << "  outputCol.xyz += litRes.z * lightSpecularColour * "
                     "specular * shadow;\n";
 
       if (_prof->getParent()->getDebugLevel())
@@ -2540,8 +2475,6 @@ void GzTerrainMatGen::SM2Profile::ShaderHelperGLSL::generateFpFooter(
   {
     _outStream << "  outputCol.xyz = mix(outputCol.xyz, fogColour, fogVal);\n";
   }
-
-  _outStream << "  outputCol.a = visible ? 1 : 0;\n";
 
   if (glslVersion == "120")
     _outStream << "  gl_FragColor = outputCol;\n";
@@ -3335,7 +3268,7 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
       Ogre::Vector4 splitPoints;
       const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
           pssm->getSplitPoints();
-      // populate from split point 1 not 0
+      // populate from split point 1 not 0, and include shadowFarDistance
       for (unsigned int t = 0u; t < numTextures; ++t)
         splitPoints[t] = splitPointList[t+1];
       params->setNamedConstant("pssmSplitPoints", splitPoints);

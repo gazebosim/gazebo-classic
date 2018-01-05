@@ -34,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent object.
-      public: Light(BasePtr _parent);
+      public: explicit Light(BasePtr _parent);
 
       /// \brief Initialize the light.
       public: void Init();
@@ -59,6 +59,14 @@ namespace gazebo
 
       /// \brief Light message container.
       private: msgs::Light msg;
+
+      /// \brief Indicate that the world pose should be recalculated.
+      /// The recalculation will be done when Light::WorldPose is
+      /// called.
+      public: void SetWorldPoseDirty();
+
+      // Documentation inherited.
+      public: virtual const ignition::math::Pose3d &WorldPose() const;
     };
     /// \}
   }
