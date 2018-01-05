@@ -46,7 +46,6 @@ set (sources
   Event.cc
   Events.cc
   Exception.cc
-  FBXLoader.cc
   HeightmapData.cc
   Image.cc
   ImageHeightmap.cc
@@ -103,7 +102,6 @@ set (headers
   Event.hh
   Events.hh
   Exception.hh
-  FBXLoader.hh
   MovingWindowFilter.hh
   HeightmapData.hh
   Image.hh
