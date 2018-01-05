@@ -615,7 +615,7 @@ namespace gazebo
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.
-    /// \param[in] _size Type of light - "spot", "directional", or "point".
+    /// \param[in] _type Type of light - "spot", "directional", or "point".
     /// \param[in] _pos Position for the light.
     /// \param[in] _rpy Roll, pitch, yaw for the light.
     /// \param[in] _diffuse Diffuse color of the light.
