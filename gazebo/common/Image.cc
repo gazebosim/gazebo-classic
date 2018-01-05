@@ -428,8 +428,12 @@ Image::PixelFormat Image::ConvertPixelFormat(const std::string &_format)
   // Handle old format strings
   if (_format == "L8" || _format == "L_INT8")
     return L_INT8;
+  else if (_format == "L16" || _format == "L_INT16")
+    return L_INT16;
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     return RGB_INT8;
+  else if (_format == "R16G16B16" || _format == "RGB_INT16")
+    return RGB_INT16;
 
   for (unsigned int i = 0; i < PIXEL_FORMAT_COUNT; ++i)
     if (PixelFormatNames[i] == _format)

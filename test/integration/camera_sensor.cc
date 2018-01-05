@@ -76,6 +76,20 @@ void OnNewRGBPointCloud(int* _imageCounter, float* _imageDest,
 }
 
 /////////////////////////////////////////////////
+void OnNew16CameraFrame(int* _imageCounter, unsigned char* _imageDest,
+                  const unsigned char *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &_format)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  pixelFormat = _format;
+  // byte => int16_t so mulitple size by two
+  memcpy(_imageDest, _image, _width * _height * _depth * 2);
+  *_imageCounter += 1;
+}
+
+/////////////////////////////////////////////////
 TEST_F(CameraSensor, WorldReset)
 {
   Load("worlds/empty_test.world");
@@ -1099,3 +1113,180 @@ TEST_F(CameraSensor, LensFlare)
   delete[] img;
   delete[] img2;
 }
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, 16bit)
+{
+  Load("worlds/16bit_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get L16 camera ssensor
+  std::string l16CameraName = "l16bit_camera_sensor";
+  sensors::SensorPtr l16Sensor = sensors::get_sensor(l16CameraName);
+  sensors::CameraSensorPtr l16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(l16Sensor);
+  EXPECT_TRUE(l16CamSensor != nullptr);
+  rendering::CameraPtr l16Cam = l16CamSensor->Camera();
+  EXPECT_TRUE(l16Cam != nullptr);
+
+  unsigned int l16Width  = l16Cam->ImageWidth();
+  unsigned int l16Height = l16Cam->ImageHeight();
+  EXPECT_GT(l16Width, 0u);
+  EXPECT_GT(l16Height, 0u);
+
+  // get rgb16 camera ssensor
+  std::string rgb16CameraName = "rgb16bit_camera_sensor";
+  sensors::SensorPtr rgb16Sensor = sensors::get_sensor(rgb16CameraName);
+  sensors::CameraSensorPtr rgb16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(rgb16Sensor);
+  EXPECT_TRUE(rgb16CamSensor != nullptr);
+  rendering::CameraPtr rgb16Cam = rgb16CamSensor->Camera();
+  EXPECT_TRUE(rgb16Cam != nullptr);
+
+  unsigned int rgb16Width  = rgb16Cam->ImageWidth();
+  unsigned int rgb16Height = rgb16Cam->ImageHeight();
+  EXPECT_GT(rgb16Width, 0u);
+  EXPECT_GT(rgb16Height, 0u);
+
+  // connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[l16Width * l16Height * 2];
+  img2 = new unsigned char[rgb16Width * rgb16Height * 3 * 2];
+
+  event::ConnectionPtr c =
+    l16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNew16CameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+    rgb16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNew16CameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages)
+      && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
+  c.reset();
+  c2.reset();
+
+  // verify L16 camera images
+  int16_t bgValue = 0;
+  int16_t boxValue = 0;
+  int16_t *l16Img = reinterpret_cast<int16_t *>(img);
+  for (unsigned int y = 0; y < l16Height; ++y)
+  {
+    for (unsigned int x = 0; x < l16Width; ++x)
+    {
+      int16_t value = l16Img[(y*l16Width)+x];
+      // expect values to be in +-(2^16/2) range
+      EXPECT_GE(value, -32768);
+      EXPECT_LT(value, 32768);
+
+      // box in top right quadrant of image
+      if (x >= l16Width / 2 && y < l16Height / 2)
+      {
+        // set its color if not done already
+        if (boxValue == 0)
+          boxValue = value;
+        // verify pixels correspond to box
+        else
+          EXPECT_EQ(boxValue, value);
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgValue == 0)
+          bgValue = value;
+        // verify pixels correspond to background
+        else
+          EXPECT_EQ(bgValue, value);
+      }
+    }
+  }
+
+  // verify RGB INT16 camera images
+  int16_t bgRValue = 0;
+  int16_t bgGValue = 0;
+  int16_t bgBValue = 0;
+  int16_t boxRValue = 0;
+  int16_t boxGValue = 0;
+  int16_t boxBValue = 0;
+  int16_t *rgb16Img = reinterpret_cast<int16_t *>(img2);
+  for (unsigned int y = 0; y < rgb16Height; ++y)
+  {
+    for (unsigned int x = 0; x < rgb16Width * 3; x+=3)
+    {
+      int16_t r = rgb16Img[(y*rgb16Width*3)+x];
+      int16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
+      int16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
+      // expect values to be in +-(2^16/2) range
+      EXPECT_GE(r, -32768);
+      EXPECT_LT(r, 32768);
+      EXPECT_GE(g, -32768);
+      EXPECT_LT(g, 32768);
+      EXPECT_GE(b, -32768);
+      EXPECT_LT(b, 32768);
+
+      // box in top right quadrant of image
+      if (x >= (rgb16Width*3) / 2 && y < rgb16Height / 2)
+      {
+        // set its color if not done already
+        if (boxRValue == 0 && boxGValue == 0 && boxBValue == 0)
+        {
+          boxRValue = r;
+          boxGValue = g;
+          boxBValue = b;
+        }
+        // verify pixels correspond to box
+        else
+        {
+          EXPECT_EQ(boxRValue, r);
+          EXPECT_EQ(boxGValue, g);
+          EXPECT_EQ(boxBValue, b);
+        }
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgRValue == 0 && bgGValue == 0 && bgBValue == 0)
+        {
+          bgRValue = r;
+          bgGValue = g;
+          bgBValue = b;
+        }
+        // verify pixels correspond to background
+        else
+        {
+          EXPECT_EQ(bgRValue, r);
+          EXPECT_EQ(bgGValue, g);
+          EXPECT_EQ(bgBValue, b);
+        }
+      }
+    }
+  }
+
+  delete [] img;
+  delete [] img2;
+}
+
+
