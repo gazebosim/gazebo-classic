@@ -459,13 +459,15 @@ void Light::SetDiffuseColor(const ignition::math::Color &_color)
 //////////////////////////////////////////////////
 ignition::math::Color Light::DiffuseColor() const
 {
-  return this->dataPtr->sdf->GetElement("diffuse")->Get<ignition::math::Color>();
+  return
+      this->dataPtr->sdf->GetElement("diffuse")->Get<ignition::math::Color>();
 }
 
 //////////////////////////////////////////////////
 ignition::math::Color Light::SpecularColor() const
 {
-  return this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
+  return
+      this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
 }
 
 //////////////////////////////////////////////////

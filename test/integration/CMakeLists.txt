@@ -87,6 +87,7 @@ set(tests
   region_events.cc
   rest_web.cc
   saving_and_loading.cc
+  sdf.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc

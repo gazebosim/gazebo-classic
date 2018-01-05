@@ -101,6 +101,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "mainwindow_example"
   , "model_push"
   , "model_move"
+  , "movable_text_demo"
   , "parameters"
   , "projector"
   , "system_gui_plugin"
