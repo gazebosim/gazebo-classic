@@ -25,9 +25,9 @@ namespace gazebo
 {
   namespace physics
   {
-    class LightState;
     class LightPrivate;
-
+    class LightState;
+    
     /// \addtogroup gazebo_physics
     /// \{
 
