@@ -12,7 +12,7 @@
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
     * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
     * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
-    * [Pull request #2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
+    * [Pull request #2842](https://bitbucket.org/osrf/gazebo/pull-request/2842)
 
 1. Updates to MovableText
     * [Pull request #2839](https://bitbucket.org/osrf/gazebo/pull-request/2839)
