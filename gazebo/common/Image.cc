@@ -277,7 +277,8 @@ Color Image::GetPixel(unsigned int _x, unsigned int _y) const
 }
 
 //////////////////////////////////////////////////
-ignition::math::Color Image::Pixel(unsigned int _x, unsigned int _y) const
+ignition::math::Color Image::Pixel(const unsigned int _x,
+                                   const unsigned int _y) const
 {
   ignition::math::Color clr;
 

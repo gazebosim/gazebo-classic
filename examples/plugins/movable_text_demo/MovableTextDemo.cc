@@ -65,6 +65,7 @@ void MovableTextDemo::Load(sdf::ElementPtr /*_elem*/)
 
   // Movable text
   this->text.Load("DEMO_TEXT", "Gazebo");
+  this->text.SetShowOnTop(true);
 
   // Visual to hold text
   rendering::VisualPtr vis(new rendering::Visual(

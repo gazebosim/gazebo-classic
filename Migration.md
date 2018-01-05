@@ -94,7 +94,7 @@ release will remove the deprecated code.
 1. **gazebo/rendering/Scene.hh**
     + ***Deprecation:*** void SetAmbientColor(const common::Color &_color)
     + ***Replacement:*** void SetAmbientColor(const ignition::math::Color &_color)
-    + ***Deprecation:*** SetBackgroundColor(const common::Color &_color)
+    + ***Deprecation:*** void SetBackgroundColor(const common::Color &_color)
     + ***Replacement:*** void SetBackgroundColor(const ignition::math::Color &_color)
     + ***Deprecation:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const float _lineWidth, const common::Color &_color)
     + ***Replacement:*** void CreateGrid(const uint32_t _cellCount, const float _cellLength, const ignition::math::Color &_color)
@@ -150,6 +150,10 @@ release will remove the deprecated code.
     + ***Replacement:*** float Baseline() const
     + ***Deprecation:*** bool GetShowOnTop() const
     + ***Replacement:*** bool ShowOnTop() const
+    + ***Deprecation:*** void _setupGeometry()
+    + ***Replacement:*** void SetupGeometry()
+    + ***Deprecation:*** void _updateColors()
+    + ***Replacement:*** void UpdateColors()
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
 1. **gazebo/msgs/msgs.hh**
@@ -1321,6 +1325,14 @@ release will remove the deprecated code.
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
@@ -1340,7 +1352,7 @@ release will remove the deprecated code.
    See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
    for further details.
 
-## Gazebo 7.3.1 to 7.4
+## Gazebo 7.3.1 to 7.X
 
 ### Deprecations
 
