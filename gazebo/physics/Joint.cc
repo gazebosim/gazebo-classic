@@ -688,8 +688,8 @@ double Joint::Position(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int /*_index*/, double _position,
-                        bool /*_preserveWorldVelocity*/)
+bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
+                        const bool /*_preserveWorldVelocity*/)
 {
   // parent class doesn't do much, derived classes do all the work.
   if (this->model)
@@ -708,8 +708,9 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position,
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(unsigned int _index, double _position,
-                               bool _preserveWorldVelocity)
+bool Joint::SetPositionMaximal(
+    const unsigned int _index, const double _position,
+    const bool _preserveWorldVelocity)
 {
   // check if index is within bounds
   if (_index >= this->DOF())

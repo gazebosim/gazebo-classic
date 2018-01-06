@@ -705,7 +705,7 @@ bool DARTJoint::SetPosition(unsigned int _index, double _position,
 
   if (_preserveWorldVelocity)
   {
-    gzwarn << "[DARTJoint::SetPosition] You requested _preserveWorldVelocity "
+    gzwarn << "[SetPosition] You requested _preserveWorldVelocity "
            << "to be true, but this is not supported in DART. The world "
            << "velocity of the child link will not be preserved\n";
   }
