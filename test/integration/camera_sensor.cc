@@ -1208,7 +1208,7 @@ TEST_F(CameraSensor, 16bit)
           boxValue = value;
         // verify pixels correspond to box
         else
-          EXPECT_EQ(boxValue, value);
+          EXPECT_NEAR(boxValue, value, 1);
       }
       // rest are all background
       else
@@ -1218,7 +1218,7 @@ TEST_F(CameraSensor, 16bit)
           bgValue = value;
         // verify pixels correspond to background
         else
-          EXPECT_EQ(bgValue, value);
+          EXPECT_NEAR(bgValue, value, 1);
       }
     }
   }
@@ -1259,9 +1259,9 @@ TEST_F(CameraSensor, 16bit)
         // verify pixels correspond to box
         else
         {
-          EXPECT_EQ(boxRValue, r);
-          EXPECT_EQ(boxGValue, g);
-          EXPECT_EQ(boxBValue, b);
+          EXPECT_NEAR(boxRValue, r, 1);
+          EXPECT_NEAR(boxGValue, g, 1);
+          EXPECT_NEAR(boxBValue, b, 1);
         }
       }
       // rest are all background
@@ -1277,9 +1277,9 @@ TEST_F(CameraSensor, 16bit)
         // verify pixels correspond to background
         else
         {
-          EXPECT_EQ(bgRValue, r);
-          EXPECT_EQ(bgGValue, g);
-          EXPECT_EQ(bgBValue, b);
+          EXPECT_NEAR(bgRValue, r, 1);
+          EXPECT_NEAR(bgGValue, g, 1);
+          EXPECT_NEAR(bgBValue, b, 1);
         }
       }
     }
