@@ -84,7 +84,7 @@ void OnNew16CameraFrame(int* _imageCounter, unsigned char* _imageDest,
 {
   std::lock_guard<std::mutex> lock(mutex);
   pixelFormat = _format;
-  // byte => int16_t so mulitple size by two
+  // byte => uint16_t so mulitple size by two
   memcpy(_imageDest, _image, _width * _height * _depth * 2);
   *_imageCounter += 1;
 }
@@ -1117,6 +1117,11 @@ TEST_F(CameraSensor, LensFlare)
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, 16bit)
 {
+  // World contains a box positioned at top left quadrant of image generated
+  // by a mono 16 bit camera and a color 16 bit camera.
+  // Verify pixel values of top left quadrant of image (corresponding to box)
+  // are approximately the same but different from the background's pixel
+  // values.
   Load("worlds/16bit_camera.world");
 
   // Make sure the render engine is available.
@@ -1188,17 +1193,17 @@ TEST_F(CameraSensor, 16bit)
   c2.reset();
 
   // verify L16 camera images
-  int16_t bgValue = 0;
-  int16_t boxValue = 0;
-  int16_t *l16Img = reinterpret_cast<int16_t *>(img);
+  uint16_t bgValue = 0;
+  uint16_t boxValue = 0;
+  uint16_t *l16Img = reinterpret_cast<uint16_t *>(img);
+  // expect pixel values to be within 0.2% of valid 16bit pixel range
+  uint16_t tol = std::pow(2, 16) * 0.002;
   for (unsigned int y = 0; y < l16Height; ++y)
   {
     for (unsigned int x = 0; x < l16Width; ++x)
     {
-      int16_t value = l16Img[(y*l16Width)+x];
-      // expect values to be in +-(2^16/2) range
-      EXPECT_GE(value, -32768);
-      EXPECT_LT(value, 32768);
+      uint16_t value = l16Img[(y*l16Width)+x];
+      EXPECT_NE(0, value);
 
       // box in top right quadrant of image
       if (x >= l16Width / 2 && y < l16Height / 2)
@@ -1208,7 +1213,7 @@ TEST_F(CameraSensor, 16bit)
           boxValue = value;
         // verify pixels correspond to box
         else
-          EXPECT_NEAR(boxValue, value, 1);
+          EXPECT_NEAR(boxValue, value, tol);
       }
       // rest are all background
       else
@@ -1218,33 +1223,39 @@ TEST_F(CameraSensor, 16bit)
           bgValue = value;
         // verify pixels correspond to background
         else
-          EXPECT_NEAR(bgValue, value, 1);
+          EXPECT_NEAR(bgValue, value, tol);
       }
     }
   }
 
+  // expect background pixel value to be different from box pixel value
+  EXPECT_GT(bgValue, boxValue);
+  uint16_t minDiff = std::pow(2, 16) * 0.25;
+  uint16_t diff = bgValue - boxValue;
+  EXPECT_GT(diff, minDiff);
+
+
   // verify RGB INT16 camera images
-  int16_t bgRValue = 0;
-  int16_t bgGValue = 0;
-  int16_t bgBValue = 0;
-  int16_t boxRValue = 0;
-  int16_t boxGValue = 0;
-  int16_t boxBValue = 0;
-  int16_t *rgb16Img = reinterpret_cast<int16_t *>(img2);
+  uint16_t bgRValue = 0;
+  uint16_t bgGValue = 0;
+  uint16_t bgBValue = 0;
+  uint16_t boxRValue = 0;
+  uint16_t boxGValue = 0;
+  uint16_t boxBValue = 0;
+  uint16_t *rgb16Img = reinterpret_cast<uint16_t *>(img2);
   for (unsigned int y = 0; y < rgb16Height; ++y)
   {
     for (unsigned int x = 0; x < rgb16Width * 3; x+=3)
     {
-      int16_t r = rgb16Img[(y*rgb16Width*3)+x];
-      int16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
-      int16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
-      // expect values to be in +-(2^16/2) range
-      EXPECT_GE(r, -32768);
-      EXPECT_LT(r, 32768);
-      EXPECT_GE(g, -32768);
-      EXPECT_LT(g, 32768);
-      EXPECT_GE(b, -32768);
-      EXPECT_LT(b, 32768);
+      uint16_t r = rgb16Img[(y*rgb16Width*3)+x];
+      uint16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
+      uint16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
+      // verify gray color
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      EXPECT_NE(0, r);
+      EXPECT_NE(0, g);
+      EXPECT_NE(0, b);
 
       // box in top right quadrant of image
       if (x >= (rgb16Width*3) / 2 && y < rgb16Height / 2)
@@ -1259,9 +1270,9 @@ TEST_F(CameraSensor, 16bit)
         // verify pixels correspond to box
         else
         {
-          EXPECT_NEAR(boxRValue, r, 1);
-          EXPECT_NEAR(boxGValue, g, 1);
-          EXPECT_NEAR(boxBValue, b, 1);
+          EXPECT_NEAR(boxRValue, r, tol);
+          EXPECT_NEAR(boxGValue, g, tol);
+          EXPECT_NEAR(boxBValue, b, tol);
         }
       }
       // rest are all background
@@ -1277,16 +1288,24 @@ TEST_F(CameraSensor, 16bit)
         // verify pixels correspond to background
         else
         {
-          EXPECT_NEAR(bgRValue, r, 1);
-          EXPECT_NEAR(bgGValue, g, 1);
-          EXPECT_NEAR(bgBValue, b, 1);
+          EXPECT_NEAR(bgRValue, r, tol);
+          EXPECT_NEAR(bgGValue, g, tol);
+          EXPECT_NEAR(bgBValue, b, tol);
         }
       }
     }
   }
+  // expect background color to be different from box color
+  EXPECT_GT(bgRValue, boxRValue);
+  EXPECT_GT(bgGValue, boxGValue);
+  EXPECT_GT(bgBValue, boxBValue);
+  uint16_t diffR = bgRValue - boxRValue;
+  uint16_t diffG = bgGValue - boxGValue;
+  uint16_t diffB = bgBValue - boxBValue;
+  EXPECT_GT(diffR, minDiff);
+  EXPECT_GT(diffG, minDiff);
+  EXPECT_GT(diffB, minDiff);
 
   delete [] img;
   delete [] img2;
 }
-
-
