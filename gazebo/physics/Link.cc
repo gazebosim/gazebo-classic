@@ -285,7 +285,9 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::bind(&Link::WindMode, this));
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      std::bind(&Link::Update, this, std::placeholders::_1)));
+      std::bind(
+      static_cast<void(Link::*)(const common::UpdateInfo &)>(&Link::Update),
+      this, std::placeholders::_1)));
 
   this->SetStatic(this->IsStatic());
 }
