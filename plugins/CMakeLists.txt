@@ -58,6 +58,7 @@ set (plugins_single_header
   InitialVelocityPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin

@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
