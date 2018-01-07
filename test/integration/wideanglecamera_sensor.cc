@@ -147,7 +147,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point directly in front of camera
   auto worldPoint = ignition::math::Vector3d::UnitX;
-  auto screenPt = camera->Project(worldPoint);
+  auto screenPt = camera->Project3d(worldPoint);
   EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
   EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -155,14 +155,14 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point behind camera
   worldPoint = -ignition::math::Vector3d::UnitX;
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   // z is distance of point from image center
   // in this case it'll be outside of image so greater than 1.0
   EXPECT_GT(screenPt.Z(), 1.0);
 
   // point at right side of camera image
   worldPoint = ignition::math::Vector3d(1, -0.5, 0.0);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -170,7 +170,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at left side of camera image
   worldPoint = ignition::math::Vector3d(1, 0.5, 0.0);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_FLOAT_EQ(camera->ViewportHeight() * 0.5, screenPt.Y());
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -178,7 +178,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at top half of camera image
   worldPoint = ignition::math::Vector3d(1, 0.0, 0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
   EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -186,7 +186,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at bottom half of camera image
   worldPoint = ignition::math::Vector3d(1, 0.0, -0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_FLOAT_EQ(camera->ViewportWidth() * 0.5, screenPt.X());
   EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -194,7 +194,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at top left quadrant of camera image
   worldPoint = ignition::math::Vector3d(1, 0.5, 0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -202,7 +202,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at top right quadrant of camera image
   worldPoint = ignition::math::Vector3d(1, -0.5, 0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_LT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -210,7 +210,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at bottom left quadrant of camera image
   worldPoint = ignition::math::Vector3d(1, 0.5, -0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_LT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
@@ -218,7 +218,7 @@ TEST_F(WideAngleCameraSensor, Projection)
 
   // point at bottom right quadrant of camera image
   worldPoint = ignition::math::Vector3d(1, -0.5, -0.5);
-  screenPt = camera->Project(worldPoint);
+  screenPt = camera->Project3d(worldPoint);
   EXPECT_GT(screenPt.X(), camera->ViewportWidth() * 0.5);
   EXPECT_GT(screenPt.Y(), camera->ViewportHeight() * 0.5);
   EXPECT_GT(screenPt.Z(), 0.0);
