@@ -375,7 +375,7 @@ namespace gazebo
       /// velocity before set position, default is false.
       /// \return returns true if operation succeeds, false if it fails.
       protected: bool SetPositionMaximal(
-                  const unsigned int _index, const double _position,
+                  const unsigned int _index, double _position,
                   const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetVelocity.

@@ -709,7 +709,7 @@ bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
 
 //////////////////////////////////////////////////
 bool Joint::SetPositionMaximal(
-    const unsigned int _index, const double _position,
+    const unsigned int _index, double _position,
     const bool _preserveWorldVelocity)
 {
   // check if index is within bounds
