@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2851](https://bitbucket.org/osrf/gazebo/pull-requests/2851)
+
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 

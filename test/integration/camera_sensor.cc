@@ -898,7 +898,7 @@ TEST_F(CameraSensor, PointCloud)
     return;
   }
 
-  // get point cloud depth camera ssensor
+  // get point cloud depth camera sensor
   std::string cameraName = "pointcloud_camera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::DepthCameraSensorPtr camSensor =
@@ -1117,9 +1117,9 @@ TEST_F(CameraSensor, LensFlare)
 /////////////////////////////////////////////////
 TEST_F(CameraSensor, 16bit)
 {
-  // World contains a box positioned at top left quadrant of image generated
+  // World contains a box positioned at top right quadrant of image generated
   // by a mono 16 bit camera and a color 16 bit camera.
-  // Verify pixel values of top left quadrant of image (corresponding to box)
+  // Verify pixel values of top right quadrant of image (corresponding to box)
   // are approximately the same but different from the background's pixel
   // values.
   Load("worlds/16bit_camera.world");
@@ -1132,7 +1132,7 @@ TEST_F(CameraSensor, 16bit)
     return;
   }
 
-  // get L16 camera ssensor
+  // get L16 camera sensor
   std::string l16CameraName = "l16bit_camera_sensor";
   sensors::SensorPtr l16Sensor = sensors::get_sensor(l16CameraName);
   sensors::CameraSensorPtr l16CamSensor =
@@ -1146,7 +1146,7 @@ TEST_F(CameraSensor, 16bit)
   EXPECT_GT(l16Width, 0u);
   EXPECT_GT(l16Height, 0u);
 
-  // get rgb16 camera ssensor
+  // get rgb16 camera sensor
   std::string rgb16CameraName = "rgb16bit_camera_sensor";
   sensors::SensorPtr rgb16Sensor = sensors::get_sensor(rgb16CameraName);
   sensors::CameraSensorPtr rgb16CamSensor =
