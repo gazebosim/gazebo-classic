@@ -1235,7 +1235,7 @@ TEST_F(CameraSensor, 16bit)
   EXPECT_GT(diff, minDiff);
 
 
-  // verify RGB INT16 camera images
+  // verify RGB UINT16 camera images
   uint16_t bgRValue = 0;
   uint16_t bgGValue = 0;
   uint16_t bgBValue = 0;

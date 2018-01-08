@@ -96,7 +96,7 @@
             <image>
               <width>320</width>
               <height>240</height>
-              <format>RGB_INT16</format>
+              <format>RGB_UINT16</format>
             </image>
             <clip>
               <near>0.1</near>

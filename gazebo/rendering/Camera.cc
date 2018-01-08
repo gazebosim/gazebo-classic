@@ -859,13 +859,14 @@ unsigned int Camera::ImageDepth() const
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
-  else if (imgFmt == "L16" || imgFmt == "L_INT16")
+  else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
     return 1;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
-  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16")
+  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16"
+      || imgFmt == "RGB_UINT16")
     return 3;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
@@ -954,7 +955,7 @@ int Camera::OgrePixelFormat(const std::string &_format)
 
   if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
-  else if (_format == "L16" || _format == "L_INT16")
+  else if (_format == "L16" || _format == "L_INT16" || _format == "L_UINT16")
     result = static_cast<int>(Ogre::PF_L16);
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
@@ -964,7 +965,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
-  else if (_format == "R16G16B16" || _format == "RGB_INT16")
+  else if (_format == "R16G16B16" || _format == "RGB_INT16"
+      || _format == "RGB_UINT16")
     result = static_cast<int>(Ogre::PF_SHORT_RGB);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
