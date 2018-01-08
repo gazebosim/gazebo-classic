@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <gui>
+      <plugin name="sample" filename="libmovable_text_demo.so"/>
+    </gui>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+  </world>
+</sdf>

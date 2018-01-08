@@ -151,7 +151,6 @@ namespace gazebo
       /// \return the color
       public: ABGR GetAsABGR() const;
 
-
       /// \brief Set from uint32 RGBA packed value
       /// \param[in] _v the new color
       public: void SetFromRGBA(const RGBA _v);

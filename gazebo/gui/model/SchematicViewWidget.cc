@@ -20,7 +20,6 @@
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
@@ -222,7 +221,7 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   std::string materialName = JointMaker::JointMaterial(_type);
 
-  common::Color edgeColor = common::Color::Black;
+  ignition::math::Color edgeColor = ignition::math::Color::Black;
   if (!materialName.empty())
   {
     ignition::math::Color matAmbient;
