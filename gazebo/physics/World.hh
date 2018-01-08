@@ -93,6 +93,10 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Get the SDF of the world in the current state.
+      /// \return The SDF
+      public: const sdf::ElementPtr SDF();
+
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
@@ -480,7 +484,7 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+      public: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
           const BasePtr &_parent);
 
       /// \brief Load an actor.

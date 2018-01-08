@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/test/ServerFixture.hh"
 #include "test/util.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -66,7 +68,7 @@ TEST_F(LightTest, LightMsg)
   msgs::Light lightMsg;
   lightMsg.set_name("test_light");
   msgs::Set(lightMsg.mutable_pose(), pose);
-  msgs::Set(lightMsg.mutable_diffuse(), common::Color(0.4, 0.5, 0.6));
+  msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0.4, 0.5, 0.6));
   lightMsg.set_type(msgs::Light::SPOT);
 
   // Process message

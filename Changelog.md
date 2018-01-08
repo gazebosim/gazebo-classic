@@ -2,8 +2,19 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Added World::GetSDF()
+    * [Pull request #2708](https://bitbucket.org/osrf/gazebo/pull-requests/2708)
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
+
+1. Deprecate gazebo::common::Color
+    * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
+    * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
+    * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
+    * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
+
+1. Updates to MovableText
+    * [Pull request #2839](https://bitbucket.org/osrf/gazebo/pull-request/2839)
 
 1. Mark constructors as explicit to fix cppcheck warnings
     * [Pull request #2790](https://bitbucket.org/osrf/gazebo/pull-request/2790)
@@ -42,7 +53,7 @@
 1. Bullet: sending feedback on contact points on depth 0 as well
     * [Pull request #2630](https://bitbucket.org/osrf/gazebo/pull-requests/2630/)
 
-1. Deprecate functions to set linear/angular acceleration 
+1. Deprecate functions to set linear/angular acceleration
     * [Pull request #2622](https://bitbucket.org/osrf/gazebo/pull-request/2622)
 
 1. Added GpuLaserDataIterator
@@ -58,10 +69,26 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Move Connection header buffer from heap to stack to avoid race condition.
+    * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
+
+1. Shadow improvements
+    * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
+
+1. Add light as child of link
+    * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
+
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
+    * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
+
+1. Image Viewer: fix QImage::Format used to display grayscale images
+    * [Pull request #2813](https://bitbucket.org/osrf/gazebo/pull-requests/2813)
+
 1. Fix gazebo8 homebrew build (support tinyxml2 6.0.0)
     * [Pull request 2823](https://bitbucket.org/osrf/gazebo/pull-request/2823)
     * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
-
 
 
 ## Gazebo 8.2.0 (2017-12-10)
@@ -538,6 +565,19 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Move Connection header buffer from heap to stack to avoid race condition.
+    * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
+
+1. Shadow improvements
+    * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
+
+1. Add light as child of link
+    * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
+
+1. Add camera lens flare effect
+    * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
+    * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
