@@ -21,6 +21,7 @@
 #include "test/util.hh"
 
 #ifndef _WIN32
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
