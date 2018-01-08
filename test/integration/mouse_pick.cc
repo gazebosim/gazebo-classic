@@ -474,14 +474,14 @@ void MousePickingTest::InvalidMesh()
   this->ProcessEventsAndDraw(mainWindow);
 
   // pick the box
-  auto pickPt = cam->Project(modelVis->GetWorldPose().pos.Ign());
+  auto pickPt = cam->Project(modelVis->WorldPose().Pos());
 
   gazebo::rendering::RayQuery rayQuery(cam);
-  gazebo::math::Vector3 intersect;
-  std::vector<gazebo::math::Vector3> vertices;
-  rayQuery.SelectMeshTriangle(pickPt.X(), pickPt.Y(), modelVis,
-      intersect, vertices);
-  QVERIFY(!vertices.empty());
+  ignition::math::Vector3d intersect;
+  ignition::math::Triangle3d triangle;
+  QVERIFY(rayQuery.SelectMeshTriangle(pickPt.X(), pickPt.Y(), modelVis,
+      intersect, triangle));
+  QVERIFY(triangle.Valid());
 
   cam->Fini();
   mainWindow->close();
