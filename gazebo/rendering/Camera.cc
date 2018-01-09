@@ -857,6 +857,10 @@ unsigned int Camera::ImageDepth() const
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->Get<std::string>("format");
 
+  // NOTE: we've been misusing image depth
+  // Image depth = number of bits per pixel
+  // e.g Depth of L8 should be 8 and R8G8B8 should be 24
+  // This function actually returns the number of channels per pixel
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
   else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
@@ -877,6 +881,14 @@ unsigned int Camera::ImageDepth() const
           << imgFmt << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageMemorySize() const
+{
+  return  Ogre::PixelUtil::getMemorySize(this->ImageWidth(),
+      this->ImageHeight(), 1, static_cast<Ogre::PixelFormat>(
+      this->imageFormat));
 }
 
 //////////////////////////////////////////////////

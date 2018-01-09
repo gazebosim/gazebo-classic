@@ -348,6 +348,10 @@ namespace gazebo
       /// \return Image width
       public: virtual unsigned int ImageWidth() const;
 
+      /// \brief Get the memory size of this image
+      /// \return Image memory size in bytes
+      public: virtual unsigned int ImageMemorySize() const;
+
       /// \brief Get the width of the off-screen render texture
       /// \return Render texture width
       /// \deprecated See TextureWidth()
@@ -373,7 +377,8 @@ namespace gazebo
       public: unsigned int GetImageDepth() const GAZEBO_DEPRECATED(7.0);
 
       /// \brief Get the depth of the image
-      /// \return Depth of the image
+      /// NOTE: This function actually returns the number of 'channels'
+      /// \return Number of channels in a pixel
       public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.

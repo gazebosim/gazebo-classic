@@ -31,14 +31,21 @@ ImageFrame::ImageFrame(QWidget *_parent)
 /////////////////////////////////////////////////
 ImageFrame::~ImageFrame()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (this->dataPtr->depthBuffer)
+    delete [] this->dataPtr->depthBuffer;
+  if (this->dataPtr->imageBuffer)
+    delete [] this->dataPtr->imageBuffer;
+
+
   delete this->dataPtr;
-  this->dataPtr = NULL;
+  this->dataPtr = nullptr;
 }
 
 /////////////////////////////////////////////////
 void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 {
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   QPainter painter(this);
 
   if (!this->dataPtr->image.isNull())
@@ -61,30 +68,137 @@ void ImageFrame::paintEvent(QPaintEvent * /*_event*/)
 /////////////////////////////////////////////////
 void ImageFrame::OnImage(const msgs::Image &_msg)
 {
-  unsigned char *rgbData = NULL;
-  unsigned int rgbDataSize = 0;
+  if (_msg.width() == 0 || _msg.height() == 0)
+    return;
 
-  // Convert the image data to RGB
-  common::Image img;
-  img.SetFromData(
-      (unsigned char *)(_msg.data().c_str()),
-      _msg.width(), _msg.height(),
-      (common::Image::PixelFormat)(_msg.pixel_format()));
-
-  img.GetRGBData(&rgbData, rgbDataSize);
-
-  boost::mutex::scoped_lock lock(this->dataPtr->mutex);
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  QImage::Format qFormat;
+  bool isDepthImage = false;
+  switch (_msg.pixel_format())
+  {
+    case common::Image::PixelFormat::L_INT8:
+    {
+#if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
+      qFormat = QImage::Format_Indexed8;
+#else
+      qFormat = QImage::Format_Grayscale8;
+#endif
+      break;
+    }
+    case common::Image::PixelFormat::R_FLOAT16:
+    case common::Image::PixelFormat::R_FLOAT32:
+    {
+      qFormat = QImage::Format_RGB888;
+      isDepthImage = true;
+      break;
+    }
+    default:
+    {
+      qFormat = QImage::Format_RGB888;
+      break;
+    }
+  }
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
-      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height()))
+      _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
+      || qFormat != this->dataPtr->image.format())
   {
-    QImage qimage(_msg.width(), _msg.height(), QImage::Format_RGB888);
+    QImage qimage(_msg.width(), _msg.height(), qFormat);
     this->dataPtr->image = qimage.copy();
   }
 
-  // Store the image data
-  memcpy(this->dataPtr->image.bits(), rgbData, rgbDataSize);
+  // Convert the image data to RGB
+  if (isDepthImage)
+  {
+    unsigned int depthSamples = _msg.width() * _msg.height();
+    float f;
+    // cppchecker recommends using sizeof(varname)
+    unsigned int depthBufferSize = depthSamples * sizeof(f);
 
+    if (!this->dataPtr->depthBuffer)
+      this->dataPtr->depthBuffer = new float[depthSamples];
+    memcpy(this->dataPtr->depthBuffer, _msg.data().c_str(), depthBufferSize);
+
+    float maxDepth = 0;
+    for (unsigned int i = 0; i < _msg.height() * _msg.width(); ++i)
+    {
+      if (this->dataPtr->depthBuffer[i] > maxDepth &&
+          !std::isinf(this->dataPtr->depthBuffer[i]))
+      {
+        maxDepth = this->dataPtr->depthBuffer[i];
+      }
+    }
+    unsigned int idx = 0;
+    double factor = 255 / maxDepth;
+    for (unsigned int j = 0; j < _msg.height(); ++j)
+    {
+      for (unsigned int i = 0; i < _msg.width(); ++i)
+      {
+        float d = this->dataPtr->depthBuffer[idx++];
+        d = 255 - (d * factor);
+        QRgb value = qRgb(d, d, d);
+        this->dataPtr->image.setPixel(i, j, value);
+      }
+    }
+  }
+  // convert 16 bit camera images to rgb image format for display
+  else if (_msg.pixel_format() == common::Image::PixelFormat::L_INT16
+      || _msg.pixel_format() == common::Image::PixelFormat::RGB_INT16)
+  {
+    uint16_t u;
+    // cppchecker recommends using sizeof(varname)
+    unsigned int channels = _msg.step() / _msg.width() / sizeof(u);
+    unsigned int samples = _msg.width() * _msg.height() * channels;
+    unsigned int bufferSize = samples * sizeof(u);
+
+    if (!this->dataPtr->imageBuffer)
+      this->dataPtr->imageBuffer = new unsigned char[bufferSize];
+    memcpy(this->dataPtr->imageBuffer, _msg.data().c_str(), bufferSize);
+
+    // factor to convert from 16bit to 8bit value
+    double factor = 255 / (std::pow(2, 16) - 1);
+    uint16_t *uint16Buffer = reinterpret_cast<uint16_t *>(
+        this->dataPtr->imageBuffer);
+    int rgb[3] = {0, 0, 0};
+    unsigned int width = _msg.width()*channels;
+    for (unsigned int j = 0; j < _msg.height(); ++j)
+    {
+      for (unsigned int i = 0; i < width; i+=channels)
+      {
+        uint16_t v = uint16Buffer[j*width + i] * factor;
+        // for L16 we set rgb to be the same value
+        rgb[0] = rgb[1] = rgb[2] = v;
+        // handle the case for rgb16
+        for (unsigned int k = 1; k < channels; ++k)
+        {
+          rgb[k] = uint16Buffer[j*width + i + k] * factor;
+        }
+        QRgb value = qRgb(rgb[0], rgb[1], rgb[2]);
+        this->dataPtr->image.setPixel(i/channels, j, value);
+      }
+    }
+  }
+  else
+  {
+#if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
+    // for use with QImage::Format_Indexed8 format
+    // only create our color table the first time
+    static QVector<QRgb>  sColorTable;
+    if (sColorTable.isEmpty())
+    {
+      sColorTable.resize(256);
+      for (int i = 0; i < 256; ++i)
+        sColorTable[i] = qRgb(i, i, i);
+      this->dataPtr->image.setColorTable(sColorTable);
+    }
+#endif
+    const char *buffer = _msg.data().c_str();
+    for (int i = 0; i < this->dataPtr->image.height(); ++i)
+    {
+      memcpy(this->dataPtr->image.scanLine(i),
+          buffer + i*this->dataPtr->image.bytesPerLine(),
+          this->dataPtr->image.bytesPerLine());
+    }
+  }
   this->update();
-  delete [] rgbData;
 }
