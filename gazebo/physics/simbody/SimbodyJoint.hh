@@ -78,8 +78,11 @@ namespace gazebo
           const unsigned int _index) const;
 
       // Documentation inherited.
-      public: virtual bool SetPosition(unsigned int _index, double _position,
-                                       bool _preserveWorldVelocity) override;
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false)
+            override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(

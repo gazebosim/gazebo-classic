@@ -679,7 +679,7 @@ JointWrench DARTJoint::GetForceTorque(unsigned int /*_index*/)
 }
 
 /////////////////////////////////////////////////
-bool DARTJoint::SetPosition(unsigned int _index, double _position,
+bool DARTJoint::SetPosition(const unsigned int _index, const double _position,
                             const bool _preserveWorldVelocity)
 {
   if (!this->dataPtr->IsInitialized())
