@@ -350,7 +350,7 @@ namespace gazebo
 
       /// \brief Get the memory size of this image
       /// \return Image memory size in bytes
-      public: virtual unsigned int ImageMemorySize() const;
+      public: unsigned int ImageMemorySize() const;
 
       /// \brief Get the width of the off-screen render texture
       /// \return Render texture width
