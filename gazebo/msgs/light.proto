@@ -34,4 +34,5 @@ message Light
   optional float spot_inner_angle        = 12;
   optional float spot_outer_angle        = 13;
   optional float spot_falloff            = 14;
+  optional uint32 id                     = 15;
 }
