@@ -2,8 +2,13 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
-1. Added World::GetSDF()
+1. Rename `BUILD_TYPE_*` macros to `GAZEBO_BUILD_TYPE_*`
+    * [Pull request #2846](https://bitbucket.org/osrf/gazebo/pull-requests/2846)
+    * [Issue 2343](https://bitbucket.org/osrf/gazebo/issues/2343)
+
+1. Added World::SDF()
     * [Pull request #2708](https://bitbucket.org/osrf/gazebo/pull-requests/2708)
+
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
@@ -12,6 +17,7 @@
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
     * [Pull request #2837](https://bitbucket.org/osrf/gazebo/pull-request/2837)
     * [Pull request #2838](https://bitbucket.org/osrf/gazebo/pull-request/2838)
+    * [Pull request #2842](https://bitbucket.org/osrf/gazebo/pull-request/2842)
 
 1. Updates to MovableText
     * [Pull request #2839](https://bitbucket.org/osrf/gazebo/pull-request/2839)

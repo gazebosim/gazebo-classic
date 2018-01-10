@@ -95,7 +95,7 @@ TEST_F(IntrospectionManagerTest, RegisterAllTypes)
   };
   auto func6 = []()
   {
-    return common::Color();
+    return ignition::math::Color();
   };
   auto func7 = []()
   {
@@ -117,7 +117,7 @@ TEST_F(IntrospectionManagerTest, RegisterAllTypes)
   EXPECT_TRUE(this->manager->Register<bool>("item7", func4));
   EXPECT_TRUE(this->manager->Register<ignition::math::Vector3d>(
       "item8", func5));
-  EXPECT_TRUE(this->manager->Register<common::Color>("item9", func6));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Color>("item9", func6));
   EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item10", func7));
   EXPECT_TRUE(this->manager->Register<ignition::math::Quaterniond>(
       "item11", func8));

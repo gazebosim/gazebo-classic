@@ -127,7 +127,7 @@ auto standaloneValues = ::testing::Values(
   , "introspection_client"
   , "listener"
   , "publisher"
-#ifndef BUILD_TYPE_COVERAGE
+#ifndef GAZEBO_BUILD_TYPE_COVERAGE
   , "test_fixture"
 #endif
   , "transporter"

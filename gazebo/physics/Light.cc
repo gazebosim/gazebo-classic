@@ -25,15 +25,29 @@
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
 
+
+/// \brief Private data for the Light class
+class gazebo::physics::LightPrivate
+{
+  /// \brief Light message container.
+  public: msgs::Light msg;
+};
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-  : Entity(_parent)
+  : Entity(_parent), dataPtr(new LightPrivate)
 {
   this->AddType(LIGHT);
 }
+
+//////////////////////////////////////////////////
+Light::~Light()
+{
+}
+
 
 //////////////////////////////////////////////////
 void Light::Init()
@@ -60,13 +74,13 @@ void Light::ProcessMsg(const msgs::Light &_msg)
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-  this->msg.MergeFrom(_msg);
+  this->dataPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg)
 {
-  _msg.MergeFrom(this->msg);
+  _msg.MergeFrom(this->dataPtr->msg);
 
   _msg.set_name(this->GetScopedName());
 
