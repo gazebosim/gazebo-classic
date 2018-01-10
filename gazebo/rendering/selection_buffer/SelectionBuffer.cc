@@ -14,7 +14,9 @@
  * limitations under the License.
  *
 */
+
 #include <memory>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -229,16 +231,16 @@ Ogre::Entity *SelectionBuffer::OnSelectionClick(int _x, int _y)
 
   size_t posInStream = 0;
 
-  common::Color::BGRA color(0);
+  ignition::math::Color::BGRA color(0);
   if (!this->dataPtr->buffer)
   {
     gzerr << "Selection buffer is null.\n";
     return nullptr;
   }
   memcpy(static_cast<void *>(&color), this->dataPtr->buffer + posInStream, 4);
-  common::Color cv;
+  ignition::math::Color cv;
   cv.SetFromARGB(color);
-  cv.a = 1.0;
+  cv.A(1.0);
   const std::string &entName =
     this->dataPtr->materialSwitchListener->GetEntityName(cv);
 

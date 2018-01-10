@@ -76,7 +76,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: DARTPhysics(WorldPtr _world);
+      public: explicit DARTPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~DARTPhysics();

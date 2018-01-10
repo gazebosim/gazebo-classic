@@ -1382,7 +1382,14 @@ void Visual::SetEmissive(const ignition::math::Color &_color,
 /////////////////////////////////////////////////
 common::Color Visual::GetAmbient() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->dataPtr->ambient;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1394,7 +1401,14 @@ ignition::math::Color Visual::Ambient() const
 /////////////////////////////////////////////////
 common::Color Visual::GetDiffuse() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->dataPtr->diffuse;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1406,7 +1420,14 @@ ignition::math::Color Visual::Diffuse() const
 /////////////////////////////////////////////////
 common::Color Visual::GetSpecular() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->dataPtr->specular;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -1418,7 +1439,14 @@ ignition::math::Color Visual::Specular() const
 /////////////////////////////////////////////////
 common::Color Visual::GetEmissive() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->dataPtr->emissive;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 /////////////////////////////////////////////////

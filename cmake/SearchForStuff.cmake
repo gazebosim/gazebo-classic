@@ -10,7 +10,7 @@ execute_process(COMMAND pkg-config --modversion protobuf
   RESULT_VARIABLE protobuf_modversion_failed)
 
 ########################################
-# 1. can not use BUILD_TYPE_PROFILE is defined after include this module
+# 1. can not use GAZEBO_BUILD_TYPE_PROFILE is defined after include this module
 # 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)

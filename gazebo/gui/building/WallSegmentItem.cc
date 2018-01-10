@@ -18,7 +18,7 @@
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/EditorView.hh"
@@ -50,7 +50,7 @@ WallSegmentItem::WallSegmentItem(const ignition::math::Vector2d &_start,
 
   this->SetThickness(this->dataPtr->wallThickness);
   this->SetLine(_start, _end);
-  this->SetColor(common::Color(247, 142, 30));
+  this->SetColor(ignition::math::Color(247, 142, 30));
 
   this->zValueIdle = 0;
   this->zValueSelected = 5;
@@ -231,7 +231,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
     this->ShowHandles(false);
     this->dataPtr->measure->setVisible(false);
     this->setZValue(this->zValueIdle);
-    this->SetColor(common::Color::Black);
+    this->SetColor(ignition::math::Color::Black);
     this->Set3dTransparency(0.4);
   }
 }

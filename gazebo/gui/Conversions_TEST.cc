@@ -35,14 +35,14 @@ TEST_F(GuiConversionsTest, Color)
 
     double tol = 0.01;
 
-    gazebo::common::Color color(red, green, blue, alpha);
+    ignition::math::Color color(red, green, blue, alpha);
     auto newColor = gazebo::gui::Conversions::Convert(
                     gazebo::gui::Conversions::Convert(color));
 
-    EXPECT_NEAR(newColor.r, newColor.r, tol);
-    EXPECT_NEAR(newColor.g, newColor.g, tol);
-    EXPECT_NEAR(newColor.b, newColor.b, tol);
-    EXPECT_NEAR(newColor.a, newColor.a, tol);
+    EXPECT_NEAR(newColor.R(), newColor.R(), tol);
+    EXPECT_NEAR(newColor.G(), newColor.G(), tol);
+    EXPECT_NEAR(newColor.B(), newColor.B(), tol);
+    EXPECT_NEAR(newColor.A(), newColor.A(), tol);
   }
 
   // Qt to Gazebo to Qt

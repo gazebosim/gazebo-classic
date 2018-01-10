@@ -149,7 +149,6 @@ void FloorItem::Update()
   this->FloorChanged();
 }
 
-
 /////////////////////////////////////////////////
 void FloorItem::mousePressEvent(QGraphicsSceneMouseEvent *_event)
 {

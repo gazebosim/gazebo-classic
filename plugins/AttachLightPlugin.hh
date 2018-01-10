@@ -48,6 +48,10 @@ namespace gazebo
     /// \brief Main loop to update the pose of lights
     private: void OnUpdate();
 
+    /// \brief Request callback for handling deletion events.
+    /// \param[in] _msg The message data.
+    public: void OnRequest(ConstRequestPtr &_msg);
+
     /// \brief Pointer to private data
     private: std::unique_ptr<AttachLightPluginPrivate> dataPtr;
   };
