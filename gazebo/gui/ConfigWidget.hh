@@ -28,6 +28,7 @@
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/util/system.hh"
 
 namespace google
 {
