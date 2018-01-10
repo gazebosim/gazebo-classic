@@ -21,7 +21,6 @@
 #include <map>
 #include <ignition/transport.hh>
 
-#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
@@ -55,13 +54,6 @@ namespace gazebo
 
       /// \brief Joint velocities.
       public: std::map<std::string, double> velocities;
-
-      /// \brief Node for communication.
-      /// \deprecated See JointControllerPrivate::node.
-      public: transport::NodePtr gznode;
-
-      /// \brief Subscribe to joint command.
-      public: transport::SubscriberPtr jointCmdSub;
 
       /// \brief Node for communication.
       public: ignition::transport::Node node;

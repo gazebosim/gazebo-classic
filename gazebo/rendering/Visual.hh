@@ -31,7 +31,6 @@
 #include <ignition/math/Vector3.hh>
 #include <ignition/msgs/MessageTypes.hh>
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/Time.hh"
 
@@ -224,22 +223,8 @@ namespace gazebo
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetAmbient(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the ambient color of the visual.
-      /// \param[in] _color The ambient color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetAmbient(const ignition::math::Color &_color,
           const bool _cascade = true);
-
-      /// \brief Set the diffuse color of the visual.
-      /// \param[in] _color Set the diffuse color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetDiffuse(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
@@ -250,22 +235,8 @@ namespace gazebo
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetSpecular(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the specular color of the visual.
-      /// \param[in] _color Specular color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
       public: void SetSpecular(const ignition::math::Color &_color,
           const bool _cascade = true);
-
-      /// \brief Set the emissive value.
-      /// \param[in] _color The emissive color.
-      /// \param[in] _cascade Whether to set this parameter in children too.
-      /// \deprecated use ignition::math::Color instead
-      public: virtual void SetEmissive(const common::Color &_color,
-          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
@@ -275,17 +246,7 @@ namespace gazebo
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetAmbient() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the ambient color of the visual.
-      /// \return Ambient color.
       public: ignition::math::Color Ambient() const;
-
-      /// \brief Get the diffuse color of the visual.
-      /// \return Diffuse color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetDiffuse() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the diffuse color of the visual.
       /// \return Diffuse color.
@@ -293,17 +254,7 @@ namespace gazebo
 
       /// \brief Get the specular color of the visual.
       /// \return Specular color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetSpecular() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the specular color of the visual.
-      /// \return Specular color.
       public: ignition::math::Color Specular() const;
-
-      /// \brief Get the emissive color of the visual.
-      /// \return Emissive color.
-      /// \deprecated use ignition::math::Color instead
-      public: common::Color GetEmissive() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
@@ -443,15 +394,6 @@ namespace gazebo
       /// \brief Set the normal map.
       /// \param[in] _nmap Name of the normal map material.
       public: void SetNormalMap(const std::string &_nmap);
-
-      /// \brief True on or off a ribbon trail.
-      /// \param[in] _value True to enable ribbon trail.
-      /// \param[in] _initialColor The initial color of the ribbon trail.
-      /// \param[in] _changeColor Color to change too as the trail grows.
-      /// \deprecated use ignition::math::Color instead
-      public: void SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor) GAZEBO_DEPRECATED(9.0);
 
       /// \brief True on or off a ribbon trail.
       /// \param[in] _value True to enable ribbon trail.

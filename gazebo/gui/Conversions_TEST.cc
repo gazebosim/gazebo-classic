@@ -15,7 +15,6 @@
  *
 */
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/gui/Conversions.hh"
 #include "test/util.hh"
 

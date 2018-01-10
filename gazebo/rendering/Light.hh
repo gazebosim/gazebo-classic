@@ -26,7 +26,6 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/rendering/RenderTypes.hh"
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace Ogre
@@ -131,23 +130,11 @@ namespace gazebo
 
       /// \brief Set the diffuse color
       /// \param[in] _color Light diffuse color.
-      /// \deprecated See function which accepts ignition::math::Color.
-      public: void SetDiffuseColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the diffuse color
-      /// \param[in] _color Light diffuse color.
       public: void SetDiffuseColor(const ignition::math::Color &_color);
 
       /// \brief Get the diffuse color
       /// \return The light's diffuse color.
       public: ignition::math::Color DiffuseColor() const;
-
-      /// \brief Set the specular color
-      /// \param[in] _color The specular color
-      /// \deprecated See function which accepts ignition::math::Color.
-      public: void SetSpecularColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the specular color
       /// \param[in] _color The specular color

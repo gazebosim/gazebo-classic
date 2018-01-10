@@ -475,12 +475,6 @@ void GpuLaser::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-const float* GpuLaser::LaserData() const
-{
-  return this->dataPtr->laserBuffer;
-}
-
-//////////////////////////////////////////////////
 GpuLaser::DataIter GpuLaser::LaserDataBegin() const
 {
   const unsigned int index = 0;

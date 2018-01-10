@@ -1101,12 +1101,6 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
-{
-  this->SetAmbient(_color.Ign(), _cascade);
-}
-
-/////////////////////////////////////////////////
 void Visual::SetAmbient(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1169,12 +1163,6 @@ void Visual::SetAmbient(const ignition::math::Color &_color,
 
   this->dataPtr->sdf->GetElement("material")
       ->GetElement("ambient")->Set(_color);
-}
-
-/////////////////////////////////////////////////
-void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
-{
-  this->SetDiffuse(_color.Ign(), _cascade);
 }
 
 /////////////////////////////////////////////////
@@ -1248,12 +1236,6 @@ void Visual::SetDiffuse(const ignition::math::Color &_color,
 }
 
 /////////////////////////////////////////////////
-void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
-{
-  this->SetSpecular(_color.Ign(), _cascade);
-}
-
-//////////////////////////////////////////////////
 void Visual::SetSpecular(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1319,12 +1301,6 @@ void Visual::SetSpecular(const ignition::math::Color &_color,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
-{
-  this->SetEmissive(_color.Ign(), _cascade);
-}
-
-//////////////////////////////////////////////////
 void Visual::SetEmissive(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -1380,35 +1356,9 @@ void Visual::SetEmissive(const ignition::math::Color &_color,
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetAmbient() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->ambient;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Ambient() const
 {
   return this->dataPtr->ambient;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetDiffuse() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->diffuse;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1418,35 +1368,9 @@ ignition::math::Color Visual::Diffuse() const
 }
 
 /////////////////////////////////////////////////
-common::Color Visual::GetSpecular() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->specular;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Color Visual::Specular() const
 {
   return this->dataPtr->specular;
-}
-
-/////////////////////////////////////////////////
-common::Color Visual::GetEmissive() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->dataPtr->emissive;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -2026,14 +1950,6 @@ void Visual::SetRibbonTrail(bool _value,
     this->dataPtr->ribbonTrail->clearChain(0);
   }
   this->dataPtr->ribbonTrail->setVisible(_value);
-}
-
-//////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value,
-                  const common::Color &_initialColor,
-                  const common::Color &_changeColor)
-{
-  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
 }
 
 //////////////////////////////////////////////////

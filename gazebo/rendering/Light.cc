@@ -440,12 +440,6 @@ std::string Light::LightType() const
 }
 
 //////////////////////////////////////////////////
-void Light::SetDiffuseColor(const common::Color &_color)
-{
-  this->SetDiffuseColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Light::SetDiffuseColor(const ignition::math::Color &_color)
 {
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
@@ -468,12 +462,6 @@ ignition::math::Color Light::SpecularColor() const
 {
   return
       this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
-}
-
-//////////////////////////////////////////////////
-void Light::SetSpecularColor(const common::Color &_color)
-{
-  this->SetSpecularColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////

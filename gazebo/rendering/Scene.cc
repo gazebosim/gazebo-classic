@@ -475,12 +475,6 @@ std::string Scene::Name() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &_color)
-{
-  this->SetAmbientColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Scene::SetAmbientColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
@@ -497,12 +491,6 @@ void Scene::SetAmbientColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::AmbientColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("ambient");
-}
-
-//////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &_color)
-{
-  this->SetBackgroundColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -529,13 +517,6 @@ void Scene::SetBackgroundColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::BackgroundColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("background");
-}
-
-//////////////////////////////////////////////////
-void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
-                       const float /*_lineWidth*/, const common::Color &_color)
-{
-  this->CreateGrid(_cellCount, _cellLength, _color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1295,14 +1276,6 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
 
   if (!attached)
     sceneNode->attachObject(obj);
-}
-
-//////////////////////////////////////////////////
-void Scene::SetFog(const std::string &_type, const common::Color &_color,
-                   const double _density, const double _start,
-                   const double _end)
-{
-  this->SetFog(_type, _color.Ign(), _density, _start, _end);
 }
 
 //////////////////////////////////////////////////

@@ -581,40 +581,6 @@ namespace gazebo
 
     /// \brief Spawn a light.
     /// \param[in] _name Name for the light.
-    /// \param[in] _size Type of light - "spot", "directional", or "point".
-    /// \param[in] _pos Position for the light.
-    /// \param[in] _rpy Roll, pitch, yaw for the light.
-    /// \param[in] _diffuse Diffuse color of the light.
-    /// \param[in] _specular Specular color of the light.
-    /// \param[in] _direction Direction of the light ("spot" and "directional").
-    /// \param[in] _attenuationRange Range of attenuation.
-    /// \param[in] _attenuationConstant Constant component of attenuation
-    /// \param[in] _attenuationLinear Linear component of attenuation
-    /// \param[in] _attenuationQuadratic Quadratic component of attenuation
-    /// \param[in] _spotInnerAngle Inner angle ("spot" only).
-    /// \param[in] _spotOuterAngle Outer angle ("spot" only).
-    /// \param[in] _spotFallOff Fall off ("spot" only).
-    /// \param[in] _castShadows True to cast shadows.
-    /// \deprecated See SpawnLight version with ignition::math::Color.
-    protected: void SpawnLight(const std::string &_name,
-                   const std::string &_type,
-                   const ignition::math::Vector3d &_pos,
-                   const ignition::math::Vector3d &_rpy,
-                   const common::Color &_diffuse,
-                   const common::Color &_specular = common::Color::White,
-                   const ignition::math::Vector3d &_direction =
-                                               -ignition::math::Vector3d::UnitZ,
-                   double _attenuationRange = 20,
-                   double _attenuationConstant = 0.5,
-                   double _attenuationLinear = 0.01,
-                   double _attenuationQuadratic = 0.001,
-                   double _spotInnerAngle = 0,
-                   double _spotOuterAngle = 0,
-                   double _spotFallOff = 0,
-                   bool _castShadows = true) GAZEBO_DEPRECATED(9.0);
-
-    /// \brief Spawn a light.
-    /// \param[in] _name Name for the light.
     /// \param[in] _type Type of light - "spot", "directional", or "point".
     /// \param[in] _pos Position for the light.
     /// \param[in] _rpy Roll, pitch, yaw for the light.
