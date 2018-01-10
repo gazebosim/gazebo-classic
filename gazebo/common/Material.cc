@@ -121,7 +121,14 @@ void Material::SetAmbient(const ignition::math::Color &_clr)
 //////////////////////////////////////////////////
 Color Material::GetAmbient() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Ambient();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -145,7 +152,14 @@ void Material::SetDiffuse(const ignition::math::Color &_clr)
 //////////////////////////////////////////////////
 Color Material::GetDiffuse() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Diffuse();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -169,7 +183,14 @@ void Material::SetSpecular(const ignition::math::Color &_clr)
 //////////////////////////////////////////////////
 Color Material::GetSpecular() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Specular();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +214,14 @@ void Material::SetEmissive(const ignition::math::Color &_clr)
 //////////////////////////////////////////////////
 Color Material::GetEmissive() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
   return this->Emissive();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 }
 
 //////////////////////////////////////////////////
