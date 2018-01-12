@@ -219,6 +219,15 @@ namespace gazebo
       public: void SetMaterial(const std::string &_materialName,
                                bool _unique = true, const bool _cascade = true);
 
+      /// \brief Set a shader program parameter associated to this visual's
+      /// material
+      /// \param[in] _paramName Name of shader parameter
+      /// \param[in] _shaderType Type of shader. Supported types:
+      /// vertex, fragment
+      /// \param[in] _value Value to set the parameter to.
+      public: void SetMaterialShaderParam(const std::string &_paramName,
+          const std::string &_shaderType, const msgs::Any _value);
+
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.

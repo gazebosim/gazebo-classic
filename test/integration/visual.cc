@@ -168,6 +168,53 @@ TEST_F(VisualProperty, CastShadows)
   delete [] img2;
 }
 
+/////////////////////////////////////////////////
+TEST_F(VisualProperty, MaterialShaderParam)
+{
+  Load("worlds/shader_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
+    return;
+  }
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+  std::cerr << "camera count " << scene->GetCameraCount() << " vs " <<
+    scene->GetUserCameraCount() << std::endl;
+  // 1 camera in scene
+
+
+/*
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+
+  gazebo::render::VisualPtr boxVis = scene->GetVisual("box::link::visual");
+  ASSERT_NE(boxVis, nullptr);
+
+  // change shader param value
+  gazebo::msgs::Any value;
+  value->set_type(gazebo::msgs::Any::COLOR);
+  msgs::Set(value->mutable_color_value(), common::Color(0, 1, 0, 1));
+  boxVis->SetMaterialShaderParam("color", "fragment", value);
+
+  // wait for a few render updates
+  for (unsigned int i = 0; i  < 10; ++i)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+    common::Time::MSleep(100);
+  }
+*/
+
+}
+
+
 int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to

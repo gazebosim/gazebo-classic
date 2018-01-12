@@ -1,0 +1,51 @@
+vertex_program Gazebo/ShaderTestVS glsl
+{
+  source shader_test_vp.glsl
+
+  default_params
+  {
+  }
+}
+
+fragment_program Gazebo/ShaderTestFS glsl
+{
+  source shader_test_fp.glsl
+
+  default_params
+  {
+    param_named color float4 1 0 0 1
+  }
+}
+
+material Gazebo/ShaderTest
+{
+  technique
+  {
+    pass
+    {
+      ambient 1 0 0 1
+      diffuse 1 0 0 1
+
+      vertex_program_ref Gazebo/ShaderTestVS
+      {
+      }
+
+      fragment_program_ref Gazebo/ShaderTestFS
+      {
+      }
+    }
+  }
+}
+
+material Gazebo/kk
+{
+  technique
+  {
+    pass main
+    {
+      ambient .3 .3 .3  1.0
+      diffuse .7 .7 .7  1.0
+      specular 0.01 0.01 0.01 1.000000 1.500000
+    }
+  }
+}

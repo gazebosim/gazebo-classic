@@ -1118,6 +1118,88 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 }
 
 /////////////////////////////////////////////////
+void Visual::SetMaterialShaderParam(const std::string &_paramName,
+    const std::string &_shaderType, const msgs::Any _value)
+{
+  auto setNamedParam = [_paramName, _value](
+      Ogre::GpuProgramParametersSharedPtr _params)
+  {
+    switch (_value.type())
+    {
+      case msgs::Any::INT32:
+      {
+         _params->setNamedConstant(_paramName,
+             Ogre::Real(_value.int_value()));
+        break;
+      }
+      case msgs::Any::DOUBLE:
+      {
+         _params->setNamedConstant(_paramName,
+             Ogre::Real(_value.double_value()));
+        break;
+      }
+      case msgs::Any::VECTOR3D:
+      {
+         _params->setNamedConstant(_paramName,
+             Conversions::Convert(msgs::ConvertIgn(_value.vector3d_value())));
+        break;
+      }
+      case msgs::Any::QUATERNIOND:
+      {
+         _params->setNamedConstant(_paramName,
+             Conversions::Convert(ignition::math::Matrix4d(
+             msgs::ConvertIgn(_value.quaternion_value()))));
+        break;
+      }
+      case msgs::Any::COLOR:
+      {
+         auto color = msgs::Convert(_value.color_value());
+         _params->setNamedConstant(_paramName,
+             Ogre::Vector4(color.r, color.g, color.b, color.a));
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(
+      this->dataPtr->myMaterialName);
+  if (mat.isNull())
+  {
+    gzerr << "Failed to find material: '" << this->dataPtr->myMaterialName
+          << std::endl;
+    return;
+  }
+  for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *technique = mat->getTechnique(0);
+    if (!technique)
+      continue;
+    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = technique->getPass(j);
+      if (!pass)
+        continue;
+
+      // check if pass is programmable, ie if they are using shaders
+      if (!pass->isProgrammable())
+        continue;
+
+      // currently support only vertex and fragment shaders
+      if (_shaderType == "vertex" && pass->hasVertexProgram())
+      {
+        setNamedParam(pass->getVertexProgramParameters());
+      }
+      else if (_shaderType == "fragment" && pass->hasFragmentProgram())
+      {
+        setNamedParam(pass->getFragmentProgramParameters());
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 {
   if (!this->dataPtr->lighting)
