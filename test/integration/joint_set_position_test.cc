@@ -781,12 +781,17 @@ void JointKinematicTest::SetPositionRotating(const std::string &_physicsEngine)
   joint->SetPosition(0, 1.0);
   world->Step(1);
 
-  // Expect velocities to be zero
-  VEC_EXPECT_NEAR(zeroVec, link0->WorldLinearVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link1->WorldLinearVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
-  EXPECT_NEAR(0.0, joint->GetVelocity(0), TOL);
+  if(_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    // ODE and Bullet should reset the velocities after calling
+    // Joint::SetPosition with _preserveWorldVelocity set to false.
+    // For other physics engines, the behavior is undefined.
+    VEC_EXPECT_NEAR(zeroVec, link0->WorldLinearVel(), TOL);
+    VEC_EXPECT_NEAR(zeroVec, link1->WorldLinearVel(), TOL);
+    VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
+    VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
+    EXPECT_NEAR(0.0, joint->GetVelocity(0), TOL);
+  }
 }
 
 TEST_P(JointKinematicTest, SetPositionRotating)
