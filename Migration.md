@@ -43,6 +43,7 @@ release will remove the deprecated code.
     + Changed `protected: Color diffuse;` to `protected: ignition::math::Color diffuse;`
     + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
     + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
+1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
 
 ### Deprecations
 
@@ -194,6 +195,11 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Color AvgColor()
     + ***Deprecation:*** Color GetMaxColor() const
     + ***Replacement:*** ignition::math::Color MaxColor() const
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** SpawnLight function that accepts common::Color
+    + ***Replacement:*** SpawnLight function that accepts ignition::math::Color
+1. **gazebo/common/Color.hh**
+    + gazebo::common::Color is deprecated, use ignition::math::Color instead.
 
 ## Gazebo 7.X to 8.X
 
