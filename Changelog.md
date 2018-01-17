@@ -12,6 +12,9 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
+1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
+    * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
