@@ -73,9 +73,12 @@ bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
     for (unsigned int j = 0; j < mesh->GetSubMeshCount(); ++j)
     {
       const common::SubMesh *submesh = mesh->GetSubMesh(j);
-      for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
+      if (submesh->GetVertexCount() < 3u)
+        continue;
+      unsigned int indexCount = submesh->GetIndexCount();
+      for (unsigned int k = 0; k < indexCount; k += 3)
       {
-        if (submesh->GetVertexCount() < 3u)
+        if (indexCount <= k+2)
           continue;
 
         ignition::math::Vector3d vertexA =
