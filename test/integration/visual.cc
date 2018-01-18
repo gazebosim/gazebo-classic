@@ -168,9 +168,35 @@ TEST_F(VisualProperty, CastShadows)
   delete [] img2;
 }
 
+bool g_shaderParamSet = false;
+
+/////////////////////////////////////////////////
+void SetShaderParam(const std::string &_visualName,
+    const std::string &_paramName, const std::string &_shaderType,
+    const gazebo::msgs::Any &_value)
+{
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  rendering::VisualPtr visual = scene->GetVisual(_visualName);
+  ASSERT_NE(nullptr, visual);
+
+  // change shader param value
+  visual->SetMaterialShaderParam(_paramName, _shaderType, _value);
+
+  g_shaderParamSet = true;
+}
+
+
 /////////////////////////////////////////////////
 TEST_F(VisualProperty, MaterialShaderParam)
 {
+  // Load a world with a camera facing a red box
+  // This test verifies the box visual color can be changed to green by
+  // setting the `color` uniform parameter exposed by the fragment shader
+  // The box visual's material and shader files are shader_test.material,
+  // shader_test_vp.glsl, shader_test_fp.glsl in test/media/materials/scripts
+  // directory.
   Load("worlds/shader_test.world");
 
   // Make sure the render engine is available.
@@ -182,38 +208,98 @@ TEST_F(VisualProperty, MaterialShaderParam)
     return;
   }
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_NE(scene, nullptr);
-  std::cerr << "camera count " << scene->GetCameraCount() << " vs " <<
-    scene->GetUserCameraCount() << std::endl;
+  ASSERT_NE(nullptr, scene);
+
   // 1 camera in scene
+  rendering::CameraPtr cam = scene->GetCamera(0);
+  ASSERT_NE(nullptr, cam);
 
+  int totalImages = 20;
+  imageCount = 0;
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  img = new unsigned char[width * height * 3];
 
-/*
-  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
-  ASSERT_NE(scene, nullptr);
+  event::ConnectionPtr c =
+      cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
 
-
-  gazebo::render::VisualPtr boxVis = scene->GetVisual("box::link::visual");
-  ASSERT_NE(boxVis, nullptr);
-
-  // change shader param value
-  gazebo::msgs::Any value;
-  value->set_type(gazebo::msgs::Any::COLOR);
-  msgs::Set(value->mutable_color_value(), common::Color(0, 1, 0, 1));
-  boxVis->SetMaterialShaderParam("color", "fragment", value);
-
-  // wait for a few render updates
-  for (unsigned int i = 0; i  < 10; ++i)
-  {
-    event::Events::preRender();
-    event::Events::render();
-    event::Events::postRender();
+  unsigned int sleep = 0;
+  unsigned int maxSleep = 50;
+  while (imageCount < totalImages && sleep++ < maxSleep)
     common::Time::MSleep(100);
+
+  EXPECT_GE(imageCount, totalImages);
+  cam->DisconnectNewImageFrame(c);
+
+  // check initial color
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(255u, r);
+      EXPECT_EQ(0u, g);
+      EXPECT_EQ(0u, b);
+    }
   }
-*/
 
+  // now set shader material param in rendering thread
+  g_shaderParamSet = false;
+  gazebo::msgs::Any value;
+  value.set_type(gazebo::msgs::Any::COLOR);
+  msgs::Set(value.mutable_color_value(), common::Color(0, 1, 0, 1));
+  std::string visualName = "box::link::visual";
+  std::string paramName = "color";
+  std::string shaderType = "fragment";
+  // Connect to the render signal
+  auto c2 =
+      event::Events::ConnectPreRender(std::bind(&::SetShaderParam,
+      visualName, paramName, shaderType, value));
+
+  // wait for the param to be set
+  sleep = 0u;
+  while (!g_shaderParamSet && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  EXPECT_TRUE(g_shaderParamSet);
+
+  c2.reset();
+
+  // get more images
+  sleep = 0;
+  imageCount = 0;
+  c = cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  while (imageCount < totalImages && sleep++ < maxSleep)
+    common::Time::MSleep(100);
+
+  EXPECT_GE(imageCount, totalImages);
+  cam->DisconnectNewImageFrame(c);
+
+  // verify new color has been set
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(0u, r);
+      EXPECT_EQ(255u, g);
+      EXPECT_EQ(0u, b);
+    }
+  }
+
+  delete [] img;
 }
-
 
 int main(int argc, char **argv)
 {
