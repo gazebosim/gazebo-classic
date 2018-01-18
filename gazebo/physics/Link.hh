@@ -550,9 +550,9 @@ namespace gazebo
       /// \param[in] _worldReferenceFrameSrc initial reference frame to
       /// which this link is attached.
       /// \param[in] _worldReferenceFrameDst final location of the
+      /// reference frame specified in world coordinates.
       /// \param[in] _preserveWorldVelocity True if to preserve the world
       /// velocity before move frame, default is false.
-      /// reference frame specified in world coordinates.
       public: void MoveFrame(
                   const ignition::math::Pose3d &_worldReferenceFrameSrc,
                   const ignition::math::Pose3d &_worldReferenceFrameDst,
