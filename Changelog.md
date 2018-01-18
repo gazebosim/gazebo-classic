@@ -12,6 +12,9 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
+1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
+    * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
     * [Pull request #2831](https://bitbucket.org/osrf/gazebo/pull-request/2831)
@@ -74,6 +77,9 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix inserting models with invalid submesh
+    * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
 
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
@@ -584,6 +590,9 @@
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
     * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
+
+1. Fix inserting models with invalid submesh
+    * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
