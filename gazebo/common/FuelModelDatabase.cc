@@ -26,7 +26,7 @@
 #include <vector>
 
 #include <ignition/common/Filesystem.hh>
-#include <ignition/fuel-tools.hh>
+#include <ignition/fuel_tools.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/common/Console.hh"

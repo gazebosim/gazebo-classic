@@ -256,7 +256,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
-  ${IGNITION-FUEL-TOOLS_LIBRARIES}
+  ${IGNITION-FUEL_TOOLS_LIBRARIES}
 )
 
 if (UNIX)

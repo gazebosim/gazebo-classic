@@ -22,7 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <ignition/fuel-tools/ClientConfig.hh>
+#include <ignition/fuel_tools/ClientConfig.hh>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
