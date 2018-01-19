@@ -37,8 +37,8 @@ shadow_caster_fp.glsl
 shadow_caster_vp.glsl
 spot_shadow_receiver_fp.glsl
 spot_shadow_receiver_vp.glsl
-# wave_fp.glsl
-# wave_vp.glsl
+deform_fp.glsl
+deform_vp.glsl
 wide_lens_map_fp.glsl
 wide_lens_map_vs.glsl
 )
