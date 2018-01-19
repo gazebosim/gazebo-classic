@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Load actor plugin on ~/factory
+    * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
+
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
