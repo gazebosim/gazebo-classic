@@ -24,7 +24,7 @@
     * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
 
 1. Allow marker requests to be received from server plugins.
-
+    * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
 
 ## Gazebo 8.2.0 (2017-12-10)
 
