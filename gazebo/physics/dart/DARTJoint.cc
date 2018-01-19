@@ -697,17 +697,17 @@ bool DARTJoint::SetPosition(const unsigned int _index, const double _position,
   const unsigned int dofs = static_cast<unsigned int>(
         this->dataPtr->dtJoint->getNumDofs());
 
-  if (_index < dofs)
-  {
-    this->dataPtr->dtJoint->setPosition(_index, _position);
-    return true;
-  }
-
   if (_preserveWorldVelocity)
   {
     gzwarn << "[SetPosition] You requested _preserveWorldVelocity "
            << "to be true, but this is not supported in DART. The world "
            << "velocity of the child link will not be preserved\n";
+  }
+
+  if (_index < dofs)
+  {
+    this->dataPtr->dtJoint->setPosition(_index, _position);
+    return true;
   }
 
   gzerr << "Invalid index [" << _index << "] (max: " << dofs << ")\n";
