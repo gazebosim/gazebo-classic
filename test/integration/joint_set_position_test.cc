@@ -678,25 +678,25 @@ void JointKinematicTest::SetPositionTranslating(
   VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
   VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
 
-  // Reset physics states before setPosition again.
-  link0->ResetPhysicsStates();
-  link1->ResetPhysicsStates();
-
   newAngle = 0.6;
   // Do not preserve the world velocity (default behavior)
   joint->SetPosition(0, newAngle);
-  world->Step(1);
 
-  // Check that child link pose changed
-  EXPECT_NEAR(newAngle, joint->Position(0), TOL);
-  EXPECT_NEAR(0.0, link0->WorldPose().Rot().Euler().Z(), TOL);
-  EXPECT_NEAR(newAngle, link1->WorldPose().Rot().Euler().Z(), TOL);
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    // The expected behavior here is undefined for DART and Simbody, so we do
+    // not test it on those simulators.
 
-  // Expect velocities to be zero
-  VEC_EXPECT_NEAR(zeroVec, link0->WorldLinearVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link1->WorldLinearVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
-  VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
+    // Check that child link pose changed
+    EXPECT_NEAR(newAngle, joint->Position(0), TOL);
+    EXPECT_NEAR(0.0, link0->WorldPose().Rot().Euler().Z(), TOL);
+    EXPECT_NEAR(newAngle, link1->WorldPose().Rot().Euler().Z(), TOL);
+
+    // Expect child velocities to be zero
+    VEC_EXPECT_NEAR(zeroVec, link1->WorldLinearVel(), TOL);
+    VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
+    VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
+  }
 }
 
 TEST_P(JointKinematicTest, SetPositionTranslating)
