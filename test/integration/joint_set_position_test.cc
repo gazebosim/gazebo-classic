@@ -678,6 +678,9 @@ void JointKinematicTest::SetPositionTranslating(
   VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
   VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
 
+  // Save the parent link velocity for later testing
+  const auto previousParentLinkVel = link0->WorldLinearVel();
+
   newAngle = 0.6;
   // Do not preserve the world velocity (default behavior)
   joint->SetPosition(0, newAngle);
@@ -697,6 +700,9 @@ void JointKinematicTest::SetPositionTranslating(
     VEC_EXPECT_NEAR(zeroVec, link0->RelativeAngularVel(), TOL);
     VEC_EXPECT_NEAR(zeroVec, link1->RelativeAngularVel(), TOL);
   }
+
+  // Expect the parent velocity to be unchanged
+  VEC_EXPECT_NEAR(previousParentLinkVel, link0->WorldLinearVel(), TOL);
 }
 
 TEST_P(JointKinematicTest, SetPositionTranslating)
