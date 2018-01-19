@@ -494,6 +494,7 @@ void SystemPaths::AddModelPaths(const std::string &_path)
     pos2 = _path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(_path.substr(pos1, _path.size()-pos1), this->modelPaths);
+  gzdbg << "Added [" << _path << "] to model paths" << std::endl;
 }
 
 /////////////////////////////////////////////////

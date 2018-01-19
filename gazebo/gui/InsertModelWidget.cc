@@ -50,6 +50,7 @@
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/InsertModelWidgetPrivate.hh"
 #include "gazebo/gui/InsertModelWidget.hh"
+#include "gazebo/gui/SaveEntityDialog.hh"
 
 using namespace gazebo;
 using namespace gui;
@@ -298,11 +299,13 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     if (fuelModelSelected)
     {
       filename = common::FuelModelDatabase::Instance()->ModelFile(path);
-      gzmsg << "Support for Ignition Fuel is experimental. It's required to "
-            << "set GAZEBO_MODEL_PATH to the directory where the Fuel model "
-            << "has been downloaded.\n"
-            << "E.g.: export GAZEBO_MODEL_PATH="
-            << "/home/caguero/.ignition/fuel/models/caguero" << std::endl;
+
+      // Add to path, update Insert widget and append to gui.ini
+      // TODO: Move function from SaveEntityDialog to a more common place
+      auto parentDir = boost::filesystem::path(filename)
+                       .parent_path().string();
+      auto saveDialog = new gui::SaveEntityDialog();
+      saveDialog->AddDirToModelPaths(parentDir);
     }
     else
 #endif
