@@ -37,7 +37,7 @@ std::mutex mutex;
 int imageCount = 0;
 
 /////////////////////////////////////////////////
-void OnNewCameraFrame(const ignition::msgs::ImageStamped &/*_msg*/)
+void OnNewCameraFrame(const ignition::msgs::Image &/*_msg*/)
 {
   std::lock_guard<std::mutex> lock(mutex);
   ++imageCount;
