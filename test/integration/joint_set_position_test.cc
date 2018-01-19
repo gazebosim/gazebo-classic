@@ -602,7 +602,7 @@ void JointKinematicTest::SetPositionTranslating(
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Bullet Joint::SetPosition affected by issue #1194.\n";
+    gzerr << "BulletLink::AddForce is not implemented (issue #1476).\n";
     return;
   }
 
@@ -715,7 +715,7 @@ void JointKinematicTest::SetPositionRotating(const std::string &_physicsEngine)
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Bullet Joint::SetPosition affected by issue #1194.\n";
+    gzerr << "BulletLink::AddTorque is not implemented (issue #1476).\n";
     return;
   }
 
