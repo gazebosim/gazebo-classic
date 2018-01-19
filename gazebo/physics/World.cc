@@ -2979,10 +2979,10 @@ bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->Name() << "]" << std::endl;
-        return;
+        return false;
       }
 
-      bool success = false
+      bool success = false;
       model->PluginInfo(pluginUri, _plugins, success);
       return success;
     }
