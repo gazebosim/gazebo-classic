@@ -1612,13 +1612,17 @@ double Link::GetWorldEnergy() const
 
 /////////////////////////////////////////////////
 void Link::MoveFrame(const ignition::math::Pose3d &_worldReferenceFrameSrc,
-                     const ignition::math::Pose3d &_worldReferenceFrameDst)
+                     const ignition::math::Pose3d &_worldReferenceFrameDst,
+                     const bool _preserveWorldVelocity)
 {
   ignition::math::Pose3d targetWorldPose = (this->WorldPose() -
       _worldReferenceFrameSrc) + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(ignition::math::Vector3d::Zero,
+  if (!_preserveWorldVelocity)
+  {
+    this->SetWorldTwist(ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
+  }
 }
 
 /////////////////////////////////////////////////
