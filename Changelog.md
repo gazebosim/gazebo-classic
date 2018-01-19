@@ -2,6 +2,10 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Provide option to preserve world velocity in Joint::SetPosition
+    * [Pull request #2814](https://bitbucket.org/osrf/gazebo/pull-requests/2814)
+    * [Issue 2111](https://bitbucket.org/osrf/gazebo/issues/2111)
+
 1. Rename `BUILD_TYPE_*` macros to `GAZEBO_BUILD_TYPE_*`
     * [Pull request #2846](https://bitbucket.org/osrf/gazebo/pull-requests/2846)
     * [Issue 2343](https://bitbucket.org/osrf/gazebo/issues/2343)
