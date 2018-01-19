@@ -33,6 +33,9 @@ class MousePickingTest : public QTestFixture
 
   /// \brief Verify camera movement does not affect entity selection
   private slots: void ModelEditorSelection();
+
+  /// \brief Testing picking a visual with invalid mesh.
+  private slots: void InvalidMesh();
 };
 
 #endif

@@ -781,7 +781,7 @@ void JointKinematicTest::SetPositionRotating(const std::string &_physicsEngine)
   joint->SetPosition(0, 1.0);
   world->Step(1);
 
-  if(_physicsEngine == "ode" || _physicsEngine == "bullet")
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
   {
     // ODE and Bullet should reset the velocities after calling
     // Joint::SetPosition with _preserveWorldVelocity set to false.
