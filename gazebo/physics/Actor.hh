@@ -139,6 +139,12 @@ namespace gazebo
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
+      /// \brief Get the custom trajectory.
+      /// \return The custom trajectory or Null if SetCustomTrajectory has
+      /// never been called.
+      /// \sa ResetCustomTrajectory, SetCustomTrajectory
+      public: TrajectoryInfoPtr CustomTrajectory() const;
+
       /// \brief Reset custom trajectory of the actor.
       /// \sa SetCustomTrajectory
       public: void ResetCustomTrajectory();

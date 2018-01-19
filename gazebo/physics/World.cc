@@ -2163,6 +2163,7 @@ void World::ProcessFactoryMsgs()
         {
           ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
           actor->Init();
+          actor->LoadPlugins();
         }
         else if (isModel)
         {

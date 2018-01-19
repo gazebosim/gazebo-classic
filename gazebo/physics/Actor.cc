@@ -816,6 +816,12 @@ void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 }
 
 //////////////////////////////////////////////////
+TrajectoryInfoPtr Actor::CustomTrajectory() const
+{
+  return this->customTrajectoryInfo;
+}
+
+//////////////////////////////////////////////////
 void Actor::ResetCustomTrajectory()
 {
   this->customTrajectoryInfo.reset();
