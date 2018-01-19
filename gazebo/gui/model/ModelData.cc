@@ -656,7 +656,7 @@ void LinkData::UpdateConfig()
     updateMsg->clear_scale();
     msgs::Material *matMsg = updateMsg->mutable_material();
     // clear empty colors so they are not used by visual updates
-    ignition::math::Color emptyColor;
+    ignition::math::Color emptyColor(0, 0, 0, 0);
     if (msgs::Convert(matMsg->ambient()) == emptyColor)
       matMsg->clear_ambient();
     if (msgs::Convert(matMsg->diffuse()) == emptyColor)
@@ -1188,7 +1188,7 @@ bool LinkData::Apply()
         rendering::Material::MaterialAsColor(scriptMsg->name(), matAmbient,
             matDiffuse, matSpecular, matEmissive);
 
-        ignition::math::Color emptyColor;
+        ignition::math::Color emptyColor(0, 0, 0, 0);
         auto ambient = msgs::Convert(matMsg->ambient());
         auto diffuse = msgs::Convert(matMsg->diffuse());
         auto specular = msgs::Convert(matMsg->specular());

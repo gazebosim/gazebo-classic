@@ -419,7 +419,7 @@ void MapShape::GetPixelCount(unsigned int xStart, unsigned int yStart,
   {
     for (x = xStart; x < xStart + width; x++)
     {
-      pixColor = this->mapImage->GetPixel(x, y).Ign();
+      pixColor = this->mapImage->Pixel(x, y);
 
       v = (unsigned char)(255 *
           ((pixColor.R() + pixColor.G() + pixColor.B()) / 3.0));

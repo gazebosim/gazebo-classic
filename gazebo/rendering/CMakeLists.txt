@@ -23,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -86,6 +87,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -178,11 +180,13 @@ set (gtest_sources_dri
   LaserVisual_TEST.cc
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  MovableText_TEST.cc
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc

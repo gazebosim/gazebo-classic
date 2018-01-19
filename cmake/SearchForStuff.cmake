@@ -10,7 +10,7 @@ execute_process(COMMAND pkg-config --modversion protobuf
   RESULT_VARIABLE protobuf_modversion_failed)
 
 ########################################
-# 1. can not use BUILD_TYPE_PROFILE is defined after include this module
+# 1. can not use GAZEBO_BUILD_TYPE_PROFILE is defined after include this module
 # 2. TODO: TOUPPER is a hack until we fix the build system to support standard build names
 if (CMAKE_BUILD_TYPE)
   string(TOUPPER ${CMAKE_BUILD_TYPE} TMP_CMAKE_BUILD_TYPE)
@@ -771,9 +771,11 @@ if (NOT ignition-fuel-tools0_FOUND)
   message (STATUS "Looking for libignition-fuel-tools0 - not found")
   BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")
   set (HAVE_IGNITION_FUEL_TOOLS OFF CACHE BOOL "HAVE HAVE_IGNITION_FUEL_TOOLS" FORCE)
+  set (IGNITION_FUEL_TOOLS_PKGCONFIG "")
 else()
   message (STATUS "Looking for libignition-fuel-tools0 - found")
   set (HAVE_IGNITION_FUEL_TOOLS ON CACHE BOOL "HAVE HAVE_IGNITION_FUEL_TOOLS" FORCE)
+  set (IGNITION_FUEL_TOOLS_PKGCONFIG "ignition-fuel-tools0")
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-FUEL-TOOLS_CXX_FLAGS}")
   include_directories(${IGNITION-FUEL-TOOLS_INCLUDE_DIRS})
   link_directories(${IGNITION-FUEL-TOOLS_LIBRARY_DIRS})
