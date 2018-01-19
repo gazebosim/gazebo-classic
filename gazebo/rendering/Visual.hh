@@ -226,7 +226,8 @@ namespace gazebo
       /// vertex, fragment
       /// \param[in] _value Value to set the parameter to.
       public: void SetMaterialShaderParam(const std::string &_paramName,
-          const std::string &_shaderType, const msgs::Any _value);
+          const std::string &_shaderType, const std::string &_value);
+//          const std::string &_shaderType, const msgs::Any _value);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.

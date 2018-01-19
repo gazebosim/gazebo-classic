@@ -173,7 +173,7 @@ bool g_shaderParamSet = false;
 /////////////////////////////////////////////////
 void SetShaderParam(const std::string &_visualName,
     const std::string &_paramName, const std::string &_shaderType,
-    const gazebo::msgs::Any &_value)
+    const std::string &_value)
 {
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
   ASSERT_NE(nullptr, scene);
@@ -250,12 +250,10 @@ TEST_F(VisualProperty, MaterialShaderParam)
 
   // now set shader material param in rendering thread
   g_shaderParamSet = false;
-  gazebo::msgs::Any value;
-  value.set_type(gazebo::msgs::Any::COLOR);
-  msgs::Set(value.mutable_color_value(), common::Color(0, 1, 0, 1));
   std::string visualName = "box::link::visual";
   std::string paramName = "color";
   std::string shaderType = "fragment";
+  std::string value = "0 1 0 1";
   // Connect to the render signal
   auto c2 =
       event::Events::ConnectPreRender(std::bind(&::SetShaderParam,

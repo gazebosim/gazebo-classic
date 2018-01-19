@@ -21,6 +21,7 @@ ssao.compositor
 ssao.material
 VPL.material
 VPL.program
+# wave.material
 WideCameraLensMap.compositor
 )
 

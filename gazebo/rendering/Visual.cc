@@ -1117,50 +1117,109 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
       ->GetElement("name")->Set(_materialName);
 }
 
+
+
+/*/////////////////////////////////////////////////
+void Visual::SetMaterialShaderParam(const std::string &_paramName,
+    const std::string &_shaderType, const std::string &_value)
+{
+}
+*/
+
 /////////////////////////////////////////////////
 void Visual::SetMaterialShaderParam(const std::string &_paramName,
-    const std::string &_shaderType, const msgs::Any _value)
+    const std::string &_shaderType, const std::string &_value)
 {
-  auto setNamedParam = [_paramName, _value](
-      Ogre::GpuProgramParametersSharedPtr _params)
+  auto setNamedParam = [](Ogre::GpuProgramParametersSharedPtr _params,
+      const std::string &_name, const std::string &_v)
   {
-    switch (_value.type())
+    auto paramDef = _params->_findNamedConstantDefinition(_name);
+    if (!paramDef)
+      return;
+
+    switch (paramDef->constType)
+    {
+      case Ogre::GCT_INT1:
+      {
+        int value = Ogre::StringConverter::parseInt(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_FLOAT1:
+      {
+        Ogre::Real value = Ogre::StringConverter::parseReal(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_INT2:
+      case Ogre::GCT_FLOAT2:
+      {
+        Ogre::Vector2 value = Ogre::StringConverter::parseVector2(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_INT3:
+      case Ogre::GCT_FLOAT3:
+      {
+        Ogre::Vector3 value = Ogre::StringConverter::parseVector3(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_INT4:
+      case Ogre::GCT_FLOAT4:
+      {
+        Ogre::Vector4 value = Ogre::StringConverter::parseVector4(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_MATRIX_4X4:
+      {
+        Ogre::Matrix4 value = Ogre::StringConverter::parseMatrix4(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      default:
+        break;
+    }
+
+    /*switch (paramValue.type())
     {
       case msgs::Any::INT32:
       {
          _params->setNamedConstant(_paramName,
-             Ogre::Real(_value.int_value()));
+             paramValue.int_value());
         break;
       }
       case msgs::Any::DOUBLE:
       {
          _params->setNamedConstant(_paramName,
-             Ogre::Real(_value.double_value()));
+             Ogre::Real(paramValue.double_value()));
         break;
       }
       case msgs::Any::VECTOR3D:
       {
          _params->setNamedConstant(_paramName,
-             Conversions::Convert(msgs::ConvertIgn(_value.vector3d_value())));
+             Conversions::Convert(
+             msgs::ConvertIgn(parmValue.vector3d_value())));
         break;
       }
       case msgs::Any::QUATERNIOND:
       {
          _params->setNamedConstant(_paramName,
              Conversions::Convert(ignition::math::Matrix4d(
-             msgs::ConvertIgn(_value.quaternion_value()))));
+             msgs::ConvertIgn(parmValue.quaternion_value()))));
         break;
       }
       case msgs::Any::COLOR:
       {
-         auto color = msgs::Convert(_value.color_value());
+         auto color = msgs::Convert(paramValue.color_value());
          _params->setNamedConstant(_paramName,
              Ogre::Vector4(color.r, color.g, color.b, color.a));
         break;
       }
       default:
         break;
-    }
+    }*/
   };
 
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(
@@ -1189,11 +1248,11 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
       // currently support only vertex and fragment shaders
       if (_shaderType == "vertex" && pass->hasVertexProgram())
       {
-        setNamedParam(pass->getVertexProgramParameters());
+        setNamedParam(pass->getVertexProgramParameters(), _paramName, _value);
       }
       else if (_shaderType == "fragment" && pass->hasFragmentProgram())
       {
-        setNamedParam(pass->getFragmentProgramParameters());
+        setNamedParam(pass->getFragmentProgramParameters(), _paramName, _value);
       }
     }
   }
