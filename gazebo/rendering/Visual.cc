@@ -1117,19 +1117,12 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
       ->GetElement("name")->Set(_materialName);
 }
 
-
-
-/*/////////////////////////////////////////////////
-void Visual::SetMaterialShaderParam(const std::string &_paramName,
-    const std::string &_shaderType, const std::string &_value)
-{
-}
-*/
-
 /////////////////////////////////////////////////
 void Visual::SetMaterialShaderParam(const std::string &_paramName,
     const std::string &_shaderType, const std::string &_value)
 {
+  // set the parameter based name and type defined in material script
+  // and shaders
   auto setNamedParam = [](Ogre::GpuProgramParametersSharedPtr _params,
       const std::string &_name, const std::string &_v)
   {
@@ -1181,47 +1174,9 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
       default:
         break;
     }
-
-    /*switch (paramValue.type())
-    {
-      case msgs::Any::INT32:
-      {
-         _params->setNamedConstant(_paramName,
-             paramValue.int_value());
-        break;
-      }
-      case msgs::Any::DOUBLE:
-      {
-         _params->setNamedConstant(_paramName,
-             Ogre::Real(paramValue.double_value()));
-        break;
-      }
-      case msgs::Any::VECTOR3D:
-      {
-         _params->setNamedConstant(_paramName,
-             Conversions::Convert(
-             msgs::ConvertIgn(parmValue.vector3d_value())));
-        break;
-      }
-      case msgs::Any::QUATERNIOND:
-      {
-         _params->setNamedConstant(_paramName,
-             Conversions::Convert(ignition::math::Matrix4d(
-             msgs::ConvertIgn(parmValue.quaternion_value()))));
-        break;
-      }
-      case msgs::Any::COLOR:
-      {
-         auto color = msgs::Convert(paramValue.color_value());
-         _params->setNamedConstant(_paramName,
-             Ogre::Vector4(color.r, color.g, color.b, color.a));
-        break;
-      }
-      default:
-        break;
-    }*/
   };
 
+  // loop through material techniques and passes to find the param
   Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(
       this->dataPtr->myMaterialName);
   if (mat.isNull())

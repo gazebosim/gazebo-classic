@@ -28,7 +28,6 @@
 namespace gazebo
 {
   /// \internal
-  /// \class ShaderParamVisualPlugin ShaderParamVisualPlugin.hh
   /// \brief Private data for the ShaderParamVisualPlugin class.
   class ShaderParamVisualPluginPrivate
   {
@@ -39,7 +38,7 @@ namespace gazebo
     /// Each element is a pair of <paramName, shaderType>
     public: std::vector<std::pair<std::string, std::string>> simTimeParams;
 
-    /// \brief Connects to rendering update event.
+    /// \brief Connects to render update event.
     public: event::ConnectionPtr updateConnection;
 
     /// \brief The current simulation time.
@@ -72,12 +71,13 @@ ShaderParamVisualPlugin::~ShaderParamVisualPlugin()
 }
 
 /////////////////////////////////////////////////
-void ShaderParamVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
+void ShaderParamVisualPlugin::Load(rendering::VisualPtr _visual,
+    sdf::ElementPtr _sdf)
 {
-  if (!_visual || ! _sdf)
+  if (!_visual || !_sdf)
   {
-    gzerr << "No visual or sdf element specified. Plugin won't load." <<
-        std::endl;
+    gzerr << "No visual or sdf element specified. Plugin won't load."
+          << std::endl;
     return;
   }
   this->dataPtr->visual = _visual;
@@ -88,6 +88,7 @@ void ShaderParamVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr
     return;
   }
 
+  // loop and set all shader params
   sdf::ElementPtr paramElem = _sdf->GetElement("param");
   while (paramElem)
   {
@@ -103,6 +104,7 @@ void ShaderParamVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr
     std::string paramName = paramElem->Get<std::string>("name");
     std::string value = paramElem->Get<std::string>("value");
 
+    // TIME is reserved keyword for sim time
     if (value == "TIME")
     {
       this->dataPtr->simTimeParams.push_back(
@@ -120,9 +122,9 @@ void ShaderParamVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr
   this->dataPtr->updateConnection = event::Events::ConnectPreRender(
       std::bind(&ShaderParamVisualPlugin::Update, this));
 
+  // only subscribe to pose topic to get sim time if a param requests it
   if (!this->dataPtr->simTimeParams.empty())
   {
-    // subscribe to pose topic to get sim time
     this->dataPtr->node = transport::NodePtr(new transport::Node());
     this->dataPtr->node->Init();
     this->dataPtr->infoSub = this->dataPtr->node->Subscribe(
@@ -135,14 +137,18 @@ void ShaderParamVisualPlugin::Update()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
+  // set sim time on every render update
   for (auto &p : this->dataPtr->simTimeParams)
-  this->dataPtr->visual->SetMaterialShaderParam(p.first, p.second,
+  {
+    this->dataPtr->visual->SetMaterialShaderParam(p.first, p.second,
       std::to_string(this->dataPtr->currentSimTime.Double()));
+  }
 }
 
 /////////////////////////////////////////////////
 void ShaderParamVisualPlugin::OnInfo(ConstPosesStampedPtr &_msg)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  // we are only interested in sim time
   this->dataPtr->currentSimTime = msgs::Convert(_msg->time());
 }

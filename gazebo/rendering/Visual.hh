@@ -224,10 +224,11 @@ namespace gazebo
       /// \param[in] _paramName Name of shader parameter
       /// \param[in] _shaderType Type of shader. Supported types:
       /// vertex, fragment
-      /// \param[in] _value Value to set the parameter to.
+      /// \param[in] _value Value to set the parameter to. The value string can
+      /// be a number (int, float) or a space delimited array of numbers
+      /// (floats). The value type must match the type defined in the shaders.
       public: void SetMaterialShaderParam(const std::string &_paramName,
           const std::string &_shaderType, const std::string &_value);
-//          const std::string &_shaderType, const msgs::Any _value);
 
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.

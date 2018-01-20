@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add Visual::SetMaterialShaderParam function for setting vertex and shader parameters.
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-requests/)
+
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
