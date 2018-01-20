@@ -131,7 +131,7 @@ TEST_F(Color, Color)
   EXPECT_TRUE(clr.YUV() ==
       ignition::math::Vector3d(0.104985, 0.95227, 0.429305));
 
-  // Note: ideally the addition should result in (1.0, 0.3, 0.4, 1.0);
+  // Note: ideally the addition should result in (1.0, 0.3, 0.9, 1.0);
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
   EXPECT_TRUE(ignition::math::equal(0.00431373f, clr.r));
   EXPECT_TRUE(ignition::math::equal(0.3f, clr.g));
