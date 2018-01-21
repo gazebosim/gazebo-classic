@@ -51,7 +51,7 @@ void EventSource::Load(const sdf::ElementPtr _sdf)
   if (_sdf->HasElement("active"))
   {
     sdf::ElementPtr activeE = _sdf->GetElement("active");
-    this->active = activeE->Get<std::string>() == "true";
+    this->active = activeE->Get<bool>();
   }
 }
 
