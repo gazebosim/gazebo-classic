@@ -22,10 +22,16 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <ignition/fuel-tools/ClientConfig.hh>
+#include <ignition/fuel_tools/ClientConfig.hh>
 
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/util/system.hh"
+
+/// \brief The file name of model XML configuration.
+#define GZ_MODEL_MANIFEST_FILENAME "model.config"
+
+/// \brief The file name of model database XML configuration.
+#define GZ_MODEL_DB_MANIFEST_FILENAME "database.config"
 
 namespace gazebo
 {
@@ -78,6 +84,24 @@ namespace gazebo
       /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
       public: virtual std::map<std::string, std::string> Models(
         const ignition::fuel_tools::ServerConfig &_server) const;
+
+      /// \brief Get a model's SDF file based on a URI.
+      ///
+      /// Get a model file based on a URI. If the model is on
+      /// a remote server, then the model is fetched and installed locally.
+      /// \param[in] _uri The URI of the model.
+      /// \return The full path and filename to the SDF file.
+      public: std::string ModelFile(const std::string &_uri);
+
+      /// \brief Get the local path to a model.
+      ///
+      /// Get the path to a model based on a URI. If the model is on
+      /// a remote server, then the model fetched and installed locally.
+      /// \param[in] _uri the model uri
+      /// \param[in] _forceDownload True to skip searching local paths.
+      /// \return path to a model directory
+      public: std::string ModelPath(const std::string &_uri,
+        const bool _forceDownload = false);
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;

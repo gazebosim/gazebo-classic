@@ -281,8 +281,33 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    std::string filename =
-      common::ModelDatabase::Instance()->GetModelFile(path);
+    std::string filename;
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+    bool fuelModelSelected = false;
+
+    // Check if this is a model from an Ignition Fuel server.
+    for (auto const &serverEntry : this->dataPtr->fuelDetails)
+    {
+      if (serverEntry.second.modelFuelItem == _item->parent())
+      {
+        fuelModelSelected = true;
+        break;
+      }
+    }
+
+    if (fuelModelSelected)
+    {
+      filename = common::FuelModelDatabase::Instance()->ModelFile(path);
+      gzmsg << "Support for Ignition Fuel is experimental. It's required to "
+            << "set GAZEBO_MODEL_PATH to the directory where the Fuel model "
+            << "has been downloaded.\n"
+            << "E.g.: export GAZEBO_MODEL_PATH="
+            << "/home/caguero/.ignition/fuel/models/caguero" << std::endl;
+    }
+    else
+#endif
+      filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
     gui::Events::createEntity("model", filename);
 
     {
@@ -493,8 +518,7 @@ void InsertModelWidget::InitializeFuelServers()
     std::string serverURL = server.URL();
     this->dataPtr->fuelDetails[serverURL];
 
-    // Create a top-level tree item for the models hosted in this
-    // Ignition Fuel server.
+    // Create a top-level tree item for the models hosted in this Fuel server.
     std::string label = "Connecting to " + serverURL + "...";
     this->dataPtr->fuelDetails[serverURL].modelFuelItem =
         new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),

@@ -15,15 +15,24 @@
  *
 */
 
+#include <sys/stat.h>
+#include <tinyxml.h>
+
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
-#include <ignition/fuel-tools.hh>
 
+#include <ignition/common/Filesystem.hh>
+#include <ignition/fuel_tools.hh>
+#include <sdf/sdf.hh>
+
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
+#include "gazebo/common/SemanticVersion.hh"
+#include "gazebo/common/SystemPaths.hh"
 
 using namespace gazebo;
 using namespace common;
@@ -41,13 +50,8 @@ class gazebo::common::FuelModelDatabasePrivate
 FuelModelDatabase::FuelModelDatabase()
   : dataPtr(new FuelModelDatabasePrivate)
 {
-  // ToDo: Remove this block when Ignition Fuel Tools supports parsing
-  // a configuration file.
-  ignition::fuel_tools::ServerConfig srv;
-  srv.URL("https://staging-api.ignitionfuel.org");
   ignition::fuel_tools::ClientConfig conf;
-  conf.AddServer(srv);
-
+  conf.LoadConfig();
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
 }
 
@@ -91,4 +95,103 @@ std::map<std::string, std::string> FuelModelDatabase::Models(
   }
 
   return models;
+}
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::ModelFile(const std::string &_uri)
+{
+  std::string result;
+
+  // This will download the model if necessary
+  std::string path = this->ModelPath(_uri);
+  std::string manifestPath =
+    ignition::common::joinPaths(path, GZ_MODEL_MANIFEST_FILENAME);
+
+  // Get the GZ_MODEL_MANIFEST_FILENAME.
+  if (!ignition::common::exists(manifestPath))
+  {
+    gzerr << "Missing " << GZ_MODEL_MANIFEST_FILENAME
+          << " for model " << path << "\n";
+    return result;
+  }
+
+  TiXmlDocument xmlDoc;
+  SemanticVersion sdfParserVersion(SDF_VERSION);
+  std::string bestVersionStr = "0.0";
+  if (xmlDoc.LoadFile(manifestPath))
+  {
+    TiXmlElement *modelXML = xmlDoc.FirstChildElement("model");
+    if (modelXML)
+    {
+      TiXmlElement *sdfXML = modelXML->FirstChildElement("sdf");
+      TiXmlElement *sdfSearch = sdfXML;
+
+      // Find the SDF element that matches our current SDF version.
+      // If a match is not found, use the latest version of the element
+      // that is not older than the SDF parser.
+      while (sdfSearch)
+      {
+        if (sdfSearch->Attribute("version"))
+        {
+          std::string version = std::string(sdfSearch->Attribute("version"));
+          SemanticVersion modelVersion(version);
+          SemanticVersion bestVersion(bestVersionStr);
+          if (modelVersion > bestVersion)
+          {
+            // this model is better than the previous one
+            if (modelVersion <= sdfParserVersion)
+            {
+              // the parser can read it
+              sdfXML = sdfSearch;
+              bestVersionStr = version;
+            }
+            else
+            {
+              gzwarn << "Ignoring version " << version
+                << " for model " << _uri
+                << " because Gazebo is using an older sdf parser (version "
+                << SDF_VERSION << ")" << std::endl;
+            }
+          }
+        }
+        sdfSearch = sdfSearch->NextSiblingElement("sdf");
+      }
+
+      if (sdfXML)
+      {
+        result = path + "/" + sdfXML->GetText();
+      }
+      else
+      {
+        gzerr << "Manifest[" << manifestPath << "] doesn't have "
+              << "<model><sdf>...</sdf></model> element.\n";
+      }
+    }
+    else
+    {
+      gzerr << "Manifest[" << manifestPath
+            << "] doesn't have a <model> element\n";
+    }
+  }
+  else
+  {
+    gzerr << "Invalid model manifest file[" << manifestPath << "]\n";
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::ModelPath(const std::string &_uri,
+    const bool /*_forceDownload*/)
+{
+  std::string path;
+
+  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
+  {
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+    return std::string();
+  }
+
+  return path;
 }
