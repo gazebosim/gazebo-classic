@@ -584,20 +584,13 @@ endif ()
 
 ########################################
 # Find SDFormat
-# try finding both sdformat 5 and 6 until we switch to 6
-set (SDFormat_MIN_VERSION 5)
-find_package(SDFormat 6 QUIET)
+set (SDFormat_MIN_VERSION 6)
+find_package(SDFormat ${SDFormat_MIN_VERSION})
 if (SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat 6 - found")
+  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
 else ()
-  # try finding both sdformat 5 and 6 until we switch to 6
-  find_package(SDFormat ${SDFormat_MIN_VERSION})
-  if (NOT SDFormat_FOUND)
-    message (STATUS "Looking for SDFormat 5 or 6 - not found")
-    BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION} <= 6. Required for reading and writing SDF files.")
-  else()
-    message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
-  endif()
+  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - not found")
+  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
 endif()
 
 ########################################
