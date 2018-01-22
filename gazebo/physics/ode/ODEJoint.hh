@@ -100,7 +100,7 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
-                                        const double _stiffness);
+                                        const double _stiffness) override;
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
