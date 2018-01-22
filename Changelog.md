@@ -2,7 +2,8 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
-1. Update to `ign-transport4`, `ign-msgs1`, and `ign-math4`.
+1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
+   only `sdformat6`, removing `sdformat5`.
     * [Pull request #2843](https://bitbucket.org/osrf/gazebo/pull-request/2843)
 
 1. Provide option to preserve world velocity in Joint::SetPosition
