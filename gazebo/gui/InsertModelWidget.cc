@@ -54,6 +54,8 @@
 using namespace gazebo;
 using namespace gui;
 
+static bool gInsertModelWidgetDeleted = false;
+
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
@@ -182,6 +184,7 @@ void InsertModelWidget::HandleButton()
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
+  gInsertModelWidgetDeleted = true;
   delete this->dataPtr->watcher;
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -547,9 +550,12 @@ void InsertModelWidget::PopulateFuelServers()
     std::function<void(const std::map<std::string, std::string> &)> f =
         [serverURL, this](const std::map<std::string, std::string> &_models)
         {
-          this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
-          // Emit the signal that populates the models for this server.
-          this->UpdateFuel(serverURL);
+          if (!gInsertModelWidgetDeleted)
+          {
+            this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
+            // Emit the signal that populates the models for this server.
+            this->UpdateFuel(serverURL);
+          }
         };
 
     common::FuelModelDatabase::Instance()->Models(server, f);
