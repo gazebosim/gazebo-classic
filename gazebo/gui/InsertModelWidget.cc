@@ -55,6 +55,23 @@ using namespace gazebo;
 using namespace gui;
 
 /////////////////////////////////////////////////
+// TODO: Remove this once Fuel support is fully functional
+bool usingFuel()
+{
+  auto useFuel = getenv("USE_IGNITION_FUEL");
+  if (!useFuel || *useFuel == '\0')
+    return false;
+
+  std::string useFuelStr{useFuel};
+  std::transform(useFuelStr.begin(), useFuelStr.end(),
+                 useFuelStr.begin(), ::tolower);
+  if (useFuelStr == "false" || useFuelStr == "0")
+    return false;
+
+  return true;
+}
+
+/////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
 {
@@ -509,6 +526,9 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 void InsertModelWidget::InitializeFuelServers()
 {
 #ifdef HAVE_IGNITION_FUEL_TOOLS
+  if (!usingFuel())
+    return;
+
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 
@@ -535,6 +555,9 @@ void InsertModelWidget::InitializeFuelServers()
 void InsertModelWidget::PopulateFuelServers()
 {
 #ifdef  HAVE_IGNITION_FUEL_TOOLS
+  if (!usingFuel())
+    return;
+
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 
