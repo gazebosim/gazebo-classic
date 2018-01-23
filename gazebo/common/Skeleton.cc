@@ -110,7 +110,7 @@ void Skeleton::Scale(double _scale)
     SkeletonNode *node = iter->second;
     ignition::math::Matrix4d trans(node->Transform());
     ignition::math::Vector3d pos(trans.Translation());
-    trans.Translate(pos * _scale);
+    trans.SetTranslation(pos * _scale);
     node->SetTransform(trans, false);
   }
 
@@ -638,7 +638,7 @@ void NodeTransform::RecalculateMatrix()
   else
     if (this->type == TRANSLATE)
     {
-      this->transform.Translate(
+      this->transform.SetTranslation(
           ignition::math::Vector3d(this->source[0],
             this->source[1], this->source[2]));
     }

@@ -630,9 +630,9 @@ namespace gazebo
       ///
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
+      /// \return True if the info was successfully obtained.
+      private: bool PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins);
 
       /// \internal
       /// \brief Private data pointer.

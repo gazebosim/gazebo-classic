@@ -675,7 +675,7 @@ void Actor::Update()
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
-    rootM.Translate(actorPose.Pos());
+    rootM.SetTranslation(actorPose.Pos());
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
