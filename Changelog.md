@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
+
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
