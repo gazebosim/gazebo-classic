@@ -584,20 +584,13 @@ endif ()
 
 ########################################
 # Find SDFormat
-# try finding both sdformat 5 and 6 until we switch to 6
-set (SDFormat_MIN_VERSION 5)
-find_package(SDFormat 6 QUIET)
+set (SDFormat_MIN_VERSION 6)
+find_package(SDFormat ${SDFormat_MIN_VERSION})
 if (SDFormat_FOUND)
-  message (STATUS "Looking for SDFormat 6 - found")
+  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
 else ()
-  # try finding both sdformat 5 and 6 until we switch to 6
-  find_package(SDFormat ${SDFormat_MIN_VERSION})
-  if (NOT SDFormat_FOUND)
-    message (STATUS "Looking for SDFormat 5 or 6 - not found")
-    BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION} <= 6. Required for reading and writing SDF files.")
-  else()
-    message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - found")
-  endif()
+  message (STATUS "Looking for SDFormat ${SDFormat_MIN_VERSION} - not found")
+  BUILD_ERROR ("Missing: SDF version >=${SDFormat_MIN_VERSION}. Required for reading and writing SDF files.")
 endif()
 
 ########################################
@@ -732,39 +725,33 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs0 0.4 QUIET)
-if (NOT ignition-msgs0_FOUND)
-  message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
-  BUILD_ERROR ("Missing: Ignition msgs0 library.")
+find_package(ignition-msgs1 1.0 QUIET)
+if (NOT ignition-msgs1_FOUND)
+  message(STATUS "Looking for ignition-msgs1-config.cmake - not found")
+  BUILD_ERROR ("Missing: Ignition msgs1 library (libignition-msgs-dev).")
 else()
-  message(STATUS "Looking for ignition-msgs0-config.cmake - found")
+  message(STATUS "Looking for ignition-msgs1-config.cmake - found")
   include_directories(${IGNITION-MSGS_INCLUDE_DIRS})
   link_directories(${IGNITION-MSGS_LIBRARY_DIRS})
 endif()
 
 ########################################
 # Find ignition math library
-find_package(ignition-math3 QUIET)
-if (NOT ignition-math3_FOUND)
-  message(STATUS "Looking for ignition-math3-config.cmake - not found")
-  find_package(ignition-math4 QUIET)
-  if (NOT ignition-math4_FOUND)
+find_package(ignition-math4 QUIET)
+if (NOT ignition-math4_FOUND)
     message(STATUS "Looking for ignition-math4-config.cmake - not found")
-    BUILD_ERROR ("Missing: Ignition math (libignition-math3-dev or libignition-math4-dev)")
-  else()
-    message(STATUS "Looking for ignition-math4-config.cmake - found")
-  endif()
+    BUILD_ERROR ("Missing: Ignition math (libignition-math4-dev)")
 else()
-  message(STATUS "Looking for ignition-math3-config.cmake - found")
+  message(STATUS "Looking for ignition-math4-config.cmake - found")
 endif()
 
 ########################################
 # Find the Ignition_Transport library
-find_package(ignition-transport3 QUIET)
-if (NOT ignition-transport3_FOUND)
-  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport3-dev)")
+find_package(ignition-transport4 QUIET)
+if (NOT ignition-transport4_FOUND)
+  BUILD_ERROR ("Missing: Ignition Transport (libignition-transport4-dev)")
 else()
-  message(STATUS "Looking for ignition-transport3-config.cmake - found")
+  message(STATUS "Looking for ignition-transport4-config.cmake - found")
 
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IGNITION-TRANSPORT_CXX_FLAGS}")
   include_directories(${IGNITION-TRANSPORT_INCLUDE_DIRS})
