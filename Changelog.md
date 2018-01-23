@@ -2,6 +2,14 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
+   only `sdformat6`, removing `sdformat5`.
+    * [Pull request #2843](https://bitbucket.org/osrf/gazebo/pull-request/2843)
+
+1. Provide option to preserve world velocity in Joint::SetPosition
+    * [Pull request #2814](https://bitbucket.org/osrf/gazebo/pull-requests/2814)
+    * [Issue 2111](https://bitbucket.org/osrf/gazebo/issues/2111)
+
 1. Rename `BUILD_TYPE_*` macros to `GAZEBO_BUILD_TYPE_*`
     * [Pull request #2846](https://bitbucket.org/osrf/gazebo/pull-requests/2846)
     * [Issue 2343](https://bitbucket.org/osrf/gazebo/issues/2343)
@@ -11,6 +19,9 @@
 
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
+
+1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
+    * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
 
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
@@ -74,6 +85,9 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2017-xx-xx)
+
+1. Fix inserting models with invalid submesh
+    * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
 
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
@@ -584,6 +598,9 @@
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
     * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
+
+1. Fix inserting models with invalid submesh
+    * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
 
 
 ## Gazebo 7.9.0 (2017-11-22)

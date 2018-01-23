@@ -14,7 +14,7 @@ set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 0)
+set (GAZEBO_PATCH_VERSION 0~pre1)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -32,6 +32,15 @@ endif()
 if(NOT DEFINED BUILD_TESTING)
     set(BUILD_TESTING OFF)
 endif()
+
+#============================================================================
+# We turn off extensions because (1) we do not ever want to use non-standard
+# compiler extensions, and (2) this variable is on by default, causing cmake
+# to choose the flag -std=gnu++14 instead of -std=c++14 when the C++14
+# features are requested. Explicitly turning this flag off will force cmake to
+# choose -std=c++14.
+# See https://bitbucket.org/ignitionrobotics/ign-cmake/issues/13 for more info.
+set(CMAKE_CXX_EXTENSIONS off)
 
 ########################################
 # Package Creation:
