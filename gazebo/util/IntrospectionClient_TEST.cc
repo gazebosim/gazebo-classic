@@ -99,6 +99,13 @@ class IntrospectionClientTest : public ::testing::Test
       this->node.Unsubscribe(topic);
   }
 
+  // Wait for asynchronous comms
+  protected: void WaitForCallback()
+  {
+    for (int i = 0; i < 10 && !this->callbackExecuted; ++i)
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  }
+
   /// \brief Flag to detect whether the callback was executed.
   protected: bool callbackExecuted;
 
@@ -152,6 +159,8 @@ TEST_F(IntrospectionClientTest, NewAndRemoveFilter)
   // Trigger an update.
   this->manager->Update();
 
+  this->WaitForCallback();
+
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
   this->callbackExecuted = false;
@@ -195,6 +204,8 @@ TEST_F(IntrospectionClientTest, RemoveAllFilters)
   // Trigger an update.
   this->manager->Update();
 
+  this->WaitForCallback();
+
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
   this->callbackExecuted = false;
@@ -204,6 +215,8 @@ TEST_F(IntrospectionClientTest, RemoveAllFilters)
 
   // Trigger an update to verify that we don't receive any updates.
   this->manager->Update();
+
+  this->WaitForCallback();
 
   // Check that we didn't receive any updates, we shouldn't have filters.
   EXPECT_FALSE(this->callbackExecuted);
@@ -246,6 +259,8 @@ TEST_F(IntrospectionClientTest, NewFilterAsync)
   // Trigger an update.
   this->manager->Update();
 
+  this->WaitForCallback();
+
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
   this->callbackExecuted = false;
@@ -275,6 +290,8 @@ TEST_F(IntrospectionClientTest, UpdateFilter)
 
   // Trigger an update.
   this->manager->Update();
+
+  this->WaitForCallback();
 
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);
@@ -341,6 +358,8 @@ TEST_F(IntrospectionClientTest, UpdateFilterAsync)
   this->manager->Update();
 
   EXPECT_TRUE(executed);
+
+  this->WaitForCallback();
 
   // Check that we received the update.
   EXPECT_TRUE(this->callbackExecuted);

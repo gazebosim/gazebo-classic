@@ -268,10 +268,9 @@ void IntrospectionManager::NotifyUpdates()
   if (itemsUpdatedCopy)
   {
     gazebo::msgs::Empty req;
-    bool result;
     gazebo::msgs::Param_V currentItems;
     // Prepare the list of items to be sent.
-    this->Items(req, currentItems, result);
+    this->Items(req, currentItems);
 
     if (!this->dataPtr->itemsUpdatePub.Publish(currentItems))
     {
@@ -282,7 +281,7 @@ void IntrospectionManager::NotifyUpdates()
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
+bool IntrospectionManager::NewFilterImpl(const std::set<std::string> &_newItems,
     std::string &_filterId)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -325,7 +324,7 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
+bool IntrospectionManager::UpdateFilterImpl(const std::string &_filterId,
     const std::set<std::string> &_newItems)
 {
   // Sanity check: Make sure that we have at least one item to be observed.
@@ -382,7 +381,7 @@ bool IntrospectionManager::UpdateFilter(const std::string &_filterId,
 }
 
 //////////////////////////////////////////////////
-bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
+bool IntrospectionManager::RemoveFilterImpl(const std::string &_filterId)
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -430,18 +429,17 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::GzString &_rep, bool &_result)
+bool IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
+    gazebo::msgs::GzString &_rep)
 {
   _rep.set_data("");
-  _result = false;
 
   // Sanity check: Make sure that the message contains at least one parameter.
   if (_req.param_size() == 0)
   {
     gzwarn << "Empty parameter message received." << std::endl;
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
   std::set<std::string> requestedItems;
@@ -454,7 +452,7 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
     {
       gzwarn << "Invalid parameter[" << param.name() << "] "
         << "Ignoring request." << std::endl;
-      return;
+      return false;
     }
 
     auto item = param.value().string_value();
@@ -462,29 +460,27 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
   }
 
   std::string topicName;
-  if (!this->NewFilter(requestedItems, topicName))
+  if (!this->NewFilterImpl(requestedItems, topicName))
   {
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
   // Answer with the custom topic created for the client.
   _rep.set_data(topicName);
-  _result = true;
+  return true;
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::Empty &/*_rep*/, bool &_result)
+bool IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
+    gazebo::msgs::Empty &/*_rep*/)
 {
-  _result = false;
-
   // Sanity check: Make sure that the message contains at least one parameter.
   if (_req.param_size() == 0)
   {
     gzwarn << "Empty parameter message received." << std::endl;
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
   std::set<std::string> newItems;
@@ -496,7 +492,7 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
     if (!this->ValidateParameter(param, {"item", "filter_id"}))
     {
       gzwarn << "Ignoring request." << std::endl;
-      return;
+      return false;
     }
 
     if (param.name() == "item")
@@ -511,7 +507,7 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
       {
         gzwarn << "Received more than one param with 'filter_id'." << std::endl;
         gzwarn << "Ignoring request." << std::endl;
-        return;
+        return false;
       }
 
       // Save filter ID to be updated.
@@ -521,7 +517,7 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
     {
       gzwarn << "Unexpected param name [" << param.name() << "]." << std::endl;
       gzwarn << "Ignoring request." << std::endl;
-      return;
+      return false;
     }
   }
 
@@ -530,47 +526,39 @@ void IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
   {
     gzwarn << "Parameter without a 'filter_id' value." << std::endl;
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
-  if (!this->UpdateFilter(filterId, newItems))
-    return;
-
-  _result = true;
+  return this->UpdateFilterImpl(filterId, newItems);
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
-    gazebo::msgs::Empty &/*_rep*/, bool &_result)
+bool IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
+    gazebo::msgs::Empty &/*_rep*/)
 {
-  _result = false;
-
   // Sanity check: Make sure that the message contains exactly one parameter.
   if (_req.param_size() != 1)
   {
     gzwarn << "Expecting message with exactly 1 parameter but "
           << _req.param_size() << " were received." << std::endl;
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
   auto param = _req.param(0);
   if (!this->ValidateParameter(param, {"filter_id"}))
   {
     gzwarn << "Ignoring request." << std::endl;
-    return;
+    return false;
   }
 
   std::string filterId = param.value().string_value();
-  if (!this->RemoveFilter(filterId))
-    return;
-
-  _result = true;
+  return this->RemoveFilterImpl(filterId);
 }
 
 //////////////////////////////////////////////////
-void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
-    gazebo::msgs::Param_V &_rep, bool &_result)
+bool IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
+    gazebo::msgs::Param_V &_rep)
 {
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -582,7 +570,7 @@ void IntrospectionManager::Items(const gazebo::msgs::Empty &/*_req*/,
       nextParam->mutable_value()->set_string_value(item.first);
     }
   }
-  _result = true;
+  return true;
 }
 
 //////////////////////////////////////////////////

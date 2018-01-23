@@ -43,6 +43,7 @@ release will remove the deprecated code.
     + Changed `protected: Color diffuse;` to `protected: ignition::math::Color diffuse;`
     + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
     + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
+1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
 
 ### Deprecations
 
@@ -131,6 +132,29 @@ release will remove the deprecated code.
     + ***Replacement:*** void AddPoint(const double _x, const double _y, const double _z, const ignition::math::Color &_color = ignition::math::Color::White)
     + ***Deprecation:*** void SetColor(unsigned int _index, const common::Color &_color)
     + ***Replacement:*** void SetColor(const unsigned int _index, const ignition::math::Color &_color)
+1. **gazebo/rendering/MovableText.hh**
+    + ***Deprecation:*** void Load(const std::string &_name, const std::string &_text, const std::string &_fontName, float _charHeight, const common::Color &_color)
+    + ***Replacement:*** void Load(const std::string &_name, const std::string &_text, const std::string &_fontName = "Arial", float _charHeight = 1.0, const ignition::math::Color &_color = ignition::math::Color::White)
+    + ***Deprecation:*** const std::string &GetFont() const
+    + ***Replacement:*** const std::string &FontName() const
+    + ***Deprecation:*** const std::string &GetText() const
+    + ***Replacement:*** const std::string &Text() const
+    + ***Deprecation:*** void SetColor(const common::Color &_color)
+    + ***Replacement:*** void SetColor(const ignition::math::Color &_color)
+    + ***Deprecation:*** const common::Color GetColor() const
+    + ***Replacement:*** const ignition::math::Color &Color() const
+    + ***Deprecation:*** float GetCharHeight() const
+    + ***Replacement:*** float CharHeight() const
+    + ***Deprecation:*** float GetSpaceWidth() const
+    + ***Replacement:*** float SpaceWidth() const
+    + ***Deprecation:*** float GetBaseline() const
+    + ***Replacement:*** float Baseline() const
+    + ***Deprecation:*** bool GetShowOnTop() const
+    + ***Replacement:*** bool ShowOnTop() const
+    + ***Deprecation:*** void _setupGeometry()
+    + ***Replacement:*** void SetupGeometry()
+    + ***Deprecation:*** void _updateColors()
+    + ***Replacement:*** void UpdateColors()
 1. **gazebo/gui/building/BuildingModelManip.hh**
     + BuildingModelManip::Color() now returns ignition::math::Color()
 1. **gazebo/msgs/msgs.hh**
@@ -171,6 +195,11 @@ release will remove the deprecated code.
     + ***Replacement:*** ignition::math::Color AvgColor()
     + ***Deprecation:*** Color GetMaxColor() const
     + ***Replacement:*** ignition::math::Color MaxColor() const
+1. **gazebo/test/ServerFixture.hh**
+    + ***Deprecation:*** SpawnLight function that accepts common::Color
+    + ***Replacement:*** SpawnLight function that accepts ignition::math::Color
+1. **gazebo/common/Color.hh**
+    + gazebo::common::Color is deprecated, use ignition::math::Color instead.
 
 ## Gazebo 7.X to 8.X
 

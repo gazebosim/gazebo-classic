@@ -54,6 +54,8 @@
 using namespace gazebo;
 using namespace gui;
 
+static bool gInsertModelWidgetDeleted = false;
+
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
 : QWidget(_parent), dataPtr(new InsertModelWidgetPrivate)
@@ -182,6 +184,7 @@ void InsertModelWidget::HandleButton()
 /////////////////////////////////////////////////
 InsertModelWidget::~InsertModelWidget()
 {
+  gInsertModelWidgetDeleted = true;
   delete this->dataPtr->watcher;
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -281,8 +284,33 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
   {
     QApplication::setOverrideCursor(Qt::BusyCursor);
 
-    std::string filename =
-      common::ModelDatabase::Instance()->GetModelFile(path);
+    std::string filename;
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+    bool fuelModelSelected = false;
+
+    // Check if this is a model from an Ignition Fuel server.
+    for (auto const &serverEntry : this->dataPtr->fuelDetails)
+    {
+      if (serverEntry.second.modelFuelItem == _item->parent())
+      {
+        fuelModelSelected = true;
+        break;
+      }
+    }
+
+    if (fuelModelSelected)
+    {
+      filename = common::FuelModelDatabase::Instance()->ModelFile(path);
+      gzmsg << "Support for Ignition Fuel is experimental. It's required to "
+            << "set GAZEBO_MODEL_PATH to the directory where the Fuel model "
+            << "has been downloaded.\n"
+            << "E.g.: export GAZEBO_MODEL_PATH="
+            << "/home/caguero/.ignition/fuel/models/caguero" << std::endl;
+    }
+    else
+#endif
+      filename = common::ModelDatabase::Instance()->GetModelFile(path);
+
     gui::Events::createEntity("model", filename);
 
     {
@@ -493,8 +521,7 @@ void InsertModelWidget::InitializeFuelServers()
     std::string serverURL = server.URL();
     this->dataPtr->fuelDetails[serverURL];
 
-    // Create a top-level tree item for the models hosted in this
-    // Ignition Fuel server.
+    // Create a top-level tree item for the models hosted in this Fuel server.
     std::string label = "Connecting to " + serverURL + "...";
     this->dataPtr->fuelDetails[serverURL].modelFuelItem =
         new QTreeWidgetItem(static_cast<QTreeWidgetItem*>(0),
@@ -523,9 +550,12 @@ void InsertModelWidget::PopulateFuelServers()
     std::function<void(const std::map<std::string, std::string> &)> f =
         [serverURL, this](const std::map<std::string, std::string> &_models)
         {
-          this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
-          // Emit the signal that populates the models for this server.
-          this->UpdateFuel(serverURL);
+          if (!gInsertModelWidgetDeleted)
+          {
+            this->dataPtr->fuelDetails[serverURL].modelBuffer = _models;
+            // Emit the signal that populates the models for this server.
+            this->UpdateFuel(serverURL);
+          }
         };
 
     common::FuelModelDatabase::Instance()->Models(server, f);
