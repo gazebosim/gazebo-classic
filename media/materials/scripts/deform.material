@@ -16,7 +16,7 @@ fragment_program Gazebo/DeformFS glsl
   {
     param_named ambient float4 1 1 1 1
     param_named diffuse float4 1 1 1 1
-    param_named speuclar float4 1 1 1 1
+    param_named specular float4 1 1 1 1
   }
 }
 
