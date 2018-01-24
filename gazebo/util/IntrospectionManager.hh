@@ -117,20 +117,20 @@ namespace gazebo
       /// creation, a client should subscribe to the topic
       /// /introspection/filter/<filter_id> for receiving updates.
       /// \return True if the filter was successfully created or false otherwise
-      private: bool NewFilter(const std::set<std::string> &_newItems,
-                              std::string &_filterId);
+      private: bool NewFilterImpl(const std::set<std::string> &_newItems,
+                                  std::string &_filterId);
 
       /// \brief Update an existing filter with a different set of items.
       /// \param[in] _filterId ID of the filter to update.
       /// \param[in] _newItems Non-empty set of items to be observed.
       /// \return True if the filter was successfuly updated or false otherwise.
-      private: bool UpdateFilter(const std::string &_filterId,
-                                 const std::set<std::string> &_newItems);
+      private: bool UpdateFilterImpl(const std::string &_filterId,
+                                     const std::set<std::string> &_newItems);
 
       /// \brief Remove an existing filter.
       /// \param[in] _filterId ID of the filter to remove.
       /// \return True if the filter was successfully removed or false otherwise
-      private: bool RemoveFilter(const std::string &_filterId);
+      private: bool RemoveFilterImpl(const std::string &_filterId);
 
       /// \brief Internal callback for creating a filter via service request.
       /// \param[in] _req Input parameter of the service request. The service
@@ -138,11 +138,10 @@ namespace gazebo
       /// value of type STRING containing the name of the item to observe.
       /// \param[out] _rep Output parameter of the service request. It contains
       /// the filter ID created.
-      /// \param[out] _result True when the operation succeed or false
+      /// \return True when the operation succeed or false
       ///  otherwise. _rep should be ignored when _result is false.
-      private: void NewFilter(const gazebo::msgs::Param_V &_req,
-                              gazebo::msgs::GzString &_rep,
-                              bool &_result);
+      private: bool NewFilter(const gazebo::msgs::Param_V &_req,
+                              gazebo::msgs::GzString &_rep);
 
       /// \brief Internal callback for updating a filter via service request.
       /// \param[in] _req Input parameter of the service request. The service
@@ -151,22 +150,20 @@ namespace gazebo
       /// a collection of one or more parameters with name "item" and a
       /// value of type STRING containing the name of the item to observe.
       /// \param[out] _rep Not used.
-      /// \param[out] _result True when the filter was successfully updated or
+      /// \return True when the filter was successfully updated or
       /// false otherwise.
-      private: void UpdateFilter(const gazebo::msgs::Param_V &_req,
-                                 gazebo::msgs::Empty &_rep,
-                                 bool &_result);
+      private: bool UpdateFilter(const gazebo::msgs::Param_V &_req,
+                                 gazebo::msgs::Empty &_rep);
 
       /// \brief Internal callback for removing a filter via service request.
       /// \param[in] _req Input parameter of the service request. The service
       /// expects exactly one parameter with name "filter_id", value type STRING
       /// and containing the filter ID to be removed.
       /// \param[out] _rep Not used.
-      /// \param[out] _result True when the filter was successfully removed or
+      /// \return True when the filter was successfully removed or
       /// false otherwise.
-      private: void RemoveFilter(const gazebo::msgs::Param_V &_req,
-                                 gazebo::msgs::Empty &_rep,
-                                 bool &_result);
+      private: bool RemoveFilter(const gazebo::msgs::Param_V &_req,
+                                 gazebo::msgs::Empty &_rep);
 
       /// \brief Internal callback for listing all the items registered in the
       /// introspection manager via service request.
@@ -174,10 +171,9 @@ namespace gazebo
       /// \param[out] _rep Collection of parameters representing the items
       /// registered. Each parameter should have a name "item", followed by a
       /// value of type STRING.
-      /// \param[out] _result True when the request succeeded.
-      private: void Items(const gazebo::msgs::Empty &_req,
-                          gazebo::msgs::Param_V &_rep,
-                          bool &_result);
+      /// \return True when the request succeeded.
+      private: bool Items(const gazebo::msgs::Empty &_req,
+                          gazebo::msgs::Param_V &_rep);
 
       /// \brief Helper function for creating a random string identifier.
       /// E.g.: "abcbgh", "egyufd".

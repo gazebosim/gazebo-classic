@@ -360,7 +360,7 @@ void MeshManager::CreatePlane(const std::string &_name,
 
   rot = rot3;
 
-  xlate.Translate(_normal * -_d);
+  xlate.SetTranslation(_normal * -_d);
   xform = xlate * rot;
   if (!xform.IsAffine())
   {

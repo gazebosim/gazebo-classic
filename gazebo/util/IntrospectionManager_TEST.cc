@@ -208,6 +208,10 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   // /introspection/<manager_id>/items_update
   this->manager->Update();
 
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // Check that the callback notifying an item update was executed.
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 4);
@@ -218,11 +222,20 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   EXPECT_FALSE(executed);
   executed = false;
 
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // Unregister all items.
   this->manager->Clear();
 
   // Trigger another update.
   this->manager->Update();
+
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 0);
 }
