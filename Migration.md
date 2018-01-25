@@ -7,6 +7,11 @@ release will remove the deprecated code.
 
 ## Gazebo 8.x to 9.x
 
+### Build system
+
+New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
+New optional dependencies: `ign-fuel-tools`,`ign-common1` 
+
 ### -g command line argument to load plugins in gzclient
 
 1. During the gazebo 8.x series the `-g` was used to load System plugins in the
