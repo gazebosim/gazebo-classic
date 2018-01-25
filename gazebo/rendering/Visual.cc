@@ -1187,7 +1187,7 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
   }
   for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
   {
-    Ogre::Technique *technique = mat->getTechnique(0);
+    Ogre::Technique *technique = mat->getTechnique(i);
     if (!technique)
       continue;
     for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
