@@ -22,15 +22,15 @@
 
 1. [Ignition Fuel Tools](https://ignitionrobotics.org/libs/fuel%20tools) integration:
   1. Ignition Fuel support - model list
-      * [Pull request #2796](https://bitbucket.org/osrf/gazebo/pull-requests/2796/ignition-fuel-support-model-list/diff)
+      * [Pull request #2796](https://bitbucket.org/osrf/gazebo/pull-requests/2796)
   1. Download a model from Ignition Fuel
-      * [Pull request #2800](https://bitbucket.org/osrf/gazebo/pull-requests/2800/download-a-model-from-ignition-fuel/diff)
+      * [Pull request #2800](https://bitbucket.org/osrf/gazebo/pull-requests/2800)
   1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
       * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
 
 1. Avoid race condition between multiple writers to the same connection
     * A contribution from Hendrik Skubch
-    * [Pull request #2826](https://bitbucket.org/osrf/gazebo/pull-requests/2826/move-header-buffer-from-heap-to-stack/diff)
+    * [Pull request #2826](https://bitbucket.org/osrf/gazebo/pull-requests/2826)
 
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
@@ -71,11 +71,11 @@
 
 1. Image Viewer: fix QImage::Format used to display grayscale images
     * A contribution from Julien Lecoeur
-    * [Pull request #2812](https://bitbucket.org/osrf/gazebo/pull-requests/2812/image-viewer-fix-qimage-format-used-to/diff)
+    * [Pull request #2812](https://bitbucket.org/osrf/gazebo/pull-requests/2812)
 
 1. Fix compilation of some tests on Windows
     * A contribution from Silvio Traversaro
-    * [Pull request #2699](https://bitbucket.org/osrf/gazebo/pull-requests/2699/fix-compilation-of-some-tests-on-windows/diff)
+    * [Pull request #2699](https://bitbucket.org/osrf/gazebo/pull-requests/2699)
 
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
