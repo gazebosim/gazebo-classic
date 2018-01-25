@@ -9,8 +9,8 @@ release will remove the deprecated code.
 
 ### Build system
 
-New versions in mandatory dependencies: `ign-transport4`, `ign-common1`, `ign-msgs1`, `ign-math4`, `sdformat6`.
-New optional dependency: `ign-fuel-tools`
+New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
+New optional dependencies: `ign-fuel-tools`,`ign-common1` 
 
 ### -g command line argument to load plugins in gzclient
 
