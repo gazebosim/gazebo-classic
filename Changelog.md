@@ -5,6 +5,9 @@
 1. Add support for 16 bit Grayscale and RGB camera image types.
     * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
 
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
+
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
