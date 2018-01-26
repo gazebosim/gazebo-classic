@@ -20,6 +20,7 @@
 
 #include <string>
 #include <sstream>
+#include <ignition/math/Inertial.hh>
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Pose3.hh>
 
@@ -115,6 +116,12 @@ class JointTest : public ServerFixture,
 
     /// \brief Use parent model frame (#494)
     public: bool useParentModelFrame = false;
+
+    /// \brief Use child link inertia.
+    public: bool useChildLinkInertia = false;
+
+    /// \brief Child link inertia.
+    public: ignition::math::Inertiald childLinkInertia;
   };
 
   /// \brief Spawn a model with a joint connecting to the world. The function
@@ -175,6 +182,10 @@ class JointTest : public ServerFixture,
               if (!_opt.noLinkPose)
               {
                 msgs::Set(link->mutable_pose(), _opt.childLinkPose);
+              }
+              if (_opt.useChildLinkInertia)
+              {
+                msgs::Set(link->mutable_inertial(), _opt.childLinkInertia);
               }
             }
             msg.add_joint();

@@ -104,6 +104,37 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     }
   }
 
+  // child link with off-diagonal inertias
+  if (_jointType != "universal")
+  {
+    gzdbg << "SpawnJoint " << _jointType
+          << " child with off-diagonal inertia, parent"
+          << std::endl;
+    SpawnJointOptions opt;
+    opt.type = _jointType;
+    opt.useChildLinkInertia = true;
+    EXPECT_TRUE(opt.childLinkInertia.SetMassMatrix(
+      ignition::math::MassMatrix3d(12.0,
+        ignition::math::Vector3d(2.0, 3.0, 4.0),
+        ignition::math::Vector3d(0.2, 0.3, 0.4))));
+    physics::JointPtr joint = SpawnJoint(opt);
+    ASSERT_TRUE(joint != nullptr);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != nullptr);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != nullptr);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
+  }
+
   if (_jointType == "gearbox")
   {
     gzerr << "Skip connect to world tests, since we aren't specifying "
