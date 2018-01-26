@@ -75,7 +75,9 @@ TEST_F(Camera_TEST, Create)
     EXPECT_EQ(height, camera->ImageHeight());
     unsigned int channels = 3u;
     unsigned int bytesPerChannel = 1u;
-    unsigned int imageMemSize = width * height * channels * bytesPerChannel;
+    unsigned int bytesPerPixel = channels * bytesPerChannel;
+    unsigned int imageMemSize = width * height * bytesPerPixel;
+    EXPECT_EQ(bytesPerPixel, camera->ImageDepth());
     EXPECT_EQ(imageMemSize, camera->ImageMemorySize());
     EXPECT_EQ(format, camera->ImageFormat());
     EXPECT_DOUBLE_EQ(hfov, camera->HFOV().Radian());
@@ -120,7 +122,9 @@ TEST_F(Camera_TEST, Create)
     EXPECT_EQ(height, camera->ImageHeight());
     unsigned int channels = 1u;
     unsigned int bytesPerChannel = 1u;
-    unsigned int imageMemSize = width * height * channels * bytesPerChannel;
+    unsigned int bytesPerPixel = channels * bytesPerChannel;
+    unsigned int imageMemSize = width * height * bytesPerPixel;
+    EXPECT_EQ(bytesPerPixel, camera->ImageDepth());
     EXPECT_EQ(imageMemSize, camera->ImageMemorySize());
     EXPECT_EQ(format, camera->ImageFormat());
     EXPECT_DOUBLE_EQ(hfov, camera->HFOV().Radian());
@@ -167,7 +171,9 @@ TEST_F(Camera_TEST, Create)
     EXPECT_EQ(height, camera->ImageHeight());
     unsigned int channels = 3u;
     unsigned int bytesPerChannel = 2u;
-    unsigned int imageMemSize = width * height * channels * bytesPerChannel;
+    unsigned int bytesPerPixel = channels * bytesPerChannel;
+    unsigned int imageMemSize = width * height * bytesPerPixel;
+    EXPECT_EQ(bytesPerPixel, camera->ImageDepth());
     EXPECT_EQ(imageMemSize, camera->ImageMemorySize());
     EXPECT_EQ(format, camera->ImageFormat());
     EXPECT_DOUBLE_EQ(hfov, camera->HFOV().Radian());

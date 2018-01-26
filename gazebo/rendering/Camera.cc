@@ -857,21 +857,17 @@ unsigned int Camera::ImageDepth() const
   sdf::ElementPtr imgElem = this->sdf->GetElement("image");
   std::string imgFmt = imgElem->Get<std::string>("format");
 
-  // NOTE: we've been misusing image depth
-  // Image depth = number of bits per pixel
-  // e.g Depth of L8 should be 8 and R8G8B8 should be 24
-  // This function actually returns the number of channels per pixel
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
   else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
-    return 1;
+    return 2;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
   else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16"
       || imgFmt == "RGB_UINT16")
-    return 3;
+    return 6;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;

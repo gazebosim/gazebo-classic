@@ -376,9 +376,8 @@ namespace gazebo
       /// \deprecated See ImageDepth()
       public: unsigned int GetImageDepth() const GAZEBO_DEPRECATED(7.0);
 
-      /// \brief Get the depth of the image
-      /// NOTE: This function actually returns the number of 'channels'
-      /// \return Number of channels in a pixel
+      /// \brief Get the depth of the image in bytes per pixel
+      /// \return Depth of the image in bytes per pixel
       public: unsigned int ImageDepth() const;
 
       /// \brief Get the string representation of the image format.
