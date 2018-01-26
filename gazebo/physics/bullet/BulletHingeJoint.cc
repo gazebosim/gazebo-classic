@@ -340,7 +340,7 @@ double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)
-    result = this->bulletHinge->getUpperLimit();
+    result = this->bulletHinge->getUpperLimit() - this->angleOffset;
   else
     gzerr << "Joint must be created before getting upper limit\n";
   return result;
@@ -351,7 +351,7 @@ double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)
-    result = this->bulletHinge->getLowerLimit();
+    result = this->bulletHinge->getLowerLimit() - this->angleOffset;
   else
     gzerr << "Joint must be created before getting low stop\n";
   return result;
