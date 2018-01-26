@@ -795,10 +795,18 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     physics::InertialPtr inertialClone = linkClone->GetInertial();
     EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
     EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
-    EXPECT_EQ(inertial->PrincipalMoments(),
-        inertialClone->PrincipalMoments());
-    EXPECT_EQ(inertial->ProductsOfInertia(),
-        inertialClone->ProductsOfInertia());
+    // Expect Inertial MOI to match, even if Principal moments
+    // and inertial frames change
+    if (_physicsEngine != "bullet")
+    {
+      EXPECT_EQ(inertial->Ign().MOI(), inertialClone->Ign().MOI());
+    }
+    else
+    {
+      // the default == tolerance of 1e-6, is too strict for bullet
+      EXPECT_TRUE(inertial->Ign().MOI().Equal(
+             inertialClone->Ign().MOI(), 1e-5));
+    }
   }
 
   // Check joints
