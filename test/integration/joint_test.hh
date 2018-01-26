@@ -73,10 +73,7 @@ class JointTest : public ServerFixture,
   public: class SpawnJointOptions
   {
     /// \brief Constructor.
-    public: SpawnJointOptions() : worldChild(false), worldParent(false),
-              wait(common::Time(99, 0)),
-              noLinkPose(false), axis(ignition::math::Vector3d(1, 0, 0)),
-              useParentModelFrame(false)
+    public: SpawnJointOptions()
             {
             }
 
@@ -89,14 +86,14 @@ class JointTest : public ServerFixture,
     public: std::string type;
 
     /// \brief Flag to set child link to the world.
-    public: bool worldChild;
+    public: bool worldChild = false;
 
     /// \brief Flag to set parent link to the world.
-    public: bool worldParent;
+    public: bool worldParent = false;
 
     /// \brief Length of time to wait for model to spawn in order to return
     ///        Joint pointer.
-    public: common::Time wait;
+    public: common::Time wait = common::Time(99, 0);
 
     /// \brief Model pose for spawned model.
     public: ignition::math::Pose3d modelPose;
@@ -108,16 +105,16 @@ class JointTest : public ServerFixture,
     public: ignition::math::Pose3d parentLinkPose;
 
     /// \brief Flag to disable including link pose per issue #978.
-    public: bool noLinkPose;
+    public: bool noLinkPose = false;
 
     /// \brief Joint pose for spawned joint.
     public: ignition::math::Pose3d jointPose;
 
     /// \brief Axis value for spawned joint.
-    public: ignition::math::Vector3d axis;
+    public: ignition::math::Vector3d axis = ignition::math::Vector3d::UnitX;
 
     /// \brief Use parent model frame (#494)
-    public: bool useParentModelFrame;
+    public: bool useParentModelFrame = false;
   };
 
   /// \brief Spawn a model with a joint connecting to the world. The function
