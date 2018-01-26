@@ -76,20 +76,6 @@ void OnNewRGBPointCloud(int* _imageCounter, float* _imageDest,
 }
 
 /////////////////////////////////////////////////
-void OnNew16CameraFrame(int* _imageCounter, unsigned char* _imageDest,
-                  const unsigned char *_image,
-                  unsigned int _width, unsigned int _height,
-                  unsigned int _depth,
-                  const std::string &_format)
-{
-  std::lock_guard<std::mutex> lock(mutex);
-  pixelFormat = _format;
-  // byte => uint16_t so mulitple size by two
-  memcpy(_imageDest, _image, _width * _height * _depth * 2);
-  *_imageCounter += 1;
-}
-
-/////////////////////////////////////////////////
 TEST_F(CameraSensor, WorldReset)
 {
   Load("worlds/empty_test.world");
@@ -1168,13 +1154,13 @@ TEST_F(CameraSensor, 16bit)
 
   event::ConnectionPtr c =
     l16CamSensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNew16CameraFrame, &imageCount, img,
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
   event::ConnectionPtr c2 =
     rgb16CamSensor->Camera()->ConnectNewImageFrame(
-        std::bind(&::OnNew16CameraFrame, &imageCount2, img2,
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
