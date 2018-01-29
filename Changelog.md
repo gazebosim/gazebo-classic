@@ -1,6 +1,6 @@
 ## Gazebo 9
 
-## Gazebo 9.x.x (2018-xx-xx)
+## Gazebo 9.0.0 (2018-01-25)
 
 1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
    only `sdformat6`, removing `sdformat5`.
@@ -20,8 +20,17 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
-1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
-    * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+1. [Ignition Fuel Tools](https://ignitionrobotics.org/libs/fuel%20tools) integration:
+  1. Ignition Fuel support - model list
+      * [Pull request #2796](https://bitbucket.org/osrf/gazebo/pull-requests/2796)
+  1. Download a model from Ignition Fuel
+      * [Pull request #2800](https://bitbucket.org/osrf/gazebo/pull-requests/2800)
+  1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
+      * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+
+1. Avoid race condition between multiple writers to the same connection
+    * A contribution from Hendrik Skubch
+    * [Pull request #2826](https://bitbucket.org/osrf/gazebo/pull-requests/2826)
 
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
@@ -59,6 +68,14 @@
 
 1. Integration of DART-6
     * [Pull request #2547](https://bitbucket.org/osrf/gazebo/
+
+1. Image Viewer: fix QImage::Format used to display grayscale images
+    * A contribution from Julien Lecoeur
+    * [Pull request #2812](https://bitbucket.org/osrf/gazebo/pull-requests/2812)
+
+1. Fix compilation of some tests on Windows
+    * A contribution from Silvio Traversaro
+    * [Pull request #2699](https://bitbucket.org/osrf/gazebo/pull-requests/2699)
 
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
