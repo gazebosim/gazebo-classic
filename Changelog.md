@@ -1,5 +1,11 @@
 ## Gazebo 9
 
+## Gazebo 9.x.x (2018-xx-xx)
+
+1. Make override keywords consistent in joint classes to fix clang warnings
+    * [Pull request #2869](https://bitbucket.org/osrf/gazebo/pull-request/2869)
+
+
 ## Gazebo 9.0.0 (2018-01-25)
 
 1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
