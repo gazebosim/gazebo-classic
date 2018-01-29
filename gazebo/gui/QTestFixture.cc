@@ -30,6 +30,7 @@
 #include "gazebo/gui/QTestFixture.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/rendering/RenderingIface.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
@@ -156,6 +157,7 @@ void QTestFixture::ProcessEventsAndDraw(QMainWindow *_mainWindow,
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
+  gazebo::sensors::fini();
   gazebo::rendering::fini();
 
   if (this->server)
