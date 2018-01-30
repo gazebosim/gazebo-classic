@@ -29,6 +29,7 @@
 #include <ignition/fuel_tools.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SemanticVersion.hh"
@@ -187,9 +188,11 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 {
   std::string path;
 
-  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
+  // encode url by replacing spaces
+  std::string uri = common::replaceAll(_uri, " ", "%20");
+  if (!this->dataPtr->fuelClient->DownloadModel(uri, path))
   {
-    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+    gzerr << "Unable to download model[" << uri << "]" << std::endl;
     return std::string();
   }
 
