@@ -37,7 +37,6 @@ ImageFrame::~ImageFrame()
   if (this->dataPtr->imageBuffer)
     delete [] this->dataPtr->imageBuffer;
 
-
   delete this->dataPtr;
   this->dataPtr = nullptr;
 }
@@ -79,7 +78,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     case common::Image::PixelFormat::L_INT8:
     {
 #if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
-      qFormat = QImage::Format_Indexed8;
+      qFormat = QImage::Format_RGB888;
 #else
       qFormat = QImage::Format_Grayscale8;
 #endif
@@ -181,15 +180,22 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
   else
   {
 #if QT_VERSION < QT_VERSION_CHECK(5, 5, 0)
-    // for use with QImage::Format_Indexed8 format
-    // only create our color table the first time
-    static QVector<QRgb>  sColorTable;
-    if (sColorTable.isEmpty())
+    if (_msg.pixel_format() == common::Image::PixelFormat::L_INT8)
     {
-      sColorTable.resize(256);
-      for (int i = 0; i < 256; ++i)
-        sColorTable[i] = qRgb(i, i, i);
-      this->dataPtr->image.setColorTable(sColorTable);
+      // convert grayscale to rgb for display
+      unsigned int idx = 0;
+      const char *buffer = _msg.data().c_str();
+      for (unsigned int j = 0; j < _msg.height(); ++j)
+      {
+        for (unsigned int i = 0; i < _msg.width(); ++i)
+        {
+          unsigned int v = static_cast<unsigned int>(buffer[idx++]);
+          QRgb value = qRgb(v, v, v);
+          this->dataPtr->image.setPixel(i, j, value);
+        }
+      }
+      this->update();
+      return;
     }
 #endif
     const char *buffer = _msg.data().c_str();
