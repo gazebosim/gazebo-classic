@@ -189,12 +189,13 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   std::string path;
 
   // encode url by replacing spaces
-  std::string uri = common::replaceAll(_uri, " ", "%20");
-  if (!this->dataPtr->fuelClient->DownloadModel(uri, path))
+  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
   {
-    gzerr << "Unable to download model[" << uri << "]" << std::endl;
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
     return std::string();
   }
+  std::cerr << "path " << path <<  std::endl;
 
+  // decode
   return path;
 }
