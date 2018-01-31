@@ -94,7 +94,6 @@ void MultiCameraSensor::Load(const std::string &_worldName)
 //////////////////////////////////////////////////
 void MultiCameraSensor::Init()
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
   {
