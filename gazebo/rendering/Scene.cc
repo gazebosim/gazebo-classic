@@ -2862,8 +2862,6 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
   {
     light.reset(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    if (_msg->has_id())
-      light->SetId(_msg->id());
     this->dataPtr->lights[light->Id()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
@@ -3240,21 +3238,6 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
     this->dataPtr->visuals.erase(_vis->GetId());
     this->dataPtr->visuals[_id] = _vis;
     _vis->SetId(_id);
-  }
-}
-
-/////////////////////////////////////////////////
-void Scene::SetLightId(LightPtr _light, uint32_t _id)
-{
-  if (!_light)
-    return;
-
-  auto iter = this->dataPtr->lights.find(_light->Id());
-  if (iter != this->dataPtr->lights.end())
-  {
-    this->dataPtr->lights.erase(_light->Id());
-    this->dataPtr->lights[_id] = _light;
-    _light->SetId(_id);
   }
 }
 

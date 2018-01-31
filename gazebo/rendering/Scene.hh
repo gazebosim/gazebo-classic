@@ -455,13 +455,6 @@ namespace gazebo
       /// \param[in] _id New id to set to.
       public: void SetVisualId(VisualPtr _vis, const uint32_t _id);
 
-      /// \internal
-      /// \brief Set the id of a light. Internally used when light ids'
-      /// are required to be updated from light msgs.
-      /// \param[in] _vis Pointer to lihgt.
-      /// \param[in] _id New id to set to.
-      public: void SetLightId(LightPtr _light, const uint32_t _id);
-
       /// \brief Add a light to the scene
       /// \param[in] _light Light to add.
       public: void AddLight(LightPtr _light);

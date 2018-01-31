@@ -166,6 +166,9 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 //////////////////////////////////////////////////
 void Light::LoadFromMsg(const msgs::Light &_msg)
 {
+  if (_msg.has_id())
+    this->dataPtr->id = _msg.id();
+
   this->UpdateSDFFromMsg(_msg);
 
   this->Load();
@@ -677,16 +680,3 @@ uint32_t Light::Id() const
 {
   return this->dataPtr->id;
 }
-
-//////////////////////////////////////////////////
-void Light::SetId(const uint32_t _id)
-{
-  if (this->dataPtr->id == _id)
-    return;
-
-  // set new id and also let the scene know that the id has changed.
-  this->dataPtr->scene->SetLightId(shared_from_this(), _id);
-  this->dataPtr->id = _id;
-}
-
-
