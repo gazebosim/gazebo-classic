@@ -246,6 +246,11 @@ void MultiCameraSensor::Render()
   }
 
   // Update all the cameras
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  if (this->dataPtr->cameras.empty())
+  {
+    return;
+  }
   for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
