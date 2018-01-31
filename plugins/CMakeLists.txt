@@ -42,12 +42,12 @@ set (plugins_single_header
   AttachLightPlugin
   BlinkVisualPlugin
   BreakableJointPlugin
-  BoxContainsPlugin
   BuoyancyPlugin
   CameraPlugin
   CartDemoPlugin
   CessnaPlugin
   ContactPlugin
+  ContainPlugin
   DepthCameraPlugin
   DiffDrivePlugin
   FollowerPlugin

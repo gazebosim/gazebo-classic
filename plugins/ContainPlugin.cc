@@ -25,12 +25,12 @@
 
 #include "gazebo/transport/Node.hh"
 
-#include "BoxContainsPlugin.hh"
+#include "ContainPlugin.hh"
 
 namespace gazebo
 {
-  /// \brief Private data class for the BoxContainsPlugin class
-  class BoxContainsPluginPrivate
+  /// \brief Private data class for the ContainPlugin class
+  class ContainPluginPrivate
   {
     /// \brief Connection to world update.
     public: event::ConnectionPtr updateConnection;
@@ -68,50 +68,69 @@ namespace gazebo
 
 using namespace gazebo;
 
-GZ_REGISTER_WORLD_PLUGIN(BoxContainsPlugin)
+GZ_REGISTER_WORLD_PLUGIN(ContainPlugin)
 
 /////////////////////////////////////////////////
-BoxContainsPlugin::BoxContainsPlugin() : WorldPlugin(),
-    dataPtr(new BoxContainsPluginPrivate)
+ContainPlugin::ContainPlugin() : WorldPlugin(),
+    dataPtr(new ContainPluginPrivate)
 {
 }
 
 /////////////////////////////////////////////////
-void BoxContainsPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
+void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
-  // Load SDF params
-  if (!_sdf->HasElement("size"))
-  {
-    gzerr << "Missing required parameter <size>, plugin will not be "
-          << "initialized." << std::endl;
-    return;
-  }
-
-  if (!_sdf->HasElement("pose"))
-  {
-    gzerr << "Missing required parameter <pose>, plugin will not be "
-          << "initialized." << std::endl;
-    return;
-  }
-
+  // Entity name
   if (!_sdf->HasElement("entity"))
   {
     gzerr << "Missing required parameter <entity>, plugin will not be "
           << "initialized." << std::endl;
     return;
   }
+  this->dataPtr->entityName = _sdf->Get<std::string>("entity");
 
+  // Namespace
   if (!_sdf->HasElement("namespace"))
   {
     gzerr << "Missing required parameter <namespace>, plugin will not be "
           << "initialized." << std::endl;
     return;
   }
-
-  auto size = _sdf->Get<ignition::math::Vector3d>("size");
-  auto pose = _sdf->Get<ignition::math::Pose3d>("pose");
-  this->dataPtr->entityName = _sdf->Get<std::string>("entity");
   this->dataPtr->ns = _sdf->Get<std::string>("namespace");
+
+  // Shape
+  if (!_sdf->HasElement("shape"))
+  {
+    gzerr << "Missing required parameter <shape>, plugin will not be "
+          << "initialized." << std::endl;
+    return;
+  }
+  auto shapeElem = _sdf->GetElement("shape");
+
+  // Pose
+  if (!shapeElem->HasElement("pose"))
+  {
+    gzerr << "Missing required parameter <pose>, plugin will not be "
+          << "initialized." << std::endl;
+    return;
+  }
+  auto pose = shapeElem->Get<ignition::math::Pose3d>("pose");
+
+  // Type-specific
+  auto shapeType = shapeElem->Get<std::string>("type");
+  if (shapeType != "box")
+  {
+    gzerr << "Shape type [" << shapeType
+          << "] not supported, plugin will not be initialized." << std::endl;
+    return;
+  }
+
+  if (!shapeElem->HasElement("size"))
+  {
+    gzerr << "Missing required parameter <size>, plugin will not be "
+          << "initialized." << std::endl;
+    return;
+  }
+  auto size = shapeElem->Get<ignition::math::Vector3d>("size");
 
   this->dataPtr->box = ignition::math::OrientedBoxd(size, pose);
 
@@ -121,7 +140,7 @@ void BoxContainsPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
   this->dataPtr->enableSub = this->dataPtr->node->Subscribe("/" +
-      this->dataPtr->ns + "/box/enable", &BoxContainsPlugin::Enable, this);
+      this->dataPtr->ns + "/box/enable", &ContainPlugin::Enable, this);
 
   auto enabled = true;
   if (_sdf->HasElement("enabled"))
@@ -136,23 +155,14 @@ void BoxContainsPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void BoxContainsPlugin::Enable(ConstIntPtr &_msg)
+void ContainPlugin::Enable(ConstIntPtr &_msg)
 {
   // Start
   if (_msg->data() == 1 && !this->dataPtr->updateConnection)
   {
-    this->dataPtr->entity = this->dataPtr->world->GetEntity(
-        this->dataPtr->entityName);
-    if (!this->dataPtr->entity)
-    {
-      gzerr << "Can't find entity[" << this->dataPtr->entityName <<
-          "] in world. Failed to enable Box Plugin." << std::endl;
-      return;
-    }
-
     // Start update
     this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-        std::bind(&BoxContainsPlugin::OnUpdate, this, std::placeholders::_1));
+        std::bind(&ContainPlugin::OnUpdate, this, std::placeholders::_1));
 
     this->dataPtr->containsPub = this->dataPtr->node->Advertise<msgs::Int>(
         "/" + this->dataPtr->ns + "/box/contains");
@@ -169,13 +179,16 @@ void BoxContainsPlugin::Enable(ConstIntPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-void BoxContainsPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
+void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
 {
-  // For safety
+  // Only get the entity once
   if (!this->dataPtr->entity)
   {
-    gzerr << "Entity is null" << std::endl;
-    return;
+    this->dataPtr->entity = this->dataPtr->world->GetEntity(
+        this->dataPtr->entityName);
+
+    if (!this->dataPtr->entity)
+      return;
   }
 
   auto pos = this->dataPtr->entity->GetWorldPose().Ign().Pos();

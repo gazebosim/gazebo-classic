@@ -34,9 +34,9 @@ set(tests
   aero_plugin.cc
   attach_light_plugin.cc
   bandwidth.cc
-  box_contains_plugin.cc
   concave_mesh.cc
   contact_sensor.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc

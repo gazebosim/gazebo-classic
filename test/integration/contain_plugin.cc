@@ -20,24 +20,24 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
-class BoxContainsPluginTest : public ServerFixture
+class ContainPluginTest : public ServerFixture
 {
 };
 
 // Flag turned to true once box contains.
-bool g_boxContains = false;
+bool g_contain = false;
 
 //////////////////////////////////////////////////
 // Callback for box/contains topic
 void boxCb(ConstIntPtr &_msg)
 {
-  g_boxContains = _msg->data() == 1;
+  g_contain = _msg->data() == 1;
 }
 
 //////////////////////////////////////////////////
-TEST_F(BoxContainsPluginTest, Disable)
+TEST_F(ContainPluginTest, Disable)
 {
-  this->Load("worlds/box_contains_plugin_demo.world", true);
+  this->Load("worlds/contain_plugin_demo.world", true);
   auto world = physics::get_world();
   ASSERT_NE(world , nullptr);
 
@@ -51,7 +51,7 @@ TEST_F(BoxContainsPluginTest, Disable)
   ASSERT_NE(boxSub , nullptr);
 
   // Check box doesn't contain yet
-  EXPECT_FALSE(g_boxContains);
+  EXPECT_FALSE(g_contain);
 
   // Place drill inside box
   drill->SetWorldPose(ignition::math::Pose3d(10.0, 10.0, 1.0, 0, 0, 0));
@@ -60,7 +60,7 @@ TEST_F(BoxContainsPluginTest, Disable)
   world->Step(1000);
 
   // Verify we get a notification
-  EXPECT_TRUE(g_boxContains);
+  EXPECT_TRUE(g_contain);
 
   // Place drill outside box
   drill->SetWorldPose(ignition::math::Pose3d(0.0, 0.0, 1.0, 0, 0, 0));
@@ -69,7 +69,7 @@ TEST_F(BoxContainsPluginTest, Disable)
   world->Step(1000);
 
   // Verify we get a notification
-  EXPECT_FALSE(g_boxContains);
+  EXPECT_FALSE(g_contain);
 
   // Disable plugin
   auto enablePub = this->node->Advertise<msgs::Int>(prefix + "enable");
@@ -85,7 +85,7 @@ TEST_F(BoxContainsPluginTest, Disable)
   world->Step(1000);
 
   // Wait and see it doesn't notify now
-  EXPECT_FALSE(g_boxContains);
+  EXPECT_FALSE(g_contain);
 }
 
 //////////////////////////////////////////////////

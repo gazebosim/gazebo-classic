@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GAZEBO_PLUGINS_BOXCONTAINSPLUGIN_HH_
-#define GAZEBO_PLUGINS_BOXCONTAINSPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_CONTAINPLUGIN_HH_
+#define GAZEBO_PLUGINS_CONTAINPLUGIN_HH_
 
 #include <memory>
 
@@ -27,15 +27,15 @@
 
 namespace gazebo
 {
-  class BoxContainsPluginPrivate;
+  class ContainPluginPrivate;
 
   /// \brief Plugin which emits gazebo transport messages according to whether
-  /// an entity's origin is inside or outside an oriented box. A message is only
+  /// an entity's origin is inside or outside a given volume. A message is only
   /// published when the state changes.
   ///
   /// Example usage:
   ///
-  ///  <plugin name="boxContainsRobotArm" filename="libBoxContainsPlugin.so">
+  ///  <plugin name="containRobotArm" filename="libContainPlugin.so">
   ///
   ///    <!-- True to enable automatically, false so it must be enabled
   ///         via a message - true by default -->
@@ -51,21 +51,26 @@ namespace gazebo
   ///    -->
   ///    <namespace>gazebo/robot</namespace>
   ///
-  ///    <!-- Box size in meters -->
-  ///    <size>1 1 4</size>
+  ///    <!-- Shape of the volume, currently only supports box -->
+  ///    <shape type="box">
   ///
-  ///    <!-- Pose of the box center point in world coordinates -->
-  ///    <pose>10 10 2 0 0 1.57</pose>
+  ///      <!-- Pose of the shape's center point in world coordinates -->
+  ///      <pose>10 10 2 0 0 1.57</pose>
+  ///
+  ///      <!-- Box size in its own coordinate frame. -->
+  ///      <size>1 1 4</size>
+  ///
+  ///    </shape>
   ///
   ///  </plugin>
   ///
-  class GAZEBO_VISIBLE BoxContainsPlugin : public WorldPlugin
+  class GAZEBO_VISIBLE ContainPlugin : public WorldPlugin
   {
     // Documentation inherited
-    public: BoxContainsPlugin();
+    public: ContainPlugin();
 
     // Documentation inherited
-    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf);
+    public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf) override;
 
     /// \brief Called every world iteration on world update begin.
     /// \param[in] _info Update info.
@@ -76,7 +81,7 @@ namespace gazebo
     private: void Enable(ConstIntPtr &_msg);
 
     /// \brief Pointer to private data
-    private: std::unique_ptr<BoxContainsPluginPrivate> dataPtr;
+    private: std::unique_ptr<ContainPluginPrivate> dataPtr;
   };
 }
 
