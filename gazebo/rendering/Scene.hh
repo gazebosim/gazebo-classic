@@ -290,11 +290,10 @@ namespace gazebo
       /// \return The number of lights.
       public: uint32_t LightCount() const;
 
-      /// \brief Get a light based on an index. The index must be between
-      /// 0 and Scene::GetLightCount.
-      /// \param[in] _index Index of the light.
-      /// \return Pointer to the Light or NULL if index was invalid.
-      public: LightPtr GetLight(const uint32_t _index) const;
+      /// \brief Get a light based on Id.
+      /// \param[in] _index Unique light id.
+      /// \return Pointer to the Light or NULL if not found.
+      public: LightPtr GetLight(const uint32_t _id) const;
 
       /// \brief Get a visual by name.
       /// \param[in] _name Name of the visual to retrieve.
@@ -455,6 +454,13 @@ namespace gazebo
       /// \param[in] _vis Pointer to visual.
       /// \param[in] _id New id to set to.
       public: void SetVisualId(VisualPtr _vis, const uint32_t _id);
+
+      /// \internal
+      /// \brief Set the id of a light. Internally used when light ids'
+      /// are required to be updated from light msgs.
+      /// \param[in] _vis Pointer to lihgt.
+      /// \param[in] _id New id to set to.
+      public: void SetLightId(LightPtr _light, const uint32_t _id);
 
       /// \brief Add a light to the scene
       /// \param[in] _light Light to add.

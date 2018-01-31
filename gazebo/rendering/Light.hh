@@ -211,6 +211,13 @@ namespace gazebo
       /// \return a clone of the light
       public: LightPtr Clone(const std::string &_name, ScenePtr _scene);
 
+      /// \brief Get the id associated with this light
+      /// \return Unique Light id
+      public: uint32_t Id() const;
+
+      /// \brief Set the id associated with this light
+      public: void SetId(const uint32_t _id);
+
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}
 

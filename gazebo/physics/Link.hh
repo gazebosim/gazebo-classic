@@ -672,6 +672,11 @@ namespace gazebo
       /// \param[in] _sdf SDF parameter.
       private: void LoadBattery(const sdf::ElementPtr _sdf);
 
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element
+      private: void LoadLight(sdf::ElementPtr _sdf);
+
+
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
 

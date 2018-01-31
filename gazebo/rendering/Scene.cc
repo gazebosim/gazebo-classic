@@ -714,37 +714,30 @@ void Scene::RemoveCamera(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const std::string &_name) const
 {
-  LightPtr result;
-  std::string n = this->StripSceneName(_name);
-  Light_M::const_iterator iter = this->dataPtr->lights.find(n);
+  for (auto iter = this->dataPtr->lights.begin();
+      iter != this->dataPtr->lights.end(); ++iter)
+  {
+    if (iter->second->Name() == _name)
+      return iter->second;
+  }
+
+  return LightPtr();
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::GetLight(const uint32_t _id) const
+{
+  auto iter = this->dataPtr->lights.find(_id);
   if (iter != this->dataPtr->lights.end())
-    result = iter->second;
-  return result;
+    return iter->second;
+
+  return LightPtr();
 }
 
 //////////////////////////////////////////////////
 uint32_t Scene::LightCount() const
 {
   return this->dataPtr->lights.size();
-}
-
-//////////////////////////////////////////////////
-LightPtr Scene::GetLight(const uint32_t _index) const
-{
-  LightPtr result;
-  if (_index < this->dataPtr->lights.size())
-  {
-    Light_M::const_iterator iter = this->dataPtr->lights.begin();
-    std::advance(iter, _index);
-    result = iter->second;
-  }
-  else
-  {
-    gzerr << "Error: light index(" << _index << ") larger than light count("
-          << this->dataPtr->lights.size() << "\n";
-  }
-
-  return result;
 }
 
 //////////////////////////////////////////////////
@@ -1678,6 +1671,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
             _msg.link(j).sensor(k)));
       this->dataPtr->sensorMsgs.push_back(sm);
     }
+    for (int k = 0; k < _msg.link(j).light_size(); ++k)
+    {
+      boost::shared_ptr<msgs::Light> lm(new msgs::Light(
+            _msg.link(j).light(k)));
+      this->dataPtr->lightFactoryMsgs.push_back(lm);
+    }
   }
 
   for (int i = 0; i < _msg.model_size(); ++i)
@@ -1867,26 +1866,6 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
-  // Process the light factory messages.
-  for (lightIter = lightFactoryMsgsCopy.begin();
-      lightIter != lightFactoryMsgsCopy.end();)
-  {
-    if (this->ProcessLightFactoryMsg(*lightIter))
-      lightFactoryMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
-  // Process the light modify messages.
-  for (lightIter = lightModifyMsgsCopy.begin();
-      lightIter != lightModifyMsgsCopy.end();)
-  {
-    if (this->ProcessLightModifyMsg(*lightIter))
-      lightModifyMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
   // Process the model visual messages.
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
@@ -1947,6 +1926,29 @@ void Scene::PreRender()
     else
       ++linkIter;
   }
+
+  // Process the light factory messages.
+  // do this after the link and visual msgs have been processed
+  for (lightIter = lightFactoryMsgsCopy.begin();
+      lightIter != lightFactoryMsgsCopy.end();)
+  {
+    if (this->ProcessLightFactoryMsg(*lightIter))
+      lightFactoryMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+  // Process the light modify messages.
+  for (lightIter = lightModifyMsgsCopy.begin();
+      lightIter != lightModifyMsgsCopy.end();)
+  {
+    if (this->ProcessLightModifyMsg(*lightIter))
+      lightModifyMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+
 
   // Process the request messages
   for (rIter =  this->dataPtr->requestMsgs.begin();
@@ -2024,24 +2026,20 @@ void Scene::PreRender()
           ++pIter;
       }
       else
-        ++pIter;
-    }
-
-    // process light pose messages
-    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
-    while (lpIter != this->dataPtr->lightPoseMsgs.end())
-    {
-      auto lIter = this->dataPtr->lights.find(lpIter->first);
-      if (lIter != this->dataPtr->lights.end())
       {
-        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
-        lIter->second->SetPosition(pose.Pos());
-        lIter->second->SetRotation(pose.Rot());
-        auto prev = lpIter++;
-        this->dataPtr->lightPoseMsgs.erase(prev);
+        // process light pose messages
+        auto lIter = this->dataPtr->lights.find(pIter->first);
+        if (lIter != this->dataPtr->lights.end())
+        {
+          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
+          lIter->second->SetPosition(pose.Pos());
+          lIter->second->SetRotation(pose.Rot());
+          auto prev = pIter++;
+          this->dataPtr->poseMsgs.erase(prev);
+        }
+        else
+          ++pIter;
       }
-      else
-        lpIter++;
     }
 
     // process skeleton pose msgs
@@ -2383,12 +2381,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     response.set_id(_msg->id());
     response.set_request(_msg->request());
 
-    Light_M::iterator iter;
-    iter = this->dataPtr->lights.find(_msg->data());
-    if (iter != this->dataPtr->lights.end())
+    LightPtr light = this->GetLight(_msg->data());
+    if (light)
     {
       msgs::Light lightMsg;
-      iter->second->FillMsg(lightMsg);
+      light->FillMsg(lightMsg);
 
       std::string *serializedData = response.mutable_serialized_data();
       lightMsg.SerializeToString(serializedData);
@@ -2403,12 +2400,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
-
     // Check to see if the deleted entity is a light.
-    if (lightIter != this->dataPtr->lights.end())
+    LightPtr light = this->GetLight(_msg->data());
+    if (light)
     {
-      this->dataPtr->lights.erase(lightIter);
+      this->RemoveLight(light);
     }
     // Otherwise delete a visual
     else
@@ -2803,25 +2799,12 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     auto p = _msg->pose(i);
-    /// TODO: empty id used to indicate it's pose of a light
-    /// remove this check once light.proto has an id field
-    if (p.has_id())
-    {
-      PoseMsgs_M::iterator iter =
-          this->dataPtr->poseMsgs.find(p.id());
-      if (iter != this->dataPtr->poseMsgs.end())
-        iter->second.CopyFrom(p);
-      else
-        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
-    }
+    PoseMsgs_M::iterator iter =
+        this->dataPtr->poseMsgs.find(p.id());
+    if (iter != this->dataPtr->poseMsgs.end())
+      iter->second.CopyFrom(p);
     else
-    {
-      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
-      if (iter != this->dataPtr->lightPoseMsgs.end())
-        iter->second.CopyFrom(p);
-      else
-        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
-    }
+      this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
   }
 }
 
@@ -2869,14 +2852,19 @@ void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->GetLight(_msg->id());
+  else
+    light = this->GetLight(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (!light)
   {
-    LightPtr light(new Light(shared_from_this()));
+    light.reset(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->dataPtr->lights[_msg->name()] = light;
+    if (_msg->has_id())
+      light->SetId(_msg->id());
+    this->dataPtr->lights[light->Id()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
   else
@@ -2893,10 +2881,13 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->GetLight(_msg->id());
+  else
+    light = this->GetLight(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (light)
   {
     // commented out for now as sometimes physics light messages could arrive
     // before the rendering light is created, e.g. light pose updates.
@@ -2907,7 +2898,7 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
   }
   else
   {
-    iter->second->UpdateFromMsg(_msg);
+    light->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 
@@ -3253,14 +3244,28 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 }
 
 /////////////////////////////////////////////////
+void Scene::SetLightId(LightPtr _light, uint32_t _id)
+{
+  if (!_light)
+    return;
+
+  auto iter = this->dataPtr->lights.find(_light->Id());
+  if (iter != this->dataPtr->lights.end())
+  {
+    this->dataPtr->lights.erase(_light->Id());
+    this->dataPtr->lights[_id] = _light;
+    _light->SetId(_id);
+  }
+}
+
+/////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->Name());
-  const auto iter = this->dataPtr->lights.find(n);
-  if (iter != this->dataPtr->lights.end())
+  LightPtr light = this->GetLight(_light->Id());
+  if (light)
     gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
-  this->dataPtr->lights[n] = _light;
+  this->dataPtr->lights[_light->Id()] = _light;
 }
 
 /////////////////////////////////////////////////
@@ -3269,8 +3274,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->Name());
-    this->dataPtr->lights.erase(n);
+    this->dataPtr->lights.erase(_light->Id());
   }
 }
 

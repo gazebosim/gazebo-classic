@@ -49,6 +49,9 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
     + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
     + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
 1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
+1. **gazebo/rendering/Scene.hh:**
+    + ***Removed:*** LightPtr GetLight(const uint32_t _index) const;
+    + ***Replacement:*** LightPtr GetLight(const uint32_t _id) const;
 
 ### Deprecations
 
