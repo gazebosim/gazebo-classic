@@ -16,10 +16,12 @@
 */
 
 #include <map>
+#include <mutex>
 #include <vector>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/physics.hh"
+#include "gazebo/transport/Node.hh"
 #include "plugins/AttachLightPlugin.hh"
 
 
@@ -40,6 +42,15 @@ namespace gazebo
     /// \brief List of link and light pointers and the light pose offset
     public: std::map<physics::LinkPtr, std::map<physics::LightPtr,
         ignition::math::Pose3d>> linkLights;
+
+    /// \brief Mutex to protect linkLights
+    public: std::mutex mutex;
+
+    /// \brief Communication Node
+    public: transport::NodePtr node;
+
+    /// \brief Subscribe to the request topic
+    public: transport::SubscriberPtr requestSub;
   };
 }
 
@@ -55,6 +66,10 @@ AttachLightPlugin::AttachLightPlugin()
 /////////////////////////////////////////////////
 void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  gzwarn << "The AttachLightPlugin is being deprecated. Consider using the "
+         << "new SDF spec that allows <light> to be added as a child of <link> "
+         << "elements" << std::endl;
+
   this->dataPtr->model = _model;
   this->dataPtr->world = _model->GetWorld();
 
@@ -115,6 +130,13 @@ void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->dataPtr->linkLights.empty())
     return;
 
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  // listen for delete events to remove lens flare if light gets deleted.
+  this->dataPtr->requestSub = this->dataPtr->node->Subscribe("~/request",
+      &AttachLightPlugin::OnRequest, this);
+
   this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateEnd(
       std::bind(&AttachLightPlugin::OnUpdate, this)));
 }
@@ -122,6 +144,7 @@ void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void AttachLightPlugin::OnUpdate()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   // update light pose based on link pose
   for (auto &it : this->dataPtr->linkLights)
   {
@@ -132,6 +155,29 @@ void AttachLightPlugin::OnUpdate()
       physics::LightPtr light = lightIt.first;
       ignition::math::Pose3d pose = lightIt.second;
       light->SetWorldPose(pose + link->GetWorldPose().Ign());
+    }
+  }
+}
+
+
+//////////////////////////////////////////////////
+void AttachLightPlugin::OnRequest(ConstRequestPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  if (_msg->request() != "entity_delete")
+    return;
+  for (auto &it : this->dataPtr->linkLights)
+  {
+    physics::LinkPtr link = it.first;
+    std::map<physics::LightPtr, ignition::math::Pose3d> &lights = it.second;
+    for (auto lightIt = lights.begin(); lightIt != lights.end(); ++lightIt)
+    {
+      physics::LightPtr light = lightIt->first;
+      if (light->GetScopedName() == _msg->data())
+      {
+        lights.erase(lightIt);
+        return;
+      }
     }
   }
 }

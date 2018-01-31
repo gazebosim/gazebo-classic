@@ -1769,6 +1769,16 @@ void dWorldSetGravity (dWorldID w, dReal x, dReal y, dReal z)
   w->gravity[2] = z;
 }
 
+int dWorldGetIslandThreads (dWorldID w)
+{
+  dAASSERT (w);
+  if (!w->threadpool) {
+    return 0;
+  }
+  // else
+  return w->threadpool->size();
+}
+
 void dWorldSetIslandThreads (dWorldID w, int num_island_threads)
 {
   dAASSERT (w);
@@ -1779,7 +1789,6 @@ void dWorldSetIslandThreads (dWorldID w, int num_island_threads)
   }
   if (num_island_threads > 0) {
     w->threadpool = new boost::threadpool::pool(num_island_threads);
-    printf("setting island pool threads to %d\n",num_island_threads);
   }
 }
 

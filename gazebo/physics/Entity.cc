@@ -44,6 +44,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -254,11 +255,11 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->GetWorldPose();
+    return this->GetWorldPose() - this->parentEntity->GetWorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->GetWorldPose();
   }
 }
 
@@ -360,6 +361,12 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
                 boost::static_pointer_cast<Collision>(*iterC);
             entityC->SetWorldPoseDirty();
           }
+          else if ((*iterC)->HasType(LIGHT))
+          {
+            LightPtr entityC =
+                boost::static_pointer_cast<Light>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
         }
       }
       else if (entity->HasType(MODEL))
@@ -437,6 +444,11 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
       if (childPtr->HasType(COLLISION))
       {
         CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+      else if (childPtr->HasType(LIGHT))
+      {
+        LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
         entityC->SetWorldPoseDirty();
       }
     }
