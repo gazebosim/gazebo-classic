@@ -209,7 +209,6 @@ void Link::Load(sdf::ElementPtr _sdf)
     while (lightElem)
     {
       // Create and Load a light
-      // this->world->LoadLight(lightElem, shared_from_this());
       this->LoadLight(lightElem);
       lightElem = lightElem->GetNextElement("light");
     }

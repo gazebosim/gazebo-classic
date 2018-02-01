@@ -384,8 +384,8 @@ TEST_F(Scene_TEST, AddRemoveLights)
   light1->SetName("light1");
   scene->AddLight(light1);
   EXPECT_EQ(scene->LightCount(), 1u);
-  EXPECT_EQ(light1, scene->GetLight("light1"));
-  EXPECT_EQ(light1, scene->GetLight(light1->Id()));
+  EXPECT_EQ(light1, scene->LightByName("light1"));
+  EXPECT_EQ(light1, scene->LightById(light1->Id()));
 
   // Add anaother light and check that it has been added
   rendering::LightPtr light2;
@@ -393,13 +393,13 @@ TEST_F(Scene_TEST, AddRemoveLights)
   light2->SetName("light2");
   scene->AddLight(light2);
   EXPECT_EQ(scene->LightCount(), 2u);
-  EXPECT_EQ(light2, scene->GetLight("light2"));
-  EXPECT_EQ(light2, scene->GetLight(light2->Id()));
+  EXPECT_EQ(light2, scene->LightByName("light2"));
+  EXPECT_EQ(light2, scene->LightById(light2->Id()));
 
   // Remove a light and check that it has been removed
   scene->RemoveLight(light1);
   EXPECT_EQ(scene->LightCount(), 1u);
-  EXPECT_FALSE(scene->GetLight("light1"));
+  EXPECT_FALSE(scene->LightByName("light1"));
 }
 
 

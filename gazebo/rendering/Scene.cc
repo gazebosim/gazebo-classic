@@ -714,18 +714,48 @@ void Scene::RemoveCamera(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const std::string &_name) const
 {
-  for (auto iter = this->dataPtr->lights.begin();
-      iter != this->dataPtr->lights.end(); ++iter)
+  return this->LightByName(_name);
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightByName(const std::string &_name) const
+{
+  for (auto &iter: this->dataPtr->lights)
   {
-    if (iter->second->Name() == _name)
-      return iter->second;
+    if (iter.second->Name() == _name)
+      return iter.second;
   }
 
   return LightPtr();
 }
 
 //////////////////////////////////////////////////
-LightPtr Scene::GetLight(const uint32_t _id) const
+LightPtr Scene::GetLight(const uint32_t _index) const
+{
+  return this->LightByIndex(_index);
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightByIndex(const uint32_t _index) const
+{
+  LightPtr result;
+  if (_index < this->dataPtr->lights.size())
+  {
+    Light_M::const_iterator iter = this->dataPtr->lights.begin();
+    std::advance(iter, _index);
+    result = iter->second;
+  }
+  else
+  {
+    gzerr << "Error: light index(" << _index << ") larger than light count("
+          << this->dataPtr->lights.size() << "\n";
+  }
+
+  return result;
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightById(const uint32_t _id) const
 {
   auto iter = this->dataPtr->lights.find(_id);
   if (iter != this->dataPtr->lights.end())
@@ -1948,8 +1978,6 @@ void Scene::PreRender()
       ++lightIter;
   }
 
-
-
   // Process the request messages
   for (rIter =  this->dataPtr->requestMsgs.begin();
       rIter != this->dataPtr->requestMsgs.end(); ++rIter)
@@ -2381,7 +2409,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     response.set_id(_msg->id());
     response.set_request(_msg->request());
 
-    LightPtr light = this->GetLight(_msg->data());
+    LightPtr light = this->LightByName(_msg->data());
     if (light)
     {
       msgs::Light lightMsg;
@@ -2401,7 +2429,7 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   else if (_msg->request() == "entity_delete")
   {
     // Check to see if the deleted entity is a light.
-    LightPtr light = this->GetLight(_msg->data());
+    LightPtr light = this->LightByName(_msg->data());
     if (light)
     {
       this->RemoveLight(light);
@@ -2854,9 +2882,9 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
   LightPtr light;
   if (_msg->has_id())
-    light = this->GetLight(_msg->id());
+    light = this->LightById(_msg->id());
   else
-    light = this->GetLight(_msg->name());
+    light = this->LightByName(_msg->name());
 
   if (!light)
   {
@@ -2881,9 +2909,9 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 {
   LightPtr light;
   if (_msg->has_id())
-    light = this->GetLight(_msg->id());
+    light = this->LightById(_msg->id());
   else
-    light = this->GetLight(_msg->name());
+    light = this->LightByName(_msg->name());
 
   if (light)
   {
@@ -3244,7 +3272,7 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  LightPtr light = this->GetLight(_light->Id());
+  LightPtr light = this->LightById(_light->Id());
   if (light)
     gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 

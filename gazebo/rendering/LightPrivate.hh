@@ -55,7 +55,7 @@ namespace gazebo
       /// \brief Pointer to the scene.
       public: ScenePtr scene;
 
-      /// \brief Unique id of this visual.
+      /// \brief Unique id of this light.
       public: uint32_t id;
 
       /// \brief Counter used to generate unique light names.

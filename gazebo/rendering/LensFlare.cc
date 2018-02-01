@@ -211,7 +211,7 @@ void LensFlare::Update()
   for (unsigned int i = 0; i < this->dataPtr->camera->GetScene()->LightCount();
       ++i)
   {
-    LightPtr light = this->dataPtr->camera->GetScene()->GetLight(i);
+    LightPtr light = this->dataPtr->camera->GetScene()->LightByIndex(i);
     if (light->Type() == "directional")
     {
       directionalLight = light;

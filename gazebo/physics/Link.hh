@@ -635,6 +635,10 @@ namespace gazebo
       /// \param[in] _sdf SDF element used to load the collision.
       private: void LoadCollision(sdf::ElementPtr _sdf);
 
+      /// \brief Load a light.
+      /// \param[in] _sdf SDF element
+      private: void LoadLight(sdf::ElementPtr _sdf);
+
       /// \brief Set the inertial properties based on the collision
       /// entities.
       private: void SetInertialFromCollisions();
@@ -671,11 +675,6 @@ namespace gazebo
       /// \brief Load a battery.
       /// \param[in] _sdf SDF parameter.
       private: void LoadBattery(const sdf::ElementPtr _sdf);
-
-      /// \brief Load a light.
-      /// \param[in] _sdf SDF element
-      private: void LoadLight(sdf::ElementPtr _sdf);
-
 
       /// \brief Register items in the introspection service.
       protected: virtual void RegisterIntrospectionItems();
