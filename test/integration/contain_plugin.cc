@@ -24,12 +24,12 @@ class ContainPluginTest : public ServerFixture
 {
 };
 
-// Flag turned to true once box contains.
+// Flag turned to true once box contain.
 bool g_contain = false;
 
 //////////////////////////////////////////////////
-// Callback for box/contains topic
-void boxCb(ConstIntPtr &_msg)
+// Callback for /contain topic
+void containCb(ConstIntPtr &_msg)
 {
   g_contain = _msg->data() == 1;
 }
@@ -46,9 +46,9 @@ TEST_F(ContainPluginTest, Disable)
   ASSERT_NE(drill , nullptr);
 
   // Subscribe to plugin notifications
-  std::string prefix("/gazebo/default/drill/box/");
-  auto boxSub = this->node->Subscribe(prefix + "contains", &boxCb);
-  ASSERT_NE(boxSub , nullptr);
+  std::string prefix("/gazebo/default/drill/");
+  auto containSub = this->node->Subscribe(prefix + "contain", &containCb);
+  ASSERT_NE(containSub , nullptr);
 
   // Check box doesn't contain yet
   EXPECT_FALSE(g_contain);

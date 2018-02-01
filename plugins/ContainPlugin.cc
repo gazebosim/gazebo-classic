@@ -139,8 +139,8 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Start/stop
   this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
   this->dataPtr->gzNode->Init();
-  this->dataPtr->enableGzSub = this->dataPtr->gzNode->Subscribe(
-      this->dataPtr->ns + "/box/enable", &ContainPlugin::Enable, this);
+  this->dataPtr->enableGzSub = this->dataPtr->gzNode->Subscribe("/" +
+      this->dataPtr->ns + "/enable", &ContainPlugin::Enable, this);
 
   auto enabled = true;
   if (_sdf->HasElement("enabled"))
@@ -167,7 +167,7 @@ void ContainPlugin::Enable(ConstIntPtr &_msg)
   }
 
   // Already stopped
-  if (enable && !this->dataPtr->updateConnection)
+  if (!enable && !this->dataPtr->updateConnection)
   {
     gzwarn << "Contain plugin is already disabled." << std::endl;
     return;
@@ -181,7 +181,7 @@ void ContainPlugin::Enable(ConstIntPtr &_msg)
         std::bind(&ContainPlugin::OnUpdate, this, std::placeholders::_1));
 
     this->dataPtr->containGzPub = this->dataPtr->gzNode->Advertise<msgs::Int>(
-        "/" + this->dataPtr->ns + "/box/contains");
+        "/" + this->dataPtr->ns + "/contain");
 
     gzmsg << "Started contain plugin [" << this->dataPtr->ns << "]"
           << std::endl;
