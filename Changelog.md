@@ -1,5 +1,10 @@
 ## Gazebo 9
 
+## Gazebo 9.x.x (2018-xx-xx)
+
+1. Attach lights to links cleanup and deprecate GetLight functions
+* [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
+
 ## Gazebo 9.0.0 (2018-01-25)
 
 1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
