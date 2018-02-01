@@ -1864,11 +1864,21 @@ void World::ProcessLightModifyMsgs()
 //////////////////////////////////////////////////
 void World::ProcessLightFactoryMsgs()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
-  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  // LoadLight also publishes to ~/light/factory so copy light factory msgs to
+  // avoid deadlock in OnLightFactory callback when trying to lock receiveMutex
+  std::list<msgs::Light> lightFactoryMsgsCopy;
+  {
+    boost::recursive_mutex::scoped_lock lock(*this->dataPtr->receiveMutex);
+
+    std::copy(this->dataPtr->lightFactoryMsgs.begin(),
+        this->dataPtr->lightFactoryMsgs.end(),
+        std::back_inserter(lightFactoryMsgsCopy));
+    this->dataPtr->lightFactoryMsgs.clear();
+  }
+
+  for (auto const &lightFactoryMsg : lightFactoryMsgsCopy)
   {
     LightPtr light = this->Light(lightFactoryMsg.name());
-
     if (light)
     {
       continue;
@@ -1883,11 +1893,6 @@ void World::ProcessLightFactoryMsgs()
       // Create new light object
       this->LoadLight(lightSDF, this->dataPtr->rootElement);
     }
-  }
-
-  if (!this->dataPtr->lightFactoryMsgs.empty())
-  {
-    this->dataPtr->lightFactoryMsgs.clear();
   }
 }
 
