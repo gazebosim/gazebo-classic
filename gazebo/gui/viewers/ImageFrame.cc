@@ -102,8 +102,7 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
       || qFormat != this->dataPtr->image.format())
   {
-    QImage qimage(_msg.width(), _msg.height(), qFormat);
-    this->dataPtr->image = qimage.copy();
+    this->dataPtr->image = QImage(_msg.width(), _msg.height(), qFormat);
   }
 
   // Convert the image data to RGB
