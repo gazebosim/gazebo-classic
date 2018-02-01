@@ -51,6 +51,7 @@ set (plugins_single_header
   CartDemoPlugin
   CessnaPlugin
   ContactPlugin
+  ContainPlugin
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
