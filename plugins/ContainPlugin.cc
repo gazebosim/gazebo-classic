@@ -185,8 +185,7 @@ void ContainPlugin::Enable(ConstIntPtr &_msg)
 
     gzmsg << "Started contain plugin [" << this->dataPtr->ns << "]"
           << std::endl;
-
-    return true;
+    return;
   }
 
   // Stop
@@ -197,8 +196,7 @@ void ContainPlugin::Enable(ConstIntPtr &_msg)
 
     gzmsg << "Stopped contain plugin [" << this->dataPtr->ns << "]"
           << std::endl;
-
-    return true;
+    return;
   }
 }
 
