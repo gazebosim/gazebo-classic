@@ -48,21 +48,21 @@ namespace gazebo
     public: ignition::math::OrientedBoxd box;
 
     /// \brief Gazebo transport node for communication.
-    public: transport::NodePtr node;
+    public: transport::NodePtr gzNode;
 
     /// \brief Publisher which publishes contain / doesn't contain messages.
-    public: transport::PublisherPtr containsPub;
+    public: transport::PublisherPtr containGzPub;
 
     /// \brief Subscriber to enable messages.
-    public: transport::SubscriberPtr enableSub;
+    public: transport::SubscriberPtr enableGzSub;
 
     /// \brief Namespace for the topics:
-    /// /<ns>/box/contains
-    /// /<ns>/box/enable
+    /// /<ns>/contain
+    /// /<ns>/enable
     public: std::string ns;
 
-    /// \brief Whether contains or not
-    public: int contains = -1;
+    /// \brief 1 if contains, 0 if doesn't contain, -1 if unset
+    public: int contain = -1;
   };
 }
 
@@ -136,10 +136,10 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   this->dataPtr->world = _world;
 
-  // Start/stop "service"
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-  this->dataPtr->enableSub = this->dataPtr->node->Subscribe("/" +
+  // Start/stop
+  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->gzNode->Init();
+  this->dataPtr->enableGzSub = this->dataPtr->gzNode->Subscribe(
       this->dataPtr->ns + "/box/enable", &ContainPlugin::Enable, this);
 
   auto enabled = true;
@@ -157,24 +157,48 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void ContainPlugin::Enable(ConstIntPtr &_msg)
 {
+  auto enable = _msg->data() == 1;
+
+  // Already started
+  if (enable && this->dataPtr->updateConnection)
+  {
+    gzwarn << "Contain plugin is already enabled." << std::endl;
+    return;
+  }
+
+  // Already stopped
+  if (enable && !this->dataPtr->updateConnection)
+  {
+    gzwarn << "Contain plugin is already disabled." << std::endl;
+    return;
+  }
+
   // Start
-  if (_msg->data() == 1 && !this->dataPtr->updateConnection)
+  if (enable)
   {
     // Start update
     this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&ContainPlugin::OnUpdate, this, std::placeholders::_1));
 
-    this->dataPtr->containsPub = this->dataPtr->node->Advertise<msgs::Int>(
+    this->dataPtr->containGzPub = this->dataPtr->gzNode->Advertise<msgs::Int>(
         "/" + this->dataPtr->ns + "/box/contains");
-    gzmsg << "Started box contains plugin [" << this->dataPtr->ns << "]"
+
+    gzmsg << "Started contain plugin [" << this->dataPtr->ns << "]"
           << std::endl;
+
+    return true;
   }
+
   // Stop
-  else
   {
     this->dataPtr->updateConnection.reset();
-    gzmsg << "Stopped box contains plugin [" << this->dataPtr->ns << "]"
+    this->dataPtr->containGzPub.reset();
+    this->dataPtr->contain = -1;
+
+    gzmsg << "Stopped contain plugin [" << this->dataPtr->ns << "]"
           << std::endl;
+
+    return true;
   }
 }
 
@@ -192,16 +216,15 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
   }
 
   auto pos = this->dataPtr->entity->GetWorldPose().Ign().Pos();
-  auto containsNow = this->dataPtr->box.Contains(pos) ? 1 : 0;
+  auto containNow = this->dataPtr->box.Contains(pos) ? 1 : 0;
 
-  if (containsNow != this->dataPtr->contains)
+  if (containNow != this->dataPtr->contain)
   {
-    this->dataPtr->contains = containsNow;
+    this->dataPtr->contain = containNow;
 
     msgs::Int msg;
-    msg.set_data(this->dataPtr->contains);
-
-    this->dataPtr->containsPub->Publish(msg);
+    msg.set_data(this->dataPtr->contain);
+    this->dataPtr->containGzPub->Publish(msg);
   }
 }
 

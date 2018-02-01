@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
+
 1. Update Color Clamp function
     * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
@@ -18,7 +21,6 @@
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
     * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
-
 
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)

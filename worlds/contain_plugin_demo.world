@@ -11,7 +11,7 @@
       <uri>model://cordless_drill</uri>
     </include>
 
-    <plugin name="boxContainsDrill" filename="libContainPlugin.so">
+    <plugin name="containDrill" filename="libContainPlugin.so">
       <entity>drill</entity>
       <namespace>gazebo/default/drill</namespace>
       <shape type="box">
