@@ -2373,7 +2373,8 @@ void World::ProcessMessages()
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->GetSimTime());
 
-      if (!this->dataPtr->publishModelPoses.empty())
+      if (!this->dataPtr->publishModelPoses.empty() ||
+          !this->dataPtr->publishLightPoses.empty())
       {
         for (auto const &model : this->dataPtr->publishModelPoses)
         {
