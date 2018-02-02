@@ -30,7 +30,6 @@
 #include "gazebo/gui/QTestFixture.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/rendering/RenderingIface.hh"
-#include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/util/LogRecord.hh"
 
 /////////////////////////////////////////////////
