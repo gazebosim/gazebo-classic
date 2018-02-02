@@ -1121,6 +1121,14 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 void Visual::SetMaterialShaderParam(const std::string &_paramName,
     const std::string &_shaderType, const std::string &_value)
 {
+  // currently only vertex and fragment shaders are supported
+  if (_shaderType != "vertex" && _shaderType != "fragment")
+  {
+    gzerr << "Shader type: '" << _shaderType << "' is not supported"
+          << std::endl;
+    return;
+  }
+
   // set the parameter based name and type defined in material script
   // and shaders
   auto setNamedParam = [](Ogre::GpuProgramParametersSharedPtr _params,
@@ -1200,7 +1208,6 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
       if (!pass->isProgrammable())
         continue;
 
-      // currently support only vertex and fragment shaders
       if (_shaderType == "vertex" && pass->hasVertexProgram())
       {
         setNamedParam(pass->getVertexProgramParameters(), _paramName, _value);
@@ -1211,9 +1218,11 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
       }
       else
       {
-        gzerr << "Shader type: '" << _shaderType << "' is not supported"
+        gzerr << "Failed to retrieve shaders for material: '"
+              << this->dataPtr->myMaterialName << "', technique: '"
+              << technique->getName() << "', pass: '" << pass->getName() << "'"
               << std::endl;
-        return;
+        continue;
       }
     }
   }
