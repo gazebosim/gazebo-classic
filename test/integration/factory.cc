@@ -354,8 +354,8 @@ TEST_F(LightFactoryTest, SpawnLight)
   // verify lights in world
   physics::LightPtr light1 = world->Light(light1Name);
   physics::LightPtr light2 = world->Light(light2Name);
-  EXPECT_NE(nullptr, light1);
-  EXPECT_NE(nullptr, light2);
+  ASSERT_NE(nullptr, light1);
+  ASSERT_NE(nullptr, light2);
 
   EXPECT_EQ(light1Name, light1->GetScopedName());
   EXPECT_EQ(light1Pose, light1->GetWorldPose().Ign());
