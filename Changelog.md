@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
 1. Update Color Clamp function
     * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
