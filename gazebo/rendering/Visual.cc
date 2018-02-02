@@ -1209,6 +1209,12 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
       {
         setNamedParam(pass->getFragmentProgramParameters(), _paramName, _value);
       }
+      else
+      {
+        gzerr << "Shader type: '" << _shaderType << "' is not supported"
+              << std::endl;
+        return;
+      }
     }
   }
 }
