@@ -1199,7 +1199,7 @@ TEST_F(MsgsTest, PluginFromSDF)
   EXPECT_TRUE(msg.has_filename());
   EXPECT_EQ(msg.filename(), "plugin_filename");
   EXPECT_TRUE(msg.has_innerxml());
-  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>true</param2>\n");
+  EXPECT_EQ(msg.innerxml(), "<param1>1</param1>\n<param2>1</param2>\n");
 }
 
 TEST_F(MsgsTest, LightFromSDF_ListDirectional)

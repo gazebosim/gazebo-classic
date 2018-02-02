@@ -43,6 +43,7 @@ release will remove the deprecated code.
     + Changed `protected: Color diffuse;` to `protected: ignition::math::Color diffuse;`
     + Changed `protected: Color specular;` to `protected: ignition::math::Color specular;`
     + Changed `protected: Color emissive;` to `protected: ignition::math::Color emissive;`
+1. `BUILD_TYPE_*` macros renamed to `GAZEBO_BUILD_TYPE_*`
 
 ### Deprecations
 

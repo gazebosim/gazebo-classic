@@ -187,8 +187,8 @@ void JointController::Update()
 }
 
 /////////////////////////////////////////////////
-void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::JointCmd &_rep, bool &_result)
+bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::JointCmd &_rep)
 {
   const std::string &jointName = _req.data();
   _rep.set_name(jointName);
@@ -233,7 +233,7 @@ void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
         this->dataPtr->velPids[jointName].GetIGain());
   }
 
-  _result = true;
+  return true;
 }
 
 /////////////////////////////////////////////////

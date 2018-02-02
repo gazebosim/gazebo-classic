@@ -139,10 +139,10 @@ namespace gazebo
       /// name.
       /// \param[out] _rep The service response. The response will contain
       /// the parameters of the joint controller(s).
-      /// \param[out] _result True when the service request was successfully
+      /// \return True when the service request was successfully
       /// processed.
-      private: void OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-          ignition::msgs::JointCmd &_rep, bool &_result);
+      private: bool OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+          ignition::msgs::JointCmd &_rep);
 
       /// \brief Callback when a joint command message is received.
       /// \param[in] _msg The received message.
