@@ -47,30 +47,32 @@ namespace gazebo
       public: virtual ~BulletJoint();
 
       /// \brief Load a BulletJoint
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       // Documentation inherited.
-      public: virtual void Fini();
+      public: virtual void Fini() override;
 
       /// \brief Reset the joint
-      public: virtual void Reset();
+      public: virtual void Reset() override;
 
       /// \brief Get the body to which the joint is attached
       ///        according the _index
-      public: LinkPtr GetJointLink(unsigned int _index) const;
+      public: LinkPtr GetJointLink(unsigned int _index) const override;
 
       /// \brief Determines of the two bodies are connected by a joint
-      public: bool AreConnected(LinkPtr _one, LinkPtr _two) const;
+      public: bool AreConnected(LinkPtr _one, LinkPtr _two) const override;
 
       /// \brief Detach this joint from all bodies
-      public: virtual void Detach();
+      public: virtual void Detach() override;
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(const unsigned int _index,
-                                     const ignition::math::Vector3d &_anchor);
+                                     const ignition::math::Vector3d &_anchor)
+            override;
 
       // Documentation inherited
-      public: virtual void SetDamping(unsigned int _index, double _damping);
+      public: virtual void SetDamping(unsigned int _index, double _damping)
+            override;
 
       // Documentation inherited.
       public: virtual bool SetPosition(
@@ -79,55 +81,56 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
-                  const double _stiffness);
+                  const double _stiffness) override;
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
-        double _stiffness, double _damping, double _reference = 0);
+        double _stiffness, double _damping, double _reference = 0) override;
 
       /// \brief Get the anchor point
       public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       /// \brief Get the force the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual ignition::math::Vector3d LinkForce(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       /// \brief Get the torque the joint applies to the first body
       /// \param index The index of the body(0 or 1)
       public: virtual ignition::math::Vector3d LinkTorque(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value);
+                                        const boost::any &_value) override;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
-                                          unsigned int _index);
+                                          unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual void SetProvideFeedback(bool _enable);
+      public: virtual void SetProvideFeedback(bool _enable) override;
 
       // Documentation inherited.
-      public: virtual void CacheForceTorque();
+      public: virtual void CacheForceTorque() override;
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      public: virtual JointWrench GetForceTorque(unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual void SetForce(unsigned int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force)
+            override;
 
       // Documentation inherited.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual double GetForce(unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       // Documentation inherited.
-      public: virtual void ApplyStiffnessDamping();
+      public: virtual void ApplyStiffnessDamping() override;
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
