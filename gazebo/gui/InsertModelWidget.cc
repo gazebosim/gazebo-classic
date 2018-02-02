@@ -65,10 +65,8 @@ bool usingFuel()
   std::string useFuelStr(useFuel);
   std::transform(useFuelStr.begin(), useFuelStr.end(),
                  useFuelStr.begin(), ::tolower);
-  if (useFuelStr == "false" || useFuelStr == "0")
-    return false;
 
-  return true;
+  return useFuelStr != "false" && useFuelStr != "0";
 }
 
 /////////////////////////////////////////////////
