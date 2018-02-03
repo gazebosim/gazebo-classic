@@ -504,11 +504,23 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
+1. Adding accessors for velocity in ENU frame for gps sensor
+    * [Pull request 2854](https://bitbucket.org/osrf/gazebo/pull-request/2854)
+
+1. Fix DEM min elevation
+    * [Pull request 2868](https://bitbucket.org/osrf/gazebo/pull-request/2868)
+
 1. Update Color Clamp function
     * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
+
+1. Initialize laser retro value
+    * [Pull request 2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
 
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
