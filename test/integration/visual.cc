@@ -234,7 +234,7 @@ TEST_F(VisualProperty, MaterialShaderParam)
     common::Time::MSleep(100);
 
   EXPECT_GE(imageCount, totalImages);
-  cam->DisconnectNewImageFrame(c);
+  c.reset();
 
   // check initial color
   for (unsigned int y = 0; y < height; ++y)
@@ -282,7 +282,7 @@ TEST_F(VisualProperty, MaterialShaderParam)
     common::Time::MSleep(100);
 
   EXPECT_GE(imageCount, totalImages);
-  cam->DisconnectNewImageFrame(c);
+  c.reset();
 
   // verify new color has been set
   for (unsigned int y = 0; y < height; ++y)
