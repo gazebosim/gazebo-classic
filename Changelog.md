@@ -5,6 +5,9 @@
 1. Added a plugin to detect if an entity is inside a given volume in space
     * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
 
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
 1. Update Color Clamp function
     * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
@@ -16,6 +19,7 @@
 
 1. Add light as child of link
     * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Pull request 2872](https://bitbucket.org/osrf/gazebo/pull-requests/2872)
     * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
