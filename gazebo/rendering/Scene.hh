@@ -290,7 +290,7 @@ namespace gazebo
       /// \return Pointer to the light, or NULL if the light was not found.
       /// \deprecated See LightByName.
       public: LightPtr GetLight(const std::string &_name) const
-          GAZEBO_DEPRECATED(9.0);
+          GAZEBO_DEPRECATED(9.1);
 
       /// \brief Get a light based on an index. The index must be between
       /// 0 and Scene::GetLightCount.
@@ -298,7 +298,7 @@ namespace gazebo
       /// \return Pointer to the Light or NULL if index was invalid.
       /// \deprecated See LightByIndex
       public: LightPtr GetLight(const uint32_t _index) const
-          GAZEBO_DEPRECATED(9.0);
+          GAZEBO_DEPRECATED(9.1);
 
       /// \brief Get a light by name.
       /// \param[in] _name Name of the light to get.
