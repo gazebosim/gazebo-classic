@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 #define GAZEBO_PLUGINS_CONTAINPLUGIN_HH_
 
 #include <memory>
-
-#include <ignition/math/OrientedBox.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"

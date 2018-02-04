@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,20 @@
  *
 */
 
-#include "gazebo/test/ServerFixture.hh"
+#include <string>
+
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class ContainPluginTest : public ServerFixture
 {
 };
 
-// Flag turned to true once box contain.
+// Flag turned to true once box contains.
 bool g_contain = false;
 
 //////////////////////////////////////////////////
@@ -39,11 +43,11 @@ TEST_F(ContainPluginTest, Disable)
 {
   this->Load("worlds/contain_plugin_demo.world", true);
   auto world = physics::get_world();
-  ASSERT_NE(world , nullptr);
+  ASSERT_NE(nullptr, world);
 
   // Get models
   auto drill = world->GetModel("drill");
-  ASSERT_NE(drill , nullptr);
+  ASSERT_NE(nullptr, drill);
 
   // Subscribe to plugin notifications
   std::string prefix("/gazebo/default/drill/");

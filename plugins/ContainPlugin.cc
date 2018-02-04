@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 */
 
 #include <string>
+
+#include <ignition/math/OrientedBox.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/UpdateInfo.hh"
@@ -144,7 +147,7 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   auto enabled = true;
   if (_sdf->HasElement("enabled"))
-    enabled= _sdf->Get<bool>("enabled");
+    enabled = _sdf->Get<bool>("enabled");
 
   if (enabled)
   {
@@ -209,6 +212,7 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
     this->dataPtr->entity = this->dataPtr->world->GetEntity(
         this->dataPtr->entityName);
 
+    // Entity may not have been spawned yet
     if (!this->dataPtr->entity)
       return;
   }
@@ -225,4 +229,3 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
     this->dataPtr->containGzPub->Publish(msg);
   }
 }
-
