@@ -97,40 +97,40 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   }
   this->dataPtr->ns = _sdf->Get<std::string>("namespace");
 
-  // Shape
-  if (!_sdf->HasElement("shape"))
-  {
-    gzerr << "Missing required parameter <shape>, plugin will not be "
-          << "initialized." << std::endl;
-    return;
-  }
-  auto shapeElem = _sdf->GetElement("shape");
-
   // Pose
-  if (!shapeElem->HasElement("pose"))
+  if (!_sdf->HasElement("pose"))
   {
     gzerr << "Missing required parameter <pose>, plugin will not be "
           << "initialized." << std::endl;
     return;
   }
-  auto pose = shapeElem->Get<ignition::math::Pose3d>("pose");
+  auto pose = _sdf->Get<ignition::math::Pose3d>("pose");
 
-  // Type-specific
-  auto shapeType = shapeElem->Get<std::string>("type");
-  if (shapeType != "box")
+  // Geometry
+  if (!_sdf->HasElement("geometry"))
   {
-    gzerr << "Shape type [" << shapeType
-          << "] not supported, plugin will not be initialized." << std::endl;
+    gzerr << "Missing required parameter <geometry>, plugin will not be "
+          << "initialized." << std::endl;
     return;
   }
+  auto geometryElem = _sdf->GetElement("geometry");
 
-  if (!shapeElem->HasElement("size"))
+  // Only box for now
+  if (!geometryElem->HasElement("box"))
+  {
+    gzerr << "Missing required parameter <box>, plugin will not be "
+          << "initialized." << std::endl;
+    return;
+  }
+  auto boxElem = geometryElem->GetElement("box");
+
+  if (!boxElem->HasElement("size"))
   {
     gzerr << "Missing required parameter <size>, plugin will not be "
           << "initialized." << std::endl;
     return;
   }
-  auto size = shapeElem->Get<ignition::math::Vector3d>("size");
+  auto size = boxElem->Get<ignition::math::Vector3d>("size");
 
   this->dataPtr->box = ignition::math::OrientedBoxd(size, pose);
 
