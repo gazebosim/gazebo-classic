@@ -51,16 +51,17 @@ namespace gazebo
   ///    -->
   ///    <namespace>gazebo/robot</namespace>
   ///
-  ///    <!-- Shape of the volume, currently only supports box -->
-  ///    <shape type="box">
+  ///    <!-- Pose of the geometry's center point in world coordinates -->
+  ///    <pose>10 10 2 0 0 1.57</pose>
   ///
-  ///      <!-- Pose of the shape's center point in world coordinates -->
-  ///      <pose>10 10 2 0 0 1.57</pose>
-  ///
-  ///      <!-- Box size in its own coordinate frame. -->
-  ///      <size>1 1 4</size>
-  ///
-  ///    </shape>
+  ///    <!-- Geometry of the volume to check, uses the SDF geometry spec:
+  ///         http://sdformat.org/spec?ver=1.6&elem=geometry
+  ///         currently <box> is supported -->
+  ///    <geometry>
+  ///      <box>
+  ///        <size>1 1 4</size>
+  ///      </box>
+  ///    </geometry>
   ///
   ///  </plugin>
   ///

@@ -11,13 +11,15 @@
       <uri>model://cordless_drill</uri>
     </include>
 
-    <plugin name="boxContainsDrill" filename="libContainPlugin.so">
+    <plugin name="containDrill" filename="libContainPlugin.so">
       <entity>drill</entity>
       <namespace>gazebo/default/drill</namespace>
-      <shape type="box">
-        <pose>10 10 0.5 0 0 0.8</pose>
-        <size>1 1 2</size>
-      </shape>
+      <pose>10 10 0.5 0 0 0.8</pose>
+      <geometry>
+        <box>
+          <size>1 1 2</size>
+        </box>
+      </geometry>
     </plugin>
 
     <!-- Box visual for demonstration -->
