@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@
 
 #include <memory>
 
-#include <ignition/math/OrientedBox.hh>
-
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"
 
@@ -29,7 +27,7 @@ namespace gazebo
 {
   class ContainPluginPrivate;
 
-  /// \brief Plugin which emits gazebo transport messages according to whether
+  /// \brief Plugin which emits Ignition Transport messages according to whether
   /// an entity's origin is inside or outside a given volume. A message is only
   /// published when the state changes.
   ///
@@ -44,7 +42,7 @@ namespace gazebo
   ///    <!-- Scoped name of entity to check -->
   ///    <entity>robot::arm_link</entity>
   ///
-  ///    <!-- Namespace for gazebo transport topic and service:
+  ///    <!-- Namespace for Ignition Transport topic and service:
   ///           /<namespace>/box/contains : topic where true / false messages
   ///                                       are published.
   ///           /<namespace>/box/enable : service to turn plugin on and off.
@@ -78,7 +76,9 @@ namespace gazebo
     private: void OnUpdate(const common::UpdateInfo &_info);
 
     /// \brief Callback for enable "service" using Gazebo msgs.
-    /// \param[in] _msg Message with 0 to disable and 1 to enable the plugin.
+    /// \param[in] _enable False to disable and true to enable the plugin.
+    /// \return True when the operation succeed or false otherwise
+    /// (e.g.: trying to enable the plugin when it is already enabled).
     /// \deprecated Remove in Gazebo 9.
     private: bool Enable(const bool _enable);
 
