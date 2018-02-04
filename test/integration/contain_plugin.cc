@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,15 @@
  *
 */
 
-#include "gazebo/test/ServerFixture.hh"
+#include <string>
+
+#include <ignition/math/Pose3.hh>
+#include <ignition/msgs/boolean.pb.h>
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/physics/physics.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
 class ContainPluginTest : public ServerFixture
@@ -39,11 +45,11 @@ TEST_F(ContainPluginTest, Disable)
 {
   this->Load("worlds/contain_plugin_demo.world", true);
   auto world = physics::get_world();
-  ASSERT_NE(world , nullptr);
+  ASSERT_NE(nullptr, world);
 
   // Get models
   auto drill = world->ModelByName("drill");
-  ASSERT_NE(drill , nullptr);
+  ASSERT_NE(nullptr, drill);
 
   // Subscribe to plugin notifications
   std::string prefix("/gazebo/default/drill/");
@@ -73,7 +79,7 @@ TEST_F(ContainPluginTest, Disable)
   EXPECT_FALSE(g_contain);
 
   // Disable plugin
-  unsigned int timeout = 300;
+  unsigned int timeout = 300u;
   ignition::msgs::Boolean req;
   ignition::msgs::Boolean rep;
   bool result;

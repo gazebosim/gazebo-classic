@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 
 #include <string>
 
+#include <ignition/math/OrientedBox.hh>
+#include <ignition/math/Pose3.hh>
 #include <ignition/msgs/boolean.pb.h>
 #include <ignition/transport/Node.hh>
 
@@ -163,7 +165,7 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
   auto enabled = true;
   if (_sdf->HasElement("enabled"))
-    enabled= _sdf->Get<bool>("enabled");
+    enabled = _sdf->Get<bool>("enabled");
 
   if (enabled)
   {
@@ -176,7 +178,7 @@ void ContainPlugin::EnableGz(ConstIntPtr &_msg)
 {
   gzwarn << "Use of Gazebo Transport on ContainPlugin has been deprecated. "
          << "Use Ignition Transport instead." << std::endl;
-  auto enable = _msg->data() == 1 ? true : false;
+  auto enable = _msg->data() == 1;
   this->Enable(enable);
 }
 
@@ -250,7 +252,11 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
         this->dataPtr->entityName);
 
     if (!this->dataPtr->entity)
+    {
+      gzwarn << "Unkown entity name [" << this->dataPtr->entityName << "]"
+             << std::endl;
       return;
+    }
   }
 
   auto pos = this->dataPtr->entity->WorldPose().Pos();
@@ -276,4 +282,3 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
     }
   }
 }
-
