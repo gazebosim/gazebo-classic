@@ -53,7 +53,7 @@
       <cast_shadows>false</cast_shadows>
     </light>
 
-    <!-- double pendulum with point and spot lights attached -->
+    <!-- double pendulum with point and spot lights attached using plugin-->
     <model name="double_pendulum_with_lights">
       <include>
         <uri>model://double_pendulum_with_base</uri>
@@ -77,6 +77,41 @@
           </light>
         </link>
       </plugin>
+    </model>
+
+    <!-- sphere with point light as child of link -->
+    <model name="sphere_with_light">
+      <pose>0.5 -1.5 0.65 0 0 0</pose>
+      <link name="link">
+        <!-- yellow point light -->
+        <light type="point" name="point">
+          <pose>0 0 0.5 0 0 0</pose>
+          <diffuse>1 1 0 1</diffuse>
+          <specular>.1 .1 .1 1</specular>
+          <attenuation>
+            <range>20</range>
+            <linear>0.2</linear>
+            <constant>0.8</constant>
+            <quadratic>0.01</quadratic>
+          </attenuation>
+          <cast_shadows>false</cast_shadows>
+        </light>
+
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
     </model>
 
   </world>

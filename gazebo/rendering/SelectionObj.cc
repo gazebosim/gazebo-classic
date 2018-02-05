@@ -586,14 +586,14 @@ void SelectionObj::CreateScaleVisual()
   dPtr->scaleYVisual->Load();
   dPtr->scaleZVisual->Load();
 
-  this->InsertMesh("unit_box");
+  this->InsertMesh("axis_box");
 
   Ogre::MovableObject *scaleShaftXObj =
       (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
       "__SELECTION_OBJ_SCALE_SHAFT_X__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadXObj =
       (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_X__" + this->GetName(), "unit_box"));
+      "__SELECTION_OBJ_SCALE_HEAD_X__" + this->GetName(), "axis_box"));
   Ogre::SceneNode *scaleShaftXNode =
       dPtr->scaleXVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ__SCALE_SHAFT_NODE_X__"  + this->GetName());
@@ -618,7 +618,7 @@ void SelectionObj::CreateScaleVisual()
       "__SELECTION_OBJ_SCALE_SHAFT_Y__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadYObj =
       (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->GetName(), "unit_box"));
+      "__SELECTION_OBJ_SCALE_HEAD_Y__" + this->GetName(), "axis_box"));
   Ogre::SceneNode *scaleShaftYNode =
       dPtr->scaleYVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_SCALE_SHAFT_NODE_Y__"  + this->GetName());
@@ -643,7 +643,7 @@ void SelectionObj::CreateScaleVisual()
       "__SELECTION_OBJ_SCALE_SHAFT_Z__" + this->GetName(), "axis_shaft"));
   Ogre::MovableObject *scaleHeadZObj =
       (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
-      "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->GetName(), "unit_box"));
+      "__SELECTION_OBJ_SCALE_HEAD_Z__" + this->GetName(), "axis_box"));
   Ogre::SceneNode *scaleShaftZNode =
       dPtr->scaleZVisual->GetSceneNode()->createChildSceneNode(
       "__SELECTION_OBJ_SCALE_SHAFT_NODE_Z__"  + this->GetName());
