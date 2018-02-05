@@ -269,7 +269,7 @@ namespace gazebo
       protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
-      private: float laserRetro;
+      private: float laserRetro = 0.0;
 
       /// \brief Stores collision state information.
       private: CollisionState state;

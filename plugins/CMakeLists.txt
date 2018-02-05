@@ -76,6 +76,7 @@ set (plugins_single_header
   JointTrajectoryPlugin
   KeysToCmdVelPlugin
   KeysToJointsPlugin
+  LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin

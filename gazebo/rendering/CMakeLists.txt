@@ -23,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -34,6 +35,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   MarkerManager.cc
   MarkerVisual.cc
@@ -85,6 +87,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -96,6 +99,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
@@ -178,6 +182,7 @@ set (gtest_sources_dri
   RenderEngine_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
