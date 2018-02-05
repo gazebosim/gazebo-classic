@@ -100,9 +100,14 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
-      || qFormat != this->dataPtr->image.format())
+      || qFormat != this->dataPtr->image.format() || _msg.step() !=
+      static_cast<unsigned int>(this->dataPtr->image.bytesPerLine()))
   {
     this->dataPtr->image = QImage(_msg.width(), _msg.height(), qFormat);
+    delete [] this->dataPtr->imageBuffer;
+    this->dataPtr->imageBuffer = nullptr;
+    delete [] this->dataPtr->depthBuffer;
+    this->dataPtr->depthBuffer = nullptr;
   }
 
   // Convert the image data to RGB
