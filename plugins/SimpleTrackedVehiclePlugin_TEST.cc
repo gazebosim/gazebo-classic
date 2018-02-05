@@ -105,12 +105,13 @@ class TestSimpleTrackedVehiclePlugin : public SimpleTrackedVehiclePlugin
     const bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
     const ignition::math::Vector3d &_bodyYAxisGlobal,
     const ignition::math::Vector3d &_centerOfRotation,
-    const dContact *_odeContact,
+    const ignition::math::Vector3d &_contactWorldPosition,
+    const ignition::math::Vector3d &_contactNormal,
     const ignition::math::Vector3d &_beltDirection) const
   {
     return this->ComputeFrictionDirection(_linearSpeed, _angularSpeed,
         _drivingStraight, _bodyPose, _bodyYAxisGlobal, _centerOfRotation,
-        _odeContact, _beltDirection);
+        _contactWorldPosition, _contactNormal, _beltDirection);
   }
 };
 
@@ -635,9 +636,6 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   ASSERT_NO_THROW(plugin.Load(model, elem));
   ASSERT_NO_THROW(plugin.Init());
 
-  dContact odeContact;
-  odeContact.geom.normal[0] = odeContact.geom.normal[1] = 0.0;
-  odeContact.geom.normal[2] = 1.0;
   auto linearSpeed = 0.;
   auto angularSpeed = 0.;
   auto drivingStraight = true;
@@ -645,6 +643,8 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   auto bodyYAxisGlobal = ignition::math::Vector3d::UnitY;
   auto centerOfRotation = ignition::math::Vector3d::One * ignition::math::INF_D;
   auto beltDirection = ignition::math::Vector3d::UnitX;
+  auto contactPose = ignition::math::Vector3d::Zero;
+  auto contactNormal = ignition::math::Vector3d(0, 0, 1);
 
   ignition::math::Vector3<double> expectedDir;
   ignition::math::Quaterniond rotation;
@@ -653,7 +653,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   // up or down if the contact point is on a curved surface.
   auto frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   EXPECT_NEAR(frictionDirection.Distance(beltDirection), 0, 1e-6);
 
   // The direction doesn't depend on the desired velocities.
@@ -661,7 +661,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   angularSpeed = M_E;
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   EXPECT_NEAR(frictionDirection.Distance(beltDirection), 0, 1e-6);
 
   // Test with belt rotated by pi/4.
@@ -671,7 +671,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   bodyPose.Rot() = rotation * bodyPose.Rot();
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   EXPECT_NEAR(frictionDirection.Distance(beltDirection), 0, 1e-6);
 
   // Test with contact normal pointing pi/4 backwards (i.e. contact on a plane
@@ -679,20 +679,19 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   bodyPose = ignition::math::Pose3d::Zero;
   bodyYAxisGlobal = ignition::math::Vector3d::UnitY;
   beltDirection = ignition::math::Vector3d::UnitX;
-  odeContact.geom.normal[0] = -cos(M_PI_4);
-  odeContact.geom.normal[2] = sin(M_PI_4);
+  contactNormal[0] = -cos(M_PI_4);
+  contactNormal[2] = sin(M_PI_4);
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal,  beltDirection);
   expectedDir = ignition::math::Vector3d(cos(M_PI_4), 0, sin(M_PI_4));
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
   // Tests for non-straight drive.
   drivingStraight = false;
   centerOfRotation = ignition::math::Vector3d::UnitY;
-  odeContact.geom.pos[0] = odeContact.geom.pos[1] = odeContact.geom.pos[2] = 0.;
-  odeContact.geom.normal[0] = odeContact.geom.normal[1] = 0.;
-  odeContact.geom.normal[2] = 1.;
+  contactPose = ignition::math::Vector3d::Zero;
+  contactNormal = ignition::math::Vector3d(0, 0, 1);
   linearSpeed = 1.0;
   angularSpeed = 1.0;
   bodyPose = ignition::math::Pose3d::Zero;
@@ -702,7 +701,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   // Friction direction on the COR-body line points forward...
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = ignition::math::Vector3d(1, 0, 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
@@ -710,7 +709,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   centerOfRotation.Y(2.);
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = ignition::math::Vector3d(1, 0, 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
@@ -718,17 +717,17 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   linearSpeed = -1.;
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = ignition::math::Vector3d(-1, 0, 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
   // Checks for contact points in front of the COR-body line.
-  odeContact.geom.pos[0] = 1.;
+  contactPose[0] = 1.;
   centerOfRotation = ignition::math::Vector3d::UnitY;
   linearSpeed = 1.;
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = ignition::math::Vector3d(cos(M_PI_4), sin(M_PI_4), 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
@@ -736,7 +735,7 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   centerOfRotation.Y(2.);
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = ignition::math::Vector3d(cos(atan2(1, 2)), sin(atan2(1, 2)), 0);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
@@ -745,17 +744,17 @@ TEST_F(SimpleTrackedVehiclePluginTest, ComputeFrictionDirection)
   angularSpeed = -1.;
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   expectedDir = -expectedDir;
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 
   // ... and is not changed by translating the body.
   bodyPose.Pos().X(bodyPose.Pos().X() + 5.);
   centerOfRotation.X(centerOfRotation.X() + 5.);
-  odeContact.geom.pos[0] += 5.;
+  contactPose[0] += 5.;
   frictionDirection = plugin.ComputeFrictionDirectionPublic(
     linearSpeed, angularSpeed, drivingStraight, bodyPose, bodyYAxisGlobal,
-    centerOfRotation, &odeContact, beltDirection);
+    centerOfRotation, contactPose, contactNormal, beltDirection);
   EXPECT_NEAR(frictionDirection.Distance(expectedDir), 0, 1e-6);
 }
 

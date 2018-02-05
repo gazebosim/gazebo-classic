@@ -111,7 +111,9 @@ namespace gazebo {
     ///            world frame.
     /// \param[in] _centerOfRotation Center of the circle the vehicle
     ///            follows (Inf/-Inf if driving straight).
-    /// \param[in] _odeContact The ode contact information (to be changed).
+    /// \param[in] _contactWorldPosition World position of the contact point.
+    /// \param[in] _contactNormal Corrected contact normal (pointing inside
+    ///            the track).
     /// \param[in] _beltDirection World-frame forward direction of the belt.
     /// \return Direction of the friction force in world frame.
     protected: ignition::math::Vector3d ComputeFrictionDirection(
@@ -119,7 +121,8 @@ namespace gazebo {
       bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
       const ignition::math::Vector3d &_bodyYAxisGlobal,
       const ignition::math::Vector3d &_centerOfRotation,
-      const dContact *_odeContact,
+      const ignition::math::Vector3d &_contactWorldPosition,
+      const ignition::math::Vector3d &_contactNormal,
       const ignition::math::Vector3d &_beltDirection) const;
 
     /// \brief Compute the velocity of the surface motion in all contact points.

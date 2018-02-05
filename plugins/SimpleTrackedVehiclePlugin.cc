@@ -268,10 +268,13 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
     dGeomID geom2 = dynamic_cast<physics::ODECollision& >(
       *contact->collision2).GetCollisionId();
 
-    if (body1 == nullptr)
-    {
+    bool bodiesSwapped = false;
+    if (body1 == 0) {
       std::swap(body1, body2);
       std::swap(geom1, geom2);
+
+      // we'll take care of the normal flipping later
+      bodiesSwapped = true;
     }
 
     // determine if track is the first or second collision element
@@ -283,6 +286,12 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
 
     // speed and geometry of the track in collision
     const auto trackGeom = (isGeom1Track ? geom1 : geom2);
+    // the != means XOR here; we basically want to get the collision belonging
+    // to the track, but we might have swapped the ODE bodies in between, 
+    // so we have to account for it
+    const physics::Collision* trackCollision =
+      ((isGeom1Track != bodiesSwapped) ? contact->collision1 
+                                       : contact->collision2);
     const dReal beltSpeed =
       (dGeomGetCategoryBits(trackGeom) & LEFT_CATEGORY) != 0 ?
       leftBeltSpeed : rightBeltSpeed;
@@ -298,9 +307,27 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       // now we're sure it is a contact between our two geometries
       foundContact = true;
 
-      const ignition::math::Vector3d contactNormal(odeContact->geom.normal[0],
-                                                   odeContact->geom.normal[1],
-                                                   odeContact->geom.normal[2]);
+      const ignition::math::Vector3d contactWorldPosition(
+        odeContact->geom.pos[0], 
+        odeContact->geom.pos[1], 
+        odeContact->geom.pos[2]);
+
+      ignition::math::Vector3d contactNormal(
+        odeContact->geom.normal[0], 
+        odeContact->geom.normal[1], 
+        odeContact->geom.normal[2]);
+
+      // We always want contactNormal to point "inside" the track. 
+      // The dot product is 1 for co-directional vectors and -1 for 
+      // opposite-pointing vectors.
+      // The contact can be flipped either by swapping body1 and body2 above, 
+      // or by having some flipped faces on collision meshes.
+      const double normalToTrackCenterDot =
+        contactNormal.Dot(
+          trackCollision->WorldPose().Pos() - contactWorldPosition);
+      if (normalToTrackCenterDot < 0) {
+        contactNormal = -contactNormal;
+      }
 
       // vector tangent to the belt pointing in the belt's movement direction
       auto beltDirection(contactNormal.Cross(bodyYAxisGlobal));
@@ -315,7 +342,8 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
                                        bodyPose,
                                        bodyYAxisGlobal,
                                        centerOfRotation,
-                                       odeContact,
+                                       contactWorldPosition,
+                                       contactNormal,
                                        beltDirection);
 
       odeContact->fdir1[0] = frictionDirection.X();
@@ -344,29 +372,27 @@ ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(
   const bool _drivingStraight, const ignition::math::Pose3d &_bodyPose,
   const ignition::math::Vector3d &_bodyYAxisGlobal,
   const ignition::math::Vector3d &_centerOfRotation,
-  const dContact *_odeContact,
+  const ignition::math::Vector3d &_contactWorldPosition,
+  const ignition::math::Vector3d &_contactNormal,
   const ignition::math::Vector3d &_beltDirection) const
 {
   ignition::math::Vector3d frictionDirection;
-
-  const ignition::math::Vector3d contactNormal(_odeContact->geom.normal[0],
-    _odeContact->geom.normal[1], _odeContact->geom.normal[2]);
-
+  
   if (!_drivingStraight)
   {
     // non-straight drive
-    const ignition::math::Vector3d contactPos(_odeContact->geom.pos[0],
-      _odeContact->geom.pos[1], _odeContact->geom.pos[2]);
 
     // vector pointing from the center of rotation to the contact point
-    const auto COR2Contact = (contactPos - _centerOfRotation).Normalize();
+    const auto COR2Contact = 
+      (_contactWorldPosition - _centerOfRotation).Normalize();
 
     // the friction force should be perpendicular to COR2Contact
-    frictionDirection = contactNormal.Cross(COR2Contact);
+    frictionDirection = _contactNormal.Cross(COR2Contact);
 
     // position of the contact point relative to vehicle body
     const auto contactInVehiclePos =
-        _bodyPose.Rot().RotateVectorReverse(contactPos - _bodyPose.Pos());
+        _bodyPose.Rot().RotateVectorReverse(
+          _contactWorldPosition - _bodyPose.Pos());
 
     const int linearSpeedSignum =
         (fabs(_linearSpeed) > 0.1) ? ignition::math::signum(_linearSpeed) : 1;
@@ -388,7 +414,7 @@ ignition::math::Vector3d SimpleTrackedVehiclePlugin::ComputeFrictionDirection(
   else
   {
     // straight drive
-    frictionDirection = contactNormal.Cross(_bodyYAxisGlobal);
+    frictionDirection = _contactNormal.Cross(_bodyYAxisGlobal);
 
     if (frictionDirection.Dot(_beltDirection) < 0)
       frictionDirection = -frictionDirection;
