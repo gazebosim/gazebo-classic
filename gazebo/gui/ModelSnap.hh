@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,9 @@ namespace gazebo
 
       /// \brief Reset the model snapping tool.
       public: void Reset();
+
+      /// \brief Clean up the model snap tool.
+      public: void Fini();
 
       /// \brief Calculate the translation and rotation needed to snap the
       /// centroid of a mesh triangle of a visual to another, taking into

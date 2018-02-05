@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->WorldPose();
-  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, -dist, 0)).Length() < tol);
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, dist, 0)).Length() < tol);
 
   // Trigger the bottom view button
   buttons[1]->click();
@@ -119,7 +119,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->WorldPose();
-  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, dist, 0)).Length() < tol);
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, -dist, 0)).Length() < tol);
 
   // Trigger the reset view button
   buttons[6]->click();

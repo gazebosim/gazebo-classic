@@ -1,0 +1,32 @@
+Gazebo Harness Example
+
+This example relies on the `worlds/harness.world` to lower an object in a
+controlled manner.
+
+===================
+Build Instructions
+===================
+
+ * From this directory:
+
+  $ mkdir build
+  $ cd build
+  $ cmake ..
+  $ make
+
+
+===================
+Execute Instructions
+===================
+
+1. Launch gazebo using the harness.world:
+
+```
+gazebo worlds/harness.world
+```
+
+1. From this build directory, run `harness` and provide a target velocity
+
+```
+$ ./harness -0.1
+```

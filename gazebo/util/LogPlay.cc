@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ void LogPlay::Open(const std::string &_logFile)
 
   // Flag use to indicate if a parser failure has occurred
   bool xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-    tinyxml2::XML_NO_ERROR;
+    tinyxml2::XML_SUCCESS;
 
   // Parse the log file
   if (xmlParserFail)
@@ -105,7 +105,7 @@ void LogPlay::Open(const std::string &_logFile)
 
           // Retry loading the log file.
           xmlParserFail = this->dataPtr->xmlDoc.LoadFile(_logFile.c_str()) !=
-            tinyxml2::XML_NO_ERROR;
+            tinyxml2::XML_SUCCESS;
         }
       }
     }
@@ -118,8 +118,13 @@ void LogPlay::Open(const std::string &_logFile)
   {
     gzerr << "Unable to load file[" << _logFile << "]. "
       << "Check the Gazebo server log file for more information.\n";
+#ifdef TINYXML2_MAJOR_VERSION_GE_6
+    const char *errorStr1 = this->dataPtr->xmlDoc.ErrorStr();
+    const char *errorStr2 = nullptr;
+#else
     const char *errorStr1 = this->dataPtr->xmlDoc.GetErrorStr1();
     const char *errorStr2 = this->dataPtr->xmlDoc.GetErrorStr2();
+#endif
     if (errorStr1)
       gzlog << "Log Error 1:\n" << errorStr1 << std::endl;
     if (errorStr2)

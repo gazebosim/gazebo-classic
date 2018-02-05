@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,11 +288,8 @@ std::string ContactManager::CreateFilter(const std::string &_name,
   // Contact sensors make use of this filter
   std::string topic = "~/" + name + "/contacts";
 
-  transport::PublisherPtr pub =
-    this->node->Advertise<msgs::Contacts>(topic);
-
   ContactPublisher *contactPublisher = new ContactPublisher;
-  contactPublisher->publisher = pub;
+  contactPublisher->publisher = this->node->Advertise<msgs::Contacts>(topic);
 
   std::map<std::string, physics::CollisionPtr>::const_iterator iter;
   for (iter = _collisions.begin(); iter != _collisions.end(); ++iter)
@@ -357,15 +354,19 @@ std::string ContactManager::CreateFilter(const std::string &_name,
 /////////////////////////////////////////////////
 void ContactManager::RemoveFilter(const std::string &_name)
 {
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
   boost::recursive_mutex::scoped_lock lock(*this->customMutex);
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter
-      = this->customContactPublishers.find(_name);
+      = this->customContactPublishers.find(name);
   if (iter != customContactPublishers.end())
   {
     ContactPublisher *contactPublisher = iter->second;
     contactPublisher->contacts.clear();
     contactPublisher->collisionNames.clear();
     contactPublisher->collisions.clear();
+    contactPublisher->publisher->Fini();
     contactPublisher->publisher.reset();
     this->customContactPublishers.erase(iter);
   }
@@ -381,7 +382,10 @@ unsigned int ContactManager::GetFilterCount()
 /////////////////////////////////////////////////
 bool ContactManager::HasFilter(const std::string &_name)
 {
+  std::string name = _name;
+  boost::replace_all(name, "::", "/");
+
   boost::recursive_mutex::scoped_lock lock(*this->customMutex);
-  return this->customContactPublishers.find(_name) !=
+  return this->customContactPublishers.find(name) !=
       this->customContactPublishers.end();
 }

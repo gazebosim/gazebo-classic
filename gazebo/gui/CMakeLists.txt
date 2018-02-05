@@ -144,13 +144,11 @@ set (qt_tests
   GLWidget_TEST.cc
   GLWidget_TEST2.cc
   GuiIface_TEST.cc
-  HotkeyDialog_TEST.cc
   LightMaker_TEST.cc
   ModelAlign_TEST.cc
   ModelListWidget_TEST.cc
   ModelMaker_TEST.cc
   ModelManipulator_TEST.cc
-  ModelSnap_TEST.cc
   RenderWidget_TEST.cc
   SaveDialog_TEST.cc
   SplashScreen_TEST.cc
@@ -185,6 +183,7 @@ if (ENABLE_SCREEN_TESTS)
       LaserVisualization_TEST.cc
       LayersWidget_TEST.cc
       MainWindow_TEST.cc
+      ModelSnap_TEST.cc
       Projection_TEST.cc)
 endif()
 

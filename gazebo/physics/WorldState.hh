@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,14 @@ namespace gazebo
       /// Generate a WorldState from an instance of a World.
       /// \param[in] _world Pointer to a world
       public: void Load(const WorldPtr _world);
+
+      /// \brief Load from a World pointer.
+      ///
+      /// Generate a WorldState from an instance of a World.
+      /// \param[in] _world Pointer to a world
+      /// \param[in] _filter String for filtering models states
+      public: void LoadWithFilter(const WorldPtr _world,
+          const std::string &_filter);
 
       /// \brief Load state from SDF element.
       ///

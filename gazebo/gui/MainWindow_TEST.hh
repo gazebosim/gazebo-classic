@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 class MainWindow_TEST : public QTestFixture
 {
   Q_OBJECT
+
+  /// \brief Test minimizing and maximizing MainWindow
+  private slots: void MinimizeMaximize();
 
   /// \brief Test the step action state when simulation is running and paused.
   private slots: void StepState();

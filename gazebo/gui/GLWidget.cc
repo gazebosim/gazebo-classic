@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,10 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->state = "select";
   this->dataPtr->copyEntityName = "";
   this->dataPtr->modelEditorEnabled = false;
+
+  this->dataPtr->updateTimer = new QTimer(this);
+  connect(this->dataPtr->updateTimer, SIGNAL(timeout()),
+          this, SLOT(update()));
 
   this->setFocusPolicy(Qt::StrongFocus);
 
@@ -229,17 +233,20 @@ void GLWidget::showEvent(QShowEvent *_event)
   QApplication::flush();
   QApplication::syncX();
 
-  // Get the window handle in a form that OGRE can use.
-  std::string winHandle = this->OgreHandle();
+  if (this->dataPtr->windowId <=0)
+  {
+    // Get the window handle in a form that OGRE can use.
+    std::string winHandle = this->OgreHandle();
 
-  // Create the OGRE render window
-  this->dataPtr->windowId =
-    rendering::RenderEngine::Instance()->GetWindowManager()->
-      CreateWindow(winHandle, this->width(), this->height());
+    // Create the OGRE render window
+    this->dataPtr->windowId =
+      rendering::RenderEngine::Instance()->GetWindowManager()->
+        CreateWindow(winHandle, this->width(), this->height());
 
-  // Attach the user camera to the window
-  rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
-      this->dataPtr->windowId, this->dataPtr->userCamera);
+    // Attach the user camera to the window
+    rendering::RenderEngine::Instance()->GetWindowManager()->SetCamera(
+        this->dataPtr->windowId, this->dataPtr->userCamera);
+  }
 
   // Let QT continue processing the show event.
   QWidget::showEvent(_event);
@@ -282,8 +289,6 @@ void GLWidget::paintEvent(QPaintEvent *_e)
   {
     event::Events::preRender();
   }
-
-  this->update();
 
   _e->accept();
 }
@@ -359,6 +364,22 @@ void GLWidget::keyPressEvent(QKeyEvent *_event)
     }
   }
 
+  /// Switch between RTS modes
+  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
+      this->dataPtr->state != "make_entity")
+  {
+    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
+      g_rotateAct->trigger();
+    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
+      g_translateAct->trigger();
+    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
+      g_scaleAct->trigger();
+    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
+      g_snapAct->trigger();
+    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
+      g_arrowAct->trigger();
+  }
+
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
   this->dataPtr->keyEvent.shift =
@@ -413,22 +434,6 @@ void GLWidget::keyReleaseEvent(QKeyEvent *_event)
     return;
 
   this->dataPtr->keyModifiers = _event->modifiers();
-
-  /// Switch between RTS modes
-  if (this->dataPtr->keyModifiers == Qt::NoModifier &&
-      this->dataPtr->state != "make_entity")
-  {
-    if (_event->key() == Qt::Key_R && g_rotateAct->isEnabled())
-      g_rotateAct->trigger();
-    else if (_event->key() == Qt::Key_T && g_translateAct->isEnabled())
-      g_translateAct->trigger();
-    else if (_event->key() == Qt::Key_S && g_scaleAct->isEnabled())
-      g_scaleAct->trigger();
-    else if (_event->key() == Qt::Key_N && g_snapAct->isEnabled())
-      g_snapAct->trigger();
-    else if (_event->key() == Qt::Key_Escape && g_arrowAct->isEnabled())
-      g_arrowAct->trigger();
-  }
 
   this->dataPtr->keyEvent.control =
     this->dataPtr->keyModifiers & Qt::ControlModifier ? true : false;
@@ -872,6 +877,14 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
   double pitch = atan2(-delta.z, sqrt(delta.x*delta.x + delta.y*delta.y));
   this->dataPtr->userCamera->SetDefaultPose(math::Pose(camPos,
         math::Vector3(0, pitch, yaw)));
+
+  // client side heightmap configuration
+  _scene->SetHeightmapLOD(gazebo::gui::getINIProperty<int>("heightmap.lod", 0));
+
+  // Update at the camera's update rate
+  this->dataPtr->updateTimer->start(
+      static_cast<int>(
+        std::round(1000.0 / (4*this->dataPtr->userCamera->RenderRate()))));
 }
 
 /////////////////////////////////////////////////

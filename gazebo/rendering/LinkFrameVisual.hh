@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _GAZEBO_LINK_FRAME_VISUAL_HH_
-#define _GAZEBO_LINK_FRAME_VISUAL_HH_
+#ifndef GAZEBO_RENDERING_LINKFRAMEVISUAL_HH_
+#define GAZEBO_RENDERING_LINKFRAMEVISUAL_HH_
 
 #include <string>
 
@@ -45,6 +45,9 @@ namespace gazebo
 
       // Documentation inherited
       public: virtual void Load();
+
+      /// \brief Recalculate scale based on parent link.
+      public: void RecalculateScale();
 
       // Documentation inherited
       public: virtual void SetHighlighted(bool _highlighted);

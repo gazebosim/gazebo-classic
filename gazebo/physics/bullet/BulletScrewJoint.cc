@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,11 +162,11 @@ void BulletScrewJoint::Init()
   // Check if parentLink exists. If not, the parent will be the world.
   if (this->parentLink)
   {
-    // Compute relative pose between joint anchor and CoG of parent link.
-    pose = this->parentLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of parent.
+    pose = this->parentLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotParent -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of parent.
+    // Rotate pivot offset and axis into body-fixed inertial frame of parent.
     pivotParent = pose.rot.RotateVectorReverse(pivotParent);
     frameParent.setOrigin(BulletTypes::ConvertVector3(pivotParent));
     axisParent = pose.rot.RotateVectorReverse(axis);
@@ -181,11 +181,11 @@ void BulletScrewJoint::Init()
   // Check if childLink exists. If not, the child will be the world.
   if (this->childLink)
   {
-    // Compute relative pose between joint anchor and CoG of child link.
-    pose = this->childLink->GetWorldCoGPose();
+    // Compute relative pose between joint anchor and inertial frame of child.
+    pose = this->childLink->GetWorldInertialPose();
     // Subtract CoG position from anchor position, both in world frame.
     pivotChild -= pose.pos;
-    // Rotate pivot offset and axis into body-fixed frame of child.
+    // Rotate pivot offset and axis into body-fixed inertial frame of child.
     pivotChild = pose.rot.RotateVectorReverse(pivotChild);
     frameChild.setOrigin(BulletTypes::ConvertVector3(pivotChild));
     axisChild = pose.rot.RotateVectorReverse(axis);
@@ -201,6 +201,17 @@ void BulletScrewJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
+    // Parent and child constraint frames generated with btPlaneSpace1 may
+    // differ by 90 degrees because they are underdetermined (only one axis
+    // given). Here we set the child constraint frame by taking the parent
+    // constraint frame (in the frame of the parent Bullet link) and rotating
+    // it into the frame of the child Bullet link. This ensures that the
+    // constraint frames are initially aligned.
+    pose = math::Pose(pivotChild,
+        this->childLink->GetWorldInertialPose().rot.GetInverse() *
+        this->parentLink->GetWorldInertialPose().rot *
+        BulletTypes::ConvertPose(frameParent).rot);
+    frameChild = BulletTypes::ConvertPose(pose);
     this->bulletScrew = new btScrewConstraint(
         *bulletParentLink->GetBulletLink(),
         *bulletChildLink->GetBulletLink(),

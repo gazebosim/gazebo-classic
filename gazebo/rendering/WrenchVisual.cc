@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,64 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
   dPtr->enabled = true;
   dPtr->receivedMsg = false;
 
+  // Transport
   dPtr->node = transport::NodePtr(new transport::Node());
   dPtr->node->Init(dPtr->scene->Name());
 
   dPtr->wrenchSub = dPtr->node->Subscribe(_topicName,
       &WrenchVisual::OnMsg, this, true);
 
+  dPtr->connections.push_back(
+      event::Events::ConnectPreRender(
+      std::bind(&WrenchVisual::Update, this)));
+}
+
+/////////////////////////////////////////////////
+WrenchVisual::~WrenchVisual()
+{
+  this->Fini();
+}
+
+/////////////////////////////////////////////////
+// Note to carefully test this when merging forward to Gazebo8
+void WrenchVisual::Fini()
+{
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
+
+  dPtr->wrenchSub.reset();
+  if (dPtr->node)
+    dPtr->node->Fini();
+  dPtr->node.reset();
+  dPtr->connections.clear();
+
+  dPtr->wrenchMsg.reset();
+
+  // Remove force visual and line
+  if (dPtr->forceVisual && dPtr->forceLine)
+    dPtr->forceVisual->DeleteDynamicLine(dPtr->forceLine);
+
+  if (dPtr->scene && dPtr->forceVisual &&
+      dPtr->scene->GetVisual(dPtr->forceVisual->GetName()))
+  {
+    dPtr->scene->RemoveVisual(dPtr->forceVisual);
+  }
+  dPtr->forceVisual.reset();
+}
+
+/////////////////////////////////////////////////
+void WrenchVisual::Load(ConstJointPtr &_msg)
+{
+  WrenchVisualPrivate *dPtr =
+      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
+
   // Make sure the meshes are in Ogre
   this->InsertMesh("unit_cone");
+
+  // Initialize visuals on Load because we can't use shared_from_this in the
+  // constructor
+
+  // Torque visual
   Ogre::MovableObject *coneXObj =
     (Ogre::MovableObject*)(dPtr->scene->OgreSceneManager()->createEntity(
           this->GetName()+"__WRENCH_X_CONE__", "unit_cone"));
@@ -70,64 +120,41 @@ WrenchVisual::WrenchVisual(const std::string &_name, VisualPtr _vis,
           this->GetName()+"__WRENCH_Z_CONE__", "unit_cone"));
   ((Ogre::Entity*)coneZObj)->setMaterialName("__GAZEBO_TRANS_BLUE_MATERIAL__");
 
-  math::Quaternion q;
+  ignition::math::Quaterniond q;
 
   dPtr->coneXNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_X_CONE");
   dPtr->coneXNode->attachObject(coneXObj);
-  q.SetFromAxis(0, 1, 0, GZ_DTOR(-90));
-  dPtr->coneXNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.Axis(0, 1, 0, IGN_DTOR(-90));
+  dPtr->coneXNode->setOrientation(q.W(), q.X(), q.Y(), q.Z());
   dPtr->coneXNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneYNode =
       dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Y_CONE");
   dPtr->coneYNode->attachObject(coneYObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(90));
-  dPtr->coneYNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.Axis(1, 0, 0, IGN_DTOR(90));
+  dPtr->coneYNode->setOrientation(q.W(), q.X(), q.Y(), q.Z());
   dPtr->coneYNode->setScale(0.02, 0.02, 0.02);
 
   dPtr->coneZNode =
     dPtr->sceneNode->createChildSceneNode(this->GetName() + "_WRENCH_Z_CONE");
   dPtr->coneZNode->attachObject(coneZObj);
-  q.SetFromAxis(1, 0, 0, GZ_DTOR(180));
-  dPtr->coneZNode->setOrientation(q.w, q.x, q.y, q.z);
+  q.Axis(1, 0, 0, IGN_DTOR(180));
+  dPtr->coneZNode->setOrientation(q.W(), q.X(), q.Y(), q.Z());
   dPtr->coneZNode->setScale(0.02, 0.02, 0.02);
 
-  dPtr->forceLine = new DynamicLines(RENDERING_LINE_LIST);
-  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
-  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0));
-  dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  // Force visual
+  dPtr->forceVisual.reset(new rendering::Visual(
+      this->GetName() + "_FORCE_VISUAL_", shared_from_this()));
+  dPtr->forceVisual->Load();
 
-  dPtr->forceNode = dPtr->sceneNode->createChildSceneNode(this->GetName() +
-      "_WRENCH_FORCE_NODE_");
-  dPtr->forceNode->attachObject(dPtr->forceLine);
+  dPtr->forceLine = dPtr->forceVisual->CreateDynamicLine(RENDERING_LINE_LIST);
+  dPtr->forceLine->setMaterial("__GAZEBO_TRANS_PURPLE_MATERIAL__");
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d::Zero);
+  dPtr->forceLine->AddPoint(ignition::math::Vector3d(0, 0, 0.1));
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
-  dPtr->connections.push_back(
-      event::Events::ConnectPreRender(
-        boost::bind(&WrenchVisual::Update, this)));
-}
-
-/////////////////////////////////////////////////
-WrenchVisual::~WrenchVisual()
-{
-  WrenchVisualPrivate *dPtr =
-      reinterpret_cast<WrenchVisualPrivate *>(this->dataPtr);
-
-  dPtr->node.reset();
-  dPtr->connections.clear();
-
-  delete dPtr->forceLine;
-  dPtr->forceLine = NULL;
-
-  delete dPtr->forceNode;
-  dPtr->forceNode = NULL;
-}
-
-/////////////////////////////////////////////////
-void WrenchVisual::Load(ConstJointPtr &_msg)
-{
   Visual::Load();
   this->SetPosition(msgs::ConvertIgn(_msg->pose().position()));
   this->SetRotation(msgs::ConvertIgn(_msg->pose().orientation()));

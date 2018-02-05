@@ -3,6 +3,7 @@ include_directories(${IGNITION-MATH_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
+  any.proto
   axis.proto
   battery.proto
   boxgeom.proto
@@ -196,7 +197,6 @@ endif()
 
 target_link_libraries(gazebo_msgs
   gazebo_common
-  gazebo_math
   ${GZ_PROTOBUF_LIBRARY}
 )
 

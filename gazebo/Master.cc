@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,6 +174,21 @@ void Master::OnRead(const unsigned int _connectionIndex,
 }
 
 //////////////////////////////////////////////////
+void Master::SendSubscribers(const std::string &_topic,
+                             const std::string &_buffer)
+{
+  // Find all subscribers for this topic
+  std::set<transport::ConnectionPtr> uniqueConnections;
+  for (auto const &subscriber : this->dataPtr->subscribers)
+    if (subscriber.first.topic() == _topic)
+      uniqueConnections.insert(subscriber.second);
+
+  // Send message to all unique connections
+  for (auto &conn : uniqueConnections)
+    conn->EnqueueMsg(_buffer);
+}
+
+//////////////////////////////////////////////////
 void Master::ProcessMessage(const unsigned int _connectionIndex,
                             const std::string &_data)
 {
@@ -225,17 +240,8 @@ void Master::ProcessMessage(const unsigned int _connectionIndex,
 
     this->dataPtr->publishers.push_back(std::make_pair(pub, conn));
 
-    SubList::iterator iter;
-
-    // Find all subscribers of the topic
-    for (iter = this->dataPtr->subscribers.begin();
-         iter != this->dataPtr->subscribers.end(); ++iter)
-    {
-      if (iter->first.topic() == pub.topic())
-      {
-        iter->second->EnqueueMsg(msgs::Package("publisher_advertise", pub));
-      }
-    }
+    this->SendSubscribers(pub.topic(),
+        msgs::Package("publisher_advertise", pub));
   }
   else if (packet.type() == "unadvertise")
   {
@@ -501,16 +507,7 @@ void Master::RemovePublisher(const msgs::Publish _pub)
     }
   }
 
-  SubList::iterator iter;
-  // Find all subscribers of the topic
-  for (iter = this->dataPtr->subscribers.begin();
-      iter != this->dataPtr->subscribers.end(); ++iter)
-  {
-    if (iter->first.topic() == _pub.topic())
-    {
-      iter->second->EnqueueMsg(msgs::Package("unadvertise", _pub));
-    }
-  }
+  this->SendSubscribers(_pub.topic(), msgs::Package("unadvertise", _pub));
 
   PubList::iterator pubIter = this->dataPtr->publishers.begin();
   while (pubIter != this->dataPtr->publishers.end())

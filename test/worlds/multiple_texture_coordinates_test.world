@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <scene>
+      <background>0 0 0 1</background>
+      <ambient>1 1 1 1</ambient>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene>
+
+    <gui>
+      <camera name="user">
+        <pose>3 2 1 0 1.5707 0</pose>
+      </camera>
+    </gui>
+
+    <model name="model">
+      <static>true</static>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file://media/models/multiple_texture_coordinates.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,6 +79,7 @@ Collision::Collision(LinkPtr _link)
 //////////////////////////////////////////////////
 Collision::~Collision()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -91,10 +92,11 @@ void Collision::Fini()
     this->requestPub->Publish(*msg, true);
   }
 
-  Entity::Fini();
   this->link.reset();
   this->shape.reset();
   this->surface.reset();
+
+  Entity::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -130,7 +132,7 @@ void Collision::Init()
 //////////////////////////////////////////////////
 void Collision::SetCollision(bool _placeable)
 {
-  this->placeable = _placeable;
+  this->SetPlaceable(_placeable);
 
   if (this->IsStatic())
   {
@@ -143,6 +145,12 @@ void Collision::SetCollision(bool _placeable)
     this->SetCategoryBits(GZ_ALL_COLLIDE);
     this->SetCollideBits(GZ_ALL_COLLIDE);
   }
+}
+
+//////////////////////////////////////////////////
+void Collision::SetPlaceable(const bool _placeable)
+{
+  this->placeable = _placeable;
 }
 
 //////////////////////////////////////////////////

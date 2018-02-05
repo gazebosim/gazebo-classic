@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -401,6 +401,13 @@ namespace gazebo
       /// \param[in] _init True if sensors have been initialized.
       public: void _SetSensorsInitialized(const bool _init);
 
+      /// \brief Get a model name which doesn't overlap with any existing
+      /// models, by appending numbers to the given name. If _name is already,
+      /// unique, the returned value is the same.
+      /// \param[in] _name Desired model name.
+      /// \return Unique model name.
+      public: std::string UniqueModelName(const std::string &_name);
+
       /// \cond
       /// This is an internal function.
       /// \brief Get a model by id.
@@ -431,7 +438,7 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+      public: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
           const BasePtr &_parent);
 
       /// \brief Load an actor.

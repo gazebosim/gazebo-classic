@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -219,6 +219,17 @@ namespace gazebo
       public: void SetMaterial(const std::string &_materialName,
                                bool _unique = true, const bool _cascade = true);
 
+      /// \brief Set a shader program parameter associated to this visual's
+      /// material
+      /// \param[in] _paramName Name of shader parameter
+      /// \param[in] _shaderType Type of shader. Supported types:
+      /// vertex, fragment
+      /// \param[in] _value Value to set the parameter to. The value string can
+      /// be a number (int, float) or a space delimited array of numbers
+      /// (floats). The value type must match the type defined in the shaders.
+      public: void SetMaterialShaderParam(const std::string &_paramName,
+          const std::string &_shaderType, const std::string &_value);
+
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
@@ -347,6 +358,10 @@ namespace gazebo
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
       public: math::Pose GetPose() const;
+
+      /// \brief Get the initial relative pose of the visual.
+      /// \return The visual's initial relative pose.
+      public: ignition::math::Pose3d InitialRelativePose() const;
 
       /// \brief Get the global pose of the node.
       /// \return The pose in the world coordinate frame.
@@ -609,6 +624,18 @@ namespace gazebo
       /// \brief Get whether this visual uses RT shader system.
       /// \return True if RT shader is used.
       public: bool UseRTShader() const;
+
+      /// \brief Set a message specific for this visual type. For example, a
+      /// link visual will have a link message.
+      /// \param[in] _msg Message for this visual.
+      public: void SetTypeMsg(const google::protobuf::Message *_msg);
+
+      /// \brief Push a message for a child of this visual which hasn't been
+      /// loaded yet.
+      /// \param[in] _pair Pair with the child visual type and the message for
+      /// the child.
+      public: void AddPendingChild(std::pair<VisualType,
+          const google::protobuf::Message *> _pair);
 
       /// \brief Convert from msgs::Visual::Type to VisualType.
       /// \param[in] _type A msgs::Visual::Type enum.

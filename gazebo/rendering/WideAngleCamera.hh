@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,6 +150,8 @@ namespace gazebo
       public: void SetCutOffAngle(const double _angle);
 
       /// \brief Sets whether the image should be scaled to fit horizontal FOV
+      /// If True, the projection will compute a new focal length for achieving
+      /// the desired FOV
       /// \param[in] _scale true if it should,
       ///   note: c1 and f parameters are ignored in this case
       public: void SetScaleToHFOV(const bool _scale);
@@ -220,12 +222,27 @@ namespace gazebo
       // Documentation inherited
       public: void SetClipDist() override;
 
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: bool SetBackgroundColor(const common::Color &_color);
+
+      /// \brief Project 3D world coordinates to screen coordinates
+      /// \param[in] _pt 3D world coodinates
+      /// \return Screen coordinates. Z is the distance of point from camera
+      /// optical center.
+      public: ignition::math::Vector3d Project3d(
+          const ignition::math::Vector3d &_pt) const;
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
 
       // Documentation inherited
       protected: void RenderImpl() override;
+
+      // Documentation inherited
+      protected: void UpdateFOV() override;
 
       /// \bried Callback that is used to set mapping material uniform values,
       ///   implements Ogre::CompositorInstance::Listener interface

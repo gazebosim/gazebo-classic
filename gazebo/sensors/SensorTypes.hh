@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ namespace gazebo
     class Noise;
     class GaussianNoiseModel;
     class ImageGaussianNoiseModel;
+    class WideAngleCameraSensor;
     class WirelessTransceiver;
     class WirelessTransmitter;
     class WirelessReceiver;
@@ -81,6 +82,10 @@ namespace gazebo
     /// \def DepthCameraSensorPtr
     /// \brief Shared pointer to DepthCameraSensor
     typedef std::shared_ptr<DepthCameraSensor> DepthCameraSensorPtr;
+
+    /// \def WideAngleCameraSensorPtr
+    /// \brief Shared pointer to WideAngleCameraSensor
+    typedef std::shared_ptr<WideAngleCameraSensor> WideAngleCameraSensorPtr;
 
     /// \def ContactSensorPtr
     /// \brief Shared pointer to ContactSensor

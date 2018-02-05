@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,6 +105,10 @@ TEST_F(GpsSensor_TEST, CreateGps)
   EXPECT_DOUBLE_EQ(sensor->Latitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
+
+  EXPECT_DOUBLE_EQ(sensor->VelocityEast(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->VelocityNorth(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->VelocityUp(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
 

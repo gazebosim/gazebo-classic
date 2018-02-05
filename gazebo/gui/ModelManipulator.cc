@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -621,11 +621,19 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
   this->SetMouseMoveVisual(rendering::VisualPtr());
 
   rendering::VisualPtr vis;
+  std::string manipState;
   rendering::VisualPtr mouseVis
-      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseEvent.Pos());
+      = this->dataPtr->userCamera->GetVisual(this->dataPtr->mouseStart,
+      manipState);
+
+  this->dataPtr->selectionObj->SetState(manipState);
+
+  // See issue #1510
+  bool keyIsPressed = (QApplication::keyboardModifiers() != Qt::NoModifier);
+
   // set the new mouse vis only if there are no modifier keys pressed and the
   // entity was different from the previously selected one.
-  if (!this->dataPtr->keyEvent.key && (this->dataPtr->selectionObj->GetMode() ==
+  if (!keyIsPressed && (this->dataPtr->selectionObj->GetMode() ==
        rendering::SelectionObj::SELECTION_NONE
       || (mouseVis && mouseVis != this->dataPtr->selectionObj->GetParent())))
   {
@@ -646,6 +654,8 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
 
     // If the root visual's ID can be found, it is a model in the main window
+    // TODO gui::get_entity_id always return 0 in QTestFixture due to NULL
+    // g_main_win
     if (gui::get_entity_id(rootVis->GetName()))
     {
       // select model
@@ -960,7 +970,7 @@ void ModelManipulator::OnKeyReleaseEvent(const common::KeyEvent &_event)
             this->dataPtr->mouseMoveVis->GetWorldPose();
       }
     }
-    else if (QApplication::keyboardModifiers() & Qt::ShiftModifier)
+    else if (this->dataPtr->keyEvent.key == Qt::Key_Shift)
     {
       this->dataPtr->globalManip = false;
       this->dataPtr->selectionObj->SetGlobal(this->dataPtr->globalManip);

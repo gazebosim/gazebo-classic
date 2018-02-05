@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,11 +47,18 @@ DARTJoint::~DARTJoint()
   this->Detach();
 
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
 void DARTJoint::Load(sdf::ElementPtr _sdf)
 {
+  if (!this->dataPtr->dtJoint)
+  {
+    gzerr << "dtJoint should be created in each subclass constructor" <<
+        std::endl;
+  }
+
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);

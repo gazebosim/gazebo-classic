@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,6 +253,10 @@ namespace gazebo
       /// \brief Remove a child by name.
       /// \param[in] _name Name of the child.
       public: void RemoveChild(const std::string &_name);
+
+      /// \brief Remove a child by pointer.
+      /// \param[in] _child Pointer to the child.
+      public: void RemoveChild(physics::BasePtr _child);
 
       /// \brief Add a type specifier.
       /// \param[in] _type New type to append to this objects type

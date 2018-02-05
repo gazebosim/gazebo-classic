@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -251,6 +251,10 @@ void Sensor::Update(const bool _force)
 //////////////////////////////////////////////////
 void Sensor::Fini()
 {
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
+
   this->connections.clear();
 
   for (auto &it : this->noises)
@@ -260,13 +264,12 @@ void Sensor::Fini()
   this->active = false;
   this->plugins.clear();
 
-  if (this->node)
-    this->node->Fini();
-  this->node.reset();
-
   if (this->sdf)
     this->sdf->Reset();
   this->sdf.reset();
+
+  this->scene.reset();
+  this->world.reset();
 }
 
 //////////////////////////////////////////////////
@@ -492,8 +495,8 @@ void Sensor::FillMsg(msgs::Sensor &_msg)
       distortionMsg->set_k3(distortion->GetK3());
       distortionMsg->set_p1(distortion->GetP1());
       distortionMsg->set_p2(distortion->GetP2());
-      distortionMsg->mutable_center()->set_x(distortion->GetCenter().x);
-      distortionMsg->mutable_center()->set_y(distortion->GetCenter().y);
+      distortionMsg->mutable_center()->set_x(distortion->GetCenter().Ign().X());
+      distortionMsg->mutable_center()->set_y(distortion->GetCenter().Ign().Y());
     }
   }
 }

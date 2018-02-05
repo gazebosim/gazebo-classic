@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,8 +97,11 @@ namespace gazebo
       /// \brief Publisher for gui messages.
       public: transport::PublisherPtr guiPub;
 
-      /// \brief Publisher for light messages.
+      /// \brief Publisher for light modify messages.
       public: transport::PublisherPtr lightPub;
+
+      /// \brief Publisher for light factory messages.
+      public: transport::PublisherPtr lightFactoryPub;
 
       /// \brief Publisher for pose messages.
       public: transport::PublisherPtr posePub;
@@ -243,6 +246,10 @@ namespace gazebo
       /// \brief Buffer of prev states
       public: WorldState prevStates[2];
 
+      /// \brief Previous unfiltered state. Used for determining insertions
+      /// and deletions
+      public: WorldState prevUnfilteredState;
+
       /// \brief Int used to toggle between prevStates
       public: int stateToggle;
 
@@ -323,6 +330,9 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief Simulation time of the last log state captured.
+      public: gazebo::common::Time logLastStateTime;
     };
   }
 }

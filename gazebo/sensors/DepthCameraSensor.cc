@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ DepthCameraSensor::DepthCameraSensor()
 //////////////////////////////////////////////////
 DepthCameraSensor::~DepthCameraSensor()
 {
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -133,10 +134,12 @@ void DepthCameraSensor::Init()
 //////////////////////////////////////////////////
 void DepthCameraSensor::Fini()
 {
-  Sensor::Fini();
-  this->scene->RemoveCamera(this->dataPtr->camera->Name());
-  this->dataPtr->camera.reset();
+  if (this->scene && this->dataPtr->camera)
+    this->scene->RemoveCamera(this->dataPtr->camera->Name());
   this->scene.reset();
+  this->dataPtr->camera.reset();
+
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////

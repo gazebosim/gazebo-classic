@@ -1,0 +1,162 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="box_sim">
+      <pose>0 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>1 0 0 1</color_a>
+            <color_b>1 0 0 0</color_b>
+            <period>10</period>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_sim">
+      <pose>0 1.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>0 1 1 1</color_a>
+            <color_b>0 1 0 1</color_b>
+            <period>2</period>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+    <model name="cylinder_sim">
+      <pose>0 -1.5 0.5 0 1.5707 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>0 0 1 1</color_a>
+            <color_b>1 1 1 1</color_b>
+            <period>0.4</period>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+    <model name="box_wall">
+      <pose>2 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>1 0 0 1</color_a>
+            <color_b>1 0 0 0</color_b>
+            <period>10</period>
+            <use_wall_time>true</use_wall_time>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+    <model name="sphere_wall">
+      <pose>2 1.5 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>0 1 1 1</color_a>
+            <color_b>0 1 0 1</color_b>
+            <period>2</period>
+            <use_wall_time>true</use_wall_time>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+    <model name="cylinder_wall">
+      <pose>2 -1.5 0.5 0 1.5707 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.5</radius>
+              <length>1.0</length>
+            </cylinder>
+          </geometry>
+          <plugin name="blink" filename="libBlinkVisualPlugin.so">
+            <color_a>0 0 1 1</color_a>
+            <color_b>1 1 1 1</color_b>
+            <period>0.4</period>
+            <use_wall_time>true</use_wall_time>
+          </plugin>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

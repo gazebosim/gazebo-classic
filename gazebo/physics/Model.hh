@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -210,7 +210,7 @@ namespace gazebo
       public: void SetSelfCollide(bool _self_collide);
 
       /// \brief Set the gravity mode of the model.
-      /// \param[in] _value False to turn gravity on for the model.
+      /// \param[in] _value True to enable gravity.
       public: void SetGravityMode(const bool &_value);
 
       /// \TODO This is not implemented in Link, which means this function
@@ -345,6 +345,21 @@ namespace gazebo
       /// \return Number of sensors.
       public: unsigned int GetSensorCount() const;
 
+      /// \brief Get scoped sensor name(s) in the model that matches
+      /// sensor name.
+      ///
+      /// Get the names of sensors in the model where sensor
+      /// name matches the user provided argument.
+      /// \note A Model does not manage or maintain a pointer to a
+      /// sensors::Sensor. Access to a Sensor object
+      /// is accomplished through the sensors::SensorManager. This was done to
+      /// separate the physics engine from the sensor engine.
+      /// \param[in] _name Unscoped sensor name.
+      /// \return The scoped name of the sensor(s),
+      ///         or empty list if not found.
+      public: std::vector<std::string> SensorScopedName(
+        const std::string &_name) const;
+
       /// \brief Get a handle to the Controller for the joints in this model.
       /// \return A handle to the Controller for the joints in this model.
       public: JointControllerPtr GetJointController();
@@ -387,6 +402,14 @@ namespace gazebo
       public: gazebo::physics::JointPtr CreateJoint(
         const std::string &_name, const std::string &_type,
         physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      /// \brief Create a joint for this model
+      /// \param[in] _sdf SDF parameters for <joint>
+      /// \return a JointPtr to the new joint created,
+      ///         returns NULL JointPtr() if joint by name _name
+      ///         already exists.
+      /// \throws common::Exception When _type is not recognized
+      public: gazebo::physics::JointPtr CreateJoint(sdf::ElementPtr _sdf);
 
       /// \brief Remove a joint for this model
       /// \param[in] _name name of joint

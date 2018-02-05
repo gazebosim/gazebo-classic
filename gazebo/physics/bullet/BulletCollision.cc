@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/PlaneShape.hh"
 
@@ -32,6 +34,7 @@ BulletCollision::BulletCollision(LinkPtr _parent)
   this->SetName("Bullet_Collision");
   this->collisionShape = NULL;
   this->surface.reset(new BulletSurfaceParams());
+  this->collideBits = GZ_ALL_COLLIDE;
 }
 
 //////////////////////////////////////////////////
@@ -50,16 +53,20 @@ void BulletCollision::Load(sdf::ElementPtr _sdf)
 
   if (this->IsStatic())
   {
-    this->SetCategoryBits(GZ_FIXED_COLLIDE);
-    this->SetCollideBits(~GZ_FIXED_COLLIDE);
+    this->collideBits = ~GZ_FIXED_COLLIDE;
+  }
+  else
+  {
+    this->collideBits = this->GetSurface()->collideBitmask;
   }
 }
 
 //////////////////////////////////////////////////
 void BulletCollision::OnPoseChange()
 {
-  math::Pose pose = this->GetRelativePose();
-  BulletLinkPtr bbody = boost::dynamic_pointer_cast<BulletLink>(this->parent);
+  // math::Pose pose = this->GetRelativePose();
+  // BulletLinkPtr bbody =
+  //     boost::dynamic_pointer_cast<BulletLink>(this->parent);
 
   // bbody->motionState.setWorldTransform(this, pose);
 }
@@ -67,25 +74,57 @@ void BulletCollision::OnPoseChange()
 //////////////////////////////////////////////////
 void BulletCollision::SetCategoryBits(unsigned int _bits)
 {
+  gzwarn << "SetCategoryBits is not implemented" << std::endl;
+  // Prevent unused variable warning
   this->categoryBits = _bits;
 }
 
 //////////////////////////////////////////////////
 void BulletCollision::SetCollideBits(unsigned int _bits)
 {
-  this->collideBits = _bits;
+  // Collide bits apply to the whole rigid body, so all sibling
+  // collisions on the same link must have identical collide bits
+  auto numChildren = this->link->GetChildCount();
+  for (decltype(numChildren) c = 0; c < numChildren; ++c)
+  {
+    BasePtr child = this->link->GetChild(c);
+    if (child->HasType(COLLISION))
+    {
+      BulletCollision *col = dynamic_cast<BulletCollision *>(&*child);
+      col->GetSurface()->collideBitmask = _bits;
+    }
+  }
+
+  BulletLink *bulletLink = dynamic_cast<BulletLink *>(&*this->parent);
+
+  // Set mask and group because BulletRayShape still uses them, TODO remove
+  btRigidBody *bod = bulletLink->GetBulletLink();
+  if (nullptr != bod)
+  {
+    // Need a rigid body in the world before bits on proxy can be changed
+    btBroadphaseProxy *proxy = bod->getBroadphaseProxy();
+    GZ_ASSERT(nullptr != proxy, "body must be added to world for collide bits");
+    proxy->m_collisionFilterMask = _bits;
+    proxy->m_collisionFilterGroup = _bits;
+
+    // CollideBits are checked in the overlappingFilterCallback which is
+    // only called when objects are added to the world
+    bulletLink->RemoveAndAddBody();
+  }
 }
 
 //////////////////////////////////////////////////
 unsigned int BulletCollision::GetCategoryBits() const
 {
+  gzwarn << "GetCategoryBits is not implemented" << std::endl;
+  // Prevent unused variable warning
   return this->categoryBits;
 }
 
 //////////////////////////////////////////////////
 unsigned int BulletCollision::GetCollideBits() const
 {
-  return this->collideBits;
+  return this->GetSurface()->collideBitmask;
 }
 
 //////////////////////////////////////////////////
@@ -104,8 +143,8 @@ math::Box BulletCollision::GetBoundingBox() const
     btVector3 btMin, btMax;
     this->collisionShape->getAabb(btTransform::getIdentity(), btMin, btMax);
 
-    result.min.Set(btMin.x(), btMin.y(), btMin.z());
-    result.max.Set(btMax.x(), btMax.y(), btMax.z());
+    result = math::Box(math::Vector3(btMin.x(), btMin.y(), btMin.z()),
+                       math::Vector3(btMax.x(), btMax.y(), btMax.z()));
 
     if (this->GetShapeType() & PLANE_SHAPE)
     {
@@ -126,7 +165,7 @@ math::Box BulletCollision::GetBoundingBox() const
 void BulletCollision::SetCollisionShape(btCollisionShape *_shape,
     bool _placeable)
 {
-  Collision::SetCollision(_placeable);
+  Collision::SetPlaceable(_placeable);
   this->collisionShape = _shape;
 
   // btmath::Vector3 vec;

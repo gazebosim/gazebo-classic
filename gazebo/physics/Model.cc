@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -408,12 +408,40 @@ boost::shared_ptr<Model> Model::shared_from_this()
 //////////////////////////////////////////////////
 void Model::Fini()
 {
+  // Destroy all attached models
+  for (auto &model : this->attachedModels)
+  {
+    if (model)
+      model->Fini();
+  }
   this->attachedModels.clear();
-  this->canonicalLink.reset();
-  this->jointController.reset();
-  this->joints.clear();
-  this->links.clear();
+
+  // Destroy all models
+  for (auto &model : this->models)
+  {
+    if (model)
+      model->Fini();
+  }
   this->models.clear();
+
+  // Destroy all joints
+  for (auto &joint : this->joints)
+  {
+    if (joint)
+      joint->Fini();
+  }
+  this->joints.clear();
+  this->jointController.reset();
+
+  // Destroy all links
+  for (auto &link : this->links)
+  {
+    if (link)
+      link->Fini();
+  }
+  this->canonicalLink.reset();
+  this->links.clear();
+
   this->plugins.clear();
 
   Entity::Fini();
@@ -429,25 +457,58 @@ void Model::UpdateParameters(sdf::ElementPtr _sdf)
     sdf::ElementPtr linkElem = _sdf->GetElement("link");
     while (linkElem)
     {
+      auto linkName = linkElem->Get<std::string>("name");
       LinkPtr link = boost::dynamic_pointer_cast<Link>(
-          this->GetChild(linkElem->Get<std::string>("name")));
-      link->UpdateParameters(linkElem);
+          this->GetChild(linkName));
+      if (link)
+        link->UpdateParameters(linkElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a link called [" << linkName << "]" << std::endl;
+      }
       linkElem = linkElem->GetNextElement("link");
     }
   }
-  /*
 
   if (_sdf->HasElement("joint"))
   {
     sdf::ElementPtr jointElem = _sdf->GetElement("joint");
     while (jointElem)
     {
-      JointPtr joint = boost::dynamic_pointer_cast<Joint>(this->GetChild(jointElem->Get<std::string>("name")));
-      joint->UpdateParameters(jointElem);
+      auto jointName = jointElem->Get<std::string>("name");
+      JointPtr joint = boost::dynamic_pointer_cast<Joint>(
+          this->GetChild(jointName));
+      if (joint)
+        joint->UpdateParameters(jointElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a joint called [" << jointName << "]" << std::endl;
+      }
       jointElem = jointElem->GetNextElement("joint");
     }
   }
-  */
+
+  if (_sdf->HasElement("model"))
+  {
+    sdf::ElementPtr modelElem = _sdf->GetElement("model");
+    while (modelElem)
+    {
+      auto modelName = modelElem->Get<std::string>("name");
+      ModelPtr model = boost::dynamic_pointer_cast<Model>(
+          this->GetChild(modelName));
+      if (model)
+        model->UpdateParameters(modelElem);
+      else
+      {
+        gzwarn << "Model [" << this->GetName() <<
+            "] doesn't have a nested model called [" << modelName << "]"
+            << std::endl;
+      }
+      modelElem = modelElem->GetNextElement("model");
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -508,8 +569,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         visualElem = visualElem->GetNextElement("visual");
@@ -552,8 +612,7 @@ const sdf::ElementPtr Model::UnscaledSDF()
         }
         else if (geomElem->HasElement("mesh"))
         {
-          geomElem->GetElement("mesh")->GetElement("scale")->Set(
-              ignition::math::Vector3d::One);
+          // Keep mesh scale because meshes can't be scaled yet (issue #1473)
         }
 
         collisionElem = collisionElem->GetNextElement("collision");
@@ -887,6 +946,32 @@ void Model::LoadGripper(sdf::ElementPtr _sdf)
       boost::static_pointer_cast<Model>(shared_from_this())));
   gripper->Load(_sdf);
   this->grippers.push_back(gripper);
+}
+
+//////////////////////////////////////////////////
+std::vector<std::string> Model::SensorScopedName(
+  const std::string &_name) const
+{
+  std::vector<std::string> names;
+  for (Link_V::const_iterator iter = this->links.begin();
+       iter != this->links.end(); ++iter)
+  {
+    for (unsigned int j = 0; j < (*iter)->GetSensorCount(); ++j)
+    {
+      const auto sensorName = (*iter)->GetSensorName(j);
+      if (sensorName.size() < _name.size())
+      {
+        continue;
+      }
+      if (sensorName.substr(sensorName.size() - _name.size(), _name.size()) ==
+          _name)
+      {
+        names.push_back(sensorName);
+      }
+    }
+  }
+
+  return names;
 }
 
 //////////////////////////////////////////////////
@@ -1450,6 +1535,38 @@ gazebo::physics::JointPtr Model::CreateJoint(
 }
 
 /////////////////////////////////////////////////
+gazebo::physics::JointPtr Model::CreateJoint(sdf::ElementPtr _sdf)
+{
+  if (_sdf->GetName() != "joint" ||
+      !_sdf->HasAttribute("name") ||
+      !_sdf->HasAttribute("type"))
+  {
+    gzerr << "Invalid _sdf passed to Model::CreateJoint" << std::endl;
+    return physics::JointPtr();
+  }
+
+  std::string jointName(_sdf->Get<std::string>("name"));
+  if (this->GetJoint(jointName))
+  {
+    gzwarn << "Model [" << this->GetName()
+           << "] already has a joint named [" << jointName
+           << "], skipping creating joint.\n";
+    return physics::JointPtr();
+  }
+
+  try
+  {
+    // LoadJoint can throw if the scoped name of the joint already exists.
+    this->LoadJoint(_sdf);
+  }
+  catch(...)
+  {
+    gzerr << "LoadJoint Failed" << std::endl;
+  }
+  return this->GetJoint(jointName);
+}
+
+/////////////////////////////////////////////////
 bool Model::RemoveJoint(const std::string &_name)
 {
   bool paused = this->world->IsPaused();
@@ -1457,7 +1574,12 @@ bool Model::RemoveJoint(const std::string &_name)
   if (joint)
   {
     this->world->SetPaused(true);
+    if (this->jointController)
+    {
+      this->jointController->RemoveJoint(joint.get());
+    }
     joint->Detach();
+    joint->Fini();
 
     this->joints.erase(
       std::remove(this->joints.begin(), this->joints.end(), joint),

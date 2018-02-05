@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ void ImuSensor_TEST::BasicImuSensorCheck(const std::string &_physicsEngine)
 
   EXPECT_EQ(sensor->AngularVelocity(), ignition::math::Vector3d::Zero);
   EXPECT_EQ(sensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
-  EXPECT_EQ(sensor->Orientation(), ignition::math::Quaterniond(0, 0, 0, 0));
+  EXPECT_EQ(sensor->Orientation(), ignition::math::Quaterniond::Identity);
 }
 
 /////////////////////////////////////////////////
@@ -118,7 +118,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
 
   EXPECT_EQ(imuSensor->AngularVelocity(), ignition::math::Vector3d::Zero);
   EXPECT_EQ(imuSensor->LinearAcceleration(), ignition::math::Vector3d::Zero);
-  EXPECT_EQ(imuSensor->Orientation(), ignition::math::Quaterniond(0, 0, 0, 0));
+  EXPECT_EQ(imuSensor->Orientation(), ignition::math::Quaterniond::Identity);
 
   // step world and verify imu's linear acceleration is zero on free fall
   world->Step(200);

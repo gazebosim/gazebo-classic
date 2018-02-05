@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,9 +66,13 @@ namespace gazebo
     /// \brief List of light messages.
     typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
 
-    /// \def PoseMsgs_L.
+    /// \typedef PoseMsgs_M.
     /// \brief List of messages.
     typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
+
+    /// \typedef LightPoseMsgs_M.
+    /// \brief List of messages.
+    typedef std::map<std::string, msgs::Pose> LightPoseMsgs_M;
 
     /// \def SceneMsgs_L
     /// \brief List of scene messages.
@@ -173,6 +177,9 @@ namespace gazebo
 
       /// \brief List of pose message to process.
       public: PoseMsgs_M poseMsgs;
+
+      /// \brief List of pose message to process.
+      public: LightPoseMsgs_M lightPoseMsgs;
 
       /// \brief List of scene message to process.
       public: SceneMsgs_L sceneMsgs;
@@ -280,6 +287,9 @@ namespace gazebo
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
 
+      /// \brief The heightmap level of detail
+      public: unsigned int heightmapLOD = 0u;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 
@@ -326,6 +336,9 @@ namespace gazebo
 
       /// \brief Keep track of data of joints.
       public: JointMsgs_M joints;
+
+      /// \brief Size of shadow texture
+      public: unsigned int shadowTextureSize = 1024u;
     };
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,6 +182,32 @@ TEST_F(LogRecord_TEST, Start_zlib)
     if ((++i % 50) == 0)
       gzdbg << "Waiting for recorder->IsReadyToStart()" << std::endl;
   }
+}
+
+/////////////////////////////////////////////////
+/// \brief Test LogRecord filter
+TEST_F(LogRecord_TEST, Filter)
+{
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
+  // check default values
+  EXPECT_DOUBLE_EQ(recorder->Period(), -1);
+  EXPECT_EQ(recorder->Filter(), std::string());
+
+  // filter by period
+  recorder->SetPeriod(0.02);
+  EXPECT_DOUBLE_EQ(recorder->Period(), 0.02);
+
+  recorder->SetPeriod(0);
+  EXPECT_DOUBLE_EQ(recorder->Period(), 0);
+
+
+  // filter by regex string
+  recorder->SetFilter("robot*");
+  EXPECT_EQ(recorder->Filter(), "robot*");
+
+  recorder->SetFilter("");
+  EXPECT_EQ(recorder->Filter(), "");
 }
 
 /////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -128,6 +128,11 @@ class Colliders_TBB
   private: ODEPhysics *engine;
   private: dContactGeom* contactCollisions;
 };
+
+//////////////////////////////////////////////////
+extern "C" void dMessageQuiet(int, const char *, va_list)
+{
+}
 
 //////////////////////////////////////////////////
 ODEPhysics::ODEPhysics(WorldPtr _world)
@@ -1143,13 +1148,13 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.mu3 = std::min(surf1->FrictionPyramid()->MuTorsion(),
                                  surf2->FrictionPyramid()->MuTorsion());
 
-  // Set the slip values
-  contact.surface.slip1 = std::min(surf1->slip1,
-                                   surf2->slip1);
-  contact.surface.slip2 = std::min(surf1->slip2,
-                                   surf2->slip2);
-  contact.surface.slip3 = std::min(surf1->slipTorsion,
-                                   surf2->slipTorsion);
+  // Combine the slip values
+  // The slip is equivalent to the inverse of a viscous damping term
+  // To combine dampers in series, the inverse of damping is summed
+  // So the sum of slip parameters is used to combine them
+  contact.surface.slip1 = surf1->slip1 + surf2->slip1;
+  contact.surface.slip2 = surf1->slip2 + surf2->slip2;
+  contact.surface.slip3 = surf1->slipTorsion + surf2->slipTorsion;
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =
@@ -1507,6 +1512,32 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
         boost::any_cast<int>(_value));
     }
+    else if (_key == "island_threads")
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
+      }
+      dWorldSetIslandThreads(this->dataPtr->worldId, value);
+    }
+    else if (_key == "ode_quiet")
+    {
+      bool odeQuiet = boost::any_cast<bool>(_value);
+      if (odeQuiet)
+      {
+        dSetMessageHandler(&dMessageQuiet);
+      }
+      else
+      {
+        dSetMessageHandler(0);
+      }
+    }
     else
     {
       return PhysicsEngine::SetParam(_key, _value);
@@ -1594,6 +1625,10 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "island_threads")
+    _value = dWorldGetIslandThreads(this->dataPtr->worldId);
+  else if (_key == "ode_quiet")
+    _value = dGetMessageHandler() != 0;
   else if (_key == "world_step_solver")
     _value = this->GetWorldStepSolverType();
   else

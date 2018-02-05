@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <model name="box">
+      <allow_auto_disable>0</allow_auto_disable>
+      <pose>0 0 1.5 0 0 0</pose>
+      <link name="link">
+        <inertial>
+          <mass>0.2</mass>
+          <inertia>
+            <ixx>0.0333333</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0333333</iyy>
+            <iyz>0</iyz>
+            <izz>0.0333333</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+
+      <plugin filename="libHarnessPlugin.so" name="harness">
+
+        <joint name="joint1" type="prismatic">
+          <pose>0 0 2 0 0 0</pose>
+          <!-- It is important to connect this joint to the world -->
+          <parent>world</parent>
+          <child>link</child>
+          <axis>
+            <xyz>1 1 1</xyz>
+            <dynamics>
+              <damping>10</damping>
+            </dynamics>
+            <limit>
+              <lower>-2.5</lower>
+              <upper>0</upper>
+              <effort>10000</effort>
+              <velocity>-1</velocity>
+              <stiffness>0</stiffness>
+              <dissipation>0</dissipation>
+            </limit>
+          </axis>
+          <physics>
+            <ode>
+              <implicit_spring_damper>1</implicit_spring_damper>
+              <limit>
+                <cfm>0.0</cfm>
+                <erp>0.0</erp>
+              </limit>
+            </ode>
+          </physics>
+        </joint>
+
+        <!-- The joint that raises or lowers the harness -->
+        <winch>
+          <!-- This must be a joint specified within
+               the body of this plugin. -->
+          <joint>joint1</joint>
+
+          <!-- PID value for velocity control of the winch. These values
+               are tuned to work with this box model. -->
+          <pos_pid>
+            <p>400</p>
+            <i>0</i>
+            <d>0</d>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_max>10000</cmd_max>
+            <cmd_min>-10000</cmd_min>
+          </pos_pid>
+          <vel_pid>
+            <p>400</p>
+            <i>0</i>
+            <d>0</d>
+            <i_max>0</i_max>
+            <i_min>0</i_min>
+            <cmd_max>10000</cmd_max>
+            <cmd_min>0</cmd_min>
+          </vel_pid>
+        </winch>
+
+        <!-- Joint to detach. Once the joint is detached, it cannot be
+             reattached. This must be a joint specified within the
+             body of this plugin. -->
+        <detach>joint1</detach>
+      </plugin>
+    </model>
+
+  </world>
+</sdf>

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ class DiagnosticsTest : public gazebo::testing::AutoLogFixture { };
 
 TEST_F(DiagnosticsTest, Diagnostics)
 {
-#ifdef ENABLE_DIAGNOSTICS
   util::DiagnosticManager *mgr = util::DiagnosticManager::Instance();
   EXPECT_TRUE(mgr != NULL);
 
@@ -35,14 +34,13 @@ TEST_F(DiagnosticsTest, Diagnostics)
   {
     mgr->StartTimer("test");
     mgr->StopTimer("test");
-    EXPECT_STREQ("test", mgr->GetLabel(0).c_str());
-    EXPECT_EQ(1, mgr->GetTimerCount());
+    EXPECT_STREQ("test", mgr->Label(0).c_str());
+    EXPECT_EQ(1, mgr->TimerCount());
   }
   common::Time after = common::Time::GetWallTime();
 
-  EXPECT_TRUE(mgr->GetTime(0) == mgr->GetTime("test"));
-  EXPECT_TRUE(mgr->GetTime(0) <= after - prev);
-#endif
+  EXPECT_TRUE(mgr->Time(0) == mgr->Time("test"));
+  EXPECT_TRUE(mgr->Time(0) <= after - prev);
 }
 
 

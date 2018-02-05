@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -120,6 +120,8 @@ auto standaloneValues = ::testing::Values(
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
+  , "diagnostics"
+  , "harness"
   , "listener"
   , "publisher"
 #ifndef BUILD_TYPE_COVERAGE

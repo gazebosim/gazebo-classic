@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,17 @@ void JointController::AddJoint(JointPtr _joint)
       1, 0.1, 0.01, 1, -1, 1000, -1000);
   this->dataPtr->velPids[_joint->GetScopedName()].Init(
       1, 0.1, 0.01, 1, -1, 1000, -1000);
+}
+
+/////////////////////////////////////////////////
+void JointController::RemoveJoint(Joint *_joint)
+{
+  if (_joint)
+  {
+    this->dataPtr->joints.erase(_joint->GetScopedName());
+    this->dataPtr->posPids.erase(_joint->GetScopedName());
+    this->dataPtr->velPids.erase(_joint->GetScopedName());
+  }
 }
 
 /////////////////////////////////////////////////

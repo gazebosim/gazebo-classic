@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -454,7 +454,7 @@ TEST_P(JointSpawningTest_All, SpawnJointTypes)
 {
   if (this->jointType == "gearbox" && this->physicsEngine != "ode")
   {
-    gzerr << "Skip test, gearbox is only supported in ODE." <<
+    gzerr << "Skip test, gearbox is only supported in ODE. " <<
          "See issues: #859, #1914, #1915" << std::endl;
     return;
   }

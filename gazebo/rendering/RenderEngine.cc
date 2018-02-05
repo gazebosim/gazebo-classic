@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ void RenderEngine::Load()
     // Make the root
     try
     {
-      this->dataPtr->root = new Ogre::Root();
+      this->dataPtr->root = new Ogre::Root("", "");
     }
     catch(Ogre::Exception &e)
     {
@@ -333,14 +333,16 @@ void RenderEngine::Init()
 //////////////////////////////////////////////////
 void RenderEngine::Fini()
 {
+  // TODO: this was causing a segfault on shutdown
+  // Windows are created on load so clear them even
+  // if render engine is not initialized
+  // Close all the windows first;
+  this->dataPtr->windowManager->Fini();
+
   if (!this->dataPtr->initialized)
     return;
 
   this->dataPtr->connections.clear();
-
-  // TODO: this was causing a segfault on shutdown
-  // Close all the windows first;
-  this->dataPtr->windowManager->Fini();
 
   RTShaderSystem::Instance()->Fini();
 
@@ -358,7 +360,6 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->dataPtr->root)
   {
-    this->dataPtr->root->shutdown();
     /*const Ogre::Root::PluginInstanceList ll =
      this->dataPtr->root->getInstalledPlugins();
 
@@ -568,7 +569,6 @@ void RenderEngine::SetupResources()
 
   std::list<std::string> mediaDirs;
   mediaDirs.push_back("media");
-  mediaDirs.push_back("Media");
 
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
@@ -591,6 +591,10 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix, "General"));
       archNames.push_back(
           std::make_pair(prefix + "/skyx", "SkyX"));
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0) && !defined(__APPLE__))
+      archNames.push_back(
+          std::make_pair(prefix + "/rtshaderlib150", "General"));
+#endif
       archNames.push_back(
           std::make_pair(prefix + "/rtshaderlib", "General"));
       archNames.push_back(
@@ -678,7 +682,38 @@ void RenderEngine::SetupRenderSystem()
   ///   FBO seem to be the only good option
   renderSys->setConfigOption("RTT Preferred Mode", "FBO");
 
-  renderSys->setConfigOption("FSAA", "4");
+  // get all supported fsaa values
+  Ogre::ConfigOptionMap configMap = renderSys->getConfigOptions();
+  auto fsaaOoption = configMap.find("FSAA");
+
+  if (fsaaOoption != configMap.end())
+  {
+    auto values = (*fsaaOoption).second.possibleValues;
+    for (auto const &str : values)
+    {
+      int value = 0;
+      try
+      {
+        value = std::stoi(str);
+      }
+      catch(...)
+      {
+        continue;
+      }
+      this->dataPtr->fsaaLevels.push_back(value);
+    }
+  }
+  std::sort(this->dataPtr->fsaaLevels.begin(), this->dataPtr->fsaaLevels.end());
+
+  // check if target fsaa is supported
+  unsigned int fsaa = 0;
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(this->dataPtr->fsaaLevels.begin(),
+      this->dataPtr->fsaaLevels.end(), targetFSAA);
+  if (it != this->dataPtr->fsaaLevels.end())
+    fsaa = targetFSAA;
+
+  renderSys->setConfigOption("FSAA", std::to_string(fsaa));
 
   this->dataPtr->root->setRenderSystem(renderSys);
 }
@@ -806,6 +841,12 @@ WindowManagerPtr RenderEngine::GetWindowManager() const
 Ogre::Root *RenderEngine::Root() const
 {
   return this->dataPtr->root;
+}
+
+/////////////////////////////////////////////////
+std::vector<unsigned int> RenderEngine::FSAALevels() const
+{
+  return this->dataPtr->fsaaLevels;
 }
 
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))

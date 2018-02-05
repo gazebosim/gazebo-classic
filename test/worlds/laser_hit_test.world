@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <scene>
+      <background>1 1 1 1</background>
+      <ambient>1 1 1 1</ambient>
+      <grid>false</grid>
+      <origin_visual>false</origin_visual>
+    </scene>
+
+    <gui>
+      <camera name="user">
+        <pose>2 0 1.0 0 1.5707 0</pose>
+      </camera>
+    </gui>
+
+    <model name="box">
+      <static>true</static>
+      <pose>8 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1 20 1</size>
+            </box>
+          </geometry>
+        </collision>
+      </link>
+    </model>
+
+    <model name="ray_model">
+      <static>true</static>
+      <link name="link">
+        <sensor name="laser" type="ray">
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>4</samples>
+                <resolution>1</resolution>
+                <min_angle>-2.26889</min_angle>
+                <max_angle>2.268899</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.0</min>
+              <max>20</max>
+              <resolution>0.01</resolution>
+            </range>
+          </ray>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>

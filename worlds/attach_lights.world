@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- blue point light -->
+    <light type="point" name="point">
+      <pose>0 0 0 0 0 0</pose>
+      <diffuse>0 0 1 1</diffuse>
+      <specular>.1 .1 .1 1</specular>
+      <attenuation>
+        <range>1</range>
+        <linear>0.2</linear>
+        <constant>0.8</constant>
+        <quadratic>0.01</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+    <!-- red point light -->
+    <light type="point" name="point2">
+      <pose>0 0 0 0 0 0</pose>
+      <diffuse>1 0 0 1</diffuse>
+      <specular>.1 .1 .1 1</specular>
+      <attenuation>
+        <range>20</range>
+        <linear>0.2</linear>
+        <constant>0.8</constant>
+        <quadratic>0.01</quadratic>
+      </attenuation>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+    <!-- green spot light -->
+    <light type="spot" name="spot">
+      <pose>0 0 0 0 0 0</pose>
+      <diffuse>0 1 0 1</diffuse>
+      <specular>.2 .2 .2 1</specular>
+      <attenuation>
+        <range>10</range>
+        <linear>0.01</linear>
+        <constant>0.2</constant>
+        <quadratic>0.0</quadratic>
+      </attenuation>
+      <direction>0 0 -1</direction>
+      <spot>
+        <inner_angle>0.1</inner_angle>
+        <outer_angle>0.5</outer_angle>
+        <falloff>1.2</falloff>
+      </spot>
+      <cast_shadows>false</cast_shadows>
+    </light>
+
+    <!-- double pendulum with point and spot lights attached using plugin-->
+    <model name="double_pendulum_with_lights">
+      <include>
+        <uri>model://double_pendulum_with_base</uri>
+      </include>
+      <plugin name="attach_light" filename="libAttachLightPlugin.so">
+        <link>
+          <link_name>double_pendulum_with_base::upper_link</link_name>
+          <light>
+            <light_name>point</light_name>
+          </light>
+          <light>
+            <pose>0 0 0.45 0 0 0</pose>
+            <light_name>point2</light_name>
+          </light>
+        </link>
+        <link>
+          <link_name>double_pendulum_with_base::lower_link</link_name>
+          <light>
+            <pose>0 0 0.9 3.14 0 0</pose>
+            <light_name>spot</light_name>
+          </light>
+        </link>
+      </plugin>
+    </model>
+
+    <!-- sphere with point light as child of link -->
+    <model name="sphere_with_light">
+      <pose>0.5 -1.5 0.65 0 0 0</pose>
+      <link name="link">
+        <!-- yellow point light -->
+        <light type="point" name="point">
+          <pose>0 0 0.5 0 0 0</pose>
+          <diffuse>1 1 0 1</diffuse>
+          <specular>.1 .1 .1 1</specular>
+          <attenuation>
+            <range>20</range>
+            <linear>0.2</linear>
+            <constant>0.8</constant>
+            <quadratic>0.01</quadratic>
+          </attenuation>
+          <cast_shadows>false</cast_shadows>
+        </light>
+
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

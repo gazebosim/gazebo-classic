@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,6 +48,15 @@ class VisualConfig_TEST : public QTestFixture
 
   /// \brief Count how many Applied signals have been emitted.
   private: unsigned int g_appliedSignalCount = 0;
+};
+
+/// \brief A help class for closing visual config modal dialog
+class VisualConfigTestHelper : public QObject
+{
+  Q_OBJECT
+
+  /// \brief Key click to close modal dialog.
+  private slots: void Confirm();
 };
 
 #endif

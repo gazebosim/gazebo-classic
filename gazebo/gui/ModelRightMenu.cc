@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -174,11 +174,11 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
   // Find out the entity type
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  if (_type == EntityTypes::MODEL)
   {
     this->entityName = _entityName.substr(0, _entityName.find("::"));
   }
-  else if (_type == EntityTypes::LINK)
+  else if (_type == EntityTypes::LINK || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName;
   }
@@ -327,7 +327,13 @@ void ModelRightMenu::OnDelete(const std::string &_name)
 
   // Delete the entity
   if (!name.empty())
+  {
     transport::requestNoReply(this->node, "entity_delete", name);
+
+    // Remove the entity from all modelStates in each ViewState.
+    for (auto &viewState : this->viewStates)
+      viewState->modelStates.erase(this->entityName);
+  }
 }
 
 /////////////////////////////////////////////////

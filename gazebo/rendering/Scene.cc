@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/RayQuery.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -519,7 +520,12 @@ void Scene::SetBackgroundColor(const common::Color &_color)
   for (iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    if ((*iter)->OgreViewport() &&
+    // TODO do not merge forward. Changes are part of an ABI compatible fix
+    // for wideangle camera background color.
+    auto cam = boost::dynamic_pointer_cast<WideAngleCamera>(*iter);
+    if (cam)
+      cam->SetBackgroundColor(_color);
+    else if ((*iter)->OgreViewport() &&
         (*iter)->OgreViewport()->getBackgroundColour() != clr)
       (*iter)->OgreViewport()->setBackgroundColour(clr);
   }
@@ -1226,12 +1232,10 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  bool valid = false;
   Ogre::Camera *ogreCam = _camera->OgreCamera();
 
   _position = ignition::math::Vector3d::Zero;
 
-  // Ogre::Real closest_distance = -1.0f;
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
       static_cast<float>(_mousePos.X()) /
       ogreCam->getViewport()->getActualWidth(),
@@ -1257,56 +1261,42 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
-    if (iter->movable &&
+    if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI))
+        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
+        && !(flags & GZ_VISIBILITY_SELECTABLE)))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve
-      size_t vertexCount;
-      size_t indexCount;
-      Ogre::Vector3 *vertices;
-      uint64_t *indices;
-
-      // Get the mesh information
-      this->MeshInformation(ogreEntity->getMesh().get(), vertexCount,
-          vertices, indexCount, indices,
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedPosition()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedOrientation()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedScale()));
-
-      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      VisualPtr vis;
+      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
       {
-        // when indices size is not divisible by 3
-        if (i+2 >= static_cast<int>(indexCount))
-          break;
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
-            vertices[indices[i]],
-            vertices[indices[i+1]],
-            vertices[indices[i+2]],
-            true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
+        try
         {
-          if ((distance < 0.0f) || (hit.second < distance))
-          {
-            // this is the closest so far, save it off
-            distance = hit.second;
-          }
+          vis = this->GetVisual(Ogre::any_cast<std::string>(
+              ogreEntity->getUserObjectBindings().getUserAny()));
         }
+        catch(Ogre::Exception &e)
+        {
+          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+          continue;
+        }
+        if (!vis)
+          continue;
+
+        RayQuery rayQuery(_camera);
+        math::Vector3 intersect;
+        std::vector<math::Vector3> vertices;
+        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+            intersect, vertices);
+        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+            intersect.Ign());
       }
     }
   }
 
-  // If nothing was hit, then check the terrain.
-  if (distance <= 0.0 && this->dataPtr->terrain)
+  // Check intersection with the terrain
+  if (this->dataPtr->terrain)
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
@@ -1314,20 +1304,27 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
-      _position = Conversions::ConvertIgn(terrainResult.position);
-      valid = true;
+      double terrainHitDist =
+          mouseRay.getOrigin().distance(terrainResult.position);
+
+      if (terrainHitDist > 0.0 &&
+          (distance <= 0.0 || terrainHitDist < distance))
+      {
+        _position = Conversions::ConvertIgn(terrainResult.position);
+        return true;
+      }
     }
   }
 
-  // Compute the interesection point using the mouse ray and a distance
-  // value.
-  if (_position == ignition::math::Vector3d::Zero && distance > 0.0)
+  // if no terrain intersection, return position of intersection point with
+  // closest entity
+  if (distance > 0.0)
   {
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
-    valid = true;
+    return true;
   }
 
-  return valid;
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1538,8 +1535,7 @@ void Scene::MeshInformation(const Ogre::Mesh *_mesh,
     Ogre::VertexData* vertex_data = submesh->useSharedVertices ?
         _mesh->sharedVertexData : submesh->vertexData;
 
-    if ((!submesh->useSharedVertices) ||
-        (submesh->useSharedVertices && !added_shared))
+    if (!submesh->useSharedVertices || !added_shared)
     {
       if (submesh->useSharedVertices)
       {
@@ -2149,6 +2145,23 @@ void Scene::PreRender()
         ++pIter;
     }
 
+    // process light pose messages
+    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
+    while (lpIter != this->dataPtr->lightPoseMsgs.end())
+    {
+      auto lIter = this->dataPtr->lights.find(lpIter->first);
+      if (lIter != this->dataPtr->lights.end())
+      {
+        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
+        lIter->second->SetPosition(pose.Pos());
+        lIter->second->SetRotation(pose.Rot());
+        auto prev = lpIter++;
+        this->dataPtr->lightPoseMsgs.erase(prev);
+      }
+      else
+        lpIter++;
+    }
+
     // process skeleton pose msgs
     spIter = this->dataPtr->skeletonPoseMsgs.begin();
     while (spIter != this->dataPtr->skeletonPoseMsgs.end())
@@ -2245,6 +2258,12 @@ bool Scene::ProcessSensorMsg(ConstSensorPtr &_msg)
     std::string wrenchVisualName = _msg->parent() + "::" + _msg->name();
     if (this->dataPtr->visuals.find(_msg->id()) == this->dataPtr->visuals.end())
     {
+      if (this->dataPtr->joints.find(_msg->parent()) ==
+          this->dataPtr->joints.end())
+      {
+        return false;
+      }
+
       ConstJointPtr jointMsg = this->dataPtr->joints[_msg->parent()];
 
       if (!jointMsg)
@@ -2385,22 +2404,6 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
     return false;
   }
 
-  std::string linkName = linkVis->GetName();
-  if (!this->GetVisual(linkName + "_COM_VISUAL__"))
-  {
-    this->CreateCOMVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_INERTIA_VISUAL__"))
-  {
-    this->CreateInertiaVisual(_msg, linkVis);
-  }
-
-  if (!this->GetVisual(linkName + "_LINK_FRAME_VISUAL__"))
-  {
-    this->CreateLinkFrameVisual(_msg, linkVis);
-  }
-
   for (int i = 0; i < _msg->projector_size(); ++i)
   {
     std::string pname = _msg->name() + "::" + _msg->projector(i).name();
@@ -2414,6 +2417,15 @@ bool Scene::ProcessLinkMsg(ConstLinkPtr &_msg)
       this->dataPtr->projectors[pname] = projector;
     }
   }
+
+  linkVis->SetTypeMsg(&*_msg);
+
+  // Trigger visualizations that depend on type msg
+  linkVis->ShowInertia(this->dataPtr->showInertias);
+  linkVis->ShowCOM(this->dataPtr->showCOMs);
+  linkVis->ShowLinkFrame(this->dataPtr->showLinkFrames);
+  linkVis->ShowCollision(this->dataPtr->showCollisions);
+  linkVis->ShowJoints(this->dataPtr->showJoints);
 
   return true;
 }
@@ -2431,14 +2443,13 @@ bool Scene::ProcessJointMsg(ConstJointPtr &_msg)
   if (!childVis)
     return false;
 
-  JointVisualPtr jointVis(new JointVisual(
-      _msg->name() + "_JOINT_VISUAL__", childVis));
-  jointVis->Load(_msg);
-  jointVis->SetVisible(this->dataPtr->showJoints);
-  if (_msg->has_id())
-    jointVis->SetId(_msg->id());
+  childVis->AddPendingChild(std::make_pair(Visual::VT_PHYSICS, &*_msg));
+  // If this needs to be added, make sure it is called after all of the visuals
+  // the childVis link have been loaded
+  // childVis->ShowJoints(this->dataPtr->showJoints);
 
-  this->dataPtr->visuals[jointVis->GetId()] = jointVis;
+  ConstJointPtr msgCopy(_msg);
+  this->dataPtr->joints[_msg->name()] = msgCopy;
 
   return true;
 }
@@ -2712,7 +2723,6 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
 {
-  bool result = false;
   Visual_M::iterator iter = this->dataPtr->visuals.end();
 
   if (_msg->has_id())
@@ -2724,107 +2734,135 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
         this->dataPtr->visuals.end();
   }
 
+  // Deleting a visual
   if (_msg->has_delete_me() && _msg->delete_me())
   {
     if (iter != this->dataPtr->visuals.end())
     {
       this->dataPtr->visuals.erase(iter);
-      result = true;
-    }
-  }
-  else if (iter != this->dataPtr->visuals.end())
-  {
-    iter->second->UpdateFromMsg(_msg);
-    result = true;
-  }
-  else
-  {
-    VisualPtr visual;
-
-    // TODO: A bit of a hack.
-    if (_msg->has_geometry() &&
-        _msg->geometry().type() == msgs::Geometry::HEIGHTMAP)
-    {
-      // Ignore collision visuals for the heightmap
-      if (_msg->name().find("__COLLISION_VISUAL__") == std::string::npos &&
-          this->dataPtr->terrain == NULL)
-      {
-        try
-        {
-          if (!this->dataPtr->terrain)
-          {
-            this->dataPtr->terrain = new Heightmap(shared_from_this());
-            this->dataPtr->terrain->LoadFromMsg(_msg);
-          }
-          else
-            gzerr << "Only one Heightmap can be created per Scene\n";
-        } catch(...)
-        {
-          return false;
-        }
-      }
       return true;
     }
+    else
+      return false;
+  }
 
-    // If the visual has a parent which is not the name of the scene...
-    if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  // Updating existing visual
+  if (iter != this->dataPtr->visuals.end())
+  {
+    iter->second->UpdateFromMsg(_msg);
+    return true;
+  }
+
+  // Creating heightmap
+  // FIXME: A bit of a hack.
+  if (_msg->has_geometry() &&
+      _msg->geometry().type() == msgs::Geometry::HEIGHTMAP &&
+      _type != Visual::VT_COLLISION)
+  {
+    if (this->dataPtr->terrain)
     {
-      if (_msg->has_id())
-        iter = this->dataPtr->visuals.find(_msg->id());
-      else
-      {
-        VisualPtr vis = this->GetVisual(_msg->name());
-        iter = vis ? this->dataPtr->visuals.find(vis->GetId()) :
-            this->dataPtr->visuals.end();
-      }
-
-      if (iter != this->dataPtr->visuals.end())
-        gzerr << "Visual already exists. This shouldn't happen.\n";
-
-      // Make sure the parent visual exists before trying to add a child
-      // visual
-      iter = this->dataPtr->visuals.find(_msg->parent_id());
-      if (iter != this->dataPtr->visuals.end())
-      {
-        visual.reset(new Visual(_msg->name(), iter->second));
-        if (_msg->has_id())
-          visual->SetId(_msg->id());
-      }
+      // Only one Heightmap can be created per Scene
+      return true;
     }
     else
     {
-      // Add a visual that is attached to the scene root
-      visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
-      if (_msg->has_id())
-        visual->SetId(_msg->id());
-    }
-
-    if (visual)
-    {
-      result = true;
-      visual->LoadFromMsg(_msg);
-      visual->SetType(_type);
-
-      this->dataPtr->visuals[visual->GetId()] = visual;
-      if (visual->GetName().find("__COLLISION_VISUAL__") != std::string::npos ||
-          visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+      if (!this->dataPtr->terrain)
       {
-        visual->SetVisible(false);
-        visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
-      }
+        // create a dummy visual for loading heightmap visual plugin
+        // TODO make heightmap a visual to avoid special treatment here?
+        VisualPtr visual(new Visual(_msg->name(), this->dataPtr->worldVisual));
+        auto m = *_msg.get();
+        m.clear_material();
+        visual->Load(msgs::VisualToSDF(m));
 
-      visual->ShowCOM(this->dataPtr->showCOMs);
-      visual->ShowInertia(this->dataPtr->showInertias);
-      visual->ShowLinkFrame(this->dataPtr->showLinkFrames);
-      visual->ShowCollision(this->dataPtr->showCollisions);
-      visual->ShowJoints(this->dataPtr->showJoints);
-      if (visual->GetType() == Visual::VT_MODEL)
-        visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
-      visual->SetWireframe(this->dataPtr->wireframe);
+        this->dataPtr->terrain = new Heightmap(shared_from_this());
+        // check the material fields and set material if it is specified
+        if (_msg->has_material())
+        {
+          auto matMsg = _msg->material();
+          if (matMsg.has_script())
+          {
+            auto scriptMsg = matMsg.script();
+            for (auto const uri : scriptMsg.uri())
+            {
+              if (!uri.empty())
+                RenderEngine::Instance()->AddResourcePath(uri);
+            }
+            std::string matName = scriptMsg.name();
+            this->dataPtr->terrain->SetMaterial(matName);
+          }
+        }
+        this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        this->dataPtr->terrain->LoadFromMsg(_msg);
+      }
     }
+    return true;
   }
 
-  return result;
+  // Creating collision
+  if (_type == Visual::VT_COLLISION)
+  {
+    // Collisions need a parent
+    if (!_msg->has_parent_name() && !_msg->has_parent_id())
+    {
+      gzerr << "Missing parent for collision visual [" << _msg->name() << "]"
+          << std::endl;
+      return false;
+    }
+
+    // Make sure the parent visual exists before trying to add a child visual
+    auto parent = this->dataPtr->visuals.find(_msg->parent_id());
+    if (parent == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    parent->second->AddPendingChild(std::make_pair(_type, &*_msg));
+    parent->second->ShowCollision(this->dataPtr->showCollisions);
+
+    return true;
+  }
+
+  // All other visuals
+  VisualPtr visual;
+
+  // If the visual has a parent which is not the name of the scene...
+  if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  {
+    // Make sure the parent visual exists before trying to add a child
+    // visual
+    iter = this->dataPtr->visuals.find(_msg->parent_id());
+    if (iter == this->dataPtr->visuals.end())
+    {
+      return false;
+    }
+
+    visual.reset(new Visual(_msg->name(), iter->second));
+  }
+  else
+  {
+    // Add a visual that is attached to the scene root
+    visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
+  }
+
+  if (_msg->has_id())
+    visual->SetId(_msg->id());
+
+  visual->LoadFromMsg(_msg);
+  visual->SetType(_type);
+
+  this->dataPtr->visuals[visual->GetId()] = visual;
+  if (visual->GetName().find("__SKELETON_VISUAL__") != std::string::npos)
+  {
+    visual->SetVisible(false);
+    visual->SetVisibilityFlags(GZ_VISIBILITY_GUI);
+  }
+
+  if (visual->GetType() == Visual::VT_MODEL)
+    visual->SetTransparency(this->dataPtr->transparent ? 0.5 : 0.0);
+  visual->SetWireframe(this->dataPtr->wireframe);
+
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -2849,13 +2887,26 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
-    if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg->pose(i));
+    auto p = _msg->pose(i);
+    /// TODO: empty id used to indicate it's pose of a light
+    /// remove this check once light.proto has an id field
+    if (p.has_id())
+    {
+      PoseMsgs_M::iterator iter =
+          this->dataPtr->poseMsgs.find(p.id());
+      if (iter != this->dataPtr->poseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
+    }
     else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+    {
+      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
+      if (iter != this->dataPtr->lightPoseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
+    }
   }
 }
 
@@ -2909,8 +2960,9 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
   else
   {
     gzerr << "Light [" << _msg->name() << "] already exists."
-        << " Use topic ~/light/modify to modify it." << std::endl;
-    return false;
+          << " Use topic ~/light/modify to modify it." << std::endl;
+    // we don't want to return false because it keeps the msg in the
+    // list and causes it to be processed again and again.
   }
 
   return true;
@@ -2924,8 +2976,11 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 
   if (iter == this->dataPtr->lights.end())
   {
-    gzerr << "Light [" << _msg->name() << "] not found."
-        << " Use topic ~/factory/light to spawn a new light." << std::endl;
+    // commented out for now as sometimes physics light messages could arrive
+    // before the rendering light is created, e.g. light pose updates.
+    // See issue #1778
+    // gzerr << "Light [" << _msg->name() << "] not found."
+    //     << " Use topic ~/factory/light to spawn a new light." << std::endl;
     return false;
   }
   else
@@ -3123,7 +3178,8 @@ void Scene::SetShadowsEnabled(bool _value)
     this->dataPtr->manager->setShadowFarDistance(150);
     // Use a value of "2" to use a different depth buffer pool and
     // avoid sharing this with the Backbuffer's
-    this->dataPtr->manager->setShadowTextureConfig(0, 1024, 1024,
+    this->dataPtr->manager->setShadowTextureConfig(0,
+        this->dataPtr->shadowTextureSize, this->dataPtr->shadowTextureSize,
         Ogre::PF_FLOAT32_RGBA, 0, 2);
     this->dataPtr->manager->setShadowDirectionalLightExtrusionDistance(75);
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
@@ -3143,7 +3199,8 @@ void Scene::SetShadowsEnabled(bool _value)
   else
   {
     this->dataPtr->manager->setShadowCasterRenderBackFaces(false);
-    this->dataPtr->manager->setShadowTextureSize(512);
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
 
     // The default shadows.
     if (_value && this->dataPtr->manager->getShadowTechnique()
@@ -3160,7 +3217,56 @@ void Scene::SetShadowsEnabled(bool _value)
 /////////////////////////////////////////////////
 bool Scene::GetShadowsEnabled() const
 {
+  return ShadowsEnabled();
+}
+
+/////////////////////////////////////////////////
+bool Scene::ShadowsEnabled() const
+{
   return this->dataPtr->sdf->Get<bool>("shadows");
+}
+
+/////////////////////////////////////////////////
+bool Scene::SetShadowTextureSize(const unsigned int _size)
+{
+  // check if texture size is a power of 2
+  if (!ignition::math::isPowerOfTwo(_size))
+  {
+    gzerr << "Shadow texture size must be a power of 2" << std::endl;
+    return false;
+  }
+  this->dataPtr->shadowTextureSize = _size;
+
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+  {
+    // RT Shader shadows
+    if (!RTShaderSystem::Instance()->SetShadowTextureSize(_size))
+      return false;
+
+    if (this->ShadowsEnabled())
+    {
+      // re-enable the shadows to take effect
+      this->SetShadowsEnabled(false);
+      this->SetShadowsEnabled(true);
+    }
+  }
+  else
+  {
+    this->dataPtr->manager->setShadowTextureSize(
+        this->dataPtr->shadowTextureSize);
+  }
+  return true;
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::ShadowTextureSize() const
+{
+  if (RenderEngine::Instance()->GetRenderPathType() ==
+      RenderEngine::FORWARD)
+    return RTShaderSystem::Instance()->ShadowTextureSize();
+  else
+    return this->dataPtr->shadowTextureSize;
 }
 
 /////////////////////////////////////////////////
@@ -3296,6 +3402,23 @@ Heightmap *Scene::GetHeightmap() const
 }
 
 /////////////////////////////////////////////////
+void Scene::SetHeightmapLOD(const unsigned int _value)
+{
+  this->dataPtr->heightmapLOD = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+}
+
+/////////////////////////////////////////////////
+unsigned int Scene::HeightmapLOD() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->LOD();
+
+  return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
 void Scene::CreateCOMVisual(ConstLinkPtr &_msg, VisualPtr _linkVisual)
 {
   COMVisualPtr comVis(new COMVisual(_linkVisual->GetName() + "_COM_VISUAL__",
@@ -3379,6 +3502,12 @@ void Scene::SetWireframe(const bool _show)
 
   if (this->dataPtr->terrain)
     this->dataPtr->terrain->SetWireframe(_show);
+}
+
+/////////////////////////////////////////////////
+bool Scene::Wireframe() const
+{
+  return this->dataPtr->wireframe;
 }
 
 /////////////////////////////////////////////////
@@ -3551,4 +3680,16 @@ void Scene::ToggleLayer(const int32_t _layer)
   {
     visual.second->ToggleLayer(_layer);
   }
+}
+
+/////////////////////////////////////////////////
+void Scene::EnableVisualizations(const bool _enable)
+{
+  this->dataPtr->enableVisualizations = _enable;
+}
+
+/////////////////////////////////////////////////
+bool Scene::EnableVisualizations() const
+{
+  return this->dataPtr->enableVisualizations;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,9 @@
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramSet.h>
+#include <OGRE/RTShaderSystem/OgreShaderGLSLProgramWriter.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramWriterManager.h>
 #endif
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9

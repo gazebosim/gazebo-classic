@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -224,6 +224,23 @@ void ModelListWidget::OnModelSelection(QTreeWidgetItem *_item, int /*_column*/)
       item->setValue(cameraName.c_str());
       topItem->addSubProperty(item);
       item->setEnabled(false);
+
+      // Create and set the gui camera clip distance items
+      auto clipItem = this->dataPtr->variantManager->addProperty(
+          QtVariantPropertyManager::groupTypeId(), tr("clip"));
+      topItem->addSubProperty(clipItem);
+
+      item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+          tr("near"));
+      item->setValue(cam->NearClip());
+      clipItem->addSubProperty(item);
+      item->setEnabled(true);
+
+      item = this->dataPtr->variantManager->addProperty(QVariant::Double,
+          tr("far"));
+      item->setValue(cam->FarClip());
+      clipItem->addSubProperty(item);
+      item->setEnabled(true);
 
       // Create and set the gui camera pose
       item = this->dataPtr->variantManager->addProperty(
@@ -565,6 +582,8 @@ QTreeWidgetItem *ModelListWidget::ListItem(const std::string &_name,
 void ModelListWidget::OnCustomContextMenu(const QPoint &_pt)
 {
   QTreeWidgetItem *item = this->dataPtr->modelTreeWidget->itemAt(_pt);
+  if (!item)
+    return;
 
   // Check to see if the selected item is a model
   int i = this->dataPtr->modelsItem->indexOfChild(item);
@@ -707,9 +726,6 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
     return;
 
   QtProperty *cameraPoseProperty = this->ChildItem(cameraProperty, "pose");
-  if (!cameraPoseProperty)
-    return;
-
   if (cameraPoseProperty)
   {
     std::string changedProperty = _item->propertyName().toStdString();
@@ -725,6 +741,38 @@ void ModelListWidget::GUIPropertyChanged(QtProperty *_item)
       rendering::UserCameraPtr cam = gui::get_active_camera();
       if (cam)
         cam->SetWorldPose(msgs::ConvertIgn(poseMsg));
+    }
+  }
+
+  QtProperty *cameraClipProperty = this->ChildItem(cameraProperty, "clip");
+  if (cameraPoseProperty)
+  {
+    std::string changedProperty = _item->propertyName().toStdString();
+    rendering::UserCameraPtr cam = gui::get_active_camera();
+
+    if (cam)
+    {
+      if (changedProperty == "near")
+      {
+        cam->SetClipDist(this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "near")).toDouble(),
+            cam->FarClip());
+      }
+      else if (changedProperty == "far")
+      {
+        cam->SetClipDist(cam->NearClip(), this->dataPtr->variantManager->value(
+              this->ChildItem(cameraClipProperty, "far")).toDouble());
+      }
+      else
+      {
+        gzerr << "Unable to process user camera clip property["
+          << changedProperty << "]\n";
+      }
+    }
+    else
+    {
+      gzerr << "Unable to get pointer to active user camera when setting clip "
+        << "plane values. This should not happen.\n";
     }
   }
 }

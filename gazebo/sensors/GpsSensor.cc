@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -220,4 +220,32 @@ double GpsSensor::GetAltitude() const
 double GpsSensor::Altitude() const
 {
   return this->dataPtr->lastGpsMsg.altitude();
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d GpsSensor::VelocityENU() const
+{
+  ignition::math::Vector3d velocity;
+  velocity.X(this->dataPtr->lastGpsMsg.velocity_east());
+  velocity.Y(this->dataPtr->lastGpsMsg.velocity_north());
+  velocity.Z(this->dataPtr->lastGpsMsg.velocity_up());
+  return velocity;
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityEast() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_east();
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityNorth() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_north();
+}
+
+//////////////////////////////////////////////////
+double GpsSensor::VelocityUp() const
+{
+  return this->dataPtr->lastGpsMsg.velocity_up();
 }

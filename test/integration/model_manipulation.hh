@@ -28,6 +28,12 @@ class ModelManipulationTest : public QTestFixture
   /// \brief Verify that model pose stops being updated while it is being
   /// manipulated.
   private slots: void StopProcessingPoseMsgs();
+
+  /// \brief Test switching modes using keyboard shortcuts.
+  private slots: void Shortcuts();
+
+  /// \brief Test manipulating models in local and global frames
+  private slots: void GlobalLocalFrames();
 };
 
 #endif

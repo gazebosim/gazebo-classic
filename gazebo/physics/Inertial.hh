@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _INERTIAL_HH_
-#define _INERTIAL_HH_
+#ifndef GAZEBO_PHYSICS_INERTIAL_HH_
+#define GAZEBO_PHYSICS_INERTIAL_HH_
 
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
@@ -25,8 +25,10 @@
 
 #include <string>
 
+#include <ignition/math/Inertial.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/math/Pose.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/math/Quaternion.hh"
 #include "gazebo/math/Vector3.hh"
@@ -51,6 +53,10 @@ namespace gazebo
       /// \param[in] _mass Mass value in kg if using metric.
       public: explicit Inertial(double _mass);
 
+      /// \brief Constructor from ignition::math::Inertial.
+      /// \param[in] _inertial Ignition inertial object to copy.
+      public: Inertial(const ignition::math::Inertiald &_inertial);
+
       /// \brief Copy constructor.
       /// \param[in] _inertial Inertial element to copy
       public: Inertial(const Inertial &_inertial);
@@ -68,6 +74,9 @@ namespace gazebo
 
       /// \brief Reset all the mass properties.
       public: void Reset();
+
+      /// \brief Return copy of Inertial in ignition format.
+      public: ignition::math::Inertiald Ign() const;
 
       /// \brief Set the mass.
       public: void SetMass(double m);
@@ -189,6 +198,11 @@ namespace gazebo
       /// \param[in] _inertial Inertial to copy.
       /// \return Reference to this object.
       public: Inertial &operator=(const Inertial &_inertial);
+
+      /// \brief Equal operator.
+      /// \param[in] _inertial Ignition inertial to copy.
+      /// \return Reference to this object.
+      public: Inertial &operator=(const ignition::math::Inertiald &_inertial);
 
       /// \brief Addition operator.
       /// Assuming both CG and Moment of Inertia (MOI) are defined

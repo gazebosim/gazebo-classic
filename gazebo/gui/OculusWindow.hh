@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@
 #ifndef _GAZEBO_OCULUS_WINDOW_HH_
 #define _GAZEBO_OCULUS_WINDOW_HH_
 
+#ifndef Q_MOC_RUN
 #include <boost/thread.hpp>
+#endif
 #include <string>
 
+#ifndef Q_MOC_RUN
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/gui/qt.h"
+#endif
 
 namespace gazebo
 {

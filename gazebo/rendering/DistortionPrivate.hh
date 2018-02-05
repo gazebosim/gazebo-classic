@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,10 +44,10 @@ namespace gazebo
       public: double p2;
 
       /// \brief Lens center used for distortion
-      public: math::Vector2d lensCenter;
+      public: ignition::math::Vector2d lensCenter;
 
       /// \brief Scale applied to distorted image.
-      public: math::Vector2d distortionScale;
+      public: ignition::math::Vector2d distortionScale;
 
       /// \brief True if the distorted image will be cropped to remove the
       /// black pixels at the corners of the image.
@@ -56,11 +56,20 @@ namespace gazebo
       /// \brief Lens distortion compositor
       public: Ogre::CompositorInstance *lensDistortionInstance;
 
+      /// \brief Ogre Material that contains the distortion shader
+      public: Ogre::MaterialPtr distortionMaterial;
+
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
 
       /// \brief Mapping of distorted to undistorted normalized pixels
-      public: std::vector<math::Vector2d> distortionMap;
+      public: std::vector<ignition::math::Vector2d> distortionMap;
+
+      /// \brief Width of distortion texture map
+      public: unsigned int distortionTexWidth;
+
+      /// \brief Height of distortion texture map
+      public: unsigned int distortionTexHeight;
     };
   }
 }

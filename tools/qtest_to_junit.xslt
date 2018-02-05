@@ -7,7 +7,7 @@
 <xsl:variable name="classname" select="/TestCase/@name" />
 <xsl:variable name="total-tests" select="count(/TestCase/TestFunction)" />
 <xsl:variable name="total-failures" select="count(/TestCase/TestFunction/Incident[@type='fail'])" />
-<xsl:variable name="total-time" select="sum(/TestCase/TestFunction/BenchmarkResult/@value)" />
+<xsl:variable name="total-time" select="sum(/TestCase/TestFunction/BenchmarkResult/@value) div 1000" />
 
 <!-- main template call -->
 <xsl:template match="/">
@@ -36,7 +36,7 @@
     <xsl:variable name="time">
       <xsl:choose>
         <xsl:when test="BenchmarkResult/@value">
-          <xsl:value-of select='BenchmarkResult/@value'/>
+          <xsl:value-of select='BenchmarkResult/@value div 1000'/>
         </xsl:when>
       <xsl:otherwise>
          <xsl:text>0</xsl:text>

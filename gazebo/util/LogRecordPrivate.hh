@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -200,6 +200,12 @@ namespace gazebo
       /// \brief True if the logger is ready to start, and the previous run
       /// has finished.
       public: bool readyToStart;
+
+      /// \brief Record period.
+      public: double period = -1.0;
+
+      /// \brief Record filter string.
+      public: std::string filter = "";
     };
     /// \}
   }

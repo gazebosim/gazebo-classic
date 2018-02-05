@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,8 +65,13 @@ namespace gazebo
       public: virtual void UpdateParameters(sdf::ElementPtr _sdf);
 
       /// \brief Set the encapsulated collsion object.
+      /// Has a side effect of changing the collision bit masks
       /// \param[in] _placeable True to make the object movable.
       public: void SetCollision(bool _placeable);
+
+      /// \brief Set if this object is moveable
+      /// \param[in] _placeable True to make the object movable.
+      public: void SetPlaceable(const bool _placeable);
 
       /// \brief Return whether this collision is movable.
       /// Example on an immovable object is a ray.
@@ -209,7 +214,7 @@ namespace gazebo
       protected: SurfaceParamsPtr surface;
 
       /// \brief The laser retro value.
-      private: float laserRetro;
+      private: float laserRetro = 0.0;
 
       /// \brief Stores collision state information.
       private: CollisionState state;

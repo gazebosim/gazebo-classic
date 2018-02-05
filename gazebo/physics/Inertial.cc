@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,23 @@ Inertial::Inertial(double _m)
   this->cog.Set(0, 0, 0, 0, 0, 0);
   this->principals.Set(1, 1, 1);
   this->products.Set(0, 0, 0);
+}
+
+//////////////////////////////////////////////////
+Inertial::Inertial(const ignition::math::Inertiald &_inertial)
+{
+  this->sdf.reset(new sdf::Element);
+  initFile("inertial.sdf", this->sdf);
+
+  this->SetMass(_inertial.MassMatrix().Mass());
+  this->SetCoG(_inertial.Pose());
+  this->SetInertiaMatrix(
+      _inertial.MassMatrix().IXX(),
+      _inertial.MassMatrix().IYY(),
+      _inertial.MassMatrix().IZZ(),
+      _inertial.MassMatrix().IXY(),
+      _inertial.MassMatrix().IXZ(),
+      _inertial.MassMatrix().IYZ());
 }
 
 //////////////////////////////////////////////////
@@ -397,3 +414,26 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
   if (_msg.has_izz())
     this->SetIZZ(_msg.izz());
 }
+
+//////////////////////////////////////////////////
+ignition::math::Inertiald Inertial::Ign() const
+{
+  return ignition::math::Inertiald(
+          ignition::math::MassMatrix3d(
+            this->GetMass(),
+            this->GetPrincipalMoments().Ign(),
+            this->GetProductsofInertia().Ign()),
+          this->cog.Ign());
+}
+
+//////////////////////////////////////////////////
+Inertial &Inertial::operator=(const ignition::math::Inertiald &_inertial)
+{
+  this->mass = _inertial.MassMatrix().Mass();
+  this->cog = _inertial.Pose();
+  this->principals = _inertial.MassMatrix().DiagonalMoments();
+  this->products = _inertial.MassMatrix().OffDiagonalMoments();
+
+  return *this;
+}
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,22 @@ namespace gazebo
       /// \brief Accessor for current altitude
       /// \return Current altitude above sea level.
       public: double Altitude() const;
+
+      /// \brief Accessor for curent velocity in East-North-Up frame
+      /// \return Current velocity
+      public: ignition::math::Vector3d VelocityENU() const;
+
+      /// \brief Accessor for current velocity in East direction
+      /// \return Current velocity towards East
+      public: double VelocityEast() const;
+
+      /// \brief Accessor for current velocity in North direction
+      /// \return Current velocity towards North
+      public: double VelocityNorth() const;
+
+      /// \brief Accessor for current velocity in Up direction
+      /// \return Current velocity towards Up
+      public: double VelocityUp() const;
 
       /// \internal
       /// \brief Private data pointer

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/format.hpp>
 #include <sdf/sdf.hh>
 
 #ifndef _WIN32
@@ -1502,7 +1503,16 @@ void Camera::SetCaptureDataOnce()
 //////////////////////////////////////////////////
 void Camera::CreateRenderTexture(const std::string &_textureName)
 {
-  int fsaa = 4;
+  unsigned int fsaa = 0;
+
+  std::vector<unsigned int> fsaaLevels =
+      RenderEngine::Instance()->FSAALevels();
+
+  // check if target fsaa is supported
+  unsigned int targetFSAA = 4;
+  auto const it = std::find(fsaaLevels.begin(), fsaaLevels.end(), targetFSAA);
+  if (it != fsaaLevels.end())
+    fsaa = targetFSAA;
 
   // Full-screen anti-aliasing only works correctly in 1.8 and above
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR < 8
@@ -1517,7 +1527,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->ImageWidth(),
       this->ImageHeight(),
       0,
-      (Ogre::PixelFormat)this->imageFormat,
+      static_cast<Ogre::PixelFormat>(this->imageFormat),
       Ogre::TU_RENDERTARGET,
       0,
       false,
@@ -1620,14 +1630,7 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-    double ratio = static_cast<double>(this->viewport->getActualWidth()) /
-                   static_cast<double>(this->viewport->getActualHeight());
-
-    double hfov = this->HFOV().Radian();
-    double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->UpdateFOV();
 
     // Setup Deferred rendering for the camera
     if (RenderEngine::Instance()->GetRenderPathType() == RenderEngine::DEFERRED)
@@ -2088,14 +2091,11 @@ void Camera::UpdateFOV()
     double ratio = static_cast<double>(this->viewport->getActualWidth()) /
       static_cast<double>(this->viewport->getActualHeight());
 
-    double hfov = this->sdf->Get<double>("horizontal_fov");
+    double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
     this->camera->setFOVy(Ogre::Radian(vfov));
-
-    delete [] this->saveFrameBuffer;
-    this->saveFrameBuffer = NULL;
   }
 }
 
@@ -2174,6 +2174,12 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::ProjectionMatrix() const
+{
+  return Conversions::ConvertIgn(this->camera->getProjectionMatrix());
+}
+
+//////////////////////////////////////////////////
 event::ConnectionPtr Camera::ConnectNewImageFrame(
     std::function<void (const unsigned char *, unsigned int, unsigned int,
     unsigned int, const std::string &)> _subscriber)
@@ -2185,4 +2191,19 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
 {
   this->newImageFrame.Disconnect(_c);
+}
+
+/////////////////////////////////////////////////
+ignition::math::Vector2i Camera::Project(
+    const ignition::math::Vector3d &_pt) const
+{
+  // Convert from 3D world pos to 2D screen pos
+  Ogre::Vector3 pos = this->OgreCamera()->getProjectionMatrix() *
+      this->OgreCamera()->getViewMatrix() * Conversions::Convert(_pt);
+
+  ignition::math::Vector2i screenPos;
+  screenPos.X() = ((pos.x / 2.0) + 0.5) * this->ViewportWidth();
+  screenPos.Y() = (1 - ((pos.y / 2.0) + 0.5)) * this->ViewportHeight();
+
+  return screenPos;
 }

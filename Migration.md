@@ -5,6 +5,41 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
+## Gazebo 7.9.0 to 7.X
+
+### Modifications
+
+1. **gazebo/physics/ode/ODEPhysics.cc**
+   `ODEPhysics::Collide` combines surface slip parameters with a sum
+   instead of `std::min`.
+   Please see [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
+   for more details.
+
+## Gazebo 7.8.0 to 7.X
+
+### Modifications
+
+1. **gz log**
+   Gazebo log files no longer store velocity data and have reduced floating point precision.
+   See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
+   for further details.
+
+## Gazebo 7.3.1 to 7.X
+
+### Deprecations
+
+1. **gazebo/sensors/ImuSensor.hh**
+    + ***Deprecation:** public: void SetWorldToReferencePose(const ignition::math::Pose3d &)
+    + ***Replacement:** public: void SetWorldToReferenceOrientation(const ignition::math::Quaterniond &)
+
 ## Gazebo 7.1.0 to 7.X
 
 ### Additions
@@ -14,6 +49,31 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/bullet/BulletJoint.hh**
     + public: virtual void Fini();
+
+### Deprecations
+
+1. **gazebo::common::VisualPlugin**
+    The custom inner xml inside visual plugins used to be wrapped in an extra
+    <sdf> tag. Now the inner xml should be accessed directly from the plugin's
+    sdf. For example, for the following plugin:
+
+          <visual ...>
+            <plugin ...>
+              <param>true</param>
+            </plugin>
+          </visual>
+
+     <param> should be accessed with:
+
+          auto param = _sdf->GetElement("param");
+
+     The old behaviour is still supported on Gazebo7, that is:
+
+          auto param = _sdf->GetElement("sdf")->GetElement("param");
+
+     but this behaviour will be removed on Gazebo8.
+
+    + [pull request #2394](https://bitbucket.org/osrf/gazebo/pull-request/2394)
 
 ## Gazebo 6.X to 7.X
 
@@ -60,6 +120,12 @@ release will remove the deprecated code.
 
 1. **gazebo/physics/Actor.hh**
     + Type change of `protected: math::Vector3 lastPos;` to `protected: ignition::math::Vector3d lastPos;`
+
+1. **gazebo/physics/ContactManager.hh**
+    + Remove contact filters with names that contain `::`.
+      The `CreateFilter`, `HasFilter`, and `RemoveFilter` functions
+      now convert `::` strings to `/` in the filter name before acting.
+      These were not being deleted properly in previous versions.
 
 1. **gazebo/rendering/RenderTypes.hh**
     + typedefs for Visual and its derived classes have been changed from boost to std pointers.

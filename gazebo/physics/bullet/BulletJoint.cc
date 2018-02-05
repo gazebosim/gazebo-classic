@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,6 +66,8 @@ void BulletJoint::Fini()
   if (this->feedback)
     delete this->feedback;
   this->feedback = NULL;
+
+  Joint::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -155,6 +157,8 @@ bool BulletJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 //////////////////////////////////////////////////
 void BulletJoint::Detach()
 {
+  this->applyDamping.reset();
+
   this->childLink.reset();
   this->parentLink.reset();
   if (this->constraint && this->bulletWorld)

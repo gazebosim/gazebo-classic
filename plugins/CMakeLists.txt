@@ -39,6 +39,8 @@ endif()
 set (plugins_single_header
   ActuatorPlugin
   ArrangePlugin
+  AttachLightPlugin
+  BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
   CameraPlugin
@@ -50,9 +52,13 @@ set (plugins_single_header
   FollowerPlugin
   ForceTorquePlugin
   GpuRayPlugin
+  HarnessPlugin
+  HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToJointsPlugin
+  LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
@@ -62,9 +68,11 @@ set (plugins_single_header
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
+  ShaderParamVisualPlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  TouchPlugin
   VehiclePlugin)
 
 set (plugins_private_header
@@ -81,6 +89,7 @@ endif()
 
 set (GUIplugins
   CessnaGUIPlugin
+  KeyboardGUIPlugin
   TimerGUIPlugin
 )
 

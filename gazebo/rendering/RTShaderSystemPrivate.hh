@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 
 #include <string>
 #include <vector>
+
+#include "gazebo/rendering/CustomPSSMShadowCameraSetup.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/gazebo_config.h"
@@ -53,6 +55,27 @@ namespace gazebo
 
       /// \brief Flag to indicate that shaders need to be updated.
       public: bool updateShaders;
+
+      /// \brief Size of the Parallel Split Shadow Map (PSSM) shadow texture
+      /// at closest layer.
+      public: unsigned int shadowTextureSize = 2048u;
+
+      /// \brief Parallel Split Shadow Map (PSSM) near clip distance.
+      public: double shadowNear = 0.01;
+
+      /// \brief Parallel Split Shadow Map (PSSM) far clip distance.
+      public: double shadowFar = 200.0;
+
+      /// \brief Parallel Split Shadow Map (PSSM) split modifier. 0.0 = linear
+      /// splits. 1.0 = logarithmic splits.
+      public: double shadowSplitLambda = 0.75;
+
+      /// \brief Parallel Split Shadow Map (PSSM) overlap between splits.
+      public: double shadowSplitPadding = 2.0;
+
+      /// \brief Custom program writer factory that supports sampler2DShadow,
+      /// only used in ogre versions <= 1.8
+      public: CustomGLSLProgramWriterFactory *programWriterFactory = nullptr;
     };
   }
 }
