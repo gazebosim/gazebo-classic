@@ -999,6 +999,7 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
   }
 }
 
+
 //////////////////////////////////////////////////
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
                          dContactGeom *_contactCollisions)
