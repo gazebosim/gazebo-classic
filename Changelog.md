@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
+
 1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
     * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
 
