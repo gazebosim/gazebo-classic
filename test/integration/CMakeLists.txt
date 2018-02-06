@@ -33,6 +33,7 @@ set(tests
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc

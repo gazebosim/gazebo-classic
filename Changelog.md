@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
+
 1. Load actor plugin on ~/factory
     * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
 
