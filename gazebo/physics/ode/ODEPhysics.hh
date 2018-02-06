@@ -291,9 +291,6 @@ namespace gazebo
       /// \param[in] _feedback ODE Joint Contact feedback information.
       public: void ProcessJointFeedback(ODEJointFeedback *_feedback);
 
-      public: void InjectCollision(CollisionPtr _coll1,
-                                   CollisionPtr _coll2);
-
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
       protected: virtual void OnPhysicsMsg(ConstPhysicsPtr &_msg);

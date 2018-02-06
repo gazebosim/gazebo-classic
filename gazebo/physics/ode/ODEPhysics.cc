@@ -400,9 +400,6 @@ void ODEPhysics::UpdateCollision()
   }
   DIAG_TIMER_LAP("ODEPhysics::UpdateCollision", "collideTrimeshes");
 
-  /*for (const auto &p : this->dataPtr->collPair)
-  {
-  }*/
   DIAG_TIMER_STOP("ODEPhysics::UpdateCollision");
 }
 
@@ -990,8 +987,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     // Make sure both collision pointers are valid.
     if (collision1 && collision2)
     {
-      std::cout << "C1[" << collision1->GetScopedName() << " --> " << collision2->GetScopedName() << "]\n";
-
       // Add either a tri-mesh collider or a regular collider.
       if (collision1->HasType(Base::MESH_SHAPE) ||
           collision2->HasType(Base::MESH_SHAPE))
@@ -1003,14 +998,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     }
   }
 }
-
-//////////////////////////////////////////////////
-void ODEPhysics::InjectCollision(CollisionPtr _coll1,
-                                 CollisionPtr _coll2)
-{
-  this->dataPtr->collPair.push_back(std::make_pair(_coll1, _coll2));
-}
-
 
 //////////////////////////////////////////////////
 void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,

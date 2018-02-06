@@ -126,7 +126,6 @@ void Actor::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("script"))
     this->LoadScript(_sdf->GetElement("script"));
 
-  _sdf->PrintValues("  ");
   // Load all links, including the new ones added when loading the skin
   Model::Load(_sdf);
 
@@ -691,8 +690,6 @@ void Actor::Update()
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
     rootM.Translate(actorPose.Pos());
-
-  std::cout << "Actor Pose[" << actorPose << "]\n";
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 

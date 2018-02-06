@@ -15,9 +15,6 @@
  *
 */
 
-#include <gazebo/ode/ode.h>
-#include <gazebo/physics/ode/ODEPhysics.hh>
-#include <gazebo/physics/ode/ODECollision.hh>
 #include <functional>
 #include <map>
 #include <set>
@@ -44,7 +41,6 @@ MudPlugin::MudPlugin()
   : newMsg(false), newMsgWait(0), stiffness(0.0), damping(100.0),
     contactSurfaceBitmask(0)
 {
-  this->contactGroup = dJointGroupCreate(0);
 }
 
 /////////////////////////////////////////////////
@@ -183,7 +179,6 @@ void MudPlugin::OnContact(ConstContactsPtr &_msg)
 /////////////////////////////////////////////////
 void MudPlugin::OnUpdate()
 {
-  dJointGroupEmpty(this->contactGroup);
   double dt = this->physics->GetMaxStepSize();
   if (dt < 1e-6)
     dt = 1e-6;
@@ -285,44 +280,8 @@ void MudPlugin::OnUpdate()
 
           if (*iterLink)
           {
-            unsigned int tt = 0;
-            gazebo::physics::CollisionPtr collision1 =
-              this->link->GetCollision(tt);
-            gazebo::physics::CollisionPtr collision2 =
-              (*iterLink)->GetCollision(tt);
-
-            gazebo::physics::PhysicsEnginePtr engine = this->model->GetWorld()->Physics();
-            static_cast<gazebo::physics::ODEPhysics*>(
-                engine.get())->InjectCollision(collision1, collision2);
-/*
-            dContact contact;
-            contact.surface.mode = dContactBounce |
-                                   dContactMu2 |
-                                   dContactSoftERP |
-                                   dContactSoftCFM |
-                                   dContactApprox1 |
-                                   dContactApprox3 |
-                                   dContactSlip1 |
-                                   dContactSlip2;
-
-
-            dJointID contactJoint = dJointCreateContact(
-                static_cast<gazebo::physics::ODEPhysics*>(
-                  engine.get())->GetWorldId(), contactGroup, &contact);
-
-
-            dBodyID b1 = dGeomGetBody(
-                static_cast<gazebo::physics::ODECollision*>(collision1.get())->GetCollisionId());
-            dBodyID b2 = dGeomGetBody(
-                static_cast<gazebo::physics::ODECollision*>(collision2.get())->GetCollisionId());
-
-            std::cout << "Creating joint[" << collision1->GetScopedName() << " --> " << collision2->GetScopedName() << "]\n";
-            dJointAttach(contactJoint, b1, b2);
-            */
-
-/*
             // Create the joint
-            gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
+            // gzdbg << "Creating a mud joint with " << *iterLinkName << '\n';
             (*iterLink)->SetAutoDisable(false);
             *iterJoint = this->physics->CreateJoint("revolute", this->model);
 
@@ -352,7 +311,6 @@ void MudPlugin::OnUpdate()
             (*iterJoint)->SetLowerLimit(0, 0.0);
 
             (*iterJoint)->Init();
-            */
           }
         }
       }

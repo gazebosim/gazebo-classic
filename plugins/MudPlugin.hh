@@ -116,7 +116,6 @@ namespace gazebo
     /// \brief Ignition transport node used for subscribing to
     /// contact sensor messages.
     private: ignition::transport::Node nodeIgn;
-    private: dJointGroupID contactGroup;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_
