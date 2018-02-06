@@ -75,20 +75,23 @@ namespace gazebo
     /// \param[in] _info Update info.
     private: void OnUpdate(const common::UpdateInfo &_info);
 
-    /// \brief Callback for enable "service" using Gazebo msgs.
+    /// \brief Enables or disables the plugin.
     /// \param[in] _enable False to disable and true to enable the plugin.
     /// \return True when the operation succeed or false otherwise
     /// (e.g.: trying to enable the plugin when it is already enabled).
-    /// \deprecated Remove in Gazebo 9.
     private: bool Enable(const bool _enable);
 
     /// \brief Callback for enable "service" using Gazebo msgs.
     /// \param[in] _msg Message with 0 to disable and 1 to enable the plugin.
     /// \deprecated Remove in Gazebo 9.
+    // cppcheck-suppress unusedPrivateFunction
     private: void EnableGz(ConstIntPtr &_msg);
 
-    /// \brief Callback for enable "service" using Ignition messages.
+    /// \brief Callback for enable service using Ignition messages.
+    /// \param[in] _req Request, true to enable
     /// \param[out] _res Response message indicating success or failure.
+    /// \param[out] _result True if successful.
+    // cppcheck-suppress unusedPrivateFunction
     private: void EnableIgn(const ignition::msgs::Boolean &_req,
                             ignition::msgs::Boolean &_res, bool &_result);
 
