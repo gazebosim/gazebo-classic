@@ -154,16 +154,21 @@ int Dem::Load(const std::string &_filename)
   if (validNoData <= 0)
     noDataValue = defaultNoDataValue;
 
-  this->dataPtr->minElevation = *std::min_element(
-      this->dataPtr->demData.begin(),
-      this->dataPtr->demData.end(),
-      [noDataValue](double _a, double _b) -> bool
-      {
-        return _a < _b && _a > noDataValue;
-      });
-  this->dataPtr->maxElevation = *std::max_element(
-      this->dataPtr->demData.begin(),
-      this->dataPtr->demData.end());
+  double min = ignition::math::MAX_D;
+  double max = -ignition::math::MAX_D;
+  for (auto d : this->dataPtr->demData)
+  {
+    if (d < min && d > noDataValue)
+      min = d;
+    if (d > max && d > noDataValue)
+      max = d;
+  }
+  if (ignition::math::equal(min, ignition::math::MAX_D) ||
+      ignition::math::equal(max, -ignition::math::MAX_D))
+    gzwarn << "Dem is composed of 'nodata' values!" << std::endl;
+
+  this->dataPtr->minElevation = min;
+  this->dataPtr->maxElevation = max;
 
   return 0;
 }
