@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2017-xx-xx)
 
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
 1. Added a plugin to detect if an entity is inside a given volume in space
     * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
 
