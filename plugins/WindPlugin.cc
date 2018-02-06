@@ -18,8 +18,74 @@
 #include <functional>
 
 #include "gazebo/common/Assert.hh"
+#include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
+
+#include "gazebo/sensors/Noise.hh"
+
 #include "plugins/WindPlugin.hh"
+
+/// \brief Private class for WindPlugin
+class gazebo::WindPluginPrivate
+{
+  /// \brief World pointer.
+  public: physics::WorldPtr world;
+
+  /// \brief Connection to World Update events.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief Time for wind to rise
+  public: double characteristicTimeForWindRise = 1;
+
+  /// \brief Wind amplitude
+  public: double magnitudeSinAmplitudePercent = 0;
+
+  /// \brief Wind period
+  public: double magnitudeSinPeriod = 1;
+
+  /// \brief Time for wind to change direction.
+  public: double characteristicTimeForWindOrientationChange = 1;
+
+  /// \brief Orientation amplitude
+  public: double orientationSinAmplitude = 0;
+
+  /// \brief Orientation period
+  public: double orientationSinPeriod = 1;
+
+  /// \brief period over characteristicTimeForWindRise
+  public: double kMag = 0;
+
+  /// \brief period over characteristicTimeForWindOrientationChange
+  public: double kDir = 0;
+
+  /// \brief Mean of the magnitude
+  public: double magnitudeMean = 0;
+
+  /// \brief Mean of the direction
+  public: double directionMean = 0;
+
+  /// \brief Noise added to magnitude
+  public: sensors::NoisePtr noiseMagnitude;
+
+  /// \brief Noise added to direction
+  public: sensors::NoisePtr noiseDirection;
+
+  /// \brief Noise added to Z axis
+  public: sensors::NoisePtr noiseVertical;
+
+  /// \brief Time for wind to rise
+  public: double characteristicTimeForWindRiseVertical = 1;
+
+  /// \brief period over characteristicTimeForWindRiseVertical
+  public: double kMagVertical = 0;
+
+  /// \brief Mean of the magnitude
+  public: double magnitudeMeanVertical = 0;
+
+  /// \brief The scaling factor to approximate wind as force on a mass.
+  public: double forceApproximationScalingFactor = 0;
+};
+
 
 using namespace gazebo;
 
@@ -27,6 +93,7 @@ GZ_REGISTER_WORLD_PLUGIN(WindPlugin)
 
 /////////////////////////////////////////////////
 WindPlugin::WindPlugin()
+    : dataPtr(new WindPluginPrivate)
 {
 }
 
@@ -34,9 +101,9 @@ WindPlugin::WindPlugin()
 void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_world, "WindPlugin world pointer is NULL");
-  this->world = _world;
+  this->dataPtr->world = _world;
 
-  physics::Wind &wind = this->world->Wind();
+  physics::Wind &wind = this->dataPtr->world->Wind();
 
   if (_sdf->HasElement("horizontal"))
   {
@@ -48,7 +115,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
       if (sdfMag->HasElement("time_for_rise"))
       {
-        this->characteristicTimeForWindRise =
+        this->dataPtr->characteristicTimeForWindRise =
           sdfMag->Get<double>("time_for_rise");
       }
 
@@ -58,19 +125,19 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
         if (sdfMagSin->HasElement("amplitude_percent"))
         {
-          this->magnitudeSinAmplitudePercent =
+          this->dataPtr->magnitudeSinAmplitudePercent =
             sdfMagSin->Get<double>("amplitude_percent");
         }
 
         if (sdfMagSin->HasElement("period"))
         {
-          this->magnitudeSinPeriod = sdfMagSin->Get<double>("period");
+          this->dataPtr->magnitudeSinPeriod = sdfMagSin->Get<double>("period");
         }
       }
 
       if (sdfMag->HasElement("noise"))
       {
-        this->noiseMagnitude = sensors::NoiseFactory::NewNoiseModel(
+        this->dataPtr->noiseMagnitude = sensors::NoiseFactory::NewNoiseModel(
               sdfMag->GetElement("noise"));
       }
     }
@@ -81,7 +148,7 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
       if (sdfDir->HasElement("time_for_rise"))
       {
-        this->characteristicTimeForWindOrientationChange =
+        this->dataPtr->characteristicTimeForWindOrientationChange =
           sdfDir->Get<double>("time_for_rise");
       }
 
@@ -91,20 +158,20 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
         if (sdfDirSin->HasElement("amplitude"))
         {
-          this->orientationSinAmplitude =
+          this->dataPtr->orientationSinAmplitude =
             sdfDirSin->Get<double>("amplitude");
         }
 
         if (sdfDirSin->HasElement("period"))
         {
-          this->orientationSinPeriod =
+          this->dataPtr->orientationSinPeriod =
             sdfDirSin->Get<double>("period");
         }
       }
 
       if (sdfDir->HasElement("noise"))
       {
-        this->noiseDirection = sensors::NoiseFactory::NewNoiseModel(
+        this->dataPtr->noiseDirection = sensors::NoiseFactory::NewNoiseModel(
             sdfDir->GetElement("noise"));
       }
     }
@@ -116,13 +183,13 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 
     if (sdfVert->HasElement("time_for_rise"))
     {
-      this->characteristicTimeForWindRiseVertical =
+      this->dataPtr->characteristicTimeForWindRiseVertical =
         sdfVert->Get<double>("time_for_rise");
     }
 
     if (sdfVert->HasElement("noise"))
     {
-      this->noiseVertical = sensors::NoiseFactory::NewNoiseModel(
+      this->dataPtr->noiseVertical = sensors::NoiseFactory::NewNoiseModel(
             sdfVert->GetElement("noise"));
     }
   }
@@ -132,19 +199,22 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     sdf::ElementPtr sdfForceApprox =
       _sdf->GetElement("force_approximation_scaling_factor");
 
-    this->forceApproximationScalingFactor = sdfForceApprox->Get<double>();
+    this->dataPtr->forceApproximationScalingFactor =
+        sdfForceApprox->Get<double>();
   }
 
-  double period = this->world->Physics()->GetMaxStepSize();
+  double period = this->dataPtr->world->Physics()->GetMaxStepSize();
 
-  this->kMag = period / this->characteristicTimeForWindRise;
-  this->kMagVertical = period / this->characteristicTimeForWindRiseVertical;
-  this->kDir = period / this->characteristicTimeForWindOrientationChange;
+  this->dataPtr->kMag = period / this->dataPtr->characteristicTimeForWindRise;
+  this->dataPtr->kMagVertical =
+      period / this->dataPtr->characteristicTimeForWindRiseVertical;
+  this->dataPtr->kDir =
+      period / this->dataPtr->characteristicTimeForWindOrientationChange;
 
   wind.SetLinearVelFunc(std::bind(&WindPlugin::LinearVel, this,
         std::placeholders::_1, std::placeholders::_2));
 
-  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
           std::bind(&WindPlugin::OnUpdate, this));
 }
 
@@ -153,22 +223,25 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
     const physics::Entity * /*_entity*/)
 {
   // Compute magnitude
-  this->magnitudeMean = (1. - this->kMag) * this->magnitudeMean +
-      this->kMag * sqrt(_wind->LinearVel().X() * _wind->LinearVel().X() +
+  this->dataPtr->magnitudeMean = (1. - this->dataPtr->kMag) *
+      this->dataPtr->magnitudeMean + this->dataPtr->kMag *
+      std::sqrt(_wind->LinearVel().X() * _wind->LinearVel().X() +
                         _wind->LinearVel().Y() * _wind->LinearVel().Y());
-  double magnitude = this->magnitudeMean;
+  double magnitude = this->dataPtr->magnitudeMean;
 
   // Compute magnitude
-  this->magnitudeMeanVertical = (1. - this->kMagVertical) * this->magnitudeMeanVertical +
-      this->kMagVertical * _wind->LinearVel().Z();
+  this->dataPtr->magnitudeMeanVertical = (1. - this->dataPtr->kMagVertical) *
+      this->dataPtr->magnitudeMeanVertical +
+      this->dataPtr->kMagVertical * _wind->LinearVel().Z();
 
-  magnitude += this->magnitudeSinAmplitudePercent * this->magnitudeMean *
-    sin(2 * M_PI * this->world->SimTime().Double() /
-        this->magnitudeSinPeriod);
+  magnitude += this->dataPtr->magnitudeSinAmplitudePercent *
+    this->dataPtr->magnitudeMean *
+    std::sin(2 * M_PI * this->dataPtr->world->SimTime().Double() /
+        this->dataPtr->magnitudeSinPeriod);
 
-  if (this->noiseMagnitude)
+  if (this->dataPtr->noiseMagnitude)
   {
-    magnitude = this->noiseMagnitude->Apply(magnitude);
+    magnitude = this->dataPtr->noiseMagnitude->Apply(magnitude);
   }
 
   // Compute horizontal direction
@@ -176,27 +249,32 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
   double direction = IGN_RTOD(atan2(_wind->LinearVel().Y(),
                                    _wind->LinearVel().X()));
 
-  this->directionMean = (1.0 - this->kDir) * this->directionMean +
-    this->kDir * direction;
+  this->dataPtr->directionMean = (1.0 - this->dataPtr->kDir) *
+      this->dataPtr->directionMean + this->dataPtr->kDir * direction;
 
-  direction = this->directionMean;
+  direction = this->dataPtr->directionMean;
 
-  direction += this->orientationSinAmplitude *
-    sin(2 * M_PI * this->world->SimTime().Double() /
-        this->orientationSinPeriod);
+  direction += this->dataPtr->orientationSinAmplitude *
+      std::sin(2 * M_PI * this->dataPtr->world->SimTime().Double() /
+        this->dataPtr->orientationSinPeriod);
 
-  if (this->noiseDirection)
-    direction = this->noiseDirection->Apply(direction);
+  if (this->dataPtr->noiseDirection)
+    direction = this->dataPtr->noiseDirection->Apply(direction);
 
   // Apply wind velocity
   ignition::math::Vector3d windVel;
-  windVel.X(magnitude * cos(IGN_DTOR(direction)));
-  windVel.Y(magnitude * sin(IGN_DTOR(direction)));
+  windVel.X(magnitude * std::cos(IGN_DTOR(direction)));
+  windVel.Y(magnitude * std::sin(IGN_DTOR(direction)));
 
-  if (this->noiseVertical)
-    windVel.Z(noiseVertical->Apply(this->magnitudeMeanVertical));
+  if (this->dataPtr->noiseVertical)
+  {
+    windVel.Z(this->dataPtr->noiseVertical->Apply(
+        this->dataPtr->magnitudeMeanVertical));
+  }
   else
-    windVel.Z(this->magnitudeMeanVertical);
+  {
+    windVel.Z(this->dataPtr->magnitudeMeanVertical);
+  }
 
   return windVel;
 }
@@ -209,9 +287,13 @@ void WindPlugin::OnUpdate()
 
   // If the forceApproximationScalingFactor is very small don't iterate.
   // It doesn't make sense to be negative, that would be negative wind drag.
-  if (fabs(this->forceApproximationScalingFactor) < 1E-6) { return; }
+  if (std::fabs(this->dataPtr->forceApproximationScalingFactor) < 1E-6)
+  {
+    return;
+  }
+
   // Get all the models
-  physics::Model_V models = this->world->Models();
+  physics::Model_V models = this->dataPtr->world->Models();
 
   // Process each model.
   for (auto const &model : models)
@@ -228,7 +310,7 @@ void WindPlugin::OnUpdate()
 
       // Add wind velocity as a force to the body
       link->AddRelativeForce(link->GetInertial()->Mass() *
-          this->forceApproximationScalingFactor *
+          this->dataPtr->forceApproximationScalingFactor *
           (link->RelativeWindLinearVel() - link->RelativeLinearVel()));
     }
   }
