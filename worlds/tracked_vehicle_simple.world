@@ -801,5 +801,37 @@
             </link>
             <static>1</static>
         </model>
+
+        <model name="cylinder_obstacle">
+            <static>true</static>
+            <pose>0 -3 -0.06 0 0 0</pose>
+            <link name="cylinder">
+                <collision name="cylinder_collision">
+                    <pose frame="">0 0 0 0 1.570796327 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.15</radius>
+                            <length>0.8</length>
+                        </cylinder>
+                    </geometry>
+                    <surface>
+                        <friction>
+                            <ode>
+                                <mu>1</mu>
+                            </ode>
+                        </friction>
+                    </surface>
+                </collision>
+                <visual name="cylinder_visual">
+                    <pose frame="">0 0 0 0 1.570796327 0</pose>
+                    <geometry>
+                        <cylinder>
+                            <radius>0.15</radius>
+                            <length>0.8</length>
+                        </cylinder>
+                    </geometry>
+                </visual>
+            </link>
+        </model>
     </world>
 </sdf>
