@@ -58,7 +58,6 @@ target_link_libraries(gz
  ${Qt5Core_LIBRARIES}
  ${Qt5Widgets_LIBRARIES}
  ${Boost_LIBRARIES}
- ${IGNITION-MSGS_LIBRARIES}
  ${IGNITION-TRANSPORT_LIBRARIES}
 )
 
