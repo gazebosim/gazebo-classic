@@ -39,6 +39,7 @@ if (HAVE_UUID)
 endif()
 
 set (plugins_single_header
+  ActorCollisionsPlugin
   ActorPlugin
   ActuatorPlugin
   ArduCopterPlugin
