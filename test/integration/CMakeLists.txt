@@ -146,6 +146,8 @@ endif()
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
+add_dependencies(${TEST_TYPE}_tracked_vehicles SimpleTrackedVehiclePlugin)
+add_dependencies(${TEST_TYPE}_tracked_vehicles WheelTrackedVehiclePlugin)
 
 set(display_tests
 )
