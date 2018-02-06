@@ -22,9 +22,9 @@
 #endif
 
 #include <map>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/plot/qwt_gazebo.h"
@@ -48,7 +48,8 @@ namespace gazebo
       public: static const int ColorGroupCount = 4;
 
       /// \brief Unique colors
-      public: static const common::Color Colors[ColorGroupCount][ColorCount];
+      public: static const ignition::math::Color
+          Colors[ColorGroupCount][ColorCount];
     };
 
     /// \brief A class that manages curve data
@@ -167,44 +168,44 @@ namespace gazebo
   }
 }
 
-const common::Color ColorPalette::Colors
+const ignition::math::Color ColorPalette::Colors
     [ColorPalette::ColorGroupCount][ColorPalette::ColorCount] =
     {
       // purple
       {
         // 0x882e72
-        common::Color(136, 46, 114),
+        ignition::math::Color(136, 46, 114),
         // 0xb178a6
-        common::Color(177, 120, 166),
+        ignition::math::Color(177, 120, 166),
         // 0xd6c1de
-        common::Color(214, 193, 222)
+        ignition::math::Color(214, 193, 222)
       },
       // blue
       {
         // 0x1965b0
-        common::Color(25, 101, 176),
+        ignition::math::Color(25, 101, 176),
         // 0x5289c7
-        common::Color(82, 137, 199),
+        ignition::math::Color(82, 137, 199),
         // 0x7bafde
-        common::Color(123, 175, 222)
+        ignition::math::Color(123, 175, 222)
       },
       // green
       {
         // 0x4eb265
-        common::Color(78, 178, 101),
+        ignition::math::Color(78, 178, 101),
         // 0x90c987
-        common::Color(144, 201, 135),
+        ignition::math::Color(144, 201, 135),
         // 0xcae0ab
-        common::Color(202, 224, 171)
+        ignition::math::Color(202, 224, 171)
       },
       // red
       {
         // 0xdc050c
-        common::Color(220, 5, 12),
+        ignition::math::Color(220, 5, 12),
         // 0xe8601c
-        common::Color(232, 96, 28),
+        ignition::math::Color(232, 96, 28),
         // 0xf1932d
-        common::Color(241, 147, 45)
+        ignition::math::Color(241, 147, 45)
       }
     };
 

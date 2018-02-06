@@ -39,6 +39,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -171,35 +172,9 @@ bool Entity::IsStatic() const
 }
 
 //////////////////////////////////////////////////
-void Entity::SetInitialRelativePose(const math::Pose &_p)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetInitialRelativePose(_p.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Entity::SetInitialRelativePose(const ignition::math::Pose3d &_p)
 {
   this->initialRelativePose = _p;
-}
-
-//////////////////////////////////////////////////
-math::Pose Entity::GetInitialRelativePose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InitialRelativePose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -208,18 +183,6 @@ ignition::math::Pose3d Entity::InitialRelativePose() const
   return this->initialRelativePose;
 }
 
-//////////////////////////////////////////////////
-math::Box Entity::GetBoundingBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->BoundingBox();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
 
 //////////////////////////////////////////////////
 ignition::math::Box Entity::BoundingBox() const
@@ -277,19 +240,6 @@ void Entity::PublishPose()
 }
 
 //////////////////////////////////////////////////
-math::Pose Entity::GetRelativePose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->RelativePose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Entity::RelativePose() const
 {
   // We return the initialRelativePose for COLLISION objects because they
@@ -302,26 +252,12 @@ ignition::math::Pose3d Entity::RelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->WorldPose();
+    return this->WorldPose() - this->parentEntity->WorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->WorldPose();
   }
-}
-
-//////////////////////////////////////////////////
-void Entity::SetRelativePose(const math::Pose &_pose, bool _notify,
-        bool _publish)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetRelativePose(_pose.Ign(), _notify, _publish);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -333,20 +269,6 @@ void Entity::SetRelativePose(const ignition::math::Pose3d &_pose,
                               _publish);
   else
     this->SetWorldPose(_pose, _notify, _publish);
-}
-
-//////////////////////////////////////////////////
-void Entity::SetWorldTwist(const math::Vector3 &_linear,
-    const math::Vector3 &_angular, bool _updateChildren)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->SetWorldTwist(_linear.Ign(), _angular.Ign(), _updateChildren);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -413,6 +335,11 @@ void Entity::SetWorldPoseModel(
         else
         {
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+
+          // Publish only for non-canonical links,
+          // since local pose of the canonical link does not change,
+          // so there is no need to keep telling everyone about it.
+          // The canonical link will automatically move as the model moves
           if (_publish)
             entity->PublishPose();
         }
@@ -430,6 +357,12 @@ void Entity::SetWorldPoseModel(
           {
             CollisionPtr entityC =
                 boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+          else if ((*iterC)->HasType(LIGHT))
+          {
+            LightPtr entityC =
+                boost::static_pointer_cast<Light>(*iterC);
             entityC->SetWorldPoseDirty();
           }
         }
@@ -454,11 +387,7 @@ void Entity::SetWorldPoseCanonicalLink(
     const ignition::math::Pose3d &_pose,
     const bool _notify, const bool _publish)
 {
-  this->worldPose = _pose;
-  this->worldPose.Correct();
-
-  if (_notify)
-    this->UpdatePhysicsPose(true);
+  this->SetWorldPoseDefault(_pose, _notify, _publish);
 
   if (!this->parentEntity->HasType(MODEL))
   {
@@ -492,19 +421,6 @@ void Entity::SetWorldPoseCanonicalLink(
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
-
-  // Tell collisions that their current world pose is dirty (needs
-  // updating). We set a dirty flag instead of directly updating the
-  // value to improve performance.
-  for (Base_V::iterator iterC = this->children.begin();
-      iterC != this->children.end(); ++iterC)
-  {
-    if ((*iterC)->HasType(COLLISION))
-    {
-      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-      entityC->SetWorldPoseDirty();
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -516,6 +432,26 @@ void Entity::SetWorldPoseDefault(const ignition::math::Pose3d &_pose,
 
   if (_notify)
     this->UpdatePhysicsPose(true);
+
+  if (this->HasType(LINK))
+  {
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (auto &childPtr : this->children)
+    {
+      if (childPtr->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+      else if (childPtr->HasType(LIGHT))
+      {
+        LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+    }
+  }
 }
 
 
@@ -558,19 +494,6 @@ void Entity::SetWorldPose(const ignition::math::Pose3d &_pose,
   }
   if (_publish)
     this->PublishPose();
-}
-
-//////////////////////////////////////////////////
-void Entity::SetWorldPose(const math::Pose &_pose, bool _notify, bool _publish)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign(), _notify, _publish);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -751,35 +674,9 @@ void Entity::UpdateAnimation(const common::UpdateInfo &_info)
 }
 
 //////////////////////////////////////////////////
-const math::Pose Entity::GetDirtyPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->DirtyPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 const ignition::math::Pose3d &Entity::DirtyPose() const
 {
   return this->dirtyPose;
-}
-
-//////////////////////////////////////////////////
-math::Box Entity::GetCollisionBoundingBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->CollisionBoundingBox();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -850,35 +747,9 @@ void Entity::PlaceOnNearestEntityBelow()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Entity::GetRelativeLinearVel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->RelativeLinearVel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Entity::RelativeLinearVel() const
 {
   return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Entity::GetWorldLinearVel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldLinearVel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -888,35 +759,9 @@ ignition::math::Vector3d Entity::WorldLinearVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Entity::GetRelativeAngularVel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->RelativeAngularVel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Entity::RelativeAngularVel() const
 {
   return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Entity::GetWorldAngularVel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldAngularVel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -926,35 +771,9 @@ ignition::math::Vector3d Entity::WorldAngularVel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Entity::GetRelativeLinearAccel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->RelativeLinearAccel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Entity::RelativeLinearAccel() const
 {
   return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Entity::GetWorldLinearAccel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldLinearAccel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -964,35 +783,9 @@ ignition::math::Vector3d Entity::WorldLinearAccel() const
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Entity::GetRelativeAngularAccel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->RelativeAngularAccel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Entity::RelativeAngularAccel() const
 {
   return ignition::math::Vector3d::Zero;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Entity::GetWorldAngularAccel() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldAngularAccel();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

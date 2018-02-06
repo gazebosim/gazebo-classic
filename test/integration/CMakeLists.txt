@@ -23,8 +23,8 @@ if(HAVE_BULLET)
   link_directories ( ${BULLET_LIBRARY_DIRS} )
 endif()
 if(HAVE_DART)
-  include_directories ( ${DARTCore_INCLUDE_DIRS} )
-  link_directories ( ${DARTCore_LIBRARY_DIRS} )
+  include_directories ( ${DART_INCLUDE_DIRS} )
+  link_directories ( ${DART_LIBRARY_DIRS} )
 endif()
 
 set(tests
@@ -33,6 +33,7 @@ set(tests
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contacts_update.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -57,6 +58,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   keys_to_joints.cc
+  kinematic_loop.cc
   laser.cc
   link.cc
   logical_camera_sensor.cc
@@ -85,10 +87,12 @@ set(tests
   region_events.cc
   rest_web.cc
   saving_and_loading.cc
+  sdf.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
   stress_spawn_models.cc
   #state_log.cc
@@ -166,6 +170,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )
@@ -176,6 +181,7 @@ set(qt_tests
   collada_visualization.cc
   force_torque_visualization.cc
   insert_model.cc
+  joint_control_widget.cc
   marker.cc
   model_editor.cc
   model_editor_undo.cc

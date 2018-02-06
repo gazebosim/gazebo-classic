@@ -20,8 +20,8 @@ link_directories(
 )
 
 if (HAVE_DART)
-  include_directories(${DARTCore_INCLUDE_DIRS})
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (HAVE_BULLET)
@@ -284,8 +284,13 @@ target_link_libraries(gazebo_ode
   ${CCD_LIBRARIES}
   ${Boost_LIBRARIES})
 
+if (HAVE_DART)
+  target_link_libraries(gazebo_ode ${DART_LIBRARIES})
+endif()
+
 if (HDF5_FOUND AND HDF5_INSTRUMENT)
   message(STATUS "HDF5 Found and Instrument enabled")
+  include_directories(${HDF5_INCLUDE_DIRS})
   target_link_libraries(gazebo_ode ${HDF5_LIBRARIES})
 endif()
 

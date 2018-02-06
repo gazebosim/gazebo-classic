@@ -116,20 +116,6 @@ void ModelManipulator::Detach()
 
 /////////////////////////////////////////////////
 void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->RotateEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
   ignition::math::Vector3d normal;
@@ -189,21 +175,6 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMousePositionOnPlane(
-    rendering::CameraPtr _camera,
-    const common::MouseEvent &_event)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return MousePositionOnPlane(_camera, _event);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
     rendering::CameraPtr _camera, const common::MouseEvent &_event)
 {
@@ -220,20 +191,6 @@ ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
   p1 = origin1 + dir1 * dist1;
 
   return p1;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
-    double _interval, double _sensitivity)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return SnapPoint(_point.Ign(), _interval, _sensitivity);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -279,23 +236,6 @@ ignition::math::Vector3d ModelManipulator::SnapPoint(
       point.Z() = point.Z() - remainder + _interval * sign;
 
   return point;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMouseMoveDistance(
-    rendering::CameraPtr _camera,
-    const math::Vector2i &_start, const math::Vector2i &_end,
-    const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(), _pose.Ign(),
-      _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -393,20 +333,6 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
       this->dataPtr->mouseStart,
       ignition::math::Vector2i(this->dataPtr->mouseEvent.Pos().X(),
       this->dataPtr->mouseEvent.Pos().Y()), _pose, _axis, _local);
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->ScaleEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -582,20 +508,6 @@ ignition::math::Vector3d ModelManipulator::UpdateScale(
   }
 
   return scale;
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->TranslateEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

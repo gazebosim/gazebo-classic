@@ -47,7 +47,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
-      public: ODEJoint(BasePtr _parent);
+      public: explicit ODEJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~ODEJoint();
@@ -90,7 +90,11 @@ namespace gazebo
       public: virtual void SetDamping(unsigned int _index, double _damping);
 
       // Documentation inherited.
-      public: virtual bool SetPosition(unsigned int _index, double _position);
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false)
+            override;
 
       // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,

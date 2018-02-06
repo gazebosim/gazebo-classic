@@ -33,12 +33,6 @@ Event::~Event()
 }
 
 //////////////////////////////////////////////////
-bool Event::GetSignaled() const
-{
-  return this->Signaled();
-}
-
-//////////////////////////////////////////////////
 bool Event::Signaled() const
 {
   return this->signaled;
@@ -74,12 +68,6 @@ Connection::~Connection()
     this->id = -1;
     this->event = nullptr;
   }
-}
-
-//////////////////////////////////////////////////
-int Connection::GetId() const
-{
-  return this->Id();
 }
 
 //////////////////////////////////////////////////

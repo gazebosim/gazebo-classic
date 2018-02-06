@@ -31,14 +31,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTMultiRayShape::DARTMultiRayShape(CollisionPtr _parent)
-  : MultiRayShape(_parent),
-    dataPtr(new DARTMultiRayShapePrivate())
-{
-  this->SetName("DART_multiray_shape");
-}
-
-//////////////////////////////////////////////////
 DARTMultiRayShape::DARTMultiRayShape(DARTCollisionPtr _parent)
   : MultiRayShape(_parent),
     dataPtr(new DARTMultiRayShapePrivate())

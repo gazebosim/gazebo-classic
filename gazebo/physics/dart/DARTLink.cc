@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2014-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
-*/
+ */
 
 #include <functional>
 
@@ -91,7 +91,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
 
           if (softContactElem->HasElement("dart"))
           {
-            if (dartElem != nullptr)
+            if (dartElem)
             {
               gzerr << "DART supports only one deformable body in a link.\n";
               break;
@@ -108,7 +108,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     }
   }
 
-  if (dartElem != nullptr)
+  if (dartElem)
   {
     dart::dynamics::SoftBodyNode::UniqueProperties softProperties;
 
@@ -116,17 +116,17 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     double fleshMassFraction = dartElem->Get<double>("flesh_mass_fraction");
 
     // bone_attachment (Kv)
-    double boneAttachment = DART_DEFAULT_VERTEX_STIFFNESS;
+    double boneAttachment = dart::dynamics::DART_DEFAULT_VERTEX_STIFFNESS;
     if (dartElem->HasElement("bone_attachment"))
       boneAttachment = dartElem->Get<double>("bone_attachment");
 
     // stiffness (Ke)
-    double stiffness = DART_DEFAULT_EDGE_STIFNESS;
+    double stiffness = dart::dynamics::DART_DEFAULT_EDGE_STIFNESS;
     if (dartElem->HasElement("stiffness"))
       stiffness = dartElem->Get<double>("stiffness");
 
     // damping
-    double damping = DART_DEFAULT_DAMPING_COEFF;
+    double damping = dart::dynamics::DART_DEFAULT_DAMPING_COEFF;
     if (dartElem->HasElement("damping"))
       damping = dartElem->Get<double>("damping");
 
@@ -167,7 +167,7 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
     }
 
     // Create DART SoftBodyNode properties
-    dart::dynamics::BodyNode::Properties properties(bodyName);
+    dart::dynamics::BodyNode::AspectProperties properties(bodyName);
     this->dataPtr->dtProperties.reset(
           new dart::dynamics::SoftBodyNode::Properties(
             properties, softProperties));
@@ -177,19 +177,9 @@ void DARTLink::Load(sdf::ElementPtr _sdf)
   else
   {
     // Create DART BodyNode properties
+    dart::dynamics::BodyNode::AspectProperties properties(bodyName);
     this->dataPtr->dtProperties.reset(
-          new dart::dynamics::BodyNode::Properties(bodyName));
-  }
-
-  for (auto child : this->children)
-  {
-    if (child->HasType(Base::COLLISION))
-    {
-      DARTCollisionPtr dartCollision =
-          boost::static_pointer_cast<DARTCollision>(child);
-      this->dataPtr->dtProperties->mColShapes.push_back(
-            dartCollision->DARTCollisionShape());
-    }
+          new dart::dynamics::BodyNode::Properties(properties));
   }
 }
 
@@ -201,32 +191,15 @@ void DARTLink::Init()
   this->dataPtr->Initialize();
 
   // DARTModel::Load() should be called first
-  GZ_ASSERT(this->dataPtr->dtBodyNode != nullptr,
+  GZ_ASSERT(this->dataPtr->dtBodyNode,
             "DART BodyNode is not initialized.");
 
   // Name
   std::string bodyName = this->GetName();
   this->dataPtr->dtBodyNode->setName(bodyName);
 
-  // Mass
-  double mass = this->inertial->Mass();
-  this->dataPtr->dtBodyNode->setMass(mass);
-
   // Inertia
-  double Ixx = this->inertial->IXX();
-  double Iyy = this->inertial->IYY();
-  double Izz = this->inertial->IZZ();
-  double Ixy = this->inertial->IXY();
-  double Ixz = this->inertial->IXZ();
-  double Iyz = this->inertial->IYZ();
-  this->dataPtr->dtBodyNode->setMomentOfInertia(Ixx, Iyy, Izz, Ixy, Ixz, Iyz);
-
-  // Visual
-  this->visuals;
-
-  // COG offset
-  ignition::math::Vector3d cog = this->inertial->CoG();
-  this->dataPtr->dtBodyNode->setLocalCOM(DARTTypes::ConvVec3(cog));
+  this->UpdateMass();
 
   // Gravity mode
   this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -269,7 +242,10 @@ void DARTLink::Init()
   hackAvgMu1 /= static_cast<double>(numCollisions);
   hackAvgMu2 /= static_cast<double>(numCollisions);
 
-  this->dataPtr->dtBodyNode->setFrictionCoeff(0.5 * (hackAvgMu1 + hackAvgMu2));
+  float coeff = 0.5 * (hackAvgMu1 + hackAvgMu2);
+  // friction coefficient may not be negative in DART
+  coeff = std::max(0.0f, coeff);
+  this->dataPtr->dtBodyNode->setFrictionCoeff(coeff);
 
   // We don't add dart body node to the skeleton here because dart body node
   // should be set its parent joint before being added. This body node will be
@@ -287,14 +263,33 @@ void DARTLink::UpdateMass()
 {
   if (this->dataPtr->dtBodyNode && this->inertial)
   {
-    this->dataPtr->dtBodyNode->setMass(this->inertial->Mass());
-    auto Ixxyyzz = this->inertial->PrincipalMoments();
-    auto Ixyxzyz = this->inertial->ProductsOfInertia();
+    double nFragments = 1.0 + this->dataPtr->dtSlaveNodes.size();
+    double mass = this->inertial->Mass()/nFragments;
+    this->dataPtr->dtBodyNode->setMass(mass);
+
+    const ignition::math::Quaterniond R_inertial = this->inertial->Pose().Rot();
+
+    const ignition::math::Matrix3d I_link =
+        ignition::math::Matrix3d(R_inertial)
+        *this->inertial->MOI()
+        *ignition::math::Matrix3d(R_inertial.Inverse())
+        *(1.0/nFragments);
+
     this->dataPtr->dtBodyNode->setMomentOfInertia(
-        Ixxyyzz[0], Ixxyyzz[1], Ixxyyzz[2],
-        Ixyxzyz[0], Ixyxzyz[1], Ixyxzyz[2]);
-    auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
+
+    const auto cog = DARTTypes::ConvVec3(this->inertial->CoG());
     this->dataPtr->dtBodyNode->setLocalCOM(cog);
+
+    for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+    {
+      slaveNode->setMass(mass);
+      slaveNode->setMomentOfInertia(
+        I_link(0, 0), I_link(1, 1), I_link(2, 2),
+        I_link(0, 1), I_link(0, 2), I_link(1, 2));
+      slaveNode->setLocalCOM(cog);
+    }
   }
 }
 
@@ -313,9 +308,8 @@ void DARTLink::OnPoseChange()
   // DART body node always have its parent joint.
   dart::dynamics::Joint *joint = this->dataPtr->dtBodyNode->getParentJoint();
 
-  dart::dynamics::FreeJoint *freeJoint =
-      dynamic_cast<dart::dynamics::FreeJoint*>(joint);
-  if (freeJoint)
+  if (dart::dynamics::FreeJoint *freeJoint =
+          dynamic_cast<dart::dynamics::FreeJoint*>(joint))
   {
     // If the parent joint is free joint, set the 6 dof to fit the target pose.
     const Eigen::Isometry3d &W = DARTTypes::ConvPose(this->WorldPose());
@@ -336,11 +330,6 @@ void DARTLink::OnPoseChange()
     // the last three components of the generalized coordinates without any
     // conversion.
     freeJoint->setPositions(dart::dynamics::FreeJoint::convertToPositions(Q));
-  }
-  else
-  {
-    gzdbg << "OnPoseChange() doesn't make sense if the parent joint "
-          << "is not free joint (6-dof).\n";
   }
 }
 
@@ -389,7 +378,7 @@ void DARTLink::SetLinearVel(const ignition::math::Vector3d &_vel)
     if (dtBodyNode->getParentBodyNode())
     {
       // Local transformation from the parent link frame to this link frame
-      Eigen::Isometry3d T = freeJoint->getLocalTransform();
+      Eigen::Isometry3d T = freeJoint->getRelativeTransform();
 
       // Parent link's linear and angular velocities
       Eigen::Vector3d parentLinVel =
@@ -464,7 +453,7 @@ void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
     if (dtBodyNode->getParentBodyNode())
     {
       // Local transformation from the parent link frame to this link frame
-      Eigen::Isometry3d T = freeJoint->getLocalTransform();
+      Eigen::Isometry3d T = freeJoint->getRelativeTransform();
 
       // Parent link's linear and angular velocities
       Eigen::Vector3d parentAngVel =
@@ -490,7 +479,7 @@ void DARTLink::SetAngularVel(const ignition::math::Vector3d &_vel)
   }
   else
   {
-    gzdbg << "DARTLink::SetLinearVel() doesn't make sense if the parent joint "
+    gzdbg << "DARTLink::SetAngularVel() doesn't make sense if the parent joint "
           << "is not free joint (6-dof).\n";
   }
 }
@@ -583,17 +572,30 @@ void DARTLink::AddForceAtRelativePosition(
     return;
   }
 
-  this->dataPtr->dtBodyNode->addExtForce(DARTTypes::ConvVec3(_force),
-                                DARTTypes::ConvVec3(_relpos),
-                                true, true);
+  this->dataPtr->dtBodyNode->addExtForce(
+        DARTTypes::ConvVec3(_force),
+        DARTTypes::ConvVec3(_relpos) + this->dataPtr->dtBodyNode->getLocalCOM(),
+        false, true);
 }
 
 //////////////////////////////////////////////////
-void DARTLink::AddLinkForce(const ignition::math::Vector3d &/*_force*/,
-    const ignition::math::Vector3d &/*_offset*/)
+void DARTLink::AddLinkForce(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_offset)
 {
-  gzlog << "DARTLink::AddLinkForce not yet implemented (issue #1477)."
-        << std::endl;
+  if (!this->dataPtr->IsInitialized())
+  {
+    this->dataPtr->Cache(
+          "AddLinkForce",
+          std::bind(
+            &DARTLink::AddLinkForce, this, _force, _offset));
+    return;
+  }
+
+  this->dataPtr->dtBodyNode->addExtForce(
+        DARTTypes::ConvVec3(_force),
+        DARTTypes::ConvVec3(_offset),
+        true, true);
 }
 
 /////////////////////////////////////////////////
@@ -699,18 +701,19 @@ ignition::math::Vector3d DARTLink::WorldTorque() const
   if (!this->dataPtr->IsInitialized())
     return this->dataPtr->GetCached<ignition::math::Vector3d>("WorldTorque");
 
-  // TODO: Need verification
-  ignition::math::Vector3d torque;
+  // DART uses spatial forces which express the torque in the first three
+  // components of the 6D vector
+  const Eigen::Vector6d f = this->dataPtr->dtBodyNode->getExternalForceGlobal();
 
-  Eigen::Isometry3d W = this->dataPtr->dtBodyNode->getTransform();
-  Eigen::Matrix6d G   = this->dataPtr->dtBodyNode->getSpatialInertia();
-  Eigen::VectorXd V   = this->dataPtr->dtBodyNode->getSpatialVelocity();
-  Eigen::VectorXd dV  = this->dataPtr->dtBodyNode->getSpatialAcceleration();
-  Eigen::Vector6d F   = G * dV - dart::math::dad(V, G * V);
+  Eigen::Isometry3d tf_com = Eigen::Isometry3d::Identity();
+  // We use the negative of the global COM location in order to transform the
+  // spatial vector to be with respect to the the body's center of mass.
+  tf_com.translation() = -this->dataPtr->dtBodyNode->getCOM(
+        dart::dynamics::Frame::World());
 
-  torque = DARTTypes::ConvVec3Ign(W.linear() * F.head<3>());
+  const Eigen::Vector6d f_com = dart::math::dAdInvT(tf_com, f);
 
-  return torque;
+  return DARTTypes::ConvVec3Ign(f_com.head<3>());
 }
 
 //////////////////////////////////////////////////
@@ -726,6 +729,10 @@ void DARTLink::SetGravityMode(bool _mode)
   }
 
   this->dataPtr->dtBodyNode->setGravityMode(_mode);
+  for (auto slaveNode : this->dataPtr->dtSlaveNodes)
+  {
+    slaveNode->setGravityMode(_mode);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -752,6 +759,11 @@ void DARTLink::SetSelfCollide(bool _collide)
     return;
   }
 
+
+  /*
+  Following code is disabled currently because the newer DART version (from 6) does not
+  support CollisionManager::enablePair() and CollisionMangager::disablePair().
+
   dart::dynamics::BodyNode *dtBodyNode = this->dataPtr->dtBodyNode;
 
   // If this function is called before the body node is not added to a skeleton,
@@ -760,10 +772,10 @@ void DARTLink::SetSelfCollide(bool _collide)
   if (dtBodyNode->getSkeleton() == nullptr)
     return;
 
-  dart::simulation::WorldPtr dtWorld = this->dataPtr->dartPhysics->DARTWorld();
-  dart::dynamics::SkeletonPtr dtSkeleton =
-      dtBodyNode->getSkeleton();
-  dart::collision::CollisionDetector *dtCollDet =
+  dart::simulation::WorldPtr dtWorld =
+      this->dataPtr->dartPhysics->DARTWorld();
+  dart::dynamics::SkeletonPtr dtSkeleton = dtBodyNode->getSkeleton();
+  dart::collision::CollisionDetectorPtr dtCollDet =
       dtWorld->getConstraintSolver()->getCollisionDetector();
 
   Link_V links = this->GetModel()->GetLinks();
@@ -783,7 +795,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this && links[i]->GetSelfCollide())
         {
           dart::dynamics::BodyNode *itdtBodyNode =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->DARTBodyNode();
 
           // If this->dataPtr->dtBodyNode and itdtBodyNode are connected then
           // don't enable the pair.
@@ -802,16 +814,17 @@ void DARTLink::SetSelfCollide(bool _collide)
     // the pairs of which both of the links in the pair is not self collidable.
     else
     {
-      dtSkeleton->enableSelfCollision();
+      dtSkeleton->enableSelfCollisionCheck();
+      dtSkeleton->setAdjacentBodyCheck(false);
 
       for (size_t i = 0; i < links.size() - 1; ++i)
       {
         for (size_t j = i + 1; j < links.size(); ++j)
         {
           dart::dynamics::BodyNode *itdtBodyNode1 =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->DARTBodyNode();
           dart::dynamics::BodyNode *itdtBodyNode2 =
-            boost::dynamic_pointer_cast<DARTLink>(links[j])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[j])->DARTBodyNode();
 
           // If this->dataPtr->dtBodyNode and itdtBodyNode are connected then
           // don't enable the pair.
@@ -837,7 +850,7 @@ void DARTLink::SetSelfCollide(bool _collide)
         if (links[i].get() != this)
         {
           dart::dynamics::BodyNode *itdtBodyNode =
-            boost::dynamic_pointer_cast<DARTLink>(links[i])->GetDARTBodyNode();
+            boost::dynamic_pointer_cast<DARTLink>(links[i])->DARTBodyNode();
           dtCollDet->disablePair(dtBodyNode, itdtBodyNode);
         }
       }
@@ -855,8 +868,12 @@ void DARTLink::SetSelfCollide(bool _collide)
       }
     }
     if (isAllLinksNotCollidable)
-      dtSkeleton->disableSelfCollision();
+    {
+      dtSkeleton->disableSelfCollisionCheck();
+      dtSkeleton->setAdjacentBodyCheck(false);
+    }
   }
+  */
 }
 
 //////////////////////////////////////////////////
@@ -910,9 +927,9 @@ void DARTLink::SetLinkStatic(bool _static)
   if (_static == true)
   {
     // Add weld joint constraint to DART
-    this->dataPtr->dtWeldJointConst =
-        new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode);
-    this->DARTWorld()->getConstraintSolver()->addConstraint(
+    this->dataPtr->dtWeldJointConst.reset(
+        new dart::constraint::WeldJointConstraint(this->dataPtr->dtBodyNode));
+    DARTWorld()->getConstraintSolver()->addConstraint(
         this->dataPtr->dtWeldJointConst);
   }
   else
@@ -920,8 +937,7 @@ void DARTLink::SetLinkStatic(bool _static)
     // Remove ball and revolute joint constraints from DART
     this->DARTWorld()->getConstraintSolver()->removeConstraint(
         this->dataPtr->dtWeldJointConst);
-    delete this->dataPtr->dtWeldJointConst;
-    this->dataPtr->dtWeldJointConst = nullptr;
+    this->dataPtr->dtWeldJointConst.reset();
   }
 
   this->dataPtr->staticLink = _static;
@@ -959,12 +975,6 @@ DARTPhysicsPtr DARTLink::GetDARTPhysics(void) const
 }
 
 //////////////////////////////////////////////////
-dart::simulation::World *DARTLink::GetDARTWorld(void) const
-{
-  return this->GetDARTPhysics()->DARTWorld().get();
-}
-
-//////////////////////////////////////////////////
 dart::simulation::WorldPtr DARTLink::DARTWorld(void) const
 {
   return this->GetDARTPhysics()->DARTWorld();
@@ -989,7 +999,13 @@ void DARTLink::SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
 }
 
 //////////////////////////////////////////////////
-dart::dynamics::BodyNode *DARTLink::GetDARTBodyNode() const
+void DARTLink::AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode)
+{
+  this->dataPtr->dtSlaveNodes.push_back(_dtBodyNode);
+}
+
+//////////////////////////////////////////////////
+dart::dynamics::BodyNode *DARTLink::DARTBodyNode() const
 {
   return this->dataPtr->dtBodyNode;
 }

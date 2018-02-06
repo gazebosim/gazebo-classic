@@ -23,6 +23,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -34,6 +35,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   MarkerManager.cc
   MarkerVisual.cc
@@ -85,17 +87,21 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
+  GpuLaserDataIterator.hh
+  GpuLaserDataIteratorImpl.hh
   Grid.hh
   Heightmap.hh
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
@@ -152,6 +158,7 @@ if (HAVE_OCULUS)
 endif ()
 
 set (gtest_sources
+  GpuLaserDataIterator_TEST.cc
   RenderingConversions_TEST.cc
 )
 
@@ -164,6 +171,7 @@ set (gtest_sources_dri
   CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
+  Distortion_TEST.cc
   GpuLaser_TEST.cc
   Grid_TEST.cc
   Heightmap_TEST.cc
@@ -172,11 +180,13 @@ set (gtest_sources_dri
   LaserVisual_TEST.cc
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  MovableText_TEST.cc
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
   RenderingLight_TEST.cc
   RFIDVisual_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc
@@ -227,7 +237,7 @@ if (NOT APPLE AND NOT WIN32)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_rendering rendering_pch.hh)
+  add_pch(gazebo_rendering rendering_pch.hh ${Boost_PKGCONFIG_CFLAGS})
 endif()
 
 gz_install_library(gazebo_rendering)

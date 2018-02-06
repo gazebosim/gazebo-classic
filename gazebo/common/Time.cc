@@ -19,11 +19,13 @@
   #include <Windows.h>
   #include <Winsock2.h>
   #include <cstdint>
-  struct timespec
-  {
-    int64_t tv_sec;
-    int64_t tv_nsec;
-  };
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    struct timespec
+    {
+      int64_t tv_sec;
+      int64_t tv_nsec;
+    };
+  #endif
 #else
   #include <unistd.h>
   #include <sys/time.h>

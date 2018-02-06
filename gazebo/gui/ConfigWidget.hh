@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -297,8 +298,16 @@ namespace gazebo
       /// \param[in] _name Name of the child widget.
       /// \param[in] _value Value to set to.
       /// \return True if the value is set successfully.
+      /// \deprecated Use function which accepts ignition::math::Color
       public: bool SetColorWidgetValue(const std::string &_name,
-          const common::Color &_value);
+          const common::Color &_value) GAZEBO_DEPRECATED(9);
+
+      /// \brief Set a color value to a child widget.
+      /// \param[in] _name Name of the child widget.
+      /// \param[in] _value Value to set to.
+      /// \return True if the value is set successfully.
+      public: bool SetColorWidgetValue(const std::string &_name,
+          const ignition::math::Color &_value);
 
       /// \brief Set a pose value to a child widget.
       /// \param[in] _name Name of the child widget.
@@ -377,14 +386,15 @@ namespace gazebo
 
       /// \brief Get a vector3 value from a child widget.
       /// \param[in] _name Name of the child widget.
-      /// \return Vector3 value.
+      /// \return ignition math Vector3d value.
       public: ignition::math::Vector3d Vector3dWidgetValue(
           const std::string &_name) const;
 
       /// \brief Get a color value from a child widget.
       /// \param[in] _name Name of the child widget.
       /// \return Color value.
-      public: common::Color ColorWidgetValue(const std::string &_name) const;
+      public: ignition::math::Color ColorWidgetValue(
+          const std::string &_name) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _name Name of the child widget.
@@ -578,7 +588,8 @@ namespace gazebo
 
       /// \brief Update a vector3d message.
       /// \param[in] _msg Vector3d message to be updated.
-      /// \param[in] _value Vector3 used for updating the message.
+      /// \param[in] _value ignition math Vector3d used for updating the
+      /// message.
       private: void UpdateVector3dMsg(google::protobuf::Message *_msg,
           const ignition::math::Vector3d &_value);
 
@@ -629,7 +640,7 @@ namespace gazebo
       /// \param[in] _value Value to set to.
       /// \return True if the update completed successfully.
       private: bool UpdateColorWidget(ConfigChildWidget *_widget,
-          const common::Color &_value);
+          const ignition::math::Color &_value);
 
       /// \brief Update a child widget with a pose value.
       /// \param[in] _widget Pointer to the child widget.
@@ -697,7 +708,8 @@ namespace gazebo
       /// \brief Get a color value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
       /// \return Value of the widget.
-      private: common::Color ColorWidgetValue(ConfigChildWidget *_widget) const;
+      private: ignition::math::Color ColorWidgetValue(
+          ConfigChildWidget *_widget) const;
 
       /// \brief Get a pose value from a child widget.
       /// \param[in] _widget Pointer to the child widget.
@@ -813,7 +825,7 @@ namespace gazebo
       /// \param[in] _name Scoped name of widget.
       /// \param[in] _value New color.
       Q_SIGNALS: void ColorValueChanged(const QString &_name,
-          const gazebo::common::Color &_value);
+          const ignition::math::Color &_value);
 
       /// \brief Signal that a pose config widget's value has changed.
       /// \param[in] _name Scoped name of widget.

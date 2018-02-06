@@ -25,7 +25,8 @@
 #include "gazebo/common/ColladaExporterPrivate.hh"
 #include "gazebo/common/ColladaExporter.hh"
 
-#ifdef _WIN32
+// snprintf is available since VS 2015
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
   #define snprintf _snprintf
 #endif
 
@@ -478,7 +479,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     techniqueXml->LinkEndChild(phongXml);
 
     // ambient
-    unsigned int RGBAcolor = material->GetAmbient().GetAsRGBA();
+    unsigned int RGBAcolor = material->Ambient().AsRGBA();
     float r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     float g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     float b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -493,7 +494,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     ambientXml->LinkEndChild(colorXml);
 
     // emission
-    RGBAcolor = material->GetEmissive().GetAsRGBA();
+    RGBAcolor = material->Emissive().AsRGBA();
     r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -521,7 +522,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     }
     else
     {
-      RGBAcolor = material->GetDiffuse().GetAsRGBA();
+      RGBAcolor = material->Diffuse().AsRGBA();
       r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
       g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
       b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;
@@ -534,7 +535,7 @@ void ColladaExporter::ExportEffects(TiXmlElement *_libraryEffectsXml)
     }
 
     // specular
-    RGBAcolor = material->GetSpecular().GetAsRGBA();
+    RGBAcolor = material->Specular().AsRGBA();
     r = ((RGBAcolor >> 24) & 0xFF) / 255.0f;
     g = ((RGBAcolor >> 16) & 0xFF) / 255.0f;
     b = ((RGBAcolor >> 8) & 0xFF) / 255.0f;

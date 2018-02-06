@@ -45,31 +45,6 @@ RayQuery::~RayQuery()
 }
 
 /////////////////////////////////////////////////
-bool RayQuery::SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
-    math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices)
-{
-  ignition::math::Vector3d intersect;
-  ignition::math::Triangle3d triangle;
-
-  auto result = this->SelectMeshTriangle(_x, _y, _visual, intersect, triangle);
-
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  _intersect = intersect;
-  _vertices.clear();
-  _vertices.push_back(triangle[0]);
-  _vertices.push_back(triangle[1]);
-  _vertices.push_back(triangle[2]);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-
-  return result;
-}
-
-/////////////////////////////////////////////////
 bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
     const VisualPtr &_visual, ignition::math::Vector3d &_intersect,
     ignition::math::Triangle3d &_triangle) const
@@ -108,8 +83,14 @@ bool RayQuery::SelectMeshTriangle(const int _x, const int _y,
     for (unsigned int j = 0; j < mesh->GetSubMeshCount(); ++j)
     {
       const common::SubMesh *submesh = mesh->GetSubMesh(j);
-      for (unsigned int k = 0; k < submesh->GetIndexCount(); k += 3)
+      if (submesh->GetVertexCount() < 3u)
+        continue;
+      unsigned int indexCount = submesh->GetIndexCount();
+      for (unsigned int k = 0; k < indexCount; k += 3)
       {
+        if (indexCount <= k+2)
+          continue;
+
         ignition::math::Vector3d vertexA =
           submesh->Vertex(submesh->GetIndex(k));
         ignition::math::Vector3d vertexB =

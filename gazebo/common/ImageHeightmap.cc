@@ -41,23 +41,6 @@ int ImageHeightmap::Load(const std::string &_filename)
 
 //////////////////////////////////////////////////
 void ImageHeightmap::FillHeightMap(int _subSampling,
-    unsigned int _vertSize, const math::Vector3 &_size,
-    const math::Vector3 &_scale, bool _flipY,
-    std::vector<float> &_heights)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->FillHeightMap(_subSampling, _vertSize, _size.Ign(), _scale.Ign(),
-      _flipY, _heights);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
-void ImageHeightmap::FillHeightMap(int _subSampling,
     unsigned int _vertSize, const ignition::math::Vector3d &_size,
     const ignition::math::Vector3d &_scale, bool _flipY,
     std::vector<float> &_heights)
@@ -148,5 +131,5 @@ unsigned int ImageHeightmap::GetWidth() const
 //////////////////////////////////////////////////
 float ImageHeightmap::GetMaxElevation() const
 {
-  return this->img.GetMaxColor().r;
+  return this->img.MaxColor().R();
 }

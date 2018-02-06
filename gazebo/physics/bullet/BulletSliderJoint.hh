@@ -18,7 +18,6 @@
 #define _GAZEBO_BULLETSLIDERJOINT_HH_
 
 #include <string>
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/bullet/BulletJoint.hh"
 #include "gazebo/physics/SliderJoint.hh"
 #include "gazebo/physics/bullet/BulletPhysics.hh"

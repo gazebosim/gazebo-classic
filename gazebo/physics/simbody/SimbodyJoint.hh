@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
-      public: SimbodyJoint(BasePtr _parent);
+      public: explicit SimbodyJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyJoint();
@@ -76,6 +76,13 @@ namespace gazebo
       // Documentation inherited.
       public: virtual ignition::math::Vector3d Anchor(
           const unsigned int _index) const;
+
+      // Documentation inherited.
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false)
+            override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(

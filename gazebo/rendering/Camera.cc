@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
@@ -579,19 +580,6 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 {
   Ogre::Quaternion rot = this->sceneNode->_getDerivedOrientation();
   return ignition::math::Quaterniond(rot.w, rot.x, rot.y, rot.z);
-}
-
-//////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1335,7 +1323,7 @@ void Camera::CreateRenderTexture(const std::string &_textureName)
       this->ImageWidth(),
       this->ImageHeight(),
       0,
-      (Ogre::PixelFormat)this->imageFormat,
+      static_cast<Ogre::PixelFormat>(this->imageFormat),
       Ogre::TU_RENDERTARGET,
       0,
       false,
@@ -1405,8 +1393,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
-    this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->viewport->setBackgroundColour(Conversions::Convert(ignBG));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -1896,6 +1884,12 @@ std::string Camera::ProjectionType() const
 //////////////////////////////////////////////////
 bool Camera::SetBackgroundColor(const common::Color &_color)
 {
+  return this->SetBackgroundColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
+{
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
@@ -1919,12 +1913,6 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 }
 
 //////////////////////////////////////////////////
-void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
-{
-  this->newImageFrame.Disconnect(_c->Id());
-}
-
-/////////////////////////////////////////////////
 VisualPtr Camera::TrackedVisual() const
 {
   return this->dataPtr->trackedVisual;

@@ -14,10 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
-#define _GAZEBO_GUI_BUILDING_MODEL_MANIP_HH_
+#ifndef GAZEBO_GUI_BUILDING_BUILDINGMODELMANIP_HH_
+#define GAZEBO_GUI_BUILDING_BUILDINGMODELMANIP_HH_
 
 #include <string>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qt.h"
 
@@ -27,11 +28,6 @@
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Color;
-  }
-
   namespace gui
   {
     // Forward declare pointers.
@@ -68,7 +64,7 @@ namespace gazebo
 
       /// \brief Get the color of the manip.
       /// \return Color.
-      public: common::Color Color() const;
+      public: ignition::math::Color Color() const;
 
       /// \brief Get the texture of the manip.
       /// \return Texture.
@@ -141,7 +137,7 @@ namespace gazebo
       /// \brief Qt signal emitted when the manip's color has changed from the
       /// 3D view.
       /// \param[in] _color New color.
-      Q_SIGNALS: void ColorChanged(const common::Color &_color);
+      Q_SIGNALS: void ColorChanged(const ignition::math::Color &_color);
 
       /// \brief Qt signal emitted when the manip's texture has changed from the
       /// 3D view.
@@ -236,7 +232,7 @@ namespace gazebo
       /// \brief Qt callback when the 3D visual's color has been changed from
       /// the associated editor item.
       /// \param[in] _color New color.
-      private slots: void OnColorChanged(const common::Color &_color);
+      private slots: void OnColorChanged(const ignition::math::Color &_color);
 
       /// \brief Qt callback when the 3D visual's texture has been changed from
       /// the associated editor item.

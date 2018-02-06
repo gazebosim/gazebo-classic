@@ -41,7 +41,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ScaleWidget(QWidget *_parent = 0);
+      public: explicit ScaleWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ScaleWidget();

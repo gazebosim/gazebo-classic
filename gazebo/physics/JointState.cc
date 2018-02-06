@@ -107,43 +107,12 @@ unsigned int JointState::GetAngleCount() const
 }
 
 /////////////////////////////////////////////////
-math::Angle JointState::GetAngle(unsigned int _axis) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Position(_axis);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 double JointState::Position(const unsigned int _axis) const
 {
   if (_axis < this->positions.size())
     return this->positions[_axis];
 
   return ignition::math::NAN_D;
-}
-
-/////////////////////////////////////////////////
-const std::vector<math::Angle> JointState::GetAngles() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  std::vector<math::Angle> gzAngles;
-
-  for (const auto &a : this->positions)
-    gzAngles.push_back(a);
-
-  return gzAngles;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

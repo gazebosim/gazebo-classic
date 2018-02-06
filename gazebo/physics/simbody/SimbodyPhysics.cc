@@ -54,7 +54,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -1551,36 +1550,10 @@ SimTK::MultibodySystem *SimbodyPhysics::GetDynamicsWorld() const
 }
 
 /////////////////////////////////////////////////
-SimTK::Quaternion SimbodyPhysics::QuadToQuad(const math::Quaternion &_q)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return QuadToQuad(_q.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 SimTK::Quaternion SimbodyPhysics::QuadToQuad(
     const ignition::math::Quaterniond &_q)
 {
   return SimTK::Quaternion(_q.W(), _q.X(), _q.Y(), _q.Z());
-}
-
-/////////////////////////////////////////////////
-math::Quaternion SimbodyPhysics::QuadToQuad(const SimTK::Quaternion &_q)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return QuadToQuadIgn(_q);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1591,19 +1564,6 @@ ignition::math::Quaterniond SimbodyPhysics::QuadToQuadIgn(
 }
 
 /////////////////////////////////////////////////
-SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(const math::Vector3 &_v)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Vector3ToVec3(_v.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(
     const ignition::math::Vector3d &_v)
 {
@@ -1611,35 +1571,9 @@ SimTK::Vec3 SimbodyPhysics::Vector3ToVec3(
 }
 
 /////////////////////////////////////////////////
-math::Vector3 SimbodyPhysics::Vec3ToVector3(const SimTK::Vec3 &_v)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Vec3ToVector3Ign(_v);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Vector3d SimbodyPhysics::Vec3ToVector3Ign(const SimTK::Vec3 &_v)
 {
   return ignition::math::Vector3d(_v[0], _v[1], _v[2]);
-}
-
-/////////////////////////////////////////////////
-SimTK::Transform SimbodyPhysics::Pose2Transform(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Pose2Transform(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -1651,19 +1585,6 @@ SimTK::Transform SimbodyPhysics::Pose2Transform(
   SimTK::Vec3 v(_pose.Pos().X(), _pose.Pos().Y(), _pose.Pos().Z());
   SimTK::Transform frame(SimTK::Rotation(q), v);
   return frame;
-}
-
-/////////////////////////////////////////////////
-math::Pose SimbodyPhysics::Transform2Pose(const SimTK::Transform &_xAB)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Transform2PoseIgn(_xAB);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

@@ -100,14 +100,14 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
-        gazebo::math::Vector3(req->pose.px, req->pose.py, req->pose.pz),
-        gazebo::math::Quaternion(req->pose.proll, req->pose.ppitch,
+    ignition::math::Pose3d pose(
+        ignition::math::Vector3d(req->pose.px, req->pose.py, req->pose.pz),
+        ignition::math::Quaterniond(req->pose.proll, req->pose.ppitch,
                                  req->pose.pyaw));
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
+    gazebo::msgs::Set(msg.mutable_pose(), pose);
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -123,13 +123,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
-    gazebo::math::Pose pose(
-        gazebo::math::Vector3(req->pose.px, req->pose.py, 0),
-        gazebo::math::Quaternion(0, 0, req->pose.pa));
+    ignition::math::Pose3d pose(
+        ignition::math::Vector3d(req->pose.px, req->pose.py, 0),
+        ignition::math::Quaterniond(0, 0, req->pose.pa));
 
     gazebo::msgs::Model msg;
     msg.set_name(req->name);
-    gazebo::msgs::Set(msg.mutable_pose(), pose.Ign());
+    gazebo::msgs::Set(msg.mutable_pose(), pose);
     this->modelPub->Publish(msg);
 
     this->driver->Publish(this->device_addr, _respQueue,
@@ -145,7 +145,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose3d_req_t *req =
       static_cast<player_simulation_pose3d_req_t*>(_data);
 
-    std::map<std::string, gazebo::math::Pose>::iterator iter;
+    std::map<std::string, ignition::math::Pose3d>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
@@ -154,13 +154,13 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
-      this->pose3dReq.pose.px = iter->second.pos.x;
-      this->pose3dReq.pose.py = iter->second.pos.y;
-      this->pose3dReq.pose.pz = iter->second.pos.z;
+      this->pose3dReq.pose.px = iter->second.Pos().X();
+      this->pose3dReq.pose.py = iter->second.Pos().Y();
+      this->pose3dReq.pose.pz = iter->second.Pos().Z();
 
-      this->pose3dReq.pose.proll = iter->second.rot.GetAsEuler().x;
-      this->pose3dReq.pose.ppitch = iter->second.rot.GetAsEuler().y;
-      this->pose3dReq.pose.pyaw = iter->second.rot.GetAsEuler().z;
+      this->pose3dReq.pose.proll = iter->second.Rot().Euler().X();
+      this->pose3dReq.pose.ppitch = iter->second.Rot().Euler().Y();
+      this->pose3dReq.pose.pyaw = iter->second.Rot().Euler().Z();
     }
 
     this->driver->Publish(this->device_addr, *(this->responseQueue),
@@ -176,7 +176,7 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
     player_simulation_pose2d_req_t *req =
       static_cast<player_simulation_pose2d_req_t*>(_data);
 
-    std::map<std::string, gazebo::math::Pose>::iterator iter;
+    std::map<std::string, ignition::math::Pose3d>::iterator iter;
 
     iter = this->entityPoses.find(req->name);
     if (iter != this->entityPoses.end())
@@ -185,9 +185,9 @@ int SimulationInterface::ProcessMessage(QueuePointer &_respQueue,
           "%s", req->name);
       this->pose3dReq.name_count = strlen(this->pose3dReq.name);
 
-      this->pose2dReq.pose.px = iter->second.pos.x;
-      this->pose2dReq.pose.py = iter->second.pos.y;
-      this->pose2dReq.pose.pa = iter->second.rot.GetAsEuler().z;
+      this->pose2dReq.pose.px = iter->second.Pos().X();
+      this->pose2dReq.pose.py = iter->second.Pos().Y();
+      this->pose2dReq.pose.pa = iter->second.Rot().Euler().Z();
     }
     this->driver->Publish(this->device_addr, *(this->responseQueue),
         PLAYER_MSGTYPE_RESP_ACK, PLAYER_SIMULATION_REQ_GET_POSE2D,
