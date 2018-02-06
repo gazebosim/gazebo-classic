@@ -693,7 +693,7 @@ endif ()
 
 ########################################
 # Find ignition msgs
-find_package(ignition-msgs0 0.7 QUIET)
+find_package(ignition-msgs0 0.4 QUIET)
 if (NOT ignition-msgs0_FOUND)
   message(STATUS "Looking for ignition-msgs0-config.cmake - not found")
   BUILD_ERROR ("Missing: Ignition msgs0 library.")

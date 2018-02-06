@@ -526,7 +526,7 @@ void Actor::Init()
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
 
-  // Initialize the bodies before the joints
+  // Initialize the bodies
   for (Base_V::iterator iter = this->children.begin();
        iter != this->children.end(); ++iter)
   {
