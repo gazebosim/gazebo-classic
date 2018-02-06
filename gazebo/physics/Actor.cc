@@ -525,21 +525,6 @@ void Actor::Init()
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
-
-  // Initialize the bodies
-  for (Base_V::iterator iter = this->children.begin();
-       iter != this->children.end(); ++iter)
-  {
-    if ((*iter)->HasType(Base::LINK))
-    {
-      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
-      if (link)
-        link->Init();
-      else
-        gzerr << "Child [" << (*iter)->GetName()
-          << "] has type Base::LINK, but cannot be dynamically casted\n";
-    }
-  }
 }
 
 //////////////////////////////////////////////////
