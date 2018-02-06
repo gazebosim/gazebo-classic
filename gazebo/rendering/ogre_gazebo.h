@@ -65,6 +65,9 @@
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 7
 #include <OGRE/RTShaderSystem/OgreRTShaderSystem.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramSet.h>
+#include <OGRE/RTShaderSystem/OgreShaderGLSLProgramWriter.h>
+#include <OGRE/RTShaderSystem/OgreShaderProgramWriterManager.h>
 #endif
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
