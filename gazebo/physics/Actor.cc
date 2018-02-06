@@ -46,6 +46,25 @@ using namespace physics;
 using namespace common;
 
 //////////////////////////////////////////////////
+/// \brief Add a box collision object.
+/// \param[in] _linkSdf Link to add the collison to.
+/// \param[in] _name Name of the collision object.
+/// \param[in] _pose Pose of the collision object.
+/// \param[in] _size Dimensions of the collison object.
+void addBoxCollision(const sdf::ElementPtr &_linkSdf,
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    const ignition::math::Vector3d &_size)
+{
+  sdf::ElementPtr collisionSdf = _linkSdf->AddElement("collision");
+  collisionSdf->GetAttribute("name")->Set(_name);
+  sdf::ElementPtr collisionPoseSdf = collisionSdf->GetElement("pose");
+  collisionPoseSdf->Set(_pose);
+  sdf::ElementPtr geomCollSdf = collisionSdf->GetElement("geometry");
+  sdf::ElementPtr boxSdf = geomCollSdf->GetElement("box");
+  boxSdf->GetElement("size")->Set(_size);
+}
+
+//////////////////////////////////////////////////
 Actor::Actor(BasePtr _parent)
   : Model(_parent)
 {
@@ -219,10 +238,6 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
     // Do we even need inertial info in an actor?
     this->AddSphereInertia(linkSdf, ignition::math::Pose3d::Zero, 1.0, 0.01);
 
-    // FIXME hardcoded collision to sphere with radius 0.02
-    this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
-                     ignition::math::Pose3d::Zero, .2);
-
     // FIXME hardcoded visual to red sphere with radius 0.02
     if (bone->IsRootNode())
     {
@@ -268,6 +283,9 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
           curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
           ignition::math::Vector3d(0.02, 0.02, length),
           "Gazebo/Green", Color::Green);
+        addBoxCollision(linkSdf,
+            bone->GetName() + "_" + curChild->GetName() + "_collision",
+            bonePose, ignition::math::Vector3d(0.02, 0.02, length));
       }
     }
   }
