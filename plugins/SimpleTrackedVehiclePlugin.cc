@@ -302,7 +302,7 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
          contactIterator != ContactIterator::end();
          ++contactIterator)
     {
-      dContact* odeContact = *contactIterator;
+      dContact* odeContact = contactIterator.getPointer();
 
       // now we're sure it is a contact between our two geometries
       foundContact = true;
@@ -349,7 +349,6 @@ void SimpleTrackedVehiclePlugin::DriveTracks(
       odeContact->fdir1[0] = frictionDirection.X();
       odeContact->fdir1[1] = frictionDirection.Y();
       odeContact->fdir1[2] = frictionDirection.Z();
-
 
       // use friction direction and motion1 to simulate the track movement
       odeContact->surface.mode |= dContactFDir1 | dContactMotion1;
@@ -482,11 +481,10 @@ SimpleTrackedVehiclePlugin::ContactIterator::operator++()
     found = true;
     this->initialized = true;
 
-    // intentionally, we allow the reference to escape local scope; we can be
-    // pretty sure the contact instance won't get deleted until this code
-    // finishes, since we are in a pause between contact generation and physics
-    // update
-    this->currentContact = &odeContact;
+    // we can be pretty sure the contact instance won't get deleted until this
+    // code finishes, since we are in a pause between contact generation and
+    // physics update
+    this->currentContact = odeContact;
 
     // needed since we break out of the for-loop
     this->jointIndex++;
@@ -591,6 +589,15 @@ SimpleTrackedVehiclePlugin::ContactIterator::operator*()
 
 SimpleTrackedVehiclePlugin::ContactIterator::pointer
 SimpleTrackedVehiclePlugin::ContactIterator::operator->()
+{
+  if (!this->initialized)
+    ++(*this);
+
+  return this->currentContact;
+}
+
+SimpleTrackedVehiclePlugin::ContactIterator::pointer
+SimpleTrackedVehiclePlugin::ContactIterator::getPointer()
 {
   if (!this->initialized)
     ++(*this);

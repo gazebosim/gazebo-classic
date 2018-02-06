@@ -159,7 +159,7 @@ namespace gazebo {
 
     /// \class ContactIterator
     /// \brief An iterator over all contacts between two geometries.
-    class ContactIterator : std::iterator<std::input_iterator_tag, dContact*>
+    class ContactIterator : std::iterator<std::input_iterator_tag, dContact>
     {
       /// \brief The contact to return as the next element.
       private: pointer currentContact;
@@ -192,6 +192,7 @@ namespace gazebo {
       public: ContactIterator operator++(int /*_unused*/);
       public: reference operator*();
       public: pointer operator->();
+      public: pointer getPointer();
       public: bool operator!=(const ContactIterator &_rhs);
     };
   };
