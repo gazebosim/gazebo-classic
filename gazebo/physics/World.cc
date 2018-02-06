@@ -1095,7 +1095,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // we also process light factory msg in World so this avoids creating a
   // duplicate light
   // Note: models uses /model/info topic. We can consider adding a
-  // /light/info topic for this
+  // /light/info topic for this, see issue #2288
   this->dataPtr->lightFactoryPub->Publish(*msg);
 
   return light;
