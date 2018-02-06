@@ -28,6 +28,7 @@
 #include <gazebo/common/Time.hh>
 #include <gazebo/common/CommonTypes.hh>
 #include "gazebo/util/system.hh"
+#include "gazebo/common/Console.hh"
 
 namespace gazebo
 {
@@ -584,7 +585,9 @@ namespace gazebo
       {
         auto const &iter = this->connections.rbegin();
         index = iter->first + 1;
+        gzdbg << " event connect not empty " << index << std::endl;
       }
+      gzdbg << "event connect " << index << std::endl;
       this->connections[index].reset(new EventConnection(true, _subscriber));
       return ConnectionPtr(new Connection(this, index));
     }
@@ -632,7 +635,10 @@ namespace gazebo
       std::lock_guard<std::mutex> lock(this->mutex);
       // Remove all queue connections.
       for (auto &conn : this->connectionsToRemove)
+      {
         this->connections.erase(conn);
+        gzdbg << "  cleanup" << std::endl;
+      }
       this->connectionsToRemove.clear();
     }
     /// \}

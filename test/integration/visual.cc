@@ -216,17 +216,21 @@ TEST_F(VisualProperty, MaterialShaderParam)
   rendering::CameraPtr cam = scene->GetCamera(0);
   ASSERT_NE(nullptr, cam);
 
+  gzdbg << "camera  " << cam->Name() << std::endl;
+
   int totalImages = 20;
   imageCount = 0;
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
   img = new unsigned char[width * height * 3];
 
+  gzdbg << " 1 b4 connect " << std::endl;
   event::ConnectionPtr c =
       cam->ConnectNewImageFrame(
       std::bind(&::OnNewCameraFrame, &imageCount, img,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
+  gzdbg << " 1 after connect " << std::endl;
 
   unsigned int sleep = 0;
   unsigned int maxSleep = 50;
@@ -273,10 +277,12 @@ TEST_F(VisualProperty, MaterialShaderParam)
   // get more images
   sleep = 0;
   imageCount = 0;
+  gzdbg << "  2 b4 connect " << std::endl;
   c = cam->ConnectNewImageFrame(
       std::bind(&::OnNewCameraFrame, &imageCount, img,
       std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
       std::placeholders::_4, std::placeholders::_5));
+  gzdbg << "  2 after connect " << std::endl;
 
   while (imageCount < totalImages && sleep++ < maxSleep)
     common::Time::MSleep(100);
