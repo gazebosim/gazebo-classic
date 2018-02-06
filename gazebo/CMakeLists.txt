@@ -61,6 +61,7 @@ target_link_libraries(gzserver
   ${freeimage_LIBRARIES}
   ${TBB_LIBRARIES}
   ${ogre_libraries}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (UNIX)

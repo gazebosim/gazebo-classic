@@ -92,6 +92,8 @@ namespace gazebo
 
       /// \brief Maximum number of contact points per collision pair.
       public: unsigned int maxContacts;
+
+      public: std::vector<std::pair<CollisionPtr, CollisionPtr>> collPair;
     };
   }
 }

@@ -108,6 +108,7 @@ target_link_libraries(gazebo_sensors
   ${libtool_library}
   ${Boost_LIBRARIES}
   ${ogre_ldflags}
+  ${IGNITION-MSGS_LIBRARIES}
   )
 
 gz_install_library(gazebo_sensors)

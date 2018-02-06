@@ -84,6 +84,8 @@ set (plugins_single_header
   WindPlugin
 )
 
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/deps/opende/include)
+
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
@@ -112,6 +114,7 @@ foreach (src ${plugins_single_header})
   add_library(${src} SHARED ${src}.cc)
   target_link_libraries(${src}
     libgazebo
+    gazebo_ode
     ${ogre_libraries}
     ${IGNITION-TRANSPORT_LIBRARIES}
   )

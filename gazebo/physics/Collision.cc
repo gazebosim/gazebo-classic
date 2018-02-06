@@ -119,11 +119,15 @@ void Collision::Load(sdf::ElementPtr _sdf)
     this->shape->Load(this->sdf->GetElement("geometry")->GetFirstElement());
   else
     gzwarn << "No shape has been specified. Error!!!\n";
+
+  std::cout << "Loaded collision[" << this->GetScopedName() << "]\n";
+  _sdf->PrintValues("  ");
 }
 
 //////////////////////////////////////////////////
 void Collision::Init()
 {
+  std::cout << "Init collision[" << this->GetScopedName() << "]\n";
   this->shape->Init();
 
   this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));

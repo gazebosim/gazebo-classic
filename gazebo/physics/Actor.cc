@@ -126,6 +126,7 @@ void Actor::Load(sdf::ElementPtr _sdf)
   if (_sdf->HasElement("script"))
     this->LoadScript(_sdf->GetElement("script"));
 
+  _sdf->PrintValues("  ");
   // Load all links, including the new ones added when loading the skin
   Model::Load(_sdf);
 
@@ -221,7 +222,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
 
     // FIXME hardcoded collision to sphere with radius 0.02
     this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
-                     ignition::math::Pose3d::Zero, 0.02);
+                     ignition::math::Pose3d::Zero, .2);
 
     // FIXME hardcoded visual to red sphere with radius 0.02
     if (bone->IsRootNode())
@@ -507,6 +508,21 @@ void Actor::Init()
   if (this->autoStart)
     this->Play();
   this->mainLink = this->GetChildLink(this->GetName() + "_pose");
+
+  // Initialize the bodies before the joints
+  for (Base_V::iterator iter = this->children.begin();
+       iter != this->children.end(); ++iter)
+  {
+    if ((*iter)->HasType(Base::LINK))
+    {
+      LinkPtr link = boost::static_pointer_cast<Link>(*iter);
+      if (link)
+        link->Init();
+      else
+        gzerr << "Child [" << (*iter)->GetName()
+          << "] has type Base::LINK, but cannot be dynamically casted\n";
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -675,6 +691,8 @@ void Actor::Update()
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
     rootM.Translate(actorPose.Pos());
+
+  std::cout << "Actor Pose[" << actorPose << "]\n";
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
