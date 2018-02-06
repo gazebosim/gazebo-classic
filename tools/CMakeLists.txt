@@ -21,7 +21,7 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (CURL_FOUND)
@@ -32,14 +32,16 @@ if (CURL_FOUND)
   endif()
 endif()
 
+if(NOT WIN32)
+  # gz_TEST and gz_log_TEST use fork(), that is not available on Windows
+  set (test_sources
+    gz_log_TEST.cc
+    gz_TEST.cc
+  )
 
-set (test_sources
-  gz_log_TEST.cc
-  gz_TEST.cc
-)
-gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gazebo_util)
-
-add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
+  gz_build_tests(${test_sources} EXTRA_LIBS libgazebo_client gazebo_transport gazebo_util)
+  add_dependencies(${TEST_TYPE}_gz_log_TEST gz)
+endif()
 
 add_executable(gz gz.cc gz_topic.cc gz_log.cc gz_marker.cc)
 

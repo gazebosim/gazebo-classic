@@ -26,7 +26,6 @@
 #include "gazebo/common/ImageHeightmap.hh"
 #include "gazebo/common/HeightmapData.hh"
 #include "gazebo/common/Dem.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/physics/Shape.hh"
@@ -69,28 +68,11 @@ namespace gazebo
 
       /// \brief Get the size in meters.
       /// \return The size in meters.
-      /// \deprecated See ignition::math::Vector3d Size() const
-      public: math::Vector3 GetSize() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the size in meters.
-      /// \return The size in meters.
       public: ignition::math::Vector3d Size() const;
 
       /// \brief Get the origin in world coordinate frame.
       /// \return The origin in world coordinate frame.
-      /// \deprecated See ignition::math::Vector3d Pos() const
-      public: math::Vector3 GetPos() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the origin in world coordinate frame.
-      /// \return The origin in world coordinate frame.
       public: ignition::math::Vector3d Pos() const;
-
-      /// \brief Return the number of vertices, which equals the size of the
-      /// image used to load the heightmap.
-      /// \return math::Vector2i, result.x = width,
-      /// result.y = length/height.
-      /// \deprecated Use function that returns ignition math.
-      public: math::Vector2i GetVertexCount() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Return the number of vertices, which equals the size of the
       /// image used to load the heightmap.

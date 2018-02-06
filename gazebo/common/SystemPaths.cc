@@ -165,33 +165,15 @@ const std::list<std::string> &SystemPaths::GetOgrePaths()
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpPath()
-{
-  return this->TmpPath();
-}
-
-/////////////////////////////////////////////////
 const std::string &SystemPaths::TmpPath() const
 {
   return this->tmpPath.string();
 }
 
 /////////////////////////////////////////////////
-std::string SystemPaths::GetTmpInstancePath()
-{
-  return this->TmpInstancePath();
-}
-
-/////////////////////////////////////////////////
 const std::string &SystemPaths::TmpInstancePath() const
 {
   return this->tmpInstancePath.string();
-}
-
-/////////////////////////////////////////////////
-std::string SystemPaths::GetDefaultTestPath()
-{
-  return this->DefaultTestPath();
 }
 
 /////////////////////////////////////////////////

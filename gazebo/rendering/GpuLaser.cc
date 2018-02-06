@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -479,6 +480,34 @@ const float* GpuLaser::LaserData() const
   return this->dataPtr->laserBuffer;
 }
 
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataBegin() const
+{
+  const unsigned int index = 0;
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataEnd() const
+{
+  const unsigned int index = this->ImageHeight() * this->ImageWidth();
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->ImageWidth());
+}
+
 /////////////////////////////////////////////////
 void GpuLaser::CreateOrthoCam()
 {
@@ -718,7 +747,7 @@ void GpuLaser::CreateCanvas()
   this->dataPtr->visual->SetPose(pose);
 
   this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }
@@ -862,10 +891,4 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
 }

@@ -594,7 +594,8 @@ void ODELink::AddRelativeForce(const ignition::math::Vector3d &_force)
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
+void ODELink::AddForceAtRelativePosition(
+    const ignition::math::Vector3d &_force,
     const ignition::math::Vector3d &_relpos)
 {
   if (this->linkId)
@@ -612,8 +613,9 @@ void ODELink::AddForceAtRelativePosition(const ignition::math::Vector3d &_force,
 }
 
 /////////////////////////////////////////////////
-void ODELink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
-                                      const ignition::math::Vector3d &_pos)
+void ODELink::AddForceAtWorldPosition(
+    const ignition::math::Vector3d &_force,
+    const ignition::math::Vector3d &_pos)
 {
   if (this->linkId)
   {
@@ -630,7 +632,8 @@ void ODELink::AddForceAtWorldPosition(const ignition::math::Vector3d &_force,
 }
 
 //////////////////////////////////////////////////
-void ODELink::AddLinkForce(const ignition::math::Vector3d &_force,
+void ODELink::AddLinkForce(
+    const ignition::math::Vector3d &_force,
     const ignition::math::Vector3d &_offset)
 {
   if (this->linkId)

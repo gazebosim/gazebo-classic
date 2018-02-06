@@ -198,10 +198,27 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
+set (headers_install ${headers})
+
+# Do not install fuel_tools headers.
+if (HAVE_IGNITION_FUEL_TOOLS)
+  set (headers ${headers}
+    FuelModelDatabase.hh
+  )
+
+  set (sources ${sources}
+    FuelModelDatabase.cc
+  )
+
+  set (gtest_sources ${gtest_sources}
+    FuelModelDatabase_TEST.cc
+  )
+endif()
+
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
-foreach (hdr ${headers})
+foreach (hdr ${headers_install})
   APPEND_TO_CACHED_STRING(common_headers
     "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
 endforeach()
@@ -227,7 +244,6 @@ set_property(
 )
 
 target_link_libraries(gazebo_common
-  gazebo_math
   ${IGNITION-MATH_LIBRARIES}
   ${libdl_library}
   ${libtool_library}
@@ -243,6 +259,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
+  ${IGNITION-FUEL_TOOLS_LIBRARIES}
 )
 
 if (UNIX)
@@ -267,10 +284,10 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  set(MORE_FLAGS "-pthread")
+  set(MORE_FLAGS "-pthread" ${Boost_PKGCONFIG_CFLAGS})
   add_pch(gazebo_common common_pch.hh ${MORE_FLAGS})
 endif()
 
 
 gz_install_library(gazebo_common)
-gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
+gz_install_includes("common" ${headers_install} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <ignition/transport.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/transport/TransportTypes.hh"
@@ -35,10 +36,10 @@ namespace gazebo
     class JointControlWidgetPrivate
     {
       /// \brief Node for coomunication.
-      public: transport::NodePtr node;
+      public: ignition::transport::Node node;
 
       /// \brief Publisher for joint messages.
-      public: transport::PublisherPtr jointPub;
+      public: ignition::transport::Node::Publisher jointPub;
 
       /// \brief Sliders for force control
       public: std::map<std::string, JointForceControl *> sliders;
@@ -63,6 +64,9 @@ namespace gazebo
 
       /// \brief Layout for the velocity controls.
       public: QGridLayout *velocityGridLayout;
+
+      /// \brief Name of currently selected model
+      public: std::string modelName;
     };
 
     /// \brief Private data for the JointForceControl class.

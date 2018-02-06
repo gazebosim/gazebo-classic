@@ -75,35 +75,24 @@ namespace gazebo
 
       /// \brief Get DART body node.
       /// \return Pointer to the dart BodyNode.
-      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
+      public: dart::dynamics::BodyNode *DARTBodyNode() const;
 
       /// \brief Set DART collision shape.
       /// \param[in] _shape DART Collision shape
       /// \param[in] _placeable True to make the object movable.
-      /// \deprecated See version that accepts dart::dynamics::ShapePtr
-      public: void SetDARTCollisionShape(dart::dynamics::Shape *_shape,
-                                         const bool _placeable = true)
-              GAZEBO_DEPRECATED(8.0);
+      public: void SetDARTCollisionShapeNode(
+                           dart::dynamics::ShapeNodePtr _shape,
+                           const bool _placeable = true);
 
-      /// \brief Set DART collision shape.
-      /// \param[in] _shape DART Collision shape
-      /// \param[in] _placeable True to make the object movable.
-      public: void SetDARTCollisionShape(dart::dynamics::ShapePtr _shape,
-                                         const bool _placeable = true);
-
-      /// \brief Get DART collision shape.
-      /// \deprecated See dart::dynamics::ShapePtr DARTCollisionShape()
-      public: dart::dynamics::Shape *GetDARTCollisionShape() const
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get DART collision shape.
+      /// \brief Get DART collision shape node.
       /// \return DART Collision shape pointer.
-      public: dart::dynamics::ShapePtr DARTCollisionShape() const;
+      public: dart::dynamics::ShapeNodePtr DARTCollisionShapeNode() const;
+
 
       /// \brief Similar to Collision::GetSurface, but provides dynamically
       ///        casted pointer to DARTSurfaceParams.
       /// \return Dynamically casted pointer to DARTSurfaceParams.
-      public: DARTSurfaceParamsPtr GetDARTSurface() const;
+      public: DARTSurfaceParamsPtr DARTSurface() const;
 
       /// \internal
       /// \brief Pointer to private data

@@ -297,16 +297,6 @@ void ImuSensor::SetReferencePose()
 }
 
 //////////////////////////////////////////////////
-void ImuSensor::SetWorldToReferencePose(
-  const ignition::math::Pose3d &_pose)
-{
-  // worldToReference: from world frame to IMU Reference frame.
-  gzwarn << "translation part of the argument is not used."
-         << " Use SetWorldToReferenceOrientation instead.\n";
-  this->dataPtr->worldToReference = _pose.Rot();
-}
-
-//////////////////////////////////////////////////
 void ImuSensor::SetWorldToReferenceOrientation(
   const ignition::math::Quaterniond &_orientation)
 {

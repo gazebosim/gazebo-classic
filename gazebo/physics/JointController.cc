@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Subscriber.hh"
 #include "gazebo/physics/Model.hh"
@@ -43,10 +45,10 @@ JointController::JointController(ModelPtr _model)
 
   if (this->dataPtr->model && this->dataPtr->model->GetWorld())
   {
-    this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->Name());
+    this->dataPtr->gznode = transport::NodePtr(new transport::Node());
+    this->dataPtr->gznode->Init(this->dataPtr->model->GetWorld()->Name());
 
-    this->dataPtr->jointCmdSub = this->dataPtr->node->Subscribe(
+    this->dataPtr->jointCmdSub = this->dataPtr->gznode->Subscribe(
         std::string("~/") + this->dataPtr->model->GetName() + "/joint_cmd",
         &JointController::OnJointCmd, this);
   }
@@ -54,6 +56,27 @@ JointController::JointController(ModelPtr _model)
   {
     gzwarn << "Unable to get world name. "
       << "JointController will not receive commands via messages\n";
+  }
+
+  std::string modelName = this->dataPtr->model->GetScopedName();
+  if (modelName.empty())
+  {
+    modelName = this->dataPtr->model->GetName();
+  }
+  boost::replace_all(modelName, "::", "/");
+
+  std::string topic = "/" + modelName + "/joint_cmd";
+  if (!this->dataPtr->node.Subscribe(topic,
+      &JointController::OnJointCommand, this))
+  {
+    gzerr << "Error subscribing to topic [" << topic << "]\n";
+  }
+
+  std::string service = "/" + modelName + "/joint_cmd_req";
+  if (!this->dataPtr->node.Advertise(service,
+      &JointController::OnJointCmdReq, this))
+  {
+    gzerr << "Error advertising service [" << service << "]\n";
   }
 }
 
@@ -181,8 +204,195 @@ void JointController::Update()
 }
 
 /////////////////////////////////////////////////
+bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::JointCmd &_rep)
+{
+  const std::string &jointName = _req.data();
+  _rep.set_name(jointName);
+
+  if (this->dataPtr->forces.find(jointName) !=
+      this->dataPtr->forces.end())
+  {
+    _rep.set_force(this->dataPtr->forces[jointName]);
+  }
+
+  if (this->dataPtr->positions.find(jointName) !=
+      this->dataPtr->positions.end())
+  {
+    _rep.mutable_position()->set_target(this->dataPtr->positions[jointName]);
+  }
+
+  if (this->dataPtr->velocities.find(jointName) !=
+      this->dataPtr->velocities.end())
+  {
+    _rep.mutable_velocity()->set_target(this->dataPtr->velocities[jointName]);
+  }
+
+  if (this->dataPtr->posPids.find(jointName) !=
+      this->dataPtr->posPids.end())
+  {
+    _rep.mutable_position()->set_p_gain(
+        this->dataPtr->posPids[jointName].GetPGain());
+    _rep.mutable_position()->set_d_gain(
+        this->dataPtr->posPids[jointName].GetDGain());
+    _rep.mutable_position()->set_i_gain(
+        this->dataPtr->posPids[jointName].GetIGain());
+  }
+
+  if (this->dataPtr->velPids.find(jointName) !=
+      this->dataPtr->velPids.end())
+  {
+    _rep.mutable_velocity()->set_p_gain(
+        this->dataPtr->velPids[jointName].GetPGain());
+    _rep.mutable_velocity()->set_d_gain(
+        this->dataPtr->velPids[jointName].GetDGain());
+    _rep.mutable_velocity()->set_i_gain(
+        this->dataPtr->velPids[jointName].GetIGain());
+  }
+
+  return true;
+}
+
+/////////////////////////////////////////////////
+void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
+{
+  std::map<std::string, JointPtr>::iterator iter;
+  iter = this->dataPtr->joints.find(_msg.name());
+  if (iter != this->dataPtr->joints.end())
+  {
+    if (_msg.has_reset() && _msg.reset())
+    {
+      if (this->dataPtr->forces.find(_msg.name()) !=
+          this->dataPtr->forces.end())
+      {
+        this->dataPtr->forces.erase(this->dataPtr->forces.find(_msg.name()));
+      }
+
+      if (this->dataPtr->positions.find(_msg.name()) !=
+          this->dataPtr->positions.end())
+      {
+        this->dataPtr->positions.erase(
+            this->dataPtr->positions.find(_msg.name()));
+      }
+
+      if (this->dataPtr->velocities.find(_msg.name()) !=
+          this->dataPtr->velocities.end())
+      {
+        this->dataPtr->velocities.erase(
+            this->dataPtr->velocities.find(_msg.name()));
+      }
+    }
+
+    if (_msg.has_force())
+      this->dataPtr->forces[_msg.name()] = _msg.force();
+
+    if (_msg.has_position())
+    {
+      if (_msg.position().has_target())
+      {
+        if (!this->SetPositionTarget(_msg.name(), _msg.position().target()))
+        {
+          gzerr << "Unable to set position target for joint["
+            << _msg.name() << "]. Joint is not found.\n";
+        }
+      }
+
+      if (_msg.position().has_p_gain())
+      {
+        this->dataPtr->posPids[_msg.name()].SetPGain(
+            _msg.position().p_gain());
+      }
+
+      if (_msg.position().has_i_gain())
+      {
+        this->dataPtr->posPids[_msg.name()].SetIGain(
+            _msg.position().i_gain());
+      }
+
+      if (_msg.position().has_d_gain())
+      {
+        this->dataPtr->posPids[_msg.name()].SetDGain(
+            _msg.position().d_gain());
+      }
+
+      if (_msg.position().has_i_max())
+      {
+        this->dataPtr->posPids[_msg.name()].SetIMax(_msg.position().i_max());
+      }
+
+      if (_msg.position().has_i_min())
+      {
+        this->dataPtr->posPids[_msg.name()].SetIMin(_msg.position().i_min());
+      }
+
+      if (_msg.position().has_limit())
+      {
+        this->dataPtr->posPids[_msg.name()].SetCmdMax(
+            _msg.position().limit());
+        this->dataPtr->posPids[_msg.name()].SetCmdMin(
+            -_msg.position().limit());
+      }
+    }
+
+    if (_msg.has_velocity())
+    {
+      if (_msg.velocity().has_target())
+      {
+        if (!this->SetVelocityTarget(_msg.name(), _msg.velocity().target()))
+        {
+          gzerr << "Unable to set velocity target for joint["
+            << _msg.name() << "]. Joint is not found.\n";
+        }
+      }
+
+      if (_msg.velocity().has_p_gain())
+      {
+        this->dataPtr->velPids[_msg.name()].SetPGain(
+            _msg.velocity().p_gain());
+      }
+
+      if (_msg.velocity().has_i_gain())
+      {
+        this->dataPtr->velPids[_msg.name()].SetIGain(
+            _msg.velocity().i_gain());
+      }
+
+      if (_msg.velocity().has_d_gain())
+      {
+        this->dataPtr->velPids[_msg.name()].SetDGain(
+            _msg.velocity().d_gain());
+      }
+
+      if (_msg.velocity().has_i_max())
+      {
+        this->dataPtr->velPids[_msg.name()].SetIMax(_msg.velocity().i_max());
+      }
+
+      if (_msg.velocity().has_i_min())
+      {
+        this->dataPtr->velPids[_msg.name()].SetIMin(_msg.velocity().i_min());
+      }
+
+      if (_msg.velocity().has_limit())
+      {
+        this->dataPtr->velPids[_msg.name()].SetCmdMax(
+            _msg.velocity().limit());
+        this->dataPtr->velPids[_msg.name()].SetCmdMin(
+            -_msg.velocity().limit());
+      }
+    }
+  }
+  else
+    gzerr << "Unable to find joint[" << _msg.name() << "]\n";
+}
+
+/////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
+  gzwarn << "Gazebo topics of the form \"~/[modelName]/joint_cmd\" are "
+      << "deprecated.\nUse ignition::transport topics of the form "
+      << "\"/[scopedModelName]/joint_cmd\" instead.\n";
+
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->dataPtr->joints.find(_msg->name());
   if (iter != this->dataPtr->joints.end())

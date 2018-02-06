@@ -91,12 +91,6 @@ Road2d::~Road2d()
   dPtr->segments.clear();
 }
 
-/////////////////////////////////////////////////
-void Road2d::Load(VisualPtr /*_parent*/)
-{
-  // This function is deprecated. Remove in gazebo9
-}
-
 //////////////////////////////////////////////////
 void Road2d::Load(msgs::Road _msg)
 {

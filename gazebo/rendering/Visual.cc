@@ -16,9 +16,8 @@
 */
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
-
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -483,13 +482,13 @@ void Visual::Load()
     }
 
     if (matElemClone->HasElement("ambient"))
-      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
+      this->SetAmbient(matElemClone->Get<ignition::math::Color>("ambient"));
     if (matElemClone->HasElement("diffuse"))
-      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
+      this->SetDiffuse(matElemClone->Get<ignition::math::Color>("diffuse"));
     if (matElemClone->HasElement("specular"))
-      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
+      this->SetSpecular(matElemClone->Get<ignition::math::Color>("specular"));
     if (matElemClone->HasElement("emissive"))
-      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
+      this->SetEmissive(matElemClone->Get<ignition::math::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -575,12 +574,6 @@ void Visual::SetName(const std::string &_name)
 {
   this->dataPtr->name = _name;
   this->dataPtr->sdf->GetAttribute("name")->Set(_name);
-}
-
-//////////////////////////////////////////////////
-std::string Visual::GetName() const
-{
-  return this->Name();
 }
 
 //////////////////////////////////////////////////
@@ -784,19 +777,6 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
 }
 
 //////////////////////////////////////////////////
-void Visual::SetScale(const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetScale(_scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Visual::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->dataPtr->scale == _scale)
@@ -888,19 +868,6 @@ void Visual::UpdateGeomSize(const ignition::math::Vector3d &_scale)
 ignition::math::Vector3d Visual::GetGeometrySize() const
 {
   return this->dataPtr->geomSize;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetScale()
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Scale();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1008,11 +975,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  common::Color matAmbient;
-  common::Color matDiffuse;
-  common::Color matSpecular;
-  common::Color matEmissive;
-  bool matColor = rendering::Material::GetMaterialAsColor(
+  ignition::math::Color matAmbient;
+  ignition::math::Color matDiffuse;
+  ignition::math::Color matSpecular;
+  ignition::math::Color matEmissive;
+  bool matColor = rendering::Material::MaterialAsColor(
       _materialName, matAmbient, matDiffuse, matSpecular, matEmissive);
 
   if (_unique)
@@ -1023,10 +990,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         _materialName;
 
     if (this->GetMaterialName() == newMaterialName &&
-        matAmbient == this->GetAmbient() &&
-        matDiffuse == this->GetDiffuse() &&
-        matSpecular == this->GetSpecular() &&
-        matEmissive == this->GetEmissive())
+        matAmbient == this->Ambient() &&
+        matDiffuse == this->Diffuse() &&
+        matSpecular == this->Specular() &&
+        matEmissive == this->Emissive())
       return;
 
     this->dataPtr->myMaterialName = newMaterialName;
@@ -1136,6 +1103,13 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 /////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 {
+  this->SetAmbient(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetAmbient(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   if (!this->dataPtr->lighting)
     return;
 
@@ -1199,6 +1173,13 @@ void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 
 /////////////////////////////////////////////////
 void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
+{
+  this->SetDiffuse(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetDiffuse(const ignition::math::Color &_color,
+    const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1269,6 +1250,13 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 /////////////////////////////////////////////////
 void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 {
+  this->SetSpecular(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSpecular(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   if (!this->dataPtr->lighting)
     return;
 
@@ -1333,6 +1321,13 @@ void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 {
+  this->SetEmissive(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1387,11 +1382,37 @@ void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 /////////////////////////////////////////////////
 common::Color Visual::GetAmbient() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->ambient;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Ambient() const
+{
   return this->dataPtr->ambient;
 }
 
 /////////////////////////////////////////////////
 common::Color Visual::GetDiffuse() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->diffuse;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Diffuse() const
 {
   return this->dataPtr->diffuse;
 }
@@ -1399,11 +1420,37 @@ common::Color Visual::GetDiffuse() const
 /////////////////////////////////////////////////
 common::Color Visual::GetSpecular() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->specular;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Specular() const
+{
   return this->dataPtr->specular;
 }
 
 /////////////////////////////////////////////////
 common::Color Visual::GetEmissive() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->emissive;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Emissive() const
 {
   return this->dataPtr->emissive;
 }
@@ -1773,38 +1820,12 @@ bool Visual::GetVisible() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPosition(const math::Vector3 &_pos)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetPosition(_pos.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPosition(const ignition::math::Vector3d &_pos)
 {
   GZ_ASSERT(this->dataPtr->sceneNode, "Visual SceneNode is NULL");
   this->dataPtr->sceneNode->setPosition(_pos.X(), _pos.Y(), _pos.Z());
 
   this->dataPtr->sdf->GetElement("pose")->Set(this->Pose());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetRotation(const math::Quaternion &_rot)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetRotation(_rot.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1818,36 +1839,10 @@ void Visual::SetRotation(const ignition::math::Quaterniond &_rot)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Visual::SetPose(const ignition::math::Pose3d &_pose)
 {
   this->SetPosition(_pose.Pos());
   this->SetRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Visual::GetPosition() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Position();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1859,37 +1854,11 @@ ignition::math::Vector3d Visual::Position() const
 }
 
 //////////////////////////////////////////////////
-math::Quaternion Visual::GetRotation() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Rotation();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Quaterniond Visual::Rotation() const
 {
   if (!this->dataPtr->sceneNode)
     return ignition::math::Quaterniond::Identity;
   return Conversions::ConvertIgn(this->dataPtr->sceneNode->getOrientation());
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1908,36 +1877,10 @@ ignition::math::Pose3d Visual::InitialRelativePose() const
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
   this->SetWorldRotation(_pose.Rot());
-}
-
-//////////////////////////////////////////////////
-void Visual::SetWorldPosition(const math::Vector3 &_pos)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPosition(_pos.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1949,37 +1892,11 @@ void Visual::SetWorldPosition(const ignition::math::Vector3d &_pos)
 }
 
 //////////////////////////////////////////////////
-void Visual::SetWorldRotation(const math::Quaternion &_q)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldRotation(_q.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Visual::SetWorldRotation(const ignition::math::Quaterniond &_q)
 {
   if (!this->dataPtr->sceneNode)
     return;
   this->dataPtr->sceneNode->_setDerivedOrientation(Conversions::Convert(_q));
-}
-
-//////////////////////////////////////////////////
-math::Pose Visual::GetWorldPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -2008,7 +1925,6 @@ Ogre::SceneNode * Visual::GetSceneNode() const
 {
   return this->dataPtr->sceneNode;
 }
-
 
 //////////////////////////////////////////////////
 bool Visual::IsStatic() const
@@ -2068,8 +1984,9 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
-                            const common::Color &_changeColor)
+void Visual::SetRibbonTrail(bool _value,
+    const ignition::math::Color &_initialColor,
+    const ignition::math::Color &_changeColor)
 {
   if (this->dataPtr->ribbonTrail == nullptr)
   {
@@ -2112,6 +2029,14 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
 }
 
 //////////////////////////////////////////////////
+void Visual::SetRibbonTrail(bool _value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor)
+{
+  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
+}
+
+//////////////////////////////////////////////////
 DynamicLines *Visual::CreateDynamicLine(RenderOpType _type)
 {
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
@@ -2150,19 +2075,6 @@ void Visual::AttachLineVertex(DynamicLines *_line, unsigned int _index)
 std::string Visual::GetMaterialName() const
 {
   return this->dataPtr->myMaterialName;
-}
-
-//////////////////////////////////////////////////
-math::Box Visual::GetBoundingBox() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->BoundingBox();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -2568,12 +2480,17 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
 
     std::string newGeometryName = geometryName;
     if (_msg->geometry().has_mesh() && _msg->geometry().mesh().has_filename())
-        newGeometryName = common::find_file(_msg->geometry().mesh().filename());
+    {
+      std::string filename = _msg->geometry().mesh().filename();
+      newGeometryName = common::find_file(filename);
+    }
 
     if (newGeometryType != geometryType ||
-        (newGeometryType == "mesh" && newGeometryName != geometryName))
+        (newGeometryType == "mesh" && !newGeometryName.empty() &&
+        newGeometryName != geometryName))
     {
       std::string origMaterial = this->dataPtr->myMaterialName;
+      bool origCastShadows = this->dataPtr->castShadows;
 
       sdf::ElementPtr geomElem = this->dataPtr->sdf->GetElement("geometry");
       geomElem->ClearElements();
@@ -2626,6 +2543,7 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
         this->dataPtr->skeleton = ent->getSkeleton();
       this->SetMaterial(origMaterial, false);
       this->UpdateTransparency(true);
+      this->SetCastShadows(origCastShadows);
     }
 
     ignition::math::Vector3d geomScale(1, 1, 1);
@@ -2956,27 +2874,6 @@ bool Visual::GetCenterSubMesh() const
 }
 
 //////////////////////////////////////////////////
-void Visual::MoveToPositions(const std::vector<math::Pose> &_pts,
-                             double _time,
-                             std::function<void()> _onComplete)
-{
-  std::vector<ignition::math::Pose3d> pts;
-  for (auto const &pt : _pts)
-  {
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    pts.push_back(pt.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-  }
-
-  this->MoveToPositions(pts, _time, _onComplete);
-}
-
-//////////////////////////////////////////////////
 void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
                              const double _time,
                              std::function<void()> _onComplete)
@@ -3024,19 +2921,6 @@ void Visual::MoveToPositions(const std::vector<ignition::math::Pose3d> &_pts,
     this->dataPtr->preRenderConnection =
       event::Events::ConnectPreRender(boost::bind(&Visual::Update, this));
   }
-}
-
-//////////////////////////////////////////////////
-void Visual::MoveToPosition(const math::Pose &_pose, double _time)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->MoveToPosition(_pose.Ign(), _time);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -3647,28 +3531,28 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 
   if (_msg.has_ambient())
   {
-    this->SetAmbient(common::Color(
+    this->SetAmbient(ignition::math::Color(
           _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
           _msg.ambient().a()));
   }
 
   if (_msg.has_diffuse())
   {
-    this->SetDiffuse(common::Color(
+    this->SetDiffuse(ignition::math::Color(
           _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
           _msg.diffuse().a()));
   }
 
   if (_msg.has_specular())
   {
-    this->SetSpecular(common::Color(
+    this->SetSpecular(ignition::math::Color(
           _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
           _msg.specular().a()));
   }
 
   if (_msg.has_emissive())
   {
-    this->SetEmissive(common::Color(
+    this->SetEmissive(ignition::math::Color(
           _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
           _msg.emissive().a()));
   }
@@ -3715,25 +3599,25 @@ void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
     _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
   }
 
-  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
-  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
-  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
-  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.R());
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.G());
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.B());
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.A());
 
-  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
-  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
-  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
-  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.R());
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.G());
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.B());
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.A());
 
-  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
-  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
-  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
-  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.R());
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.G());
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.B());
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.A());
 
-  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
-  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
-  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
-  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.R());
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.G());
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.B());
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.A());
 
   if (!this->GetNormalMap().empty())
     _msg.set_normal_map(this->GetNormalMap());

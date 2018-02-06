@@ -18,8 +18,6 @@
 #ifndef _ODEGEARBOXJOINT_HH_
 #define _ODEGEARBOXJOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/physics/GearboxJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/util/system.hh"

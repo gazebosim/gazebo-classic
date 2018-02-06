@@ -39,8 +39,6 @@
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
 
-#include "gazebo/math/Rand.hh"
-
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -220,8 +218,6 @@ void World::Load(sdf::ElementPtr _sdf)
   this->dataPtr->jointSub = this->dataPtr->node->Subscribe("~/joint",
       &World::JointLog, this);
 
-  this->dataPtr->lightSub = this->dataPtr->node->Subscribe("~/light",
-      &World::OnLightMsg, this);
   this->dataPtr->lightFactorySub =
       this->dataPtr->node->Subscribe("~/factory/light",
       &World::OnLightFactoryMsg, this);
@@ -241,6 +237,8 @@ void World::Load(sdf::ElementPtr _sdf)
       "~/model/info");
   this->dataPtr->lightPub = this->dataPtr->node->Advertise<msgs::Light>(
       "~/light/modify");
+  this->dataPtr->lightFactoryPub = this->dataPtr->node->Advertise<msgs::Light>(
+      "~/factory/light");
 
   // Ignition transport
   std::string pluginInfoService("/physics/info/plugin");
@@ -342,6 +340,13 @@ void World::Load(sdf::ElementPtr _sdf)
   this->RegisterIntrospectionItems();
 
   this->dataPtr->loaded = true;
+}
+
+//////////////////////////////////////////////////
+const sdf::ElementPtr World::SDF()
+{
+  this->UpdateStateSDF();
+  return this->dataPtr->sdf;
 }
 
 //////////////////////////////////////////////////
@@ -449,12 +454,6 @@ void World::RemoveModel(ModelPtr _model)
 {
   if (_model)
     this->RemoveModel(_model->GetName());
-}
-
-//////////////////////////////////////////////////
-bool World::GetRunning() const
-{
-  return this->Running();
 }
 
 //////////////////////////////////////////////////
@@ -774,7 +773,7 @@ void World::Update()
 
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
-  // This must be called before PhysicsEngine::UpdatePhysics.
+  // This must be called before PhysicsEngine::UpdatePhysics for ODE.
   this->dataPtr->physicsEngine->UpdateCollision();
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
@@ -957,21 +956,9 @@ void World::ClearModels()
 }
 
 //////////////////////////////////////////////////
-std::string World::GetName() const
-{
-  return this->Name();
-}
-
-//////////////////////////////////////////////////
 std::string World::Name() const
 {
   return this->dataPtr->name;
-}
-
-//////////////////////////////////////////////////
-PhysicsEnginePtr World::GetPhysicsEngine() const
-{
-  return this->Physics();
 }
 
 //////////////////////////////////////////////////
@@ -993,21 +980,9 @@ Atmosphere &World::Atmosphere() const
 }
 
 //////////////////////////////////////////////////
-PresetManagerPtr World::GetPresetManager() const
-{
-  return this->PresetMgr();
-}
-
-//////////////////////////////////////////////////
 PresetManagerPtr World::PresetMgr() const
 {
   return this->dataPtr->presetManager;
-}
-
-//////////////////////////////////////////////////
-common::SphericalCoordinatesPtr World::GetSphericalCoordinates() const
-{
-  return this->SphericalCoords();
 }
 
 //////////////////////////////////////////////////
@@ -1049,12 +1024,6 @@ void World::SetMagneticField(const ignition::math::Vector3d &_mag)
 }
 
 //////////////////////////////////////////////////
-BasePtr World::GetByName(const std::string &_name)
-{
-  return this->BaseByName(_name);
-}
-
-//////////////////////////////////////////////////
 BasePtr World::BaseByName(const std::string &_name) const
 {
   if (this->dataPtr->rootElement)
@@ -1071,12 +1040,6 @@ ModelPtr World::ModelById(unsigned int _id) const
 }
 
 //////////////////////////////////////////////////
-ModelPtr World::GetModel(const std::string &_name)
-{
-  return this->ModelByName(_name);
-}
-
-//////////////////////////////////////////////////
 ModelPtr World::ModelByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadModelMutex);
@@ -1084,23 +1047,10 @@ ModelPtr World::ModelByName(const std::string &_name) const
 }
 
 //////////////////////////////////////////////////
-LightPtr World::Light(const std::string &_name)
-{
-  std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
-  return boost::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
-}
-
-//////////////////////////////////////////////////
 LightPtr World::LightByName(const std::string &_name) const
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->loadLightMutex);
   return boost::dynamic_pointer_cast<physics::Light>(this->BaseByName(_name));
-}
-
-//////////////////////////////////////////////////
-EntityPtr World::GetEntity(const std::string &_name)
-{
-  return this->EntityByName(_name);
 }
 
 //////////////////////////////////////////////////
@@ -1162,6 +1112,16 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
 
+  // msg should contain scoped name (consistent with other entities)
+  msg->set_name(light->GetScopedName());
+
+  // publish after adding light to the lights vector
+  // we also process light factory msg in World so this avoids creating a
+  // duplicate light
+  // Note: models uses /model/info topic. We can consider adding a
+  // /light/info topic for this
+  this->dataPtr->lightFactoryPub->Publish(*msg);
+
   return light;
 }
 
@@ -1177,6 +1137,10 @@ ActorPtr World::LoadActor(sdf::ElementPtr _sdf , BasePtr _parent)
   msgs::Model msg;
   actor->FillMsg(msg);
   this->dataPtr->modelPub->Publish(msg);
+
+  this->EnableAllModels();
+  this->PublishModelPose(actor);
+  this->dataPtr->models.push_back(actor);
 
   return actor;
 }
@@ -1242,12 +1206,6 @@ void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 }
 
 //////////////////////////////////////////////////
-unsigned int World::GetModelCount() const
-{
-  return this->ModelCount();
-}
-
-//////////////////////////////////////////////////
 unsigned int World::ModelCount() const
 {
   return this->dataPtr->models.size();
@@ -1257,12 +1215,6 @@ unsigned int World::ModelCount() const
 unsigned int World::LightCount() const
 {
   return this->dataPtr->lights.size();
-}
-
-//////////////////////////////////////////////////
-ModelPtr World::GetModel(unsigned int _index) const
-{
-  return this->ModelByIndex(_index);
 }
 
 //////////////////////////////////////////////////
@@ -1276,12 +1228,6 @@ ModelPtr World::ModelByIndex(const unsigned int _index) const
   }
 
   return this->dataPtr->models[_index];
-}
-
-//////////////////////////////////////////////////
-Model_V World::GetModels() const
-{
-  return this->Models();
 }
 
 //////////////////////////////////////////////////
@@ -1328,18 +1274,6 @@ void World::Reset()
   {
     std::lock_guard<std::recursive_mutex> lk(this->dataPtr->worldUpdateMutex);
 
-    // \todo: The following is deprecated, but we're keeping it until other
-    // gazebo math functionality is removed.
-
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    math::Rand::SetSeed(math::Rand::GetSeed());
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
-
     ignition::math::Rand::Seed(ignition::math::Rand::Seed());
     this->dataPtr->physicsEngine->SetSeed(ignition::math::Rand::Seed());
 
@@ -1373,12 +1307,6 @@ void World::PrintEntityTree()
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetSimTime() const
-{
-  return this->SimTime();
-}
-
-//////////////////////////////////////////////////
 gazebo::common::Time World::SimTime() const
 {
   return this->dataPtr->simTime;
@@ -1391,33 +1319,15 @@ void World::SetSimTime(const common::Time &_t)
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetPauseTime() const
-{
-  return this->PauseTime();
-}
-
-//////////////////////////////////////////////////
 gazebo::common::Time World::PauseTime() const
 {
   return this->dataPtr->pauseTime;
 }
 
 //////////////////////////////////////////////////
-gazebo::common::Time World::GetStartTime() const
-{
-  return this->StartTime();
-}
-
-//////////////////////////////////////////////////
 gazebo::common::Time World::StartTime() const
 {
   return this->dataPtr->startTime;
-}
-
-//////////////////////////////////////////////////
-common::Time World::GetRealTime() const
-{
-  return this->RealTime();
 }
 
 //////////////////////////////////////////////////
@@ -1500,14 +1410,6 @@ void World::OnControl(ConstWorldControlPtr &_data)
 
   if (_data->has_seed())
   {
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-    math::Rand::SetSeed(_data->seed());
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
     ignition::math::Rand::Seed(_data->seed());
     this->dataPtr->physicsEngine->SetSeed(_data->seed());
   }
@@ -1617,6 +1519,11 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
     {
       msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
+    }
+    else if (_entity->HasType(Entity::LIGHT))
+    {
+      msgs::Light *lightMsg = _scene.add_light();
+      boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
     }
 
     for (unsigned int i = 0; i < _entity->GetChildCount(); ++i)
@@ -1872,6 +1779,7 @@ void World::ProcessRequestMsgs()
     else if (requestMsg.request() == "scene_info")
     {
       this->dataPtr->sceneMsg.clear_model();
+      this->dataPtr->sceneMsg.clear_light();
       this->BuildSceneMsg(this->dataPtr->sceneMsg, this->dataPtr->rootElement);
 
       std::string *serializedData = response.mutable_serialized_data();
@@ -1997,8 +1905,6 @@ void World::ProcessLightFactoryMsgs()
 
     if (light)
     {
-      gzerr << "Light [" << lightFactoryMsg.name() << "] already exists."
-          << " Use topic ~/light/modify to modify it." << std::endl;
       continue;
     }
     else
@@ -2207,25 +2113,13 @@ void World::ProcessFactoryMsgs()
       std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
       LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+      light->Init();
     }
     catch(...)
     {
       gzerr << "Loading light from factory message failed\n";
     }
   }
-}
-
-//////////////////////////////////////////////////
-ModelPtr World::GetModelBelowPoint(const math::Vector3 &_pt)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->ModelBelowPoint(_pt.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -2238,19 +2132,6 @@ ModelPtr World::ModelBelowPoint(const ignition::math::Vector3d &_pt) const
     model = entity->GetParentModel();
 
   return model;
-}
-
-//////////////////////////////////////////////////
-EntityPtr World::GetEntityBelowPoint(const math::Vector3 &_pt)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->EntityBelowPoint(_pt.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -2348,6 +2229,7 @@ void World::SetState(const WorldState &_state)
         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
+        light->Init();
       }
       catch(...)
       {
@@ -2571,6 +2453,20 @@ void World::ProcessMessages()
           }
         }
 
+        for (auto const &light : this->dataPtr->publishLightPoses)
+        {
+          msgs::Pose *poseMsg = msg.add_pose();
+
+          // Publish the light's pose
+          poseMsg->set_name(light->GetScopedName());
+          // \todo Change to relative once lights can be attached to links
+          // on the rendering side
+          // \todo Hack: we use empty id to indicate it's pose of a light
+          // Need to add an id field to light.proto
+          // poseMsg->set_id(light->GetId());
+          msgs::Set(poseMsg, light->WorldPose());
+        }
+
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())
           this->dataPtr->posePub->Publish(msg);
       }
@@ -2633,26 +2529,6 @@ void World::ProcessMessages()
     this->ProcessLightFactoryMsgs();
     this->ProcessLightModifyMsgs();
     this->dataPtr->prevProcessMsgsTime = common::Time::GetWallTime();
-  }
-
-  // Process light poses after light factory
-  {
-    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-
-    if (!this->dataPtr->publishLightPoses.empty() && this->dataPtr->lightPub &&
-        this->dataPtr->lightPub->HasConnections())
-    {
-      for (auto const &light : this->dataPtr->publishLightPoses)
-      {
-        // Publish the light's world pose
-        // \todo Change to relative once lights can be attached to links
-        msgs::Light lightMsg;
-        lightMsg.set_name(light->GetScopedName());
-        msgs::Set(lightMsg.mutable_pose(), light->WorldPose());
-        this->dataPtr->lightPub->Publish(lightMsg);
-      }
-    }
-    this->dataPtr->publishLightPoses.clear();
   }
 }
 
@@ -2733,36 +2609,70 @@ void World::LogWorker()
 
   while (!this->dataPtr->stop)
   {
-    int currState = (this->dataPtr->stateToggle + 1) % 2;
-
-    this->dataPtr->prevStates[currState].Load(self);
-    WorldState diffState = this->dataPtr->prevStates[currState] -
-      this->dataPtr->prevStates[this->dataPtr->stateToggle];
-    this->dataPtr->logPrevIteration = this->dataPtr->iterations;
-
-    if (!diffState.IsZero())
+    // get unfiltered world state
+    WorldState unfilteredState;
     {
-      this->dataPtr->stateToggle = currState;
+      std::lock_guard<std::mutex> dLock(this->dataPtr->entityDeleteMutex);
+      unfilteredState.Load(self);
+    }
+
+    // compute world state diff and find out about insertions and deletions
+    std::vector<std::string> insertions;
+    std::vector<std::string> deletions;
+    bool insertDelete = false;
+    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+    {
+      WorldState unfilteredDiffState = unfilteredState -
+          this->dataPtr->prevUnfilteredState;
+      if (!unfilteredDiffState.IsZero())
       {
-        // Store the entire current state (instead of the diffState). A slow
-        // moving link may never be captured if only diff state is recorded.
-        std::lock_guard<std::mutex> bLock(this->dataPtr->logBufferMutex);
+        insertions = unfilteredDiffState.Insertions();
+        deletions = unfilteredDiffState.Deletions();
+        insertDelete = !insertions.empty() || !deletions.empty();
+      }
+    }
+    this->dataPtr->prevUnfilteredState = unfilteredState;
 
-        auto insertions = diffState.Insertions();
-        this->dataPtr->prevStates[currState].SetInsertions(insertions);
-        auto deletions = diffState.Deletions();
-        this->dataPtr->prevStates[currState].SetDeletions(deletions);
+    // Throttle state capture based on log recording frequency.
+    auto simTime = this->SimTime();
+    if ((simTime - this->dataPtr->logLastStateTime >=
+        util::LogRecord::Instance()->Period()) || insertDelete)
+    {
+      int currState = (this->dataPtr->stateToggle + 1) % 2;
 
-        this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
-            this->dataPtr->prevStates[currState]);
+      std::string filterStr = util::LogRecord::Instance()->Filter();
+      // compute diff for filtered states
+      {
+        std::lock_guard<std::mutex> dLock(this->dataPtr->entityDeleteMutex);
+        this->dataPtr->prevStates[currState].LoadWithFilter(self, filterStr);
+      }
+      WorldState diffState = this->dataPtr->prevStates[currState] -
+          this->dataPtr->prevStates[this->dataPtr->stateToggle];
+      this->dataPtr->logPrevIteration = this->dataPtr->iterations;
 
-        // Tell the logger to update, once the number of states exceeds 1000
-        if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
-            1000)
+      if (!diffState.IsZero() || insertDelete)
+      {
+        this->dataPtr->stateToggle = currState;
         {
-          util::LogRecord::Instance()->Notify();
+          // Store the entire current state (instead of the diffState). A slow
+          // moving link may never be captured if only diff state is recorded.
+          std::lock_guard<std::mutex> bLock(this->dataPtr->logBufferMutex);
+
+          this->dataPtr->prevStates[currState].SetInsertions(insertions);
+          this->dataPtr->prevStates[currState].SetDeletions(deletions);
+          this->dataPtr->states[this->dataPtr->currentStateBuffer].push_back(
+              this->dataPtr->prevStates[currState]);
+
+          // Tell the logger to update, once the number of states exceeds 1000
+          if (this->dataPtr->states[this->dataPtr->currentStateBuffer].size() >
+              1000)
+          {
+            util::LogRecord::Instance()->Notify();
+          }
         }
       }
+
+      this->dataPtr->logLastStateTime = simTime;
     }
 
     this->dataPtr->logContinueCondition.notify_all();
@@ -2773,12 +2683,6 @@ void World::LogWorker()
 
   // Make sure nothing is blocked by this thread.
   this->dataPtr->logContinueCondition.notify_all();
-}
-
-/////////////////////////////////////////////////
-uint32_t World::GetIterations() const
-{
-  return this->Iterations();
 }
 
 /////////////////////////////////////////////////
@@ -2810,13 +2714,16 @@ void World::RemoveModel(const std::string &_name)
     }
   }
 
+  // Remove from SDF
   if (this->dataPtr->sdf->HasElement("model"))
   {
     sdf::ElementPtr childElem = this->dataPtr->sdf->GetElement("model");
     while (childElem && childElem->Get<std::string>("name") != _name)
       childElem = childElem->GetNextElement("model");
     if (childElem)
+    {
       this->dataPtr->sdf->RemoveChild(childElem);
+    }
   }
 
   if (this->dataPtr->sdf->HasElement("light"))
@@ -2826,46 +2733,56 @@ void World::RemoveModel(const std::string &_name)
       childElem = childElem->GetNextElement("light");
     if (childElem)
     {
-      // Remove light object
-      for (auto light = this->dataPtr->lights.begin();
-          light != this->dataPtr->lights.end(); ++light)
-      {
-        if ((*light)->GetName() == _name || (*light)->GetScopedName() == _name)
-        {
-          this->dataPtr->lights.erase(light);
-          break;
-        }
-      }
-
-      // Remove from SDF
       this->dataPtr->sdf->RemoveChild(childElem);
-
-      // Find the light by name in the scene msg, and remove it.
-      for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
-      {
-        if (this->dataPtr->sceneMsg.light(i).name() == _name)
-        {
-          this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
-              this->dataPtr->sceneMsg.light_size()-1);
-          this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
-          break;
-        }
-      }
     }
   }
 
+  // remove objects in world
   {
     boost::recursive_mutex::scoped_lock lock(
         *this->Physics()->GetPhysicsUpdateMutex());
 
-    this->dataPtr->rootElement->RemoveChild(_name);
-
+    // Remove model object
     for (auto model = this->dataPtr->models.begin();
              model != this->dataPtr->models.end(); ++model)
     {
       if ((*model)->GetName() == _name || (*model)->GetScopedName() == _name)
       {
         this->dataPtr->models.erase(model);
+        this->dataPtr->rootElement->RemoveChild(_name);
+        break;
+      }
+    }
+
+    // Remove light object
+    for (auto light = this->dataPtr->lights.begin();
+        light != this->dataPtr->lights.end(); ++light)
+    {
+      if ((*light)->GetScopedName() == _name)
+      {
+        if ((*light)->GetParent())
+        {
+          // Avoid calling: this->dataPtr->rootElement->RemoveChild(_name);
+          // which removes the first child it finds with _name, ignoring
+          // entity type (model or light) and scoping of names,
+          // e.g. In a world with "point" and "parent::point" entities,
+          // removing "point" will remove "parent::child" if it's first in the
+          // list
+          (*light)->GetParent()->RemoveChild(*light);
+        }
+        this->dataPtr->lights.erase(light);
+        break;
+      }
+    }
+
+    // Find the light by name in the scene msg, and remove it.
+    for (int i = 0; i < this->dataPtr->sceneMsg.light_size(); ++i)
+    {
+      if (this->dataPtr->sceneMsg.light(i).name() == _name)
+      {
+        this->dataPtr->sceneMsg.mutable_light()->SwapElements(i,
+            this->dataPtr->sceneMsg.light_size()-1);
+        this->dataPtr->sceneMsg.mutable_light()->RemoveLast();
         break;
       }
     }
@@ -2900,13 +2817,6 @@ void World::RemoveModel(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void World::OnLightMsg(ConstLightPtr &/*_msg*/)
-{
-  gzerr << "Topic ~/light deprecated, use ~/factory/light to spawn new lights "
-      << "and ~/light/modify to modify existing lights." << std::endl;
-}
-
-/////////////////////////////////////////////////
 void World::OnLightModifyMsg(ConstLightPtr &_msg)
 {
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
@@ -2921,21 +2831,9 @@ void World::OnLightFactoryMsg(ConstLightPtr &_msg)
 }
 
 /////////////////////////////////////////////////
-msgs::Scene World::GetSceneMsg() const
-{
-  return this->SceneMsg();
-}
-
-/////////////////////////////////////////////////
 msgs::Scene World::SceneMsg() const
 {
   return this->dataPtr->sceneMsg;
-}
-
-/////////////////////////////////////////////////
-std::mutex &World::GetSetWorldPoseMutex() const
-{
-  return this->WorldPoseMutex();
 }
 
 /////////////////////////////////////////////////
@@ -2945,21 +2843,9 @@ std::mutex &World::WorldPoseMutex() const
 }
 
 /////////////////////////////////////////////////
-bool World::GetEnablePhysicsEngine()
-{
-  return this->PhysicsEnabled();
-}
-
-/////////////////////////////////////////////////
 bool World::PhysicsEnabled() const
 {
   return this->dataPtr->enablePhysicsEngine;
-}
-
-/////////////////////////////////////////////////
-void World::EnablePhysicsEngine(const bool _enable)
-{
-  this->SetPhysicsEnabled(_enable);
 }
 
 /////////////////////////////////////////////////
@@ -3060,24 +2946,23 @@ std::string World::UniqueModelName(const std::string &_name)
 }
 
 //////////////////////////////////////////////////
-void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::Plugin_V &_plugins, bool &_success)
+bool World::PluginInfoService(const ignition::msgs::StringMsg &_req,
+                              ignition::msgs::Plugin_V &_plugins)
 {
   _plugins.clear_plugins();
-  _success = false;
 
   common::URI pluginUri = _req.data();
   if (!pluginUri.Valid())
   {
     gzwarn << "URI [" << _req.data() << "] is not valid." << std::endl;
-    return;
+    return false;
   }
 
   if (!pluginUri.Path().Contains(this->URI().Path()))
   {
     gzwarn << "Plugin [" << pluginUri.Str() << "] does not match world [" <<
         this->URI().Str() << "]" << std::endl;
-    return;
+    return false;
   }
 
   auto parts = common::split(pluginUri.Path().Str(), "/");
@@ -3094,21 +2979,24 @@ void World::PluginInfoService(const ignition::msgs::StringMsg &_req,
       {
         gzwarn << "Model [" << parts[i+1] << "] not found in world [" <<
             this->Name() << "]" << std::endl;
-        return;
+        return false;
       }
 
-      model->PluginInfo(pluginUri, _plugins, _success);
-      return;
+      bool success = false;
+      model->PluginInfo(pluginUri, _plugins, success);
+      return success;
     }
     // TODO: Handle world plugins
     else
     {
       gzwarn << "Segment [" << parts[i] << "] in [" << pluginUri.Str() <<
          "] cannot be handled." << std::endl;
-      return;
+      return false;
     }
   }
 
   gzwarn << "Couldn't get information for plugin [" << pluginUri.Str() << "]"
       << std::endl;
+
+  return false;
 }

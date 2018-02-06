@@ -290,9 +290,3 @@ event::ConnectionPtr ForceTorqueSensor::ConnectUpdate(
 {
   return this->dataPtr->update.Connect(_subscriber);
 }
-
-//////////////////////////////////////////////////
-void ForceTorqueSensor::DisconnectUpdate(event::ConnectionPtr &_conn)
-{
-  this->dataPtr->update.Disconnect(_conn->Id());
-}

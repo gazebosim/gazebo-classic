@@ -51,7 +51,8 @@ class HeightmapTest : public ServerFixture,
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
   public: void Volume(const std::string &_physicsEngine);
   public: void LoadDEM(const std::string &_physicsEngine);
-  public: void Material(const std::string &_physicsEngine);
+  public: void Material(const std::string &_worldName,
+      const std::string &_physicsEngine);
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
@@ -451,7 +452,8 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 */
 
 /////////////////////////////////////////////////
-void HeightmapTest::Material(const std::string &_physicsEngine)
+void HeightmapTest::Material(const std::string &_worldName,
+    const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
   {
@@ -460,7 +462,7 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   }
 
   // load a heightmap with red material
-  Load("worlds/heightmap_material.world", false, _physicsEngine);
+  Load(_worldName, false, _physicsEngine);
   physics::ModelPtr heightmap = GetModel("heightmap");
   ASSERT_NE(heightmap, nullptr);
 
@@ -471,7 +473,7 @@ void HeightmapTest::Material(const std::string &_physicsEngine)
   unsigned int height = 240;
   double updateRate = 10;
   ignition::math::Pose3d testPose(
-      ignition::math::Vector3d(0, 0, 10),
+      ignition::math::Vector3d(0, 0, 100),
       ignition::math::Quaterniond(0, 1.57, 0));
   SpawnCamera(modelName, cameraName, testPose.Pos(),
       testPose.Rot().Euler(), width, height, updateRate);
@@ -683,8 +685,18 @@ TEST_P(HeightmapTest, Heights)
 /////////////////////////////////////////////////
 TEST_P(HeightmapTest, Material)
 {
-  Material(GetParam());
+  Material("worlds/heightmap_material.world", GetParam());
 }
+
+// This test fails on OSX
+// It uses glsl 130 which is not supported yet
+#ifndef __APPLE__
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, MaterialShader)
+{
+  Material("worlds/heightmap_material_shader.world", GetParam());
+}
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, NoVisual)

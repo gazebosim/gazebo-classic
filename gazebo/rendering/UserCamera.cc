@@ -15,6 +15,7 @@
  *
 */
 #include <boost/bind.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -207,19 +208,6 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetDefaultPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetInitialPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 {
   this->dataPtr->initialPose = _pose;
@@ -227,35 +215,9 @@ void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 }
 
 //////////////////////////////////////////////////
-math::Pose UserCamera::DefaultPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InitialPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d UserCamera::InitialPose() const
 {
   return this->dataPtr->initialPose;
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -450,20 +412,6 @@ void UserCamera::SetViewController(const std::string &_type)
     gzerr << "Invalid view controller type[" << _type << "]. "
       << "The view controller is not changed.\n";
   }
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &_type,
-                                   const math::Vector3 &_pos)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetViewController(_type, _pos.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -702,8 +650,9 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    auto const &ignBgColor = this->scene->BackgroundColor();
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBgColor));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
@@ -725,13 +674,6 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 void UserCamera::EnableViewController(bool _value) const
 {
   this->dataPtr->viewController->SetEnabled(_value);
-}
-
-//////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
-                                std::string &_mod)
-{
-  return this->Visual(_mousePos.Ign(), _mod);
 }
 
 //////////////////////////////////////////////////
@@ -791,28 +733,9 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetFocalPoint(_pt.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
 {
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
-}
-
-//////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
-{
-  return this->Visual(_mousePos.Ign());
 }
 
 //////////////////////////////////////////////////

@@ -40,7 +40,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This sensor is used for simulating standard monocular cameras
-    class GAZEBO_VISIBLE CameraSensor : public Sensor
+    class GZ_SENSORS_VISIBLE CameraSensor : public Sensor
     {
       /// \brief Constructor
       public: CameraSensor();
@@ -75,7 +75,6 @@ namespace gazebo
 
       /// \brief Gets the width of the image in pixels.
       /// \return The image width in pixels.
-      /// \deprecated See ImageWidth()
       public: unsigned int ImageWidth() const;
 
       /// \brief Gets the height of the image in pixels.

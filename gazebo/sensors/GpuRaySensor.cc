@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math.hh>
 #include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
@@ -337,19 +338,6 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
 }
 
 //////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-{
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 unsigned int GpuRaySensor::CameraCount() const
 {
   return this->dataPtr->laserCam->CameraCount();
@@ -605,48 +593,45 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->RangeMin());
   scan->set_range_max(this->RangeMax());
 
-  bool add = scan->ranges_size() == 0;
-
-  // todo: add loop for vertical range count
-  for (int j = 0; j < this->VerticalRayCount(); ++j)
+  const int numRays = this->RayCount() * this->VerticalRayCount();
+  if (scan->ranges_size() != numRays)
   {
-    for (int i = 0; i < this->RayCount(); ++i)
+    // gzdbg << "Size mismatch; allocating memory\n";
+    scan->clear_ranges();
+    scan->clear_intensities();
+    for (int i = 0; i < numRays; ++i)
     {
-      int index = j * this->RayCount() + i;
-      double range = this->dataPtr->laserCam->LaserData()[index * 3];
-
-      // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (range >= this->RangeMax())
-      {
-        range = ignition::math::INF_D;
-      }
-      else if (range <= this->RangeMin())
-      {
-        range = -ignition::math::INF_D;
-      }
-      else if (this->noises.find(GPU_RAY_NOISE) !=
-               this->noises.end())
-      {
-        range = this->noises[GPU_RAY_NOISE]->Apply(range);
-        range = ignition::math::clamp(range,
-            this->RangeMin(), this->RangeMax());
-      }
-
-      range = ignition::math::isnan(range) ? this->RangeMax() : range;
-
-      if (add)
-      {
-        scan->add_ranges(range);
-        scan->add_intensities(
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
-      else
-      {
-        scan->set_ranges(index, range);
-        scan->set_intensities(index,
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
+      scan->add_ranges(ignition::math::NAN_F);
+      scan->add_intensities(ignition::math::NAN_F);
     }
+  }
+
+  auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
+  auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
+  for (int i = 0; dataIter != dataEnd; ++dataIter, ++i)
+  {
+    const rendering::GpuLaserData data = *dataIter;
+    double range = data.range;
+    double intensity = data.intensity;
+
+    // Mask ranges outside of min/max to +/- inf, as per REP 117
+    if (range >= this->RangeMax())
+    {
+      range = ignition::math::INF_D;
+    }
+    else if (range <= this->RangeMin())
+    {
+      range = -ignition::math::INF_D;
+    }
+    else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
+    {
+      range = this->noises[GPU_RAY_NOISE]->Apply(range);
+      range = ignition::math::clamp(range, this->RangeMin(), this->RangeMax());
+    }
+
+    range = ignition::math::isnan(range) ? this->RangeMax() : range;
+    scan->set_ranges(i, range);
+    scan->set_intensities(i, intensity);
   }
 
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())

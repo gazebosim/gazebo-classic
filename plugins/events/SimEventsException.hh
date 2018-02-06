@@ -25,7 +25,8 @@ namespace gazebo
   {
     /// \brief Constructor
     /// param[in] m the exception message
-    public: SimEventsException(const char* m) : std::runtime_error(m) {}
+    public: explicit SimEventsException(const char* m)
+        : std::runtime_error(m) {}
   };
 }
 

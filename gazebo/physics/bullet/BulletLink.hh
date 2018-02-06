@@ -37,7 +37,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletLink : public Link
     {
       /// \brief Constructor
-      public: BulletLink(EntityPtr _parent);
+      public: explicit BulletLink(EntityPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletLink();

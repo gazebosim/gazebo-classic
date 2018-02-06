@@ -128,13 +128,21 @@ struct CollisionFilter : public btOverlapFilterCallback
 };
 
 //////////////////////////////////////////////////
-void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
+// Gets the contact information in the current state of
+// the world, updates the contact manager and
+// and sets the contact feedback information.
+void UpdateContacts(btDynamicsWorld *_world, btScalar _timeStep)
 {
   int numManifolds = _world->getDispatcher()->getNumManifolds();
   for (int i = 0; i < numManifolds; ++i)
   {
     btPersistentManifold *contactManifold =
         _world->getDispatcher()->getManifoldByIndexInternal(i);
+
+    const int numContacts = contactManifold->getNumContacts();
+    if (0 == numContacts)
+      continue;
+
     const btCollisionObject *obA =
         static_cast<const btCollisionObject *>(contactManifold->getBody0());
     const btCollisionObject *obB =
@@ -173,18 +181,15 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
 
     auto body1Pose = link1->WorldPose();
     auto body2Pose = link2->WorldPose();
-    auto cg1Pos = link1->GetInertial()->Pose().Pos();
-    auto cg2Pos = link2->GetInertial()->Pose().Pos();
     ignition::math::Vector3d localForce1;
     ignition::math::Vector3d localForce2;
     ignition::math::Vector3d localTorque1;
     ignition::math::Vector3d localTorque2;
 
-    int numContacts = contactManifold->getNumContacts();
     for (int j = 0; j < numContacts; ++j)
     {
       btManifoldPoint &pt = contactManifold->getContactPoint(j);
-      if (pt.getDistance() < 0.f)
+      if (pt.getDistance() <= 0.f)
       {
         const btVector3 &ptB = pt.getPositionWorldOnB();
         const btVector3 &normalOnB = pt.m_normalWorldOnB;
@@ -224,6 +229,12 @@ void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+void InternalTickCallback(btDynamicsWorld *_world, btScalar _timeStep)
+{
+  UpdateContacts(_world, _timeStep);
 }
 
 //////////////////////////////////////////////////
@@ -475,6 +486,24 @@ void BulletPhysics::OnPhysicsMsg(ConstPhysicsPtr &_msg)
 void BulletPhysics::UpdateCollision()
 {
   this->contactManager->ResetCount();
+
+  if (!this->world->PhysicsEnabled())
+  {
+    // if physics is disabled, UpdatePhysics() will not be
+    // called, and collision updates will not be made
+    // unless this->dynamicsWorld->stepSimulation() or
+    // this->dynamicsWorld->performDiscreteCollisionDetection()
+    // is called.
+    // A call to both UpdateCollision() and UpdatePhysics() (or
+    // only of UpdateCollision()) expects the calculation of contact
+    // points to happen. So because UpdatePhysics() won't be
+    // called, we have to do this here with
+    // this->dynamicsWorld->performDiscreteCollisionDetection().
+    this->dynamicsWorld->performDiscreteCollisionDetection();
+    // In addition, the contacts have to be updated in the contact
+    // manager and for the feedback.
+    UpdateContacts(this->dynamicsWorld, this->maxStepSize);
+  }
 }
 
 //////////////////////////////////////////////////

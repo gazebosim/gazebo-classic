@@ -24,7 +24,6 @@
 
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
-#include "gazebo/math/Pose.hh"
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/physics/LinkState.hh"
@@ -94,11 +93,6 @@ namespace gazebo
       /// Load ModelState information from stored data in and SDF::Element
       /// \param[in] _elem Pointer to the SDF::Element containing state info.
       public: virtual void Load(const sdf::ElementPtr _elem);
-
-      /// \brief Get the stored model pose.
-      /// \return The gazebo::math::Pose of the Model.
-      /// \deprecated See function that returns ign-math.
-      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the stored model pose.
       /// \return The ignition::math::Pose3d of the Model.
@@ -250,19 +244,21 @@ namespace gazebo
                   const gazebo::physics::ModelState &_state)
       {
         ignition::math::Vector3d euler(_state.pose.Rot().Euler());
-        _out << std::fixed <<std::setprecision(3)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(3)
           << "<model name='" << _state.GetName() << "'>"
           << "<pose>"
-          << _state.pose.Pos().X() << " "
-          << _state.pose.Pos().Y() << " "
-          << _state.pose.Pos().Z() << " "
-          << euler.X() << " "
-          << euler.Y() << " "
-          << euler.Z() << " "
-          << "</pose>"
-          << "<scale>"
-          << _state.scale
-          << "</scale>";
+          << ignition::math::precision(_state.pose.Pos().X(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Y(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Z(), 4) << " "
+          << ignition::math::precision(euler.X(), 4) << " "
+          << ignition::math::precision(euler.Y(), 4) << " "
+          << ignition::math::precision(euler.Z(), 4) << " "
+          << "</pose>";
+
+        // Only record scale if it is not the default value of [1, 1, 1].
+        if (_state.scale != ignition::math::Vector3d::One)
+          _out << "<scale>" << _state.scale << "</scale>";
 
         for (LinkState_M::const_iterator iter =
             _state.linkStates.begin(); iter != _state.linkStates.end();

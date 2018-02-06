@@ -95,7 +95,7 @@ void GraphScene_TEST::EdgeColor()
 
   edge1 = gs.AddEdge("edge1", "node1", "node2");
 
-  common::Color c1(1, 0, 0);
+  ignition::math::Color c1(1, 0, 0);
   gs.SetEdgeColor("edge1", c1);
 
   QColor c2 = edge1->color();
