@@ -534,45 +534,6 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
-        // Process insertions
-        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
-        {
-          sdf::ElementPtr modelElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "insertions")->GetElement("model");
-
-          while (modelElem)
-          {
-            auto name = modelElem->GetAttribute("name")->GetAsString();
-            if (!this->GetModel(name))
-            {
-              ModelPtr model = this->LoadModel(modelElem,
-                  this->dataPtr->rootElement);
-              model->Init();
-
-              // Disabling plugins on playback
-              // model->LoadPlugins();
-            }
-
-            modelElem = modelElem->GetNextElement("model");
-          }
-        }
-
-        // Process deletions
-        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-        {
-          sdf::ElementPtr nameElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "deletions")->GetElement("name");
-
-          while (nameElem)
-          {
-            transport::requestNoReply(this->GetName(), "entity_delete",
-                                      nameElem->Get<std::string>());
-            nameElem = nameElem->GetNextElement("name");
-          }
-        }
-
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
