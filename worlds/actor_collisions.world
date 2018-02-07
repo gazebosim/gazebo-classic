@@ -1,163 +1,2712 @@
+
+<!--
+  Generated from actor_collisions.world.erb
+  Seed: 6449088
+-->
 <?xml version="1.0" ?>
-<sdf version="1.5">
-   <world name="default">
-      <include>
-         <uri>model://ground_plane</uri>
-      </include>
-      <!-- A global light source -->
-      <include>
-         <uri>model://sun</uri>
-      </include>
-      <actor name="actor">
-        <plugin name="actor_collisions_plugin"
-                filename="libActorCollisionsPlugin.so">
-          <scaling>8.0 8.0 1.0</scaling>
-        </plugin>
-         <skin>
-            <filename>walk.dae</filename>
-            <scale>1.0</scale>
-         </skin>
-         <pose>0 0 0 0 0 0</pose>
-         <animation name="walking">
-            <filename>walk.dae</filename>
-            <scale>1.000000</scale>
-            <interpolate_x>true</interpolate_x>
-         </animation>
-         <script>
-            <loop>true</loop>
-            <delay_start>0.000000</delay_start>
-            <auto_start>true</auto_start>
-            <trajectory id="0" type="walking">
-               <waypoint>
-                  <time>0.000000</time>
-                  <pose>0.000000 1.000000 0.000000 0.000000 0.000000 0.000000</pose>
-               </waypoint>
-               <waypoint>
-                  <time>0.500000</time>
-                  <pose>0.195090 0.980785 0.000000 0.000000 0.000000 -0.196350</pose>
-               </waypoint>
-               <waypoint>
-                  <time>1.000000</time>
-                  <pose>0.382683 0.923880 0.000000 0.000000 0.000000 -0.392699</pose>
-               </waypoint>
-               <waypoint>
-                  <time>1.500000</time>
-                  <pose>0.555570 0.831470 0.000000 0.000000 0.000000 -0.589049</pose>
-               </waypoint>
-               <waypoint>
-                  <time>2.000000</time>
-                  <pose>0.707107 0.707107 0.000000 0.000000 0.000000 -0.785398</pose>
-               </waypoint>
-               <waypoint>
-                  <time>2.500000</time>
-                  <pose>0.831470 0.555570 0.000000 0.000000 0.000000 -0.981748</pose>
-               </waypoint>
-               <waypoint>
-                  <time>3.000000</time>
-                  <pose>0.923880 0.382683 0.000000 0.000000 0.000000 -1.178100</pose>
-               </waypoint>
-               <waypoint>
-                  <time>3.500000</time>
-                  <pose>0.980785 0.195090 0.000000 0.000000 0.000000 -1.374450</pose>
-               </waypoint>
-               <waypoint>
-                  <time>4.000000</time>
-                  <pose>1.000000 0.000000 0.000000 0.000000 0.000000 -1.570800</pose>
-               </waypoint>
-               <waypoint>
-                  <time>4.500000</time>
-                  <pose>0.980785 -0.195090 0.000000 0.000000 0.000000 -1.767150</pose>
-               </waypoint>
-               <waypoint>
-                  <time>5.000000</time>
-                  <pose>0.923880 -0.382683 0.000000 0.000000 0.000000 -1.963500</pose>
-               </waypoint>
-               <waypoint>
-                  <time>5.500000</time>
-                  <pose>0.831470 -0.555570 0.000000 0.000000 0.000000 -2.159840</pose>
-               </waypoint>
-               <waypoint>
-                  <time>6.000000</time>
-                  <pose>0.707107 -0.707107 0.000000 0.000000 0.000000 -2.356190</pose>
-               </waypoint>
-               <waypoint>
-                  <time>6.500000</time>
-                  <pose>0.555570 -0.831470 0.000000 0.000000 0.000000 -2.552540</pose>
-               </waypoint>
-               <waypoint>
-                  <time>7.500000</time>
-                  <pose>0.382683 -0.923880 0.000000 0.000000 0.000000 -2.748890</pose>
-               </waypoint>
-               <waypoint>
-                  <time>8.500000</time>
-                  <pose>0.195090 -0.980785 0.000000 0.000000 0.000000 -2.945240</pose>
-               </waypoint>
-               <waypoint>
-                  <time>9.500000</time>
-                  <pose>0.000000 -1.000000 0.000000 0.000000 0.000000 -3.141590</pose>
-               </waypoint>
-               <waypoint>
-                  <time>10.500000</time>
-                  <pose>-0.195090 -0.980785 0.000000 0.000000 0.000000 2.945245</pose>
-               </waypoint>
-               <waypoint>
-                  <time>11.500000</time>
-                  <pose>-0.382683 -0.923880 0.000000 0.000000 0.000000 2.748895</pose>
-               </waypoint>
-               <waypoint>
-                  <time>12.000000</time>
-                  <pose>-0.555570 -0.831470 0.000000 0.000000 0.000000 2.552545</pose>
-               </waypoint>
-               <waypoint>
-                  <time>12.500000</time>
-                  <pose>-0.707107 -0.707107 0.000000 0.000000 0.000000 2.356195</pose>
-               </waypoint>
-               <waypoint>
-                  <time>13.000000</time>
-                  <pose>-0.831470 -0.555570 0.000000 0.000000 0.000000 2.159845</pose>
-               </waypoint>
-               <waypoint>
-                  <time>13.500000</time>
-                  <pose>-0.923880 -0.382683 0.000000 0.000000 0.000000 1.963495</pose>
-               </waypoint>
-               <waypoint>
-                  <time>14.000000</time>
-                  <pose>-0.980785 -0.195090 0.000000 0.000000 0.000000 1.767145</pose>
-               </waypoint>
-               <waypoint>
-                  <time>14.500000</time>
-                  <pose>-1.000000 0.000000 0.000000 0.000000 0.000000 1.570795</pose>
-               </waypoint>
-               <waypoint>
-                  <time>15.000000</time>
-                  <pose>-0.980785 0.195090 0.000000 0.000000 0.000000 1.374445</pose>
-               </waypoint>
-               <waypoint>
-                  <time>15.500000</time>
-                  <pose>-0.923880 0.382683 0.000000 0.000000 0.000000 1.178095</pose>
-               </waypoint>
-               <waypoint>
-                  <time>16.000000</time>
-                  <pose>-0.831470 0.555570 0.000000 0.000000 0.000000 0.981745</pose>
-               </waypoint>
-               <waypoint>
-                  <time>16.500000</time>
-                  <pose>-0.707107 0.707107 0.000000 0.000000 0.000000 0.785395</pose>
-               </waypoint>
-               <waypoint>
-                  <time>17.000000</time>
-                  <pose>-0.555570 0.831470 0.000000 0.000000 0.000000 0.589045</pose>
-               </waypoint>
-               <waypoint>
-                  <time>17.500000</time>
-                  <pose>-0.382683 0.923880 0.000000 0.000000 0.000000 0.392695</pose>
-               </waypoint>
-               <waypoint>
-                  <time>18.000000</time>
-                  <pose>-0.195090 0.980785 0.000000 0.000000 0.000000 0.196345</pose>
-               </waypoint>
-            </trajectory>
-         </script>
-      </actor>
-   </world>
+<sdf version="1.6">
+<world name="default">
+  <include>
+    <uri>model://ground_plane</uri>
+  </include>
+  <include>
+    <uri>model://sun</uri>
+  </include>
+  <actor name="actor">
+    <plugin name="actor_collisions_plugin" filename="libActorCollisionsPlugin.so">
+      <scaling>8.0 8.0 1.0</scaling>
+    </plugin>
+    <skin>
+      <filename>walk.dae</filename>
+      <scale>1.0</scale>
+    </skin>
+    <animation name="walking">
+      <filename>walk.dae</filename>
+      <scale>1.000000</scale>
+      <interpolate_x>true</interpolate_x>
+    </animation>
+    <script>
+      <loop>true</loop>
+      <delay_start>0.000000</delay_start>
+      <auto_start>true</auto_start>
+      <trajectory id="0" type="walking">
+        <waypoint>
+          <time>0.000000</time>
+          <pose>0.000000 1.000000 0.000000 0.000000 0.000000 0.000000</pose>
+        </waypoint>
+        <waypoint>
+          <time>0.500000</time>
+          <pose>0.195090 0.980785 0.000000 0.000000 0.000000 -0.196350</pose>
+        </waypoint>
+        <waypoint>
+           <time>1.000000</time>
+           <pose>0.382683 0.923880 0.000000 0.000000 0.000000 -0.392699</pose>
+        </waypoint>
+        <waypoint>
+           <time>1.500000</time>
+           <pose>0.555570 0.831470 0.000000 0.000000 0.000000 -0.589049</pose>
+        </waypoint>
+        <waypoint>
+           <time>2.000000</time>
+           <pose>0.707107 0.707107 0.000000 0.000000 0.000000 -0.785398</pose>
+        </waypoint>
+        <waypoint>
+           <time>2.500000</time>
+           <pose>0.831470 0.555570 0.000000 0.000000 0.000000 -0.981748</pose>
+        </waypoint>
+        <waypoint>
+           <time>3.000000</time>
+           <pose>0.923880 0.382683 0.000000 0.000000 0.000000 -1.178100</pose>
+        </waypoint>
+        <waypoint>
+           <time>3.500000</time>
+           <pose>0.980785 0.195090 0.000000 0.000000 0.000000 -1.374450</pose>
+        </waypoint>
+        <waypoint>
+           <time>4.000000</time>
+           <pose>1.000000 0.000000 0.000000 0.000000 0.000000 -1.570800</pose>
+        </waypoint>
+        <waypoint>
+           <time>4.500000</time>
+           <pose>0.980785 -0.195090 0.000000 0.000000 0.000000 -1.767150</pose>
+        </waypoint>
+        <waypoint>
+           <time>5.000000</time>
+           <pose>0.923880 -0.382683 0.000000 0.000000 0.000000 -1.963500</pose>
+        </waypoint>
+        <waypoint>
+           <time>5.500000</time>
+           <pose>0.831470 -0.555570 0.000000 0.000000 0.000000 -2.159840</pose>
+        </waypoint>
+        <waypoint>
+           <time>6.000000</time>
+           <pose>0.707107 -0.707107 0.000000 0.000000 0.000000 -2.356190</pose>
+        </waypoint>
+        <waypoint>
+           <time>6.500000</time>
+           <pose>0.555570 -0.831470 0.000000 0.000000 0.000000 -2.552540</pose>
+        </waypoint>
+        <waypoint>
+           <time>7.500000</time>
+           <pose>0.382683 -0.923880 0.000000 0.000000 0.000000 -2.748890</pose>
+        </waypoint>
+        <waypoint>
+           <time>8.500000</time>
+           <pose>0.195090 -0.980785 0.000000 0.000000 0.000000 -2.945240</pose>
+        </waypoint>
+        <waypoint>
+           <time>9.500000</time>
+           <pose>0.000000 -1.000000 0.000000 0.000000 0.000000 -3.141590</pose>
+        </waypoint>
+        <waypoint>
+           <time>10.500000</time>
+           <pose>-0.195090 -0.980785 0.000000 0.000000 0.000000 2.945245</pose>
+        </waypoint>
+        <waypoint>
+           <time>11.500000</time>
+           <pose>-0.382683 -0.923880 0.000000 0.000000 0.000000 2.748895</pose>
+        </waypoint>
+        <waypoint>
+           <time>12.000000</time>
+           <pose>-0.555570 -0.831470 0.000000 0.000000 0.000000 2.552545</pose>
+        </waypoint>
+        <waypoint>
+           <time>12.500000</time>
+           <pose>-0.707107 -0.707107 0.000000 0.000000 0.000000 2.356195</pose>
+        </waypoint>
+        <waypoint>
+           <time>13.000000</time>
+           <pose>-0.831470 -0.555570 0.000000 0.000000 0.000000 2.159845</pose>
+        </waypoint>
+        <waypoint>
+           <time>13.500000</time>
+           <pose>-0.923880 -0.382683 0.000000 0.000000 0.000000 1.963495</pose>
+        </waypoint>
+        <waypoint>
+           <time>14.000000</time>
+           <pose>-0.980785 -0.195090 0.000000 0.000000 0.000000 1.767145</pose>
+        </waypoint>
+        <waypoint>
+           <time>14.500000</time>
+           <pose>-1.000000 0.000000 0.000000 0.000000 0.000000 1.570795</pose>
+        </waypoint>
+        <waypoint>
+           <time>15.000000</time>
+           <pose>-0.980785 0.195090 0.000000 0.000000 0.000000 1.374445</pose>
+        </waypoint>
+        <waypoint>
+           <time>15.500000</time>
+           <pose>-0.923880 0.382683 0.000000 0.000000 0.000000 1.178095</pose>
+        </waypoint>
+        <waypoint>
+           <time>16.000000</time>
+           <pose>-0.831470 0.555570 0.000000 0.000000 0.000000 0.981745</pose>
+        </waypoint>
+        <waypoint>
+           <time>16.500000</time>
+           <pose>-0.707107 0.707107 0.000000 0.000000 0.000000 0.785395</pose>
+        </waypoint>
+        <waypoint>
+           <time>17.000000</time>
+           <pose>-0.555570 0.831470 0.000000 0.000000 0.000000 0.589045</pose>
+        </waypoint>
+        <waypoint>
+           <time>17.500000</time>
+           <pose>-0.382683 0.923880 0.000000 0.000000 0.000000 0.392695</pose>
+        </waypoint>
+        <waypoint>
+           <time>18.000000</time>
+           <pose>-0.195090 0.980785 0.000000 0.000000 0.000000 0.196345</pose>
+        </waypoint>
+      </trajectory>
+    </script>
+  </actor>
+
+  
+  <model name="model_0">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -1.374294774189893
+      1.885519007449501
+      3.7026255134502475
+      3.005669854813967
+      2.8638914943796823
+      1.3077832168750223
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.0007131186897285685</mass>
+      <inertia>
+        <ixx>9.357279532422578e-06</ixx>
+        <iyy>9.357279532422578e-06</iyy>
+        <izz>1.2595235519873175e-07</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.018794779496375192
+         </radius>
+         <length>
+           0.39547418092295006
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>9</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.018794779496375192
+         </radius>
+         <length>
+           0.39547418092295006
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_1">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.5768004656303993
+      -0.26855779351785447
+      4.264016927218423
+      1.6683609654142575
+      2.259367356452
+      2.561096728052627
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.0016738145005613634</mass>
+      <inertia>
+        <ixx>9.14697502546209e-06</ixx>
+        <iyy>3.4614142305655505e-06</iyy>
+        <izz>1.1006766216281201e-05</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.13811058813218288
+           0.24461349022058984
+           0.07577084246925933
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>8</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>5</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.13811058813218288
+           0.24461349022058984
+           0.07577084246925933
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_2">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.8278756536159149
+      -1.8205902466468304
+      2.510964563602264
+      2.6478601635915733
+      1.8116980327243988
+      1.3102396918117472
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.04394270827996959</mass>
+      <inertia>
+        <ixx>0.0004507877893239998</ixx>
+        <iyy>0.0004507877893239998</iyy>
+        <izz>0.00046588737495932526</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.14561699304823988
+         </radius>
+         <length>
+           0.24390467014566572
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>9</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.14561699304823988
+         </radius>
+         <length>
+           0.24390467014566572
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_3">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.806659790921219
+      0.758449552092741
+      2.3470036160353365
+      1.8876109645881216
+      0.7274224111943212
+      2.830070721979093
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.12299672670459796</mass>
+      <inertia>
+        <ixx>0.0029964885548564584</ixx>
+        <iyy>0.0029964885548564584</iyy>
+        <izz>0.0026532597325849352</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.20771033392686386
+         </radius>
+         <length>
+           0.40363024957218285
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>4</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.20771033392686386
+         </radius>
+         <length>
+           0.40363024957218285
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            0
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_4">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -1.683259599320861
+      1.6609845421698122
+      3.6584629614700006
+      0.5373237845203087
+      1.009158794376195
+      0.9634726378397384
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.0445647664015624</mass>
+      <inertia>
+        <ixx>0.00031822511365145885</ixx>
+        <iyy>0.00031822511365145885</iyy>
+        <izz>0.00042090518403449306</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.13743942134412854
+         </radius>
+         <length>
+           0.17035262420774747
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>4</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>4</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.13743942134412854
+         </radius>
+         <length>
+           0.17035262420774747
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_5">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -1.1646228340529197
+      0.9804064086591833
+      4.026472488406187
+      1.4542595413107549
+      1.2609892112990713
+      2.286193394007714
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.06889088895436787</mass>
+      <inertia>
+        <ixx>0.0011125113123153217</ixx>
+        <iyy>0.0011125113123153217</iyy>
+        <izz>0.00042515409117144893</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.11109826704437627
+         </radius>
+         <length>
+           0.3959270034280114
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>4</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>5</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.11109826704437627
+         </radius>
+         <length>
+           0.3959270034280114
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_6">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.3471117144913718
+      -1.3064668878806036
+      0.7264518797908712
+      2.8307530628275637
+      1.559431719616952
+      1.2142221898638477
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.25244838298998495</mass>
+      <inertia>
+        <ixx>0.0074903669705880934</ixx>
+        <iyy>0.009171768043666484</iyy>
+        <izz>0.008282861606509656</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.48664460438293294
+           0.396104105878109
+           0.4462646734329613
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>4</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>8</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.48664460438293294
+           0.396104105878109
+           0.4462646734329613
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_7">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.1083938886884761
+      0.1277957452706735
+      1.9183404429284676
+      0.05860790143134316
+      0.19561183692910436
+      1.395987027916954
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.07621677721630384</mass>
+      <inertia>
+        <ixx>0.000949626123787911</ixx>
+        <iyy>0.000949626123787911</iyy>
+        <izz>0.0011847771052856107</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1763226214380538
+         </radius>
+         <length>
+           0.2371613405553954
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>2</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>2</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1763226214380538
+         </radius>
+         <length>
+           0.2371613405553954
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_8">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      2.3324880369854997
+      -1.134425295848402
+      2.1534173051993135
+      1.5886527521685763
+      1.4374680330662728
+      1.8281342649016097
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.00784975280966787</mass>
+      <inertia>
+        <ixx>8.463658350230044e-05</ixx>
+        <iyy>8.463658350230044e-05</iyy>
+        <izz>7.979523854800846e-06</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.0450895079570502
+         </radius>
+         <length>
+           0.3511205599690679
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>3</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>4</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.0450895079570502
+         </radius>
+         <length>
+           0.3511205599690679
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_9">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.8062665221237015
+      1.946876473724859
+      3.96939360100925
+      0.7132324395799472
+      0.24126366880094133
+      1.2277373570156365
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.07518975890340789</mass>
+      <inertia>
+        <ixx>0.0015148714091882504</ixx>
+        <iyy>0.0011418572976740326</iyy>
+        <izz>0.0011997108380624227</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.2568439782334719
+           0.3542604478226878
+           0.3409798520954487
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>9</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>8</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.2568439782334719
+           0.3542604478226878
+           0.3409798520954487
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_10">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      2.280326984193504
+      1.1914604169575553
+      1.914256752031347
+      0.764325850728566
+      0.3833377392821497
+      3.033348518571033
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.008657616111190477</mass>
+      <inertia>
+        <ixx>0.00019379443789180255</ixx>
+        <iyy>0.00019379443789180255</iyy>
+        <izz>6.069478010780392e-05</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1184108521678654
+         </radius>
+         <length>
+           0.47597046105124363
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>10</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>6</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1184108521678654
+         </radius>
+         <length>
+           0.47597046105124363
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_11">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.6779386272852617
+      -0.8602435985342549
+      3.3641430392553806
+      0.38034243322295225
+      0.6185521817601586
+      2.5289365738171212
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.05635970997490847</mass>
+      <inertia>
+        <ixx>0.0006441451220178824</ixx>
+        <iyy>0.0008959306809948641</iyy>
+        <izz>0.0014537455710500794</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.42610936163477514
+           0.35771426559603864
+           0.09586778744790989
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>10</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>7</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.42610936163477514
+           0.35771426559603864
+           0.09586778744790989
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_12">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -2.1015576146823327
+      1.5675193775365805
+      2.9438572229148483
+      0.694901532623795
+      1.1273341537537462
+      2.157983732710391
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.016223366104496918</mass>
+      <inertia>
+        <ixx>0.0003795406525929637</ixx>
+        <iyy>0.0003795406525929637</iyy>
+        <izz>0.00011206092178665061</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.11753618999856995
+         </radius>
+         <length>
+           0.4891748518266017
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>5</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>10</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.11753618999856995
+         </radius>
+         <length>
+           0.4891748518266017
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_13">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.5844211524391536
+      -2.028802019162115
+      4.185502853803231
+      2.9587241843198413
+      1.2729956454438025
+      1.5879467331662536
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>9.143822858090412e-05</mass>
+      <inertia>
+        <ixx>1.1361230472967659e-08</ixx>
+        <iyy>1.1361230472967659e-08</iyy>
+        <izz>1.1361230472967659e-08</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01762458044491
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>8</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>0</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01762458044491
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_14">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      2.228648420691515
+      0.23580498925084958
+      0.6607437555384545
+      1.839623834669117
+      1.1460592935413823
+      1.68260120642021
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>1.0791938811735725e-05</mass>
+      <inertia>
+        <ixx>5.7215730836982e-10</ixx>
+        <iyy>5.7215730836982e-10</iyy>
+        <izz>5.7215730836982e-10</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.011512721317302188
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>10</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>7</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.011512721317302188
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_15">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -1.145849185628539
+      2.141819440649103
+      1.0014256505662869
+      0.8777569955711382
+      2.4974472239348113
+      2.226683717918751
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.12619597954089154</mass>
+      <inertia>
+        <ixx>0.0025371310021282453</ixx>
+        <iyy>0.0025371310021282453</iyy>
+        <izz>0.0014168769555197851</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1498505380883031
+         </radius>
+         <length>
+           0.4170020675607914
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>3</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>9</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1498505380883031
+         </radius>
+         <length>
+           0.4170020675607914
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_16">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.7103370087125904
+      -0.40222140352402036
+      2.7629324743767483
+      1.9912688367554128
+      2.7483081582878945
+      2.889015767592095
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.01641349168827499</mass>
+      <inertia>
+        <ixx>0.0002794196278392779</ixx>
+        <iyy>0.0002794196278392779</iyy>
+        <izz>4.721613219071837e-05</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.07585072077959995
+         </radius>
+         <length>
+           0.4324642557794725
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>9</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>4</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.07585072077959995
+         </radius>
+         <length>
+           0.4324642557794725
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_17">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -2.4701247431524593
+      -1.7827072392956633
+      1.3796999564914674
+      0.4964693525976893
+      1.4846589113889108
+      0.4984305804713846
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.1897915831806767</mass>
+      <inertia>
+        <ixx>0.0037734908944440453</ixx>
+        <iyy>0.005939211191847401</iyy>
+        <izz>0.003691205077416831</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.4303006441317923
+           0.2196044268001374
+           0.43630419470583903
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>4</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>8</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.4303006441317923
+           0.2196044268001374
+           0.43630419470583903
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            1
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_18">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.8506146815378512
+      -1.010119893456594
+      2.7804677828659203
+      1.3977458028453615
+      2.523923751697428
+      2.195421024805544
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.0006558084566040562</mass>
+      <inertia>
+        <ixx>3.550305884273021e-07</ixx>
+        <iyy>3.550305884273021e-07</iyy>
+        <izz>3.550305884273021e-07</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.036788695147083536
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>10</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>5</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.036788695147083536
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_19">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.9257859630205285
+      0.7178369670547289
+      3.167346147864511
+      1.7855377628128895
+      2.813897256668224
+      1.3136525987170644
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.022925465816175446</mass>
+      <inertia>
+        <ixx>0.0001472202208592074</ixx>
+        <iyy>0.0001665218152842516</iyy>
+        <izz>0.00012976922656421616</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.19752081207945596
+           0.17003333119496802
+           0.21942866517919818
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>7</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>7</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.19752081207945596
+           0.17003333119496802
+           0.21942866517919818
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_20">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.4349476086908255
+      1.5002644038612267
+      1.2555911903290617
+      2.6570783399830433
+      1.333428038320237
+      0.6050971345503271
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.019026309569178394</mass>
+      <inertia>
+        <ixx>0.0005100038309295383</ixx>
+        <iyy>0.00036802829485190137</iyy>
+        <izz>0.00014963526370614304</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.04914790490319447
+           0.30324953796939724
+           0.4792723548339008
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>7</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>0</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.04914790490319447
+           0.30324953796939724
+           0.4792723548339008
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_21">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.5478618210361053
+      -1.854934693749607
+      2.3511392337642727
+      2.2994188647959772
+      1.3650327172691568
+      3.0743833968377645
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>2.726771010371371e-05</mass>
+      <inertia>
+        <ixx>1.4926830070814874e-09</ixx>
+        <iyy>1.4926830070814874e-09</iyy>
+        <izz>1.4926830070814874e-09</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01169848074691816
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>6</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>8</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01169848074691816
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            0
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_22">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.7588296144179152
+      -0.42658195762782025
+      3.868542265330361
+      1.304673925556502
+      1.2643317752439107
+      0.4217151418859461
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>1.3597760075030003e-06</mass>
+      <inertia>
+        <ixx>1.0450651050598608e-10</ixx>
+        <iyy>1.0450651050598608e-10</iyy>
+        <izz>1.0450651050598608e-10</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01386142855097838
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>8</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.01386142855097838
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_23">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -2.126962982501296
+      -1.6169601803068456
+      2.206115762802354
+      0.4128528407366584
+      1.9784027514118707
+      1.2429731875854853
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.008303472459352791</mass>
+      <inertia>
+        <ixx>0.00012784935414504283</ixx>
+        <iyy>0.00012784935414504283</iyy>
+        <izz>0.000172257749670083</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.2036922510814673
+         </radius>
+         <length>
+           0.24554742992669842
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>6</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>0</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.2036922510814673
+         </radius>
+         <length>
+           0.24554742992669842
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            1
+            1
+          </diffuse>
+          <specular>
+            0
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_24">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.015659350479797052
+      -1.3485074954574343
+      2.118840123007945
+      2.3719928713633047
+      1.2110940359375955
+      2.1114727056893616
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.03944021543257506</mass>
+      <inertia>
+        <ixx>0.0007225328615514542</ixx>
+        <iyy>0.00029318304068609927</iyy>
+        <izz>0.0009833456870417586</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.29030816321826813
+           0.4635859529921462
+           0.07017441150177828
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>2</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>6</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.29030816321826813
+           0.4635859529921462
+           0.07017441150177828
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_25">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.6244199230519798
+      0.8457521180409753
+      3.395764438229918
+      1.7137193648877647
+      0.27938788212639937
+      2.487674010089147
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.1200363481773867</mass>
+      <inertia>
+        <ixx>0.0028977397007042133</ixx>
+        <iyy>0.0028977397007042133</iyy>
+        <izz>0.0028977397007042133</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.24566500890654194
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>8</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>2</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.24566500890654194
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_26">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -2.2937147326328655
+      -0.1956901313427033
+      1.8292162533321346
+      1.0498778474643127
+      0.7983188864075292
+      1.1952290552715745
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.0002769726810537198</mass>
+      <inertia>
+        <ixx>5.695537881809642e-07</ixx>
+        <iyy>5.695537881809642e-07</iyy>
+        <izz>1.6965346723821567e-08</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.011068222991165694
+         </radius>
+         <length>
+           0.15591256304867018
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>6</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>6</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.011068222991165694
+         </radius>
+         <length>
+           0.15591256304867018
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            1
+            0
+            1
+          </diffuse>
+          <specular>
+            0
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            0
+            0
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_27">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.5155112457897966
+      -1.5212032709108532
+      0.7356066688128187
+      0.10587982889739592
+      2.5338774647421376
+      1.8907085389777287
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.05741469887308543</mass>
+      <inertia>
+        <ixx>0.0009217864997385777</ixx>
+        <iyy>0.0009217864997385777</iyy>
+        <izz>0.0009854711711009658</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1852786655624491
+         </radius>
+         <length>
+           0.29945632682469847
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>5</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.1852786655624491
+         </radius>
+         <length>
+           0.29945632682469847
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            0
+            0
+            1
+          </diffuse>
+          <specular>
+            1
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            1
+            1
+            0
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_28">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      -0.17014060242784357
+      -1.6791007878666253
+      3.02214104300677
+      2.574511859690524
+      2.4317864308077453
+      2.7340765916925793
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.11293192310336782</mass>
+      <inertia>
+        <ixx>0.0026868881808006975</ixx>
+        <iyy>0.0026868881808006975</iyy>
+        <izz>0.0026868881808006975</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <sphere>
+         <radius>
+           0.24388575745126773
+         </radius>
+        </sphere>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>10</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>8</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+         <radius>
+           0.24388575745126773
+         </radius>
+        </sphere>
+
+        </geometry>
+        <material>
+          <diffuse>
+            1
+            1
+            1
+            1
+          </diffuse>
+          <specular>
+            0
+            1
+            1
+            1
+          </specular>
+          <ambient>
+            0
+            1
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_29">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      0.02038136144055347
+      0.12474417007958749
+      2.3415413221876547
+      0.465336224923185
+      2.247713439189678
+      2.316655544022785
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.005098408862401851</mass>
+      <inertia>
+        <ixx>4.373622704388439e-05</ixx>
+        <iyy>2.8045881145316698e-05</iyy>
+        <izz>3.783433937136827e-05</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <box>
+         <size>
+           0.16143075107559568
+           0.250977827772412
+           0.19987750193177697
+         </size>
+        </box>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>6</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>2</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+         <size>
+           0.16143075107559568
+           0.250977827772412
+           0.19987750193177697
+         </size>
+        </box>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+  <model name="model_30">
+    <!-- important to allow collisions with actor -->
+    <allow_auto_disable>false</allow_auto_disable>
+    <pose>
+      1.1089661084307245
+      1.3048756310802
+      3.496157909880531
+      0.024309857221199237
+      1.6988398637337871
+      0.9507416728064751
+    </pose>
+    <link name="link">
+      <inertial>
+      <mass>0.07746976290739606</mass>
+      <inertia>
+        <ixx>0.0008528789217517034</ixx>
+        <iyy>0.0008528789217517034</iyy>
+        <izz>0.0010812048908855456</izz>
+        <ixy>0.0</ixy>
+        <ixz>0.0</ixz>
+        <iyz>0.0</iyz>
+      </inertia>
+    </inertial>
+
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.16707169750425185
+         </radius>
+         <length>
+           0.21993489725795165
+         </length>
+        </cylinder>
+
+        </geometry>
+        <surface>
+          <bounce>
+            <restitution_coefficient>9</restitution_coefficient>
+            <threshold>5.0</threshold>
+          </bounce>
+          <friction>
+            <ode>
+              <mu>3</mu>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+         <radius>
+           0.16707169750425185
+         </radius>
+         <length>
+           0.21993489725795165
+         </length>
+        </cylinder>
+
+        </geometry>
+        <material>
+          <diffuse>
+            0
+            0
+            1
+            1
+          </diffuse>
+          <specular>
+            1
+            0
+            0
+            1
+          </specular>
+          <ambient>
+            1
+            0
+            1
+            1
+          </ambient>
+        </material>
+      </visual>
+    </link>
+  </model>
+  
+
+ </world>
 </sdf>
