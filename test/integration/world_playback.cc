@@ -111,7 +111,7 @@ TEST_P(WorldPlaybackTest, Pause)
     gazebo::common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_TRUE(!this->world->IsPaused());
+  EXPECT_FALSE(this->world->IsPaused());
 
   // Send a message to pause the world.
   msg.set_pause(true);
