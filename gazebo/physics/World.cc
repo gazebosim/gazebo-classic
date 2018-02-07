@@ -2012,11 +2012,21 @@ void World::ProcessLightModifyMsgs()
 //////////////////////////////////////////////////
 void World::ProcessLightFactoryMsgs()
 {
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  // LoadLight also publishes to ~/light/factory so copy light factory msgs to
+  // avoid deadlock in OnLightFactory callback when trying to lock receiveMutex
+  std::list<msgs::Light> lightFactoryMsgsCopy;
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
+
+    std::copy(this->dataPtr->lightFactoryMsgs.begin(),
+        this->dataPtr->lightFactoryMsgs.end(),
+        std::back_inserter(lightFactoryMsgsCopy));
+    this->dataPtr->lightFactoryMsgs.clear();
+  }
+
+  for (auto const &lightFactoryMsg : lightFactoryMsgsCopy)
   {
     LightPtr light = this->LightByName(lightFactoryMsg.name());
-
     if (light)
     {
       continue;
@@ -2031,11 +2041,6 @@ void World::ProcessLightFactoryMsgs()
       // Create new light object
       this->LoadLight(lightSDF, this->dataPtr->rootElement);
     }
-  }
-
-  if (!this->dataPtr->lightFactoryMsgs.empty())
-  {
-    this->dataPtr->lightFactoryMsgs.clear();
   }
 }
 
@@ -2163,6 +2168,7 @@ void World::ProcessFactoryMsgs()
         {
           ActorPtr actor = this->LoadActor(elem, this->dataPtr->rootElement);
           actor->Init();
+          actor->LoadPlugins();
         }
         else if (isModel)
         {
@@ -2559,7 +2565,8 @@ void World::ProcessMessages()
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->SimTime());
 
-      if (!this->dataPtr->publishModelPoses.empty())
+      if (!this->dataPtr->publishModelPoses.empty() ||
+          !this->dataPtr->publishLightPoses.empty())
       {
         for (auto const &model : this->dataPtr->publishModelPoses)
         {
@@ -2620,6 +2627,7 @@ void World::ProcessMessages()
       }
     }
     this->dataPtr->publishModelPoses.clear();
+    this->dataPtr->publishLightPoses.clear();
   }
 
   {
