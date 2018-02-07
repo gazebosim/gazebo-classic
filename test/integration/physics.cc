@@ -730,14 +730,41 @@ TEST_F(PhysicsTest, StateInsertion)
               << "</link>"
               << "</model>";
 
+  std::stringstream newModelSDFStr;
+  newModelSDFStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<model name ='" << newModelName << "_SDF'>"
+                 << "<link name ='link'>"
+                 << "  <collision name ='collision'>"
+                 << "    <geometry>"
+                 << "      <box><size>2 2 2</size></box>"
+                 << "    </geometry>"
+                 << "  </collision>"
+                 << "  <visual name ='visual'>"
+                 << "    <geometry>"
+                 << "      <box><size>2 2 2</size></box>"
+                 << "    </geometry>"
+                 << "  </visual>"
+                 << "</link>"
+                 << "</model>"
+                 << "</sdf>";
+
   std::stringstream newLightStr;
   newLightStr << "<light name ='" << newLightName << "' type='spot'>"
               << "<diffuse>0 1 0 1</diffuse>"
               << "</light>";
 
+  std::stringstream newLightSDFStr;
+  newLightSDFStr << "<sdf version='" << SDF_VERSION << "'>"
+                 << "<light name ='" << newLightName << "_SDF' type='point'>"
+                 << "<diffuse>0 1 0 1</diffuse>"
+                 << "</light>"
+                 << "</sdf>";
+
   std::vector<std::string> insertions;
   insertions.push_back(newModelStr.str());
+  insertions.push_back(newModelSDFStr.str());
   insertions.push_back(newLightStr.str());
+  insertions.push_back(newLightSDFStr.str());
 
   worldState.SetInsertions(insertions);
 
@@ -748,15 +775,17 @@ TEST_F(PhysicsTest, StateInsertion)
   world->Step(1);
 
   // Check entities were inserted
-  EXPECT_EQ(2u, world->GetModelCount());
-  EXPECT_EQ(2u, world->LightCount());
-  EXPECT_FALSE(world->GetModel(newModelName) == NULL);
-  EXPECT_FALSE(world->Light(newLightName) == NULL);
+  EXPECT_EQ(3u, world->GetModelCount());
+  EXPECT_EQ(3u, world->LightCount());
+  EXPECT_NE(nullptr, world->GetModel(newModelName));
+  EXPECT_NE(nullptr, world->GetModel(newModelName + "_SDF"));
+  EXPECT_NE(nullptr, world->Light(newLightName));
+  EXPECT_NE(nullptr, world->Light(newLightName + "_SDF"));
 
   // New world state
   physics::WorldState newWorldState(world);
-  EXPECT_EQ(2u, newWorldState.GetModelStateCount());
-  EXPECT_EQ(2u, newWorldState.LightStateCount());
+  EXPECT_EQ(3u, newWorldState.GetModelStateCount());
+  EXPECT_EQ(3u, newWorldState.LightStateCount());
 }
 
 //////////////////////////////////////////////////

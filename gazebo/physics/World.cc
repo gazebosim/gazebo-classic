@@ -2206,12 +2206,8 @@ void World::SetState(const WorldState &_state)
       {
         boost::mutex::scoped_lock lock(this->dataPtr->factoryDeleteMutex);
 
-        // FIXME: We need to publish a light factory message to update the client,
-        // see issue #2288
         LightPtr light = this->LoadLight(elem, this->dataPtr->rootElement);
         light->Init();
-        // msgs::Light lightMsg = msgs::LightFromSDF(elem);
-        // this->dataPtr->lightFactoryPub->Publish(lightMsg);
       }
       catch(...)
       {

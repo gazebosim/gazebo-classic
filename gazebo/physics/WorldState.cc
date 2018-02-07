@@ -355,7 +355,46 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
-  this->insertions = _insertions;
+  sdf::SDFPtr root(new sdf::SDF);
+  sdf::initFile("root.sdf", root);
+
+  // Unwrap insertions from <sdf>
+  for (const auto &insertion : _insertions)
+  {
+    root->Root()->ClearElements();
+    // <sdf>
+    if (sdf::readString(insertion, root))
+    {
+      // <model>
+      if (root->Root()->HasElement("model"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("model")->ToString(""));
+      }
+      // <light>
+      else if (root->Root()->HasElement("light"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("light")->ToString(""));
+      }
+      // <actor>
+      else if (root->Root()->HasElement("actor"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("actor")->ToString(""));
+      }
+      else
+      {
+        gzwarn << "Unsupported insertion [" << insertion << "]" << std::endl;
+        continue;
+      }
+    }
+    // Otherwise copy as-is without validating
+    else
+    {
+      this->insertions.push_back(insertion);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
