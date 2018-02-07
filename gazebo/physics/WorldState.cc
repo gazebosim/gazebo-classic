@@ -216,12 +216,12 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   this->insertions.clear();
   if (_elem->HasElement("insertions"))
   {
-    auto insertionsElem = _elem->GetElement("insertions");
+    sdf::ElementPtr insertionsElem = _elem->GetElement("insertions");
 
     // Models
     if (insertionsElem->HasElement("model"))
     {
-      auto modelElem = insertionsElem->GetElement("model");
+      sdf::ElementPtr modelElem = insertionsElem->GetElement("model");
 
       while (modelElem)
       {
@@ -233,7 +233,7 @@ void WorldState::Load(const sdf::ElementPtr _elem)
     // Lights
     if (insertionsElem->HasElement("light"))
     {
-      auto lightElem = insertionsElem->GetElement("light");
+      sdf::ElementPtr lightElem = insertionsElem->GetElement("light");
 
       while (lightElem)
       {
@@ -247,11 +247,11 @@ void WorldState::Load(const sdf::ElementPtr _elem)
   this->deletions.clear();
   if (_elem->HasElement("deletions"))
   {
-    auto deletionsElem = _elem->GetElement("deletions");
+    sdf::ElementPtr deletionsElem = _elem->GetElement("deletions");
 
     if (deletionsElem->HasElement("name"))
     {
-      auto nameElem = deletionsElem->GetElement("name");
+      sdf::ElementPtr nameElem = deletionsElem->GetElement("name");
 
       while (nameElem)
       {
