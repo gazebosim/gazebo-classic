@@ -161,9 +161,9 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
     {
       for (unsigned int i = 0; i < width; i+=channels)
       {
-        uint16_t v = uint16Buffer[j*width + i] * factor;
+        u = uint16Buffer[j*width + i] * factor;
         // for L16 we set rgb to be the same value
-        rgb[0] = rgb[1] = rgb[2] = v;
+        rgb[0] = rgb[1] = rgb[2] = u;
         // handle the case for rgb16
         for (unsigned int k = 1; k < channels; ++k)
         {
