@@ -1389,8 +1389,8 @@ void World::ProcessPlaybackControlMsgs()
 
     if (msg.has_multi_step())
     {
-      // stepWorld is a blocking call so set stepInc directly so that world stats
-      // will still be published
+      // stepWorld is a blocking call so set stepInc directly so that
+      // world stats will still be published
       this->SetPaused(true);
       this->dataPtr->stepInc += msg.multi_step();
     }
