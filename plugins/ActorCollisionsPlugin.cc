@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,25 +33,31 @@ ActorCollisionsPlugin::ActorCollisionsPlugin()
 /////////////////////////////////////////////////
 void ActorCollisionsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  // Get a pointer to the actor
   physics::ActorPtr actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
 
+  // The collision scaling factor
   ignition::math::Vector3d scaling = ignition::math::Vector3d::One;
 
-  // Read in the collision scaling factor
+  // Read in the collision scaling factor, if present
   if (_sdf->HasElement("scaling"))
     scaling = _sdf->Get<ignition::math::Vector3d>("scaling");
 
-  // Scale all the collisions
   for (const auto &link : actor->GetLinks())
   {
     // Init the links, which in turn enables collisions
     link->Init();
+
+    // Scale all the collisions in all the links
     for (const auto &collision : link->GetCollisions())
     {
       gazebo::physics::BoxShapePtr boxShape =
         boost::dynamic_pointer_cast<gazebo::physics::BoxShape>(
             collision->GetShape());
-      boxShape->SetSize(boxShape->Size() * scaling);
+
+      // Make sure we have a box shape.
+      if (boxShape)
+        boxShape->SetSize(boxShape->Size() * scaling);
     }
   }
 }
