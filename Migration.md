@@ -12,7 +12,7 @@ release will remove the deprecated code.
 1. During the gazebo 8.x series the `-g` was used to load System plugins in the
    client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
-   plugins and will remain the exactly the same.   
+   plugins and will remain the exactly the same.
 
 ### Modifications
 
@@ -172,6 +172,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **plugins/ContainPlugin.hh**
+    + ***Deprecation:*** Gazebo transport publisher on <namespace>/contain
+    + ***Replacement:*** Ignition transport publisher on <namespace>/contain
+    + ***Deprecation:*** Gazebo transport subscriber on <namespace>/enable
+    + ***Replacement:*** Ignition transport service on <namespace>/enable
 
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
