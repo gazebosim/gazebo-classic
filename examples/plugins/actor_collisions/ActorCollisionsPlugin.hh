@@ -15,27 +15,22 @@
  *
 */
 
-#ifndef GAZEBO_PLUGINS_ACTORCOLLISIONSPLUGIN_HH_
-#define GAZEBO_PLUGINS_ACTORCOLLISIONSPLUGIN_HH_
+#ifndef GAZEBO_EXAMPLES_PLUGINS_ACTORCOLLISIONSPLUGIN_HH_
+#define GAZEBO_EXAMPLES_PLUGINS_ACTORCOLLISIONSPLUGIN_HH_
 
-#include <string>
-#include <vector>
-
-#include "gazebo/common/Plugin.hh"
-#include "gazebo/physics/physics.hh"
-#include "gazebo/util/system.hh"
+#include <gazebo/common/Plugin.hh>
 
 namespace gazebo
 {
   /// \brief This plugin enables collisions on an Actor, and
-  /// optionally applies a scaling factor to the Actor's box collisions.
+  /// optionally applies a scaling factor to each of the Actor's box collisions.
   /// Collisions only work on enabled objects. ODE has a auto-disable
   /// feature that "disables" an object when it comes to rest. An actor will
   /// pass through these objects.
   ///
-  /// See worlds/actor_collisions.world for an example world file.
+  /// See actor_collisions.world for an example world file.
   ///
-  class GAZEBO_VISIBLE ActorCollisionsPlugin : public ModelPlugin
+  class ActorCollisionsPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: ActorCollisionsPlugin();
