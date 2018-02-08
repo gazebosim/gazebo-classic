@@ -125,8 +125,117 @@
     <uri>model://sun</uri>
   </include>
   <actor name="actor">
+    <%
+      # Scaling chosen by trial and error
+      legs = [8.0, 8.0, 1.0]
+      arms = [5.0, 5.0, 1.0]
+      feet = [4.0, 4.0, 1.5]
+      hands = [4.0, 4.0, 3.0]
+      neck = [5.0, 5.0, 3.0]
+      torso = [12.0, 20.0, 5.0]
+      zero = [0.01, 0.001, 0.001]
+    %>
     <plugin name="actor_collisions_plugin" filename="libActorCollisionsPlugin.so">
-      <scaling>8.0 8.0 1.0</scaling>
+      <scaling collision="LHipJoint_LeftUpLeg_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="LeftUpLeg_LeftLeg_collision" scale="
+        <%= legs[0] %>
+        <%= legs[1] %>
+        <%= legs[2] %>
+      "/>
+      <scaling collision="LeftLeg_LeftFoot_collision" scale="
+        <%= legs[0] %>
+        <%= legs[1] %>
+        <%= legs[2] %>
+      "/>
+      <scaling collision="LeftFoot_LeftToeBase_collision" scale="
+        <%= feet[0] %>
+        <%= feet[1] %>
+        <%= feet[2] %>
+      "/>
+      <scaling collision="RHipJoint_RightUpLeg_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="RightUpLeg_RightLeg_collision" scale="
+        <%= legs[0] %>
+        <%= legs[1] %>
+        <%= legs[2] %>
+      "/>
+      <scaling collision="RightLeg_RightFoot_collision" scale="
+        <%= legs[0] %>
+        <%= legs[1] %>
+        <%= legs[2] %>
+      "/>
+      <scaling collision="RightFoot_RightToeBase_collision" scale="
+        <%= feet[0] %>
+        <%= feet[1] %>
+        <%= feet[2] %>
+      "/>
+      <scaling collision="LowerBack_Spine_collision" scale="
+        <%= torso[0] %>
+        <%= torso[1] %>
+        <%= torso[2] %>
+      "/>
+      <scaling collision="Spine_Spine1_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="Neck_Neck1_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="Neck1_Head_collision" scale="
+        <%= neck[0] %>
+        <%= neck[1] %>
+        <%= neck[2] %>
+      "/>
+      <scaling collision="LeftShoulder_LeftArm_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="LeftArm_LeftForeArm_collision" scale="
+        <%= arms[0] %>
+        <%= arms[1] %>
+        <%= arms[2] %>
+      "/>
+      <scaling collision="LeftForeArm_LeftHand_collision" scale="
+        <%= arms[0] %>
+        <%= arms[1] %>
+        <%= arms[2] %>
+      "/>
+      <scaling collision="LeftFingerBase_LeftHandIndex1_collision" scale="
+        <%= hands[0] %>
+        <%= hands[1] %>
+        <%= hands[2] %>
+      "/>
+      <scaling collision="RightShoulder_RightArm_collision" scale="
+        <%= zero[0] %>
+        <%= zero[1] %>
+        <%= zero[2] %>
+      "/>
+      <scaling collision="RightArm_RightForeArm_collision" scale="
+        <%= arms[0] %>
+        <%= arms[1] %>
+        <%= arms[2] %>
+      "/>
+      <scaling collision="RightForeArm_RightHand_collision" scale="
+        <%= arms[0] %>
+        <%= arms[1] %>
+        <%= arms[2] %>
+      "/>
+      <scaling collision="RightFingerBase_RightHandIndex1_collision" scale="
+        <%= hands[0] %>
+        <%= hands[1] %>
+        <%= hands[2] %>
+      "/>
     </plugin>
     <skin>
       <filename>walk.dae</filename>
@@ -300,7 +409,7 @@
         </geometry>
         <surface>
           <bounce>
-            <restitution_coefficient><%= rand(0..10) %></restitution_coefficient>
+            <restitution_coefficient><%= rand(0..1) %></restitution_coefficient>
             <threshold>5.0</threshold>
           </bounce>
           <friction>

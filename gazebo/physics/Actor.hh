@@ -189,6 +189,7 @@ namespace gazebo
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
       /// \param[in] _radius Radius of the collision object.
+      /// \deprecated This function is no longer used, consider removing it
       private: void AddSphereCollision(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose,

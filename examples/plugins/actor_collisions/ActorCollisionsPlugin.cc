@@ -15,11 +15,13 @@
  *
 */
 
-#include <functional>
+#include <ignition/math/Vector3.hh>
 
-#include <ignition/math.hh>
-#include "gazebo/physics/physics.hh"
-#include "plugins/ActorCollisionsPlugin.hh"
+#include <gazebo/physics/Actor.hh>
+#include <gazebo/physics/BoxShape.hh>
+#include <gazebo/physics/Collision.hh>
+#include <gazebo/physics/Link.hh>
+#include "ActorCollisionsPlugin.hh"
 
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(ActorCollisionsPlugin)
@@ -34,30 +36,46 @@ ActorCollisionsPlugin::ActorCollisionsPlugin()
 void ActorCollisionsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   // Get a pointer to the actor
-  physics::ActorPtr actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(_model);
 
-  // The collision scaling factor
-  ignition::math::Vector3d scaling = ignition::math::Vector3d::One;
+  // Map of collision scaling factors
+  std::map<std::string, ignition::math::Vector3d> scaling;
 
-  // Read in the collision scaling factor, if present
+  // Read in the collision scaling factors, if present
   if (_sdf->HasElement("scaling"))
-    scaling = _sdf->Get<ignition::math::Vector3d>("scaling");
+  {
+    auto elem = _sdf->GetElement("scaling");
+    while (elem)
+    {
+      auto name = elem->Get<std::string>("collision");
+      auto scale = elem->Get<ignition::math::Vector3d>("scale");
+      scaling[name] = scale;
+      elem = elem->GetNextElement("scaling");
+    }
+  }
 
   for (const auto &link : actor->GetLinks())
   {
     // Init the links, which in turn enables collisions
     link->Init();
 
+    if (scaling.empty())
+      continue;
+
     // Scale all the collisions in all the links
     for (const auto &collision : link->GetCollisions())
     {
-      gazebo::physics::BoxShapePtr boxShape =
-        boost::dynamic_pointer_cast<gazebo::physics::BoxShape>(
-            collision->GetShape());
+      auto name = collision->GetName();
+
+      if (scaling.find(name) == scaling.end())
+        continue;
+
+      auto boxShape = boost::dynamic_pointer_cast<gazebo::physics::BoxShape>(
+          collision->GetShape());
 
       // Make sure we have a box shape.
       if (boxShape)
-        boxShape->SetSize(boxShape->Size() * scaling);
+        boxShape->SetSize(boxShape->Size() * scaling[name]);
     }
   }
 }
