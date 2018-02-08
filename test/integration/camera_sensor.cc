@@ -919,7 +919,7 @@ TEST_F(CameraSensor, PointCloud)
     return;
   }
 
-  // get point cloud depth camera ssensor
+  // get point cloud depth camera sensor
   std::string cameraName = "pointcloud_camera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::DepthCameraSensorPtr camSensor =
@@ -1133,4 +1133,200 @@ TEST_F(CameraSensor, LensFlare)
 
   delete[] img;
   delete[] img2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, 16bit)
+{
+  // World contains a box positioned at top right quadrant of image generated
+  // by a mono 16 bit camera and a color 16 bit camera.
+  // Verify pixel values of top right quadrant of image (corresponding to box)
+  // are approximately the same but different from the background's pixel
+  // values.
+  Load("worlds/16bit_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get L16 camera sensor
+  std::string l16CameraName = "l16bit_camera_sensor";
+  sensors::SensorPtr l16Sensor = sensors::get_sensor(l16CameraName);
+  sensors::CameraSensorPtr l16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(l16Sensor);
+  EXPECT_TRUE(l16CamSensor != nullptr);
+  rendering::CameraPtr l16Cam = l16CamSensor->Camera();
+  EXPECT_TRUE(l16Cam != nullptr);
+
+  unsigned int l16Width  = l16Cam->ImageWidth();
+  unsigned int l16Height = l16Cam->ImageHeight();
+  EXPECT_GT(l16Width, 0u);
+  EXPECT_GT(l16Height, 0u);
+
+  // get rgb16 camera sensor
+  std::string rgb16CameraName = "rgb16bit_camera_sensor";
+  sensors::SensorPtr rgb16Sensor = sensors::get_sensor(rgb16CameraName);
+  sensors::CameraSensorPtr rgb16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(rgb16Sensor);
+  EXPECT_TRUE(rgb16CamSensor != nullptr);
+  rendering::CameraPtr rgb16Cam = rgb16CamSensor->Camera();
+  EXPECT_TRUE(rgb16Cam != nullptr);
+
+  unsigned int rgb16Width  = rgb16Cam->ImageWidth();
+  unsigned int rgb16Height = rgb16Cam->ImageHeight();
+  EXPECT_GT(rgb16Width, 0u);
+  EXPECT_GT(rgb16Height, 0u);
+
+  // connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[l16Width * l16Height * 2];
+  img2 = new unsigned char[rgb16Width * rgb16Height * 3 * 2];
+
+  event::ConnectionPtr c =
+    l16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+    rgb16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages)
+      && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
+  c.reset();
+  c2.reset();
+
+  // verify L16 camera images
+  uint16_t bgValue = 0;
+  uint16_t boxValue = 0;
+  uint16_t *l16Img = reinterpret_cast<uint16_t *>(img);
+  // expect pixel values to be within 0.2% of valid 16bit pixel range
+  uint16_t tol = std::pow(2, 16) * 0.002;
+  for (unsigned int y = 0; y < l16Height; ++y)
+  {
+    for (unsigned int x = 0; x < l16Width; ++x)
+    {
+      uint16_t value = l16Img[(y*l16Width)+x];
+      EXPECT_NE(0, value);
+
+      // box in top right quadrant of image
+      if (x >= l16Width / 2 && y < l16Height / 2)
+      {
+        // set its color if not done already
+        if (boxValue == 0)
+          boxValue = value;
+        // verify pixels correspond to box
+        else
+          EXPECT_NEAR(boxValue, value, tol);
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgValue == 0)
+          bgValue = value;
+        // verify pixels correspond to background
+        else
+          EXPECT_NEAR(bgValue, value, tol);
+      }
+    }
+  }
+
+  // expect background pixel value to be different from box pixel value
+  EXPECT_GT(bgValue, boxValue);
+  uint16_t minDiff = std::pow(2, 16) * 0.25;
+  uint16_t diff = bgValue - boxValue;
+  EXPECT_GT(diff, minDiff);
+
+
+  // verify RGB UINT16 camera images
+  uint16_t bgRValue = 0;
+  uint16_t bgGValue = 0;
+  uint16_t bgBValue = 0;
+  uint16_t boxRValue = 0;
+  uint16_t boxGValue = 0;
+  uint16_t boxBValue = 0;
+  uint16_t *rgb16Img = reinterpret_cast<uint16_t *>(img2);
+  for (unsigned int y = 0; y < rgb16Height; ++y)
+  {
+    for (unsigned int x = 0; x < rgb16Width * 3; x+=3)
+    {
+      uint16_t r = rgb16Img[(y*rgb16Width*3)+x];
+      uint16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
+      uint16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
+      // verify gray color
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      EXPECT_NE(0, r);
+      EXPECT_NE(0, g);
+      EXPECT_NE(0, b);
+
+      // box in top right quadrant of image
+      if (x >= (rgb16Width*3) / 2 && y < rgb16Height / 2)
+      {
+        // set its color if not done already
+        if (boxRValue == 0 && boxGValue == 0 && boxBValue == 0)
+        {
+          boxRValue = r;
+          boxGValue = g;
+          boxBValue = b;
+        }
+        // verify pixels correspond to box
+        else
+        {
+          EXPECT_NEAR(boxRValue, r, tol);
+          EXPECT_NEAR(boxGValue, g, tol);
+          EXPECT_NEAR(boxBValue, b, tol);
+        }
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgRValue == 0 && bgGValue == 0 && bgBValue == 0)
+        {
+          bgRValue = r;
+          bgGValue = g;
+          bgBValue = b;
+        }
+        // verify pixels correspond to background
+        else
+        {
+          EXPECT_NEAR(bgRValue, r, tol);
+          EXPECT_NEAR(bgGValue, g, tol);
+          EXPECT_NEAR(bgBValue, b, tol);
+        }
+      }
+    }
+  }
+  // expect background color to be different from box color
+  EXPECT_GT(bgRValue, boxRValue);
+  EXPECT_GT(bgGValue, boxGValue);
+  EXPECT_GT(bgBValue, boxBValue);
+  uint16_t diffR = bgRValue - boxRValue;
+  uint16_t diffG = bgGValue - boxGValue;
+  uint16_t diffB = bgBValue - boxBValue;
+  EXPECT_GT(diffR, minDiff);
+  EXPECT_GT(diffG, minDiff);
+  EXPECT_GT(diffB, minDiff);
+
+  delete [] img;
+  delete [] img2;
 }
