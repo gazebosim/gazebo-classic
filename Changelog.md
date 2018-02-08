@@ -1,6 +1,27 @@
 ## Gazebo 7
 
-## Gazebo 7.x.x (2017-xx-xx)
+## Gazebo 7.x.x (2018-xx-xx)
+
+
+## Gazebo 7.10.0 (2018-02-07)
+
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
+
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
+1. Adding accessors for velocity in ENU frame for gps sensor
+    * [Pull request 2854](https://bitbucket.org/osrf/gazebo/pull-request/2854)
+
+1. Fix DEM min elevation
+    * [Pull request 2868](https://bitbucket.org/osrf/gazebo/pull-request/2868)
+
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
 1. Diagnostics: record timing statistics instead of all timestamps
     * [Pull request 2821](https://bitbucket.org/osrf/gazebo/pull-requests/2821)
@@ -8,16 +29,29 @@
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
+1. Initialize laser retro value
+    * [Pull request 2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
+
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
 
 1. Add light as child of link
     * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Pull request 2872](https://bitbucket.org/osrf/gazebo/pull-requests/2872)
     * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
     * [Pull request 2806](https://bitbucket.org/osrf/gazebo/pull-request/2806)
     * [Pull request 2829](https://bitbucket.org/osrf/gazebo/pull-request/2829)
+
+1. Fix inserting models with invalid submesh
+    * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Fix gazebo7 homebrew build (tinyxml2 6.0.0)
+    * [Pull request 2824](https://bitbucket.org/osrf/gazebo/pull-request/2824)
 
 
 ## Gazebo 7.9.0 (2017-11-22)

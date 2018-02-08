@@ -204,6 +204,24 @@ TEST_F(DemTest, UnfinishedDem)
   // by our dem class and ignored when computing the min elevation
   EXPECT_FLOAT_EQ(-10, dem.GetMinElevation());
   EXPECT_FLOAT_EQ(1909, dem.GetMaxElevation());
+
+  // test another dem file with multiple nodata values
+  common::Dem demNoData;
+
+  path = TEST_PATH;
+  path /= "data/dem_nodata.dem";
+  EXPECT_EQ(demNoData.Load(path.string()), 0);
+
+  // Check that the min and max elevations are valid for a dem with multiple
+  // nodata values
+  EXPECT_EQ(65, static_cast<int>(demNoData.GetHeight()));
+  EXPECT_EQ(65, static_cast<int>(demNoData.GetWidth()));
+  EXPECT_FLOAT_EQ(14050.08, demNoData.GetWorldHeight());
+  EXPECT_FLOAT_EQ(9785.4375, demNoData.GetWorldWidth());
+  // gdal reports min elevation as -32767 but this is treated as a nodata
+  // by our dem class and ignored when computing the min elevation
+  EXPECT_FLOAT_EQ(682, demNoData.GetMinElevation());
+  EXPECT_FLOAT_EQ(2932, demNoData.GetMaxElevation());
 }
 #endif
 
