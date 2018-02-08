@@ -127,7 +127,6 @@ gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
 set_property(
