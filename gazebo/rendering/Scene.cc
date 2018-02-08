@@ -153,6 +153,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
 
+  this->dataPtr->isServer = _isServer;
   if (_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
@@ -386,7 +387,7 @@ void Scene::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
-  if (this->dataPtr->enableVisualizations)
+  if (!this->dataPtr->isServer)
   {
     // Initialize the marker manager if this is a GUI scene.
     if (!this->dataPtr->markerManager.Init(this))
