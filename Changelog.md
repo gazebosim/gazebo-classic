@@ -1,6 +1,9 @@
 ## Gazebo 7
 
-## Gazebo 7.x.x (2017-xx-xx)
+## Gazebo 7.x.x (2018-xx-xx)
+
+
+## Gazebo 7.10.0 (2018-02-07)
 
 1. Add support for 16 bit Grayscale and RGB camera image types.
     * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
@@ -40,6 +43,12 @@
 
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Fix gazebo7 homebrew build (tinyxml2 6.0.0)
+    * [Pull request 2824](https://bitbucket.org/osrf/gazebo/pull-request/2824)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
