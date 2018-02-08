@@ -106,6 +106,10 @@ TEST_F(GpsSensor_TEST, CreateGps)
   EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
 
+  EXPECT_DOUBLE_EQ(sensor->VelocityEast(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->VelocityNorth(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->VelocityUp(), 0.0);
+
   EXPECT_TRUE(sensor->IsActive());
 
   physics::WorldPtr world = physics::get_world();
