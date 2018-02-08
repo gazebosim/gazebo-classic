@@ -105,10 +105,10 @@ TEST_P(WorldPlaybackTest, Pause)
 
   // Wait for message to be processed
   int sleep = 0;
-  int maxSleep = 30;
+  int maxSleep = 3000;
   while (this->world->IsPaused() && sleep < maxSleep)
   {
-    gazebo::common::Time::MSleep(100);
+    gazebo::common::Time::MSleep(1);
     sleep++;
   }
   EXPECT_FALSE(this->world->IsPaused());
@@ -121,7 +121,7 @@ TEST_P(WorldPlaybackTest, Pause)
   sleep = 0;
   while (!this->world->IsPaused() && sleep < maxSleep)
   {
-    gazebo::common::Time::MSleep(100);
+    gazebo::common::Time::MSleep(1);
     sleep++;
   }
   EXPECT_TRUE(this->world->IsPaused());
