@@ -2,6 +2,10 @@
 
 ## Gazebo 7.x.x (2018-xx-xx)
 
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
 
 ## Gazebo 7.10.0 (2018-02-07)
 
@@ -155,10 +159,6 @@
 
 1. Cache heightmap tile data
     * [Pull request 2645](https://bitbucket.org/osrf/gazebo/pull-request/2645)
-
-1. Process insertions and deletions on gz log echo
-    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
-    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
 
 1. Add plugin for attaching lights to links in a model
     * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
