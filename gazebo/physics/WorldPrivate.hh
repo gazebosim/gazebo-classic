@@ -177,8 +177,11 @@ namespace gazebo
       /// World::SetPaused to assign world::pause
       public: boost::recursive_mutex *worldUpdateMutex;
 
-      /// \brief THe world's SDF values.
+      /// \brief The world's current SDF description.
       public: sdf::ElementPtr sdf;
+
+      /// \brief The world description when it was first loaded.
+      public: sdf::ElementPtr initialSdf;
 
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
@@ -200,6 +203,9 @@ namespace gazebo
 
       /// \brief Light modify message buffer.
       public: std::list<msgs::Light> lightModifyMsgs;
+
+      /// \brief Playback control message buffer.
+      public: std::list<msgs::LogPlaybackControl> playbackControlMsgs;
 
       /// \brief True to reset the world on next update.
       public: bool needsReset;

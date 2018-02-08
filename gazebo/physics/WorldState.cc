@@ -211,6 +211,55 @@ void WorldState::Load(const sdf::ElementPtr _elem)
       childElem = childElem->GetNextElement("light");
     }
   }
+
+  // Add insertions
+  this->insertions.clear();
+  if (_elem->HasElement("insertions"))
+  {
+    sdf::ElementPtr insertionsElem = _elem->GetElement("insertions");
+
+    // Models
+    if (insertionsElem->HasElement("model"))
+    {
+      sdf::ElementPtr modelElem = insertionsElem->GetElement("model");
+
+      while (modelElem)
+      {
+        this->insertions.push_back(modelElem->ToString(""));
+        modelElem = modelElem->GetNextElement("model");
+      }
+    }
+
+    // Lights
+    if (insertionsElem->HasElement("light"))
+    {
+      sdf::ElementPtr lightElem = insertionsElem->GetElement("light");
+
+      while (lightElem)
+      {
+        this->insertions.push_back(lightElem->ToString(""));
+        lightElem = lightElem->GetNextElement("light");
+      }
+    }
+  }
+
+  // Add deletions
+  this->deletions.clear();
+  if (_elem->HasElement("deletions"))
+  {
+    sdf::ElementPtr deletionsElem = _elem->GetElement("deletions");
+
+    if (deletionsElem->HasElement("name"))
+    {
+      sdf::ElementPtr nameElem = deletionsElem->GetElement("name");
+
+      while (nameElem)
+      {
+        this->deletions.push_back(nameElem->Get<std::string>());
+        nameElem = nameElem->GetNextElement("name");
+      }
+    }
+  }
 }
 
 /////////////////////////////////////////////////
@@ -306,7 +355,46 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
-  this->insertions = _insertions;
+  sdf::SDFPtr root(new sdf::SDF);
+  sdf::initFile("root.sdf", root);
+
+  // Unwrap insertions from <sdf>
+  for (const auto &insertion : _insertions)
+  {
+    root->Root()->ClearElements();
+    // <sdf>
+    if (sdf::readString(insertion, root))
+    {
+      // <model>
+      if (root->Root()->HasElement("model"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("model")->ToString(""));
+      }
+      // <light>
+      else if (root->Root()->HasElement("light"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("light")->ToString(""));
+      }
+      // <actor>
+      else if (root->Root()->HasElement("actor"))
+      {
+        this->insertions.push_back(
+            root->Root()->GetElement("actor")->ToString(""));
+      }
+      else
+      {
+        gzwarn << "Unsupported insertion [" << insertion << "]" << std::endl;
+        continue;
+      }
+    }
+    // Otherwise copy as-is without validating
+    else
+    {
+      this->insertions.push_back(insertion);
+    }
+  }
 }
 
 /////////////////////////////////////////////////
