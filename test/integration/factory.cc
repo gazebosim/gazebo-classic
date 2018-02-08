@@ -54,11 +54,21 @@ class FactoryTest : public ServerFixture,
   /// \param[in] _physicsEngine Physics engine name
   public: void ActorLinkTrajectory(const std::string &_physicsEngine);
 
+  /// \brief Test spawning an actor with a plugin.
+  public: void ActorPlugin();
+
   /// \brief Test spawning an actor with skin, animation and trajectory.
   /// \param[in] _physicsEngine Physics engine name
   public: void ActorAll(const std::string &_physicsEngine);
 
   public: void Clone(const std::string &_physicsEngine);
+};
+
+
+class LightFactoryTest : public ServerFixture
+{
+  /// \brief Light factory publisher.
+  protected: transport::PublisherPtr lightFactoryPub;
 };
 
 ///////////////////////////////////////////////////
@@ -547,6 +557,68 @@ TEST_P(FactoryTest, ActorLinkTrajectory)
 }
 
 /////////////////////////////////////////////////
+TEST_F(FactoryTest, ActorPlugin)
+{
+  // Load a world with the default physics engine
+  this->Load("worlds/empty.world", true);
+
+  // Check there is no actor yet
+  std::string actorName("test_actor");
+  EXPECT_FALSE(this->GetModel(actorName));
+
+  // Spawn from actor SDF string
+  std::string skinFile("walk.dae");
+  std::string animFile("walk.dae");
+  std::string animName("walking");
+  std::ostringstream actorStr;
+  actorStr << "<sdf version='" << SDF_VERSION << "'>"
+    << "<actor name ='" << actorName << "'>"
+    << "  <skin>"
+    << "    <filename>" << skinFile << "</filename>"
+    << "  </skin>"
+    << "  <animation name='" << animName << "'>"
+    << "    <filename>" << animFile << "</filename>"
+    << "    <interpolate_x>true</interpolate_x>"
+    << "  </animation>"
+    << "  <plugin name='actorPlugin' filename='libActorPlugin.so'>"
+    << "    <target>0 -5 1.2138</target>"
+    << "    <target_weight>1.15</target_weight>"
+    << "    <obstacle_weight>1.8</obstacle_weight>"
+    << "    <animation_factor>5.1</animation_factor>"
+    << "  </plugin>"
+    << "</actor>"
+    << "</sdf>";
+
+  msgs::Factory msg;
+  msg.set_sdf(actorStr.str());
+  this->factoryPub->Publish(msg);
+
+  // Wait until actor was spawned
+  this->WaitUntilEntitySpawn(actorName, 300, 10);
+
+  auto model = this->GetModel(actorName);
+  ASSERT_NE(nullptr, model);
+
+  // Convert to actor
+  auto actor = boost::dynamic_pointer_cast<physics::Actor>(model);
+  ASSERT_NE(nullptr, actor);
+
+  // Check it is active
+  EXPECT_TRUE(actor->IsActive());
+
+  // Check the SDF
+  auto sdf = actor->GetSDF();
+  ASSERT_NE(nullptr, sdf);
+
+  // Check the plugin is still there
+  EXPECT_TRUE(sdf->HasElement("plugin"));
+  EXPECT_EQ(1u, actor->GetPluginCount());
+
+  // Check the plugin was loaded and set a custom trajectory
+  EXPECT_NE(nullptr, actor->CustomTrajectory());
+}
+
+/////////////////////////////////////////////////
 void FactoryTest::ActorAll(const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
@@ -640,6 +712,9 @@ void FactoryTest::ActorAll(const std::string &_physicsEngine)
   EXPECT_FALSE(skelAnims.empty());
   EXPECT_EQ(skelAnims.size(), 1u);
   EXPECT_TRUE(skelAnims[animName] != nullptr);
+
+  // Check no custom trajectory has been set
+  EXPECT_EQ(nullptr, actor->CustomTrajectory());
 }
 
 /////////////////////////////////////////////////
@@ -794,6 +869,53 @@ TEST_P(FactoryTest, Clone)
 //  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
 //  ASSERT_EQ(0.0, diffAvg);
 // }
+
+
+/////////////////////////////////////////////////
+TEST_F(LightFactoryTest, SpawnLight)
+{
+  Load("worlds/empty.world");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // create lights using ~/factory/light topic
+  this->lightFactoryPub = this->node->Advertise<msgs::Light>("~/factory/light");
+  std::string light1Name = "new1_light";
+  std::string light2Name = "new2_light";
+
+  msgs::Light msg;
+  msg.set_name(light1Name);
+  ignition::math::Pose3d light1Pose = ignition::math::Pose3d(0, 2, 1, 0, 0, 0);
+  msgs::Set(msg.mutable_pose(), light1Pose);
+  this->lightFactoryPub->Publish(msg);
+
+  msg.set_name(light2Name);
+  ignition::math::Pose3d light2Pose = ignition::math::Pose3d(1, 0, 5, 0, 2, 0);
+  msgs::Set(msg.mutable_pose(), light2Pose);
+  this->lightFactoryPub->Publish(msg);
+
+  // wait for light to spawn
+  int sleep = 0;
+  int maxSleep = 50;
+  while ((!world->LightByName(light1Name) || !world->LightByName(light2Name)) &&
+      sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // verify lights in world
+  physics::LightPtr light1 = world->LightByName(light1Name);
+  physics::LightPtr light2 = world->LightByName(light2Name);
+  ASSERT_NE(nullptr, light1);
+  ASSERT_NE(nullptr, light2);
+
+  EXPECT_EQ(light1Name, light1->GetScopedName());
+  EXPECT_EQ(light1Pose, light1->WorldPose());
+
+  EXPECT_EQ(light2Name, light2->GetScopedName());
+  EXPECT_EQ(light2Pose, light2->WorldPose());
+}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
 

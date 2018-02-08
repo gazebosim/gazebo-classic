@@ -12,7 +12,7 @@ release will remove the deprecated code.
 1. During the gazebo 8.x series the `-g` was used to load System plugins in the
    client side instead of GUI plugins. In gazebo 9.x the `-g` loads GUI
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
-   plugins and will remain the exactly the same.   
+   plugins and will remain the exactly the same.
 
 ### Modifications
 
@@ -172,6 +172,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **plugins/ContainPlugin.hh**
+    + ***Deprecation:*** Gazebo transport publisher on <namespace>/contain
+    + ***Replacement:*** Ignition transport publisher on <namespace>/contain
+    + ***Deprecation:*** Gazebo transport subscriber on <namespace>/enable
+    + ***Replacement:*** Ignition transport service on <namespace>/enable
 
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
@@ -1151,6 +1157,14 @@ release will remove the deprecated code.
 1. **gazebo/physics/Link.hh**
     + std::vector<std::string> cgVisuals
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
@@ -1170,7 +1184,7 @@ release will remove the deprecated code.
    See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
    for further details.
 
-## Gazebo 7.3.1 to 7.4
+## Gazebo 7.3.1 to 7.X
 
 ### Deprecations
 
