@@ -1,3 +1,10 @@
+## Gazebo 10
+
+## Gazebo 10.x.x (201x-xx-xx)
+
+1. Update Wind Plugin to support being used by Lift Drag Plugin
+    * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
+
 ## Gazebo 9
 
 ## Gazebo 9.x.x (2018-xx-xx)
