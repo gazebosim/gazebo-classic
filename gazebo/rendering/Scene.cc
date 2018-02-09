@@ -2973,7 +2973,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
+  // Pass parameter false to ensure that sky won't delete controller
+  this->dataPtr->skyxController = new SkyX::BasicController(false);
   this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
       this->dataPtr->skyxController);
   this->dataPtr->skyx->create();
