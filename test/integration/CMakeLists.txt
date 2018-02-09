@@ -105,7 +105,6 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
-  world_remove.cc
   worlds_installed.cc
   )
 
@@ -169,6 +168,7 @@ set(dri_tests
   speed_pr2.cc
   visual.cc
   wideanglecamera_sensor.cc
+  world_remove.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
