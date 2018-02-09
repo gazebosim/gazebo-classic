@@ -159,9 +159,7 @@ GZ_REGISTER_WORLD_PLUGIN(StaticMapPlugin)
 /////////////////////////////////////////////////
 size_t WriteData(void *_ptr, size_t _size, size_t _nmemb, FILE *_stream)
 {
-  size_t written;
-  written = fwrite(_ptr, _size, _nmemb, _stream);
-  return written;
+  return fwrite(_ptr, _size, _nmemb, _stream);
 }
 
 /////////////////////////////////////////////////
@@ -308,7 +306,15 @@ void StaticMapPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     this->dataPtr->zoom = _sdf->Get<unsigned int>("zoom");
 
   if (_sdf->HasElement("tile_size"))
+  {
     this->dataPtr->tileSizePx = _sdf->Get<unsigned int>("tile_size");
+    if (this->dataPtr->tileSizePx > 640u)
+    {
+      gzerr << "Tile size exceeds standard API usage limit. Setting to 640px."
+            << std::endl;
+      this->dataPtr->tileSizePx = 640u;
+    }
+  }
 
   if (_sdf->HasElement("map_type"))
     this->dataPtr->mapType= _sdf->Get<std::string>("map_type");

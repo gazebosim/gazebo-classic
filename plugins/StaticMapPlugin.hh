@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ namespace gazebo
   /// <zoom>       Zoom level from 0 (entire world) to 21+ (streets)
   /// <map_type>   Type of map to use: roadmap, satellite, terrain, hybrid
   /// <tile_size>  Size of map tiles in pixels. Max of 640 for standard usage
-  ///              and 2048 for premium usage. See Google Static Maps API
-  ///              documentation for more details.
+  ///              (only standard usage is supported). See Google Static Maps
+  ///              API documentation for more details.
   /// <use_cache>  Use model in gazebo model path if exists, otherwise
   ///              recreate the model and save it in <HOME>/.gazebo/models
   class GAZEBO_VISIBLE StaticMapPlugin : public WorldPlugin
