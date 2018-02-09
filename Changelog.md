@@ -11,6 +11,9 @@
 1. Load actor plugin on ~/factory
     * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
 
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
 1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
     * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
 
@@ -51,6 +54,8 @@
     * [Pull request 2823](https://bitbucket.org/osrf/gazebo/pull-request/2823)
     * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
 
+1. Allow marker requests to be received from server plugins.
+    * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
 
 ## Gazebo 8.2.0 (2017-12-10)
 
@@ -525,6 +530,12 @@
 ## Gazebo 7
 
 ## Gazebo 7.x.x (2017-xx-xx)
+
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
 
 1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
     * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
