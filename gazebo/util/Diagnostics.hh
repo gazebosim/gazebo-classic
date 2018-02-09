@@ -84,7 +84,7 @@ namespace gazebo
       /// \param[in] _worldName Name of the world.
       public: void Init(const std::string &_worldName);
 
-      /// \brief Finalize to prepare for shutdown.
+      /// \brief Finish reporting diagnostics for a world.
       /// Write all remaining log data to disk.
       public: void Fini();
 

@@ -72,7 +72,20 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
   this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->timers.clear();
+
+  this->dataPtr->pub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -87,14 +100,6 @@ void DiagnosticManager::Init(const std::string &_worldName)
 
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       std::bind(&DiagnosticManager::Update, this, std::placeholders::_1));
-}
-
-//////////////////////////////////////////////////
-void DiagnosticManager::Fini()
-{
-  this->dataPtr->updateConnection.reset();
-
-  this->dataPtr->timers.clear();
 }
 
 //////////////////////////////////////////////////
