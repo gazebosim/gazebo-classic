@@ -8,6 +8,9 @@ uniform vec3 viewport;
 // light pos in clip space
 uniform vec3 lightPos;
 
+// lens flare scale
+uniform float scale;
+
 float noise(float t)
 {
   // 256 is the size of noiseRGBA texture
@@ -59,6 +62,8 @@ vec3 lensflare(vec2 uv,vec2 pos)
 
   c.r+=f2+f4+f5+f6; c.g+=f22+f42+f52+f62; c.b+=f23+f43+f53+f63;
   c+=vec3(f0);
+
+  c = c * vec3(scale, scale, scale);
 
   return c;
 }

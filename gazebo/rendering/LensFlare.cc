@@ -118,9 +118,66 @@ namespace gazebo
           lightPos.x = pos.x / pos.w;
           lightPos.y = pos.y / pos.w;
           lightPos.z = pos.z;
+
+          double occlusionScale = 1.0;
+          if (lightPos.z >= 0.0)
+          {
+            occlusionScale = this->OcclusionScale(this->camera,
+                Conversions::ConvertIgn(lightPos), worldPos);
+          }
+          params->setNamedConstant("scale",
+              static_cast<Ogre::Real>(occlusionScale));
         }
         params->setNamedConstant("lightPos", lightPos);
       }
+
+     /// \brief Check to see if the lensflare is occluded and return a scaling
+     /// factor for the lens flare that is proportional to its visibility
+     private: double OcclusionScale(CameraPtr _cam,
+                                    const ignition::math::Vector3d &_imgPos,
+                                    const ignition::math::Vector3d &_lightPos)
+     {
+       double viewportWidth =
+           static_cast<double>(_cam->ViewportWidth());
+       double viewportHeight =
+          static_cast<double>(_cam->ViewportHeight());
+       ignition::math::Vector2i screenPos;
+       screenPos.X() = ((_imgPos.X() / 2.0) + 0.5) * viewportWidth;
+       screenPos.Y() = (1 - ((_imgPos.Y() / 2.0) + 0.5)) * viewportHeight;
+       ScenePtr scene = _cam->GetScene();
+
+       unsigned int rays = 0;
+       unsigned int occluded = 0u;
+       // work in normalized device coordinates
+       // lens flare's halfSize is just an approximated value
+       double halfSize = 0.065;
+       double steps = 5;
+       double stepSize = halfSize * 2 / steps;
+       double cx = _imgPos.X();
+       double cy = _imgPos.Y();
+       double startx = cx - halfSize;
+       double starty = cy - halfSize;
+       double endx = cx + halfSize;
+       double endy = cy + halfSize;
+       // do sparse ray cast occlusion check
+       for (double i = starty; i < endy; i+=stepSize)
+       {
+         for (double j = startx; j < endx; j+=stepSize)
+         {
+           screenPos.X() = ((j / 2.0) + 0.5) * viewportWidth;
+           screenPos.Y() = (1 - ((i / 2.0) + 0.5)) * viewportHeight;
+           ignition::math::Vector3d position;
+           bool intersect = scene->FirstContact(_cam, screenPos, position);
+           if (intersect && (position.Length() < _lightPos.Length()))
+             occluded++;
+           rays++;
+         }
+       }
+       double s = static_cast<double>(rays - occluded) /
+           static_cast<double>(rays);
+       std::cerr << "scale s: " << s << " [" << occluded << "/" << rays << "]" <<  std::endl;
+       return s;
+     };
 
       /// \brief Pointer to camera
       private: CameraPtr camera;
