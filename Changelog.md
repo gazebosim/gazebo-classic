@@ -2,6 +2,9 @@
 
 ## Gazebo 7.x.x (2018-xx-xx)
 
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
 1. Process insertions and deletions on gz log echo
     * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
     * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
