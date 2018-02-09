@@ -81,6 +81,7 @@ set (plugins_single_header
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  StaticMapPlugin
   TouchPlugin
   VehiclePlugin
   WindPlugin
