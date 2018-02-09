@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <fstream>
+#include <cstdlib>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -58,7 +59,7 @@ using namespace gui;
 // TODO: Remove this once Fuel support is fully functional
 bool usingFuel()
 {
-  auto useFuel = getenv("USE_IGNITION_FUEL");
+  auto useFuel = std::getenv("USE_IGNITION_FUEL");
   if (!useFuel || *useFuel == '\0')
     return false;
 
