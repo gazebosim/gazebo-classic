@@ -86,7 +86,10 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
 
   // Clear scene created by ServerFixture
   auto scene = this->GetScene();
-  scene->Clear();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
 
   // Wait until all topics are advertised
   // Note: The number of topics was determined by giving gzserver enough time to
@@ -201,7 +204,10 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 
   // Clear scene created by ServerFixture
   auto scene = this->GetScene();
-  scene->Clear();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
 
   // Wait until all topics are advertised
   // Note: The number of topics was determined by giving gzserver enough time to
@@ -442,7 +448,10 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
 
   // Clear scene created by ServerFixture
   auto scene = this->GetScene();
-  scene->Clear();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
 
   // Get world pointer
   auto world = physics::get_world("default");
