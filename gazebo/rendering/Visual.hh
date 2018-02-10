@@ -227,6 +227,7 @@ namespace gazebo
       /// \param[in] _value Value to set the parameter to. The value string can
       /// be a number (int, float) or a space delimited array of numbers
       /// (floats). The value type must match the type defined in the shaders.
+      /// Note: Setting vec2/float2 params is only supported in ogre1.9+
       public: void SetMaterialShaderParam(const std::string &_paramName,
           const std::string &_shaderType, const std::string &_value);
 

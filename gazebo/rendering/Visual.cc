@@ -1152,6 +1152,7 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
         _params->setNamedConstant(_name, value);
         break;
       }
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
       case Ogre::GCT_INT2:
       case Ogre::GCT_FLOAT2:
       {
@@ -1159,6 +1160,7 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
         _params->setNamedConstant(_name, value);
         break;
       }
+#endif
       case Ogre::GCT_INT3:
       case Ogre::GCT_FLOAT3:
       {
