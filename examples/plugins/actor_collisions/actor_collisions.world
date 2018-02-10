@@ -13,7 +13,7 @@
     <uri>model://sun</uri>
   </include>
   <actor name="actor">
-    
+
     <plugin name="actor_collisions_plugin" filename="libActorCollisionsPlugin.so">
       <scaling collision="LHipJoint_LeftUpLeg_collision" scale="
         0.01
@@ -59,7 +59,7 @@
         12.0
         20.0
         5.0
-      "/>
+      " pose="0.05 0 0 0 -0.2 0"/>
       <scaling collision="Spine_Spine1_collision" scale="
         0.01
         0.001
@@ -262,7 +262,7 @@
     </script>
   </actor>
 
-  
+
   <model name="model_0">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -344,7 +344,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_1">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -422,7 +422,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_2">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -506,7 +506,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_3">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -590,7 +590,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_4">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -672,7 +672,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_5">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -754,7 +754,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_6">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -832,7 +832,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_7">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -910,7 +910,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_8">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -988,7 +988,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_9">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1070,7 +1070,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_10">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1148,7 +1148,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_11">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1230,7 +1230,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_12">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1314,7 +1314,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_13">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1398,7 +1398,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_14">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1482,7 +1482,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_15">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1560,7 +1560,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_16">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1644,7 +1644,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_17">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1722,7 +1722,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_18">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1800,7 +1800,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_19">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1878,7 +1878,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_20">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -1962,7 +1962,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_21">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2044,7 +2044,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_22">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2128,7 +2128,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_23">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2206,7 +2206,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_24">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2284,7 +2284,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_25">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2366,7 +2366,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_26">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2450,7 +2450,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_27">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2528,7 +2528,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_28">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2606,7 +2606,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_29">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2684,7 +2684,7 @@
       </visual>
     </link>
   </model>
-  
+
   <model name="model_30">
     <!-- important to allow collisions with actor -->
     <allow_auto_disable>false</allow_auto_disable>
@@ -2766,7 +2766,7 @@
       </visual>
     </link>
   </model>
-  
+
 
  </world>
 </sdf>
