@@ -195,6 +195,17 @@ namespace gazebo
                    const ignition::math::Pose3d &_pose,
                    const double _radius);
 
+      /// \brief Add a spherical collision object.
+      /// \param[in] _linkSdf Link to add the collision to.
+      /// \param[in] _name Name of the collision object.
+      /// \param[in] _pose Pose of the collision object.
+      /// \param[in] _size Dimensions of the collison object.
+      /// \deprecated This function is no longer used, consider removing it
+      private: void AddBoxCollision(const sdf::ElementPtr &_linkSdf,
+                   const std::string &_name,
+                   const ignition::math::Pose3d &_pose,
+                   const ignition::math::Vector3d &_size);
+
       /// \brief Add a spherical visual object.
       /// \param[in] _linkSdf Link to add the visual to.
       /// \param[in] _name Name of the visual object.
