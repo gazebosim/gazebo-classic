@@ -2,6 +2,13 @@
 
 ## Gazebo 8.x.x (2017-xx-xx)
 
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
 1. Added a plugin to detect if an entity is inside a given volume in space
     * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
 
@@ -528,15 +535,17 @@
 
 ## Gazebo 7.x.x (2018-xx-xx)
 
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
 1. Process insertions and deletions on gz log echo
     * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
     * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
 
-
-## Gazebo 7.10.0 (2018-02-07)
-
 1. Add Static Map Plugin for creating textured map model
     * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
+## Gazebo 7.10.0 (2018-02-07)
 
 1. Add support for 16 bit Grayscale and RGB camera image types.
     * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
