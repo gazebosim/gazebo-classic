@@ -195,7 +195,7 @@ namespace gazebo
                    const ignition::math::Pose3d &_pose,
                    const double _radius);
 
-      /// \brief Add a spherical collision object.
+      /// \brief Add a box collision object.
       /// \param[in] _linkSdf Link to add the collision to.
       /// \param[in] _name Name of the collision object.
       /// \param[in] _pose Pose of the collision object.
