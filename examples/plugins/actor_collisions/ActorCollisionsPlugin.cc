@@ -40,6 +40,7 @@ void ActorCollisionsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Map of collision scaling factors
   std::map<std::string, ignition::math::Vector3d> scaling;
+  std::map<std::string, ignition::math::Pose3d> offsets;
 
   // Read in the collision scaling factors, if present
   if (_sdf->HasElement("scaling"))
@@ -47,9 +48,25 @@ void ActorCollisionsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     auto elem = _sdf->GetElement("scaling");
     while (elem)
     {
+      if (!elem->HasAttribute("collision"))
+      {
+        gzwarn << "Skipping element without collision attribute" << std::endl;
+        elem = elem->GetNextElement("scaling");
+        continue;
+      }
       auto name = elem->Get<std::string>("collision");
-      auto scale = elem->Get<ignition::math::Vector3d>("scale");
-      scaling[name] = scale;
+
+      if (elem->HasAttribute("scale"))
+      {
+        auto scale = elem->Get<ignition::math::Vector3d>("scale");
+        scaling[name] = scale;
+      }
+
+      if (elem->HasAttribute("pose"))
+      {
+        auto pose = elem->Get<ignition::math::Pose3d>("pose");
+        offsets[name] = pose;
+      }
       elem = elem->GetNextElement("scaling");
     }
   }
@@ -62,20 +79,26 @@ void ActorCollisionsPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     if (scaling.empty())
       continue;
 
-    // Scale all the collisions in all the links
+    // Process all the collisions in all the links
     for (const auto &collision : link->GetCollisions())
     {
       auto name = collision->GetName();
 
-      if (scaling.find(name) == scaling.end())
-        continue;
+      if (scaling.find(name) != scaling.end())
+      {
+        auto boxShape = boost::dynamic_pointer_cast<gazebo::physics::BoxShape>(
+            collision->GetShape());
 
-      auto boxShape = boost::dynamic_pointer_cast<gazebo::physics::BoxShape>(
-          collision->GetShape());
+        // Make sure we have a box shape.
+        if (boxShape)
+          boxShape->SetSize(boxShape->Size() * scaling[name]);
+      }
 
-      // Make sure we have a box shape.
-      if (boxShape)
-        boxShape->SetSize(boxShape->Size() * scaling[name]);
+      if (offsets.find(name) != offsets.end())
+      {
+        collision->SetInitialRelativePose(
+            offsets[name] + collision->InitialRelativePose());
+      }
     }
   }
 }

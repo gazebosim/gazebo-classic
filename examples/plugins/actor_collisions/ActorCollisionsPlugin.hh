@@ -23,7 +23,8 @@
 namespace gazebo
 {
   /// \brief This plugin enables collisions on an Actor, and
-  /// optionally applies a scaling factor to each of the Actor's box collisions.
+  /// optionally applies a scaling factor and pose offset to each of the
+  /// Actor's box collisions.
   /// Collisions only work on enabled objects. ODE has a auto-disable
   /// feature that "disables" an object when it comes to rest. An actor will
   /// pass through these objects.
