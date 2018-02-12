@@ -154,6 +154,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
 
+  this->dataPtr->isServer = _isServer;
   if (_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/local/info",
@@ -398,11 +399,14 @@ void Scene::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
-  // Initialize the marker manager
-  if (!this->dataPtr->markerManager.Init(this))
+  if (!this->dataPtr->isServer)
   {
-    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
-      << "will not work.\n";
+    // Initialize the marker manager if this is a GUI scene.
+    if (!this->dataPtr->markerManager.Init(this))
+    {
+      gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+        << "will not work.\n";
+    }
   }
 }
 

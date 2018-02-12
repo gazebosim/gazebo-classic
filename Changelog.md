@@ -1,6 +1,23 @@
 ## Gazebo 8
 
-## Gazebo 8.x.x (2017-xx-xx)
+## Gazebo 8.x.x (2018-xx-xx)
+
+1. Ensure sdf inertia values are consistent
+    * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
+    * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
+
+
+## Gazebo 8.3.0 (2018-02-10)
+
+1. Add support for Actor collisions.
+    * [Pull request 2875](https://bitbucket.org/osrf/gazebo/pull-requests/2875)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
 
 1. Don't shut down gazebo when removing a world
     * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
@@ -54,6 +71,18 @@
     * [Pull request 2823](https://bitbucket.org/osrf/gazebo/pull-request/2823)
     * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
 
+1. Allow marker requests to be received from server plugins.
+    * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
 
 ## Gazebo 8.2.0 (2017-12-10)
 
@@ -527,7 +556,19 @@
 
 ## Gazebo 7
 
-## Gazebo 7.x.x (2017-xx-xx)
+## Gazebo 7.x.x (2018-xx-xx)
+
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
+## Gazebo 7.10.0 (2018-02-07)
 
 1. Add support for 16 bit Grayscale and RGB camera image types.
     * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
@@ -567,6 +608,12 @@
 
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Fix gazebo7 homebrew build (tinyxml2 6.0.0)
+    * [Pull request 2824](https://bitbucket.org/osrf/gazebo/pull-request/2824)
 
 
 ## Gazebo 7.9.0 (2017-11-22)

@@ -298,6 +298,9 @@ namespace gazebo
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;
 
+      /// \brief True if this scene is running on the server.
+      public: bool isServer;
+
       /// \brief The heightmap, if any.
       public: Heightmap *terrain = nullptr;
 
