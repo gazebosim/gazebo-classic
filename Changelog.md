@@ -2,8 +2,12 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Ensure sdf inertia values are consistent
+    * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
+    * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
 
-## Gazebo 8.x.x (2018-02-09)
+
+## Gazebo 8.3.0 (2018-02-10)
 
 1. Add support for Actor collisions.
     * [Pull request 2875](https://bitbucket.org/osrf/gazebo/pull-requests/2875)
@@ -14,10 +18,6 @@
 
 1. Add Static Map Plugin for creating textured map model
     * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
-
-1. Ensure sdf inertia values are consistent
-    * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
-    * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
 
 1. Added a plugin to detect if an entity is inside a given volume in space
     * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
