@@ -1,6 +1,6 @@
 ## Gazebo 7
 
-## Gazebo 7.x.x (2018-xx-xx)
+## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
     * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
