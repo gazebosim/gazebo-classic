@@ -167,8 +167,6 @@ void QTestFixture::ProcessEventsAndDraw(QMainWindow *_mainWindow,
 /////////////////////////////////////////////////
 void QTestFixture::cleanup()
 {
-  gazebo::rendering::fini();
-
   if (this->server)
   {
     this->server->Stop();
@@ -181,6 +179,8 @@ void QTestFixture::cleanup()
 
   delete this->serverThread;
   this->serverThread = NULL;
+
+  gazebo::rendering::fini();
 
   double residentEnd, shareEnd;
   this->GetMemInfo(residentEnd, shareEnd);
