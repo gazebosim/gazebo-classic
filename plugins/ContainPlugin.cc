@@ -28,8 +28,6 @@
 #include "gazebo/physics/Entity.hh"
 #include "gazebo/physics/World.hh"
 
-#include "gazebo/transport/Node.hh"
-
 #include "ContainPlugin.hh"
 
 namespace gazebo
@@ -51,18 +49,6 @@ namespace gazebo
 
     /// \brief Box representing the volume to check.
     public: ignition::math::OrientedBoxd box;
-
-    /// \brief Gazebo transport node for communication.
-    /// \deprecated Remove on Gazebo 9
-    public: transport::NodePtr gzNode;
-
-    /// \brief Publisher which publishes contain / doesn't contain messages.
-    /// \deprecated Remove on Gazebo 9
-    public: transport::PublisherPtr containGzPub;
-
-    /// \brief Subscriber to enable messages.
-    /// \deprecated Remove on Gazebo 9
-    public: transport::SubscriberPtr enableGzSub;
 
     /// \brief Ignition transport node for communication
     public: ignition::transport::Node ignNode;
@@ -153,12 +139,6 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   // Start/stop
   auto enableService = "/" + this->dataPtr->ns + "/enable";
 
-  // Gazebo transport "service"
-  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
-  this->dataPtr->gzNode->Init();
-  this->dataPtr->enableGzSub = this->dataPtr->gzNode->Subscribe(
-      enableService, &ContainPlugin::EnableGz, this);
-
   // Ignition transport service
   this->dataPtr->ignNode.Advertise(enableService,
       &ContainPlugin::EnableIgn, this);
@@ -174,20 +154,12 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void ContainPlugin::EnableGz(ConstIntPtr &_msg)
+bool ContainPlugin::EnableIgn(const ignition::msgs::Boolean &_req,
+    ignition::msgs::Boolean &_res)
 {
-  gzwarn << "Use of Gazebo Transport on ContainPlugin has been deprecated. "
-         << "Use Ignition Transport instead." << std::endl;
-  auto enable = _msg->data() == 1;
-  this->Enable(enable);
-}
-
-//////////////////////////////////////////////////
-void ContainPlugin::EnableIgn(const ignition::msgs::Boolean &_req,
-    ignition::msgs::Boolean &_res, bool &_result)
-{
-  _result = this->Enable(_req.data());
-  _res.set_data(_result);
+  bool result = this->Enable(_req.data());
+  _res.set_data(result);
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -216,9 +188,6 @@ bool ContainPlugin::Enable(const bool _enable)
 
     auto topic = "/" + this->dataPtr->ns + "/contain";
 
-    this->dataPtr->containGzPub = this->dataPtr->gzNode->Advertise<msgs::Int>(
-        topic);
-
     this->dataPtr->containIgnPub =
         this->dataPtr->ignNode.Advertise<ignition::msgs::Boolean>(topic);
 
@@ -231,7 +200,6 @@ bool ContainPlugin::Enable(const bool _enable)
   // Stop
   {
     this->dataPtr->updateConnection.reset();
-    this->dataPtr->containGzPub.reset();
     this->dataPtr->containIgnPub = ignition::transport::Node::Publisher();
     this->dataPtr->contain = -1;
 
@@ -262,14 +230,6 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
   if (containNow != this->dataPtr->contain)
   {
     this->dataPtr->contain = containNow;
-
-    // Gazebo transport
-    {
-      auto containInt = this->dataPtr->contain;
-      msgs::Int msg;
-      msg.set_data(containInt);
-      this->dataPtr->containGzPub->Publish(msg);
-    }
 
     // Ignition transport
     {
