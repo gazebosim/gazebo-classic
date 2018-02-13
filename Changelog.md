@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
+    * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
+
 1. Ensure sdf inertia values are consistent
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)

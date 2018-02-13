@@ -105,6 +105,8 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   }
 
   // child link with off-diagonal inertias
+  // skip universal joints because the off-diagonal inertias
+  // add coupling between the axes, which messes up CheckJointProperties
   if (_jointType != "universal")
   {
     gzdbg << "SpawnJoint " << _jointType
