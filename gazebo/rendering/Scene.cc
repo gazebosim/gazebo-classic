@@ -203,16 +203,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sensorMsgs.clear();
-  this->dataPtr->roadMsgs.clear();
+  this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -233,6 +224,24 @@ void Scene::Clear()
   if (this->dataPtr->node)
     this->dataPtr->node->Fini();
   this->dataPtr->node.reset();
+
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
+    this->dataPtr->roadMsgs.clear();
+  }
+
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    this->dataPtr->poseMsgs.clear();
+  }
 
   this->dataPtr->joints.clear();
 
@@ -286,14 +295,14 @@ void Scene::Clear()
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
 
-  this->dataPtr->connections.clear();
-
   this->dataPtr->initialized = false;
 }
 
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
+  this->Clear();
+
   delete this->dataPtr->requestMsg;
   this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
@@ -301,8 +310,6 @@ Scene::~Scene()
 
   // raySceneQuery deletion handled by ogre
   this->dataPtr->raySceneQuery= NULL;
-
-  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
