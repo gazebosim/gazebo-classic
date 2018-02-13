@@ -6,6 +6,9 @@
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
 
+1. Don't shut down gazebo when removing a world
+    * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
+
 
 ## Gazebo 8.3.0 (2018-02-10)
 
@@ -18,9 +21,6 @@
 
 1. Add Static Map Plugin for creating textured map model
     * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
-
-1. Don't shut down gazebo when removing a world
-    * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
 
 1. Added a plugin to detect if an entity is inside a given volume in space
     * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
