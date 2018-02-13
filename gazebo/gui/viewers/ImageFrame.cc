@@ -34,6 +34,8 @@ ImageFrame::~ImageFrame()
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   if (this->dataPtr->depthBuffer)
     delete [] this->dataPtr->depthBuffer;
+  if (this->dataPtr->imageBuffer)
+    delete [] this->dataPtr->imageBuffer;
 }
 
 /////////////////////////////////////////////////
@@ -91,10 +93,14 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
 
   if (_msg.width() != static_cast<unsigned int>(this->dataPtr->image.width()) ||
       _msg.height() != static_cast<unsigned int>(this->dataPtr->image.height())
-      || qFormat != this->dataPtr->image.format())
+      || qFormat != this->dataPtr->image.format() || _msg.step() !=
+      static_cast<unsigned int>(this->dataPtr->image.bytesPerLine()))
   {
-    QImage qimage(_msg.width(), _msg.height(), qFormat);
-    this->dataPtr->image = qimage.copy();
+    this->dataPtr->image = QImage(_msg.width(), _msg.height(), qFormat);
+    delete [] this->dataPtr->imageBuffer;
+    this->dataPtr->imageBuffer = nullptr;
+    delete [] this->dataPtr->depthBuffer;
+    this->dataPtr->depthBuffer = nullptr;
   }
 
   // Convert the image data to RGB
@@ -128,6 +134,43 @@ void ImageFrame::OnImage(const msgs::Image &_msg)
         d = 255 - (d * factor);
         QRgb value = qRgb(d, d, d);
         this->dataPtr->image.setPixel(i, j, value);
+      }
+    }
+  }
+  // convert 16 bit camera images to rgb image format for display
+  else if (_msg.pixel_format() == common::Image::PixelFormat::L_INT16
+      || _msg.pixel_format() == common::Image::PixelFormat::RGB_INT16)
+  {
+    uint16_t u;
+    // cppchecker recommends using sizeof(varname)
+    unsigned int channels = _msg.step() / _msg.width() / sizeof(u);
+    unsigned int samples = _msg.width() * _msg.height() * channels;
+    unsigned int bufferSize = samples * sizeof(u);
+
+    if (!this->dataPtr->imageBuffer)
+      this->dataPtr->imageBuffer = new unsigned char[bufferSize];
+    memcpy(this->dataPtr->imageBuffer, _msg.data().c_str(), bufferSize);
+
+    // factor to convert from 16bit to 8bit value
+    double factor = 255 / (std::pow(2, 16) - 1);
+    uint16_t *uint16Buffer = reinterpret_cast<uint16_t *>(
+        this->dataPtr->imageBuffer);
+    int rgb[3] = {0, 0, 0};
+    unsigned int width = _msg.width()*channels;
+    for (unsigned int j = 0; j < _msg.height(); ++j)
+    {
+      for (unsigned int i = 0; i < width; i+=channels)
+      {
+        u = uint16Buffer[j*width + i] * factor;
+        // for L16 we set rgb to be the same value
+        rgb[0] = rgb[1] = rgb[2] = u;
+        // handle the case for rgb16
+        for (unsigned int k = 1; k < channels; ++k)
+        {
+          rgb[k] = uint16Buffer[j*width + i + k] * factor;
+        }
+        QRgb value = qRgb(rgb[0], rgb[1], rgb[2]);
+        this->dataPtr->image.setPixel(i/channels, j, value);
       }
     }
   }

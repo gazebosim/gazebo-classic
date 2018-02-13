@@ -115,6 +115,9 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
+  this->dataPtr->initialSdf.reset(new sdf::Element);
+  sdf::initFile("world.sdf", this->dataPtr->initialSdf);
+
   // Keep this in the constructor for performance.
   // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
@@ -169,6 +172,8 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
+
+  this->dataPtr->initialSdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -569,45 +574,6 @@ void World::LogStep()
             this->dataPtr->iterations + 1);
         }
 
-        // Process insertions
-        if (this->dataPtr->logPlayStateSDF->HasElement("insertions"))
-        {
-          sdf::ElementPtr modelElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "insertions")->GetElement("model");
-
-          while (modelElem)
-          {
-            auto name = modelElem->GetAttribute("name")->GetAsString();
-            if (!this->ModelByName(name))
-            {
-              ModelPtr model = this->LoadModel(modelElem,
-                  this->dataPtr->rootElement);
-              model->Init();
-
-              // Disabling plugins on playback
-              // model->LoadPlugins();
-            }
-
-            modelElem = modelElem->GetNextElement("model");
-          }
-        }
-
-        // Process deletions
-        if (this->dataPtr->logPlayStateSDF->HasElement("deletions"))
-        {
-          sdf::ElementPtr nameElem =
-            this->dataPtr->logPlayStateSDF->GetElement(
-                "deletions")->GetElement("name");
-
-          while (nameElem)
-          {
-            transport::requestNoReply(this->Name(), "entity_delete",
-                                      nameElem->Get<std::string>());
-            nameElem = nameElem->GetNextElement("name");
-          }
-        }
-
         this->SetState(this->dataPtr->logPlayState);
         this->Update();
       }
@@ -864,6 +830,7 @@ void World::Fini()
     this->dataPtr->modelMsgs.clear();
     this->dataPtr->lightFactoryMsgs.clear();
     this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->playbackControlMsgs.clear();
 
     this->dataPtr->poseLocalPub.reset();
     this->dataPtr->posePub.reset();
@@ -872,6 +839,7 @@ void World::Fini()
     this->dataPtr->statPub.reset();
     this->dataPtr->modelPub.reset();
     this->dataPtr->lightPub.reset();
+    this->dataPtr->lightFactoryPub.reset();
 
     this->dataPtr->factorySub.reset();
     this->dataPtr->controlSub.reset();
@@ -1171,7 +1139,7 @@ LightPtr World::LoadLight(const sdf::ElementPtr &_sdf, const BasePtr &_parent)
   // we also process light factory msg in World so this avoids creating a
   // duplicate light
   // Note: models uses /model/info topic. We can consider adding a
-  // /light/info topic for this
+  // /light/info topic for this, see issue #2288
   this->dataPtr->lightFactoryPub->Publish(*msg);
 
   return light;
@@ -1552,41 +1520,53 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
+  this->dataPtr->playbackControlMsgs.push_back(*_data);
+}
+
+//////////////////////////////////////////////////
+void World::ProcessPlaybackControlMsgs()
+{
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
 
-  if (_data->has_pause())
-    this->SetPaused(_data->pause());
-
-  if (_data->has_multi_step())
+  for (auto const &msg : this->dataPtr->playbackControlMsgs)
   {
-    // stepWorld is a blocking call so set stepInc directly so that world stats
-    // will still be published
-    this->SetPaused(true);
-    this->dataPtr->stepInc += _data->multi_step();
+    if (msg.has_pause())
+      this->SetPaused(msg.pause());
+
+    if (msg.has_multi_step())
+    {
+      // stepWorld is a blocking call so set stepInc directly so that
+      // world stats will still be published
+      this->SetPaused(true);
+      this->dataPtr->stepInc += msg.multi_step();
+    }
+
+    if (msg.has_seek())
+    {
+      common::Time targetSimTime = msgs::Convert(msg.seek());
+      util::LogPlay::Instance()->Seek(targetSimTime);
+      this->dataPtr->stepInc = 1;
+    }
+
+    if (msg.has_rewind() && msg.rewind())
+    {
+      util::LogPlay::Instance()->Rewind();
+      this->dataPtr->stepInc = 1;
+      if (!util::LogPlay::Instance()->HasIterations())
+        this->dataPtr->iterations = 0;
+    }
+
+    if (msg.has_forward() && msg.forward())
+    {
+      util::LogPlay::Instance()->Forward();
+      this->dataPtr->stepInc = -1;
+      this->SetPaused(true);
+      // ToDo: Update iterations if the log doesn't have it.
+    }
   }
 
-  if (_data->has_seek())
-  {
-    common::Time targetSimTime = msgs::Convert(_data->seek());
-    util::LogPlay::Instance()->Seek(targetSimTime);
-    this->dataPtr->stepInc = 1;
-  }
-
-  if (_data->has_rewind() && _data->rewind())
-  {
-    util::LogPlay::Instance()->Rewind();
-    this->dataPtr->stepInc = 1;
-    if (!util::LogPlay::Instance()->HasIterations())
-      this->dataPtr->iterations = 0;
-  }
-
-  if (_data->has_forward() && _data->forward())
-  {
-    util::LogPlay::Instance()->Forward();
-    this->dataPtr->stepInc = -1;
-    this->SetPaused(true);
-    // ToDo: Update iterations if the log doesn't have it.
-  }
+  this->dataPtr->playbackControlMsgs.clear();
 }
 
 //////////////////////////////////////////////////
@@ -2012,11 +1992,21 @@ void World::ProcessLightModifyMsgs()
 //////////////////////////////////////////////////
 void World::ProcessLightFactoryMsgs()
 {
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
-  for (auto const &lightFactoryMsg : this->dataPtr->lightFactoryMsgs)
+  // LoadLight also publishes to ~/light/factory so copy light factory msgs to
+  // avoid deadlock in OnLightFactory callback when trying to lock receiveMutex
+  std::list<msgs::Light> lightFactoryMsgsCopy;
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
+
+    std::copy(this->dataPtr->lightFactoryMsgs.begin(),
+        this->dataPtr->lightFactoryMsgs.end(),
+        std::back_inserter(lightFactoryMsgsCopy));
+    this->dataPtr->lightFactoryMsgs.clear();
+  }
+
+  for (auto const &lightFactoryMsg : lightFactoryMsgsCopy)
   {
     LightPtr light = this->LightByName(lightFactoryMsg.name());
-
     if (light)
     {
       continue;
@@ -2031,11 +2021,6 @@ void World::ProcessLightFactoryMsgs()
       // Create new light object
       this->LoadLight(lightSDF, this->dataPtr->rootElement);
     }
-  }
-
-  if (!this->dataPtr->lightFactoryMsgs.empty())
-  {
-    this->dataPtr->lightFactoryMsgs.clear();
   }
 }
 
@@ -2304,8 +2289,13 @@ void World::SetState(const WorldState &_state)
   {
     this->dataPtr->factorySDF->Root()->ClearElements();
 
+    std::stringstream sdfStr;
+    sdfStr << "<sdf version='" << SDF_VERSION << "'>"
+           << insertion
+           << "</sdf>";
+
     // SDF Parsing happens here
-    if (!sdf::readString(insertion, this->dataPtr->factorySDF))
+    if (!sdf::readString(sdfStr.str(), this->dataPtr->factorySDF))
     {
       gzerr << "Unable to read sdf string[" << insertion << "]" << std::endl;
       continue;
@@ -2486,11 +2476,10 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
-    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->dataPtr->sdf->ToString("");
+    _stream << this->dataPtr->initialSdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
@@ -2560,7 +2549,8 @@ void World::ProcessMessages()
       // Time stamp this PosesStamped message
       msgs::Set(msg.mutable_time(), this->SimTime());
 
-      if (!this->dataPtr->publishModelPoses.empty())
+      if (!this->dataPtr->publishModelPoses.empty() ||
+          !this->dataPtr->publishLightPoses.empty())
       {
         for (auto const &model : this->dataPtr->publishModelPoses)
         {
@@ -2621,6 +2611,7 @@ void World::ProcessMessages()
       }
     }
     this->dataPtr->publishModelPoses.clear();
+    this->dataPtr->publishLightPoses.clear();
   }
 
   {
@@ -2663,6 +2654,7 @@ void World::ProcessMessages()
   if (common::Time::GetWallTime() - this->dataPtr->prevProcessMsgsTime >
       this->dataPtr->processMsgsPeriod)
   {
+    this->ProcessPlaybackControlMsgs();
     this->ProcessEntityMsgs();
     this->ProcessRequestMsgs();
     this->ProcessFactoryMsgs();
