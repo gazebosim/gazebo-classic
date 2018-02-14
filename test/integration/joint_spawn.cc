@@ -118,7 +118,7 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
     EXPECT_TRUE(opt.childLinkInertia.SetMassMatrix(
       ignition::math::MassMatrix3d(12.0,
         ignition::math::Vector3d(2.0, 3.0, 4.0),
-        ignition::math::Vector3d(0.2, 0.3, 0.4))));
+        ignition::math::Vector3d(0, 0, 0.4))));
     physics::JointPtr joint = SpawnJoint(opt);
     ASSERT_TRUE(joint != nullptr);
     // Check child and parent links
