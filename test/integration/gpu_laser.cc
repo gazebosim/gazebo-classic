@@ -21,6 +21,9 @@
 #define LASER_TOL 1e-4
 #define DOUBLE_TOL 1e-6
 
+// vertical range values seem to be less accurate
+#define VERTICAL_LASER_TOL 1e-4
+
 using namespace gazebo;
 class GPURaySensorTest : public ServerFixture
 {
@@ -364,6 +367,218 @@ TEST_F(GPURaySensorTest, Heightmap)
 
   for (int i = 0; i < raySensor->RayCount(); ++i)
     EXPECT_TRUE(raySensor->Range(i) < maxRange / 2.0);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test GPU ray sensor vertical component
+TEST_F(GPURaySensorTest, LaserVertical)
+{
+  // Test a ray sensor that has a vertical range component.
+  // Place a box within range and verify range values,
+  // then move the box out of range and verify range values
+
+  Load("worlds/empty_test.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    return;
+  }
+
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  double hMinAngle = -M_PI/2.0;
+  double hMaxAngle = M_PI/2.0;
+  double vMinAngle = -0.1;
+  double vMaxAngle = 0.1;
+  double minRange = 0.1;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int samples = 640;
+  unsigned int vSamples = 3;
+  double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
+  math::Pose testPose(math::Vector3(0.25, 0, 0.5),
+      math::Quaternion(0, 0, 0));
+
+  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+      minRange, maxRange, rangeResolution, samples, vSamples, 1, 1);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+
+  std::string box01 = "box_01";
+
+  // box in front of ray sensor
+  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+
+  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
+      box01Pose.rot.GetAsEuler());
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::GpuRaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+
+  raySensor->SetActive(true);
+
+  // listen to new laser frames
+  float *scan = new float[raySensor->RayCount()
+      * raySensor->VerticalRayCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    raySensor->ConnectNewLaserFrame(
+        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
+          _1, _2, _3, _4, _5));
+
+  // wait for a few laser scans
+  int iter = 0;
+  while (scanCount < 10 && iter < 300)
+  {
+    common::Time::MSleep(10);
+    iter++;
+  }
+  EXPECT_LT(iter, 300);
+
+  unsigned int mid = samples / 2;
+  double unitBoxSize = 1.0;
+
+  double angleStep = vMinAngle;
+
+  // all vertical laser planes should sense box
+  for (unsigned int i = 0; i < vSamples; ++i)
+  {
+    double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2
+        - testPose.pos.x;
+    expectedRangeAtMidPoint = expectedRangeAtMidPoint / cos(angleStep);
+
+    EXPECT_NEAR(raySensor->Range(i*samples + mid),
+        expectedRangeAtMidPoint, VERTICAL_LASER_TOL);
+
+    angleStep += vAngleStep;
+
+    // WARNING: for readings of no return, gazebo returns max range rather
+    // than +inf. issue #124
+    EXPECT_NEAR(raySensor->Range(i*samples), maxRange, LASER_TOL);
+    EXPECT_NEAR(raySensor->Range(i*samples + samples-1),
+        maxRange, LASER_TOL);
+  }
+
+  // Move box out of range
+  world->GetModel(box01)->SetWorldPose(
+      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+
+  // wait for a few more laser scans
+  iter = 0;
+  scanCount = 0;
+  while (scanCount < 10 && iter < 300)
+  {
+    common::Time::MSleep(10);
+    iter++;
+  }
+  EXPECT_LT(iter, 300);
+
+  for (int j = 0; j < raySensor->VerticalRayCount(); ++j)
+  {
+    for (int i = 0; i < raySensor->RayCount(); ++i)
+    {
+      EXPECT_NEAR(raySensor->Range(j*raySensor->RayCount() + i),
+          maxRange, LASER_TOL);
+    }
+  }
+  delete [] scan;
+}
+
+TEST_F(GPURaySensorTest, LaserScanResolution)
+{
+  // Test gpu ray sensor scan resolution.
+  // Orient the sensor to face downwards and verify that the interpolated
+  // range values all intersect with ground plane at z = 0;
+
+  Load("worlds/empty.world");
+
+    // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run gpu laser test\n";
+    return;
+  }
+
+  std::string modelName = "ray_model";
+  std::string raySensorName = "ray_sensor";
+  // use asymmetric horizontal angles to make test more difficult
+  double hMinAngle = -M_PI/4.0;
+  double hMaxAngle = M_PI/8.0;
+  double vMinAngle = -0.1;
+  double vMaxAngle = 0.1;
+  double vMidAngle = M_PI/2.0;
+  double minRange = 0.01;
+  double maxRange = 5.0;
+  double rangeResolution = 0.02;
+  unsigned int hSamples = 641;
+  unsigned int vSamples = 5;
+  double hResolution = 3;
+  double vResolution = 2;
+  double hAngleStep = (hMaxAngle - hMinAngle) / (hSamples*hResolution-1);
+  double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples*vResolution-1);
+  double z0 = 0.5;
+  math::Pose testPose(math::Vector3(0.25, 0, z0),
+      math::Quaternion(0, vMidAngle, 0));
+
+  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+      minRange, maxRange, rangeResolution, hSamples, vSamples,
+      hResolution, vResolution);
+
+  sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
+  sensors::GpuRaySensorPtr raySensor =
+    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+
+  raySensor->SetActive(true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // listen to new laser frames
+  float *scan = new float[raySensor->RangeCount()
+      * raySensor->VerticalRangeCount() * 3];
+  int scanCount = 0;
+  event::ConnectionPtr c =
+    raySensor->ConnectNewLaserFrame(
+        boost::bind(&::OnNewLaserFrame, &scanCount, scan,
+          _1, _2, _3, _4, _5));
+
+  // wait for a few laser scans
+  int iter = 0;
+  while (scanCount < 10 && iter < 300)
+  {
+    common::Time::MSleep(10);
+    iter++;
+  }
+  EXPECT_LT(iter, 300);
+
+  unsigned int h, v;
+
+  for (v = 0; v < vSamples*vResolution; ++v)
+  {
+    for (h = 0; h < hSamples*hResolution; ++h)
+    {
+      // pitch angle
+      double p = vMinAngle + v*vAngleStep;
+      // yaw angle
+      double y = hMinAngle + h*hAngleStep;
+      double R = raySensor->Range(v*hSamples*hResolution + h);
+
+      math::Quaternion rot(0.0, -p, y);
+      math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
+      math::Vector3 intersection = (axis * R) + testPose.pos;
+      EXPECT_NEAR(intersection.z, 0.0, rangeResolution);
+    }
+  }
+  delete [] scan;
 }
 
 int main(int argc, char **argv)

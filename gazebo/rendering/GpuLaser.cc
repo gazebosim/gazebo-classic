@@ -449,6 +449,7 @@ void GpuLaser::RenderImpl()
     this->UpdateRenderTarget(this->dataPtr->firstPassTargets[i],
                   this->dataPtr->matFirstPass, this->camera);
     this->dataPtr->firstPassTargets[i]->update(false);
+    this->dataPtr->firstPassTargets[i]->writeContentsToFile("firstpass.png");
   }
 
   if (this->dataPtr->textureCount > 1)
@@ -619,16 +620,25 @@ void GpuLaser::CreateMesh()
 
   dx = 0.1;
 
+  // startX ranges from 0 to -(w2nd/10) at dx=0.1 increments
+  // startY ranges from h2nd/10 to 0 at dy=0.1 decrements
+  // see GpuLaser::Set2ndPassTarget() on how the ortho cam is set up
   double startX = dx;
   double startY = viewHeight;
 
-  double phi = this->vfov / 2;
+  // half of actual camera vertical FOV without padding
+  double phi = (this->dataPtr->vfovPadding) / 2;
+  double theta = this->hfov / 2;
 
   double vAngMin = -phi;
 
   if (this->ImageHeight() == 1)
     phi = 0;
 
+  gazebo::math::Vector3 axis;
+  math::Quaternion ray;
+
+  // index of ray
   unsigned int ptsOnLine = 0;
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
@@ -638,9 +648,9 @@ void GpuLaser::CreateMesh()
     for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
       double thfov = this->dataPtr->textureCount * this->hfov;
-      double theta = this->hfov / 2;
       double delta = ((thfov / (this->dataPtr->w2nd - 1)) * i);
 
+      // index of texture that contains the depth value
       unsigned int texture = delta / (theta*2);
 
       if (texture > this->dataPtr->textureCount-1)
@@ -649,8 +659,9 @@ void GpuLaser::CreateMesh()
         delta -= (thfov / (this->dataPtr->w2nd - 1));
       }
 
+      // first compute angle from the start of current camera's horizontal
+      // min angle, then set delta to be angle from center of current camera.
       delta = delta - (texture * (theta*2));
-
       delta = delta - theta;
 
       startX -= dx;
@@ -661,14 +672,33 @@ void GpuLaser::CreateMesh()
         startY -= dy;
       }
       ptsOnLine++;
+
+      // the texture/1000.0 value is used in the laser_2nd_pass.frag shader
+      // as a trick to determine which camera texture to use when stitching
+      // together the final depth image.
       submesh->AddVertex(texture/1000.0, startX, startY);
 
+      // convert laser scan from plane to cone sweep for non zero pitch angles,
+      // this samples the depth image in a shape of a parabola.
+      ray.SetFromEuler(gazebo::math::Vector3(0.0, -gamma, delta));
+      axis = ray * math::Vector3(1.0, 0.0, 0.0);
+      double newGamma = atan(axis.z / axis.x);
+      double newDelta = atan(axis.y / axis.x);
+
+      // adjust uv coordinates of depth texture to match projection of current
+      // laser ray the depth image plane.
       double u, v;
+      //if (u > 1.0 || v > 1.0 || u < 0 || v < 0)
+      //  gzerr << u << " , " << v << std::endl;
       if (this->isHorizontal)
       {
-        u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = ignition::math::equal(phi, 0.0) ?
-            -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        //u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
+        //v = ignition::math::equal(phi, 0.0) ?
+        //     -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        u = -(cos(this->vfov/2.0) * tan(newDelta))/
+          (2 * tan(theta) * cos(newGamma)) + 0.5;
+        v = math::equal(this->vfov/2.0, 0.0) ? 0.5 :
+          -tan(newGamma)/(2 * tan(this->vfov/2.0)) + 0.5;
       }
       else
       {
@@ -810,7 +840,8 @@ void GpuLaser::SetHorzFOV(const double _hfov)
 //////////////////////////////////////////////////
 void GpuLaser::SetVertFOV(const double _vfov)
 {
-  this->vfov = _vfov;
+  this->vfov = math::equal(_vfov, 0.0) ? 0.0 : M_PI / 2.0;
+  this->dataPtr->vfovPadding = this->vfov - _vfov;
 }
 
 //////////////////////////////////////////////////
