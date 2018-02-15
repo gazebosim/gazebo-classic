@@ -39,8 +39,6 @@ using namespace physics;
 // move to class when merging forward
 static std::string worldStateFilter;
 
-static sdf::SDFPtr rootSDF = nullptr;
-
 /////////////////////////////////////////////////
 WorldState::WorldState()
   : State()
@@ -357,6 +355,7 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
+  static sdf::SDFPtr rootSDF = nullptr;
   if (rootSDF == nullptr)
   {
     rootSDF.reset(new sdf::SDF);
