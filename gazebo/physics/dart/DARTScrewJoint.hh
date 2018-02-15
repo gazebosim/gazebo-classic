@@ -42,43 +42,43 @@ namespace gazebo
       public: virtual ~DARTScrewJoint();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       // Documentation inherited.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       // Documentation inherited
       public: virtual double GetVelocity(unsigned int _index) const override;
 
       // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited
       public: virtual void SetAxis(const unsigned int _index,
-                  const ignition::math::Vector3d &_axis);
+                  const ignition::math::Vector3d &_axis) override;
 
       /// \copydoc ScrewJoint::SetThreadPitch
       public: virtual void SetThreadPitch(unsigned int _index,
                   double _threadPitch);
 
       /// \copydoc ScrewJoint::SetThreadPitch
-      public: virtual void SetThreadPitch(double _threadPitch);
+      public: virtual void SetThreadPitch(double _threadPitch) override;
 
       /// \copydoc ScrewJoint::GetThreadPitch
       public: virtual double GetThreadPitch(unsigned int _index);
 
       /// \copydoc ScrewJoint::GetThreadPitch
-      public: virtual double GetThreadPitch();
+      public: virtual double GetThreadPitch() override;
 
       // Documentation inherited
       public: virtual double GetParam(const std::string &_key,
-                                      unsigned int _index);
+                                      unsigned int _index) override;
 
       // Documentation inherited
       public: virtual bool SetParam(const std::string &_key,
                                     unsigned int _index,
-                                    const boost::any &_value);
+                                    const boost::any &_value) override;
 
       public: virtual double PositionImpl(
         const unsigned int _index = 0) const override;
