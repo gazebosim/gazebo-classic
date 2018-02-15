@@ -353,6 +353,12 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
 
 ### Deprecations
 
+1. **plugins/ContainPlugin.hh**
+    + ***Deprecation:*** Gazebo transport publisher on <namespace>/contain
+    + ***Replacement:*** Ignition transport publisher on <namespace>/contain
+    + ***Deprecation:*** Gazebo transport subscriber on <namespace>/enable
+    + ***Replacement:*** Ignition transport service on <namespace>/enable
+
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)
     + ***Replacement:*** void SetPoints(const ignition::math::Vector3d &_posStart, const ignition::math::Vector3d &_posEnd)
