@@ -420,7 +420,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
   raySensor->SetActive(true);
 
@@ -535,7 +535,7 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
-    boost::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
+    std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
   raySensor->SetActive(true);
 

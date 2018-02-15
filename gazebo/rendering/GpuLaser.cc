@@ -627,7 +627,7 @@ void GpuLaser::CreateMesh()
   double startY = viewHeight;
 
   // half of actual camera vertical FOV without padding
-  double phi = (this->dataPtr->vfovPadding) / 2;
+  double phi = (this->vfov - this->dataPtr->vfovPadding) / 2;
   double theta = this->hfov / 2;
 
   double vAngMin = -phi;
