@@ -39,6 +39,8 @@ using namespace physics;
 // move to class when merging forward
 static std::string worldStateFilter;
 
+static sdf::SDFPtr rootSDF = nullptr;
+
 /////////////////////////////////////////////////
 WorldState::WorldState()
   : State()
@@ -355,33 +357,36 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
-  sdf::SDFPtr root(new sdf::SDF);
-  sdf::initFile("root.sdf", root);
+  if (rootSDF == nullptr)
+  {
+    rootSDF.reset(new sdf::SDF);
+    sdf::initFile("root.sdf", rootSDF);
+  }
 
   // Unwrap insertions from <sdf>
   for (const auto &insertion : _insertions)
   {
-    root->Root()->ClearElements();
+    rootSDF->Root()->ClearElements();
     // <sdf>
-    if (sdf::readString(insertion, root))
+    if (sdf::readString(insertion, rootSDF))
     {
       // <model>
-      if (root->Root()->HasElement("model"))
+      if (rootSDF->Root()->HasElement("model"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("model")->ToString(""));
+            rootSDF->Root()->GetElement("model")->ToString(""));
       }
       // <light>
-      else if (root->Root()->HasElement("light"))
+      else if (rootSDF->Root()->HasElement("light"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("light")->ToString(""));
+            rootSDF->Root()->GetElement("light")->ToString(""));
       }
       // <actor>
-      else if (root->Root()->HasElement("actor"))
+      else if (rootSDF->Root()->HasElement("actor"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("actor")->ToString(""));
+            rootSDF->Root()->GetElement("actor")->ToString(""));
       }
       else
       {
