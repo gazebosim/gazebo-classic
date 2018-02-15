@@ -53,6 +53,12 @@ namespace gazebo
     /// \brief Gazebo transport node for communication.
     public: transport::NodePtr gzNode;
 
+    /// \brief pointer to an entity whose pose the geometry will track
+    public: physics::EntityPtr containerEntity;
+
+    /// \brief scoped name of entity to track
+    public: std::string containerEntityName;
+
     /// \brief Publisher which publishes contain / doesn't contain messages.
     public: transport::PublisherPtr containGzPub;
 
@@ -108,6 +114,11 @@ void ContainPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
     return;
   }
   auto pose = _sdf->Get<ignition::math::Pose3d>("pose");
+  sdf::ParamPtr frameParam = _sdf->GetElement("pose")->GetAttribute("frame");
+  if (frameParam)
+  {
+    this->dataPtr->containerEntityName = frameParam->GetAsString();
+  }
 
   // Geometry
   if (!_sdf->HasElement("geometry"))
@@ -217,8 +228,34 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
       return;
   }
 
-  auto pos = this->dataPtr->entity->GetWorldPose().Ign().Pos();
-  auto containNow = this->dataPtr->box.Contains(pos) ? 1 : 0;
+  ignition::math::Vector3d entityInWorldFrame =
+    this->dataPtr->entity->GetWorldPose().Ign().Pos();
+
+  // code handles OrientedBox in a moving frame of reference
+  ignition::math::Vector3d entityInBoxFrame;
+  if (!this->dataPtr->containerEntityName.empty())
+  {
+    if (!this->dataPtr->containerEntity)
+    {
+      this->dataPtr->containerEntity = this->dataPtr->world->GetEntity(
+        this->dataPtr->containerEntityName);
+    }
+  }
+  if (this->dataPtr->containerEntity)
+  {
+    auto worldToBox = this->dataPtr->containerEntity->GetWorldPose().Ign();
+    auto boxToWorld = worldToBox.Inverse();
+    // Transform the entity vector from world frame to the frame the box is in
+    entityInBoxFrame = (boxToWorld.Rot() * entityInWorldFrame)
+      + boxToWorld.Pos();
+  }
+  else
+  {
+    // box frame is world frame
+    entityInBoxFrame = entityInWorldFrame;
+  }
+
+  auto containNow = this->dataPtr->box.Contains(entityInBoxFrame) ? 1 : 0;
 
   if (containNow != this->dataPtr->contain)
   {

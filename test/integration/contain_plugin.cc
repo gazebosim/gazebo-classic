@@ -93,6 +93,31 @@ TEST_F(ContainPluginTest, Disable)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ContainPluginTest, MovingGeometry)
+{
+  this->Load("worlds/contain_plugin_moving_demo.world", true);
+  auto world = physics::get_world();
+  ASSERT_NE(nullptr, world);
+
+  // Subscribe to plugin notifications
+  std::string prefix("/gazebo/default/drill/");
+  auto containSub = this->node->Subscribe(prefix + "contain", &containCb);
+  ASSERT_NE(containSub , nullptr);
+
+  // Box initially does not contain drill
+  world->Step(10);
+  EXPECT_FALSE(g_contain);
+
+  // Box contains drill after box falls for a bit
+  world->Step(400);
+  EXPECT_TRUE(g_contain);
+
+  // Box doesn't contain drill after falling a bit more
+  world->Step(400);
+  EXPECT_FALSE(g_contain);
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

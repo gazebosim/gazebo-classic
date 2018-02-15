@@ -52,6 +52,9 @@ namespace gazebo
   ///    <!-- Pose of the geometry's center point in world coordinates -->
   ///    <pose>10 10 2 0 0 1.57</pose>
   ///
+  ///    <!-- OR Pose of the geometry's center in link frame coordinates -->
+  ///    <pose frame="model_name::link_name">10 10 2 0 0 1.57</pose>
+  ///
   ///    <!-- Geometry of the volume to check, uses the SDF geometry spec:
   ///         http://sdformat.org/spec?ver=1.6&elem=geometry
   ///         currently <box> is supported -->
