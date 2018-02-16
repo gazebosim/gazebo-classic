@@ -132,6 +132,11 @@ Mesh *OBJLoader::Load(const std::string &_filename)
             matIndex = mesh->AddMaterial(mat);
           subMesh->SetMaterialIndex(matIndex);
         }
+        else
+        {
+          gzwarn << "Missing material for shape[" << s.name << "] "
+            << "in OBJ file[" << _filename << "]" << std::endl;
+        }
         mesh->AddSubMesh(subMesh.release());
       }
     }
