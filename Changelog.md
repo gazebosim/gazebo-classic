@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
 
 ## Gazebo 8.x.x (2018-02-09)
 
