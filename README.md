@@ -15,7 +15,7 @@ Instructions are located at
 Gazebo cmake parameters available at configuring time:
 
  - BUILD_TESTING (boot) [default False]
-   Include the testsuite compilation in the default make call (make all)
+   Include the test suite compilation in the default make call (make all).
  - ENABLE_DIAGNOSTICS
    If this is defined, it will enable diagnostic timers using the macros
    from Diagnostics.hh (see also the standalone diagnostics example):
@@ -36,17 +36,17 @@ Gazebo cmake parameters available at configuring time:
    available.
  - FORCE_GRAPHIC_TESTS_COMPILATION (bool) [default False]
    Ignore system checks to look for graphic and acceleration support and
-   compile all the test suite.
+   compile all the test suites.
  - ENABLE_SCREEN_TESTS (bool) [default True]
    Enable or disable tests that need screen rendering to run properly.
    Headless machines or machines with the screen turned off should set this to
-   False
+   False.
  - USE_PCH (bool) [default False]
-   Use GNU Precompiled Headers. Only works with the gnu compiler
+   Use GNU Precompiled Headers. Only works with the gnu compiler.
 
  - ENABLE_TESTS_COMPILATION (DEPRECATED)
    The new behaviour is to call 'make tests' explicitly to compile the test
-   suite. Calling 'make' or 'make all' won't compile the tests
+   suite. Calling 'make' or 'make all' won't compile the tests.
 
 
 Uninstallation
