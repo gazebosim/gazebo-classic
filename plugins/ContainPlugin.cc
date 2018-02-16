@@ -231,18 +231,20 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
   ignition::math::Vector3d entityInWorldFrame =
     this->dataPtr->entity->GetWorldPose().Ign().Pos();
 
-  // code handles OrientedBox in a moving frame of reference
   ignition::math::Vector3d entityInBoxFrame;
   if (!this->dataPtr->containerEntityName.empty())
   {
+    // box is in a potentially moving reference frame
     if (!this->dataPtr->containerEntity)
     {
       this->dataPtr->containerEntity = this->dataPtr->world->GetEntity(
         this->dataPtr->containerEntityName);
+      if (!this->dataPtr->containerEntity)
+      {
+        // Couldn't find entity, do nothing for now
+        return;
+      }
     }
-  }
-  if (this->dataPtr->containerEntity)
-  {
     auto worldToBox = this->dataPtr->containerEntity->GetWorldPose().Ign();
     auto boxToWorld = worldToBox.Inverse();
     // Transform the entity vector from world frame to the frame the box is in
