@@ -1,5 +1,11 @@
 ## Gazebo 7
 
+## Gazebo 7.X.X (2018-xx-xx)
+
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
 ## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
