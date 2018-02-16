@@ -115,9 +115,6 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
-  this->dataPtr->initialSdf.reset(new sdf::Element);
-  sdf::initFile("world.sdf", this->dataPtr->initialSdf);
-
   // Keep this in the constructor for performance.
   // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
@@ -172,8 +169,6 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
-
-  this->dataPtr->initialSdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -2476,10 +2471,11 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->dataPtr->initialSdf->ToString("");
+    _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
@@ -2740,6 +2736,9 @@ void World::LogWorker()
 
   GZ_ASSERT(self, "Self pointer to World is invalid");
 
+  // Init the prevUnfilteredState
+  this->dataPtr->prevUnfilteredState.Load(self);
+
   while (!this->dataPtr->stop)
   {
     // get unfiltered world state
@@ -2753,7 +2752,7 @@ void World::LogWorker()
     std::vector<std::string> insertions;
     std::vector<std::string> deletions;
     bool insertDelete = false;
-    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+
     {
       WorldState unfilteredDiffState = unfilteredState -
           this->dataPtr->prevUnfilteredState;
