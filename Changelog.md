@@ -2,10 +2,13 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
 1. Ensure sdf inertia values are consistent
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
-
 
 ## Gazebo 8.3.0 (2018-02-10)
 
