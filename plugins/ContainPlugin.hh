@@ -82,6 +82,10 @@ namespace gazebo
     /// \param[in] _msg Message with 0 to disable and 1 to enable the plugin.
     private: void Enable(ConstIntPtr &_msg);
 
+    /// \brief Publish a message indicating if the box contains an entity
+    /// \param[in] _contains True if the geometry contains the target
+    private: void PublishContains(bool _contains);
+
     /// \brief Pointer to private data
     private: std::unique_ptr<ContainPluginPrivate> dataPtr;
   };

@@ -118,6 +118,63 @@ TEST_F(ContainPluginTest, MovingGeometry)
 }
 
 //////////////////////////////////////////////////
+TEST_F(ContainPluginTest, RemoveEntity)
+{
+  this->Load("worlds/contain_plugin_demo.world", true);
+  auto world = physics::get_world();
+  ASSERT_NE(nullptr, world);
+
+  // Get models
+  auto drill = world->GetModel("drill");
+  ASSERT_NE(nullptr, drill);
+
+  // Subscribe to plugin notifications
+  std::string prefix("/gazebo/default/drill/");
+  auto containSub = this->node->Subscribe(prefix + "contain", &containCb);
+  ASSERT_NE(containSub , nullptr);
+
+  // Place drill inside box
+  drill->SetWorldPose(ignition::math::Pose3d(10.0, 10.0, 1.0, 0, 0, 0));
+  world->Step(10);
+  EXPECT_TRUE(g_contain);
+
+  // Delete drill
+  world->RemoveModel(drill);
+  drill = nullptr;
+
+  // Box doesn't contain drill since drill does not exist
+  world->Step(10);
+  EXPECT_FALSE(g_contain);
+}
+
+//////////////////////////////////////////////////
+TEST_F(ContainPluginTest, RemoveReferenceEntity)
+{
+  this->Load("worlds/contain_plugin_moving_demo.world", true);
+  auto world = physics::get_world();
+  ASSERT_NE(nullptr, world);
+
+  // Subscribe to plugin notifications
+  std::string prefix("/gazebo/default/drill/");
+  auto containSub = this->node->Subscribe(prefix + "contain", &containCb);
+  ASSERT_NE(containSub , nullptr);
+
+  // Box contains drill after box falls for a bit
+  world->Step(400);
+  EXPECT_TRUE(g_contain);
+
+  // Delete box
+  auto box = world->GetModel("box");
+  ASSERT_NE(nullptr, box);
+  world->RemoveModel(box);
+  box = nullptr;
+
+  // No box, so nothing contains the drill
+  world->Step(10);
+  EXPECT_FALSE(g_contain);
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

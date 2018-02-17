@@ -32,6 +32,12 @@
 
 namespace gazebo
 {
+  namespace physics
+  {
+    // TODO(sloretz) change this to STL type in gazebo8+
+    typedef boost::weak_ptr<physics::Entity> EntityWeakPtr;
+  }
+
   /// \brief Private data class for the ContainPlugin class
   class ContainPluginPrivate
   {
@@ -45,7 +51,7 @@ namespace gazebo
     public: std::string entityName;
 
     /// \brief Pointer to the entity we're checking.
-    public: physics::EntityPtr entity;
+    public: physics::EntityWeakPtr entity;
 
     /// \brief Box representing the volume to check.
     public: ignition::math::OrientedBoxd box;
@@ -54,7 +60,7 @@ namespace gazebo
     public: transport::NodePtr gzNode;
 
     /// \brief pointer to an entity whose pose the geometry will track
-    public: physics::EntityPtr containerEntity;
+    public: physics::EntityWeakPtr containerEntity;
 
     /// \brief scoped name of entity to track
     public: std::string containerEntityName;
@@ -218,34 +224,42 @@ void ContainPlugin::Enable(ConstIntPtr &_msg)
 void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
 {
   // Only get the entity once
-  if (!this->dataPtr->entity)
+  physics::EntityPtr entity = this->dataPtr->entity.lock();
+  if (!entity)
   {
     this->dataPtr->entity = this->dataPtr->world->GetEntity(
         this->dataPtr->entityName);
-
-    // Entity may not have been spawned yet
-    if (!this->dataPtr->entity)
+    entity = this->dataPtr->entity.lock();
+    if (!entity)
+    {
+      // Could not find entity being tested
+      this->PublishContains(false);
       return;
+    }
   }
 
   ignition::math::Vector3d entityInWorldFrame =
-    this->dataPtr->entity->GetWorldPose().Ign().Pos();
+    entity->GetWorldPose().Ign().Pos();
 
   ignition::math::Vector3d entityInBoxFrame;
   if (!this->dataPtr->containerEntityName.empty())
   {
+    physics::EntityPtr referenceEntity = this->dataPtr->containerEntity.lock();
     // box is in a potentially moving reference frame
-    if (!this->dataPtr->containerEntity)
+    if (!referenceEntity)
     {
       this->dataPtr->containerEntity = this->dataPtr->world->GetEntity(
         this->dataPtr->containerEntityName);
-      if (!this->dataPtr->containerEntity)
+      referenceEntity = this->dataPtr->containerEntity.lock();
+      if (!referenceEntity)
       {
-        // Couldn't find entity, do nothing for now
+        // Could not find reference entity
+        this->PublishContains(false);
         return;
       }
     }
-    auto worldToBox = this->dataPtr->containerEntity->GetWorldPose().Ign();
+
+    auto worldToBox = referenceEntity->GetWorldPose().Ign();
     auto boxToWorld = worldToBox.Inverse();
     // Transform the entity vector from world frame to the frame the box is in
     entityInBoxFrame = (boxToWorld.Rot() * entityInWorldFrame)
@@ -257,8 +271,13 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
     entityInBoxFrame = entityInWorldFrame;
   }
 
-  auto containNow = this->dataPtr->box.Contains(entityInBoxFrame) ? 1 : 0;
+  this->PublishContains(this->dataPtr->box.Contains(entityInBoxFrame));
+}
 
+//////////////////////////////////////////////////
+void ContainPlugin::PublishContains(bool _contains)
+{
+  int containNow = _contains ? 1 : 0;
   if (containNow != this->dataPtr->contain)
   {
     this->dataPtr->contain = containNow;
