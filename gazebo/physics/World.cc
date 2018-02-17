@@ -882,6 +882,8 @@ void World::Fini()
   }
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
+  this->dataPtr->prevUnfilteredState.SetWorld(WorldPtr());
+  this->dataPtr->logPlayState.SetWorld(WorldPtr());
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
