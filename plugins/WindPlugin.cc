@@ -203,6 +203,15 @@ void WindPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
         sdfForceApprox->Get<double>();
   }
 
+  // If the forceApproximationScalingFactor is very small don't update.
+  // It doesn't make sense to be negative, that would be negative wind drag.
+  if (std::fabs(this->dataPtr->forceApproximationScalingFactor) < 1e-6)
+  {
+    gzerr << "Please set <force_approximation_scaling_factor> to a value "
+          << "greater than 0" << std::endl;
+    return;
+  }
+
   double period = this->dataPtr->world->Physics()->GetMaxStepSize();
 
   this->dataPtr->kMag = period / this->dataPtr->characteristicTimeForWindRise;
@@ -284,13 +293,6 @@ void WindPlugin::OnUpdate()
 {
   // Update loop for using the force on mass approximation
   // This is not recommended. Please use the LiftDragPlugin instead.
-
-  // If the forceApproximationScalingFactor is very small don't iterate.
-  // It doesn't make sense to be negative, that would be negative wind drag.
-  if (std::fabs(this->dataPtr->forceApproximationScalingFactor) < 1E-6)
-  {
-    return;
-  }
 
   // Get all the models
   physics::Model_V models = this->dataPtr->world->Models();
