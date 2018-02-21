@@ -762,7 +762,6 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     for (int i = 0; i < this->RayCount(); ++i)
     {
       int index = j * this->RayCount() + i;
-
       hb = (rangeCount == 1)? 0 : static_cast<double>(i * (rayCount - 1))
           / (rangeCount - 1);
       hja = static_cast<int>(floor(hb));

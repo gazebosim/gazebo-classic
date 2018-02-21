@@ -109,7 +109,6 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
       box03Pose.rot.GetAsEuler());
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
-
   sensors::GpuRaySensorPtr raySensor =
     std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
@@ -459,7 +458,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
 
     // TODO: Fix this test
     EXPECT_NEAR(raySensor->Range(i*samples + mid),
-        expectedRangeAtMidPoint, 0.2); //VERTICAL_LASER_TOL);
+        expectedRangeAtMidPoint, VERTICAL_LASER_TOL);
 
     angleStep += vAngleStep;
 
