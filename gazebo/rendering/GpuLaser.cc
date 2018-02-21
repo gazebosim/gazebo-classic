@@ -635,24 +635,32 @@ void GpuLaser::CreateMesh()
   if (this->ImageHeight() == 1)
     phi = 0;
 
+  // index of ray
+  unsigned int ptsOnLine = 0;
+
   gazebo::math::Vector3 axis;
   math::Quaternion ray;
 
-  // index of ray
-  unsigned int ptsOnLine = 0;
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
     double gamma = 0;
     if (this->dataPtr->h2nd != 1)
+    {
+      // gamma: current vertical angle
       gamma = ((2 * phi / (this->dataPtr->h2nd - 1)) * j) + vAngMin;
+    }
     for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
+      // total laser hfov
       double thfov = this->dataPtr->textureCount * this->hfov;
+
+      // current horizontal angle from start of laser scan
       double delta = ((thfov / (this->dataPtr->w2nd - 1)) * i);
 
       // index of texture that contains the depth value
       unsigned int texture = delta / (theta*2);
 
+      // cap texture index and horizontal angle
       if (texture > this->dataPtr->textureCount-1)
       {
         texture -= 1;
@@ -693,18 +701,17 @@ void GpuLaser::CreateMesh()
       if (this->isHorizontal)
       {
         //u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        //v = ignition::math::equal(phi, 0.0) ?
-        //     -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
+        //v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
         u = -(cos(this->vfov/2.0) * tan(newDelta))/
           (2 * tan(theta) * cos(newGamma)) + 0.5;
-        v = math::equal(this->vfov/2.0, 0.0) ? 0.5 :
+        v = ignition::math::equal(this->vfov/2.0, 0.0) ? 0.5 :
           -tan(newGamma)/(2 * tan(this->vfov/2.0)) + 0.5;
       }
       else
       {
         v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = ignition::math::equal(theta, 0.0) ?
-            -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
+        u = math::equal(theta, 0.0) ?  0.5 :
+             -tan(delta)/(2 * tan(theta)) + 0.5;
       }
       submesh->AddTexCoord(u, v);
     }

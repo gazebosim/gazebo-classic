@@ -193,15 +193,23 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->SetHorzFOV(this->HorzFOV() / this->CameraCount());
     this->dataPtr->horzRayCount /= this->CameraCount();
 
-    if (this->VertFOV() > M_PI / 2)
+    // vertical laser setup
+    double vfov = (this->VerticalAngleMax()
+                - this->VerticalAngleMin()).Radian();
+    if (vfov > M_PI / 2)
     {
+      vfov = M_PI / 2;
       gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
-      this->dataPtr->laserCam->SetVertFOV(M_PI / 2);
-      this->SetVerticalAngleMin(this->dataPtr->laserCam->VertHalfAngle() -
-                                (this->VertFOV() / 2));
-      this->SetVerticalAngleMax(this->dataPtr->laserCam->VertHalfAngle() +
-                                (this->VertFOV() / 2));
     }
+
+    this->dataPtr->laserCam->SetVertFOV(vfov);
+    this->SetVerticalAngleMin(this->dataPtr->laserCam->VertHalfAngle() -
+                              (vfov / 2));
+    this->SetVerticalAngleMax(this->dataPtr->laserCam->VertHalfAngle() +
+                              (vfov / 2));
+
+    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
+            + this->VerticalAngleMin()).Radian() / 2.0);
 
     if ((this->dataPtr->horzRayCount * this->dataPtr->vertRayCount) <
         (this->dataPtr->horzRangeCount * this->dataPtr->vertRangeCount))
