@@ -5,6 +5,13 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 9.x to 10.x
+
+### Modifications
+
+1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
+   enable mass based force approximation. Set to 1.0 for original behavior.
+
 ## Gazebo 8.x to 9.x
 
 ### Build system
