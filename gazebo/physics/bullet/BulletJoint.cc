@@ -599,6 +599,32 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
   {
     double currentAngle = this->GetAngle(0).Radian();
 
+    const double maxSupportedAngle = 1e12;
+    if (   std::abs(currentAngle) > maxSupportedAngle
+        || std::abs(_position) > maxSupportedAngle)
+    {
+      // If either the current or the target angle are absurdly large, we will
+      // get permanently stuck in the while-loop below, because trying to
+      // increment currentAngle by delta will (eventually) not be able to modify
+      // its floating point value.
+      //
+      // We put this check here to make sure that we can't get permanently stuck
+      // in the loop.
+      gzerr << "For Bullet hinge joints, the function Joint::SetPosition(~) "
+            << "does not support positions larger than [" << maxSupportedAngle
+            << "] radians. Your joint currently has an angle of ["
+            << currentAngle << "] radians, and you are requesting an angle of ["
+            << _position << "] radians.\n";
+
+      // We can still call Joint::SetPositionMaximal in the normal way to reset
+      // this joint angle. The end result should put this joint angle within
+      // the range of [-pi, pi]. That should at least bring it back to a sane
+      // state, even if it's not exactly what the user asked for.
+      Joint::SetPositionMaximal(_index, _position);
+
+      return false;
+    }
+
     // Based on the source code of Bullet, the largest position change that
     // shouldn't bug out is 0.3 radians, so we keep our changes a little bit
     // below that.

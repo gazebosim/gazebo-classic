@@ -77,9 +77,28 @@ class Issue2430Test
     // There is no gravity, and there are no forces acting on the bodies or the
     // joint, so the joint position value should still be the same.
 
-    const double resultPosition = joint->GetAngle(0).Radian();
+    const double initialResultPosition = joint->GetAngle(0).Radian();
 
-    EXPECT_NEAR(initialPosition, resultPosition, 1e-6);
+    // We use a tolerance relative to the size of the angle, because 1e-6 is not
+    // tolerant enough for the large angles.
+    const double tolerance = 1e-6*std::abs(initialPosition);
+
+    EXPECT_NEAR(initialPosition, initialResultPosition, tolerance);
+
+
+    //-----------------------------------
+    // Move the angle to make sure that Joint::SetPosition works from non-zero
+    // initial values.
+
+    const double finalPosition = 0.5*initialPosition;
+
+    joint->SetPosition(0, finalPosition);
+
+    world->Step(1);
+
+    const double finalResultPosition = joint->GetAngle(0).Radian();
+
+    EXPECT_NEAR(finalPosition, finalResultPosition, tolerance);
   }
 
   protected: std::string physicsEngine;
@@ -109,6 +128,17 @@ TEST_P(Issue2430Test, Negative200Degrees)
   this->TestJointInitialization(-200.0*M_PI/180.0);
 }
 
+/////////////////////////////////////////////////
+TEST_P(Issue2430Test, LargePositiveAngle)
+{
+  this->TestJointInitialization(100000*M_PI/180.0);
+}
+
+/////////////////////////////////////////////////
+TEST_P(Issue2430Test, LargeNegativeAngle)
+{
+  this->TestJointInitialization(-100000*M_PI/180.0);
+}
 
 /////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue2430Test, PHYSICS_ENGINE_VALUES);

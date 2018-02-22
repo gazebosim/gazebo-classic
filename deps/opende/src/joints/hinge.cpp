@@ -180,7 +180,7 @@ dxJointHinge::getInfo2( dxJoint::Info2 *info )
 }
 
 
-void dJointSetHingeCumulativeAngle(dJointID joint, double angle)
+void dJointSetHingeCumulativeAngle(dJointID joint, dReal angle)
 {
   dAASSERT(joint);
   static_cast<dxJointHinge*>(joint)->cumulative_angle = angle;
