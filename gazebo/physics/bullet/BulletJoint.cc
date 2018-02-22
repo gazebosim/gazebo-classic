@@ -607,14 +607,19 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
     do
     {
       if (std::abs(_position - currentAngle) > delta)
+      {
         currentAngle += _position > currentAngle? delta : -delta;
+      }
       else
+      {
         currentAngle = _position;
+      }
 
       if (!Joint::SetPositionMaximal(_index, currentAngle))
+      {
         return false;
-
-    } while( std::abs(currentAngle - _position) > 1e-16);
+      }
+    } while ( std::abs(currentAngle - _position) > 1e-16);
 
     return true;
   }

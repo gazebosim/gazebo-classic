@@ -21,9 +21,9 @@
 using namespace gazebo;
 
 /////////////////////////////////////////////////
-class Issue2430Test :
-    public ServerFixture,
-    public ::testing::WithParamInterface<std::string>
+class Issue2430Test
+    : public ServerFixture,
+      public ::testing::WithParamInterface<std::string>
 {
   /////////////////////////////////////////////////
   public: virtual void SetUp() override
@@ -40,8 +40,8 @@ class Issue2430Test :
   /////////////////////////////////////////////////
   public: void TestJointInitialization(const double initialPosition)
   {
-    if(   "simbody" == this->physicsEngine
-       || "dart" == this->physicsEngine)
+    if (   "simbody" == this->physicsEngine
+        || "dart" == this->physicsEngine)
     {
       gzdbg << "Test is disabled for " << this->physicsEngine << ", skipping\n";
       // This test is disabled for Simbody and DART, because the ability to set
@@ -88,7 +88,7 @@ class Issue2430Test :
 /////////////////////////////////////////////////
 TEST_P(Issue2430Test, Positive20Degrees)
 {
-  this->TestJointInitialization( 20.0*M_PI/180.0);
+  this->TestJointInitialization(20.0*M_PI/180.0);
 }
 
 /////////////////////////////////////////////////
@@ -100,7 +100,7 @@ TEST_P(Issue2430Test, Negative20Degrees)
 /////////////////////////////////////////////////
 TEST_P(Issue2430Test, Positive200Degrees)
 {
-  this->TestJointInitialization( 200.0*M_PI/180.0);
+  this->TestJointInitialization(200.0*M_PI/180.0);
 }
 
 /////////////////////////////////////////////////
