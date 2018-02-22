@@ -161,7 +161,8 @@ void LaserView::OnScan(ConstLaserScanStampedPtr &_msg)
   if (_msg->scan().has_vertical_count() && _msg->scan().vertical_count() !=
       static_cast<uint32_t>(this->vertScanSpin->maximum()+1))
   {
-    int max = std::max(0u, _msg->scan().vertical_count()-1);
+    int max = _msg->scan().vertical_count()-1;
+    max = std::max(0, max);
     rayOffset = std::min(rayOffset, max);
 
     if (this->vertScanSpin->value() > max)
