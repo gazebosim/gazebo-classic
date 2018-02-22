@@ -586,7 +586,39 @@ math::Angle BulletJoint::GetLowStop(unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool BulletJoint::SetPosition(unsigned int _index, double _position)
+bool BulletJoint::SetPosition(unsigned int _index, const double _position)
 {
+  // The code inside this ifdef is only relevant for versions of bullet greater
+  // than 2.82. Any versions earlier than that will be broken no matter what.
+#ifdef LIBBULLET_VERSION_GT_282
+  // The following code fixes issue 2430 without breaking ABI. The key is to
+  // take relatively small steps towards a target position so that the
+  // accumulated angle doesn't bug out and reset itself from receiving too large
+  // of a change all at once.
+  if (this->HasType(Base::HINGE_JOINT))
+  {
+    double currentAngle = this->GetAngle(0).Radian();
+
+    // Based on the source code of Bullet, the largest position change that
+    // shouldn't bug out is 0.3 radians, so we keep our changes a little bit
+    // below that.
+    const double delta = 0.25;
+
+    do
+    {
+      if (std::abs(_position - currentAngle) > delta)
+        currentAngle += _position > currentAngle? delta : -delta;
+      else
+        currentAngle = _position;
+
+      if (!Joint::SetPositionMaximal(_index, currentAngle))
+        return false;
+
+    } while( std::abs(currentAngle - _position) > 1e-16);
+
+    return true;
+  }
+#endif
+
   return Joint::SetPositionMaximal(_index, _position);
 }

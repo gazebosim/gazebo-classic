@@ -175,3 +175,9 @@ void ODEHingeJoint::SetParam(unsigned int _parameter, double _value)
   else
     gzerr << "ODE Joint ID is invalid\n";
 }
+
+//////////////////////////////////////////////////
+void ODEHingeJoint::SetCumulativeAngle(double _angle)
+{
+  dJointSetHingeCumulativeAngle(this->jointId, _angle);
+}
