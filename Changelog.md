@@ -1,5 +1,11 @@
 ## Gazebo 7
 
+## Gazebo 7.XX.X (2018-XX-XX)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+
 ## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
