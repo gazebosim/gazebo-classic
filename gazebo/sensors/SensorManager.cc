@@ -552,7 +552,7 @@ void SensorManager::SensorContainer::RunLoop()
     {
         gzerr << "Took over 1000*max_step_size to update a sensor " \
           << "(took " << diffTime.sec << " sec, which is more than " \
-          << maxSensorUpdate << ")." << std::endl;
+          << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
         return;
     }
 
