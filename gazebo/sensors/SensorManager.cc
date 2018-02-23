@@ -21,6 +21,7 @@
 #endif
 
 #include <functional>
+#include <limits>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
@@ -32,6 +33,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -489,6 +491,12 @@ void SensorManager::SensorContainer::RunLoop()
   // 1000 * MaxStepSize in order to handle simulation with a
   // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
+  // During log playback, time can jump forward an arbitrary amount.
+  if (util::LogPlay::Instance()->IsOpen())
+  {
+    maxSensorUpdate = std::numeric_limits<double>::max();
+  }
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
