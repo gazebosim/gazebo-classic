@@ -70,20 +70,27 @@ class Issue2430Test
 
     EXPECT_NEAR(0.0, joint->GetAngle(0).Radian(), 1e-6);
 
-    joint->SetPosition(0, initialPosition);
-
-    world->Step(1);
-
-    // There is no gravity, and there are no forces acting on the bodies or the
-    // joint, so the joint position value should still be the same.
-
-    const double initialResultPosition = joint->GetAngle(0).Radian();
-
     // We use a tolerance relative to the size of the angle, because 1e-6 is not
     // tolerant enough for the large angles.
     const double tolerance = 1e-6*std::abs(initialPosition);
 
-    EXPECT_NEAR(initialPosition, initialResultPosition, tolerance);
+    if (this->physicsEngine == "bullet" && std::abs(initialPosition) > 1e12)
+    {
+      EXPECT_FALSE(joint->SetPosition(0, initialPosition));
+    }
+    else
+    {
+      EXPECT_TRUE(joint->SetPosition(0, initialPosition));
+
+      world->Step(1);
+
+      // There is no gravity, and there are no forces acting on the bodies or
+      // the joint, so the joint position value should still be the same.
+
+      const double initialResultPosition = joint->GetAngle(0).Radian();
+
+      EXPECT_NEAR(initialPosition, initialResultPosition, tolerance);
+    }
 
 
     //-----------------------------------
@@ -92,13 +99,20 @@ class Issue2430Test
 
     const double finalPosition = 0.5*initialPosition;
 
-    joint->SetPosition(0, finalPosition);
+    if (this->physicsEngine == "bullet" && std::abs(finalPosition) > 1e12)
+    {
+      EXPECT_FALSE(joint->SetPosition(0, finalPosition));
+    }
+    else
+    {
+      EXPECT_TRUE(joint->SetPosition(0, finalPosition));
 
-    world->Step(1);
+      world->Step(1);
 
-    const double finalResultPosition = joint->GetAngle(0).Radian();
+      const double finalResultPosition = joint->GetAngle(0).Radian();
 
-    EXPECT_NEAR(finalPosition, finalResultPosition, tolerance);
+      EXPECT_NEAR(finalPosition, finalResultPosition, tolerance);
+    }
   }
 
   protected: std::string physicsEngine;
@@ -138,6 +152,12 @@ TEST_P(Issue2430Test, LargePositiveAngle)
 TEST_P(Issue2430Test, LargeNegativeAngle)
 {
   this->TestJointInitialization(-100000*M_PI/180.0);
+}
+
+/////////////////////////////////////////////////
+TEST_P(Issue2430Test, SuperLargeAngle)
+{
+  this->TestJointInitialization(1e15);
 }
 
 /////////////////////////////////////////////////
