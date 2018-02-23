@@ -384,11 +384,17 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
 
       std::string query = cIt->first;
 
+      ///////////////////////////////////////////////
+      /// TODO REMOVE ME - hardcoded for testing
+      query = "?p=/link/0/collision/1/pose/position/x";
+      ///////////////////////////////////////////////
+
       // tokenize query, e.g. ?p=sim_time -> [?p, sim_time]
       std::vector<std::string> queryTokens = common::split(query, "=/");
 
       // skip ?p
       unsigned int queryIndex = _index + 1;
+
 
       if (queryTokens.size() < 2 || queryTokens.size() <= queryIndex)
         continue;
@@ -400,46 +406,86 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
       if (topicField != fieldName)
         continue;
 
+      // check repeated field
+      // if repeated, the the next query token should indicate the index,
+      // e.g. ?p=model/2/position/x
+      // model is repeated and we want to get index value of 2
+      bool repeated = field->is_repeated();
+      int repeatedIdx = 0;
+      if (repeated)
+      {
+        repeatedIdx = std::stoi(queryTokens[queryIndex + 1].c_str());
+        int fieldSize = ref->FieldSize(*_msg, field);
+                  << std::endl;
+        if (repeatedIdx >= fieldSize)
+          continue;
+      }
+
       switch (field->type())
       {
         case google::protobuf::FieldDescriptor::TYPE_DOUBLE:
         {
-          data = ref->GetDouble(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedDouble(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetDouble(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_FLOAT:
         {
-          data = ref->GetFloat(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedFloat(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetFloat(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_INT64:
         {
-          data = ref->GetInt64(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedInt64(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetInt64(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_UINT64:
         {
-          data = ref->GetUInt64(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedUInt64(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetUInt64(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_INT32:
         {
-          data = ref->GetInt32(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedInt32(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetInt32(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_UINT32:
         {
-          data = ref->GetUInt32(*_msg, field);
+          if (repeated)
+            data = ref->GetRepeatedUInt32(*_msg, field, repeatedIdx);
+          else
+            data = ref->GetUInt32(*_msg, field);
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_BOOL:
         {
-          data = static_cast<int>(ref->GetBool(*_msg, field));
+          if (repeated)
+            data = ref->GetRepeatedBool(*_msg, field, repeatedIdx);
+          else
+            data = static_cast<int>(ref->GetBool(*_msg, field));
           break;
         }
         case google::protobuf::FieldDescriptor::TYPE_MESSAGE:
         {
-          auto valueMsg = ref->MutableMessage(_msg, field);
+          google::protobuf::Message *valueMsg = nullptr;
+          if (repeated)
+            valueMsg = ref->MutableRepeatedMessage(_msg, field, repeatedIdx);
+          else
+            valueMsg = ref->MutableMessage(_msg, field);
 
           if (field->message_type()->name() == "Time")
           {
@@ -500,7 +546,11 @@ void TopicCurve::UpdateCurve(google::protobuf::Message *_msg,
           }
           else
           {
-            this->UpdateCurve(valueMsg, _index + 1, xData, _curvesUpdates);
+            // increment query token index
+            // if repeated field, further increment by one to skip the repeated
+            // index token
+            int nextIdx = _index + ((repeated) ? 2 : 1);
+            this->UpdateCurve(valueMsg, nextIdx, xData, _curvesUpdates);
             addData = false;
           }
           break;
