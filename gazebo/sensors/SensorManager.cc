@@ -558,8 +558,8 @@ void SensorManager::SensorContainer::RunLoop()
     // Make sure update time is reasonable.
     if (diffTime.sec >= maxSensorUpdate)
     {
-        gzerr << "Took over 1000*max_step_size to update a sensor " \
-          << "(took " << diffTime.sec << " sec, which is more than " \
+        gzerr << "Took over 1000*max_step_size to update a sensor "
+          << "(took " << diffTime.sec << " sec, which is more than "
           << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
         return;
     }
