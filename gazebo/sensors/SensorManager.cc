@@ -548,12 +548,20 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
-        "Took over 1000*max_step_size to update a sensor.");
+    if (diffTime.sec >= maxSensorUpdate)
+    {
+        gzerr << "Took over 1000*max_step_size to update a sensor " \
+          << "(took " << diffTime.sec << " sec, which is more than " \
+          << maxSensorUpdate << ")." << std::endl;
+        return;
+    }
 
     // Make sure eventTime is not negative.
-    GZ_ASSERT(eventTime >= common::Time::Zero,
-        "Time to next sensor update is negative.");
+    if (eventTime < common::Time::Zero)
+    {
+        gzerr << "Time to next sensor update is negative." << std::endl;
+        return;
+    }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
 
