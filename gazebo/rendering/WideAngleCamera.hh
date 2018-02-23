@@ -234,6 +234,11 @@ namespace gazebo
       public: ignition::math::Vector3d Project3d(
           const ignition::math::Vector3d &_pt) const;
 
+      /// \brief Get the list of ogre cameras used to create the cube map for
+      /// generating the wide angle camera image
+      /// \return A list of OGRE cameras
+      public: std::vector<Ogre::Camera *> OgreEnvCameras() const;
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);

@@ -34,7 +34,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief We'll create an instance of this class for each camera, to be
-    /// used to inject dir light clip space pos and time (for animating flare)
+    /// used to inject lens flare uniforms and time (for animating flare)
     /// in each render call.
     class LensFlareCompositorListener
       : public Ogre::CompositorInstance::Listener
@@ -46,12 +46,24 @@ namespace gazebo
         this->SetLight(_light);
       }
 
+      /// \brief Destructor
+      public: ~LensFlareCompositorListener()
+      {
+        if (this->wideAngleDummyCamera)
+        {
+          this->wideAngleDummyCamera->GetScene()->RemoveCamera(
+              this->wideAngleDummyCamera->Name());
+        }
+      }
+
       /// \brief Set directional light that generates lens flare
       /// \param[in] _light Pointer to directional light
       public: void SetLight(LightPtr _light)
       {
         this->dir = ignition::math::Quaterniond(_light->Rotation()) *
             _light->Direction();
+        // set light world pos to be far away
+        this->lightWorldPos = -this->dir * 100000.0;
       }
 
       /// \brief Callback that OGRE will invoke for us on each render call
@@ -81,109 +93,240 @@ namespace gazebo
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
 
-        // set light world pos to be far away
-        auto worldPos = -this->dir * 100000.0;
+        ignition::math::Vector3d pos;
+        double scale = 1.0;
 
-        Ogre::Vector3 lightPos;
-        // cast to wide angle camera and use project function
+        // wide angle camera has a different way of projecting 3d points and
+        // occlusion checking
         auto wideAngleCam =
             boost::dynamic_pointer_cast<WideAngleCamera>(this->camera);
         if (wideAngleCam)
-        {
-          // project camera into screen space
-          double viewportWidth =
-              static_cast<double>(wideAngleCam->ViewportWidth());
-          double viewportHeight =
-              static_cast<double>(wideAngleCam->ViewportHeight());
-          auto imagePos = wideAngleCam->Project3d(worldPos);
-
-          // convert to normalized device coordinates
-          // keep z for visibility test
-          lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
-          lightPos.y = 2.0 * (1.0 - (imagePos.Y() / viewportHeight) - 0.5);
-          // imagePos.Z() is the distance of point from camera optical center
-          // if it's > 1.0 than the point is outside of camera view
-          // but allow some tol to avoid sharp dropoff of lens flare at
-          // edge of image frame. tol = 0.75
-          lightPos.z = (imagePos.Z() > 1.75) ? -1 : 1;
-        }
+          this->WideAngleCameraPosScale(wideAngleCam, pos, scale);
         else
-        {
-          // project 3d world space to clip space
-          auto viewProj = this->camera->OgreCamera()->getProjectionMatrix() *
-            this->camera->OgreCamera()->getViewMatrix();
-          auto pos = viewProj * Ogre::Vector4(Conversions::Convert(worldPos));
-          // normalize x and y
-          // keep z for visibility test
-          lightPos.x = pos.x / pos.w;
-          lightPos.y = pos.y / pos.w;
-          lightPos.z = pos.z;
+          this->CameraPosScale(this->camera, pos, scale);
 
-          double occlusionScale = 1.0;
-          if (lightPos.z >= 0.0)
-          {
-            occlusionScale = this->OcclusionScale(this->camera,
-                Conversions::ConvertIgn(lightPos), worldPos);
-          }
-          params->setNamedConstant("scale",
-              static_cast<Ogre::Real>(occlusionScale));
-        }
-        params->setNamedConstant("lightPos", lightPos);
+        params->setNamedConstant("lightPos", Conversions::Convert(pos));
+        params->setNamedConstant("scale", static_cast<Ogre::Real>(scale));
       }
 
-     /// \brief Check to see if the lensflare is occluded and return a scaling
-     /// factor for the lens flare that is proportional to its visibility
-     private: double OcclusionScale(CameraPtr _cam,
-                                    const ignition::math::Vector3d &_imgPos,
-                                    const ignition::math::Vector3d &_lightPos)
-     {
-       double viewportWidth =
-           static_cast<double>(_cam->ViewportWidth());
-       double viewportHeight =
-          static_cast<double>(_cam->ViewportHeight());
-       ignition::math::Vector2i screenPos;
-       screenPos.X() = ((_imgPos.X() / 2.0) + 0.5) * viewportWidth;
-       screenPos.Y() = (1 - ((_imgPos.Y() / 2.0) + 0.5)) * viewportHeight;
-       ScenePtr scene = _cam->GetScene();
+      /// \brief Get the lens flare position and scale for a normal camera
+      /// \param[in] _camera Camera which the lens flare is added to
+      /// \param[out] _pos lens flare position in normalized device coordinates
+      /// \param[out] _scale Amount to scale the lens flare scale by.
+      /// Computed based on occlusion percentage
+      private: void CameraPosScale(CameraPtr _camera,
+          ignition::math::Vector3d &_pos, double &_scale)
+      {
+        Ogre::Vector3 lightPos;
+        // project 3d world space to clip space
+        auto viewProj = _camera->OgreCamera()->getProjectionMatrix() *
+          _camera->OgreCamera()->getViewMatrix();
+        auto pos = viewProj * Ogre::Vector4(
+            Conversions::Convert(this->lightWorldPos));
+        // normalize x and y
+        // keep z for visibility test
+        lightPos.x = pos.x / pos.w;
+        lightPos.y = pos.y / pos.w;
+        lightPos.z = pos.z;
 
-       unsigned int rays = 0;
-       unsigned int occluded = 0u;
-       // work in normalized device coordinates
-       // lens flare's halfSize is just an approximated value
-       double halfSize = 0.065;
-       double steps = 5;
-       double stepSize = halfSize * 2 / steps;
-       double cx = _imgPos.X();
-       double cy = _imgPos.Y();
-       double startx = cx - halfSize;
-       double starty = cy - halfSize;
-       double endx = cx + halfSize;
-       double endy = cy + halfSize;
-       // do sparse ray cast occlusion check
-       for (double i = starty; i < endy; i+=stepSize)
-       {
-         for (double j = startx; j < endx; j+=stepSize)
-         {
-           screenPos.X() = ((j / 2.0) + 0.5) * viewportWidth;
-           screenPos.Y() = (1 - ((i / 2.0) + 0.5)) * viewportHeight;
-           ignition::math::Vector3d position;
-           bool intersect = scene->FirstContact(_cam, screenPos, position);
-           if (intersect && (position.Length() < _lightPos.Length()))
-             occluded++;
-           rays++;
-         }
-       }
-       double s = static_cast<double>(rays - occluded) /
-           static_cast<double>(rays);
-       std::cerr << "scale s: " << s << " [" << occluded << "/" << rays << "]" <<  std::endl;
-       return s;
-     };
+        double occlusionScale = 1.0;
+        if (lightPos.z >= 0.0)
+        {
+          occlusionScale = this->OcclusionScale(_camera,
+              Conversions::ConvertIgn(lightPos), this->lightWorldPos);
+        }
+        _pos = Conversions::ConvertIgn(lightPos);
+        _scale = occlusionScale;
+      }
+
+      /// \brief Get the lens flare position and scale for a wide angle camera
+      /// \param[in] _wideAngleCam Camera which the lens flare is added to
+      /// \param[out] _pos lens flare position in normalized device coordinates
+      /// \param[out] _scale Amount to scale the lens flare scale by.
+      /// Computed based on occlusion percentage
+      private: void WideAngleCameraPosScale(WideAngleCameraPtr _wideAngleCam,
+          ignition::math::Vector3d &_pos, double &_scale)
+      {
+        Ogre::Vector3 lightPos;
+        // create dummy camera for occlusion checking
+        // Needed so we can reuse Scene::FirstContact function which expects
+        // a gazebo camera object
+        std::vector<Ogre::Camera *> ogreEnvCameras =
+            _wideAngleCam->OgreEnvCameras();
+        if (!this->wideAngleDummyCamera)
+        {
+          // create camera with auto render set to false
+          // so it doesn't actually use up too much gpu resources
+          static unsigned int dummyCamId = 0;
+          std::string dummyCamName =
+              _wideAngleCam->Name() + "_lensflare_occlusion_" +
+              std::to_string(dummyCamId);
+          this->wideAngleDummyCamera =
+              _wideAngleCam->GetScene()->CreateCamera(
+              dummyCamName, false);
+
+          // set dummy camera properties based on env cam
+          Ogre::Camera *cam = ogreEnvCameras[0];
+          this->wideAngleDummyCamera->SetImageWidth(
+              cam->getViewport()->getActualWidth());
+          this->wideAngleDummyCamera->SetImageHeight(
+              cam->getViewport()->getActualHeight());
+          this->wideAngleDummyCamera->Init();
+          this->wideAngleDummyCamera->CreateRenderTexture(
+              dummyCamName + "_rtt");
+          this->wideAngleDummyCamera->SetAspectRatio(
+              cam->getAspectRatio());
+          // aspect ratio should be 1.0 so VFOV should equal to HFOV
+          this->wideAngleDummyCamera->SetHFOV(
+              ignition::math::Angle(cam->getFOVy().valueRadians()));
+          // reset camera orientation so we can set the exact world pose
+          // below when doing occlusion ray cast test
+          this->wideAngleDummyCamera->OgreCamera()->setOrientation(
+              Ogre::Quaternion::IDENTITY);
+          std::cerr << "set up ogre env camera====== " << std::endl;
+          auto c = this->wideAngleDummyCamera->OgreCamera();
+          std::cerr << "w: " << c->getViewport()->getActualWidth() << " vs " << cam->getViewport()->getActualWidth() << std::endl;
+          std::cerr << "h: " << c->getViewport()->getActualHeight() << " vs " << cam->getViewport()->getActualHeight() << std::endl;
+          std::cerr << "aspect: " << c->getAspectRatio() << " vs " << cam->getAspectRatio() << std::endl;
+          std::cerr << "fov: " << c->getFOVy().valueRadians() << " vs " << cam->getFOVy().valueRadians() << std::endl;
+        }
+
+        // project camera into screen space
+        double viewportWidth =
+            static_cast<double>(_wideAngleCam->ViewportWidth());
+        double viewportHeight =
+            static_cast<double>(_wideAngleCam->ViewportHeight());
+//        double aspect = viewportWidth / viewportHeight;
+        auto imagePos = _wideAngleCam->Project3d(this->lightWorldPos);
+
+        // convert to normalized device coordinates (needed by shaders)
+        // keep z for visibility test
+        lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
+        lightPos.y = 2.0 * (1.0 - (imagePos.Y() / viewportHeight) - 0.5);
+//        lightPos.y *= aspect;
+        // imagePos.Z() is the distance of point from camera optical center
+        // if it's > 1.0 than the point is outside of camera view
+        // but allow some tol to avoid sharp dropoff of lens flare at
+        // edge of image frame. tol = 0.75
+        lightPos.z = (imagePos.Z() > 1.75) ? -1 : 1;
+
+        std::cerr << "lightPos " << lightPos << std::endl;
+
+        // check occlusion and set scale
+        // loop through all env cameras and find the cam that sees the light
+        // ray cast using that env camera to see if the distance to closest
+        // intersection point is less than light's world pos
+        double occlusionScale = 1.0;
+        if (lightPos.z >= 0.0)
+        {
+          // loop through all env cameras
+          for (auto cam : ogreEnvCameras)
+          {
+            // project light world point to camera clip space.
+            auto viewProj = cam->getProjectionMatrix() * cam->getViewMatrix();
+            auto pos = viewProj *
+                Ogre::Vector4(Conversions::Convert(this->lightWorldPos));
+            pos.x /= pos.w;
+            pos.y /= pos.w;
+            // check if light is visible
+            if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
+            {
+              // check occlusion using this env camera
+              this->wideAngleDummyCamera->SetWorldPose(ignition::math::Pose3d(
+                  Conversions::ConvertIgn(cam->getDerivedPosition()),
+                  Conversions::ConvertIgn(cam->getDerivedOrientation())));
+//              std::cerr << "pos: " << this->wideAngleDummyCamera->OgreCamera()->getDerivedPosition() << " vs " << cam->getDerivedPosition() << std::endl;
+//              std::cerr << "orient : " << this->wideAngleDummyCamera->OgreCamera()->getDerivedOrientation() << " vs " << cam->getDerivedOrientation() << std::endl;
+
+//              std::cerr << "env cam idx: " << i << std::endl;
+//              std::cerr << "env cam img pos : " << pos << std::endl;
+              occlusionScale = this->OcclusionScale(
+                  this->wideAngleDummyCamera,
+                  ignition::math::Vector3d(pos.x, pos.y, pos.z),
+                  this->lightWorldPos);
+              break;
+            }
+          }
+        }
+        _pos = Conversions::ConvertIgn(lightPos);
+        _scale = occlusionScale;
+      }
+
+      /// \brief Check to see if the lensflare is occluded and return a scaling
+      /// factor for the lens flare that is proportional to its visibility
+      private: double OcclusionScale(CameraPtr _cam,
+                                     const ignition::math::Vector3d &_imgPos,
+                                     const ignition::math::Vector3d &_worldPos)
+      {
+        double viewportWidth =
+            static_cast<double>(_cam->ViewportWidth());
+        double viewportHeight =
+           static_cast<double>(_cam->ViewportHeight());
+        ignition::math::Vector2i screenPos;
+        screenPos.X() = ((_imgPos.X() / 2.0) + 0.5) * viewportWidth;
+        screenPos.Y() = (1 - ((_imgPos.Y() / 2.0) + 0.5)) * viewportHeight;
+
+//        std::cerr << "manual project " <<
+//            _cam->Project(ignition::math::Vector3d(100.0, 0.0, 40));
+
+//        std::cerr << "occlusion scale img center " << _imgPos << std::endl;
+//        std::cerr << "occlusion scale screen center " << screenPos << std::endl;
+        ScenePtr scene = _cam->GetScene();
+
+        // check center point
+        // if occluded than set scale to 0
+        ignition::math::Vector3d position;
+        bool intersect = scene->FirstContact(_cam, screenPos, position);
+        if (intersect && (position.Length() < _worldPos.Length()))
+        {
+          gzerr << "center occluded s: 0" << std::endl;
+//          return 0;
+        }
+
+        unsigned int rays = 0;
+        unsigned int occluded = 0u;
+        // work in normalized device coordinates
+        // lens flare's halfSize is just an approximated value
+        //double halfSize = 0.065;
+        double halfSize = 0.08;
+        double steps = 10;
+        double stepSize = halfSize * 2 / steps;
+        double cx = _imgPos.X();
+        double cy = _imgPos.Y();
+        double startx = cx - halfSize;
+        double starty = cy - halfSize;
+        double endx = cx + halfSize;
+        double endy = cy + halfSize;
+        // do sparse ray cast occlusion check
+        for (double i = starty; i < endy; i+=stepSize)
+        {
+          for (double j = startx; j < endx; j+=stepSize)
+          {
+            screenPos.X() = ((j / 2.0) + 0.5) * viewportWidth;
+            screenPos.Y() = (1 - ((i / 2.0) + 0.5)) * viewportHeight;
+            intersect = scene->FirstContact(_cam, screenPos, position);
+            if (intersect && (position.Length() < _worldPos.Length()))
+              occluded++;
+            rays++;
+          }
+        }
+        double s = static_cast<double>(rays - occluded) /
+            static_cast<double>(rays);
+        std::cerr << "scale s: " << s << " [" << occluded << "/" << rays << "]" <<  std::endl;
+        return s;
+      };
 
       /// \brief Pointer to camera
       private: CameraPtr camera;
 
+      /// \brief Dummy camera used by wide angle camera for occlusion checking
+      private: CameraPtr wideAngleDummyCamera;
+
       /// \brief Light dir in world frame
       private: ignition::math::Vector3d dir;
+
+      /// \brief Position of light in world frame
+      private: ignition::math::Vector3d lightWorldPos;
     };
 
     /// \brief Private data class for LensFlare
