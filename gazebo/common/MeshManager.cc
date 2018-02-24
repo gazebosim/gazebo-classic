@@ -30,6 +30,7 @@
 #include "gazebo/common/Mesh.hh"
 #include "gazebo/common/ColladaLoader.hh"
 #include "gazebo/common/ColladaExporter.hh"
+#include "gazebo/common/FBXLoader.hh"
 #include "gazebo/common/STLLoader.hh"
 #include "gazebo/common/OBJLoader.hh"
 #include "gazebo/gazebo_config.h"
@@ -43,6 +44,10 @@
 
 using namespace gazebo;
 using namespace common;
+
+// added here for ABI compatibility
+// TODO move to header / private class when merging forward.
+static FBXLoader fbxLoader;
 
 // added here for ABI compatibility
 // TODO move to header / private class when merging forward.
@@ -85,6 +90,7 @@ MeshManager::MeshManager()
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
   this->fileExtensions.push_back("obj");
+  this->fileExtensions.push_back("fbx");
 }
 
 //////////////////////////////////////////////////
@@ -143,6 +149,8 @@ const Mesh *MeshManager::Load(const std::string &_filename)
       loader = this->colladaLoader;
     else if (extension == "obj")
       loader = &objLoader;
+    else if (extension == "fbx")
+      loader = &fbxLoader;
     else
     {
       gzerr << "Unsupported mesh format for file[" << _filename << "]\n";

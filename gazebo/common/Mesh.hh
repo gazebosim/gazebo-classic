@@ -22,6 +22,7 @@
 
 #include <ignition/math/Vector3.hh>
 #include <ignition/math/Vector2.hh>
+#include <ignition/math/Matrix4.hh>
 
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/math/Vector2d.hh"
@@ -419,6 +420,9 @@ namespace gazebo
       /// \brief Move all vertices by _vec.
       /// \param[in] _vec Amount to translate vertices.
       public: void Translate(const ignition::math::Vector3d &_vec);
+
+      public: void Rotate(const ignition::math::Vector3d &_vec);
+      public: void Transform(const ignition::math::Matrix4d &_mat);
 
       /// \brief Scale all vertices by the _factor vector
       /// \param[in] _factor Scaling vector
