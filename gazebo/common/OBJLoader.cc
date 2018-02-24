@@ -103,7 +103,7 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         subMeshMatId[id] = subMesh.get();
 
         Material *mat = nullptr;
-        if (id > 0 && static_cast<size_t>(id) < materials.size())
+        if (id >= 0 && static_cast<size_t>(id) < materials.size())
         {
           tinyobj::material_t &m = materials[id];
           if (materialIds.find(m.name) != materialIds.end())
