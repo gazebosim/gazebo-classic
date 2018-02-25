@@ -10,6 +10,13 @@
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
 
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+
 ## Gazebo 8.3.0 (2018-02-10)
 
 1. Add support for Actor collisions.
@@ -556,7 +563,16 @@
 
 ## Gazebo 7
 
-## Gazebo 7.x.x (2018-xx-xx)
+## Gazebo 7.XX.X (2018-XX-XX)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+
+## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
     * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
