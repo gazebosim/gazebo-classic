@@ -21,7 +21,6 @@
 #endif
 
 #include <functional>
-#include <limits>
 #include <boost/bind.hpp>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Time.hh"
@@ -492,12 +491,6 @@ void SensorManager::SensorContainer::RunLoop()
   // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
 
-  // During log playback, time can jump forward an arbitrary amount.
-  if (util::LogPlay::Instance()->IsOpen())
-  {
-    maxSensorUpdate = std::numeric_limits<double>::max();
-  }
-
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
 
@@ -556,19 +549,20 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    if (diffTime.sec >= maxSensorUpdate)
+    // During log playback, time can jump forward an arbitrary amount.
+    if (diffTime.sec >= maxSensorUpdate && !util::LogPlay::Instance()->IsOpen())
     {
-        gzerr << "Took over 1000*max_step_size to update a sensor "
-          << "(took " << diffTime.sec << " sec, which is more than "
-          << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
-        return;
+      gzwarn << "Took over 1000*max_step_size to update a sensor "
+        << "(took " << diffTime.sec << " sec, which is more than "
+        << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
+      return;
     }
 
     // Make sure eventTime is not negative.
     if (eventTime < common::Time::Zero)
     {
-        gzerr << "Time to next sensor update is negative." << std::endl;
-        return;
+      gzerr << "Time to next sensor update is negative." << std::endl;
+      return;
     }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
