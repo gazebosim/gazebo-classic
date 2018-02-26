@@ -63,7 +63,7 @@ GUIExampleSpawnWidget::GUIExampleSpawnWidget()
 
   // Position and resize this widget
   this->move(10, 10);
-  this->resize(120, 30);
+  this->resize(120, 40);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());

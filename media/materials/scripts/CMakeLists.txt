@@ -21,6 +21,7 @@ ssao.compositor
 ssao.material
 VPL.material
 VPL.program
+deform.material
 WideCameraLensMap.compositor
 )
 

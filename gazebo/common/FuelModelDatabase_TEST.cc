@@ -59,7 +59,7 @@ TEST(FuelModelDatabaseTest, FuelDown)
   // We now wait for a while unless the callback is executed and wake us up.
   std::unique_lock<std::mutex> lk(mutex);
   auto now = std::chrono::system_clock::now();
-  EXPECT_TRUE(cv.wait_until(lk, now + std::chrono::milliseconds(100),
+  EXPECT_TRUE(cv.wait_until(lk, now + std::chrono::milliseconds(200),
     [&cbExecuted]
     {
       return cbExecuted;
