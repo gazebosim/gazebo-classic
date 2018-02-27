@@ -152,13 +152,8 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->SetCaptureData(true);
 
     // initialize GpuLaser from sdf
-    if (this->dataPtr->vertRayCount == 1)
-    {
-      this->dataPtr->vertRangeCount = 1;
-      this->dataPtr->laserCam->SetIsHorizontal(true);
-    }
-    else
-      this->dataPtr->laserCam->SetIsHorizontal(false);
+    // assume horizontal sweep (rotation around z axis) like cpu ray sensor
+    this->dataPtr->laserCam->SetIsHorizontal(true);
 
     this->dataPtr->rangeCountRatio =
       this->dataPtr->horzRangeCount / this->dataPtr->vertRangeCount;
@@ -166,16 +161,12 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->SetNearClip(this->RangeMin());
     this->dataPtr->laserCam->SetFarClip(this->RangeMax());
 
+    // horizontal laser setup
     this->dataPtr->laserCam->SetHorzFOV(
         (this->AngleMax() - this->AngleMin()).Radian());
-    this->dataPtr->laserCam->SetVertFOV(
-        (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian());
 
     this->dataPtr->laserCam->SetHorzHalfAngle(
       (this->AngleMax() + this->AngleMin()).Radian() / 2.0);
-
-    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
-            + this->VerticalAngleMin()).Radian() / 2.0);
 
     if (this->HorzFOV() > 2 * M_PI)
       this->dataPtr->laserCam->SetHorzFOV(2*M_PI);
@@ -201,15 +192,14 @@ void GpuRaySensor::Init()
       vfov = M_PI / 2;
       gzwarn << "Vertical FOV for block GPU laser is capped at 90 degrees.\n";
     }
-
     this->dataPtr->laserCam->SetVertFOV(vfov);
+    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
+             + this->VerticalAngleMin()).Radian() / 2.0);
+
     this->SetVerticalAngleMin(this->dataPtr->laserCam->VertHalfAngle() -
                               (vfov / 2));
     this->SetVerticalAngleMax(this->dataPtr->laserCam->VertHalfAngle() +
                               (vfov / 2));
-
-    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
-            + this->VerticalAngleMin()).Radian() / 2.0);
 
     if ((this->dataPtr->horzRayCount * this->dataPtr->vertRayCount) <
         (this->dataPtr->horzRangeCount * this->dataPtr->vertRangeCount))
@@ -220,61 +210,34 @@ void GpuRaySensor::Init()
         std::max(this->dataPtr->vertRayCount, this->dataPtr->vertRangeCount);
     }
 
-    if (this->dataPtr->laserCam->IsHorizontal())
+    // If vertical ray is not 1 adjust horizontal and vertical FOV and
+    // ray count to maintain aspect ratio
+    // NOTE we assume gpu ray sensor does a horizontal sweep like ray sensor
+    // Vertical sweeps can be achieved by rotating the gpu ray sensor.
+    if (this->dataPtr->vertRayCount > 1)
     {
-      if (this->dataPtr->vertRayCount > 1)
-      {
-        this->dataPtr->laserCam->SetCosHorzFOV(
-          2 * atan(tan(this->HorzFOV()/2) / cos(this->VertFOV()/2)));
-        this->dataPtr->laserCam->SetCosVertFOV(this->VertFOV());
-        this->dataPtr->laserCam->SetRayCountRatio(
-          tan(this->CosHorzFOV()/2.0) / tan(this->VertFOV()/2.0));
+      this->dataPtr->laserCam->SetCosHorzFOV(
+        2 * atan(tan(this->HorzFOV()/2) / cos(this->VertFOV()/2)));
+      this->dataPtr->laserCam->SetCosVertFOV(this->VertFOV());
+      this->dataPtr->laserCam->SetRayCountRatio(
+        tan(this->CosHorzFOV()/2.0) / tan(this->VertFOV()/2.0));
 
-        if ((this->dataPtr->horzRayCount / this->RayCountRatio()) >
-            this->dataPtr->vertRayCount)
-        {
-          this->dataPtr->vertRayCount =
-            this->dataPtr->horzRayCount / this->RayCountRatio();
-        }
-        else
-        {
-          this->dataPtr->horzRayCount =
-            this->dataPtr->vertRayCount * this->RayCountRatio();
-        }
+      if ((this->dataPtr->horzRayCount / this->RayCountRatio()) >
+          this->dataPtr->vertRayCount)
+      {
+        this->dataPtr->vertRayCount =
+          this->dataPtr->horzRayCount / this->RayCountRatio();
       }
       else
       {
-        this->dataPtr->laserCam->SetCosHorzFOV(this->HorzFOV());
-        this->dataPtr->laserCam->SetCosVertFOV(this->VertFOV());
+        this->dataPtr->horzRayCount =
+          this->dataPtr->vertRayCount * this->RayCountRatio();
       }
     }
     else
     {
-      if (this->dataPtr->horzRayCount > 1)
-      {
-        this->dataPtr->laserCam->SetCosHorzFOV(this->HorzFOV());
-        this->dataPtr->laserCam->SetCosVertFOV(
-          2 * atan(tan(this->VertFOV()/2) / cos(this->HorzFOV()/2)));
-        this->dataPtr->laserCam->SetRayCountRatio(
-          tan(this->HorzFOV()/2.0) / tan(this->CosVertFOV()/2.0));
-
-        if ((this->dataPtr->horzRayCount / this->RayCountRatio()) >
-            this->dataPtr->vertRayCount)
-        {
-          this->dataPtr->vertRayCount =
-            this->dataPtr->horzRayCount / this->RayCountRatio();
-        }
-        else
-        {
-          this->dataPtr->horzRayCount = this->dataPtr->vertRayCount *
-            this->RayCountRatio();
-        }
-      }
-      else
-      {
-        this->dataPtr->laserCam->SetCosHorzFOV(this->HorzFOV());
-        this->dataPtr->laserCam->SetCosVertFOV(this->VertFOV());
-      }
+      this->dataPtr->laserCam->SetCosHorzFOV(this->HorzFOV());
+      this->dataPtr->laserCam->SetCosVertFOV(this->VertFOV());
     }
 
     // Initialize camera sdf for GpuLaser
@@ -295,7 +258,6 @@ void GpuRaySensor::Init()
 
     // Load camera sdf for GpuLaser
     this->dataPtr->laserCam->Load(this->dataPtr->cameraElem);
-
 
     // initialize GpuLaser
     this->dataPtr->laserCam->Init();
