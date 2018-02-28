@@ -68,7 +68,7 @@ TimePanel::TimePanel(QWidget *_parent)
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->WaitForInit(common::Time::Maximum());
 
   this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
       "~/world_stats", &TimePanel::OnStats, this);

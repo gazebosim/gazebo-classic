@@ -87,29 +87,35 @@ void Node::Init(const std::string &_space)
     return;
   }
 
-  this->topicNamespace = _space;
+  if (_space.empty() && this->WaitForInit())
+    return;
 
-  if (_space.empty())
+  this->topicNamespace = _space.empty()? "default" : _space;
+
+  TopicManager::Instance()->RegisterTopicNamespace(this->topicNamespace);
+  TopicManager::Instance()->AddNode(shared_from_this());
+  this->initialized = true;
+}
+
+//////////////////////////////////////////////////
+bool Node::WaitForInit(const common::Time &_maxWait)
+{
+  if (!transport::waitForNamespaces(_maxWait))
   {
-    this->topicNamespace = "default";
-
-    // wait at most 1 second for namespaces to appear.
-    if (transport::waitForNamespaces(common::Time(1, 0)))
-    {
-      std::list<std::string> namespaces;
-      TopicManager::Instance()->GetTopicNamespaces(namespaces);
-      this->topicNamespace = namespaces.empty() ? this->topicNamespace :
-        namespaces.front();
-    }
-    else
-      gzerr << "No namespace found\n";
+    gzerr << "No namespaces found\n";
+    return false;
   }
-  else
-    TopicManager::Instance()->RegisterTopicNamespace(_space);
+
+  // If waitForNamespaces succeeded, then we are guaranteed to have at least one
+  // namespace in the list.
+  std::list<std::string> namespaces;
+  TopicManager::Instance()->GetTopicNamespaces(namespaces);
+  this->topicNamespace = namespaces.front();
 
   TopicManager::Instance()->AddNode(shared_from_this());
-
   this->initialized = true;
+
+  return true;
 }
 
 //////////////////////////////////////////////////

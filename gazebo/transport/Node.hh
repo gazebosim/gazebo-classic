@@ -86,9 +86,20 @@ namespace gazebo
 
       /// \brief Init the node
       /// \param[in] _space Set the global namespace of all topics. If left
-      ///              blank, the topic will initialize to the first
-      ///              namespace on the Master
+      /// blank, the topic will initialize to the first namespace on the Master,
+      /// which is the same behavior as calling WaitForInit().
       public: void Init(const std::string &_space ="");
+
+      /// \brief Init the node to use the global namespace, and specify the
+      /// maximum wait time.
+      /// \param[in] _maxWait The maximum amount of time to wait for the Node to
+      /// initialize. The initialization might be delayed while waiting for
+      /// namespaces to be found. The default is 1 second.
+      /// \return True if a global namespace was found, and this node has been
+      /// initialized to it. False if a global namespace was not found (the node
+      /// will not be initialized in that case).
+      public: bool WaitForInit(
+        const common::Time &_maxWait = common::Time(1, 0));
 
       /// \brief Finalize the node
       public: void Fini();

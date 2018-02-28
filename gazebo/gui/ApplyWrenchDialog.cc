@@ -384,7 +384,7 @@ ApplyWrenchDialog::ApplyWrenchDialog(QWidget *_parent)
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->WaitForInit(common::Time::Maximum());
 
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");

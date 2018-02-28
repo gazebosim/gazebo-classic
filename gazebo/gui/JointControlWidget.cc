@@ -309,7 +309,7 @@ JointControlWidget::JointControlWidget(QWidget *_parent)
 
   this->setWindowTitle("Joint Control");
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->WaitForInit(common::Time::Maximum());
 
   this->dataPtr->tabWidget = new QTabWidget;
   this->dataPtr->tabWidget->setObjectName("embeddedTab");

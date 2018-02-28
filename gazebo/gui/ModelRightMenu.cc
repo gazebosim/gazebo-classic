@@ -143,7 +143,7 @@ ModelRightMenu::ModelRightMenu()
 bool ModelRightMenu::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->WaitForInit(common::Time::Maximum());
   this->requestSub = this->node->Subscribe("~/request",
       &ModelRightMenu::OnRequest, this);
 
