@@ -105,7 +105,7 @@
     <plugin name="alignmentDrillScrew_1" filename="libMisalignmentPlugin.so">
       <namespace>gazebo/default/drill/alignment_1/</namespace>
       <pose frame="drill::link">-0.004 0.135 0.239 0 -0.1 1.570796</pose>
-      <pose frame="Mailbox::link">.06 -0.1 0.798 0 0 3.14159</pose>
+      <pose>1.06 -0.1 0.798 0 0 3.14159</pose>
       <enable>true</enable>
     </plugin>
     <plugin name="alignmentDrillScrew_2" filename="libMisalignmentPlugin.so">
