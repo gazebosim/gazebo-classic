@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent widget.
-      public: PlotCanvas(QWidget *_parent);
+      public: explicit PlotCanvas(QWidget *_parent);
 
       /// \brief Destructor.
       public: virtual ~PlotCanvas();

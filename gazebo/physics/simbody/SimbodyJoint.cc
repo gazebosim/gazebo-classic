@@ -457,6 +457,15 @@ ignition::math::Vector3d SimbodyJoint::Anchor(
 }
 
 //////////////////////////////////////////////////
+bool SimbodyJoint::SetPosition(
+    const unsigned int /*_index*/, const double /*_position*/,
+    const bool /*_preserveWorldVelocity*/)
+{
+  gzerr << "Joint::SetPosition is not available for Simbody\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
 ignition::math::Vector3d SimbodyJoint::LinkForce(
           const unsigned int /*_index*/) const
 {

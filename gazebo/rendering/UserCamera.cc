@@ -15,6 +15,7 @@
  *
 */
 #include <boost/bind.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -649,8 +650,9 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    auto const &ignBgColor = this->scene->BackgroundColor();
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBgColor));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);

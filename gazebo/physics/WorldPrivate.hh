@@ -110,8 +110,11 @@ namespace gazebo
       /// \brief Publisher for gui messages.
       public: transport::PublisherPtr guiPub;
 
-      /// \brief Publisher for light messages.
+      /// \brief Publisher for light modify messages.
       public: transport::PublisherPtr lightPub;
+
+      /// \brief Publisher for light factory messages.
+      public: transport::PublisherPtr lightFactoryPub;
 
       /// \brief Publisher for pose messages.
       public: transport::PublisherPtr posePub;
@@ -187,8 +190,11 @@ namespace gazebo
       /// World::SetPaused to assign world::pause
       public: std::recursive_mutex worldUpdateMutex;
 
-      /// \brief THe world's SDF values.
+      /// \brief The world's current SDF description.
       public: sdf::ElementPtr sdf;
+
+      /// \brief The world description when it was first loaded.
+      public: sdf::ElementPtr initialSdf;
 
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
@@ -210,6 +216,9 @@ namespace gazebo
 
       /// \brief Light modify message buffer.
       public: std::list<msgs::Light> lightModifyMsgs;
+
+      /// \brief Playback control message buffer.
+      public: std::list<msgs::LogPlaybackControl> playbackControlMsgs;
 
       /// \brief True to reset the world on next update.
       public: bool needsReset;
@@ -261,6 +270,10 @@ namespace gazebo
 
       /// \brief Buffer of prev states
       public: WorldState prevStates[2];
+
+      /// \brief Previous unfiltered state. Used for determining insertions
+      /// and deletions
+      public: WorldState prevUnfilteredState;
 
       /// \brief Int used to toggle between prevStates
       public: int stateToggle;
@@ -342,6 +355,9 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief Simulation time of the last log state captured.
+      public: gazebo::common::Time logLastStateTime;
 
       /// \brief URI of this world.
       public: common::URI uri;

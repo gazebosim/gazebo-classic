@@ -351,7 +351,6 @@ void RenderEngine::Fini()
   // TODO: this was causing a segfault. Need to debug, and put back in
   if (this->dataPtr->root)
   {
-    this->dataPtr->root->shutdown();
     /*const Ogre::Root::PluginInstanceList ll =
      this->dataPtr->root->getInstalledPlugins();
 
@@ -419,20 +418,17 @@ void RenderEngine::LoadPlugins()
     std::vector<std::string>::iterator piter;
 
 #ifdef __APPLE__
-    std::string prefix = "lib";
     std::string extension = ".dylib";
 #elif defined(_WIN32)
-    std::string prefix = "";
     std::string extension = ".dll";
 #else
-    std::string prefix = "";
     std::string extension = ".so";
 #endif
 
-    plugins.push_back(path+"/"+prefix+"RenderSystem_GL");
-    plugins.push_back(path+"/"+prefix+"Plugin_ParticleFX");
-    plugins.push_back(path+"/"+prefix+"Plugin_BSPSceneManager");
-    plugins.push_back(path+"/"+prefix+"Plugin_OctreeSceneManager");
+    plugins.push_back(path+"/RenderSystem_GL");
+    plugins.push_back(path+"/Plugin_ParticleFX");
+    plugins.push_back(path+"/Plugin_BSPSceneManager");
+    plugins.push_back(path+"/Plugin_OctreeSceneManager");
 
 #ifdef HAVE_OCULUS
     plugins.push_back(path+"/Plugin_CgProgramManager");
@@ -564,7 +560,6 @@ void RenderEngine::SetupResources()
 
   std::list<std::string> mediaDirs;
   mediaDirs.push_back("media");
-  mediaDirs.push_back("Media");
 
   for (iter = paths.begin(); iter != paths.end(); ++iter)
   {
@@ -587,6 +582,10 @@ void RenderEngine::SetupResources()
           std::make_pair(prefix, "General"));
       archNames.push_back(
           std::make_pair(prefix + "/skyx", "SkyX"));
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0) && !defined(__APPLE__))
+      archNames.push_back(
+          std::make_pair(prefix + "/rtshaderlib150", "General"));
+#endif
       archNames.push_back(
           std::make_pair(prefix + "/rtshaderlib", "General"));
       archNames.push_back(
@@ -612,19 +611,19 @@ void RenderEngine::SetupResources()
       archNames.push_back(
           std::make_pair(prefix + "/gui/animations", "Animations"));
     }
+  }
 
-    for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  for (aiter = archNames.begin(); aiter != archNames.end(); ++aiter)
+  {
+    try
     {
-      try
-      {
-        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-            aiter->first, "FileSystem", aiter->second);
-      }
-      catch(Ogre::Exception &/*_e*/)
-      {
-        gzthrow("Unable to load Ogre Resources. Make sure the resources path "
-            "in the world file is set correctly.");
-      }
+      Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
+          aiter->first, "FileSystem", aiter->second);
+    }
+    catch(Ogre::Exception &/*_e*/)
+    {
+      gzthrow("Unable to load Ogre Resources. Make sure the resources path "
+          "in the world file is set correctly.");
     }
   }
 }

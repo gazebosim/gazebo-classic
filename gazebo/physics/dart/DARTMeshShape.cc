@@ -61,6 +61,7 @@ void DARTMeshShape::Init()
 {
   MeshShape::Init();
 
+
   if (this->submesh)
   {
     this->dataPtr->dartMesh->Init(this->submesh,
@@ -69,6 +70,11 @@ void DARTMeshShape::Init()
   }
   else
   {
+    if (!this->mesh)
+    {
+      gzerr << "No DART mesh specified\n";
+      return;
+    }
     this->dataPtr->dartMesh->Init(this->mesh,
         boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent),
         this->sdf->Get<ignition::math::Vector3d>("scale"));

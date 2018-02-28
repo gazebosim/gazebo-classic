@@ -5,6 +5,8 @@ ambient_one_texture_vp.glsl
 blur.glsl
 camera_distortion_map_fs.glsl
 camera_distortion_map_vs.glsl
+camera_lens_flare_fs.glsl
+camera_lens_flare_vs.glsl
 camera_noise_gaussian_fs.glsl
 camera_noise_gaussian_vs.glsl
 depth_map.frag
@@ -35,6 +37,8 @@ shadow_caster_fp.glsl
 shadow_caster_vp.glsl
 spot_shadow_receiver_fp.glsl
 spot_shadow_receiver_vp.glsl
+deform_fp.glsl
+deform_vp.glsl
 wide_lens_map_fp.glsl
 wide_lens_map_vs.glsl
 )

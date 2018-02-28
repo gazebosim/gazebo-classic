@@ -26,9 +26,11 @@
 #include <string.h>
 #include <math.h>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -730,8 +732,9 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
+    auto const &ignDiffuse = directionalLight->DiffuseColor();
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->DiffuseColor()));
+        Conversions::Convert(ignDiffuse));
   }
   else
   {
@@ -3265,9 +3268,9 @@ Ogre::MaterialPtr TerrainMaterial::Profile::generate(
       Ogre::Vector4 splitPoints;
       const Ogre::PSSMShadowCameraSetup::SplitPointList& splitPointList =
           pssm->getSplitPoints();
-      // populate from split point 1 not 0
-      for (unsigned int t = 1u; t < numTextures; ++t)
-        splitPoints[t-1] = splitPointList[t];
+      // populate from split point 1 not 0, and include shadowFarDistance
+      for (unsigned int t = 0u; t < numTextures; ++t)
+        splitPoints[t] = splitPointList[t+1];
       params->setNamedConstant("pssmSplitPoints", splitPoints);
 
       // set up uv transform

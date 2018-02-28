@@ -235,7 +235,7 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() == "End of file")
+                  if (_e.value() == boost::asio::error::eof)
                     this->isOpen = false;
                 }
                 else
@@ -295,7 +295,7 @@ namespace gazebo
               {
                 if (_e)
                 {
-                  if (_e.message() == "End of file")
+                  if (_e.value() == boost::asio::error::eof)
                     this->isOpen = false;
                 }
 
@@ -341,6 +341,10 @@ namespace gazebo
       /// environment variable.
       /// \return GAZEBO_IP_WHITE_LIST
       public: std::string GetIPWhiteList() const;
+
+      /// \brief Post write.
+      /// Called afer a write is finished.
+      private: void PostWrite();
 
       /// \brief Callback when a write has occurred.
       /// \param[in] _e Error code
@@ -388,8 +392,9 @@ namespace gazebo
 
       /// \brief List of callbacks, paired with writeQueue. The callbacks
       /// are used to notify a publisher when a message is successfully sent.
-      private: std::deque<
-               std::pair<boost::function<void(uint32_t)>, uint32_t> > callbacks;
+      private: std::deque< std::vector<
+               std::pair<boost::function<void(uint32_t)>, uint32_t> > >
+                 callbacks;
 
       /// \brief Mutex to protect new connections.
       private: boost::mutex connectMutex;
@@ -454,15 +459,8 @@ namespace gazebo
       /// \brief Comma separated list of valid IP addresses.
       private: std::string ipWhiteList;
 
-      /// \brief Buffer for header information.
-      private: char *headerBuffer;
-
       /// \brief Used to prevent too many log messages.
       private: bool dropMsgLogged;
-
-      /// \brief Index into the callbacks buffer that marks the last
-      /// async_write.
-      private: unsigned int callbackIndex;
 
       /// \brief True if the connection is open.
       private: bool isOpen;

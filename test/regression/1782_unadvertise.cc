@@ -15,7 +15,6 @@
  *
 */
 
-#include <unistd.h>
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
