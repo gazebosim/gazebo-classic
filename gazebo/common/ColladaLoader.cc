@@ -1888,7 +1888,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // Get the vertex texcoord index value. If the texcoord is a
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
-            unsigned int remappedTexcoordIndex = values[*inputs[TEXCOORD].begin()];
+            unsigned int remappedTexcoordIndex =
+                values[*inputs[TEXCOORD].begin()];
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -1950,7 +1951,8 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasTexcoords)
       {
-        unsigned int inputRemappedTexcoordIndex = values[*inputs[TEXCOORD].begin()];
+        unsigned int inputRemappedTexcoordIndex =
+            values[*inputs[TEXCOORD].begin()];
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
