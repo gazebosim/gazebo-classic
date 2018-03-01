@@ -2547,7 +2547,7 @@ void ModelListWidget::InitTransport(const std::string &_name)
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   if (_name.empty())
-    this->dataPtr->node->WaitForInit(common::Time::Maximum());
+    this->dataPtr->node->TryInit(common::Time::Maximum());
   else
     this->dataPtr->node->Init(_name);
 

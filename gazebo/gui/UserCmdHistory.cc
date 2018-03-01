@@ -45,7 +45,7 @@ UserCmdHistory::UserCmdHistory()
 
   // Pub / sub
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->WaitForInit(common::Time::Maximum());
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->undoRedoPub =
       this->dataPtr->node->Advertise<msgs::UndoRedo>("~/undo_redo");

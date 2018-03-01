@@ -134,7 +134,7 @@ void ModelSnap::Init()
   this->dataPtr->updateMutex = new boost::recursive_mutex();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->WaitForInit(common::Time::Maximum());
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 

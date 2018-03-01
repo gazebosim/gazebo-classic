@@ -85,20 +85,27 @@ namespace gazebo
       public: virtual ~Node();
 
       /// \brief Init the node
-      /// \param[in] _space Set the global namespace of all topics. If left
-      /// blank, the topic will initialize to the first namespace on the Master,
-      /// which is the same behavior as calling WaitForInit().
+      /// \param[in] _space Set the namespace of this topic. If this is the
+      /// first Node initialized, then this namespace will become the global
+      /// namespace. If left blank, the topic will initialize to the first
+      /// namespace on the Master. If the Master does not have any namespaces
+      /// within 1 second of calling this function, the Node will be initialized
+      /// with a namespace of "default".
+      /// \sa TryInit()
       public: void Init(const std::string &_space ="");
 
-      /// \brief Init the node to use the global namespace, and specify the
-      /// maximum wait time.
+      /// \brief Try to initialize the node to use the global namespace, and
+      /// specify the maximum wait time. If a global namespace is not available
+      /// by the time a duration of _maxWait has transpired, this will return
+      /// false, and the Node will not be initialized.
       /// \param[in] _maxWait The maximum amount of time to wait for the Node to
       /// initialize. The initialization might be delayed while waiting for
       /// namespaces to be found. The default is 1 second.
       /// \return True if a global namespace was found, and this node has been
       /// initialized to it. False if a global namespace was not found (the node
       /// will not be initialized in that case).
-      public: bool WaitForInit(
+      /// \sa Init()
+      public: bool TryInit(
         const common::Time &_maxWait = common::Time(1, 0));
 
       /// \brief Finalize the node
@@ -336,6 +343,21 @@ namespace gazebo
       /// \param[in] _topic Name of the topic.
       /// \param[in] _id Id of the callback.
       public: void RemoveCallback(const std::string &_topic, unsigned int _id);
+
+      /// \internal
+      /// \brief Private implementation of Init() and TryInit()
+      /// \param[in] _space Namespace to initialize this Node to. Use an empty
+      /// string to have the namespace inferred.
+      /// \param[in] _maxWait Maximum amount of time to wait for a namespace if
+      /// _space is left blank.
+      /// \param[in] _fallbackToDefault If true, after _maxWait passes without a
+      /// global namespace appearing, the Node will be initialized to have a
+      /// namespace of "default".
+      /// \return True if this Node is initialized upon returning from this
+      /// function.
+      private: bool PrivateInit(const std::string &_space,
+                                const common::Time &_maxWait,
+                                const bool _fallbackToDefault);
 
       private: std::string topicNamespace;
       private: std::vector<PublisherPtr> publishers;

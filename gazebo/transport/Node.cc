@@ -79,43 +79,13 @@ void Node::Fini()
 /////////////////////////////////////////////////
 void Node::Init(const std::string &_space)
 {
-  // Don't initialize twice.
-  if (this->initialized)
-  {
-    gzerr << "Node is already initialized, skipping Init."
-          << "This shouldn't happen...so fix it.\n";
-    return;
-  }
-
-  if (_space.empty() && this->WaitForInit())
-    return;
-
-  this->topicNamespace = _space.empty()? "default" : _space;
-
-  TopicManager::Instance()->RegisterTopicNamespace(this->topicNamespace);
-  TopicManager::Instance()->AddNode(shared_from_this());
-  this->initialized = true;
+  this->PrivateInit(_space, common::Time(1, 0), true);
 }
 
 //////////////////////////////////////////////////
-bool Node::WaitForInit(const common::Time &_maxWait)
+bool Node::TryInit(const common::Time &_maxWait)
 {
-  if (!transport::waitForNamespaces(_maxWait))
-  {
-    gzerr << "No namespaces found\n";
-    return false;
-  }
-
-  // If waitForNamespaces succeeded, then we are guaranteed to have at least one
-  // namespace in the list.
-  std::list<std::string> namespaces;
-  TopicManager::Instance()->GetTopicNamespaces(namespaces);
-  this->topicNamespace = namespaces.front();
-
-  TopicManager::Instance()->AddNode(shared_from_this());
-  this->initialized = true;
-
-  return true;
+  return this->PrivateInit("", _maxWait, false);
 }
 
 //////////////////////////////////////////////////
@@ -361,4 +331,57 @@ void Node::RemoveCallback(const std::string &_topic, unsigned int _id)
       }
     }
   }
+}
+
+/////////////////////////////////////////////////
+bool Node::PrivateInit(const std::string &_space,
+                       const common::Time &_maxWait,
+                       const bool _fallbackToDefault)
+{
+  if (this->initialized)
+  {
+    gzerr << "Node is already initialized, skipping initialization. "
+          << "This shouldn't happen... so fix it.\n";
+
+    // If the Node is already initialized, return true in order to match the
+    // function description.
+    return true;
+  }
+
+  // Clearing the topicNamespace field shouldn't affect anything, but let's make
+  // sure that the assumption made later in this function is valid.
+  this->topicNamespace.clear();
+
+  if (_space.empty())
+  {
+    if (transport::waitForNamespaces(_maxWait))
+    {
+      // If waitForNamespaces succeeded, then we are guaranteed to have at least
+      // one namespace in the list.
+      std::list<std::string> namespaces;
+      TopicManager::Instance()->GetTopicNamespaces(namespaces);
+      this->topicNamespace = namespaces.front();
+    }
+    else
+    {
+      gzerr << "No namespaces found\n";
+
+      // If we're coming here from TryInit(), then quit right away.
+      if (!_fallbackToDefault)
+        return false;
+    }
+  }
+
+  // If the topic namespace field is empty, then either a global namespace was
+  // not found, or we want a specific namespace for this Node.
+  if (this->topicNamespace.empty())
+  {
+    this->topicNamespace = _space.empty() ? "default" : _space;
+    TopicManager::Instance()->RegisterTopicNamespace(this->topicNamespace);
+  }
+
+  TopicManager::Instance()->AddNode(shared_from_this());
+  this->initialized = true;
+
+  return true;
 }
