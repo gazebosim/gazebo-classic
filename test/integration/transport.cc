@@ -765,22 +765,23 @@ TEST_F(TransportTest, Errors)
 /////////////////////////////////////////////////
 TEST_F(TransportTest, TryInit)
 {
-  // Create a Node and ensure that it's initialized
-  transport::NodePtr node1 = transport::NodePtr(new transport::Node);
-  node1->Init();
+  // If the ConnectionManager has not been initialized, then TryInit() is
+  // certain to fail.
+  transport::NodePtr node = transport::NodePtr(new transport::Node);
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_FALSE(node->TryInit(common::Time(0.01)));
+  EXPECT_FALSE(node->IsInitialized());
 
-  // Create a Node and perform a TryInit() on it. Since we already have an
-  // initialized Node, it should be guaranteed to succeed.
-  transport::NodePtr node2 = transport::NodePtr(new transport::Node);
-  EXPECT_TRUE(node2->TryInit(common::Time(0.01)));
+  // Loading the server will initialize the ConnectionManager
+  this->Load("worlds/empty.world");
 
-  // Note: We cannot guarantee that the namespace of node2 will match node1,
-  // because the test might get run on machine where a Node outside of this test
-  // already initialized to a different namespace, in which case node2 will use
-  // that namespace instead.
-  //
-  // We also cannot reliably test the failure mode of TryInit(), because we
-  // cannot ensure that no other Nodes are running outside of this test.
+  // The server will initialize some Nodes, so a namespace will be available now
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_TRUE(node->TryInit(common::Time(0.01)));
+  EXPECT_TRUE(node->IsInitialized());
+
+  // The namespace of the Node should match the name of the world that we loaded
+  EXPECT_EQ(physics::get_world()->GetName(), node->GetTopicNamespace());
 }
 
 /////////////////////////////////////////////////

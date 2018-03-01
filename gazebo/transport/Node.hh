@@ -108,6 +108,12 @@ namespace gazebo
       public: bool TryInit(
         const common::Time &_maxWait = common::Time(1, 0));
 
+      /// \brief Check if this Node has been initialized.
+      /// \return True if initialized, otherwise false
+      /// \sa Init()
+      /// \sa TryInit()
+      public: bool IsInitialized() const;
+
       /// \brief Finalize the node
       public: void Fini();
 

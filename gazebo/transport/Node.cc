@@ -89,6 +89,12 @@ bool Node::TryInit(const common::Time &_maxWait)
 }
 
 //////////////////////////////////////////////////
+bool Node::IsInitialized() const
+{
+  return this->initialized;
+}
+
+//////////////////////////////////////////////////
 std::string Node::GetTopicNamespace() const
 {
   return this->topicNamespace;
@@ -360,6 +366,9 @@ bool Node::PrivateInit(const std::string &_space,
       // one namespace in the list.
       std::list<std::string> namespaces;
       TopicManager::Instance()->GetTopicNamespaces(namespaces);
+
+      GZ_ASSERT(!namespaces.empty(),
+                "It should not be possible for namespaces to be empty here");
       this->topicNamespace = namespaces.front();
     }
     else
