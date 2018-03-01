@@ -194,8 +194,6 @@ void Publisher::SendMessage()
     for (std::list<MessagePtr>::iterator iter = localBuffer.begin();
         iter != localBuffer.end(); ++iter, ++pubIter)
     {
-#define TEMP_NEW_APPROACH_TEST
-#ifdef TEMP_NEW_APPROACH_TEST
       // Expected number of calls to the callback function
       // Publisher::OnPublishComplete() triggered by subscriber callbacks.
       // If there are no subscriber callbacks, OnPublishComplete()
@@ -212,7 +210,6 @@ void Publisher::SendMessage()
         // this counter.
         this->pubIds[*pubIter] = std::max(1, expRemoteCalls);
       }
-#endif
 
       // Send the latest message.
       // The result will be the number of calls to OnPublishComplete()
@@ -223,7 +220,6 @@ void Publisher::SendMessage()
       int result = this->publication->Publish(*iter,
           boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
 
-#ifdef TEMP_NEW_APPROACH_TEST
       // It is possible that OnPublishComplete() was called less times than
       // initially expected, which happens when a callback of the
       // transport::Publication was found invalid and deleted. In this case
@@ -251,12 +247,6 @@ void Publisher::SendMessage()
           if (pIt->second <= 0) this->pubIds.erase(pIt);
         }
       }
-#else
-    if (result > 0)
-      this->pubIds[*pubIter] = result;
-    else
-      this->pubIds.erase(*pubIter);
-#endif
     }
 
     // Clear the local buffer.
