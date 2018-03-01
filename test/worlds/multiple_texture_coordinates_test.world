@@ -17,10 +17,18 @@
     <model name="model">
       <static>true</static>
       <link name="link">
-        <visual name="visual">
+        <visual name="visual-polylist">
           <geometry>
             <mesh>
               <uri>file://media/models/multiple_texture_coordinates.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <visual name="visual-triangle">
+          <pose>0 0 1 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>file://media/models/multiple_texture_coordinates_triangle.dae</uri>
             </mesh>
           </geometry>
         </visual>

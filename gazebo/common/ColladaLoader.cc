@@ -1735,7 +1735,10 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   bool hasNormals = false;
   bool hasTexcoords = false;
   unsigned int offsetSize = 0;
-  std::map<const unsigned int, int> inputs;
+
+  // read input elements. A vector of int is used because there can be
+  // multiple TEXCOORD inputs.
+  std::map<const unsigned int, std::set<int>> inputs;
 
   // look up table of position/normal/texcoord duplicate indices
   std::map<unsigned int, unsigned int> texDupMap;
@@ -1747,6 +1750,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     std::string semantic = trianglesInputXml->Attribute("semantic");
     std::string source = trianglesInputXml->Attribute("source");
     std::string offset = trianglesInputXml->Attribute("offset");
+
     if (semantic == "VERTEX")
     {
       unsigned int count = norms.size();
@@ -1754,32 +1758,34 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           positionDupMap, normalDupMap);
       if (norms.size() > count)
         combinedVertNorms = true;
-      inputs[VERTEX] = ignition::math::parseInt(offset);
+      inputs[VERTEX].insert(ignition::math::parseInt(offset));
       hasVertices = true;
     }
     else if (semantic == "NORMAL")
     {
       this->LoadNormals(source, _transform, norms, normalDupMap);
       combinedVertNorms = false;
-      inputs[NORMAL] = ignition::math::parseInt(offset);
+      inputs[NORMAL].insert(ignition::math::parseInt(offset));
       hasNormals = true;
     }
-    else if (semantic == "TEXCOORD" && !hasTexcoords)
+    else if (semantic == "TEXCOORD")
     {
       // we currently only support one set of UVs
       this->LoadTexCoords(source, texcoords, texDupMap);
-      inputs[TEXCOORD] = ignition::math::parseInt(offset);
+      inputs[TEXCOORD].insert(ignition::math::parseInt(offset));
       hasTexcoords = true;
     }
     else
     {
-      inputs[otherSemantics++] = ignition::math::parseInt(offset);
+      inputs[otherSemantics++].insert(ignition::math::parseInt(offset));
       gzwarn << "Triangle input semantic: '" << semantic << "' is currently"
           << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
-    offsetSize++;
   }
+
+  for (const auto &input : inputs)
+    offsetSize += input.second.size();
 
   TiXmlElement *pXml = _trianglesXml->FirstChildElement("p");
   if (!pXml || !pXml->GetText())
@@ -1843,7 +1849,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     {
       // Get the vertex position index value. If the position is a duplicate
       // then reset the index to the first instance of the duplicated position
-      daeVertIndex = values[inputs[VERTEX]];
+      daeVertIndex = values[*inputs[VERTEX].begin()];
       if (positionDupMap.find(daeVertIndex) != positionDupMap.end())
         daeVertIndex = positionDupMap[daeVertIndex];
 
@@ -1870,7 +1876,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // Get the vertex normal index value. If the normal is a duplicate
             // then reset the index to the first instance of the duplicated
             // position
-            unsigned int remappedNormalIndex = values[inputs[NORMAL]];
+            unsigned int remappedNormalIndex = values[*inputs[NORMAL].begin()];
             if (normalDupMap.find(remappedNormalIndex) != normalDupMap.end())
               remappedNormalIndex = normalDupMap[remappedNormalIndex];
 
@@ -1882,7 +1888,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
             // Get the vertex texcoord index value. If the texcoord is a
             // duplicate then reset the index to the first instance of the
             // duplicated texcoord
-            unsigned int remappedTexcoordIndex = values[inputs[TEXCOORD]];
+            unsigned int remappedTexcoordIndex = values[*inputs[TEXCOORD].begin()];
             if (texDupMap.find(remappedTexcoordIndex) != texDupMap.end())
               remappedTexcoordIndex = texDupMap[remappedTexcoordIndex];
 
@@ -1936,7 +1942,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasNormals)
       {
-        unsigned int inputRemappedNormalIndex = values[inputs[NORMAL]];
+        unsigned int inputRemappedNormalIndex = values[*inputs[NORMAL].begin()];
         if (normalDupMap.find(inputRemappedNormalIndex) != normalDupMap.end())
           inputRemappedNormalIndex = normalDupMap[inputRemappedNormalIndex];
         subMesh->AddNormal(norms[inputRemappedNormalIndex]);
@@ -1944,7 +1950,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
       }
       if (hasTexcoords)
       {
-        unsigned int inputRemappedTexcoordIndex = values[inputs[TEXCOORD]];
+        unsigned int inputRemappedTexcoordIndex = values[*inputs[TEXCOORD].begin()];
         if (texDupMap.find(inputRemappedTexcoordIndex) != texDupMap.end())
           inputRemappedTexcoordIndex = texDupMap[inputRemappedTexcoordIndex];
         subMesh->AddTexCoord(texcoords[inputRemappedTexcoordIndex].X(),
