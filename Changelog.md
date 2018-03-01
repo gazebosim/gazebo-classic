@@ -10,6 +10,10 @@
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
 1. Fix OBJLoader when mesh has invalid material
     * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
 
