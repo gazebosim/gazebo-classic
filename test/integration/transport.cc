@@ -763,6 +763,27 @@ TEST_F(TransportTest, Errors)
 }
 
 /////////////////////////////////////////////////
+TEST_F(TransportTest, TryInit)
+{
+  // Create a Node and ensure that it's initialized
+  transport::NodePtr node1 = transport::NodePtr(new transport::Node);
+  node1->Init();
+
+  // Create a Node and perform a TryInit() on it. Since we already have an
+  // initialized Node, it should be guaranteed to succeed.
+  transport::NodePtr node2 = transport::NodePtr(new transport::Node);
+  EXPECT_TRUE(node2->TryInit(common::Time(0.01)));
+
+  // Note: We cannot guarantee that the namespace of node2 will match node1,
+  // because the test might get run on machine where a Node outside of this test
+  // already initialized to a different namespace, in which case node2 will use
+  // that namespace instead.
+  //
+  // We also cannot reliably test the failure mode of TryInit(), because we
+  // cannot ensure that no other Nodes are running outside of this test.
+}
+
+/////////////////////////////////////////////////
 // Main
 int main(int argc, char **argv)
 {
