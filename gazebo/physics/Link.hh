@@ -628,6 +628,11 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+
+      /// \brief Set the visibility of the visuals.
+      /// \param[in] _visible True to show the visuals.
+      public: void SetVisible(const bool _visible) const;
+
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
 

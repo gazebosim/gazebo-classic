@@ -1913,3 +1913,16 @@ event::ConnectionPtr Link::ConnectEnabled(
   return this->dataPtr->enabledSignal.Connect(_subscriber);
 }
 
+//////////////////////////////////////////////////
+void Link::SetVisible(const bool _visible) const
+{
+  msgs::Visual msg;
+  msg.set_parent_name(this->GetScopedName());
+  msg.set_parent_id(this->GetId());
+  msg.set_visible(_visible);
+  for (const auto &iter : this->visuals)
+  {
+    msg.set_name(iter.second.name());
+    this->visPub->Publish(msg);
+  }
+}
