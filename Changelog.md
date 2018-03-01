@@ -12,6 +12,9 @@
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
 
+1. Fix loading collada mesh that contains multiple texcoord sets with same offset
+    * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
+
 
 ## Gazebo 7.11.0 (2018-02-12)
 
