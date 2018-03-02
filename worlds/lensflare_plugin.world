@@ -30,7 +30,7 @@
         </visual>
         <sensor name="camera_sensor_lensflare" type="camera">
           <camera>
-            <horizontal_fov>1.047</horizontal_fov>
+            <horizontal_fov>0.78539816339744828</horizontal_fov>
             <image>
               <width>320</width>
               <height>240</height>
@@ -111,11 +111,6 @@
               <near>0.02</near>
               <far>300</far>
             </clip>
-            <noise>
-              <type>gaussian</type>
-              <mean>0.0</mean>
-              <stddev>0.007</stddev>
-            </noise>
           </camera>
           <camera name="right">
             <pose>0 -0.07 0 0 0 0</pose>
@@ -129,11 +124,6 @@
               <near>0.02</near>
               <far>300</far>
             </clip>
-            <noise>
-              <type>gaussian</type>
-              <mean>0.0</mean>
-              <stddev>0.007</stddev>
-            </noise>
           </camera>
           <visualize>true</visualize>
           <plugin name="lensflare" filename="libLensFlareSensorPlugin.so"/>

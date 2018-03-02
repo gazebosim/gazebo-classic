@@ -164,6 +164,7 @@ namespace gazebo
           this->wideAngleDummyCamera =
               _wideAngleCam->GetScene()->CreateCamera(
               dummyCamName, false);
+          this->wideAngleDummyCamera->Load();
 
           // set dummy camera properties based on env cam
           Ogre::Camera *cam = ogreEnvCameras[0];
@@ -183,12 +184,6 @@ namespace gazebo
           // below when doing occlusion ray cast test
           this->wideAngleDummyCamera->OgreCamera()->setOrientation(
               Ogre::Quaternion::IDENTITY);
-          std::cerr << "set up ogre env camera====== " << std::endl;
-          auto c = this->wideAngleDummyCamera->OgreCamera();
-          std::cerr << "w: " << c->getViewport()->getActualWidth() << " vs " << cam->getViewport()->getActualWidth() << std::endl;
-          std::cerr << "h: " << c->getViewport()->getActualHeight() << " vs " << cam->getViewport()->getActualHeight() << std::endl;
-          std::cerr << "aspect: " << c->getAspectRatio() << " vs " << cam->getAspectRatio() << std::endl;
-          std::cerr << "fov: " << c->getFOVy().valueRadians() << " vs " << cam->getFOVy().valueRadians() << std::endl;
         }
 
         // project camera into screen space
@@ -196,21 +191,17 @@ namespace gazebo
             static_cast<double>(_wideAngleCam->ViewportWidth());
         double viewportHeight =
             static_cast<double>(_wideAngleCam->ViewportHeight());
-//        double aspect = viewportWidth / viewportHeight;
         auto imagePos = _wideAngleCam->Project3d(this->lightWorldPos);
 
         // convert to normalized device coordinates (needed by shaders)
         // keep z for visibility test
         lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
         lightPos.y = 2.0 * (1.0 - (imagePos.Y() / viewportHeight) - 0.5);
-//        lightPos.y *= aspect;
         // imagePos.Z() is the distance of point from camera optical center
         // if it's > 1.0 than the point is outside of camera view
         // but allow some tol to avoid sharp dropoff of lens flare at
         // edge of image frame. tol = 0.75
         lightPos.z = (imagePos.Z() > 1.75) ? -1 : 1;
-
-        std::cerr << "lightPos " << lightPos << std::endl;
 
         // check occlusion and set scale
         // loop through all env cameras and find the cam that sees the light
@@ -235,11 +226,7 @@ namespace gazebo
               this->wideAngleDummyCamera->SetWorldPose(ignition::math::Pose3d(
                   Conversions::ConvertIgn(cam->getDerivedPosition()),
                   Conversions::ConvertIgn(cam->getDerivedOrientation())));
-//              std::cerr << "pos: " << this->wideAngleDummyCamera->OgreCamera()->getDerivedPosition() << " vs " << cam->getDerivedPosition() << std::endl;
-//              std::cerr << "orient : " << this->wideAngleDummyCamera->OgreCamera()->getDerivedOrientation() << " vs " << cam->getDerivedOrientation() << std::endl;
 
-//              std::cerr << "env cam idx: " << i << std::endl;
-//              std::cerr << "env cam img pos : " << pos << std::endl;
               occlusionScale = this->OcclusionScale(
                   this->wideAngleDummyCamera,
                   ignition::math::Vector3d(pos.x, pos.y, pos.z),
@@ -266,11 +253,6 @@ namespace gazebo
         screenPos.X() = ((_imgPos.X() / 2.0) + 0.5) * viewportWidth;
         screenPos.Y() = (1 - ((_imgPos.Y() / 2.0) + 0.5)) * viewportHeight;
 
-//        std::cerr << "manual project " <<
-//            _cam->Project(ignition::math::Vector3d(100.0, 0.0, 40));
-
-//        std::cerr << "occlusion scale img center " << _imgPos << std::endl;
-//        std::cerr << "occlusion scale screen center " << screenPos << std::endl;
         ScenePtr scene = _cam->GetScene();
 
         // check center point
@@ -278,17 +260,13 @@ namespace gazebo
         ignition::math::Vector3d position;
         bool intersect = scene->FirstContact(_cam, screenPos, position);
         if (intersect && (position.Length() < _worldPos.Length()))
-        {
-          gzerr << "center occluded s: 0" << std::endl;
-//          return 0;
-        }
+          return 0;
 
         unsigned int rays = 0;
         unsigned int occluded = 0u;
         // work in normalized device coordinates
         // lens flare's halfSize is just an approximated value
-        //double halfSize = 0.065;
-        double halfSize = 0.08;
+        double halfSize = 0.05;
         double steps = 10;
         double stepSize = halfSize * 2 / steps;
         double cx = _imgPos.X();
@@ -312,7 +290,6 @@ namespace gazebo
         }
         double s = static_cast<double>(rays - occluded) /
             static_cast<double>(rays);
-        std::cerr << "scale s: " << s << " [" << occluded << "/" << rays << "]" <<  std::endl;
         return s;
       };
 

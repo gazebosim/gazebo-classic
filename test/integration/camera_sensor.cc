@@ -1074,6 +1074,9 @@ TEST_F(CameraSensor, LensFlare)
   EXPECT_GE(imageCount, 10);
   EXPECT_GE(imageCount2, 10);
 
+  c.reset();
+  c2.reset();
+
   // Compare colors. Camera sensor with lens flare plugin should have a brigher
   // image than the one without the lens flare plugin.
   unsigned int colorSum = 0;
@@ -1095,6 +1098,56 @@ TEST_F(CameraSensor, LensFlare)
   EXPECT_GT(colorSum, colorSum2) <<
       "colorSum: " << colorSum << ", " <<
       "colorSum2: " << colorSum2;
+
+  // test lens flare occlusion by spawning box in front of camera
+  // Spawn a box in front of the cameras
+  ignition::math::Vector3d boxPos = setPose.Pos()
+      + ignition::math::Vector3d(2.5, 0, 0.5);
+  SpawnBox("occlusion_box", ignition::math::Vector3d(0.5, 0.5, 0.5),
+      boxPos, ignition::math::Vector3d::Zero, true);
+
+  c = camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  c2 = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get more images
+  sleep = 0;
+  imageCount = 0;
+  imageCount2 = 0;
+  while ((imageCount < 10 || imageCount2 < 10) && sleep++ < 1000)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, 10);
+  EXPECT_GE(imageCount2, 10);
+
+  // Lens flare should be completely occluded.
+  // Camera sensor with lens flare plugin should have approx the same image as
+  // the one without the lens flare plugin.
+  colorSum = 0;
+  colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+    }
+  }
+
+  // set tolerance to be 0.02% of total pixel values
+  unsigned int tol = width * height * 3 * 255 * 2e-4;
+  EXPECT_NEAR(colorSum, colorSum2, tol);
 
   delete[] img;
   delete[] img2;

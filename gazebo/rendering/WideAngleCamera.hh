@@ -21,6 +21,8 @@
 
 #include <string>
 #include <utility>
+#include <vector>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"

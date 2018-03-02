@@ -815,8 +815,6 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
       double x = cos(phi) * r;
       double y = sin(phi) * r;
 
-      std::cerr << " xy " << x << ", " << y << std::endl;
-
       // env cam cube map texture is square and likely to be different size from
       // viewport. We need to adjust projected pos based on aspect ratio
       double aspect = static_cast<double>(this->ViewportWidth()) /
@@ -826,12 +824,6 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
       // convert to screen space
       screenPos.X() = ((x / 2.0) + 0.5) * this->ViewportWidth();
       screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight();
-//      screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight() * aspect;
-
-      std::cerr << " aspect " << aspect << std::endl;
-      std::cerr << " screen -xy " << screenPos << std::endl;
-      std::cerr << " vp width " << this->ViewportWidth() << std::endl;
-      std::cerr << " vp height " << this->ViewportHeight() << std::endl;
 
       // r will be > 1.0 if point is not visible (outside of image)
       screenPos.Z() = r;

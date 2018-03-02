@@ -94,13 +94,6 @@ void main()
   // scale lightPos to be same range as uv
   pos *= 0.5;
 
-  float t = 0.01;
-  if (uv.x > pos.x - t && uv.x < pos.x + t && uv.y > pos.y - t && uv.y < pos.y + t)
-  {
-    gl_FragColor = vec4(0, 0, 1, 1);
-    return;
-  }
-
   // fix aspect ratio
   uv.x *= aspect;
   pos.x *= aspect;

@@ -219,7 +219,6 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
     img.SetFromData(this->camera->ImageData(),
       this->camera->ImageWidth(), this->camera->ImageHeight(),
       common::Image::RGB_INT8);
-    img.SavePNG("/tmp/img/test2.png");
 
     this->imagePub->Publish(msg);
   }
