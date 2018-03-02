@@ -137,7 +137,7 @@ TEST_F(TransportMsgCountTest, MsgCount)
 
   // The test case error (error with the old code) will only be
   // triggered with remote connections (see code in Publisher.cc
-  // and Publishing.cc). So create a remote subscriber with the child
+  // and Publication.cc). So create a remote subscriber with the child
   // process.
   if (IsChild())
   {
