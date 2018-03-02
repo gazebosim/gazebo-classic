@@ -43,7 +43,6 @@ class ContactSensor : public ServerFixture,
   public: void TorqueTest(const std::string &_physicsEngine);
 
   /// \brief Check communications while sensor is active or not.
-  /// \param[in] _physicsEngine Physics engine to use.
   public: void Active();
 
   /// \brief Callback for sensor subscribers in MultipleSensors test.
@@ -686,6 +685,28 @@ TEST_P(ContactSensor, TorqueTest)
   TorqueTest(GetParam());
 }
 
+//////////////////////////////////////////////////
+msgs::TopicInfo requestTopicInfo(const std::string &_topic)
+{
+  auto request = msgs::CreateRequest("topic_info", _topic);
+
+  auto connection = transport::connectToMaster();
+  connection->EnqueueMsg(msgs::Package("request", *request), true);
+
+  std::string data;
+  connection->Read(data);
+
+  msgs::Packet packet;
+  packet.ParseFromString(data);
+
+  EXPECT_EQ(packet.type(), "topic_info_response");
+
+  msgs::TopicInfo topicInfo;
+  topicInfo.ParseFromString(packet.serialized_data());
+
+  return topicInfo;
+}
+
 ////////////////////////////////////////////////////////////////////////
 void ContactSensor::Active()
 {
@@ -702,11 +723,11 @@ void ContactSensor::Active()
       math::Vector3::Zero, math::Vector3::Zero);
 
   auto sensor = sensors::get_sensor(contactSensorName);
-  ASSERT_TRUE(sensor != nullptr);
+  ASSERT_NE(nullptr, sensor);
 
   auto contactSensor =
       std::dynamic_pointer_cast<sensors::ContactSensor>(sensor);
-  ASSERT_TRUE(contactSensor != nullptr);
+  ASSERT_NE(nullptr, contactSensor);
 
   // Initialize sensor manager
   sensors::SensorManager::Instance()->Init();
@@ -715,41 +736,78 @@ void ContactSensor::Active()
   // Check that sensor is not active
   EXPECT_FALSE(contactSensor->IsActive());
 
-  world->SetPaused(true);
   world->Step(100);
-  world->SetPaused(false);
+
+  // Check there are 3 contact topics advertised:
+  std::vector<std::string> contactTopics;
+
+  // The global ~/physics/contacts
+  contactTopics.push_back("/gazebo/default/physics/contacts");
+
+  // One from the contace manager with filtered contacts
+  contactTopics.push_back("/gazebo/default/contactModel/body/contactSensor");
+
+  // One from the sensor
+  contactTopics.push_back("/gazebo/default/contactModel/body/contactSensor/contacts");
 
   auto topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
   auto topicsCount = topics.size();
 
   EXPECT_EQ(topicsCount, 3u);
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/physics/contacts"), topics.end());
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/contactModel/body/contactSensor"), topics.end());
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/contactModel/body/contactSensor/contacts"), topics.end());
+
+  // Check each topic has 1 publisher and no subscribers
+  for (auto topic : contactTopics)
+  {
+    // Check it is advertised
+    EXPECT_NE(std::find(topics.begin(), topics.end(), topic), topics.end());
+
+    auto topicInfo = requestTopicInfo(topic);
+    EXPECT_EQ(topicInfo.msg_type(), "gazebo.msgs.Contacts");
+    EXPECT_EQ(topicInfo.publisher().size(), 1);
+    EXPECT_EQ(topicInfo.subscriber().size(), 0);
+  }
+
+  // Set sensor active
+  contactSensor->SetActive(true);
+  EXPECT_TRUE(contactSensor->IsActive());
+  world->Step(100);
+
+  // Check now the filtered topic has a subscriber
+  for (auto topic : contactTopics)
+  {
+    // Check it is advertised
+    EXPECT_NE(std::find(topics.begin(), topics.end(), topic), topics.end());
+
+    auto topicInfo = requestTopicInfo(topic);
+    EXPECT_EQ(topicInfo.msg_type(), "gazebo.msgs.Contacts");
+    EXPECT_EQ(topicInfo.publisher().size(), 1);
+
+    if (topic == "/gazebo/default/contactModel/body/contactSensor/contacts")
+      EXPECT_EQ(topicInfo.subscriber().size(), 1);
+    else
+      EXPECT_EQ(topicInfo.subscriber().size(), 0);
+  }
 
   // Set sensor back to inactive
   contactSensor->SetActive(false);
   EXPECT_FALSE(contactSensor->IsActive());
-
-  world->SetPaused(true);
   world->Step(100);
-  world->SetPaused(false);
 
-  topics = transport::getAdvertisedTopics("gazebo.msgs.Contacts");
-  topicsCount = topics.size();
+  // Check the subscriber is gone
+  for (auto topic : contactTopics)
+  {
+    // Check it is advertised
+    EXPECT_NE(std::find(topics.begin(), topics.end(), topic), topics.end());
 
-  EXPECT_EQ(topicsCount, 3u);
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/physics/contacts"), topics.end());
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/contactModel/body/contactSensor"), topics.end());
-  EXPECT_NE(std::find(topics.begin(), topics.end(),
-    "/gazebo/default/contactModel/body/contactSensor/contacts"), topics.end());
+    auto topicInfo = requestTopicInfo(topic);
+    EXPECT_EQ(topicInfo.msg_type(), "gazebo.msgs.Contacts");
+    EXPECT_EQ(topicInfo.publisher().size(), 1);
+
+    EXPECT_EQ(topicInfo.subscriber().size(), 0);
+  }
 }
 
+////////////////////////////////////////////////////////////////////////
 TEST_F(ContactSensor, Active)
 {
   Active();
@@ -757,6 +815,7 @@ TEST_F(ContactSensor, Active)
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, ContactSensor, PHYSICS_ENGINE_VALUES);
 
+////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

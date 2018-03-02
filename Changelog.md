@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. ContactSensor subscribes to filters on demand.
+    * [Pull request 2695](https://bitbucket.org/osrf/gazebo/pull-request/2695)
+
 1. Fix log recording, only call sdf::initFile once
     * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
@@ -136,9 +139,6 @@
     * [Issue 2377](https://bitbucket.org/osrf/gazebo/issues/2377)
 
 ## Gazebo 7.8.1 (2017-06-08)
-
-1. ContactSensor subscribes to filters on demand.
-    * [Pull request 2695](https://bitbucket.org/osrf/gazebo/pull-request/2695)
 
 1. ODE slip parameter example world and test
     * [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)

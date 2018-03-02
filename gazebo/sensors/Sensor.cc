@@ -35,7 +35,7 @@
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
 
-// Remove on Gazebo 9
+// Remove on Gazebo 10
 #include "gazebo/sensors/ContactSensor.hh"
 
 #include "gazebo/sensors/CameraSensor.hh"
@@ -331,7 +331,7 @@ void Sensor::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Sensor::SetActive(const bool _value)
 {
-  // Remove on Gazebo 9 (deprecated)
+  // Remove on Gazebo 10 (deprecated)
   if (ContactSensor *this2 = static_cast<ContactSensor*>(this))
     this2->SetActiveContactSensor(_value);
 
