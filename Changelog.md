@@ -12,6 +12,9 @@
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
 
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
 1. Fix loading collada mesh that contains multiple texcoord sets with same offset
     * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
 
