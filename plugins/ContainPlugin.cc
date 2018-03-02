@@ -275,7 +275,7 @@ void ContainPlugin::OnUpdate(const common::UpdateInfo &/*_info*/)
 }
 
 //////////////////////////////////////////////////
-void ContainPlugin::PublishContains(bool _contains)
+void ContainPlugin::PublishContains(const bool _contains)
 {
   int containNow = _contains ? 1 : 0;
   if (containNow != this->dataPtr->contain)
