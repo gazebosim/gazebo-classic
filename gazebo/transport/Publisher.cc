@@ -244,7 +244,8 @@ void Publisher::SendMessage()
           // we have to delete the entry of the publication ID (which is
           // what last call of OnPublishComplete() would have done if it was
           // called the expected amount of times).
-          if (pIt->second <= 0) this->pubIds.erase(pIt);
+          if (pIt->second <= 0)
+            this->pubIds.erase(pIt);
         }
       }
     }

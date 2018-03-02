@@ -143,12 +143,12 @@ TEST_F(TransportMsgCountTest, MsgCount)
   {
     // transport system has to have been successfully started for the
     // child process
-    ASSERT_EQ(gazebo::transport::is_stopped(), false);
+    ASSERT_FALSE(gazebo::transport::is_stopped());
 
     transport::NodePtr nodeRemote(new transport::Node());
     nodeRemote->Init();
     // we can use the same callback method for the subscriber as the child
-    // process global variable doesn't interfer with the parent process.
+    // process global variable doesn't interfere with the parent process.
     transport::SubscriberPtr subRemote =
       nodeRemote->Subscribe("/gazebo/ttest/test",
                             &ReceivePosesStampedMsgCounter);
@@ -158,7 +158,7 @@ TEST_F(TransportMsgCountTest, MsgCount)
   }
 
   // at this point, it can only be the parent process
-  ASSERT_EQ(IsParent(), true);
+  ASSERT_TRUE(IsParent());
   ASSERT_EQ(ChildRunning(), 1);
 
   // size of the publisher buffer
@@ -206,7 +206,6 @@ TEST_F(TransportMsgCountTest, MsgCount)
   numMsgs = std::max(numMsgs, bufferSize);
   for (int i = 0; i < numMsgs; ++i)
   {
-    // std::cout<<"SENDING MESSAGE! "<<i<<"..."<<std::endl;
     msgs::Set(msg.mutable_time(), common::Time(i));
     // do a direct publishing in which the message should
     // be written out right away: set "blocking" parameter to true.
