@@ -146,8 +146,10 @@ void DepthCamera::CreateDepthTexture(const std::string &_textureName)
     this->dataPtr->pcdViewport =
         this->dataPtr->pcdTarget->addViewport(this->camera);
     this->dataPtr->pcdViewport->setClearEveryFrame(true);
+
+    auto const &ignBG = this->scene->BackgroundColor();
     this->dataPtr->pcdViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBG));
     this->dataPtr->pcdViewport->setOverlaysEnabled(false);
     this->dataPtr->pcdViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
@@ -384,8 +386,8 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     // Setup the viewport to use the texture
     this->depthViewport = this->depthTarget->addViewport(this->camera);
     this->depthViewport->setClearEveryFrame(true);
-    this->depthViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->depthViewport->setBackgroundColour(Conversions::Convert(ignBG));
     this->depthViewport->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 

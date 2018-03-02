@@ -34,6 +34,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   contacts_update.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -58,6 +59,7 @@ set(tests
   joint_test.cc
   joint_universal.cc
   keys_to_joints.cc
+  kinematic_loop.cc
   laser.cc
   link.cc
   logical_camera_sensor.cc
@@ -86,11 +88,14 @@ set(tests
   region_events.cc
   rest_web.cc
   saving_and_loading.cc
+  sdf.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
+  static_map_plugin.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
@@ -130,10 +135,6 @@ set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
-# TODO: remove the timeout for this test after the requirement
-# to manually start a remote subscriber is removed.
-set_tests_properties(${TEST_TYPE}_transport_msg_count PROPERTIES TIMEOUT 20)
-
 set_property(
   SOURCE world_clone.cc
   PROPERTY COMPILE_DEFINITIONS
@@ -172,6 +173,7 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
   world_reset.cc
 )
@@ -182,6 +184,7 @@ set(qt_tests
   collada_visualization.cc
   force_torque_visualization.cc
   insert_model.cc
+  joint_control_widget.cc
   marker.cc
   model_editor.cc
   model_editor_undo.cc

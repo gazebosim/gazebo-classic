@@ -15,14 +15,13 @@
  *
 */
 
-#ifndef _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
-#define _GAZEBO_GUI_BUILDING_EDITORITEM_HH_
+#ifndef GAZEBO_GUI_BUILDING_EDITORITEM_HH_
+#define GAZEBO_GUI_BUILDING_EDITORITEM_HH_
 
 #include <string>
 #include <memory>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector3.hh>
-
-#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qt.h"
 
@@ -79,7 +78,7 @@ namespace gazebo
 
       /// \brief Get the associated 3D visual's color.
       /// \return Color of the 3D visual.
-      public: virtual common::Color Color3d() const;
+      public: virtual ignition::math::Color Color3d() const;
 
       /// \brief Get the associated 3D visual's texture.
       /// \return Texture of the 3D visual.
@@ -100,7 +99,7 @@ namespace gazebo
 
       /// \brief Set the associated 3D visual's color.
       /// \param[in] _color Color.
-      public: void SetColor3d(const common::Color &_color);
+      public: void SetColor3d(const ignition::math::Color &_color);
 
       /// \brief Set the associated 3D visual's texture.
       /// \param[in] _texture Texture.
@@ -204,7 +203,7 @@ namespace gazebo
       /// \brief Qt signal emitted when the editor item's 3D color has
       /// changed.
       /// \param[in] _color Color.
-      Q_SIGNALS: void ColorChanged(const common::Color &_color);
+      Q_SIGNALS: void ColorChanged(const ignition::math::Color &_color);
 
       /// \brief Qt signal emitted when the editor item's 3D texture has
       /// changed.
@@ -221,7 +220,7 @@ namespace gazebo
 
       /// \brief Qt callback when the color has been changed from the 3D view.
       /// \param[in] _color Color.
-      private slots: void OnColorChanged(const common::Color &_color);
+      private slots: void OnColorChanged(const ignition::math::Color &_color);
 
       /// \brief Qt callback when the texture has been changed from the 3D view.
       /// \param[in] _texture Texture.
@@ -247,7 +246,7 @@ namespace gazebo
       protected: double levelBaseHeight;
 
       /// \brief Color of the associated 3D visual.
-      protected: common::Color visual3dColor;
+      protected: ignition::math::Color visual3dColor;
 
       /// \brief Texture of the associated 3D visual.
       protected: std::string visual3dTexture;

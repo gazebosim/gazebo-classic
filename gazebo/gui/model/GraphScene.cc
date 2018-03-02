@@ -83,13 +83,13 @@ void GraphScene::RemoveEdge(const std::string &_id)
 
 /////////////////////////////////////////////////
 void GraphScene::SetEdgeColor(const std::string &_id,
-    const common::Color &_color)
+    const ignition::math::Color &_color)
 {
   QGVEdge *edge = this->getEdge(tr(_id.c_str()));
   if (edge)
   {
-    edge->setColor(QColor(_color.r*255, _color.g*255, _color.b*255,
-        _color.a*255));
+    edge->setColor(QColor(_color.R()*255, _color.G()*255, _color.B()*255,
+        _color.A()*255));
   }
 }
 

@@ -161,6 +161,12 @@ class PhysicsFrictionTest : public ServerFixture,
   /// no NaN's are generated.
   /// \param[in] _physicsEngine Physics engine to use.
   public: void DirectionNaN(const std::string &_physicsEngine);
+
+  /// \brief Test ode slip parameter on models with 1-3 spheres
+  /// and varying mass.
+  /// Expect motion to depend on mass, slip, and number of contact points.
+  /// \param[in] _physicsEngine Physics engine to use.
+  public: void SphereSlip(const std::string &_physicsEngine);
 };
 
 class WorldStepFrictionTest : public PhysicsFrictionTest
@@ -414,6 +420,18 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   }
   EXPECT_EQ(modelAngles.size(), 44u);
 
+  // Pointers to spheres model and its links
+  physics::ModelPtr spheres = world->ModelByName("spheres");
+  ASSERT_TRUE(spheres != nullptr);
+  auto sphereLinks = spheres->GetLinks();
+  EXPECT_EQ(sphereLinks.size(), 2u);
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // spin spheres about vertical axis
+    link->SetAngularVel(ignition::math::Vector3d::UnitZ);
+  }
+
   // Step forward
   world->Step(1500);
   double t = world->SimTime().Double();
@@ -428,6 +446,15 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     ignition::math::Vector3d vel = iter->first->WorldLinearVel();
     EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
     EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
+  }
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // the friction direction should be in a body-fixed frame
+    // so spinning the spheres should cause them to start rolling
+    // check that spheres are spinning about the X axis
+    auto w = link->WorldAngularVel();
+    EXPECT_LT(w.X(), -4) << "Checking " << link->GetScopedName() << std::endl;
   }
 }
 
@@ -499,6 +526,129 @@ void PhysicsFrictionTest::DirectionNaN(const std::string &_physicsEngine)
 }
 
 /////////////////////////////////////////////////
+void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "Aborting test since there's an issue with bullet's friction"
+          << " parameters (#1045)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Aborting test since there's an issue with simbody's friction"
+          << " parameters (#989)"
+          << std::endl;
+    return;
+  }
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test since there's an issue with dart's friction"
+          << " parameters (#1000)"
+          << std::endl;
+    return;
+  }
+
+  // Load an empty world
+  Load("worlds/friction_spheres.world", true, _physicsEngine);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+
+  // check the gravity vector
+  // small positive y component
+  ignition::math::Vector3d grav = world->Gravity();
+  EXPECT_NEAR(grav.X(), 0, 1e-6);
+  EXPECT_NEAR(grav.Y(), 2, 1e-6);
+  EXPECT_NEAR(grav.Z(), -9.81, 1e-6);
+
+  // Get pointers to models and their mass-slip product
+  std::map<physics::ModelPtr, double> lowballMassSlip;
+  std::map<physics::ModelPtr, double> twoballMassSlip;
+  std::map<physics::ModelPtr, double> triballMassSlip;
+
+  auto models = world->Models();
+  for (auto model : models)
+  {
+    ASSERT_TRUE(model != nullptr);
+    auto name = model->GetName();
+    if (0 != name.compare(3, 5, "ball_"))
+    {
+      continue;
+    }
+    double massSlip = std::stod(name.substr(8, 3));
+    if (0 == name.compare(0, 3, "low"))
+    {
+      lowballMassSlip[model] = massSlip;
+    }
+    else if (0 == name.compare(0, 3, "two"))
+    {
+      twoballMassSlip[model] = massSlip;
+    }
+    else if (0 == name.compare(0, 3, "tri"))
+    {
+      triballMassSlip[model] = massSlip;
+    }
+  }
+
+  EXPECT_EQ(lowballMassSlip.size(), 6u);
+  EXPECT_EQ(twoballMassSlip.size(), 6u);
+  EXPECT_EQ(triballMassSlip.size(), 6u);
+
+  world->Step(5000);
+
+  // With constant lateral gravity and non-zero slip,
+  // expect a steady-state lateral velocity that is proportional
+  // to the product of slip and mass divided by the number of contact points.
+  //
+  // The contact points act like viscous dampers in parallel.
+  // The slip parameter is defined as:
+  //   slip = lateral_velocity / (lateral_force / contact_points)
+  // and the velocity is then:
+  //   lateral_velocity = lateral_force * slip / contact_points
+  //   lateral_velocity = gravity * mass * slip / contact_points
+  gzdbg << "Checking velocity of lowball models" << std::endl;
+  for (auto lowball : lowballMassSlip)
+  {
+    auto model = lowball.first;
+    double massSlip = lowball.second;
+    auto vel = model->WorldLinearVel();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 1.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << lowball.first->GetScopedName()
+      << std::endl;
+  }
+  gzdbg << "Checking velocity of twoball models" << std::endl;
+  for (auto twoball : twoballMassSlip)
+  {
+    auto model = twoball.first;
+    double massSlip = twoball.second;
+    auto vel = model->WorldLinearVel();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 2.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << twoball.first->GetScopedName()
+      << std::endl;
+  }
+  gzdbg << "Checking velocity of triball models" << std::endl;
+  for (auto triball : triballMassSlip)
+  {
+    auto model = triball.first;
+    double massSlip = triball.second;
+    auto vel = model->WorldLinearVel();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 3.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << triball.first->GetScopedName()
+      << std::endl;
+  }
+}
+
+/////////////////////////////////////////////////
 TEST_P(PhysicsFrictionTest, FrictionDemo)
 {
   FrictionDemo(GetParam());
@@ -545,6 +695,21 @@ TEST_P(PhysicsFrictionTest, BoxDirectionRing)
 TEST_P(PhysicsFrictionTest, DirectionNaN)
 {
   DirectionNaN(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(PhysicsFrictionTest, SphereSlip)
+{
+  if (std::string("ode").compare(GetParam()) == 0)
+  {
+    SphereSlip(GetParam());
+  }
+  else
+  {
+    gzerr << "Skipping test for physics engine "
+          << GetParam()
+          << std::endl;
+  }
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsFrictionTest,

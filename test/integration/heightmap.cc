@@ -51,7 +51,7 @@ class HeightmapTest : public ServerFixture,
   public: void WhiteNoAlpha(const std::string &_physicsEngine);
   public: void Volume(const std::string &_physicsEngine);
   public: void LoadDEM(const std::string &_physicsEngine);
-  public: void Material(const std::string _worldName,
+  public: void Material(const std::string &_worldName,
       const std::string &_physicsEngine);
 
   /// \brief Test loading a heightmap that has no visuals
@@ -452,7 +452,7 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 */
 
 /////////////////////////////////////////////////
-void HeightmapTest::Material(const std::string _worldName,
+void HeightmapTest::Material(const std::string &_worldName,
     const std::string &_physicsEngine)
 {
   if (_physicsEngine == "dart")
@@ -688,11 +688,15 @@ TEST_P(HeightmapTest, Material)
   Material("worlds/heightmap_material.world", GetParam());
 }
 
+// This test fails on OSX
+// It uses glsl 130 which is not supported yet
+#ifndef __APPLE__
 /////////////////////////////////////////////////
 TEST_P(HeightmapTest, MaterialShader)
 {
   Material("worlds/heightmap_material_shader.world", GetParam());
 }
+#endif
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, NoVisual)

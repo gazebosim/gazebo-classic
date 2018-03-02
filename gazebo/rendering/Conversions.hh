@@ -17,6 +17,7 @@
 #ifndef GAZEBO_RENDERING_CONVERSIONS_HH_
 #define GAZEBO_RENDERING_CONVERSIONS_HH_
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
@@ -42,12 +43,21 @@ namespace gazebo
       /// \brief Return the equivalent ogre color
       /// \param[in] _clr Gazebo color to convert
       /// \return Ogre color value
-      public: static Ogre::ColourValue Convert(const common::Color &_clr);
+      /// \deprecated use ignition::math::Color
+      public: static Ogre::ColourValue Convert(const common::Color &_clr)
+              GAZEBO_DEPRECATED(9.0);
 
-      /// \brief Return the equivalent gazebo color
+      /// \brief Return the equivalent ogre color
+      /// \param[in] _clr color to convert
+      /// \return Ogre color value
+      public: static Ogre::ColourValue Convert(
+                  const ignition::math::Color &_clr);
+
+      /// \brief Return the equivalent color
       /// \param[in] _clr Ogre color to convert
-      /// \return Gazebo color value
-      public: static common::Color Convert(const Ogre::ColourValue &_clr);
+      /// \return igntion math color value
+      public: static ignition::math::Color Convert(
+                  const Ogre::ColourValue &_clr);
 
       /// \brief Return ignition::math::Vector3d from Ogre Vector3.
       /// \param[in] _v Ogre Vector3

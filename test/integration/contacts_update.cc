@@ -35,15 +35,6 @@ void OnContact(ConstContactsPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzwarn << "Disabling TestTwoSpheres for dart.\n";
-    // Take the DART test back in as soon as this fix has been merged:
-    // https://bitbucket.org/JenniferBuehler/gazebo
-    // branch "dart-6-fix-like-PR-2654"
-    return;
-  }
-
   this->Load("worlds/empty.world", true, _physicsEngine);
 
   // Load the spheres into the world.
@@ -57,6 +48,10 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 
   // Get a pointer to the world, physics engine and contact manager
   physics::WorldPtr world = physics::get_world("default");
+
+  // Set gravity to zero to make sure the spheres do not fall on the ground
+  world->SetGravity(ignition::math::Vector3d());
+
   ASSERT_TRUE(world != nullptr);
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
@@ -74,8 +69,23 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   world->Step(1);
 
   gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
 
-  ASSERT_GT(contactManager->GetContactCount(), 0u);
+  contactManager->ResetCount();
+
+  world->SetPhysicsEnabled(true);
+  // Enable the engine and do one step.
+  // The contacts should be available with the engine enabled.
+  world->Step(1);
+
+  gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
+
+  world->RemoveModel("sphere2");
+  // There should be no more contacts reported after sphere2 is removed.
+  world->Step(1);
+
+  EXPECT_EQ(contactManager->GetContactCount(), 0u);
 }
 
 TEST_P(ContactsUpdate, TestTwoSpheres)

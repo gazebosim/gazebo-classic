@@ -25,6 +25,8 @@
 #include <mutex>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"

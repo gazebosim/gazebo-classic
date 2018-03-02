@@ -37,62 +37,71 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE SimbodyJoint : public Joint
     {
       /// \brief Constructor
-      public: SimbodyJoint(BasePtr _parent);
+      public: explicit SimbodyJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~SimbodyJoint();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       // Documentation inherited.
-      public: virtual void Reset();
+      public: virtual void Reset() override;
 
       // Documentation inherited.
-      public: virtual LinkPtr GetJointLink(unsigned int _index) const;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const override;
 
       // Documentation inherited.
-      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
+      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const
+            override;
 
       // Documentation inherited.
-      public: virtual void Detach();
+      public: virtual void Detach() override;
 
       // Documentation inherited.
       public: virtual void SetAnchor(const unsigned int _index,
-                  const ignition::math::Vector3d &_anchor);
+                  const ignition::math::Vector3d &_anchor) override;
 
       // Documentation inherited.
       public: virtual void SetDamping(unsigned int _index,
-                                      const double _damping);
+                                      const double _damping) override;
 
       // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
-                                        const double _stiffness);
+                                        const double _stiffness) override;
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
-        double _stiffness, double _damping, double _reference = 0);
+        double _stiffness, double _damping, double _reference = 0) override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
+
+      // Documentation inherited.
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false)
+            override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkTorque(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value);
+                                        const boost::any &_value)
+            override;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
-                  unsigned int _index);
+                  unsigned int _index) override;
 
       // Save current Simbody State
       public: virtual void SaveSimbodyState(const SimTK::State &_state);
@@ -101,17 +110,19 @@ namespace gazebo
       public: virtual void RestoreSimbodyState(SimTK::State &_state);
 
       // Documentation inherited.
-      public: virtual void SetForce(unsigned int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force)
+            override;
 
       // Documentation inherited.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual double GetForce(unsigned int _index) override;
 
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,
-                                   const ignition::math::Vector3d &_axis);
+                                   const ignition::math::Vector3d &_axis)
+            override;
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      public: virtual JointWrench GetForceTorque(unsigned int _index) override;
 
       /// \brief Set the force applied to this physics::Joint.
       /// Note that the unit of force should be consistent with the rest
@@ -132,7 +143,7 @@ namespace gazebo
       private: void SaveForce(unsigned int _index, double _force);
 
       // Documentation inherited.
-      public: virtual void CacheForceTorque();
+      public: virtual void CacheForceTorque() override;
 
       /// \brief Force Simbody to break a loop by using a weld constraint.
       /// This flag is needed by SimbodyPhysics::MultibodyGraphMaker, so kept
@@ -192,17 +203,19 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void SetUpperLimit(const unsigned int _index,
-                                         const double _limit);
+                                         const double _limit) override;
 
       // Documentation inherited.
       public: virtual void SetLowerLimit(const unsigned int _index,
-                                         const double _limit);
+                                         const double _limit) override;
 
       // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index) const;
+      public: virtual double UpperLimit(const unsigned int _index) const
+            override;
 
       // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index) const;
+      public: virtual double LowerLimit(const unsigned int _index) const
+            override;
 
       /// \brief Simbody Multibody System
       protected: SimTK::MultibodySystem *world;

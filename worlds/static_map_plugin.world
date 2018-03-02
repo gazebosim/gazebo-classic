@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <plugin name="map" filename="libStaticMapPlugin.so">
+      <center>37.386491 -122.065255</center>
+      <world_size>100</world_size>
+      <map_type>satellite</map_type>
+      <api_key>enter_your_google_api_key_here</api_key>
+      <use_cache>false</use_cache>
+    </plugin>
+  </world>
+</sdf>

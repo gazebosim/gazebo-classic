@@ -27,7 +27,7 @@ using namespace rendering;
 MaterialSwitcher::MaterialSwitcher()
 : lastTechnique(nullptr)
 {
-  this->currentColor = common::Color(0.0, 0.0, 0.1);
+  this->currentColor = ignition::math::Color(0.0, 0.0, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -59,8 +59,8 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
       if (this->lastEntity == subEntity->getParent()->getName())
       {
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
-            Ogre::Vector4(this->currentColor.r, this->currentColor.g,
-                          this->currentColor.b, 1.0));
+            Ogre::Vector4(this->currentColor.R(), this->currentColor.G(),
+                          this->currentColor.B(), 1.0));
       }
       else
       {
@@ -124,11 +124,11 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
         this->GetNextColor();
 
         const_cast<Ogre::SubEntity *>(subEntity)->setCustomParameter(1,
-            Ogre::Vector4(this->currentColor.r, this->currentColor.g,
-              this->currentColor.b, 1.0));
+            Ogre::Vector4(this->currentColor.R(), this->currentColor.G(),
+              this->currentColor.B(), 1.0));
 
         this->lastEntity = subEntity->getParent()->getName();
-        this->colorDict[this->currentColor.GetAsRGBA()] = this->lastEntity;
+        this->colorDict[this->currentColor.AsRGBA()] = this->lastEntity;
       }
 
       return this->lastTechnique;
@@ -146,9 +146,9 @@ Ogre::Technique *MaterialSwitcher::handleSchemeNotFound(
 
 /////////////////////////////////////////////////
 const std::string &MaterialSwitcher::GetEntityName(
-    const common::Color &_color) const
+    const ignition::math::Color &_color) const
 {
-  ColorMapConstIter iter = this->colorDict.find(_color.GetAsRGBA());
+  ColorMapConstIter iter = this->colorDict.find(_color.AsRGBA());
 
   if (iter != this->colorDict.end())
     return (*iter).second;
@@ -159,7 +159,7 @@ const std::string &MaterialSwitcher::GetEntityName(
 /////////////////////////////////////////////////
 void MaterialSwitcher::GetNextColor()
 {
-  common::Color::ARGB color = this->currentColor.GetAsARGB();
+  auto color = this->currentColor.AsARGB();
   color++;
   this->currentColor.SetFromARGB(color);
 }
@@ -167,7 +167,7 @@ void MaterialSwitcher::GetNextColor()
 /////////////////////////////////////////////////
 void MaterialSwitcher::Reset()
 {
-  this->currentColor = common::Color(0.0, 0.0, 0.1);
+  this->currentColor = ignition::math::Color(0.0, 0.0, 0.1);
   this->lastEntity.clear();
   this->colorDict.clear();
 }
