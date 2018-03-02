@@ -420,6 +420,18 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
   }
   EXPECT_EQ(modelAngles.size(), 44u);
 
+  // Pointers to spheres model and its links
+  physics::ModelPtr spheres = world->GetModel("spheres");
+  ASSERT_TRUE(spheres != nullptr);
+  auto sphereLinks = spheres->GetLinks();
+  EXPECT_EQ(sphereLinks.size(), 2u);
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // spin spheres about vertical axis
+    link->SetAngularVel(ignition::math::Vector3d::UnitZ);
+  }
+
   // Step forward
   world->Step(1500);
   double t = world->GetSimTime().Double();
@@ -434,6 +446,15 @@ void PhysicsFrictionTest::BoxDirectionRing(const std::string &_physicsEngine)
     ignition::math::Vector3d vel = iter->first->GetWorldLinearVel().Ign();
     EXPECT_NEAR(velMag*cosAngle, vel.X(), 5*g_friction_tolerance);
     EXPECT_NEAR(velMag*sinAngle, vel.Y(), 5*g_friction_tolerance);
+  }
+  for (auto link : sphereLinks)
+  {
+    ASSERT_TRUE(link != nullptr);
+    // the friction direction should be in a body-fixed frame
+    // so spinning the spheres should cause them to start rolling
+    // check that spheres are spinning about the X axis
+    auto w = link->GetWorldAngularVel().Ign();
+    EXPECT_LT(w.X(), -4) << "Checking " << link->GetScopedName() << std::endl;
   }
 }
 

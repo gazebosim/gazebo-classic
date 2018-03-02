@@ -44,6 +44,7 @@
 #include "gazebo/physics/RayShape.hh"
 #include "gazebo/physics/Collision.hh"
 #include "gazebo/physics/Model.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Link.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/PhysicsEngine.hh"
@@ -254,11 +255,11 @@ math::Pose Entity::GetRelativePose() const
   }
   else if (this->parent && this->parentEntity)
   {
-    return this->worldPose - this->parentEntity->GetWorldPose();
+    return this->GetWorldPose() - this->parentEntity->GetWorldPose();
   }
   else
   {
-    return this->worldPose;
+    return this->GetWorldPose();
   }
 }
 
@@ -336,6 +337,11 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
         else
         {
           entity->worldPose = ((entity->worldPose - oldModelWorldPose) + _pose);
+
+          // Publish only for non-canonical links,
+          // since local pose of the canonical link does not change,
+          // so there is no need to keep telling everyone about it.
+          // The canonical link will automatically move as the model moves
           if (_publish)
             entity->PublishPose();
         }
@@ -353,6 +359,12 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
           {
             CollisionPtr entityC =
                 boost::static_pointer_cast<Collision>(*iterC);
+            entityC->SetWorldPoseDirty();
+          }
+          else if ((*iterC)->HasType(LIGHT))
+          {
+            LightPtr entityC =
+                boost::static_pointer_cast<Light>(*iterC);
             entityC->SetWorldPoseDirty();
           }
         }
@@ -376,11 +388,7 @@ void Entity::SetWorldPoseModel(const math::Pose &_pose, bool _notify,
 void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
         bool _publish)
 {
-  this->worldPose = _pose;
-  this->worldPose.Correct();
-
-  if (_notify)
-    this->UpdatePhysicsPose(true);
+  this->SetWorldPoseDefault(_pose, _notify, _publish);
 
   if (!this->parentEntity->HasType(MODEL))
   {
@@ -414,19 +422,6 @@ void Entity::SetWorldPoseCanonicalLink(const math::Pose &_pose, bool _notify,
 
     parentEnt = boost::dynamic_pointer_cast<Entity>(parentEnt->GetParent());
   }
-
-  // Tell collisions that their current world pose is dirty (needs
-  // updating). We set a dirty flag instead of directly updating the
-  // value to improve performance.
-  for (Base_V::iterator iterC = this->children.begin();
-      iterC != this->children.end(); ++iterC)
-  {
-    if ((*iterC)->HasType(COLLISION))
-    {
-      CollisionPtr entityC = boost::static_pointer_cast<Collision>(*iterC);
-      entityC->SetWorldPoseDirty();
-    }
-  }
 }
 
 //////////////////////////////////////////////////
@@ -438,6 +433,26 @@ void Entity::SetWorldPoseDefault(const math::Pose &_pose, bool _notify,
 
   if (_notify)
     this->UpdatePhysicsPose(true);
+
+  if (this->HasType(LINK))
+  {
+    // Tell collisions that their current world pose is dirty (needs
+    // updating). We set a dirty flag instead of directly updating the
+    // value to improve performance.
+    for (auto &childPtr : this->children)
+    {
+      if (childPtr->HasType(COLLISION))
+      {
+        CollisionPtr entityC = boost::static_pointer_cast<Collision>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+      else if (childPtr->HasType(LIGHT))
+      {
+        LightPtr entityC = boost::static_pointer_cast<Light>(childPtr);
+        entityC->SetWorldPoseDirty();
+      }
+    }
+  }
 }
 
 

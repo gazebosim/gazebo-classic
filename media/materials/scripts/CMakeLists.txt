@@ -9,6 +9,7 @@ distortion.compositor
 gazebo.material
 grid.material
 kitchen.material
+lens_flare.compositor
 noise.compositor
 oculus.material
 perpixel.program
@@ -20,6 +21,7 @@ ssao.compositor
 ssao.material
 VPL.material
 VPL.program
+deform.material
 WideCameraLensMap.compositor
 )
 

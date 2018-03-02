@@ -53,7 +53,7 @@ void UndoTest::MsgPassing()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world", true, false, true);
+  this->Load("worlds/empty.world", true, false, false);
 
   // Get world
   gazebo::physics::WorldPtr world = gazebo::physics::get_world("default");

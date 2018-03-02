@@ -200,7 +200,6 @@ void MultiCameraSensor::Init()
 void MultiCameraSensor::Fini()
 {
   this->dataPtr->imagePub.reset();
-  Sensor::Fini();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
 
@@ -208,10 +207,11 @@ void MultiCameraSensor::Fini()
       this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {
-    (*iter)->GetScene()->RemoveCamera((*iter)->Name());
+    this->scene->RemoveCamera((*iter)->Name());
   }
   this->dataPtr->cameras.clear();
   this->scene.reset();
+  Sensor::Fini();
 }
 
 //////////////////////////////////////////////////
@@ -238,13 +238,18 @@ rendering::CameraPtr MultiCameraSensor::Camera(const unsigned int _index) const
 //////////////////////////////////////////////////
 void MultiCameraSensor::Render()
 {
-  if (this->dataPtr->cameras.empty() || !this->IsActive() ||
-      !this->NeedsUpdate())
+  if (!this->IsActive() || !this->NeedsUpdate())
   {
     return;
   }
 
   // Update all the cameras
+  std::lock_guard<std::mutex> lock(this->dataPtr->cameraMutex);
+  if (this->dataPtr->cameras.empty())
+  {
+    return;
+  }
+
   for (auto iter = this->dataPtr->cameras.begin();
       iter != this->dataPtr->cameras.end(); ++iter)
   {

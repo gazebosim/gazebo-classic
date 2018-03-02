@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 7.10.0 to 7.X
+
+### Modifications
+
+1. Shadows ambient factor has been reduced - they will now appear darker than before. Also increased shadow texture resolution and reduced effect of jagged shadow edges.
+   Please see [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-request/2805)
+   for more details.
+
 ## Gazebo 7.9.0 to 7.X
 
 ### Modifications
@@ -14,6 +22,15 @@ release will remove the deprecated code.
    instead of `std::min`.
    Please see [Pull request 2717](https://bitbucket.org/osrf/gazebo/pull-request/2717)
    for more details.
+
+## Gazebo 7.8.0 to 7.X
+
+### Modifications
+
+1. **gz log**
+   Gazebo log files no longer store velocity data and have reduced floating point precision.
+   See [pull request 2715](https://bitbucket.org/osrf/gazebo/pull-requests/2715/add-log-record-filter-options)
+   for further details.
 
 ## Gazebo 7.3.1 to 7.X
 

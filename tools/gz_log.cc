@@ -557,6 +557,22 @@ std::string StateFilter::Filter(const std::string &_stateString)
       << "<real_time>" << state.GetRealTime() << "</real_time>\n"
       << "<wall_time>" << state.GetWallTime() << "</wall_time>\n"
       << "<iterations>" << state.GetIterations() << "</iterations>\n";
+
+    auto insertions = state.Insertions();
+    if (insertions.size() > 0)
+      result << "<insertions>" << std::endl;
+    for (auto insertion : insertions)
+      result << insertion << std::endl;
+    if (insertions.size() > 0)
+      result << "</insertions>" << std::endl;
+
+    auto deletions = state.Deletions();
+    if (deletions.size() > 0)
+      result << "<deletions>" << std::endl;
+    for (auto deletion : deletions)
+      result << "<name>" << deletion << "</name>" << std::endl;
+    if (deletions.size() > 0)
+      result << "</deletions>" << std::endl;
   }
 
   result << this->filter.Filter(state);

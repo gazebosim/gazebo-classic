@@ -131,6 +131,26 @@ TEST(gz_log, Echo)
 }
 
 /////////////////////////////////////////////////
+/// Check to make sure that 'gz log -e' returns model and light insertions and
+/// deletions
+TEST(gz_log, EchoInsertionDeletion)
+{
+  std::string echo = custom_exec(std::string("gz log -e -f ") +
+      PROJECT_SOURCE_PATH + "/test/logs/insertion_deletion.log");
+  boost::trim_right(echo);
+
+  EXPECT_TRUE(echo.find("<insertions>\n<model") != std::string::npos);
+  EXPECT_TRUE(echo.find("<insertions>\n<light") != std::string::npos);
+  EXPECT_TRUE(echo.find("</insertions>") != std::string::npos);
+
+  EXPECT_TRUE(echo.find("<deletions>\n<name>unit_box</name>\n</deletions>") !=
+      std::string::npos);
+  EXPECT_TRUE(echo.find(
+      "<deletions>\n<name>user_point_light_0</name>\n</deletions>") !=
+      std::string::npos);
+}
+
+/////////////////////////////////////////////////
 /// Check to make sure that 'gz log -e --filter' returns correct information
 TEST(gz_log, EchoFilter)
 {
@@ -147,7 +167,7 @@ TEST(gz_log, EchoFilter)
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "6ab471e6c410ebe90a939383bd168660ba9019e8");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "fa985e8b71e5bef52b1c8c824d4536bb5ad8b3b4");
+    EXPECT_EQ(shasum, "da29428454cff7ef3b54115db8cd52b11dc055f9");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -308,7 +328,7 @@ TEST(gz_log, Step)
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "cc55bc387eec68fc2b2aef70bfb7372a2706a6dc");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "eefcf9d19040d39c9dbb49d3ee771fee820032d3");
+    EXPECT_EQ(shasum, "414d50cf03c3650c112062a90a8c87acccbab893");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 
@@ -320,7 +340,7 @@ TEST(gz_log, Step)
   else if (std::string("1.5").compare(SDF_VERSION) == 0)
     EXPECT_EQ(shasum, "37934b37eb4e2e7d88ed764c296232124c8a38ab");
   else if (std::string("1.6").compare(SDF_VERSION) == 0)
-    EXPECT_EQ(shasum, "e4a90a629b65ff0eede877f75bcf203cfa2f7891");
+    EXPECT_EQ(shasum, "c713b28ea4da6a7a9750aba1d9e65c12756ce026");
   else
     FAIL() << "Please add support for sdf version: " << SDF_VERSION;
 }

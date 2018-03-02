@@ -108,6 +108,8 @@ void ModelMaker_TEST::SimpleShape()
   hasBox = mainWindow->HasEntityName("unit_box");
   QVERIFY(hasBox);
 
+  delete modelMaker;
+
   // Terminate
   mainWindow->close();
   delete mainWindow;
@@ -198,6 +200,8 @@ void ModelMaker_TEST::FromFile()
   // Check the box is in the left panel
   hasBox = mainWindow->HasEntityName("box");
   QVERIFY(hasBox);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -311,6 +315,8 @@ void ModelMaker_TEST::FromNestedModelFile()
   hasModel = mainWindow->HasEntityName("model_00");
   QVERIFY(hasModel);
 
+  delete modelMaker;
+
   // Terminate
   mainWindow->close();
   delete mainWindow;
@@ -407,6 +413,8 @@ void ModelMaker_TEST::FromModel()
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("box_clone");
   QVERIFY(hasModel);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
@@ -533,6 +541,8 @@ void ModelMaker_TEST::FromNestedModel()
   // Check the clone is in the left panel
   hasModel = mainWindow->HasEntityName("model_00_clone");
   QVERIFY(hasModel);
+
+  delete modelMaker;
 
   // Terminate
   mainWindow->close();
