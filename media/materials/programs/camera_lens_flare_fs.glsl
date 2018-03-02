@@ -93,7 +93,6 @@ void main()
   vec2 uv = gl_TexCoord[0].xy - 0.5;
   // scale lightPos to be same range as uv
   pos *= 0.5;
-
   // fix aspect ratio
   uv.x *= aspect;
   pos.x *= aspect;
@@ -101,7 +100,6 @@ void main()
   // compute lens flare
   vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv, pos.xy);
   color = cc(color,.5,.1);
-
 
   // apply lens flare
   gl_FragColor = texture2D(RT, gl_TexCoord[0].xy) + vec4(color, 1.0);

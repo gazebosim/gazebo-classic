@@ -214,12 +214,6 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
         this->camera->ImageHeight());
     msg.mutable_image()->set_data(this->camera->ImageData(),
         this->camera->ImageMemorySize());
-
-    common::Image img;
-    img.SetFromData(this->camera->ImageData(),
-      this->camera->ImageWidth(), this->camera->ImageHeight(),
-      common::Image::RGB_INT8);
-
     this->imagePub->Publish(msg);
   }
 
