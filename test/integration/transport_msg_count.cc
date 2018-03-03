@@ -30,7 +30,7 @@ using namespace gazebo;
  */
 class TransportMsgCountTest: public ::testing::Test
 {
-protected:
+ protected:
 
   TransportMsgCountTest()
     :fakeProgramName("TransportMsgCountTest"),
@@ -69,7 +69,7 @@ protected:
     gazebo::shutdown();
   }
 
-protected:
+ protected:
 
   bool IsParent()
   {
@@ -103,7 +103,7 @@ protected:
     return result == 0;
   }
 
-private:
+ private:
   // kills the child process, if it's the parent process.
   void KillChildProcess()
   {
@@ -221,7 +221,9 @@ TEST_F(TransportMsgCountTest, MsgCount)
   // regularly emptied with SendMessage() calls.
   // Trying more times than the actualy amount of left-over messages
   // would be an error though.
-  int tries = 20; // pub->GetOutgoingCount();  20 is plenty for testing
+  // Could do pub->GetOutgoingCount(), but  20 is plenty for testing
+  // because we also sleep in the loop
+  int tries = 20;
   while ((pub->GetOutgoingCount() > 0) && (tries > 0))
   {
     std::cout << "Sending out " << pub->GetOutgoingCount()
