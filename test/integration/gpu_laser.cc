@@ -22,7 +22,7 @@
 #define DOUBLE_TOL 1e-6
 
 // vertical range values seem to be less accurate
-#define VERTICAL_LASER_TOL 1e-4
+#define VERTICAL_LASER_TOL 2e-4
 
 using namespace gazebo;
 class GPURaySensorTest : public ServerFixture
@@ -395,13 +395,13 @@ TEST_F(GPURaySensorTest, LaserVertical)
   std::string raySensorName = "gpu_ray_sensor";
   double hMinAngle = -M_PI/4.0;
   double hMaxAngle = M_PI/4.0;
-  double vMinAngle = -0.3;
-  double vMaxAngle = 0.3;
+  double vMinAngle = -M_PI/8.0;
+  double vMaxAngle = M_PI/8.0;
   double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 640;
-  unsigned int vSamples = 7;
+  unsigned int vSamples = 91;
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
   math::Pose testPose(math::Vector3(0.25, 0, 0.5),
       math::Quaternion(0, 0, 0));
