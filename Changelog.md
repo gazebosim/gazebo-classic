@@ -15,6 +15,9 @@
 1. Add support for moving geometry to ContainPlugin
     * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
 
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
 ## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
