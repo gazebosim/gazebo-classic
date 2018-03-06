@@ -2,8 +2,21 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
 
 1. Fix undefined behavior in ODESliderJoint
     * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
