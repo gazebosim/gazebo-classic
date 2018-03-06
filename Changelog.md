@@ -18,6 +18,9 @@
 1. Support python3 with check_test_ran.py
     * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
 
+1. Fix undefined behavior in ODESliderJoint
+    * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
+
 ## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
