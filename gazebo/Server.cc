@@ -536,6 +536,8 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+  if (sigaction(SIGTERM, &sigact, NULL))
+    std::cerr << "sigaction failed while setting up for SIGTERM" << std::endl;
 #endif
 
   if (this->dataPtr->stop)

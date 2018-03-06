@@ -141,6 +141,11 @@ int main(int _argc, char **_argv)
     return 0;
   }
 
+  if (sigaction(SIGTERM, &sigact, NULL))
+  {
+    std::cerr << "Warning: Unable to catch SIGTERM.\n";
+  }
+
   pid1 = fork();
 
   char **argvServer = new char*[_argc+1];
