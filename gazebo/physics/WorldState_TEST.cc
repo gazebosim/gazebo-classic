@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,11 +71,11 @@ TEST_F(WorldStateTest, SDFConstructor)
 
   auto modelStates = worldState.GetModelStates();
   EXPECT_EQ(modelStates.size(), 2u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(1, 1, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["model_1"].GetPose(),
+  EXPECT_EQ(modelStates["model_1"].Pose(),
       ignition::math::Pose3d(2, 1, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["fake_model"].GetPose(),
+  EXPECT_EQ(modelStates["fake_model"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState.LightStates();
@@ -104,7 +104,7 @@ TEST_F(WorldStateTest, WorldConstructor)
 
   auto modelStates = worldState.GetModelStates();
   EXPECT_EQ(modelStates.size(), 1u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState.LightStates();
@@ -208,11 +208,11 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
 
   auto modelStates = worldState2.GetModelStates();
   EXPECT_EQ(modelStates.size(), 2u);
-  EXPECT_EQ(modelStates["sphere"].GetPose(),
+  EXPECT_EQ(modelStates["sphere"].Pose(),
       ignition::math::Pose3d(2, 2.5, 5.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["cylinder"].GetPose(),
+  EXPECT_EQ(modelStates["cylinder"].Pose(),
       ignition::math::Pose3d(3, 7.5, 8.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["fake_model"].GetPose(),
+  EXPECT_EQ(modelStates["fake_model"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
 
   auto lightStates = worldState2.LightStates();
@@ -239,13 +239,13 @@ TEST_F(WorldStateTest, OperatorsNoInsertionsDeletions)
 
   modelStates = worldState2.GetModelStates();
   EXPECT_EQ(modelStates.size(), 4u);
-  EXPECT_EQ(modelStates["ground_plane"].GetPose(),
+  EXPECT_EQ(modelStates["ground_plane"].Pose(),
       ignition::math::Pose3d(0, 0, 0, 0, 0, 0));
-  EXPECT_EQ(modelStates["box"].GetPose(),
+  EXPECT_EQ(modelStates["box"].Pose(),
       ignition::math::Pose3d(0, 0, 1, 0, 0, 0));
-  EXPECT_EQ(modelStates["sphere"].GetPose(),
+  EXPECT_EQ(modelStates["sphere"].Pose(),
       ignition::math::Pose3d(2, 5.5, 6.5, 0, 0, 0));
-  EXPECT_EQ(modelStates["cylinder"].GetPose().pos,
+  EXPECT_EQ(modelStates["cylinder"].Pose().Pos(),
       ignition::math::Vector3d(3, 4.5, 9.5));
 
   lightStates = worldState2.LightStates();

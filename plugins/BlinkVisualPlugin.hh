@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_BLINKVISUALPLUGIN_HH_
-#define GAZEBO_BLINKVISUALPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_BLINKVISUALPLUGIN_HH_
+#define GAZEBO_PLUGINS_BLINKVISUALPLUGIN_HH_
 
 #include <memory>
 #include <gazebo/common/Plugin.hh>

@@ -19,6 +19,7 @@
 
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/common/PID.hh"
@@ -129,6 +130,12 @@ namespace gazebo
 
     /// \brief Connection to World Update events.
     private: event::ConnectionPtr updateConnection;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Communication node
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ TEST_F(JointControllerTest, PositionControl)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 
@@ -55,9 +55,9 @@ TEST_F(JointControllerTest, PositionControl)
 
   world->Step(5000);
 
-  math::Angle angle = model->GetJoint("arm_shoulder_pan_joint")->GetAngle(0);
+  auto angle = model->GetJoint("arm_shoulder_pan_joint")->Position(0);
 
-  EXPECT_NEAR(angle.Radian(), 1.0, 0.1);
+  EXPECT_NEAR(angle, 1.0, 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -66,7 +66,7 @@ TEST_F(JointControllerTest, VelocityControl)
   Load("worlds/simple_arm_test.world", true);
   gazebo::physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
-  gazebo::physics::ModelPtr model = world->GetModel("simple_arm");
+  gazebo::physics::ModelPtr model = world->ModelByName("simple_arm");
   gazebo::physics::JointControllerPtr jointController =
     model->GetJointController();
 

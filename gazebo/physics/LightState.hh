@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  *
 */
 
-#ifndef _GAZEBO_LIGHT_STATE_HH_
-#define _GAZEBO_LIGHT_STATE_HH_
+#ifndef GAZEBO_PHYSICS_LIGHTSTATE_HH_
+#define GAZEBO_PHYSICS_LIGHTSTATE_HH_
 
 #include <iomanip>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
 

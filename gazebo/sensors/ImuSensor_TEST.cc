@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
@@ -134,7 +134,7 @@ void ImuSensor_TEST::LinearAccelerationTest(const std::string &_physicsEngine)
   double tHit = sqrt((z-0.5) / (-gravityZ));
   // Time to advance, allow 0.5 s settling time.
   // This assumes inelastic collisions with the ground.
-  double dtHit = tHit+0.5 - world->GetSimTime().Double();
+  double dtHit = tHit+0.5 - world->SimTime().Double();
   double steps = ceil(dtHit / stepSize);
   EXPECT_GT(steps, 0);
   world->Step(steps);

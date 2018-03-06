@@ -64,7 +64,7 @@ void Palette_TEST::ModelsTab()
   auto world = gazebo::physics::get_world("default");
   QVERIFY(world != nullptr);
 
-  auto count = world->GetModelCount();
+  auto count = world->ModelCount();
 
   // Create a new plot window widget
   auto palette = new gazebo::gui::Palette(nullptr);
@@ -85,7 +85,7 @@ void Palette_TEST::ModelsTab()
   this->ProcessEventsAndDraw();
 
   // Check it was deleted
-  QCOMPARE(count - 1, world->GetModelCount());
+  QCOMPARE(count - 1, world->ModelCount());
   count--;
 
   // Get the new models model

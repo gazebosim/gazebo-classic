@@ -177,7 +177,7 @@ void FiducialCameraPlugin::PopulateFiducials()
   {
     rendering::VisualPtr childVis = worldVis->GetChild(i);
     if (childVis->GetType() == rendering::Visual::VT_MODEL)
-      this->dataPtr->fiducials.insert(childVis->GetName());
+      this->dataPtr->fiducials.insert(childVis->Name());
   }
 }
 
@@ -211,7 +211,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
       continue;
 
     ignition::math::Vector2i pt =
-        this->dataPtr->camera->Project(vis->GetWorldPose().pos.Ign());
+        this->dataPtr->camera->Project(vis->WorldPose().Pos());
 
     // use selection buffer to check if visual is occluded by other entities
     // in the camera view
@@ -237,7 +237,7 @@ void FiducialCameraPlugin::OnNewFrame(const unsigned char */*_image*/,
     if (result && result->GetRootVisual() == vis)
     {
       FiducialData fd;
-      fd.id = vis->GetName();
+      fd.id = vis->Name();
       fd.pt = pt;
       results.push_back(fd);
     }

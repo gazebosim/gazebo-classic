@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _CONTACTMANAGER_HH_
-#define _CONTACTMANAGER_HH_
+#ifndef GAZEBO_PHYSICS_CONTACTMANAGER_HH_
+#define GAZEBO_PHYSICS_CONTACTMANAGER_HH_
 
 #include <vector>
 #include <string>
 #include <map>
+#include <ignition/transport/Node.hh>
 
 #include <boost/unordered/unordered_set.hpp>
 #include <boost/unordered/unordered_map.hpp>
@@ -54,6 +55,12 @@ namespace gazebo
 
       /// \brief A list of contacts associated to the collisions.
       public: std::vector<Contact *> contacts;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition contact message publisher
+      public: ignition::transport::Node::Publisher publisherIgn;
     };
 
     /// \addtogroup gazebo_physics
@@ -177,6 +184,15 @@ namespace gazebo
 
       /// \brief Mutex to protect the list of custom publishers.
       private: boost::recursive_mutex *customMutex;
+
+      // Place ignition::transport objects at the end of this file to
+      // guarantee they are destructed first.
+
+      /// \brief Ignition node for communication.
+      private: ignition::transport::Node nodeIgn;
+
+      /// \brief Contact publisher.
+      private: ignition::transport::Node::Publisher contactPubIgn;
     };
     /// \}
   }

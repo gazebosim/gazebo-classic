@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,10 @@
 
 #include "gazebo/math/Matrix3.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Matrix3Test : public ::testing::Test { };
@@ -26,6 +30,7 @@ class Matrix3Test : public ::testing::Test { };
 TEST_F(Matrix3Test, Matrix3)
 {
   {
+    // cppcheck-suppress unassignedVariable
     math::Matrix3 matrix;
     EXPECT_TRUE(matrix == math::Matrix3(0, 0, 0, 0, 0, 0, 0, 0, 0));
   }

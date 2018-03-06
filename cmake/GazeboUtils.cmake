@@ -201,27 +201,7 @@ endmacro()
 # directories. It's present on cmake 2.8.8 while precise version is 2.8.7
 link_directories(${PROJECT_BINARY_DIR}/test)
 include_directories("${PROJECT_SOURCE_DIR}/test/gtest/include")
-
-#################################################
-# Enable tests compilation by default
-if (NOT DEFINED ENABLE_TESTS_COMPILATION)
-  set (ENABLE_TESTS_COMPILATION True)
-endif()
-
-# Define testing macros as empty and redefine them if support is found and
-# ENABLE_TESTS_COMPILATION is set to true
-macro (gz_build_tests)
-endmacro()
-macro (gz_build_qt_tests)
-endmacro()
-macro (gz_build_display_tests)
-endmacro()
-macro (gz_build_dri_tests)
-endmacro()
-
-if (ENABLE_TESTS_COMPILATION)
-  include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
-endif()
+include (${gazebo_cmake_dir}/GazeboTestUtils.cmake)
 
 #################################################
 # Macro to setup supported compiler flags

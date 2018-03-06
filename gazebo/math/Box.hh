@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,11 @@
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/util/system.hh"
 
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 namespace gazebo
 {
   namespace math
@@ -32,24 +37,26 @@ namespace gazebo
 
     /// \class Box Box.hh math/gzmath.hh
     /// \brief Mathematical representation of a box and related functions.
+    // cppcheck-suppress noConstructor
     class GZ_MATH_VISIBLE Box
     {
       /// \brief Default constructor
-      public: Box();
+      public: Box() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor. This constructor will compute the box's
       /// minumum and maximum corners based on the two arguments.
       /// \param[in] _vec1 One corner of the box
       /// \param[in] _vec2 Another corner of the box
-      public: Box(const Vector3 &_vec1, const Vector3 &_vec2);
+      public: Box(const Vector3 &_vec1, const Vector3 &_vec2)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Ignition math copy constructor
       /// \param[in] _box Ignition box to convert
-      public: Box(const ignition::math::Box &_box);
+      public: Box(const ignition::math::Box &_box) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy Constructor
       /// \param[in]  _b Box to copy
-      public: Box(const Box &_b);
+      public: Box(const Box &_b) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Box();
@@ -146,6 +153,9 @@ namespace gazebo
   }
 }
 
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
 #endif
 
 

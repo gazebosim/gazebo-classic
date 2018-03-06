@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#include <boost/bind.hpp>
-#include "gazebo/transport/transport.hh"
-#include "gazebo/physics/physics.hh"
+#include <functional>
 #include "gazebo/gazebo.hh"
+#include "gazebo/physics/physics.hh"
+#include "gazebo/transport/transport.hh"
 
 #include "msgs/custom.pb.h"
 
@@ -33,7 +33,7 @@ namespace gazebo
       // Listen to the update event. This event is broadcast every
       // simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&CustomMessages::OnUpdate, this));
+          std::bind(&CustomMessages::OnUpdate, this));
     }
 
     // Called by the world update start event

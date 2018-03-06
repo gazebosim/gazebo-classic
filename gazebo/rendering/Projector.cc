@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,24 @@ void Projector::Load(const std::string &_name,
                      double _farClip,
                      double _fov)
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->Load(_name, _pose.Ign(), _textureName, _nearClip, _farClip, _fov);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Projector::Load(const std::string &_name,
+                     const ignition::math::Pose3d &_pose,
+                     const std::string &_textureName,
+                     const double _nearClip,
+                     const double _farClip,
+                     const double _fov)
+{
   std::string topicName = std::string("~/") + _name;
 
   boost::replace_all(topicName, "::", "/");
@@ -100,14 +118,14 @@ void Projector::Load(const std::string &_name,
 /////////////////////////////////////////////////
 void Projector::Load(sdf::ElementPtr _sdf)
 {
-  math::Pose pose;
+  ignition::math::Pose3d pose;
   std::string textureName;
   double nearClip = 0.1;
   double farClip = 10.0;
   double fov = M_PI * 0.25;
 
   if (_sdf->HasElement("pose"))
-    pose = _sdf->Get<math::Pose>("pose");
+    pose = _sdf->Get<ignition::math::Pose3d>("pose");
 
   if (_sdf->HasElement("texture_name"))
     textureName = _sdf->Get<std::string>("texture_name");
@@ -215,7 +233,9 @@ Projector::ProjectorFrameListener::~ProjectorFrameListener()
   if (this->node)
   {
     this->node->detachObject(this->frustum);
-    this->visual->GetSceneNode()->removeAndDestroyChild(this->nodeName);
+    Ogre::SceneNode *n = this->visual->GetSceneNode();
+    if (n)
+      n->removeAndDestroyChild(this->nodeName);
     this->node = NULL;
   }
 
@@ -248,8 +268,8 @@ void Projector::ProjectorFrameListener::Init(VisualPtr _visual,
 
   this->visual = _visual;
 
-  this->nodeName = this->visual->GetName() + "_Projector";
-  this->filterNodeName = this->visual->GetName() + "_ProjectorFilter";
+  this->nodeName = this->visual->Name() + "_Projector";
+  this->filterNodeName = this->visual->Name() + "_ProjectorFilter";
 
   this->frustum = new Ogre::Frustum();
   this->filterFrustum = new Ogre::Frustum();
@@ -331,8 +351,22 @@ void Projector::ProjectorFrameListener::SetSceneNode()
 /////////////////////////////////////////////////
 void Projector::ProjectorFrameListener::SetPose(const math::Pose &_pose)
 {
-  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.rot);
-  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.pos);
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->SetPose(_pose.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+void Projector::ProjectorFrameListener::SetPose(
+  const ignition::math::Pose3d &_pose)
+{
+  Ogre::Quaternion ogreQuaternion = Conversions::Convert(_pose.Rot());
+  Ogre::Vector3 ogreVec = Conversions::Convert(_pose.Pos());
   Ogre::Quaternion offsetQuaternion;
 
   this->node->setPosition(ogreVec);

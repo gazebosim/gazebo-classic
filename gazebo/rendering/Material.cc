@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #include "gazebo/common/Color.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/common/Console.hh"
+#include "gazebo/rendering/RenderEngine.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Material.hh"
 
@@ -74,9 +75,6 @@ void Material::CreateMaterials()
   texState = pass->createTextureUnitState();
   texState->setColourOperationEx(Ogre::LBX_SOURCE1, Ogre::LBS_MANUAL,
       Ogre::LBS_CURRENT, Ogre::ColourValue(0, 0, 1));
-
-
-
 
   mat = Ogre::MaterialManager::getSingleton().create(
       "__GAZEBO_TRANS_RED_MATERIAL__", "General");
@@ -157,27 +155,33 @@ void Material::Update(const gazebo::common::Material *_mat)
   common::Color diffuse =  _mat->GetDiffuse();
   common::Color specular = _mat->GetSpecular();
   common::Color emissive = _mat->GetEmissive();
+  float transparency = _mat->GetTransparency();
 
-
-  pass->setLightingEnabled(_mat->GetLighting());
+  // use transparency value if specified otherwise use diffuse alpha value
+  double alpha = transparency > 0 ? 1.0 - transparency : diffuse.a;
+  diffuse.a = alpha;
   pass->setDiffuse(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
   pass->setAmbient(ambient.r, ambient.g, ambient.b);
+  pass->setDepthWriteEnabled(_mat->GetDepthWrite());
 
   if (diffuse.a < 1.0)
   {
+    // set up pass for rendering transparency
     pass->setDepthWriteEnabled(false);
     pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
   }
 
   pass->setSpecular(specular.r, specular.g, specular.b, specular.a);
   pass->setSelfIllumination(emissive.r, emissive.g, emissive.b);
-
   pass->setShininess(_mat->GetShininess());
+  pass->setLightingEnabled(_mat->GetLighting());
 
   // Only add the texture unit if it's not present in the material
   if (!_mat->GetTextureImage().empty() &&
       pass->getTextureUnitState(_mat->GetTextureImage()) == NULL)
   {
+    // Make sure to add the path to the texture image.
+    RenderEngine::Instance()->AddResourcePath(_mat->GetTextureImage());
     Ogre::TextureUnitState *texState = pass->createTextureUnitState(
         _mat->GetTextureImage());
     texState->setTextureName(_mat->GetTextureImage());

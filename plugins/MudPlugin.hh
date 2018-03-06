@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,13 @@
  * limitations under the License.
  *
 */
-#ifndef _MUD_PLUGIN_HH_
-#define _MUD_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_MUDPLUGIN_HH_
+#define GAZEBO_PLUGINS_MUDPLUGIN_HH_
 
+#include <mutex>
 #include <string>
 #include <vector>
+#include <ignition/transport/Node.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -74,7 +76,7 @@ namespace gazebo
     private: std::string contactSensorName;
 
     /// \brief Mutex to protect reads and writes.
-    private: mutable boost::mutex mutex;
+    private: mutable std::mutex mutex;
 
     /// \brief Store newest contacts message.
     private: msgs::Contacts newestContactsMsg;
@@ -107,6 +109,13 @@ namespace gazebo
 
     /// \brief SDF for this plugin;
     private: sdf::ElementPtr sdf;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition transport node used for subscribing to
+    /// contact sensor messages.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif  // ifndef _MUD_PLUGIN_HH_

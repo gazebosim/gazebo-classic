@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  *
 */
-#include <string>
 
-// Include Rand.hh first to avoid osx compilation errors
-#include "gazebo/math/Rand.hh"
+#ifndef GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+#define GAZEBO_PLUGINS_MODELPROPSHOP_HH_
+
+#include <string>
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/rendering/rendering.hh"
 #include "gazebo/util/system.hh"
@@ -77,5 +80,19 @@ namespace gazebo
 
     /// \brief Path in which to save the output images.
     private: boost::filesystem::path savePath;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition node for communication.
+    private: ignition::transport::Node nodeIgn;
+
+    /// \brief Ignition publisher used to stop the server.
+    private: ignition::transport::Node::Publisher pubIgn;
+
+    /// \brief Ignition publisher used to spawn the model.
+    private: ignition::transport::Node::Publisher factoryPubIgn;
   };
 }
+
+#endif

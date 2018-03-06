@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
  * limitations under the License.
  *
 */
-/* Desc: A 4-wheeled vehicle
- * Author: Nate Koenig
- */
 
-#ifndef _GAZEBO_VEHICLE_PLUGIN_HH_
-#define _GAZEBO_VEHICLE_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_VEHICLEPLUGIN_HH_
+#define GAZEBO_PLUGINS_VEHICLEPLUGIN_HH_
 
 #include <string>
 #include <vector>
+
+#include <ignition/transport/Node.hh>
+#include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -51,7 +51,7 @@ namespace gazebo
     private: physics::JointPtr gasJoint, brakeJoint;
     private: physics::JointPtr steeringJoint;
 
-    private: math::Vector3 velocity;
+    private: ignition::math::Vector3d velocity;
 
     private: transport::NodePtr node;
     private: transport::SubscriberPtr velSub;
@@ -66,6 +66,12 @@ namespace gazebo
 
     private: double aeroLoad;
     private: double swayForce;
+
+    // Place ignition::transport objects at the end of this file to
+    // guarantee they are destructed first.
+
+    /// \brief Ignition Transport Node for communication.
+    private: ignition::transport::Node nodeIgn;
   };
 }
 #endif

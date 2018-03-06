@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
 
 #include "InRegionEventSource.hh"
 
@@ -43,13 +45,13 @@ void InRegionEventSource::Load(const sdf::ElementPtr _sdf)
   // Listen to the update event. This event is broadcast every
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&InRegionEventSource::Update, this));
+      std::bind(&InRegionEventSource::Update, this));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InRegionEventSource::Init()
 {
-  this->model = this->world->GetModel(this->modelName);
+  this->model = this->world->ModelByName(this->modelName);
   if (!model)
   {
     gzerr << this->name << ": Model '" << this->modelName
@@ -82,10 +84,12 @@ void InRegionEventSource::Info() const
   for (auto v: this->region->boxes)
   {
     ss << "  Min ";
-    ss << "[" << v.min.x << ", " << v.min.y << ", " << v.min.z << "]";
+    ss << "[" << v.Min().X() << ", " << v.Min().Y() << ", " << v.Min().Z()
+       << "]";
     ss << std::endl;
     ss << "  Max ";
-    ss << "[" << v.max.x << ", " << v.max.y << ", " << v.max.z << "]\n";
+    ss << "[" << v.Max().X() << ", " << v.Max().Y() << ", " << v.Max().Z()
+       << "]\n";
   }
   ss << "  inside: " << this->isInside << std::endl;
   gzmsg << ss.str();
@@ -102,7 +106,7 @@ void InRegionEventSource::Update()
   if (!this->region)
     return;
 
-  math::Vector3 point = this->model->GetWorldPose().pos;
+  ignition::math::Vector3d point = this->model->WorldPose().Pos();
   bool oldState = this->isInside;
   bool currentState = this->region->Contains(point);
 

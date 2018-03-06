@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _SIMBODY_COLLISION_HH_
-#define _SIMBODY_COLLISION_HH_
+#ifndef GAZEBO_PHYSICS_SIMBODY_SIMBODYCOLLISION_HH_
+#define GAZEBO_PHYSICS_SIMBODY_SIMBODYCOLLISION_HH_
 
 #include <string>
 
@@ -59,7 +59,7 @@ namespace gazebo
       public: virtual void SetCollideBits(unsigned int _bits);
 
       // Documentation inherited
-      public: virtual math::Box GetBoundingBox() const;
+      public: virtual ignition::math::Box BoundingBox() const;
 
       /// \brief Set the collision shape.
       /// \param[in] _shape SimTK geometry to use as the collision

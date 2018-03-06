@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,20 +36,22 @@ namespace gazebo
     class GZ_MATH_VISIBLE Vector2d
     {
       /// \brief Constructor
-      public: Vector2d();
+      public: Vector2d() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Constructor
       /// \param[in] _x value along x
       /// \param[in] _y value along y
-      public: Vector2d(const double &_x, const double &_y);
+      public: Vector2d(const double &_x, const double &_y)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor
       /// \param[in] _v the value
-      public: Vector2d(const Vector2d &_v);
+      public: Vector2d(const Vector2d &_v) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Copy constructor for ignition math
       /// \param[in] _v the value
-      public: Vector2d(const ignition::math::Vector2d &_v);
+      public: Vector2d(const ignition::math::Vector2d &_v)
+          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Destructor
       public: virtual ~Vector2d();
@@ -203,7 +205,6 @@ namespace gazebo
         return _in;
       }
     };
-
   /// \}
   }
 }

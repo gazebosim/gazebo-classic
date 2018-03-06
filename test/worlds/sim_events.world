@@ -16,7 +16,7 @@
     <region>
       <name>start</name>
       <volume>
-          <!-- min and max are sdf::Vector3 -->
+          <!-- min and max are ignition::math::Vector3d -->
           <!-- around the origin -->
           <min>-3 -3 -3</min>
           <max>3 3 3</max>
@@ -32,7 +32,7 @@
       </volume>
     </region>
 
-<!--   this only works in Mentor2 
+<!--   this only works in Mentor2
     <event>
       <name>connect</name>
       <type>topic</type>
@@ -68,7 +68,7 @@
       <name>Sim</name>
       <type>sim_state</type>
     </event>
-    
+
     <!-- bounding box intersection event-->
     <event>
       <name>Can1_in_0_0</name>
@@ -85,8 +85,8 @@
       <region>end</region>
     </event>
     </plugin>
-    
-    <!-- 
+
+    <!--
     spawn a few beers in the world (not coke cans, they have
     meshes that can't be loaded with all engines yet
     -->

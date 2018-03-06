@@ -16,10 +16,25 @@
 */
 #include <functional>
 #include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
+
+#ifdef _WIN32
+  #include <Winsock2.h>
+  #include <Ws2def.h>
+  #include <Ws2ipdef.h>
+  #include <Ws2tcpip.h>
+  using raw_type = char;
+#else
+  #include <sys/socket.h>
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
+  #include <arpa/inet.h>
+  using raw_type = void;
+#endif
+
+#if defined(_MSC_VER)
+#include <BaseTsd.h>
+typedef SSIZE_T ssize_t;
+#endif
 
 #include <mutex>
 #include <string>
@@ -135,10 +150,14 @@ class Rotor
   public: double samplingRate;
   public: ignition::math::OnePole<double> velocityFilter;
 
-  public: static constexpr double kDefaultRotorVelocitySlowdownSim = 10.0;
-  public: static constexpr double kDefaultFrequencyCutoff = 5.0;
-  public: static constexpr double kDefaultSamplingRate = 0.2;
+  public: static double kDefaultRotorVelocitySlowdownSim;
+  public: static double kDefaultFrequencyCutoff;
+  public: static double kDefaultSamplingRate;
 };
+
+double Rotor::kDefaultRotorVelocitySlowdownSim = 10.0;
+double Rotor::kDefaultFrequencyCutoff = 5.0;
+double Rotor::kDefaultSamplingRate = 0.2;
 
 // Private data class
 class gazebo::ArduCopterSocketPrivate
@@ -148,7 +167,10 @@ class gazebo::ArduCopterSocketPrivate
   {
     // initialize socket udp socket
     fd = socket(AF_INET, SOCK_DGRAM, 0);
+    #ifndef _WIN32
+    // Windows does not support FD_CLOEXEC
     fcntl(fd, F_SETFD, FD_CLOEXEC);
+    #endif
   }
 
   /// \brief destructor
@@ -173,15 +195,27 @@ class gazebo::ArduCopterSocketPrivate
     if (bind(this->fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) != 0)
     {
       shutdown(this->fd, 0);
+      #ifdef _WIN32
+      closesocket(this->fd);
+      #else
       close(this->fd);
+      #endif
       return false;
     }
     int one = 1;
     setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
           &one, sizeof(one));
+    setsockopt(this->fd, IPPROTO_TCP, TCP_NODELAY,
+          &one, sizeof(one));
 
+#ifdef _WIN32
+    u_long on = 1;
+    ioctlsocket(this->fd, FIONBIO,
+                reinterpret_cast<u_long FAR *>(&on));
+#else
     fcntl(this->fd, F_SETFL,
-    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+      fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+#endif
     return true;
   }
 
@@ -203,9 +237,17 @@ class gazebo::ArduCopterSocketPrivate
     int one = 1;
     setsockopt(this->fd, SOL_SOCKET, SO_REUSEADDR,
           &one, sizeof(one));
+    setsockopt(this->fd, IPPROTO_TCP, TCP_NODELAY,
+          &one, sizeof(one));
 
+#ifdef _WIN32
+    u_long on = 1;
+    ioctlsocket(this->fd, FIONBIO,
+                reinterpret_cast<u_long FAR *>(&on));
+#else
     fcntl(this->fd, F_SETFL,
-    fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+      fcntl(this->fd, F_GETFL, 0) | O_NONBLOCK);
+#endif
     return true;
   }
 
@@ -229,7 +271,7 @@ class gazebo::ArduCopterSocketPrivate
 
   public: ssize_t Send(const void *_buf, size_t _size)
   {
-    return send(this->fd, _buf, _size, 0);
+    return send(this->fd, reinterpret_cast<const raw_type *>(_buf), _size, 0);
   }
 
   /// \brief Receive data
@@ -252,7 +294,11 @@ class gazebo::ArduCopterSocketPrivate
         return -1;
     }
 
+    #ifdef _WIN32
+    return recv(this->fd, reinterpret_cast<char *>(_buf), _size, 0);
+    #else
     return recv(this->fd, _buf, _size, 0);
+    #endif
   }
 
   /// \brief Socket handle
@@ -283,16 +329,16 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Ardupilot Socket to send state to Ardupilot
   public: ArduCopterSocketPrivate socket_out;
 
-  /// \brief Ardupilot address  
+  /// \brief Ardupilot address
   public: std::string fdm_addr;
 
-  /// \brief Ardupilot listen address  
+  /// \brief Ardupilot listen address
   public: std::string listen_addr;
 
   /// \brief Ardupilot port for receiver socket
   public: uint16_t fdm_port_in;
 
-  /// \brief Ardupilot port for sender socket  
+  /// \brief Ardupilot port for sender socket
   public: uint16_t fdm_port_out;
 
   /// \brief Pointer to an IMU sensor
@@ -310,7 +356,7 @@ class gazebo::ArduCopterPluginPrivate
   public: int connectionTimeoutMaxCount;
 };
 
-/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 ArduCopterPlugin::ArduCopterPlugin()
   : dataPtr(new ArduCopterPluginPrivate)
 {
@@ -407,7 +453,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "samplingRate",
           rotor.samplingRate, rotor.samplingRate);
 
-      // use gazebo::math::Filter
+      // use ignition::math::Filter
       rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
 
       // initialize filter to zero value
@@ -452,7 +498,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  // std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
+  // std::string imuScopedName = this->dataPtr->model->GetWorld()->Name()
   //     + "::" + this->dataPtr->model->GetScopedName()
   //     + "::" + imuName;
   std::vector<std::string> imuScopedName =
@@ -505,7 +551,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     if (!this->dataPtr->imuSensor)
     {
       gzerr << "imu_sensor [" << imuName
-            << "] not found, abort ArduPilot plugin.\n" << "\n";
+            << "] not found, abort ArduCopter plugin.\n" << "\n";
       return;
     }
   }
@@ -536,7 +582,7 @@ void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
@@ -639,7 +685,7 @@ void ArduCopterPlugin::ReceiveMotorCommand()
   ssize_t recvSize =
       this->dataPtr->socket_in.Recv(&pkt, sizeof(ServoPacket), waitMs);
 
-  //Drain the socket in the case we're backed up
+  // Drain the socket in the case we're backed up
   int counter = 0;
   ServoPacket last_pkt;
   ssize_t recvSize_last = 1;
@@ -723,7 +769,7 @@ void ArduCopterPlugin::SendState() const
   // send_fdm
   fdmPacket pkt;
 
-  pkt.timestamp = this->dataPtr->model->GetWorld()->GetSimTime().Double();
+  pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward
@@ -773,7 +819,7 @@ void ArduCopterPlugin::SendState() const
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
   ignition::math::Pose3d worldToModel = gazeboToNED +
-    this->dataPtr->model->GetWorldPose().Ign();
+    this->dataPtr->model->WorldPose();
 
   // get transform from world NED to Model frame
   ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;
@@ -804,7 +850,7 @@ void ArduCopterPlugin::SendState() const
   // or...
   // Get model velocity in NED frame
   ignition::math::Vector3d velGazeboWorldFrame =
-    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+    this->dataPtr->model->GetLink()->WorldLinearVel();
   ignition::math::Vector3d velNEDFrame =
     gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();

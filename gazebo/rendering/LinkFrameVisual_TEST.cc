@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in axispliance with the License.
@@ -63,7 +63,7 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   EXPECT_EQ(linkFrameVis->GetParent(), linkVis);
 
   // Check that the pose within the link visual (local pose) is zero
-  EXPECT_EQ(linkFrameVis->GetPose(), gazebo::math::Pose::Zero);
+  EXPECT_EQ(linkFrameVis->Pose(), ignition::math::Pose3d::Zero);
 
   // Check that frame is not highlighted
   EXPECT_FALSE(linkFrameVis->GetHighlighted());

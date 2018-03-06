@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,12 +57,12 @@ TEST_F(GzWorld, Step)
 
   EXPECT_TRUE(world->IsPaused());
 
-  EXPECT_EQ(world->GetIterations(), 0u);
+  EXPECT_EQ(world->Iterations(), 0u);
 
   // Step the world one iteration.
   custom_exec("gz world -s 1");
 
-  EXPECT_EQ(world->GetIterations(), 1u);
+  EXPECT_EQ(world->Iterations(), 1u);
 
   EXPECT_TRUE(world->IsPaused());
 }

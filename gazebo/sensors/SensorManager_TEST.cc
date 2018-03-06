@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ TEST_F(SensorManager_TEST, Data)
   EXPECT_EQ(sensors.size(), sensorCount);
 
   // Get the current simulation time
-  common::Time time = physics::get_world()->GetSimTime();
+  common::Time time = physics::get_world()->SimTime();
 
   // Wait for 1 second
   for (unsigned int i = 0; i < 10; ++i)

@@ -7,13 +7,12 @@ include_directories(SYSTEM
   skyx/include
 )
 
-
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-link_directories(${tinyxml_LIBRARY_DIRS})
+link_directories(${tinyxml_LIBRARY_DIRS} ${IGNITION-MSGS_LIBRARY_DIRS})
 
 set (sources
   ApplyWrenchVisual.cc
@@ -36,6 +35,8 @@ set (sources
   JointVisual.cc
   LaserVisual.cc
   LinkFrameVisual.cc
+  MarkerManager.cc
+  MarkerVisual.cc
   SonarVisual.cc
   Light.cc
   LogicalCameraVisual.cc
@@ -128,6 +129,12 @@ set (headers
   ogre_gazebo.h
 )
 
+# This captures headers that should not be installed.
+set (internal_headers
+  MarkerManager.hh
+  MarkerVisual.hh
+)
+
 if (${OGRE_VERSION} VERSION_GREATER 1.7.4)
   add_subdirectory(deferred_shading)
 endif()
@@ -165,6 +172,7 @@ set (gtest_sources_dri
   LaserVisual_TEST.cc
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
   RenderingLight_TEST.cc
@@ -206,6 +214,8 @@ target_link_libraries(gazebo_rendering
   ${ogre_libraries}
   ${OPENGL_LIBRARIES}
   ${tinyxml_LIBRARIES}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 if (HAVE_OCULUS)

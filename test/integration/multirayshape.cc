@@ -37,7 +37,7 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
 
   gazebo::physics::MultiRayShapePtr rays =
     boost::dynamic_pointer_cast<gazebo::physics::MultiRayShape>(
-        world->GetPhysicsEngine()->CreateShape("multiray",
+        world->Physics()->CreateShape("multiray",
           gazebo::physics::CollisionPtr()));
   ASSERT_TRUE(rays != NULL);
 

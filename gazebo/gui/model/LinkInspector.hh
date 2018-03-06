@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,18 @@ namespace gazebo
       /// \brief Open the inspector.
       public: void Open();
 
+      /// \brief Set the state of show collisions button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowCollisions(const bool _show);
+
+      /// \brief Set the state of show visuals button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowVisuals(const bool _show);
+
+      /// \brief Set the state of show link frame button.
+      /// \param[in] _show If true, button is checked.
+      public: void SetShowLinkFrame(const bool _show);
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -102,8 +114,35 @@ namespace gazebo
       /// and the inspector closed.
       Q_SIGNALS: void Accepted();
 
+      /// \brief Qt signal emitted to indicate that all collisions should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowCollisions(const bool _show);
+
+      /// \brief Qt signal emitted to indicate that all visuals should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowVisuals(const bool _show);
+
+      /// \brief Qt signal emitted to indicate that link frame should be
+      /// shown/hidden.
+      /// \param[in] _show True to show.
+      Q_SIGNALS: void ShowLinkFrame(const bool _show);
+
       /// \brief Qt callback when the Remove button is pressed.
       private slots: void OnRemove();
+
+      /// \brief Qt callback when the show collisions button is pressed.
+      /// \param[in] _show Show if checked, hide otherwise.
+      private slots: void OnShowCollisions(const bool _show);
+
+      /// \brief Qt callback when the show visuals button is pressed.
+      /// \param[in] _show Show if checked, hide otherwise.
+      private slots: void OnShowVisuals(const bool _show);
+
+      /// \brief Qt callback when the show link frame button is pressed.
+      /// \param[in] _show Show if checked, hide otherwise.
+      private slots: void OnShowLinkFrame(const bool _show);
 
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();

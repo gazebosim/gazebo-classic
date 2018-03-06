@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: ODE Heightmap shape
- * Author: Nate Koenig
- * Date: 12 Nov 2009
- */
-
-#ifndef _ODEHEIGHTMAPSHAPE_HH_
-#define _ODEHEIGHTMAPSHAPE_HH_
+#ifndef GAZEBO_PHYSICS_ODE_ODEHEIGHTMAPSHAPE_HH_
+#define GAZEBO_PHYSICS_ODE_ODEHEIGHTMAPSHAPE_HH_
 
 #include <vector>
 

@@ -49,7 +49,7 @@
 #include <QtCore/QLocale>
 #include <QtCore/QDateTime>
 #include <QtCore/QMetaEnum>
-#include <QLineEdit>
+#include <QtWidgets/QLineEdit>
 #include <QtGui/QIcon>
 #include <climits>
 

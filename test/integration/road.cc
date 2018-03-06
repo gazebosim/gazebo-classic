@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,16 +44,16 @@ void RoadTest::TexturedWorld()
 
   // simulate 1 step
   world->Step(1);
-  double t = world->GetSimTime().Double();
+  double t = world->SimTime().Double();
   // verify that time moves forward
   EXPECT_GT(t, 0);
 
   // simulate a few steps
   int steps = 20;
   world->Step(steps);
-  double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  double dt = world->Physics()->GetMaxStepSize();
   EXPECT_GT(dt, 0);
-  t = world->GetSimTime().Double();
+  t = world->SimTime().Double();
   EXPECT_GT(t, 0.99*dt*static_cast<double>(steps+1));
 }
 
@@ -92,7 +92,7 @@ void RoadTest::RoadVisual()
   msg.set_name(roadName);
   msg.set_width(8);
   msgs::Vector3d *pt01Msg = msg.add_point();
-  msgs::Set(pt01Msg, ignition::math::Vector3d(0, 0, 0));
+  msgs::Set(pt01Msg, ignition::math::Vector3d::Zero);
   msgs::Vector3d *pt02Msg = msg.add_point();
   msgs::Set(pt02Msg, ignition::math::Vector3d(0, 5, 0));
   msgs::Vector3d *pt03Msg = msg.add_point();
@@ -117,7 +117,7 @@ void RoadTest::RoadVisual()
     sleep++;
   }
   ASSERT_TRUE(roadVis != nullptr);
-  EXPECT_EQ(roadVis->GetName(), roadName);
+  EXPECT_EQ(roadVis->Name(), roadName);
 }
 
 /////////////////////////////////////////////////

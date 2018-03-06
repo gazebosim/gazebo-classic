@@ -116,7 +116,7 @@ namespace gazebo
       /// returned on error.
       public: static std::tuple<MaterialType, double> Nearest(
                   const double _value,
-                  const double _epsilon = IGN_DBL_MAX);
+                  const double _epsilon = ignition::math::MAX_D);
 
       /// \brief Return the material with the closest density value within
       /// _epsilon, or MATERIAL_TYPE_END if not found.
@@ -125,7 +125,7 @@ namespace gazebo
       /// and a material's density.
       /// \return The nearest material type. MATERIAL_TYPE_END on error.
       public: static MaterialType NearestMaterial(const double _value,
-                  const double _epsilon = IGN_DBL_MAX);
+                  const double _epsilon = ignition::math::MAX_D);
 
       /// \brief List of density entries
       private: static std::map<MaterialType, double> materials;

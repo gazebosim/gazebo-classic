@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 // How tightly to compare for deterministic values
-#define IMU_TOL 1e-5
+#define IMU_TOL 8e-5
 
 using namespace gazebo;
 class ImuTest : public ServerFixture,
@@ -125,7 +125,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get pendulum
   std::string pendulumName = "model_pendulum";
-  physics::ModelPtr pendulumModel = world->GetModel(pendulumName);
+  physics::ModelPtr pendulumModel = world->ModelByName(pendulumName);
   ASSERT_TRUE(pendulumModel != NULL);
 
   std::string pendulumSensorName = "pendulum_imu_sensor";
@@ -137,7 +137,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get friction ball
   std::string ballFrictionName = "model_ball";
-  physics::ModelPtr ballFrictionModel = world->GetModel(ballFrictionName);
+  physics::ModelPtr ballFrictionModel = world->ModelByName(ballFrictionName);
   ASSERT_TRUE(ballFrictionModel != NULL);
 
   std::string ballFrictionSensorName = "ball_imu_sensor";
@@ -149,7 +149,8 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get frictionless ball
   std::string ballNoFrictionName = "model_ball_no_friction";
-  physics::ModelPtr ballNoFrictionModel = world->GetModel(ballNoFrictionName);
+  physics::ModelPtr ballNoFrictionModel =
+    world->ModelByName(ballNoFrictionName);
   ASSERT_TRUE(ballNoFrictionModel != NULL);
 
   std::string ballNoFrictionSensorName = "ball_no_friction_imu_sensor";
@@ -161,7 +162,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // get floating ball
   std::string ballFloatingName = "model_floating_imu";
-  physics::ModelPtr ballFloatingModel = world->GetModel(ballFloatingName);
+  physics::ModelPtr ballFloatingModel = world->ModelByName(ballFloatingName);
   ASSERT_TRUE(ballFloatingModel != NULL);
 
   std::string ballFloatingSensorName = "ball_floating_imu_sensor";
@@ -192,7 +193,7 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
   for (unsigned n = 0; n < 1900; ++n)
   {
     world->Step(1);
-    // gzdbg << "time: " << world->GetSimTime().Double() << "\n";
+    // gzdbg << "time: " << world->SimTime().Double() << "\n";
 
     // pendulum
     // on startup
@@ -208,30 +209,30 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       ignition::math::Vector3d imuLinearAccel =
         pendulumImu->LinearAcceleration();
       // get states from link
-      math::Vector3 relativeLinearAccel =
-        pendulumModel->GetRelativeLinearAccel();
-      math::Vector3 worldLinearAccel =
-        pendulumModel->GetWorldLinearAccel();
+      ignition::math::Vector3d relativeLinearAccel =
+        pendulumModel->RelativeLinearAccel();
+      ignition::math::Vector3d worldLinearAccel =
+        pendulumModel->WorldLinearAccel();
 
-      if (world->GetSimTime().Double() == 1.872)
+      if (world->SimTime().Double() == 1.872)
       {
         // initial values
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Y(), -0.041216, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Z(), 29.42581726, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, -0.036397, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, 19.6158848, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, -0.0267709, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, 19.6159003, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Y(), -0.036397, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Z(), 19.6158848, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Y(), -0.0267709, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Z(), 19.6159003, IMU_TOL);
       }
       else
       {
         // initial values
         EXPECT_LE(imuLinearAccel.Z(), 29.4259);
-        EXPECT_LE(relativeLinearAccel.z, 19.616);
-        EXPECT_LE(worldLinearAccel.z, 19.616);
+        EXPECT_LE(relativeLinearAccel.Z(), 19.616);
+        EXPECT_LE(worldLinearAccel.Z(), 19.616);
       }
     }
 
@@ -255,43 +256,43 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       ignition::math::Vector3d imuLinearAccel =
         ballFrictionImu->LinearAcceleration();
       // get states from link
-      math::Vector3 relativeLinearAccel =
-        ballFrictionModel->GetRelativeLinearAccel();
-      math::Vector3 worldLinearAccel =
-        ballFrictionModel->GetWorldLinearAccel();
+      ignition::math::Vector3d relativeLinearAccel =
+        ballFrictionModel->RelativeLinearAccel();
+      ignition::math::Vector3d worldLinearAccel =
+        ballFrictionModel->WorldLinearAccel();
 
-      if (world->GetSimTime().Double() <= 1.0)
+      if (world->SimTime().Double() <= 1.0)
       {
         // freefall
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, g.X(), IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, g.Y(), IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, g.Z(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, g.X(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, g.Y(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.X(), g.X(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Y(), g.Y(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Z(), g.Z(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.X(), g.X(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Y(), g.Y(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Z(), g.Z(), IMU_TOL);
       }
       // should use contact detector for these timing stuff
-      else if (world->GetSimTime().Double() >= 1.2 &&
-               world->GetSimTime().Double() <= 1.84)
+      else if (world->SimTime().Double() >= 1.2 &&
+               world->SimTime().Double() <= 1.84)
       {
         // on ramp
         // ...hm, not much can be said in simple terms, leave out for now.
       }
-      else if (world->GetSimTime().Double() >= 1.85)
+      else if (world->SimTime().Double() >= 1.85)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
         double gMag = g.Length();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Z(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Z(), 0, IMU_TOL);
       }
     }
 
@@ -313,26 +314,26 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
       ignition::math::Vector3d imuLinearAccel =
         ballNoFrictionImu->LinearAcceleration();
       // get states from link
-      math::Vector3 relativeLinearAccel =
-        ballNoFrictionModel->GetRelativeLinearAccel();
-      math::Vector3 worldLinearAccel =
-        ballNoFrictionModel->GetWorldLinearAccel();
+      ignition::math::Vector3d relativeLinearAccel =
+        ballNoFrictionModel->RelativeLinearAccel();
+      ignition::math::Vector3d worldLinearAccel =
+        ballNoFrictionModel->WorldLinearAccel();
 
-      if (world->GetSimTime().Double() <= 1.0)
+      if (world->SimTime().Double() <= 1.0)
       {
         // freefall
         EXPECT_NEAR(imuLinearAccel.X(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Y(), 0, IMU_TOL);
         EXPECT_NEAR(imuLinearAccel.Z(), 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, g.X(), IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, g.Y(), IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, g.Z(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, g.X(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, g.Y(), IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, g.Z(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.X(), g.X(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Y(), g.Y(), IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Z(), g.Z(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.X(), g.X(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Y(), g.Y(), IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Z(), g.Z(), IMU_TOL);
       }
-      else if (world->GetSimTime().Double() >= 1.3 &&
-               world->GetSimTime().Double() <= 1.751)
+      else if (world->SimTime().Double() >= 1.3 &&
+               world->SimTime().Double() <= 1.751)
       {
         // on the ramp
         const double rampAngle = 0.5;
@@ -340,23 +341,23 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
         double imuMag = imuLinearAccel.Length();
         EXPECT_NEAR(imuMag, gMag*cos(rampAngle), IMU_TOL);
 
-        double relMag = relativeLinearAccel.GetLength();
+        double relMag = relativeLinearAccel.Length();
         EXPECT_NEAR(relMag, gMag*sin(rampAngle), IMU_TOL);
-        double worMag = worldLinearAccel.GetLength();
+        double worMag = worldLinearAccel.Length();
         EXPECT_NEAR(worMag, gMag*sin(rampAngle), IMU_TOL);
       }
-      else if (world->GetSimTime().Double() >= 1.8)
+      else if (world->SimTime().Double() >= 1.8)
       {
         // on the ground
         double imuMag = imuLinearAccel.Length();
         double gMag = g.Length();
         EXPECT_NEAR(imuMag, gMag, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(relativeLinearAccel.z, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.x, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.y, 0, IMU_TOL);
-        EXPECT_NEAR(worldLinearAccel.z, 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(relativeLinearAccel.Z(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.X(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Y(), 0, IMU_TOL);
+        EXPECT_NEAR(worldLinearAccel.Z(), 0, IMU_TOL);
       }
     }
   }
@@ -506,11 +507,11 @@ void ImuTest::ImuSensorTestWorld(const std::string &_physicsEngine)
 
   // expected velocity calculation
   // kg*m^2
-  const double iyy = ballFloatingLink2->GetInertial()->GetPrincipalMoments().y;
+  const double iyy = ballFloatingLink2->GetInertial()->PrincipalMoments().Y();
   EXPECT_NEAR(iyy, 0.1, 1e-6);
 
   // sec
-  const double dt = world->GetPhysicsEngine()->GetMaxStepSize();
+  const double dt = world->Physics()->GetMaxStepSize();
   EXPECT_NEAR(dt, 0.001, 1e-6);
 
   // 1.5 m/s , pitch rate

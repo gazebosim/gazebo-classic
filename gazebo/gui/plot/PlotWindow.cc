@@ -16,6 +16,7 @@
 */
 #include <mutex>
 
+#include "gazebo/gui/qt.h"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/plot/IncrementalPlot.hh"

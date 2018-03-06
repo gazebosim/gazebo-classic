@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ ODERayShape::ODERayShape(CollisionPtr _parent)
     boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
   this->physicsEngine = boost::static_pointer_cast<ODEPhysics>(
-      this->collisionParent->GetWorld()->GetPhysicsEngine());
+      this->collisionParent->GetWorld()->Physics());
 
   GZ_ASSERT(collision->GetSpaceId() != 0, "Ray collision space is null");
   this->geomId = dCreateRay(collision->GetSpaceId(), 1.0);
@@ -90,7 +90,7 @@ ODERayShape::~ODERayShape()
 //////////////////////////////////////////////////
 void ODERayShape::Update()
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
 
   if (this->collisionParent)
   {
@@ -98,22 +98,24 @@ void ODERayShape::Update()
       boost::static_pointer_cast<ODECollision>(this->collisionParent);
 
     this->globalStartPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
           this->relativeStartPos);
 
     this->globalEndPos =
-      this->collisionParent->GetLink()->GetWorldPose().CoordPositionAdd(
+      this->collisionParent->GetLink()->WorldPose().CoordPositionAdd(
           this->relativeEndPos);
   }
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  if (!math::equal(this->contactLen, 0.0))
+  if (!ignition::math::equal(this->contactLen, 0.0))
   {
     dGeomRaySet(this->geomId,
-        this->globalStartPos.x, this->globalStartPos.y, this->globalStartPos.z,
-        dir.x, dir.y, dir.z);
+        this->globalStartPos.X(),
+        this->globalStartPos.Y(),
+        this->globalStartPos.Z(),
+        dir.X(), dir.Y(), dir.Z());
 
     dGeomRaySetLength(this->geomId,
         this->globalStartPos.Distance(this->globalEndPos));
@@ -144,18 +146,18 @@ void ODERayShape::GetIntersection(double &_dist, std::string &_entity)
 }
 
 //////////////////////////////////////////////////
-void ODERayShape::SetPoints(const math::Vector3 &_posStart,
-                            const math::Vector3 &_posEnd)
+void ODERayShape::SetPoints(const ignition::math::Vector3d &_posStart,
+                            const ignition::math::Vector3d &_posEnd)
 {
-  math::Vector3 dir;
+  ignition::math::Vector3d dir;
   RayShape::SetPoints(_posStart, _posEnd);
 
   dir = this->globalEndPos - this->globalStartPos;
   dir.Normalize();
 
-  dGeomRaySet(this->geomId, this->globalStartPos.x,
-              this->globalStartPos.y, this->globalStartPos.z,
-              dir.x, dir.y, dir.z);
+  dGeomRaySet(this->geomId, this->globalStartPos.X(),
+              this->globalStartPos.Y(), this->globalStartPos.Z(),
+              dir.X(), dir.Y(), dir.Z());
 
   dGeomRaySetLength(this->geomId,
                      this->globalStartPos.Distance(this->globalEndPos));

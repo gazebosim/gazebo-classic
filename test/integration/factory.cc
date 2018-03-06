@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  *
 */
 #include <string.h>
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 
@@ -28,6 +27,9 @@
 #include "gazebo/test/helper_physics_generator.hh"
 
 using namespace gazebo;
+
+const double g_tolerance = 1e-4;
+
 class FactoryTest : public ServerFixture,
                     public testing::WithParamInterface<const char*>
 {
@@ -76,7 +78,7 @@ void FactoryTest::BoxSdf(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
   }
@@ -114,13 +116,11 @@ void FactoryTest::Box(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_box_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
-    SpawnBox(name.str(), math::Vector3(1, 1, 1), setPose.Pos(),
+        ignition::math::Quaterniond::Identity);
+    SpawnBox(name.str(), ignition::math::Vector3d(1, 1, 1), setPose.Pos(),
         setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = EntityPose(name.str());
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -141,12 +141,10 @@ void FactoryTest::Sphere(const std::string &_physicsEngine)
     std::ostringstream name;
     name << "test_sphere_" << i;
     setPose.Set(ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnSphere(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = EntityPose(name.str());
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -168,12 +166,10 @@ void FactoryTest::Cylinder(const std::string &_physicsEngine)
     name << "test_cylinder_" << i;
     setPose.Set(
         ignition::math::Vector3d(0, 0, i+0.5),
-        ignition::math::Quaterniond(0, 0, 0));
+        ignition::math::Quaterniond::Identity);
     SpawnCylinder(name.str(), setPose.Pos(), setPose.Rot().Euler());
-    testPose = GetEntityPose(name.str()).Ign();
-    EXPECT_TRUE(math::equal(testPose.Pos().X(), setPose.Pos().X(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Y(), setPose.Pos().Y(), 0.1));
-    EXPECT_TRUE(math::equal(testPose.Pos().Z(), setPose.Pos().Z(), 0.1));
+    testPose = EntityPose(name.str());
+    EXPECT_TRUE(testPose.Pos().Equal(setPose.Pos(), 0.1));
   }
 }
 
@@ -655,6 +651,13 @@ TEST_P(FactoryTest, ActorAll)
 /////////////////////////////////////////////////
 void FactoryTest::Clone(const std::string &_physicsEngine)
 {
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Abort test since dart does not support ray sensor in PR2, "
+          << "Please see issue #911.\n";
+    return;
+  }
+
   ignition::math::Pose3d testPose;
   this->Load("worlds/pr2.world", true, _physicsEngine);
 
@@ -663,7 +666,7 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   msgs::Factory msg;
   ignition::math::Pose3d clonePose;
   clonePose.Set(ignition::math::Vector3d(2, 3, 0.5),
-      ignition::math::Quaterniond(0, 0, 0));
+      ignition::math::Quaterniond::Identity);
   msgs::Set(msg.mutable_pose(), clonePose);
   msg.set_clone_model_name(name);
   this->factoryPub->Publish(msg);
@@ -673,10 +676,8 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   this->WaitUntilEntitySpawn(cloneName, 100, 100);
 
   EXPECT_TRUE(this->HasEntity(cloneName));
-  testPose = GetEntityPose(cloneName).Ign();
-  EXPECT_TRUE(math::equal(testPose.Pos().X(), clonePose.Pos().X(), 0.1));
-  EXPECT_TRUE(math::equal(testPose.Pos().Y(), clonePose.Pos().Y(), 0.1));
-  EXPECT_TRUE(math::equal(testPose.Pos().Z(), clonePose.Pos().Z(), 0.1));
+  testPose = EntityPose(cloneName);
+  EXPECT_TRUE(testPose.Pos().Equal(clonePose.Pos(), 0.1));
 
   // Verify properties of the pr2 clone with the original model.
   // Check model
@@ -724,12 +725,12 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     // Check inertial
     physics::InertialPtr inertial = link->GetInertial();
     physics::InertialPtr inertialClone = linkClone->GetInertial();
-    EXPECT_EQ(inertial->GetMass(), inertialClone->GetMass());
-    EXPECT_EQ(inertial->GetCoG(), inertialClone->GetCoG());
-    EXPECT_EQ(inertial->GetPrincipalMoments(),
-        inertialClone->GetPrincipalMoments());
-    EXPECT_EQ(inertial->GetProductsofInertia(),
-        inertialClone->GetProductsofInertia());
+    EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
+    EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
+    EXPECT_EQ(inertial->PrincipalMoments(),
+        inertialClone->PrincipalMoments());
+    EXPECT_EQ(inertial->ProductsOfInertia(),
+        inertialClone->ProductsOfInertia());
   }
 
   // Check joints
@@ -739,17 +740,17 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
   {
     physics::JointPtr joint = joints[i];
     physics::JointPtr jointClone = jointClones[i];
-    EXPECT_EQ(joint->GetAngleCount(), jointClone->GetAngleCount());
-    for (unsigned j = 0; j < joint->GetAngleCount(); ++j)
+    EXPECT_EQ(joint->DOF(), jointClone->DOF());
+    for (unsigned j = 0; j < joint->DOF(); ++j)
     {
-      EXPECT_EQ(joint->GetUpperLimit(j), jointClone->GetUpperLimit(j));
-      EXPECT_EQ(joint->GetLowerLimit(j), jointClone->GetLowerLimit(j));
+      EXPECT_NEAR(joint->UpperLimit(j), jointClone->UpperLimit(j), g_tolerance);
+      EXPECT_NEAR(joint->LowerLimit(j), jointClone->LowerLimit(j), g_tolerance);
       EXPECT_EQ(joint->GetEffortLimit(j), jointClone->GetEffortLimit(j));
       EXPECT_EQ(joint->GetVelocityLimit(j), jointClone->GetVelocityLimit(j));
       EXPECT_EQ(joint->GetStopStiffness(j), jointClone->GetStopStiffness(j));
       EXPECT_EQ(joint->GetStopDissipation(j),
           jointClone->GetStopDissipation(j));
-      EXPECT_EQ(joint->GetLocalAxis(j), jointClone->GetLocalAxis(j));
+      EXPECT_EQ(joint->LocalAxis(j), jointClone->LocalAxis(j));
       EXPECT_EQ(joint->GetDamping(j), jointClone->GetDamping(j));
     }
   }
@@ -765,34 +766,33 @@ TEST_P(FactoryTest, Clone)
 // camera images. Need a better way to evaluate rendered content.
 // TEST_F(FactoryTest, Camera)
 // {
-/*
-  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
-      rendering::RenderEngine::NONE)
-    return;
-
-  math::Pose setPose, testPose;
-  Load("worlds/empty.world");
-  setPose.Set(math::Vector3(-5, 0, 5), math::Quaternion(0, GZ_DTOR(15), 0));
-  SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
-      setPose.rot.GetAsEuler());
-
-  unsigned char *img = NULL;
-  unsigned int width;
-  unsigned int height;
-  GetFrame("camera_sensor2", &img, width, height);
-  ASSERT_EQ(width, static_cast<unsigned int>(320));
-  ASSERT_EQ(height, static_cast<unsigned int>(240));
-
-  unsigned int diffMax = 0;
-  unsigned int diffSum = 0;
-  double diffAvg = 0;
-  ImageCompare(&img, &empty_world_camera1,
-      width, height, 3, diffMax, diffSum, diffAvg);
-  // PrintImage("empty_world_camera1", &img, width, height, 3);
-  ASSERT_LT(diffSum, static_cast<unsigned int>(100));
-  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
-  ASSERT_EQ(0.0, diffAvg);
-  */
+//  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+//      rendering::RenderEngine::NONE)
+//    return;
+//
+//  math::Pose setPose, testPose;
+//  Load("worlds/empty.world");
+//  setPose.Set(ignition::math::Vector3d(-5, 0, 5),
+//              ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+//  SpawnCamera("camera_model", "camera_sensor2", setPose.pos,
+//      setPose.rot.GetAsEuler());
+//
+//  unsigned char *img = NULL;
+//  unsigned int width;
+//  unsigned int height;
+//  GetFrame("camera_sensor2", &img, width, height);
+//  ASSERT_EQ(width, static_cast<unsigned int>(320));
+//  ASSERT_EQ(height, static_cast<unsigned int>(240));
+//
+//  unsigned int diffMax = 0;
+//  unsigned int diffSum = 0;
+//  double diffAvg = 0;
+//  ImageCompare(&img, &empty_world_camera1,
+//      width, height, 3, diffMax, diffSum, diffAvg);
+//  // PrintImage("empty_world_camera1", &img, width, height, 3);
+//  ASSERT_LT(diffSum, static_cast<unsigned int>(100));
+//  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
+//  ASSERT_EQ(0.0, diffAvg);
 // }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);

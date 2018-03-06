@@ -82,7 +82,7 @@ namespace gazebo
 }
 
 // empty plot id
-const unsigned int PlotCanvas::EmptyPlot = IGN_UINT32_MAX;
+const unsigned int PlotCanvas::EmptyPlot = ignition::math::MAX_UI32;
 
 // global plot id count
 unsigned int PlotCanvasPrivate::globalPlotId = 0;

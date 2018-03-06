@@ -42,9 +42,9 @@
 #ifndef QTPROPERTYBROWSER_H
 #define QTPROPERTYBROWSER_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtCore/QSet>
-#include <QtGui/QLineEdit>
+#include <QtWidgets/QLineEdit>
 #include <QtCore/QMap>
 
 #if QT_VERSION >= 0x040400

@@ -21,11 +21,6 @@
 #include <string>
 #include <memory>
 
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <arpa/inet.h>
-
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/util/system.hh"
 

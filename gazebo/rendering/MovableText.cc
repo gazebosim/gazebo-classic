@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -175,6 +175,12 @@ void MovableText::SetText(const std::string &newText)
 }
 
 //////////////////////////////////////////////////
+const std::string &MovableText::GetText() const
+{
+  return this->text;
+}
+
+//////////////////////////////////////////////////
 void MovableText::SetColor(const common::Color &newColor)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
@@ -191,7 +197,7 @@ void MovableText::SetCharHeight(float _height)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->charHeight, _height))
+  if (!ignition::math::equal(this->charHeight, _height))
   {
     this->charHeight = _height;
     this->needUpdate = true;
@@ -203,7 +209,7 @@ void MovableText::SetSpaceWidth(float _width)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
 
-  if (!math::equal(this->spaceWidth, _width))
+  if (!ignition::math::equal(this->spaceWidth, _width))
   {
     this->spaceWidth = _width;
     this->needUpdate = true;
@@ -231,7 +237,7 @@ void MovableText::SetTextAlignment(const HorizAlign &h, const VertAlign &v)
 void MovableText::SetBaseline(float _base)
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  if (!math::equal(this->baseline, _base))
+  if (!ignition::math::equal(this->baseline, _base))
   {
     this->baseline = _base;
     this->needUpdate = true;
@@ -260,14 +266,27 @@ bool MovableText::GetShowOnTop() const
 }
 
 //////////////////////////////////////////////////
-math::Box MovableText::GetAABB(void)
+math::Box MovableText::GetAABB()
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->AABB();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Box MovableText::AABB()
 {
   boost::recursive_mutex::scoped_lock lock(*this->mutex);
-  return math::Box(
-      math::Vector3(this->aabb->getMinimum().x,
+  return ignition::math::Box(
+      ignition::math::Vector3d(this->aabb->getMinimum().x,
                     this->aabb->getMinimum().y,
                     this->aabb->getMinimum().z),
-      math::Vector3(this->aabb->getMaximum().x,
+      ignition::math::Vector3d(this->aabb->getMaximum().x,
                     this->aabb->getMaximum().y,
                     this->aabb->getMaximum().z));
 }
@@ -360,7 +379,7 @@ void MovableText::_setupGeometry()
   pVert = static_cast<float*>(ptbuf->lock(Ogre::HardwareBuffer::HBL_DISCARD));
 
   // Derive space width from a capital A
-  if (math::equal(this->spaceWidth, 0.0f))
+  if (ignition::math::equal(this->spaceWidth, 0.0f))
     this->spaceWidth =
       this->font->getGlyphAspectRatio('A') * this->charHeight * 2.0;
 

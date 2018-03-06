@@ -34,8 +34,15 @@ macro (gz_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
-                   ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    if (BUILD_TESTING)
+      add_executable(${BINARY_NAME}
+                     ${GTEST_SOURCE_file}
+                     ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    else()
+      add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
+                     ${GTEST_SOURCE_file}
+                     ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    endif()
 
     link_directories(${PROJECT_BINARY_DIR}/test)
     target_link_libraries(${BINARY_NAME}
@@ -52,11 +59,11 @@ macro (gz_build_tests)
 	--gtest_output=xml:${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
 
     set(_env_vars)
-    list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
+    list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:$ENV{CMAKE_PREFIX_PATH}")
     list(APPEND _env_vars "GAZEBO_PLUGIN_PATH=${CMAKE_BINARY_DIR}/plugins:${CMAKE_BINARY_DIR}/plugins/events:${CMAKE_BINARY_DIR}/plugins/rest_web")
     list(APPEND _env_vars "GAZEBO_RESOURCE_PATH=${CMAKE_SOURCE_DIR}")
     list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
-    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$ENV{PKG_CONFIG_PATH}")
     set_tests_properties(${BINARY_NAME} PROPERTIES
       TIMEOUT 240
       ENVIRONMENT "${_env_vars}")
@@ -70,6 +77,8 @@ macro (gz_build_tests)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
         --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
+
+    add_dependencies(tests ${BINARY_NAME})
   endforeach()
 
   set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS "")
@@ -88,10 +97,14 @@ if (VALID_DISPLAY)
      string(REGEX REPLACE ".cc" "" BINARY_NAME ${QTEST_SOURCE_file})
      string(REGEX REPLACE ".cc" ".hh" QTEST_HEADER_file ${QTEST_SOURCE_file})
      set(BINARY_NAME ${TEST_TYPE}_${BINARY_NAME})
-     QT4_WRAP_CPP(${BINARY_NAME}_MOC ${QTEST_HEADER_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.hh)
 
-     add_executable(${BINARY_NAME}
-      ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      if (BUILD_TESTING)
+        add_executable(${BINARY_NAME}
+         ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      else()
+        add_executable(${BINARY_NAME} EXCLUDE_FROM_ALL
+         ${${BINARY_NAME}_MOC} ${QTEST_SOURCE_file} ${CMAKE_SOURCE_DIR}/gazebo/gui/QTestFixture.cc)
+      endif()
 
     add_dependencies(${BINARY_NAME}
       gazebo_gui
@@ -109,8 +122,7 @@ if (VALID_DISPLAY)
       # libraries as dependencies
       libgazebo
       gazebo_gui
-      ${QT_QTTEST_LIBRARY}
-      ${QT_LIBRARIES}
+      ${Qt5Test_LIBRARIES}
       )
 
     # QTest need and extra -o parameter to write logging information to a file
@@ -136,12 +148,24 @@ if (VALID_DISPLAY)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
         --error-exitcode=1 --show-leak-kinds=all ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME})
     endif()
+
+    add_dependencies(tests ${BINARY_NAME})
     endforeach()
+  endmacro()
+else()
+  # Fake macros when no valid display is found
+  macro (gz_build_display_tests)
+  endmacro()
+  macro (gz_build_qt_tests)
   endmacro()
 endif()
 
 if (VALID_DRI_DISPLAY)
   macro (gz_build_dri_tests)
     gz_build_tests(${ARGV})
+  endmacro()
+else()
+  # Fake macro when no valid DRI display is found
+  macro (gz_build_dri_tests)
   endmacro()
 endif()

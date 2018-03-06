@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
  * limitations under the License.
  *
 */
-/* Desc: Occupancy grid collision
- * Author: Nate Koenig
-*/
-
-#ifndef _MAPSHAPE_HH_
-#define _MAPSHAPE_HH_
+#ifndef GAZEBO_PHYSISCS_MAPSHAPE_HH_
+#define GAZEBO_PHYSISCS_MAPSHAPE_HH_
 
 #include <deque>
 #include <string>
@@ -80,11 +76,16 @@ namespace gazebo
 
       /// \brief Set the scale of the map shape.
       /// \param[in] _scale Scale to set the map shape to.
-      public: void SetScale(const math::Vector3 &_scale);
+      public: void SetScale(const ignition::math::Vector3d &_scale);
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      public: virtual math::Vector3 GetScale() const;
+      /// \deprecated See ignition::math::Vector3d Scale() const
+      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Returns scaling factor for this geometry.
+      /// \return Scaling factor.
+      public: virtual ignition::math::Vector3d Scale() const;
 
       /// \brief Returns image threshold for this geometry.
       /// All regions in image with value larger than MapShape::scale

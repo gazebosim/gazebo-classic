@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,9 @@ Contact &Contact::operator =(const msgs::Contact &_contact)
   if (world)
   {
     this->collision1 = boost::dynamic_pointer_cast<Collision>(
-        this->world->GetEntity(_contact.collision1())).get();
+        this->world->EntityByName(_contact.collision1())).get();
     this->collision2 = boost::dynamic_pointer_cast<Collision>(
-      this->world->GetEntity(_contact.collision2())).get();
+      this->world->EntityByName(_contact.collision2())).get();
   }
   else
   {
@@ -130,7 +130,7 @@ std::string Contact::DebugString() const
 {
   std::ostringstream stream;
 
-  stream << "World [" << this->world->GetName() << "]\n"
+  stream << "World [" << this->world->Name() << "]\n"
          << "Collision 1[" << this->collision1->GetScopedName() << "]\n"
          << "Collision 2[" << this->collision2->GetScopedName() << "]\n"
          << "Time[" << this->time << "]\n"
@@ -154,7 +154,7 @@ std::string Contact::DebugString() const
 //////////////////////////////////////////////////
 void Contact::FillMsg(msgs::Contact &_msg) const
 {
-  _msg.set_world(this->world->GetName());
+  _msg.set_world(this->world->Name());
   _msg.set_collision1(this->collision1->GetScopedName());
   _msg.set_collision2(this->collision2->GetScopedName());
   msgs::Set(_msg.mutable_time(), this->time);
@@ -163,8 +163,8 @@ void Contact::FillMsg(msgs::Contact &_msg) const
   {
     _msg.add_depth(this->depths[j]);
 
-    msgs::Set(_msg.add_position(), this->positions[j].Ign());
-    msgs::Set(_msg.add_normal(), this->normals[j].Ign());
+    msgs::Set(_msg.add_position(), this->positions[j]);
+    msgs::Set(_msg.add_normal(), this->normals[j]);
 
     msgs::JointWrench *jntWrench = _msg.add_wrench();
     jntWrench->set_body_1_name(this->collision1->GetScopedName());
@@ -173,11 +173,11 @@ void Contact::FillMsg(msgs::Contact &_msg) const
     jntWrench->set_body_2_id(this->collision2->GetId());
 
     msgs::Wrench *wrenchMsg =  jntWrench->mutable_body_1_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body1Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body1Torque);
 
     wrenchMsg =  jntWrench->mutable_body_2_wrench();
-    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force.Ign());
-    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque.Ign());
+    msgs::Set(wrenchMsg->mutable_force(), this->wrench[j].body2Force);
+    msgs::Set(wrenchMsg->mutable_torque(), this->wrench[j].body2Torque);
   }
 }

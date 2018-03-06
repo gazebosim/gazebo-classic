@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,17 +65,17 @@ void AxisVisual::Load()
 
   Visual::Load();
 
-  dPtr->xAxis.reset(new ArrowVisual(this->GetName() +
+  dPtr->xAxis.reset(new ArrowVisual(this->Name() +
       "_X_AXIS", shared_from_this()));
   dPtr->xAxis->Load();
   dPtr->xAxis->SetMaterial("Gazebo/RedTransparent");
 
-  dPtr->yAxis.reset(new ArrowVisual(this->GetName() +
+  dPtr->yAxis.reset(new ArrowVisual(this->Name() +
       "_Y_AXIS", shared_from_this()));
   dPtr->yAxis->Load();
   dPtr->yAxis->SetMaterial("Gazebo/GreenTransparent");
 
-  dPtr->zAxis.reset(new ArrowVisual(this->GetName() +
+  dPtr->zAxis.reset(new ArrowVisual(this->Name() +
       "_Z_AXIS", shared_from_this()));
   dPtr->zAxis->Load();
   dPtr->zAxis->SetMaterial("Gazebo/BlueTransparent");

@@ -52,7 +52,7 @@ IntrospectionManager::IntrospectionManager()
   // Advertise the service for creating a new filter.
   std::string service = this->dataPtr->prefix + "filter_new";
   if (!this->dataPtr->node.Advertise(service,
-      &IntrospectionManager::NewFilter, this))
+        &IntrospectionManager::NewFilter, this))
   {
     gzerr << "Error advertising service [" << service << "]" << std::endl;
   }
@@ -84,7 +84,9 @@ IntrospectionManager::IntrospectionManager()
   // Advertise the topic for notifying changes in the registered items.
   std::string topic = "/introspection/" + this->dataPtr->managerId +
       "/items_update";
-  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic))
+  this->dataPtr->itemsUpdatePub =
+    this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topic);
+  if (!this->dataPtr->itemsUpdatePub)
   {
     gzerr << "Error advertising topic [" << topic << "]" << std::endl;
   }
@@ -236,10 +238,16 @@ void IntrospectionManager::Update()
 
     // Publish the update for this filter.
     std::string topicName = this->dataPtr->prefix + "filter/" + filter.first;
-    if (!this->dataPtr->node.Publish(topicName, nextMsg))
+
     {
-      gzerr << "Error publishing update for topic [" << topicName << "]"
-            << std::endl;
+      std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+      if (this->dataPtr->filterPubs.find(topicName) ==
+          this->dataPtr->filterPubs.end() ||
+          !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
+      {
+        gzerr << "Error publishing update for topic [" << topicName << "]"
+          << std::endl;
+      }
     }
   }
 
@@ -265,9 +273,11 @@ void IntrospectionManager::NotifyUpdates()
     // Prepare the list of items to be sent.
     this->Items(req, currentItems, result);
 
-    std::string topicName = "/introspection/" + this->dataPtr->managerId +
-      "/items_update";
-    this->dataPtr->node.Publish(topicName, currentItems);
+    if (!this->dataPtr->itemsUpdatePub.Publish(currentItems))
+    {
+      gzerr << "Failed to publish items on topic[/introspection/" <<
+        this->dataPtr->managerId << "/items_update]" << std::endl;
+    }
   }
 }
 
@@ -289,8 +299,15 @@ bool IntrospectionManager::NewFilter(const std::set<std::string> &_newItems,
 
   std::string topicName = this->dataPtr->prefix + "filter/" + _filterId;
 
+  ignition::transport::Node::Publisher pub =
+    this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topicName);
+
   // Advertise the new topic.
-  if (!this->dataPtr->node.Advertise<gazebo::msgs::Param_V>(topicName))
+  if (pub)
+  {
+    this->dataPtr->filterPubs[topicName] = pub;
+  }
+  else
   {
     gzerr << "Error advertising topic [" << topicName << "]." << std::endl;
     gzerr << "Ignoring request." << std::endl;
@@ -379,11 +396,17 @@ bool IntrospectionManager::RemoveFilter(const std::string &_filterId)
 
   // Unadvertise topic.
   std::string topicName = this->dataPtr->prefix + "filter/" + _filterId;
-  if (!this->dataPtr->node.Unadvertise(topicName))
+  if (this->dataPtr->filterPubs.find(topicName) ==
+      this->dataPtr->filterPubs.end())
   {
     gzerr << "Error unadvertising topic [" << topicName << "]" << std::endl;
     gzerr << "Ignoring request." << std::endl;
     return false;
+  }
+  else
+  {
+    // Removing the publisher should unadvertise the topic.
+    this->dataPtr->filterPubs.erase(topicName);
   }
 
   // Save the old list of items.

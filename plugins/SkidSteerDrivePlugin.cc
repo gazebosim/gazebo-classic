@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
   this->model = _model;
 
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init(this->model->GetWorld()->GetName());
+  this->node->Init(this->model->GetWorld()->Name());
 
   int err = 0;
 
@@ -77,8 +77,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
     return;
 
   // This assumes that front and rear wheel spacing is identical
-  this->wheelSeparation = this->joints[RIGHT_FRONT]->GetAnchor(0).Distance(
-                          this->joints[LEFT_FRONT]->GetAnchor(0));
+  this->wheelSeparation = this->joints[RIGHT_FRONT]->Anchor(0).Distance(
+                          this->joints[LEFT_FRONT]->Anchor(0));
 
   // This assumes that the largest dimension of the wheel is the diameter
   // and that all wheels have the same diameter
@@ -86,8 +86,8 @@ void SkidSteerDrivePlugin::Load(physics::ModelPtr _model,
                                         this->joints[RIGHT_FRONT]->GetChild() );
   if (wheelLink)
   {
-    math::Box bb = wheelLink->GetBoundingBox();
-    this->wheelRadius = bb.GetSize().GetMax() * 0.5;
+    ignition::math::Box bb = wheelLink->BoundingBox();
+    this->wheelRadius = bb.Size().Max() * 0.5;
   }
 
   // Validity checks...

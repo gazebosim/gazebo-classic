@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 Open Source Robotics Foundation
+ * Copyright 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
 
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/GuiEvents.hh>
@@ -85,7 +87,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
       // Connections
       this->connections.push_back(
           gui::Events::ConnectWindowMode(
-          boost::bind(&RestUiWidget::OnWindowMode, this, _1)));
+          std::bind(&RestUiWidget::OnWindowMode, this, std::placeholders::_1)));
     }
   }
   if (!this->toolbar)

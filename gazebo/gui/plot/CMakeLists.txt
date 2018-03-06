@@ -1,4 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
+include_directories(${QWT_WIN_INCLUDE_DIR})
 
 set (sources_local
   plot/EditableLabel.cc

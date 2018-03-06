@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
 {
   // store a pointer to the simbody physics engine for convenience
   this->simbodyPhysics = boost::dynamic_pointer_cast<SimbodyPhysics>(
-    this->model->GetWorld()->GetPhysicsEngine());
+    this->model->GetWorld()->Physics());
 
   Joint::Load(_sdf);
 
@@ -106,13 +106,13 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
   // \TODO: consider storing the unassembled format parent pose when
   // calling Joint::Load(sdf::ElementPtr)
 
-  math::Pose childPose = _sdf->Get<math::Pose>("pose");
+  ignition::math::Pose3d childPose = _sdf->Get<ignition::math::Pose3d>("pose");
   if (_sdf->GetElement("child")->HasElement("pose"))
-    childPose = _sdf->GetElement("child")->Get<math::Pose>("pose");
+    childPose = _sdf->GetElement("child")->Get<ignition::math::Pose3d>("pose");
 
   this->xCB = physics::SimbodyPhysics::Pose2Transform(childPose);
 
-  math::Pose parentPose;
+  ignition::math::Pose3d parentPose;
   if (_sdf->GetElement("parent")->HasElement("pose"))
     this->xPA = physics::SimbodyPhysics::GetPose(_sdf->GetElement("parent"));
   else
@@ -121,26 +121,24 @@ void SimbodyJoint::Load(sdf::ElementPtr _sdf)
     if (this->parentLink)
     {
       X_MP = physics::SimbodyPhysics::Pose2Transform(
-        this->parentLink->GetRelativePose());
+          this->parentLink->RelativePose());
     }
     else
     {
       // TODO: verify
       // parent frame is at the world frame
-      X_MP = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+      X_MP = ~physics::SimbodyPhysics::Pose2Transform(this->model->WorldPose());
     }
 
     if (this->childLink)
     {
       X_MC = physics::SimbodyPhysics::Pose2Transform(
-        this->childLink->GetRelativePose());
+        this->childLink->RelativePose());
     }
     else
     {
       // TODO: verify
-      X_MC = ~physics::SimbodyPhysics::Pose2Transform(
-        this->model->GetWorldPose());
+      X_MC = ~physics::SimbodyPhysics::Pose2Transform(this->model->WorldPose());
     }
 
     const SimTK::Transform X_PC = ~X_MP*X_MC;
@@ -222,14 +220,14 @@ void SimbodyJoint::CacheForceTorque()
   // Note minus sign indicates these are reaction forces
   // by the Link on the Joint in the target Link frame.
   this->wrench.body1Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnParentBody);
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnParentBody);
   this->wrench.body1Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnParentBody);
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnParentBody);
 
   this->wrench.body2Force =
-    -SimbodyPhysics::Vec3ToVector3(reactionForceOnChildBody);
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionForceOnChildBody);
   this->wrench.body2Torque =
-    -SimbodyPhysics::Vec3ToVector3(reactionTorqueOnChildBody);
+    -SimbodyPhysics::Vec3ToVector3Ign(reactionTorqueOnChildBody);
 }
 
 //////////////////////////////////////////////////
@@ -266,18 +264,19 @@ void SimbodyJoint::Detach()
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAxis(unsigned int _index, const math::Vector3 &/*_axis*/)
+void SimbodyJoint::SetAxis(const unsigned int _index,
+    const ignition::math::Vector3d &/*_axis*/)
 {
-  math::Pose parentModelPose;
+  ignition::math::Pose3d parentModelPose;
   if (this->parentLink)
-    parentModelPose = this->parentLink->GetModel()->GetWorldPose();
+    parentModelPose = this->parentLink->GetModel()->WorldPose();
 
   // Set joint axis
   // assuming incoming axis is defined in the model frame, so rotate them
   // into the inertial frame
   // TODO: switch so the incoming axis is defined in the child frame.
-  math::Vector3 axis = parentModelPose.rot.RotateVector(
-    this->sdf->GetElement("axis")->Get<math::Vector3>("xyz"));
+  ignition::math::Vector3d axis = parentModelPose.Rot().RotateVector(
+    this->sdf->GetElement("axis")->Get<ignition::math::Vector3d>("xyz"));
 
   if (_index == 0)
     this->sdf->GetElement("axis")->GetElement("xyz")->Set(axis);
@@ -308,7 +307,7 @@ void SimbodyJoint::SetForce(unsigned int _index, double _force)
 //////////////////////////////////////////////////
 double SimbodyJoint::GetForce(unsigned int _index)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     return this->forceApplied[_index];
   }
@@ -325,12 +324,12 @@ void SimbodyJoint::SaveForce(unsigned int _index, double _force)
 {
   // this bit of code actually doesn't do anything physical,
   // it simply records the forces commanded inside forceApplied.
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
-    if (this->forceAppliedTime < this->GetWorld()->GetSimTime())
+    if (this->forceAppliedTime < this->GetWorld()->SimTime())
     {
       // reset forces if time step is new
-      this->forceAppliedTime = this->GetWorld()->GetSimTime();
+      this->forceAppliedTime = this->GetWorld()->SimTime();
       this->forceApplied[0] = this->forceApplied[1] = 0;
     }
 
@@ -378,8 +377,8 @@ void SimbodyJoint::RestoreSimbodyState(SimTK::State &/*_state*/)
 }
 
 //////////////////////////////////////////////////
-void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
-    const gazebo::math::Vector3 & /*_anchor*/)
+void SimbodyJoint::SetAnchor(const unsigned int /*_index*/,
+    const ignition::math::Vector3d & /*_anchor*/)
 {
   gzerr << "SimbodyJoint::SetAnchor:  Not implement in Simbody."
         << " Anchor is set during joint construction in SimbodyPhysics.cc\n";
@@ -388,7 +387,7 @@ void SimbodyJoint::SetAnchor(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, this->stiffnessCoefficient[_index],
       _damping);
@@ -396,8 +395,8 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
   else
   {
      gzerr << "SimbodyJoint::SetDamping: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -405,7 +404,7 @@ void SimbodyJoint::SetDamping(unsigned int _index, const double _damping)
 //////////////////////////////////////////////////
 void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->SetStiffnessDamping(_index, _stiffness,
       this->dissipationCoefficient[_index]);
@@ -413,8 +412,8 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
   else
   {
      gzerr << "SimbodyJoint::SetStiffness: index[" << _index
-           << "] is out of bounds (GetAngleCount() = "
-           << this->GetAngleCount() << ").\n";
+           << "] is out of bounds (DOF() = "
+           << this->DOF() << ").\n";
      return;
   }
 }
@@ -423,7 +422,7 @@ void SimbodyJoint::SetStiffness(unsigned int _index, const double _stiffness)
 void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
   double _stiffness, double _damping, double _reference)
 {
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     this->stiffnessCoefficient[_index] = _stiffness;
     this->dissipationCoefficient[_index] = _damping;
@@ -450,24 +449,27 @@ void SimbodyJoint::SetStiffnessDamping(unsigned int _index,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::Anchor(
+    const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkForce(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyJoint::GetLinkTorque(unsigned int /*_index*/) const
+ignition::math::Vector3d SimbodyJoint::LinkTorque(
+          const unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";
-  return math::Vector3();
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
@@ -485,11 +487,12 @@ double SimbodyJoint::GetParam(const std::string &_key, unsigned int _index)
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetUpperLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetHighStop(_index, _angle);
+  Joint::SetUpperLimit(_index, _limit);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -497,35 +500,33 @@ bool SimbodyJoint::SetHighStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          this->GetLowStop(_index).Radian(), _angle.Radian());
+          this->LowerLimit(_index), _limit);
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetHighStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetUpperLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetHighStop: State not initialized, SetHighStop failed.\n";
-      return false;
+      gzerr << "SetUpperLimit: State not initialized, SetUpperLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetHighStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetUpperLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
+void SimbodyJoint::SetLowerLimit(const unsigned int _index,
+                                 const double _limit)
 {
-  Joint::SetLowStop(_index, _angle);
+  Joint::SetLowerLimit(_index, _limit);
 
-  if (_index < this->GetAngleCount())
+  if (_index < this->DOF())
   {
     if (this->physicsInitialized)
     {
@@ -533,82 +534,78 @@ bool SimbodyJoint::SetLowStop(unsigned int _index, const math::Angle &_angle)
       {
         this->limitForce[_index].setBounds(
           this->simbodyPhysics->integ->updAdvancedState(),
-          _angle.Radian(),
-          this->GetHighStop(_index).Radian());
+          _limit, this->UpperLimit(_index));
       }
       else
       {
         gzerr << "child link is null, force element not initialized, "
-              << "SetLowStop failed. Please file a report on issue tracker.\n";
-        return false;
+              << "SetLowerLimit failed. Please file a report on issue "
+              << "tracker.\n";
       }
     }
     else
     {
-      gzerr << "SetLowStop: State not initialized, SetLowStop failed.\n";
-      return false;
+      gzerr << "SetLowerLimit: State not initialized, SetLowerLimit failed.\n";
     }
   }
   else
   {
-    gzerr << "SetLowStop: index out of bounds.\n";
-    return false;
+    gzerr << "SetLowerLimit: index out of bounds.\n";
   }
-  return true;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetHighStop(unsigned int _index)
+double SimbodyJoint::UpperLimit(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::UpperLimit.
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get high stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("upper"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("upper");
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    gzerr << "Should not be here in code, DOF > 2?\n";
+    return ignition::math::NAN_D;
   }
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyJoint::GetLowStop(unsigned int _index)
+double SimbodyJoint::LowerLimit(const unsigned int _index) const
 {
-  if (_index >= this->GetAngleCount())
+  /// \todo Simbody is getting the limit from SDF, maybe it should use the base
+  /// class Joint::LowerLimit.
+  if (_index >= this->DOF())
   {
     gzerr << "Invalid joint index [" << _index
           << "] when trying to get low stop\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    return ignition::math::NAN_D;
   }
   else if (_index == 0)
   {
-    return math::Angle(this->sdf->GetElement("axis")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else if (_index == 1)
   {
-    return math::Angle(this->sdf->GetElement("axis2")->GetElement("limit")
-             ->Get<double>("lower"));
+    return this->sdf->GetElement("axis2")->GetElement("limit")
+             ->Get<double>("lower");
   }
   else
   {
-    gzerr << "Should not be here in code, GetAngleCount > 2?\n";
-    /// \TODO: should return NaN
-    return math::Angle(0.0);
+    gzerr << "Should not be here in code, DOF > 2?\n";
+    return ignition::math::NAN_D;
   }
 }

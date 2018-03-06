@@ -100,6 +100,12 @@ namespace gazebo
       /// \return True if the string could be parsed as a URIPath.
       public: bool Parse(const std::string &_str);
 
+      /// \brief Returns true if _other is a subset of this, counting from the
+      /// beginning.
+      /// \param[in] _other Another path.
+      /// \return True if this path contains _other.
+      public: bool Contains(const URIPath &_other) const;
+
       /// \internal
       /// \brief Pointer to private data.
       private: std::unique_ptr<URIPathPrivate> dataPtr;

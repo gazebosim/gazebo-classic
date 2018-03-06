@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,23 @@ void Road::Init()
 }
 
 /////////////////////////////////////////////////
-const std::vector<math::Vector3> &Road::GetPoints() const
+const std::vector<math::Vector3> Road::GetPoints() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  std::vector<math::Vector3> result;
+  for (const auto pt : this->points)
+    result.push_back(pt);
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+  return result;
+}
+
+/////////////////////////////////////////////////
+const std::vector<ignition::math::Vector3d> &Road::Points() const
 {
   return this->points;
 }

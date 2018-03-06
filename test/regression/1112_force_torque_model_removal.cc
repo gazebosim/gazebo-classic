@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,14 @@ TEST_F(Issue1112Test, Reset)
   // Wait some bit of time since World::Clear is not immediate.
   int sleepCount = 20;
   int sleep = 0;
-  while (world->GetModelCount() > 0u && sleep < sleepCount)
+  while (world->ModelCount() > 0u && sleep < sleepCount)
   {
     common::Time::MSleep(100);
     sleep++;
   }
 
   // Expecting that the world is empty (and the simulation did not crash)
-  EXPECT_EQ(world->GetModelCount(), 0u);
+  EXPECT_EQ(world->ModelCount(), 0u);
 }
 
 /////////////////////////////////////////////////

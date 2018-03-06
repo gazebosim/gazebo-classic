@@ -1,5 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
-include_directories(${IGNITION-MATH_INCLUDE_DIRS})
+include_directories(${IGNITION-MATH_INCLUDE_DIRS} ${IGNITION-MSGS_INCLUDE_DIRS})
 
 set (msgs
   altimeter.proto
@@ -207,6 +207,7 @@ endif()
 target_link_libraries(gazebo_msgs
   gazebo_common
   ${GZ_PROTOBUF_LIBRARY}
+  ${IGNITION-MSGS_LIBRARIES}
 )
 
 add_dependencies(gazebo_msgs gazebomsgs_out)

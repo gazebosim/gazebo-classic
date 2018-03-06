@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2016 Open Source Robotics Foundation
+ * Copyright (C) 2013 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ TEST_F(GzJoint, Force)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
@@ -42,7 +42,7 @@ TEST_F(GzJoint, Force)
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   world->SetPaused(true);
 
@@ -52,7 +52,7 @@ TEST_F(GzJoint, Force)
   world->Step(100);
 
   // Make sure the joint has moved.
-  EXPECT_GT(joint->GetAngle(0).Radian(), 0.1);
+  EXPECT_GT(joint->Position(0), 0.1);
 }
 
 /////////////////////////////////////////////////
@@ -66,12 +66,12 @@ TEST_F(GzJoint, PositionPID)
   ASSERT_TRUE(world != NULL);
 
   // Disable gravity to simplify PID control
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
-  physics->SetGravity(math::Vector3::Zero);
+  physics->SetGravity(ignition::math::Vector3d::Zero);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
@@ -79,7 +79,7 @@ TEST_F(GzJoint, PositionPID)
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   world->SetPaused(true);
 
@@ -94,7 +94,7 @@ TEST_F(GzJoint, PositionPID)
   world->Step(5000);
 
   // Make sure the joint is at the specified pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), targetAngle, 0.2);
+  EXPECT_NEAR(joint->Position(0), targetAngle, 0.2);
 }
 
 /////////////////////////////////////////////////
@@ -108,7 +108,7 @@ TEST_F(GzJoint, VelocityPID)
   ASSERT_TRUE(world != NULL);
 
   // Get a pointer to the model
-  physics::ModelPtr model = world->GetModel("model");
+  physics::ModelPtr model = world->ModelByName("model");
   ASSERT_TRUE(model != NULL);
 
   // Get a pointer to the joint
@@ -116,7 +116,7 @@ TEST_F(GzJoint, VelocityPID)
   ASSERT_TRUE(joint != NULL);
 
   // Make sure the joint is at the correct initial pose
-  EXPECT_NEAR(joint->GetAngle(0).Radian(), 0.0, 1e-3);
+  EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
 
   world->SetPaused(true);
 

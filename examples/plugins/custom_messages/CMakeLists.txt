@@ -4,8 +4,8 @@ find_package(gazebo REQUIRED)
 
 include_directories(
   ${GAZEBO_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}/msgs
-  )
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
 link_directories(${GAZEBO_LIBRARY_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 

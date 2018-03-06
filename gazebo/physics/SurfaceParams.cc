@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  *
 */
 
+#include <ignition/math/Helpers.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/physics/SurfaceParams.hh"
@@ -25,7 +26,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 FrictionPyramid::FrictionPyramid()
   : patchRadius(0.0)
-  , surfaceRadius(IGN_DBL_MAX)
+  , surfaceRadius(ignition::math::MAX_D)
   , usePatchRadius(1)
   , poissonsRatio(0.3)
   , elasticModulus(0)
@@ -171,7 +172,7 @@ void FrictionPyramid::SetMu(unsigned int _index, double _mu)
   GZ_ASSERT(_index < 3, "Invalid _index to SetMu");
   if (_mu < 0)
   {
-    this->mu[_index] = GZ_FLT_MAX;
+    this->mu[_index] = ignition::math::MAX_F;
   }
   else
   {

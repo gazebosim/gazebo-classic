@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,18 @@
 #ifndef GAZEBO_RENDERING_VISUALPRIVATE_HH_
 #define GAZEBO_RENDERING_VISUALPRIVATE_HH_
 
+#include <map>
 #include <string>
 #include <utility>
 #include <list>
 #include <vector>
+#include <functional>
 
-#include <boost/function.hpp>
 #include <sdf/sdf.hh>
+#include <ignition/math/Vector3.hh>
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Vector2d.hh"
 
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/RenderTypes.hh"
@@ -146,7 +144,7 @@ namespace gazebo
       public: common::Time prevAnimTime;
 
       /// \brief Callback for the animation complete event.
-      public: boost::function<void()> onAnimationComplete;
+      public: std::function<void()> onAnimationComplete;
 
       /// \brief True to use RT shader system.
       public: bool useRTShader;
@@ -208,6 +206,20 @@ namespace gazebo
 
       /// \brief True if wireframe mode is enabled
       public: bool wireframe;
+
+      /// \brief Stores the message for this visual according to the visual
+      /// type. For example, VT_LINK will have gazebo::msgs::Link.
+      public: google::protobuf::Message *typeMsg = nullptr;
+
+      /// \brief Vector of visuals which will be generated on demand.
+      public: std::vector<std::pair<Visual::VisualType,
+          google::protobuf::Message *>> pendingChildren;
+
+      /// \brief The initial pose of the visual.
+      public: ignition::math::Pose3d initialRelativePose;
+
+      /// \brief Original ogre materials used by the submeshes in the visual
+      public: std::map<std::string, Ogre::MaterialPtr> submeshMaterials;
     };
     /// \}
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,17 +44,17 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
   modelNames.push_back("sphere");
 
   std::vector<std::string>::iterator iter;
-  math::Vector3 pos, testPos;
+  ignition::math::Vector3d pos, testPos;
   physics::ModelPtr model;
   physics::EntityPtr entity;
   for (iter = modelNames.begin(); iter != modelNames.end(); ++iter)
   {
-    model = world->GetModel(*iter);
+    model = world->ModelByName(*iter);
     ASSERT_TRUE(model != NULL);
-    pos = model->GetWorldPose().pos;
-    pos.z += 10;
+    pos = model->WorldPose().Pos();
+    pos.Z() += 10;
 
-    entity = world->GetEntityBelowPoint(pos);
+    entity = world->EntityBelowPoint(pos);
     if (entity)
     {
       gzdbg << "hit: " << entity->GetScopedName()
@@ -69,8 +69,8 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
     }
 
     testPos = pos;
-    testPos.z = pos.z + 5;
-    entity = world->GetEntityBelowPoint(testPos);
+    testPos.Z() = pos.Z() + 5;
+    entity = world->EntityBelowPoint(testPos);
     if (entity)
     {
       gzdbg << "hit: " << entity->GetScopedName()
@@ -87,7 +87,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Ground plane
   pos.Set(25, 25, 1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos);
   if (entity)
   {
     gzdbg << "hit: " << entity->GetScopedName()
@@ -103,7 +103,7 @@ void WorldTest::GetEntityBelowPoint(const std::string &_physicsEngine)
 
   // Expect no hit
   pos.Set(25, 25, -1);
-  entity = world->GetEntityBelowPoint(pos);
+  entity = world->EntityBelowPoint(pos);
   EXPECT_TRUE(entity == NULL);
 }
 

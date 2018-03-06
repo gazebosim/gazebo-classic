@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
@@ -51,9 +50,9 @@ MultiRayShape::~MultiRayShape()
 //////////////////////////////////////////////////
 void MultiRayShape::Init()
 {
-  math::Vector3 start, end, axis;
+  ignition::math::Vector3d start, end, axis;
   double yawAngle, pitchAngle;
-  math::Quaternion ray;
+  ignition::math::Quaterniond ray;
   double yDiff;
   double horzMinAngle, horzMaxAngle;
   int horzSamples = 1;
@@ -88,7 +87,7 @@ void MultiRayShape::Init()
   this->minRange = this->rangeElem->Get<double>("min");
   this->maxRange = this->rangeElem->Get<double>("max");
 
-  this->offset = this->collisionParent->GetRelativePose();
+  this->offset = this->collisionParent->RelativePose();
 
   // Create an array of ray collisions
   for (unsigned int j = 0; j < (unsigned int)vertSamples; ++j)
@@ -103,11 +102,11 @@ void MultiRayShape::Init()
 
       // since we're rotating a unit x vector, a pitch rotation will now be
       // around the negative y axis
-      ray.SetFromEuler(math::Vector3(0.0, -pitchAngle, yawAngle));
-      axis = this->offset.rot * ray * math::Vector3(1.0, 0.0, 0.0);
+      ray.Euler(ignition::math::Vector3d(0.0, -pitchAngle, yawAngle));
+      axis = this->offset.Rot() * ray * ignition::math::Vector3d::UnitX;
 
-      start = (axis * this->minRange) + this->offset.pos;
-      end = (axis * this->maxRange) + this->offset.pos;
+      start = (axis * this->minRange) + this->offset.Pos();
+      end = (axis * this->maxRange) + this->offset.Pos();
 
       this->AddRay(start, end);
     }
@@ -115,7 +114,7 @@ void MultiRayShape::Init()
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::SetScale(const math::Vector3 &_scale)
+void MultiRayShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   if (this->scale == _scale)
     return;
@@ -211,8 +210,22 @@ bool MultiRayShape::SetRay(const unsigned int _rayIndex,
 }
 
 //////////////////////////////////////////////////
-void MultiRayShape::AddRay(const math::Vector3 &/*_start*/,
-                           const math::Vector3 &/*_end*/)
+void MultiRayShape::AddRay(const math::Vector3 &_start,
+                           const math::Vector3 &_end)
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  this->AddRay(_start.Ign(), _end.Ign());
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+void MultiRayShape::AddRay(const ignition::math::Vector3d &/*_start*/,
+                           const ignition::math::Vector3d &/*_end*/)
 {
   // msgs::Vector3d *pt = NULL;
 
@@ -255,11 +268,37 @@ double MultiRayShape::GetScanResolution() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMinAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->MinAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::MinAngle() const
+{
   return this->horzElem->Get<double>("min_angle");
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetMaxAngle() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->MaxAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::MaxAngle() const
 {
   return this->horzElem->Get<double>("max_angle");
 }
@@ -285,20 +324,47 @@ double MultiRayShape::GetVerticalScanResolution() const
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMinAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->VerticalMinAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::VerticalMinAngle() const
+{
   if (this->vertElem)
     return this->vertElem->Get<double>("min_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
 
 //////////////////////////////////////////////////
 math::Angle MultiRayShape::GetVerticalMaxAngle() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->VerticalMaxAngle();
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+//////////////////////////////////////////////////
+ignition::math::Angle MultiRayShape::VerticalMaxAngle() const
+{
   if (this->vertElem)
     return this->vertElem->Get<double>("max_angle");
   else
-    return math::Angle(0);
+    return ignition::math::Angle::Zero;
 }
+
 
 //////////////////////////////////////////////////
 void MultiRayShape::FillMsg(msgs::Geometry &/*_msg*/)

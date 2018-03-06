@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,6 +124,8 @@ MainWindow::MainWindow()
   this->dataPtr->toolsWidget = new ToolsWidget();
 
   this->dataPtr->renderWidget = new gui::RenderWidget(mainWidget);
+  // don't call RenderWidget::Init() yet, as some GUI plugins loaded from
+  // there may need the main window to be finalised already.
 
   this->CreateEditors();
 
@@ -286,6 +288,8 @@ void MainWindow::Load()
 /////////////////////////////////////////////////
 void MainWindow::Init()
 {
+  this->RenderWidget()->Init();
+
   // Get the size properties from the INI file.
   int winWidth = getINIProperty<int>("geometry.width", -1);
   int winHeight = getINIProperty<int>("geometry.height", -1);
@@ -1651,6 +1655,15 @@ void MainWindow::ShowMenuBar(QMenuBar *_bar)
 
   this->dataPtr->menuLayout->addStretch(5);
   this->dataPtr->menuLayout->setContentsMargins(0, 0, 0, 0);
+
+  // OSX:
+  // There is a problem on osx with the qt5 menubar being out of focus when
+  // the application is launched from a terminal, so prevent using a native
+  // menubar for now.
+  //
+  // Ubuntu Xenial + Unity:
+  // The native menubar is not registering shortcuts (issue #2134)
+  this->dataPtr->menuBar->setNativeMenuBar(false);
 }
 
 /////////////////////////////////////////////////
@@ -1990,7 +2003,7 @@ void MainWindow::OnGUI(ConstGUIPtr &_msg)
 
       ignition::math::Pose3d cam_pose(cam_pose_pos, cam_pose_rot);
 
-      cam->SetDefaultPose(cam_pose);
+      cam->SetInitialPose(cam_pose);
       cam->SetUseSDFPose(true);
     }
 

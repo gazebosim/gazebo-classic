@@ -33,12 +33,12 @@ TEST_F(PhysicsBase, URI)
   ASSERT_TRUE(world != NULL);
 
   // Check light URI
-  auto light = world->Light("sun");
+  auto light = world->LightByName("sun");
   ASSERT_TRUE(light != NULL);
   EXPECT_EQ(light->URI().Str(), "data://world/default/light/sun");
 
   // Check model URI
-  auto model = world->GetModel("revolute_model");
+  auto model = world->ModelByName("revolute_model");
   ASSERT_TRUE(model != NULL);
   EXPECT_EQ(model->URI().Str(), "data://world/default/model/revolute_model");
 

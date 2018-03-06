@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  *
 */
-#include <ignition/math/Vector3.hh>
-#include <ignition/math/Quaternion.hh>
 
-#include "gazebo/common/CommonTypes.hh"
+#include <ignition/math/Quaternion.hh>
+#include <ignition/math/Vector3.hh>
+
 #include "gazebo/common/Animation.hh"
+#include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/KeyFrame.hh"
-#include "gazebo/physics/Model.hh"
 #include "gazebo/gazebo.hh"
+#include "gazebo/physics/Model.hh"
 
 namespace gazebo
 {

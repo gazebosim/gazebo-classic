@@ -49,9 +49,9 @@ TEST_F(ContactVisual_TEST, ContactVisualTest)
       "contact_vis", scene->WorldVisual(), ""));
   contactVis->Load();
 
-  EXPECT_EQ(contactVis->GetName(), "contact_vis");
+  EXPECT_EQ(contactVis->Name(), "contact_vis");
   EXPECT_GT(scene->WorldVisual()->GetChildCount(), count);
-  EXPECT_TRUE(scene->GetVisual(contactVis->GetName()) != nullptr);
+  EXPECT_TRUE(scene->GetVisual(contactVis->Name()) != nullptr);
 
   // test destroying the visual
   contactVis->Fini();

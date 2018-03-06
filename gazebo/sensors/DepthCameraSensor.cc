@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ void DepthCameraSensor::Init()
     return;
   }
 
-  std::string worldName = this->world->GetName();
+  std::string worldName = this->world->Name();
 
   if (!worldName.empty())
   {
@@ -168,11 +168,11 @@ bool DepthCameraSensor::UpdateImpl(const bool /*_force*/)
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (this->dataPtr->depthBuffer[i] >= this->camera->FarClip())
       {
-        this->dataPtr->depthBuffer[i] = IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = ignition::math::INF_D;
       }
       else if (this->dataPtr->depthBuffer[i] <= this->camera->NearClip())
       {
-        this->dataPtr->depthBuffer[i] = -IGN_DBL_INF;
+        this->dataPtr->depthBuffer[i] = -ignition::math::INF_D;
       }
     }
     msg.mutable_image()->set_data(this->dataPtr->depthBuffer, depthBufferSize);

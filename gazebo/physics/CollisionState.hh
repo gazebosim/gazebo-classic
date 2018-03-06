@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2012 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@
  * Author: Nate Koenig
  */
 
-#ifndef _COLLISIONSTATE_HH_
-#define _COLLISIONSTATE_HH_
+#ifndef GAZEBO_PHYSICS_COLLISIONSTATE_HH_
+#define GAZEBO_PHYSICS_COLLISIONSTATE_HH_
+
+#include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/State.hh"
 #include "gazebo/math/Pose.hh"
@@ -68,7 +70,12 @@ namespace gazebo
 
       /// \brief Get the Collision pose
       /// \return The pose of the CollisionState
-      public: const math::Pose &GetPose() const;
+      /// \deprecated See function that returns ign-math.
+      public: const math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
+
+      /// \brief Get the Collision pose
+      /// \return The pose of the CollisionState
+      public: const ignition::math::Pose3d &Pose() const;
 
       /// \brief Return true if the values in the state are zero.
       /// \return True if the values in the state are zero.
@@ -108,7 +115,7 @@ namespace gazebo
       }
 
       /// \brief Pose of the Collision object.
-      private: math::Pose pose;
+      private: ignition::math::Pose3d pose;
     };
     /// \}
   }
