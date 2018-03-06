@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <google/protobuf/text_format.h>
+
 #include <gazebo/gui/qt.h>
 #include <gazebo/gui/TopicSelector.hh>
 #include <gazebo/gui/viewers/TopicView.hh>
@@ -45,14 +47,15 @@ TopicCommand::TopicCommand()
      "View topic data using a QT widget.")
     ("hz,z", po::value<std::string>(), "Get publish frequency.")
     ("bw,b", po::value<std::string>(), "Get topic bandwidth.")
+    ("publish,p", po::value<std::string>(), "Publish message on a topic.")
     ("request,r", po::value<std::string>(), "Send a request.")
     ("unformatted,u", "Output data from echo without formatting.")
     ("duration,d", po::value<double>(), "Duration (seconds) to run. "
      "Applicable with echo, hz, and bw")
     ("msg,m", po::value<std::string>(), "Message to send on topic. "
-     "Applicable with request")
+     "Applicable with publish and request")
     ("file,f", po::value<std::string>(), "Path to a file containing the "
-     "message to send on topic. Applicable with request");
+     "message to send on topic. Applicable with publish and request");
 }
 
 /////////////////////////////////////////////////
@@ -88,6 +91,8 @@ bool TopicCommand::RunImpl()
     this->Bw(this->vm["bw"].as<std::string>());
   else if (this->vm.count("view"))
     this->View(this->vm["view"].as<std::string>());
+  else if (this->vm.count("publish"))
+    this->Publish(this->vm["publish"].as<std::string>());
   else if (this->vm.count("request"))
     this->Request(worldName, this->vm["request"].as<std::string>());
   else
@@ -386,6 +391,63 @@ void TopicCommand::View(const std::string &_topic)
   app = NULL;
 
   gazebo::client::shutdown();
+}
+
+/////////////////////////////////////////////////
+bool TopicCommand::Publish(const std::string &_topic)
+{
+  std::string msgData;
+  if (this->vm.count("msg"))
+  {
+    msgData = this->vm["msg"].as<std::string>();
+  }
+  else if (this->vm.count("file"))
+  {
+    std::string filename = this->vm["file"].as<std::string>();
+    std::ifstream ifs(filename.c_str());
+    if (!ifs)
+    {
+      gzerr << "Error: Unable to open file[" << filename << "]\n";
+      return false;
+    }
+
+    msgData = std::string((std::istreambuf_iterator<char>(ifs)),
+      std::istreambuf_iterator<char>());
+  }
+  else
+  {
+    gzerr << "Error: Missing message to publish on topic.\n";
+    return false;
+  }
+
+  std::string topicName = this->node->DecodeTopicName(_topic);
+
+  // Get the message type on the topic.
+  std::string msgTypeName = gazebo::transport::getTopicMsgType(topicName);
+
+  if (msgTypeName.empty())
+  {
+    gzerr << "Unable to get message type for topic[" << _topic << "]\n";
+    return false;
+  }
+
+  boost::shared_ptr<google::protobuf::Message> msg =
+    msgs::MsgFactory::NewMsg(msgTypeName);
+
+  if (!msg)
+  {
+    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    transport::fini();
+    return false;
+  }
+
+  // Parse string to the message object
+  google::protobuf::TextFormat::ParseFromString(msgData, msg.get());
+
+  // Publish message on topic
+  this->node->Publish(topicName, *msg.get());
+
+  return true;
 }
 
 /////////////////////////////////////////////////

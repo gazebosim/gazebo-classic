@@ -96,6 +96,60 @@ namespace gazebo
       /// \param[in] _hz Update rate for the publisher. Units are
       /// 1.0/seconds.
       /// \return Pointer to the newly created Publisher
+      public: PublisherPtr Advertise(const std::string &_topic,
+                                     const std::string &_msgTypeName,
+                                     unsigned int _queueLimit,
+                                     double _hzRate)
+              {
+                this->UpdatePublications(_topic, _msgTypeName);
+
+                PublisherPtr pub = PublisherPtr(new Publisher(_topic,
+                      _msgTypeName, _queueLimit, _hzRate));
+
+                std::string msgTypename;
+                PublicationPtr publication;
+
+                // Connect all local subscription to the publisher
+                publication = this->FindPublication(_topic);
+                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+
+                publication->AddPublisher(pub);
+                if (!publication->GetLocallyAdvertised())
+                {
+                  ConnectionManager::Instance()->Advertise(_topic, _msgTypeName);
+                }
+
+                publication->SetLocallyAdvertised(true);
+                pub->SetPublication(publication);
+
+
+                SubNodeMap::iterator iter2;
+                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
+                for (iter2 = this->subscribedNodes.begin();
+                     iter2 != stEnd2; ++iter2)
+                {
+                  if (iter2->first == _topic)
+                  {
+                    std::list<NodePtr>::iterator liter;
+                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
+                    for (liter = iter2->second.begin();
+                        liter != lEnd; ++liter)
+                    {
+                      publication->AddSubscription(*liter);
+                    }
+                  }
+                }
+
+                return pub;
+              }
+
+      /// \brief Advertise on a topic
+      /// \param[in] _topic The name of the topic
+      /// \param[in] _queueLimit The maximum number of outgoing messages
+      /// to queue
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
+      /// \return Pointer to the newly created Publisher
       public: template<typename M>
               PublisherPtr Advertise(const std::string &_topic,
                                      unsigned int _queueLimit,

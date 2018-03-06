@@ -692,6 +692,11 @@ TEST_F(gzTest, Topic)
   output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
   EXPECT_NE(output.find("Total["), std::string::npos);
 
+  // Publish
+  output = custom_exec_str("gz topic -p /gazebo/default/atmosphere "
+      "-m temperature:400");
+  EXPECT_TRUE(output.empty());
+
   fini();
 }
 
