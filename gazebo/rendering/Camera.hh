@@ -736,6 +736,11 @@ namespace gazebo
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
 
+      /// \brief Set vertical FOV of the ogre camera taking care of using a
+      ///        valid value
+      /// \param[in] _fovy vertical field of view
+      protected: void SetSafeFOVy(const Ogre::Radian &_fovy);
+
       /// \brief Tell the camera whether to yaw around its own local Y axis or a
       /// fixed axis of choice.
       /// \param[in] _useFixed If true, the axis passed in the second parameter

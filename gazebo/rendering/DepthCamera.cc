@@ -398,7 +398,7 @@ void DepthCamera::SetDepthTarget(Ogre::RenderTarget *_target)
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     // gzerr << "debug " << hfov << " " << vfov << " " << ratio << "\n";
     this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->SetSafeFOVy(Ogre::Radian(vfov));
   }
 }
 
