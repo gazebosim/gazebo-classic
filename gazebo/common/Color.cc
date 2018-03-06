@@ -516,12 +516,15 @@ bool Color::operator!=(const Color &_pt) const
 //////////////////////////////////////////////////
 void Color::Clamp()
 {
-  this->r = this->r < 0 ? 0: this->r;
-  this->r = this->r > 1 ? this->r/255.0: this->r;
+  this->r = this->r < 0 || std::isnan(this->r) ? 0: this->r;
+  this->r = this->r > 1 ? std::min(this->r/255.0, 1.0) : this->r;
 
-  this->g = this->g < 0 ? 0: this->g;
-  this->g = this->g > 1 ? this->g/255.0: this->g;
+  this->g = this->g < 0 || std::isnan(this->g) ? 0: this->g;
+  this->g = this->g > 1 ? std::min(this->g/255.0, 1.0): this->g;
 
-  this->b = this->b < 0 ? 0: this->b;
-  this->b = this->b > 1 ? this->b/255.0: this->b;
+  this->b = this->b < 0 || std::isnan(this->b) ? 0: this->b;
+  this->b = this->b > 1 ? std::min(this->b/255.0, 1.0): this->b;
+
+  this->a = this->a < 0 || std::isnan(this->a) ? 0: this->a;
+  this->a = this->a > 1 ? std::min(this->a/255.0, 1.0): this->a;
 }

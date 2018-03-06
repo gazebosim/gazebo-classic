@@ -17,6 +17,7 @@
 #ifndef GAZEBO_PHYSICS_LINKSTATE_HH_
 #define GAZEBO_PHYSICS_LINKSTATE_HH_
 
+#include <iostream>
 #include <vector>
 #include <string>
 
@@ -206,28 +207,33 @@ namespace gazebo
                   const gazebo::physics::LinkState &_state)
       {
         ignition::math::Vector3d euler(_state.pose.Rot().Euler());
-        _out << std::fixed <<std::setprecision(5)
+        _out.unsetf(std::ios_base::floatfield);
+        _out << std::setprecision(4)
           << "<link name='" << _state.name << "'>"
           << "<pose>"
-          << _state.pose.Pos().X() << " "
-          << _state.pose.Pos().Y() << " "
-          << _state.pose.Pos().Z() << " "
-          << euler.X() << " "
-          << euler.Y() << " "
-          << euler.Z() << " "
+          << ignition::math::precision(_state.pose.Pos().X(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Y(), 4) << " "
+          << ignition::math::precision(_state.pose.Pos().Z(), 4) << " "
+          << ignition::math::precision(euler.X(), 4) << " "
+          << ignition::math::precision(euler.Y(), 4) << " "
+          << ignition::math::precision(euler.Z(), 4) << " "
           << "</pose>";
 
-        /// Disabling this for efficiency.
-        euler = _state.velocity.Rot().Euler();
-         _out << std::fixed <<std::setprecision(4)
-           << "<velocity>"
-           << _state.velocity.Pos().X() << " "
-           << _state.velocity.Pos().Y() << " "
-           << _state.velocity.Pos().Z() << " "
-           << euler.X() << " "
-           << euler.Y() << " "
-           << euler.Z() << " "
-           << "</velocity>";
+        if (_state.RecordVelocity())
+        {
+          /// Disabling this for efficiency.
+          euler = _state.velocity.Rot().Euler();
+          _out.unsetf(std::ios_base::floatfield);
+          _out << std::setprecision(4)
+            << "<velocity>"
+            << ignition::math::precision(_state.velocity.Pos().X(), 4) << " "
+            << ignition::math::precision(_state.velocity.Pos().Y(), 4) << " "
+            << ignition::math::precision(_state.velocity.Pos().Z(), 4) << " "
+            << ignition::math::precision(euler.X(), 4) << " "
+            << ignition::math::precision(euler.Y(), 4) << " "
+            << ignition::math::precision(euler.Z(), 4) << " "
+            << "</velocity>";
+        }
         // << "<acceleration>" << _state.acceleration << "</acceleration>"
         // << "<wrench>" << _state.wrench << "</wrench>";
 
@@ -243,6 +249,15 @@ namespace gazebo
 
         return _out;
       }
+
+      /// \brief Set whether to record link velocity
+      /// \param[in] _record True to record link velocity, false to leave it
+      /// out of the log
+      public: void SetRecordVelocity(const bool _record);
+
+      /// \brief Get whether link velocity is recorded
+      /// \return True if link velocity is recorded
+      public: bool RecordVelocity() const;
 
       /// \brief 3D pose of the link relative to the model.
       private: ignition::math::Pose3d pose;

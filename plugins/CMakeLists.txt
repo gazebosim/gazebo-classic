@@ -3,6 +3,7 @@ if (WIN32)
 endif()
 
 include_directories(
+  ${CURL_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
@@ -21,6 +22,9 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
+if (WIN32)
+  add_definitions(-DCURL_STATICLIB)
+endif()
 add_definitions(${Qt5Core_DEFINITIONS})
 set (CMAKE_AUTOMOC ON)
 
@@ -53,6 +57,7 @@ set (plugins_single_header
   CartDemoPlugin
   CessnaPlugin
   ContactPlugin
+  ContainPlugin
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
@@ -66,6 +71,7 @@ set (plugins_single_header
   InitialVelocityPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
@@ -77,9 +83,11 @@ set (plugins_single_header
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
+  ShaderParamVisualPlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  StaticMapPlugin
   TouchPlugin
   VehiclePlugin
   WindPlugin

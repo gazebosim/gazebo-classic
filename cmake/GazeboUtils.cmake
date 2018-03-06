@@ -229,12 +229,11 @@ macro(add_pch target_name filename)
 
   set(pch_out ${CMAKE_CURRENT_BINARY_DIR}/${filename}.out.gch)
   set(pch_in ${CMAKE_CURRENT_SOURCE_DIR}/${filename})
-  set(FLAGS -g -O2 -fPIC -x c++-header)
+  set(FLAGS -fPIC -x c++-header)
 
-  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS_ALL} ${CMAKE_CXX_FLAGS} ${ARGN}")
-
+  separate_arguments(ARGS UNIX_COMMAND "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS}")
   add_custom_command(OUTPUT ${pch_out}
-    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${FLAGS} ${pch_in} -o ${pch_out}
+    COMMAND ${CMAKE_CXX_COMPILER} ${ARGS} ${ARGN} ${FLAGS} ${pch_in} -o ${pch_out}
     DEPENDS ${pch_in}
     COMMENT "Generating precompiled header: ${pch_out}"
     VERBATIM)

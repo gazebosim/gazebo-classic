@@ -41,6 +41,7 @@
 #include "gazebo/common/Battery.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -133,9 +134,26 @@ void Link::Load(sdf::ElementPtr _sdf)
     }
   }
 
+  // Load the lights
+  if (this->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr lightElem = this->sdf->GetElement("light");
+    while (lightElem)
+    {
+      // Create and Load a light
+      this->world->LoadLight(lightElem, shared_from_this());
+      lightElem = lightElem->GetNextElement("light");
+    }
+  }
+
   if (!this->IsStatic())
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
+  }
+  else
+  {
+    this->inertial->SetMass(0.0);
+    this->inertial->SetInertiaMatrix(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   }
 
 #ifdef HAVE_OPENAL
@@ -228,6 +246,13 @@ void Link::Init()
       CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
       this->collisions.push_back(collision);
       collision->Init();
+    }
+    if ((*iter)->HasType(Base::LIGHT))
+    {
+      LightPtr light= boost::static_pointer_cast<Light>(*iter);
+      // TODO add to lights var?
+      // this->lights.push_back(light);
+      light->Init();
     }
   }
 

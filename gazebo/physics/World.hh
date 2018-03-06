@@ -632,7 +632,7 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+      public: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
           const BasePtr &_parent);
 
       /// \brief Load an actor.
@@ -734,6 +734,10 @@ namespace gazebo
       /// \brief Process all received light modify messages.
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessLightModifyMsgs();
+
+      /// \brief Process all received log playback control messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessPlaybackControlMsgs();
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);

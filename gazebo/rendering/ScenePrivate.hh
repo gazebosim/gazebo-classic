@@ -67,9 +67,13 @@ namespace gazebo
     /// \brief List of light messages.
     typedef std::list<boost::shared_ptr<msgs::Light const> > LightMsgs_L;
 
-    /// \def PoseMsgs_L.
+    /// \typedef PoseMsgs_M.
     /// \brief List of messages.
     typedef std::map<uint32_t, msgs::Pose> PoseMsgs_M;
+
+    /// \typedef LightPoseMsgs_M.
+    /// \brief List of messages.
+    typedef std::map<std::string, msgs::Pose> LightPoseMsgs_M;
 
     /// \def SceneMsgs_L
     /// \brief List of scene messages.
@@ -179,6 +183,9 @@ namespace gazebo
       /// \brief List of pose message to process.
       public: PoseMsgs_M poseMsgs;
 
+      /// \brief List of pose message to process.
+      public: LightPoseMsgs_M lightPoseMsgs;
+
       /// \brief List of scene message to process.
       public: SceneMsgs_L sceneMsgs;
 
@@ -287,6 +294,9 @@ namespace gazebo
 
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;
+
+      /// \brief True if this scene is running on the server.
+      public: bool isServer;
 
       /// \brief The heightmap, if any.
       public: Heightmap *terrain;
