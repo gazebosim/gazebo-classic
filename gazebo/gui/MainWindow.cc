@@ -82,10 +82,6 @@ using namespace gui;
 #define MINIMUM_TAB_WIDTH 250
 
 extern bool g_fullscreen;
-
-// whether the file is atleast saved once or not.
-bool isSavedOnce = 0;
-
 /////////////////////////////////////////////////
 MainWindow::MainWindow()
   : dataPtr(new MainWindowPrivate)
@@ -512,7 +508,7 @@ void MainWindow::SaveAs()
 
     std::string filename = selected[0].toStdString();
 
-    g_saveAct->setEnabled(true);
+    this->dataPtr->isSavedOnce=1;
     this->dataPtr->saveFilename = filename;
     this->Save();
   }
@@ -521,7 +517,7 @@ void MainWindow::SaveAs()
 /////////////////////////////////////////////////
 void MainWindow::Save()
 {
-  if (isSavedOnce)
+  if (this->dataPtr->isSavedOnce)
   {
     // Get the latest world in SDF.
     boost::shared_ptr<msgs::Response> response =
@@ -1126,7 +1122,6 @@ void MainWindow::CreateActions()
   g_saveAct = new QAction(tr("&Save World"), this);
   g_saveAct->setShortcut(tr("Ctrl+S"));
   g_saveAct->setStatusTip(tr("Save world"));
-  // g_saveAct->setEnabled(false);
   this->connect(g_saveAct, SIGNAL(triggered()), this, SLOT(Save()));
 
   g_saveAsAct = new QAction(tr("Save World &As"), this);
