@@ -2205,7 +2205,9 @@ void World::SetState(const WorldState &_state)
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
         model->Init();
-        model->LoadPlugins();
+
+        if (!util::LogPlay::Instance()->IsOpen())
+          model->LoadPlugins();
       }
       catch(...)
       {

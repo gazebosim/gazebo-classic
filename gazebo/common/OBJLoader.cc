@@ -88,14 +88,14 @@ Mesh *OBJLoader::Load(const std::string &_filename)
   Mesh *mesh = new Mesh();
   mesh->SetPath(path);
 
-  for (auto const s: shapes)
+  for (const tinyobj::shape_t &s: shapes)
   {
     // obj mesh assigns a material id to each 'face' but gazebo assigns a single
     // material to each 'submesh'. The strategy here is to identify
     // the number of unique material ids in each obj shape and create a new
     // submesh per unique material id
     std::map<int, SubMesh *> subMeshMatId;
-    for (auto const id :  s.mesh.material_ids)
+    for (const int id :  s.mesh.material_ids)
     {
       if (subMeshMatId.find(id) == subMeshMatId.end())
       {
@@ -105,34 +105,42 @@ Mesh *OBJLoader::Load(const std::string &_filename)
         subMeshMatId[id] = subMesh.get();
 
         Material *mat = nullptr;
-        auto m = materials[id];
-        if (materialIds.find(m.name) != materialIds.end())
+        if (id >= 0 && static_cast<size_t>(id) < materials.size())
         {
-          mat = materialIds[m.name];
+          tinyobj::material_t &m = materials[id];
+          if (materialIds.find(m.name) != materialIds.end())
+          {
+            mat = materialIds[m.name];
+          }
+          else
+          {
+            // Create new material and pass it to mesh who will take
+            // ownership of the object
+            mat = new Material();
+            mat->SetAmbient(ignition::math::Color(m.ambient[0], m.ambient[1],
+                m.ambient[2]));
+            mat->SetDiffuse(ignition::math::Color(m.diffuse[0], m.diffuse[1],
+                m.diffuse[2]));
+            mat->SetSpecular(ignition::math::Color(m.specular[0], m.specular[1],
+                m.specular[2]));
+            mat->SetEmissive(ignition::math::Color(m.emission[0], m.emission[1],
+                m.emission[2]));
+            mat->SetShininess(m.shininess);
+            mat->SetTransparency(1.0 - m.dissolve);
+            if (!m.diffuse_texname.empty())
+              mat->SetTextureImage(m.diffuse_texname, path.c_str());
+            materialIds[m.name] = mat;
+          }
+          int matIndex = mesh->GetMaterialIndex(mat);
+          if (matIndex < 0)
+            matIndex = mesh->AddMaterial(mat);
+          subMesh->SetMaterialIndex(matIndex);
         }
         else
         {
-          // Create new material and pass it to mesh who will take ownership of
-          // the object
-          mat = new Material();
-          mat->SetAmbient(ignition::math::Color(m.ambient[0], m.ambient[1],
-              m.ambient[2]));
-          mat->SetDiffuse(ignition::math::Color(m.diffuse[0], m.diffuse[1],
-              m.diffuse[2]));
-          mat->SetSpecular(ignition::math::Color(m.specular[0], m.specular[1],
-              m.specular[2]));
-          mat->SetEmissive(ignition::math::Color(m.emission[0], m.emission[1],
-              m.emission[2]));
-          mat->SetShininess(m.shininess);
-          mat->SetTransparency(1.0 - m.dissolve);
-          if (!m.diffuse_texname.empty())
-            mat->SetTextureImage(m.diffuse_texname, path.c_str());
-          materialIds[m.name] = mat;
+          gzwarn << "Missing material for shape[" << s.name << "] "
+            << "in OBJ file[" << _filename << "]" << std::endl;
         }
-        int matIndex = mesh->GetMaterialIndex(mat);
-        if (matIndex < 0)
-          matIndex = mesh->AddMaterial(mat);
-        subMesh->SetMaterialIndex(matIndex);
         mesh->AddSubMesh(subMesh.release());
       }
     }
