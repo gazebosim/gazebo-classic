@@ -21,6 +21,10 @@
 1. Fix undefined behavior in ODESliderJoint
     * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
 
+1. Fix loading collada mesh that contains multiple texcoord sets with same offset
+    * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
+
+
 ## Gazebo 7.11.0 (2018-02-12)
 
 1. Fix gazebo7 + ogre 1.8 build error
