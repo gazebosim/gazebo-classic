@@ -640,6 +640,10 @@ Get information about a topic.
 .TP
 .B \-e, \-\-echo\fR=\fIarg\fR
 .
+Send a request.
+.TP
+.B \-r, \-\-request\fR=\fIarg\fR
+.
 Output topic data to screen.
 .TP
 .B \-v, \-\-view\fR=\fIarg\fR
@@ -661,6 +665,14 @@ Output data from echo without formatting.
 .B \-d, \-\-duration\fR=\fIarg\fR
 .
 Duration (seconds) to run. Applicable with echo, hz, and bw
+.TP
+.B \-m, \-\-msg\fR=\fIarg\fR
+.
+Message to send on topic. Applicable with request
+.TP
+.B \-f, \-\-file\fR=\fIarg\fR
+.
+Path to a file containing the message to send on topic. Applicable with request
 .UNINDENT
 .SS world
 .sp
