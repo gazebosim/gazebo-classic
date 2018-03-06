@@ -748,6 +748,22 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   }
   else
   {
+    // build tangent vectors if normal mapping in tangent space is specified
+    if (this->GetShaderType() == "normal_map_tangent_space")
+    {
+      Ogre::MeshPtr ogreMesh = Ogre::MeshManager::getSingleton().getByName(
+        _meshName);
+      if (!ogreMesh.isNull())
+      {
+        uint16_t src, dest;
+        if (!ogreMesh->suggestTangentVectorBuildParams(
+            Ogre::VES_TANGENT, src, dest))
+        {
+          ogreMesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+        }
+      }
+    }
+
     obj = (Ogre::MovableObject*)
         (this->dataPtr->sceneNode->getCreator()->createEntity(objName,
         meshName));
@@ -2188,7 +2204,6 @@ void Visual::InsertMesh(const std::string &_meshName,
     this->InsertMesh(mesh);
   }*/
 }
-
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
     bool _centerSubmesh)
