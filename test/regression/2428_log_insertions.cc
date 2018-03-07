@@ -77,7 +77,6 @@ TEST_F(Issue2428_Test, InsertionBeforeRecording)
   world->Step(200);
 
   std::string filename = recorder->Filename();
-  std::cout << "Filename[" << filename << "]\n";
 
   // Stop recording
   recorder->Stop();
@@ -89,7 +88,6 @@ TEST_F(Issue2428_Test, InsertionBeforeRecording)
 
   std::string data;
   player->Step(data);
-  std::cout << data << std::endl;
   size_t worldStart = data.find("<world name='default'>");
   size_t boxPos = data.find("<model name='box'>");
   size_t worldEnd = data.find("</world>");
