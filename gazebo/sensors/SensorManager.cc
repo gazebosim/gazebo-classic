@@ -32,6 +32,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -548,12 +549,21 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
-        "Took over 1000*max_step_size to update a sensor.");
+    // During log playback, time can jump forward an arbitrary amount.
+    if (diffTime.sec >= maxSensorUpdate && !util::LogPlay::Instance()->IsOpen())
+    {
+      gzwarn << "Took over 1000*max_step_size to update a sensor "
+        << "(took " << diffTime.sec << " sec, which is more than "
+        << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
+      return;
+    }
 
     // Make sure eventTime is not negative.
-    GZ_ASSERT(eventTime >= common::Time::Zero,
-        "Time to next sensor update is negative.");
+    if (eventTime < common::Time::Zero)
+    {
+      gzerr << "Time to next sensor update is negative." << std::endl;
+      return;
+    }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
 

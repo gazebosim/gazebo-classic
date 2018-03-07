@@ -5,7 +5,19 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 9.x to 10.x
+
+### Modifications
+
+1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
+   enable mass based force approximation. Set to 1.0 for original behavior.
+
 ## Gazebo 8.x to 9.x
+
+### Build system
+
+New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
+New optional dependencies: `ign-fuel-tools`,`ign-common1` 
 
 ### -g command line argument to load plugins in gzclient
 
@@ -347,6 +359,12 @@ release will remove the deprecated code.
     + ***Removed:*** public: virtual bool MoveToPosition(const math::Pose &_pose, double _time)
 
 ### Deprecations
+
+1. **plugins/ContainPlugin.hh**
+    + ***Deprecation:*** Gazebo transport publisher on <namespace>/contain
+    + ***Replacement:*** Ignition transport publisher on <namespace>/contain
+    + ***Deprecation:*** Gazebo transport subscriber on <namespace>/enable
+    + ***Replacement:*** Ignition transport service on <namespace>/enable
 
 1. **gazebo/physics/RayShape.hh**
     + ***Deprecation:*** void SetPoints(const math::Vector3 &_posStart, const math::Vector3 &_posEnd)

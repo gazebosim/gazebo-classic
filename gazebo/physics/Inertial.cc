@@ -132,6 +132,8 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
   ignition::math::Pose3d pose =
     this->dataPtr->sdf->Get<ignition::math::Pose3d>("pose");
   this->SetCoG(pose);
+  this->dataPtr->sdf->GetElement("pose")->GetValue()->SetUpdateFunc(
+      std::bind(&Inertial::Pose, this));
 
   // if (this->dataPtr->sdf->HasElement("inertia"))
   // Do the following whether an inertia element was specified or not.

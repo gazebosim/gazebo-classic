@@ -1,6 +1,80 @@
+## Gazebo 10
+
+## Gazebo 10.x.x (201x-xx-xx)
+
+1. Update Wind Plugin to support being used by Lift Drag Plugin
+    * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
+
 ## Gazebo 9
 
 ## Gazebo 9.x.x (2018-xx-xx)
+
+1. Make override keywords consistent in joint classes to fix clang warnings
+    * [Pull request 2869](https://bitbucket.org/osrf/gazebo/pull-request/2869)
+    * [Pull request 2881](https://bitbucket.org/osrf/gazebo/pull-request/2881)
+
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
+1. Ensure sdf inertia values are consistent
+    * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
+    * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
+
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+1. Add support for Actor collisions.
+    * [Pull request 2875](https://bitbucket.org/osrf/gazebo/pull-requests/2875)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
+
+1. Load actor plugin on ~/factory
+    * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
+
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
+1. Adding accessors for velocity in ENU frame for gps sensor
+    * [Pull request 2854](https://bitbucket.org/osrf/gazebo/pull-request/2854)
+
+1. Fix DEM min elevation
+    * [Pull request 2868](https://bitbucket.org/osrf/gazebo/pull-request/2868)
+
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
+
+1. Initialize laser retro value
+    * [Pull request 2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
+
+1. Allow marker requests to be received from server plugins.
+    * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
+
+
+## Gazebo 9.0.0 (2018-01-25)
 
 1. Update to `ign-transport4`, `ign-msgs1`, `ign-math4`. Added dependency on
    only `sdformat6`, removing `sdformat5`.
@@ -20,8 +94,17 @@
 1. Fix compile error with due to using gazebo::common::Color with sdformat 6
     * [Pull request #2786](https://bitbucket.org/osrf/gazebo/pull-request/2786)
 
-1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
-    * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+1. [Ignition Fuel Tools](https://ignitionrobotics.org/libs/fuel%20tools) integration:
+  1. Ignition Fuel support - model list
+      * [Pull request #2796](https://bitbucket.org/osrf/gazebo/pull-requests/2796)
+  1. Download a model from Ignition Fuel
+      * [Pull request #2800](https://bitbucket.org/osrf/gazebo/pull-requests/2800)
+  1. Export dependency on ignition-fuel-tools in cmake and pkgconfig files if it's found
+      * [Pull request #2850](https://bitbucket.org/osrf/gazebo/pull-request/2850)
+
+1. Avoid race condition between multiple writers to the same connection
+    * A contribution from Hendrik Skubch
+    * [Pull request #2826](https://bitbucket.org/osrf/gazebo/pull-requests/2826)
 
 1. Deprecate gazebo::common::Color
     * [Pull request #2818](https://bitbucket.org/osrf/gazebo/pull-request/2818)
@@ -60,6 +143,14 @@
 1. Integration of DART-6
     * [Pull request #2547](https://bitbucket.org/osrf/gazebo/
 
+1. Image Viewer: fix QImage::Format used to display grayscale images
+    * A contribution from Julien Lecoeur
+    * [Pull request #2812](https://bitbucket.org/osrf/gazebo/pull-requests/2812)
+
+1. Fix compilation of some tests on Windows
+    * A contribution from Silvio Traversaro
+    * [Pull request #2699](https://bitbucket.org/osrf/gazebo/pull-requests/2699)
+
 1. Remove Gazebo 8 deprecations
     * [Pull request #2605](https://bitbucket.org/osrf/gazebo/pull-request/2605)
     * [Pull request #2607](https://bitbucket.org/osrf/gazebo/pull-request/2607)
@@ -84,7 +175,64 @@
 
 ## Gazebo 8
 
-## Gazebo 8.x.x (2017-xx-xx)
+## Gazebo 8.x.x (2018-xx-xx)
+
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
+1. Ensure sdf inertia values are consistent
+    * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
+    * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
+
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+
+## Gazebo 8.3.0 (2018-02-10)
+
+1. Add support for Actor collisions.
+    * [Pull request 2875](https://bitbucket.org/osrf/gazebo/pull-requests/2875)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2870](https://bitbucket.org/osrf/gazebo/pull-requests/2870)
+
+1. Load actor plugin on ~/factory
+    * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
+
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
+1. Adding accessors for velocity in ENU frame for gps sensor
+    * [Pull request 2854](https://bitbucket.org/osrf/gazebo/pull-request/2854)
+
+1. Fix DEM min elevation
+    * [Pull request 2868](https://bitbucket.org/osrf/gazebo/pull-request/2868)
+
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
@@ -92,11 +240,15 @@
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
 
+1. Initialize laser retro value
+    * [Pull request 2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
+
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
 
 1. Add light as child of link
     * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Pull request 2872](https://bitbucket.org/osrf/gazebo/pull-requests/2872)
     * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
@@ -110,6 +262,18 @@
     * [Pull request 2823](https://bitbucket.org/osrf/gazebo/pull-request/2823)
     * [ign-common issue 28](https://bitbucket.org/ignitionrobotics/ign-common/issues/28)
 
+1. Allow marker requests to be received from server plugins.
+    * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
 
 ## Gazebo 8.2.0 (2017-12-10)
 
@@ -583,16 +747,65 @@
 
 ## Gazebo 7
 
-## Gazebo 7.x.x (2017-xx-xx)
+## Gazebo 7.XX.X (2018-XX-XX)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
+1. Fix clang warnings in LaserView and EnumIface
+    * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+
+## Gazebo 7.11.0 (2018-02-12)
+
+1. Fix gazebo7 + ogre 1.8 build error
+    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
+
+1. Process insertions and deletions on gz log echo
+    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
+    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
+
+1. Add Static Map Plugin for creating textured map model
+    * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
+
+## Gazebo 7.10.0 (2018-02-07)
+
+1. Add support for 16 bit Grayscale and RGB camera image types.
+    * [Pull request 2852](https://bitbucket.org/osrf/gazebo/pull-requests/2852)
+
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
+
+1. Add Visual::SetMaterialShaderParam function for setting shader parameters.
+    * [Pull request 2863](https://bitbucket.org/osrf/gazebo/pull-requests/2863)
+
+1. Adding accessors for velocity in ENU frame for gps sensor
+    * [Pull request 2854](https://bitbucket.org/osrf/gazebo/pull-request/2854)
+
+1. Fix DEM min elevation
+    * [Pull request 2868](https://bitbucket.org/osrf/gazebo/pull-request/2868)
+
+1. Update Color Clamp function
+    * [Pull request 2859](https://bitbucket.org/osrf/gazebo/pull-requests/2859)
 
 1. Move Connection header buffer from heap to stack to avoid race condition.
     * [Pull request 2844](https://bitbucket.org/osrf/gazebo/pull-requests/2844)
+
+1. Initialize laser retro value
+    * [Pull request 2841](https://bitbucket.org/osrf/gazebo/pull-request/2841)
 
 1. Shadow improvements
     * [Pull request 2805](https://bitbucket.org/osrf/gazebo/pull-requests/2805)
 
 1. Add light as child of link
     * [Pull request 2807](https://bitbucket.org/osrf/gazebo/pull-requests/2807)
+    * [Pull request 2872](https://bitbucket.org/osrf/gazebo/pull-requests/2872)
     * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Add camera lens flare effect
@@ -601,6 +814,12 @@
 
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
+
+1. Call DisconnectNewImageFrame in the CameraPlugin destructor
+    * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
+
+1. Fix gazebo7 homebrew build (tinyxml2 6.0.0)
+    * [Pull request 2824](https://bitbucket.org/osrf/gazebo/pull-request/2824)
 
 
 ## Gazebo 7.9.0 (2017-11-22)
