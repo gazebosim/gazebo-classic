@@ -116,7 +116,7 @@ namespace gazebo
 
       /// \brief Get whether there's at least one sensor container running.
       /// \return True if running.
-      public: bool Running();
+      public: bool Running() const;
 
       /// \brief Get all the sensor types
       /// \param[out] All the sensor types.
@@ -201,7 +201,7 @@ namespace gazebo
 
                  /// \brief Get whether running or stopped.
                  /// \return True if running.
-                 public: bool Running();
+                 public: bool Running() const;
 
                  /// \brief Update the sensors.
                  /// \param[in] _force True to force the sensors to update,
