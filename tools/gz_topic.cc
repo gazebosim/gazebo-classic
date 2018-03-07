@@ -59,7 +59,8 @@ TopicCommand::TopicCommand()
 void TopicCommand::HelpDetailed()
 {
   std::cerr <<
-    "\tPrint topic information to standard out. If a name for the world, \n"
+    "\tPrint topic information to standard out or send request.\n"
+    "If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
     << std::endl;
