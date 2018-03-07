@@ -1,0 +1,15 @@
+vertex_program Ogre/Compositor/StdQuad_GLSL_vp glsl
+{
+  source StdQuad_vp.glsl
+  default_params
+  {
+    param_named_auto worldViewProj worldviewproj_matrix
+  }
+}
+
+// Unified definitions
+vertex_program Ogre/Compositor/StdQuad_vp unified
+{
+  delegate Ogre/Compositor/StdQuad_GLSL_vp
+}
+

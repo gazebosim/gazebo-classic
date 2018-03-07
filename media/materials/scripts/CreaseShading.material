@@ -1,0 +1,59 @@
+fragment_program SSAO/CreaseShading_fp_glsl glsl
+{
+  source CreaseShadingFP.glsl
+  default_params
+  {
+    param_named sNormal int 0
+    param_named sPosition int 1
+    param_named sRandom int 2
+
+    param_named cMinimumCrease float 0.2
+    param_named cRange float 1.0
+    param_named cBias float 1.0
+    param_named cAverager float 24.0
+    param_named cKernelSize float 3.0
+  }
+}
+
+fragment_program SSAO/CreaseShading_fp unified
+{
+  delegate SSAO/CreaseShading_fp_glsl
+}
+
+material SSAO/CreaseShading
+{
+    technique
+    {
+        pass
+        {
+            depth_check off
+
+            vertex_program_ref Ogre/Compositor/StdQuad_vp {}
+            fragment_program_ref SSAO/CreaseShading_fp
+            {
+                param_named_auto cViewportSize viewport_size
+            }
+
+            texture_unit // normals
+            {
+                content_type compositor SSAO/GBuffer mrt 0
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // view space position
+            {
+                content_type compositor SSAO/GBuffer mrt 1
+                tex_address_mode clamp
+                filtering none
+            }
+
+            texture_unit // random texture will be replace by 11x11 stipple
+            {
+                texture rand1x32.png
+                tex_address_mode clamp
+                filtering none
+            }
+        }
+    }
+}

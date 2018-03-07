@@ -1,0 +1,40 @@
+vertex_program SSAO/GBuffer_vp_glsl glsl
+{
+  source GBufferVP.glsl
+}
+
+fragment_program SSAO/GBuffer_fp_glsl glsl
+{
+  source GBufferFP.glsl
+}
+
+vertex_program SSAO/GBuffer_vp unified
+{
+  delegate SSAO/GBuffer_vp_glsl
+}
+fragment_program SSAO/GBuffer_fp unified
+{
+  delegate SSAO/GBuffer_fp_glsl
+}
+
+
+material SSAO/GBuffer
+{
+    technique
+    {
+        pass
+        {
+            vertex_program_ref SSAO/GBuffer_vp
+            {
+                param_named_auto cWorldViewProj worldviewproj_matrix
+                param_named_auto cWorldView worldview_matrix
+            }
+
+            fragment_program_ref SSAO/GBuffer_fp
+            {
+                param_named_auto cNearClipDistance near_clip_distance
+                param_named_auto cFarClipDistance far_clip_distance
+            }
+        }
+    }
+}
