@@ -132,7 +132,7 @@ GLWidget::GLWidget(QWidget *_parent)
   this->dataPtr->entityMaker = NULL;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // Publishes information about user selections.
   this->dataPtr->selectionPub =
