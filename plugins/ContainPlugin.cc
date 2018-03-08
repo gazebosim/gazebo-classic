@@ -36,7 +36,6 @@ namespace gazebo
 {
   namespace physics
   {
-    // TODO(sloretz) change this to STL type in gazebo8+
     typedef boost::weak_ptr<physics::Entity> EntityWeakPtr;
   }
 
