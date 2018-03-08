@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Simplify search logic for Qt5
+    * [Pull request 2911](https://bitbucket.org/osrf/gazebo/pull-request/2911)
+    * [Issue 2419](https://bitbucket.org/osrf/gazebo/issues/2419)
+
 1. Fix log recording, only call sdf::initFile once
     * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
@@ -15,6 +19,15 @@
 
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+1. Don't shut down gazebo when removing a world
+    * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
 
 
 ## Gazebo 8.3.0 (2018-02-10)
@@ -570,6 +583,12 @@
 
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
 
 
 ## Gazebo 7.11.0 (2018-02-12)

@@ -457,7 +457,9 @@ void ODEPhysics::Fini()
 {
   dCloseODE();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
+  if (this->dataPtr->contactGroup)
+    dJointGroupDestroy(this->dataPtr->contactGroup);
+  this->dataPtr->contactGroup = nullptr;
 
   // Delete all the joint feedbacks.
   for (auto iter = this->dataPtr->jointFeedbacks.begin();
