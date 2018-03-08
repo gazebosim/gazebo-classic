@@ -474,8 +474,7 @@ void UserCamera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->dataPtr->rightCamera->setAspectRatio(ratio);
-    this->dataPtr->rightCamera->setFOVy(std::min(std::max(Ogre::Radian(0.001),
-                    Ogre::Radian(vfov)), Ogre::Radian(M_PI * 0.999)));
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 

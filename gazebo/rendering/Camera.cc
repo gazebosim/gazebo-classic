@@ -1394,14 +1394,9 @@ bool Camera::WorldPointOnPlane(const int _x, const int _y,
 }
 
 //////////////////////////////////////////////////
-void Camera::SetSafeFOVy(const Ogre::Radian &_fovy)
+double Camera::LimitFOV(const double _fovy)
 {
-  if (_fovy < Ogre::Radian(0.001) || _fovy > Ogre::Radian(M_PI * 0.999))
-    gzwarn << "Vertical FoV for camera " << this->name
-           << " is out of range" << std::endl;
-
-  this->camera->setFOVy(std::min(std::max(Ogre::Radian(0.001), _fovy),
-                                 Ogre::Radian(M_PI * 0.999)));
+  return std::min(std::max(0.001, _fovy), M_PI * 0.999);
 }
 
 //////////////////////////////////////////////////
@@ -1850,7 +1845,7 @@ void Camera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
-    this->SetSafeFOVy(Ogre::Radian(vfov));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 
