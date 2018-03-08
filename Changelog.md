@@ -2,12 +2,34 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request 2889](https://bitbucket.org/osrf/gazebo/pull-request/2889)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
+1. Fix OBJLoader when mesh has invalid material
+    * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
+
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
 
 1. Fix Joint::SetPosition for HingeJoint
     * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
     * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
+
+1. Add support for moving geometry to ContainPlugin
+    * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
+
+1. Support python3 with check_test_ran.py
+    * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+1. Fix undefined behavior in ODESliderJoint
+    * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
+
+1. Fix loading collada mesh that contains multiple texcoord sets with same offset
+    * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
+
+1. Fix race conditions during client startup, and introduce Node::TryInit()
+    * [Pull request 2897](https://bitbucket.org/osrf/gazebo/pull-requests/2897)
 
 
 ## Gazebo 7.11.0 (2018-02-12)
