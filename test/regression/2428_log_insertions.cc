@@ -45,11 +45,14 @@ TEST_F(Issue2428_Test, InsertionBeforeRecording)
   recorder->Init("test");
 
   // Playback the state log
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", true);
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
+
+  // take some steps before inserting model to avoid issue #2297
+  world->Step(100);
 
   std::string modelString =
       "<sdf version='1.6'>"
