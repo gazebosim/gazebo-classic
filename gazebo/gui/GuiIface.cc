@@ -405,11 +405,14 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
   if (sigaction(SIGTERM, &sigact, NULL))
-    std::cerr << "sigaction failed while setting up for SIGTERM" << std::endl;
+  {
+    std::cerr << "sigaction(15) failed while setting up for SIGTERM" << std::endl;
+    return false;
+  }
 #endif
 
   g_app->exec();
