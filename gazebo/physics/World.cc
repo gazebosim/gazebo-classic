@@ -1105,7 +1105,7 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
     {
       if (m->GetName() == modelName)
       {
-        gzwarn << "Model with name[" << modelName << "] already exists."
+        gzwarn << "Model with name [" << modelName << "] already exists. "
           << "Not inserting model. This warning can be ignored in certain "
           << "situations such as rewind during log playback.\n";
         return model;
