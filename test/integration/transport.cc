@@ -781,7 +781,7 @@ TEST_F(TransportTest, TryInit)
   EXPECT_TRUE(node->IsInitialized());
 
   // The namespace of the Node should match the name of the world that we loaded
-  EXPECT_EQ(physics::get_world()->GetName(), node->GetTopicNamespace());
+  EXPECT_EQ(physics::get_world()->Name(), node->GetTopicNamespace());
 }
 
 /////////////////////////////////////////////////
