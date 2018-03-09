@@ -1084,6 +1084,18 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
+    std::string modelName = _sdf->Get<std::string>("name");
+    for (auto const m : this->dataPtr->models)
+    {
+      if (m->GetName() == modelName)
+      {
+        gzwarn << "Model with name[" << modelName << "] already exists."
+          << "Not inserting model. This warning can be ignored in certain "
+          << "situations such as rewind during log playback.\n";
+        return model;
+      }
+    }
+
     model = this->dataPtr->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
@@ -2193,8 +2205,11 @@ void World::ProcessFactoryMsgs()
       std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
       ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-      model->Init();
-      model->LoadPlugins();
+      if (model != nullptr)
+      {
+        model->Init();
+        model->LoadPlugins();
+      }
     }
     catch(...)
     {
@@ -2341,8 +2356,11 @@ void World::SetState(const WorldState &_state)
         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-        model->Init();
-        model->LoadPlugins();
+        if (model != nullptr)
+        {
+          model->Init();
+          model->LoadPlugins();
+        }
       }
       catch(...)
       {
