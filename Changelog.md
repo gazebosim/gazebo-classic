@@ -29,6 +29,15 @@
 1. Don't shut down gazebo when removing a world
     * [Pull request 2511](https://bitbucket.org/osrf/gazebo/pull-request/2511)
 
+1. Fix undefined behavior in ODESliderJoint
+    * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
+
+1. Fix loading collada mesh that contains multiple texcoord sets with same offset
+    * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
+
+1. Fix race conditions during client startup, and introduce Node::TryInit()
+    * [Pull request 2897](https://bitbucket.org/osrf/gazebo/pull-requests/2897)
+
 
 ## Gazebo 8.3.0 (2018-02-10)
 
@@ -578,6 +587,10 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix log recording, only call sdf::initFile once
+    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
+
 1. Fix OBJLoader when mesh has invalid material
     * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
 
@@ -589,6 +602,15 @@
 
 1. Support python3 with check_test_ran.py
     * [Pull request 2902](https://bitbucket.org/osrf/gazebo/pull-request/2902)
+
+1. Fix undefined behavior in ODESliderJoint
+    * [Pull request 2905](https://bitbucket.org/osrf/gazebo/pull-requests/2905)
+
+1. Fix loading collada mesh that contains multiple texcoord sets with same offset
+    * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
+
+1. Fix race conditions during client startup, and introduce Node::TryInit()
+    * [Pull request 2897](https://bitbucket.org/osrf/gazebo/pull-requests/2897)
 
 
 ## Gazebo 7.11.0 (2018-02-12)
