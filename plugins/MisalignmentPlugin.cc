@@ -272,8 +272,14 @@ void MisalignmentPlugin::Load(physics::WorldPtr _world, sdf::ElementPtr _sdf)
   sdf::ElementPtr tgtPose = refPose->GetNextElement("pose");
   if (!tgtPose)
   {
-    gzerr << "Must have two <pose> tags, plugin will not be initialized.\n";
+    gzerr << "Two <pose> tags are required, plugin will not be initialized.\n";
     return;
+  }
+
+  if (refPose->GetNextElement("pose"))
+  {
+    gzwarn << "Found more than two <pose> tags,"
+      << " only the first two will be used.\n";
   }
 
   this->dataPtr->referencePose = refPose->Get<ignition::math::Pose3d>();
