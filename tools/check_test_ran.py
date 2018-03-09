@@ -68,7 +68,7 @@ def run_xsltproc(stylesheet, document):
         if process.returncode != 0:
             test_ran_message = "Error while converting QTest XML to junit with xsltproc."
         # Overwrite same document
-        open(document, 'w').write(stdout)
+        open(document, 'w').write(stdout.decode())
     except OSError as err:
         test_ran_message = "Unable to find xsltproc. Can not parse output test for QTest suite."
     if len(test_ran_message) > 0:

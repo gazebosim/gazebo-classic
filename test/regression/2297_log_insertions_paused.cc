@@ -80,8 +80,8 @@ TEST_F(Issue2297_Test, ModelInsertRecord)
   // The first step should be the initial world configuration
   std::string data;
   player->Step(data);
-  EXPECT_TRUE(data.find("<world name='default'>") != std::string::npos);
-  EXPECT_TRUE(data.find("<insertions>") == std::string::npos);
+  EXPECT_NE(data.find("<world name='default'>"), std::string::npos);
+  EXPECT_EQ(data.find("<insertions>"), std::string::npos);
 
   int count = 0;
   // The second step should have the insertions

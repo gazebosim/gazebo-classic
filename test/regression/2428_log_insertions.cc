@@ -45,11 +45,14 @@ TEST_F(Issue2428_Test, InsertionBeforeRecording)
   recorder->Init("test");
 
   // Playback the state log
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", true);
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
+
+  // take some steps before inserting model to avoid issue #2297
+  world->Step(100);
 
   std::string modelString =
       "<sdf version='1.6'>"
@@ -93,9 +96,9 @@ TEST_F(Issue2428_Test, InsertionBeforeRecording)
   size_t worldEnd = data.find("</world>");
 
   // The box model should exist in the initial world.
-  EXPECT_TRUE(worldStart < boxPos);
-  EXPECT_TRUE(worldEnd > boxPos);
-  EXPECT_TRUE(boxPos != std::string::npos);
+  EXPECT_LT(worldStart, boxPos);
+  EXPECT_GT(worldEnd, boxPos);
+  EXPECT_NE(boxPos, std::string::npos);
 
   // Cleanup the directory
   remove(filename.c_str());

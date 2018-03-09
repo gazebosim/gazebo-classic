@@ -47,8 +47,11 @@ ContactManager::ContactManager()
 ContactManager::~ContactManager()
 {
   this->Clear();
-  this->node.reset();
+
   this->contactPub.reset();
+  if (this->node)
+    this->node->Fini();
+  this->node.reset();
 
   boost::unordered_map<std::string, ContactPublisher *>::iterator iter;
   for (iter = this->customContactPublishers.begin();
