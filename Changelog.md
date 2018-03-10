@@ -24,6 +24,9 @@
 1. Fix loading collada mesh that contains multiple texcoord sets with same offset
     * [Pull request 2899](https://bitbucket.org/osrf/gazebo/pull-request/2899)
 
+1. Fix race conditions during client startup, and introduce Node::TryInit()
+    * [Pull request 2897](https://bitbucket.org/osrf/gazebo/pull-requests/2897)
+
 
 ## Gazebo 7.11.0 (2018-02-12)
 

@@ -228,6 +228,27 @@ TEST_F(TimeTest, String)
 }
 
 /////////////////////////////////////////////////
+TEST_F(TimeTest, Maximum)
+{
+  const common::Time maximum = common::Time::Maximum();
+
+  const common::Time zeroTime = common::Time(0, 0);
+  EXPECT_LT(zeroTime, maximum);
+  EXPECT_GT(maximum, zeroTime);
+  EXPECT_NE(zeroTime, maximum);
+
+  // This time is very large, but it is still not technically the maximum that
+  // we are able to represent.
+  const common::Time veryLargeTime =
+      common::Time(std::numeric_limits<int32_t>::max(), 0);
+  EXPECT_LT(veryLargeTime, maximum);
+  EXPECT_GT(maximum, veryLargeTime);
+  EXPECT_NE(veryLargeTime, maximum);
+
+  EXPECT_EQ(common::Time::Maximum(), maximum);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
