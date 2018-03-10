@@ -442,7 +442,7 @@ TEST_F(VisualProperty, NormalMap)
 
   // check that the r component of pixel varies throughout the image for
   // visual with normal map. The variation of b and g should still be small
-  EXPECT_GT(rSet2.size(), 150u);
+  EXPECT_GT(rSet2.size(), 100u);
   EXPECT_LE(gSet2.size(), 5u);
   EXPECT_LE(bSet2.size(), 5u);
 
