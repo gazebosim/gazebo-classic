@@ -2,8 +2,11 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Support lens flare occlusion
+    * [Pull request 2915](https://bitbucket.org/osrf/gazebo/pull-request/2915)
+
 1. Fix log recording, only call sdf::initFile once
-    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request 2889](https://bitbucket.org/osrf/gazebo/pull-request/2889)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
 
 1. Fix OBJLoader when mesh has invalid material
