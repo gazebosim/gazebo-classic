@@ -15,8 +15,6 @@
  *
 */
 
-#include <mutex>
-
 #include <gazebo/rendering/Camera.hh>
 #include <gazebo/rendering/RenderTypes.hh>
 #include <gazebo/rendering/Scene.hh>
@@ -28,42 +26,63 @@
 
 namespace gazebo
 {
+  /// \brief Helper class to assign the GBuffer shaders to compositors that
+  /// need them
   class SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
   {
-    public:
-      SSAOGBufferSchemeHandler()
-      {
-        mGBufRefMat = Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
-      }
+    /// \brief Constructor
+    public: SSAOGBufferSchemeHandler()
+    {
+      this->gBufRefMat =
+          Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+    }
 
-      virtual ~SSAOGBufferSchemeHandler()
-      {
-        mGBufRefMat.setNull();
-      }
+    /// \brief Destructor
+    public: ~SSAOGBufferSchemeHandler()
+    {
+      this->gBufRefMat.setNull();
+    }
 
-      /** @copydoc MaterialManager::Listener::handleSchemeNotFound */
-      virtual Ogre::Technique* handleSchemeNotFound(unsigned short /*schemeIndex*/,
-        const Ogre::String& schemeName, Ogre::Material *originalMaterial, unsigned short /*lodIndex*/,
+    /// \brief Ogre callback that is used to assign the GBuffer material to
+    /// compositors
+    /// \param[in] _schemeIndex Index of scheme requested
+    /// \param[in] _schemeName Name of scheme requested
+    /// \param[in] _originalMaterial Orignal material that does not contain
+    /// the requested scheme
+    /// \param[in] _lodIndex The material level-of-detail
+    /// \param[in] _rend Pointer to the Ogre::Renderable object requesting
+    /// the use of the techinique
+    /// \return The Ogre material technique to use when scheme is not found.
+    public: virtual Ogre::Technique* handleSchemeNotFound(
+        uint16_t /*schemeIndex*/, const Ogre::String& schemeName,
+        Ogre::Material *originalMaterial, uint16_t /*lodIndex*/,
         const Ogre::Renderable * /*rend*/)
-      {
-          Ogre::Technique *gBufferTech = originalMaterial->createTechnique();
-          gBufferTech->setSchemeName(schemeName);
-          Ogre::Pass* gbufPass = gBufferTech->createPass();
-          *gbufPass = *mGBufRefMat->getTechnique(0)->getPass(0);
-          return gBufferTech;
-      }
+    {
+      Ogre::Technique *gBufferTech = originalMaterial->createTechnique();
+      gBufferTech->setSchemeName(schemeName);
+      Ogre::Pass* gbufPass = gBufferTech->createPass();
+      *gbufPass = *this->gBufRefMat->getTechnique(0)->getPass(0);
+      return gBufferTech;
+    }
 
-    private:
-      Ogre::MaterialPtr mGBufRefMat;
+    /// \brief GBuffer material
+    private: Ogre::MaterialPtr gBufRefMat;
   };
 
   /// \brief Private data for the AmbientOcclusionVisualPlugin class.
   class AmbientOcclusionVisualPluginPrivate
   {
+    /// \brief Ambient occlusion compositor name
     public: std::string compositorName;
-    public: std::string postFilterName;
-    public: SSAOGBufferSchemeHandler *GBufSchemeHandler = nullptr;
 
+    /// \brief Post filter compositor name
+    public: std::string postFilterName;
+
+    /// \brief GBuffer material scheme handler
+    public: SSAOGBufferSchemeHandler *gBufSchemeHandler = nullptr;
+
+    /// \brief Apply ambient occlusion to the viewport of the input camera
+    /// \param[in] _cam Pointer to a camera
     public: void AddSSAO(rendering::CameraPtr _cam);
   };
 }
@@ -82,9 +101,9 @@ AmbientOcclusionVisualPlugin::AmbientOcclusionVisualPlugin()
 AmbientOcclusionVisualPlugin::~AmbientOcclusionVisualPlugin()
 {
   Ogre::MaterialManager::getSingleton().removeListener(
-      this->dataPtr->GBufSchemeHandler, "GBuffer");
-  delete this->dataPtr->GBufSchemeHandler;
-  this->dataPtr->GBufSchemeHandler = nullptr;
+      this->dataPtr->gBufSchemeHandler, "GBuffer");
+  delete this->dataPtr->gBufSchemeHandler;
+  this->dataPtr->gBufSchemeHandler = nullptr;
 }
 
 /////////////////////////////////////////////////
@@ -97,19 +116,21 @@ void AmbientOcclusionVisualPlugin::Load(rendering::VisualPtr _visual,
         std::endl;
     return;
   }
-//  this->dataPtr->visual = _visual;
 
-
+  // Use Crease Shading. There are others but this one is cheapest
+  // and gives reasonably nice looking results
   this->dataPtr->compositorName = "SSAO/CreaseShading";
   this->dataPtr->postFilterName = "SSAO/Post/NoFilter";
 
   rendering::ScenePtr scene = _visual->GetScene();
   if (!scene)
   {
-    gzerr << "Scene is null. Ambient Occlusion will not be enabled" << std::endl;
+    gzerr << "Scene is null. Ambient Occlusion will not be enabled"
+          << std::endl;
     return;
   }
 
+  // apply to all cameras
   for (unsigned int i = 0; i < scene->CameraCount(); ++i)
   {
     this->dataPtr->AddSSAO(scene->GetCamera(i));
@@ -122,9 +143,9 @@ void AmbientOcclusionVisualPlugin::Load(rendering::VisualPtr _visual,
     this->dataPtr->AddSSAO(cam);
   }
 
-  this->dataPtr->GBufSchemeHandler = new SSAOGBufferSchemeHandler();
+  this->dataPtr->gBufSchemeHandler = new SSAOGBufferSchemeHandler();
   Ogre::MaterialManager::getSingleton().addListener(
-      this->dataPtr->GBufSchemeHandler, "GBuffer");
+      this->dataPtr->gBufSchemeHandler, "GBuffer");
 }
 
 /////////////////////////////////////////////////

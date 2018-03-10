@@ -18,9 +18,9 @@ void main()
     vec3 fragmentPosition = texture2D(sPosition, uv).xyz;
     vec3 fragmentNormal = texture2D(sNormal, uv).xyz;
 
-	float totalGI = 0.0f;
+    float totalGI = 0.0f;
 
-	const int stippleSize = 11; // must be odd
+    const int stippleSize = 11; // must be odd
     for (int i = 0; i < (stippleSize + 1) / 2; i++)
     {
         vec2 diagonalStart = vec2(-(stippleSize - 1.0) / 2.0, 0) + i;
