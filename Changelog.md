@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
+    * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
+
 1. Fix log recording, only call sdf::initFile once
     * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
