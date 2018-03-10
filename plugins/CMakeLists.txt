@@ -71,6 +71,7 @@ set (plugins_single_header
   RubblePlugin
   ShaderParamVisualPlugin
   SkidSteerDrivePlugin
+  StaticMapPlugin
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
