@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Add Screen Space Ambient Occlusion visual plugin
+    * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+
 1. Fix log recording, only call sdf::initFile once
     * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
