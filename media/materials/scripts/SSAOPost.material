@@ -16,22 +16,22 @@ fragment_program SSAO/Post/NoFilter_fp unified
 
 material SSAO/Post/NoFilter
 {
-    technique
+  technique
+  {
+    pass
     {
-        pass
-        {
-            cull_hardware none
-            cull_software none
-            depth_check off
-            vertex_program_ref Ogre/Compositor/StdQuad_vp {}
-            fragment_program_ref SSAO/Post/NoFilter_fp {}
-            texture_unit
-            {
-                content_type compositor SSAO/GBuffer occlusion
-                tex_address_mode clamp
-                filtering none
-            }
-        }
+      cull_hardware none
+      cull_software none
+      depth_check off
+      vertex_program_ref Ogre/Compositor/StdQuad_vp {}
+      fragment_program_ref SSAO/Post/NoFilter_fp {}
+      texture_unit
+      {
+        content_type compositor SSAO/GBuffer occlusion
+        tex_address_mode clamp
+        filtering none
+      }
     }
+  }
 }
 

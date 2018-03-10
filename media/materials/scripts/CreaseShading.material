@@ -22,38 +22,41 @@ fragment_program SSAO/CreaseShading_fp unified
 
 material SSAO/CreaseShading
 {
-    technique
+  technique
+  {
+    pass
     {
-        pass
-        {
-            depth_check off
+      depth_check off
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp {}
-            fragment_program_ref SSAO/CreaseShading_fp
-            {
-                param_named_auto cViewportSize viewport_size
-            }
+      vertex_program_ref Ogre/Compositor/StdQuad_vp {}
+      fragment_program_ref SSAO/CreaseShading_fp
+      {
+        param_named_auto cViewportSize viewport_size
+      }
 
-            texture_unit // normals
-            {
-                content_type compositor SSAO/GBuffer mrt 0
-                tex_address_mode clamp
-                filtering none
-            }
+      // normals
+      texture_unit
+      {
+        content_type compositor SSAO/GBuffer mrt 0
+        tex_address_mode clamp
+        filtering none
+      }
 
-            texture_unit // view space position
-            {
-                content_type compositor SSAO/GBuffer mrt 1
-                tex_address_mode clamp
-                filtering none
-            }
+      // view space position
+      texture_unit
+      {
+        content_type compositor SSAO/GBuffer mrt 1
+        tex_address_mode clamp
+        filtering none
+      }
 
-            texture_unit // random texture will be replace by 11x11 stipple
-            {
-                texture rand1x32.png
-                tex_address_mode clamp
-                filtering none
-            }
-        }
+      // random texture will be replace by 11x11 stipple
+      texture_unit
+      {
+        texture rand1x32.png
+        tex_address_mode clamp
+        filtering none
+      }
     }
+  }
 }

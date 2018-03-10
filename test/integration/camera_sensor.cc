@@ -1309,29 +1309,20 @@ TEST_F(CameraSensor, AmbientOcclusion)
     return;
   }
 
-  // Get the camera model
-  std::string modelName = "camera";
+  // spawn a camera
+  std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-
-  physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != nullptr);
-  physics::ModelPtr model = world->GetModel(modelName);
-  ASSERT_TRUE(model != nullptr);
-
-  // get a pointer to the camera sensor
-  sensors::SensorPtr sensor =
-    sensors::get_sensor(cameraName);
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(6, 0, 2),
+      ignition::math::Quaterniond(0, 0, 3.14));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  ASSERT_TRUE(camSensor != nullptr);
-
-  unsigned int width  = camSensor->ImageWidth();
-  unsigned int height = camSensor->ImageHeight();
-  double updateRate = camSensor->UpdateRate();
-
-  EXPECT_GT(width, 0u);
-  EXPECT_GT(height, 0u);
-  EXPECT_GT(updateRate, 0u);
 
   // collect images
   imageCount = 0;
@@ -1367,9 +1358,9 @@ TEST_F(CameraSensor, AmbientOcclusion)
     }
   }
   // verify image is predominantly white but not the whole image
-  EXPECT_GT(uniquePixel[255], width*height*0.75);
-  EXPECT_LT(uniquePixel[255], width*height*0.8);
+  EXPECT_GT(uniquePixel[255], width*height*0.80);
+  EXPECT_LT(uniquePixel[255], width*height*0.85);
   // there should be some variations of grayscale pixels
-  EXPECT_LT(uniquePixel.size(), 255*0.3);
+  EXPECT_LT(uniquePixel.size(), 255*0.35);
   delete[] img;
 }

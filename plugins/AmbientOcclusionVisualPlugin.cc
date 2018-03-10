@@ -26,7 +26,7 @@
 
 namespace gazebo
 {
-  /// \brief Helper class to assign the GBuffer shaders to compositors that
+  /// \brief Helper class to assign the GBuffer material to compositors that
   /// need them
   class SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
   {
@@ -43,8 +43,7 @@ namespace gazebo
       this->gBufRefMat.setNull();
     }
 
-    /// \brief Ogre callback that is used to assign the GBuffer material to
-    /// compositors
+    /// \brief Ogre callback for assigning the GBuffer material to compositors
     /// \param[in] _schemeIndex Index of scheme requested
     /// \param[in] _schemeName Name of scheme requested
     /// \param[in] _originalMaterial Orignal material that does not contain
@@ -117,7 +116,7 @@ void AmbientOcclusionVisualPlugin::Load(rendering::VisualPtr _visual,
     return;
   }
 
-  // Use Crease Shading. There are others but this one is cheapest
+  // Use Crease Shading. There are others but this one is fast
   // and gives reasonably nice looking results
   this->dataPtr->compositorName = "SSAO/CreaseShading";
   this->dataPtr->postFilterName = "SSAO/Post/NoFilter";

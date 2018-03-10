@@ -5,7 +5,8 @@ varying vec3 oViewPos;
 varying vec3 oNormal;
 
 uniform float cNearClipDistance;
-uniform float cFarClipDistance; // !!! might be 0 for infinite view projection.
+// !!! might be 0 for infinite view projection.
+uniform float cFarClipDistance;
 
 void main()
 {
