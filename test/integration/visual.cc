@@ -300,14 +300,14 @@ TEST_F(VisualProperty, MaterialShaderParam)
 }
 
 /////////////////////////////////////////////////
-// normal is not work on OSX yet
+// normal map is not work on OSX yet
 #ifndef __APPLE__
 TEST_F(VisualProperty, NormalMap)
 {
-  // Load a world with two red box visuals: one without normal and and one with
-  // normal map. Spawn a camera in front of each visual. Verify the color of
-  // visual with normal mpa is different (darker) than visual without normal
-  // map and has  irregular pattern
+  // Load a world with two red box visuals: one without normal map and and one
+  // with normal map. Spawn a camera in front of each visual. Verify the visual
+  // with normal map is darker than visual without normal map and has irregular
+  // pattern
   Load("worlds/normal_map.world");
 
   // Make sure the render engine is available.
