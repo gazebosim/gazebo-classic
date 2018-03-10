@@ -159,7 +159,7 @@ namespace gazebo
       public: UserCmdHistory *userCmdHistory = nullptr;
 
       // whether the file is atleast saved once or not.
-      public: bool isSavedOnce = 0;
+      public: bool isSavedOnce = false;
     };
   }
 }

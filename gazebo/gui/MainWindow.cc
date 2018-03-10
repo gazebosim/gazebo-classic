@@ -508,7 +508,7 @@ void MainWindow::SaveAs()
 
     std::string filename = selected[0].toStdString();
 
-    this->dataPtr->isSavedOnce=1;
+    this->dataPtr->isSavedOnce = true;
     this->dataPtr->saveFilename = filename;
     this->Save();
   }
