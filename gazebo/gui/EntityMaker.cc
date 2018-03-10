@@ -39,7 +39,7 @@ EntityMaker::EntityMaker(EntityMakerPrivate &_dataPtr)
   : dataPtr(&_dataPtr)
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 }
 
 //////////////////////////////////////////////////
