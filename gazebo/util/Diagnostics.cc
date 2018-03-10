@@ -69,7 +69,18 @@ DiagnosticManager::DiagnosticManager()
 //////////////////////////////////////////////////
 DiagnosticManager::~DiagnosticManager()
 {
+  this->Fini();
+}
+
+//////////////////////////////////////////////////
+void DiagnosticManager::Fini()
+{
   this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->pub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
