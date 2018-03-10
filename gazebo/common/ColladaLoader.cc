@@ -1747,6 +1747,15 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
     std::string semantic = trianglesInputXml->Attribute("semantic");
     std::string source = trianglesInputXml->Attribute("source");
     std::string offset = trianglesInputXml->Attribute("offset");
+
+    // skip extra UV set for now
+    int of = ignition::math::parseInt(offset);
+    if (hasTexcoords && (inputs[TEXCOORD] == of))
+    {
+      trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
+      continue;
+    }
+
     if (semantic == "VERTEX")
     {
       unsigned int count = norms.size();
@@ -1778,6 +1787,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
           << " not supported" << std::endl;
     }
     trianglesInputXml = trianglesInputXml->NextSiblingElement("input");
+
     offsetSize++;
   }
 
@@ -1828,6 +1838,12 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
   std::vector<std::string> strs;
 
   boost::split(strs, pStr, boost::is_any_of("   "));
+
+  std::cerr << "==== name " << this->dataPtr->currentNodeName << std::endl;
+  std::cerr << " offsetSize " <<  offsetSize << std::endl;
+  std::cerr << " strs size " << strs.size() << std::endl;;
+  // for (auto s : strs) std::cerr <<  s << " ";
+  // std::cerr << std::endl;
 
   for (unsigned int j = 0; j < strs.size(); j += offsetSize)
   {

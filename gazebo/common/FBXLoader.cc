@@ -596,7 +596,7 @@ class FBXNode
   public: void GenerateModels(Mesh *_mesh,
               std::map<int64_t, SubMesh*> &_subMeshMap,
               std::map<int64_t, Material*> &_materialMap,
-              std::vector<std::pair<int64_t, int64_t>> &_connections)
+              std::vector<std::tuple<int64_t, int64_t, std::string>> &_connections)
   {
     if (this->name == "Model")
     {
@@ -604,15 +604,17 @@ class FBXNode
       int64_t other = 0;
       FBXNode *scaleNode = this->ChildWithProperty("Lcl Scaling");
       FBXNode *rotNode = this->ChildWithProperty("Lcl Rotation");
-      FBXNode *preRotNode = this->ChildWithProperty("PreRotation");
       FBXNode *transNode = this->ChildWithProperty("Lcl Translation");
+      FBXNode *preRotNode = this->ChildWithProperty("PreRotation");
       FBXNode *geomTransNode = this->ChildWithProperty("GeometricTranslation");
+      FBXNode *geomRotNode = this->ChildWithProperty("GeometricRotation");
 
       ignition::math::Vector3d scale(1, 1, 1);
       ignition::math::Vector3d rot(0, 0, 0);
       ignition::math::Vector3d preRot(0, 0, 0);
       ignition::math::Vector3d trans(0, 0, 0);
       ignition::math::Vector3d geomTrans(0, 0, 0);
+      ignition::math::Vector3d geomRot(0, 0, 0);
 
       if (scaleNode)
       {
@@ -641,55 +643,72 @@ class FBXNode
       }
       if (geomTransNode)
       {
+        std::cerr << " -============!!! geometric translation " << std::endl;
         geomTrans.Set(geomTransNode->properties[4]->Dbl(),
                       geomTransNode->properties[5]->Dbl(),
                       geomTransNode->properties[6]->Dbl());
       }
+      if (geomRotNode)
+      {
+        geomRot.Set(geomRotNode->properties[4]->Dbl(),
+                      geomRotNode->properties[5]->Dbl(),
+                      geomRotNode->properties[6]->Dbl());
+      }
+
+      // local transform
+      ignition::math::Quaterniond q(rot);
+      ignition::math::Quaterniond pq(preRot);
+      ignition::math::Matrix4d rotMat(q);
+      ignition::math::Matrix4d preRotMat(pq);
+
+      ignition::math::Matrix4d transMat(ignition::math::Matrix4d::Identity);
+      transMat.Translate(trans);
+
+      ignition::math::Matrix4d scaleMat(ignition::math::Matrix4d::Identity);
+      scaleMat.Scale(scale);
+
+      // geom transform
+      ignition::math::Quaterniond gq(geomRot);
+      ignition::math::Matrix4d geomMat(geomRot);
+      geomMat.Translate(geomTrans);
+
+      // final transform
+      ignition::math::Matrix4d finalMat(ignition::math::Matrix4d::Identity);
+      finalMat = transMat * preRotMat * rotMat * scaleMat * geomMat;
+      // Translation * RotationOffset * RotationPivot * PreRotation
+      // * Rotation * PostRotation * RotationPivotInverse
+      // * ScalingOffset * ScalingPivot * Scaling * Scaling PivotInverse
+      // * GeometricTranslation * GeometricRotation * GeometricScaling.
 
       for (const auto c : _connections)
       {
+        int64_t cfirst = std::get<0>(c);
+        int64_t csecond = std::get<1>(c);
         other = 0;
-        if (c.first == id)
-          other = c.second;
-        else if (c.second == id)
-          other = c.first;
+        if (cfirst == id)
+          other = csecond;
+        else if (csecond == id)
+          other = cfirst;
 
         // Attempt to add a submesh
-        if (_subMeshMap[other])
+        if (_subMeshMap.find(other) != _subMeshMap.end())
         {
-          SubMesh *sub = new SubMesh(_subMeshMap[other]);
-          ignition::math::Quaterniond q(rot);
-          ignition::math::Quaterniond pq(preRot);
-          ignition::math::Matrix4d rotMat(q);
-          ignition::math::Matrix4d preRotMat(pq);
-
-          ignition::math::Matrix4d transMat(ignition::math::Matrix4d::Identity);
-          transMat.Translate(trans);
-
-          ignition::math::Matrix4d geomTransMat(
-              ignition::math::Matrix4d::Identity);
-          geomTransMat.Translate(geomTrans);
-
-          ignition::math::Matrix4d scaleMat(ignition::math::Matrix4d::Identity);
-          scaleMat.Scale(scale);
-
-          ignition::math::Matrix4d finalMat(ignition::math::Matrix4d::Identity);
-          finalMat = transMat * preRotMat * rotMat * scaleMat * geomTransMat;
+//          SubMesh *sub = new SubMesh(_subMeshMap[other]);
+          SubMesh *sub = _subMeshMap[other];
           sub->Transform(finalMat);
-          // Translation * RotationOffset * RotationPivot * PreRotation
-          // * Rotation * PostRotation * RotationPivotInverse
-          // * ScalingOffset * ScalingPivot * Scaling * Scaling PivotInverse
-          // * GeometricTranslation * GeometricRotation * GeometricScaling.
 
           for (const auto c2 : _connections)
           {
-            int64_t other2 = 0;
-            if (c2.first == id)
-              other2 = c2.second;
-            else if (c2.second == id)
-              other2 = c2.first;
+            int64_t c2first = std::get<0>(c2);
+            int64_t c2second = std::get<1>(c2);
 
-            if (_materialMap[other2])
+            int64_t other2 = 0;
+            if (c2first == id)
+              other2 = c2second;
+            else if (c2second == id)
+              other2 = c2first;
+
+            if (_materialMap.find(other) != _materialMap.end())
             {
               int matId = _mesh->AddMaterial(_materialMap[other2]);
               std::cout << "Adding material. Model: " << id << " Mat: " << other2
@@ -710,7 +729,7 @@ class FBXNode
   }
 
   public: void GenerateConnections(
-              std::vector<std::pair<int64_t, int64_t>> &_connections)
+              std::vector<std::tuple<int64_t, int64_t, std::string>> &_connections)
   {
     if (this->name == "Connections")
     {
@@ -718,9 +737,13 @@ class FBXNode
       {
         if (n->name == "C")
         {
-          int64_t a = n->properties[1]->Int();
-          int64_t b = n->properties[2]->Int();
-          _connections.push_back(std::make_pair(a, b));
+          int64_t from = n->properties[1]->Int();
+          int64_t to = n->properties[2]->Int();
+          std::string relationship;
+          if (n->properties.size() >= 4u)
+            relationship = n->properties[3]->String();
+          _connections.push_back(std::make_tuple(from, to, relationship));
+//          std::cerr << "===============!!!connections: " << n->properties.size() << std::endl;
         }
       }
     }
@@ -928,7 +951,7 @@ Mesh *FBXLoader::Load(const std::string &_filename)
   std::map<int64_t, SubMesh*> subMeshMap;
   std::map<int64_t, Material*> materialMap;
 
-  std::vector<std::pair<int64_t, int64_t>> connections;
+  std::vector<std::tuple<int64_t, int64_t, std::string>> connections;
 
   for (const auto n : nodes)
     n->GenerateConnections(connections);
