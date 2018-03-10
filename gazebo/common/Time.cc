@@ -115,6 +115,18 @@ Time::~Time()
 }
 
 /////////////////////////////////////////////////
+Time Time::Maximum()
+{
+  // We do not maximize the nanoseconds, because then the Correct() function
+  // will overflow the seconds member data, which will make the seconds field
+  // negative. Instead, we set the nanoseconds field to one nanosecond beneath
+  // one second, so that it's as high as it can be without spilling into
+  // seconds.
+  return Time(std::numeric_limits<int32_t>::max(),
+              static_cast<int32_t>(1e9) - 1);
+}
+
+/////////////////////////////////////////////////
 const Time &Time::GetWallTime()
 {
   struct timespec tv;
