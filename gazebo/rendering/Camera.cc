@@ -1394,9 +1394,9 @@ bool Camera::WorldPointOnPlane(const int _x, const int _y,
 }
 
 //////////////////////////////////////////////////
-double Camera::LimitFOV(const double _fovy)
+double Camera::LimitFOV(const double _fov)
 {
-  return std::min(std::max(0.001, _fovy), M_PI * 0.999);
+  return std::min(std::max(0.001, _fov), M_PI * 0.999);
 }
 
 //////////////////////////////////////////////////
