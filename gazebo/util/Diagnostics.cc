@@ -245,7 +245,7 @@ std::string DiagnosticManager::GetLabel(int _index) const
 //////////////////////////////////////////////////
 std::string DiagnosticManager::Label(const int _index) const
 {
-  if (_index < 0 || static_cast<size_t>(_index) > this->dataPtr->timers.size())
+  if (_index < 0 || static_cast<size_t>(_index) >= this->dataPtr->timers.size())
   {
     gzerr << "Invalid index of[" << _index << "]. Must be between 0 and "
       << this->dataPtr->timers.size()-1 << ", inclusive.\n";
