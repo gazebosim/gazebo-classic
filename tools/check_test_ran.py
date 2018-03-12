@@ -65,7 +65,7 @@ def run_xsltproc(stylesheet, document):
         process = subprocess.Popen(['xsltproc', stylesheet, document], stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
         # Overwrite same document
-        open(document, 'w').write(stdout)
+        open(document, 'w').write(stdout.decode())
     except OSError as err:
         test_name = os.path.basename(document)
         f = open(document, 'w')
