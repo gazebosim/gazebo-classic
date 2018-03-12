@@ -410,7 +410,8 @@ bool gui::run(int _argc, char **_argv)
   }
   if (sigaction(SIGTERM, &sigact, NULL))
   {
-    std::cerr << "sigaction(15) failed while setting up for SIGTERM" << std::endl;
+    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+              << std::endl;
     return false;
   }
 #endif
