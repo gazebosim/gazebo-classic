@@ -93,7 +93,7 @@ void ModelManipulator::Init()
   this->dataPtr->scene =  cam->GetScene();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
