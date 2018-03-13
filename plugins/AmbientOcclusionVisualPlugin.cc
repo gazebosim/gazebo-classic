@@ -35,6 +35,11 @@ namespace gazebo
     {
       this->gBufRefMat =
           Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
+      if (this->gBufRefMat.isNull())
+      {
+        gzerr << "Unable to find 'SSAO/GBuffer' material, SSAO will not work"
+              << std::endl;
+      }
     }
 
     /// \brief Destructor
@@ -60,7 +65,8 @@ namespace gazebo
       Ogre::Technique *gBufferTech = originalMaterial->createTechnique();
       gBufferTech->setSchemeName(schemeName);
       Ogre::Pass* gbufPass = gBufferTech->createPass();
-      *gbufPass = *this->gBufRefMat->getTechnique(0)->getPass(0);
+      if (!this->gBufRefMat.isNull())
+        *gbufPass = *this->gBufRefMat->getTechnique(0)->getPass(0);
       return gBufferTech;
     }
 
