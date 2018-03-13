@@ -77,6 +77,9 @@ namespace gazebo
   /// \brief Private data for the AmbientOcclusionVisualPlugin class.
   class AmbientOcclusionVisualPluginPrivate
   {
+    /// \brief Destructor
+    public: ~AmbientOcclusionVisualPluginPrivate();
+
     /// \brief Ambient occlusion compositor name
     public: std::string compositorName;
 
@@ -97,6 +100,15 @@ using namespace gazebo;
 GZ_REGISTER_VISUAL_PLUGIN(AmbientOcclusionVisualPlugin)
 
 /////////////////////////////////////////////////
+AmbientOcclusionVisualPluginPrivate::~AmbientOcclusionVisualPluginPrivate()
+{
+  Ogre::MaterialManager::getSingleton().removeListener(
+      this->gBufSchemeHandler, "GBuffer");
+  delete this->gBufSchemeHandler;
+  this->gBufSchemeHandler = nullptr;
+}
+
+/////////////////////////////////////////////////
 AmbientOcclusionVisualPlugin::AmbientOcclusionVisualPlugin()
     : dataPtr(new AmbientOcclusionVisualPluginPrivate)
 {
@@ -105,10 +117,6 @@ AmbientOcclusionVisualPlugin::AmbientOcclusionVisualPlugin()
 /////////////////////////////////////////////////
 AmbientOcclusionVisualPlugin::~AmbientOcclusionVisualPlugin()
 {
-  Ogre::MaterialManager::getSingleton().removeListener(
-      this->dataPtr->gBufSchemeHandler, "GBuffer");
-  delete this->dataPtr->gBufSchemeHandler;
-  this->dataPtr->gBufSchemeHandler = nullptr;
 }
 
 /////////////////////////////////////////////////
