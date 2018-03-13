@@ -755,11 +755,19 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
         _meshName);
       if (!ogreMesh.isNull())
       {
-        uint16_t src, dest;
-        if (!ogreMesh->suggestTangentVectorBuildParams(
-            Ogre::VES_TANGENT, src, dest))
+        try
         {
-          ogreMesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+          uint16_t src, dest;
+          if (!ogreMesh->suggestTangentVectorBuildParams(
+              Ogre::VES_TANGENT, src, dest))
+          {
+            ogreMesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+          }
+        }
+        catch(Ogre::Exception &e)
+        {
+          gzwarn << "Problem generating tangent vectors for " << _meshName
+                 << ". Normal map will not work: " << e.what() << std::endl;
         }
       }
     }
