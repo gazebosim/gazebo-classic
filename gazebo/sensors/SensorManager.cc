@@ -581,15 +581,15 @@ void SensorManager::SensorContainer::RunLoop()
     {
       gzwarn << "Took over 1000*max_step_size to update a sensor "
         << "(took " << diffTime.sec << " sec, which is more than "
-        << "the max update of " << maxSensorUpdate << " sec)." << std::endl;
-      return;
+        << "the max update of " << maxSensorUpdate << " sec)."
+        << "This warning can be ignored during log playback" << std::endl;
     }
 
     // Make sure eventTime is not negative.
     if (eventTime < common::Time::Zero)
     {
       gzerr << "Time to next sensor update is negative." << std::endl;
-      return;
+      continue;
     }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);

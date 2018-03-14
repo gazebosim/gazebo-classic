@@ -2,6 +2,15 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Do not load model plugins during log playback.
+    * [Pull request 2884](https://bitbucket.org/osrf/gazebo/pull-request/2884)
+    * [Issue 2427](https://bitbucket.org/osrf/gazebo/issues/2427)
+
+1. State log file playback can cause a sensor manager assert if there is
+   a large period of inactivity. This PR outputs warning messages instead of
+   using asserts.
+    * [Pull request 2893](https://bitbucket.org/osrf/gazebo/pull-request/2893)
+
 1. Simplify search logic for Qt5
     * [Pull request 2911](https://bitbucket.org/osrf/gazebo/pull-request/2911)
     * [Issue 2419](https://bitbucket.org/osrf/gazebo/issues/2419)
