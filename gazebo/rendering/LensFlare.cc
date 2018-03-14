@@ -112,9 +112,8 @@ namespace gazebo
       /// \brief Get the lens flare position and scale for a normal camera
       /// \param[in] _camera Camera which the lens flare is added to
       /// \param[out] _pos lens flare position in normalized device coordinates
-      /// \param[out] _scale Amount to scale the lens flare scale by.
-      /// Computed based on occlusion percentage
-      private: void CameraPosScale(CameraPtr _camera,
+      /// \param[out] _scale Amount to scale the lens flare by.
+      private: void CameraPosScale(const CameraPtr _camera,
           ignition::math::Vector3d &_pos, double &_scale)
       {
         Ogre::Vector3 lightPos;
@@ -142,9 +141,9 @@ namespace gazebo
       /// \brief Get the lens flare position and scale for a wide angle camera
       /// \param[in] _wideAngleCam Camera which the lens flare is added to
       /// \param[out] _pos lens flare position in normalized device coordinates
-      /// \param[out] _scale Amount to scale the lens flare scale by.
-      /// Computed based on occlusion percentage
-      private: void WideAngleCameraPosScale(WideAngleCameraPtr _wideAngleCam,
+      /// \param[out] _scale Amount to scale the lens flare by.
+      private: void WideAngleCameraPosScale(
+          const WideAngleCameraPtr _wideAngleCam,
           ignition::math::Vector3d &_pos, double &_scale)
       {
         Ogre::Vector3 lightPos;
@@ -193,6 +192,9 @@ namespace gazebo
             static_cast<double>(_wideAngleCam->ViewportHeight());
         auto imagePos = _wideAngleCam->Project3d(this->lightWorldPos);
 
+        GZ_ASSERT(viewportWidth > 0, "Viewport width is 0");
+        GZ_ASSERT(viewportHeight > 0, "Viewport height is 0");
+
         // convert to normalized device coordinates (needed by shaders)
         // keep z for visibility test
         lightPos.x = 2.0 * (imagePos.X() / viewportWidth  - 0.5);
@@ -239,8 +241,8 @@ namespace gazebo
         _scale = occlusionScale;
       }
 
-      /// \brief Check to see if the lensflare is occluded and return a scaling
-      /// factor for the lens flare that is proportional to its visibility
+      /// \brief Check to see if the lens flare is occluded and return a scaling
+      /// factor that is proportional to the lens flare's visibility
       /// \param[in] _cam Camera used for checking occlusion
       /// \param[in] _imgPos light pos in clip space
       /// \param[in] _worldPos light pos in 3D world space
