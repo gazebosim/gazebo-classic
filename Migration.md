@@ -5,6 +5,14 @@ Deprecated code produces compile-time warnings. These warning serve as
 notification to users that their code should be upgraded. The next major
 release will remove the deprecated code.
 
+## Gazebo 8.4 to 9.x
+
+### Models with duplicate names will not be inserted
+
+1. Prior to gazebo 8.4, multiple models with the same name could be inserted
+   into a world and simulated, though they were not fully functional.
+   Now models with duplicate names are not allowed to be inserted.
+
 ## Gazebo 8.x to 9.x
 
 ### -g command line argument to load plugins in gzclient
