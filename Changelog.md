@@ -11,6 +11,11 @@
    using asserts.
     * [Pull request 2893](https://bitbucket.org/osrf/gazebo/pull-request/2893)
 
+1. Fix model insertions during log playback.
+    * [Pull request 2890](https://bitbucket.org/osrf/gazebo/pull-request/2890)
+    * [Issue 2297](https://bitbucket.org/osrf/gazebo/issues/2297)
+    * [Issue 2428](https://bitbucket.org/osrf/gazebo/issues/2428)
+
 1. Simplify search logic for Qt5
     * [Pull request 2911](https://bitbucket.org/osrf/gazebo/pull-request/2911)
     * [Issue 2419](https://bitbucket.org/osrf/gazebo/issues/2419)
