@@ -581,7 +581,7 @@ void SensorManager::SensorContainer::RunLoop()
     {
       gzwarn << "Took over 1000*max_step_size to update a sensor "
         << "(took " << diffTime.sec << " sec, which is more than "
-        << "the max update of " << maxSensorUpdate << " sec)."
+        << "the max update of " << maxSensorUpdate << " sec). "
         << "This warning can be ignored during log playback" << std::endl;
     }
 
