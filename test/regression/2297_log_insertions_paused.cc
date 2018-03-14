@@ -84,7 +84,7 @@ TEST_F(Issue2297_Test, ModelInsertRecord)
   EXPECT_EQ(data.find("<insertions>"), std::string::npos);
 
   int count = 0;
-  // The second step should have the insertions
+  // The insertions should come after the first step
   while (player->Step(data))
   {
     size_t boxPos = data.find("<insertions><model name='box'>");
