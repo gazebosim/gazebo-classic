@@ -10,6 +10,7 @@
    a large period of inactivity. This PR outputs warning messages instead of
    using asserts.
     * [Pull request 2893](https://bitbucket.org/osrf/gazebo/pull-request/2893)
+    * [Pull request 2921](https://bitbucket.org/osrf/gazebo/pull-request/2921)
 
 1. Fix model insertions during log playback.
     * [Pull request 2890](https://bitbucket.org/osrf/gazebo/pull-request/2890)
