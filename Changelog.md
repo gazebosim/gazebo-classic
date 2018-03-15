@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Handle signal SIGTERM exactly the same way as SIGINT
+    * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
+
 1. Make override keywords consistent in joint classes to fix clang warnings
     * [Pull request 2869](https://bitbucket.org/osrf/gazebo/pull-request/2869)
     * [Pull request 2881](https://bitbucket.org/osrf/gazebo/pull-request/2881)
