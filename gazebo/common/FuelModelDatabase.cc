@@ -29,6 +29,7 @@
 #include <ignition/fuel_tools.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SemanticVersion.hh"
@@ -52,6 +53,24 @@ FuelModelDatabase::FuelModelDatabase()
 {
   ignition::fuel_tools::ClientConfig conf;
   conf.LoadConfig();
+  std::string userAgent = "Gazebo ";
+  userAgent += GAZEBO_VERSION_FULL + "(";
+
+#if defined(_WIN32)
+  userAgent += "Windows";
+#elif defined(__linux__)
+  userAgent += "GNU/Linux";
+#elif defined(__APPLE__)
+  userAgent += "Mac OSX";
+#elif defined (BSD)
+  userAgent += "BSD";
+#else
+  userAgent += "unknown";
+#endif
+
+  userAgent += ")";
+
+  conf.SetUserAgent(userAgent);
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
 }
 
