@@ -472,7 +472,8 @@ void World::Stop()
 {
   this->dataPtr->stop = true;
 
-  if (this->dataPtr->thread)
+  if (this->dataPtr->thread &&
+     this->dataPtr->thread->get_id() != std::this_thread::get_id())
   {
     this->dataPtr->thread->join();
     delete this->dataPtr->thread;
