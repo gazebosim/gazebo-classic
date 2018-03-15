@@ -32,7 +32,7 @@ vec3 lensflare(vec2 uv,vec2 pos)
   float dist = length(main); dist = pow(dist,.1);
   float n = noise(vec2((ang-time/9.0)*16.0,dist*32.0));
 
-  float f0 = 1.0/(length(uv-pos)*16.0+1.0);
+  float f0 = 1.0/(length(uv-pos)*16.0/scale+1.0);
 
   f0 = f0+f0*(sin((ang+time/18.0 + noise(abs(ang)+n/2.0)*2.0)*12.0)*.1+dist*.1+.8);
 
@@ -61,9 +61,8 @@ vec3 lensflare(vec2 uv,vec2 pos)
   vec3 c = vec3(.0);
 
   c.r+=f2+f4+f5+f6; c.g+=f22+f42+f52+f62; c.b+=f23+f43+f53+f63;
+  c *= min(scale, 0.2)/0.2;
   c+=vec3(f0);
-
-  c = c * vec3(scale, scale, scale);
 
   return c;
 }

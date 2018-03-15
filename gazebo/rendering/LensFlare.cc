@@ -66,6 +66,13 @@ namespace gazebo
         this->lightWorldPos = -this->dir * 100000.0;
       }
 
+      /// \brief Set the scale of lens flare.
+      /// \param[in] _scale Scale of lens flare
+      public: void SetScale(const double _scale)
+      {
+        this->scale = _scale;
+      }
+
       /// \brief Callback that OGRE will invoke for us on each render call
       /// \param[in] _passID OGRE material pass ID.
       /// \param[in] _mat Pointer to OGRE material.
@@ -94,26 +101,27 @@ namespace gazebo
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
 
         ignition::math::Vector3d pos;
-        double scale = 1.0;
+        double lensFlareScale = 1.0;
 
         // wide angle camera has a different way of projecting 3d points and
         // occlusion checking
         auto wideAngleCam =
             boost::dynamic_pointer_cast<WideAngleCamera>(this->camera);
         if (wideAngleCam)
-          this->WideAngleCameraPosScale(wideAngleCam, pos, scale);
+          this->WideAngleCameraPosScale(wideAngleCam, pos, lensFlareScale);
         else
-          this->CameraPosScale(this->camera, pos, scale);
+          this->CameraPosScale(this->camera, pos, lensFlareScale);
 
         params->setNamedConstant("lightPos", Conversions::Convert(pos));
-        params->setNamedConstant("scale", static_cast<Ogre::Real>(scale));
+        params->setNamedConstant("scale",
+            static_cast<Ogre::Real>(lensFlareScale));
       }
 
       /// \brief Get the lens flare position and scale for a normal camera
       /// \param[in] _camera Camera which the lens flare is added to
       /// \param[out] _pos lens flare position in normalized device coordinates
       /// \param[out] _scale Amount to scale the lens flare by.
-      private: void CameraPosScale(const CameraPtr _camera,
+      private: void CameraPosScale(const CameraPtr &_camera,
           ignition::math::Vector3d &_pos, double &_scale)
       {
         Ogre::Vector3 lightPos;
@@ -135,7 +143,7 @@ namespace gazebo
               Conversions::ConvertIgn(lightPos), this->lightWorldPos);
         }
         _pos = Conversions::ConvertIgn(lightPos);
-        _scale = occlusionScale;
+        _scale = occlusionScale * this->scale;
       }
 
       /// \brief Get the lens flare position and scale for a wide angle camera
@@ -143,7 +151,7 @@ namespace gazebo
       /// \param[out] _pos lens flare position in normalized device coordinates
       /// \param[out] _scale Amount to scale the lens flare by.
       private: void WideAngleCameraPosScale(
-          const WideAngleCameraPtr _wideAngleCam,
+          const WideAngleCameraPtr &_wideAngleCam,
           ignition::math::Vector3d &_pos, double &_scale)
       {
         Ogre::Vector3 lightPos;
@@ -238,7 +246,7 @@ namespace gazebo
           }
         }
         _pos = Conversions::ConvertIgn(lightPos);
-        _scale = occlusionScale;
+        _scale = occlusionScale * this->scale;
       }
 
       /// \brief Check to see if the lens flare is occluded and return a scaling
@@ -271,7 +279,7 @@ namespace gazebo
         unsigned int occluded = 0u;
         // work in normalized device coordinates
         // lens flare's halfSize is just an approximated value
-        double halfSize = 0.05;
+        double halfSize = 0.05 * this->scale;
         double steps = 10;
         double stepSize = halfSize * 2 / steps;
         double cx = _imgPos.X();
@@ -309,6 +317,9 @@ namespace gazebo
 
       /// \brief Position of light in world frame
       private: ignition::math::Vector3d lightWorldPos;
+
+      /// \brief Scale of lens flare.
+      private: double scale = 1.0;
     };
 
     /// \brief Private data class for LensFlare
@@ -341,6 +352,9 @@ namespace gazebo
 
       /// \brief Connection for the pre render event.
       public: event::ConnectionPtr preRenderConnection;
+
+      /// \brief Scale of lens flare.
+      public: double lensFlareScale = 1.0;
     };
   }
 }
@@ -371,6 +385,17 @@ void LensFlare::SetCamera(CameraPtr _camera)
   this->dataPtr->camera = _camera;
   this->dataPtr->preRenderConnection = event::Events::ConnectPreRender(
       std::bind(&LensFlare::Update, this));
+}
+
+//////////////////////////////////////////////////
+void LensFlare::SetScale(const double _scale)
+{
+  this->dataPtr->lensFlareScale = std::max(0.0, _scale);
+  if (this->dataPtr->lensFlareCompositorListener)
+  {
+    this->dataPtr->lensFlareCompositorListener->SetScale(
+        this->dataPtr->lensFlareScale);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -416,6 +441,8 @@ void LensFlare::Update()
 
     this->dataPtr->lensFlareCompositorListener.reset(new
           LensFlareCompositorListener(this->dataPtr->camera, directionalLight));
+    this->dataPtr->lensFlareCompositorListener->SetScale(
+        this->dataPtr->lensFlareScale);
 
     this->dataPtr->lensFlareInstance =
         Ogre::CompositorManager::getSingleton().addCompositor(

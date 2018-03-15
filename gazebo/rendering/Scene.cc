@@ -1262,10 +1262,11 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     // Only accept a hit if there is an entity and not a gui visual
     // and not a selection-only object (e.g. light selection ent)
+    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+        || (flags & GZ_VISIBILITY_SELECTABLE);
     if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && (flags & GZ_VISIBILITY_GUI
-        || flags & GZ_VISIBILITY_SELECTABLE)))
+        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
