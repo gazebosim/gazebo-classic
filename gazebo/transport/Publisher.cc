@@ -28,6 +28,7 @@
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/WeakBind.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -194,7 +195,8 @@ void Publisher::SendMessage()
     {
       // Send the latest message.
       int result = this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+          common::weakBind(&Publisher::OnPublishComplete,
+              this->shared_from_this(), _1), *pubIter);
 
       if (result > 0)
         this->pubIds[*pubIter] = result;

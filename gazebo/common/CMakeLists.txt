@@ -73,6 +73,7 @@ set (sources
   URI.cc
   Video.cc
   VideoEncoder.cc
+  WeakBind.hh
   ffmpeg_inc.cc
 )
 
