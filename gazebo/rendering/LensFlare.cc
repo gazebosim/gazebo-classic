@@ -254,7 +254,7 @@ namespace gazebo
       /// \param[in] _cam Camera used for checking occlusion
       /// \param[in] _imgPos light pos in clip space
       /// \param[in] _worldPos light pos in 3D world space
-      private: double OcclusionScale(CameraPtr _cam,
+      private: double OcclusionScale(const CameraPtr &_cam,
                                      const ignition::math::Vector3d &_imgPos,
                                      const ignition::math::Vector3d &_worldPos)
       {
