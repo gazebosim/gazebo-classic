@@ -53,22 +53,19 @@ FuelModelDatabase::FuelModelDatabase()
 {
   ignition::fuel_tools::ClientConfig conf;
   conf.LoadConfig();
-  std::string userAgent = "Gazebo ";
-  userAgent += GAZEBO_VERSION_FULL + "(";
+  std::string userAgent = "Gazebo " GAZEBO_VERSION_FULL;
 
 #if defined(_WIN32)
-  userAgent += "Windows";
+  userAgent += "(Windows)";
 #elif defined(__linux__)
-  userAgent += "GNU/Linux";
+  userAgent += "(GNU/Linux)";
 #elif defined(__APPLE__)
-  userAgent += "Mac OSX";
+  userAgent += "(Mac OSX)";
 #elif defined (BSD)
-  userAgent += "BSD";
+  userAgent += "(BSD)";
 #else
-  userAgent += "unknown";
+  userAgent += "(unknown)";
 #endif
-
-  userAgent += ")";
 
   conf.SetUserAgent(userAgent);
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
