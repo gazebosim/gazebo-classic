@@ -58,6 +58,7 @@ SensorManager::SensorManager()
 //////////////////////////////////////////////////
 SensorManager::~SensorManager()
 {
+  sensors::disable();
   // Clean up the sensors.
   for (SensorContainer_V::iterator iter = this->sensorContainers.begin();
        iter != this->sensorContainers.end(); ++iter)
