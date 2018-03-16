@@ -73,7 +73,6 @@ set (sources
   URI.cc
   Video.cc
   VideoEncoder.cc
-  WeakBind.hh
   ffmpeg_inc.cc
 )
 
@@ -133,6 +132,7 @@ set (headers
   URI.hh
   Video.hh
   VideoEncoder.hh
+  WeakBind.hh
   ffmpeg_inc.h
  )
 
