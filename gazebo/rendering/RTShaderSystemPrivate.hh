@@ -76,6 +76,10 @@ namespace gazebo
       /// \brief Custom program writer factory that supports sampler2DShadow,
       /// only used in ogre versions <= 1.8
       public: CustomGLSLProgramWriterFactory *programWriterFactory = nullptr;
+
+      /// \brief A list of viewports to init after the first RTShaderSystem
+      /// update. This makes sure the shadows and visual visibility are correct.
+      public: static std::set<Ogre::Viewport *> initOgreViewports;
     };
   }
 }

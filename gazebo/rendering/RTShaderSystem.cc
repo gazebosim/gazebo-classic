@@ -54,6 +54,8 @@
 using namespace gazebo;
 using namespace rendering;
 
+std::set<Ogre::Viewport *> RTShaderSystemPrivate::initOgreViewports;
+
 //////////////////////////////////////////////////
 RTShaderSystem::RTShaderSystem()
   : dataPtr(new RTShaderSystemPrivate)
@@ -232,6 +234,7 @@ void RTShaderSystem::AttachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   _viewport->setMaterialScheme(_scene->Name() +
       Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+  RTShaderSystemPrivate::initOgreViewports.insert(_viewport);
 #endif
 }
 
@@ -241,6 +244,7 @@ void RTShaderSystem::DetachViewport(Ogre::Viewport *_viewport, ScenePtr _scene)
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 7
   if (_viewport && _scene && _scene->Initialized())
     _viewport->setMaterialScheme(_scene->Name());
+  RTShaderSystemPrivate::initOgreViewports.erase(_viewport);
 #endif
 }
 
@@ -651,6 +655,25 @@ void RTShaderSystem::Update()
       this->UpdateShaders(vis);
     }
   }
+
+  // there seems to be a problem that the camera's first render update doesn't
+  // generate shadows and correct visibility of visuals, issue #2438.
+  // A workaround is to do one extra render call after the first RTShaderSystem
+  // update.
+  if (!RTShaderSystemPrivate::initOgreViewports.empty())
+  {
+    for (auto vp : RTShaderSystemPrivate::initOgreViewports)
+    {
+      if (!vp)
+        continue;
+      Ogre::RenderTarget *target = vp->getTarget();
+      if (!target)
+        continue;
+      target->update();
+    }
+    RTShaderSystemPrivate::initOgreViewports.clear();
+  }
+
   this->dataPtr->updateShaders = false;
 }
 

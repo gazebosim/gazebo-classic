@@ -1386,3 +1386,107 @@ TEST_F(CameraSensor, 16bit)
   delete [] img;
   delete [] img2;
 }
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, FirstImage)
+{
+  // World contains a box positioned at top right quadrant of image generated
+  // by a mono 16 bit camera and a color 16 bit camera.
+  // Verify pixel values of top right quadrant of image (corresponding to box)
+  // are approximately the same but different from the background's pixel
+  // values.
+  Load("worlds/empty.world", true);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Spawn a camera without lens flare at the same pose as
+  // the camera lens flare model
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 1;
+  ignition::math::Vector3d pos(-3, 0, 0.5);
+  ignition::math::Quaterniond rot = ignition::math::Quaterniond::Identity;
+  SpawnCamera(modelName, cameraName, pos, rot.Euler(), width, height,
+      updateRate);
+
+  // get a pointer to the camera
+  sensors::SensorPtr sensor =
+    sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  ASSERT_TRUE(camSensor != nullptr);
+
+  // spawn box in front of camera
+  // SpawnBox("test_box", ignition::math::Vector3d::One,
+  //    ignition::math::Vector3d(1, 0, 0.5), ignition::math::Vector3d::Zero);
+
+  // get first image
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+  unsigned char *firstImg = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, firstImg,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_NE(nullptr, world);
+
+  // wait for one image
+  int sleep = 0;
+  int maxSleep = 2000;
+  int totalImages = 1;
+  while ((imageCount < totalImages) && sleep++ < maxSleep)
+  {
+    // common::Time::MSleep(10);
+    world->Step(1);
+  }
+
+  EXPECT_EQ(imageCount, totalImages);
+
+  c.reset();
+
+  common::Image im;
+  im.SetFromData(firstImg, width, height, common::Image::RGB_INT8);
+  im.SavePNG("first.png");
+
+  // get second image
+  c = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+
+  // wait for one image
+  sleep = 0;
+  imageCount = 0u;
+  while ((imageCount < totalImages) && sleep++ < maxSleep)
+  {
+    world->Step(1);
+  }
+
+  EXPECT_EQ(imageCount, totalImages);
+
+  c.reset();
+
+  im.SetFromData(img, width, height, common::Image::RGB_INT8);
+  im.SavePNG("second.png");
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+  this->ImageCompare(firstImg, img, width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_EQ(diffSum, 0u);
+
+  delete [] img;
+  delete [] firstImg;
+}
