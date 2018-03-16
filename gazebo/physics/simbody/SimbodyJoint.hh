@@ -77,6 +77,12 @@ namespace gazebo
       public: virtual math::Vector3 GetAnchor(unsigned int _index) const;
 
       // Documentation inherited.
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false);
+
+      // Documentation inherited.
       public: virtual math::Vector3 GetLinkForce(unsigned int _index) const;
 
       // Documentation inherited.

@@ -16,16 +16,17 @@
 */
 
 #include <gtest/gtest.h>
+#include <ignition/math/Pose3.hh>
 #include "gazebo/physics/physics.hh"
-// #include "gazebo/physics/Joint.hh"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
+#include "test/util.hh"
 
 #define TOL 0.001
 using namespace gazebo;
 
 class JointKinematicTest : public ServerFixture,
-                           public testing::WithParamInterface<const char*>
+                           public ::testing::WithParamInterface<const char*>
 {
   /// \brief Test setting joint position.  Joint::SetPosition is called
   /// in series with World::Step(1) with physics paused to avoid race
@@ -49,6 +50,14 @@ class JointKinematicTest : public ServerFixture,
   /// should not change.
   /// \param[in] _physicsEngine physics engine type [bullet|dart|ode|simbody]
   public: void SetJointPositionLoopJointTest(const std::string &_physicsEngine);
+
+  /// \brief Test setting joint position while the model is translating.
+  /// \param[in] _physicsEngine physics engine type [bullet|dart|ode|simbody]
+  public: void SetPositionTranslating(const std::string &_physicsEngine);
+
+  /// \brief Test setting joint position while the child link is rotating.
+  /// \param[in] _physicsEngine physics engine type [bullet|dart|ode|simbody]
+  public: void SetPositionRotating(const std::string &_physicsEngine);
 };
 
 //////////////////////////////////////////////////
@@ -585,6 +594,215 @@ void JointKinematicTest::SetJointPositionLoopJointTest(
 TEST_P(JointKinematicTest, SetJointPositionLoopJointTest)
 {
   SetJointPositionLoopJointTest(GetParam());
+}
+
+//////////////////////////////////////////////////
+void JointKinematicTest::SetPositionTranslating(
+    const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "BulletLink::AddForce is not implemented (issue #1476).\n";
+    return;
+  }
+
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody Joint::SetPosition not yet working.\n";
+    return;
+  }
+
+  // Two boxes connected by a revolute joint at the center of the second one
+  Load("test/worlds/set_joint_position_moving.world", true, _physicsEngine);
+
+  // Verify world
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  const double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // Verify model
+  auto model = world->GetModel("model");
+  ASSERT_TRUE(model != nullptr);
+
+  auto link0 = model->GetLink("link0");
+  auto link1 = model->GetLink("link1");
+  ASSERT_TRUE(link0 != nullptr);
+  ASSERT_TRUE(link1 != nullptr);
+
+  auto joint = model->GetJoint("joint");
+  ASSERT_TRUE(joint != nullptr);
+
+  const int accSteps = 800;
+  const auto force = ignition::math::Vector3d::UnitX;
+  const auto zeroVec = ignition::math::Vector3d::Zero;
+
+  // Calculate expected linear velocity after steps
+  const auto linVel = (accSteps * dt) * 2 * force /
+    (link0->GetInertial()->GetMass() + link1->GetInertial()->GetMass());
+
+  for (int i = 0; i < accSteps; ++i)
+  {
+    link0->AddForce(force);
+    link1->AddForce(force);
+    world->Step(1);
+  }
+
+  // Both links have reached expected velocity
+  EXPECT_EQ(linVel, link0->GetWorldLinearVel().Ign());
+  EXPECT_EQ(linVel, link1->GetWorldLinearVel().Ign());
+  EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+  EXPECT_EQ(zeroVec, link1->GetRelativeAngularVel().Ign());
+
+  // Set the joint angle
+  EXPECT_NEAR(0.0, joint->GetAngle(0).Radian(), TOL);
+  double newAngle = 0.9;
+  // Preserve the world velocity when SetPosition
+  joint->SetPosition(0, newAngle, true);
+  world->Step(1);
+
+  // Check that child link pose changed
+  EXPECT_NEAR(newAngle, joint->GetAngle(0).Radian(), TOL);
+  EXPECT_NEAR(0.0, link0->GetWorldPose().Ign().Rot().Euler().Z(), TOL);
+  EXPECT_NEAR(newAngle, link1->GetWorldPose().Ign().Rot().Euler().Z(), TOL);
+
+  // Expect velocities to be unchanged
+  EXPECT_EQ(linVel, link0->GetWorldLinearVel().Ign());
+  EXPECT_EQ(linVel, link1->GetWorldLinearVel().Ign());
+  EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+  EXPECT_EQ(zeroVec, link1->GetRelativeAngularVel().Ign());
+
+  // Save the parent link velocity for later testing
+  const auto previousParentLinkVel = link0->GetWorldLinearVel().Ign();
+
+  newAngle = 0.6;
+  // Do not preserve the world velocity (default behavior)
+  joint->SetPosition(0, newAngle);
+
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    // The expected behavior here is undefined for DART and Simbody, so we do
+    // not test it on those simulators.
+
+    // Check that child link pose changed
+    EXPECT_NEAR(newAngle, joint->GetAngle(0).Radian(), TOL);
+    EXPECT_NEAR(0.0, link0->GetWorldPose().Ign().Rot().Euler().Z(), TOL);
+    EXPECT_NEAR(newAngle, link1->GetWorldPose().Ign().Rot().Euler().Z(), TOL);
+
+    // Expect child velocities to be zero
+    EXPECT_EQ(zeroVec, link1->GetWorldLinearVel().Ign());
+    EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+    EXPECT_EQ(zeroVec, link1->GetRelativeAngularVel().Ign());
+  }
+
+  // Expect the parent velocity to be unchanged
+  EXPECT_EQ(previousParentLinkVel, link0->GetWorldLinearVel().Ign());
+}
+
+TEST_P(JointKinematicTest, SetPositionTranslating)
+{
+  SetPositionTranslating(GetParam());
+}
+
+//////////////////////////////////////////////////
+void JointKinematicTest::SetPositionRotating(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "bullet")
+  {
+    gzerr << "BulletLink::AddTorque is not implemented (issue #1476).\n";
+    return;
+  }
+
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Simbody Joint::SetPosition not yet working.\n";
+    return;
+  }
+
+  // Two boxes connected by a revolute joint at the center of the second one
+  Load("test/worlds/set_joint_position_moving.world", true, _physicsEngine);
+
+  // Verify world
+  auto world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  auto physics = world->GetPhysicsEngine();
+  ASSERT_TRUE(physics != nullptr);
+  EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  const double dt = physics->GetMaxStepSize();
+  EXPECT_GT(dt, 0);
+
+  // Verify model
+  auto model = world->GetModel("model");
+  ASSERT_TRUE(model != nullptr);
+
+  auto link0 = model->GetLink("link0");
+  auto link1 = model->GetLink("link1");
+  ASSERT_TRUE(link0 != nullptr);
+  ASSERT_TRUE(link1 != nullptr);
+
+  auto joint = model->GetJoint("joint");
+  ASSERT_TRUE(joint != nullptr);
+
+  const int accSteps = 800;
+  const auto torque = ignition::math::Vector3d::UnitZ;
+  const auto zeroVec = ignition::math::Vector3d::Zero;
+
+  // Calculate expected angular velocity after steps
+  const auto angVel = (accSteps * dt) * torque /
+    link1->GetInertial()->GetPrincipalMoments().Ign();
+
+  for (int i = 0; i < accSteps; ++i)
+  {
+    link1->AddTorque(torque);
+    world->Step(1);
+  }
+
+  // Expect second link to rotate and first to not rotate
+  EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+  EXPECT_EQ(angVel, link1->GetRelativeAngularVel().Ign());
+  EXPECT_NEAR(angVel.Z(), joint->GetVelocity(0), TOL);
+
+  // Set the joint position back to zero
+  EXPECT_LT(0.0, joint->GetAngle(0).Radian());
+  // Preserve the world velocity when SetPosition
+  joint->SetPosition(0, 0.0, true);
+  world->Step(1);
+
+  // Expect velocities to be unchanged
+  EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+  EXPECT_EQ(angVel, link1->GetRelativeAngularVel().Ign());
+  EXPECT_NEAR(angVel.Z(), joint->GetVelocity(0), TOL);
+
+  // Reset physics states before setPosition again.
+  // Do not preserve the world velocity (default behavior)
+  joint->SetPosition(0, 1.0);
+  world->Step(1);
+
+  if (_physicsEngine == "ode" || _physicsEngine == "bullet")
+  {
+    // ODE and Bullet should reset the velocities after calling
+    // Joint::SetPosition with _preserveWorldVelocity set to false.
+    // For other physics engines, the behavior is undefined.
+    EXPECT_EQ(zeroVec, link0->GetWorldLinearVel().Ign());
+    EXPECT_EQ(zeroVec, link1->GetWorldLinearVel().Ign());
+    EXPECT_EQ(zeroVec, link0->GetRelativeAngularVel().Ign());
+    EXPECT_EQ(zeroVec, link1->GetRelativeAngularVel().Ign());
+    EXPECT_NEAR(0.0, joint->GetVelocity(0), TOL);
+  }
+}
+
+TEST_P(JointKinematicTest, SetPositionRotating)
+{
+  SetPositionRotating(GetParam());
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, JointKinematicTest,

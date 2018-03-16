@@ -457,6 +457,15 @@ math::Vector3 SimbodyJoint::GetAnchor(unsigned int /*_index*/) const
 }
 
 //////////////////////////////////////////////////
+bool SimbodyJoint::SetPosition(
+    const unsigned int /*_index*/, const double /*_position*/,
+    const bool /*_preserveWorldVelocity*/)
+{
+  gzerr << "Joint::SetPosition is not available for Simbody\n";
+  return false;
+}
+
+//////////////////////////////////////////////////
 math::Vector3 SimbodyJoint::GetLinkForce(unsigned int /*_index*/) const
 {
   gzerr << "Not implement in Simbody\n";

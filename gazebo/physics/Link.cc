@@ -1465,12 +1465,16 @@ double Link::GetWorldEnergy() const
 
 /////////////////////////////////////////////////
 void Link::MoveFrame(const math::Pose &_worldReferenceFrameSrc,
-                     const math::Pose &_worldReferenceFrameDst)
+                     const math::Pose &_worldReferenceFrameDst,
+                     const bool _preserveWorldVelocity)
 {
   math::Pose targetWorldPose = (this->GetWorldPose() - _worldReferenceFrameSrc)
     + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+  if (!_preserveWorldVelocity)
+  {
+    this->SetWorldTwist(math::Vector3(0, 0, 0), math::Vector3(0, 0, 0));
+  }
 }
 
 /////////////////////////////////////////////////

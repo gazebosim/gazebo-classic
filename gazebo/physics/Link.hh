@@ -534,8 +534,11 @@ namespace gazebo
       /// which this link is attached.
       /// \param[in] _worldReferenceFrameDst final location of the
       /// reference frame specified in world coordinates.
+      /// \param[in] _preserveWorldVelocity True if to preserve the world
+      /// velocity before move frame, default is false.
       public: void MoveFrame(const math::Pose &_worldReferenceFrameSrc,
-                        const math::Pose &_worldReferenceFrameDst);
+                        const math::Pose &_worldReferenceFrameDst,
+                        const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function to find all connected links of a link
       /// based on parent/child relations of joints. For example,
