@@ -78,8 +78,8 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual bool SetPosition(
-                              const unsigned int _index,
-                              const double _position,
+                              unsigned int _index,
+                              double _position,
                               const bool _preserveWorldVelocity = false);
 
       // Documentation inherited.

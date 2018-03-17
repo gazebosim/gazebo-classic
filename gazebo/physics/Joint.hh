@@ -376,8 +376,7 @@ namespace gazebo
       ///
       /// \note{Only ODE and Bullet support _preserveWorldVelocity being true.}
       /// \return returns true if operation succeeds, false if it fails.
-      public: virtual bool SetPosition(
-                  const unsigned int _index, const double _position,
+      public: virtual bool SetPosition(unsigned int _index, double _position,
                   const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetPosition.
@@ -390,8 +389,7 @@ namespace gazebo
       /// \param[in] _preserveWorldVelocity True if to preserve the world
       /// velocity before set position, default is false.
       /// \return returns true if operation succeeds, false if it fails.
-      protected: bool SetPositionMaximal(
-                  const unsigned int _index, double _position,
+      protected: bool SetPositionMaximal(unsigned int _index, double _position,
                   const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetVelocity.

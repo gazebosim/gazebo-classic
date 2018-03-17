@@ -703,7 +703,7 @@ bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
+bool Joint::SetPosition(unsigned int /*_index*/, double _position,
                         const bool /*_preserveWorldVelocity*/)
 {
   // parent class doesn't do much, derived classes do all the work.
@@ -723,8 +723,7 @@ bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(
-    const unsigned int _index, double _position,
+bool Joint::SetPositionMaximal(unsigned int _index, double _position,
     const bool _preserveWorldVelocity)
 {
   // check if index is within bounds
