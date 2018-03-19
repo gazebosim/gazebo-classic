@@ -23,9 +23,6 @@
               <size>1 1 1</size>
             </box>
           </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
         </visual>
       </link>
     </model>
@@ -45,9 +42,6 @@
               <radius>0.5</radius>
             </sphere>
           </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
         </visual>
       </link>
     </model>
@@ -69,9 +63,6 @@
               <length>1.0</length>
             </cylinder>
           </geometry>
-          <material>
-            <script>Gazebo/WoodPallet</script>
-          </material>
         </visual>
       </link>
     </model>
