@@ -22,7 +22,7 @@
             <box>
               <size>1 1 1</size>
             </box>
-          </geometry>         
+          </geometry>
         </visual>
       </link>
     </model>
