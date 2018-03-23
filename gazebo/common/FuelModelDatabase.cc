@@ -183,9 +183,15 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::ModelPath(const std::string &_uri,
-    const bool /*_forceDownload*/)
+    const bool _forceDownload)
 {
   std::string path;
+
+  if (!_forceDownload)
+  {
+    if (this->dataPtr->fuelClient->CachedModel(_uri, path))
+      return path;
+  }
 
   if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
   {
