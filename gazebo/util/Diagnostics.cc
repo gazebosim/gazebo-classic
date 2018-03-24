@@ -408,14 +408,15 @@ const std::string DiagnosticTimer::Name() const
 void DiagnosticTimer::InsertData(const std::string &_name,
                                  const common::Time &_time)
 {
-  auto iter = this->dataPtr->stats.find(_name);
-  if (iter == this->dataPtr->stats.end())
+  const auto inserted = this->dataPtr->stats.insert(
+      std::make_pair(_name, ignition::math::SignalStats()));
+  const auto &iter = inserted.first;
+
+  if (inserted.second)
   {
-    ignition::math::SignalStats newStat;
-    newStat.InsertStatistics("mean,maxAbs,min,var");
-    this->dataPtr->stats[_name] = newStat;
-    iter = this->dataPtr->stats.find(_name);
+    iter->second.InsertStatistics("mean,maxAbs,min,var");
   }
+
   iter->second.InsertData(_time.Double());
 }
 
