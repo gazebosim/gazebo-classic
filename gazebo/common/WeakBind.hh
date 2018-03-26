@@ -27,13 +27,11 @@ namespace gazebo
   {
     namespace details
     {
-
       /// \class WeakBinder WeakBind.hh
       /// \brief Function object wrapper used by common::weakBind
       template <typename Func, typename T>
       class WeakBinder
       {
-
         public: using WeakPtr = boost::weak_ptr<T>;
 
         private: Func func;
@@ -60,7 +58,7 @@ namespace gazebo
           }
           else
           {
-            return {};
+            return {};  // NOLINT(readability/braces)
           }
         }
 
@@ -79,7 +77,6 @@ namespace gazebo
             this->func(std::forward<Args>(_args)...);
           }
         }
-
       };
 
       template <typename Func, typename T>
@@ -87,7 +84,6 @@ namespace gazebo
       {
         return WeakBinder<Func, T>(func, ptr);
       }
-
     }
 
     /// \addtogroup gazebo_common Common
@@ -107,18 +103,15 @@ namespace gazebo
     #if __cplusplus < 201402L
       -> decltype(details::makeWeakBinder(
             boost::bind(_func, _ptr.get(), _args...),
-            boost::weak_ptr<T>(_ptr)
-        ))
+            boost::weak_ptr<T>(_ptr)))
     #endif
     {
       return details::makeWeakBinder(
                 boost::bind(_func, _ptr.get(), _args...),
-                boost::weak_ptr<T>(_ptr)
-      );
+                boost::weak_ptr<T>(_ptr));
     }
     /// \}
   }
-
 }
 
 #endif
