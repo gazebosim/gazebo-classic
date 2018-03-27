@@ -87,6 +87,7 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   StaticMapPlugin
+  StopWorldPlugin
   TouchPlugin
   VehiclePlugin
   WindPlugin

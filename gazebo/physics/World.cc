@@ -479,6 +479,8 @@ void World::Stop()
     delete this->dataPtr->thread;
     this->dataPtr->thread = nullptr;
   }
+
+  event::Events::stop();
 }
 
 //////////////////////////////////////////////////
