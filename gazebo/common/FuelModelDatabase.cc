@@ -70,7 +70,8 @@ std::vector<ignition::fuel_tools::ServerConfig> FuelModelDatabase::Servers()
 /////////////////////////////////////////////////
 void FuelModelDatabase::Models(
     const ignition::fuel_tools::ServerConfig &_server,
-    std::function<void (const std::map<std::string, std::string> &)> &_func)
+    std::function<void (
+    const std::vector<ignition::fuel_tools::ModelIdentifier> &)> &_func)
 {
   std::thread t([this, _func, _server]
   {
@@ -81,17 +82,15 @@ void FuelModelDatabase::Models(
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, std::string> FuelModelDatabase::Models(
+std::vector<ignition::fuel_tools::ModelIdentifier>
+    FuelModelDatabase::Models(
     const ignition::fuel_tools::ServerConfig &_server) const
 {
-  std::map<std::string, std::string> models;
+  std::vector<ignition::fuel_tools::ModelIdentifier> models;
 
   for (auto iter = this->dataPtr->fuelClient->Models(_server); iter; ++iter)
   {
-    std::string fullURI = iter->Identification().UniqueName();
-    std::string modelName = iter->Identification().Name();
-
-    models[fullURI] = modelName;
+    models.push_back(iter->Identification());
   }
 
   return models;

@@ -50,7 +50,7 @@ namespace gazebo
       /// The key is the unique name (containing the full path in the server,
       /// owner and model name) and the value is just the model name.
       /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
-      public: std::map<std::string, std::string> modelBuffer;
+      public: std::vector<ignition::fuel_tools::ModelIdentifier> modelBuffer;
     };
 #endif
 
