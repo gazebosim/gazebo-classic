@@ -187,11 +187,8 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 {
   std::string path;
 
-  if (!_forceDownload)
-  {
-    if (this->dataPtr->fuelClient->CachedModel(_uri, path))
-      return path;
-  }
+  if (!_forceDownload && this->dataPtr->fuelClient->CachedModel(_uri, path))
+    return path;
 
   if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
   {
