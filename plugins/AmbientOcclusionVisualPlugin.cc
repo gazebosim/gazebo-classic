@@ -173,11 +173,21 @@ void AmbientOcclusionVisualPluginPrivate::AddSSAO(rendering::CameraPtr _cam)
   }
 
   // GBuffer
-  if (Ogre::CompositorManager::getSingleton().addCompositor(
-      ogreViewport, "SSAO/GBuffer"))
+  Ogre::CompositorInstance *gBufCompInstance =
+      Ogre::CompositorManager::getSingleton().addCompositor(
+      ogreViewport, "SSAO/GBuffer");
+  if (gBufCompInstance)
   {
-    Ogre::CompositorManager::getSingleton().setCompositorEnabled(
-        ogreViewport, "SSAO/GBuffer", true);
+    gBufCompInstance->setEnabled(true);
+    // the GBuffer compositor should have 2 passes,
+    // see gazebo/media/materials/scripts/CreaseShading.compositor
+    if (gBufCompInstance->getTechnique()->getNumTargetPass() > 1)
+    {
+      // set a visibility mask so that the ssao effect does not apply to
+      // gui visuals
+      gBufCompInstance->getTechnique()->getTargetPass(1)->setVisibilityMask(
+          GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+    }
   }
   else
   {
@@ -193,8 +203,8 @@ void AmbientOcclusionVisualPluginPrivate::AddSSAO(rendering::CameraPtr _cam)
   }
   else
   {
-      gzerr << "Failed to add compositor: " << this->compositorName
-            << std::endl;
+    gzerr << "Failed to add compositor: " << this->compositorName
+          << std::endl;
   }
 
   // SSAO post filter
