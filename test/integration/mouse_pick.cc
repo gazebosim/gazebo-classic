@@ -505,13 +505,11 @@ void MousePickingTest::DistantMovement()
   this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
-  QVERIFY(mainWindow != NULL);
+  QVERIFY(mainWindow != nullptr);
   // Create the main window.
   mainWindow->Load();
   mainWindow->Init();
   mainWindow->show();
-
-  std::string modelName = "box";
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
