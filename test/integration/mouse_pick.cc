@@ -549,6 +549,7 @@ void MousePickingTest::DistantMovement()
 
   this->ProcessEventsAndDraw(mainWindow);
 
+  // test panning
   MouseDrag(glWidget, Qt::LeftButton,
       ignition::math::Vector2d(0.5, 0.75),
       ignition::math::Vector2d(0.5, 0.25));
