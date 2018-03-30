@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix mouse movement ogre assertion error
+    * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
+
 1. Support lens flare occlusion
     * [Pull request 2915](https://bitbucket.org/osrf/gazebo/pull-request/2915)
 
