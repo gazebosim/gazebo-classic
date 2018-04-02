@@ -181,7 +181,7 @@ void AmbientOcclusionVisualPluginPrivate::AddSSAO(rendering::CameraPtr _cam)
     gBufCompInstance->setEnabled(true);
     // the GBuffer compositor should have 2 passes,
     // see gazebo/media/materials/scripts/CreaseShading.compositor
-    if (gBufCompInstance->getTechnique()->getNumTargetPass() > 1)
+    if (gBufCompInstance->getTechnique()->getNumTargetPasses() > 1)
     {
       // set a visibility mask so that the ssao effect does not apply to
       // gui visuals
