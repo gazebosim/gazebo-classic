@@ -77,7 +77,7 @@ if (NOT MSVC)
 endif()
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" AND
     "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
-  set(@PKG_NAME@_CXX_FLAGS "${@PKG_NAME@_CXX_FLAGS} -stdlib=libc++")
+  list(APPEND @PKG_NAME@_CXX_FLAGS -stdlib=libc++)
 endif ()
 
 foreach(lib @PKG_LIBRARIES@)
