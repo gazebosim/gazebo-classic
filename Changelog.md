@@ -5,8 +5,11 @@
 1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
     * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
 
+1. Support lens flare occlusion
+    * [Pull request 2915](https://bitbucket.org/osrf/gazebo/pull-request/2915)
+
 1. Fix log recording, only call sdf::initFile once
-    * [Pull request ](https://bitbucket.org/osrf/gazebo/pull-request/)
+    * [Pull request 2889](https://bitbucket.org/osrf/gazebo/pull-request/2889)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
 
 1. Fix OBJLoader when mesh has invalid material
@@ -29,6 +32,9 @@
 
 1. Fix race conditions during client startup, and introduce Node::TryInit()
     * [Pull request 2897](https://bitbucket.org/osrf/gazebo/pull-requests/2897)
+
+1. Diagnostics: record timing statistics instead of all timestamps
+    * [Pull request 2821](https://bitbucket.org/osrf/gazebo/pull-requests/2821)
 
 
 ## Gazebo 7.11.0 (2018-02-12)
