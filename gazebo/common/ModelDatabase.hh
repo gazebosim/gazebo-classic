@@ -156,6 +156,9 @@ namespace gazebo
       /// \brief Handy trick to automatically call a singleton's
       /// constructor.
       private: static ModelDatabase *myself;
+
+      /// \brief
+      private: static const bool _auto_download = false;
     };
   }
 }

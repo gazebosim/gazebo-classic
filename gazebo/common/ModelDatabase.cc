@@ -198,7 +198,9 @@ std::string ModelDatabase::GetModelConfig(const std::string &_uri)
 std::string ModelDatabase::GetManifestImpl(const std::string &_uri)
 {
   std::string xmlString;
-  if (!_uri.empty())
+  gzwarn << " !!!!! Download GetModelfestImpl: " << _uri << "\n";
+
+  if (!_uri.empty() && _auto_download)
   {
     CURL *curl = curl_easy_init();
     curl_easy_setopt(curl, CURLOPT_URL, _uri.c_str());
@@ -402,6 +404,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
 {
   std::string path, suffix;
 
+  gzwarn << " !!!!! Download GetModelPath: " << _uri << "\n";
+
   if (!_forceDownload)
     path = SystemPaths::Instance()->FindFileURI(_uri);
 
@@ -409,6 +413,9 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
 
   if (path.empty() || stat(path.c_str(), &st) != 0 )
   {
+    if (! _auto_download)
+      return std::string();
+
     if (!ModelDatabase::HasModel(_uri))
     {
       gzerr << "Unable to download model[" << _uri << "]\n";

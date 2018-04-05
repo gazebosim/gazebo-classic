@@ -389,7 +389,9 @@ bool Server::LoadFile(const std::string &_filename,
     return false;
   }
 
-  if (!sdf::readFile(common::find_file(_filename), sdf))
+  std::string file_path = common::find_file(_filename);
+
+  if (!sdf::readFile(file_path, sdf))
   {
     gzerr << "Unable to read sdf file[" << _filename << "]\n";
     return false;
