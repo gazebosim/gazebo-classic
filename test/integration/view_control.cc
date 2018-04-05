@@ -255,5 +255,65 @@ void ViewControlTest::MouseZoomTerrain()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ViewControlTest::MouseZoomBoundingBox()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/gazebo.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  std::string modelName = "gazebo";
+  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
+  QVERIFY(modelVis != nullptr);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  // place camera inside the gazebo looking up the ceiling
+  cam->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(0, 0, 2),
+      ignition::math::Quaterniond(0, -1.57, 0)));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  ignition::math::Vector3d pos;
+  scene->FirstContact(cam, ignition::math::Vector2i(0, 0), pos);
+  QVERIFY(pos.Z() < 5.0);
+
+  // zoom in. It should not zoom outside of the gazebo.
+  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  MouseZoom(glWidget);
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Make sure the camera is still inside the gazebo
+  ignition::math::Vector3d camPose = cam->WorldPose().Pos();
+  qFuzzyCompare(camPose.X(), 0);
+  qFuzzyCompare(camPose.Y(), 0);
+  QVERIFY(camPose.Z() < 5.0);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ViewControlTest)
