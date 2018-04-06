@@ -1,5 +1,3 @@
-add_subdirectory(materials)
-
 set (files
 FFPLib_Common.glsl
 FFPLib_Fog.glsl
