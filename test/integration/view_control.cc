@@ -261,7 +261,11 @@ void ViewControlTest::MouseZoomBoundingBox()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/gazebo.world", false, false, false);
+  // Load a world with a large cordless drill mesh. Place a camera
+  // inside its bounding box and test view control using the mouse.
+  // Mouse clicks on the mesh should return valid contact points that
+  // can be used as focus points for moving the camera.
+  this->Load("worlds/camera_mesh_bbox.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != nullptr);
@@ -278,25 +282,26 @@ void ViewControlTest::MouseZoomBoundingBox()
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  std::string modelName = "gazebo";
+  std::string modelName = "drill";
   gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
   QVERIFY(modelVis != nullptr);
 
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != nullptr);
 
-  // place camera inside the gazebo looking up the ceiling
+  // place camera inside bounding box of cordless drill and look up
   cam->SetWorldPose(ignition::math::Pose3d(
-      ignition::math::Vector3d(0, 0, 2),
+      ignition::math::Vector3d(0, 0.3, 1.0),
       ignition::math::Quaterniond(0, -1.57, 0)));
 
   this->ProcessEventsAndDraw(mainWindow);
 
+  // verify valid contact point
   ignition::math::Vector3d pos;
   scene->FirstContact(cam, ignition::math::Vector2i(0, 0), pos);
-  QVERIFY(pos.Z() < 5.0);
+  QVERIFY(pos.Z() < 1.5);
 
-  // zoom in. It should not zoom outside of the gazebo.
+  // zoom in. It should not zoom pass the drill
   QTest::mouseClick(glWidget, Qt::LeftButton, 0,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
   MouseZoom(glWidget);
@@ -304,11 +309,11 @@ void ViewControlTest::MouseZoomBoundingBox()
   // Process some events and draw the screen
   this->ProcessEventsAndDraw(mainWindow);
 
-  // Make sure the camera is still inside the gazebo
+  // Make sure the camera is still inside bounding box of drill
   ignition::math::Vector3d camPose = cam->WorldPose().Pos();
   qFuzzyCompare(camPose.X(), 0);
   qFuzzyCompare(camPose.Y(), 0);
-  QVERIFY(camPose.Z() < 5.0);
+  QVERIFY(camPose.Z() < 1.5);
 
   cam->Fini();
   mainWindow->close();
