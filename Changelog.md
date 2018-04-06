@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix camera view control inside bounding box of large meshes
+    * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
+
 1. Support lens flare occlusion
     * [Pull request 2915](https://bitbucket.org/osrf/gazebo/pull-request/2915)
 
