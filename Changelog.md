@@ -5,6 +5,9 @@
 1. Fix camera view control inside bounding box of large meshes
     * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
 
+1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
+    * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
+
 1. Support lens flare occlusion
     * [Pull request 2915](https://bitbucket.org/osrf/gazebo/pull-request/2915)
 
