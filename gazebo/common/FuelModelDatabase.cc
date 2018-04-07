@@ -61,7 +61,7 @@ FuelModelDatabase::FuelModelDatabase()
   userAgent += "(GNU/Linux)";
 #elif defined(__APPLE__)
   userAgent += "(Mac OSX)";
-#elif defined (BSD)
+#elif defined(BSD)
   userAgent += "(BSD)";
 #else
   userAgent += "(unknown)";
