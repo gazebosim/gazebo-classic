@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Fix empty visual bounding box
+    * [Pull request 2934](https://bitbucket.org/osrf/gazebo/pull-request/2934)
+
 1. Make override keywords consistent in joint classes to fix clang warnings
     * [Pull request 2869](https://bitbucket.org/osrf/gazebo/pull-request/2869)
     * [Pull request 2881](https://bitbucket.org/osrf/gazebo/pull-request/2881)

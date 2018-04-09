@@ -183,7 +183,7 @@ TEST_F(Visual_TEST, BoundingBox)
   EXPECT_EQ(newScale*newBoundingBox.Max(),
       ignition::math::Vector3d(1, 1.5, 2));
 
-  // create empty visaul and check bounding box
+  // create empty visual and check bounding box
   gazebo::rendering::VisualPtr emptyVis(
       new gazebo::rendering::Visual("empty_visual", scene));
   ignition::math::Box emptyBoundingBox = emptyVis->BoundingBox();
