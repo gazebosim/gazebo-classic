@@ -5,6 +5,9 @@
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
+1. Fix mouse movement ogre assertion error
+    * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
+
 1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
     * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
 
