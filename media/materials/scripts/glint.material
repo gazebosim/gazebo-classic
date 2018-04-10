@@ -1,0 +1,34 @@
+vertex_program Gazebo/CameraGlintVS glsl
+{
+  source camera_glint_vs.glsl
+}
+
+fragment_program Gazebo/CameraGlintFS glsl
+{
+  source camera_glint_fs.glsl
+  default_params
+  {
+    param_named RT int 0
+    param_named sunlight float3 0.0 1.0 0.0
+    param_named tolerance float 0.1
+  }
+}
+
+material Gazebo/CameraGlint
+{
+  technique ReflectedGlint
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/CameraGlintVS { }
+      fragment_program_ref Gazebo/CameraGlintFS { }
+
+      texture_unit RT
+      {
+        tex_coord_set 0
+        tex_address_mode clamp
+        filtering linear linear linear
+      }
+    }
+  }
+}

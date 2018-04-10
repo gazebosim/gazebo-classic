@@ -5,6 +5,8 @@ ambient_one_texture_vp.glsl
 blur.glsl
 camera_distortion_map_fs.glsl
 camera_distortion_map_vs.glsl
+camera_glint_fs.glsl
+camera_glint_vs.glsl
 camera_lens_flare_fs.glsl
 camera_lens_flare_vs.glsl
 camera_noise_gaussian_fs.glsl

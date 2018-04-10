@@ -7,6 +7,7 @@ deferred_post_minilight.material
 deferred_post.program
 distortion.compositor
 gazebo.material
+glint.material
 grid.material
 kitchen.material
 lens_flare.compositor

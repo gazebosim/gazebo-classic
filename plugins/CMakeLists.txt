@@ -43,6 +43,7 @@ set (plugins_single_header
   BlinkVisualPlugin
   BreakableJointPlugin
   BuoyancyPlugin
+  CameraGlintPlugin
   CameraPlugin
   CartDemoPlugin
   CessnaPlugin

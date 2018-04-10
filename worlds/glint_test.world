@@ -1,0 +1,155 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <model name="left_wall">
+      <static>true</static>
+
+<!--       <pose> 0  0  0  0  0  0 </pose>-->
+
+
+    <!-- transform for sphere test -->
+    <pose> 5.0 0.0 0.5 0.0 0.0 0.0 </pose>
+
+
+
+
+      <!-- -70-degree tilt -->
+<!--      <pose> 0.0 0.0 0.0 0 -1.22 3.14159 </pose>-->
+
+
+      <!-- 30-degree tilt -->
+<!--      <pose> 0  0  0  0  0.52359877559  3.14159 </pose>-->
+
+      <!-- 44-degree tilt -->
+<!--      <pose> 0  0  0  0  -0.76794487087  3.14159 </pose>-->
+
+      <!-- 44.99-degree tilt -->
+<!--      <pose> 0  0  0  0  0.78522363047  3.14159 </pose>-->
+
+      <!-- 45.0-degree tilt -->
+<!--      <pose> 0  0  0  0  0.78539816339  3.14159 </pose>-->
+
+      <!-- 46.0-degree tilt -->
+<!--      <pose> 0  0  0  0  0.80285145591  3.14159 </pose>-->
+
+      <!-- 50.0-degree tilt -->
+<!--      <pose> 0  0  0  0  0.87266462599  3.14159 </pose>-->
+
+      <!-- 70.0-degree tilt -->
+<!--      <pose> 0  0  0  0  1.2217304764  3.14159 </pose>-->
+
+      <!-- 88.0-degree tilt -->
+<!--      <pose> 0  0  0.46  0  1.53588974176  3.14159 </pose>-->
+
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>5 0.2 1.0</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+<!--
+            <mesh>
+              <uri>file:///home/grey/resources/mesh/plane.stl</uri>
+            </mesh>
+-->
+
+            <sphere>
+              <radius>0.5</radius>
+            </sphere>
+
+
+          </geometry>
+
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Wood</name>
+            </script>
+          </material>
+
+        </visual>
+      </link>
+    </model>
+    <model name="camera">
+<!--      <pose>0.5 0 0.5 0.0 0 3.14159</pose> -->
+
+
+      <pose> -0.5  0  0.5   0  0  0 </pose>
+<!--      <pose> -0.1  0  0.5   0  0  0 </pose>-->
+<!--      <pose> -3  0  0.5   0  0  0 </pose>-->
+
+
+      <static>true</static>
+      <link name="link">
+        <inertial>
+          <mass>0.1</mass>
+          <inertia>
+            <ixx>0.000166667</ixx>
+            <iyy>0.000166667</iyy>
+            <izz>0.000166667</izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.1 0.1 0.1</size>
+            </box>
+          </geometry>
+        </visual>
+        <sensor name="camera" type="camera">
+          <camera>
+            <horizontal_fov>1.047</horizontal_fov>
+            <image>
+              <width>320</width>
+              <height>320</height>
+            </image>
+            <clip>
+              <near>0.1</near>
+              <far>100</far>
+            </clip>
+
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.02</stddev>
+            </noise>
+
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>30</update_rate>
+          <visualize>true</visualize>
+
+
+          <plugin name="glinting_camera" filename="libCameraGlintPlugin.so">
+
+            <sunlight>0.0 0.0 -1.0</sunlight>
+
+            <!-- Approximately 10-degrees -->
+            <sun_angular_diameter>0.1745</sun_angular_diameter>
+
+          </plugin>
+
+        </sensor>
+      </link>
+    </model>
+  </world>
+</sdf>
