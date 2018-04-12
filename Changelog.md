@@ -5,6 +5,9 @@
 1. Fix camera view control inside bounding box of large meshes
     * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
 
+1. Fix mouse movement ogre assertion error
+    * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
+
 1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
     * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
 

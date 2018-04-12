@@ -102,6 +102,8 @@ void WorldState::Load(const WorldPtr _world)
   this->simTime = _world->GetSimTime();
   this->realTime = _world->GetRealTime();
   this->iterations = _world->GetIterations();
+  this->insertions.clear();
+  this->deletions.clear();
 
   std::string filter = worldStateFilter;
   std::list<std::string> mainParts, parts;
