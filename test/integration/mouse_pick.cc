@@ -496,6 +496,70 @@ void MousePickingTest::InvalidMesh()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void MousePickingTest::DistantMovement()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // move camera to a distance far away from origin
+  ignition::math::Pose3d camPose(
+      ignition::math::Vector3d(-160000, 0.0, 0.0),
+      ignition::math::Quaterniond(0, 0, 0));
+  cam->SetWorldPose(camPose);
+
+  QCOMPARE(cam->WorldPose(), camPose);
+
+  // set a large clip distance
+  double nearClip = 0.1;
+  double farClip = 200000.0;
+  cam->SetClipDist(nearClip, farClip);
+
+  qFuzzyCompare(cam->NearClip(), nearClip);
+  qFuzzyCompare(cam->FarClip(), farClip);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  // test orbiting
+  MouseDrag(glWidget, Qt::MiddleButton,
+      ignition::math::Vector2d(0.75, 0.5),
+      ignition::math::Vector2d(0.25, 0.5));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // test panning
+  MouseDrag(glWidget, Qt::LeftButton,
+      ignition::math::Vector2d(0.5, 0.75),
+      ignition::math::Vector2d(0.5, 0.25));
+
+  QVERIFY(cam->WorldPose() != camPose);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
 
 // Generate a main function for the test
 QTEST_MAIN(MousePickingTest)
