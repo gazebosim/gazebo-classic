@@ -75,7 +75,9 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  IRSensorPlugin
+  )
 
 set (plugins_private_header
   ElevatorPlugin
