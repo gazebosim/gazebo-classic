@@ -1261,10 +1261,12 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
+    // and not a selection-only object (e.g. light selection ent)
+    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+        || (flags & GZ_VISIBILITY_SELECTABLE);
     if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
-        && !(flags & GZ_VISIBILITY_SELECTABLE)))
+        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
@@ -2145,6 +2147,23 @@ void Scene::PreRender()
         ++pIter;
     }
 
+    // process light pose messages
+    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
+    while (lpIter != this->dataPtr->lightPoseMsgs.end())
+    {
+      auto lIter = this->dataPtr->lights.find(lpIter->first);
+      if (lIter != this->dataPtr->lights.end())
+      {
+        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
+        lIter->second->SetPosition(pose.Pos());
+        lIter->second->SetRotation(pose.Rot());
+        auto prev = lpIter++;
+        this->dataPtr->lightPoseMsgs.erase(prev);
+      }
+      else
+        lpIter++;
+    }
+
     // process skeleton pose msgs
     spIter = this->dataPtr->skeletonPoseMsgs.begin();
     while (spIter != this->dataPtr->skeletonPoseMsgs.end())
@@ -2870,13 +2889,26 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
-    if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg->pose(i));
+    auto p = _msg->pose(i);
+    /// TODO: empty id used to indicate it's pose of a light
+    /// remove this check once light.proto has an id field
+    if (p.has_id())
+    {
+      PoseMsgs_M::iterator iter =
+          this->dataPtr->poseMsgs.find(p.id());
+      if (iter != this->dataPtr->poseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
+    }
     else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+    {
+      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
+      if (iter != this->dataPtr->lightPoseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
+    }
   }
 }
 
@@ -2930,8 +2962,9 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
   else
   {
     gzerr << "Light [" << _msg->name() << "] already exists."
-        << " Use topic ~/light/modify to modify it." << std::endl;
-    return false;
+          << " Use topic ~/light/modify to modify it." << std::endl;
+    // we don't want to return false because it keeps the msg in the
+    // list and causes it to be processed again and again.
   }
 
   return true;

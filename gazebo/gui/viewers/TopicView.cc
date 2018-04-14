@@ -40,7 +40,7 @@ TopicView::TopicView(QWidget *_parent, const std::string &_msgTypeName,
 : QDialog(_parent), msgTypeName(_msgTypeName)
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->TryInit(common::Time::Maximum());
 
   this->setWindowIcon(QIcon(":/images/gazebo.svg"));
   this->setWindowTitle(tr("Gazebo: Topic View"));

@@ -24,6 +24,7 @@ set (sources
   COMVisual.cc
   ContactVisual.cc
   Conversions.cc
+  CustomPSSMShadowCameraSetup.cc
   DepthCamera.cc
   Distortion.cc
   DynamicLines.cc
@@ -35,6 +36,7 @@ set (sources
   InertiaVisual.cc
   JointVisual.cc
   LaserVisual.cc
+  LensFlare.cc
   LinkFrameVisual.cc
   SonarVisual.cc
   Light.cc
@@ -84,6 +86,7 @@ set (headers
   COMVisual.hh
   ContactVisual.hh
   Conversions.hh
+  CustomPSSMShadowCameraSetup.hh
   DepthCamera.hh
   Distortion.hh
   DynamicLines.hh
@@ -95,6 +98,7 @@ set (headers
   InertiaVisual.hh
   JointVisual.hh
   LaserVisual.hh
+  LensFlare.hh
   LinkFrameVisual.hh
   LogicalCameraVisual.hh
   SonarVisual.hh
@@ -151,6 +155,7 @@ set (gtest_sources
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_rendering)
 
 set (gtest_sources_dri
+  Camera_TEST.cc
   COMVisual_TEST.cc
   Distortion_TEST.cc
   GpuLaser_TEST.cc
@@ -160,6 +165,7 @@ set (gtest_sources_dri
   LinkFrameVisual_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc
+  RTShaderSystem_TEST.cc
   Scene_TEST.cc
   SelectionObj_TEST.cc
   SonarVisual_TEST.cc

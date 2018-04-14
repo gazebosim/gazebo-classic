@@ -102,13 +102,28 @@ TEST_P(WorldPlaybackTest, Pause)
   msgs::LogPlaybackControl msg;
   msg.set_pause(false);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
-  EXPECT_TRUE(!this->world->IsPaused());
+
+  // Wait for message to be processed
+  int sleep = 0;
+  int maxSleep = 3000;
+  while (this->world->IsPaused() && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(1);
+    sleep++;
+  }
+  EXPECT_FALSE(this->world->IsPaused());
 
   // Send a message to pause the world.
   msg.set_pause(true);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Wait for message to be processed
+  sleep = 0;
+  while (!this->world->IsPaused() && sleep < maxSleep)
+  {
+    gazebo::common::Time::MSleep(1);
+    sleep++;
+  }
   EXPECT_TRUE(this->world->IsPaused());
 }
 
@@ -139,7 +154,7 @@ TEST_P(WorldPlaybackTest, Step)
   expectedSimTime.Set(std::get<0>(this->features));
   msg.set_multi_step(-1);
   this->logPlaybackPub->Publish(msg);
-  this->WaitUntilSimTime(expectedSimTime, 10, 20);
+  this->WaitUntilSimTime(expectedSimTime, 10, 30);
   EXPECT_EQ(world->GetSimTime(), expectedSimTime);
 
   // Step +3

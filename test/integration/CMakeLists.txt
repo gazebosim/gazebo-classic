@@ -36,6 +36,7 @@ set(tests
   bandwidth.cc
   concave_mesh.cc
   contact_sensor.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -65,6 +66,7 @@ set(tests
   nested_model.cc
   noise.cc
   nondefault_world.cc
+  obj_loader.cc
   physics.cc
   physics_basic_controller_response.cc
   physics_collision.cc
@@ -88,7 +90,9 @@ set(tests
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
+  static_map_plugin.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc

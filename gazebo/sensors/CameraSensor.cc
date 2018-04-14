@@ -210,12 +210,10 @@ bool CameraSensor::UpdateImpl(const bool /*_force*/)
     msg.mutable_image()->set_pixel_format(common::Image::ConvertPixelFormat(
           this->camera->ImageFormat()));
 
-    msg.mutable_image()->set_step(this->camera->ImageWidth() *
-        this->camera->ImageDepth());
+    msg.mutable_image()->set_step(this->camera->ImageMemorySize() /
+        this->camera->ImageHeight());
     msg.mutable_image()->set_data(this->camera->ImageData(),
-        msg.image().width() * this->camera->ImageDepth() *
-        msg.image().height());
-
+        this->camera->ImageMemorySize());
     this->imagePub->Publish(msg);
   }
 

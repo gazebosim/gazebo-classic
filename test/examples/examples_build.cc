@@ -103,6 +103,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "parameters"
   , "projector"
   , "system_gui_plugin"
+  , "trigger_light"
   , "world_edit"
 ));
 
@@ -120,6 +121,7 @@ auto standaloneValues = ::testing::Values(
   , "clone_simulation"
   , "custom_main"
   , "custom_main_pkgconfig"
+  , "diagnostics"
   , "harness"
   , "listener"
   , "publisher"
