@@ -2193,7 +2193,9 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::Box Visual::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::Box box(
+      ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
