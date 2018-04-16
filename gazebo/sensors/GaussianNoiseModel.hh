@@ -101,8 +101,13 @@ namespace gazebo
         /// \brief True if the type is GAUSSIAN_QUANTIZED
         protected: bool quantized;
 
-        /// \brief Pointer the the SDF element for the noise.
-        private: sdf::ElementPtr sdf;
+        /// \brief The mean of the Gaussian distribution from which bias values
+        /// are drawn.
+        private: double biasMean;
+
+        /// \brief The standard deviation of the Gaussian distribution from
+        /// which bias values are drawn.
+        private: double biasStdDev;
     };
 
     /// \class GaussianNoiseModel

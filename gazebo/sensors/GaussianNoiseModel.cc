@@ -92,7 +92,9 @@ GaussianNoiseModel::GaussianNoiseModel()
     stdDev(0.0),
     bias(0.0),
     precision(0.0),
-    quantized(false)
+    quantized(false),
+    biasMean(0),
+    biasStdDev(0)
 {
 }
 
@@ -108,6 +110,10 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
 
   this->mean = _sdf->Get<double>("mean");
   this->stdDev = _sdf->Get<double>("stddev");
+  if (_sdf->HasElement("bias_mean"))
+    this->biasMean = _sdf->Get<double>("bias_mean");
+  if (_sdf->HasElement("bias_stddev"))
+    this->biasStdDev = _sdf->Get<double>("bias_stddev");
   this->SampleBias();
 
   /// \todo Remove this, and use Noise::Print. See ImuSensor for an example
@@ -127,8 +133,6 @@ void GaussianNoiseModel::Load(sdf::ElementPtr _sdf)
       this->quantized = true;
     }
   }
-
-  this->sdf = _sdf;
 }
 
 //////////////////////////////////////////////////
@@ -189,16 +193,8 @@ double GaussianNoiseModel::GetBias() const
 //////////////////////////////////////////////////
 void GaussianNoiseModel::SampleBias()
 {
-  if (!this->sdf)
-    return;
-
-  double biasMean = 0;
-  double biasStdDev = 0;
-  if (this->sdf->HasElement("bias_mean"))
-    biasMean = this->sdf->Get<double>("bias_mean");
-  if (this->sdf->HasElement("bias_stddev"))
-    biasStdDev = this->sdf->Get<double>("bias_stddev");
-  this->bias = ignition::math::Rand::DblNormal(biasMean, biasStdDev);
+  this->bias =
+      ignition::math::Rand::DblNormal(this->biasMean, this->biasStdDev);
   // With equal probability, we pick a negative bias (by convention,
   // rateBiasMean should be positive, though it would work fine if
   // negative).
