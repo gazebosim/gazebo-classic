@@ -174,7 +174,7 @@ void GaussianNoiseModel::SetMean(const double _mean)
 }
 
 //////////////////////////////////////////////////
-void GaussianNoiseModel::SetStddev(const double _stddev)
+void GaussianNoiseModel::SetStdDev(const double _stddev)
 {
   this->stdDev = _stddev;
   this->SampleBias();

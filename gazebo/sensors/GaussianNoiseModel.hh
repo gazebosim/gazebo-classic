@@ -75,7 +75,7 @@ namespace gazebo
 
         /// \brief Set stddev.
         /// \param[in] _stddev Standard deviation of Gaussian noise.
-        public: void SetStddev(const double _stddev);
+        public: void SetStdDev(const double _stddev);
 
         /// Documentation inherited
         public: virtual void Print(std::ostream &_out) const;
