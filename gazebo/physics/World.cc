@@ -472,6 +472,7 @@ void World::Stop()
 {
   this->dataPtr->stop = true;
 
+  // Make sure that the thread does not try to join with itself
   if (this->dataPtr->thread &&
      this->dataPtr->thread->get_id() != std::this_thread::get_id())
   {
