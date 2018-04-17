@@ -630,8 +630,6 @@ void GpuLaser::CreateMesh()
   double phi = (this->vfov - this->dataPtr->vfovPadding) / 2;
   double theta = this->hfov / 2;
 
-  double vAngMin = -phi;
-
   if (this->ImageHeight() == 1)
     phi = 0;
 
@@ -641,21 +639,23 @@ void GpuLaser::CreateMesh()
   gazebo::math::Vector3 axis;
   math::Quaternion ray;
 
+  // total laser hfov
+  double thfov = this->dataPtr->textureCount * theta * 2;
+  double hstep = thfov / (this->dataPtr->w2nd - 1);
+  double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
+
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
     double gamma = 0;
     if (this->dataPtr->h2nd != 1)
     {
       // gamma: current vertical angle
-      gamma = ((2 * phi / (this->dataPtr->h2nd - 1)) * j) + vAngMin;
+      gamma = vstep * j - phi;
     }
     for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
-      // total laser hfov
-      double thfov = this->dataPtr->textureCount * this->hfov;
-
       // current horizontal angle from start of laser scan
-      double delta = ((thfov / (this->dataPtr->w2nd - 1)) * i);
+      double delta = hstep * i;
 
       // index of texture that contains the depth value
       unsigned int texture = delta / (theta*2);
@@ -666,11 +666,6 @@ void GpuLaser::CreateMesh()
         texture -= 1;
         delta -= (thfov / (this->dataPtr->w2nd - 1));
       }
-
-      // first compute angle from the start of current camera's horizontal
-      // min angle, then set delta to be angle from center of current camera.
-      delta = delta - (texture * (theta*2));
-      delta = delta - theta;
 
       startX -= dx;
       if (ptsOnLine == this->ImageWidth())
@@ -686,40 +681,23 @@ void GpuLaser::CreateMesh()
       // together the final depth image.
       submesh->AddVertex(texture/1000.0, startX, startY);
 
-      // convert laser scan from plane to cone sweep for non zero pitch angles,
-      // this samples the depth image in a shape of a parabola.
-      ray.SetFromEuler(gazebo::math::Vector3(0.0, -gamma, delta));
-      axis = ray * math::Vector3(1.0, 0.0, 0.0);
-      double newGamma = atan(axis.z / axis.x);
-      double newDelta = atan(axis.y / axis.x);
+      // first compute angle from the start of current camera's horizontal
+      // min angle, then set delta to be angle from center of current camera.
+      delta = delta - (texture * (theta*2));
+      delta = delta - theta;
 
       // adjust uv coordinates of depth texture to match projection of current
       // laser ray the depth image plane.
-      double u, v;
-      //if (u > 1.0 || v > 1.0 || u < 0 || v < 0)
-      //  gzerr << u << " , " << v << std::endl;
-      if (this->isHorizontal)
-      {
-        //u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        //v = math::equal(phi, 0.0) ? -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
-        u = -(cos(this->vfov/2.0) * tan(newDelta))/
-          (2 * tan(theta) * cos(newGamma)) + 0.5;
-        v = ignition::math::equal(this->vfov/2.0, 0.0) ? 0.5 :
-          -tan(newGamma)/(2 * tan(this->vfov/2.0)) + 0.5;
-      }
-      else
-      {
-        v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = math::equal(theta, 0.0) ?  0.5 :
-             -tan(delta)/(2 * tan(theta)) + 0.5;
-      }
+      double u = -(tan(delta) * cos(this->vfov/2.0))/
+        (2.0 * tan(theta) * cos(gamma)) + 0.5;
+
+      double v = ignition::math::equal(phi, 0.0) ? 0.5 :
+        -tan(gamma)/(2.0 * tan(this->vfov/2.0)) + 0.5;
+
       submesh->AddTexCoord(u, v);
+      submesh->AddIndex(this->dataPtr->w2nd * j + i);
     }
   }
-
-  for (unsigned int j = 0; j < (this->dataPtr->h2nd ); ++j)
-    for (unsigned int i = 0; i < (this->dataPtr->w2nd ); ++i)
-      submesh->AddIndex(this->dataPtr->w2nd * j + i);
 
   mesh->AddSubMesh(submesh);
 

@@ -22,7 +22,7 @@
 #define DOUBLE_TOL 1e-6
 
 // vertical range values seem to be less accurate
-#define VERTICAL_LASER_TOL 2e-4
+#define VERTICAL_LASER_TOL 1e-3
 
 using namespace gazebo;
 class GPURaySensorTest : public ServerFixture
@@ -395,13 +395,13 @@ TEST_F(GPURaySensorTest, LaserVertical)
   std::string raySensorName = "gpu_ray_sensor";
   double hMinAngle = -M_PI/4.0;
   double hMaxAngle = M_PI/4.0;
-  double vMinAngle = -M_PI/8.0;
-  double vMaxAngle = M_PI/8.0;
+  double vMinAngle = -M_PI/4.0;
+  double vMaxAngle = M_PI/4.0;
   double minRange = 0.1;
   double maxRange = 5.0;
   double rangeResolution = 0.02;
   unsigned int samples = 640;
-  unsigned int vSamples = 91;
+  unsigned int vSamples = 25;
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
   math::Pose testPose(math::Vector3(0.25, 0, 0.5),
       math::Quaternion(0, 0, 0));
@@ -460,13 +460,11 @@ TEST_F(GPURaySensorTest, LaserVertical)
         - testPose.pos.x;
     double expectedRange = expectedRangeAtMidPoint / cos(angleStep);
 
-    // TODO: Fix this test
     EXPECT_NEAR(raySensor->Range(i*samples + mid),
         expectedRange, VERTICAL_LASER_TOL);
 
     angleStep += vAngleStep;
 
-    // This should be removed?
     //EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), GZ_DBL_INF);
     //EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1), GZ_DBL_INF);
   }
