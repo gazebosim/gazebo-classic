@@ -528,12 +528,12 @@ void MousePickingTest::DistantMovement()
   QCOMPARE(cam->WorldPose(), camPose);
 
   // set a large clip distance
-  double nearClip = 0.1;
+  double nearClip = 0.125;
   double farClip = 200000.0;
   cam->SetClipDist(nearClip, farClip);
 
-  qFuzzyCompare(cam->NearClip(), nearClip);
-  qFuzzyCompare(cam->FarClip(), farClip);
+  QVERIFY(qFuzzyCompare(cam->NearClip(), nearClip));
+  QVERIFY(qFuzzyCompare(cam->FarClip(), farClip));
 
   this->ProcessEventsAndDraw(mainWindow);
 
