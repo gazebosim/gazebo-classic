@@ -811,7 +811,7 @@ StatsCommand::StatsCommand()
   // Options that are visible to the user through help.
   this->visibleOptions.add_options()
     ("world-name,w", po::value<std::string>(), "World name.")
-    ("duration,d", po::value<double>(), "Duration (seconds) to run.")
+    ("duration,d", po::value<long>(), "Duration (seconds) to run.")
     ("plot,p", "Output comma-separated values, useful for processing and "
      "plotting.");
 }
@@ -843,7 +843,7 @@ bool StatsCommand::RunImpl()
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<long>()));
   else
     this->sigCondition.wait(lock);
 
