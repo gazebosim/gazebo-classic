@@ -168,6 +168,7 @@ void SelectionBuffer::CreateRTTBuffer()
   this->dataPtr->renderTexture->setPriority(0);
   this->dataPtr->renderTexture->addViewport(this->dataPtr->selectionCamera);
   this->dataPtr->renderTexture->getViewport(0)->setOverlaysEnabled(false);
+  this->dataPtr->renderTexture->getViewport(0)->setShadowsEnabled(false);
   this->dataPtr->renderTexture->getViewport(0)->setClearEveryFrame(true);
   this->dataPtr->renderTexture->addListener(
       this->dataPtr->selectionTargetListener.get());

@@ -36,6 +36,9 @@ class MousePickingTest : public QTestFixture
 
   /// \brief Testing picking a visual with invalid mesh.
   private slots: void InvalidMesh();
+
+  /// \brief Testing mouse movement at a distance.
+  private slots: void DistantMovement();
 };
 
 #endif
