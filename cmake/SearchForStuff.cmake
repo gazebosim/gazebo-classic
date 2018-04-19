@@ -595,25 +595,7 @@ endif()
 
 ########################################
 # Find QT
-find_package (Qt5Widgets)
-if (NOT Qt5Widgets_FOUND)
-  BUILD_ERROR("Missing: Qt5Widgets")
-endif()
-
-find_package (Qt5Core)
-if (NOT Qt5Core_FOUND)
-  BUILD_ERROR("Missing: Qt5Core")
-endif()
-
-find_package (Qt5OpenGL)
-if (NOT Qt5OpenGL_FOUND)
-  BUILD_ERROR("Missing: Qt5OpenGL")
-endif()
-
-find_package (Qt5Test)
-if (NOT Qt5Test_FOUND)
-  BUILD_ERROR("Missing: Qt5Test")
-endif()
+find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 
 ########################################
 # Find Boost, if not specified manually

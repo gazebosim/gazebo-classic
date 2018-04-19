@@ -767,6 +767,30 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   }
   else
   {
+    // build tangent vectors if normal mapping in tangent space is specified
+    if (this->GetShaderType() == "normal_map_tangent_space")
+    {
+      Ogre::MeshPtr ogreMesh = Ogre::MeshManager::getSingleton().getByName(
+        _meshName);
+      if (!ogreMesh.isNull())
+      {
+        try
+        {
+          uint16_t src, dest;
+          if (!ogreMesh->suggestTangentVectorBuildParams(
+              Ogre::VES_TANGENT, src, dest))
+          {
+            ogreMesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+          }
+        }
+        catch(Ogre::Exception &e)
+        {
+          gzwarn << "Problem generating tangent vectors for " << _meshName
+                 << ". Normal map will not work: " << e.what() << std::endl;
+        }
+      }
+    }
+
     obj = (Ogre::MovableObject*)
         (this->dataPtr->sceneNode->getCreator()->createEntity(objName,
         meshName));
@@ -2193,7 +2217,9 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::Box Visual::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::Box box(
+      ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
@@ -2295,7 +2321,6 @@ void Visual::InsertMesh(const std::string &_meshName,
     this->InsertMesh(mesh);
   }*/
 }
-
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
     bool _centerSubmesh)

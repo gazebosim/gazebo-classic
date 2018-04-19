@@ -54,6 +54,10 @@ namespace gazebo
       /// \param[in] _camera Camera to be distorted
       public: void SetCamera(CameraPtr _camera);
 
+      /// \brief Set the scale of lens flare. Must be greater than 0.
+      /// \param[in] _scale Scale of lens flare
+      public: void SetScale(const double _scale);
+
       /// \brief Update function to search light source
       private: void Update();
 

@@ -948,7 +948,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // unsuccessfully) established.
 
   boost::mutex::scoped_lock lock(this->connectMutex);
-  if (_error == 0)
+  if (_error == boost::system::errc::success)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
       + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());
