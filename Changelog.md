@@ -5,6 +5,9 @@
 1. Add MisalignmentPlugin which reports alignment between two poses
     * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
 
+1. Fix compilation with boost 1.67
+    * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
 ## Gazebo 7.12.0 (2018-04-11)
 
 1. Fix mouse movement ogre assertion error
