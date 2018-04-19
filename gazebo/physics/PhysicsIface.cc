@@ -184,7 +184,7 @@ bool physics::worlds_running()
 {
   for (auto const &world : g_worlds)
   {
-    if (world->Running())
+    if (world && world->Running())
       return true;
   }
 

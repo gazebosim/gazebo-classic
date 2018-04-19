@@ -246,6 +246,7 @@ namespace gazebo
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
+    /// \param[in] _distortion Flag to enable distortion.
     /// \param[in] _distortionK1 Distortion coefficient k1.
     /// \param[in] _distortionK2 Distortion coefficient k2.
     /// \param[in] _distortionK3 Distortion coefficient k3.
