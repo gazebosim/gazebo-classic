@@ -14,6 +14,9 @@
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request #2908](https://bitbucket.org/osrf/gazebo/pull-request/2908)
 
+1. Displaying light direction on the world tree
+    * [Pull request 2912](https://bitbucket.org/osrf/gazebo/pull-request/2912)
+
 1. Fix Enter in Link Inspector
     * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
 
