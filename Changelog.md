@@ -2,6 +2,24 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Force vertical field of view to be lower than 180 degrees
+    * [Pull request #2909](https://bitbucket.org/osrf/gazebo/pull-request/2909)
+
+1. Fixed issue which lead to reset of values on pressing enter in Joint Creator
+    * [Pull request #2926](https://bitbucket.org/osrf/gazebo/pull-request/2926)
+
+1. Removed material block from shapes.world
+    * [Pull request #2925](https://bitbucket.org/osrf/gazebo/pull-request/2925)
+
+1. Handle signal SIGTERM exactly the same way as SIGINT
+    * [Pull request #2908](https://bitbucket.org/osrf/gazebo/pull-request/2908)
+
+1. Displaying light direction on the world tree
+    * [Pull request 2912](https://bitbucket.org/osrf/gazebo/pull-request/2912)
+
+1. Fix Enter in Link Inspector
+    * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
+
 1. Update Wind Plugin to support being used by Lift Drag Plugin
     * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
 
