@@ -69,9 +69,8 @@ std::vector<ignition::fuel_tools::ServerConfig> FuelModelDatabase::Servers()
 
 /////////////////////////////////////////////////
 void FuelModelDatabase::Models(
-    const ignition::fuel_tools::ServerConfig &_server,
-    std::function<void (
-    const std::vector<ignition::fuel_tools::ModelIdentifier> &)> &_func)
+    const ignition::fuel_tools::ServerConfig &_server, std::function<void
+    (const std::vector<ignition::fuel_tools::ModelIdentifier> &)> &_func)
 {
   std::thread t([this, _func, _server]
   {
@@ -82,8 +81,7 @@ void FuelModelDatabase::Models(
 }
 
 /////////////////////////////////////////////////
-std::vector<ignition::fuel_tools::ModelIdentifier>
-    FuelModelDatabase::Models(
+std::vector<ignition::fuel_tools::ModelIdentifier> FuelModelDatabase::Models(
     const ignition::fuel_tools::ServerConfig &_server) const
 {
   std::vector<ignition::fuel_tools::ModelIdentifier> models;
@@ -184,14 +182,29 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 std::string FuelModelDatabase::ModelPath(const std::string &_uri,
     const bool _forceDownload)
 {
+  auto fuelUri = ignition::common::URI(_uri);
+
+  // Gazebo URIs default to Open Robotics account on ignitionfuel.org
+  if (fuelUri.Scheme() == "model")
+  {
+    auto modelName = fuelUri.Path();
+    auto firstServer = this->dataPtr->fuelClient->Config().Servers()[0];
+
+    fuelUri.Parse(firstServer.URL() + "/" + firstServer.Version() +
+        "/openrobotics/models/" + modelName.Str());
+  }
+
   std::string path;
 
-  if (!_forceDownload && this->dataPtr->fuelClient->CachedModel(_uri, path))
-    return path;
-
-  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
+  if (!_forceDownload)
   {
-    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+    if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+      return path;
+  }
+
+  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri.Str(), path))
+  {
+    gzerr << "Unable to download model[" << fuelUri.Str() << "]" << std::endl;
     return std::string();
   }
 

@@ -925,6 +925,65 @@ TEST_F(LightFactoryTest, SpawnLight)
   EXPECT_EQ(light2Pose, light2->WorldPose());
 }
 
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameModelDatabase)
+{
+  this->Load("worlds/empty.world", true);
+
+  // Test database
+  common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models/testdb");
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  // Publish factory msg
+  msgs::Factory msg;
+  msg.set_sdf_filename("model://cococan");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("cococan") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("cococan"));
+}
+
+//////////////////////////////////////////////////
+TEST_F(FactoryTest, FilenameFuelURL)
+{
+  this->Load("worlds/empty.world", true);
+
+  // World
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  msgs::Factory msg;
+  msg.set_sdf_filename(
+      "https://api.ignitionfuel.org/1.0/chapulina/models/Test box");
+
+  auto pub = this->node->Advertise<msgs::Factory>("~/factory");
+  pub->Publish(msg);
+
+  // Wait for it to be spawned
+  int sleep = 0;
+  int maxSleep = 50;
+  while (!world->ModelByName("test_box") && sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // Check model was spawned
+  ASSERT_NE(nullptr, world->ModelByName("test_box"));
+}
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)

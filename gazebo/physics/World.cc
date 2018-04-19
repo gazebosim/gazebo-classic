@@ -46,6 +46,10 @@
 
 #include "gazebo/util/LogPlay.hh"
 
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  #include <ignition/common/URI.hh>
+  #include "gazebo/common/FuelModelDatabase.hh"
+#endif
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"
@@ -1950,8 +1954,25 @@ void World::ProcessFactoryMsgs()
       else if (factoryMsg.has_sdf_filename() &&
               !factoryMsg.sdf_filename().empty())
       {
-        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-            factoryMsg.sdf_filename());
+        std::string filename;
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+        // If http, look at Fuel
+        // TODO: model:// should fallback to Fuel's openrobotics account,
+        // but if we check ModelDatabase first it takes forever to check.
+        // Is there a better way?
+        auto uri = ignition::common::URI(factoryMsg.sdf_filename());
+        if (uri.Valid() && uri.Scheme() == "https")
+        {
+          filename = common::FuelModelDatabase::Instance()->ModelFile(
+              factoryMsg.sdf_filename());
+        }
+        // Otherwise, look at database
+        else
+#endif
+        {
+          filename = common::ModelDatabase::Instance()->GetModelFile(
+              factoryMsg.sdf_filename());
+        }
 
         if (!sdf::readFile(filename, this->dataPtr->factorySDF))
         {
