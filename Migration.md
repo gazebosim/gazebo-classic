@@ -7,8 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 9.x to 10.x
 
+### Additions
+1. **gazebo/physics/dart/DARTLink.hh**
+    + public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+    + public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + public: virtual void SetName(const std::string &_name);
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + public: std::string GetSolverType() const;
+    + public: void SetSolverType(const std::string &_type);
+
 ### Modifications
 
+1. **gazebo/physics/Model.hh**
+    + Made `CreateJoint` virtual
+    + Made `RemoveJoint` virtual
 1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
    enable mass based force approximation. Set to 1.0 for original behavior.
 
@@ -34,16 +47,6 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
    plugins. The `--gui-client-plugin` argument introduced in gazebo 8.2 load GUI
    plugins and will remain the exactly the same.
 
-### Additions
-1. **gazebo/physics/dart/DARTLink.hh**
-    + public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
-    + public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
-1. **gazebo/physics/dart/DARTJoint.hh**
-    + public: virtual void SetName(const std::string &_name);
-1. **gazebo/physics/dart/DARTPhysics.hh**
-    + public: std::string GetSolverType() const;
-    + public: void SetSolverType(const std::string &_type);
-
 ### Modifications
 
 1. ***Modified:*** Many constructors with 1 argument were marked as explicit.
@@ -62,9 +65,6 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
     + ***Replacement:*** None. Calls now deprecated SetLinearAccel() on all links.
     + ***Deprecation:*** void SetAngularAccel(const ignition::math::Vector3d &_vel);
     + ***Replacement:*** None. Calls now deprecated SetAngularAccel() on all links.
-1. **gazebo/physics/Model.hh**
-    + Made `CreateJoint` virtual
-    + Made `RemoveJoint` virtual
 1. **gazebo/sensors/CameraSensor.cc**
     + ***Modified:*** Ignition transport topic now uses ignition::msgs::Image instead of ignition::msgs::ImageStamped
 1. **gazebo/sensors/WideAngleCameraSensor.cc**
