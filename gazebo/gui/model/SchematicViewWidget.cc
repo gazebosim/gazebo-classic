@@ -15,10 +15,11 @@
  *
 */
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/rendering/Material.hh"
 
 #include "gazebo/common/Events.hh"
-#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/qgv/QGVNode.h"
 #include "gazebo/gui/qgv/QGVEdge.h"
@@ -220,15 +221,14 @@ void SchematicViewWidget::AddEdge(const std::string &_id,
 
   std::string materialName = JointMaker::JointMaterial(_type);
 
-  common::Color edgeColor = common::Color::Black;
+  ignition::math::Color edgeColor = ignition::math::Color::Black;
   if (!materialName.empty())
   {
-    common::Color emptyColor;
-    common::Color matAmbient;
-    common::Color matDiffuse;
-    common::Color matSpecular;
-    common::Color matEmissive;
-    rendering::Material::GetMaterialAsColor(materialName, matAmbient,
+    ignition::math::Color matAmbient;
+    ignition::math::Color matDiffuse;
+    ignition::math::Color matSpecular;
+    ignition::math::Color matEmissive;
+    rendering::Material::MaterialAsColor(materialName, matAmbient,
         matDiffuse, matSpecular, matEmissive);
     edgeColor = matDiffuse;
   }

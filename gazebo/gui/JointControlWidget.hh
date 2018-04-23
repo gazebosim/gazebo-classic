@@ -52,7 +52,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Pointer to the parent of the widget.
-      public: JointControlWidget(QWidget *_parent = 0);
+      public: explicit JointControlWidget(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~JointControlWidget();
@@ -190,6 +190,10 @@ namespace gazebo
       /// \param[in] _force Value of the control force.
       public: void SetForce(const double _force);
 
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(const bool _active);
+
       /// \brief On force changed callback.
       /// \param[in] _value Value of the changed slider.
       public slots: void OnChanged(double _value);
@@ -241,6 +245,10 @@ namespace gazebo
       /// \brief Set the PID derivative gain.
       /// \param[in] _dGain Derivative gain value.
       public: void SetDGain(const double _dGain);
+
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(const bool _active);
 
       /// \brief Set the units to radians.
       public: void SetToRadians();
@@ -329,6 +337,10 @@ namespace gazebo
       /// \brief Set the PID derivative gain.
       /// \param[in] _dGain Derivative gain value.
       public: void SetDGain(const double _dGain);
+
+      /// \brief Indicate whether controls are active by highlighting them.
+      /// \param[in] _active Whether the joint control is active or not.
+      public: void SetShowActive(const bool _active);
 
       /// \brief Callback when the value of velocity slider changed.
       /// \param[in] _value Value of the slider.

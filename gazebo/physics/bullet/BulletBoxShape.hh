@@ -37,7 +37,8 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletBoxShape : public BoxShape
     {
       /// \brief Constructor
-      public: BulletBoxShape(CollisionPtr _parent) : BoxShape(_parent) {}
+      public: explicit BulletBoxShape(CollisionPtr _parent)
+              : BoxShape(_parent) {}
 
       /// \brief Destructor
       public: virtual ~BulletBoxShape() {}
@@ -108,8 +109,8 @@ namespace gazebo
 
                     compoundShape->removeChildShape(shape);
                     ignition::math::Pose3d relativePose =
-                        this->collisionParent->RelativePose();
-                    relativePose.Pos() -= bLink->GetInertial()->CoG();
+                        this->collisionParent->RelativePose()
+                        - bLink->GetInertial()->Pose();
                     compoundShape->addChildShape(
                         BulletTypes::ConvertPose(relativePose), shape);
                   }

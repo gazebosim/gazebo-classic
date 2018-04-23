@@ -121,7 +121,7 @@ bool SpaceNav::Load()
   if (daemonRunning >= 0 && spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init();
+    this->dataPtr->node->TryInit(common::Time::Maximum());
     this->dataPtr->joyPub = this->dataPtr->node->Advertise<msgs::Joystick>(
         topic);
 

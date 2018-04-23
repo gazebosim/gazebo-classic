@@ -53,7 +53,7 @@ namespace gazebo
 // plot
 class DragableListWidget : public QListWidget
 {
-  public: DragableListWidget(QWidget *_parent)
+  public: explicit DragableListWidget(QWidget *_parent)
           : QListWidget(_parent)
           {
           }

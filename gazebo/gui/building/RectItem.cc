@@ -47,7 +47,7 @@ RectItem::RectItem() : EditorItem(), dataPtr(new RectItemPrivate())
   this->drawingWidth = this->width;
   this->drawingHeight = this->height;
 
-  this->borderColor = common::Color::Black;
+  this->borderColor = ignition::math::Color::Black;
 
   for (int i = 0; i < 8; ++i)
   {

@@ -229,7 +229,7 @@ void LaserVisual::Update()
 }
 
 /////////////////////////////////////////////////
-void LaserVisual::SetEmissive(const common::Color &/*_color*/,
+void LaserVisual::SetEmissive(const ignition::math::Color &/*_color*/,
     const bool /*_cascade*/)
 {
 }

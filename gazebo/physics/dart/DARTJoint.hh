@@ -42,49 +42,51 @@ namespace gazebo
     {
       /// \brief Constructor.
       /// \param[in] _parent Parent of the Joint.
-      public: DARTJoint(BasePtr _parent);
+      public: explicit DARTJoint(BasePtr _parent);
 
       /// \brief Destructor.
       public: virtual ~DARTJoint();
 
       // Documentation inherited.
-      public: virtual void Load(sdf::ElementPtr _sdf);
+      public: virtual void Load(sdf::ElementPtr _sdf) override;
 
       /// \brief Initialize a joint.
-      public: virtual void Init();
+      public: virtual void Init() override;
 
       // Documentation inherited.
       public: virtual void SetName(const std::string &_name);
 
       // Documentation inherited.
-      public: virtual void Reset();
+      public: virtual void Reset() override;
 
       // Documentation inherited.
-      public: virtual LinkPtr GetJointLink(unsigned int _index) const;
+      public: virtual LinkPtr GetJointLink(unsigned int _index) const override;
 
       // Documentation inherited.
-      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const;
+      public: virtual bool AreConnected(LinkPtr _one, LinkPtr _two) const
+            override;
 
       // Documentation inherited.
-      public: virtual void Attach(LinkPtr _parent, LinkPtr _child);
+      public: virtual void Attach(LinkPtr _parent, LinkPtr _child) override;
 
       // Documentation inherited.
-      public: virtual void Detach();
+      public: virtual void Detach() override;
 
       // Documentation inherited
-      public: virtual void SetDamping(unsigned int _index, double _damping);
+      public: virtual void SetDamping(unsigned int _index, double _damping)
+            override;
 
       // Documentation inherited.
       public: virtual void SetStiffnessDamping(unsigned int _index,
-        double _stiffness, double _damping, double _reference = 0);
+        double _stiffness, double _damping, double _reference = 0) override;
 
       // Documentation inherited.
       public: virtual void SetStiffness(unsigned int _index,
-                  const double _stiffness);
+                  const double _stiffness) override;
 
       /// \brief Set the anchor point
       public: virtual void SetAnchor(const unsigned int /*_index*/,
-          const ignition::math::Vector3d &/*_anchor*/);
+          const ignition::math::Vector3d &/*_anchor*/) override;
 
       public: virtual ignition::math::Vector3d Anchor(
             const unsigned int /*_index*/) const override final;
@@ -98,51 +100,57 @@ namespace gazebo
             const override;
 
       // Documentation inherited.
-      public: virtual void SetForce(unsigned int _index, double _force);
+      public: virtual void SetForce(unsigned int _index, double _force)
+            override;
 
       // Documentation inherited.
-      public: virtual double GetForce(unsigned int _index);
+      public: virtual double GetForce(unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual JointWrench GetForceTorque(unsigned int _index);
+      public: virtual JointWrench GetForceTorque(unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual bool SetPosition(unsigned int _index, double _position)
+      public: virtual bool SetPosition(
+                              const unsigned int _index,
+                              const double _position,
+                              const bool _preserveWorldVelocity = false)
             override final;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkForce(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited.
       public: virtual ignition::math::Vector3d LinkTorque(
-          const unsigned int _index) const;
+          const unsigned int _index) const override;
 
       // Documentation inherited.
       public: virtual bool SetParam(const std::string &_key,
                                         unsigned int _index,
-                                        const boost::any &_value);
+                                        const boost::any &_value) override;
 
       // Documentation inherited.
       public: virtual double GetParam(const std::string &_key,
-                                          unsigned int _index);
+                                          unsigned int _index) override;
 
       // Documentation inherited.
-      public: virtual double LowerLimit(const unsigned int _index) const;
+      public: virtual double LowerLimit(const unsigned int _index) const
+            override;
 
       // Documentation inherited.
-      public: virtual double UpperLimit(const unsigned int _index) const;
+      public: virtual double UpperLimit(const unsigned int _index) const
+            override;
 
       // Documentation inherited.
       public: virtual void SetLowerLimit(const unsigned int _index,
-                                         const double _limit);
+                                         const double _limit) override;
 
       // Documentation inherited.
       public: virtual void SetUpperLimit(const unsigned int _index,
-                                         const double _limit);
+                                         const double _limit) override;
 
       // Documentation inherited.
-      public: virtual void CacheForceTorque();
+      public: virtual void CacheForceTorque() override;
 
       // Documentation inherited.
       protected: virtual double PositionImpl(const unsigned int _index = 0)

@@ -43,7 +43,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: SchematicViewWidget(QWidget *_parent = 0);
+      public: explicit SchematicViewWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~SchematicViewWidget() = default;

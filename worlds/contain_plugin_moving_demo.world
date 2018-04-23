@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <include>
+      <uri>model://cordless_drill</uri>
+      <static>true</static>
+      <pose>0 0 1 0 0 0</pose>
+    </include>
+
+    <plugin name="containDrill" filename="libContainPlugin.so">
+      <entity>drill</entity>
+      <namespace>gazebo/default/drill</namespace>
+      <pose frame="box::link">0 0 0 0 0 0</pose>
+      <geometry>
+        <box>
+          <size>0.5 0.5 0.5</size>
+        </box>
+      </geometry>
+    </plugin>
+
+    <model name="box">
+      <static>false</static>
+      <pose>0 0 2 0.707 0.707 0.707</pose>
+      <link name="link">
+        <!-- Box visual for demonstration -->
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0 0 1 0.5</ambient>
+            <specular>0 0 1 0.5</specular>
+            <diffuse>0 0 1 0.5</diffuse>
+            <emissive>0 0 1 0.5</emissive>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

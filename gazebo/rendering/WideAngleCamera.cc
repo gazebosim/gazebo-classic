@@ -30,6 +30,8 @@
 
 #endif /* HAVE_OPENGL */
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
@@ -612,7 +614,7 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+bool WideAngleCamera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   bool retVal = true;
   Ogre::ColourValue clr = Conversions::Convert(_color);
@@ -677,8 +679,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     RTShaderSystem::AttachViewport(vp, this->GetScene());
 
-    vp->setBackgroundColour(
-      Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &gzBgColor = this->scene->BackgroundColor();
+    vp->setBackgroundColour(Conversions::Convert(gzBgColor));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -742,4 +744,105 @@ void WideAngleCamera::UpdateFOV()
 {
   // override to prevent parent class from updating fov as
   // it'll be handled here in this class.
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d WideAngleCamera::Project3d(
+    const ignition::math::Vector3d &_pt) const
+{
+  // project onto cubemap face then onto
+  ignition::math::Vector3d screenPos;
+  // loop through all env cameras can find the one that sees the 3d world point
+  for (int i = 0; i < 6; ++i)
+  {
+    // project world point to camera clip space.
+    auto viewProj = this->dataPtr->envCameras[i]->getProjectionMatrix() *
+        this->dataPtr->envCameras[i]->getViewMatrix();
+    auto pos = viewProj * Ogre::Vector4(Conversions::Convert(_pt));
+    pos.x /= pos.w;
+    pos.y /= pos.w;
+    // check if point is visible
+    if (std::fabs(pos.x) <= 1 && std::fabs(pos.y) <= 1 && pos.z > 0)
+    {
+      // determine dir vector to projected point from env camera
+      // work in y up, z forward, x right clip space
+      ignition::math::Vector3d dir(pos.x, pos.y, 1);
+      ignition::math::Quaterniond rot = ignition::math::Quaterniond::Identity;
+
+      // rotate dir vector into wide angle camera frame based on the
+      // face of the cube. Note: operate in clip space so
+      // left handed coordinate system rotation
+      if (i == 0)
+        rot = ignition::math::Quaterniond(0.0, M_PI*0.5, 0.0);
+      else if (i == 1)
+        rot = ignition::math::Quaterniond(0.0, -M_PI*0.5, 0.0);
+      else if (i == 2)
+        rot = ignition::math::Quaterniond(-M_PI*0.5, 0.0, 0.0);
+      else if (i == 3)
+        rot = ignition::math::Quaterniond(M_PI*0.5, 0.0, 0.0);
+      else if (i == 5)
+        rot = ignition::math::Quaterniond(0.0, M_PI, 0.0);
+      dir = rot * dir;
+      dir.Normalize();
+
+      // compute theta and phi from the dir vector
+      // theta is angle to dir vector from z (forward)
+      // phi is angle from x in x-y plane
+      // direction vector (x, y, z)
+      // x = sin(theta)cos(phi)
+      // y = sin(theta)sin(phi)
+      // z = cos(theta)
+      double theta =  std::atan2(
+          std::sqrt(dir.X() * dir.X() + dir.Y() * dir.Y()), dir.Z());
+      double phi = std::atan2(dir.Y(), dir.X());
+      // this also works:
+      // double theta = std::acos(dir.Z());
+      // double phi = std::asin(dir.Y() / std::sin(theta));
+
+      double f = this->Lens()->F();
+      double hfov = this->HFOV().Radian();
+      // recompute f if scale to HFOV is true
+      if (this->Lens()->ScaleToHFOV())
+      {
+        double param = (hfov/2.0) / this->Lens()->C2() + this->Lens()->C3();
+        double funRes =
+            CameraLensPrivate::MapFunctionEnum(this->Lens()->Fun()).Apply(
+            static_cast<float>(param));
+        f = 1.0/(this->Lens()->C1()*funRes);
+      }
+
+      // Apply fisheye lens mapping function
+      // r is distance of point from image center
+      double r = this->Lens()->C1() * f *
+          CameraLensPrivate::MapFunctionEnum(this->Lens()->Fun()).Apply(
+          theta/this->Lens()->C2() + this->Lens()->C3());
+
+      // compute projected x and y in clip space
+      double x = cos(phi) * r;
+      double y = sin(phi) * r;
+
+      // env cam cube map texture is square and likely to be different size from
+      // viewport. We need to adjust projected pos based on aspect ratio
+      double aspect = static_cast<double>(this->ViewportWidth()) /
+        static_cast<double>(this->ViewportHeight());
+      y *= aspect;
+
+      // convert to screen space
+      screenPos.X() = ((x / 2.0) + 0.5) * this->ViewportWidth();
+      screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight();
+
+      // r will be > 1.0 if point is not visible (outside of image)
+      screenPos.Z() = r;
+      return screenPos;
+    }
+  }
+
+  return screenPos;
+}
+
+//////////////////////////////////////////////////
+std::vector<Ogre::Camera *> WideAngleCamera::OgreEnvCameras() const
+{
+  return std::vector<Ogre::Camera *>(
+    std::begin(this->dataPtr->envCameras), std::end(this->dataPtr->envCameras));
 }

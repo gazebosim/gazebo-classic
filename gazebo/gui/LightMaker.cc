@@ -24,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/transport/Node.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/rendering/Light.hh"
@@ -40,15 +42,15 @@ using namespace gui;
 LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");
 
   msgs::Set(this->msg.mutable_diffuse(),
-      common::Color(0.5, 0.5, 0.5, 1));
+      ignition::math::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(this->msg.mutable_specular(),
-      common::Color(0.1, 0.1, 0.1, 1));
+      ignition::math::Color(0.1, 0.1, 0.1, 1));
 
   this->msg.set_attenuation_constant(0.5);
   this->msg.set_attenuation_linear(0.01);

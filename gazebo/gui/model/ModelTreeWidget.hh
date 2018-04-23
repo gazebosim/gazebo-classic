@@ -44,7 +44,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
-      public: ModelTreeWidget(QWidget *_parent = 0);
+      public: explicit ModelTreeWidget(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: ~ModelTreeWidget() = default;

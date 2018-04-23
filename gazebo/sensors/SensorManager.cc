@@ -32,6 +32,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -96,6 +97,20 @@ void SensorManager::Stop()
     GZ_ASSERT((*iter) != nullptr, "Sensor Constainer is null");
     (*iter)->Stop();
   }
+
+  if (!physics::worlds_running())
+    this->worlds.clear();
+}
+
+//////////////////////////////////////////////////
+bool SensorManager::Running() const
+{
+  for (auto const &container : this->sensorContainers)
+  {
+    if (container->Running())
+      return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -162,6 +177,10 @@ void SensorManager::Update(bool _force)
         (*iter2)->RemoveSensors();
       }
       this->initSensors.clear();
+
+      // Also clear the list of worlds
+      this->worlds.clear();
+
       this->removeAllSensors = false;
     }
   }
@@ -473,6 +492,12 @@ void SensorManager::SensorContainer::Stop()
 }
 
 //////////////////////////////////////////////////
+bool SensorManager::SensorContainer::Running() const
+{
+  return !this->stop;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
   this->stop = false;
@@ -489,6 +514,9 @@ void SensorManager::SensorContainer::RunLoop()
   // 1000 * MaxStepSize in order to handle simulation with a
   // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
+  // Release engine pointer, we don't need it in the loop
+  engine.reset();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
@@ -548,12 +576,21 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
-        "Took over 1000*max_step_size to update a sensor.");
+    // During log playback, time can jump forward an arbitrary amount.
+    if (diffTime.sec >= maxSensorUpdate && !util::LogPlay::Instance()->IsOpen())
+    {
+      gzwarn << "Took over 1000*max_step_size to update a sensor "
+        << "(took " << diffTime.sec << " sec, which is more than "
+        << "the max update of " << maxSensorUpdate << " sec). "
+        << "This warning can be ignored during log playback" << std::endl;
+    }
 
     // Make sure eventTime is not negative.
-    GZ_ASSERT(eventTime >= common::Time::Zero,
-        "Time to next sensor update is negative.");
+    if (eventTime < common::Time::Zero)
+    {
+      gzerr << "Time to next sensor update is negative." << std::endl;
+      continue;
+    }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
 
