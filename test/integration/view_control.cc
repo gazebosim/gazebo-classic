@@ -289,10 +289,12 @@ void ViewControlTest::MouseZoomBoundingBox()
   auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
   QVERIFY(glWidget != nullptr);
 
-  // place camera inside bounding box of cordless drill and look up
-  cam->SetWorldPose(ignition::math::Pose3d(
+  ignition::math::Pose3d camWorldPose(
       ignition::math::Vector3d(0, 0.3, 1.0),
-      ignition::math::Quaterniond(0, -1.57, 0)));
+      ignition::math::Quaterniond(0, -1.57, 0));
+
+  // place camera inside bounding box of cordless drill and look up
+  cam->SetWorldPose(camWorldPose);
 
   this->ProcessEventsAndDraw(mainWindow);
 
@@ -311,8 +313,8 @@ void ViewControlTest::MouseZoomBoundingBox()
 
   // Make sure the camera is still inside bounding box of drill
   ignition::math::Vector3d camPose = cam->WorldPose().Pos();
-  qFuzzyCompare(camPose.X(), 0);
-  qFuzzyCompare(camPose.Y(), 0);
+  QVERIFY(ignition::math::equal(camPose.X(), camWorldPose.Pos().X(), 1e-3));
+  QVERIFY(ignition::math::equal(camPose.Y(), camWorldPose.Pos().Y(), 1e-3));
   QVERIFY(camPose.Z() < 1.5);
 
   cam->Fini();
