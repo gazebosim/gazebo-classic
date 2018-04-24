@@ -189,7 +189,12 @@ void DARTJoint::Detach()
 void DARTJoint::SetAnchor(const unsigned int /*_index*/,
     const ignition::math::Vector3d &/*_anchor*/)
 {
-  gzerr << "DARTJoint: SetAnchor is not implemented.\n";
+  static bool notPrintedYet = true;
+  if (notPrintedYet)
+  {
+    gzerr << "DARTJoint: SetAnchor is not implemented.\n";
+    notPrintedYet = false;
+  }
 }
 
 //////////////////////////////////////////////////
