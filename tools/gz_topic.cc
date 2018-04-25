@@ -31,6 +31,18 @@
 
 using namespace gazebo;
 
+static std::string &EraseTrailingWhitespaces(std::string &_str)
+{
+  const std::string whitespaces(" \t\f\v\n\r");
+
+  std::size_t found = _str.find_last_not_of(whitespaces);
+  if (found != std::string::npos)
+    _str.erase(found + 1);
+  else
+    _str.clear();
+  return _str;
+}
+
 /////////////////////////////////////////////////
 TopicCommand::TopicCommand()
   : Command("topic", "Lists information about topics on a Gazebo master")
@@ -413,7 +425,8 @@ bool TopicCommand::Request(const std::string &_space,
   }
 
   boost::shared_ptr<msgs::Response> response = gazebo::transport::request(
-      _space, _requestType, requestData, gazebo::common::Time(10, 0));
+      _space, _requestType, EraseTrailingWhitespaces(requestData),
+      gazebo::common::Time(10, 0));
 
   if (response)
   {
