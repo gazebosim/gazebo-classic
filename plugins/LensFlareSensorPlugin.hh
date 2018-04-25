@@ -27,6 +27,8 @@ namespace gazebo
 
   /// \brief Plugin that adds lens flare effect to a camera or multicamera
   /// sensor
+  /// The plugin has the following optional parameter:
+  /// <scale>     Scale of lens flare. Must be greater than 0
   class GAZEBO_VISIBLE LensFlareSensorPlugin : public SensorPlugin
   {
     /// \brief Constructor.

@@ -52,6 +52,9 @@ namespace gazebo
   ///    <!-- Pose of the geometry's center point in world coordinates -->
   ///    <pose>10 10 2 0 0 1.57</pose>
   ///
+  ///    <!-- OR Pose of the geometry's center in link frame coordinates -->
+  ///    <pose frame="model_name::link_name">10 10 2 0 0 1.57</pose>
+  ///
   ///    <!-- Geometry of the volume to check, uses the SDF geometry spec:
   ///         http://sdformat.org/spec?ver=1.6&elem=geometry
   ///         currently <box> is supported -->
@@ -88,6 +91,10 @@ namespace gazebo
     // cppcheck-suppress unusedPrivateFunction
     private: bool EnableIgn(const ignition::msgs::Boolean &_req,
                             ignition::msgs::Boolean &_res);
+
+    /// \brief Publish a message indicating if the box contains an entity
+    /// \param[in] _contains True if the geometry contains the target
+    private: void PublishContains(bool _contains);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<ContainPluginPrivate> dataPtr;

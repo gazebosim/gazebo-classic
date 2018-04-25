@@ -99,6 +99,11 @@ namespace gazebo
     /// \brief Enable sensors.
     GZ_SENSORS_VISIBLE
     void enable();
+
+    /// \brief Return true if the manager is running.
+    /// \return True if manager is running.
+    GAZEBO_VISIBLE
+    bool running();
     /// \}
   }
 }
