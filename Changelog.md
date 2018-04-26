@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix ray intersection check in Scene::FirstContact
+    * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
+
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
 
