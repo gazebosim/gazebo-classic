@@ -1289,10 +1289,12 @@ bool Scene::FirstContact(CameraPtr _camera,
         RayQuery rayQuery(_camera);
         math::Vector3 intersect;
         std::vector<math::Vector3> vertices;
-        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-            intersect, vertices);
-        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-            intersect.Ign());
+        if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+            intersect, vertices))
+        {
+          distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+              intersect.Ign());
+        }
       }
     }
   }
