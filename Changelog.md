@@ -37,6 +37,9 @@
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
 
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
+
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
 
@@ -250,6 +253,9 @@
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
 
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
@@ -872,6 +878,10 @@
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
+
 
 ## Gazebo 7.12.0 (2018-04-11)
 
