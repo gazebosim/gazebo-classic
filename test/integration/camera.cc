@@ -228,7 +228,7 @@ TEST_F(CameraTest, RayTriangleIntersection)
 
   ignition::math::Pose3d cameraStartPose(-1, 0, 0.02, 0, 0, 0);
 
-  // Spawn a camera that will do the following
+  // Spawn a camera for ray intersection test
   SpawnCamera("test_camera_model", "test_camera",
       cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
 
