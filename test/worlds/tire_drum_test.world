@@ -2,6 +2,15 @@
 <sdf version="1.5">
   <world name="default">
 
+    <physics type="ode">
+      <ode>
+        <solver>
+          <iters>100</iters>
+          <sor>1.0</sor>
+        </solver>
+      </ode>
+    </physics>
+
     <include>
       <uri>model://sun</uri>
     </include>
@@ -46,8 +55,9 @@
             </contact>
             <friction>
               <ode>
-                <mu>0.9</mu>
-                <mu2>0.9</mu2>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <fdir1>0 0 1</fdir1>
               </ode>
             </friction>
           </surface>
@@ -201,9 +211,9 @@
 
       <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
         <wheel link_name="wheel">
-          <slip_compliance_lateral>0</slip_compliance_lateral>
-          <slip_compliance_longitudinal>0</slip_compliance_longitudinal>
-          <wheel_normal_force>100</wheel_normal_force>
+          <slip_compliance_lateral>0.01</slip_compliance_lateral>
+          <slip_compliance_longitudinal>0.01</slip_compliance_longitudinal>
+          <wheel_normal_force>1000</wheel_normal_force>
         </wheel>
       </plugin>
     </model>
