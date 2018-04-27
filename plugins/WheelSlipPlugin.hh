@@ -98,6 +98,14 @@ namespace gazebo
     /// \param[in] _compliance unitless slip compliance to set.
     public: void SetSlipComplianceLongitudinal(const double _compliance);
 
+    /// \brief Transport callback for setting lateral slip compliance.
+    /// \param[in] _msg Slip compliance encoded as string.
+    private: void OnLateralCompliance(ConstGzStringPtr &_msg);
+
+    /// \brief Transport callback for setting longitudinal slip compliance.
+    /// \param[in] _msg Slip compliance encoded as string.
+    private: void OnLongitudinalCompliance(ConstGzStringPtr &_msg);
+
     /// \brief Update the plugin. This is updated every iteration of
     /// simulation.
     private: void Update();

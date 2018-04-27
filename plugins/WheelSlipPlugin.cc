@@ -15,6 +15,7 @@
  *
 */
 #include <map>
+#include <mutex>
 
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/CommonTypes.hh>
@@ -28,8 +29,12 @@
 #include <gazebo/physics/Shape.hh>
 #include <gazebo/physics/SphereShape.hh>
 #include <gazebo/physics/SurfaceParams.hh>
+#include <gazebo/physics/World.hh>
 #include <gazebo/physics/ode/ODESurfaceParams.hh>
 #include <gazebo/physics/ode/ODETypes.hh>
+
+#include <gazebo/transport/Node.hh>
+#include <gazebo/transport/Subscriber.hh>
 
 #include "plugins/WheelSlipPlugin.hh"
 
@@ -71,6 +76,21 @@ namespace gazebo
 
     /// \brief Link and surface pointers to update.
     public: std::map<physics::LinkPtr, LinkSurfaceParams> mapLinkSurfaceParams;
+
+    /// \brief Protect data access during transport callbacks
+    public: std::mutex mutex;
+
+    /// \brief Communication node
+    /// \todo: Transition to ignition-transport in gazebo8
+    public: transport::NodePtr node;
+
+    /// \brief Lateral slip compliance subscriber.
+    /// \todo: Transition to ignition-transport in gazebo8.
+    public: transport::SubscriberPtr lateralComplianceSub;
+
+    /// \brief Longitudinal slip compliance subscriber.
+    /// \todo: Transition to ignition-transport in gazebo8.
+    public: transport::SubscriberPtr longitudinalComplianceSub;
 
     /// \brief Pointer to the update event connection
     public: event::ConnectionPtr updateConnection;
@@ -251,12 +271,25 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     this->dataPtr->mapLinkSurfaceParams[link] = params;
   }
 
-  // Connect to the update event
   if (this->dataPtr->mapLinkSurfaceParams.empty())
   {
     gzerr << "No ODE links and surfaces found, plugin is disabled" << std::endl;
     return;
   }
+
+  // Subscribe to slip compliance updates
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(_model->GetWorld()->GetName());
+
+  this->dataPtr->lateralComplianceSub = this->dataPtr->node->Subscribe(
+      "~/" + _model->GetName() + "/wheel_slip/lateral_compliance",
+      &WheelSlipPlugin::OnLateralCompliance, this);
+
+  this->dataPtr->longitudinalComplianceSub = this->dataPtr->node->Subscribe(
+      "~/" + _model->GetName() + "/wheel_slip/longitudinal_compliance",
+      &WheelSlipPlugin::OnLongitudinalCompliance, this);
+
+  // Connect to the update event
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&WheelSlipPlugin::Update, this));
 }
@@ -272,6 +305,8 @@ void WheelSlipPlugin::GetSlips(
         std::map<std::string, ignition::math::Vector3d> &_out) const
 {
   auto chassisWorldPose = this->GetParentModel()->GetWorldPose().Ign();
+
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     auto link = linkSurface.first;
@@ -291,8 +326,35 @@ void WheelSlipPlugin::GetSlips(
 }
 
 /////////////////////////////////////////////////
+void WheelSlipPlugin::OnLateralCompliance(ConstGzStringPtr &_msg)
+{
+  try
+  {
+    this->SetSlipComplianceLateral(std::stof(_msg->data()));
+  }
+  catch(...)
+  {
+    gzerr << "Invalid slip compliance data[" << _msg->data() << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::OnLongitudinalCompliance(ConstGzStringPtr &_msg)
+{
+  try
+  {
+    this->SetSlipComplianceLongitudinal(std::stof(_msg->data()));
+  }
+  catch(...)
+  {
+    gzerr << "Invalid slip compliance data[" << _msg->data() << "]\n";
+  }
+}
+
+/////////////////////////////////////////////////
 void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     linkSurface.second.slipComplianceLateral = _compliance;
@@ -302,6 +364,7 @@ void WheelSlipPlugin::SetSlipComplianceLateral(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     linkSurface.second.slipComplianceLongitudinal = _compliance;
@@ -311,6 +374,7 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
+  std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     auto params = linkSurface.second;
