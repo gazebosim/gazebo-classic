@@ -306,7 +306,6 @@ TEST_F(CameraTest, RayTriangleIntersection)
   }
   EXPECT_TRUE(verified);
 
-  event::Events::DisconnectPreRender(connection);
   connection.reset();
 }
 
