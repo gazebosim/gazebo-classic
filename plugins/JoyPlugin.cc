@@ -41,7 +41,7 @@ class gazebo::JoyPluginPrivate
   /// \brief Publisher used to publish the messages.
   public: ignition::transport::Node::Publisher pub;
 
-  /// \brief This non-sticky button joystick message.
+  /// \brief The non-sticky button joystick message.
   public: ignition::msgs::Joy joyMsg;
 
   /// \brief Previous joystick message, used to help computer the sticky
