@@ -50,7 +50,7 @@ ModelMaker::ModelMaker() : dataPtr(new ModelMakerPrivate)
   this->dataPtr->clone = false;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->makerPub =
       this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
 }

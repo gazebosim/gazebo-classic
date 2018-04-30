@@ -128,6 +128,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
+  this->dataPtr->isServer = _isServer;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
   this->dataPtr->skyx = NULL;
@@ -203,17 +204,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sensorMsgs.clear();
-  this->dataPtr->roadMsgs.clear();
+  this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -230,6 +221,28 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->roadSub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
+    this->dataPtr->roadMsgs.clear();
+  }
+
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    this->dataPtr->poseMsgs.clear();
+  }
 
   this->dataPtr->joints.clear();
 
@@ -270,12 +283,18 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  // FIXME: Hack to avoid segfault when deleting server sky, see issue #1757
+  if (!this->dataPtr->isServer)
+  {
+    if (this->dataPtr->skyx)
+      delete this->dataPtr->skyx;
+    if (this->dataPtr->skyxController)
+      delete this->dataPtr->skyxController;
+  }
+  this->dataPtr->skyx = nullptr;
+  this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
@@ -283,6 +302,8 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
+  this->Clear();
+
   delete this->dataPtr->requestMsg;
   this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
@@ -290,8 +311,6 @@ Scene::~Scene()
 
   // raySceneQuery deletion handled by ogre
   this->dataPtr->raySceneQuery= NULL;
-
-  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -1132,10 +1151,12 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
+    // and not a selection-only object (e.g. light selection ent)
+    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+        || (flags & GZ_VISIBILITY_SELECTABLE);
     if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
-        && !(flags & GZ_VISIBILITY_SELECTABLE)))
+        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
@@ -2969,7 +2990,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
+  // Pass parameter false to ensure that sky won't delete controller
+  this->dataPtr->skyxController = new SkyX::BasicController(false);
   this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
       this->dataPtr->skyxController);
   this->dataPtr->skyx->create();

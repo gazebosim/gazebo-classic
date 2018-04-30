@@ -576,7 +576,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   if (_index == 0)
   {
     this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(this->vfov)));
   }
 }
 

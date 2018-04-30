@@ -729,6 +729,12 @@ namespace gazebo
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
 
+      /// \brief Limit field of view taking care of using a valid value for
+      /// an OGRE camera.
+      /// \param[in] _fov expected field of view
+      /// \return valid field of view
+      protected: static double LimitFOV(const double _fov);
+
       /// \brief Tell the camera whether to yaw around its own local Y axis or a
       /// fixed axis of choice.
       /// \param[in] _useFixed If true, the axis passed in the second parameter

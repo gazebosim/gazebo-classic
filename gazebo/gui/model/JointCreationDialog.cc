@@ -464,6 +464,14 @@ JointCreationDialog::JointCreationDialog(JointMaker *_jointMaker,
   connect(this->dataPtr->createButton, SIGNAL(clicked()), this,
       SLOT(OnCreate()));
 
+  // Removes defaults so that nothing happens on clicking enter.
+  resetAllButton->setDefault(false);
+  resetAllButton->setAutoDefault(false);
+  this->dataPtr->createButton->setDefault(false);
+  this->dataPtr->createButton->setAutoDefault(false);
+  cancelButton->setDefault(false);
+  cancelButton->setAutoDefault(false);
+
   // Buttons layout
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(resetAllButton);

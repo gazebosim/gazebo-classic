@@ -193,9 +193,6 @@ namespace gazebo
       /// \brief The world's current SDF description.
       public: sdf::ElementPtr sdf;
 
-      /// \brief The world description when it was first loaded.
-      public: sdf::ElementPtr initialSdf;
-
       /// \brief All the plugins.
       public: std::vector<WorldPluginPtr> plugins;
 

@@ -536,6 +536,11 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+  if (sigaction(SIGTERM, &sigact, NULL))
+  {
+    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+              << std::endl;
+  }
 #endif
 
   if (this->dataPtr->stop)
@@ -569,11 +574,17 @@ void Server::Run()
 
   this->dataPtr->initialized = true;
 
-  // Update the sensors.
-  while (!this->dataPtr->stop && physics::worlds_running())
+  // Stay on this loop until Gazebo needs to be shut down
+  // The server and sensor manager outlive worlds
+  while (!this->dataPtr->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once();
+
+    if (physics::worlds_running())
+      sensors::run_once();
+    else if (sensors::running())
+      sensors::stop();
+
     common::Time::MSleep(1);
   }
 
@@ -705,8 +716,19 @@ void Server::ProcessControlMsgs()
     }
     else if ((*iter).has_save_world_name())
     {
-      physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      if ((*iter).has_save_filename())
+      // Get the world pointer.
+      physics::WorldPtr world;
+      try
+      {
+        world = physics::get_world((*iter).save_world_name());
+      }
+      catch(const common::Exception &)
+      {
+        gzerr << "Unable to save world. Unknown world ["
+               << (*iter).save_world_name() << "]" << std::endl;
+      }
+
+      if (world && (*iter).has_save_filename())
         world->Save((*iter).save_filename());
       else
         gzerr << "No filename specified.\n";
