@@ -5,6 +5,9 @@
 1. Load actor plugin on ~/factory
     * [Pull request 2855](https://bitbucket.org/osrf/gazebo/pull-requests/2855)
 
+1. Print some bullet console warnings only once
+    * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
+
 1. Fix inserting models with invalid submesh
     * [Pull request 2828](https://bitbucket.org/osrf/gazebo/pull-request/2828)
 
