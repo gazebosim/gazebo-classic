@@ -153,6 +153,12 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     this->dataPtr->cameraYaws[3] = -this->hfov;
   }
 
+  gzmsg << "Texture count: " << this->dataPtr->textureCount << "\n";
+  gzmsg << "Camera yaw[0]: " << this->dataPtr->cameraYaws[0] << "\n";
+  gzmsg << "Camera yaw[1]: " << this->dataPtr->cameraYaws[1] << "\n";
+  gzmsg << "Camera yaw[2]: " << this->dataPtr->cameraYaws[2] << "\n";
+  gzmsg << "Camera yaw[3]: " << this->dataPtr->cameraYaws[3] << "\n";
+
   for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
     std::stringstream texName;
@@ -179,7 +185,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
       _textureName + "second_pass",
       "General",
       Ogre::TEX_TYPE_2D,
-      this->ImageWidth(), this->ImageHeight(), 0,
+      this->dataPtr->w2nd, this->dataPtr->h2nd, 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
@@ -449,7 +455,7 @@ void GpuLaser::RenderImpl()
     this->UpdateRenderTarget(this->dataPtr->firstPassTargets[i],
                   this->dataPtr->matFirstPass, this->camera);
     this->dataPtr->firstPassTargets[i]->update(false);
-    this->dataPtr->firstPassTargets[i]->writeContentsToFile("firstpass.png");
+    this->dataPtr->firstPassTargets[i]->writeContentsToFile("firstpass_tex" + std::to_string(i) + ".exr");
   }
 
   if (this->dataPtr->textureCount > 1)
@@ -465,6 +471,7 @@ void GpuLaser::RenderImpl()
   this->UpdateRenderTarget(this->dataPtr->secondPassTarget,
                 this->dataPtr->matSecondPass, this->dataPtr->orthoCam, true);
   this->dataPtr->secondPassTarget->update(false);
+  this->dataPtr->secondPassTarget->writeContentsToFile("secondpass.exr");
 
   this->dataPtr->visual->SetVisible(false);
 
@@ -543,6 +550,14 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
 {
   this->dataPtr->firstPassTargets[_index] = _target;
 
+  if (_index == 0)
+  {
+    this->camera->setAspectRatio(this->RayCountRatio());
+    this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
+    gzmsg << "1st target VFOV: " << this->camera->getFOVy().valueRadians() << "\n";
+    gzmsg << "1st target aspect ratio: " << this->camera->getAspectRatio() << "\n";
+  }
+
   if (this->dataPtr->firstPassTargets[_index])
   {
     // Setup the viewport to use the texture
@@ -557,11 +572,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
-  if (_index == 0)
-  {
-    this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
-  }
+
 }
 
 //////////////////////////////////////////////////
@@ -584,8 +595,8 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-      0, static_cast<float>(this->ImageWidth() / 10.0),
-      0, static_cast<float>(this->ImageHeight() / 10.0),
+      0, static_cast<float>(this->dataPtr->w2nd / 10.0),
+      0, static_cast<float>(this->dataPtr->h2nd / 10.0),
       0.01, 0.02);
 
   this->dataPtr->orthoCam->setCustomProjectionMatrix(true, p);
@@ -611,7 +622,7 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double viewHeight = this->ImageHeight()/10.0;
+  double viewHeight = this->dataPtr->h2nd/10.0;
 
   if (this->dataPtr->h2nd == 1)
     dy = 0;
@@ -627,11 +638,18 @@ void GpuLaser::CreateMesh()
   double startY = viewHeight;
 
   // half of actual camera vertical FOV without padding
-  double phi = (this->vfov - this->dataPtr->vfovPadding) / 2;
-  double theta = this->hfov / 2;
+  double phi = this->cvfov / 2;
+  double theta = this->chfov / 2;
 
   if (this->ImageHeight() == 1)
     phi = 0;
+
+  gzmsg << "ImageHeight() = " << this->ImageHeight() << "\n";
+  gzmsg << "ImageWidth() = " << this->ImageWidth() << "\n";
+  gzmsg << "this->dataPtr->h2nd = " << this->dataPtr->h2nd << "\n";
+  gzmsg << "this->dataPtr->w2nd = " << this->dataPtr->w2nd << "\n";
+  gzmsg << "phi = " << phi * 180. / M_PI << "\n";
+  gzmsg << "theta = " << theta * 180. / M_PI << "\n";
 
   // index of ray
   unsigned int ptsOnLine = 0;
@@ -640,9 +658,13 @@ void GpuLaser::CreateMesh()
   math::Quaternion ray;
 
   // total laser hfov
-  double thfov = this->dataPtr->textureCount * theta * 2;
+  double thfov = this->dataPtr->textureCount * this->chfov;
   double hstep = thfov / (this->dataPtr->w2nd - 1);
   double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
+
+  gzmsg << "thfov = " << thfov * 180. / M_PI << "\n";
+  gzmsg << "vstep = " << vstep * 180. / M_PI << "\n";
+  gzmsg << "hstep = " << hstep * 180. / M_PI << "\n";
 
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
@@ -658,17 +680,17 @@ void GpuLaser::CreateMesh()
       double delta = hstep * i;
 
       // index of texture that contains the depth value
-      unsigned int texture = delta / (theta*2);
+      unsigned int texture = delta / this->chfov;
 
       // cap texture index and horizontal angle
       if (texture > this->dataPtr->textureCount-1)
       {
         texture -= 1;
-        delta -= (thfov / (this->dataPtr->w2nd - 1));
+        delta -= hstep;
       }
 
       startX -= dx;
-      if (ptsOnLine == this->ImageWidth())
+      if (ptsOnLine == this->dataPtr->w2nd)
       {
         ptsOnLine = 0;
         startX = 0;
@@ -683,16 +705,23 @@ void GpuLaser::CreateMesh()
 
       // first compute angle from the start of current camera's horizontal
       // min angle, then set delta to be angle from center of current camera.
-      delta = delta - (texture * (theta*2));
+      delta = delta - (texture * this->chfov);
       delta = delta - theta;
 
       // adjust uv coordinates of depth texture to match projection of current
       // laser ray the depth image plane.
-      double u = -(tan(delta) * cos(this->vfov/2.0))/
-        (2.0 * tan(theta) * cos(gamma)) + 0.5;
+      double u, v;
 
-      double v = ignition::math::equal(phi, 0.0) ? 0.5 :
-        -tan(gamma)/(2.0 * tan(this->vfov/2.0)) + 0.5;
+      u = 0.5 - tan(delta) / (2.0 * tan(theta));
+      v = 0.5 - this->RayCountRatio() * tan(gamma) / (2.0 * tan(theta) * cos(delta));
+
+//      if (math::equal(delta, 0.0)) {
+//        v = 0.5 - tan(gamma) / (2.0 * tan(theta));
+//      } else {
+//        v = 0.5 - (tan(gamma) * tan(delta)) / (2.0 * sin(delta) * tan(theta));
+//      }
+//      u = 0.5 - (cos(phi)*tan(delta)) / (2.0 * tan(theta) * cos(gamma));
+//      v = 0.5 - tan(gamma) / (2.0 * tan(phi));
 
       submesh->AddTexCoord(u, v);
       submesh->AddIndex(this->dataPtr->w2nd * j + i);
@@ -825,8 +854,9 @@ void GpuLaser::SetHorzFOV(const double _hfov)
 //////////////////////////////////////////////////
 void GpuLaser::SetVertFOV(const double _vfov)
 {
-  this->vfov = math::equal(_vfov, 0.0) ? 0.0 : M_PI / 2.0;
-  this->dataPtr->vfovPadding = this->vfov - _vfov;
+//  this->vfov = math::equal(_vfov, 0.0) ? 0.0 : M_PI / 2.0;
+//  this->dataPtr->vfovPadding = this->vfov - _vfov;
+  this->vfov = _vfov;
 }
 
 //////////////////////////////////////////////////
