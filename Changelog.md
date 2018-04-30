@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+1. Handle signal SIGTERM exactly the same way as SIGINT
+    * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
+
 1. Fix empty visual bounding box
     * [Pull request 2934](https://bitbucket.org/osrf/gazebo/pull-request/2934)
 
