@@ -16,6 +16,7 @@
 */
 
 #include "gazebo/physics/PhysicsTypes.hh"
+#include "gazebo/sensors/SensorsIface.hh"
 
 #include "gazebo/transport/transport.hh"
 
@@ -75,14 +76,42 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Load a blank world
   this->Load("worlds/blank.world", false, _physicsEngine);
 
-  // Give time for everything to be created
+  // Clean up ServerFixture transport so it doesn't affect the test
+  this->poseSub.reset();
+  this->statsSub.reset();
+  this->factoryPub.reset();
+  this->requestPub.reset();
+  this->node->Fini();
+  this->node.reset();
+
+  // Clear scene created by ServerFixture
+  auto scene = this->GetScene();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
+
+  // Wait until all topics are advertised
+  // Note: The number of topics was determined by giving gzserver enough time to
+  // startup. It will most likely change often.
+  const size_t startupTopics = 12u;
+
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+
   int sleep = 0;
   int maxSleep = 10;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) < startupTopics && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check advertised topics
+  EXPECT_FALSE(msgTypes.empty());
+
+  auto worldTopicCount = WorldTopicCount(msgTypes);
+  EXPECT_GE(worldTopicCount, startupTopics);
 
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
@@ -101,13 +130,6 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
 
-  // Check advertised topics
-  auto msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_FALSE(msgTypes.empty());
-
-  auto worldTopicCount = WorldTopicCount(msgTypes);
-  EXPECT_GT(worldTopicCount, 0u);
-
   // Stats before removing world
   gzmsg << "Stats before removing world:" << std::endl
         << "- WorldPtr use count: [" << world.use_count() << "]" << std::endl
@@ -118,16 +140,26 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Remove world
   physics::remove_worlds();
 
-  // Give time for everything to be removed
+  // Wait until transport is cleared
+  msgTypes = gazebo::transport::getAdvertisedTopics();
   sleep = 0;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) > 0 && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
 
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
+
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointer left to the physics engine is this one
   EXPECT_LT(physicsEngine.use_count(), physicsEnginePtrCount);
@@ -148,11 +180,6 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
 
-  // Check all topics related to that world are gone
-  msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
-  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
-
   // Stats after removing world
   gzmsg << "Stats after removing world:" << std::endl
         << "- WorldPtr use count: [" << world.use_count() << "]" << std::endl
@@ -167,14 +194,43 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   // Load a world with entities
   this->Load("worlds/shapes.world", false, _physicsEngine);
 
-  // Give time for everything to be created
+  // Clean up ServerFixture transport so it doesn't affect the test
+  this->poseSub.reset();
+  this->statsSub.reset();
+  this->factoryPub.reset();
+  this->requestPub.reset();
+  this->node->Fini();
+  this->node.reset();
+
+  // Clear scene created by ServerFixture
+  auto scene = this->GetScene();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
+
+  // Wait until all topics are advertised
+  // Note: The number of topics was determined by giving gzserver enough time to
+  // startup. It will most likely change often.
+  const size_t startupTopics = 16u;
+
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+
   int sleep = 0;
   int maxSleep = 10;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) < startupTopics && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check advertised topics
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  auto worldTopicCount = WorldTopicCount(msgTypes);
+  EXPECT_GE(worldTopicCount, startupTopics);
 
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
@@ -192,13 +248,6 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
 
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
-
-  // Check advertised topics
-  auto msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_FALSE(msgTypes.empty());
-
-  auto worldTopicCount = WorldTopicCount(msgTypes);
-  EXPECT_GT(worldTopicCount, 0u);
 
   // Get model pointers
   std::vector<std::string> modelNames;
@@ -251,16 +300,26 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   // Remove world
   physics::remove_worlds();
 
-  // Give time for everything to be removed
+  // Wait until transport is cleared
+  msgTypes = gazebo::transport::getAdvertisedTopics();
   sleep = 0;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) > 0 && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
 
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
+
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointers to entities left are the ones we're holding
   for (auto &ptr : modelPtrs)
@@ -300,11 +359,6 @@ void WorldRemoveTest::RemoveWorldWithEntities(const std::string &_physicsEngine)
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
-
-  // Check all topics related to that world are gone
-  msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
-  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
 
   // Stats after removing world
   gzmsg << "Stats after removing world:" << std::endl;
@@ -353,14 +407,28 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   // Load an empty world
   this->Load("worlds/empty.world", true, _physicsEngine);
 
-  // Give time for everything to be created
+  // Wait until all topics are advertised
+  // Note: The number of topics was determined by giving gzserver enough time to
+  // startup. It will most likely change often.
+  const size_t startupTopics = 16u;
+
+  auto msgTypes = gazebo::transport::getAdvertisedTopics();
+
   int sleep = 0;
   int maxSleep = 10;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) < startupTopics && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
+
+  // Check advertised topics
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_FALSE(msgTypes.empty());
+
+  auto worldTopicCount = WorldTopicCount(msgTypes);
+  EXPECT_GE(worldTopicCount, startupTopics);
 
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
@@ -368,6 +436,22 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   // Spawn a model with a joint
   auto joint = SpawnJoint(_jointType, false, false);
   ASSERT_TRUE(joint != nullptr);
+
+  // Clean up ServerFixture transport so it doesn't affect the test
+  // Do this after spawning
+  this->poseSub.reset();
+  this->statsSub.reset();
+  this->factoryPub.reset();
+  this->requestPub.reset();
+  this->node->Fini();
+  this->node.reset();
+
+  // Clear scene created by ServerFixture
+  auto scene = this->GetScene();
+  if (scene != nullptr)
+  {
+    scene->Clear();
+  }
 
   // Get world pointer
   auto world = physics::get_world("default");
@@ -398,13 +482,6 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   auto physicsEnginePtrCount = physicsEngine.use_count();
   EXPECT_GT(physicsEnginePtrCount, 1);
 
-  // Check advertised topics
-  auto msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_FALSE(msgTypes.empty());
-
-  auto worldTopicCount = WorldTopicCount(msgTypes);
-  EXPECT_GT(worldTopicCount, 0u);
-
   // Stats before removing world
   gzmsg << "Stats before removing world:" << std::endl
         << "- WorldPtr use count: [" << world.use_count() << "]"
@@ -425,16 +502,26 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   // Remove world
   physics::remove_worlds();
 
-  // Give time for everything to be removed
+  // Wait until transport is cleared
+  msgTypes = gazebo::transport::getAdvertisedTopics();
   sleep = 0;
-  while (sleep < maxSleep)
+  while (WorldTopicCount(msgTypes) > 0 && sleep < maxSleep)
   {
+    msgTypes = gazebo::transport::getAdvertisedTopics();
     gazebo::common::Time::MSleep(300);
     sleep++;
   }
 
+  // Check all topics related to that world are gone
+  msgTypes = gazebo::transport::getAdvertisedTopics();
+  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
+  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
+
   // Check there are no worlds running
   EXPECT_FALSE(physics::worlds_running());
+
+  // Check there are no sensors running
+  EXPECT_FALSE(sensors::running());
 
   // Check the only shared pointers left are these
   EXPECT_EQ(model.use_count(), 1) << "Model pointer [" << model << "]";
@@ -468,11 +555,6 @@ void WorldRemoveJointsTest::RemoveWorldWithJoint(
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
-
-  // Check all topics related to that world are gone
-  msgTypes = gazebo::transport::getAdvertisedTopics();
-  EXPECT_LT(WorldTopicCount(msgTypes), worldTopicCount);
-  EXPECT_EQ(WorldTopicCount(msgTypes), 0u);
 
   // Stats after removing world
   gzmsg << "Stats after removing world:" << std::endl

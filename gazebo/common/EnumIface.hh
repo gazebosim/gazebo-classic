@@ -42,6 +42,10 @@ namespace gazebo
     template<> GZ_COMMON_VISIBLE \
     std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-var-template"
+#endif
     /// \brief Enum interface. Use this interface to convert an enum to
     /// a string, and set an enum from a string.
     template<typename T>
@@ -100,6 +104,9 @@ namespace gazebo
       /// use this directly.
       public: static std::vector<std::string> names;
     };
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
     /// \brief An iterator over enum types.
     ///

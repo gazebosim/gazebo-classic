@@ -64,6 +64,13 @@ class FactoryTest : public ServerFixture,
   public: void Clone(const std::string &_physicsEngine);
 };
 
+
+class LightFactoryTest : public ServerFixture
+{
+  /// \brief Light factory publisher.
+  protected: transport::PublisherPtr lightFactoryPub;
+};
+
 ///////////////////////////////////////////////////
 // Verify that sdf is retained by entities spawned
 // via factory messages. A change between 1.6, 1.7
@@ -795,10 +802,18 @@ void FactoryTest::Clone(const std::string &_physicsEngine)
     physics::InertialPtr inertialClone = linkClone->GetInertial();
     EXPECT_EQ(inertial->Mass(), inertialClone->Mass());
     EXPECT_EQ(inertial->CoG(), inertialClone->CoG());
-    EXPECT_EQ(inertial->PrincipalMoments(),
-        inertialClone->PrincipalMoments());
-    EXPECT_EQ(inertial->ProductsOfInertia(),
-        inertialClone->ProductsOfInertia());
+    // Expect Inertial MOI to match, even if Principal moments
+    // and inertial frames change
+    if (_physicsEngine != "bullet")
+    {
+      EXPECT_EQ(inertial->Ign().MOI(), inertialClone->Ign().MOI());
+    }
+    else
+    {
+      // the default == tolerance of 1e-6, is too strict for bullet
+      EXPECT_TRUE(inertial->Ign().MOI().Equal(
+             inertialClone->Ign().MOI(), 1e-5));
+    }
   }
 
   // Check joints
@@ -862,6 +877,53 @@ TEST_P(FactoryTest, Clone)
 //  ASSERT_EQ(static_cast<unsigned int>(0), diffMax);
 //  ASSERT_EQ(0.0, diffAvg);
 // }
+
+
+/////////////////////////////////////////////////
+TEST_F(LightFactoryTest, SpawnLight)
+{
+  Load("worlds/empty.world");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // create lights using ~/factory/light topic
+  this->lightFactoryPub = this->node->Advertise<msgs::Light>("~/factory/light");
+  std::string light1Name = "new1_light";
+  std::string light2Name = "new2_light";
+
+  msgs::Light msg;
+  msg.set_name(light1Name);
+  ignition::math::Pose3d light1Pose = ignition::math::Pose3d(0, 2, 1, 0, 0, 0);
+  msgs::Set(msg.mutable_pose(), light1Pose);
+  this->lightFactoryPub->Publish(msg);
+
+  msg.set_name(light2Name);
+  ignition::math::Pose3d light2Pose = ignition::math::Pose3d(1, 0, 5, 0, 2, 0);
+  msgs::Set(msg.mutable_pose(), light2Pose);
+  this->lightFactoryPub->Publish(msg);
+
+  // wait for light to spawn
+  int sleep = 0;
+  int maxSleep = 50;
+  while ((!world->LightByName(light1Name) || !world->LightByName(light2Name)) &&
+      sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+  }
+
+  // verify lights in world
+  physics::LightPtr light1 = world->LightByName(light1Name);
+  physics::LightPtr light2 = world->LightByName(light2Name);
+  ASSERT_NE(nullptr, light1);
+  ASSERT_NE(nullptr, light2);
+
+  EXPECT_EQ(light1Name, light1->GetScopedName());
+  EXPECT_EQ(light1Pose, light1->WorldPose());
+
+  EXPECT_EQ(light2Name, light2->GetScopedName());
+  EXPECT_EQ(light2Pose, light2->WorldPose());
+}
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, FactoryTest, PHYSICS_ENGINE_VALUES);
 

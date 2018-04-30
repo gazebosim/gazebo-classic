@@ -145,10 +145,10 @@ namespace gazebo
 #endif
 
       /// \brief The ogre scene manager.
-      public: Ogre::SceneManager *manager;
+      public: Ogre::SceneManager *manager = nullptr;
 
       /// \brief A ray query used to locate distances to visuals.
-      public: Ogre::RaySceneQuery *raySceneQuery;
+      public: Ogre::RaySceneQuery *raySceneQuery = nullptr;
 
       /// \brief All the grids in the scene.
       public: std::vector<Grid *> grids;
@@ -217,7 +217,7 @@ namespace gazebo
       public: RoadMsgs_L roadMsgs;
 
       /// \brief Mutex to lock the various message buffers.
-      public: std::mutex *receiveMutex;
+      public: std::mutex *receiveMutex = nullptr;
 
       /// \brief Mutex to lock the pose message buffers.
       public: std::recursive_mutex poseMsgMutex;
@@ -290,13 +290,16 @@ namespace gazebo
       public: std::string selectionMode;
 
       /// \brief Keep around our request message.
-      public: msgs::Request *requestMsg;
+      public: msgs::Request *requestMsg = nullptr;
 
       /// \brief True if visualizations should be rendered.
       public: bool enableVisualizations;
 
+      /// \brief True if this scene is running on the server.
+      public: bool isServer;
+
       /// \brief The heightmap, if any.
-      public: Heightmap *terrain;
+      public: Heightmap *terrain = nullptr;
 
       /// \brief The heightmap level of detail
       public: unsigned int heightmapLOD = 0u;
@@ -305,10 +308,10 @@ namespace gazebo
       public: std::map<std::string, Projector *> projectors;
 
       /// \brief Pointer to the sky.
-      public: SkyX::SkyX *skyx;
+      public: SkyX::SkyX *skyx = nullptr;
 
       /// \brief Controls the sky.
-      public: SkyX::BasicController *skyxController;
+      public: SkyX::BasicController *skyxController = nullptr;
 
       /// \brief True when all COMs should be visualized.
       public: bool showCOMs;
