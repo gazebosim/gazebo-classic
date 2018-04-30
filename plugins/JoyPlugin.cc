@@ -121,7 +121,7 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
         << "] Attemping again in 1 second\n";
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
   // Stop if we couldn't open the joystick after N attempts
