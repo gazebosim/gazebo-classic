@@ -713,7 +713,7 @@ void GpuLaser::CreateMesh()
       double u, v;
 
       u = 0.5 - tan(delta) / (2.0 * tan(theta));
-      v = 0.5 - this->RayCountRatio() * tan(gamma) / (2.0 * tan(theta) * cos(delta));
+      v = 0.5 - tan(gamma) / (2.0 * tan(phi) * cos(delta) * this->RayCountRatio());
 
 //      if (math::equal(delta, 0.0)) {
 //        v = 0.5 - tan(gamma) / (2.0 * tan(theta));
