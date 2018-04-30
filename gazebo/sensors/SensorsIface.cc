@@ -157,3 +157,10 @@ void sensors::enable()
 {
   g_disable = false;
 }
+
+/////////////////////////////////////////////////
+bool sensors::running()
+{
+  return sensors::SensorManager::Instance()->Running();
+}
+

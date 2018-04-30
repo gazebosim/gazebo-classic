@@ -113,9 +113,6 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
-  this->dataPtr->initialSdf.reset(new sdf::Element);
-  sdf::initFile("world.sdf", this->dataPtr->initialSdf);
-
   // Keep this in the constructor for performance.
   // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
@@ -170,8 +167,6 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
-
-  this->dataPtr->initialSdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -814,6 +809,7 @@ void World::Update()
 void World::Fini()
 {
   this->dataPtr->stop = true;
+  this->dataPtr->enablePhysicsEngine = false;
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
@@ -848,6 +844,8 @@ void World::Fini()
     this->dataPtr->lightModifySub.reset();
     this->dataPtr->modelSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 
@@ -884,10 +882,25 @@ void World::Fini()
   }
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
+  this->dataPtr->prevUnfilteredState.SetWorld(WorldPtr());
+  this->dataPtr->logPlayState.SetWorld(WorldPtr());
+  this->dataPtr->states[0].clear();
+  this->dataPtr->states[1].clear();
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
+
+  this->dataPtr->atmosphere.reset();
+  this->dataPtr->wind.reset();
+
+  // Engine shouldn't outlive world
+  if (this->dataPtr->physicsEngine)
+    this->dataPtr->physicsEngine->Fini();
   this->dataPtr->physicsEngine.reset();
+
+  // Clear singletons whose states are tied to this world
+  util::DiagnosticManager::Instance()->Fini();
+  util::LogRecord::Instance()->Fini();
 
   // End world run thread
   if (this->dataPtr->thread)
@@ -1035,6 +1048,18 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
+    std::string modelName = _sdf->Get<std::string>("name");
+    for (auto const m : this->dataPtr->models)
+    {
+      if (m->GetName() == modelName)
+      {
+        gzwarn << "Model with name [" << modelName << "] already exists. "
+          << "Not inserting model. This warning can be ignored in certain "
+          << "situations such as rewind during log playback.\n";
+        return model;
+      }
+    }
+
     model = this->dataPtr->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
@@ -2082,8 +2107,11 @@ void World::ProcessFactoryMsgs()
       std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
       ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-      model->Init();
-      model->LoadPlugins();
+      if (model != nullptr)
+      {
+        model->Init();
+        model->LoadPlugins();
+      }
     }
     catch(...)
     {
@@ -2204,8 +2232,12 @@ void World::SetState(const WorldState &_state)
         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-        model->Init();
-        model->LoadPlugins();
+        if (model != nullptr)
+        {
+          model->Init();
+          if (!util::LogPlay::Instance()->IsOpen())
+            model->LoadPlugins();
+        }
       }
       catch(...)
       {
@@ -2336,10 +2368,11 @@ bool World::OnLog(std::ostringstream &_stream)
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->dataPtr->initialSdf->ToString("");
+    _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
@@ -2600,6 +2633,9 @@ void World::LogWorker()
 
   GZ_ASSERT(self, "Self pointer to World is invalid");
 
+  // Init the prevUnfilteredState
+  this->dataPtr->prevUnfilteredState.Load(self);
+
   while (!this->dataPtr->stop)
   {
     // get unfiltered world state
@@ -2613,7 +2649,7 @@ void World::LogWorker()
     std::vector<std::string> insertions;
     std::vector<std::string> deletions;
     bool insertDelete = false;
-    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+
     {
       WorldState unfilteredDiffState = unfilteredState -
           this->dataPtr->prevUnfilteredState;
