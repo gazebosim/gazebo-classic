@@ -9,6 +9,9 @@
     * [Pull request 2869](https://bitbucket.org/osrf/gazebo/pull-request/2869)
     * [Pull request 2881](https://bitbucket.org/osrf/gazebo/pull-request/2881)
 
+1. Print some bullet console warnings only once
+    * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
+
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
 
@@ -225,6 +228,9 @@
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2018-xx-xx)
+
+1. Print some bullet console warnings only once
+    * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
