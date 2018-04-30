@@ -312,7 +312,12 @@ void BulletHingeJoint::SetUpperLimit(const unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletHinge not yet created.\n";
+    static bool notPrintedYet = true;
+    if (notPrintedYet)
+    {
+      gzerr << "Joint must be created before calling SetUpperLimit\n";
+      notPrintedYet = false;
+    }
   }
 }
 
@@ -331,7 +336,12 @@ void BulletHingeJoint::SetLowerLimit(const unsigned int /*_index*/,
   }
   else
   {
-    gzerr << "bulletHinge not yet created.\n";
+    static bool notPrintedYet = true;
+    if (notPrintedYet)
+    {
+      gzerr << "Joint must be created before calling SetLowerLimit\n";
+      notPrintedYet = false;
+    }
   }
 }
 
@@ -342,7 +352,14 @@ double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
   if (this->bulletHinge)
     result = this->bulletHinge->getUpperLimit();
   else
-    gzerr << "Joint must be created before getting upper limit\n";
+  {
+    static bool notPrintedYet = true;
+    if (notPrintedYet)
+    {
+      gzerr << "Joint must be created before getting upper limit\n";
+      notPrintedYet = false;
+    }
+  }
   return result;
 }
 
@@ -353,7 +370,14 @@ double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
   if (this->bulletHinge)
     result = this->bulletHinge->getLowerLimit();
   else
-    gzerr << "Joint must be created before getting low stop\n";
+  {
+    static bool notPrintedYet = true;
+    if (notPrintedYet)
+    {
+      gzerr << "Joint must be created before getting lower limit\n";
+      notPrintedYet = false;
+    }
+  }
   return result;
 }
 
@@ -402,7 +426,12 @@ bool BulletHingeJoint::SetParam(const std::string &_key,
       }
       else
       {
-        gzerr << "Joint must be created before setting " << _key << std::endl;
+        static bool notPrintedYet = true;
+        if (notPrintedYet)
+        {
+          gzerr << "Joint must be created before setting " << _key << std::endl;
+          notPrintedYet = false;
+        }
         return false;
       }
     }
@@ -439,7 +468,12 @@ double BulletHingeJoint::GetParam(const std::string &_key, unsigned int _index)
     }
     else
     {
-      gzerr << "Joint must be created before getting " << _key << std::endl;
+      static bool notPrintedYet = true;
+      if (notPrintedYet)
+      {
+        gzerr << "Joint must be created before getting " << _key << std::endl;
+        notPrintedYet = false;
+      }
       return 0.0;
     }
   }
