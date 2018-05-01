@@ -2,6 +2,12 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Add methods to set dynamically Gaussian noise parameters
+    * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
+
+1. Add command to send a request with gz topic
+    * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
+
 1. Force vertical field of view to be lower than 180 degrees
     * [Pull request #2909](https://bitbucket.org/osrf/gazebo/pull-request/2909)
 
