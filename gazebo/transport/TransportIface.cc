@@ -409,6 +409,14 @@ transport::ConnectionPtr transport::connectToMaster()
 /////////////////////////////////////////////////
 bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
 {
+  // If the ConnectionManager has not been initialized, then there is no point
+  // in waiting for namespaces.
+  if (!ConnectionManager::Instance()->IsInitialized())
+  {
+    gzerr << "ConnectionManager has not been initialized!\n";
+    return false;
+  }
+
   std::list<std::string> namespaces;
   gazebo::common::Time startTime = gazebo::common::Time::GetWallTime();
 
@@ -426,7 +434,5 @@ bool transport::waitForNamespaces(const gazebo::common::Time &_maxWait)
     gazebo::common::Time::Sleep(waitTime);
   }
 
-  if (gazebo::common::Time::GetWallTime() - startTime <= _maxWait)
-    return true;
-  return false;
+  return !namespaces.empty();
 }

@@ -254,8 +254,13 @@ bool AudioDecoder::SetFile(const std::string &_filename)
     return false;
   }
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(56, 60, 100)
+  if (this->codec->capabilities & AV_CODEC_CAP_TRUNCATED)
+    this->codecCtx->flags |= AV_CODEC_FLAG_TRUNCATED;
+#else
   if (this->codec->capabilities & CODEC_CAP_TRUNCATED)
     this->codecCtx->flags |= CODEC_FLAG_TRUNCATED;
+#endif
 
   // Open codec
   if (avcodec_open2(this->codecCtx, this->codec, NULL) < 0)

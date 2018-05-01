@@ -98,7 +98,7 @@ void Light::Load()
   this->Update();
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->WorldVisual()));
+                     this->dataPtr->scene->WorldVisual(), false));
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
   this->dataPtr->scene->AddVisual(this->dataPtr->visual);
 
@@ -227,34 +227,24 @@ void Light::CreateVisual()
 
     this->dataPtr->visual->SetVisible(true);
 
-    // Create a scene node to hold the light selection object.
-    Ogre::SceneNode *visSceneNode;
-    visSceneNode =
-        this->dataPtr->visual->GetSceneNode()->createChildSceneNode();
+    // Create a visual to hold the light selection object.
+    VisualPtr lightSelectionVis(new Visual(this->Name() + "_selection",
+        this->dataPtr->visual, false));
+    lightSelectionVis->Load();
+    lightSelectionVis->SetType(Visual::VT_GUI);
 
     // Make sure the unit_sphere has been inserted.
-    this->dataPtr->visual->InsertMesh("unit_sphere");
-
-    Ogre::Entity *ent =
-        visSceneNode->getCreator()->createEntity(this->Name() +
-        "_selection_sphere", "unit_sphere");
-
-    ent->setMaterialName("Gazebo/White");
-
-    // Create the selection object.
-    Ogre::MovableObject *obj = static_cast<Ogre::MovableObject*>(ent);
-
-    // Attach the selection object to the light visual
-    visSceneNode->attachObject(obj);
+    lightSelectionVis->InsertMesh("unit_sphere");
+    lightSelectionVis->AttachMesh("unit_sphere");
+    lightSelectionVis->SetMaterial("Gazebo/White");
 
     // Make sure the selection object is rendered only in the selection
     // buffer.
-    obj->setVisibilityFlags(GZ_VISIBILITY_SELECTION);
-    obj->getUserObjectBindings().setUserAny(Ogre::Any(this->Name()));
-    obj->setCastShadows(false);
+    lightSelectionVis->SetVisibilityFlags(GZ_VISIBILITY_SELECTABLE);
+    lightSelectionVis->SetCastShadows(false);
 
     // Scale the selection object to roughly match the light visual size.
-    visSceneNode->setScale(0.25, 0.25, 0.25);
+    lightSelectionVis->SetScale(ignition::math::Vector3d(0.25, 0.25, 0.25));
   }
 
   std::string lightType = this->dataPtr->sdf->Get<std::string>("type");

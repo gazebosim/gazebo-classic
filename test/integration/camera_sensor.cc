@@ -884,7 +884,7 @@ TEST_F(CameraSensor, PointCloud)
     return;
   }
 
-  // get point cloud depth camera ssensor
+  // get point cloud depth camera sensor
   std::string cameraName = "pointcloud_camera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::DepthCameraSensorPtr camSensor =
@@ -1027,6 +1027,19 @@ TEST_F(CameraSensor, LensFlare)
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
   ASSERT_TRUE(camSensorLensFlare != nullptr);
 
+  // Get the lens flare camera model with scale applied
+  std::string modelNameLensFlareScaled = "camera_lensflare_scaled";
+  std::string cameraNameLensFlareScaled = "camera_sensor_lensflare_scaled";
+
+  model = world->GetModel(modelNameLensFlareScaled);
+  ASSERT_TRUE(model != nullptr);
+
+  sensors::SensorPtr sensorLensFlareScaled =
+    sensors::get_sensor(cameraNameLensFlareScaled);
+  sensors::CameraSensorPtr camSensorLensFlareScaled =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlareScaled);
+  ASSERT_TRUE(camSensorLensFlareScaled != nullptr);
+
   // Spawn a camera without lens flare at the same pose as
   // the camera lens flare model
   std::string modelName = "camera_model";
@@ -1043,41 +1056,117 @@ TEST_F(CameraSensor, LensFlare)
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
 
-  // get a pointer to the camera lens flare sensor
+  // get a pointer to the camera without lens flare
   sensors::SensorPtr sensor =
     sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   ASSERT_TRUE(camSensor != nullptr);
 
-  // collect images from both cameras
+  // collect images from all 3 cameras
   imageCount = 0;
   imageCount2 = 0;
+  imageCount3 = 0;
   img = new unsigned char[width * height * 3];
   img2 = new unsigned char[width * height * 3];
+  img3 = new unsigned char[width * height * 3];
   event::ConnectionPtr c =
     camSensorLensFlare->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensor->Camera()->ConnectNewImageFrame(
+    camSensorLensFlareScaled->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c3 =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   int sleep = 0;
+  while ((imageCount < 10 || imageCount2 < 10 || imageCount3 < 10)
+      && sleep++ < 1000)
+  {
+    common::Time::MSleep(10);
+  }
+
+  EXPECT_GE(imageCount, 10);
+  EXPECT_GE(imageCount2, 10);
+  EXPECT_GE(imageCount3, 10);
+
+  c.reset();
+  c2.reset();
+  c3.reset();
+
+  // Compare colors.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  unsigned int colorSum3 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+      unsigned int r3 = img3[(y*width*3) + x];
+      unsigned int g3 = img3[(y*width*3) + x + 1];
+      unsigned int b3 = img3[(y*width*3) + x + 2];
+      colorSum3 += r3 + g3 + b3;
+    }
+  }
+
+  // camera with lens flare should be brighter than camera with scaled down
+  // lens flare
+  EXPECT_GT(colorSum, colorSum2) <<
+      "colorSum: " << colorSum << ", " <<
+      "colorSum2: " << colorSum2;
+  // camera with scaled down lens flare should be brighter than camera without
+  // lens flare
+  EXPECT_GT(colorSum2, colorSum3) <<
+      "colorSum2: " << colorSum2 << ", " <<
+      "colorSum3: " << colorSum3;
+
+  // test lens flare occlusion by spawning box in front of camera
+  // Spawn a box in front of the cameras
+  ignition::math::Vector3d boxPos = setPose.Pos()
+      + ignition::math::Vector3d(2.5, 0, 0.5);
+  SpawnBox("occlusion_box", ignition::math::Vector3d(0.5, 0.5, 0.5),
+      boxPos, ignition::math::Vector3d::Zero, true);
+
+  c = camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  c2 = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get more images
+  sleep = 0;
+  imageCount = 0;
+  imageCount2 = 0;
   while ((imageCount < 10 || imageCount2 < 10) && sleep++ < 1000)
     common::Time::MSleep(10);
 
   EXPECT_GE(imageCount, 10);
   EXPECT_GE(imageCount2, 10);
 
-  // Compare colors. Camera sensor with lens flare plugin should have a brigher
-  // image than the one without the lens flare plugin.
-  unsigned int colorSum = 0;
-  unsigned int colorSum2 = 0;
+  // Lens flare should be completely occluded.
+  // Camera sensor with lens flare plugin should have approx the same image as
+  // the one without the lens flare plugin.
+  colorSum = 0;
+  colorSum2 = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -1092,10 +1181,208 @@ TEST_F(CameraSensor, LensFlare)
       colorSum2 += r2 + g2 + b2;
     }
   }
-  EXPECT_GT(colorSum, colorSum2) <<
-      "colorSum: " << colorSum << ", " <<
-      "colorSum2: " << colorSum2;
+
+  // set tolerance to be 0.02% of total pixel values
+  unsigned int tol = width * height * 3 * 255 * 2e-4;
+  EXPECT_NEAR(colorSum, colorSum2, tol);
 
   delete[] img;
   delete[] img2;
+  delete[] img3;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, 16bit)
+{
+  // World contains a box positioned at top right quadrant of image generated
+  // by a mono 16 bit camera and a color 16 bit camera.
+  // Verify pixel values of top right quadrant of image (corresponding to box)
+  // are approximately the same but different from the background's pixel
+  // values.
+  Load("worlds/16bit_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get L16 camera sensor
+  std::string l16CameraName = "l16bit_camera_sensor";
+  sensors::SensorPtr l16Sensor = sensors::get_sensor(l16CameraName);
+  sensors::CameraSensorPtr l16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(l16Sensor);
+  EXPECT_TRUE(l16CamSensor != nullptr);
+  rendering::CameraPtr l16Cam = l16CamSensor->Camera();
+  EXPECT_TRUE(l16Cam != nullptr);
+
+  unsigned int l16Width  = l16Cam->ImageWidth();
+  unsigned int l16Height = l16Cam->ImageHeight();
+  EXPECT_GT(l16Width, 0u);
+  EXPECT_GT(l16Height, 0u);
+
+  // get rgb16 camera sensor
+  std::string rgb16CameraName = "rgb16bit_camera_sensor";
+  sensors::SensorPtr rgb16Sensor = sensors::get_sensor(rgb16CameraName);
+  sensors::CameraSensorPtr rgb16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(rgb16Sensor);
+  EXPECT_TRUE(rgb16CamSensor != nullptr);
+  rendering::CameraPtr rgb16Cam = rgb16CamSensor->Camera();
+  EXPECT_TRUE(rgb16Cam != nullptr);
+
+  unsigned int rgb16Width  = rgb16Cam->ImageWidth();
+  unsigned int rgb16Height = rgb16Cam->ImageHeight();
+  EXPECT_GT(rgb16Width, 0u);
+  EXPECT_GT(rgb16Height, 0u);
+
+  // connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[l16Width * l16Height * 2];
+  img2 = new unsigned char[rgb16Width * rgb16Height * 3 * 2];
+
+  event::ConnectionPtr c =
+    l16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+    rgb16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages)
+      && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
+  c.reset();
+  c2.reset();
+
+  // verify L16 camera images
+  uint16_t bgValue = 0;
+  uint16_t boxValue = 0;
+  uint16_t *l16Img = reinterpret_cast<uint16_t *>(img);
+  // expect pixel values to be within 0.2% of valid 16bit pixel range
+  uint16_t tol = std::pow(2, 16) * 0.002;
+  for (unsigned int y = 0; y < l16Height; ++y)
+  {
+    for (unsigned int x = 0; x < l16Width; ++x)
+    {
+      uint16_t value = l16Img[(y*l16Width)+x];
+      EXPECT_NE(0, value);
+
+      // box in top right quadrant of image
+      if (x >= l16Width / 2 && y < l16Height / 2)
+      {
+        // set its color if not done already
+        if (boxValue == 0)
+          boxValue = value;
+        // verify pixels correspond to box
+        else
+          EXPECT_NEAR(boxValue, value, tol);
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgValue == 0)
+          bgValue = value;
+        // verify pixels correspond to background
+        else
+          EXPECT_NEAR(bgValue, value, tol);
+      }
+    }
+  }
+
+  // expect background pixel value to be different from box pixel value
+  EXPECT_GT(bgValue, boxValue);
+  uint16_t minDiff = std::pow(2, 16) * 0.25;
+  uint16_t diff = bgValue - boxValue;
+  EXPECT_GT(diff, minDiff);
+
+
+  // verify RGB UINT16 camera images
+  uint16_t bgRValue = 0;
+  uint16_t bgGValue = 0;
+  uint16_t bgBValue = 0;
+  uint16_t boxRValue = 0;
+  uint16_t boxGValue = 0;
+  uint16_t boxBValue = 0;
+  uint16_t *rgb16Img = reinterpret_cast<uint16_t *>(img2);
+  for (unsigned int y = 0; y < rgb16Height; ++y)
+  {
+    for (unsigned int x = 0; x < rgb16Width * 3; x+=3)
+    {
+      uint16_t r = rgb16Img[(y*rgb16Width*3)+x];
+      uint16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
+      uint16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
+      // verify gray color
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      EXPECT_NE(0, r);
+      EXPECT_NE(0, g);
+      EXPECT_NE(0, b);
+
+      // box in top right quadrant of image
+      if (x >= (rgb16Width*3) / 2 && y < rgb16Height / 2)
+      {
+        // set its color if not done already
+        if (boxRValue == 0 && boxGValue == 0 && boxBValue == 0)
+        {
+          boxRValue = r;
+          boxGValue = g;
+          boxBValue = b;
+        }
+        // verify pixels correspond to box
+        else
+        {
+          EXPECT_NEAR(boxRValue, r, tol);
+          EXPECT_NEAR(boxGValue, g, tol);
+          EXPECT_NEAR(boxBValue, b, tol);
+        }
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgRValue == 0 && bgGValue == 0 && bgBValue == 0)
+        {
+          bgRValue = r;
+          bgGValue = g;
+          bgBValue = b;
+        }
+        // verify pixels correspond to background
+        else
+        {
+          EXPECT_NEAR(bgRValue, r, tol);
+          EXPECT_NEAR(bgGValue, g, tol);
+          EXPECT_NEAR(bgBValue, b, tol);
+        }
+      }
+    }
+  }
+  // expect background color to be different from box color
+  EXPECT_GT(bgRValue, boxRValue);
+  EXPECT_GT(bgGValue, boxGValue);
+  EXPECT_GT(bgBValue, boxBValue);
+  uint16_t diffR = bgRValue - boxRValue;
+  uint16_t diffG = bgGValue - boxGValue;
+  uint16_t diffB = bgBValue - boxBValue;
+  EXPECT_GT(diffR, minDiff);
+  EXPECT_GT(diffG, minDiff);
+  EXPECT_GT(diffB, minDiff);
+
+  delete [] img;
+  delete [] img2;
 }

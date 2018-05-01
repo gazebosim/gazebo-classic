@@ -60,8 +60,10 @@ void common::load()
   if (first)
   {
     first = false;
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     avcodec_register_all();
     av_register_all();
+#endif
   }
 #endif
 }
