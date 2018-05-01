@@ -97,11 +97,15 @@ namespace gazebo
     /// should be sent
     /// \param[in] _request The type request.
     /// \param[in] _data Optional data string.
+    /// \param[in] _timeout Maxiumum time to wait. Use a negative time
+    /// value to wait forever.
     /// \return The response to the request.  Can be empty.
     GZ_TRANSPORT_VISIBLE
     boost::shared_ptr<msgs::Response> request(const std::string &_worldName,
-                                              const std::string &_request,
-                                              const std::string &_data = "");
+            const std::string &_request,
+            const std::string &_data = "",
+            const common::Time &_timeout = -1);
+
 
     /// \brief Send a request and don't wait for a response. This is
     /// non-blocking.
