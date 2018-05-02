@@ -655,9 +655,6 @@ void GpuLaser::CreateMesh()
   // index of ray
   unsigned int ptsOnLine = 0;
 
-  gazebo::math::Vector3 axis;
-  math::Quaternion ray;
-
   // total laser hfov
   double thfov = this->dataPtr->textureCount * this->chfov;
   double hstep = thfov / (this->dataPtr->w2nd - 1);
