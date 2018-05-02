@@ -174,13 +174,17 @@ void GpuRaySensor::Init()
     unsigned int cameraCount;
     if (hfov > 2.8)
     {
-      if (hfov > 5.6) {
+      if (hfov > 5.6)
+      {
         cameraCount = 3;
       }
-      else {
+      else
+      {
         cameraCount = 2;
       }
-    } else {
+    }
+    else
+    {
       cameraCount = 1;
     }
     this->dataPtr->laserCam->SetCameraCount(cameraCount);
@@ -193,7 +197,8 @@ void GpuRaySensor::Init()
     this->dataPtr->horzRayCount /= cameraCount;
 
     // vertical laser setup
-    double vfov = (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian();
+    double vfov = (this->VerticalAngleMax() -
+        this->VerticalAngleMin()).Radian();
     this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
                  + this->VerticalAngleMin()).Radian() / 2.0);
 

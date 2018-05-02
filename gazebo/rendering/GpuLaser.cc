@@ -553,8 +553,10 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   {
     this->camera->setAspectRatio(this->RayCountRatio());
     this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
-    gzmsg << "1st target VFOV: " << this->camera->getFOVy().valueRadians() << "\n";
-    gzmsg << "1st target aspect ratio: " << this->camera->getAspectRatio() << "\n";
+    gzmsg << "1st target VFOV: " << this->camera->getFOVy().valueRadians()
+        << "\n";
+    gzmsg << "1st target aspect ratio: " << this->camera->getAspectRatio()
+        << "\n";
   }
 
   if (this->dataPtr->firstPassTargets[_index])
@@ -571,7 +573,6 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
-
 }
 
 //////////////////////////////////////////////////
@@ -626,7 +627,8 @@ void GpuLaser::CreateMesh()
   if (this->dataPtr->h2nd == 1)
   {
     dy = 0;
-  } else
+  }
+  else
   {
     dy = 0.1;
   }
@@ -643,7 +645,8 @@ void GpuLaser::CreateMesh()
   double phi = this->VertFOV() / 2;
   double theta = this->CosHorzFOV() / 2;
 
-  if (this->ImageHeight() == 1) {
+  if (this->ImageHeight() == 1)
+  {
     phi = 0;
   }
 
@@ -662,7 +665,8 @@ void GpuLaser::CreateMesh()
   double hstep = thfov / (this->dataPtr->w2nd - 1);
   double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
 
-  if(this->dataPtr->h2nd == 1) {
+  if (this->dataPtr->h2nd == 1)
+  {
     vstep = 0;
   }
 
@@ -715,7 +719,8 @@ void GpuLaser::CreateMesh()
       // adjust uv coordinates of depth texture to match projection of current
       // laser ray the depth image plane.
       double u = 0.5 - tan(delta) / (2.0 * tan(theta));
-      double v = 0.5 - (tan(gamma) * cos(theta)) / (2.0 * tan(phi) * cos(delta));
+      double v = 0.5 - (tan(gamma) * cos(theta)) /
+          (2.0 * tan(phi) * cos(delta));
 
       submesh->AddTexCoord(u, v);
       submesh->AddIndex(this->dataPtr->w2nd * j + i);
