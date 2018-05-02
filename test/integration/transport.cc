@@ -765,6 +765,28 @@ TEST_F(TransportTest, Errors)
 }
 
 /////////////////////////////////////////////////
+TEST_F(TransportTest, TryInit)
+{
+  // If the ConnectionManager has not been initialized, then TryInit() is
+  // certain to fail.
+  transport::NodePtr node = transport::NodePtr(new transport::Node);
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_FALSE(node->TryInit(common::Time(0.01)));
+  EXPECT_FALSE(node->IsInitialized());
+
+  // Loading the server will initialize the ConnectionManager
+  this->Load("worlds/empty.world");
+
+  // The server will initialize some Nodes, so a namespace will be available now
+  EXPECT_FALSE(node->IsInitialized());
+  EXPECT_TRUE(node->TryInit(common::Time(0.01)));
+  EXPECT_TRUE(node->IsInitialized());
+
+  // The namespace of the Node should match the name of the world that we loaded
+  EXPECT_EQ(physics::get_world()->Name(), node->GetTopicNamespace());
+}
+
+/////////////////////////////////////////////////
 // Main
 int main(int argc, char **argv)
 {

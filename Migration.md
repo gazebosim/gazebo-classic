@@ -12,6 +12,14 @@ release will remove the deprecated code.
 1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
    enable mass based force approximation. Set to 1.0 for original behavior.
 
+## Gazebo 8.4 to 9.x
+
+### Models with duplicate names will not be inserted
+
+1. Prior to gazebo 8.4, multiple models with the same name could be inserted
+   into a world and simulated, though they were not fully functional.
+   Now models with duplicate names are not allowed to be inserted.
+
 ## Gazebo 8.x to 9.x
 
 ### Build system
