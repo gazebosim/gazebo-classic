@@ -42,7 +42,7 @@ using namespace gui;
 LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->lightPub =
       this->dataPtr->node->Advertise<msgs::Light>("~/factory/light");

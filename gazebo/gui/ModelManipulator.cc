@@ -93,7 +93,7 @@ void ModelManipulator::Init()
   this->dataPtr->scene =  cam->GetScene();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -671,11 +671,12 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
       vis = rootVis;
     }
     // If it is not a model and its parent is either a direct child or
-    // grandchild of the world, this is a light, so just keep vis = vis
+    // grandchild of the world, this is a light
     else if (vis->GetParent() == rootVis ||
         vis->GetParent() == this->dataPtr->scene->WorldVisual())
     {
       // select light
+      vis = rootVis;
     }
     // Otherwise, this is a visual in the model editor, so we want to get its
     // top level visual below the root.

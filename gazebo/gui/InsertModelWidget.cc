@@ -23,6 +23,7 @@
 
 #include <functional>
 #include <fstream>
+#include <cstdlib>
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -55,6 +56,21 @@ using namespace gazebo;
 using namespace gui;
 
 static bool gInsertModelWidgetDeleted = false;
+
+/////////////////////////////////////////////////
+// TODO: Remove this once Fuel support is fully functional
+bool usingFuel()
+{
+  auto useFuel = std::getenv("USE_IGNITION_FUEL");
+  if (!useFuel || *useFuel == '\0')
+    return false;
+
+  std::string useFuelStr(useFuel);
+  std::transform(useFuelStr.begin(), useFuelStr.end(),
+                 useFuelStr.begin(), ::tolower);
+
+  return useFuelStr != "false" && useFuelStr != "0";
+}
 
 /////////////////////////////////////////////////
 InsertModelWidget::InsertModelWidget(QWidget *_parent)
@@ -512,6 +528,9 @@ bool InsertModelWidget::IsPathAccessible(const boost::filesystem::path &_path)
 void InsertModelWidget::InitializeFuelServers()
 {
 #ifdef HAVE_IGNITION_FUEL_TOOLS
+  if (!usingFuel())
+    return;
+
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 
@@ -538,6 +557,9 @@ void InsertModelWidget::InitializeFuelServers()
 void InsertModelWidget::PopulateFuelServers()
 {
 #ifdef  HAVE_IGNITION_FUEL_TOOLS
+  if (!usingFuel())
+    return;
+
   // Get the list of Ignition Fuel servers.
   auto servers = common::FuelModelDatabase::Instance()->Servers();
 

@@ -108,6 +108,9 @@ Atmosphere::Atmosphere(physics::World &_world)
 //////////////////////////////////////////////////
 Atmosphere::~Atmosphere()
 {
+  this->dataPtr->atmosphereSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responsePub.reset();
   // Must call fini on node to remove it from topic manager.
   this->dataPtr->node->Fini();
 }

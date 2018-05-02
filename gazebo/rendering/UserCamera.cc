@@ -659,10 +659,12 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
   }
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewport->setVisibilityMask(
+      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
 
   this->initialized = true;
 
