@@ -14,12 +14,12 @@
  * limitations under the License.
  *
 */
-#include <linux/joystick.h>
 #include <fcntl.h>
+#include <linux/joystick.h>
 #include <sys/stat.h>
 #include <thread>
-#include <ignition/transport/Node.hh>
 #include <ignition/math/Helpers.hh>
+#include <ignition/transport/Node.hh>
 
 #include "plugins/JoyPlugin.hh"
 
@@ -118,7 +118,7 @@ void JoyPlugin::Load(physics::WorldPtr /*_world*/, sdf::ElementPtr _sdf)
     else
     {
       gzdbg << "Unable to open joystick at [" << deviceFilename
-        << "] Attemping again in 1 second\n";
+        << "] Attemping again\n";
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -326,8 +326,7 @@ void JoyPluginPrivate::Run()
       accumulate = false;
     }
 
-    // If an axis event occurred, start a timer to combine with other
-    // events.
+    // If an axis event occurred, start a timer to combine with other events.
     if (!accumulating && accumulate)
     {
       tv.tv_sec = trunc(this->accumulationInterval);
