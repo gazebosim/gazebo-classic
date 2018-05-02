@@ -623,9 +623,12 @@ void GpuLaser::CreateMesh()
   double viewHeight = this->dataPtr->h2nd/10.0;
 
   if (this->dataPtr->h2nd == 1)
+  {
     dy = 0;
-  else
+  } else
+  {
     dy = 0.1;
+  }
 
   dx = 0.1;
 
@@ -710,18 +713,8 @@ void GpuLaser::CreateMesh()
 
       // adjust uv coordinates of depth texture to match projection of current
       // laser ray the depth image plane.
-      double u, v;
-
-      u = 0.5 - tan(delta) / (2.0 * tan(theta));
-      v = 0.5 - (tan(gamma) * cos(theta)) / (2.0 * tan(phi) * cos(delta));
-
-//      if (math::equal(delta, 0.0)) {
-//        v = 0.5 - tan(gamma) / (2.0 * tan(theta));
-//      } else {
-//        v = 0.5 - (tan(gamma) * tan(delta)) / (2.0 * sin(delta) * tan(theta));
-//      }
-//      u = 0.5 - (cos(phi)*tan(delta)) / (2.0 * tan(theta) * cos(gamma));
-//      v = 0.5 - tan(gamma) / (2.0 * tan(phi));
+      double u = 0.5 - tan(delta) / (2.0 * tan(theta));
+      double v = 0.5 - (tan(gamma) * cos(theta)) / (2.0 * tan(phi) * cos(delta));
 
       submesh->AddTexCoord(u, v);
       submesh->AddIndex(this->dataPtr->w2nd * j + i);
