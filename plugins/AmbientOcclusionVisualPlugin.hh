@@ -38,7 +38,7 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Load(rendering::VisualPtr _visual,
-        sdf::ElementPtr _sdf);
+        sdf::ElementPtr _sdf) override;
 
     /// \internal
     /// \brief Private data pointer

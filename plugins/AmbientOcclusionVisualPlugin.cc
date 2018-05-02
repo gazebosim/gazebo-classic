@@ -28,10 +28,10 @@ namespace gazebo
 {
   /// \brief Helper class to assign the GBuffer material to compositors that
   /// need them
-  class SSAOGBufferSchemeHandler : public Ogre::MaterialManager::Listener
+  class SsaoGBufferSchemeHandler : public Ogre::MaterialManager::Listener
   {
     /// \brief Constructor
-    public: SSAOGBufferSchemeHandler()
+    public: SsaoGBufferSchemeHandler()
     {
       this->gBufRefMat =
           Ogre::MaterialManager::getSingleton().getByName("SSAO/GBuffer");
@@ -43,7 +43,7 @@ namespace gazebo
     }
 
     /// \brief Destructor
-    public: ~SSAOGBufferSchemeHandler()
+    public: ~SsaoGBufferSchemeHandler()
     {
       this->gBufRefMat.setNull();
     }
@@ -57,14 +57,14 @@ namespace gazebo
     /// \param[in] _rend Pointer to the Ogre::Renderable object requesting
     /// the use of the techinique
     /// \return The Ogre material technique to use when scheme is not found.
-    public: virtual Ogre::Technique* handleSchemeNotFound(
-        uint16_t /*schemeIndex*/, const Ogre::String& schemeName,
-        Ogre::Material *originalMaterial, uint16_t /*lodIndex*/,
-        const Ogre::Renderable * /*rend*/)
+    public: virtual Ogre::Technique *handleSchemeNotFound(
+        uint16_t /*_schemeIndex*/, const Ogre::String& _schemeName,
+        Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
+        const Ogre::Renderable */*_rend*/)
     {
-      Ogre::Technique *gBufferTech = originalMaterial->createTechnique();
-      gBufferTech->setSchemeName(schemeName);
-      Ogre::Pass* gbufPass = gBufferTech->createPass();
+      Ogre::Technique *gBufferTech = _originalMaterial->createTechnique();
+      gBufferTech->setSchemeName(_schemeName);
+      Ogre::Pass *gbufPass = gBufferTech->createPass();
       if (!this->gBufRefMat.isNull())
         *gbufPass = *this->gBufRefMat->getTechnique(0)->getPass(0);
       return gBufferTech;
@@ -87,11 +87,11 @@ namespace gazebo
     public: std::string postFilterName;
 
     /// \brief GBuffer material scheme handler
-    public: SSAOGBufferSchemeHandler *gBufSchemeHandler = nullptr;
+    public: SsaoGBufferSchemeHandler *gBufSchemeHandler = nullptr;
 
     /// \brief Apply ambient occlusion to the viewport of the input camera
     /// \param[in] _cam Pointer to a camera
-    public: void AddSSAO(rendering::CameraPtr _cam);
+    public: void AddSsao(rendering::CameraPtr _cam);
   };
 }
 
@@ -146,23 +146,23 @@ void AmbientOcclusionVisualPlugin::Load(rendering::VisualPtr _visual,
   // apply to all cameras
   for (unsigned int i = 0; i < scene->CameraCount(); ++i)
   {
-    this->dataPtr->AddSSAO(scene->GetCamera(i));
+    this->dataPtr->AddSsao(scene->GetCamera(i));
   }
   for (unsigned int i = 0; i < scene->UserCameraCount(); ++i)
   {
     rendering::CameraPtr cam =
         boost::dynamic_pointer_cast<rendering::Camera>(
         scene->GetUserCamera(i));
-    this->dataPtr->AddSSAO(cam);
+    this->dataPtr->AddSsao(cam);
   }
 
-  this->dataPtr->gBufSchemeHandler = new SSAOGBufferSchemeHandler();
+  this->dataPtr->gBufSchemeHandler = new SsaoGBufferSchemeHandler();
   Ogre::MaterialManager::getSingleton().addListener(
       this->dataPtr->gBufSchemeHandler, "GBuffer");
 }
 
 /////////////////////////////////////////////////
-void AmbientOcclusionVisualPluginPrivate::AddSSAO(rendering::CameraPtr _cam)
+void AmbientOcclusionVisualPluginPrivate::AddSsao(rendering::CameraPtr _cam)
 {
   Ogre::Viewport *ogreViewport = _cam->OgreCamera()->getViewport();
   if (!ogreViewport)
