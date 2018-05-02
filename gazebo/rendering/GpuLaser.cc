@@ -710,7 +710,7 @@ void GpuLaser::CreateMesh()
 
       // first compute angle from the start of current camera's horizontal
       // min angle, then set delta to be angle from center of current camera.
-      delta = delta - (texture * this->chfov);
+      delta = delta - (texture * this->CosHorzFOV());
       delta = delta - theta;
 
       // adjust uv coordinates of depth texture to match projection of current
