@@ -455,7 +455,6 @@ void GpuLaser::RenderImpl()
     this->UpdateRenderTarget(this->dataPtr->firstPassTargets[i],
                   this->dataPtr->matFirstPass, this->camera);
     this->dataPtr->firstPassTargets[i]->update(false);
-    this->dataPtr->firstPassTargets[i]->writeContentsToFile("firstpass_tex" + std::to_string(i) + ".exr");
   }
 
   if (this->dataPtr->textureCount > 1)
@@ -471,7 +470,6 @@ void GpuLaser::RenderImpl()
   this->UpdateRenderTarget(this->dataPtr->secondPassTarget,
                 this->dataPtr->matSecondPass, this->dataPtr->orthoCam, true);
   this->dataPtr->secondPassTarget->update(false);
-  this->dataPtr->secondPassTarget->writeContentsToFile("secondpass.exr");
 
   this->dataPtr->visual->SetVisible(false);
 
