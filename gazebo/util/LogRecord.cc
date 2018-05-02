@@ -619,7 +619,7 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
       this->dataPtr->savedFiles.end(),
       std::inserter(diff, diff.begin()));
 
-  for (auto &file: diff)
+  for (auto &file : diff)
   {
     if (file.empty())
       continue;

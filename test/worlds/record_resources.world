@@ -8,7 +8,7 @@
       <uri>model://sun</uri>
     </include>
 
-   <include>
+    <include>
       <uri>model://double_pendulum_with_base</uri>
     </include>
 

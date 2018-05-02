@@ -178,15 +178,15 @@ TEST_F(GzLog, RecordResources)
   recorder->SetBasePath(recordPath);
   recorder->Init("test");
 
-  std::cerr << "record path: " << recordPath << std::endl;
+  gzdbg << "record path: " << recordPath << std::endl;
 
-  Load("worlds/record_resources.world", true);
+  this->Load("worlds/record_resources.world", true);
 
   // Get a pointer to the world
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != nullptr);
+  ASSERT_NE(nullptr, world);
 
-  ASSERT_TRUE(recorder != nullptr);
+  ASSERT_NE(nullptr, recorder);
 
   EXPECT_FALSE(recorder->Paused());
   EXPECT_FALSE(recorder->Running());
@@ -205,11 +205,13 @@ TEST_F(GzLog, RecordResources)
   // test spawning model
   // spawn one from model path
   std::string spawnModelName = "beer";
-  SpawnModel("model://" + spawnModelName);
+  this->SpawnModel("model://" + spawnModelName);
   physics::ModelPtr newModel = world->GetModel(spawnModelName);
-  EXPECT_TRUE(newModel == nullptr);
+  EXPECT_EQ(nullptr, newModel);
 
   // spawn another one with abs path to mesh file
+  EXPECT_EQ(nullptr, world->GetModel("model_abs"));
+
   std::string absMeshPath = std::string(TEST_PATH) + "/data/box.obj";
   std::stringstream modelStr;
   modelStr << "<sdf version='" << SDF_VERSION << "'>"
@@ -233,9 +235,13 @@ TEST_F(GzLog, RecordResources)
       << "  </link>"
       << "</model>"
       << "</sdf>";
-  SpawnSDF(modelStr.str());
+  this->SpawnSDF(modelStr.str());
 
   world->Step(100);
+
+  // Check models were spawned
+  EXPECT_NE(nullptr, world->GetModel(spawnModelName));
+  EXPECT_NE(nullptr, world->GetModel("model_abs"));
 
   // Stop log recording
   custom_exec("gz log -w default -d 0");
@@ -250,7 +256,7 @@ TEST_F(GzLog, RecordResources)
   EXPECT_FALSE(logDirPath.empty());
 
   // check that resources referenced by material script uri have been saved.
-  std::string path = logDirPath + "/media";
+  std::string path = logDirPath + "/media/materials/scripts/gazebo.material";
   EXPECT_TRUE(common::exists(path));
 
   // check for collision stl mesh
