@@ -235,7 +235,7 @@ void GpuRaySensor::Init()
     // Vertical sweeps can be achieved by rotating the gpu ray sensor.
     double vfov_camera = 2 * atan(tan(vfov / 2) / cos(hfov / 2));
     this->dataPtr->laserCam->SetCosVertFOV(vfov_camera);
-    double camera_aspect_ratio = hfov / vfov_camera;
+    double camera_aspect_ratio = tan(hfov / 2.0) / tan(vfov_camera / 2.0);
     if (this->dataPtr->vertRayCount > 1)
     {
 //      this->dataPtr->laserCam->SetCosHorzFOV(
