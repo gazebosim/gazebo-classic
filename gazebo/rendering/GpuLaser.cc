@@ -638,11 +638,12 @@ void GpuLaser::CreateMesh()
   double startY = viewHeight;
 
   // half of actual camera vertical FOV without padding
-  double phi = this->cvfov / 2;
-  double theta = this->chfov / 2;
+  double phi = this->VertFOV() / 2;
+  double theta = this->CosHorzFOV() / 2;
 
-  if (this->ImageHeight() == 1)
+  if (this->ImageHeight() == 1) {
     phi = 0;
+  }
 
   gzmsg << "ImageHeight() = " << this->ImageHeight() << "\n";
   gzmsg << "ImageWidth() = " << this->ImageWidth() << "\n";
@@ -661,6 +662,10 @@ void GpuLaser::CreateMesh()
   double thfov = this->dataPtr->textureCount * this->chfov;
   double hstep = thfov / (this->dataPtr->w2nd - 1);
   double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
+
+  if(this->dataPtr->h2nd == 1) {
+    vstep = 0;
+  }
 
   gzmsg << "thfov = " << thfov * 180. / M_PI << "\n";
   gzmsg << "vstep = " << vstep * 180. / M_PI << "\n";
@@ -713,7 +718,7 @@ void GpuLaser::CreateMesh()
       double u, v;
 
       u = 0.5 - tan(delta) / (2.0 * tan(theta));
-      v = 0.5 - tan(gamma) / (2.0 * tan(phi) * cos(delta) * this->RayCountRatio());
+      v = 0.5 - (tan(gamma) * cos(theta)) / (2.0 * tan(phi) * cos(delta));
 
 //      if (math::equal(delta, 0.0)) {
 //        v = 0.5 - tan(gamma) / (2.0 * tan(theta));
