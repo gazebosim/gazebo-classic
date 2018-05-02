@@ -34,15 +34,23 @@ namespace gazebo
       {
         public: using WeakPtr = boost::weak_ptr<T>;
 
+        /// \brief Wrapped function object
         private: Func func;
+
+        /// \brief Owning pointer to bind as the first argument of the function
+        /// object.
         private: WeakPtr ptr;
 
+        /// \brief Constructor.
+        /// \param[in] _func Wrapped function object
+        /// \param[in] _ptr Owning pointer to bind as the first argument of the
+        /// function object.
         public: WeakBinder(Func _func, WeakPtr _ptr) :
             func(_func),
             ptr(_ptr)
         {}
 
-        // Return non-void version
+        /// \brief Return non-void version
         public: template <typename... Args> auto operator()(Args&&... _args)
             -> typename std::enable_if<
                 !std::is_void<
@@ -62,7 +70,7 @@ namespace gazebo
           }
         }
 
-        // Return void version
+        /// \brief Return void version
         public: template <typename... Args> auto operator()(Args&&... _args)
           -> typename std::enable_if<
                 std::is_void<
