@@ -62,6 +62,20 @@ namespace gazebo
         Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
         const Ogre::Renderable */*_rend*/)
     {
+      // ignore transparent / semi-tranparent materials with alpha rejection set
+      Ogre::Technique *origTech = _originalMaterial->getTechnique(0);
+      if (origTech)
+      {
+        for (unsigned int i = 0; i < origTech->getNumPasses(); ++i)
+        {
+          Ogre::Pass *origPass = origTech->getPass(i);
+          if (origPass && origPass->getAlphaRejectFunction() !=
+              Ogre::CMPF_ALWAYS_PASS)
+            return nullptr;
+        }
+      }
+
+      // set to use gbuffer
       Ogre::Technique *gBufferTech = _originalMaterial->createTechnique();
       gBufferTech->setSchemeName(_schemeName);
       Ogre::Pass *gbufPass = gBufferTech->createPass();
