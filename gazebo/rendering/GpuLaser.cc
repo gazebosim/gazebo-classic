@@ -179,6 +179,7 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").get());
 
   this->dataPtr->matFirstPass->load();
+  this->dataPtr->matFirstPass->setCullingMode(Ogre::CULL_NONE);
 
   this->dataPtr->secondPassTexture =
       Ogre::TextureManager::getSingleton().createManual(
