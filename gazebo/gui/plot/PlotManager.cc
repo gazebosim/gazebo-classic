@@ -67,7 +67,7 @@ PlotManager::PlotManager()
   : dataPtr(new PlotManagerPrivate())
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // check for reset events and restart plots when time is reset
   this->dataPtr->worldControlSub =

@@ -19,17 +19,13 @@
 
 #include <memory>
 #include <string>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
-  namespace common
-  {
-    class Color;
-  }
-
   namespace gui
   {
     // Forward declare private data.
@@ -59,7 +55,7 @@ namespace gazebo
 
       /// \brief Get the color.
       /// \return Color.
-      public: common::Color Color() const;
+      public: ignition::math::Color Color() const;
 
       /// \brief Get the texture.
       /// \return Texture.
@@ -67,7 +63,7 @@ namespace gazebo
 
       /// \brief Set the color.
       /// \param[in] _color Color.
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Set the texture.
       /// \param[in] _texture Texture.

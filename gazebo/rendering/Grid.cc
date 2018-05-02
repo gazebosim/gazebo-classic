@@ -16,6 +16,7 @@
 */
 
 #include <sstream>
+#include <ignition/math/Color.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
 
@@ -42,20 +43,17 @@ namespace gazebo
       /// \brief Length of each cell in each direction.
       public: float cellLength;
 
-      /// \brief Width of the lines.
-      public: float lineWidth;
-
       /// \brief Line color.
-      public: common::Color color;
+      public: ignition::math::Color color;
 
       /// \brief Height offset.
-      public: float heightOffset;
+      public: float heightOffset = 0.015f;
 
       /// \brief Grid name.
       public: std::string name;
 
       /// \brief Number of cells in the normal direction.
-      public: uint32_t height;
+      public: uint32_t height = 0u;
 
       /// \brief Pointer to the scene.
       public: Scene *scene = nullptr;
@@ -71,18 +69,21 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 Grid::Grid(Scene *_scene, const unsigned int _cellCount,
-    const float _cellLength, const float _lineWidth,
+    const float _cellLength, const float /*_lineWidth*/,
     const common::Color &_color)
+: Grid(_scene, _cellCount, _cellLength, _color.Ign())
+{
+}
+
+//////////////////////////////////////////////////
+Grid::Grid(Scene *_scene, const unsigned int _cellCount,
+    const float _cellLength, const ignition::math::Color &_color)
 : dataPtr(new GridPrivate)
 {
   this->dataPtr->scene = _scene;
-  this->dataPtr->height = 0;
-
   this->dataPtr->cellCount = _cellCount;
   this->dataPtr->cellLength = _cellLength;
-  this->dataPtr->lineWidth = _lineWidth;
   this->dataPtr->color = _color;
-  this->dataPtr->heightOffset = 0.015;
 
   static uint32_t gridCount = 0;
   std::stringstream ss;
@@ -115,22 +116,24 @@ void Grid::SetCellLength(const float _len)
 }
 
 //////////////////////////////////////////////////
-void Grid::SetLineWidth(const float _width)
+void Grid::SetLineWidth(const float /*_width*/)
 {
-  this->dataPtr->lineWidth = _width;
-
-  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
-  // Uncomment once line width is implemented
-  // this->Create();
+  gzwarn << "Line width is not supported. Issue #1978" << std::endl;
 }
 
 //////////////////////////////////////////////////
 void Grid::SetColor(const common::Color &_color)
 {
+  this->SetColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Grid::SetColor(const ignition::math::Color &_color)
+{
   this->dataPtr->color = _color;
 
-  this->dataPtr->material->setDiffuse(_color.r, _color.g, _color.b, _color.a);
-  this->dataPtr->material->setAmbient(_color.r, _color.g, _color.b);
+  this->dataPtr->material->setDiffuse(Conversions::Convert(_color));
+  this->dataPtr->material->setAmbient(Conversions::Convert(_color));
 
   this->dataPtr->material->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
 
@@ -279,7 +282,7 @@ VisualPtr Grid::GridVisual() const
 }
 
 //////////////////////////////////////////////////
-common::Color Grid::Color() const
+ignition::math::Color Grid::Color() const
 {
   return this->dataPtr->color;
 }
@@ -299,8 +302,8 @@ float Grid::CellLength() const
 //////////////////////////////////////////////////
 float Grid::LineWidth() const
 {
-  gzwarn << "Line width is currently not supported. Issue #1978" << std::endl;
-  return this->dataPtr->lineWidth;
+  gzwarn << "Line width is not supported. Issue #1978" << std::endl;
+  return 1.0;
 }
 
 //////////////////////////////////////////////////

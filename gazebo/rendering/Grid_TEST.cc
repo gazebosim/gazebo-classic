@@ -41,9 +41,8 @@ TEST_F(Grid_TEST, SetSize)
   // Create a grid
   int cellCount = 10;
   float cellLength  = 1;
-  float lineWidth = 0.1;
   auto grid = new gazebo::rendering::Grid(scene.get(), cellCount, cellLength,
-      lineWidth, common::Color::Red);
+      ignition::math::Color::Red);
   ASSERT_TRUE(grid != nullptr);
 
   grid->Init();
@@ -82,13 +81,14 @@ TEST_F(Grid_TEST, SetSize)
           << std::endl;
 
       // Check size
-      EXPECT_EQ(manualObject->getBoundingBox(),
-          Ogre::AxisAlignedBox(-count * length / 2,
-                               -count * length / 2,
-                               0.015,
-                               count * length / 2,
-                               count * length / 2,
-                               0.015));
+      const Ogre::AxisAlignedBox &box = manualObject->getBoundingBox();
+      const Ogre::Vector3 &actualMin = box.getMinimum();
+      const Ogre::Vector3 &actualMax = box.getMaximum();
+      Ogre::Vector3 expectedMin(-count * length / 2,
+                                -count * length / 2, 0.015);
+      Ogre::Vector3 expectedMax(count * length / 2, count * length / 2, 0.015);
+      EXPECT_TRUE(actualMin.positionEquals(expectedMin));
+      EXPECT_TRUE(actualMax.positionEquals(expectedMax));
     }
   }
 

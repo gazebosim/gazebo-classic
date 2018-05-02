@@ -95,7 +95,7 @@ MainWindow::MainWindow()
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   gui::set_world(this->dataPtr->node->GetTopicNamespace());
 
   QWidget *mainWidget = new QWidget;

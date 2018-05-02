@@ -27,9 +27,15 @@ Ogre::ColourValue Conversions::Convert(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Conversions::Convert(const Ogre::ColourValue &_clr)
+Ogre::ColourValue Conversions::Convert(const ignition::math::Color &_color)
 {
-  return common::Color(_clr.r, _clr.g, _clr.b, _clr.a);
+  return Ogre::ColourValue(_color.R(), _color.G(), _color.B(), _color.A());
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Conversions::Convert(const Ogre::ColourValue &_clr)
+{
+  return ignition::math::Color(_clr.r, _clr.g, _clr.b, _clr.a);
 }
 
 //////////////////////////////////////////////////

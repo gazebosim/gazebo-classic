@@ -137,8 +137,10 @@ namespace gazebo
       /// \param[in] _emissive Emissive color of visual.
       public: void SetMaterial(const std::string &_name,
           const std::string &_materialName,
-          const common::Color &_ambient, const common::Color &_diffuse,
-          const common::Color &_specular, const common::Color &_emissive);
+          const ignition::math::Color &_ambient,
+          const ignition::math::Color &_diffuse,
+          const ignition::math::Color &_specular,
+          const ignition::math::Color &_emissive);
 
       /// \brief Get visual config data
       /// \return Config data for the visuals
@@ -194,7 +196,7 @@ namespace gazebo
       /// signal.
       /// \param[in] _value New value.
       private slots: void OnColorChanged(const QString &_name,
-          const gazebo::common::Color &_value);
+          const ignition::math::Color &_value);
 
       /// \brief Qt callback when a double value has changed.
       /// \param[in] _name of widget in the config widget that emitted the
