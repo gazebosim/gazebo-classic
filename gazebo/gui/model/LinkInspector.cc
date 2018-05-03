@@ -120,6 +120,14 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent),
   QPushButton *OKButton = new QPushButton(tr("OK"));
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
+  // Removes defaults so that nothing happens on clicking enter.
+  OKButton->setDefault(false);
+  OKButton->setAutoDefault(false);
+  resetButton->setDefault(false);
+  resetButton->setAutoDefault(false);
+  cancelButton->setDefault(false);
+  cancelButton->setAutoDefault(false);
+
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addWidget(showLinkFrameButton);

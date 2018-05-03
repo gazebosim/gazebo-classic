@@ -11,6 +11,18 @@ release will remove the deprecated code.
 
 1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
    enable mass based force approximation. Set to 1.0 for original behavior.
+1. **gazebo/transport/TransportIface.hh**
+    + ***Removed:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "");
+    + ***Replacement:*** boost::shared_ptr<msgs::Response> request(const std::string &_worldName, const std::string &_request, const std::string &_data = "", const common::Time &_timeout = -1);
+    + ***Note:*** Added extra argument `_timeout`
+
+## Gazebo 8.4 to 9.x
+
+### Models with duplicate names will not be inserted
+
+1. Prior to gazebo 8.4, multiple models with the same name could be inserted
+   into a world and simulated, though they were not fully functional.
+   Now models with duplicate names are not allowed to be inserted.
 
 ## Gazebo 8.x to 9.x
 

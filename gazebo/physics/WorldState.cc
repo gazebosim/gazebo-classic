@@ -102,6 +102,8 @@ void WorldState::Load(const WorldPtr _world)
   this->simTime = _world->SimTime();
   this->realTime = _world->RealTime();
   this->iterations = _world->Iterations();
+  this->insertions.clear();
+  this->deletions.clear();
 
   std::string filter = worldStateFilter;
   std::list<std::string> mainParts, parts;
@@ -355,33 +357,37 @@ const std::vector<std::string> &WorldState::Insertions() const
 /////////////////////////////////////////////////
 void WorldState::SetInsertions(const std::vector<std::string> &_insertions)
 {
-  sdf::SDFPtr root(new sdf::SDF);
-  sdf::initFile("root.sdf", root);
+  static sdf::SDFPtr rootSDF = nullptr;
+  if (rootSDF == nullptr)
+  {
+    rootSDF.reset(new sdf::SDF);
+    sdf::initFile("root.sdf", rootSDF);
+  }
 
   // Unwrap insertions from <sdf>
   for (const auto &insertion : _insertions)
   {
-    root->Root()->ClearElements();
+    rootSDF->Root()->ClearElements();
     // <sdf>
-    if (sdf::readString(insertion, root))
+    if (sdf::readString(insertion, rootSDF))
     {
       // <model>
-      if (root->Root()->HasElement("model"))
+      if (rootSDF->Root()->HasElement("model"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("model")->ToString(""));
+            rootSDF->Root()->GetElement("model")->ToString(""));
       }
       // <light>
-      else if (root->Root()->HasElement("light"))
+      else if (rootSDF->Root()->HasElement("light"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("light")->ToString(""));
+            rootSDF->Root()->GetElement("light")->ToString(""));
       }
       // <actor>
-      else if (root->Root()->HasElement("actor"))
+      else if (rootSDF->Root()->HasElement("actor"))
       {
         this->insertions.push_back(
-            root->Root()->GetElement("actor")->ToString(""));
+            rootSDF->Root()->GetElement("actor")->ToString(""));
       }
       else
       {

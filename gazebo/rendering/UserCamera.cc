@@ -474,7 +474,7 @@ void UserCamera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->dataPtr->rightCamera->setAspectRatio(ratio);
-    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 
@@ -659,10 +659,12 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
   }
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewport->setVisibilityMask(
+      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
 
   this->initialized = true;
 

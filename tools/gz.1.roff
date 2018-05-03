@@ -610,7 +610,8 @@ gz topic [options]
 .fi
 .sp
 
-Print topic information to standard out. If a name for the world,
+Print topic information to standard out or publish message on a topic.
+If a name for the world,
 option -w, is not specified, the first world found on
 the Gazebo master will be used.
 
@@ -661,6 +662,10 @@ Get publish frequency.
 .B \-b, \-\-bw\fR=\fIarg\fR
 .
 Get topic bandwidth.
+.TP
+.B \-r, \-\-request\fR=\fIarg\fR
+.
+Send a request.
 .TP
 .B \-u, \-\-unformatted
 .

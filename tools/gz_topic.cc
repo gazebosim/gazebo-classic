@@ -33,6 +33,18 @@
 
 using namespace gazebo;
 
+static std::string &EraseTrailingWhitespaces(std::string &_str)
+{
+  const std::string whitespaces(" \t\f\v\n\r");
+
+  std::size_t found = _str.find_last_not_of(whitespaces);
+  if (found != std::string::npos)
+    _str.erase(found + 1);
+  else
+    _str.clear();
+  return _str;
+}
+
 /////////////////////////////////////////////////
 TopicCommand::TopicCommand()
   : Command("topic", "Lists information about topics on a Gazebo master")
@@ -50,7 +62,7 @@ TopicCommand::TopicCommand()
     ("publish,p", po::value<std::string>(), "Publish message on a topic.")
     ("request,r", po::value<std::string>(), "Send a request.")
     ("unformatted,u", "Output data from echo without formatting.")
-    ("duration,d", po::value<double>(), "Duration (seconds) to run. "
+    ("duration,d", po::value<uint64_t>(), "Duration (seconds) to run. "
      "Applicable with echo, hz, and bw")
     ("msg,m", po::value<std::string>(), "Message to send on topic. "
      "Applicable with publish and request")
@@ -62,7 +74,8 @@ TopicCommand::TopicCommand()
 void TopicCommand::HelpDetailed()
 {
   std::cerr <<
-    "\tPrint topic information to standard out. If a name for the world, \n"
+    "\tPrint topic information to standard out or send request.\n"
+    "If a name for the world, \n"
     "\toption -w, is not specified, the first world found on \n"
     "\tthe Gazebo master will be used.\n"
     << std::endl;
@@ -218,7 +231,7 @@ void TopicCommand::Echo(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }
@@ -243,7 +256,7 @@ void TopicCommand::Hz(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }
@@ -335,7 +348,7 @@ void TopicCommand::Bw(const std::string &_topic)
   boost::mutex::scoped_lock lock(this->sigMutex);
   if (this->vm.count("duration"))
     this->sigCondition.timed_wait(lock,
-        boost::posix_time::seconds(this->vm["duration"].as<double>()));
+        boost::posix_time::seconds(this->vm["duration"].as<uint64_t>()));
   else
     this->sigCondition.wait(lock);
 }
@@ -474,7 +487,8 @@ bool TopicCommand::Request(const std::string &_space,
   }
 
   boost::shared_ptr<msgs::Response> response = gazebo::transport::request(
-      _space, _requestType, requestData, gazebo::common::Time(10, 0));
+      _space, _requestType, EraseTrailingWhitespaces(requestData),
+      gazebo::common::Time(10, 0));
 
   if (response)
   {

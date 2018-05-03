@@ -65,6 +65,7 @@
           <input semantic="NORMAL" source="#normals" offset="1"/>
           <input semantic="TEXCOORD" source="#map1" offset="2" set="0"/>
           <input semantic="TEXCOORD" source="#map2" offset="3" set="2"/>
+          <input semantic="TEXCOORD" source="#map2" offset="3" set="3"/>
           <vcount>3</vcount>
           <p>
             0 0 0 0

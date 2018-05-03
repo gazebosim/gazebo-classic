@@ -55,6 +55,8 @@ UserCmd::UserCmd(const unsigned int _id,
 UserCmd::~UserCmd()
 {
   this->dataPtr->world.reset();
+  this->dataPtr->startState.SetWorld(WorldPtr());
+  this->dataPtr->endState.SetWorld(WorldPtr());
 
   delete this->dataPtr;
   this->dataPtr = NULL;
@@ -146,6 +148,8 @@ UserCmdManager::~UserCmdManager()
     this->dataPtr->userCmdSub.reset();
     this->dataPtr->undoRedoSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 
