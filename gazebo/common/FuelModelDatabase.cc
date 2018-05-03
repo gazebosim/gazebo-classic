@@ -53,6 +53,9 @@ FuelModelDatabase::FuelModelDatabase()
   ignition::fuel_tools::ClientConfig conf;
   conf.LoadConfig();
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
+
+  common::SystemPaths::Instance()->AddFindFileCallback(std::bind(
+      &FuelModelDatabase::CachedFilePath, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
@@ -199,7 +202,11 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   if (!_forceDownload)
   {
     if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+    {
+      gzmsg << "Found model [" << _uri << "] cached on [" << path << "]"
+             << std::endl;
       return path;
+    }
   }
 
   if (!this->dataPtr->fuelClient->DownloadModel(fuelUri.Str(), path))
@@ -207,6 +214,20 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
     gzerr << "Unable to download model[" << fuelUri.Str() << "]" << std::endl;
     return std::string();
   }
+  else
+  {
+    gzmsg << "Downloaded model [" << _uri << "] to [" << path << "]"
+           << std::endl;
+  }
 
   return path;
 }
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
+{
+  // FIXME: Only model root should use this function, we need a different one
+  // for individual files
+  return this->ModelPath(_uri, false);
+}
+

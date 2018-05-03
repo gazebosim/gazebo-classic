@@ -101,6 +101,11 @@ namespace gazebo
       public: std::string ModelPath(const std::string &_uri,
         const bool _forceDownload = false);
 
+      /// \brief Get the full local path to a cached file based on its URI.
+      /// \param[in] _uri The file's URI
+      /// \return Local path to the file
+      public: std::string CachedFilePath(const std::string &_uri);
+
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;
 

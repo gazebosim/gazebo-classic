@@ -47,6 +47,11 @@ static const std::string PathDelimiter = ";";
 static const std::string PathDelimiter = ":";
 #endif
 
+/// \brief Callbacks to be called in order in case a file can't be found
+/// locally.
+/// TODO: Move to member variable when porting forward
+std::vector<std::function<std::string (const std::string &)>> g_findFileCbs;
+
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
 {
@@ -324,8 +329,6 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
     // First try to find the file on the current system
     filename = this->FindFile(suffix);
   }
-  else if (prefix != "http" && prefix != "https")
-    gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
   return filename;
 }
@@ -407,6 +410,17 @@ std::string SystemPaths::FindFile(const std::string &_filename,
       return std::string();
   }
 
+  // If not found, try custom callback
+  if (path.empty())
+  {
+    for (auto cb : g_findFileCbs)
+    {
+      path = cb(_filename);
+      if (!path.empty())
+        break;
+    }
+  }
+
   if (!boost::filesystem::exists(path))
   {
     gzerr << "File or path does not exist[" << path << "]\n";
@@ -414,6 +428,13 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   }
 
   return path.string();
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFindFileCallback(
+    std::function<std::string (const std::string &)> _cb)
+{
+  g_findFileCbs.push_back(_cb);
 }
 
 /////////////////////////////////////////////////

@@ -158,6 +158,12 @@ World::World(const std::string &_name)
   this->dataPtr->connections.push_back(
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
+
+   // Make dbs are initialized
+   common::ModelDatabase::Instance();
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+   common::FuelModelDatabase::Instance();
+#endif
 }
 
 //////////////////////////////////////////////////
