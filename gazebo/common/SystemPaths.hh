@@ -99,16 +99,29 @@ namespace gazebo
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file
+      /// \return Returns full path name to file or am empty string is URI
+      /// couldn't be parsed.
       public: std::string FindFileURI(const std::string &_uri);
 
-      /// \brief Find a file in the gazebo paths
+      /// \brief Find a file in the gazebo paths. If not found locally, all
+      /// callbacks added with AddFindFileCallback will be called in order
+      /// until found.
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
       /// \return Returns full path name to file
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
+
+      /// \brief Add a callback to use when Gazebo can't find a file.
+      /// The callback should return a full local path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// Callbacks will be called in the order they were added until a path is
+      /// found.
+      /// \param[in] _cb The callback function, which takes a file path and
+      /// returns the full local path.
+      public: void AddFindFileCallback(
+                  std::function<std::string (const std::string &)> _cb);
 
       /// \brief Add colon delimited paths to Gazebo install
       /// \param[in] _path the directory to add
