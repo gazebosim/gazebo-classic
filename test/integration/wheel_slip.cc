@@ -19,6 +19,8 @@
 #include "gazebo/physics/ode/ODESurfaceParams.hh"
 #include "gazebo/physics/ode/ODETypes.hh"
 
+#include "test_config.h"
+
 using namespace gazebo;
 
 class WheelSlipTest : public ServerFixture
@@ -66,6 +68,39 @@ class WheelSlipTest : public ServerFixture
 
     /// \brief Wheel torque in Nm.
     public: double wheelTorque = 0.0;
+  };
+
+  /// \brief Class to hold parameters for each model in the TriballDrift test.
+  public: class TriballDriftMeasurement
+  {
+    /// \brief Reset stats and set reference pose.
+    public: void Reset()
+    {
+      this->pose0 = this->model->GetWorldPose().Ign();
+      this->statsPositionX.Reset();
+      this->statsVelocityX.Reset();
+    }
+
+    /// \brief Take new measurements.
+    public: void Update()
+    {
+      this->statsPositionX.InsertData(
+        this->pose0.Pos().X() - this->model->GetWorldPose().Ign().Pos().X());
+      this->statsVelocityX.InsertData(
+        this->model->GetWorldLinearVel().Ign().X());
+    }
+
+    /// \brief Model pointer.
+    public: physics::ModelPtr model;
+
+    /// \brief Reference pose.
+    public: ignition::math::Pose3d pose0;
+
+    /// \brief Statistics on position error in X.
+    public: ignition::math::SignalMaxAbsoluteValue statsPositionX;
+
+    /// \brief Statistics on velocity error in X.
+    public: ignition::math::SignalMaxAbsoluteValue statsVelocityX;
   };
 
   /// \brief Set joint commands for tire testrig.
@@ -373,6 +408,61 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 
   this->steerJoint->SetHighStop(0, _state.steer);
   this->steerJoint->SetLowStop(0, _state.steer);
+}
+
+/////////////////////////////////////////////////
+// This test measures whether a 3-wheeled "vehicle"
+// with locked wheels can hold position on a slope,
+// simulated as a ground plane with lateral gravity.
+// The model variations include:
+// * Lumped rigid body with fixed collisions for each wheel.
+// * Chassis connected to spherical wheels with fixed joints.
+// * Chassis connected to spherical wheels with revolute joints
+//   and using joint friction to keep the wheels locked.
+TEST_F(WheelSlipTest, TriballDrift)
+{
+  gazebo::common::SystemPaths::Instance()->AddModelPaths(
+    PROJECT_SOURCE_PATH "/test/models");
+
+  Load("worlds/triball_drift.world", true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_NE(physics, nullptr);
+
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(1, 0, -9.8));
+
+  // allow some settling time
+  world->Step(100);
+
+  std::map<std::string, TriballDriftMeasurement> measures;
+  measures["triball_lumped"].model = world->GetModel("triball_lumped");
+  measures["triball_fixed"].model = world->GetModel("triball_fixed");
+  measures["triball_revolute"].model = world->GetModel("triball_revolute");
+  for (auto &measure : measures)
+  {
+    ASSERT_NE(measure.second.model, nullptr);
+    measure.second.Reset();
+  }
+
+  for (int i = 0; i < 3e3; ++i)
+  {
+    world->Step(1);
+    for (auto &measure : measures)
+    {
+      measure.second.Update();
+    }
+  }
+
+  EXPECT_NEAR(0.0, measures["triball_lumped"].statsPositionX.Value(), 1e-10);
+  EXPECT_NEAR(0.0, measures["triball_lumped"].statsVelocityX.Value(), 1e-10);
+  EXPECT_NEAR(0.0, measures["triball_fixed"].statsPositionX.Value(), 1e-5);
+  EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-5);
+  EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 2e-4);
+  EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 7e-5);
 }
 
 /////////////////////////////////////////////////

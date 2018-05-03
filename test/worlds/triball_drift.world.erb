@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<%
+  # Several variants of the triball (lumped, fixed, revolute).
+  # Apply lateral gravity and observe drift.
+  # SI units (length in meters)
+  require "matrix"
+
+  v0 = [0, 15, 0]
+  N = 16
+  w0max = 150.0
+  w0mags = w0max * Vector.elements((-N..N).to_a) / N.to_f
+%>
+<sdf version="1.6">
+  <world name="default">
+    <gravity>1 0 -9.8</gravity>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://triball_lumped</uri>
+      <pose>0 0 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://triball_fixed</uri>
+      <pose>0 3 0  0 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://triball_revolute</uri>
+      <pose>0 6 0  0 0 0</pose>
+    </include>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>1.5 -4 2.5  0 0.5 1.6</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+  </world>
+</sdf>
