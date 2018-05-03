@@ -456,7 +456,8 @@ bool TopicCommand::Publish(const std::string &_topic)
   }
 
   // Parse string to the message object
-  google::protobuf::TextFormat::ParseFromString(msgData, msg.get());
+  google::protobuf::TextFormat::ParseFromString(
+     EraseTrailingWhitespaces(msgData), msg.get());
 
   // Publish message on topic
   this->node->Publish(topicName, *msg.get());
