@@ -23,7 +23,7 @@
 
 namespace gazebo
 {
-  /// \brief This plugin will stop and restart the world.
+  /// \brief This plugin will stop the world.
   class GAZEBO_VISIBLE StopWorldPlugin : public SystemPlugin
   {
     /// \brief Destructor

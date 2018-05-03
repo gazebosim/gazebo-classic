@@ -195,6 +195,27 @@ TEST_F(WorldTest, EditName)
 }
 
 //////////////////////////////////////////////////
+TEST_F(WorldTest, Stop)
+{
+  // Load an empty world
+  this->Load("worlds/blank.world", true);
+
+  // Get world and check it's running
+  auto world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  EXPECT_TRUE(world->Running());
+
+  // Stop the world and see it stops running
+  world->Stop();
+  EXPECT_FALSE(world->Running());
+
+  // Run the world again
+  world->Run();
+  EXPECT_TRUE(world->Running());
+}
+
+//////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
