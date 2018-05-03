@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Fix ray intersection check in Scene::FirstContact
+    * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
+
 1. Fix camera view control inside bounding box of large meshes
     * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
 
