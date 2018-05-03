@@ -465,6 +465,32 @@ TEST_F(WheelSlipTest, TriballDrift)
   EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-5);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 2e-4);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 7e-5);
+
+  // try it again with more ODE solver iterations
+  physics->SetParam("iters", 200);
+  world->Step(100);
+
+  for (auto &measure : measures)
+  {
+    ASSERT_NE(measure.second.model, nullptr);
+    measure.second.Reset();
+  }
+
+  for (int i = 0; i < 3e3; ++i)
+  {
+    world->Step(1);
+    for (auto &measure : measures)
+    {
+      measure.second.Update();
+    }
+  }
+
+  EXPECT_NEAR(0.0, measures["triball_lumped"].statsPositionX.Value(), 1e-19);
+  EXPECT_NEAR(0.0, measures["triball_lumped"].statsVelocityX.Value(), 1e-11);
+  EXPECT_NEAR(0.0, measures["triball_fixed"].statsPositionX.Value(), 1e-8);
+  EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-6);
+  EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 1e-7);
+  EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 1e-6);
 }
 
 /////////////////////////////////////////////////
