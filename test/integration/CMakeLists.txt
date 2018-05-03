@@ -48,6 +48,7 @@ set(tests
   imu.cc
   info_services.cc
   introspection_items.cc
+  joint_control_plugin.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -146,6 +147,7 @@ if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
 endif()
 
 # Add plugin dependency
+add_dependencies(${TEST_TYPE}_joint_control_plugin JointControlPlugin)
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 
 set(display_tests

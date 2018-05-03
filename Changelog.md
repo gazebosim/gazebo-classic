@@ -23,6 +23,10 @@
 1. Displaying light direction on the world tree
     * [Pull request 2912](https://bitbucket.org/osrf/gazebo/pull-request/2912)
 
+1. Plugin to initialize joint controller parameters
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo
+
 1. Fix Enter in Link Inspector
     * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
 
