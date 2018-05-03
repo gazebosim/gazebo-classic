@@ -259,7 +259,8 @@ namespace gazebo
       public: bool SaveModels(const std::set<std::string> &models);
 
       /// \brief Return true if all the files are saved successfully.
-      /// \return True if all the files are saved successfully.
+      /// \return True if all the files are saved successfully, and false if
+      /// there are errors saving the files.
       public: bool SaveFiles(const std::set<std::string> &resources);
 
       /// \brief Write all logs.

@@ -613,6 +613,10 @@ bool LogRecord::SaveModels(const std::set<std::string> &_models)
 //////////////////////////////////////////////////
 bool LogRecord::SaveFiles(const std::set<std::string> &_files)
 {
+  if (_files.empty())
+    return false;
+
+  bool saveError = false;
   std::set<std::string> diff;
   std::set_difference(_files.begin(), _files.end(),
       this->dataPtr->savedFiles.begin(),
@@ -676,6 +680,7 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
         {
           gzerr << "Failed to copy model from '" << srcPath.string()
                  << "' to '" << destPath.string() << "'" << std::endl;
+          saveError = true;
         }
       }
       // else copy only the specified file
@@ -693,15 +698,18 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
         {
           gzerr << "Failed to copy file from '" << srcPath.string()
                  << "' to '" << destPath.string() << "'" << std::endl;
+          saveError = true;
         }
       }
     }
     else
     {
       gzerr << "File: " << file << " not found!" << std::endl;
+      saveError = true;
     }
   }
-  return true;
+
+  return !saveError;
 }
 
 //////////////////////////////////////////////////
