@@ -140,6 +140,11 @@ int main(int _argc, char **_argv)
               << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }
+  if (sigaction(SIGTERM, &sigact, NULL))
+  {
+    std::cerr << "Stopping. Unable to catch SIGTERM.\n";
+    return 0;
+  }
 
   pid1 = fork();
 
