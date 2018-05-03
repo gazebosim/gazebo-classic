@@ -34,6 +34,7 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   contacts_update.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
@@ -69,6 +70,7 @@ set(tests
   nested_model.cc
   noise.cc
   nondefault_world.cc
+  obj_loader.cc
   physics.cc
   physics_base.cc
   physics_basic_controller_response.cc
@@ -95,6 +97,7 @@ set(tests
   speed.cc
   speed_thread_islands.cc
   speed_thread_pr2.cc
+  static_map_plugin.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
@@ -108,7 +111,6 @@ set(tests
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
-  world_remove.cc
   worlds_installed.cc
   )
 
@@ -130,7 +132,6 @@ gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
 set_property(
@@ -174,6 +175,7 @@ set(dri_tests
   speed_pr2.cc
   visual.cc
   wideanglecamera_sensor.cc
+  world_remove.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)

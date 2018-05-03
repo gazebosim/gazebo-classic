@@ -177,16 +177,18 @@ namespace gazebo
       public: std::string subMeshName;
 
       /// \brief Ambient color of the visual.
-      public: ignition::math::Color ambient;
+      public: ignition::math::Color ambient = ignition::math::Color(0, 0, 0, 0);
 
       /// \brief Diffuse color of the visual.
-      public: ignition::math::Color diffuse;
+      public: ignition::math::Color diffuse = ignition::math::Color(0, 0, 0, 0);
 
       /// \brief Specular color of the visual.
-      public: ignition::math::Color specular;
+      public: ignition::math::Color specular =
+          ignition::math::Color(0, 0, 0, 0);
 
       /// \brief Emissive color of the visual.
-      public: ignition::math::Color emissive;
+      public: ignition::math::Color emissive =
+          ignition::math::Color(0, 0, 0, 0);
 
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;

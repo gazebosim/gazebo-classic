@@ -96,7 +96,7 @@ void Light::Load()
   this->Update();
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->WorldVisual()));
+                     this->dataPtr->scene->WorldVisual(), false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
@@ -111,9 +111,9 @@ void Light::Update()
   this->SetCastShadows(this->dataPtr->sdf->Get<bool>("cast_shadows"));
 
   this->SetDiffuseColor(
-      this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>());
+      this->dataPtr->sdf->GetElement("diffuse")->Get<ignition::math::Color>());
   this->SetSpecularColor(
-      this->dataPtr->sdf->GetElement("specular")->Get<common::Color>());
+      this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>());
   this->SetDirection(
       this->dataPtr->sdf->Get<ignition::math::Vector3d>("direction"));
 
@@ -442,35 +442,49 @@ std::string Light::LightType() const
 //////////////////////////////////////////////////
 void Light::SetDiffuseColor(const common::Color &_color)
 {
+  this->SetDiffuseColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Light::SetDiffuseColor(const ignition::math::Color &_color)
+{
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("diffuse");
 
-  if (_color != elem->Get<common::Color>())
+  if (_color != elem->Get<ignition::math::Color>())
     elem->Set(_color);
 
-  this->dataPtr->light->setDiffuseColour(_color.r, _color.g, _color.b);
+  this->dataPtr->light->setDiffuseColour(Conversions::Convert(_color));
 }
 
 //////////////////////////////////////////////////
-common::Color Light::DiffuseColor() const
+ignition::math::Color Light::DiffuseColor() const
 {
-  return this->dataPtr->sdf->GetElement("diffuse")->Get<common::Color>();
+  return
+      this->dataPtr->sdf->GetElement("diffuse")->Get<ignition::math::Color>();
 }
 
 //////////////////////////////////////////////////
-common::Color Light::SpecularColor() const
+ignition::math::Color Light::SpecularColor() const
 {
-  return this->dataPtr->sdf->GetElement("specular")->Get<common::Color>();
+  return
+      this->dataPtr->sdf->GetElement("specular")->Get<ignition::math::Color>();
 }
 
 //////////////////////////////////////////////////
 void Light::SetSpecularColor(const common::Color &_color)
 {
+  this->SetSpecularColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Light::SetSpecularColor(const ignition::math::Color &_color)
+{
   sdf::ElementPtr elem = this->dataPtr->sdf->GetElement("specular");
 
-  if (elem->Get<common::Color>() != _color)
+  if (elem->Get<ignition::math::Color>() != _color)
     elem->Set(_color);
 
-  this->dataPtr->light->setSpecularColour(_color.r, _color.g, _color.b);
+  this->dataPtr->light->setSpecularColour(Conversions::Convert(_color));
 }
 
 //////////////////////////////////////////////////
@@ -615,8 +629,8 @@ void Light::FillMsg(msgs::Light &_msg) const
   msgs::Set(_msg.mutable_pose()->mutable_position(), this->Position());
   msgs::Set(_msg.mutable_pose()->mutable_orientation(),
       this->Rotation());
-  msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor().Ign());
-  msgs::Set(_msg.mutable_specular(), this->SpecularColor().Ign());
+  msgs::Set(_msg.mutable_diffuse(), this->DiffuseColor());
+  msgs::Set(_msg.mutable_specular(), this->SpecularColor());
   msgs::Set(_msg.mutable_direction(), this->Direction());
 
   _msg.set_cast_shadows(this->dataPtr->light->getCastShadows());

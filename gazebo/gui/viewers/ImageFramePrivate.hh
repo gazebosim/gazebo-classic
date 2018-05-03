@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
-#define _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
+#ifndef GAZEBO_GUI_VIEWERS_IMAGEFRAMEPRIVATE_HH_
+#define GAZEBO_GUI_VIEWERS_IMAGEFRAMEPRIVATE_HH_
 
 #include <mutex>
 #include "gazebo/gui/qt.h"
@@ -33,7 +33,10 @@ namespace gazebo
       public: std::mutex mutex;
 
       /// \brief Depth camera image data buffer.
-      public: float *depthBuffer = NULL;
+      public: float *depthBuffer = nullptr;
+
+      /// \brief Camera image data buffer.
+      public: unsigned char *imageBuffer = nullptr;
     };
   }
 }

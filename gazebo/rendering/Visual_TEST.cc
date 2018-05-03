@@ -182,6 +182,13 @@ TEST_F(Visual_TEST, BoundingBox)
       ignition::math::Vector3d(-1, -1.5, -2));
   EXPECT_EQ(newScale*newBoundingBox.Max(),
       ignition::math::Vector3d(1, 1.5, 2));
+
+  // create empty visual and check bounding box
+  gazebo::rendering::VisualPtr emptyVis(
+      new gazebo::rendering::Visual("empty_visual", scene));
+  ignition::math::Box emptyBoundingBox = emptyVis->BoundingBox();
+  EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Min());
+  EXPECT_EQ(ignition::math::Vector3d::Zero, emptyBoundingBox.Max());
 }
 
 /////////////////////////////////////////////////
@@ -1013,14 +1020,14 @@ TEST_F(Visual_TEST, ChildColor)
   vis2->Load();
 
   // Check default colors
-  EXPECT_EQ(vis1->Ambient(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis1->Emissive(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis1->Specular(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis1->Diffuse(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis2->Ambient(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis2->Emissive(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis2->Specular(), ignmath::Color(0, 0, 0, 1));
-  EXPECT_EQ(vis2->Diffuse(), ignmath::Color(0, 0, 0, 1));
+  EXPECT_EQ(vis1->Ambient(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Emissive(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Specular(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis1->Diffuse(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Ambient(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Emissive(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Specular(), ignmath::Color(0, 0, 0, 0));
+  EXPECT_EQ(vis2->Diffuse(), ignmath::Color(0, 0, 0, 0));
 
   // Set vis1's color with default cascade
   ignmath::Color defaultCascadeAmbient(0.1, 0, 0, 1);

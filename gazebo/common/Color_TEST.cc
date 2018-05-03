@@ -20,6 +20,11 @@
 #include "gazebo/common/Color.hh"
 #include "test/util.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 
 class Color : public gazebo::testing::AutoLogFixture { };
@@ -131,11 +136,12 @@ TEST_F(Color, Color)
   EXPECT_TRUE(clr.YUV() ==
       ignition::math::Vector3d(0.104985, 0.95227, 0.429305));
 
+  // Note: ideally the addition should result in (1.0, 0.3, 0.9, 1.0);
   clr = common::Color(1.0, 0.0, 0.5, 1.0) + common::Color(0.1, 0.3, 0.4, 1.0);
   EXPECT_TRUE(ignition::math::equal(0.00431373f, clr.r));
   EXPECT_TRUE(ignition::math::equal(0.3f, clr.g));
   EXPECT_TRUE(ignition::math::equal(0.9f, clr.b));
-  EXPECT_TRUE(ignition::math::equal(2.0f, clr.a));
+  EXPECT_TRUE(ignition::math::equal(0.00784314f, clr.a));
 
   clr = common::Color(1.0, 0.0, 0.5, 1.0) - common::Color(0.1, 0.3, 0.4, 1.0);
   EXPECT_TRUE(ignition::math::equal(0.9f, clr.r));
@@ -148,6 +154,13 @@ TEST_F(Color, Color)
   EXPECT_TRUE(ignition::math::equal(0.1f, clr.g));
   EXPECT_TRUE(ignition::math::equal(0.2f, clr.b));
   EXPECT_TRUE(ignition::math::equal(0.3f, clr.a));
+
+  // test color rgb value clamping
+  clr = common::Color(ignition::math::NAN_F, 51, 256, -1.0);
+  EXPECT_TRUE(ignition::math::equal(0.0f, clr.r));
+  EXPECT_TRUE(ignition::math::equal(0.2f, clr.g));
+  EXPECT_TRUE(ignition::math::equal(1.0f, clr.b));
+  EXPECT_TRUE(ignition::math::equal(0.0f, clr.a));
 }
 
 TEST_F(Color, Ign)
@@ -165,3 +178,6 @@ int main(int argc, char **argv)
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif

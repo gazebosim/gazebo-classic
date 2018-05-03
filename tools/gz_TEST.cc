@@ -692,6 +692,10 @@ TEST_F(gzTest, Topic)
   output = custom_exec_str("gz topic -b /gazebo/default/world_stats -d 10");
   EXPECT_NE(output.find("Total["), std::string::npos);
 
+  // Request
+  output = custom_exec_str("gz topic -r entity_list");
+  EXPECT_NE(output.find("models {"), std::string::npos);
+
   fini();
 }
 
@@ -706,10 +710,10 @@ TEST_F(gzTest, SDF)
   // Regenerate each sum using:
   // gz sdf -d -v <major.minor> | sha1sum'
   std::map<std::string, std::string> descSums;
-  descSums["1.0"] = "a02fbc1275100569c99d860044563f669934c0fc";
-  descSums["1.2"] = "f524458ace57d6aabbbc2303da208f65af37ef53";
-  descSums["1.3"] = "74a3aa8d31f97328175f43d03410be55631fa0e1";
-  descSums["1.4"] = "057f26137669d9d7eeb5a8c6f51e4f4077d9ddcf";
+  descSums["1.0"] = "c69f2dcf512a58fd63b1ba604c3e3f23069afcae";
+  descSums["1.2"] = "a78a9127ce11ecbd90126654dfa991949f12ff27";
+  descSums["1.3"] = "f3dfff3a79eeca7a962f75ce537c94df8db4d81b";
+  descSums["1.4"] = "e4de8b88e2ddc9d88d5b335ca88c5b046ed8f068";
   // descSums["1.5"] = "dddf642e1259439ce47b4664f853ac9f32432762";
 
   // Test each descSum
@@ -728,7 +732,7 @@ TEST_F(gzTest, SDF)
   docSums["1.0"] = "4cf955ada785adf72503744604ffadcdf13ec0d2";
   docSums["1.2"] = "27f9d91080ce8aa18eac27c9d899fde2d4b78785";
   docSums["1.3"] = "ad80986d42eae97baf277118f52d7e8b951d8ea1";
-  docSums["1.4"] = "153ddd6ba6797c37c7fcddb2be5362c9969d97a1";
+  docSums["1.4"] = "bb4c725f2a29b32d413cd490c9a221cd27b36997";
   // docSums["1.5"] = "4e99e3a1e3497a0262d5253cbff12be4758e3c16";
 
   // Test each docSum

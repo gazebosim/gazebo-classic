@@ -219,10 +219,6 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
     // Do we even need inertial info in an actor?
     this->AddSphereInertia(linkSdf, ignition::math::Pose3d::Zero, 1.0, 0.01);
 
-    // FIXME hardcoded collision to sphere with radius 0.02
-    this->AddSphereCollision(linkSdf, bone->GetName() + "_collision",
-                     ignition::math::Pose3d::Zero, 0.02);
-
     // FIXME hardcoded visual to red sphere with radius 0.02
     if (bone->IsRootNode())
     {
@@ -269,6 +265,9 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
           curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
           ignition::math::Vector3d(0.02, 0.02, length),
           "Gazebo/Green", ignition::math::Color::Green);
+        this->AddBoxCollision(linkSdf,
+            bone->GetName() + "_" + curChild->GetName() + "_collision",
+            bonePose, ignition::math::Vector3d(0.02, 0.02, length));
       }
     }
   }
@@ -675,7 +674,7 @@ void Actor::Update()
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
-    rootM.Translate(actorPose.Pos());
+    rootM.SetTranslation(actorPose.Pos());
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
@@ -830,6 +829,12 @@ void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 }
 
 //////////////////////////////////////////////////
+TrajectoryInfoPtr Actor::CustomTrajectory() const
+{
+  return this->customTrajectoryInfo;
+}
+
+//////////////////////////////////////////////////
 void Actor::ResetCustomTrajectory()
 {
   this->customTrajectoryInfo.reset();
@@ -905,6 +910,20 @@ void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
   matSdf->GetElement("script")->Set(_material);
   sdf::ElementPtr colorSdf = matSdf->GetElement("ambient");
   colorSdf->Set(_ambient);
+}
+
+//////////////////////////////////////////////////
+void Actor::AddBoxCollision(const sdf::ElementPtr &_linkSdf,
+    const std::string &_name, const ignition::math::Pose3d &_pose,
+    const ignition::math::Vector3d &_size)
+{
+  sdf::ElementPtr collisionSdf = _linkSdf->AddElement("collision");
+  collisionSdf->GetAttribute("name")->Set(_name);
+  sdf::ElementPtr collisionPoseSdf = collisionSdf->GetElement("pose");
+  collisionPoseSdf->Set(_pose);
+  sdf::ElementPtr geomCollSdf = collisionSdf->GetElement("geometry");
+  sdf::ElementPtr boxSdf = geomCollSdf->GetElement("box");
+  boxSdf->GetElement("size")->Set(_size);
 }
 
 //////////////////////////////////////////////////

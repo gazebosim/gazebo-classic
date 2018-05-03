@@ -614,10 +614,10 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+bool WideAngleCamera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   bool retVal = true;
-  Ogre::ColourValue clr = Conversions::Convert(_color.Ign());
+  Ogre::ColourValue clr = Conversions::Convert(_color);
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(clr);
@@ -679,8 +679,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     RTShaderSystem::AttachViewport(vp, this->GetScene());
 
-    common::Color const &gzBgColor = this->scene->BackgroundColor();
-    vp->setBackgroundColour(Conversions::Convert(gzBgColor.Ign()));
+    auto const &gzBgColor = this->scene->BackgroundColor();
+    vp->setBackgroundColour(Conversions::Convert(gzBgColor));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -785,12 +785,19 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
       dir = rot * dir;
       dir.Normalize();
 
-      // compute theta and phi of the dir vector
+      // compute theta and phi from the dir vector
       // theta is angle to dir vector from z (forward)
       // phi is angle from x in x-y plane
+      // direction vector (x, y, z)
+      // x = sin(theta)cos(phi)
+      // y = sin(theta)sin(phi)
+      // z = cos(theta)
       double theta =  std::atan2(
           std::sqrt(dir.X() * dir.X() + dir.Y() * dir.Y()), dir.Z());
       double phi = std::atan2(dir.Y(), dir.X());
+      // this also works:
+      // double theta = std::acos(dir.Z());
+      // double phi = std::asin(dir.Y() / std::sin(theta));
 
       double f = this->Lens()->F();
       double hfov = this->HFOV().Radian();
@@ -814,6 +821,12 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
       double x = cos(phi) * r;
       double y = sin(phi) * r;
 
+      // env cam cube map texture is square and likely to be different size from
+      // viewport. We need to adjust projected pos based on aspect ratio
+      double aspect = static_cast<double>(this->ViewportWidth()) /
+        static_cast<double>(this->ViewportHeight());
+      y *= aspect;
+
       // convert to screen space
       screenPos.X() = ((x / 2.0) + 0.5) * this->ViewportWidth();
       screenPos.Y() = (1 - ((y / 2.0) + 0.5)) * this->ViewportHeight();
@@ -825,4 +838,11 @@ ignition::math::Vector3d WideAngleCamera::Project3d(
   }
 
   return screenPos;
+}
+
+//////////////////////////////////////////////////
+std::vector<Ogre::Camera *> WideAngleCamera::OgreEnvCameras() const
+{
+  return std::vector<Ogre::Camera *>(
+    std::begin(this->dataPtr->envCameras), std::end(this->dataPtr->envCameras));
 }
