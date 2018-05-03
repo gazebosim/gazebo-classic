@@ -432,6 +432,8 @@ TEST_F(WheelSlipTest, TriballDrift)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_NE(physics, nullptr);
 
+  physics->SetRealTimeUpdateRate(0);
+
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(1, 0, -9.8));
 
