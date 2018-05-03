@@ -746,8 +746,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
   }
 
   // truncate position by joint limits
-  double lower = this->GetLowStop(_index).Radian();
-  double upper = this->GetHighStop(_index).Radian();
+  double lower = this->GetLowerLimit(_index).Radian();
+  double upper = this->GetUpperLimit(_index).Radian();
   if (lower < upper)
     _position = math::clamp(_position, lower, upper);
   else

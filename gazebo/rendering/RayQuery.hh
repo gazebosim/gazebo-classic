@@ -54,6 +54,8 @@ namespace gazebo
       /// \param[in] _visual Visual containing the mesh to be selected.
       /// \param[out] _intersect Intersection point.
       /// \param[out] _vertices Vertices of the selected triangle on the mesh.
+      /// \return True if the ray intersects with a triangle on the mesh,
+      /// false otherwise
       public: bool SelectMeshTriangle(int _x, int _y, VisualPtr _visual,
           math::Vector3 &_intersect, std::vector<math::Vector3> &_vertices);
 
