@@ -76,6 +76,9 @@ namespace gazebo
       /// \brief Custom program writer factory that supports sampler2DShadow,
       /// only used in ogre versions <= 1.8
       public: CustomGLSLProgramWriterFactory *programWriterFactory = nullptr;
+
+      /// \brief Flag to indicate if normal map should be enabled
+      public: bool enableNormalMap = true;
     };
   }
 }

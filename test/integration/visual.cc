@@ -299,6 +299,162 @@ TEST_F(VisualProperty, MaterialShaderParam)
   delete [] img;
 }
 
+/////////////////////////////////////////////////
+// normal map is not work on OSX yet
+#ifndef __APPLE__
+TEST_F(VisualProperty, NormalMap)
+{
+  // Load a world with two red box visuals: one without normal map and and one
+  // with normal map. Spawn a camera in front of each visual. Verify the visual
+  // with normal map is darker than visual without normal map and has irregular
+  // pattern
+  Load("worlds/normal_map.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
+    return;
+  }
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  ignition::math::Pose3d testPose(
+      ignition::math::Vector3d(0, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 1.57));
+  SpawnCamera(modelName, cameraName, testPose.Pos(),
+      testPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  physics::ModelPtr model = world->GetModel(modelName);
+  EXPECT_EQ(model->GetWorldPose().Ign(), testPose);
+
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c =
+      camSensor->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
+  // wait for images
+  int totalImages = 20;
+  while (imageCount < totalImages && timer.GetElapsed().Double() < 5)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  camSensor->Camera()->DisconnectNewImageFrame(c);
+
+  // spawn second camera sensor
+  ignition::math::Pose3d testPose2(
+      ignition::math::Vector3d(3, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 1.57));
+  std::string modelName2 = "camera_model2";
+  std::string cameraName2 = "camera_sensor2";
+  SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
+      testPose2.Rot().Euler(), width, height, updateRate);
+
+  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
+  sensors::CameraSensorPtr camSensor2 =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+
+  physics::ModelPtr model2 = world->GetModel(modelName2);
+  EXPECT_EQ(model2->GetWorldPose().Ign(), testPose2);
+
+  imageCount2 = 0;
+  img2 = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c2 =
+      camSensor2->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer2;
+  timer2.Start();
+
+  while (imageCount2 < totalImages && timer2.GetElapsed().Double() < 5)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount2, totalImages);
+  camSensor2->Camera()->DisconnectNewImageFrame(c2);
+
+  // check color of visuals with and without normal map
+  std::set<unsigned int> rSet;
+  std::set<unsigned int> gSet;
+  std::set<unsigned int> bSet;
+  std::set<unsigned int> rSet2;
+  std::set<unsigned int> gSet2;
+  std::set<unsigned int> bSet2;
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      // visual without normal map
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      rSet.insert(r);
+      gSet.insert(g);
+      bSet.insert(b);
+      colorSum += r + g + b;
+      // verify color is predominantly red
+      EXPECT_GT(r, g);
+      EXPECT_GT(r, b);
+      EXPECT_EQ(g, b);
+
+      // visual with normal map
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      rSet2.insert(r2);
+      gSet2.insert(g2);
+      bSet2.insert(b2);
+      colorSum2 += r2+ g2+ b2;
+
+      // verify color is predominantly red
+      EXPECT_GT(r2, g2);
+      EXPECT_GT(r2, b2);
+      EXPECT_EQ(g2, b2);
+    }
+  }
+  // verify the rgb components of pixel are somewhat consistent throughout the
+  // the image
+  EXPECT_LE(rSet.size(), 3u);
+  EXPECT_LE(gSet.size(), 3u);
+  EXPECT_LE(bSet.size(), 3u);
+
+  // check that the r component of pixel varies throughout the image for
+  // visual with normal map. The variation of b and g should still be small
+  EXPECT_GT(rSet2.size(), 100u);
+  EXPECT_LE(gSet2.size(), 5u);
+  EXPECT_LE(bSet2.size(), 5u);
+
+  // the visual with normal map should be darker than the visual without
+  // normal map
+  EXPECT_GT(colorSum, colorSum2);
+
+  delete [] img;
+  delete [] img2;
+}
+#endif
+
 int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to

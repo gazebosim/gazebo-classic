@@ -194,7 +194,7 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
     std::string newPath = logPath.string() + ".old";
     boost::system::error_code ec;
     boost::filesystem::rename(logPath, newPath, ec);
-    if (ec == 0)
+    if (ec == boost::system::errc::success)
       std::cerr << "Existing log directory [" << logPath
                 << "] renamed to [" << newPath << "]" << std::endl;
     else
