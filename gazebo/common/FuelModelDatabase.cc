@@ -28,6 +28,7 @@
 #include <ignition/fuel_tools.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SemanticVersion.hh"
@@ -202,8 +203,10 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   {
     if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
     {
-      gzmsg << "Found model [" << _uri << "] cached on [" << path << "]"
-             << std::endl;
+      gzmsg << "Found model URL: " << std::endl
+            << "          " << _uri << std::endl
+            << "      cached on: " << std::endl
+            << "          " << path << std::endl;
       return path;
     }
   }
@@ -215,8 +218,10 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   }
   else
   {
-    gzmsg << "Downloaded model [" << _uri << "] to [" << path << "]"
-           << std::endl;
+      gzmsg << "Download model URL: " << std::endl
+            << "          " << _uri << std::endl
+            << "      to: " << std::endl
+            << "          " << path << std::endl;
   }
 
   return path;
@@ -225,8 +230,37 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
 {
-  // FIXME: Only model root should use this function, we need a different one
-  // for individual files
-  return this->ModelPath(_uri, false);
+  std::string path;
+  auto fuelUri = ignition::common::URI(_uri);
+
+  // Gazebo URIs default to Open Robotics account on ignitionfuel.org
+  if (fuelUri.Scheme() == "model")
+  {
+    auto parts = common::split(fuelUri.Path().Str(), "/");
+
+    if (parts.size() < 2)
+      return path;
+
+    auto modelName = parts[0];
+    std::string filePath;
+    for (unsigned int i = 1; i < parts.size(); ++i)
+      filePath = ignition::common::joinPaths(filePath, parts[i]);
+
+    auto firstServer = this->dataPtr->fuelClient->Config().Servers()[0];
+
+    fuelUri.Parse(firstServer.URL() + "/" + firstServer.Version() +
+        "/openrobotics/models/" + modelName + "/files" + filePath);
+  }
+
+  if (this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+  {
+    gzmsg << "Found file URL: " << std::endl
+          << "          " << _uri << std::endl
+          << "      cached on: " << std::endl
+          << "          " << path << std::endl;
+    return path;
+  }
+
+  return path;
 }
 
