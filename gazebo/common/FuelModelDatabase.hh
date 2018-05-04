@@ -18,7 +18,6 @@
 #define GAZEBO_COMMON_FUELMODELDATABASE_HH_
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
