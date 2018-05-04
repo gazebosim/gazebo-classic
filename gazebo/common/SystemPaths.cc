@@ -364,6 +364,25 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   else if (_filename[0] == '/')
   {
     path = boost::filesystem::path(_filename);
+    // absolute paths are not portable, e.g. when running world or
+    // or log files on a different machine. To workaround this problem,
+    // we'll further look for these files in one of gazebo model paths.
+    // e.g. /tmp/path/to/my_file
+    //      =>  ${GAZEBO_MODEL_PATH}/tmp/path/to/my_file
+    // Gazebo log playback makes use of this feature
+    if (!boost::filesystem::exists(path))
+    {
+      for (std::list<std::string>::iterator iter = this->modelPaths.begin();
+           iter != this->modelPaths.end(); ++iter)
+      {
+        auto modelPath = boost::filesystem::path(*iter) / path;
+        if (boost::filesystem::exists(modelPath))
+        {
+          path = modelPath;
+          break;
+        }
+      }
+    }
   }
   else
   {

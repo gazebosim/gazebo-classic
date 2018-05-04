@@ -627,6 +627,15 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Add Screen Space Ambient Occlusion visual plugin
+    * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+
+1. Fix ray intersection check in Scene::FirstContact
+    * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
+
+1. Fix camera view control inside bounding box of large meshes
+    * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
+
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
 
@@ -654,6 +663,10 @@
 
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
+
+1. Fix Joint::SetPosition for HingeJoint
+    * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
+    * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
 
 1. Add support for moving geometry to ContainPlugin
     * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
@@ -822,7 +835,7 @@
     * [Pull request 2711](https://bitbucket.org/osrf/gazebo/pull-request/2711)
 
 1. Add function to retrieve scoped sensors name in multi-nested model
-    * [Pull request 2674](https://bitbucket.org/osrf/gazebo/pull-request/2674)
+    * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2674)
 
 ## Gazebo 7.7.0 (2017-05-04)
 
@@ -838,7 +851,6 @@
 
 1. Fix linking when using HDF5_INSTRUMENT for logging ODE data
     * [Pull request 2669](https://bitbucket.org/osrf/gazebo/pull-request/2669)
-    * [Issue 1841](https://bitbucket.org/osrf/gazebo/issues/1841)
 
 1. Subdivide large heightmaps to fix LOD and support global texture mapping
     * [Pull request 2655](https://bitbucket.org/osrf/gazebo/pull-request/2655)
@@ -853,7 +865,6 @@
 
 1. Add plugin for attaching lights to links in a model
     * [Pull request 2647](https://bitbucket.org/osrf/gazebo/pull-request/2647)
-    * [Issue 900](https://bitbucket.org/osrf/gazebo/issues/900)
 
 1. Support Heightmap LOD
     * [Pull request 2636](https://bitbucket.org/osrf/gazebo/pull-request/2636)
@@ -1485,9 +1496,6 @@ using the same arguments used in the command line.
 
     1. Scale link mass and inertia when a link is scaled
         * [Pull request #1836](https://bitbucket.org/osrf/gazebo/pull-request/1836)
-
-    1. Add density widget to config widget and link inspector
-        * [Pull request #1978](https://bitbucket.org/osrf/gazebo/pull-request/1978)
 
     1. Added icons for child and parent link in joint inspector
         * [Pull request #1953](https://bitbucket.org/osrf/gazebo/pull-request/1953)
