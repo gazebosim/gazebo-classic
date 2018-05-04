@@ -276,6 +276,7 @@ TEST_F(GzLog, RecordResources)
   // model with abs path to mesh
   path = logDirPath + absMeshPath;
   EXPECT_TRUE(common::exists(path));
+  boost::filesystem::remove_all(recordPath);
 }
 
 /////////////////////////////////////////////////
