@@ -182,8 +182,11 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
 
   // Check if the Init method has been already called, and if so
   // remove current buffer.
-  if (buf->stream)
-    delete buf->stream;
+  if (buf->stream && buf->stream->is_open())
+  {
+    buf->stream->flush();
+    buf->stream->close();
+  }
 
   // If the logPath is a directory, just rename it.
   if (boost::filesystem::is_directory(logPath))
@@ -191,7 +194,7 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
     std::string newPath = logPath.string() + ".old";
     boost::system::error_code ec;
     boost::filesystem::rename(logPath, newPath, ec);
-    if (ec == 0)
+    if (ec == boost::system::errc::success)
       std::cerr << "Existing log directory [" << logPath
                 << "] renamed to [" << newPath << "]" << std::endl;
     else
@@ -202,7 +205,11 @@ void FileLogger::Init(const std::string &_prefix, const std::string &_filename)
     }
   }
 
-  buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+  if (!buf->stream)
+    buf->stream = new std::ofstream(logPath.string().c_str(), std::ios::out);
+  else
+    buf->stream->open(logPath.string().c_str(), std::ios::out);
+
   if (!buf->stream->is_open())
     std::cerr << "Error opening log file: " << logPath << std::endl;
 
@@ -273,6 +280,7 @@ FileLogger::Buffer::~Buffer()
   {
     if (this->stream)
       static_cast<std::ofstream*>(this->stream)->close();
+    delete this->stream;
   }
   catch(...)
   {

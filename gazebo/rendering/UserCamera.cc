@@ -15,6 +15,7 @@
  *
 */
 #include <boost/bind.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -473,7 +474,7 @@ void UserCamera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->dataPtr->rightCamera->setAspectRatio(ratio);
-    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(vfov));
+    this->dataPtr->rightCamera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 
@@ -649,18 +650,21 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    auto const &ignBgColor = this->scene->BackgroundColor();
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBgColor));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
   }
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewport->setVisibilityMask(
+      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
 
   this->initialized = true;
 

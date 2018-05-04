@@ -18,6 +18,7 @@
 #define _GAZEBO_COLOR_HH_
 
 #include <iostream>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/CommonTypes.hh"
@@ -66,21 +67,35 @@ namespace gazebo
       public: typedef unsigned int ABGR;
 
       /// \brief Constructor
-      public: Color();
+      public: Color() GAZEBO_DEPRECATED(9.0);
 
       /// \brief Constructor
       /// \param[in] _r Red value (range 0 to 1)
       /// \param[in] _g Green value (range 0 to 1
       /// \param[in] _b Blue value (range 0 to 1
       /// \param[in] _a Alpha value (0=transparent, 1=opaque)
-      public: Color(float _r, float _g, float _b, float _a = 1.0);
+      public: Color(float _r, float _g, float _b, float _a = 1.0)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Converting constructor
+      /// \param[in] _color Color class from ignition library
+      // cppcheck-suppress noExplicitConstructor
+      public: Color(const ignition::math::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Converting assignment operator
+      /// \param[in] _color Color class from ignition library
+      public: Color &operator=(const ignition::math::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Convert to ignition type
+      public: ignition::math::Color Ign() const;
 
       /// \brief Copy Constructor
       /// \param[in] _clr Color to copy
-      public: Color(const Color &_clr);
+      public: Color(const Color &_clr) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Destructor
-      public: virtual ~Color();
+      public: virtual ~Color() GAZEBO_DEPRECATED(9.0);
 
       /// \brief Reset the color to default values
       public: void Reset();
@@ -115,7 +130,7 @@ namespace gazebo
       /// \brief Equal operator
       /// \param[in] _pt Color to copy
       /// \return Reference to this color
-      public: Color &operator =(const Color &_pt);
+      public: Color &operator =(const Color &_pt) GAZEBO_DEPRECATED(9.0);
 
       /// \brief Array index operator
       /// \param[in] _index Color component index(0=red, 1=green, 2=blue)
@@ -137,7 +152,6 @@ namespace gazebo
       /// \brief Get as uint32 ABGR packed value
       /// \return the color
       public: ABGR GetAsABGR() const;
-
 
       /// \brief Set from uint32 RGBA packed value
       /// \param[in] _v the new color

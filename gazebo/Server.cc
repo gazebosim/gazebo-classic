@@ -283,11 +283,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
     }
   }
 
-  if (this->dataPtr->vm.count("pause"))
-    this->dataPtr->params["pause"] = "true";
-  else
-    this->dataPtr->params["pause"] = "false";
-
   if (!this->PreLoad())
   {
     gzerr << "Unable to load gazebo\n";
@@ -544,6 +539,11 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+  if (sigaction(SIGTERM, &sigact, NULL))
+  {
+    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+              << std::endl;
+  }
 #endif
 
   if (this->dataPtr->stop)
@@ -577,11 +577,17 @@ void Server::Run()
 
   this->dataPtr->initialized = true;
 
-  // Update the sensors.
-  while (!this->dataPtr->stop && physics::worlds_running())
+  // Stay on this loop until Gazebo needs to be shut down
+  // The server and sensor manager outlive worlds
+  while (!this->dataPtr->stop)
   {
     this->ProcessControlMsgs();
-    sensors::run_once();
+
+    if (physics::worlds_running())
+      sensors::run_once();
+    else if (sensors::running())
+      sensors::stop();
+
     common::Time::MSleep(1);
   }
 
@@ -592,36 +598,14 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
+  bool p = this->dataPtr->vm.count("pause") > 0;
+  physics::pause_worlds(p);
   common::StrStr_M::const_iterator iter;
   for (iter = this->dataPtr->params.begin();
        iter != this->dataPtr->params.end();
        ++iter)
   {
-    if (iter->first == "pause")
-    {
-      bool p = false;
-      try
-      {
-        p = boost::lexical_cast<bool>(iter->second);
-      }
-      catch(...)
-      {
-        // Unable to convert via lexical_cast, so try "true/false" string
-        std::string str = iter->second;
-        boost::to_lower(str);
-
-        if (str == "true")
-          p = true;
-        else if (str == "false")
-          p = false;
-        else
-          gzerr << "Invalid param value[" << iter->first << ":"
-                << iter->second << "]\n";
-      }
-
-      physics::pause_worlds(p);
-    }
-    else if (iter->first == "record")
+    if (iter->first == "record")
     {
       util::LogRecordParams params;
 
@@ -736,8 +720,19 @@ void Server::ProcessControlMsgs()
     }
     else if ((*iter).has_save_world_name())
     {
-      physics::WorldPtr world = physics::get_world((*iter).save_world_name());
-      if ((*iter).has_save_filename())
+      // Get the world pointer.
+      physics::WorldPtr world;
+      try
+      {
+        world = physics::get_world((*iter).save_world_name());
+      }
+      catch(const common::Exception &)
+      {
+        gzerr << "Unable to save world. Unknown world ["
+               << (*iter).save_world_name() << "]" << std::endl;
+      }
+
+      if (world && (*iter).has_save_filename())
         world->Save((*iter).save_filename());
       else
         gzerr << "No filename specified.\n";

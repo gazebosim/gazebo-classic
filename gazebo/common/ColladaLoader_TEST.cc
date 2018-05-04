@@ -130,10 +130,10 @@ TEST_F(ColladaLoader, Material)
   ASSERT_TRUE(mat);
 
   // Make sure we read the specular value
-  EXPECT_EQ(mat->GetAmbient(), common::Color(0.0, 0.0, 0.0, 1.0));
-  EXPECT_EQ(mat->GetDiffuse(), common::Color(0.64, 0.64, 0.64, 1.0));
-  EXPECT_EQ(mat->GetSpecular(), common::Color(0.5, 0.5, 0.5, 1.0));
-  EXPECT_EQ(mat->GetEmissive(), common::Color(0.0, 0.0, 0.0, 1.0));
+  EXPECT_EQ(mat->Ambient(), ignition::math::Color(0.0, 0.0, 0.0, 1.0));
+  EXPECT_EQ(mat->Diffuse(), ignition::math::Color(0.64, 0.64, 0.64, 1.0));
+  EXPECT_EQ(mat->Specular(), ignition::math::Color(0.5, 0.5, 0.5, 1.0));
+  EXPECT_EQ(mat->Emissive(), ignition::math::Color(0.0, 0.0, 0.0, 1.0));
   EXPECT_DOUBLE_EQ(mat->GetShininess(), 50.0);
   // transparent: opaque="A_ONE", color=[1 1 1 1]
   // transparency: 1.0

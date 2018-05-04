@@ -244,7 +244,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Create a node from communication.
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // Advertise on the log control topic. The server listens to log control
   // messages.

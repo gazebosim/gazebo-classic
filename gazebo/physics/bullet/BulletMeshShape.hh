@@ -34,7 +34,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletMeshShape : public MeshShape
     {
       /// \brief Constructor
-      public: BulletMeshShape(CollisionPtr _parent);
+      public: explicit BulletMeshShape(CollisionPtr _parent);
 
       /// \brief Destructor
       public: virtual ~BulletMeshShape();

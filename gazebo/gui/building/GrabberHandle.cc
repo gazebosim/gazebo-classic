@@ -17,7 +17,7 @@
 
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Conversions.hh"
@@ -34,7 +34,7 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   this->dataPtr->index = _index;
   this->dataPtr->mouseDownX = 0;
   this->dataPtr->mouseDownY = 0;
-  this->dataPtr->borderColor = common::Color::Black;
+  this->dataPtr->borderColor = ignition::math::Color::Black;
   this->dataPtr->width = 8;
   this->dataPtr->height = 8;
   this->dataPtr->widthGrabBuffer = 10;
@@ -45,8 +45,8 @@ GrabberHandle::GrabberHandle(QGraphicsItem *_parent, int _index)
   this->setZValue(_parent->zValue() + 1);
   // this->setZValue(5);
   this->setAcceptHoverEvents(true);
-  this->dataPtr->handleColor = common::Color::Black;
-  this->dataPtr->borderColor = common::Color(247, 142, 30);
+  this->dataPtr->handleColor = ignition::math::Color::Black;
+  this->dataPtr->borderColor = ignition::math::Color(247, 142, 30);
 }
 
 /////////////////////////////////////////////////
@@ -105,15 +105,15 @@ double GrabberHandle::Height() const
 }
 
 /////////////////////////////////////////////////
-void GrabberHandle::SetColor(const common::Color &_color)
+void GrabberHandle::SetColor(const ignition::math::Color &_color)
 {
   this->dataPtr->handleColor = _color;
 }
 
 /////////////////////////////////////////////////
-common::Color GrabberHandle::Color() const
+ignition::math::Color GrabberHandle::Color() const
 {
-  return common::Color(this->dataPtr->handleColor);
+  return ignition::math::Color(this->dataPtr->handleColor);
 }
 
 /////////////////////////////////////////////////
@@ -195,7 +195,7 @@ QRectF GrabberHandle::boundingRect() const
 }
 
 /////////////////////////////////////////////////
-void GrabberHandle::SetBorderColor(const common::Color &_borderColor)
+void GrabberHandle::SetBorderColor(const ignition::math::Color &_borderColor)
 {
   this->dataPtr->borderColor = _borderColor;
 }

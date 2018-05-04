@@ -482,13 +482,13 @@ void Visual::Load()
     }
 
     if (matElemClone->HasElement("ambient"))
-      this->SetAmbient(matElemClone->Get<common::Color>("ambient"));
+      this->SetAmbient(matElemClone->Get<ignition::math::Color>("ambient"));
     if (matElemClone->HasElement("diffuse"))
-      this->SetDiffuse(matElemClone->Get<common::Color>("diffuse"));
+      this->SetDiffuse(matElemClone->Get<ignition::math::Color>("diffuse"));
     if (matElemClone->HasElement("specular"))
-      this->SetSpecular(matElemClone->Get<common::Color>("specular"));
+      this->SetSpecular(matElemClone->Get<ignition::math::Color>("specular"));
     if (matElemClone->HasElement("emissive"))
-      this->SetEmissive(matElemClone->Get<common::Color>("emissive"));
+      this->SetEmissive(matElemClone->Get<ignition::math::Color>("emissive"));
 
     if (matElem->HasElement("lighting"))
     {
@@ -767,6 +767,30 @@ Ogre::MovableObject *Visual::AttachMesh(const std::string &_meshName,
   }
   else
   {
+    // build tangent vectors if normal mapping in tangent space is specified
+    if (this->GetShaderType() == "normal_map_tangent_space")
+    {
+      Ogre::MeshPtr ogreMesh = Ogre::MeshManager::getSingleton().getByName(
+        _meshName);
+      if (!ogreMesh.isNull())
+      {
+        try
+        {
+          uint16_t src, dest;
+          if (!ogreMesh->suggestTangentVectorBuildParams(
+              Ogre::VES_TANGENT, src, dest))
+          {
+            ogreMesh->buildTangentVectors(Ogre::VES_TANGENT, src, dest);
+          }
+        }
+        catch(Ogre::Exception &e)
+        {
+          gzwarn << "Problem generating tangent vectors for " << _meshName
+                 << ". Normal map will not work: " << e.what() << std::endl;
+        }
+      }
+    }
+
     obj = (Ogre::MovableObject*)
         (this->dataPtr->sceneNode->getCreator()->createEntity(objName,
         meshName));
@@ -975,11 +999,11 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
   if (_materialName.empty() || _materialName == "__default__")
     return;
 
-  common::Color matAmbient;
-  common::Color matDiffuse;
-  common::Color matSpecular;
-  common::Color matEmissive;
-  bool matColor = rendering::Material::GetMaterialAsColor(
+  ignition::math::Color matAmbient;
+  ignition::math::Color matDiffuse;
+  ignition::math::Color matSpecular;
+  ignition::math::Color matEmissive;
+  bool matColor = rendering::Material::MaterialAsColor(
       _materialName, matAmbient, matDiffuse, matSpecular, matEmissive);
 
   if (_unique)
@@ -990,10 +1014,10 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
         _materialName;
 
     if (this->GetMaterialName() == newMaterialName &&
-        matAmbient == this->GetAmbient() &&
-        matDiffuse == this->GetDiffuse() &&
-        matSpecular == this->GetSpecular() &&
-        matEmissive == this->GetEmissive())
+        matAmbient == this->Ambient() &&
+        matDiffuse == this->Diffuse() &&
+        matSpecular == this->Specular() &&
+        matEmissive == this->Emissive())
       return;
 
     this->dataPtr->myMaterialName = newMaterialName;
@@ -1101,7 +1125,127 @@ void Visual::SetMaterial(const std::string &_materialName, bool _unique,
 }
 
 /////////////////////////////////////////////////
+void Visual::SetMaterialShaderParam(const std::string &_paramName,
+    const std::string &_shaderType, const std::string &_value)
+{
+  // currently only vertex and fragment shaders are supported
+  if (_shaderType != "vertex" && _shaderType != "fragment")
+  {
+    gzerr << "Shader type: '" << _shaderType << "' is not supported"
+          << std::endl;
+    return;
+  }
+
+  // set the parameter based name and type defined in material script
+  // and shaders
+  auto setNamedParam = [](Ogre::GpuProgramParametersSharedPtr _params,
+      const std::string &_name, const std::string &_v)
+  {
+    auto paramDef = _params->_findNamedConstantDefinition(_name);
+    if (!paramDef)
+      return;
+
+    switch (paramDef->constType)
+    {
+      case Ogre::GCT_INT1:
+      {
+        int value = Ogre::StringConverter::parseInt(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_FLOAT1:
+      {
+        Ogre::Real value = Ogre::StringConverter::parseReal(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+#if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0))
+      case Ogre::GCT_INT2:
+      case Ogre::GCT_FLOAT2:
+      {
+        Ogre::Vector2 value = Ogre::StringConverter::parseVector2(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+#endif
+      case Ogre::GCT_INT3:
+      case Ogre::GCT_FLOAT3:
+      {
+        Ogre::Vector3 value = Ogre::StringConverter::parseVector3(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_INT4:
+      case Ogre::GCT_FLOAT4:
+      {
+        Ogre::Vector4 value = Ogre::StringConverter::parseVector4(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      case Ogre::GCT_MATRIX_4X4:
+      {
+        Ogre::Matrix4 value = Ogre::StringConverter::parseMatrix4(_v);
+        _params->setNamedConstant(_name, value);
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  // loop through material techniques and passes to find the param
+  Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(
+      this->dataPtr->myMaterialName);
+  if (mat.isNull())
+  {
+    gzerr << "Failed to find material: '" << this->dataPtr->myMaterialName
+          << std::endl;
+    return;
+  }
+  for (unsigned int i = 0; i < mat->getNumTechniques(); ++i)
+  {
+    Ogre::Technique *technique = mat->getTechnique(i);
+    if (!technique)
+      continue;
+    for (unsigned int j = 0; j < technique->getNumPasses(); ++j)
+    {
+      Ogre::Pass *pass = technique->getPass(j);
+      if (!pass)
+        continue;
+
+      // check if pass is programmable, ie if they are using shaders
+      if (!pass->isProgrammable())
+        continue;
+
+      if (_shaderType == "vertex" && pass->hasVertexProgram())
+      {
+        setNamedParam(pass->getVertexProgramParameters(), _paramName, _value);
+      }
+      else if (_shaderType == "fragment" && pass->hasFragmentProgram())
+      {
+        setNamedParam(pass->getFragmentProgramParameters(), _paramName, _value);
+      }
+      else
+      {
+        gzerr << "Failed to retrieve shaders for material: '"
+              << this->dataPtr->myMaterialName << "', technique: '"
+              << technique->getName() << "', pass: '" << pass->getName() << "'"
+              << std::endl;
+        continue;
+      }
+    }
+  }
+}
+
+/////////////////////////////////////////////////
 void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
+{
+  this->SetAmbient(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetAmbient(const ignition::math::Color &_color,
+    const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1166,6 +1310,13 @@ void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
 
 /////////////////////////////////////////////////
 void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
+{
+  this->SetDiffuse(_color.Ign(), _cascade);
+}
+
+/////////////////////////////////////////////////
+void Visual::SetDiffuse(const ignition::math::Color &_color,
+    const bool _cascade)
 {
   if (!this->dataPtr->lighting)
     return;
@@ -1236,6 +1387,13 @@ void Visual::SetDiffuse(const common::Color &_color, const bool _cascade)
 /////////////////////////////////////////////////
 void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 {
+  this->SetSpecular(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetSpecular(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   if (!this->dataPtr->lighting)
     return;
 
@@ -1300,6 +1458,13 @@ void Visual::SetSpecular(const common::Color &_color, const bool _cascade)
 //////////////////////////////////////////////////
 void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 {
+  this->SetEmissive(_color.Ign(), _cascade);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetEmissive(const ignition::math::Color &_color,
+    const bool _cascade)
+{
   for (unsigned int i = 0; i < this->dataPtr->sceneNode->numAttachedObjects();
       i++)
   {
@@ -1354,11 +1519,37 @@ void Visual::SetEmissive(const common::Color &_color, const bool _cascade)
 /////////////////////////////////////////////////
 common::Color Visual::GetAmbient() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->ambient;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Ambient() const
+{
   return this->dataPtr->ambient;
 }
 
 /////////////////////////////////////////////////
 common::Color Visual::GetDiffuse() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->diffuse;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Diffuse() const
 {
   return this->dataPtr->diffuse;
 }
@@ -1366,11 +1557,37 @@ common::Color Visual::GetDiffuse() const
 /////////////////////////////////////////////////
 common::Color Visual::GetSpecular() const
 {
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->specular;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Specular() const
+{
   return this->dataPtr->specular;
 }
 
 /////////////////////////////////////////////////
 common::Color Visual::GetEmissive() const
+{
+#ifndef _WIN32
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+  return this->dataPtr->emissive;
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif
+}
+
+/////////////////////////////////////////////////
+ignition::math::Color Visual::Emissive() const
 {
   return this->dataPtr->emissive;
 }
@@ -1904,8 +2121,9 @@ void Visual::SetShaderType(const std::string &_type)
 
 
 //////////////////////////////////////////////////
-void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
-                            const common::Color &_changeColor)
+void Visual::SetRibbonTrail(bool _value,
+    const ignition::math::Color &_initialColor,
+    const ignition::math::Color &_changeColor)
 {
   if (this->dataPtr->ribbonTrail == nullptr)
   {
@@ -1945,6 +2163,14 @@ void Visual::SetRibbonTrail(bool _value, const common::Color &_initialColor,
     this->dataPtr->ribbonTrail->clearChain(0);
   }
   this->dataPtr->ribbonTrail->setVisible(_value);
+}
+
+//////////////////////////////////////////////////
+void Visual::SetRibbonTrail(bool _value,
+                  const common::Color &_initialColor,
+                  const common::Color &_changeColor)
+{
+  this->SetRibbonTrail(_value, _initialColor.Ign(), _changeColor.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1991,7 +2217,9 @@ std::string Visual::GetMaterialName() const
 //////////////////////////////////////////////////
 ignition::math::Box Visual::BoundingBox() const
 {
-  ignition::math::Box box;
+  ignition::math::Box box(
+      ignition::math::Vector3d::Zero,
+      ignition::math::Vector3d::Zero);
   this->BoundsHelper(this->GetSceneNode(), box);
   return box;
 }
@@ -2093,7 +2321,6 @@ void Visual::InsertMesh(const std::string &_meshName,
     this->InsertMesh(mesh);
   }*/
 }
-
 //////////////////////////////////////////////////
 void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
     bool _centerSubmesh)
@@ -3442,28 +3669,28 @@ void Visual::ProcessMaterialMsg(const ignition::msgs::Material &_msg)
 
   if (_msg.has_ambient())
   {
-    this->SetAmbient(common::Color(
+    this->SetAmbient(ignition::math::Color(
           _msg.ambient().r(), _msg.ambient().g(), _msg.ambient().b(),
           _msg.ambient().a()));
   }
 
   if (_msg.has_diffuse())
   {
-    this->SetDiffuse(common::Color(
+    this->SetDiffuse(ignition::math::Color(
           _msg.diffuse().r(), _msg.diffuse().g(), _msg.diffuse().b(),
           _msg.diffuse().a()));
   }
 
   if (_msg.has_specular())
   {
-    this->SetSpecular(common::Color(
+    this->SetSpecular(ignition::math::Color(
           _msg.specular().r(), _msg.specular().g(), _msg.specular().b(),
           _msg.specular().a()));
   }
 
   if (_msg.has_emissive())
   {
-    this->SetEmissive(common::Color(
+    this->SetEmissive(ignition::math::Color(
           _msg.emissive().r(), _msg.emissive().g(), _msg.emissive().b(),
           _msg.emissive().a()));
   }
@@ -3510,25 +3737,25 @@ void Visual::FillMaterialMsg(ignition::msgs::Material &_msg) const
     _msg.mutable_script()->set_name(this->dataPtr->origMaterialName);
   }
 
-  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.r);
-  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.g);
-  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.b);
-  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.a);
+  _msg.mutable_ambient()->set_r(this->dataPtr->ambient.R());
+  _msg.mutable_ambient()->set_g(this->dataPtr->ambient.G());
+  _msg.mutable_ambient()->set_b(this->dataPtr->ambient.B());
+  _msg.mutable_ambient()->set_a(this->dataPtr->ambient.A());
 
-  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.r);
-  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.g);
-  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.b);
-  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.a);
+  _msg.mutable_diffuse()->set_r(this->dataPtr->diffuse.R());
+  _msg.mutable_diffuse()->set_g(this->dataPtr->diffuse.G());
+  _msg.mutable_diffuse()->set_b(this->dataPtr->diffuse.B());
+  _msg.mutable_diffuse()->set_a(this->dataPtr->diffuse.A());
 
-  _msg.mutable_specular()->set_r(this->dataPtr->specular.r);
-  _msg.mutable_specular()->set_g(this->dataPtr->specular.g);
-  _msg.mutable_specular()->set_b(this->dataPtr->specular.b);
-  _msg.mutable_specular()->set_a(this->dataPtr->specular.a);
+  _msg.mutable_specular()->set_r(this->dataPtr->specular.R());
+  _msg.mutable_specular()->set_g(this->dataPtr->specular.G());
+  _msg.mutable_specular()->set_b(this->dataPtr->specular.B());
+  _msg.mutable_specular()->set_a(this->dataPtr->specular.A());
 
-  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.r);
-  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.g);
-  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.b);
-  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.a);
+  _msg.mutable_emissive()->set_r(this->dataPtr->emissive.R());
+  _msg.mutable_emissive()->set_g(this->dataPtr->emissive.G());
+  _msg.mutable_emissive()->set_b(this->dataPtr->emissive.B());
+  _msg.mutable_emissive()->set_a(this->dataPtr->emissive.A());
 
   if (!this->GetNormalMap().empty())
     _msg.set_normal_map(this->GetNormalMap());

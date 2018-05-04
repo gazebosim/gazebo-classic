@@ -249,6 +249,12 @@ const std::string &LogRecord::Encoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
+  this->dataPtr->logControlSub.reset();
+  this->dataPtr->logStatusPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   {
     std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
     this->dataPtr->cleanupCondition.notify_all();
@@ -263,10 +269,6 @@ void LogRecord::Fini()
 
   // Remove all the logs.
   this->ClearLogs();
-
-  this->dataPtr->logControlSub.reset();
-  this->dataPtr->logStatusPub.reset();
-  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////

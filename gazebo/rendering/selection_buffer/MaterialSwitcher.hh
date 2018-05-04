@@ -15,13 +15,13 @@
  *
 */
 
-#ifndef _MATERIALSWITCHER_HH_
-#define _MATERIALSWITCHER_HH_
+#ifndef GAZEBO_RENDERING_SELECTIONBUFFER_MATERIALSWITCHER_HH_
+#define GAZEBO_RENDERING_SELECTIONBUFFER_MATERIALSWITCHER_HH_
 
 #include <map>
 #include <string>
+#include <ignition/math/Color.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -30,9 +30,10 @@ namespace gazebo
   {
     /*struct cmp_color
     {
-      bool operator()(const common::Color &_a, const common::Color &_b) const
+      bool operator()(const ignition::math::Color &_a,
+                      const ignition::math::Color &_b) const
       {
-        return _a.GetAsBGRA() < _b.GetAsBGRA();
+        return _a.AsBGRA() < _b.AsBGRA();
       }
     };*/
 
@@ -47,8 +48,9 @@ namespace gazebo
       public: ~MaterialSwitcher();
 
       /// \brief Get the entity with a specific color
+      /// \param[in] _color The entity's color.
       public: const std::string &GetEntityName(
-                  const common::Color &_color) const;
+              const ignition::math::Color &_color) const;
 
       /// \brief Reset the color value incrementor
       public: void Reset();
@@ -64,7 +66,7 @@ namespace gazebo
       private: typedef std::map<unsigned int, std::string> ColorMap;
       private: typedef ColorMap::const_iterator ColorMapConstIter;
       private: std::string emptyString;
-      private: common::Color currentColor;
+      private: ignition::math::Color currentColor;
       private: std::string lastEntity;
       private: Ogre::Technique *lastTechnique;
       private: MaterialSwitcher::ColorMap colorDict;

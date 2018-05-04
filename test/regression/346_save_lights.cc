@@ -29,7 +29,7 @@ class Issue346Test : public ServerFixture
 // \brief Test for issue #346
 TEST_F(Issue346Test, SaveLights)
 {
-  Load("worlds/empty.world", true);
+  this->Load("worlds/empty.world", true);
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != NULL);
 
@@ -42,8 +42,8 @@ TEST_F(Issue346Test, SaveLights)
   ignition::math::Vector3d pointLightRot(0, 0.8, 0.1);
 
   // Spawn two lights: one spot light and one point light
-  SpawnLight(spotLightName, "spot", spotLightPos, spotLightRot);
-  SpawnLight(pointLightName, "point", pointLightPos, pointLightRot);
+  this->SpawnLight(spotLightName, "spot", spotLightPos, spotLightRot);
+  this->SpawnLight(pointLightName, "point", pointLightPos, pointLightRot);
 
   boost::filesystem::path pathOut(boost::filesystem::current_path());
   boost::filesystem::create_directories(pathOut /
