@@ -92,7 +92,8 @@ TEST_P(ExamplesBuild_Plugins, Plugins)
 
 ///////////////////////////////////////////////////////////////////
 INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
-  "animate_joints"
+  "actor_collisions"
+  , "animate_joints"
   , "animate_pose"
   , "factory"
   , "gui_overlay_plugin_spawn"
@@ -104,6 +105,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "parameters"
   , "projector"
   , "system_gui_plugin"
+  , "trigger_light"
   , "world_edit"
 ));
 

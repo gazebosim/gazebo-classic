@@ -209,6 +209,12 @@ bool ConnectionManager::Init(const std::string &_masterHost,
 }
 
 //////////////////////////////////////////////////
+bool ConnectionManager::IsInitialized() const
+{
+  return this->initialized;
+}
+
+//////////////////////////////////////////////////
 void ConnectionManager::Fini()
 {
   if (!this->initialized)
