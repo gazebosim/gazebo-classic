@@ -421,7 +421,7 @@ bool TopicCommand::Publish(const std::string &_topic)
     std::ifstream ifs(filename.c_str());
     if (!ifs)
     {
-      gzerr << "Error: Unable to open file[" << filename << "]\n";
+      std::cerr << "Error: Unable to open file[" << filename << "]\n";
       return false;
     }
 
@@ -430,27 +430,73 @@ bool TopicCommand::Publish(const std::string &_topic)
   }
   else
   {
-    gzerr << "Error: Missing message to publish on topic.\n";
+    std::cerr << "Error: Missing message to publish on topic.\n";
     return false;
   }
 
   std::string topicName = this->node->DecodeTopicName(_topic);
 
-  // Get the message type on the topic.
-  std::string msgTypeName = gazebo::transport::getTopicMsgType(topicName);
-
-  if (msgTypeName.empty())
+  // Get the message type on the topic
+  std::string msgTypeName;
+  transport::ConnectionPtr connection = transport::connectToMaster();
+  if (connection)
   {
-    gzerr << "Unable to get message type for topic[" << _topic << "]\n";
-    return false;
+    msgs::Request *request;
+    request = msgs::CreateRequest("get_topics");
+    connection->EnqueueMsg(msgs::Package("request", *request), true);
+    std::string topicData;
+    connection->Read(topicData);
+
+    msgs::Packet packet;
+    packet.ParseFromString(topicData);
+    msgs::GzString_V topics;
+    topics.ParseFromString(packet.serialized_data());
+
+    for (int i = 0; i < topics.data_size(); ++i)
+    {
+      if (topics.data(i) == topicName)
+      {
+        request = msgs::CreateRequest("topic_info", topics.data(i));
+        connection->EnqueueMsg(msgs::Package("request", *request), true);
+
+        int j = 0;
+        do
+        {
+          std::string data;
+          connection->Read(data);
+          packet.ParseFromString(data);
+        }
+        while (packet.type() != "topic_info_response" && ++j < 10);
+
+        msgs::TopicInfo topicInfo;
+        if (j <10)
+        {
+          topicInfo.ParseFromString(packet.serialized_data());
+          msgTypeName = topicInfo.msg_type();
+        }
+        else
+        {
+          std::cerr << "Unable to get info for topic["
+                    << topics.data(i) << "]\n";
+        }
+
+        break;
+      }
+    }
+
+    if (msgTypeName.empty())
+    {
+      std::cerr << "Unable to get message type for topic[" << _topic << "]\n";
+      return false;
+    }
   }
 
+  // Create message
   boost::shared_ptr<google::protobuf::Message> msg =
     msgs::MsgFactory::NewMsg(msgTypeName);
-
   if (!msg)
   {
-    gzerr << "Unable to create message of type[" << msgTypeName << "]\n";
+    std::cerr << "Unable to create message of type[" << msgTypeName << "]\n";
     transport::fini();
     return false;
   }
