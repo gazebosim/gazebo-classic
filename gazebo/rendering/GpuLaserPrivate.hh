@@ -133,11 +133,6 @@ namespace gazebo
 
       /// Number of second pass texture units created.
       public: static int texCount;
-
-      /// \brief Padding added to vertical FOV in order capture a large enough
-      /// depth image needed when undistorting min and max vertical laser scans
-      /// in a horizontal sweep.
-      public: double vfovPadding;
     };
   }
 }

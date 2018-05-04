@@ -618,8 +618,6 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double viewHeight = this->dataPtr->h2nd/10.0;
-
   if (this->dataPtr->h2nd == 1)
   {
     dy = 0;
@@ -635,7 +633,7 @@ void GpuLaser::CreateMesh()
   // startY ranges from h2nd/10 to 0 at dy=0.1 decrements
   // see GpuLaser::Set2ndPassTarget() on how the ortho cam is set up
   double startX = dx;
-  double startY = viewHeight;
+  double startY = this->dataPtr->h2nd/10.0;
 
   // half of actual camera vertical FOV without padding
   double phi = this->VertFOV() / 2;
@@ -849,8 +847,6 @@ void GpuLaser::SetHorzFOV(const double _hfov)
 //////////////////////////////////////////////////
 void GpuLaser::SetVertFOV(const double _vfov)
 {
-//  this->vfov = math::equal(_vfov, 0.0) ? 0.0 : M_PI / 2.0;
-//  this->dataPtr->vfovPadding = this->vfov - _vfov;
   this->vfov = _vfov;
 }
 
