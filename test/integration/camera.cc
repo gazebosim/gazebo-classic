@@ -217,6 +217,99 @@ TEST_F(CameraTest, Visible)
 }
 
 /////////////////////////////////////////////////
+// Spawn a mesh in front of camera and test ray triangle intersection
+TEST_F(CameraTest, RayTriangleIntersection)
+{
+  Load("worlds/empty.world");
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  ignition::math::Pose3d cameraStartPose(-1, 0, 0.02, 0, 0, 0);
+
+  // Spawn a camera for ray intersection test
+  SpawnCamera("test_camera_model", "test_camera",
+      cameraStartPose.Pos(), cameraStartPose.Rot().Euler());
+
+  // Spawn a cordless drill
+  SpawnModel("model://cordless_drill");
+  WaitUntilEntitySpawn("drill", 100, 50);
+
+  // verify ray triangle intersection in rendering thread
+  bool verified = false;
+  auto testRayIntersection = [&]()
+  {
+    // get scene
+    rendering::ScenePtr scene = rendering::get_scene();
+    ASSERT_TRUE(scene != nullptr);
+
+    // wait until the camera is created in scene
+    rendering::CameraPtr camera = scene->GetCamera(
+        "test_camera_model::body::test_camera");
+    if (!camera)
+      return;
+
+    // wait until the drill is created in scene
+    rendering::VisualPtr drillVis = scene->GetVisual("drill");
+    if (!drillVis)
+      return;
+
+    // wait until the camera is in place
+    if (camera->WorldPose() != cameraStartPose)
+      return;
+
+    // sanity check
+    if (!camera->IsVisible(drillVis))
+      return;
+
+    // test ray intersection with a mesh
+    ignition::math::Vector2i drillImgPos =
+        camera->Project(drillVis->GetWorldPose().Ign().Pos() +
+                        ignition::math::Vector3d(0, 0, 0.05));
+
+    ignition::math::Vector3d intersectPos;
+    bool intersect = scene->FirstContact(camera, drillImgPos, intersectPos);
+
+    // camera ray should intersect with a triangle on mesh
+    EXPECT_TRUE(intersect);
+    EXPECT_GT(intersectPos.X(), -1);
+    EXPECT_LT(intersectPos.X(), 0);
+    EXPECT_TRUE(ignition::math::equal(intersectPos.Y(), 0.0, 1e-4));
+    EXPECT_GT(intersectPos.Z(), 0);
+    EXPECT_LT(intersectPos.Z(), 0.05);
+
+    // cast a ray so that it's within the bounding box of the mesh but doesn't
+    // intersect with any triangles
+    ignition::math::Vector2i emptyImgPos =
+        camera->Project(drillVis->GetWorldPose().Ign().Pos() +
+                        ignition::math::Vector3d(0, 0, 0.1));
+
+    // ray should not intersect with any triangles on mesh
+    intersect = scene->FirstContact(camera, emptyImgPos, intersectPos);
+    EXPECT_FALSE(intersect);
+    EXPECT_EQ(ignition::math::Vector3d::Zero, intersectPos);
+
+    verified = true;
+  };
+  auto connection =
+      event::Events::ConnectPreRender(std::bind(testRayIntersection));
+
+  // wait until the verification has been done in the rendering thread
+  int sleep = 0;
+  int maxSleep = 50;
+  while (sleep++ < maxSleep)
+  {
+    common::Time::MSleep(100);
+    if (verified)
+      break;
+  }
+  EXPECT_TRUE(verified);
+
+  connection.reset();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

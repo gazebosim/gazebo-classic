@@ -38,6 +38,7 @@ endif()
 
 set (plugins_single_header
   ActuatorPlugin
+  AmbientOcclusionVisualPlugin
   ArrangePlugin
   AttachLightPlugin
   BlinkVisualPlugin
