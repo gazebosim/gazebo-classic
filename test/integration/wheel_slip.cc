@@ -444,6 +444,7 @@ TEST_F(WheelSlipTest, TriballDrift)
   measures["triball_lumped"].model = world->GetModel("triball_lumped");
   measures["triball_fixed"].model = world->GetModel("triball_fixed");
   measures["triball_revolute"].model = world->GetModel("triball_revolute");
+  measures["triball_wheel_slip"].model = world->GetModel("triball_wheel_slip");
   for (auto &measure : measures)
   {
     ASSERT_NE(measure.second.model, nullptr);
@@ -465,6 +466,8 @@ TEST_F(WheelSlipTest, TriballDrift)
   EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-5);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 2e-4);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 7e-5);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 3e-4);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsVelocityX.Value(), 7e-5);
 
   // try it again with more ODE solver iterations
   physics->SetParam("iters", 200);
@@ -491,6 +494,8 @@ TEST_F(WheelSlipTest, TriballDrift)
   EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-6);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 1e-7);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 1e-6);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 1e-7);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsVelocityX.Value(), 1e-6);
 }
 
 /////////////////////////////////////////////////
