@@ -549,16 +549,6 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
 {
   this->dataPtr->firstPassTargets[_index] = _target;
 
-  if (_index == 0)
-  {
-    this->camera->setAspectRatio(this->RayCountRatio());
-    this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
-    gzmsg << "1st target VFOV: " << this->camera->getFOVy().valueRadians()
-        << "\n";
-    gzmsg << "1st target aspect ratio: " << this->camera->getAspectRatio()
-        << "\n";
-  }
-
   if (this->dataPtr->firstPassTargets[_index])
   {
     // Setup the viewport to use the texture
@@ -572,6 +562,12 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
         Ogre::ColourValue(this->farClip, 0.0, 1.0));
     this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
+  }
+
+  if (_index == 0)
+  {
+    this->camera->setAspectRatio(this->RayCountRatio());
+    this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
   }
 }
 
