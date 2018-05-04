@@ -89,7 +89,9 @@ LogRecord::LogRecord()
     this->dataPtr->logBasePath = paths->GetTmpPath() + "/gazebo";
   }
   else
+  {
     this->dataPtr->logBasePath = boost::filesystem::path(homePath);
+  }
 
   this->dataPtr->logBasePath /= "/.gazebo/log/";
 
@@ -166,6 +168,10 @@ bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 
   // Get the current time as an ISO string.
   std::string logTimeDir = common::Time::GetWallTimeAsISOString();
+
+  // remove ":" if the dir is to be added to env path, e.g. for playback
+  // with resources
+  logTimeDir = common::replaceAll(logTimeDir, ":", "");
 
   // Override the default path settings if the _path parameter is set.
   if (!_path.empty())
@@ -279,6 +285,8 @@ void LogRecord::Stop()
   if (this->dataPtr->cleanupThread && this->dataPtr->cleanupThread->joinable())
     this->dataPtr->cleanupThread->join();
   this->dataPtr->cleanupThread.reset();
+  this->dataPtr->savedModels.clear();
+  this->dataPtr->savedFiles.clear();
 }
 
 //////////////////////////////////////////////////
@@ -349,6 +357,18 @@ bool LogRecord::GetRunning() const
 bool LogRecord::Running() const
 {
   return this->dataPtr->running;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::RecordResources() const
+{
+  return this->dataPtr->recordResources;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetRecordResources(const bool _record)
+{
+  this->dataPtr->recordResources = _record;
 }
 
 //////////////////////////////////////////////////
@@ -545,6 +565,151 @@ bool LogRecord::GetFirstUpdate() const
 bool LogRecord::FirstUpdate() const
 {
   return this->dataPtr->firstUpdate;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::SaveModels(const std::set<std::string> &_models)
+{
+  std::set<std::string> diff;
+  std::set_difference(_models.begin(), _models.end(),
+      this->dataPtr->savedModels.begin(), this->dataPtr->savedModels.end(),
+      std::inserter(diff, diff.begin()));
+
+  for (auto &model: diff)
+  {
+    if (model.empty())
+      continue;
+
+    this->dataPtr->savedModels.insert(model);
+
+    bool modelFound = false;
+    for (const auto &path : common::SystemPaths::Instance()->GetModelPaths())
+    {
+      boost::filesystem::path srcModelPath(path);
+      srcModelPath /= model;
+      if (boost::filesystem::exists(srcModelPath))
+      {
+        modelFound = true;
+        boost::filesystem::path destModelPath =
+          this->dataPtr->logCompletePath / model;
+        if (!gazebo::common::copyDir(srcModelPath, destModelPath))
+        {
+          gzerr << "Failed to copy model from '" << srcModelPath.string()
+                 << "' to '" << destModelPath.string() << "'" << std::endl;
+        }
+        break;
+      }
+    }
+
+    if (!modelFound)
+    {
+      gzwarn << "Model: " << model << " not found, "
+        << "please check the value of env variable GAZEBO_MODEL_PATH\n";
+    }
+  }
+  return true;
+}
+
+//////////////////////////////////////////////////
+bool LogRecord::SaveFiles(const std::set<std::string> &_files)
+{
+  if (_files.empty())
+    return false;
+
+  bool saveError = false;
+  std::set<std::string> diff;
+  std::set_difference(_files.begin(), _files.end(),
+      this->dataPtr->savedFiles.begin(),
+      this->dataPtr->savedFiles.end(),
+      std::inserter(diff, diff.begin()));
+
+  for (auto &file : diff)
+  {
+    if (file.empty())
+      continue;
+
+    this->dataPtr->savedFiles.insert(file);
+
+    bool fileFound = false;
+    std::string prefix = "file://";
+    std::string fileName = file;
+
+    boost::filesystem::path srcPath;
+    if (fileName.find(prefix) == 0u)
+    {
+      // strip prefix
+      fileName = file.substr(prefix.size());
+      // search in gazebo path
+      for (const auto &path : common::SystemPaths::Instance()->GetGazeboPaths())
+      {
+        auto p = boost::filesystem::path(path) / fileName;
+        if (common::exists(p.string()))
+        {
+          srcPath = path;
+          fileFound = true;
+          break;
+        }
+      }
+    }
+
+    // if not found in gazebo path or resource has abs path then check local
+    // filesystem
+    if (!fileFound || fileName[0] == '/')
+    {
+      fileFound = common::exists(fileName);
+    }
+
+    // copy resource
+    // NOTE: if file is a mesh, e.g. box.dae, it could contain reference to
+    // to texture files in other directories. A hacky workaround is to copy
+    // entire model dir
+    if (fileFound)
+    {
+      // HACK! copy entire model dir if mesh
+      size_t meshIdx = fileName.find("/meshes/");
+      if (meshIdx != std::string::npos)
+      {
+        auto modelPath =
+            boost::filesystem::path(fileName.substr(0, meshIdx));
+        srcPath = srcPath / modelPath;
+        boost::filesystem::path destPath =
+          this->dataPtr->logCompletePath / modelPath;
+        boost::system::error_code errorCode;
+        boost::filesystem::create_directories(destPath, errorCode);
+        if (errorCode != 0 || !gazebo::common::copyDir(srcPath, destPath))
+        {
+          gzerr << "Failed to copy model from '" << srcPath.string()
+                 << "' to '" << destPath.string() << "'" << std::endl;
+          saveError = true;
+        }
+      }
+      // else copy only the specified file
+      else
+      {
+        srcPath = srcPath / fileName;
+        boost::filesystem::path destPath =
+          this->dataPtr->logCompletePath / fileName;
+        boost::system::error_code errorCode;
+        boost::filesystem::create_directories(
+            destPath.parent_path(), errorCode);
+        if (errorCode == 0)
+          boost::filesystem::copy_file(srcPath, destPath, errorCode);
+        else
+        {
+          gzerr << "Failed to copy file from '" << srcPath.string()
+                 << "' to '" << destPath.string() << "'" << std::endl;
+          saveError = true;
+        }
+      }
+    }
+    else
+    {
+      gzerr << "File: " << file << " not found!" << std::endl;
+      saveError = true;
+    }
+  }
+
+  return !saveError;
 }
 
 //////////////////////////////////////////////////

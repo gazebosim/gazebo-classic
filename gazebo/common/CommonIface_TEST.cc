@@ -20,8 +20,10 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/CommonIface.hh"
+#include "gazebo/common/SystemPaths.hh"
 #include "test/util.hh"
 
 using namespace gazebo;
@@ -171,6 +173,50 @@ TEST_F(CommonIface_TEST, replaceAll)
   std::string test = "12345555675";
   common::replaceAll(test, test, "5", "*");
   EXPECT_EQ(test, "1234****67*");
+}
+
+/////////////////////////////////////////////////
+TEST_F(CommonIface_TEST, directoryOps)
+{
+  // Cleanup test directory.
+  common::SystemPaths *paths = common::SystemPaths::Instance();
+  boost::filesystem::path testPath(paths->GetDefaultTestPath());
+  boost::filesystem::remove_all(testPath);
+  boost::filesystem::create_directories(testPath);
+
+  boost::filesystem::path src = testPath / "src";
+  boost::filesystem::path dest = testPath / "dest";
+  boost::filesystem::create_directories(src);
+  boost::filesystem::path srcFilePath = src / "test.txt";
+  std::ofstream srcFile(srcFilePath.string());
+  srcFile << "This is a test file!" << std::endl;
+  srcFile.close();
+  EXPECT_FALSE(boost::filesystem::exists(dest));
+  EXPECT_TRUE(boost::filesystem::exists(srcFilePath));
+
+  // src exists, dest doesn't
+  EXPECT_TRUE(common::copyDir(src, dest));
+  EXPECT_TRUE(boost::filesystem::exists(dest));
+
+  // src not exists
+  boost::filesystem::remove_all(src);
+  EXPECT_FALSE(common::copyDir(src, dest));
+
+  // dest exists with nonempty contents
+  boost::filesystem::create_directories(src);
+  boost::filesystem::path srcFile2Path = src / "test2.txt";
+  std::ofstream srcFile2(srcFile2Path.string());
+  srcFile2 << "This is a 2nd test file!" << std::endl;
+  srcFile2.close();
+  EXPECT_FALSE(boost::filesystem::exists(srcFilePath));
+  boost::filesystem::path destFilePath = dest / "test.txt";
+  boost::filesystem::path destFile2Path = dest / "test2.txt";
+  EXPECT_TRUE(boost::filesystem::exists(destFilePath));
+  EXPECT_TRUE(boost::filesystem::exists(srcFile2Path));
+
+  EXPECT_TRUE(common::copyDir(src, dest));
+  EXPECT_TRUE(common::exists(destFile2Path.string()));
+  EXPECT_FALSE(common::exists(destFilePath.string()));
 }
 
 /////////////////////////////////////////////////
