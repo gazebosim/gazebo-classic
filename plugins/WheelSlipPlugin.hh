@@ -32,7 +32,7 @@ namespace gazebo
   class WheelSlipPluginPrivate;
 
   /// \brief A plugin that updates ODE wheel slip parameters based
-  /// on wheel spin velocity (radius * spin rate).
+  /// on linear wheel spin velocity (radius * spin rate).
   /// It currently assumes that the fdir1 friction parameter is set
   /// parallel to the joint axis (often [0 0 1]) and that the link
   /// origin is on the joint axis.
@@ -42,28 +42,60 @@ namespace gazebo
   /// and it has units of velocity / force (m / s / N),
   /// similar to the inverse of a viscous damping coefficient.
   /// The slip_compliance parameters specified in this plugin
-  /// have units of 1/force (1/N), and the wheel spin velocity
-  /// is multiplied by these compliances at each time step
-  /// to provide a scaled form of slip, that matches how
-  /// slip is often defined for wheel-terrain interaction models.
+  /// are unitless, representing the lateral or longitudinal slip ratio
+  /// (see https://en.wikipedia.org/wiki/Slip_(vehicle_dynamics) )
+  /// to tangential force ratio (tangential / normal force).
+  /// Note that the maximum force ratio is the friction coefficient.
+  /// At each time step, these compliance are multipled by
+  /// the linear wheel spin velocity and divided by the wheel_normal_force
+  /// parameter specified below in order to match the units of the ODE
+  /// slip parameters.
+  ///
+  /// A graphical interpretation of these parameters is provided below
+  /// for a positive value of slip compliance.
+  /// The horizontal axis corresponds to the slip ratio at the wheel,
+  /// and the vertical axis corresponds to the tangential force ratio
+  /// (tangential / normal force).
+  /// As wheel slip increases, the tangential force increases until
+  /// it reaches the maximum set by the friction coefficient.
+  /// The slip compliance corresponds to the inverse of the slope
+  /// of the force before it reaches the maximum value.
+  /// A slip compliance of 0 corresponds to a completely vertical
+  /// portion of the plot below.
+  /// As slip compliance increases, the slope decreases.
   ///
   /** \verbatim
+        |                                            .
+        |      _________ friction coefficient        .
+        |     /                                      .
+        |    /|                                      .
+        |   /-┘ slope is inverse of                  .
+        |  /    slip compliance                      .
+        | /                                          .
+        |/                                           .
+      --+-------------------------- slipRatio
+        |
+
     <plugin filename="libWheelSlipPlugin.so" name="wheel_slip">
       <wheel link_name="wheel_front_left">
         <slip_compliance_lateral>0</slip_compliance_lateral>
         <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+        <wheel_normal_force>100</wheel_normal_force>
       </wheel>
       <wheel link_name="wheel_front_right">
         <slip_compliance_lateral>0</slip_compliance_lateral>
         <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+        <wheel_normal_force>100</wheel_normal_force>
       </wheel>
       <wheel link_name="wheel_rear_left">
         <slip_compliance_lateral>0</slip_compliance_lateral>
         <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+        <wheel_normal_force>80</wheel_normal_force>
       </wheel>
       <wheel link_name="wheel_rear_right">
         <slip_compliance_lateral>0</slip_compliance_lateral>
         <slip_compliance_longitudinal>0.1</slip_compliance_longitudinal>
+        <wheel_normal_force>80</wheel_normal_force>
       </wheel>
     </plugin>
    \endverbatim */
