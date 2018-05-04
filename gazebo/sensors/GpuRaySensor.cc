@@ -717,60 +717,15 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->RangeMin());
   scan->set_range_max(this->RangeMax());
 
-  // see RaySensor.cc for documentation on range interpolation.
-  unsigned int rayCount = this->RayCount();
-  unsigned int rangeCount = this->RangeCount();
-  unsigned int verticalRayCount = this->VerticalRayCount();
-  unsigned int verticalRangeCount = this->VerticalRangeCount();
-  unsigned int hja, hjb;
-  unsigned int vja, vjb;
-  double vb, hb;
-  int j1, j2, j3, j4;
-  double r1, r2, r3, r4;
-
   bool add = scan->ranges_size() == 0;
+  const float *laserBuffer = this->dataPtr->laserCam->LaserData();
 
-  // todo: add loop for vertical range count
   for (int j = 0; j < this->VerticalRayCount(); ++j)
   {
-    vb = (verticalRangeCount == 1) ? 0 :
-        static_cast<double>(j * (verticalRayCount - 1))
-        / (verticalRangeCount - 1);
-    vja = static_cast<int>(floor(vb));
-    vjb = std::min(vja + 1, verticalRayCount - 1);
-    vb = vb - floor(vb);
-
-    GZ_ASSERT(vja < verticalRayCount,
-        "Invalid vertical ray index used for interpolation");
-    GZ_ASSERT(vjb < verticalRayCount,
-        "Invalid vertical ray index used for interpolation");
-
     for (int i = 0; i < this->RayCount(); ++i)
     {
       int index = j * this->RayCount() + i;
-      hb = (rangeCount == 1)? 0 : static_cast<double>(i * (rayCount - 1))
-          / (rangeCount - 1);
-      hja = static_cast<int>(floor(hb));
-      hjb = std::min(hja + 1, rayCount - 1);
-      hb = hb - floor(hb);
-
-      GZ_ASSERT(hja < rayCount,
-          "Invalid horizontal ray index used for interpolation");
-      GZ_ASSERT(hjb < rayCount,
-          "Invalid horizontal ray index used for interpolation");
-
-      j1 = hja + vja * rayCount;
-      j2 = hjb + vja * rayCount;
-      j3 = hja + vjb * rayCount;
-      j4 = hjb + vjb * rayCount;
-
-      const float *laserBuffer = this->dataPtr->laserCam->LaserData();
-      r1 = laserBuffer[j1*3];
-      r2 = laserBuffer[j2*3];
-      r3 = laserBuffer[j3*3];
-      r4 = laserBuffer[j4*3];
-      double range = (1-vb)*((1 - hb) * r1 + hb * r2)
-          + vb *((1 - hb) * r3 + hb * r4);
+      double range = laserBuffer[index*3];
 
       // Mask ranges outside of min/max to +/- inf, as per REP 117
       if (range >= this->RangeMax())
