@@ -197,10 +197,19 @@ void GpuRaySensor::Init()
     this->dataPtr->horzRayCount /= cameraCount;
 
     // vertical laser setup
-    double vfov = (this->VerticalAngleMax() -
-        this->VerticalAngleMin()).Radian();
-    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
-                 + this->VerticalAngleMin()).Radian() / 2.0);
+    double vfov;
+
+    if (this->dataPtr->vertRayCount > 1)
+    {
+      vfov = (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian();
+    }
+    else
+    {
+      vfov = 0;
+
+      this->SetVerticalAngleMin(0);
+      this->SetVerticalAngleMax(0);
+    }
 
     if (vfov > M_PI / 2)
     {
@@ -209,7 +218,8 @@ void GpuRaySensor::Init()
     }
 
     this->dataPtr->laserCam->SetVertFOV(vfov);
-
+    this->dataPtr->laserCam->SetVertHalfAngle((this->VerticalAngleMax()
+                     + this->VerticalAngleMin()).Radian() / 2.0);
 
     this->SetVerticalAngleMin(this->dataPtr->laserCam->VertHalfAngle() -
                               (vfov / 2));
@@ -222,11 +232,13 @@ void GpuRaySensor::Init()
     // Vertical sweeps can be achieved by rotating the gpu ray sensor.
     double vfov_camera = 2 * atan(tan(vfov / 2) / cos(hfov / 2));
     this->dataPtr->laserCam->SetCosVertFOV(vfov_camera);
-    double camera_aspect_ratio = tan(hfov / 2.0) / tan(vfov_camera / 2.0);
 
     if (this->dataPtr->vertRayCount > 1)
     {
+      double camera_aspect_ratio = tan(hfov / 2.0) / tan(vfov_camera / 2.0);
       this->dataPtr->laserCam->SetRayCountRatio(camera_aspect_ratio);
+
+      gzmsg << "Camera aspect ratio: " << camera_aspect_ratio << "\n";
 
       if ((this->dataPtr->horzRayCount / this->RayCountRatio()) >
           this->dataPtr->vertRayCount)
@@ -240,12 +252,16 @@ void GpuRaySensor::Init()
           this->dataPtr->vertRayCount * this->RayCountRatio();
       }
     }
+    else
+    {
+      // set a very small vertical FOV for camera
+      this->dataPtr->laserCam->SetRayCountRatio(this->RayCount() / 1);
+    }
 
     gzmsg << "Number of cameras: " << cameraCount << "\n";
     gzmsg << "HFOV per frame: " << hfov << "\n";
     gzmsg << "VFOV laser: " << vfov << "\n";
     gzmsg << "VFOV camera: " << vfov_camera << "\n";
-    gzmsg << "Camera aspect ratio: " << camera_aspect_ratio << "\n";
     gzmsg << "Horiz. ray count: " << this->dataPtr->horzRayCount << "\n";
     gzmsg << "Vert. ray count: " << this->dataPtr->vertRayCount << "\n";
 
