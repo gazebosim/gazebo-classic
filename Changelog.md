@@ -642,6 +642,10 @@
 1. Fix compilation with ffmpeg4
     * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
 
+1. Fix Joint::SetPosition for HingeJoint
+    * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
+    * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
+
 
 ## Gazebo 7.12.0 (2018-04-11)
 
@@ -663,10 +667,6 @@
 
 1. Fix clang warnings in LaserView and EnumIface
     * [Pull request 2891](https://bitbucket.org/osrf/gazebo/pull-request/2891)
-
-1. Fix Joint::SetPosition for HingeJoint
-    * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
-    * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
 
 1. Add support for moving geometry to ContainPlugin
     * [Pull request 2886](https://bitbucket.org/osrf/gazebo/pull-request/2886)
