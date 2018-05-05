@@ -42,6 +42,12 @@ void JointTest::JointCreationDestructionTest(const std::string &_physicsEngine)
     gzerr << "Aborting test for Simbody, see issue #862.\n";
     return;
   }
+  /// \TODO: dart not complete for this test
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Aborting test for DART, see issue #2469.\n";
+    return;
+  }
 
   // Load our inertial test world
   Load("worlds/joint_test.world", true, _physicsEngine);
