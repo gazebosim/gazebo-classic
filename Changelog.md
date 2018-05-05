@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
+    * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
+
 1. Print some bullet console warnings only once
     * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
 
@@ -49,9 +52,6 @@
 1. Fix log recording, only call sdf::initFile once
     * [Pull request 2885](https://bitbucket.org/osrf/gazebo/pull-request/2885)
     * [Issue 2425](https://bitbucket.org/osrf/gazebo/issues/2425)
-
-1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
-    * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
 
 1. Ensure sdf inertia values are consistent
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
