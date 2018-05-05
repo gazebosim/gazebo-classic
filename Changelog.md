@@ -2,6 +2,12 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Add methods to set dynamically Gaussian noise parameters
+    * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
+
+1. Add command to send a request with gz topic
+    * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
+
 1. Force vertical field of view to be lower than 180 degrees
     * [Pull request #2909](https://bitbucket.org/osrf/gazebo/pull-request/2909)
 
@@ -16,6 +22,10 @@
 
 1. Displaying light direction on the world tree
     * [Pull request 2912](https://bitbucket.org/osrf/gazebo/pull-request/2912)
+
+1. Plugin to initialize joint controller parameters
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo
 
 1. Fix Enter in Link Inspector
     * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
@@ -41,6 +51,9 @@
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
 
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
@@ -255,6 +268,9 @@
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
 
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
@@ -877,6 +893,10 @@
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
+
+1. Fix compilation with ffmpeg4
+    * [Pull request 2942](https://bitbucket.org/osrf/gazebo/pull-request/2942)
+
 
 ## Gazebo 7.12.0 (2018-04-11)
 
