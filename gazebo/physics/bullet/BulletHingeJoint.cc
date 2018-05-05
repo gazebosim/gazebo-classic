@@ -350,7 +350,7 @@ double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)
-    result = this->bulletHinge->getUpperLimit();
+    result = this->bulletHinge->getUpperLimit() - this->angleOffset;
   else
   {
     static bool notPrintedYet = true;
@@ -368,7 +368,7 @@ double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 {
   double result = ignition::math::NAN_D;
   if (this->bulletHinge)
-    result = this->bulletHinge->getLowerLimit();
+    result = this->bulletHinge->getLowerLimit() - this->angleOffset;
   else
   {
     static bool notPrintedYet = true;
