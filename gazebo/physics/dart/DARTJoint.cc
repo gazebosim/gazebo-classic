@@ -39,6 +39,8 @@ DARTJoint::DARTJoint(BasePtr _parent)
     dataPtr(new DARTJointPrivate(boost::dynamic_pointer_cast<DARTPhysics>(
       this->GetWorld()->Physics())))
 {
+  this->dataPtr->dtProperties.reset(new dart::dynamics::Joint::Properties());
+  this->dataPtr->dtProperties->mIsPositionLimitEnforced = true;
 }
 
 //////////////////////////////////////////////////
@@ -56,10 +58,7 @@ void DARTJoint::Load(sdf::ElementPtr _sdf)
   // In Joint::Load(sdf::ElementPtr), this joint stored the information of the
   // parent link and child link.
   Joint::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(new dart::dynamics::Joint::Properties());
   this->dataPtr->dtProperties->mName = this->GetName();
-  this->dataPtr->dtProperties->mIsPositionLimitEnforced = true;
 }
 
 //////////////////////////////////////////////////
@@ -113,6 +112,18 @@ void DARTJoint::Init()
 void DARTJoint::Reset()
 {
   Joint::Reset();
+  GZ_ASSERT(this->dataPtr->dtJoint, "dtJoint is null pointer.\n");
+  for (unsigned int i = 0; i < this->DOF(); ++i)
+  {
+    this->dataPtr->dtJoint->setPosition(i, 0.0);
+  }
+}
+
+//////////////////////////////////////////////////
+void DARTJoint::SetName(const std::string &_name)
+{
+  Joint::SetName(_name);
+  this->dataPtr->dtProperties->mName = _name;
 }
 
 //////////////////////////////////////////////////
@@ -160,11 +171,6 @@ bool DARTJoint::AreConnected(LinkPtr _one, LinkPtr _two) const
 void DARTJoint::Attach(LinkPtr _parent, LinkPtr _child)
 {
   Joint::Attach(_parent, _child);
-
-  if (this->AreConnected(_parent, _child))
-    return;
-
-  gzerr << "DART does not support joint attaching.\n";
 }
 
 //////////////////////////////////////////////////
@@ -176,8 +182,6 @@ void DARTJoint::Detach()
   this->childLink.reset();
   this->parentLink.reset();
 
-  gzerr << "DART does not support joint dettaching.\n";
-
   Joint::Detach();
 }
 
@@ -185,7 +189,12 @@ void DARTJoint::Detach()
 void DARTJoint::SetAnchor(const unsigned int /*_index*/,
     const ignition::math::Vector3d &/*_anchor*/)
 {
-  gzerr << "DARTJoint: SetAnchor is not implemented.\n";
+  static bool notPrintedYet = true;
+  if (notPrintedYet)
+  {
+    gzerr << "DARTJoint: SetAnchor is not implemented.\n";
+    notPrintedYet = false;
+  }
 }
 
 //////////////////////////////////////////////////

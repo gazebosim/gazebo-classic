@@ -33,6 +33,11 @@
 1. Update Wind Plugin to support being used by Lift Drag Plugin
     * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
 
+1. Dart: create joints dynamically, support kinematic loops and HarnessPlugin
+    * [Pull request #2762](https://bitbucket.org/osrf/gazebo/pull-requests/2762)
+    * [Issue #903](https://bitbucket.org/osrf/gazebo/issues/903)
+
+
 ## Gazebo 9
 
 ## Gazebo 9.x.x (2018-xx-xx)
