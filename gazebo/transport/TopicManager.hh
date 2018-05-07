@@ -123,19 +123,13 @@ namespace gazebo
                 pub->SetPublication(publication);
 
 
-                SubNodeMap::iterator iter2;
-                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
-                for (iter2 = this->subscribedNodes.begin();
-                     iter2 != stEnd2; ++iter2)
+                for (auto &iter2 : this->subscribedNodes)
                 {
-                  if (iter2->first == _topic)
+                  if (iter2.first == _topic)
                   {
-                    std::list<NodePtr>::iterator liter;
-                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
-                    for (liter = iter2->second.begin();
-                        liter != lEnd; ++liter)
+                    for (const auto liter : iter2.second)
                     {
-                      publication->AddSubscription(*liter);
+                      publication->AddSubscription(liter);
                     }
                   }
                 }
