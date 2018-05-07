@@ -73,10 +73,17 @@ namespace gazebo
       /// \param[in] _publication Pointer to the publication object to be set
       public: void SetPublication(PublicationPtr _publication);
 
+      /// \brief Get the amount of remote subscribers.
+      /// \sa Publication::GetRemoteSubscriptionCount()
+      public: unsigned int GetRemoteSubscriptionCount();
+
       /// \brief Publish a protobuf message on the topic
       /// \param[in] _message Message to be published
       /// \param[in] _block Whether to block until the message is actually
-      /// written out
+      /// written into the local message buffer, and SendMessage() is called.
+      /// Note that it may be required to call SendMessage() again if it could
+      /// not be sent out immediately. Check with  GetOutgoingCount() if
+      /// there are still messages in the queue which need to be sent out.
       public: void Publish(const google::protobuf::Message &_message,
                  bool _block = false)
               { this->PublishImpl(_message, _block); }
@@ -84,7 +91,10 @@ namespace gazebo
       /// \brief Publish an arbitrary message on the topic
       /// \param[in] _message Message to be published
       /// \param[in] _block Whether to block until the message is actually
-      /// written out
+      /// written into the local message buffer, and SendMessage() is called.
+      /// Note that it may be required to call SendMessage() again if it could
+      /// not be sent out immediately. Check with  GetOutgoingCount() if
+      /// there are still messages in the queue which need to be sent out.
       public: template< typename M>
               void Publish(M _message, bool _block = false)
               { this->PublishImpl(_message, _block); }
@@ -101,7 +111,11 @@ namespace gazebo
       /// \return The message type
       public: std::string GetMsgType() const;
 
-      /// \brief Send latest message over the wire. For internal use only
+      /// \brief Send message(s) in the local buffer over the wire.
+      /// This will be called from Publish() and should normally only be
+      /// used internally, however you may need to call this function if
+      /// using blocking calls to Publish (parameter \e _block = true) in
+      /// order to ensure the whole message buffer is sent out.
       public: void SendMessage();
 
       /// \brief Set our containing node.
