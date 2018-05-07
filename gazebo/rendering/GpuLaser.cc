@@ -116,8 +116,8 @@ void GpuLaser::Load()
 void GpuLaser::Init()
 {
   Camera::Init();
-  this->dataPtr->w2nd = this->ImageWidth();
-  this->dataPtr->h2nd = this->ImageHeight();
+  this->dataPtr->w1st = this->ImageWidth();
+  this->dataPtr->h1st = this->ImageHeight();
   this->dataPtr->visual.reset(new Visual(this->Name()+"second_pass_canvas",
      this->GetScene()->WorldVisual()));
 }
@@ -600,6 +600,13 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
 
 /////////////////////////////////////////////////
 void GpuLaser::SetRangeCount(const unsigned int _w, const unsigned int _h)
+{
+  this->dataPtr->w1st = _w;
+  this->dataPtr->h1st = _h;
+}
+
+/////////////////////////////////////////////////
+void GpuLaser::SetRayCount(const unsigned int _w, const unsigned int _h)
 {
   this->dataPtr->w2nd = _w;
   this->dataPtr->h2nd = _h;

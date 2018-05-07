@@ -195,6 +195,7 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->SetHorzFOV(hfov);
     this->dataPtr->laserCam->SetCosHorzFOV(hfov);
     this->dataPtr->horzRayCount /= cameraCount;
+    this->dataPtr->horzRangeCount /= cameraCount;
 
     // vertical laser setup
     double vfov;
@@ -236,26 +237,29 @@ void GpuRaySensor::Init()
     if (this->dataPtr->vertRayCount > 1)
     {
       double camera_aspect_ratio = tan(hfov / 2.0) / tan(vfov_camera / 2.0);
+
       this->dataPtr->laserCam->SetRayCountRatio(camera_aspect_ratio);
+      this->dataPtr->rangeCountRatio = camera_aspect_ratio;
 
       gzmsg << "Camera aspect ratio: " << camera_aspect_ratio << "\n";
 
-      if ((this->dataPtr->horzRayCount / this->RayCountRatio()) >
-          this->dataPtr->vertRayCount)
+      if ((this->dataPtr->horzRangeCount / this->RangeCountRatio()) >
+          this->dataPtr->vertRangeCount)
       {
-        this->dataPtr->vertRayCount =
-          this->dataPtr->horzRayCount / this->RayCountRatio();
+        this->dataPtr->vertRangeCount =
+          this->dataPtr->horzRangeCount / this->RangeCountRatio();
       }
       else
       {
-        this->dataPtr->horzRayCount =
-          this->dataPtr->vertRayCount * this->RayCountRatio();
+        this->dataPtr->horzRangeCount =
+          this->dataPtr->vertRangeCount * this->RangeCountRatio();
       }
     }
     else
     {
       // set a very small vertical FOV for camera
-      this->dataPtr->laserCam->SetRayCountRatio(this->RayCount() / 1);
+      this->dataPtr->laserCam->SetRayCountRatio(
+          this->dataPtr->horzRangeCount / 1);
     }
 
     gzmsg << "Number of cameras: " << cameraCount << "\n";
@@ -272,8 +276,8 @@ void GpuRaySensor::Init()
     this->dataPtr->cameraElem->GetElement("horizontal_fov")->Set(hfov);
 
     sdf::ElementPtr ptr = this->dataPtr->cameraElem->GetElement("image");
-    ptr->GetElement("width")->Set(this->dataPtr->horzRayCount);
-    ptr->GetElement("height")->Set(this->dataPtr->vertRayCount);
+    ptr->GetElement("width")->Set(this->dataPtr->horzRangeCount);
+    ptr->GetElement("height")->Set(this->dataPtr->vertRangeCount);
     ptr->GetElement("format")->Set("FLOAT32");
 
     ptr = this->dataPtr->cameraElem->GetElement("clip");
@@ -285,6 +289,8 @@ void GpuRaySensor::Init()
 
     // initialize GpuLaser
     this->dataPtr->laserCam->Init();
+    this->dataPtr->laserCam->SetRayCount(
+        this->RayCount(), this->VerticalRayCount());
     this->dataPtr->laserCam->SetRangeCount(
         this->dataPtr->horzRangeCount, this->dataPtr->vertRangeCount);
     this->dataPtr->laserCam->SetClipDist(this->RangeMin(), this->RangeMax());
@@ -489,7 +495,7 @@ double GpuRaySensor::GetAngleResolution() const
 double GpuRaySensor::AngleResolution() const
 {
   return (this->AngleMax() - this->AngleMin()).Radian() /
-    (this->RangeCount()-1);
+    (this->RayCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -600,7 +606,7 @@ double GpuRaySensor::GetVerticalAngleResolution() const
 double GpuRaySensor::VerticalAngleResolution() const
 {
   return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
-    (this->VerticalRangeCount()-1);
+    (this->VerticalRayCount()-1);
 }
 
 //////////////////////////////////////////////////

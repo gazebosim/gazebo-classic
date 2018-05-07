@@ -118,10 +118,16 @@ namespace gazebo
       /// \brief Pointer to visual that holds the canvas.
       public: VisualPtr visual;
 
-      /// \brief Image width.
+      /// \brief Image width of first pass texture.
+      public: unsigned int w1st;
+
+      /// \brief Image height of first pass texture.
+      public: unsigned int h1st;
+
+      /// \brief Image width of second pass (i.e. horizontal laser samples).
       public: unsigned int w2nd;
 
-      /// \brief Image height.
+      /// \brief Image height of second pass (i.e. number of vertical rays).
       public: unsigned int h2nd;
 
       /// \brief Time taken to complete the two rendering passes.
