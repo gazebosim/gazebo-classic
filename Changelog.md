@@ -2,6 +2,9 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
+    * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
+
 1. Print some bullet console warnings only once
     * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
 
