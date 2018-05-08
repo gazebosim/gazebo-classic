@@ -595,7 +595,7 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
     std::string fileName = file;
 
     boost::filesystem::path srcPath;
-    if (fileName.find(prefix) == 0u)
+    if (fileName.compare(0, prefix.size(), prefix) == 0)
     {
       // strip prefix
       fileName = file.substr(prefix.size());
@@ -636,7 +636,8 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
           this->dataPtr->logCompletePath / modelPath;
         boost::system::error_code errorCode;
         boost::filesystem::create_directories(destPath, errorCode);
-        if (errorCode != 0 || !gazebo::common::copyDir(srcPath, destPath))
+        if (errorCode != boost::system::errc::success ||
+            !gazebo::common::copyDir(srcPath, destPath))
         {
           gzerr << "Failed to copy model from '" << srcPath.string()
                  << "' to '" << destPath.string() << "'" << std::endl;
@@ -652,7 +653,7 @@ bool LogRecord::SaveFiles(const std::set<std::string> &_files)
         boost::system::error_code errorCode;
         boost::filesystem::create_directories(
             destPath.parent_path(), errorCode);
-        if (errorCode == 0)
+        if (errorCode == boost::system::errc::success)
           boost::filesystem::copy_file(srcPath, destPath, errorCode);
         else
         {
