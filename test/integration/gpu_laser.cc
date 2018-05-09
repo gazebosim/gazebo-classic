@@ -76,11 +76,11 @@ TEST_F(GPURaySensorTest, LaserUnitBox)
       math::Quaternion(M_PI/2.0, 0, 0));
 
   SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0.0, 0.0, minRange, maxRange,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
-      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0.0, 0.0, minRange, maxRange,
+      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
@@ -247,11 +247,11 @@ TEST_F(GPURaySensorTest, NameCollision)
       math::Quaternion(M_PI/2.0, 0, 0));
 
   SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0.0, 0.0, minRange, maxRange,
+      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   SpawnGpuRaySensor(modelName2, raySensorName2, testPose2.pos,
-      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, 0.0, 0.0, minRange, maxRange,
+      testPose2.rot.GetAsEuler(), hMinAngle, hMaxAngle, minRange, maxRange,
       rangeResolution, samples);
 
   std::string box01 = "box_01";
@@ -403,30 +403,31 @@ TEST_F(GPURaySensorTest, LaserVertical)
   unsigned int samples = 640;
   unsigned int vSamples = 25;
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples-1);
-  math::Pose testPose(math::Vector3(0.25, 0, 0.5),
-      math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, 0.5),
+      ignition::math::Quaterniond::Identity);
 
-  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+  SpawnGpuRaySensorVertical(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
       minRange, maxRange, rangeResolution, samples, vSamples, 1, 1);
 
   sensors::SensorPtr sensor = sensors::get_sensor(raySensorName);
   sensors::GpuRaySensorPtr raySensor =
     std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
-  EXPECT_TRUE(raySensor != NULL);
+  EXPECT_TRUE(raySensor != nullptr);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
-  world->GetPhysicsEngine()->SetGravity(math::Vector3(0, 0, 0));
+  ASSERT_TRUE(world != nullptr);
+  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d::Zero);
 
   std::string box01 = "box_01";
 
   // box in front of ray sensor
-  math::Pose box01Pose(math::Vector3(1, 0, 0.5), math::Quaternion(0, 0, 0));
+  ignition::math::Pose3d box01Pose(ignition::math::Vector3d(1, 0, 0.5),
+      ignition::math::Quaterniond::Identity);
 
-  SpawnBox(box01, math::Vector3(1, 1, 1), box01Pose.pos,
-      box01Pose.rot.GetAsEuler());
+  SpawnBox(box01, ignition::math::Vector3d::One, box01Pose.Pos(),
+      box01Pose.Rot().Euler());
 
   raySensor->SetActive(true);
 
@@ -456,8 +457,8 @@ TEST_F(GPURaySensorTest, LaserVertical)
   // all vertical laser planes should sense box
   for (unsigned int i = 0; i < vSamples; ++i)
   {
-    double expectedRangeAtMidPoint = box01Pose.pos.x - unitBoxSize/2
-        - testPose.pos.x;
+    double expectedRangeAtMidPoint = box01Pose.Pos().X() - unitBoxSize/2
+        - testPose.Pos().X();
     double expectedRange = expectedRangeAtMidPoint / cos(angleStep);
 
     EXPECT_NEAR(raySensor->Range(i*samples + mid),
@@ -471,7 +472,8 @@ TEST_F(GPURaySensorTest, LaserVertical)
 
   // Move box out of range
   world->GetModel(box01)->SetWorldPose(
-      math::Pose(math::Vector3(maxRange + 1, 0, 0), math::Quaternion(0, 0, 0)));
+      ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0),
+      ignition::math::Quaterniond::Identity));
 
   // wait for a few more laser scans
   iter = 0;
@@ -487,7 +489,8 @@ TEST_F(GPURaySensorTest, LaserVertical)
   {
     for (int i = 0; i < raySensor->RayCount(); ++i)
     {
-      EXPECT_DOUBLE_EQ(raySensor->Range(j*raySensor->RayCount() + i), GZ_DBL_INF);
+      EXPECT_DOUBLE_EQ(raySensor->Range(j*raySensor->RayCount() + i),
+          IGN_DBL_INF);
     }
   }
 
@@ -501,7 +504,6 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
   // Test gpu ray sensor scan resolution.
   // Orient the sensor to face downwards and verify that the interpolated
   // range values all intersect with ground plane at z = 0;
-
   Load("worlds/empty.world");
 
     // Make sure the render engine is available.
@@ -531,11 +533,11 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
   double hAngleStep = (hMaxAngle - hMinAngle) / (hSamples*hResolution-1);
   double vAngleStep = (vMaxAngle - vMinAngle) / (vSamples*vResolution-1);
   double z0 = 0.5;
-  math::Pose testPose(math::Vector3(0.25, 0, z0),
-      math::Quaternion(0, vMidAngle, 0));
+  ignition::math::Pose3d testPose(ignition::math::Vector3d(0.25, 0, z0),
+      ignition::math::Quaterniond(0, vMidAngle, 0));
 
-  SpawnGpuRaySensor(modelName, raySensorName, testPose.pos,
-      testPose.rot.GetAsEuler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
+  SpawnGpuRaySensorVertical(modelName, raySensorName, testPose.Pos(),
+      testPose.Rot().Euler(), hMinAngle, hMaxAngle, vMinAngle, vMaxAngle,
       minRange, maxRange, rangeResolution, hSamples, vSamples,
       hResolution, vResolution);
 
@@ -543,10 +545,10 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
   sensors::GpuRaySensorPtr raySensor =
     std::dynamic_pointer_cast<sensors::GpuRaySensor>(sensor);
 
-  EXPECT_TRUE(raySensor != NULL);
+  EXPECT_TRUE(raySensor != nullptr);
 
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   raySensor->SetActive(true);
 
@@ -570,23 +572,22 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
 
   unsigned int h, v;
 
-  for (v = 0; v < vSamples; ++v)
+  for (v = 0; v < vSamples * vResolution; ++v)
   {
-    for (h = 0; h < hSamples; ++h)
+    for (h = 0; h < hSamples * hResolution; ++h)
     {
       // pitch angle
       double p = vMinAngle + v*vAngleStep;
       // yaw angle
       double y = hMinAngle + h*hAngleStep;
-      // This should be v*hSamples*hresolution, but Range() doesn't take
-      // into account vertical and horizontal resolution
-      double R = raySensor->Range(v*hSamples + h);
+      double R = raySensor->Range(v*hSamples*hResolution + h);
 
-      math::Quaternion rot(0.0, -p, y);
-      math::Vector3 axis = testPose.rot * rot * math::Vector3::UnitX;
-      math::Vector3 intersection = (axis * R) + testPose.pos;
+      ignition::math::Quaterniond rot(0.0, -p, y);
+      ignition::math::Vector3d axis = testPose.Rot() * rot *
+          ignition::math::Vector3d::UnitX;
+      ignition::math::Vector3d intersection = (axis * R) + testPose.Pos();
 
-      EXPECT_NEAR(intersection.z, 0.0, rangeResolution);
+      EXPECT_NEAR(intersection.Z(), 0.0, rangeResolution);
     }
   }
 

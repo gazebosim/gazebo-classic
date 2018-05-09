@@ -349,6 +349,29 @@ namespace gazebo
     /// \param[in] _rpy Camera roll, pitch, yaw.
     /// \param[in] _hMinAngle Horizontal min angle
     /// \param[in] _hMaxAngle Horizontal max angle
+    /// \param[in] _minRange Min range
+    /// \param[in] _maxRange Max range
+    /// \param[in] _rangeResolution Resolution of the scan
+    /// \param[in] _samples Number of samples.
+    /// \param[in] _noiseType Type of noise to apply.
+    /// \param[in] _noiseMean Mean noise value.
+    /// \param[in] _noiseStdDev Standard deviation of the noise.
+    protected: void SpawnGpuRaySensor(const std::string &_modelName,
+                   const std::string &_raySensorName,
+                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
+                   double _minRange = 0.08, double _maxRange = 10,
+                   double _rangeResolution = 0.01, unsigned int _samples = 640,
+                   const std::string &_noiseType = "", double _noiseMean = 0.0,
+                   double _noiseStdDev = 0.0);
+
+    /// \brief Spawn a gpu laser.
+    /// \param[in] _modelName Name of the model.
+    /// \param[in] _raySensorName Name of the laser.
+    /// \param[in] _pos Camera position.
+    /// \param[in] _rpy Camera roll, pitch, yaw.
+    /// \param[in] _hMinAngle Horizontal min angle
+    /// \param[in] _hMaxAngle Horizontal max angle
     /// \param[in] _vMinAngle Vertical min angle
     /// \param[in] _vMaxAngle Vertical max angle
     /// \param[in] _minRange Min range
@@ -361,9 +384,10 @@ namespace gazebo
     /// \param[in] _noiseType Type of noise to apply.
     /// \param[in] _noiseMean Mean noise value.
     /// \param[in] _noiseStdDev Standard deviation of the noise.
-    protected: void SpawnGpuRaySensor(const std::string &_modelName,
+    protected: void SpawnGpuRaySensorVertical(const std::string &_modelName,
                    const std::string &_raySensorName,
-                   const math::Vector3 &_pos, const math::Vector3 &_rpy,
+                   const ignition::math::Vector3d &_pos,
+                   const ignition::math::Vector3d &_rpy,
                    double _hMinAngle = -2.0, double _hMaxAngle = 2.0,
                    double _vMinAngle = -1.0, double _vMaxAngle = 1.0,
                    double _minRange = 0.08, double _maxRange = 10,
