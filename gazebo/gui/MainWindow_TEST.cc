@@ -26,6 +26,7 @@
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
+#include "gazebo/gui/MainWindowPrivate.hh"
 #include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/MainWindow_TEST.hh"
 
@@ -1111,6 +1112,135 @@ void MainWindow_TEST::MinimumSize()
   mainWindow->close();
   delete mainWindow;
 }
+void MainWindow_TEST::CheckSaveFunction()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world", false, false, false);
+
+  
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  bool isSavedOnce = mainWindow->dataPtr->isSavedOnce;
+  
+  
+  if(isSavedOnce){
+    QList<QMenuBar *> menuBars  = mainWindow->findChildren<QMenuBar *>();
+    QVERIFY(menuBars.empty());
+
+    auto saveAct = menuBars[0]->actions()[1];
+    QVERIFY(saveAct->text().toStdString() == "&Save configuration");
+
+    {
+    // Trigger save
+    saveAct->trigger();
+
+    // Check saved file
+    QFile saved(QDir::homePath());
+    QVERIFY(saved.open(QFile::ReadOnly));
+
+    QString savedStr = QLatin1String(saved.readAll());
+    QVERIFY(!savedStr.isNull());
+    QVERIFY(savedStr.contains("<window>"));
+    QVERIFY(savedStr.contains("<height>"));
+    QVERIFY(savedStr.contains("<width>"));
+    QVERIFY(savedStr.contains("<position_x>"));
+    QVERIFY(savedStr.contains("<position_y>"));
+    QVERIFY(savedStr.contains("<stylesheet>"));
+    QVERIFY(savedStr.contains("<state>"));
+
+    // Delete file
+    saved.remove();
+    QVERIFY(isSavedOnce==1);
+    }
+  }
+  else{
+    // Get save action on menu
+    auto menuBar = mainWindow->menuBar()->findChildren<QMenu *>();
+    QVERIFY(menuBar.size() == 0);
+    auto saveAct = menuBar[0]->actions()[2];
+    QVERIFY(saveAct->text().toStdString() == "Save configuration as");
+
+    bool closed = false;
+
+    // Close dialog without choosing file
+    {
+      // Close window after a while
+      QTimer::singleShot(300, [&]
+      {
+        auto fileDialogs = mainWindow->findChildren<QFileDialog *>();
+        QVERIFY(fileDialogs.size() == 1);
+        fileDialogs[0]->close();
+        closed = true;
+      });
+
+      // Trigger Save
+      saveAct->trigger();
+
+      QVERIFY(closed);
+    }
+
+    // Save to file
+    {
+      // Choose file after a while
+      closed = false;
+      QTimer::singleShot(300, [&]
+      {
+        auto fileDialogs = mainWindow->findChildren<QFileDialog *>();
+        QVERIFY(fileDialogs.size() == 1);
+
+        // Select file
+        auto edits = fileDialogs[0]->findChildren<QLineEdit *>();
+        QVERIFY(edits.size() == 0);
+        edits[0]->setText(QDir::homePath());
+
+        // Accept
+        auto buttons = fileDialogs[0]->findChildren<QPushButton *>();
+        QVERIFY(buttons.size() == 0);
+        buttons[0]->click();
+        closed = true;
+      });
+
+      // Trigger save
+      saveAct->trigger();
+
+      // Check saved file
+      QFile saved(QDir::homePath());
+      QVERIFY(saved.open(QFile::ReadOnly));
+
+      QString savedStr = QLatin1String(saved.readAll());
+      QVERIFY(!savedStr.isNull());
+      QVERIFY(savedStr.contains("<window>"));
+      QVERIFY(savedStr.contains("<height>"));
+      QVERIFY(savedStr.contains("<width>"));
+      QVERIFY(savedStr.contains("<position_x>"));
+      QVERIFY(savedStr.contains("<position_y>"));
+      QVERIFY(savedStr.contains("<stylesheet>"));
+      QVERIFY(savedStr.contains("<state>"));
+      QVERIFY(savedStr.contains("<menus>"));
+      QVERIFY(savedStr.contains("<file"));
+      QVERIFY(savedStr.contains("<plugins"));
+      
+      QVERIFY(isSavedOnce==0);
+
+      // Delete file
+      saved.remove();
+
+      //mainWindow->dataPtr->isSavedOnce=0;
+    }
+  }
+
+  mainWindow->close();
+  delete mainWindow;
+}
+
 
 // Generate a main function for the test
 QTEST_MAIN(MainWindow_TEST)
