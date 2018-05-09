@@ -289,10 +289,9 @@ void GpuRaySensor::Init()
 
     // initialize GpuLaser
     this->dataPtr->laserCam->Init();
-    this->dataPtr->laserCam->SetRayCount(
-        this->RayCount(), this->VerticalRayCount());
     this->dataPtr->laserCam->SetRangeCount(
-        this->dataPtr->horzRangeCount, this->dataPtr->vertRangeCount);
+        this->RangeCount(),
+        this->VerticalRangeCount());
     this->dataPtr->laserCam->SetClipDist(this->RangeMin(), this->RangeMax());
     this->dataPtr->laserCam->CreateLaserTexture(
         this->ScopedName() + "_RttTex_Laser");
@@ -495,7 +494,7 @@ double GpuRaySensor::GetAngleResolution() const
 double GpuRaySensor::AngleResolution() const
 {
   return (this->AngleMax() - this->AngleMin()).Radian() /
-    (this->RayCount()-1);
+    (this->RangeCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -606,7 +605,7 @@ double GpuRaySensor::GetVerticalAngleResolution() const
 double GpuRaySensor::VerticalAngleResolution() const
 {
   return (this->VerticalAngleMax() - this->VerticalAngleMin()).Radian() /
-    (this->VerticalRayCount()-1);
+    (this->VerticalRangeCount()-1);
 }
 
 //////////////////////////////////////////////////
@@ -713,12 +712,12 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_angle_min(this->AngleMin().Radian());
   scan->set_angle_max(this->AngleMax().Radian());
   scan->set_angle_step(this->AngleResolution());
-  scan->set_count(this->RayCount());
+  scan->set_count(this->RangeCount());
 
   scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
   scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->VerticalAngleResolution());
-  scan->set_vertical_count(this->VerticalRayCount());
+  scan->set_vertical_count(this->VerticalRangeCount());
 
   scan->set_range_min(this->RangeMin());
   scan->set_range_max(this->RangeMax());
@@ -726,11 +725,11 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   bool add = scan->ranges_size() == 0;
   const float *laserBuffer = this->dataPtr->laserCam->LaserData();
 
-  for (int j = 0; j < this->VerticalRayCount(); ++j)
+  for (int j = 0; j < this->VerticalRangeCount(); ++j)
   {
-    for (int i = 0; i < this->RayCount(); ++i)
+    for (int i = 0; i < this->RangeCount(); ++i)
     {
-      int index = j * this->RayCount() + i;
+      int index = j * this->RangeCount() + i;
       double range = laserBuffer[index*3];
 
       // Mask ranges outside of min/max to +/- inf, as per REP 117

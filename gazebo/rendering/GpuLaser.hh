@@ -116,12 +116,6 @@ namespace gazebo
       public: void SetRangeCount(const unsigned int _w,
           const unsigned int _h = 1);
 
-      /// \brief Set the number of laser samples in the width and height
-      /// \param[in] _w Number of samples in the horizontal sweep
-      /// \param[in] _h Number of samples in the vertical sweep
-      public: void SetRayCount(const unsigned int _w,
-          const unsigned int _h = 1);
-
       /// \internal
       /// \brief Implementation of Ogre::RenderObjectListener
       public: virtual void notifyRenderSingleObject(Ogre::Renderable *_rend,
