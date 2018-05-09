@@ -151,12 +151,6 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
     this->dataPtr->cameraYaws[3] = -this->hfov;
   }
 
-  gzmsg << "Texture count: " << this->dataPtr->textureCount << "\n";
-  gzmsg << "Camera yaw[0]: " << this->dataPtr->cameraYaws[0] << "\n";
-  gzmsg << "Camera yaw[1]: " << this->dataPtr->cameraYaws[1] << "\n";
-  gzmsg << "Camera yaw[2]: " << this->dataPtr->cameraYaws[2] << "\n";
-  gzmsg << "Camera yaw[3]: " << this->dataPtr->cameraYaws[3] << "\n";
-
   for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
     std::stringstream texName;
@@ -227,11 +221,6 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
-//  common::Timer postRenderT, blitT;
-//  postRenderT.Start();
-//  double blitDur = 0.0;
-//  double postRenderDur = 0.0;
-
   for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
     this->dataPtr->firstPassTargets[i]->swapBuffers();
@@ -261,9 +250,7 @@ void GpuLaser::PostRender()
     Ogre::PixelBox dstBox(width, height,
         1, Ogre::PF_FLOAT32_RGB, this->dataPtr->laserBuffer);
 
-//    blitT.Start();
     pixelBuffer->blitToMemory(dstBox);
-//    blitDur = blitT.GetElapsed().Double();
 
     if (!this->dataPtr->laserScan)
     {
@@ -280,16 +267,6 @@ void GpuLaser::PostRender()
   }
 
   this->newData = false;
-//  postRenderDur = postRenderT.GetElapsed().Double();
-
-/*  std::cerr << " Render: " << this->dataPtr->lastRenderDuration * 1000
-              << " BLIT: " << blitDur * 1000
-              << " postRender: " << postRenderDur * 1000
-              << " TOTAL: "
-              << (this->dataPtr->lastRenderDuration + postRenderDur) * 1000
-              << " Total - BLIT: "
-              << (this->dataPtr->lastRenderDuration + postRenderDur - blitDur)
-                  * 1000 << "\n";   */
 }
 
 /////////////////////////////////////////////////
@@ -642,13 +619,6 @@ void GpuLaser::CreateMesh()
     phi = 0;
   }
 
-  gzmsg << "ImageHeight() = " << this->ImageHeight() << "\n";
-  gzmsg << "ImageWidth() = " << this->ImageWidth() << "\n";
-  gzmsg << "this->dataPtr->h2nd = " << this->dataPtr->h2nd << "\n";
-  gzmsg << "this->dataPtr->w2nd = " << this->dataPtr->w2nd << "\n";
-  gzmsg << "phi = " << phi * 180. / M_PI << "\n";
-  gzmsg << "theta = " << theta * 180. / M_PI << "\n";
-
   // index of ray
   unsigned int ptsOnLine = 0;
 
@@ -661,10 +631,6 @@ void GpuLaser::CreateMesh()
   {
     vstep = 0;
   }
-
-  gzmsg << "thfov = " << thfov * 180. / M_PI << "\n";
-  gzmsg << "vstep = " << vstep * 180. / M_PI << "\n";
-  gzmsg << "hstep = " << hstep * 180. / M_PI << "\n";
 
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
