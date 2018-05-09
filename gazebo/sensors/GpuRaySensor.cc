@@ -241,8 +241,6 @@ void GpuRaySensor::Init()
       this->dataPtr->laserCam->SetRayCountRatio(camera_aspect_ratio);
       this->dataPtr->rangeCountRatio = camera_aspect_ratio;
 
-      gzmsg << "Camera aspect ratio: " << camera_aspect_ratio << "\n";
-
       if ((this->dataPtr->horzRangeCount / this->RangeCountRatio()) >
           this->dataPtr->vertRangeCount)
       {
@@ -261,13 +259,6 @@ void GpuRaySensor::Init()
       this->dataPtr->laserCam->SetRayCountRatio(
           this->dataPtr->horzRangeCount / 1);
     }
-
-    gzmsg << "Number of cameras: " << cameraCount << "\n";
-    gzmsg << "HFOV per frame: " << hfov << "\n";
-    gzmsg << "VFOV laser: " << vfov << "\n";
-    gzmsg << "VFOV camera: " << vfov_camera << "\n";
-    gzmsg << "Horiz. ray count: " << this->dataPtr->horzRayCount << "\n";
-    gzmsg << "Vert. ray count: " << this->dataPtr->vertRayCount << "\n";
 
     // Initialize camera sdf for GpuLaser
     this->dataPtr->cameraElem.reset(new sdf::Element);
