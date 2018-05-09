@@ -267,7 +267,7 @@ TEST_F(CameraTest, RayTriangleIntersection)
 
     // test ray intersection with a mesh
     ignition::math::Vector2i drillImgPos =
-        camera->Project(drillVis->GetWorldPose().Ign().Pos() +
+        camera->Project(drillVis->WorldPose().Pos() +
                         ignition::math::Vector3d(0, 0, 0.05));
 
     ignition::math::Vector3d intersectPos;
@@ -284,7 +284,7 @@ TEST_F(CameraTest, RayTriangleIntersection)
     // cast a ray so that it's within the bounding box of the mesh but doesn't
     // intersect with any triangles
     ignition::math::Vector2i emptyImgPos =
-        camera->Project(drillVis->GetWorldPose().Ign().Pos() +
+        camera->Project(drillVis->WorldPose().Pos() +
                         ignition::math::Vector3d(0, 0, 0.1));
 
     // ray should not intersect with any triangles on mesh

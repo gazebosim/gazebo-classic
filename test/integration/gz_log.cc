@@ -174,7 +174,7 @@ TEST_F(GzLog, RecordResources)
   util::LogRecord *recorder = util::LogRecord::Instance();
   recorder->SetRecordResources(true);
   std::string recordPath =
-      common::SystemPaths::Instance()->GetDefaultTestPath();
+      common::SystemPaths::Instance()->DefaultTestPath();
   recorder->SetBasePath(recordPath);
   recorder->Init("test");
 
@@ -206,11 +206,11 @@ TEST_F(GzLog, RecordResources)
   // spawn one from model path
   std::string spawnModelName = "beer";
   this->SpawnModel("model://" + spawnModelName);
-  physics::ModelPtr newModel = world->GetModel(spawnModelName);
+  physics::ModelPtr newModel = world->ModelByName(spawnModelName);
   EXPECT_EQ(nullptr, newModel);
 
   // spawn another one with abs path to mesh file
-  EXPECT_EQ(nullptr, world->GetModel("model_abs"));
+  EXPECT_EQ(nullptr, world->ModelByName("model_abs"));
 
   std::string absMeshPath = std::string(TEST_PATH) + "/data/box.obj";
   std::stringstream modelStr;
@@ -240,8 +240,8 @@ TEST_F(GzLog, RecordResources)
   world->Step(100);
 
   // Check models were spawned
-  EXPECT_NE(nullptr, world->GetModel(spawnModelName));
-  EXPECT_NE(nullptr, world->GetModel("model_abs"));
+  EXPECT_NE(nullptr, world->ModelByName(spawnModelName));
+  EXPECT_NE(nullptr, world->ModelByName("model_abs"));
 
   // Stop log recording
   custom_exec("gz log -w default -d 0");

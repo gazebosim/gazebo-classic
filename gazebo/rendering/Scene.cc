@@ -1138,16 +1138,16 @@ bool Scene::FirstContact(CameraPtr _camera,
   UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
   if (userCam)
   {
-    VisualPtr vis = userCam->GetVisual(_mousePos);
+    VisualPtr vis = userCam->Visual(_mousePos);
     if (vis)
     {
       RayQuery rayQuery(_camera);
-      math::Vector3 intersect;
-      std::vector<math::Vector3> vertices;
+      ignition::math::Vector3d intersect;
+      ignition::math::Triangle3d triangle;
       rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-          intersect, vertices);
+          intersect, triangle);
       distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-          intersect.Ign());
+          intersect);
     }
   }
   else
@@ -1196,13 +1196,13 @@ bool Scene::FirstContact(CameraPtr _camera,
             continue;
 
           RayQuery rayQuery(_camera);
-          math::Vector3 intersect;
-          std::vector<math::Vector3> vertices;
+          ignition::math::Vector3d intersect;
+          ignition::math::Triangle3d triangle;
           if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-              intersect, vertices))
+              intersect, triangle))
           {
             distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-                intersect.Ign());
+                intersect);
           }
         }
       }

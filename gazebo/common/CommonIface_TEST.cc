@@ -214,7 +214,7 @@ TEST_F(CommonIface_TEST, directoryOps)
 {
   // Cleanup test directory.
   common::SystemPaths *paths = common::SystemPaths::Instance();
-  boost::filesystem::path testPath(paths->GetDefaultTestPath());
+  boost::filesystem::path testPath(paths->DefaultTestPath());
   boost::filesystem::remove_all(testPath);
   boost::filesystem::create_directories(testPath);
 

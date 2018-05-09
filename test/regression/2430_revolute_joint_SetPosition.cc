@@ -59,16 +59,16 @@ class Issue2430Test
     ASSERT_NE(nullptr, world);
 
     // Verify the physics engine
-    physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+    physics::PhysicsEnginePtr physics = world->Physics();
     ASSERT_NE(nullptr, physics);
 
-    physics::ModelPtr model = world->GetModel("revolute_model");
+    physics::ModelPtr model = world->ModelByName("revolute_model");
     ASSERT_NE(nullptr, model);
 
     physics::JointPtr joint = model->GetJoint("revolute_joint");
     ASSERT_NE(nullptr, joint);
 
-    EXPECT_NEAR(0.0, joint->GetAngle(0).Radian(), 1e-6);
+    EXPECT_NEAR(0.0, joint->Position(0), 1e-6);
 
     // We use a tolerance relative to the size of the angle, because 1e-6 is not
     // tolerant enough for the large angles.
@@ -87,7 +87,7 @@ class Issue2430Test
       // There is no gravity, and there are no forces acting on the bodies or
       // the joint, so the joint position value should still be the same.
 
-      const double initialResultPosition = joint->GetAngle(0).Radian();
+      const double initialResultPosition = joint->Position(0);
 
       EXPECT_NEAR(initialPosition, initialResultPosition, tolerance);
     }
@@ -109,7 +109,7 @@ class Issue2430Test
 
       world->Step(1);
 
-      const double finalResultPosition = joint->GetAngle(0).Radian();
+      const double finalResultPosition = joint->Position(0);
 
       EXPECT_NEAR(finalPosition, finalResultPosition, tolerance);
     }
