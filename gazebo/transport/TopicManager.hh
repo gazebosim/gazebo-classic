@@ -106,11 +106,8 @@ namespace gazebo
                 PublisherPtr pub = PublisherPtr(new Publisher(_topic,
                       _msgTypeName, _queueLimit, _hzRate));
 
-                std::string msgTypename;
-                PublicationPtr publication;
-
                 // Connect all local subscription to the publisher
-                publication = this->FindPublication(_topic);
+                PublicationPtr publication = this->FindPublication(_topic);
                 GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
 
                 publication->AddPublisher(pub);
@@ -121,7 +118,6 @@ namespace gazebo
 
                 publication->SetLocallyAdvertised(true);
                 pub->SetPublication(publication);
-
 
                 for (auto &iter2 : this->subscribedNodes)
                 {
@@ -149,54 +145,14 @@ namespace gazebo
                                      unsigned int _queueLimit,
                                      double _hzRate)
               {
-                google::protobuf::Message *msg = NULL;
+                google::protobuf::Message *msg = nullptr;
                 M msgtype;
                 msg = dynamic_cast<google::protobuf::Message *>(&msgtype);
                 if (!msg)
                   gzthrow("Advertise requires a google protobuf type");
 
-                this->UpdatePublications(_topic, msg->GetTypeName());
-
-                PublisherPtr pub = PublisherPtr(new Publisher(_topic,
-                      msg->GetTypeName(), _queueLimit, _hzRate));
-
-                std::string msgTypename;
-                PublicationPtr publication;
-
-                // Connect all local subscription to the publisher
-                msgTypename = msg->GetTypeName();
-
-                publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
-
-                publication->AddPublisher(pub);
-                if (!publication->GetLocallyAdvertised())
-                {
-                  ConnectionManager::Instance()->Advertise(_topic, msgTypename);
-                }
-
-                publication->SetLocallyAdvertised(true);
-                pub->SetPublication(publication);
-
-
-                SubNodeMap::iterator iter2;
-                SubNodeMap::iterator stEnd2 = this->subscribedNodes.end();
-                for (iter2 = this->subscribedNodes.begin();
-                     iter2 != stEnd2; ++iter2)
-                {
-                  if (iter2->first == _topic)
-                  {
-                    std::list<NodePtr>::iterator liter;
-                    std::list<NodePtr>::iterator lEnd = iter2->second.end();
-                    for (liter = iter2->second.begin();
-                        liter != lEnd; ++liter)
-                    {
-                      publication->AddSubscription(*liter);
-                    }
-                  }
-                }
-
-                return pub;
+                return this->Advertise(_topic, msg->GetTypeName(), _queueLimit,
+                        _hzRate);
               }
 
       /// \brief Unadvertise a topic
