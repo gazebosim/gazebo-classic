@@ -167,6 +167,119 @@ TEST_F(GzLog, RecordFilter)
 }
 
 /////////////////////////////////////////////////
+/// Save resources when recording.
+TEST_F(GzLog, RecordResources)
+{
+  // Init recorder to save resources into specified path
+  util::LogRecord *recorder = util::LogRecord::Instance();
+  recorder->SetRecordResources(true);
+  std::string recordPath =
+      common::SystemPaths::Instance()->GetDefaultTestPath();
+  recorder->SetBasePath(recordPath);
+  recorder->Init("test");
+
+  gzdbg << "record path: " << recordPath << std::endl;
+
+  this->Load("worlds/record_resources.world", true);
+
+  // Get a pointer to the world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(nullptr, world);
+
+  ASSERT_NE(nullptr, recorder);
+
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_FALSE(recorder->Running());
+
+  // Start log recording
+  custom_exec("gz log -w default -d 1");
+
+  world->Step(100);
+
+  std::string filename = recorder->Filename();
+  EXPECT_TRUE(recorder->Running());
+  EXPECT_FALSE(recorder->Paused());
+  EXPECT_FALSE(filename.empty());
+  EXPECT_GT(recorder->FileSize(), 0u);
+
+  // test spawning model
+  // spawn one from model path
+  std::string spawnModelName = "beer";
+  this->SpawnModel("model://" + spawnModelName);
+  physics::ModelPtr newModel = world->GetModel(spawnModelName);
+  EXPECT_EQ(nullptr, newModel);
+
+  // spawn another one with abs path to mesh file
+  EXPECT_EQ(nullptr, world->GetModel("model_abs"));
+
+  std::string absMeshPath = std::string(TEST_PATH) + "/data/box.obj";
+  std::stringstream modelStr;
+  modelStr << "<sdf version='" << SDF_VERSION << "'>"
+      << "<model name=\"model_abs\">"
+      << "  <pose>1 0 0.5 0 0 0</pose>"
+      << "  <link name=\"link\">"
+      << "    <collision name=\"collision\">"
+      << "      <geometry>"
+      << "        <box>"
+      << "          <size>1 1 1</size>"
+      << "        </box>"
+      << "      </geometry>"
+      << "    </collision>"
+      << "    <visual name=\"visual\">"
+      << "      <geometry>"
+      << "        <mesh>"
+      << "          <uri>" << absMeshPath << "</uri>"
+      << "        </mesh>"
+      << "      </geometry>"
+      << "    </visual>"
+      << "  </link>"
+      << "</model>"
+      << "</sdf>";
+  this->SpawnSDF(modelStr.str());
+
+  world->Step(100);
+
+  // Check models were spawned
+  EXPECT_NE(nullptr, world->GetModel(spawnModelName));
+  EXPECT_NE(nullptr, world->GetModel("model_abs"));
+
+  // Stop log recording
+  custom_exec("gz log -w default -d 0");
+
+  EXPECT_FALSE(recorder->Running());
+
+  // check that model recource files are saved
+  EXPECT_TRUE(common::exists(filename));
+
+  // get log dir path
+  std::string logDirPath = filename.substr(0, filename.rfind("/"));
+  EXPECT_FALSE(logDirPath.empty());
+
+  // check that resources referenced by material script uri have been saved.
+  std::string path = logDirPath + "/media/materials/scripts/gazebo.material";
+  EXPECT_TRUE(common::exists(path));
+
+  // check for collision stl mesh
+  path = logDirPath +
+      "/cordless_drill/meshes/cordless_drill.stl";
+  EXPECT_TRUE(common::exists(path));
+
+  // check for visual dae mesh
+  path = logDirPath +
+      "/cordless_drill/meshes/cordless_drill.dae";
+  EXPECT_TRUE(common::exists(path));
+
+  // check that spawned models are also saved.
+  path = logDirPath + "/" + spawnModelName;
+  EXPECT_TRUE(common::exists(path));
+
+  // model with abs path to mesh
+  path = logDirPath + absMeshPath;
+  EXPECT_TRUE(common::exists(path));
+  boost::filesystem::remove_all(recordPath);
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

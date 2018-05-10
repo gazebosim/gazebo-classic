@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 #include <boost/uuid/sha1.hpp>
+#include <boost/filesystem.hpp>
 #include <iomanip>
 #include <sstream>
 
@@ -112,6 +113,14 @@ namespace gazebo
     GZ_COMMON_VISIBLE
     bool copyFile(const std::string &_existingFilename,
                   const std::string &_newFilename);
+
+    /// \brief Copy a directory, overwrite the destination directory if exists.
+    /// \param[in] _source Path to an existing directory to copy from.
+    /// \param[in] _destination Path to the destination directory.
+    /// \return True on success.
+    GZ_COMMON_VISIBLE
+    bool copyDir(const boost::filesystem::path &_source,
+                 const boost::filesystem::path &_destination);
 
     /// \brief Move a file.
     /// \param[in] _existingFilename Full path to an existing file.
