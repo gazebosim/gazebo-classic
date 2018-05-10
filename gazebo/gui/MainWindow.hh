@@ -312,7 +312,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Private data pointer
-      public: std::unique_ptr<MainWindowPrivate> dataPtr;
+      private: std::unique_ptr<MainWindowPrivate> dataPtr;
     };
   }
 }
