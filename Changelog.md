@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
