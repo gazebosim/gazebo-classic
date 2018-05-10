@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <dart/collision/bullet/bullet.hpp>
+#include <dart/collision/ode/ode.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -85,6 +87,13 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   if (g == ignition::math::Vector3d::Zero)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
+
+  // use bullet collision detection
+  // TODO: this should be made a parameter, to switch between the DART
+  // collision detector as user wants?
+  auto cd = dart::collision::BulletCollisionDetector::create();
+  // auto cd = dart::collision::OdeCollisionDetector::create();
+  this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
 }
 
 //////////////////////////////////////////////////

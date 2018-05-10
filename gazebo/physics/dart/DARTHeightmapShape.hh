@@ -48,6 +48,9 @@ namespace gazebo
       // Documentation inerited.
       public: virtual void Init();
 
+      // Documentation inerited.
+      public: virtual void SetScale(const ignition::math::Vector3d &_scale);
+
       /// \internal
       /// \brief Pointer to private data
       private: DARTHeightmapShapePrivate *dataPtr;

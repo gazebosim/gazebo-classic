@@ -80,6 +80,11 @@ void BulletHeightmapShape::Init()
 
   btVector3 min, max;
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
+  gzdbg << "Bullet heightfield AABB: min = {"
+        << min.x() << ", " << min.y() << ", " << min.z() << "}, max = {"
+        << max.x() << ", " << max.y() << ", " << max.z() << "}"
+        << " (will be translated by z="
+        << ((maxHeight - minHeight) * 0.5 + minHeight) << ")" << std::endl;
 
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
@@ -92,7 +97,10 @@ void BulletHeightmapShape::Init()
 
   btTransform tr;
   tr.setIdentity();
-  tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5));
+  // change the relative transform of the height field so that the minimum
+  // height is at the same z coordinate. Bullet shifts the height map such
+  // that its center is the AABB center.
+  tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5 + minHeight));
 
   // Set the transform for the heightmap.
   motionState->setWorldTransform(tr);

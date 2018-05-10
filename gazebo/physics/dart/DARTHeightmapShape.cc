@@ -42,5 +42,40 @@ DARTHeightmapShape::~DARTHeightmapShape()
 //////////////////////////////////////////////////
 void DARTHeightmapShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
+
+  if (!bodyNode) gzerr << "BodyNode is NULL in Init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL Init!");
+
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(
+                      this->dataPtr->ShapeNode(), false);
+
+  // superclasses' Init method initializes the heightmap
+  // data (this->heights etc.)
+  HeightmapShape::Init();
+
+  GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
+  this->dataPtr->Shape()->setHeightField(this->vertSize, this->vertSize,
+                                         this->heights);
+  // XXX TODO decide what to do with this: for bullet, it seems that
+  // local scaling of 1 is always used in Gazebo, so we'd have to keep
+  // this uniform? See BulletHeightmapShape::Init()
+  this->dataPtr->Shape()->setScale(Eigen::Vector3d(this->scale.X(),
+                                     this->scale.Y(), 1)); //this->scale.Z()));
+}
+
+//////////////////////////////////////////////////
+void DARTHeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
+{
+  GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
+  this->dataPtr->Shape()->setScale(Eigen::Vector3d(_scale.X(), _scale.Y(),
+                                                   _scale.Z()));
+  HeightmapShape::SetScale(_scale);
 }
