@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef GAZEBO_WHEEL_SLIP_PLUGIN_HH_
-#define GAZEBO_WHEEL_SLIP_PLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_WHEELSLIPPLUGIN_HH_
+#define GAZEBO_PLUGINS_WHEELSLIPPLUGIN_HH_
 
 #include <map>
 #include <memory>
