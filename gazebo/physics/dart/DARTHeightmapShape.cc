@@ -64,18 +64,14 @@ void DARTHeightmapShape::Init()
   GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
   this->dataPtr->Shape()->setHeightField(this->vertSize, this->vertSize,
                                          this->heights);
-  // XXX TODO decide what to do with this: for bullet, it seems that
-  // local scaling of 1 is always used in Gazebo, so we'd have to keep
-  // this uniform? See BulletHeightmapShape::Init()
   this->dataPtr->Shape()->setScale(Eigen::Vector3d(this->scale.X(),
-                                     this->scale.Y(), 1)); //this->scale.Z()));
+                                                   this->scale.Y(), 1));
 }
 
 //////////////////////////////////////////////////
 void DARTHeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
 {
   GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
-  this->dataPtr->Shape()->setScale(Eigen::Vector3d(_scale.X(), _scale.Y(),
-                                                   _scale.Z()));
+  this->dataPtr->Shape()->setScale(Eigen::Vector3d(_scale.X(), _scale.Y(), 1));
   HeightmapShape::SetScale(_scale);
 }

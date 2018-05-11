@@ -51,7 +51,7 @@ void BulletHeightmapShape::Init()
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1.0);
+  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
       this->vertSize,     // # of heights along width
@@ -84,7 +84,8 @@ void BulletHeightmapShape::Init()
         << min.x() << ", " << min.y() << ", " << min.z() << "}, max = {"
         << max.x() << ", " << max.y() << ", " << max.z() << "}"
         << " (will be translated by z="
-        << ((maxHeight - minHeight) * 0.5 + minHeight) << ")" << std::endl;
+        << (maxHeight - minHeight) * 0.5 + minHeight
+        << ")" << std::endl;
 
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());

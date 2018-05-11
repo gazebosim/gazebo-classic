@@ -8,7 +8,7 @@
           <geometry>
             <heightmap>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>17 17 1</size>
+              <size>17 17 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
@@ -47,7 +47,7 @@
                 <fade_dist>5</fade_dist>
               </blend>
               <uri>file://media/materials/textures/heightmap_bowl.png</uri>
-              <size>17 17 1</size>
+              <size>17 17 10</size>
               <pos>0 0 0</pos>
             </heightmap>
           </geometry>
@@ -58,7 +58,7 @@
       </link>
     </model>
     <model name='unit_box'>
-      <pose frame=''>0 0 3 0 0 0</pose>
+      <pose frame=''>0 0 12 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -105,7 +105,7 @@
       </link>
     </model>
     <model name='unit_box_0'>
-      <pose frame=''>-7 -7 3 0 0 0</pose>
+      <pose frame=''>-7 -7 12 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -152,7 +152,7 @@
       </link>
     </model>
     <model name='unit_box_1'>
-      <pose frame=''>7 7 3 0 0 0</pose>
+      <pose frame=''>7 7 12 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -199,7 +199,7 @@
       </link>
     </model>
     <model name='unit_box_2'>
-      <pose frame=''>7 -7 3 0 0 0</pose>
+      <pose frame=''>7 -7 12 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
@@ -246,7 +246,7 @@
       </link>
     </model>
     <model name='unit_box_5'>
-      <pose frame=''>-7 7 3 0 0 0</pose>
+      <pose frame=''>-7 7 12 0 0 0</pose>
       <link name='link'>
         <inertial>
           <mass>1</mass>
