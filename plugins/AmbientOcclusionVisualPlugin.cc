@@ -60,7 +60,7 @@ namespace gazebo
     public: virtual Ogre::Technique *handleSchemeNotFound(
         uint16_t /*_schemeIndex*/, const Ogre::String& _schemeName,
         Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
-        const Ogre::Renderable */*_rend*/)
+        const Ogre::Renderable * /*_rend*/)
     {
       // ignore transparent / semi-tranparent materials with alpha rejection set
       Ogre::Technique *origTech = _originalMaterial->getTechnique(0);
