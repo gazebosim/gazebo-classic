@@ -590,7 +590,7 @@ bool BulletJoint::SetPosition(unsigned int _index, const double _position)
   // of a change all at once.
   if (this->HasType(Base::HINGE_JOINT))
   {
-    double currentAngle = this->GetAngle(0).Radian();
+    double currentAngle = this->Position(0);
 
     const double maxSupportedAngle = 1e12;
     if (   std::abs(currentAngle) > maxSupportedAngle
