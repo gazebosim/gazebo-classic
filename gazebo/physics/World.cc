@@ -2517,7 +2517,6 @@ void World::LogModelResources()
 
     const std::string modelPrefix = "model://";
     const std::string filePrefix = "file://";
-    std::string prefix;
     if (_uri.find(modelPrefix) == 0)
     {
       std::string modelName = _uri.substr(modelPrefix.size(),
