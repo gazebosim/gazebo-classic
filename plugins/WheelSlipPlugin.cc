@@ -34,6 +34,7 @@
 #include <gazebo/physics/ode/ODETypes.hh>
 
 #include <gazebo/transport/Node.hh>
+#include <gazebo/transport/Publisher.hh>
 #include <gazebo/transport/Subscriber.hh>
 
 #include "plugins/WheelSlipPlugin.hh"
@@ -77,6 +78,9 @@ namespace gazebo
       /// \brief Wheel radius extracted from collision shape if not
       /// specified as xml parameter.
       public: double wheelRadius = 0;
+
+      /// \brief Publish slip for each wheel.
+      public: transport::PublisherPtr slipPub;
     };
 
     /// \brief Initial gravity direction in parent model frame.
@@ -85,16 +89,16 @@ namespace gazebo
     /// \brief Model pointer.
     public: physics::ModelWeakPtr model;
 
-    /// \brief Link and surface pointers to update.
-    public: std::map<physics::LinkWeakPtr,
-                        LinkSurfaceParams> mapLinkSurfaceParams;
-
     /// \brief Protect data access during transport callbacks
     public: std::mutex mutex;
 
-    /// \brief Communication node
+    /// \brief Gazebo communication node
     /// \todo: Transition to ignition-transport in gazebo8
-    public: transport::NodePtr node;
+    public: transport::NodePtr gzNode;
+
+    /// \brief Link and surface pointers to update.
+    public: std::map<physics::LinkWeakPtr,
+                        LinkSurfaceParams> mapLinkSurfaceParams;
 
     /// \brief Lateral slip compliance subscriber.
     /// \todo: Transition to ignition-transport in gazebo8.
@@ -132,8 +136,12 @@ void WheelSlipPlugin::Fini()
 
   this->dataPtr->lateralComplianceSub.reset();
   this->dataPtr->longitudinalComplianceSub.reset();
-  if (this->dataPtr->node)
-    this->dataPtr->node->Fini();
+  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    linkSurface.second.slipPub.reset();
+  }
+  if (this->dataPtr->gzNode)
+    this->dataPtr->gzNode->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -310,14 +318,24 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Subscribe to slip compliance updates
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(world->GetName());
+  this->dataPtr->gzNode = transport::NodePtr(new transport::Node());
+  this->dataPtr->gzNode->Init(world->GetName());
 
-  this->dataPtr->lateralComplianceSub = this->dataPtr->node->Subscribe(
+  // add publishers
+  for (auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  {
+    auto link = linkSurface.first.lock();
+    GZ_ASSERT(link, "link should still exist inside Load");
+    auto &params = linkSurface.second;
+    params.slipPub = this->dataPtr->gzNode->Advertise<msgs::Vector3d>(
+        "~/" + _model->GetName() + "/wheel_slip/" + link->GetName());
+  }
+
+  this->dataPtr->lateralComplianceSub = this->dataPtr->gzNode->Subscribe(
       "~/" + _model->GetName() + "/wheel_slip/lateral_compliance",
       &WheelSlipPlugin::OnLateralCompliance, this);
 
-  this->dataPtr->longitudinalComplianceSub = this->dataPtr->node->Subscribe(
+  this->dataPtr->longitudinalComplianceSub = this->dataPtr->gzNode->Subscribe(
       "~/" + _model->GetName() + "/wheel_slip/longitudinal_compliance",
       &WheelSlipPlugin::OnLongitudinalCompliance, this);
 
@@ -431,6 +449,9 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
+  std::map<std::string, ignition::math::Vector3d> slips;
+  this->GetSlips(slips);
+
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
@@ -446,6 +467,16 @@ void WheelSlipPlugin::Update()
     {
       surface->slip1 = speed / force * params.slipComplianceLateral;
       surface->slip2 = speed / force * params.slipComplianceLongitudinal;
+    }
+
+    auto link = linkSurface.first.lock();
+    if (link)
+    {
+      msgs::Vector3d msg;
+      auto name = link->GetName();
+      msg = msgs::Convert(slips[name]);
+      if (params.slipPub)
+        params.slipPub->Publish(msg);
     }
   }
 }
