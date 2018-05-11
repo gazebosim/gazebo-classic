@@ -103,6 +103,9 @@ void BulletHeightmapShape::Init()
   // that its center is the AABB center.
   tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5 + minHeight));
 
+  // TODO FIXME this doesn't work. Some sort of fixed relative transform has
+  // to be set, but MotionState::SetWorldTransform() doesn't even consider
+  // the parameter input, so this does virtually nothing...
   // Set the transform for the heightmap.
   motionState->setWorldTransform(tr);
 }
