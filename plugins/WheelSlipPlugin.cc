@@ -79,6 +79,9 @@ namespace gazebo
       public: double wheelRadius = 0;
     };
 
+    /// \brief Initial gravity direction in parent model frame.
+    public: ignition::math::Vector3d initialGravityDirection;
+
     /// \brief Model pointer.
     public: physics::ModelWeakPtr model;
 
@@ -140,6 +143,15 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   GZ_ASSERT(_sdf, "WheelSlipPlugin sdf pointer is NULL");
 
   this->dataPtr->model = _model;
+  auto world = _model->GetWorld();
+  GZ_ASSERT(world, "world pointer is NULL");
+  {
+    ignition::math::Vector3d gravity = world->Gravity();
+    ignition::math::Quaterniond initialModelRot =
+        _model->GetWorldPose().Ign().Rot();
+    this->dataPtr->initialGravityDirection =
+        initialModelRot.RotateVectorReverse(gravity.Normalized());
+  }
 
   if (!_sdf->HasElement("wheel"))
   {
@@ -299,7 +311,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Subscribe to slip compliance updates
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(_model->GetWorld()->GetName());
+  this->dataPtr->node->Init(world->GetName());
 
   this->dataPtr->lateralComplianceSub = this->dataPtr->node->Subscribe(
       "~/" + _model->GetName() + "/wheel_slip/lateral_compliance",
@@ -324,7 +336,13 @@ physics::ModelPtr WheelSlipPlugin::GetParentModel() const
 void WheelSlipPlugin::GetSlips(
         std::map<std::string, ignition::math::Vector3d> &_out) const
 {
-  auto chassisWorldPose = this->GetParentModel()->GetWorldPose().Ign();
+  auto model = this->GetParentModel();
+  if (!model)
+  {
+    gzerr << "Parent model does not exist" << std::endl;
+    return;
+  }
+  auto modelWorldPose = model->GetWorldPose().Ign();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
@@ -334,15 +352,32 @@ void WheelSlipPlugin::GetSlips(
       continue;
     auto params = linkSurface.second;
 
-    auto name = link->GetName();
-    double radiusOmega = params.wheelRadius * params.joint->GetVelocity(0);
+    // Compute wheel velocity in parent model frame
     auto wheelWorldLinearVel = link->GetWorldLinearVel().Ign();
-    auto wheelChassisLinearVel =
-      chassisWorldPose.Rot().RotateVectorReverse(wheelWorldLinearVel);
+    auto wheelModelLinearVel =
+        modelWorldPose.Rot().RotateVectorReverse(wheelWorldLinearVel);
+    // Compute wheel spin axis in parent model frame
+    auto joint = params.joint.lock();
+    if (!link)
+      continue;
+    auto wheelWorldAxis = joint->GetGlobalAxis(0).Ign().Normalized();
+    auto wheelModelAxis =
+        modelWorldPose.Rot().RotateVectorReverse(wheelWorldAxis);
+    // Estimate longitudinal direction as cross product of wheel spin axis
+    // with initial gravity direction
+    auto longitudinalModelAxis =
+        wheelModelAxis.Cross(this->dataPtr->initialGravityDirection);
+
+    double spinSpeed = params.wheelRadius * joint->GetVelocity(0);
+    double lateralSpeed = wheelModelAxis.Dot(wheelModelLinearVel);
+    double longitudinalSpeed = longitudinalModelAxis.Dot(wheelModelLinearVel);
+
     ignition::math::Vector3d slip;
-    slip.X(wheelChassisLinearVel.X() - radiusOmega);
-    slip.Y(wheelChassisLinearVel.Y());
-    slip.Z(radiusOmega);
+    slip.X(longitudinalSpeed - spinSpeed);
+    slip.Y(lateralSpeed);
+    slip.Z(spinSpeed);
+
+    auto name = link->GetName();
     _out[name] = slip;
   }
 }
