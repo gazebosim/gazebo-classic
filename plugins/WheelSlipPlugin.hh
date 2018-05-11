@@ -110,6 +110,9 @@ namespace gazebo
     // Documentation inherited
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf);
 
+    // Documentation inherited
+    public: virtual void Fini();
+
     /// \brief Get parent model.
     /// \return pointer to parent model.
     public: physics::ModelPtr GetParentModel() const;

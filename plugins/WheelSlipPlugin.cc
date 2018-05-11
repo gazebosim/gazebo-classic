@@ -40,15 +40,23 @@
 
 namespace gazebo
 {
+  namespace physics
+  {
+    typedef boost::weak_ptr<physics::Joint> JointWeakPtr;
+    typedef boost::weak_ptr<physics::Link> LinkWeakPtr;
+    typedef boost::weak_ptr<physics::Model> ModelWeakPtr;
+    typedef boost::weak_ptr<physics::ODESurfaceParams> ODESurfaceParamsWeakPtr;
+  }
+
   class WheelSlipPluginPrivate
   {
     public: class LinkSurfaceParams
     {
       /// \brief Pointer to wheel spin joint.
-      public: physics::JointPtr joint = nullptr;
+      public: physics::JointWeakPtr joint;
 
       /// \brief Pointer to ODESurfaceParams object.
-      public: physics::ODESurfaceParamsPtr surface = nullptr;
+      public: physics::ODESurfaceParamsWeakPtr surface;
 
       /// \brief Unitless wheel slip compliance in lateral direction.
       /// The parameter should be non-negative,
@@ -72,10 +80,11 @@ namespace gazebo
     };
 
     /// \brief Model pointer.
-    public: physics::ModelPtr model;
+    public: physics::ModelWeakPtr model;
 
     /// \brief Link and surface pointers to update.
-    public: std::map<physics::LinkPtr, LinkSurfaceParams> mapLinkSurfaceParams;
+    public: std::map<physics::LinkWeakPtr,
+                        LinkSurfaceParams> mapLinkSurfaceParams;
 
     /// \brief Protect data access during transport callbacks
     public: std::mutex mutex;
@@ -111,6 +120,17 @@ WheelSlipPlugin::WheelSlipPlugin()
 /////////////////////////////////////////////////
 WheelSlipPlugin::~WheelSlipPlugin()
 {
+}
+
+/////////////////////////////////////////////////
+void WheelSlipPlugin::Fini()
+{
+  this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->lateralComplianceSub.reset();
+  this->dataPtr->longitudinalComplianceSub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
 }
 
 /////////////////////////////////////////////////
@@ -297,7 +317,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 physics::ModelPtr WheelSlipPlugin::GetParentModel() const
 {
-  return this->dataPtr->model;
+  return this->dataPtr->model.lock();
 }
 
 /////////////////////////////////////////////////
@@ -309,7 +329,9 @@ void WheelSlipPlugin::GetSlips(
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
-    auto link = linkSurface.first;
+    auto link = linkSurface.first.lock();
+    if (!link)
+      continue;
     auto params = linkSurface.second;
 
     auto name = link->GetName();
@@ -379,10 +401,16 @@ void WheelSlipPlugin::Update()
   {
     auto params = linkSurface.second;
     double force = params.wheelNormalForce;
-    auto omega = params.joint->GetVelocity(0);
+    auto joint = params.joint.lock();
+    double omega = 0;
+    if (joint)
+      omega = joint->GetVelocity(0);
     double speed = std::abs(omega) * params.wheelRadius;
-    // auto speed = linkSurface.first->GetWorldLinearVel().Ign().Length();
-    params.surface->slip1 = speed / force * params.slipComplianceLateral;
-    params.surface->slip2 = speed / force * params.slipComplianceLongitudinal;
+    auto surface = params.surface.lock();
+    if (surface)
+    {
+      surface->slip1 = speed / force * params.slipComplianceLateral;
+      surface->slip2 = speed / force * params.slipComplianceLongitudinal;
+    }
   }
 }
