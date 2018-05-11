@@ -166,7 +166,7 @@ namespace gazebo
                 return;
               }
 
-      /// \brief Adverise a topic
+      /// \brief Advertise a topic
       /// \param[in] _topic The topic to advertise
       /// \param[in] _queueLimit The maximum number of outgoing messages to
       /// queue for delivery
@@ -182,6 +182,46 @@ namespace gazebo
         PublisherPtr publisher =
           transport::TopicManager::Instance()->Advertise<M>(
               decodedTopic, _queueLimit, _hzRate);
+
+        boost::mutex::scoped_lock lock(this->publisherMutex);
+        publisher->SetNode(shared_from_this());
+        this->publishers.push_back(publisher);
+
+        return publisher;
+      }
+
+      /// \brief A convenience function for a one-time publication of
+      /// a message. This is inefficient, compared to
+      /// Node::Advertise followed by Publisher::Publish. This function
+      /// should only be used when sending a message very infrequently.
+      /// \param[in] _topic The topic to advertise
+      /// \param[in] _message Message to be published
+      public: void Publish(const std::string &_topic,
+                  const google::protobuf::Message &_message)
+              {
+                transport::PublisherPtr pub = this->Advertise(_topic,
+                    _message.GetTypeName());
+                pub->WaitForConnection();
+
+                pub->Publish(_message, true);
+              }
+
+      /// \brief Advertise a topic
+      /// \param[in] _topic The topic to advertise
+      /// \param[in] _queueLimit The maximum number of outgoing messages to
+      /// queue for delivery
+      /// \param[in] _hz Update rate for the publisher. Units are
+      /// 1.0/seconds.
+      /// \return Pointer to new publisher object
+      public: transport::PublisherPtr Advertise(const std::string &_topic,
+                                        const std::string &_msgTypeName,
+                                        unsigned int _queueLimit = 1000,
+                                        double _hzRate = 0)
+      {
+        std::string decodedTopic = this->DecodeTopicName(_topic);
+        PublisherPtr publisher =
+          transport::TopicManager::Instance()->Advertise(
+              decodedTopic, _msgTypeName, _queueLimit, _hzRate);
 
         boost::mutex::scoped_lock lock(this->publisherMutex);
         publisher->SetNode(shared_from_this());
