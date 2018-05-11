@@ -108,12 +108,14 @@ namespace gazebo
 
                 // Connect all local subscription to the publisher
                 PublicationPtr publication = this->FindPublication(_topic);
-                GZ_ASSERT(publication != NULL, "FindPublication returned NULL");
+                GZ_ASSERT(publication != nullptr,
+                    "FindPublication returned nullptr");
 
                 publication->AddPublisher(pub);
                 if (!publication->GetLocallyAdvertised())
                 {
-                  ConnectionManager::Instance()->Advertise(_topic, _msgTypeName);
+                  ConnectionManager::Instance()->Advertise(_topic,
+                      _msgTypeName);
                 }
 
                 publication->SetLocallyAdvertised(true);
