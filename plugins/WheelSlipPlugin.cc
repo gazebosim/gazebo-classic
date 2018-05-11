@@ -381,10 +381,10 @@ void WheelSlipPlugin::GetSlips(
     auto wheelWorldAxis = joint->GetGlobalAxis(0).Ign().Normalized();
     auto wheelModelAxis =
         modelWorldPose.Rot().RotateVectorReverse(wheelWorldAxis);
-    // Estimate longitudinal direction as cross product of wheel spin axis
-    // with initial gravity direction
+    // Estimate longitudinal direction as cross product of initial gravity
+    // direction with wheel spin axis.
     auto longitudinalModelAxis =
-        wheelModelAxis.Cross(this->dataPtr->initialGravityDirection);
+        this->dataPtr->initialGravityDirection.Cross(wheelModelAxis);
 
     double spinSpeed = params.wheelRadius * joint->GetVelocity(0);
     double lateralSpeed = wheelModelAxis.Dot(wheelModelLinearVel);
