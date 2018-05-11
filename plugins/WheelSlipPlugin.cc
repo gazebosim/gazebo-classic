@@ -323,7 +323,7 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 
   // Connect to the update event
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&WheelSlipPlugin::Update, this));
+      std::bind(&WheelSlipPlugin::Update, this));
 }
 
 /////////////////////////////////////////////////
