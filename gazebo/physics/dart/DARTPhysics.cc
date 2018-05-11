@@ -92,6 +92,7 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
   // TODO: this should be made a parameter, to switch between the DART
   // collision detector as user wants?
   auto cd = dart::collision::BulletCollisionDetector::create();
+  // use ode collision detection
   // auto cd = dart::collision::OdeCollisionDetector::create();
   this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
 }

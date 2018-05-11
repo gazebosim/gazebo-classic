@@ -109,6 +109,7 @@ void ODEHeightmapShape::Init()
   // dGeomSetOffsetQuaternion(oParent->getCollisionId(), q);
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
 
+  // TODO FIXME remove this as soon as testing of this PR is done
   // debug print of geometry AABB actually created
   dReal aabb[6];
   dGeomGetAABB(oParent->GetCollisionId(), aabb);
