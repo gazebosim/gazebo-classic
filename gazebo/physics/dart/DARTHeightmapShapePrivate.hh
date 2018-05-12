@@ -81,7 +81,6 @@ namespace gazebo
 
       /// \brief DART cylinder shape
       private: dart::dynamics::ShapeNodePtr dtHeightmapShape;
-
     };
   }
 }
