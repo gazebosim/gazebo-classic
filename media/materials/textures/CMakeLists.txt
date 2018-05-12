@@ -17,6 +17,7 @@ set (files
   grass_normal.png
   hardwood_floor.jpg
   heightmap_bowl.png
+  heightmap_valley.png
   motorway.jpg
   noise_rgba.png
   paintedWall.jpg

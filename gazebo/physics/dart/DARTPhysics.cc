@@ -98,6 +98,15 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::CollisionDetectorInUse() const
+{
+  dart::collision::CollisionDetectorPtr cd =
+    this->dataPtr->dtWorld->getConstraintSolver()->getCollisionDetector();
+  if (!cd) return "";
+  return cd->getType();
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::Init()
 {
 }

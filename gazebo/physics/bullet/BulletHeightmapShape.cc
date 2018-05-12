@@ -51,7 +51,7 @@ void BulletHeightmapShape::Init()
 
   // This will force the Z-axis to be up
   int upIndex = 2;
-  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1);
+  btVector3 localScaling(this->scale.X(), this->scale.Y(), 1.0);
 
   this->heightFieldShape  = new btHeightfieldTerrainShape(
       this->vertSize,     // # of heights along width
@@ -78,6 +78,8 @@ void BulletHeightmapShape::Init()
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
+  // TODO take this print out as soon as testing is finished.
+  // AABB getting is only needed for debug print.
   btVector3 min, max;
   this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
   gzdbg << "Bullet heightfield AABB: min = {"

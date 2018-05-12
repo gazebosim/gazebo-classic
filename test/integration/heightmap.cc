@@ -25,6 +25,7 @@
 #include "gazebo/test/helper_physics_generator.hh"
 #include "images_cmp.h"
 #include "gazebo/test/ServerFixture.hh"
+#include "gazebo/physics/dart/DARTPhysics.hh"
 
 using namespace gazebo;
 
@@ -53,6 +54,7 @@ class HeightmapTest : public ServerFixture,
   public: void LoadDEM(const std::string &_physicsEngine);
   public: void Material(const std::string &_worldName,
       const std::string &_physicsEngine);
+  public: void TerrainCollision(const std::string &_physicsEngine);
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
@@ -71,13 +73,26 @@ class HeightmapTest : public ServerFixture,
 /////////////////////////////////////////////////
 void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 {
+  Load("worlds/heightmap_test.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
   }
-
-  Load("worlds/heightmap_test.world", true, _physicsEngine);
 
   // Make sure the render engine is available.
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -133,13 +148,27 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 {
+  Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
   }
 
-  Load("worlds/white_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
@@ -165,13 +194,27 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 /////////////////////////////////////////////////
 void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 {
+  Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
+
   if (_physicsEngine == "dart")
   {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
   }
 
-  Load("worlds/white_no_alpha_heightmap.world", true, _physicsEngine);
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
 
@@ -236,15 +279,27 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
           << std::endl;
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for "
-          << _physicsEngine
-          << ", see issue #909" << std::endl;
-    return;
-  }
 
   Load("worlds/heightmap_test.world", true, _physicsEngine);
+
+  if (_physicsEngine == "dart")
+  {
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+  }
 
   physics::ModelPtr model = GetModel("heightmap");
   EXPECT_TRUE(model != NULL);
@@ -263,12 +318,6 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
 void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
 {
 #ifdef HAVE_GDAL
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
-  }
-
   if (_physicsEngine == "bullet" || _physicsEngine == "simbody")
   {
     gzerr << "Aborting test for " << _physicsEngine <<
@@ -277,6 +326,25 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   }
 
   Load("worlds/dem_neg.world", true, _physicsEngine);
+
+  if (_physicsEngine == "dart")
+  {
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+  }
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_NE(world, nullptr);
@@ -308,8 +376,9 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
   EXPECT_GE(boxInitPose.Pos().Z(), minHeight);
 
   // step the world
-  // let the box fall onto the heightmap and wait for it to rest
-  world->Step(1000);
+  // let the box fall onto the heightmap and wait for it to rest.
+  // ODE and Bullet seem to be fine with 1000 iterations, but DART needs more.
+  world->Step(1200);
 
   ignition::math::Pose3d boxRestPose = boxModel->WorldPose();
   EXPECT_NE(boxRestPose, boxInitPose);
@@ -455,14 +524,28 @@ void HeightmapTest::Heights(const std::string &_physicsEngine)
 void HeightmapTest::Material(const std::string &_worldName,
     const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "Aborting test for dart, see issue #909" << std::endl;
-    return;
-  }
-
   // load a heightmap with red material
   Load(_worldName, false, _physicsEngine);
+
+  if (_physicsEngine == "dart")
+  {
+    physics::WorldPtr w = physics::get_world();
+    ASSERT_NE(w, nullptr);
+    physics::PhysicsEnginePtr engine = w->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+  }
+
   physics::ModelPtr heightmap = GetModel("heightmap");
   ASSERT_NE(heightmap, nullptr);
 
@@ -629,6 +712,79 @@ void HeightmapTest::HeightmapCache()
 }
 
 /////////////////////////////////////////////////
+void HeightmapTest::TerrainCollision(const std::string &_physicsEngine)
+{
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
+    // an error code, which is the correct answer, but we'll skip it for now.
+    gzerr << "Aborting test for "
+          << _physicsEngine
+          << std::endl;
+    return;
+  }
+
+  Load("worlds/heightmap_test_with_sphere.world", true, _physicsEngine);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  if (_physicsEngine == "dart")
+  {
+    physics::PhysicsEnginePtr engine = world->Physics();
+    ASSERT_NE(engine, nullptr);
+    physics::DARTPhysicsPtr dartEngine
+      = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+    ASSERT_NE(dartEngine, nullptr);
+    std::string cd = dartEngine->CollisionDetectorInUse();
+    ASSERT_FALSE(cd.empty());
+    if (cd != "bullet" && cd != "ode")
+    {
+      gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
+            << std::endl;
+      return;
+    }
+  }
+
+  // step the world and verify the sphere has rolled into the valley
+  world->Step(5000);
+
+  // get shapes and min height
+  physics::ModelPtr heightmap = GetModel("heightmap");
+  ASSERT_NE(heightmap, nullptr);
+
+  physics::CollisionPtr hmCollision =
+    heightmap->GetLink("link")->GetCollision("collision");
+
+  physics::HeightmapShapePtr heightmapShape =
+    boost::dynamic_pointer_cast<
+      physics::HeightmapShape>(hmCollision->GetShape());
+  ASSERT_NE(heightmapShape, nullptr);
+  double minHeight = heightmapShape->GetMinHeight();
+
+  physics::ModelPtr sphere = GetModel("test_sphere");
+  ASSERT_NE(sphere, nullptr);
+
+  physics::CollisionPtr sphereCollision =
+    sphere->GetLink("link")->GetCollision("collision");
+  ASSERT_NE(sphereCollision, nullptr);
+
+  physics::SphereShapePtr sphereShape =
+    boost::dynamic_pointer_cast<
+      physics::SphereShape>(sphereCollision->GetShape());
+  ASSERT_NE(sphereShape, nullptr);
+  double radius = sphereShape->GetRadius();
+
+  // verify that the sphere has rolled to valley as expected
+  ignition::math::Pose3d spherePose = sphere->WorldPose();
+
+  // ensure it in fact has rolled all the way down, with some tolerance
+  EXPECT_LE(spherePose.Pos().Z(), (minHeight + radius*1.1));
+  // ensure it has not dropped below terrain, with some tolerance
+  EXPECT_GE(spherePose.Pos().Z(), (minHeight + radius*0.99));
+}
+
+/////////////////////////////////////////////////
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
@@ -668,6 +824,12 @@ TEST_P(HeightmapTest, Volume)
 TEST_P(HeightmapTest, LoadDEM)
 {
   LoadDEM(GetParam());
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollision)
+{
+  TerrainCollision(GetParam());
 }
 
 /////////////////////////////////////////////////
