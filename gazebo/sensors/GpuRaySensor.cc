@@ -107,6 +107,9 @@ void GpuRaySensor::Load(const std::string &_worldName)
   this->dataPtr->horzRangeCount = this->RangeCount();
   this->dataPtr->vertRangeCount = this->VerticalRangeCount();
 
+  this->dataPtr->rangeMin = this->RangeMin();
+  this->dataPtr->rangeMax = this->RangeMax();
+
   // Handle noise model settings.
   if (rayElem->HasElement("noise"))
   {
@@ -194,8 +197,9 @@ void GpuRaySensor::Init()
 
     this->dataPtr->laserCam->SetHorzFOV(hfov);
     this->dataPtr->laserCam->SetCosHorzFOV(hfov);
-    this->dataPtr->horzRayCount /= cameraCount;
-    this->dataPtr->horzRangeCount /= cameraCount;
+
+    unsigned int horzRangeCountPerCamera = this->dataPtr->horzRangeCount / cameraCount;
+    unsigned int vertRangeCountPerCamera = this->dataPtr->vertRangeCount;
 
     // vertical laser setup
     double vfov;
@@ -241,23 +245,22 @@ void GpuRaySensor::Init()
       this->dataPtr->laserCam->SetRayCountRatio(camera_aspect_ratio);
       this->dataPtr->rangeCountRatio = camera_aspect_ratio;
 
-      if ((this->dataPtr->horzRangeCount / this->RangeCountRatio()) >
-          this->dataPtr->vertRangeCount)
+      if ((horzRangeCountPerCamera / this->RangeCountRatio()) >
+           vertRangeCountPerCamera)
       {
-        this->dataPtr->vertRangeCount =
-          this->dataPtr->horzRangeCount / this->RangeCountRatio();
+        vertRangeCountPerCamera =
+            horzRangeCountPerCamera / this->RangeCountRatio();
       }
       else
       {
-        this->dataPtr->horzRangeCount =
-          this->dataPtr->vertRangeCount * this->RangeCountRatio();
+        horzRangeCountPerCamera =
+            vertRangeCountPerCamera * this->RangeCountRatio();
       }
     }
     else
     {
       // set a very small vertical FOV for camera
-      this->dataPtr->laserCam->SetRayCountRatio(
-          this->dataPtr->horzRangeCount / 1);
+      this->dataPtr->laserCam->SetRayCountRatio(horzRangeCountPerCamera / 1);
     }
 
     // Initialize camera sdf for GpuLaser
@@ -267,8 +270,8 @@ void GpuRaySensor::Init()
     this->dataPtr->cameraElem->GetElement("horizontal_fov")->Set(hfov);
 
     sdf::ElementPtr ptr = this->dataPtr->cameraElem->GetElement("image");
-    ptr->GetElement("width")->Set(this->dataPtr->horzRangeCount);
-    ptr->GetElement("height")->Set(this->dataPtr->vertRangeCount);
+    ptr->GetElement("width")->Set(horzRangeCountPerCamera);
+    ptr->GetElement("height")->Set(vertRangeCountPerCamera);
     ptr->GetElement("format")->Set("FLOAT32");
 
     ptr = this->dataPtr->cameraElem->GetElement("clip");
@@ -708,27 +711,27 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_vertical_angle_min(this->VerticalAngleMin().Radian());
   scan->set_vertical_angle_max(this->VerticalAngleMax().Radian());
   scan->set_vertical_angle_step(this->VerticalAngleResolution());
-  scan->set_vertical_count(this->VerticalRangeCount());
+  scan->set_vertical_count(this->dataPtr->vertRangeCount);
 
-  scan->set_range_min(this->RangeMin());
-  scan->set_range_max(this->RangeMax());
+  scan->set_range_min(this->dataPtr->rangeMin);
+  scan->set_range_max(this->dataPtr->rangeMax);
 
   bool add = scan->ranges_size() == 0;
   const float *laserBuffer = this->dataPtr->laserCam->LaserData();
 
-  for (int j = 0; j < this->VerticalRangeCount(); ++j)
+  for (unsigned int j = 0; j < this->dataPtr->vertRangeCount; ++j)
   {
-    for (int i = 0; i < this->RangeCount(); ++i)
+    for (unsigned int i = 0; i < this->dataPtr->horzRangeCount; ++i)
     {
-      int index = j * this->RangeCount() + i;
+      int index = j * this->dataPtr->horzRangeCount + i;
       double range = laserBuffer[index*3];
 
       // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (range >= this->RangeMax())
+      if (range >= this->dataPtr->rangeMax)
       {
         range = GZ_DBL_INF;
       }
-      else if (range <= this->RangeMin())
+      else if (range <= this->dataPtr->rangeMin)
       {
         range = -GZ_DBL_INF;
       }
@@ -737,10 +740,10 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
       {
         range = this->noises[GPU_RAY_NOISE]->Apply(range);
         range = ignition::math::clamp(range,
-            this->RangeMin(), this->RangeMax());
+            this->dataPtr->rangeMin, this->dataPtr->rangeMax);
       }
 
-      range = ignition::math::isnan(range) ? this->RangeMax() : range;
+      range = ignition::math::isnan(range) ? this->dataPtr->rangeMax : range;
 
       if (add)
       {
