@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Improve BulletHingeJoint support for large joint limits
+    * [Pull request 2958](https://bitbucket.org/osrf/gazebo/pull-request/2958)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
