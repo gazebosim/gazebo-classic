@@ -116,6 +116,19 @@ void RTShaderSystem::Init()
   else
     gzerr << "RT Shader system failed to initialize\n";
 #endif
+
+  // normal map is not working with the shaders in media/rtshaderlib
+  // (GLSL < 130), so disable it for now.
+  // this mainly affects gazebo on OSX
+  const Ogre::RenderSystemCapabilities *capabilities =
+      Ogre::Root::getSingleton().getRenderSystem()->getCapabilities();
+  Ogre::DriverVersion glVersion;
+  glVersion.build = 0;
+  glVersion.major = 3;
+  glVersion.minor = 0;
+  glVersion.release = 0;
+  if (capabilities->isDriverOlderThanVersion(glVersion))
+    this->dataPtr->enableNormalMap = false;
 }
 
 //////////////////////////////////////////////////
@@ -325,8 +338,8 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
           // Remove all sub render states.
           renderState->reset();
 
-          /// This doesn't seem to work properly.
-          if (_vis->GetShaderType() == "normal_map_object_space")
+          if (this->dataPtr->enableNormalMap &&
+              _vis->GetShaderType() == "normal_map_object_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->dataPtr->shaderGenerator->createSubRenderState(
@@ -341,7 +354,8 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
             normalMapSubRS->setNormalMapTextureName(_vis->GetNormalMap());
             renderState->addTemplateSubRenderState(normalMapSubRS);
           }
-          else if (_vis->GetShaderType() == "normal_map_tangent_space")
+          else if (this->dataPtr->enableNormalMap &&
+              _vis->GetShaderType() == "normal_map_tangent_space")
           {
             Ogre::RTShader::SubRenderState* subRenderState =
               this->dataPtr->shaderGenerator->createSubRenderState(

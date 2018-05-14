@@ -445,6 +445,32 @@ void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
   this->UpdateFOV();
   this->dataPtr->viewController->Resize(_w, _h);
+
+  // reload ogre compositors on window resize
+  // otherwise some compositors can cause the client to crash
+  Ogre::CompositorManager *compMgr =
+      Ogre::CompositorManager::getSingletonPtr();
+  if (compMgr->hasCompositorChain(this->viewport))
+  {
+    Ogre::CompositorChain *chain =
+        compMgr->getCompositorChain(this->viewport);
+    std::vector<std::pair<std::string, bool>> compositors;
+    Ogre::CompositorChain::InstanceIterator it = chain->getCompositors();
+    while (it.hasMoreElements())
+    {
+      Ogre::CompositorInstance* nextCompInst = it.getNext();
+      compositors.push_back(
+          std::make_pair(nextCompInst->getCompositor()->getName(),
+          nextCompInst->getEnabled()));
+    }
+    compMgr->removeCompositorChain(this->viewport);
+    for (unsigned int i = 0; i < compositors.size(); ++i)
+    {
+      compMgr->addCompositor(this->viewport, compositors[i].first);
+      compMgr->setCompositorEnabled(this->viewport, compositors[i].first,
+          compositors[i].second);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -622,10 +648,12 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
   }
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewport->setVisibilityMask(
+      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
 
   this->initialized = true;
 

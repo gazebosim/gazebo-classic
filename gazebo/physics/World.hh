@@ -541,8 +541,16 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessLightModifyMsgs();
 
+      /// \brief Process all received log playback control messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessPlaybackControlMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
+
+      /// \brief Save model resources while recording a log, such as meshes
+      /// and textures.
+      private: void LogModelResources();
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();

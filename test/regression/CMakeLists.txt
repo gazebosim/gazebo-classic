@@ -38,6 +38,9 @@ set(tests
   1569_hydra_crash.cc
   1694_world_accel.cc
   1782_unadvertise.cc
+  2297_log_insertions_paused.cc
+  2428_log_insertions.cc
+  2430_revolute_joint_SetPosition.cc
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 

@@ -66,6 +66,7 @@ set(tests
   nested_model.cc
   noise.cc
   nondefault_world.cc
+  obj_loader.cc
   physics.cc
   physics_basic_controller_response.cc
   physics_collision.cc
@@ -91,6 +92,7 @@ set(tests
   speed.cc
   speed_thread_islands.cc
   speed_thread_pr2.cc
+  static_map_plugin.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc

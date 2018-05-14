@@ -140,13 +140,15 @@ namespace gazebo
 
       /// \brief Get the vector of SDF insertions.
       /// \return A vector of SDF blocks. Each block contains the SDF of the
-      /// model to be spawned in the simulation.
+      /// model to be spawned in the simulation, without the <sdf> tag wrapping
+      /// it.
       public: const std::vector<std::string> &Insertions() const;
 
       /// \brief Set a new vector of SDF insertions.
       /// \param[in] _insertions Vector containing SDF blocks. Each block should
-      /// contain the SDF of the new models spawned in the current simulation
-      /// frame.
+      /// contain the SDF of the new model, light or actor spawned in the
+      /// current simulation frame. The block could either come wrapped in an
+      /// <sdf> tag or not.
       public: void SetInsertions(const std::vector<std::string> &_insertions);
 
       /// \brief Get the vector of SDF deletions.

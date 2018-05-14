@@ -229,7 +229,7 @@ ModelCreator::ModelCreator(QObject *_parent)
   this->dataPtr->modelCounter = 0;
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->makerPub =
       this->dataPtr->node->Advertise<msgs::Factory>("~/factory");
   this->dataPtr->requestPub =
