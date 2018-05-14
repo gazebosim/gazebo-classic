@@ -128,8 +128,7 @@ void JointTestRevolute::UnwrappedAngle(const std::string &_physicsEngine)
     {
       // bullet doesn't store large joint limits properly
       // https://github.com/bulletphysics/bullet3/issues/42
-      EXPECT_NEAR(-1.2954917, joint->GetLowStop(0).Radian(), 1e-6);
-      EXPECT_NEAR( 1.2954917, joint->GetHighStop(0).Radian(), 1e-6);
+      EXPECT_LT(joint->GetHighStop(0).Radian(), joint->GetLowStop(0).Radian());
     }
     else
     {

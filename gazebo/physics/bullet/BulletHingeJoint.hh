@@ -95,6 +95,12 @@ namespace gazebo
       // Documentation inherited.
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
+      /// \brief Helper for calls to btHingeConstraint::setLimit.
+      /// \param[in] _low Lower limit for joint.
+      /// \param[in] _high Upper limit for joint.
+      /// \return True if setLimit was called.
+      private: bool setLimitHelper(const double _low, const double _high);
+
       /// \brief Pointer to bullet hinge constraint.
       private: btHingeConstraint *bulletHinge;
 

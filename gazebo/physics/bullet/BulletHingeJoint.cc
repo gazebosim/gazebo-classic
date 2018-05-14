@@ -171,7 +171,7 @@ void BulletHingeJoint::Init()
   {
     sdf::ElementPtr limitElem;
     limitElem = this->sdf->GetElement("axis")->GetElement("limit");
-    this->bulletHinge->setLimit(
+    this->setLimitHelper(
       this->angleOffset + limitElem->Get<double>("lower"),
       this->angleOffset + limitElem->Get<double>("upper"));
   }
@@ -294,6 +294,17 @@ void BulletHingeJoint::SetForceImpl(unsigned int /*_index*/, double _effort)
 }
 
 //////////////////////////////////////////////////
+bool BulletHingeJoint::setLimitHelper(const double _low, const double _high)
+{
+  if (_low <= _high && std::abs(_low) < IGN_PI && std::abs(_high) < IGN_PI)
+  {
+    this->bulletHinge->setLimit(_low, _high);
+    return true;
+  }
+  return false;
+}
+
+//////////////////////////////////////////////////
 bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
                       const math::Angle &_angle)
 {
@@ -303,9 +314,8 @@ bool BulletHingeJoint::SetHighStop(unsigned int /*_index*/,
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    this->bulletHinge->setLimit(this->bulletHinge->getLowerLimit(),
+    return this->setLimitHelper(this->bulletHinge->getLowerLimit(),
                                 this->angleOffset + _angle.Radian());
-    return true;
   }
   else
   {
@@ -324,9 +334,8 @@ bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
     // this function has additional parameters that we may one day
     // implement. Be warned that this function will reset them to default
     // settings
-    this->bulletHinge->setLimit(this->angleOffset + _angle.Radian(),
+    return this->setLimitHelper(this->angleOffset + _angle.Radian(),
                                 this->bulletHinge->getUpperLimit());
-    return true;
   }
   else
   {
