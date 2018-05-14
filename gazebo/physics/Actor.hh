@@ -88,6 +88,11 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Align BVH to DAE skin
+      /// \param[in] _skel BVH skeleton
+      /// \param[in] skelMap joint mapping between DAE skin and BVH skeleton
+      public: void AlignBVH(common::Skeleton* _skel, std::map<std::string, std::string> skelMap);
+
       /// \brief Initialize the actor
       public: virtual void Init();
 
@@ -221,7 +226,7 @@ namespace gazebo
       private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose, const double _radius,
-                   const std::string &_material,
+		   const std::string &_material,
                    const ignition::math::Color &_ambient);
 
       /// \brief Add a box visual object.
@@ -294,6 +299,15 @@ namespace gazebo
 
       /// \brief True if the animation should loop.
       protected: bool loop;
+
+      /// \brief True if the animation is loaded from BVH file
+      protected: bool bvhFile;
+
+      /// \brief Translations to align BVH skeleton to DAE skin
+      protected: std::map<std::string, ignition::math::Matrix4d> translationAligner;
+
+      /// \brief Rotations to align BVH skeleton to DAE skin
+      protected: std::map<std::string, ignition::math::Matrix4d> rotationAligner;
 
       /// \brief True if the actor is being updated.
       protected: bool active;
