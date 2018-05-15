@@ -124,18 +124,8 @@ void JointTestRevolute::UnwrappedAngle(const std::string &_physicsEngine)
     // expect large joint limits
     EXPECT_DOUBLE_EQ(-1e16, joint->GetLowerLimit(0).Radian());
     EXPECT_DOUBLE_EQ(+1e16, joint->GetUpperLimit(0).Radian());
-    if (_physicsEngine == "bullet")
-    {
-      // bullet doesn't store large joint limits properly
-      // https://github.com/bulletphysics/bullet3/issues/42
-      EXPECT_NEAR(-1.2954917, joint->GetLowStop(0).Radian(), 1e-6);
-      EXPECT_NEAR( 1.2954917, joint->GetHighStop(0).Radian(), 1e-6);
-    }
-    else
-    {
-      EXPECT_DOUBLE_EQ(-1e16, joint->GetLowStop(0).Radian());
-      EXPECT_DOUBLE_EQ(+1e16, joint->GetHighStop(0).Radian());
-    }
+    EXPECT_DOUBLE_EQ(-1e16, joint->GetLowStop(0).Radian());
+    EXPECT_DOUBLE_EQ(+1e16, joint->GetHighStop(0).Radian());
 
     // set velocity to 2 pi rad/s and step forward 1.5 seconds.
     // angle should reach 3 pi rad.
