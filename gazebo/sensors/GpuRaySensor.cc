@@ -198,7 +198,11 @@ void GpuRaySensor::Init()
     this->dataPtr->laserCam->SetHorzFOV(hfov);
     this->dataPtr->laserCam->SetCosHorzFOV(hfov);
 
-    unsigned int horzRangeCountPerCamera = this->dataPtr->horzRangeCount / cameraCount;
+    // Fixed minimum resolution of texture to reduce steps in ranges
+    // when hitting surfaces where the angle between ray and surface is small.
+    // Also have to keep in mind the GPU's max. texture size
+    unsigned int horzRangeCountPerCamera =
+        std::max(2048U, this->dataPtr->horzRangeCount / cameraCount);
     unsigned int vertRangeCountPerCamera = this->dataPtr->vertRangeCount;
 
     // vertical laser setup
