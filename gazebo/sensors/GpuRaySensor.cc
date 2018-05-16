@@ -216,8 +216,12 @@ void GpuRaySensor::Init()
     {
       vfov = 0;
 
-      this->SetVerticalAngleMin(0);
-      this->SetVerticalAngleMax(0);
+      if (this->VerticalAngleMax() != this->VerticalAngleMin())
+      {
+        gzwarn << "Only one vertical ray but vertical min. and max. angle "
+            "are not equal. Min. angle is used.\n";
+        this->SetVerticalAngleMax(this->VerticalAngleMin().Radian());
+      }
     }
 
     if (vfov > M_PI / 2)
@@ -235,35 +239,46 @@ void GpuRaySensor::Init()
     this->SetVerticalAngleMax(this->dataPtr->laserCam->VertHalfAngle() +
                               (vfov / 2));
 
-    // If vertical ray is not 1 adjust horizontal and vertical FOV and
-    // ray count to maintain aspect ratio
-    // NOTE we assume gpu ray sensor does a horizontal sweep like ray sensor
-    // Vertical sweeps can be achieved by rotating the gpu ray sensor.
-    double vfov_camera = 2 * atan(tan(vfov / 2) / cos(hfov / 2));
-    this->dataPtr->laserCam->SetCosVertFOV(vfov_camera);
+    // Assume camera always stays horizontally even if vert. half angle of
+    // laser is not 0. Add padding to camera vfov.
+    double vfovCamera = vfov + 2 * std::abs(
+        this->dataPtr->laserCam->VertHalfAngle());
 
+    // Add padding to vertical camera FOV to cover all possible rays
+    // for given laser vert. and horiz. FOV
+    vfovCamera = 2 * atan(tan(vfovCamera / 2) / cos(hfov / 2));
+
+    if (vfovCamera > 2.8)
+    {
+      gzerr << "Vertical FOV of internal camera exceeds 2.8 radians.\n";
+    }
+
+    this->dataPtr->laserCam->SetCosVertFOV(vfovCamera);
+
+    // If vertical ray is not 1 adjust horizontal and vertical
+    // ray count to maintain aspect ratio
     if (this->dataPtr->vertRayCount > 1)
     {
-      double camera_aspect_ratio = tan(hfov / 2.0) / tan(vfov_camera / 2.0);
+      double cameraAspectRatio = tan(hfov / 2.0) / tan(vfovCamera / 2.0);
 
-      this->dataPtr->laserCam->SetRayCountRatio(camera_aspect_ratio);
-      this->dataPtr->rangeCountRatio = camera_aspect_ratio;
+      this->dataPtr->laserCam->SetRayCountRatio(cameraAspectRatio);
+      this->dataPtr->rangeCountRatio = cameraAspectRatio;
 
       if ((horzRangeCountPerCamera / this->RangeCountRatio()) >
            vertRangeCountPerCamera)
       {
         vertRangeCountPerCamera =
-            horzRangeCountPerCamera / this->RangeCountRatio();
+            round(horzRangeCountPerCamera / this->RangeCountRatio());
       }
       else
       {
         horzRangeCountPerCamera =
-            vertRangeCountPerCamera * this->RangeCountRatio();
+            round(vertRangeCountPerCamera * this->RangeCountRatio());
       }
     }
     else
     {
-      // set a very small vertical FOV for camera
+      // In case of 1 vert. ray, set a very small vertical FOV for camera
       this->dataPtr->laserCam->SetRayCountRatio(horzRangeCountPerCamera / 1);
     }
 

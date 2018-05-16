@@ -130,7 +130,6 @@ void GpuLaser::Fini()
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
   this->camera->yaw(Ogre::Radian(this->horzHalfAngle));
-  this->camera->pitch(Ogre::Radian(this->vertHalfAngle));
 
   this->CreateOrthoCam();
 
@@ -612,6 +611,7 @@ void GpuLaser::CreateMesh()
 
   // half of actual camera vertical FOV without padding
   double phi = this->VertFOV() / 2;
+  double phiCamera = phi + std::abs(this->VertHalfAngle());
   double theta = this->CosHorzFOV() / 2;
 
   if (this->ImageHeight() == 1)
@@ -637,9 +637,10 @@ void GpuLaser::CreateMesh()
     double gamma = 0;
     if (this->dataPtr->h2nd != 1)
     {
-      // gamma: current vertical angle
-      gamma = vstep * j - phi;
+      // gamma: current vertical angle w.r.t. camera
+      gamma = vstep * j - phi + this->VertHalfAngle();
     }
+
     for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
       // current horizontal angle from start of laser scan
@@ -678,7 +679,7 @@ void GpuLaser::CreateMesh()
       // laser ray the depth image plane.
       double u = 0.5 - tan(delta) / (2.0 * tan(theta));
       double v = 0.5 - (tan(gamma) * cos(theta)) /
-          (2.0 * tan(phi) * cos(delta));
+          (2.0 * tan(phiCamera) * cos(delta));
 
       submesh->AddTexCoord(u, v);
       submesh->AddIndex(this->dataPtr->w2nd * j + i);
