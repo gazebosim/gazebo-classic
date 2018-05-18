@@ -623,7 +623,7 @@ void GpuLaser::CreateMesh()
   unsigned int ptsOnLine = 0;
 
   // total laser hfov
-  double thfov = this->dataPtr->textureCount * this->chfov;
+  double thfov = this->dataPtr->textureCount * this->CosHorzFOV();
   double hstep = thfov / (this->dataPtr->w2nd - 1);
   double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
 
@@ -647,7 +647,7 @@ void GpuLaser::CreateMesh()
       double delta = hstep * i;
 
       // index of texture that contains the depth value
-      unsigned int texture = delta / this->chfov;
+      unsigned int texture = delta / this->CosHorzFOV();
 
       // cap texture index and horizontal angle
       if (texture > this->dataPtr->textureCount-1)
