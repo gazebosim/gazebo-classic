@@ -338,26 +338,19 @@ bool BulletHingeJoint::SetLowStop(unsigned int /*_index*/,
 //////////////////////////////////////////////////
 math::Angle BulletHingeJoint::GetHighStop(unsigned int /*_index*/)
 {
-  math::Angle result;
-
-  if (this->bulletHinge)
-    result = this->bulletHinge->getUpperLimit();
-  else
-    gzerr << "Joint must be created before getting high stop\n";
-
-  return result;
+  // the bullet limits are wrapped to [-pi,pi]
+  // https://github.com/bulletphysics/bullet3/issues/42
+  // it's more accurate to return our cached value for limit
+  return math::Angle(this->upperLimit[0]);
 }
 
 //////////////////////////////////////////////////
 math::Angle BulletHingeJoint::GetLowStop(unsigned int /*_index*/)
 {
-  math::Angle result;
-  if (this->bulletHinge)
-    result = this->bulletHinge->getLowerLimit();
-  else
-    gzerr << "Joint must be created before getting low stop\n";
-
-  return result;
+  // the bullet limits are wrapped to [-pi,pi]
+  // https://github.com/bulletphysics/bullet3/issues/42
+  // it's more accurate to return our cached value for limit
+  return math::Angle(this->lowerLimit[0]);
 }
 
 //////////////////////////////////////////////////
