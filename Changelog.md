@@ -8,6 +8,9 @@
 1. Print some bullet console warnings only once
     * [Pull request 2866](https://bitbucket.org/osrf/gazebo/pull-request/2866)
 
+1. Fix getting joint limits for BulletHingeJoint
+    * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
@@ -642,6 +645,9 @@
 ## Gazebo 7
 
 ## Gazebo 7.XX.X (2018-XX-XX)
+
+1. Fix getting joint limits for BulletHingeJoint
+    * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
