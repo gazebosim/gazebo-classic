@@ -211,6 +211,22 @@ TEST_F(LogRecord_TEST, Filter)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test LogRecord record resources
+TEST_F(LogRecord_TEST, RecordResources)
+{
+  gazebo::util::LogRecord *recorder = gazebo::util::LogRecord::Instance();
+
+  // check default values
+  EXPECT_FALSE(recorder->RecordResources());
+
+  recorder->SetRecordResources(true);
+  EXPECT_TRUE(recorder->RecordResources());
+
+  recorder->SetRecordResources(false);
+  EXPECT_FALSE(recorder->RecordResources());
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
