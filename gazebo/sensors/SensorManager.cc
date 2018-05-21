@@ -32,6 +32,7 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+#include "gazebo/util/LogPlay.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -96,19 +97,33 @@ void SensorManager::Stop()
     GZ_ASSERT((*iter) != nullptr, "Sensor Constainer is null");
     (*iter)->Stop();
   }
+
+  if (!physics::worlds_running())
+    this->worlds.clear();
+}
+
+//////////////////////////////////////////////////
+bool SensorManager::Running() const
+{
+  for (auto const &container : this->sensorContainers)
+  {
+    if (container->Running())
+      return true;
+  }
+  return false;
 }
 
 //////////////////////////////////////////////////
 void SensorManager::WaitForSensors(double _clk, double _dt)
 {
-  double tnext = this->GetNextRequiredTimestamp();
+  double tnext = this->NextRequiredTimestamp();
 
   while (!std::isnan(tnext)
       && ignition::math::lessOrNearEqual(tnext - _dt / 2.0, _clk)
       && physics::worlds_running())
   {
     this->WaitForPrerendered(0.001);
-    tnext = this->GetNextRequiredTimestamp();
+    tnext = this->NextRequiredTimestamp();
   }
 }
 
@@ -176,6 +191,10 @@ void SensorManager::Update(bool _force)
         (*iter2)->RemoveSensors();
       }
       this->initSensors.clear();
+
+      // Also clear the list of worlds
+      this->worlds.clear();
+
       this->removeAllSensors = false;
     }
   }
@@ -206,7 +225,7 @@ void SensorManager::ResetLastUpdateTimes()
 }
 
 //////////////////////////////////////////////////
-double SensorManager::GetNextRequiredTimestamp()
+double SensorManager::NextRequiredTimestamp()
 {
   double rv = std::numeric_limits<double>::quiet_NaN();
 
@@ -215,8 +234,8 @@ double SensorManager::GetNextRequiredTimestamp()
   {
     // skip deactivated sensors
     if (!s->IsActive()) continue;
-    
-    double candidate = s->GetNextRequiredTimestamp();
+
+    double candidate = s->NextRequiredTimestamp();
     // take the smallest valid value
     if (!std::isnan(candidate)
         && (std::isnan(rv) || rv > candidate))
@@ -523,6 +542,12 @@ void SensorManager::SensorContainer::Stop()
 }
 
 //////////////////////////////////////////////////
+bool SensorManager::SensorContainer::Running() const
+{
+  return !this->stop;
+}
+
+//////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
   this->stop = false;
@@ -539,6 +564,9 @@ void SensorManager::SensorContainer::RunLoop()
   // 1000 * MaxStepSize in order to handle simulation with a
   // large step size.
   double maxSensorUpdate = engine->GetMaxStepSize() * 1000;
+
+  // Release engine pointer, we don't need it in the loop
+  engine.reset();
 
   common::Time sleepTime, startTime, eventTime, diffTime;
   double maxUpdateRate = 0;
@@ -598,12 +626,21 @@ void SensorManager::SensorContainer::RunLoop()
     eventTime = std::max(common::Time::Zero, sleepTime - diffTime);
 
     // Make sure update time is reasonable.
-    GZ_ASSERT(diffTime.sec < maxSensorUpdate,
-        "Took over 1000*max_step_size to update a sensor.");
+    // During log playback, time can jump forward an arbitrary amount.
+    if (diffTime.sec >= maxSensorUpdate && !util::LogPlay::Instance()->IsOpen())
+    {
+      gzwarn << "Took over 1000*max_step_size to update a sensor "
+        << "(took " << diffTime.sec << " sec, which is more than "
+        << "the max update of " << maxSensorUpdate << " sec). "
+        << "This warning can be ignored during log playback" << std::endl;
+    }
 
     // Make sure eventTime is not negative.
-    GZ_ASSERT(eventTime >= common::Time::Zero,
-        "Time to next sensor update is negative.");
+    if (eventTime < common::Time::Zero)
+    {
+      gzerr << "Time to next sensor update is negative." << std::endl;
+      continue;
+    }
 
     boost::mutex::scoped_lock timingLock(g_sensorTimingMutex);
 
@@ -766,7 +803,8 @@ bool SensorManager::ImageSensorContainer::WaitForPrerendered(double _timeoutsec)
   std::cv_status ret;
   std::mutex mtx;
   std::unique_lock<std::mutex> lck(mtx);
-  ret = this->conditionPrerendered.wait_for(lck, std::chrono::duration<double>(_timeoutsec));
+  ret = this->conditionPrerendered.wait_for(lck,
+      std::chrono::duration<double>(_timeoutsec));
   return (ret == std::cv_status::no_timeout);
 }
 

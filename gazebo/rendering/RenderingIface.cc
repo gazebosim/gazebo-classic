@@ -111,7 +111,7 @@ void rendering::remove_scene(const std::string &_name)
 
 //////////////////////////////////////////////////
 bool rendering::wait_for_render_request(const std::string &_name,
-                                        double _timeoutsec)
+                                        const double _timeoutsec)
 {
   ScenePtr scene = get_scene(_name);
 
@@ -123,3 +123,14 @@ bool rendering::wait_for_render_request(const std::string &_name,
 
   return scene->WaitForRenderRequest(_timeoutsec);
 }
+
+//////////////////////////////////////////////////
+void rendering::set_pose_msg(const std::string &_name,
+                             const msgs::PosesStamped &_msg)
+{
+    ScenePtr scn = get_scene(_name);
+    if (scn)
+      scn->SetPoseMsg(_msg);
+}
+
+

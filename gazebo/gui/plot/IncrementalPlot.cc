@@ -45,9 +45,9 @@ namespace gazebo
       /// \brief Constructor
       /// \param[in] _canvas Canvas the magnifier will be attached to.
 #if (QWT_VERSION < ((6 << 16) | (1 << 8) | 0))
-      public: PlotMagnifier(QwtPlotCanvas *_canvas)
+      public: explicit PlotMagnifier(QwtPlotCanvas *_canvas)
 #else
-      public: PlotMagnifier(QWidget *_canvas)
+      public: explicit PlotMagnifier(QWidget *_canvas)
 #endif
                 : QwtPlotMagnifier(_canvas)
               {

@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -581,7 +582,7 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
   if (_index == 0)
   {
     this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(this->vfov)));
   }
 }
 
@@ -746,7 +747,7 @@ void GpuLaser::CreateCanvas()
   this->dataPtr->visual->SetPose(pose);
 
   this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }

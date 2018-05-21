@@ -20,6 +20,7 @@
 #include <string>
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
+#include "gazebo/msgs/msgs.hh"
 
 namespace gazebo
 {
@@ -44,6 +45,13 @@ namespace gazebo
     /// \param[in] _name Name of the scene to retrieve.
     GZ_RENDERING_VISIBLE
     rendering::ScenePtr get_scene(const std::string &_name = "");
+ 
+    /// \brief directly provide Pose message to the corresponding scene.
+    /// \param[in] _name Name of the scene concerned.
+    /// \param[in] _msg message to be passed.
+    GZ_RENDERING_VISIBLE
+    void set_pose_msg(const std::string &_name,
+                      const msgs::PosesStamped &_msg);
 
     /// \brief wait until a render request occurs
     /// \param[in] _name Name of the scene to retrieve
@@ -51,7 +59,8 @@ namespace gazebo
     /// \return true if a render request occured, false in case
     ///          we waited until the timeout
     GZ_RENDERING_VISIBLE
-    bool wait_for_render_request(const std::string &_name, double _timeoutsec);
+    bool wait_for_render_request(const std::string &_name,
+                                 const double _timeoutsec);
 
     /// \brief create rendering::Scene by name.
     /// \param[in] _name Name of the scene to create.

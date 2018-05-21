@@ -27,6 +27,7 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -150,28 +151,48 @@ namespace gazebo
 
       /// \brief Set the ambient color.
       /// \param[in] _color The ambient color to use.
-      public: void SetAmbientColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: void SetAmbientColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the ambient color.
+      /// \param[in] _color The ambient color to use.
+      public: void SetAmbientColor(const ignition::math::Color &_color);
 
       /// \brief Get the ambient color.
       /// \return The scene's ambient color.
-      public: common::Color AmbientColor() const;
+      public: ignition::math::Color AmbientColor() const;
 
       /// \brief Set the background color.
       /// \param[in] _color The background color.
-      public: void SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: void SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the background color.
+      /// \param[in] _color The background color.
+      public: void SetBackgroundColor(const ignition::math::Color &_color);
 
       /// \brief Get the background color.
       /// \return The background color.
-      public: common::Color BackgroundColor() const;
+      public: ignition::math::Color BackgroundColor() const;
 
       /// \brief Create a square grid of cells.
       /// \param[in] _cellCount Number of grid cells in one direction.
       /// \param[in] _cellLength Length of one grid cell.
       /// \param[in] _lineWidth Width of the grid lines.
       /// \param[in] _color Color of the grid lines.
+      /// \deprecated Use function which accepts ignition::math::Color.
       public: void CreateGrid(const uint32_t _cellCount,
           const float _cellLength, const float _lineWidth,
-          const common::Color &_color);
+          const common::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Create a square grid of cells.
+      /// \param[in] _cellCount Number of grid cells in one direction.
+      /// \param[in] _cellLength Length of one grid cell.
+      /// \param[in] _color Color of the grid lines.
+      public: void CreateGrid(const uint32_t _cellCount,
+          const float _cellLength, const ignition::math::Color &_color);
 
       /// \brief Get a grid based on an index. Index must be between 0 and
       /// Scene::GetGridCount.
@@ -377,8 +398,21 @@ namespace gazebo
       /// \param[in] _start Distance from camera to start the fog.
       /// \param[in] _end Distance from camera at which the fog is at max
       /// density.
+      /// \deprecated Use function which accepts ignition::math::Color.
       public: void SetFog(const std::string &_type,
                           const common::Color &_color,
+                          const double _density, const double _start,
+                          const double _end) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the fog parameters.
+      /// \param[in] _type Type of fog: "linear", "exp", or "exp2".
+      /// \param[in] _color Color of the fog.
+      /// \param[in] _density Fog density.
+      /// \param[in] _start Distance from camera to start the fog.
+      /// \param[in] _end Distance from camera at which the fog is at max
+      /// density.
+      public: void SetFog(const std::string &_type,
+                          const ignition::math::Color &_color,
                           const double _density, const double _start,
                           const double _end);
 
@@ -707,7 +741,7 @@ namespace gazebo
 
       /// \brief Set new Pose message
       /// \param[in] _msg The message data.
-      public: void SetPoseMsg(msgs::PosesStamped& _msg);
+      public: void SetPoseMsg(const msgs::PosesStamped& _msg);
 
       /// \brief Skeleton animation callback.
       /// \param[in] _msg The message data.

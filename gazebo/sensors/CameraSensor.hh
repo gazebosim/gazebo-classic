@@ -40,7 +40,7 @@ namespace gazebo
     /// \brief Basic camera sensor
     ///
     /// This sensor is used for simulating standard monocular cameras
-    class GAZEBO_VISIBLE CameraSensor : public Sensor
+    class GZ_SENSORS_VISIBLE CameraSensor : public Sensor
     {
       /// \brief Constructor
       public: CameraSensor();
@@ -74,7 +74,7 @@ namespace gazebo
 
       /// \brief Return the next timestamp going to be used by the sensor
       /// \return the timestamp
-      public: double GetNextRequiredTimestamp() const override;
+      public: double NextRequiredTimestamp() const override;
 
       /// \brief Gets the topic name of the sensor
       /// \return Topic name
@@ -83,6 +83,10 @@ namespace gazebo
       /// \brief Gets the ignition topic name of the sensor
       /// \return Ignition topic name
       public: std::string TopicIgn() const;
+
+      /// \brief Set whether the sensor is active or not.
+      /// \param[in] _value True if active, false if not.
+      public: void SetActive(bool _value) override;
 
       /// \brief Returns a pointer to the rendering::Camera.
       /// \return The Pointer to the camera sensor.

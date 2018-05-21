@@ -18,6 +18,8 @@
 #include <functional>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/rendering/skyx/include/SkyX.h"
@@ -59,6 +61,7 @@
 #include "gazebo/rendering/VideoVisual.hh"
 #include "gazebo/rendering/TransmitterVisual.hh"
 #include "gazebo/rendering/SelectionObj.hh"
+#include "gazebo/rendering/RayQuery.hh"
 
 #if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
 #include "gazebo/rendering/deferred_shading/SSAOLogic.hh"
@@ -126,6 +129,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
+  this->dataPtr->isServer = _isServer;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
   this->dataPtr->skyx = NULL;
@@ -152,6 +156,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
       this->dataPtr->node->Subscribe("~/light/modify",
       &Scene::OnLightModifyMsg, this);
 
+  this->dataPtr->isServer = _isServer;
   if (!_isServer)
   {
     this->dataPtr->poseSub = this->dataPtr->node->Subscribe("~/pose/info",
@@ -195,17 +200,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sensorMsgs.clear();
-  this->dataPtr->roadMsgs.clear();
+  this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -222,6 +217,28 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->roadSub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
+    this->dataPtr->roadMsgs.clear();
+  }
+
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    this->dataPtr->poseMsgs.clear();
+  }
 
   this->dataPtr->joints.clear();
 
@@ -262,12 +279,18 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  // FIXME: Hack to avoid segfault when deleting server sky, see issue #1757
+  if (!this->dataPtr->isServer)
+  {
+    if (this->dataPtr->skyx)
+      delete this->dataPtr->skyx;
+    if (this->dataPtr->skyxController)
+      delete this->dataPtr->skyxController;
+  }
+  this->dataPtr->skyx = nullptr;
+  this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
@@ -275,6 +298,8 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
+  this->Clear();
+
   delete this->dataPtr->requestMsg;
   this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
@@ -282,8 +307,6 @@ Scene::~Scene()
 
   // raySceneQuery deletion handled by ogre
   this->dataPtr->raySceneQuery= NULL;
-
-  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -355,7 +378,7 @@ void Scene::Init()
   {
     sdf::ElementPtr fogElem = this->dataPtr->sdf->GetElement("fog");
     this->SetFog(fogElem->Get<std::string>("type"),
-                 fogElem->Get<common::Color>("color"),
+                 fogElem->Get<ignition::math::Color>("color"),
                  fogElem->Get<double>("density"),
                  fogElem->Get<double>("start"),
                  fogElem->Get<double>("end"));
@@ -380,11 +403,14 @@ void Scene::Init()
   this->dataPtr->requestMsg = msgs::CreateRequest("scene_info");
   this->dataPtr->requestPub->Publish(*this->dataPtr->requestMsg);
 
-  // Initialize the marker manager
-  if (!this->dataPtr->markerManager.Init(this))
+  if (!this->dataPtr->isServer)
   {
-    gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
-      << "will not work.\n";
+    // Initialize the marker manager if this is a GUI scene.
+    if (!this->dataPtr->markerManager.Init(this))
+    {
+      gzerr << "Unable to initialize the MarkerManager. Marker visualizations "
+        << "will not work.\n";
+    }
   }
 }
 
@@ -470,24 +496,36 @@ std::string Scene::Name() const
 //////////////////////////////////////////////////
 void Scene::SetAmbientColor(const common::Color &_color)
 {
+  this->SetAmbientColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Scene::SetAmbientColor(const ignition::math::Color &_color)
+{
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
 
   // Ambient lighting
-  if (this->dataPtr->manager &&
-      Conversions::Convert(this->dataPtr->manager->getAmbientLight()) != _color)
+  if (this->dataPtr->manager && Conversions::Convert(
+        this->dataPtr->manager->getAmbientLight()) != _color)
   {
     this->dataPtr->manager->setAmbientLight(Conversions::Convert(_color));
   }
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::AmbientColor() const
+ignition::math::Color Scene::AmbientColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("ambient");
+  return this->dataPtr->sdf->Get<ignition::math::Color>("ambient");
 }
 
 //////////////////////////////////////////////////
 void Scene::SetBackgroundColor(const common::Color &_color)
+{
+  this->SetBackgroundColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Scene::SetBackgroundColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("background")->Set(_color);
 
@@ -507,16 +545,23 @@ void Scene::SetBackgroundColor(const common::Color &_color)
 }
 
 //////////////////////////////////////////////////
-common::Color Scene::BackgroundColor() const
+ignition::math::Color Scene::BackgroundColor() const
 {
-  return this->dataPtr->sdf->Get<common::Color>("background");
+  return this->dataPtr->sdf->Get<ignition::math::Color>("background");
 }
 
 //////////////////////////////////////////////////
-void Scene::CreateGrid(const uint32_t cell_count, const float cell_length,
-                       const float line_width, const common::Color &color)
+void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
+                       const float /*_lineWidth*/, const common::Color &_color)
 {
-  Grid *grid = new Grid(this, cell_count, cell_length, line_width, color);
+  this->CreateGrid(_cellCount, _cellLength, _color.Ign());
+}
+
+//////////////////////////////////////////////////
+void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
+    const ignition::math::Color &_color)
+{
+  Grid *grid = new Grid(this, _cellCount, _cellLength, _color);
 
   if (this->dataPtr->manager)
     grid->Init();
@@ -1095,8 +1140,6 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  bool valid = false;
-
   _position = ignition::math::Vector3d::Zero;
 
   ignition::math::Vector3d origin;
@@ -1123,59 +1166,44 @@ bool Scene::FirstContact(CameraPtr _camera,
     unsigned int flags = iter->movable->getVisibilityFlags();
 
     // Only accept a hit if there is an entity and not a gui visual
+    // and not a selection-only object (e.g. light selection ent)
+    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+        || (flags & GZ_VISIBILITY_SELECTABLE);
     if (iter->movable && iter->movable->getVisible() &&
         iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
-        && !(flags & GZ_VISIBILITY_SELECTABLE)))
+        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
     {
       Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-      // mesh data to retrieve
-      size_t vertexCount;
-      size_t indexCount;
-      Ogre::Vector3 *vertices;
-      uint64_t *indices;
-
-      // Get the mesh information
-      this->MeshInformation(ogreEntity->getMesh().get(), vertexCount,
-          vertices, indexCount, indices,
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedPosition()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedOrientation()),
-          Conversions::ConvertIgn(
-          ogreEntity->getParentNode()->_getDerivedScale()));
-
-      for (int i = 0; i < static_cast<int>(indexCount); i += 3)
+      VisualPtr vis;
+      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
       {
-        // when indices size is not divisible by 3
-        if (i+2 >= static_cast<int>(indexCount))
-          break;
-
-        // check for a hit against this triangle
-        std::pair<bool, Ogre::Real> hit = Ogre::Math::intersects(mouseRay,
-            vertices[indices[i]],
-            vertices[indices[i+1]],
-            vertices[indices[i+2]],
-            true, false);
-
-        // if it was a hit check if its the closest
-        if (hit.first)
+        try
         {
-          if ((distance < 0.0f) || (hit.second < distance))
-          {
-            // this is the closest so far, save it off
-            distance = hit.second;
-          }
+          vis = this->GetVisual(Ogre::any_cast<std::string>(
+              ogreEntity->getUserObjectBindings().getUserAny()));
         }
+        catch(Ogre::Exception &e)
+        {
+          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+          continue;
+        }
+        if (!vis)
+          continue;
+
+        RayQuery rayQuery(_camera);
+        ignition::math::Vector3d intersect;
+        ignition::math::Triangle3d vertices;
+        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+            intersect, vertices);
+        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+            intersect);
       }
-      delete [] vertices;
-      delete [] indices;
     }
   }
 
-  // If nothing was hit, then check the terrain.
-  if (distance <= 0.0 && this->dataPtr->terrain)
+  // Check intersection with the terrain
+  if (this->dataPtr->terrain)
   {
     // The terrain uses a special ray intersection test.
     Ogre::TerrainGroup::RayResult terrainResult =
@@ -1183,20 +1211,27 @@ bool Scene::FirstContact(CameraPtr _camera,
 
     if (terrainResult.hit)
     {
-      _position = Conversions::ConvertIgn(terrainResult.position);
-      valid = true;
+      double terrainHitDist =
+          mouseRay.getOrigin().distance(terrainResult.position);
+
+      if (terrainHitDist > 0.0 &&
+          (distance <= 0.0 || terrainHitDist < distance))
+      {
+        _position = Conversions::ConvertIgn(terrainResult.position);
+        return true;
+      }
     }
   }
 
-  // Compute the interesection point using the mouse ray and a distance
-  // value.
-  if (_position == ignition::math::Vector3d::Zero && distance > 0.0)
+  // if no terrain intersection, return position of intersection point with
+  // closest entity
+  if (distance > 0.0)
   {
     _position = Conversions::ConvertIgn(mouseRay.getPoint(distance));
-    valid = true;
+    return true;
   }
 
-  return valid;
+  return false;
 }
 
 //////////////////////////////////////////////////
@@ -1288,6 +1323,15 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
                    const double _density, const double _start,
                    const double _end)
 {
+  this->SetFog(_type, _color.Ign(), _density, _start, _end);
+}
+
+//////////////////////////////////////////////////
+void Scene::SetFog(const std::string &_type,
+                   const ignition::math::Color &_color,
+                   const double _density, const double _start,
+                   const double _end)
+{
   Ogre::FogMode fogType = Ogre::FOG_NONE;
 
   if (_type == "linear")
@@ -1306,8 +1350,10 @@ void Scene::SetFog(const std::string &_type, const common::Color &_color,
   elem->GetElement("end")->Set(_end);
 
   if (this->dataPtr->manager)
+  {
     this->dataPtr->manager->setFog(fogType, Conversions::Convert(_color),
                            _density, _start, _end);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1544,7 +1590,7 @@ bool Scene::ProcessSceneMsg(ConstScenePtr &_msg)
     }
 
     this->SetFog(elem->Get<std::string>("type"),
-                 elem->Get<common::Color>("color"),
+                 elem->Get<ignition::math::Color>("color"),
                  elem->Get<double>("density"),
                  elem->Get<double>("start"),
                  elem->Get<double>("end"));
@@ -2000,6 +2046,23 @@ void Scene::PreRender()
       }
       else
         ++pIter;
+    }
+
+    // process light pose messages
+    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
+    while (lpIter != this->dataPtr->lightPoseMsgs.end())
+    {
+      auto lIter = this->dataPtr->lights.find(lpIter->first);
+      if (lIter != this->dataPtr->lights.end())
+      {
+        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
+        lIter->second->SetPosition(pose.Pos());
+        lIter->second->SetRotation(pose.Rot());
+        auto prev = lpIter++;
+        this->dataPtr->lightPoseMsgs.erase(prev);
+      }
+      else
+        lpIter++;
     }
 
     // process skeleton pose msgs
@@ -2760,33 +2823,34 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
 
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
-    PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg->pose(i).id());
-    if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg->pose(i));
+    auto p = _msg->pose(i);
+    /// TODO: empty id used to indicate it's pose of a light
+    /// remove this check once light.proto has an id field
+    if (p.has_id())
+    {
+      PoseMsgs_M::iterator iter =
+          this->dataPtr->poseMsgs.find(p.id());
+      if (iter != this->dataPtr->poseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
+    }
     else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg->pose(i).id(), _msg->pose(i)));
+    {
+      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
+      if (iter != this->dataPtr->lightPoseMsgs.end())
+        iter->second.CopyFrom(p);
+      else
+        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
+    }
   }
 }
 
 /////////////////////////////////////////////////
-void Scene::SetPoseMsg(msgs::PosesStamped &_msg)
+void Scene::SetPoseMsg(const msgs::PosesStamped &_msg)
 {
-  std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
-  this->dataPtr->sceneSimTimePosesReceived =
-    common::Time(_msg.time().sec(), _msg.time().nsec());
-
-  for (int i = 0; i < _msg.pose_size(); ++i)
-  {
-    PoseMsgs_M::iterator iter =
-        this->dataPtr->poseMsgs.find(_msg.pose(i).id());
-    if (iter != this->dataPtr->poseMsgs.end())
-      iter->second.CopyFrom(_msg.pose(i));
-    else
-      this->dataPtr->poseMsgs.insert(
-          std::make_pair(_msg.pose(i).id(), _msg.pose(i)));
-  }
+  auto msgptr = boost::make_shared<const msgs::PosesStamped>(_msg);
+  this->OnPoseMsg(msgptr);
 
   std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
   this->dataPtr->newPoseAvailable = true;
@@ -2797,13 +2861,18 @@ void Scene::SetPoseMsg(msgs::PosesStamped &_msg)
 bool Scene::WaitForRenderRequest(double _timeoutsec)
 {
   std::unique_lock<std::mutex> lck(this->dataPtr->newPoseMutex);
-  bool ret = this->dataPtr->newPoseCondition.wait_for(lck,
-      std::chrono::duration<double>(_timeoutsec),
-      [&](){return this->dataPtr->newPoseAvailable;});
+
+  while (!this->dataPtr->newPoseAvailable)
+  {
+    auto ret = this->dataPtr->newPoseCondition.wait_for(lck,
+      std::chrono::duration<double>(_timeoutsec));
+
+    if (ret == std::cv_status::timeout)
+      return false;
+  }
 
   this->dataPtr->newPoseAvailable = false;
-
-  return ret;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -2863,8 +2932,9 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
   else
   {
     gzerr << "Light [" << _msg->name() << "] already exists."
-        << " Use topic ~/light/modify to modify it." << std::endl;
-    return false;
+          << " Use topic ~/light/modify to modify it." << std::endl;
+    // we don't want to return false because it keeps the msg in the
+    // list and causes it to be processed again and again.
   }
 
   return true;
@@ -2972,7 +3042,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
+  // Pass parameter false to ensure that sky won't delete controller
+  this->dataPtr->skyxController = new SkyX::BasicController(false);
   this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
       this->dataPtr->skyxController);
   this->dataPtr->skyx->create();
@@ -3259,7 +3330,8 @@ void Scene::SetGrid(const bool _enabled)
 {
   if (_enabled && this->dataPtr->grids.empty())
   {
-    Grid *grid = new Grid(this, 20, 1, 10, common::Color(0.3, 0.3, 0.3, 0.5));
+    Grid *grid = new Grid(this, 20, 1,
+        ignition::math::Color(0.3f, 0.3f, 0.3f, 0.5f));
     grid->Init();
     this->dataPtr->grids.push_back(grid);
   }

@@ -137,6 +137,14 @@ bool LogRecord::Init(const std::string &_subdir)
 }
 
 //////////////////////////////////////////////////
+bool LogRecord::Start(const LogRecordParams &_params)
+{
+  this->dataPtr->period = _params.period;
+  this->dataPtr->filter = _params.filter;
+  return this->Start(_params.encoding, _params.path);
+}
+
+//////////////////////////////////////////////////
 bool LogRecord::Start(const std::string &_encoding, const std::string &_path)
 {
   std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
@@ -236,6 +244,12 @@ const std::string &LogRecord::Encoding() const
 //////////////////////////////////////////////////
 void LogRecord::Fini()
 {
+  this->dataPtr->logControlSub.reset();
+  this->dataPtr->logStatusPub.reset();
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
   {
     std::unique_lock<std::mutex> lock(this->dataPtr->controlMutex);
     this->dataPtr->cleanupCondition.notify_all();
@@ -250,10 +264,6 @@ void LogRecord::Fini()
 
   // Remove all the logs.
   this->ClearLogs();
-
-  this->dataPtr->logControlSub.reset();
-  this->dataPtr->logStatusPub.reset();
-  this->dataPtr->node.reset();
 }
 
 //////////////////////////////////////////////////
@@ -293,6 +303,30 @@ void LogRecord::SetPaused(const bool _paused)
 bool LogRecord::Paused() const
 {
   return this->dataPtr->paused;
+}
+
+//////////////////////////////////////////////////
+double LogRecord::Period() const
+{
+  return this->dataPtr->period;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetPeriod(const double _period)
+{
+  this->dataPtr->period = _period;
+}
+
+//////////////////////////////////////////////////
+std::string LogRecord::Filter() const
+{
+  return this->dataPtr->filter;
+}
+
+//////////////////////////////////////////////////
+void LogRecord::SetFilter(const std::string &_filter)
+{
+  this->dataPtr->filter = _filter;
 }
 
 //////////////////////////////////////////////////

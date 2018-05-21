@@ -88,6 +88,14 @@ bool SpaceNav::Load()
   this->dataPtr->buttons[1] = 0;
 
 #ifdef HAVE_SPNAV
+  // Read whether to use spacenav in gui.ini
+  bool enableSpacenav = getINIProperty<bool>("spacenav.enable", true);
+  if (!enableSpacenav)
+  {
+    gzlog << "Spacenav functionality is disabled\n";
+    return result;
+  }
+
   // Read deadband from [spacenav] in gui.ini
   this->dataPtr->deadbandTrans.X(getINIProperty<double>(
       "spacenav.deadband_x", 0.1));
@@ -113,7 +121,7 @@ bool SpaceNav::Load()
   if (daemonRunning >= 0 && spnav_open() >= 0)
   {
     this->dataPtr->node = transport::NodePtr(new transport::Node());
-    this->dataPtr->node->Init();
+    this->dataPtr->node->TryInit(common::Time::Maximum());
     this->dataPtr->joyPub = this->dataPtr->node->Advertise<msgs::Joystick>(
         topic);
 

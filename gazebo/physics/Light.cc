@@ -25,15 +25,29 @@
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
 
+
+/// \brief Private data for the Light class
+class gazebo::physics::LightPrivate
+{
+  /// \brief Light message container.
+  public: msgs::Light msg;
+};
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-  : Entity(_parent)
+  : Entity(_parent), dataPtr(new LightPrivate)
 {
   this->AddType(LIGHT);
 }
+
+//////////////////////////////////////////////////
+Light::~Light()
+{
+}
+
 
 //////////////////////////////////////////////////
 void Light::Init()
@@ -48,24 +62,33 @@ void Light::Init()
 //////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  // Get leaf name
+  std::string lightName = _msg.name();
+  size_t idx = lightName.rfind("::");
+  if (idx != std::string::npos)
+    lightName = lightName.substr(idx+2);
+
+  this->SetName(lightName);
   if (_msg.has_pose())
   {
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-  this->msg.MergeFrom(_msg);
+  this->dataPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg)
 {
-  _msg.MergeFrom(this->msg);
+  _msg.MergeFrom(this->dataPtr->msg);
 
   _msg.set_name(this->GetScopedName());
 
-  ignition::math::Pose3d relPose = this->RelativePose();
-  msgs::Set(_msg.mutable_pose(), relPose);
+  // TODO change to RelativePose once lights can be attached to links
+  // in link.proto and on the rendering side
+  // ignition::math::Pose3d pose = this->RelativePose();
+  ignition::math::Pose3d pose = this->WorldPose();
+  msgs::Set(_msg.mutable_pose(), pose);
 }
 
 //////////////////////////////////////////////////
@@ -90,3 +113,38 @@ void Light::OnPoseChange()
 {
 }
 
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &Light::WorldPose() const
+{
+  // TODO add and use worldPoseDirty member variable
+  // If true, compute a new world pose value.
+  // if (this->worldPoseDirty)
+  EntityPtr parentEnt = boost::dynamic_pointer_cast<Entity>(this->parent);
+  if (!this->worldPose.IsFinite() && parentEnt)
+  {
+    this->worldPose = this->InitialRelativePose() +
+                      parentEnt->WorldPose();
+    // this->worldPoseDirty = false;
+  }
+
+  return this->worldPose;
+}
+
+/////////////////////////////////////////////////
+void Light::SetWorldPoseDirty()
+{
+  // Tell the light object that the next call to ::WorldPose should
+  // compute a new worldPose value.
+
+  // TODO add and use worldPoseDirty member variable
+  // instead of making the pose infinite. It was done to avoid breaking ABI
+  // this->worldPoseDirty = true;
+  double v = std::numeric_limits<double>::infinity();
+  this->worldPose.Pos().Set(v, v, v);
+
+  /// TODO The following line is added as a workaround to update light pose on
+  /// the rendering side without breaking the API/ABI. Later we should update
+  /// link.proto and add a repeated light field (breaks ABI) and in rendering we
+  /// just attach the light scene node to the parent link node.
+  this->PublishPose();
+}

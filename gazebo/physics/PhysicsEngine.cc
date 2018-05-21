@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -88,9 +90,12 @@ void PhysicsEngine::Fini()
 {
   // Clean up transport
   {
-    this->responsePub.reset();
+    this->physicsSub.reset();
     this->requestSub.reset();
+    this->responsePub.reset();
 
+    if (this->node)
+      this->node->Fini();
     this->node.reset();
   }
 
@@ -233,15 +238,13 @@ bool PhysicsEngine::SetParam(const std::string &_key,
       this->SetTargetRealTimeFactor(boost::any_cast<double>(_value));
     else if (_key == "gravity")
     {
-      boost::any copy = _value;
-      copy = boost::lexical_cast<ignition::math::Vector3d>
+      boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
           (boost::any_cast<ignition::math::Vector3d>(_value));
       this->SetGravity(boost::any_cast<ignition::math::Vector3d>(copy));
     }
     else if (_key == "magnetic_field")
     {
-      boost::any copy = _value;
-      copy = boost::lexical_cast<ignition::math::Vector3d>
+      boost::any copy = boost::lexical_cast<ignition::math::Vector3d>
           (boost::any_cast<ignition::math::Vector3d>(_value));
       this->world->SetMagneticField(
           boost::any_cast<ignition::math::Vector3d>(copy));

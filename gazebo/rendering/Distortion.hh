@@ -35,8 +35,7 @@ namespace gazebo
     /// \{
 
     /// \class Distortion Distortion.hh rendering/rendering.hh
-    /// \brief Camera distortion based on Brown's model. Note that the current
-    /// implementation only supports barrel distortion.
+    /// \brief Camera distortion based on the Brown-Conrady model.
     class GZ_RENDERING_VISIBLE Distortion
     {
       /// \brief Constructor
@@ -59,8 +58,8 @@ namespace gazebo
       /// \sa Crop
       public: void SetCrop(const bool _crop);
 
-      /// \brief Get whether to crop the black border around the distorted
-      /// image points.
+      /// \brief Get whether or not the camera is being cropped to
+      /// account for black borders created by barrel distortion.
       /// \return True if the black border is cropped
       /// \sa SetCrop
       public: bool Crop() const;
@@ -103,6 +102,18 @@ namespace gazebo
                   const ignition::math::Vector2d &_center,
                   double _k1, double _k2, double _k3,
                   double _p1, double _p2);
+
+      /// \brief get the distortion map value.
+      /// \return the distortion map value at the specified index,
+      /// or (-1, -1) if the index
+      /// is out of bounds.
+      protected: ignition::math::Vector2d
+        DistortionMapValueClamped(const int x, const int y) const;
+
+      /// \brief calculate the correct scale factor to "zoom" the render,
+      /// cutting off black borders caused by distortion (only if the crop
+      /// flag has been set).
+      protected: void CalculateAndApplyDistortionScale();
 
       /// \internal
       /// \brief Pointer to private data.

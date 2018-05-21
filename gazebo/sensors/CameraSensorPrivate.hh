@@ -17,6 +17,8 @@
 #ifndef GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 #define GAZEBO_SENSORS_CAMERASENSOR_PRIVATE_HH_
 
+#include <limits>
+
 namespace gazebo
 {
   namespace sensors

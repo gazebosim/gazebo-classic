@@ -20,7 +20,7 @@
 
 #include <vector>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 namespace gazebo
 {
@@ -45,10 +45,10 @@ namespace gazebo
       public: double mouseDownY;
 
       /// \brief Fill color of the grabber handle.
-      public: common::Color handleColor;
+      public: ignition::math::Color handleColor;
 
       /// \brief Border color of the grabber handle.
-      public: common::Color borderColor;
+      public: ignition::math::Color borderColor;
 
       /// \brief Width of the grabber handle in pixels.
       public: double width;

@@ -31,10 +31,13 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo.hh"
+
+#include "gazebo/rendering/RenderingIface.hh"
 
 boost::mutex fini_mutex;
 std::vector<gazebo::SystemPluginPtr> g_plugins;
@@ -133,6 +136,7 @@ bool gazebo::shutdown()
   // Make sure to shut everything down.
   boost::mutex::scoped_lock lock(fini_mutex);
   util::LogRecord::Instance()->Fini();
+  util::DiagnosticManager::Instance()->Fini();
   g_plugins.clear();
   gazebo::transport::fini();
 
@@ -180,7 +184,7 @@ gazebo::physics::WorldPtr gazebo::loadWorld(const std::string &_worldFile)
   world = gazebo::physics::create_world();
   gazebo::physics::load_world(world, sdf->Root()->GetElement("world"));
 
-  gazebo::physics::init_world(world);
+  gazebo::physics::init_world(world, rendering::set_pose_msg);
 
   return world;
 }

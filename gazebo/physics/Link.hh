@@ -29,9 +29,7 @@
 #include <ignition/math/Matrix3.hh>
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/transport/TransportTypes.hh"
 
-#include "gazebo/util/UtilTypes.hh"
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/CommonTypes.hh"
 
@@ -43,17 +41,12 @@
 
 namespace gazebo
 {
-  namespace util
-  {
-    class OpenALSource;
-    class OpenALSink;
-  }
-
   namespace physics
   {
     class Model;
     class Collision;
     class Battery;
+    class LinkPrivate;
 
     /// \addtogroup gazebo_physics
     /// \{
@@ -171,13 +164,15 @@ namespace gazebo
 
       /// \brief Set the linear acceleration of the body.
       /// \param[in] _accel Linear acceleration.
-      /// \deprecated acceleration should be achieved by setting force, see SetForce()
+      /// \deprecated acceleration should be achieved by setting
+      ///     force, see SetForce()
       public: void SetLinearAccel(const ignition::math::Vector3d &_accel)
               GAZEBO_DEPRECATED(9.0);
 
       /// \brief Set the angular acceleration of the body.
       /// \param[in] _accel Angular acceleration.
-      /// \deprecated acceleration should be achieved by setting force, see SetForce()
+      /// \deprecated acceleration should be achieved by setting
+      ///     force, see SetForce()
       public: void SetAngularAccel(const ignition::math::Vector3d &_accel)
               GAZEBO_DEPRECATED(9.0);
 
@@ -208,23 +203,28 @@ namespace gazebo
                   const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_pos) = 0;
 
-      /// \brief Add a force to the body at position expressed to the body's
-      /// own frame of reference.
-      /// \param[in] _force Force to add.
-      /// \param[in] _relPos Position on the link to add the force.
+      /// \brief Add a force (in world frame coordinates) to the body at a
+      /// position relative to the center of mass which is expressed in the
+      /// link's own frame of reference.
+      /// \param[in] _force Force to add. The force must be expressed in the
+      /// world reference frame.
+      /// \param[in] _relPos Position on the link to add the force. This
+      /// position must be expressed in the link's coordinates with respect to
+      /// the link's center of mass.
       public: virtual void AddForceAtRelativePosition(
                   const ignition::math::Vector3d &_force,
                   const ignition::math::Vector3d &_relPos) = 0;
 
       /// \brief Add a force expressed in the link frame.
-      /// \param[in] _force Direction vector expressed in the link frame. Each
-      /// component corresponds to the force which will be added in that axis
-      /// and the vector's magnitude corresponds to the total force.
-      /// \param[in] _offset Offset position expressed in the link frame. It
-      /// defaults to the link origin.
-      public: virtual void AddLinkForce(const ignition::math::Vector3d &_force,
-          const ignition::math::Vector3d &_offset =
-          ignition::math::Vector3d::Zero) = 0;
+      /// \param[in] _force Force to add. The force must be expressed in the
+      /// link-fixed reference frame.
+      /// \param[in] _offset Offset position expressed in coordinates of the
+      /// link frame with respect to the link frame's origin. It defaults to the
+      /// link origin.
+      public: virtual void AddLinkForce(
+                  const ignition::math::Vector3d &_force,
+                  const ignition::math::Vector3d &_offset =
+                      ignition::math::Vector3d::Zero) = 0;
 
       /// \brief Add a torque to the body.
       /// \param[in] _torque Torque value to add to the link.
@@ -323,7 +323,8 @@ namespace gazebo
       /// \return Torque applied to the body.
       public: ignition::math::Vector3d RelativeTorque() const;
 
-      /// \brief Get the torque applied to the body in the world frame.
+      /// \brief Get the torque applied to the body about the center of mass in
+      /// world frame coordinates.
       /// \return Torque applied to the body in the world frame.
       public: virtual ignition::math::Vector3d WorldTorque() const = 0;
 
@@ -428,9 +429,8 @@ namespace gazebo
       /// \brief Connect to the add entity signal
       /// \param[in] _subscriber Subsciber callback function.
       /// \return Pointer to the connection, which must be kept in scope.
-      public: template<typename T>
-              event::ConnectionPtr ConnectEnabled(T _subscriber)
-              {return enabledSignal.Connect(_subscriber);}
+      public: event::ConnectionPtr ConnectEnabled(
+          std::function<void (bool)> _subscriber);
 
       /// \brief Fill a link message
       /// \param[out] _msg Message to fill
@@ -551,9 +551,12 @@ namespace gazebo
       /// which this link is attached.
       /// \param[in] _worldReferenceFrameDst final location of the
       /// reference frame specified in world coordinates.
+      /// \param[in] _preserveWorldVelocity True if to preserve the world
+      /// velocity before move frame, default is false.
       public: void MoveFrame(
                   const ignition::math::Pose3d &_worldReferenceFrameSrc,
-                  const ignition::math::Pose3d &_worldReferenceFrameDst);
+                  const ignition::math::Pose3d &_worldReferenceFrameDst,
+                  const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function to find all connected links of a link
       /// based on parent/child relations of joints. For example,
@@ -694,70 +697,10 @@ namespace gazebo
       protected: std::vector<ignition::math::Pose3d> attachedModelsOffset;
 
       /// \brief This flag is set to true when the link is initialized.
-      protected: bool initialized;
+      protected: bool initialized = false;
 
-      /// \brief Event used when the link is enabled or disabled.
-      private: event::EventT<void (bool)> enabledSignal;
-
-      /// \brief This flag is used to trigger the enabled
-      private: bool enabled;
-
-      /// \brief Names of all the sensors attached to the link.
-      private: std::vector<std::string> sensors;
-
-      /// \brief All the parent joints.
-      private: std::vector<JointPtr> parentJoints;
-
-      /// \brief All the child joints.
-      private: std::vector<JointPtr> childJoints;
-
-      /// \brief All the attached models.
-      private: std::vector<ModelPtr> attachedModels;
-
-      /// \brief Link data publisher
-      private: transport::PublisherPtr dataPub;
-
-      /// \brief Link data message
-      private: msgs::LinkData linkDataMsg;
-
-      /// \brief True to publish data, false otherwise
-      private: bool publishData;
-
-      /// \brief Mutex to protect the publishData variable
-      private: boost::recursive_mutex *publishDataMutex;
-
-      /// \brief Cached list of collisions. This is here for performance.
-      private: Collision_V collisions;
-
-      /// \brief Wrench subscriber.
-      private: transport::SubscriberPtr wrenchSub;
-
-      /// \brief Vector of wrench messages to be processed.
-      private: std::vector<msgs::Wrench> wrenchMsgs;
-
-      /// \brief Mutex to protect the wrenchMsgs variable.
-      private: boost::mutex wrenchMsgMutex;
-
-      /// \brief Wind velocity.
-      private: ignition::math::Vector3d windLinearVel;
-
-      /// \brief Update connection to calculate wind velocity.
-      private: event::ConnectionPtr updateConnection;
-
-      /// \brief All the attached batteries.
-      private: std::vector<common::BatteryPtr> batteries;
-
-#ifdef HAVE_OPENAL
-      /// \brief All the audio sources
-      private: std::vector<util::OpenALSourcePtr> audioSources;
-
-      /// \brief An audio sink
-      private: util::OpenALSinkPtr audioSink;
-
-      /// \brief Subscriber to contacts with this collision. Used for audio
-      /// playback.
-      private: transport::SubscriberPtr audioContactsSub;
-#endif
+      /// \brief Pointer to private data
+      private: std::unique_ptr<LinkPrivate> dataPtr;
     };
     /// \}
   }

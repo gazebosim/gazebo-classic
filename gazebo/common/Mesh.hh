@@ -221,6 +221,7 @@ namespace gazebo
       public: SubMesh();
 
       /// \brief Copy Constructor
+      // cppcheck-suppress noExplicitConstructor
       public: SubMesh(const SubMesh *_mesh);
 
       /// \brief Destructor

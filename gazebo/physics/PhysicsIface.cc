@@ -110,10 +110,12 @@ void physics::load_worlds(sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void physics::init_worlds()
+void physics::init_worlds(std::function<void(
+            const std::string &,
+            const msgs::PosesStamped &)> _func)
 {
   for (auto &world : g_worlds)
-    world->Init();
+    world->Init(_func);
 }
 
 /////////////////////////////////////////////////
@@ -144,9 +146,12 @@ void physics::load_world(WorldPtr _world, sdf::ElementPtr _sdf)
 }
 
 /////////////////////////////////////////////////
-void physics::init_world(WorldPtr _world)
+void physics::init_world(WorldPtr _world,
+                        std::function<void(
+                          const std::string &,
+                          const msgs::PosesStamped &)> _func)
 {
-  _world->Init();
+  _world->Init(_func);
 }
 
 /////////////////////////////////////////////////
@@ -184,7 +189,7 @@ bool physics::worlds_running()
 {
   for (auto const &world : g_worlds)
   {
-    if (world->Running())
+    if (world && world->Running())
       return true;
   }
 

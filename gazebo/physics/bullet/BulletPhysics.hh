@@ -78,7 +78,7 @@ namespace gazebo
       };
 
       /// \brief Constructor
-      public: BulletPhysics(WorldPtr _world);
+      public: explicit BulletPhysics(WorldPtr _world);
 
       /// \brief Destructor
       public: virtual ~BulletPhysics();

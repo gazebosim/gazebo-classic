@@ -31,7 +31,7 @@ namespace gazebo
 
     /// \brief Load the sensor library.
     /// \return True if successfully loaded, false if not.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     bool load();
 
     /// \brief Create a sensor using SDF.
@@ -39,43 +39,43 @@ namespace gazebo
     /// \param[in] _worldName Name of the world in which to create the sensor.
     /// \param[in] _parentName The fully scoped parent name (model::link).
     /// \return The name of the new sensor.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     std::string create_sensor(sdf::ElementPtr _elem,
         const std::string &_worldName, const std::string &_parentName,
         uint32_t _parentId);
 
     /// \brief Remove a sensor by name
     /// \param[in] _sensorName Name of sensor to remove
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void remove_sensor(const std::string &_sensorName);
 
     /// \brief Run the sensor generation one step.
     /// \param _force: If true, all sensors are forced to update. Otherwise
     ///        a sensor will update based on it's Hz rate.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void run_once(bool _force = false);
 
     /// \brief Run sensors in a threads. This is a non-blocking call.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void run_threads();
 
     /// \brief Stop the sensor generation loop.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void stop();
 
     /// \brief initialize the sensor generation loop.
     /// \return True if successfully initialized, false if not
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     bool init();
 
     /// \brief shutdown the sensor generation loop.
     /// \return True if successfully finalized, false if not
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     bool fini();
 
     /// \brief Remove all sensors.
     /// \return True if all successfully removed, false if not
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     bool remove_sensors();
 
     /// \brief Get a sensor using by name
@@ -89,16 +89,21 @@ namespace gazebo
     /// returned.
     /// \return Pointer to the sensor, nullptr if the sensor could not be
     /// found.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     SensorPtr get_sensor(const std::string &_name);
 
     /// \brief Disable sensors.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void disable();
 
     /// \brief Enable sensors.
-    GAZEBO_VISIBLE
+    GZ_SENSORS_VISIBLE
     void enable();
+
+    /// \brief Return true if the manager is running.
+    /// \return True if manager is running.
+    GAZEBO_VISIBLE
+    bool running();
     /// \}
   }
 }

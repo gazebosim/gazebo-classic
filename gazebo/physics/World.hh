@@ -93,6 +93,10 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Get the SDF of the world in the current state.
+      /// \return The SDF
+      public: const sdf::ElementPtr SDF();
+
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
@@ -100,7 +104,10 @@ namespace gazebo
 
       /// \brief Initialize the world.
       /// This is called after Load.
-      public: void Init();
+      /// \param[in] func function to be called when a new Pose message is built
+      public: void Init(std::function<void(
+                          const std::string &,
+                          const msgs::PosesStamped &)> _func);
 
       /// \brief Run the world in a thread.
       /// Run the update loop.
@@ -484,7 +491,7 @@ namespace gazebo
       /// \param[in] _sdf SDF element containing the Light description.
       /// \param[in] _parent Parent of the light.
       /// \return Pointer to the newly created Light.
-      private: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
+      public: LightPtr LoadLight(const sdf::ElementPtr &_sdf,
           const BasePtr &_parent);
 
       /// \brief Load an actor.
@@ -517,9 +524,6 @@ namespace gazebo
 
       /// \brief Step callback.
       private: void OnStep();
-
-      /// \brief Wait until all sensors do not need the current step any more
-      private: std::function<void(double, double)> waitForSensors;
 
       /// \brief Called when a world control message is received.
       /// \param[in] _data The world control message.
@@ -590,6 +594,10 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessLightModifyMsgs();
 
+      /// \brief Process all received log playback control messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessPlaybackControlMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
 
@@ -633,9 +641,9 @@ namespace gazebo
       ///
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
+      /// \return True if the info was successfully obtained.
+      private: bool PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins);
 
       /// \internal
       /// \brief Private data pointer.

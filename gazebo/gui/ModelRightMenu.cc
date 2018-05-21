@@ -143,7 +143,7 @@ ModelRightMenu::ModelRightMenu()
 bool ModelRightMenu::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->node->TryInit(common::Time::Maximum());
   this->requestSub = this->node->Subscribe("~/request",
       &ModelRightMenu::OnRequest, this);
 
@@ -176,11 +176,11 @@ void ModelRightMenu::Run(const std::string &_entityName, const QPoint &_pt,
     EntityTypes _type)
 {
   // Find out the entity type
-  if (_type == EntityTypes::MODEL || _type == EntityTypes::LIGHT)
+  if (_type == EntityTypes::MODEL)
   {
     this->entityName = _entityName.substr(0, _entityName.find("::"));
   }
-  else if (_type == EntityTypes::LINK)
+  else if (_type == EntityTypes::LINK || _type == EntityTypes::LIGHT)
   {
     this->entityName = _entityName;
   }

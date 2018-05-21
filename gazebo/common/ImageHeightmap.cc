@@ -131,5 +131,5 @@ unsigned int ImageHeightmap::GetWidth() const
 //////////////////////////////////////////////////
 float ImageHeightmap::GetMaxElevation() const
 {
-  return this->img.GetMaxColor().r;
+  return this->img.MaxColor().R();
 }

@@ -38,6 +38,7 @@ namespace gazebo
   {
     class ColladaLoader;
     class ColladaExporter;
+    class FBXLoader;
     class STLLoader;
     class Mesh;
     class Plane;
@@ -263,13 +264,17 @@ namespace gazebo
                       double _tol);
 
       /// \brief 3D mesh loader for COLLADA files
-      private: ColladaLoader *colladaLoader;
+      private: ColladaLoader *colladaLoader = nullptr;
 
       /// \brief 3D mesh exporter for COLLADA files
-      private: ColladaExporter *colladaExporter;
+      private: ColladaExporter *colladaExporter = nullptr;
 
       /// \brief 3D mesh loader for STL files
-      private: STLLoader *stlLoader;
+      private: STLLoader *stlLoader = nullptr;
+
+      /// \brief 3D mesh loader for FBX files
+      /// \todo The FBX loader needs to be implemented.
+      private: FBXLoader *fbxLoader = nullptr;
 
       /// \brief Dictionary of meshes, indexed by name
       private: std::map<std::string, Mesh*> meshes;

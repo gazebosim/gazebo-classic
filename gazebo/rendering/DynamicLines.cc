@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <ignition/math/Color.hh>
 #include "gazebo/rendering/ogre_gazebo.h"
 
 #include "gazebo/common/Console.hh"
@@ -29,8 +30,17 @@ using namespace rendering;
 
 enum {POSITION_BINDING, TEXCOORD_BINDING};
 
+
+/// \brief Private implementation
+class gazebo::rendering::DynamicLinesPrivate
+{
+  /// \brief list of colors at each point
+  public: std::vector<ignition::math::Color> colors;
+};
+
 /////////////////////////////////////////////////
 DynamicLines::DynamicLines(RenderOpType opType)
+  : dataPtr(new DynamicLinesPrivate)
 {
   this->Init(opType, false);
   this->setCastShadows(false);
@@ -59,14 +69,28 @@ const Ogre::String &DynamicLines::getMovableType() const
 void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
                             const common::Color &_color)
 {
+  this->AddPoint(_pt, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(const ignition::math::Vector3d &_pt,
+                            const ignition::math::Color &_color)
+{
   this->points.push_back(_pt);
-  this->colors.push_back(_color);
+  this->dataPtr->colors.push_back(_color);
   this->dirty = true;
 }
 
 /////////////////////////////////////////////////
 void DynamicLines::AddPoint(double _x, double _y, double _z,
                             const common::Color &_color)
+{
+  this->AddPoint(_x, _y, _z, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::AddPoint(const double _x, const double _y, const double _z,
+                            const ignition::math::Color &_color)
 {
   this->AddPoint(ignition::math::Vector3d(_x, _y, _z), _color);
 }
@@ -90,7 +114,14 @@ void DynamicLines::SetPoint(const unsigned int _index,
 /////////////////////////////////////////////////
 void DynamicLines::SetColor(unsigned int _index, const common::Color &_color)
 {
-  this->colors[_index] = _color;
+  this->SetColor(_index, _color.Ign());
+}
+
+/////////////////////////////////////////////////
+void DynamicLines::SetColor(const unsigned int _index,
+                            const ignition::math::Color &_color)
+{
+  this->dataPtr->colors[_index] = _color;
   this->dirty = true;
 }
 
@@ -180,7 +211,7 @@ void DynamicLines::FillHardwareBuffers()
         Ogre::Root::getSingleton().getRenderSystem();
   for (int i = 0; i < size; ++i)
   {
-    Ogre::ColourValue color = Conversions::Convert(this->colors[i]);
+    Ogre::ColourValue color = Conversions::Convert(this->dataPtr->colors[i]);
     renderSystemForVertex->convertColourValue(color, &colorArrayBuffer[i]);
   }
   cbuf->unlock();

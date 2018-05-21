@@ -20,6 +20,8 @@
 #include <fstream>
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/unordered_map.hpp>
+#include <ignition/math/SignalStats.hh>
 
 #include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/msgs/msgs.hh"
@@ -64,6 +66,17 @@ namespace gazebo
 
       /// \brief Time of the previous lap.
       public: common::Time prevLap;
+
+      /// \brief Cumulative time throughout simulation.
+      public: common::Time cumulativeTime;
+
+      /// \brief Timing statistics map.
+      public: typedef
+              boost::unordered_map<std::string, ignition::math::SignalStats>
+              SignalStatsMap;
+
+      /// \brief Timing statistics.
+      public: SignalStatsMap stats;
     };
   }
 }

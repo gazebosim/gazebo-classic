@@ -35,15 +35,6 @@ void OnContact(ConstContactsPtr &/*_msg*/)
 //////////////////////////////////////////////////
 void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 {
-  if (_physicsEngine == "dart")
-  {
-    gzwarn << "Disabling TestTwoSpheres for dart.\n";
-    // Take the DART test back in as soon as this fix has been merged:
-    // https://bitbucket.org/JenniferBuehler/gazebo
-    // branch "dart-6-fix-like-PR-2654"
-    return;
-  }
-
   this->Load("worlds/empty.world", true, _physicsEngine);
 
   // Load the spheres into the world.
@@ -57,21 +48,18 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
 
   // Get a pointer to the world, physics engine and contact manager
   physics::WorldPtr world = physics::get_world("default");
+
+  // Set gravity to zero to make sure the spheres do not fall on the ground
+  world->SetGravity(ignition::math::Vector3d());
+
   ASSERT_TRUE(world != nullptr);
   physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   physics::ContactManager * contactManager = physics->GetContactManager();
   ASSERT_TRUE(contactManager != nullptr);
-
-  // need to make a fake subscriber to the contacts topic in order
-  // to trigger the ContactManager to maintain all contacts.
-  // This can be replaced by ContactManager::NeverDropContacts()
-  // as soon as PR 2629 is merged
-  // https://bitbucket.org/osrf/gazebo/pull-requests/2629
-  std::string contactsTopic = "~/physics/contacts";
-  transport::NodePtr node(new transport::Node());
-  node->Init();
-  transport::SubscriberPtr sub = node->Subscribe(contactsTopic, &OnContact);
+  // Set contact manager to never drop contacts, even if there are
+  // no subscribers.
+  contactManager->SetNeverDropContacts(true);
 
   // Disable physics engine and do one step.
   // The contacts should be available, even though the engine is disabled.
@@ -81,8 +69,23 @@ void ContactsUpdate::TestTwoSpheres(const std::string &_physicsEngine)
   world->Step(1);
 
   gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
 
-  ASSERT_GT(contactManager->GetContactCount(), 0u);
+  contactManager->ResetCount();
+
+  world->SetPhysicsEnabled(true);
+  // Enable the engine and do one step.
+  // The contacts should be available with the engine enabled.
+  world->Step(1);
+
+  gzdbg << "Number of contacts: " << contactManager->GetContactCount() << "\n";
+  EXPECT_GT(contactManager->GetContactCount(), 0u);
+
+  world->RemoveModel("sphere2");
+  // There should be no more contacts reported after sphere2 is removed.
+  world->Step(1);
+
+  EXPECT_EQ(contactManager->GetContactCount(), 0u);
 }
 
 TEST_P(ContactsUpdate, TestTwoSpheres)

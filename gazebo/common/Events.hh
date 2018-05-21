@@ -167,11 +167,6 @@ namespace gazebo
       public: template<typename T>
               static ConnectionPtr ConnectPreRenderEnded(T _subscriber)
               { return preRenderEnded.Connect(_subscriber); }
-      /// \brief Disconnect an end of prerender signal
-      /// \param[in] _subscriber the subscriber to this event
-      public: static void DisconnectPreRenderEnded(ConnectionPtr _subscriber)
-              GAZEBO_DEPRECATED(8.0)
-              { preRenderEnded.Disconnect(_subscriber->Id()); }
 
       //////////////////////////////////////////////////////////////////////////
       /// \brief Render start signal

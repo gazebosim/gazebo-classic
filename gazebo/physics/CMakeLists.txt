@@ -21,8 +21,8 @@ endif()
 if (HAVE_DART)
   add_subdirectory(dart)
 
-  include_directories(${DARTCore_INCLUDE_DIRS})
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 # Add Simbody support if present
@@ -161,7 +161,6 @@ target_link_libraries(gazebo_physics
   gazebo_util
   gazebo_ode
   gazebo_opcode
-  gazebo_rendering
   ${Boost_LIBRARIES}
   ${IGNITION-TRANSPORT_LIBRARIES}
 )
@@ -173,7 +172,7 @@ endif()
 
 # Link in DART support if present
 if (HAVE_DART)
-  target_link_libraries(gazebo_physics ${DARTCore_LIBRARIES})
+  target_link_libraries(gazebo_physics ${DART_LIBRARIES})
 endif()
 
 # Link in Simbody support if present
@@ -187,7 +186,7 @@ if (HAVE_GDAL)
 endif()
 
 if (USE_PCH)
-  add_pch(gazebo_physics physics_pch.hh)
+  add_pch(gazebo_physics physics_pch.hh ${Boost_PKGCONFIG_CFLAGS} "-I${TBB_INCLUDEDIR}")
 endif()
 
 gz_install_library(gazebo_physics)
@@ -199,6 +198,7 @@ set (gtest_sources
   CylinderShape_TEST.cc
   Inertial_TEST.cc
   JointController_TEST.cc
+  JointState_TEST.cc
   ModelState_TEST.cc
   Road_TEST.cc
   SphereShape_TEST.cc

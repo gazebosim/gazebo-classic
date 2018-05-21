@@ -48,7 +48,8 @@ namespace gazebo
 
     /// \class Sensor Sensor.hh sensors/sensors.hh
     /// \brief Base class for sensors
-    class GAZEBO_VISIBLE Sensor : public std::enable_shared_from_this<Sensor>
+    class GZ_SENSORS_VISIBLE Sensor
+    : public std::enable_shared_from_this<Sensor>
     {
       /// \brief Constructor.
       /// \param[in] _cat Category of the sensor
@@ -182,7 +183,7 @@ namespace gazebo
 
       /// \brief Get the next timestamp that will be used by the sensor
       /// \return the timestamp
-      public: virtual double GetNextRequiredTimestamp() const;
+      public: virtual double NextRequiredTimestamp() const;
 
       /// \brief This gets overwritten by derived sensor types.
       ///        This function is called during Sensor::Update.

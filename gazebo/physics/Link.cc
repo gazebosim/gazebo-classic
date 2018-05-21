@@ -22,17 +22,15 @@
 #endif
 
 #include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
-#include <sstream>
 #include <functional>
-
-#include "gazebo/msgs/msgs.hh"
+#include <mutex>
+#include <sstream>
 
 #include "gazebo/transport/TransportIface.hh"
+#include "gazebo/transport/TransportTypes.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/Publisher.hh"
 
-#include "gazebo/util/OpenAL.hh"
 #include "gazebo/common/Events.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
@@ -40,6 +38,7 @@
 #include "gazebo/common/Battery.hh"
 
 #include "gazebo/physics/PhysicsIface.hh"
+#include "gazebo/physics/Light.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/ContactManager.hh"
@@ -49,20 +48,88 @@
 #include "gazebo/physics/Wind.hh"
 
 #include "gazebo/util/IntrospectionManager.hh"
+#include "gazebo/util/OpenAL.hh"
+#include "gazebo/util/UtilTypes.hh"
+
+/// \brief Private data for the Link class
+class gazebo::physics::LinkPrivate
+{
+  /// \brief Event used when the link is enabled or disabled.
+  public: event::EventT<void (bool)> enabledSignal;
+
+  /// \brief This flag is used to trigger the enabled
+  public: bool enabled = false;
+
+  /// \brief Names of all the sensors attached to the link.
+  public: std::vector<std::string> sensors;
+
+  /// \brief All the parent joints.
+  public: std::vector<JointPtr> parentJoints;
+
+  /// \brief All the child joints.
+  public: std::vector<JointPtr> childJoints;
+
+  /// \brief All the attached models.
+  public: std::vector<ModelPtr> attachedModels;
+
+  /// \brief Link data publisher
+  public: transport::PublisherPtr dataPub;
+
+  /// \brief Link data message
+  public: msgs::LinkData linkDataMsg;
+
+  /// \brief True to publish data, false otherwise
+  public: bool publishData = false;
+
+  /// \brief Mutex to protect the publishData variable
+  public: std::recursive_mutex *publishDataMutex;
+
+  /// \brief Cached list of collisions. This is here for performance.
+  public: Collision_V collisions;
+
+  /// \brief Wrench subscriber.
+  public: transport::SubscriberPtr wrenchSub;
+
+  /// \brief Vector of wrench messages to be processed.
+  public: std::vector<msgs::Wrench> wrenchMsgs;
+
+  /// \brief Mutex to protect the wrenchMsgs variable.
+  public: std::mutex wrenchMsgMutex;
+
+  /// \brief Wind velocity.
+  public: ignition::math::Vector3d windLinearVel;
+
+  /// \brief Update connection to calculate wind velocity.
+  public: event::ConnectionPtr updateConnection;
+
+  /// \brief All the attached batteries.
+  public: std::vector<common::BatteryPtr> batteries;
+
+#ifdef HAVE_OPENAL
+      /// \brief All the audio sources
+      public: std::vector<util::OpenALSourcePtr> audioSources;
+
+      /// \brief An audio sink
+      public: util::OpenALSinkPtr audioSink;
+
+      /// \brief Subscriber to contacts with this collision. Used for audio
+      /// playback.
+      public: transport::SubscriberPtr audioContactsSub;
+#endif
+};
 
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Link::Link(EntityPtr _parent)
-    : Entity(_parent), initialized(false)
+    : Entity(_parent), dataPtr(new LinkPrivate)
 {
   this->AddType(Base::LINK);
   this->inertial.reset(new Inertial);
-  this->parentJoints.clear();
-  this->childJoints.clear();
-  this->publishData = false;
-  this->publishDataMutex = new boost::recursive_mutex();
+  this->dataPtr->parentJoints.clear();
+  this->dataPtr->childJoints.clear();
+  this->dataPtr->publishDataMutex = new std::recursive_mutex();
 }
 
 //////////////////////////////////////////////////
@@ -126,15 +193,32 @@ void Link::Load(sdf::ElementPtr _sdf)
         event::Events::createSensor(sensorElem,
             this->GetWorld()->Name(), this->GetScopedName(), this->GetId());
 
-        this->sensors.push_back(sensorName);
+        this->dataPtr->sensors.push_back(sensorName);
       }
       sensorElem = sensorElem->GetNextElement("sensor");
+    }
+  }
+
+  // Load the lights
+  if (this->sdf->HasElement("light"))
+  {
+    sdf::ElementPtr lightElem = this->sdf->GetElement("light");
+    while (lightElem)
+    {
+      // Create and Load a light
+      this->world->LoadLight(lightElem, shared_from_this());
+      lightElem = lightElem->GetNextElement("light");
     }
   }
 
   if (!this->IsStatic())
   {
     this->inertial->Load(this->sdf->GetElement("inertial"));
+  }
+  else
+  {
+    this->inertial->SetMass(0.0);
+    this->inertial->SetInertiaMatrix(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
   }
 
 #ifdef HAVE_OPENAL
@@ -153,7 +237,7 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::copy(names.begin(), names.end(), std::back_inserter(collisionNames));
 
       audioElem = audioElem->GetNextElement("audio_source");
-      this->audioSources.push_back(source);
+      this->dataPtr->audioSources.push_back(source);
     }
 
     if (!collisionNames.empty())
@@ -167,14 +251,14 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::string topic =
         this->world->Physics()->GetContactManager()->CreateFilter(
             this->GetScopedName() + "/audio_collision", collisionNames);
-      this->audioContactsSub = this->node->Subscribe(topic,
+      this->dataPtr->audioContactsSub = this->node->Subscribe(topic,
           &Link::OnCollision, this);
     }
   }
 
   if (_sdf->HasElement("audio_sink"))
   {
-    this->audioSink = util::OpenAL::Instance()->CreateSink(
+    this->dataPtr->audioSink = util::OpenAL::Instance()->CreateSink(
         _sdf->GetElement("audio_sink"));
   }
 #endif
@@ -201,7 +285,9 @@ void Link::Load(sdf::ElementPtr _sdf)
       std::bind(&Link::WindMode, this));
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&Link::Update, this, _1)));
+      std::bind(
+      static_cast<void(Link::*)(const common::UpdateInfo &)>(&Link::Update),
+      this, std::placeholders::_1)));
 
   this->SetStatic(this->IsStatic());
 }
@@ -212,7 +298,7 @@ void Link::Init()
   this->linearAccel.Set(0, 0, 0);
   this->angularAccel.Set(0, 0, 0);
 
-  this->enabled = true;
+  this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
   this->SetRelativePose(this->sdf->Get<ignition::math::Pose3d>("pose"));
@@ -225,13 +311,20 @@ void Link::Init()
     if ((*iter)->HasType(Base::COLLISION))
     {
       CollisionPtr collision = boost::static_pointer_cast<Collision>(*iter);
-      this->collisions.push_back(collision);
+      this->dataPtr->collisions.push_back(collision);
       collision->Init();
+    }
+    if ((*iter)->HasType(Base::LIGHT))
+    {
+      LightPtr light= boost::static_pointer_cast<Light>(*iter);
+      // TODO add to lights var?
+      // this->lights.push_back(light);
+      light->Init();
     }
   }
 
   // Initialize all the batteries
-  for (auto &battery : this->batteries)
+  for (auto &battery : this->dataPtr->batteries)
   {
     battery->Init();
   }
@@ -245,20 +338,22 @@ void Link::Init()
 //////////////////////////////////////////////////
 void Link::Fini()
 {
-  this->attachedModels.clear();
-  this->parentJoints.clear();
-  this->childJoints.clear();
-  this->collisions.clear();
+  this->dataPtr->updateConnection.reset();
+
+  this->dataPtr->attachedModels.clear();
+  this->dataPtr->parentJoints.clear();
+  this->dataPtr->childJoints.clear();
+  this->dataPtr->collisions.clear();
   this->inertial.reset();
-  this->batteries.clear();
+  this->dataPtr->batteries.clear();
 
   // Remove all the sensors attached to the link
-  for (auto const &sensor : this->sensors)
+  for (auto const &sensor : this->dataPtr->sensors)
   {
     event::Events::removeSensor(sensor);
   }
 
-  this->sensors.clear();
+  this->dataPtr->sensors.clear();
 
   // Clean up visuals
   // FIXME: Do we really need to send 2 msgs to delete a visual?!
@@ -297,22 +392,22 @@ void Link::Fini()
     this->world->Physics()->GetContactManager()->RemoveFilter(
         this->GetScopedName() + "/audio_collision");
   }
-  this->audioContactsSub.reset();
-  this->audioSink.reset();
-  this->audioSources.clear();
+  this->dataPtr->audioContactsSub.reset();
+  this->dataPtr->audioSink.reset();
+  this->dataPtr->audioSources.clear();
 #endif
 
   // Clean transport
   {
-    this->dataPub.reset();
+    this->dataPtr->dataPub.reset();
     this->visPub.reset();
 
-    this->wrenchSub.reset();
+    this->dataPtr->wrenchSub.reset();
   }
   this->connections.clear();
 
-  delete this->publishDataMutex;
-  this->publishDataMutex = NULL;
+  delete this->dataPtr->publishDataMutex;
+  this->dataPtr->publishDataMutex = NULL;
 
   Entity::Fini();
 }
@@ -348,11 +443,11 @@ void Link::UpdateParameters(sdf::ElementPtr _sdf)
   }
 
   this->sdf->GetElement("gravity")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetGravityMode, this));
+      std::bind(&Link::GetGravityMode, this));
   this->sdf->GetElement("enable_wind")->GetValue()->SetUpdateFunc(
       std::bind(&Link::WindMode, this));
   this->sdf->GetElement("kinematic")->GetValue()->SetUpdateFunc(
-      boost::bind(&Link::GetKinematic, this));
+      std::bind(&Link::GetKinematic, this));
 
   if (this->sdf->Get<bool>("gravity") != this->GetGravityMode())
     this->SetGravityMode(this->sdf->Get<bool>("gravity"));
@@ -451,8 +546,8 @@ void Link::SetCollideMode(const std::string &_mode)
     return;
   }
 
-  for (Collision_V::iterator iter = this->collisions.begin();
-       iter != this->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
+       iter != this->dataPtr->collisions.end(); ++iter)
   {
     if ((*iter))
     {
@@ -475,8 +570,8 @@ bool Link::GetSelfCollide() const
 //////////////////////////////////////////////////
 void Link::SetLaserRetro(float _retro)
 {
-  for (Collision_V::iterator iter = this->collisions.begin();
-       iter != this->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
+       iter != this->dataPtr->collisions.end(); ++iter)
   {
     (*iter)->SetLaserRetro(_retro);
   }
@@ -486,15 +581,16 @@ void Link::SetLaserRetro(float _retro)
 void Link::Update(const common::UpdateInfo & /*_info*/)
 {
 #ifdef HAVE_OPENAL
-  if (this->audioSink)
+  if (this->dataPtr->audioSink)
   {
-    this->audioSink->SetPose(this->WorldPose());
-    this->audioSink->SetVelocity(this->WorldLinearVel());
+    this->dataPtr->audioSink->SetPose(this->WorldPose());
+    this->dataPtr->audioSink->SetVelocity(this->WorldLinearVel());
   }
 
   // Update all the audio sources
   for (std::vector<util::OpenALSourcePtr>::iterator iter =
-      this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+      this->dataPtr->audioSources.begin(); iter !=
+      this->dataPtr->audioSources.end(); ++iter)
   {
     (*iter)->SetPose(this->WorldPose());
     (*iter)->SetVelocity(this->WorldLinearVel());
@@ -502,19 +598,19 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 #endif
 
   // FIXME: race condition on factory-based model loading!!!!!
-   /*if (this->GetEnabled() != this->enabled)
+   /*if (this->GetEnabled() != this->dataPtr->enabled)
    {
-     this->enabled = this->GetEnabled();
-     this->enabledSignal(this->enabled);
+     this->dataPtr->enabled = this->GetEnabled();
+     this->dataPtr->enabledSignal(this->dataPtr->enabled);
    }*/
 
-  if (!this->IsStatic() && !this->wrenchMsgs.empty())
+  if (!this->IsStatic() && !this->dataPtr->wrenchMsgs.empty())
   {
     std::vector<msgs::Wrench> messages;
     {
-      boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
-      messages = this->wrenchMsgs;
-      this->wrenchMsgs.clear();
+      std::lock_guard<std::mutex> lock(this->dataPtr->wrenchMsgMutex);
+      messages = this->dataPtr->wrenchMsgs;
+      this->dataPtr->wrenchMsgs.clear();
     }
 
     for (auto it : messages)
@@ -524,7 +620,7 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
   }
 
   // Update the batteries.
-  for (auto &battery : this->batteries)
+  for (auto &battery : this->dataPtr->batteries)
   {
     battery->Update();
   }
@@ -533,28 +629,28 @@ void Link::Update(const common::UpdateInfo & /*_info*/)
 //////////////////////////////////////////////////
 void Link::UpdateWind(const common::UpdateInfo & /*_info*/)
 {
-  this->windLinearVel = this->world->Wind().WorldLinearVel(this);
+  this->dataPtr->windLinearVel = this->world->Wind().WorldLinearVel(this);
 }
 
 /////////////////////////////////////////////////
 Joint_V Link::GetParentJoints() const
 {
-  return this->parentJoints;
+  return this->dataPtr->parentJoints;
 }
 
 /////////////////////////////////////////////////
 Joint_V Link::GetChildJoints() const
 {
-  return this->childJoints;
+  return this->dataPtr->childJoints;
 }
 
 /////////////////////////////////////////////////
 Link_V Link::GetChildJointsLinks() const
 {
   Link_V links;
-  for (std::vector<JointPtr>::const_iterator iter = this->childJoints.begin();
-                                             iter != this->childJoints.end();
-                                             ++iter)
+  for (std::vector<JointPtr>::const_iterator iter =
+      this->dataPtr->childJoints.begin();
+      iter != this->dataPtr->childJoints.end(); ++iter)
   {
     if ((*iter)->GetChild())
       links.push_back((*iter)->GetChild());
@@ -566,9 +662,9 @@ Link_V Link::GetChildJointsLinks() const
 Link_V Link::GetParentJointsLinks() const
 {
   Link_V links;
-  for (std::vector<JointPtr>::const_iterator iter = this->parentJoints.begin();
-                                             iter != this->parentJoints.end();
-                                             ++iter)
+  for (std::vector<JointPtr>::const_iterator iter =
+      this->dataPtr->parentJoints.begin();
+      iter != this->dataPtr->parentJoints.end(); ++iter)
   {
     if ((*iter)->GetParent())
       links.push_back((*iter)->GetParent());
@@ -621,7 +717,7 @@ CollisionPtr Link::GetCollision(const std::string &_name)
 //////////////////////////////////////////////////
 Collision_V Link::GetCollisions() const
 {
-  return this->collisions;
+  return this->dataPtr->collisions;
 }
 
 //////////////////////////////////////////////////
@@ -683,6 +779,11 @@ ignition::math::Vector3d Link::RelativeLinearAccel() const
 //////////////////////////////////////////////////
 ignition::math::Vector3d Link::WorldLinearAccel() const
 {
+  // Developer note (MXG): The meaning of WorldForce seems to vary between
+  // engines. In particular, ODE sees it as the net force on a body, whereas
+  // DART sees it as the net of the external forces (which excludes internal
+  // forces caused by joint constraints). These will be equivalent for bodies
+  // that have no joints, but they will not be equivalent in general.
   return this->WorldForce() / this->inertial->Mass();
 }
 
@@ -738,8 +839,8 @@ ignition::math::Box Link::BoundingBox() const
       ignition::math::MAX_D);
   box.Max().Set(0, 0, 0);
 
-  for (Collision_V::const_iterator iter = this->collisions.begin();
-       iter != this->collisions.end(); ++iter)
+  for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
+       iter != this->dataPtr->collisions.end(); ++iter)
   {
     box += (*iter)->BoundingBox();
   }
@@ -752,9 +853,9 @@ void Link::SetWindMode(const bool _mode)
 {
   this->sdf->GetElement("enable_wind")->Set(_mode);
 
-  if (!this->WindMode() && this->updateConnection)
+  if (!this->WindMode() && this->dataPtr->updateConnection)
     this->SetWindEnabled(false);
-  else if (this->WindMode() && !this->updateConnection)
+  else if (this->WindMode() && !this->dataPtr->updateConnection)
     this->SetWindEnabled(true);
 }
 
@@ -763,21 +864,21 @@ void Link::SetWindEnabled(const bool _enable)
 {
   if (_enable)
   {
-    this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
         std::bind(&Link::UpdateWind, this, std::placeholders::_1));
   }
   else
   {
-    this->updateConnection.reset();
+    this->dataPtr->updateConnection.reset();
     // Make sure wind velocity is null
-    this->windLinearVel.Set(0, 0, 0);
+    this->dataPtr->windLinearVel.Set(0, 0, 0);
   }
 }
 
 //////////////////////////////////////////////////
 const ignition::math::Vector3d Link::WorldWindLinearVel() const
 {
-  return this->windLinearVel;
+  return this->dataPtr->windLinearVel;
 }
 
 //////////////////////////////////////////////////
@@ -828,26 +929,26 @@ ignition::math::Matrix3d Link::WorldInertiaMatrix() const
 //////////////////////////////////////////////////
 void Link::AddParentJoint(JointPtr _joint)
 {
-  this->parentJoints.push_back(_joint);
+  this->dataPtr->parentJoints.push_back(_joint);
 }
 
 //////////////////////////////////////////////////
 void Link::AddChildJoint(JointPtr _joint)
 {
-  this->childJoints.push_back(_joint);
+  this->dataPtr->childJoints.push_back(_joint);
 }
 
 //////////////////////////////////////////////////
 void Link::RemoveParentJoint(const std::string &_jointName)
 {
-  for (std::vector<JointPtr>::iterator iter = this->parentJoints.begin();
-                                       iter != this->parentJoints.end();
-                                       ++iter)
+  for (std::vector<JointPtr>::iterator iter =
+      this->dataPtr->parentJoints.begin();
+      iter != this->dataPtr->parentJoints.end(); ++iter)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _jointName)
     {
-      this->parentJoints.erase(iter);
+      this->dataPtr->parentJoints.erase(iter);
       break;
     }
   }
@@ -856,14 +957,14 @@ void Link::RemoveParentJoint(const std::string &_jointName)
 //////////////////////////////////////////////////
 void Link::RemoveChildJoint(const std::string &_jointName)
 {
-  for (std::vector<JointPtr>::iterator iter = this->childJoints.begin();
-                                       iter != this->childJoints.end();
-                                       ++iter)
+  for (std::vector<JointPtr>::iterator iter =
+      this->dataPtr->childJoints.begin();
+      iter != this->dataPtr->childJoints.end(); ++iter)
   {
     /// @todo: can we assume there are no repeats?
     if ((*iter)->GetName() == _jointName)
     {
-      this->childJoints.erase(iter);
+      this->dataPtr->childJoints.erase(iter);
       break;
     }
   }
@@ -953,7 +1054,7 @@ void Link::FillMsg(msgs::Link &_msg)
     _msg.set_canonical(true);
 
   // Fill message with battery information
-  for (auto &battery : this->batteries)
+  for (auto &battery : this->dataPtr->batteries)
   {
     msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
@@ -1013,14 +1114,14 @@ void Link::ProcessMsg(const msgs::Link &_msg)
 //////////////////////////////////////////////////
 unsigned int Link::GetSensorCount() const
 {
-  return this->sensors.size();
+  return this->dataPtr->sensors.size();
 }
 
 //////////////////////////////////////////////////
 std::string Link::GetSensorName(unsigned int _i) const
 {
-  if (_i < this->sensors.size())
-    return this->sensors[_i];
+  if (_i < this->dataPtr->sensors.size())
+    return this->dataPtr->sensors[_i];
 
   return std::string();
 }
@@ -1035,19 +1136,21 @@ void Link::AttachStaticModel(ModelPtr &_model,
     return;
   }
 
-  this->attachedModels.push_back(_model);
+  this->dataPtr->attachedModels.push_back(_model);
   this->attachedModelsOffset.push_back(_offset);
 }
 
 //////////////////////////////////////////////////
 void Link::DetachStaticModel(const std::string &_modelName)
 {
-  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
   {
-    if (this->attachedModels[i]->GetName() == _modelName)
+    if (this->dataPtr->attachedModels[i]->GetName() == _modelName)
     {
-      this->attachedModels.erase(this->attachedModels.begin()+i);
-      this->attachedModelsOffset.erase(this->attachedModelsOffset.begin()+i);
+      this->dataPtr->attachedModels.erase(
+          this->dataPtr->attachedModels.begin()+i);
+      this->attachedModelsOffset.erase(
+          this->attachedModelsOffset.begin()+i);
       break;
     }
   }
@@ -1056,7 +1159,7 @@ void Link::DetachStaticModel(const std::string &_modelName)
 //////////////////////////////////////////////////
 void Link::DetachAllStaticModels()
 {
-  this->attachedModels.clear();
+  this->dataPtr->attachedModels.clear();
   this->attachedModelsOffset.clear();
 }
 
@@ -1064,13 +1167,13 @@ void Link::DetachAllStaticModels()
 void Link::OnPoseChange()
 {
   ignition::math::Pose3d p;
-  for (unsigned int i = 0; i < this->attachedModels.size(); i++)
+  for (unsigned int i = 0; i < this->dataPtr->attachedModels.size(); i++)
   {
     p = this->WorldPose();
     p.Pos() += this->attachedModelsOffset[i].Pos();
     p.Rot() = p.Rot() * this->attachedModelsOffset[i].Rot();
 
-    this->attachedModels[i]->SetWorldPose(p, true);
+    this->dataPtr->attachedModels[i]->SetWorldPose(p, true);
   }
 }
 
@@ -1123,27 +1226,28 @@ void Link::SetPublishData(bool _enable)
 {
   // Skip if we're trying to disable after the publisher has already been
   // cleared
-  if (!_enable && !this->dataPub)
+  if (!_enable && !this->dataPtr->dataPub)
     return;
 
   {
-    boost::recursive_mutex::scoped_lock lock(*this->publishDataMutex);
-    if (this->publishData == _enable)
+    std::lock_guard<std::recursive_mutex> lock(
+        *this->dataPtr->publishDataMutex);
+    if (this->dataPtr->publishData == _enable)
       return;
 
-    this->publishData = _enable;
+    this->dataPtr->publishData = _enable;
   }
   if (_enable)
   {
     std::string topic = "~/" + this->GetScopedName();
-    this->dataPub = this->node->Advertise<msgs::LinkData>(topic);
+    this->dataPtr->dataPub = this->node->Advertise<msgs::LinkData>(topic);
     this->connections.push_back(
       event::Events::ConnectWorldUpdateEnd(
-        boost::bind(&Link::PublishData, this)));
+        std::bind(&Link::PublishData, this)));
   }
   else
   {
-    this->dataPub.reset();
+    this->dataPtr->dataPub.reset();
     // Do we want to clear all of them though?
     this->connections.clear();
   }
@@ -1152,15 +1256,16 @@ void Link::SetPublishData(bool _enable)
 /////////////////////////////////////////////////
 void Link::PublishData()
 {
-  if (this->publishData && this->dataPub->HasConnections())
+  if (this->dataPtr->publishData && this->dataPtr->dataPub->HasConnections())
   {
-    msgs::Set(this->linkDataMsg.mutable_time(), this->world->SimTime());
-    linkDataMsg.set_name(this->GetScopedName());
-    msgs::Set(this->linkDataMsg.mutable_linear_velocity(),
+    msgs::Set(this->dataPtr->linkDataMsg.mutable_time(),
+        this->world->SimTime());
+    this->dataPtr->linkDataMsg.set_name(this->GetScopedName());
+    msgs::Set(this->dataPtr->linkDataMsg.mutable_linear_velocity(),
         this->WorldLinearVel());
-    msgs::Set(this->linkDataMsg.mutable_angular_velocity(),
+    msgs::Set(this->dataPtr->linkDataMsg.mutable_angular_velocity(),
         this->WorldAngularVel());
-    this->dataPub->Publish(this->linkDataMsg);
+    this->dataPtr->dataPub->Publish(this->dataPtr->linkDataMsg);
   }
 }
 
@@ -1169,7 +1274,7 @@ common::BatteryPtr Link::Battery(const std::string &_name) const
 {
   common::BatteryPtr result;
 
-  for (auto &battery : this->batteries)
+  for (auto &battery : this->dataPtr->batteries)
   {
     if (battery->Name() == _name)
     {
@@ -1184,8 +1289,8 @@ common::BatteryPtr Link::Battery(const std::string &_name) const
 /////////////////////////////////////////////////
 common::BatteryPtr Link::Battery(const size_t _index) const
 {
-  if (_index < this->batteries.size())
-    return this->batteries[_index];
+  if (_index < this->dataPtr->batteries.size())
+    return this->dataPtr->batteries[_index];
   else
     return common::BatteryPtr();
 }
@@ -1193,7 +1298,7 @@ common::BatteryPtr Link::Battery(const size_t _index) const
 /////////////////////////////////////////////////
 size_t Link::BatteryCount() const
 {
-  return this->batteries.size();
+  return this->dataPtr->batteries.size();
 }
 
 //////////////////////////////////////////////////
@@ -1300,7 +1405,8 @@ void Link::OnCollision(ConstContactsPtr &_msg)
 
 #ifdef HAVE_OPENAL
     for (std::vector<util::OpenALSourcePtr>::iterator iter =
-        this->audioSources.begin(); iter != this->audioSources.end(); ++iter)
+        this->dataPtr->audioSources.begin();
+        iter != this->dataPtr->audioSources.end(); ++iter)
     {
       if ((*iter)->HasCollisionName(collisionName1) ||
           (*iter)->HasCollisionName(collisionName2))
@@ -1335,12 +1441,12 @@ void Link::RemoveChild(EntityPtr _child)
 /////////////////////////////////////////////////
 void Link::RemoveCollision(const std::string &_name)
 {
-  for (Collision_V::iterator iter = this->collisions.begin();
-       iter != this->collisions.end(); ++iter)
+  for (Collision_V::iterator iter = this->dataPtr->collisions.begin();
+       iter != this->dataPtr->collisions.end(); ++iter)
   {
     if ((*iter)->GetName() == _name || (*iter)->GetScopedName() == _name)
     {
-      this->collisions.erase(iter);
+      this->dataPtr->collisions.erase(iter);
       break;
     }
   }
@@ -1506,13 +1612,17 @@ double Link::GetWorldEnergy() const
 
 /////////////////////////////////////////////////
 void Link::MoveFrame(const ignition::math::Pose3d &_worldReferenceFrameSrc,
-                     const ignition::math::Pose3d &_worldReferenceFrameDst)
+                     const ignition::math::Pose3d &_worldReferenceFrameDst,
+                     const bool _preserveWorldVelocity)
 {
   ignition::math::Pose3d targetWorldPose = (this->WorldPose() -
       _worldReferenceFrameSrc) + _worldReferenceFrameDst;
   this->SetWorldPose(targetWorldPose);
-  this->SetWorldTwist(ignition::math::Vector3d::Zero,
+  if (!_preserveWorldVelocity)
+  {
+    this->SetWorldTwist(ignition::math::Vector3d::Zero,
       ignition::math::Vector3d::Zero);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -1658,16 +1768,16 @@ msgs::Visual Link::GetVisualMessage(const std::string &_name) const
 //////////////////////////////////////////////////
 void Link::SetStatic(const bool &_static)
 {
-  if (!_static && !this->wrenchSub)
+  if (!_static && !this->dataPtr->wrenchSub)
   {
     std::string topicName = "~/" + this->GetScopedName() + "/wrench";
     boost::replace_all(topicName, "::", "/");
-    this->wrenchSub = this->node->Subscribe(topicName, &Link::OnWrenchMsg,
-        this);
+    this->dataPtr->wrenchSub =
+        this->node->Subscribe(topicName, &Link::OnWrenchMsg, this);
   }
   else if (_static)
   {
-    this->wrenchSub.reset();
+    this->dataPtr->wrenchSub.reset();
   }
 
   Entity::SetStatic(_static);
@@ -1684,8 +1794,8 @@ void Link::OnWrenchMsg(ConstWrenchPtr &_msg)
     return;
   }
 
-  boost::mutex::scoped_lock lock(this->wrenchMsgMutex);
-  this->wrenchMsgs.push_back(*_msg);
+  std::lock_guard<std::mutex> lock(this->dataPtr->wrenchMsgMutex);
+  this->dataPtr->wrenchMsgs.push_back(*_msg);
 }
 
 //////////////////////////////////////////////////
@@ -1717,14 +1827,14 @@ void Link::LoadBattery(sdf::ElementPtr _sdf)
 {
   common::BatteryPtr battery(new common::Battery());
   battery->Load(_sdf);
-  this->batteries.push_back(battery);
+  this->dataPtr->batteries.push_back(battery);
 }
 
 /////////////////////////////////////////////////
 const ignition::math::Vector3d Link::RelativeWindLinearVel() const
 {
   return this->WorldPose().Rot().Inverse().RotateVector(
-      this->windLinearVel);
+      this->dataPtr->windLinearVel);
 }
 
 /////////////////////////////////////////////////
@@ -1794,5 +1904,12 @@ void Link::RegisterIntrospectionItems()
 ignition::math::Vector3d Link::WorldLinearVel() const
 {
   return this->WorldLinearVel(ignition::math::Vector3d::Zero);
+}
+
+/////////////////////////////////////////////////
+event::ConnectionPtr Link::ConnectEnabled(
+    std::function<void (bool)> _subscriber)
+{
+  return this->dataPtr->enabledSignal.Connect(_subscriber);
 }
 
