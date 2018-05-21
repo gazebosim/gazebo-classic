@@ -415,9 +415,6 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
       return std::string();
     }
 
-    // DEBUG output
-    // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
-
     // Get the model name from the uri
     size_t startIndex = _uri.find_first_of("://");
     if (startIndex == std::string::npos)

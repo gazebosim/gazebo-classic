@@ -45,6 +45,7 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  AmbientOcclusionVisualPlugin
   ArduCopterPlugin
   ArrangePlugin
   AttachLightPlugin

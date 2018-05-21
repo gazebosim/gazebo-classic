@@ -159,6 +159,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
      "Recording period (seconds).")
     ("record_filter", po::value<std::string>()->default_value(""),
      "Recording filter (supports wildcard and regular expression).")
+    ("record_resources", "Recording with model meshes and materials.")
     ("seed",  po::value<double>(), "Start with a given random number seed.")
     ("iters",  po::value<unsigned int>(), "Number of iterations to simulate.")
     ("minimal_comms", "Reduce the TCP/IP traffic output by gzserver")
@@ -268,6 +269,8 @@ bool Server::ParseArgs(int _argc, char **_argv)
       this->dataPtr->vm["record_path"].as<std::string>();
     this->dataPtr->params["record_encoding"] =
       this->dataPtr->vm["record_encoding"].as<std::string>();
+    if (this->dataPtr->vm.count("record_resources"))
+      this->dataPtr->params["record_resources"] = "true";
   }
 
   if (this->dataPtr->vm.count("iters"))
@@ -300,7 +303,7 @@ bool Server::ParseArgs(int _argc, char **_argv)
   // this->dataPtr->ProcessPrarams.
   //
   // Set the parameter to playback a log file. The log file contains the
-  // world description, so don't try to reead the world file from the
+  // world description, so don't try to read the world file from the
   // command line.
   if (this->dataPtr->vm.count("play"))
   {
@@ -637,6 +640,10 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
+      // TODO Remove call to SetRecordResources function and update to use
+      // params.record_resources instead.
+      util::LogRecord::Instance()->SetRecordResources(
+          this->dataPtr->params.count("record_resources") > 0);
       util::LogRecord::Instance()->Start(params);
     }
   }

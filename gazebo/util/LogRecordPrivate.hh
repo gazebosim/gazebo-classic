@@ -17,7 +17,9 @@
 #ifndef _GAZEBO_UTIL_LOGRECORD_PRIVATE_HH_
 #define _GAZEBO_UTIL_LOGRECORD_PRIVATE_HH_
 
+#include <list>
 #include <map>
+#include <set>
 #include <string>
 #include <thread>
 #include <functional>
@@ -206,6 +208,15 @@ namespace gazebo
 
       /// \brief Record filter string.
       public: std::string filter = "";
+
+      /// \brief Record with model resources.
+      public: bool recordResources = false;
+
+      /// \brief List of saved models if record with resources is enabled.
+      public: std::set<std::string> savedModels;
+
+      /// \brief List of saved files if record with resources is enabled.
+      public: std::set<std::string> savedFiles;
     };
     /// \}
   }
