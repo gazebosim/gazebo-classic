@@ -74,11 +74,11 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // disable gravity
@@ -87,14 +87,47 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzdbg << "SpawnJoint " << _jointType << " child parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, false);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check child and parent links
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    ASSERT_TRUE(child != NULL);
+    ASSERT_TRUE(child != nullptr);
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
-    ASSERT_TRUE(parent != NULL);
+    ASSERT_TRUE(parent != nullptr);
+    EXPECT_EQ(parent->GetChildJoints().size(), 1u);
+    EXPECT_EQ(parent->GetParentJoints().size(), 0u);
+    EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
+    for (unsigned int i = 0; i < joint->DOF(); ++i)
+    {
+      CheckJointProperties(i, joint);
+    }
+  }
+
+  // child link with off-diagonal inertias
+  // skip universal joints because the off-diagonal inertias
+  // add coupling between the axes, which messes up CheckJointProperties
+  if (_jointType != "universal")
+  {
+    gzdbg << "SpawnJoint " << _jointType
+          << " child with off-diagonal inertia, parent"
+          << std::endl;
+    SpawnJointOptions opt;
+    opt.type = _jointType;
+    opt.useChildLinkInertia = true;
+    EXPECT_TRUE(opt.childLinkInertia.SetMassMatrix(
+      ignition::math::MassMatrix3d(12.0,
+        ignition::math::Vector3d(2.0, 3.0, 4.0),
+        ignition::math::Vector3d(0, 0, 0.4))));
+    physics::JointPtr joint = SpawnJoint(opt);
+    ASSERT_TRUE(joint != nullptr);
+    // Check child and parent links
+    physics::LinkPtr child = joint->GetChild();
+    physics::LinkPtr parent = joint->GetParent();
+    ASSERT_TRUE(child != nullptr);
+    EXPECT_EQ(child->GetParentJoints().size(), 1u);
+    EXPECT_EQ(child->GetChildJoints().size(), 0u);
+    ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
     EXPECT_EQ(_jointType, msgs::ConvertJointType(joint->GetMsgType()));
@@ -115,14 +148,14 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzdbg << "SpawnJoint " << _jointType << " child world" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, false, true);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check child link
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    ASSERT_TRUE(child != NULL);
+    ASSERT_TRUE(child != nullptr);
     EXPECT_EQ(child->GetParentJoints().size(), 1u);
     EXPECT_EQ(child->GetChildJoints().size(), 0u);
-    EXPECT_TRUE(parent == NULL);
+    EXPECT_TRUE(parent == nullptr);
     for (unsigned int i = 0; i < joint->DOF(); ++i)
     {
       CheckJointProperties(i, joint);
@@ -144,12 +177,12 @@ void JointSpawningTest::SpawnJointTypes(const std::string &_physicsEngine,
   {
     gzdbg << "SpawnJoint " << _jointType << " world parent" << std::endl;
     physics::JointPtr joint = SpawnJoint(_jointType, true, false);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
     // Check parent link
     physics::LinkPtr child = joint->GetChild();
     physics::LinkPtr parent = joint->GetParent();
-    EXPECT_TRUE(child == NULL);
-    ASSERT_TRUE(parent != NULL);
+    EXPECT_TRUE(child == nullptr);
+    ASSERT_TRUE(parent != nullptr);
     EXPECT_EQ(parent->GetChildJoints().size(), 1u);
     EXPECT_EQ(parent->GetParentJoints().size(), 0u);
     for (unsigned int i = 0; i < joint->DOF(); ++i)
@@ -168,22 +201,22 @@ void JointSpawningTest::SpawnJointRotational(const std::string &_physicsEngine,
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   gzdbg << "SpawnJoint " << _jointType << std::endl;
   physics::JointPtr joint = SpawnJoint(_jointType);
-  ASSERT_TRUE(joint != NULL);
+  ASSERT_TRUE(joint != nullptr);
 
   physics::LinkPtr parent, child;
   child = joint->GetChild();
   parent = joint->GetParent();
-  ASSERT_TRUE(child != NULL);
-  ASSERT_TRUE(parent != NULL);
+  ASSERT_TRUE(child != nullptr);
+  ASSERT_TRUE(parent != nullptr);
 
   ignition::math::Vector3d pos(10, 10, 10);
   ignition::math::Vector3d vel(10, 10, 10);
@@ -215,11 +248,11 @@ void JointSpawningTest::SpawnJointRotationalWorld(
   // Load an empty world
   Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   physics::JointPtr joint;
@@ -248,14 +281,14 @@ void JointSpawningTest::SpawnJointRotationalWorld(
     }
 
     joint = SpawnJoint(_jointType, worldChild, worldParent);
-    ASSERT_TRUE(joint != NULL);
+    ASSERT_TRUE(joint != nullptr);
 
     physics::LinkPtr link;
     if (!worldChild)
       link = joint->GetChild();
     else if (!worldParent)
       link = joint->GetParent();
-    ASSERT_TRUE(link != NULL);
+    ASSERT_TRUE(link != nullptr);
 
     auto initialPose = link->WorldPose();
     world->Step(100);
@@ -271,9 +304,9 @@ void JointSpawningTest::CheckJointProperties(unsigned int _index,
                                         physics::JointPtr _joint)
 {
   physics::WorldPtr world = physics::get_world();
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
   bool isBullet = physics->GetType().compare("bullet") == 0;
   bool isDart = physics->GetType().compare("dart") == 0;
   bool isSimbody = physics->GetType().compare("simbody") == 0;
