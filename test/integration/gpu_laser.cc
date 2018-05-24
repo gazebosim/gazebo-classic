@@ -466,8 +466,8 @@ TEST_F(GPURaySensorTest, LaserVertical)
 
     angleStep += vAngleStep;
 
-    //EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), GZ_DBL_INF);
-    //EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1), GZ_DBL_INF);
+    // EXPECT_DOUBLE_EQ(raySensor->Range(i*samples), GZ_DBL_INF);
+    // EXPECT_DOUBLE_EQ(raySensor->Range(i*samples + samples-1), GZ_DBL_INF);
   }
 
   // Move box out of range
