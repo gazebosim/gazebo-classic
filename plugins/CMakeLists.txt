@@ -61,6 +61,7 @@ set (plugins_single_header
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
+  FlashLightPlugin
   FollowerPlugin
   ForceTorquePlugin
   GimbalSmall2dPlugin
