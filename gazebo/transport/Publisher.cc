@@ -28,6 +28,7 @@
 #include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/WeakBind.hh"
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/Publisher.hh"
@@ -218,7 +219,8 @@ void Publisher::SendMessage()
       // (the subscriber callback SubscriptionTransport::HandleData() only
       // enqueues the message!).
       int result = this->publication->Publish(*iter,
-          boost::bind(&Publisher::OnPublishComplete, this, _1), *pubIter);
+          common::weakBind(&Publisher::OnPublishComplete,
+              this->shared_from_this(), _1), *pubIter);
 
       // It is possible that OnPublishComplete() was called less times than
       // initially expected, which happens when a callback of the
