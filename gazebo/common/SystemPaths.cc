@@ -303,7 +303,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  // If trying to find a model, look through all currently registeres model
+  // If trying to find a model, look through all currently registered model
   // paths
   if (prefix == "model")
   {
