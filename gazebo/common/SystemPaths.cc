@@ -200,7 +200,7 @@ void SystemPaths::UpdateModelPaths()
   else
     path = pathCStr;
 
-  /// \TODO: Use something else to split string.
+  /// TODO(anyone) Use something else to split string.
   size_t pos1 = 0;
   size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
