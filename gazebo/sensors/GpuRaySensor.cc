@@ -279,7 +279,7 @@ void GpuRaySensor::Init()
     else
     {
       // In case of 1 vert. ray, set a very small vertical FOV for camera
-      this->dataPtr->laserCam->SetRayCountRatio(horzRangeCountPerCamera / 1);
+      this->dataPtr->laserCam->SetRayCountRatio(horzRangeCountPerCamera);
     }
 
     // Initialize camera sdf for GpuLaser
