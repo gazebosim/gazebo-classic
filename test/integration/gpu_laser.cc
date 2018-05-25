@@ -377,6 +377,11 @@ TEST_F(GPURaySensorTest, Heightmap)
 /// \brief Test GPU ray sensor vertical component
 TEST_F(GPURaySensorTest, LaserVertical)
 {
+  // issue #946
+  #ifdef __APPLE__
+    return;
+  #endif
+
   // Test a ray sensor that has a vertical range component.
   // Place a box within range and verify range values,
   // then move the box out of range and verify range values
