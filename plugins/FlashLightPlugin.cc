@@ -156,22 +156,6 @@ void FlashLightSettings::UpdateLightInEnv(const common::Time &_current_time)
 }
 
 //////////////////////////////////////////////////
-FlashLightSettings& FlashLightSettings::operator=(
-  const FlashLightSettings &_settings)
-{
-  this->name = _settings.name;
-  this->link = _settings.link;
-  this->start_time = _settings.start_time;
-  this->f_switch_on = _settings.f_switch_on;
-  this->f_flashing = _settings.f_flashing;
-  this->duration = _settings.duration;
-  this->interval = _settings.interval;
-  this->range = _settings.range;
-
-  return *this;
-}
-
-//////////////////////////////////////////////////
 const std::string FlashLightSettings::Name() const
 {
   return this->name;
@@ -193,6 +177,18 @@ void FlashLightSettings::SwitchOn()
 void FlashLightSettings::SwitchOff()
 {
   this->f_switch_on = false;
+}
+
+//////////////////////////////////////////////////
+void FlashLightSettings::SetDuration(const double &_duration)
+{
+  this->duration = _duration;
+}
+
+//////////////////////////////////////////////////
+void FlashLightSettings::SetInterval(const double &_interval)
+{
+  this->interval = _interval;
 }
 
 //////////////////////////////////////////////////
@@ -265,27 +261,18 @@ bool FlashLightPlugin::TurnOn(
   const std::string &_light_name, const std::string &_link_name)
 {
   bool f_found = false;
+  std::shared_ptr<FlashLightSettings> set
+    = this->FindSettings(_light_name, _link_name);
 
-  std::vector<std::shared_ptr<FlashLightSettings>>::iterator it;
-  for (it = this->list_flash_light.begin();
-    it != this->list_flash_light.end(); ++it)
+  if (set != NULL)
   {
-    std::shared_ptr<FlashLightSettings> set
-      = (std::shared_ptr<FlashLightSettings>)*it;
-
-    if (set->Name().compare(_light_name) == 0)
-    {
-      if (_link_name.length() == 0
-        || set->Link()->GetName().compare(_link_name) == 0)
-      {
-        set->SwitchOn();
-        f_found = true;
-      }
-    }
+    set->SwitchOn();
+    f_found = true;
   }
-
-  if (f_found == false)
+  else
+  {
     gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+  }
 
   return f_found;
 }
@@ -295,7 +282,7 @@ bool FlashLightPlugin::TurnOnAll()
 {
   bool f_found = false;
 
-  std::vector<std::shared_ptr<FlashLightSettings>>::iterator it;
+  std::vector< std::shared_ptr<FlashLightSettings> >::iterator it;
   for (it = this->list_flash_light.begin();
     it != this->list_flash_light.end(); ++it)
   {
@@ -323,27 +310,18 @@ bool FlashLightPlugin::TurnOff(const std::string &_light_name,
   const std::string &_link_name)
 {
   bool f_found = false;
+  std::shared_ptr<FlashLightSettings> set
+    = this->FindSettings(_light_name, _link_name);
 
-  std::vector<std::shared_ptr<FlashLightSettings>>::iterator it;
-  for (it = this->list_flash_light.begin();
-    it != this->list_flash_light.end(); ++it)
+  if (set != NULL)
   {
-    std::shared_ptr<FlashLightSettings> set
-      = (std::shared_ptr<FlashLightSettings>)*it;
-
-    if (set->Name().compare(_light_name) == 0)
-    {
-      if (_link_name.length() == 0
-        || set->Link()->GetName().compare(_link_name))
-      {
-        set->SwitchOff();
-        f_found = true;
-      }
-    }
+    set->SwitchOff();
+    f_found = true;
   }
-
-  if (f_found == false)
+  else
+  {
     gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+  }
 
   return f_found;
 }
@@ -353,7 +331,7 @@ bool FlashLightPlugin::TurnOffAll()
 {
   bool f_found = false;
 
-  std::vector<std::shared_ptr<FlashLightSettings>>::iterator it;
+  std::vector< std::shared_ptr<FlashLightSettings> >::iterator it;
   for (it = this->list_flash_light.begin();
     it != this->list_flash_light.end(); ++it)
   {
@@ -368,4 +346,75 @@ bool FlashLightPlugin::TurnOffAll()
     gzerr << "no flash lights exist to turn off." << std::endl;
 
   return f_found;
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeDuration(
+  const std::string &_light_name, const std::string &_link_name,
+  const double &_duration
+)
+{
+  bool f_found = false;
+  std::shared_ptr<FlashLightSettings> set
+    = this->FindSettings(_light_name, _link_name);
+
+  if (set != NULL)
+  {
+    set->SetDuration(_duration);
+  }
+  else
+  {
+    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+  }
+
+  return f_found;
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeInterval(
+  const std::string &_light_name, const std::string &_link_name,
+  const double &_interval
+)
+{
+  bool f_found = false;
+  std::shared_ptr<FlashLightSettings> set
+    = this->FindSettings(_light_name, _link_name);
+
+  if (set != NULL)
+  {
+    set->SetInterval(_interval);
+  }
+  else
+  {
+    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+  }
+
+  return f_found;
+}
+
+//////////////////////////////////////////////////
+std::shared_ptr<FlashLightSettings> FlashLightPlugin::FindSettings(
+  const std::string &_light_name, const std::string &_link_name
+)
+{
+  std::shared_ptr<FlashLightSettings> ptr;
+
+  std::vector< std::shared_ptr<FlashLightSettings> >::iterator it;
+  for (it = this->list_flash_light.begin();
+    it != this->list_flash_light.end(); ++it)
+  {
+    std::shared_ptr<FlashLightSettings> set
+      = (std::shared_ptr<FlashLightSettings>)*it;
+
+    if (set->Name().compare(_light_name) == 0)
+    {
+      if (_link_name.length() == 0
+        || set->Link()->GetName().compare(_link_name))
+      {
+        ptr = set;
+      }
+    }
+  }
+
+  return ptr;
 }

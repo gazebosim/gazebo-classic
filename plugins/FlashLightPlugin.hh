@@ -24,7 +24,6 @@
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "ignition/math/Color.hh"
 
 namespace gazebo
 {
@@ -46,8 +45,8 @@ namespace gazebo
   // More than one <flash_light> can exist.
   //
   // Settings for each flash light is separately stored in a
-  // FlashLightSettings class, which takes care of light specifications
-  // such as color, range, blinking interval, and so on.
+  // FlashLightSettings class, which takes care of dynamic specifications
+  // such as duration and interval.
   //
   // This base class provides basic functions to turn the lights on/off.
   // Users can create their own flash light plugin by inheriting this base
@@ -77,7 +76,7 @@ namespace gazebo
     /// \param[in] _light_name The name of flash light
     /// \param[in] _link_name The name of the link holding the light
     public: virtual bool TurnOn(
-        const std::string &_light_name, const std::string &_link_name) final;
+      const std::string &_light_name, const std::string &_link_name) final;
 
     /// \brief Turn on all flash lights
     public: virtual bool TurnOnAll() final;
@@ -91,11 +90,32 @@ namespace gazebo
     /// \brief Turn off a flash light specified by the name
     /// \param[in] _light_name The name of flash light
     /// \param[in] _link_name The name of the link holding the light
-    public: virtual bool TurnOff(const std::string &_light_name,
-        const std::string &_link_name) final;
+    public: virtual bool TurnOff(
+      const std::string &_light_name, const std::string &_link_name) final;
 
     /// \brief Turn off all flash lights
     public: virtual bool TurnOffAll() final;
+
+    /// \brief Change the duration
+    /// \param[in] _light_name The name of flash light
+    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _duration The new duration time to set
+    public: virtual bool ChangeDuration(
+      const std::string &_light_name, const std::string &_link_name,
+      const double &_duration) final;
+
+    /// \brief Change the interval
+    /// \param[in] _light_name The name of flash light
+    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _interval The new interval time to set
+    public: virtual bool ChangeInterval(
+      const std::string &_light_name, const std::string &_link_name,
+      const double &_interval) final;
+
+    /// \brief Find a unit of settings by names
+    //  This is internally used to access an individual unit of light settings
+    private: virtual std::shared_ptr<FlashLightSettings> FindSettings(
+      const std::string &_light_name, const std::string &_link_name) final;
 
     /// \brief list of light settings to control
     private: std::vector<std::shared_ptr<FlashLightSettings>> list_flash_light;
@@ -155,9 +175,6 @@ namespace gazebo
     /// \brief Update the light based on the given time
     public: void UpdateLightInEnv(const common::Time &_current_time);
 
-    /// \brief Assignment operator
-    public: FlashLightSettings& operator=(const FlashLightSettings &_settings);
-
     /// \brief Getter of name
     public: const std::string Name() const;
 
@@ -169,6 +186,12 @@ namespace gazebo
 
     /// \brief Switch off
     public: void SwitchOff();
+
+    /// \brief Set the duration time
+    public: void SetDuration(const double &_duration);
+
+    /// \brief Set the interval time
+    public: void SetInterval(const double &_interval);
   };
 }
 #endif
