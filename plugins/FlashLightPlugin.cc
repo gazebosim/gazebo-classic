@@ -198,9 +198,10 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->model = _parent;
   this->world = _parent->GetWorld();
 
-  // get the current time
+  // Get the current time
   common::Time current_time = this->world->SimTime();
 
+  // Get the parameters from sdf
   sdf::ElementPtr sdfFlashLight = _sdf->GetElement("flash_light");
   while (sdfFlashLight)
   {
@@ -220,6 +221,41 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // display an error message
       gzerr << "no name field exists in <flash_light>" << std::endl;
+    }
+
+    sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
+  }
+
+  // Turn on/off the lights if <start> element is given
+  if (_sdf->HasElement("start"))
+  {
+    if (_sdf->Get<bool>("start") == true)
+    {
+      this->TurnOnAll();
+    }
+    else
+    {
+      this->TurnOffAll();
+    }
+  }
+  sdfFlashLight = _sdf->GetElement("flash_light");
+  while (sdfFlashLight)
+  {
+    // light_id required
+    if (sdfFlashLight->HasElement("start"))
+    {
+      std::string light_id = sdfFlashLight->Get<std::string>("light_id");
+      int pos_delim = light_id.find("/");
+      std::string light_name = light_id.substr(pos_delim+1, light_id.length());
+      std::string link_name = light_id.substr(0, pos_delim);
+      if (sdfFlashLight->Get<bool>("start") == true)
+      {
+        this->TurnOn(light_name, link_name);
+      }
+      else
+      {
+        this->TurnOff(light_name, link_name);
+      }
     }
 
     sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
@@ -271,7 +307,8 @@ bool FlashLightPlugin::TurnOn(
   }
   else
   {
-    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+    gzerr << "light: [" + _link_name + "/" + _light_name
+     + "] does not exist." << std::endl;
   }
 
   return f_found;
@@ -320,7 +357,8 @@ bool FlashLightPlugin::TurnOff(const std::string &_light_name,
   }
   else
   {
-    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+    gzerr << "light: [" + _link_name + "/" + _light_name
+     + "] does not exist." << std::endl;
   }
 
   return f_found;
@@ -406,10 +444,10 @@ std::shared_ptr<FlashLightSettings> FlashLightPlugin::FindSettings(
     std::shared_ptr<FlashLightSettings> set
       = (std::shared_ptr<FlashLightSettings>)*it;
 
-    if (set->Name().compare(_light_name) == 0)
+    if (set->Name() == _light_name)
     {
       if (_link_name.length() == 0
-        || set->Link()->GetName().compare(_link_name))
+        || set->Link()->GetName() == _link_name)
       {
         ptr = set;
       }

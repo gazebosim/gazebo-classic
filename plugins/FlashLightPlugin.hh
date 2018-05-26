@@ -31,16 +31,29 @@ namespace gazebo
   class FlashLightSettings;
 
   /// \brief A plugin that turns on/off a light component in the model.
-  // This plugin accesses <light> components in the model specified
+  // This plugin accesses <light> elements in the model specified
   // by <flash_light> as a parameter.
   // The light is specified by <light_id>, including link and light names
-  // separated by a slash "/"
+  // separated by a slash "/".
+  // <start> is optional. It indicates whehter it starts flashing from the
+  // beginning. If <start> is directly under the <plugin>, it affects all
+  // the lights. Otherwise, it individually affects the corresponding <light>
+  // element.
   //
+  // <start>true</start>
   // <flash_light>
-  //  <light_id>link_light/light_source</light_id>
+  //  <light_id>link1/light_source</light_id>
   //  <duration>0.1</duration>
   //  <interval>0.4</interval>
+  //  <start>true</start>
   // </flash_light>
+  // <flash_light>
+  //  <light_id>link1/light_source2</light_id>
+  //  <duration>0.8</duration>
+  //  <interval>0.2</interval>
+  //  <start>false</start>
+  // </flash_light>
+  // ...
   //
   // More than one <flash_light> can exist.
   //
@@ -48,7 +61,7 @@ namespace gazebo
   // FlashLightSettings class, which takes care of dynamic specifications
   // such as duration and interval.
   //
-  // This base class provides basic functions to turn the lights on/off.
+  // NOTE: This base class provides basic functions to turn the lights on/off.
   // Users can create their own flash light plugin by inheriting this base
   // model.
   //
