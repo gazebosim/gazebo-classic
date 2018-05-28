@@ -628,10 +628,13 @@ namespace gazebo
       public: bool SetVisualPose(const uint32_t _id,
                                  const ignition::math::Pose3d &_pose);
 
+      /// \def Visuals_M
+      /// \brief Map of unique ID to visual message.
+      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
 
-      /// \brief Set the visibility of the visuals.
-      /// \param[in] _visible True to show the visuals.
-      public: void SetVisible(const bool _visible) const;
+      /// \brief Return the link visual elements.
+      /// \return a map of unique ID to visual message
+      public: const Visuals_M &Visuals() const;
 
       /// \brief Publish timestamped link data such as velocity.
       private: void PublishData();
@@ -682,10 +685,6 @@ namespace gazebo
 
       /// \brief Inertial properties.
       protected: InertialPtr inertial;
-
-      /// \def Visuals_M
-      /// \brief Map of unique ID to visual message.
-      typedef std::map<uint32_t, msgs::Visual> Visuals_M;
 
       /// \brief Link visual elements.
       protected: Visuals_M visuals;

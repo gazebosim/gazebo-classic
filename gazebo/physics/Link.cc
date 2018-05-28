@@ -1914,15 +1914,7 @@ event::ConnectionPtr Link::ConnectEnabled(
 }
 
 //////////////////////////////////////////////////
-void Link::SetVisible(const bool _visible) const
+const Link::Visuals_M &Link::Visuals() const
 {
-  msgs::Visual msg;
-  msg.set_parent_name(this->GetScopedName());
-  msg.set_parent_id(this->GetId());
-  msg.set_visible(_visible);
-  for (const auto &iter : this->visuals)
-  {
-    msg.set_name(iter.second.name());
-    this->visPub->Publish(msg);
-  }
+  return this->visuals;
 }

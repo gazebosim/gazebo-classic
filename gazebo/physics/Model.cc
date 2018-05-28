@@ -1828,10 +1828,3 @@ void Model::PluginInfo(const common::URI &_pluginUri,
   gzwarn << "Couldn't get information for plugin [" << _pluginUri.Str() << "]"
       << std::endl;
 }
-
-//////////////////////////////////////////////////
-void Model::SetVisible(const bool _visible) const
-{
-  for (const auto &link : this->links)
-    link->SetVisible(_visible);
-}

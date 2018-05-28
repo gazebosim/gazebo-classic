@@ -468,10 +468,6 @@ namespace gazebo
       public: void PluginInfo(const common::URI &_pluginUri,
           ignition::msgs::Plugin_V &_plugins, bool &_success);
 
-      /// \brief Set the visibility of the links.
-      /// \param[in] _visible True to show the links.
-      public: void SetVisible(const bool _visible) const;
-
       /// \brief Callback when the pose of the model has been changed.
       protected: virtual void OnPoseChange();
 
