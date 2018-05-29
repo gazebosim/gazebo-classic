@@ -48,7 +48,7 @@ static const std::string PathDelimiter = ":";
 #endif
 
 /// \brief Callbacks to be called in order in case a file can't be found.
-/// TODO: Move to member variable when porting forward
+/// TODO(chapulina): Move to member variable when porting forward
 std::vector<std::function<std::string (const std::string &)>> g_findFileCbs;
 
 //////////////////////////////////////////////////
@@ -200,7 +200,7 @@ void SystemPaths::UpdateModelPaths()
   else
     path = pathCStr;
 
-  /// \TODO: Use boost to split string.
+  /// TODO(anyone) Use something else to split string.
   size_t pos1 = 0;
   size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
@@ -303,7 +303,7 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  // If trying to find a model, look through all currently registeres model
+  // If trying to find a model, look through all currently registered model
   // paths
   if (prefix == "model")
   {
