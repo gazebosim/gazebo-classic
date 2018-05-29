@@ -160,7 +160,7 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
-   // Make dbs are initialized
+   // Make sure dbs are initialized
    common::ModelDatabase::Instance();
 #ifdef HAVE_IGNITION_FUEL_TOOLS
    common::FuelModelDatabase::Instance();
@@ -1971,12 +1971,9 @@ void World::ProcessFactoryMsgs()
       {
         std::string filename;
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-        // If http, look at Fuel
-        // TODO: model:// should fallback to Fuel's openrobotics account,
-        // but if we check ModelDatabase first it takes forever to check.
-        // Is there a better way?
+        // If http(s), look at Fuel
         auto uri = ignition::common::URI(factoryMsg.sdf_filename());
-        if (uri.Valid() && uri.Scheme() == "https")
+        if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
         {
           filename = common::FuelModelDatabase::Instance()->ModelFile(
               factoryMsg.sdf_filename());

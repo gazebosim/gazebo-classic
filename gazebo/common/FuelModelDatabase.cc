@@ -24,6 +24,7 @@
 #include <thread>
 #include <vector>
 
+#include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
 #include <ignition/fuel_tools.hh>
 #include <sdf/sdf.hh>
@@ -50,6 +51,9 @@ class gazebo::common::FuelModelDatabasePrivate
 FuelModelDatabase::FuelModelDatabase()
   : dataPtr(new FuelModelDatabasePrivate)
 {
+  unsigned int verbosity = common::Console::GetQuiet() ? 0 : 4;
+  ignition::common::Console::SetVerbosity(verbosity);
+
   ignition::fuel_tools::ClientConfig conf;
   conf.LoadConfig();
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
@@ -187,14 +191,10 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 {
   auto fuelUri = ignition::common::URI(_uri);
 
-  // Gazebo URIs default to Open Robotics account on ignitionfuel.org
-  if (fuelUri.Scheme() == "model")
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
   {
-    auto modelName = fuelUri.Path();
-    auto firstServer = this->dataPtr->fuelClient->Config().Servers()[0];
-
-    fuelUri.Parse(firstServer.URL() + "/" + firstServer.Version() +
-        "/openrobotics/models/" + modelName.Str());
+    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
+    return std::string();
   }
 
   std::string path;
@@ -213,12 +213,12 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 
   if (!this->dataPtr->fuelClient->DownloadModel(fuelUri.Str(), path))
   {
-    gzerr << "Unable to download model[" << fuelUri.Str() << "]" << std::endl;
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
     return std::string();
   }
   else
   {
-      gzmsg << "Download model URL: " << std::endl
+      gzmsg << "Downloaded model URL: " << std::endl
             << "          " << _uri << std::endl
             << "      to: " << std::endl
             << "          " << path << std::endl;
@@ -230,35 +230,24 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
 {
-  std::string path;
   auto fuelUri = ignition::common::URI(_uri);
-
-  // Gazebo URIs default to Open Robotics account on ignitionfuel.org
-  if (fuelUri.Scheme() == "model")
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
   {
-    auto parts = common::split(fuelUri.Path().Str(), "/");
-
-    if (parts.size() < 2)
-      return path;
-
-    auto modelName = parts[0];
-    std::string filePath;
-    for (unsigned int i = 1; i < parts.size(); ++i)
-      filePath = ignition::common::joinPaths(filePath, parts[i]);
-
-    auto firstServer = this->dataPtr->fuelClient->Config().Servers()[0];
-
-    fuelUri.Parse(firstServer.URL() + "/" + firstServer.Version() +
-        "/openrobotics/models/" + modelName + "/files" + filePath);
+    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
+    return std::string();
   }
 
-  if (this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+  std::string path;
+  if (!this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+  {
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+  }
+  else
   {
     gzmsg << "Found file URL: " << std::endl
           << "          " << _uri << std::endl
           << "      cached on: " << std::endl
           << "          " << path << std::endl;
-    return path;
   }
 
   return path;
