@@ -330,6 +330,11 @@ FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
 }
 
 //////////////////////////////////////////////////
+FlashLightPlugin::~FlashLightPlugin()
+{
+}
+
+//////////////////////////////////////////////////
 void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointers to the model and world

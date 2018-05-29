@@ -68,6 +68,8 @@ namespace gazebo
   {
     // Constructor
     public: FlashLightPlugin();
+    // Destructor
+    public: ~FlashLightPlugin();
 
     /// \brief Called when the plugin is loaded
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
