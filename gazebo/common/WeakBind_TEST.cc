@@ -48,7 +48,6 @@ class EventBindTestClass
 
   /// \brief Keep a pointer to the connection alive
   private: event::ConnectionPtr connection;
-
 };
 
 /////////////////////////////////////////////////
