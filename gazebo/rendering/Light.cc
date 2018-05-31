@@ -96,7 +96,7 @@ void Light::Load()
   this->Update();
 
   this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->WorldVisual()));
+                     this->dataPtr->scene->WorldVisual(), false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 

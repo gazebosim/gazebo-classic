@@ -32,6 +32,9 @@ namespace gazebo
   {
     /// \brief Lens flare
     public: std::vector<rendering::LensFlarePtr> lensFlares;
+
+    /// \brief Lens flare scale
+    public: double scale = 1.0;
   };
 }
 
@@ -52,10 +55,25 @@ LensFlareSensorPlugin::~LensFlareSensorPlugin()
 
 /////////////////////////////////////////////////
 void LensFlareSensorPlugin::Load(sensors::SensorPtr _sensor,
-    sdf::ElementPtr /*_sdf*/)
+    sdf::ElementPtr _sdf)
 {
   if (!_sensor)
+  {
     gzerr << "Invalid sensor pointer." << std::endl;
+    return;
+  }
+  if (!_sdf)
+  {
+    gzerr << "Invalid SDF pointer." << std::endl;
+    return;
+  }
+
+  if (_sdf->HasElement("scale"))
+  {
+    this->dataPtr->scale = _sdf->Get<double>("scale");
+    if (this->dataPtr->scale < 0)
+      gzerr << "Lens flare scale must be greater than 0" << std::endl;
+  }
 
   sensors::CameraSensorPtr cameraSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(_sensor);
@@ -92,5 +110,6 @@ void LensFlareSensorPlugin::AddLensFlare(rendering::CameraPtr _camera)
   rendering::LensFlarePtr lensFlare;
   lensFlare.reset(new rendering::LensFlare);
   lensFlare->SetCamera(_camera);
+  lensFlare->SetScale(this->dataPtr->scale);
   this->dataPtr->lensFlares.push_back(lensFlare);
 }

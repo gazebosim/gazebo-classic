@@ -80,6 +80,15 @@ namespace gazebo
 
       // Documentation inherited
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
+
+      // Make ODEJoint a friend class so we can fix issue 2430 without breaking
+      // ABI
+      friend class gazebo::physics::ODEJoint;
+
+      /// \brief Method for setting the cumulative_angle value of the underlying
+      /// dxJointHinge object of this ODEHingeJoint.
+      /// \param[in] _angle The cumulative angle value.
+      private: void SetCumulativeAngle(double _angle);
     };
     /// \}
   }
