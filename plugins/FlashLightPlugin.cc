@@ -56,11 +56,8 @@ namespace gazebo
     /// \brief The length of the ray (in meters).
     private: double range;
 
-    /// \brief The pointer to node for communication.
-    private: static transport::NodePtr node;
-
     /// \brief The pointer to publisher to send a command to a light.
-    private: static transport::PublisherPtr pubLight;
+    private: transport::PublisherPtr pubLight;
 
     /// \brief Flash the light
     /// This function is internally used to update the light in the environment.
@@ -72,10 +69,12 @@ namespace gazebo
 
     /// \brief Constructor
     /// \param[in] _model The Model pointer holding the light to control.
+    /// \param[in] _pubLight The publisher to send a message
     /// \param[in] _sdfFlashLight SDF data for flashlight settings.
     /// \param[in] _currentTime The current time point.
     public: FlashLightSettings(
       const physics::ModelPtr &_model,
+      const transport::PublisherPtr &_pubLight,
       const sdf::ElementPtr &_sdfFlashLight,
       const common::Time &_currentTime);
 
@@ -109,6 +108,12 @@ namespace gazebo
     /// \brief pointer to the world.
     public: physics::WorldPtr world;
 
+    /// \brief The pointer to node for communication.
+    public: transport::NodePtr node;
+
+    /// \brief The pointer to publisher to send a command to a light.
+    public: transport::PublisherPtr pubLight;
+
     /// \brief list of light settings to control.
     public: std::vector< std::shared_ptr<FlashLightSettings> > listFlashLight;
 
@@ -132,10 +137,6 @@ namespace gazebo
 using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
-// static members
-transport::NodePtr FlashLightSettings::node;
-transport::PublisherPtr FlashLightSettings::pubLight;
-
 //////////////////////////////////////////////////
 void FlashLightSettings::Flash()
 {
@@ -144,7 +145,7 @@ void FlashLightSettings::Flash()
   msg.set_name(this->link->GetScopedName() + "::" + this->name);
   msg.set_range(this->range);
   // Send the message
-  FlashLightSettings::pubLight->Publish(msg);
+  this->pubLight->Publish(msg);
   // Update the state
   this->flashing = true;
 }
@@ -157,7 +158,7 @@ void FlashLightSettings::Dim()
   msg.set_name(this->link->GetScopedName() + "::" + this->name);
   msg.set_range(0.0);
   // Send the message
-  FlashLightSettings::pubLight->Publish(msg);
+  this->pubLight->Publish(msg);
   // Update the state
   this->flashing = false;
 }
@@ -165,29 +166,18 @@ void FlashLightSettings::Dim()
 //////////////////////////////////////////////////
 FlashLightSettings::FlashLightSettings(
   const physics::ModelPtr &_model,
+  const transport::PublisherPtr &_pubLight,
   const sdf::ElementPtr &_sdfFlashLight,
   const common::Time &_currentTime)
 {
-  if (!FlashLightSettings::node)
-  {
-    // Create a node
-    FlashLightSettings::node = transport::NodePtr(new transport::Node());
-    FlashLightSettings::node->Init();
-
-    // advertise the topic to update lights
-    FlashLightSettings::pubLight =
-      FlashLightSettings::node
-      ->Advertise<gazebo::msgs::Light>("~/light/modify");
-
-    FlashLightSettings::pubLight->WaitForConnection();
-  }
-
   // name
   std::string lightId = _sdfFlashLight->Get<std::string>("light_id");
   int posDelim = lightId.find("/");
   this->name = lightId.substr(posDelim+1, lightId.length());
   // link which holds this light
   this->link = _model->GetLink(lightId.substr(0, posDelim));
+  // The PublisherPtr
+  this->pubLight = _pubLight;
   // start time
   this->startTime = _currentTime;
   // current states
@@ -228,7 +218,7 @@ FlashLightSettings::FlashLightSettings(
   msg.set_range(this->range);
 
   // Send the message to initialize the light
-  FlashLightSettings::pubLight->Publish(msg);
+  this->pubLight->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -336,6 +326,15 @@ std::shared_ptr<FlashLightSettings>
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
   dataPtr(new FlashLightPluginPrivate)
 {
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  // advertise the topic to update lights
+  this->dataPtr->pubLight
+    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
+
+  this->dataPtr->pubLight->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
@@ -363,6 +362,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       // Get the setting information from sdf
       std::shared_ptr<FlashLightSettings> settings
         = std::make_shared<FlashLightSettings>(this->dataPtr->model,
+                                               this->dataPtr->pubLight,
                                                sdfFlashLight,
                                                currentTime);
 
