@@ -31,27 +31,27 @@ struct RecordInfo
 {
   double duration;
   double interval;
-  common::Time last_update;
+  common::Time lastUpdate;
 };
 
-struct RecordInfo flash_light[4];
-bool f_called;
+struct RecordInfo flashLight[4];
+bool called;
 
 void InitRec()
 {
-  common::Time current_time = physics::get_world()->SimTime();
-  flash_light[0].duration = -1;
-  flash_light[1].duration = -1;
-  flash_light[2].duration = -1;
-  flash_light[3].duration = -1;
-  flash_light[0].interval = -1;
-  flash_light[1].interval = -1;
-  flash_light[2].interval = -1;
-  flash_light[3].interval = -1;
-  flash_light[0].last_update = current_time;
-  flash_light[1].last_update = current_time;
-  flash_light[2].last_update = current_time;
-  flash_light[3].last_update = current_time;
+  common::Time currentTime = physics::get_world()->SimTime();
+  flashLight[0].duration = -1;
+  flashLight[1].duration = -1;
+  flashLight[2].duration = -1;
+  flashLight[3].duration = -1;
+  flashLight[0].interval = -1;
+  flashLight[1].interval = -1;
+  flashLight[2].interval = -1;
+  flashLight[3].interval = -1;
+  flashLight[0].lastUpdate = currentTime;
+  flashLight[1].lastUpdate = currentTime;
+  flashLight[2].lastUpdate = currentTime;
+  flashLight[3].lastUpdate = currentTime;
 }
 
 //////////////////////////////////////////////////
@@ -66,33 +66,33 @@ void lightCb(ConstLightPtr &_msg)
   ss >> indx;
   indx--;
 
-  bool flag = true;
+  bool indexInRange = true;
   if (indx < 0 || 3 < indx)
   {
-    flag = false;
+    indexInRange = false;
   }
-  EXPECT_TRUE(flag);
+  EXPECT_TRUE(indexInRange);
 
   // Get the current time
-  common::Time current_time = physics::get_world()->SimTime();
+  common::Time currentTime = physics::get_world()->SimTime();
 
   // Update to flash
   if (_msg->range() > 0)
   {
-    flash_light[indx].interval
-      = current_time.Double() - flash_light[indx].last_update.Double();
+    flashLight[indx].interval
+      = currentTime.Double() - flashLight[indx].lastUpdate.Double();
   }
   // Update to dim
   else
   {
-    flash_light[indx].duration
-      = current_time.Double() - flash_light[indx].last_update.Double();
+    flashLight[indx].duration
+      = currentTime.Double() - flashLight[indx].lastUpdate.Double();
   }
 
   // Update the last update time
-  flash_light[indx].last_update = current_time;
+  flashLight[indx].lastUpdate = currentTime;
 
-  f_called = true;
+  called = true;
 }
 
 //////////////////////////////////////////////////
@@ -110,48 +110,46 @@ TEST_F(FlashLightPluginTest, Blinking)
   InitRec();
 
   // Subscribe to plugin notifications
-  f_called = false;
-  transport::NodePtr node = transport::NodePtr(new transport::Node());
-  node->Init();
+  called = false;
   transport::SubscriberPtr sceneSub
-    = node->Subscribe("~/light/modify", &lightCb);
+    = this->node->Subscribe("~/light/modify", &lightCb);
 
   // Let the plugin blink the lights for a while
-  common::Time s_time = world->SimTime();
-  flash_light[0].last_update = s_time;
-  flash_light[1].last_update = s_time;
-  flash_light[2].last_update = s_time;
-  flash_light[3].last_update = s_time;
+  common::Time sTime = world->SimTime();
+  flashLight[0].lastUpdate = sTime;
+  flashLight[1].lastUpdate = sTime;
+  flashLight[2].lastUpdate = sTime;
+  flashLight[3].lastUpdate = sTime;
   world->Step(5000);
-  common::Time e_time = world->SimTime();
-  double last_update0 = flash_light[0].last_update.Double();
-  double last_update1 = flash_light[1].last_update.Double();
-  double last_update2 = flash_light[2].last_update.Double();
-  double last_update3 = flash_light[3].last_update.Double();
+  common::Time eTime = world->SimTime();
+  double lastUpdate0 = flashLight[0].lastUpdate.Double();
+  double lastUpdate1 = flashLight[1].lastUpdate.Double();
+  double lastUpdate2 = flashLight[2].lastUpdate.Double();
+  double lastUpdate3 = flashLight[3].lastUpdate.Double();
 
   // Make sure if the function was called
-  EXPECT_TRUE(f_called);
+  EXPECT_TRUE(called);
 
   // Verify only the supposed lights are updated
   // NOTE: Taking some errors caused by callback functions into consideration.
   //       Here, it is considered to be passed if the error is less than or
   //       equal to 0.01 sec.
   // NOTE: The first and second must have been updated within their phases.
-  EXPECT_TRUE(fabs(last_update0 - e_time.Double()) <= 0.41);
-  EXPECT_TRUE(fabs(last_update1 - e_time.Double()) <= 0.06);
+  EXPECT_TRUE(fabs(lastUpdate0 - eTime.Double()) <= 0.41);
+  EXPECT_TRUE(fabs(lastUpdate1 - eTime.Double()) <= 0.06);
   // NOTE: It is supposed to stop updating the third and forth lights just
   //       after the beginning.
-  EXPECT_TRUE(fabs(last_update2 - s_time.Double()) <= 0.01);
-  EXPECT_TRUE(fabs(last_update3 - s_time.Double()) <= 0.01);
+  EXPECT_TRUE(fabs(lastUpdate2 - sTime.Double()) <= 0.01);
+  EXPECT_TRUE(fabs(lastUpdate3 - sTime.Double()) <= 0.01);
 
   // Verify the lights blinking at the supposed duration and interval.
   // NOTE: Taking some errors caused by callback functions into consideration.
   //       Here, it is considered to be passed if the error is less than or
   //       equal to 0.01 sec.
-  EXPECT_TRUE(fabs(flash_light[0].duration - 0.1) <= 0.01);
-  EXPECT_TRUE(fabs(flash_light[0].interval - 0.4) <= 0.01);
-  EXPECT_TRUE(fabs(flash_light[1].duration - 0.05) <= 0.01);
-  EXPECT_TRUE(fabs(flash_light[1].interval - 0.05) <= 0.01);
+  EXPECT_TRUE(fabs(flashLight[0].duration - 0.1) <= 0.01);
+  EXPECT_TRUE(fabs(flashLight[0].interval - 0.4) <= 0.01);
+  EXPECT_TRUE(fabs(flashLight[1].duration - 0.05) <= 0.01);
+  EXPECT_TRUE(fabs(flashLight[1].interval - 0.05) <= 0.01);
 }
 
 //////////////////////////////////////////////////

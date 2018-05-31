@@ -71,8 +71,8 @@ namespace gazebo
     // Destructor
     public: ~FlashLightPlugin();
 
-    /// \brief Called when the plugin is loaded
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf);
+    // Documentation inherited.
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
     /// \brief Called by the world update start event
     public: virtual void OnUpdate();
@@ -80,47 +80,55 @@ namespace gazebo
     /// \brief Turn on a flash light specified by the light name
     /// If more than one link have lights with the identical name,
     /// the first appearing light in the list will be updated.
-    /// \param[in] _light_name The name of flash light
-    public: virtual bool TurnOn(const std::string &_light_name) final;
+    /// \param[in] _lightName The name of flash light
+    /// \return True if the specified light is found.
+    public: virtual bool TurnOn(const std::string &_lightName) final;
 
     /// \brief Turn on a flash light specified by the name and its link
-    /// \param[in] _light_name The name of flash light
-    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \return True if the specified light is found.
     public: virtual bool TurnOn(
-      const std::string &_light_name, const std::string &_link_name) final;
+      const std::string &_lightName, const std::string &_linkName) final;
 
     /// \brief Turn on all flash lights
+    /// \return True if there is one or more lights to turn on.
     public: virtual bool TurnOnAll() final;
 
     /// \brief Turn off a flash light specified by the name
     /// If more than one link have lights with the identical name,
     /// the first appearing light in the list will be updated.
-    /// \param[in] _light_name The name of flash light
-    public: virtual bool TurnOff(const std::string &_light_name) final;
+    /// \param[in] _lightName The name of flash light
+    /// \return True if the specified light is found.
+    public: virtual bool TurnOff(const std::string &_lightName) final;
 
     /// \brief Turn off a flash light specified by the name
-    /// \param[in] _light_name The name of flash light
-    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \return True if the specified light is found.
     public: virtual bool TurnOff(
-      const std::string &_light_name, const std::string &_link_name) final;
+      const std::string &_lightName, const std::string &_linkName) final;
 
     /// \brief Turn off all flash lights
+    /// \return True if there is one or more lights to turn off.
     public: virtual bool TurnOffAll() final;
 
     /// \brief Change the duration
-    /// \param[in] _light_name The name of flash light
-    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _duration The new duration time to set
+    /// \return True if the specified light is found.
     public: virtual bool ChangeDuration(
-      const std::string &_light_name, const std::string &_link_name,
+      const std::string &_lightName, const std::string &_linkName,
       const double &_duration) final;
 
     /// \brief Change the interval
-    /// \param[in] _light_name The name of flash light
-    /// \param[in] _link_name The name of the link holding the light
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _interval The new interval time to set
+    /// \return True if the specified light is found.
     public: virtual bool ChangeInterval(
-      const std::string &_light_name, const std::string &_link_name,
+      const std::string &_lightName, const std::string &_linkName,
       const double &_interval) final;
 
     /// \brief Pointer to private data

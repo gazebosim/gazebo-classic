@@ -28,96 +28,104 @@
 
 namespace gazebo
 {
-  /// \brief Internal data class to hold individual flash light settings
+  /// \brief Internal data class to hold individual flash light settings.
   class FlashLightSettings
   {
-    /// \brief The name of flash light
+    /// \brief The name of flash light.
     private: std::string name;
 
-    /// \brief Link which holds this flash light
+    /// \brief Link which holds this flash light.
     private: physics::LinkPtr link;
 
-    /// \brief The time at which the current phase started
-    private: common::Time start_time;
+    /// \brief The time at which the current phase started.
+    private: common::Time startTime;
 
-    /// \brief The current switch state (the light itself on or off)
-    private: bool f_switch_on;
+    /// \brief The current switch state (the light itself is on or off).
+    private: bool switchIsOn;
 
-    /// \brief The current flasshing state (flashing or not)
-    private: bool f_flashing;
+    /// \brief The current flasshing state (flashing or not).
+    private: bool flashing;
 
-    /// \brief The duration time to flash (in seconds)
+    /// \brief The duration time to flash (in seconds).
     private: double duration;
 
-    /// \brief The interval time between flashing (in seconds)
+    /// \brief The interval time between flashing (in seconds).
     //  When it is zero, the light is constant.
     private: double interval;
 
-    /// \brief The length of the ray (in meters)
+    /// \brief The length of the ray (in meters).
     private: double range;
 
-    /// \brief The pointer to node for communication
+    /// \brief The pointer to node for communication.
     private: static transport::NodePtr node;
 
-    /// \brief The pointer to publisher to send a command to a light
+    /// \brief The pointer to publisher to send a command to a light.
     private: static transport::PublisherPtr pubLight;
 
     /// \brief Flash the light
-    /// This function is internally used to update the light in the environment
+    /// This function is internally used to update the light in the environment.
     private: void Flash();
 
     /// \brief Dim the light
-    /// This function is internally used to update the light in the environment
+    /// This function is internally used to update the light in the environment.
     private: void Dim();
 
     /// \brief Constructor
+    /// \param[in] _model The Model pointer holding the light to control.
+    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+    /// \param[in] _currentTime The current time point.
     public: FlashLightSettings(
       const physics::ModelPtr &_model,
       const sdf::ElementPtr &_sdfFlashLight,
-      const common::Time &_current_time);
+      const common::Time &_currentTime);
 
-    /// \brief Update the light based on the given time
-    public: void UpdateLightInEnv(const common::Time &_current_time);
+    /// \brief Update the light based on the given time.
+    public: void UpdateLightInEnv(const common::Time &_currentTime);
 
-    /// \brief Getter of name
+    /// \brief Getter of name.
     public: const std::string Name() const;
 
-    /// \brief Getter of link
+    /// \brief Getter of link.
     public: const physics::LinkPtr Link() const;
 
-    /// \brief Switch on
+    /// \brief Switch on.
     public: void SwitchOn();
 
-    /// \brief Switch off
+    /// \brief Switch off.
     public: void SwitchOff();
 
-    /// \brief Set the duration time
+    /// \brief Set the duration time.
     public: void SetDuration(const double &_duration);
 
-    /// \brief Set the interval time
+    /// \brief Set the interval time.
     public: void SetInterval(const double &_interval);
   };
 
   class FlashLightPluginPrivate
   {
-    /// \brief pointer to the model
+    /// \brief pointer to the model.
     public: physics::ModelPtr model;
 
-    /// \brief pointer to the world
+    /// \brief pointer to the world.
     public: physics::WorldPtr world;
 
-    /// \brief list of light settings to control
-    public: std::vector< std::shared_ptr<FlashLightSettings> > list_flash_light;
+    /// \brief list of light settings to control.
+    public: std::vector< std::shared_ptr<FlashLightSettings> > listFlashLight;
 
-    /// \brief pointer to the update even connection
+    /// \brief pointer to the update even connection.
     public: event::ConnectionPtr updateConnection;
 
-    /// \brief Find a unit of settings by names
-    //  This is internally used to access an individual unit of light settings
+    /// \brief Find a unit of settings by names.
+    /// This is internally used to access an individual unit of light settings.
+    /// If the link name is blank, the first match of the light name in the list
+    /// will be returned.
+    /// \param[in] _lightName The name of the light.
+    /// \param[in] _linkName The name of the link holding the light.
+    /// \return A pointer to the specified settings or nullptr if not found.
     public:
       std::shared_ptr<FlashLightSettings>
         SettingsByLightNameAndLinkName(
-          const std::string &_light_name, const std::string &_link_name) const;
+          const std::string &_lightName, const std::string &_linkName) const;
   };
 }
 
@@ -138,7 +146,7 @@ void FlashLightSettings::Flash()
   // Send the message
   FlashLightSettings::pubLight->Publish(msg);
   // Update the state
-  this->f_flashing = true;
+  this->flashing = true;
 }
 
 //////////////////////////////////////////////////
@@ -151,14 +159,14 @@ void FlashLightSettings::Dim()
   // Send the message
   FlashLightSettings::pubLight->Publish(msg);
   // Update the state
-  this->f_flashing = false;
+  this->flashing = false;
 }
 
 //////////////////////////////////////////////////
 FlashLightSettings::FlashLightSettings(
   const physics::ModelPtr &_model,
   const sdf::ElementPtr &_sdfFlashLight,
-  const common::Time &_current_time)
+  const common::Time &_currentTime)
 {
   if (!FlashLightSettings::node)
   {
@@ -175,16 +183,16 @@ FlashLightSettings::FlashLightSettings(
   }
 
   // name
-  std::string light_id = _sdfFlashLight->Get<std::string>("light_id");
-  int pos_delim = light_id.find("/");
-  this->name = light_id.substr(pos_delim+1, light_id.length());
+  std::string lightId = _sdfFlashLight->Get<std::string>("light_id");
+  int posDelim = lightId.find("/");
+  this->name = lightId.substr(posDelim+1, lightId.length());
   // link which holds this light
-  this->link = _model->GetLink(light_id.substr(0, pos_delim));
+  this->link = _model->GetLink(lightId.substr(0, posDelim));
   // start time
-  this->start_time = _current_time;
+  this->startTime = _currentTime;
   // current states
-  this->f_switch_on = true;
-  this->f_flashing = true;
+  this->switchIsOn = true;
+  this->flashing = true;
   // duration
   if (_sdfFlashLight->HasElement("duration"))
   {
@@ -224,22 +232,22 @@ FlashLightSettings::FlashLightSettings(
 }
 
 //////////////////////////////////////////////////
-void FlashLightSettings::UpdateLightInEnv(const common::Time &_current_time)
+void FlashLightSettings::UpdateLightInEnv(const common::Time &_currentTime)
 {
   // reset the time at the and of each phase
-  if (_current_time.Double() - this->start_time.Double()
+  if (_currentTime.Double() - this->startTime.Double()
         > this->duration + this->interval)
   {
-    this->start_time = _current_time;
+    this->startTime = _currentTime;
   }
 
-  if (this->f_switch_on)
+  if (this->switchIsOn)
   {
     // time to dim
-    if (_current_time.Double() - this->start_time.Double()
+    if (_currentTime.Double() - this->startTime.Double()
           > this->duration)
     {
-      if (this->f_flashing == true)
+      if (this->flashing == true)
       {
         this->Dim();
       }
@@ -247,13 +255,13 @@ void FlashLightSettings::UpdateLightInEnv(const common::Time &_current_time)
     // time to flash
     else
     {
-      if (this->f_flashing == false)
+      if (this->flashing == false)
       {
         this->Flash();
       }
     }
   }
-  else if (this->f_flashing)
+  else if (this->flashing)
   {
     this->Dim();
   }
@@ -274,13 +282,13 @@ const physics::LinkPtr FlashLightSettings::Link() const
 //////////////////////////////////////////////////
 void FlashLightSettings::SwitchOn()
 {
-  this->f_switch_on = true;
+  this->switchIsOn = true;
 }
 
 //////////////////////////////////////////////////
 void FlashLightSettings::SwitchOff()
 {
-  this->f_switch_on = false;
+  this->switchIsOn = false;
 }
 
 //////////////////////////////////////////////////
@@ -298,24 +306,25 @@ void FlashLightSettings::SetInterval(const double &_interval)
 //////////////////////////////////////////////////
 std::shared_ptr<FlashLightSettings>
   FlashLightPluginPrivate::SettingsByLightNameAndLinkName(
-  const std::string &_light_name, const std::string &_link_name
+  const std::string &_lightName, const std::string &_linkName
 ) const
 {
   std::shared_ptr<FlashLightSettings> ptr;
 
   std::vector< std::shared_ptr<FlashLightSettings> >::const_iterator it;
-  for (it = this->list_flash_light.begin();
-    it != this->list_flash_light.end(); ++it)
+  for (it = this->listFlashLight.begin();
+    it != this->listFlashLight.end(); ++it)
   {
     std::shared_ptr<FlashLightSettings> set
       = (std::shared_ptr<FlashLightSettings>)*it;
 
-    if (set->Name() == _light_name)
+    if (set->Name() == _lightName)
     {
-      if (_link_name.length() == 0
-        || set->Link()->GetName() == _link_name)
+      if (_linkName.length() == 0
+        || set->Link()->GetName() == _linkName)
       {
         ptr = set;
+        break;
       }
     }
   }
@@ -342,7 +351,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->dataPtr->world = _parent->GetWorld();
 
   // Get the current time
-  common::Time current_time = this->dataPtr->world->SimTime();
+  common::Time currentTime = this->dataPtr->world->SimTime();
 
   // Get the parameters from sdf
   sdf::ElementPtr sdfFlashLight = _sdf->GetElement("flash_light");
@@ -355,10 +364,10 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       std::shared_ptr<FlashLightSettings> settings
         = std::make_shared<FlashLightSettings>(this->dataPtr->model,
                                                sdfFlashLight,
-                                               current_time);
+                                               currentTime);
 
       // Store the settings to the list
-      this->dataPtr->list_flash_light.push_back(settings);
+      this->dataPtr->listFlashLight.push_back(settings);
     }
     else
     {
@@ -387,17 +396,17 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // light_id required
     if (sdfFlashLight->HasElement("start"))
     {
-      std::string light_id = sdfFlashLight->Get<std::string>("light_id");
-      int pos_delim = light_id.find("/");
-      std::string light_name = light_id.substr(pos_delim+1, light_id.length());
-      std::string link_name = light_id.substr(0, pos_delim);
+      std::string lightId = sdfFlashLight->Get<std::string>("light_id");
+      int posDelim = lightId.find("/");
+      std::string lightName = lightId.substr(posDelim+1, lightId.length());
+      std::string linkName = lightId.substr(0, posDelim);
       if (sdfFlashLight->Get<bool>("start") == true)
       {
-        this->TurnOn(light_name, link_name);
+        this->TurnOn(lightName, linkName);
       }
       else
       {
-        this->TurnOff(light_name, link_name);
+        this->TurnOff(lightName, linkName);
       }
     }
 
@@ -412,163 +421,165 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void FlashLightPlugin::OnUpdate()
 {
-  common::Time current_time = this->dataPtr->world->SimTime();
+  common::Time currentTime = this->dataPtr->world->SimTime();
 
   std::vector< std::shared_ptr<FlashLightSettings> >::iterator it
-    = this->dataPtr->list_flash_light.begin();
+    = this->dataPtr->listFlashLight.begin();
 
-  while (it != this->dataPtr->list_flash_light.end())
+  while (it != this->dataPtr->listFlashLight.end())
   {
     std::shared_ptr<FlashLightSettings> set
       = (std::shared_ptr<FlashLightSettings>)*it;
 
     /// update the light
-    set->UpdateLightInEnv(current_time);
+    set->UpdateLightInEnv(currentTime);
 
     ++it;
   }
 }
 
 //////////////////////////////////////////////////
-bool FlashLightPlugin::TurnOn(const std::string &_light_name)
+bool FlashLightPlugin::TurnOn(const std::string &_lightName)
 {
-  return this->TurnOn(_light_name, "");
+  return this->TurnOn(_lightName, "");
 }
 
 //////////////////////////////////////////////////
 bool FlashLightPlugin::TurnOn(
-  const std::string &_light_name, const std::string &_link_name)
+  const std::string &_lightName, const std::string &_linkName)
 {
-  bool f_found = false;
+  bool found = false;
   std::shared_ptr<FlashLightSettings> set
-    = this->dataPtr->SettingsByLightNameAndLinkName(_light_name, _link_name);
+    = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set != NULL)
+  if (set != nullptr)
   {
     set->SwitchOn();
-    f_found = true;
+    found = true;
   }
   else
   {
-    gzerr << "light: [" + _link_name + "/" + _light_name
+    gzerr << "light: [" + _linkName + "/" + _lightName
      + "] does not exist." << std::endl;
   }
 
-  return f_found;
+  return found;
 }
 
 //////////////////////////////////////////////////
 bool FlashLightPlugin::TurnOnAll()
 {
-  bool f_found = false;
+  bool found = false;
 
   std::vector< std::shared_ptr<FlashLightSettings> >::iterator it;
-  for (it = this->dataPtr->list_flash_light.begin();
-    it != this->dataPtr->list_flash_light.end(); ++it)
+  for (it = this->dataPtr->listFlashLight.begin();
+    it != this->dataPtr->listFlashLight.end(); ++it)
   {
     std::shared_ptr<FlashLightSettings> set
       = (std::shared_ptr<FlashLightSettings>)*it;
 
     set->SwitchOn();
-    f_found = true;
+    found = true;
   }
 
-  if (f_found == false)
+  if (found == false)
     gzerr << "no flash lights exist to turn on." << std::endl;
 
-  return f_found;
+  return found;
 }
 
 //////////////////////////////////////////////////
-bool FlashLightPlugin::TurnOff(const std::string &_light_name)
+bool FlashLightPlugin::TurnOff(const std::string &_lightName)
 {
-  return this->TurnOff(_light_name, "");
+  return this->TurnOff(_lightName, "");
 }
 
 //////////////////////////////////////////////////
-bool FlashLightPlugin::TurnOff(const std::string &_light_name,
-  const std::string &_link_name)
+bool FlashLightPlugin::TurnOff(const std::string &_lightName,
+  const std::string &_linkName)
 {
-  bool f_found = false;
+  bool found = false;
   std::shared_ptr<FlashLightSettings> set
-    = this->dataPtr->SettingsByLightNameAndLinkName(_light_name, _link_name);
+    = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set != NULL)
+  if (set != nullptr)
   {
     set->SwitchOff();
-    f_found = true;
+    found = true;
   }
   else
   {
-    gzerr << "light: [" + _link_name + "/" + _light_name
+    gzerr << "light: [" + _linkName + "/" + _lightName
      + "] does not exist." << std::endl;
   }
 
-  return f_found;
+  return found;
 }
 
 //////////////////////////////////////////////////
 bool FlashLightPlugin::TurnOffAll()
 {
-  bool f_found = false;
+  bool found = false;
 
   std::vector< std::shared_ptr<FlashLightSettings> >::iterator it;
-  for (it = this->dataPtr->list_flash_light.begin();
-    it != this->dataPtr->list_flash_light.end(); ++it)
+  for (it = this->dataPtr->listFlashLight.begin();
+    it != this->dataPtr->listFlashLight.end(); ++it)
   {
     std::shared_ptr<FlashLightSettings> set
       = (std::shared_ptr<FlashLightSettings>)*it;
 
     set->SwitchOff();
-    f_found = true;
+    found = true;
   }
 
-  if (f_found == false)
+  if (found == false)
     gzerr << "no flash lights exist to turn off." << std::endl;
 
-  return f_found;
+  return found;
 }
 
 //////////////////////////////////////////////////
 bool FlashLightPlugin::ChangeDuration(
-  const std::string &_light_name, const std::string &_link_name,
+  const std::string &_lightName, const std::string &_linkName,
   const double &_duration
 )
 {
-  bool f_found = false;
+  bool found = false;
   std::shared_ptr<FlashLightSettings> set
-    = this->dataPtr->SettingsByLightNameAndLinkName(_light_name, _link_name);
+    = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set != NULL)
+  if (set != nullptr)
   {
     set->SetDuration(_duration);
+    found = true;
   }
   else
   {
-    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+    gzerr << "light <" + _lightName + "> does not exist." << std::endl;
   }
 
-  return f_found;
+  return found;
 }
 
 //////////////////////////////////////////////////
 bool FlashLightPlugin::ChangeInterval(
-  const std::string &_light_name, const std::string &_link_name,
+  const std::string &_lightName, const std::string &_linkName,
   const double &_interval
 )
 {
-  bool f_found = false;
+  bool found = false;
   std::shared_ptr<FlashLightSettings> set
-    = this->dataPtr->SettingsByLightNameAndLinkName(_light_name, _link_name);
+    = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set != NULL)
+  if (set != nullptr)
   {
     set->SetInterval(_interval);
+    found = true;
   }
   else
   {
-    gzerr << "light <" + _light_name + "> does not exist." << std::endl;
+    gzerr << "light <" + _lightName + "> does not exist." << std::endl;
   }
 
-  return f_found;
+  return found;
 }
