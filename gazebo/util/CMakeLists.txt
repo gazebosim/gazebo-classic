@@ -21,6 +21,10 @@ set (sources
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
+  ProfileNode.cc
+  ProfileManager.cc
+  ProfileIterator.cc
+  Profiler.cc
 )
 
 if (NOT USE_EXTERNAL_TINYXML2)
@@ -40,6 +44,7 @@ set (headers
   IgnMsgSdf.hh
   IntrospectionClient.hh
   IntrospectionManager.hh
+  Profiler.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
@@ -49,6 +54,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  Profiler_TEST.cc
   IgnMsgSdf_TEST.cc
   IntrospectionClient_TEST.cc
   IntrospectionManager_TEST.cc

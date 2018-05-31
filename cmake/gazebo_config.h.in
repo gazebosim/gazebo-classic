@@ -29,6 +29,7 @@
 #cmakedefine INCLUDE_RTSHADER 1
 #cmakedefine HAVE_GTS 1
 #cmakedefine ENABLE_DIAGNOSTICS 1
+#cmakedefine ENABLE_PROFILER 1
 #cmakedefine HAVE_GDAL 1
 #cmakedefine HAVE_USB 1
 #cmakedefine HAVE_OCULUS 1
@@ -39,6 +40,8 @@
 #cmakedefine USE_EXTERNAL_TINYXML2 1
 #cmakedefine HAVE_OSVR 1
 #cmakedefine HAVE_IGNITION_FUEL_TOOLS 1
+#cmakedefine GAZEBO_THREAD_LOCAL 1
+#define THREADLOCAL @THREADLOCAL@
 
 #ifdef GAZEBO_BUILD_TYPE_PROFILE
 #include <gperftools/heap-checker.h>
