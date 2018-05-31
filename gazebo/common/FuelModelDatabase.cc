@@ -203,10 +203,6 @@ std::string FuelModelDatabase::ModelPath(const std::string &_uri,
   {
     if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
     {
-      gzmsg << "Found model URL: " << std::endl
-            << "          " << _uri << std::endl
-            << "      cached on: " << std::endl
-            << "          " << path << std::endl;
       return path;
     }
   }
@@ -241,13 +237,6 @@ std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
   if (!this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
   {
     gzerr << "Unable to download model[" << _uri << "]" << std::endl;
-  }
-  else
-  {
-    gzmsg << "Found file URL: " << std::endl
-          << "          " << _uri << std::endl
-          << "      cached on: " << std::endl
-          << "          " << path << std::endl;
   }
 
   return path;
