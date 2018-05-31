@@ -31,6 +31,38 @@ namespace gazebo
   /// \brief Internal data class to hold individual flash light settings.
   class FlashLightSettings
   {
+    /// \brief Constructor
+    /// \param[in] _model The Model pointer holding the light to control.
+    /// \param[in] _pubLight The publisher to send a message
+    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+    /// \param[in] _currentTime The current time point.
+    public: FlashLightSettings(
+      const physics::ModelPtr &_model,
+      const transport::PublisherPtr &_pubLight,
+      const sdf::ElementPtr &_sdfFlashLight,
+      const common::Time &_currentTime);
+
+    /// \brief Update the light based on the given time.
+    public: void UpdateLightInEnv(const common::Time &_currentTime);
+
+    /// \brief Getter of name.
+    public: const std::string Name() const;
+
+    /// \brief Getter of link.
+    public: const physics::LinkPtr Link() const;
+
+    /// \brief Switch on (enable the flashlight).
+    public: void SwitchOn();
+
+    /// \brief Switch off (disable the flashlight).
+    public: void SwitchOff();
+
+    /// \brief Set the duration time.
+    public: void SetDuration(const double &_duration);
+
+    /// \brief Set the interval time.
+    public: void SetInterval(const double &_interval);
+    
     /// \brief The name of flash light.
     private: std::string name;
 
@@ -66,38 +98,6 @@ namespace gazebo
     /// \brief Dim the light
     /// This function is internally used to update the light in the environment.
     private: void Dim();
-
-    /// \brief Constructor
-    /// \param[in] _model The Model pointer holding the light to control.
-    /// \param[in] _pubLight The publisher to send a message
-    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
-    /// \param[in] _currentTime The current time point.
-    public: FlashLightSettings(
-      const physics::ModelPtr &_model,
-      const transport::PublisherPtr &_pubLight,
-      const sdf::ElementPtr &_sdfFlashLight,
-      const common::Time &_currentTime);
-
-    /// \brief Update the light based on the given time.
-    public: void UpdateLightInEnv(const common::Time &_currentTime);
-
-    /// \brief Getter of name.
-    public: const std::string Name() const;
-
-    /// \brief Getter of link.
-    public: const physics::LinkPtr Link() const;
-
-    /// \brief Switch on (enable the flashlight).
-    public: void SwitchOn();
-
-    /// \brief Switch off (disable the flashlight).
-    public: void SwitchOff();
-
-    /// \brief Set the duration time.
-    public: void SetDuration(const double &_duration);
-
-    /// \brief Set the interval time.
-    public: void SetInterval(const double &_interval);
   };
 
   class FlashLightPluginPrivate
