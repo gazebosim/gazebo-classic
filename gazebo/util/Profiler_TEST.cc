@@ -32,7 +32,8 @@ TEST_F(DiagnosticsTest, Diagnostics)
 
   mgr->Reset();
 
-  for(size_t ii = 0; ii < 100; ++ii) {
+  for (size_t ii = 0; ii < 100; ++ii) 
+  {
     mgr->Increment_Frame_Counter();
     mgr->Start_Profile("outer");
     {
