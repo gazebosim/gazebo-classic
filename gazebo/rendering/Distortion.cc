@@ -409,7 +409,12 @@ ignition::math::Vector2d Distortion::Distort(
 //////////////////////////////////////////////////
 void Distortion::SetCrop(const bool _crop)
 {
-  this->dataPtr->distortionCrop = _crop;
+  // Only update the distortion scale if the crop value is going to flip.
+  if (this->dataPtr->distortionCrop != _crop)
+  {
+    this->dataPtr->distortionCrop = _crop;
+    this->CalculateAndApplyDistortionScale();
+  }
 }
 
 //////////////////////////////////////////////////
