@@ -40,17 +40,17 @@ namespace gazebo
     /// \brief The time at which the current phase started.
     private: common::Time startTime;
 
-    /// \brief The current switch state (the light itself is on or off).
-    private: bool switchIsOn;
+    /// \brief The current switch state (the light itself is active or not).
+    private: bool switchOn;
 
-    /// \brief The current flasshing state (flashing or not).
+    /// \brief The current flasshing state (flash or dim).
     private: bool flashing;
 
     /// \brief The duration time to flash (in seconds).
     private: double duration;
 
     /// \brief The interval time between flashing (in seconds).
-    //  When it is zero, the light is constant.
+    /// When it is zero, the light is constant.
     private: double interval;
 
     /// \brief The length of the ray (in meters).
@@ -87,10 +87,10 @@ namespace gazebo
     /// \brief Getter of link.
     public: const physics::LinkPtr Link() const;
 
-    /// \brief Switch on.
+    /// \brief Switch on (enable the flashlight).
     public: void SwitchOn();
 
-    /// \brief Switch off.
+    /// \brief Switch off (disable the flashlight).
     public: void SwitchOff();
 
     /// \brief Set the duration time.
@@ -111,10 +111,10 @@ namespace gazebo
     /// \brief The pointer to node for communication.
     public: transport::NodePtr node;
 
-    /// \brief The pointer to publisher to send a command to a light.
+    /// \brief The pointer to publisher to send a command to the light.
     public: transport::PublisherPtr pubLight;
 
-    /// \brief list of light settings to control.
+    /// \brief The list of light settings to control.
     public: std::vector< std::shared_ptr<FlashLightSettings> > listFlashLight;
 
     /// \brief pointer to the update even connection.
@@ -122,8 +122,8 @@ namespace gazebo
 
     /// \brief Find a unit of settings by names.
     /// This is internally used to access an individual unit of light settings.
-    /// If the link name is blank, the first match of the light name in the list
-    /// will be returned.
+    /// If the link name is blank (""), the first match of the light name in the
+    /// list will be returned.
     /// \param[in] _lightName The name of the light.
     /// \param[in] _linkName The name of the link holding the light.
     /// \return A pointer to the specified settings or nullptr if not found.
@@ -181,7 +181,7 @@ FlashLightSettings::FlashLightSettings(
   // start time
   this->startTime = _currentTime;
   // current states
-  this->switchIsOn = true;
+  this->switchOn = true;
   this->flashing = true;
   // duration
   if (_sdfFlashLight->HasElement("duration"))
@@ -224,18 +224,17 @@ FlashLightSettings::FlashLightSettings(
 //////////////////////////////////////////////////
 void FlashLightSettings::UpdateLightInEnv(const common::Time &_currentTime)
 {
-  // reset the time at the and of each phase
+  // reset the time at the end of each phase
   if (_currentTime.Double() - this->startTime.Double()
         > this->duration + this->interval)
   {
     this->startTime = _currentTime;
   }
 
-  if (this->switchIsOn)
+  if (this->switchOn)
   {
     // time to dim
-    if (_currentTime.Double() - this->startTime.Double()
-          > this->duration)
+    if (_currentTime.Double() - this->startTime.Double() > this->duration)
     {
       if (this->flashing == true)
       {
@@ -272,13 +271,13 @@ const physics::LinkPtr FlashLightSettings::Link() const
 //////////////////////////////////////////////////
 void FlashLightSettings::SwitchOn()
 {
-  this->switchIsOn = true;
+  this->switchOn = true;
 }
 
 //////////////////////////////////////////////////
 void FlashLightSettings::SwitchOff()
 {
-  this->switchIsOn = false;
+  this->switchOn = false;
 }
 
 //////////////////////////////////////////////////
@@ -296,8 +295,7 @@ void FlashLightSettings::SetInterval(const double &_interval)
 //////////////////////////////////////////////////
 std::shared_ptr<FlashLightSettings>
   FlashLightPluginPrivate::SettingsByLightNameAndLinkName(
-  const std::string &_lightName, const std::string &_linkName
-) const
+  const std::string &_lightName, const std::string &_linkName) const
 {
   std::shared_ptr<FlashLightSettings> ptr;
 
@@ -378,7 +376,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
   }
 
-  // Turn on/off the lights if <start> element is given
+  // Turn on/off all the lights if <start> element is given
   if (_sdf->HasElement("start"))
   {
     if (_sdf->Get<bool>("start") == true)
@@ -390,6 +388,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       this->TurnOffAll();
     }
   }
+  // Turn on/off a specific light if <start> is specifically given.
   sdfFlashLight = _sdf->GetElement("flash_light");
   while (sdfFlashLight)
   {
