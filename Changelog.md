@@ -11,6 +11,9 @@
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
+1. Save model materials and meshes when logging
+    * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
@@ -648,6 +651,9 @@
 
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
+
+1. Save model materials and meshes when logging
+    * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
