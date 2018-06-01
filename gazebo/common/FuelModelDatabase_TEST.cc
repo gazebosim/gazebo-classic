@@ -39,7 +39,7 @@ TEST(FuelModelDatabaseTest, FuelDown)
   std::condition_variable cv;
   bool cbExecuted = false;
 
-  std::function<void(
+  std::function <void(
       const std::vector<ignition::fuel_tools::ModelIdentifier> &)> cb =
       [&cbExecuted, &cv](
       const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)

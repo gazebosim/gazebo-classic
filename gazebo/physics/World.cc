@@ -37,8 +37,14 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
 
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  #include <ignition/common/URI.hh>
+#endif
+
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
+
+#include "gazebo/gazebo_config.h"
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -48,9 +54,9 @@
 #include "gazebo/util/LogPlay.hh"
 
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-  #include <ignition/common/URI.hh>
   #include "gazebo/common/FuelModelDatabase.hh"
 #endif
+
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Events.hh"

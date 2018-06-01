@@ -581,7 +581,7 @@ void InsertModelWidget::PopulateFuelServers()
 
     // This lamda will be executed asynchronously when we get the list of models
     // from this Ignition Fuel Server.
-    std::function<void(
+    std::function <void(
         const std::vector<ignition::fuel_tools::ModelIdentifier> &)> f =
         [serverURL, this](
             const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)

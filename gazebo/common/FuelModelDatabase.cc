@@ -26,7 +26,7 @@
 
 #include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
-#include <ignition/fuel_tools.hh>
+#include <ignition/fuel_tools/FuelClient.hh>
 #include <sdf/sdf.hh>
 
 #include "gazebo/gazebo_config.h"
@@ -92,7 +92,7 @@ std::vector<ignition::fuel_tools::ServerConfig> FuelModelDatabase::Servers()
 
 /////////////////////////////////////////////////
 void FuelModelDatabase::Models(
-    const ignition::fuel_tools::ServerConfig &_server, std::function<void
+    const ignition::fuel_tools::ServerConfig &_server, std::function <void
     (const std::vector<ignition::fuel_tools::ModelIdentifier> &)> &_func)
 {
   std::thread t([this, _func, _server]

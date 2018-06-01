@@ -69,7 +69,7 @@ namespace gazebo
       /// unique identifier of a model.
       public: virtual void Models(
           const ignition::fuel_tools::ServerConfig &_server,
-          std::function<void (
+          std::function <void (
           const std::vector<ignition::fuel_tools::ModelIdentifier> &)>
           &_func);
 

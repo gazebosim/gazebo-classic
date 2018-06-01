@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _NODE_HH_
-#define _NODE_HH_
+#ifndef GAZEBO_TRANSPORT_NODE_HH_
+#define GAZEBO_TRANSPORT_NODE_HH_
 
 #include <tbb/task.h>
 #include <boost/bind.hpp>

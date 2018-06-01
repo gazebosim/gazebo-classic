@@ -21,11 +21,12 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <vector>
 #include <boost/thread/mutex.hpp>
 
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-  #include <ignition/fuel_tools.hh>
-  #include "gazebo/common/FuelModelDatabase.hh"
+  #include <ignition/fuel_tools/FuelClient.hh>
+  #include <ignition/fuel_tools/ModelIdentifier.hh>
 #endif
 
 #include "gazebo/common/Event.hh"

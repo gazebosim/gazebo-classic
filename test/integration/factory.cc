@@ -958,6 +958,7 @@ TEST_F(FactoryTest, FilenameModelDatabase)
 }
 
 //////////////////////////////////////////////////
+#ifdef HAVE_IGNITION_FUEL_TOOLS
 TEST_F(FactoryTest, FilenameFuelURL)
 {
   this->Load("worlds/empty.world", true);
@@ -984,6 +985,7 @@ TEST_F(FactoryTest, FilenameFuelURL)
   // Check model was spawned
   ASSERT_NE(nullptr, world->ModelByName("test_box"));
 }
+#endif
 
 //////////////////////////////////////////////////
 TEST_P(FactoryTest, InvalidMeshInsertion)
