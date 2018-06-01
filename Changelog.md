@@ -2,6 +2,9 @@
 
 ## Gazebo 9.x.x (2018-xx-xx)
 
+
+## Gazebo 9.1.0 (2018-06-01)
+
 1. Fuel: Support models with full Fuel URLs in <uri>
     * [Pull request 2962](https://bitbucket.org/osrf/gazebo/pull-request/2962)
 
