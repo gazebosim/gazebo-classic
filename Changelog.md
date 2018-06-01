@@ -43,6 +43,9 @@
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
+1. Save model materials and meshes when logging
+    * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
@@ -288,6 +291,9 @@
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
+1. Save model materials and meshes when logging
+    * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
 
@@ -387,6 +393,9 @@
     * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
     * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
 
+1. Added a plugin to detect if an entity is inside a given volume in space
+    * [Pull request 2780](https://bitbucket.org/osrf/gazebo/pull-requests/2780)
+
 1. Add Static Map Plugin for creating textured map model
     * [Pull request 2834](https://bitbucket.org/osrf/gazebo/pull-requests/2834)
 
@@ -441,10 +450,6 @@
 
 1. Allow marker requests to be received from server plugins.
     * [Pull request 2858](https://bitbucket.org/osrf/gazebo/pull-requests/2858)
-
-1. Process insertions and deletions on gz log echo
-    * [Pull request 2608](https://bitbucket.org/osrf/gazebo/pull-request/2608)
-    * [Issue 2136](https://bitbucket.org/osrf/gazebo/issues/2136)
 
 1. Call DisconnectNewImageFrame in the CameraPlugin destructor
     * [Pull request 2815](https://bitbucket.org/osrf/gazebo/pull-request/2815)
@@ -928,6 +933,9 @@
 
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
+
+1. Save model materials and meshes when logging
+    * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
