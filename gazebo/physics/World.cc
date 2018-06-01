@@ -160,10 +160,10 @@ World::World(const std::string &_name)
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
 
-   // Make sure dbs are initialized
-   common::ModelDatabase::Instance();
+  // Make sure dbs are initialized
+  common::ModelDatabase::Instance();
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-   common::FuelModelDatabase::Instance();
+  common::FuelModelDatabase::Instance();
 #endif
 }
 
