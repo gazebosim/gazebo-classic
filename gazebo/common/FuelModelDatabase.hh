@@ -69,7 +69,7 @@ namespace gazebo
       /// unique identifier of a model.
       public: virtual void Models(
           const ignition::fuel_tools::ServerConfig &_server,
-          std::function<void (
+          std::function <void (
           const std::vector<ignition::fuel_tools::ModelIdentifier> &)>
           &_func);
 
@@ -95,10 +95,15 @@ namespace gazebo
       /// Get the path to a model based on a URI. If the model is on
       /// a remote server, then the model fetched and installed locally.
       /// \param[in] _uri the model uri
-      /// \param[in] _forceDownload True to skip searching local paths.
-      /// \return path to a model directory
+      /// \param[in] _forceDownload True to skip searching local cache.
+      /// \return Local path to a model directory
       public: std::string ModelPath(const std::string &_uri,
         const bool _forceDownload = false);
+
+      /// \brief Get the full local path to a cached file based on its URI.
+      /// \param[in] _uri The file's URI
+      /// \return Local path to the file
+      public: std::string CachedFilePath(const std::string &_uri);
 
       /// \brief Private data.
       private: std::unique_ptr<FuelModelDatabasePrivate> dataPtr;

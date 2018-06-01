@@ -37,8 +37,15 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
 
+#include <gazebo/gazebo_config.h>
+
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
+
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  #include <ignition/common/URI.hh>
+  #include "gazebo/common/FuelModelDatabase.hh"
+#endif
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -155,6 +162,12 @@ World::World(const std::string &_name)
   this->dataPtr->connections.push_back(
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
+
+  // Make sure dbs are initialized
+  common::ModelDatabase::Instance();
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  common::FuelModelDatabase::Instance();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -1959,8 +1972,22 @@ void World::ProcessFactoryMsgs()
       else if (factoryMsg.has_sdf_filename() &&
               !factoryMsg.sdf_filename().empty())
       {
-        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-            factoryMsg.sdf_filename());
+        std::string filename;
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+        // If http(s), look at Fuel
+        auto uri = ignition::common::URI(factoryMsg.sdf_filename());
+        if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
+        {
+          filename = common::FuelModelDatabase::Instance()->ModelFile(
+              factoryMsg.sdf_filename());
+        }
+        // Otherwise, look at database
+        else
+#endif
+        {
+          filename = common::ModelDatabase::Instance()->GetModelFile(
+              factoryMsg.sdf_filename());
+        }
 
         if (!sdf::readFile(filename, this->dataPtr->factorySDF))
         {
