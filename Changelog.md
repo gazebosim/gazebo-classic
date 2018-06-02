@@ -2,6 +2,9 @@
 
 ## Gazebo 7.XX.X (2018-XX-XX)
 
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
