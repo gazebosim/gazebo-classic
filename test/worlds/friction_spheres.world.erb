@@ -177,6 +177,71 @@
 <%
     end
   end
+
+  # add box next to lowball to test collision with multiple contact points
+  mass_slip.keys.each_with_index do |ms_name, ii|
+    ms = mass_slip[ms_name]
+    box_mass = ms[:mass]
+    box_ixx  = 1.0/3.0 * box_mass * ball_radius**2
+    box_iyy  = 1.0/3.0 * box_mass * ball_radius**2
+    box_izz  = 1.0/3.0 * box_mass * ball_radius**2
+    box_ixy = 0.0
+    box_ixz = 0.0
+    box_iyz = 0.0
+    slip = ms[:slip]
+    friction = 0.5
+    color = ms[:color]
+    model_name = "boxball_#{ms_name}"
+%>
+    <model name="<%= "#{model_name}" %>">
+      <pose><%= 2*(ii+0.5) %> 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 <%= ball_radius %>  0 0 0</pose>
+        <inertial>
+          <mass><%= box_mass %></mass>
+          <inertia>
+            <ixx><%= box_ixx %></ixx>
+            <iyy><%= box_iyy %></iyy>
+            <izz><%= box_izz %></izz>
+            <ixy><%= box_ixy %></ixy>
+            <ixz><%= box_ixz %></ixz>
+            <iyz><%= box_iyz %></iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= a_to_s(2*ball_radius * Vector[1, 1, 1]) %></size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu><%= friction %></mu>
+                <mu2><%= friction %></mu2>
+                <slip1><%= slip %></slip1>
+                <slip2><%= slip %></slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= a_to_s(2*ball_radius * Vector[1, 1, 1]) %></size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/<%= color %></name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+<%
+  end
 %>
   </world>
 </sdf>

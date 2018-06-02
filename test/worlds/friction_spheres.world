@@ -1564,5 +1564,293 @@
       </link>
     </model>
 
+    <model name="boxball_0.2a">
+      <pose>1.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.013333333333333336</ixx>
+            <iyy>0.013333333333333336</iyy>
+            <izz>0.013333333333333336</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.2</slip1>
+                <slip2>0.2</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boxball_0.2b">
+      <pose>3.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>2.0</mass>
+          <inertia>
+            <ixx>0.026666666666666672</ixx>
+            <iyy>0.026666666666666672</iyy>
+            <izz>0.026666666666666672</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.1</slip1>
+                <slip2>0.1</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boxball_0.4a">
+      <pose>5.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>2.0</mass>
+          <inertia>
+            <ixx>0.026666666666666672</ixx>
+            <iyy>0.026666666666666672</iyy>
+            <izz>0.026666666666666672</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.2</slip1>
+                <slip2>0.2</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boxball_0.4b">
+      <pose>7.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>4.0</mass>
+          <inertia>
+            <ixx>0.053333333333333344</ixx>
+            <iyy>0.053333333333333344</iyy>
+            <izz>0.053333333333333344</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.1</slip1>
+                <slip2>0.1</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boxball_0.6a">
+      <pose>9.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>3.0</mass>
+          <inertia>
+            <ixx>0.04000000000000001</ixx>
+            <iyy>0.04000000000000001</iyy>
+            <izz>0.04000000000000001</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.2</slip1>
+                <slip2>0.2</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="boxball_0.6b">
+      <pose>11.0 0 0  0 0 0</pose>
+      <link name="link">
+        <pose>0 0 0.2  0 0 0</pose>
+        <inertial>
+          <mass>6.0</mass>
+          <inertia>
+            <ixx>0.08000000000000002</ixx>
+            <iyy>0.08000000000000002</iyy>
+            <izz>0.08000000000000002</izz>
+            <ixy>0.0</ixy>
+            <ixz>0.0</ixz>
+            <iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>0.5</mu>
+                <mu2>0.5</mu2>
+                <slip1>0.1</slip1>
+                <slip2>0.1</slip2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.4 0.4 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
   </world>
 </sdf>
