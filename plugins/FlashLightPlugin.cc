@@ -29,6 +29,9 @@
 namespace gazebo
 {
   /// \brief Internal data class to hold individual flash light settings.
+  /// Settings for each flash light is separately stored in a
+  /// FlashLightSettings class, which takes care of dynamic specifications
+  /// such as duration and interval.
   class FlashLightSettings
   {
     /// \brief Constructor
@@ -62,7 +65,7 @@ namespace gazebo
 
     /// \brief Set the interval time.
     public: void SetInterval(const double &_interval);
-    
+
     /// \brief The name of flash light.
     private: std::string name;
 

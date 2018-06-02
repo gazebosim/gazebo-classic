@@ -18,8 +18,8 @@
 #ifndef GAZEBO_PLUGINS_FLASHLIGHTPLUGIN_HH_
 #define GAZEBO_PLUGINS_FLASHLIGHTPLUGIN_HH_
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -34,10 +34,13 @@ namespace gazebo
   // by <flash_light> as a parameter.
   // The light is specified by <light_id>, including link and light names
   // separated by a slash "/".
-  // <start> is optional. It indicates whehter it starts flashing from the
+  // <start> is optional. It indicates whether it starts flashing from the
   // beginning. If <start> is directly under the <plugin>, it affects all
   // the lights. Otherwise, it individually affects the corresponding <light>
   // element.
+  // <duration> represents the time to flash in seconds. <interval> is the time
+  // to dim in seconds. That is, the phase is determined as the sume of them:
+  // duration + interval.
   //
   // <start>true</start>
   // <flash_light>
@@ -56,69 +59,65 @@ namespace gazebo
   //
   // More than one <flash_light> can exist.
   //
-  // Settings for each flash light is separately stored in a
-  // FlashLightSettings class, which takes care of dynamic specifications
-  // such as duration and interval.
-  //
   // NOTE: This base class provides basic functions to turn the lights on/off.
   // Users can create their own flash light plugin by inheriting this base
-  // model.
+  // model plugin.
   //
   class GAZEBO_VISIBLE FlashLightPlugin : public ModelPlugin
   {
     // Constructor
     public: FlashLightPlugin();
     // Destructor
-    public: ~FlashLightPlugin();
+    public: virtual ~FlashLightPlugin();
 
     // Documentation inherited.
     public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
     /// \brief Called by the world update start event
-    public: virtual void OnUpdate();
+    protected: virtual void OnUpdate();
 
     /// \brief Turn on a flash light specified by the light name
     /// If more than one link have lights with the identical name,
     /// the first appearing light in the list will be updated.
     /// \param[in] _lightName The name of flash light
     /// \return True if the specified light is found.
-    public: virtual bool TurnOn(const std::string &_lightName) final;
+    protected: virtual bool TurnOn(const std::string &_lightName) final;
 
     /// \brief Turn on a flash light specified by the name and its link
     /// \param[in] _lightName The name of flash light
     /// \param[in] _linkName The name of the link holding the light
     /// \return True if the specified light is found.
-    public: virtual bool TurnOn(
+    protected: virtual bool TurnOn(
       const std::string &_lightName, const std::string &_linkName) final;
 
     /// \brief Turn on all flash lights
     /// \return True if there is one or more lights to turn on.
-    public: virtual bool TurnOnAll() final;
+    protected: virtual bool TurnOnAll() final;
 
     /// \brief Turn off a flash light specified by the name
     /// If more than one link have lights with the identical name,
     /// the first appearing light in the list will be updated.
     /// \param[in] _lightName The name of flash light
     /// \return True if the specified light is found.
-    public: virtual bool TurnOff(const std::string &_lightName) final;
+    protected: virtual bool TurnOff(const std::string &_lightName) final;
 
     /// \brief Turn off a flash light specified by the name
     /// \param[in] _lightName The name of flash light
     /// \param[in] _linkName The name of the link holding the light
     /// \return True if the specified light is found.
-    public: virtual bool TurnOff(
+    protected: virtual bool TurnOff(
       const std::string &_lightName, const std::string &_linkName) final;
 
     /// \brief Turn off all flash lights
     /// \return True if there is one or more lights to turn off.
-    public: virtual bool TurnOffAll() final;
+    protected: virtual bool TurnOffAll() final;
 
     /// \brief Change the duration
     /// \param[in] _lightName The name of flash light
     /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _duration The new duration time to set
     /// \return True if the specified light is found.
-    public: virtual bool ChangeDuration(
+    protected: virtual bool ChangeDuration(
       const std::string &_lightName, const std::string &_linkName,
       const double &_duration) final;
 
@@ -127,7 +126,7 @@ namespace gazebo
     /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _interval The new interval time to set
     /// \return True if the specified light is found.
-    public: virtual bool ChangeInterval(
+    protected: virtual bool ChangeInterval(
       const std::string &_lightName, const std::string &_linkName,
       const double &_interval) final;
 
