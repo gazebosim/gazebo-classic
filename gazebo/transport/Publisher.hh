@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef _PUBLISHER_HH_
-#define _PUBLISHER_HH_
+#ifndef GAZEBO_TRANSPORT_PUBLISHER_HH_
+#define GAZEBO_TRANSPORT_PUBLISHER_HH_
 
 #include <google/protobuf/message.h>
 #include <boost/thread.hpp>
