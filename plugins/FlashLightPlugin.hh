@@ -29,40 +29,46 @@ namespace gazebo
   // forward declaration
   class FlashLightPluginPrivate;
 
-  /// \brief A plugin that turns on/off a light component in the model.
-  // This plugin accesses <light> elements in the model specified
-  // by <flash_light> as a parameter.
-  // The light is specified by <light_id>, including link and light names
-  // separated by a slash "/".
-  // <start> is optional. It indicates whether it starts flashing from the
-  // beginning. If <start> is directly under the <plugin>, it affects all
-  // the lights. Otherwise, it individually affects the corresponding <light>
-  // element.
-  // <duration> represents the time to flash in seconds. <interval> is the time
-  // to dim in seconds. That is, the phase is determined as the sume of them:
-  // duration + interval.
-  //
-  // <start>true</start>
-  // <flash_light>
-  //  <light_id>link1/light_source</light_id>
-  //  <duration>0.1</duration>
-  //  <interval>0.4</interval>
-  //  <start>true</start>
-  // </flash_light>
-  // <flash_light>
-  //  <light_id>link1/light_source2</light_id>
-  //  <duration>0.8</duration>
-  //  <interval>0.2</interval>
-  //  <start>false</start>
-  // </flash_light>
-  // ...
-  //
-  // More than one <flash_light> can exist.
-  //
-  // NOTE: This base class provides basic functions to turn the lights on/off.
-  // Users can create their own flash light plugin by inheriting this base
-  // model plugin.
-  //
+  /// \brief A plugin that blinks a light component in the model.
+  /// This plugin accesses <light> elements in the model specified
+  /// by <flash_light> as a parameter.
+  ///
+  /// NOTE: This base class provides basic functions to control the lights.
+  /// Users can create their own flash light plugin by inheriting this base
+  /// model plugin.
+  ///
+  /// A light is specified by <light_id>, including link and light names
+  /// separated by a slash "/".
+  ///
+  /// <enable> is optional. It indicates whether a light starts flashing from
+  /// the beginning. If <enable> is directly under the <plugin>, it affects all
+  /// the lights. Otherwise, it individually affects the corresponding <light>
+  /// element. If <enable> is false, the light is off, and it is  necessary to
+  /// call TurnOn() or TurnOnAll() in an inherited class to enable the light.
+  /// If <enable> is not given, the light is enabled in default.
+  ///
+  /// <duration> and <interval> represent the time to flash and dim in seconds,
+  /// respectively. That is, the phase is determined as the sum of them:
+  /// duration + interval.
+  ///
+  /// Example:
+  /// <enable>true</enable>
+  /// <flash_light>
+  ///  <light_id>link1/light_source</light_id>
+  ///  <duration>0.1</duration>
+  ///  <interval>0.4</interval>
+  ///  <enable>true</enable>
+  /// </flash_light>
+  /// <flash_light>
+  ///  <light_id>link1/light_source2</light_id>
+  ///  <duration>0.8</duration>
+  ///  <interval>0.2</interval>
+  ///  <enable>false</enable>
+  /// </flash_light>
+  /// ...
+  ///
+  /// More than one <flash_light> can exist.
+  ///
   class GAZEBO_VISIBLE FlashLightPlugin : public ModelPlugin
   {
     // Constructor

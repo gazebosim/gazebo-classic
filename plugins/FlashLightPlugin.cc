@@ -379,10 +379,10 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
   }
 
-  // Turn on/off all the lights if <start> element is given
-  if (_sdf->HasElement("start"))
+  // Turn on/off all the lights if <enable> element is given
+  if (_sdf->HasElement("enable"))
   {
-    if (_sdf->Get<bool>("start") == true)
+    if (_sdf->Get<bool>("enable") == true)
     {
       this->TurnOnAll();
     }
@@ -391,18 +391,18 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       this->TurnOffAll();
     }
   }
-  // Turn on/off a specific light if <start> is specifically given.
+  // Turn on/off a specific light if <enable> is specifically given.
   sdfFlashLight = _sdf->GetElement("flash_light");
   while (sdfFlashLight)
   {
     // light_id required
-    if (sdfFlashLight->HasElement("start"))
+    if (sdfFlashLight->HasElement("enable"))
     {
       std::string lightId = sdfFlashLight->Get<std::string>("light_id");
       int posDelim = lightId.find("/");
       std::string lightName = lightId.substr(posDelim+1, lightId.length());
       std::string linkName = lightId.substr(0, posDelim);
-      if (sdfFlashLight->Get<bool>("start") == true)
+      if (sdfFlashLight->Get<bool>("enable") == true)
       {
         this->TurnOn(lightName, linkName);
       }
