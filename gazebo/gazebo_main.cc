@@ -60,7 +60,7 @@ void help()
   << "  --record_period arg (=-1)     Recording period (seconds).\n"
   << "  --record_filter arg           Recording filter (supports wildcard and "
   << "regular expression).\n"
-  << "  --record_with_model           Recording with model meshes and "
+  << "  --record_resources           Recording with model meshes and "
   << "materials.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"

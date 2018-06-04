@@ -7,8 +7,21 @@ release will remove the deprecated code.
 
 ## Gazebo 9.x to 10.x
 
+### Additions
+1. **gazebo/physics/dart/DARTLink.hh**
+    + public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+    + public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+1. **gazebo/physics/dart/DARTJoint.hh**
+    + public: virtual void SetName(const std::string &_name);
+1. **gazebo/physics/dart/DARTPhysics.hh**
+    + public: std::string GetSolverType() const;
+    + public: void SetSolverType(const std::string &_type);
+
 ### Modifications
 
+1. **gazebo/physics/Model.hh**
+    + Made `CreateJoint` virtual
+    + Made `RemoveJoint` virtual
 1. WindPlugin now requires setting `<force_approximation_scaling_factor>` to
    enable mass based force approximation. Set to 1.0 for original behavior.
 1. **gazebo/transport/TransportIface.hh**

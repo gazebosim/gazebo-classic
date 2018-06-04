@@ -18,8 +18,8 @@
  * Author: Nate Koenig
  */
 
-#ifndef _SUBSCRIBER_HH_
-#define _SUBSCRIBER_HH_
+#ifndef GAZEBO_TRANSPORT_SUBSCRIBER_HH_
+#define GAZEBO_TRANSPORT_SUBSCRIBER_HH_
 
 #include <string>
 #include <boost/shared_ptr.hpp>

@@ -19,8 +19,8 @@
  * Date: 2 Sept 2007
  */
 
-#ifndef _SINGLETONT_HH_
-#define _SINGLETONT_HH_
+#ifndef GAZEBO_COMMON_SINGLETONT_HH_
+#define GAZEBO_COMMON_SINGLETONT_HH_
 
 #include "gazebo/util/system.hh"
 

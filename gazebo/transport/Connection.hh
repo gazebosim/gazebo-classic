@@ -36,6 +36,7 @@
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
+#include "gazebo/common/WeakBind.hh"
 #include "gazebo/util/system.hh"
 
 #define HEADER_LENGTH 8
@@ -217,7 +218,7 @@ namespace gazebo
                 this->inboundHeader.resize(HEADER_LENGTH);
                 boost::asio::async_read(*this->socket,
                     boost::asio::buffer(this->inboundHeader),
-                    boost::bind(f, this,
+                    common::weakBind(f, this->shared_from_this(),
                                 boost::asio::placeholders::error,
                                 boost::make_tuple(_handler)));
               }
@@ -258,7 +259,7 @@ namespace gazebo
 
                     boost::asio::async_read(*this->socket,
                         boost::asio::buffer(this->inboundData),
-                        boost::bind(f, this,
+                        common::weakBind(f, this->shared_from_this(),
                                     boost::asio::placeholders::error,
                                     _handler));
                   }
@@ -276,7 +277,7 @@ namespace gazebo
 
                     // boost::asio::async_read(*this->socket,
                     //    boost::asio::buffer(this->inboundHeader),
-                    //    boost::bind(f, this,
+                    //    common::weakBind(f, this->shared_from_this(),
                     //      boost::asio::placeholders::error, _handler));
                   }
                 }

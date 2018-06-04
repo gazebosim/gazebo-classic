@@ -117,7 +117,8 @@ namespace gazebo
       public: bool Running() const;
 
       /// \brief Stop the world.
-      /// Stop the update loop.
+      /// Request the update loop thread to stop. Wait for it to join if this
+      /// function is called from another thread. Return immediately otherwise.
       public: void Stop();
 
       /// \brief Finalize the world.
@@ -593,6 +594,10 @@ namespace gazebo
 
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
+
+      /// \brief Save model resources while recording a log, such as meshes
+      /// and textures.
+      private: void LogModelResources();
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();

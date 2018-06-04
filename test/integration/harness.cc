@@ -65,6 +65,8 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   const double dt = physics->GetMaxStepSize();
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
+  auto localAxis = sqrt(3) / 3.0 * ignition::math::Vector3d::One;
+
   {
     // Wait for joint to load
     for (int i = 0; i < 1000; ++i)
@@ -82,6 +84,10 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
     world->Step(50);
     EXPECT_NEAR(joint->GetVelocity(0), 0.0, 1e-2);
     EXPECT_NEAR(joint->Position(0), 0.0, 1e-3);
+
+    // Verify correct global axis
+    VEC_EXPECT_NEAR(localAxis, joint->LocalAxis(0).Normalized(), 1e-6);
+    VEC_EXPECT_NEAR(localAxis, joint->GlobalAxis(0), 1e-6);
   }
 
   // Detach message harness via transport topic
@@ -138,7 +144,13 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
   msgs::Set(&msgPose, newPose);
   attachPub->Publish(msgPose);
   world->Step(150);
-  EXPECT_NE(model->GetJoint("joint1"), nullptr);
+
+  auto joint = model->GetJoint("joint1");
+  ASSERT_NE(joint, nullptr);
+  // Verify new global axis
+  VEC_EXPECT_NEAR(newPose.Rot().RotateVector(localAxis),
+                  joint->GlobalAxis(0), 1e-6);
+  // Verify new pose
   VEC_EXPECT_NEAR(newPose.Pos(), model->WorldPose().Pos(), 2e-2);
   EXPECT_EQ(newPose.Rot(), model->WorldPose().Rot());
 }
@@ -146,7 +158,7 @@ void Harness::DetachPaused(const std::string &_physicsEngine)
 TEST_P(Harness, DetachPaused)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
@@ -232,12 +244,12 @@ void Harness::DetachNonCanonical(const std::string &_physicsEngine)
 TEST_P(Harness, DetachNonCanonical)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
           << " since it doesn't support dynamic creation/destruction of joints"
-          << ", see issues #862, #903."
+          << ", see issue #862."
           << std::endl;
     return;
   }
@@ -320,7 +332,7 @@ void Harness::DetachUnpaused(const std::string &_physicsEngine)
 TEST_P(Harness, DetachUnpaused)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
@@ -376,8 +388,8 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   velocityPub->Publish(msg);
   common::Time::MSleep(30);
   world->Step(3.0 / dt);
-  EXPECT_NEAR(joint->GetVelocity(0), -0.113, 1e-3);
-  EXPECT_NEAR(joint->Position(0), -0.3375, 1e-4);
+  EXPECT_NEAR(joint->GetVelocity(0), -0.113, 1e-2);
+  EXPECT_NEAR(joint->Position(0), -0.3375, 2e-2);
 
   // Stop and verify that it holds position
   const double stopPosition = joint->Position(0);
@@ -397,13 +409,13 @@ void Harness::LowerStopRaise(const std::string &_physicsEngine)
   world->Step(1.0 / dt);
 
   EXPECT_NEAR(joint->GetVelocity(0), upVel, 2e-2);
-  EXPECT_NEAR(joint->Position(0), -0.145, 1e-3);
+  EXPECT_NEAR(joint->Position(0), -0.145, 2e-2);
 }
 
 TEST_P(Harness, LowerStopRaise)
 {
   const std::string physicsEngine = GetParam();
-  if (physicsEngine == "simbody" || physicsEngine == "dart")
+  if (physicsEngine == "simbody")
   {
     gzerr << "Skipping test for "
           << physicsEngine
