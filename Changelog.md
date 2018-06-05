@@ -2,6 +2,10 @@
 
 ## Gazebo 8.x.x (2018-xx-xx)
 
+1. Print joint_cmd deprecation warnings only one time
+    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
+    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
 1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
     * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
 
