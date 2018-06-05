@@ -499,6 +499,75 @@ TEST_F(WheelSlipTest, TriballDrift)
 }
 
 /////////////////////////////////////////////////
+// This test shows tricycles with spherical wheels
+// driving under load with and without slip compliance.
+// The actual slip should match the predicted value.
+TEST_F(WheelSlipTest, TricyclesUphill)
+{
+  Load("worlds/trisphere_cycle_wheel_slip.world", true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_NE(physics, nullptr);
+
+  physics->SetRealTimeUpdateRate(0);
+
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(-2, 0, -9.8));
+
+  std::map<physics::ModelPtr, double> modelSlips;
+
+  physics::ModelPtr modelSlip0 = world->GetModel("trisphere_cycle_slip0");
+  ASSERT_NE(nullptr, modelSlip0);
+  modelSlips[modelSlip0] = 0.0;
+
+  physics::ModelPtr modelSlip1 = world->GetModel("trisphere_cycle_slip1");
+  ASSERT_NE(nullptr, modelSlip1);
+  modelSlips[modelSlip1] = 1.0;
+
+  const common::PID wheelSpeed(9, 2, 0, 9, -9);
+  const common::PID steerPosition(9, 0, 0.1);
+  const double desiredSpeed = 1.0;
+  for (auto modelSlip : modelSlips)
+  {
+    auto model = modelSlip.first;
+    auto jc = model->GetJointController();
+    jc->SetVelocityPID(model->GetScopedName() + "::wheel_rear_left_spin",
+        wheelSpeed);
+    jc->SetVelocityPID(model->GetScopedName() + "::wheel_rear_right_spin",
+        wheelSpeed);
+    jc->SetPositionPID(model->GetScopedName() + "::wheel_front_steer",
+        steerPosition);
+    jc->SetVelocityTarget(model->GetScopedName() + "::wheel_rear_left_spin",
+        desiredSpeed);
+    jc->SetVelocityTarget(model->GetScopedName() + "::wheel_rear_right_spin",
+        desiredSpeed);
+    jc->SetPositionTarget(model->GetScopedName() + "::wheel_front_steer", 0.0);
+  }
+
+  for (int i = 0; i < 5000; ++i)
+  {
+    world->Step(1);
+    std::cerr << "i " << i << ", speed "
+              << modelSlip0->GetJoint("wheel_rear_left_spin")->GetVelocity(0)
+              << std::endl;
+  }
+
+  for (auto modelSlip : modelSlips)
+  {
+    auto model = modelSlip.first;
+    auto jointLeft = model->GetJoint("wheel_rear_left_spin");
+    ASSERT_NE(nullptr, jointLeft);
+    auto jointRight = model->GetJoint("wheel_rear_right_spin");
+    ASSERT_NE(nullptr, jointRight);
+    EXPECT_DOUBLE_EQ(desiredSpeed, jointLeft->GetVelocity(0));
+    EXPECT_DOUBLE_EQ(desiredSpeed, jointRight->GetVelocity(0));
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
