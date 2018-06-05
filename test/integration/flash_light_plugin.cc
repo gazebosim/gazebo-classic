@@ -18,6 +18,7 @@
 #include <cmath>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "gazebo/test/ServerFixture.hh"
 
@@ -37,10 +38,15 @@ struct RecordInfo
 class FlashLightPluginTest : public ServerFixture
 {
   // Constructor.
-  public: FlashLightPluginTest(){}
+  public: FlashLightPluginTest(): called(false)
+  {
+    this->flashLight.resize(4);
+  }
 
   // Destructor.
-  public: ~FlashLightPluginTest(){}
+  public: ~FlashLightPluginTest()
+  {
+  }
 
   // Callback for light/modify topic
   public: void lightCb(ConstLightPtr &_msg);
@@ -51,9 +57,8 @@ class FlashLightPluginTest : public ServerFixture
   // Check the records.
   protected: void CheckRec();
 
-  // Four units of records
-  // (since there are supposed to be four lights in the environment.)
-  protected: struct RecordInfo flashLight[4];
+  // An array of records
+  protected: std::vector<RecordInfo> flashLight;
 
   // True if the callback function has been called.
   protected: bool called;

@@ -30,8 +30,8 @@ namespace gazebo
   class FlashLightPluginPrivate;
 
   /// \brief A plugin that blinks a light component in the model.
-  /// This plugin accesses <light> elements in the model specified
-  /// by <flash_light> as a parameter.
+  /// This plugin accesses <light> elements in the model specified by
+  /// <flash_light> as a parameter. More than one <flash_light> can exist.
   ///
   /// NOTE: This base class provides basic functions to control the lights.
   /// Users can create their own flash light plugin by inheriting this base
@@ -40,14 +40,18 @@ namespace gazebo
   /// A light is specified by <light_id>, including link and light names
   /// separated by a slash "/".
   ///
-  /// <enable> is optional. It indicates whether a light starts flashing from
-  /// the beginning. If <enable> is directly under the <plugin>, it affects all
-  /// the lights. Otherwise, it individually affects the corresponding <light>
-  /// element. If <enable> is false, the light is off, and it is  necessary to
-  /// call TurnOn() or TurnOnAll() in an inherited class to enable the light.
-  /// If <enable> is not given, the light is enabled in default.
+  /// <enable> is optional. The default value is true.
+  /// When it is set to true, a light starts flashing from the beginning.
+  /// If <enable> is directly under the <plugin>, it affects all the lights.
+  /// If it is under <flash_light>, it individually affects the corresponding
+  /// light.
+  /// When it is set to false, the light is off, and it is  necessary to call
+  /// TurnOn() or TurnOnAll() in an inherited class to enable the light.
+  /// A locally placed <enable> has a higher priority than the global one so
+  /// specific lights can be turned on while the others are all off, and vice
+  /// versa.
   ///
-  /// <duration> and <interval> represent the time to flash and dim in seconds,
+  /// <duration> and <interval> specify the time to flash and dim in seconds,
   /// respectively. That is, the phase is determined as the sum of them:
   /// duration + interval.
   ///
@@ -67,12 +71,11 @@ namespace gazebo
   /// </flash_light>
   /// ...
   ///
-  /// More than one <flash_light> can exist.
-  ///
   class GAZEBO_VISIBLE FlashLightPlugin : public ModelPlugin
   {
     // Constructor
     public: FlashLightPlugin();
+
     // Destructor
     public: virtual ~FlashLightPlugin();
 
