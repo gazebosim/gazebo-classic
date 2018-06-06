@@ -417,7 +417,7 @@ void JointController::SetPositionPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetPositionTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 
@@ -446,7 +446,7 @@ void JointController::SetVelocityPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetVelocityTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 

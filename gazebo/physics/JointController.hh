@@ -93,7 +93,7 @@ namespace gazebo
       /// \param[in] _target Position target.
       /// \return False if the joint was not found.
       public: bool SetPositionTarget(const std::string &_jointName,
-                  double _target);
+                  const double _target);
 
       /// \brief Set the velocity PID values for a joint.
       /// \param[in] _jointName Scoped name of the joint.
@@ -106,7 +106,7 @@ namespace gazebo
       /// \param[in] _target Velocity target.
       /// \return False if the joint was not found.
       public: bool SetVelocityTarget(const std::string &_jointName,
-                  double _target);
+                  const double _target);
 
       /// \brief Get all the position PID controllers.
       /// \return A map<joint_name, PID> for all the position PID
