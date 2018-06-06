@@ -30,7 +30,7 @@ namespace gazebo
   namespace rendering
   {
     /// \brief Private data for the Distortion class
-    class DistortionPrivate
+    class DistortionPrivate : public Ogre::CompositorInstance::Listener
     {
       /// \brief Radial distortion coefficient k1.
       public: double k1 = 0;
@@ -74,6 +74,21 @@ namespace gazebo
 
       /// \brief Height of distortion texture map
       public: unsigned int distortionTexHeight;
+
+      // \brief Set scale parameter in shader before rendering frame
+      public:
+      virtual void notifyMaterialRender(Ogre::uint32 pass_id,
+                                        Ogre::MaterialPtr& material)
+      {
+        // @todo Explore more efficent implementations as it is run every frame
+        (void)pass_id;
+        Ogre::GpuProgramParametersSharedPtr params =
+            material->getTechnique(0)->getPass(pass_id)
+                    ->getFragmentProgramParameters();
+        params->setNamedConstant("scale",
+            Ogre::Vector3(1.0/distortionScale.X(),
+            1.0/distortionScale.Y(), 1.0));
+      }
     };
   }
 }
@@ -313,52 +328,47 @@ void Distortion::SetCamera(CameraPtr _camera)
   this->CalculateAndApplyDistortionScale();
 
   this->dataPtr->lensDistortionInstance->setEnabled(true);
+
+  // Add callback to set scaling factor before rendering
+  // See https://bitbucket.org/osrf/gazebo/pull-requests/2963
+  this->dataPtr->lensDistortionInstance->addListener(this->dataPtr.get());
 }
 
 //////////////////////////////////////////////////
 void Distortion::CalculateAndApplyDistortionScale()
 {
-  if (!this->dataPtr->distortionMaterial.isNull())
-  {
-    if (this->dataPtr->distortionCrop && this->dataPtr->k1 < 0)
-    {
-      // I believe that if not used with a square distortion texture, this
-      // calculation will result in stretching of the final output image.
-      ignition::math::Vector2d boundA = this->Distort(
-          ignition::math::Vector2d(0, 0),
-          this->dataPtr->lensCenter,
-          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-          this->dataPtr->p1, this->dataPtr->p2);
-      ignition::math::Vector2d boundB = this->Distort(
-          ignition::math::Vector2d(1, 1),
-          this->dataPtr->lensCenter,
-          this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
-          this->dataPtr->p1, this->dataPtr->p2);
-      this->dataPtr->distortionScale = boundB - boundA;
-    }
-    else
-    {
-      this->dataPtr->distortionScale = ignition::math::Vector2d(1, 1);
-    }
+  if (this->dataPtr->distortionMaterial.isNull()) return;
 
-    // Both invalid: scale very close to 0 OR negative scale
-    if (this->dataPtr->distortionScale.X() < 1e-7 ||
-        this->dataPtr->distortionScale.Y() < 1e-7)
+  // Scale up image if cropping enabled and valid
+  if (this->dataPtr->distortionCrop && this->dataPtr->k1 < 0)
+  {
+    // I believe that if not used with a square distortion texture, this
+    // calculation will result in stretching of the final output image.
+    ignition::math::Vector2d boundA = this->Distort(
+        ignition::math::Vector2d(0, 0),
+        this->dataPtr->lensCenter,
+        this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+        this->dataPtr->p1, this->dataPtr->p2);
+    ignition::math::Vector2d boundB = this->Distort(
+        ignition::math::Vector2d(1, 1),
+        this->dataPtr->lensCenter,
+        this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
+        this->dataPtr->p1, this->dataPtr->p2);
+    ignition::math::Vector2d new_scale = boundB - boundA;
+    // If distortionScale is extremely small, don't crop
+    if (new_scale.X() < 1e-7 || new_scale.Y() < 1e-7)
     {
-      gzerr << "Distortion model attempted to apply a scale parameter of ("
-            << this->dataPtr->distortionScale.X() << ", "
-            << this->dataPtr->distortionScale.Y() << ", which is invalid.\n";
+          gzerr << "Distortion model attempted to apply a scale parameter of ("
+                << this->dataPtr->distortionScale.X() << ", "
+                << this->dataPtr->distortionScale.Y()
+                << ", which is invalid.\n";
     }
     else
-    {
-      Ogre::GpuProgramParametersSharedPtr params =
-          this->dataPtr->distortionMaterial->getTechnique(0)->getPass(0)->
-              getFragmentProgramParameters();
-      params->setNamedConstant("scale",
-          Ogre::Vector3(1.0/this->dataPtr->distortionScale.X(),
-          1.0/this->dataPtr->distortionScale.Y(), 1.0));
-    }
+      this->dataPtr->distortionScale = new_scale;
   }
+  // Otherwise no scaling
+  else
+    this->dataPtr->distortionScale = ignition::math::Vector2d(1, 1);
 }
 
 //////////////////////////////////////////////////
