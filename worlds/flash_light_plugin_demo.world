@@ -162,7 +162,7 @@
         <child>box</child>
       </joint>
       <plugin name='light_control' filename='libFlashLightPlugin.so'>
-        <start>true</start>
+        <enable>true</enable>
         <flash_light>
           <light_id>cylinder/light_source1</light_id>
           <duration>0.1</duration>
@@ -177,13 +177,13 @@
           <light_id>box/light_source3</light_id>
           <duration>1.0</duration>
           <interval>0.1</interval>
-          <start>false</start>
+          <enable>false</enable>
         </flash_light>
         <flash_light>
           <light_id>box/light_source4</light_id>
           <duration>1.0</duration>
           <interval>0.0</interval>
-          <start>true</start>
+          <enable>true</enable>
         </flash_light>
       </plugin>
     </model>

@@ -197,7 +197,8 @@ FlashLightSettings::FlashLightSettings(
   {
     if (sdfLightInLink->Get<std::string>("name") == this->name)
     {
-      this->range = sdfLightInLink->Get<double>("range");
+      this->range
+        = sdfLightInLink->GetElement("attenuation")->Get<double>("range");
       break;
     }
     sdfLightInLink = sdfLightInLink->GetNextElement("light");
@@ -469,7 +470,7 @@ bool FlashLightPlugin::TurnOn(
   std::shared_ptr<FlashLightSettings> set
     = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (!set)
+  if (set)
   {
     set->SwitchOn();
     found = true;
@@ -519,7 +520,7 @@ bool FlashLightPlugin::TurnOff(const std::string &_lightName,
   std::shared_ptr<FlashLightSettings> set
     = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (!set)
+  if (set)
   {
     set->SwitchOff();
     found = true;
@@ -565,7 +566,7 @@ bool FlashLightPlugin::ChangeDuration(
   std::shared_ptr<FlashLightSettings> set
     = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (!set)
+  if (set)
   {
     set->SetDuration(_duration);
     found = true;
@@ -588,7 +589,7 @@ bool FlashLightPlugin::ChangeInterval(
   std::shared_ptr<FlashLightSettings> set
     = this->dataPtr->SettingsByLightNameAndLinkName(_lightName, _linkName);
 
-  if (!set)
+  if (set)
   {
     set->SetInterval(_interval);
     found = true;
