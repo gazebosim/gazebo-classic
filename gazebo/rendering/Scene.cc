@@ -2815,6 +2815,7 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }
@@ -3438,6 +3439,23 @@ unsigned int Scene::HeightmapLOD() const
     return this->dataPtr->terrain->LOD();
 
   return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapSkirtLength(const double _value)
+{
+  this->dataPtr->heightmapSkirtLength = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapSkirtLength() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->SkirtLength();
+
+  return this->dataPtr->heightmapSkirtLength;
 }
 
 /////////////////////////////////////////////////

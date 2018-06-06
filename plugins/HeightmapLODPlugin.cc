@@ -33,6 +33,9 @@ namespace gazebo
 
     /// \brief Default LOD value to set to.
     public: unsigned int lod = 3u;
+    
+    /// \brief Default skirt length
+    public: double skirtLength = 1.0;
   };
 }
 
@@ -59,6 +62,9 @@ void HeightmapLODPlugin::Load(rendering::VisualPtr _visual,
 
   if (_sdf->HasElement("lod"))
     this->dataPtr->lod = _sdf->Get<unsigned int>("lod");
+  if (_sdf->HasElement("skirt_length"))
+    this->dataPtr->skirtLength = _sdf->Get<double>("skirt_length");
 
   _visual->GetScene()->SetHeightmapLOD(this->dataPtr->lod);
+  _visual->GetScene()->SetHeightmapSkirtLength(this->dataPtr->skirtLength);
 }
