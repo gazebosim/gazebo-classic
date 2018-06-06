@@ -24,7 +24,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/MassMatrix3.hh>
-
+#include <ignition/math/Box.hh>
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/rendering/LinkFrameVisual.hh"
@@ -1428,26 +1428,29 @@ void LinkData::OnAddCollision(const std::string &_name)
 
   if (!collisionVis)
   {
-    if (!this->collisions.empty())
-    {
-      // add new collision by cloning last instance
-      collisionVis = this->collisions.rbegin()->first->Clone(
-          collisionName.str(), this->linkVisual);
-    }
-    else
-    {
-      // create new collision based on sdf template (box)
-      sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-      modelTemplateSDF->SetFromString(
-          ModelData::GetTemplateSDFString());
+    // create new collision based on sdf template (box)
+    sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
+    modelTemplateSDF->SetFromString(
+        ModelData::GetTemplateSDFString());
 
-      collisionVis.reset(new rendering::Visual(collisionName.str(),
-          this->linkVisual));
-      sdf::ElementPtr collisionElem =  modelTemplateSDF->Root()
-          ->GetElement("model")->GetElement("link")->GetElement("visual");
-      collisionVis->Load(collisionElem);
-      collisionVis->SetMaterial("Gazebo/Orange");
-    }
+    ignition::math::Vector3d _size;
+    ignition::math::Box boundingBox;
+
+    collisionVis.reset(new rendering::Visual(collisionName.str(),
+        this->linkVisual));
+    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+
+    boundingBox = this->linkVisual->BoundingBox();
+    _size = boundingBox.Size();
+
+    collisionElem->GetElement("geometry")->AddElement("box")
+         ->AddElement("size");
+    collisionElem->GetElement("geometry")->GetElement("box")
+         ->GetElement("size")->Set(_size);
+
+    collisionVis->Load(collisionElem);
+    collisionVis->SetMaterial("Gazebo/Orange");
 
     msgs::Visual visualMsg = msgs::VisualFromSDF(collisionVis->GetSDF());
     collisionMsg.set_name(_name);
