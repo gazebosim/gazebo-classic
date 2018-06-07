@@ -173,6 +173,7 @@ if (HAVE_DART_URDF)
 endif()
 
 add_subdirectory(events)
+add_subdirectory(distributed_sim)
 
 if (NOT WIN32)
   add_subdirectory(rest_web)
