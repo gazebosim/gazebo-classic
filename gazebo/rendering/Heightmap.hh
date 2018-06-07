@@ -307,8 +307,8 @@ namespace gazebo
       public: unsigned int LOD() const;
 
       /// \brief Set the skirt length for the heightmap LOD tiles.
-      /// \param[in] _value LOD tile skirts hide potential gaps between 
-      /// tiles of different detail levels. 
+      /// \param[in] _value LOD tile skirts hide potential gaps between
+      /// tiles of different detail levels.
       public: void SetSkirtLength(const double _value);
 
       /// \brief Get the skirt length of LOD tiles

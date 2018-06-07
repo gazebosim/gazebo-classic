@@ -33,7 +33,7 @@ namespace gazebo
 
     /// \brief Default LOD value to set to.
     public: unsigned int lod = 3u;
-    
+
     /// \brief Default skirt length
     public: double skirtLength = 1.0;
   };

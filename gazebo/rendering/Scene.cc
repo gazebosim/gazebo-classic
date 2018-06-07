@@ -2815,7 +2815,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
-        this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+        const double skirtLen = this->dataPtr->heightmapSkirtLength;
+        this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }

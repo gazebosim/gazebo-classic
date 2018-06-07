@@ -737,7 +737,7 @@ void Heightmap::ConfigureTerrainDefaults()
   }
 
   this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
-  
+
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
 
