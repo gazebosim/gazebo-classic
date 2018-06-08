@@ -2,8 +2,6 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
-
-
 ## Gazebo 7.13.0 (2018-06-08)
 
 1. Update model database URI
