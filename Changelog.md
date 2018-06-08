@@ -1,6 +1,13 @@
 ## Gazebo 9
 
-## Gazebo 9.x.x (2018-xx-xx)
+## Gazebo 9.X.X (2018-xx-xx)
+
+
+
+## Gazebo 9.1.1 (2018-06-08)
+
+1. Set the default model database URI to avoid a redirect
+    * [Pull request 2971](https://bitbucket.org/osrf/gazebo/pull-request/2971)
 
 
 ## Gazebo 9.1.0 (2018-06-01)
