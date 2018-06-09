@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 7)
-set (GAZEBO_MINOR_VERSION 13)
+set (GAZEBO_MINOR_VERSION 14)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -138,7 +138,7 @@ set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
 set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
-set(GAZEBO_MODEL_DATABASE_URI http://gazebosim.org/models)
+set(GAZEBO_MODEL_DATABASE_URI http://models.gazebosim.org)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when
 # we pass it to the compiler later.
