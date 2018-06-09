@@ -2,13 +2,14 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+
 ## Gazebo 7.13.0 (2018-06-08)
 
 1. Update model database URI
     * [Pull request 2969](https://bitbucket.org/osrf/gazebo/pull-request/2969)
-
-1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
-    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
 
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
