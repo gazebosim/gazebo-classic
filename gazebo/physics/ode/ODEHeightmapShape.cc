@@ -96,7 +96,7 @@ void ODEHeightmapShape::Init()
   q[2] = pose.Rot().Y();
   q[3] = pose.Rot().Z();
 
-  // TODO: FIXME: As soon as the pose of the ODE body
+  // As soon as the pose of the ODE body
   // is changed, this will be overwritten. Probably better
   // to use dGeomSetOffsetQuaternion and set it to just the
   // relative rotation, e.g.:
@@ -113,7 +113,7 @@ void ODEHeightmapShape::Init()
   // debug print of geometry AABB actually created
   dReal aabb[6];
   dGeomGetAABB(oParent->GetCollisionId(), aabb);
-  std::cerr << "ODE Heightfield AABB: min = {"
+  std::cout << "ODE Heightfield AABB: min = {"
         << aabb[0] << ", " << aabb[2] << ", " << aabb[4]<< "} max = {"
         << aabb[1] << ", " << aabb[3] << ", " << aabb[5] << "}" << std::endl;
 }

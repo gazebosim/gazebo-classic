@@ -16,6 +16,8 @@
 */
 #include <dart/collision/bullet/bullet.hpp>
 #include <dart/collision/ode/ode.hpp>
+#include <dart/collision/dart/dart.hpp>
+#include <dart/collision/fcl/fcl.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -88,13 +90,51 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
     gzwarn << "Gravity vector is (0, 0, 0). Objects will float.\n";
   this->dataPtr->dtWorld->setGravity(Eigen::Vector3d(g.X(), g.Y(), g.Z()));
 
-  // use bullet collision detection
-  // TODO: this should be made a parameter, to switch between the DART
-  // collision detector as user wants?
-  auto cd = dart::collision::BulletCollisionDetector::create();
-  // use ode collision detection
-  // auto cd = dart::collision::OdeCollisionDetector::create();
-  this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
+  // set collision detector
+  std::string useCollisionDetector;
+  if (_sdf->HasElement("dart") &&
+      _sdf->GetElement("dart") &&
+      _sdf->GetElement("dart")->HasElement("collision_detector"))
+  {
+    sdf::ElementPtr collElem = _sdf->GetElement("dart");
+    useCollisionDetector = collElem->Get<std::string>("collision_detector");
+    std::shared_ptr<dart::collision::CollisionDetector> cd;
+    if (useCollisionDetector == "bullet")
+    {
+      gzdbg << "Using BULLET collision detector" << std::endl;
+      cd = dart::collision::BulletCollisionDetector::create();
+    }
+    else if (useCollisionDetector == "fcl")
+    {
+      gzdbg << "Using FCL collision detector" << std::endl;
+      cd = dart::collision::FCLCollisionDetector::create();
+    }
+    else if (useCollisionDetector == "ode")
+    {
+      gzdbg << "Using ODE collision detector" << std::endl;
+      cd = dart::collision::OdeCollisionDetector::create();
+    }
+    else if (useCollisionDetector == "dart")
+    {
+      gzdbg << "Using DART collision detector" << std::endl;
+      cd = dart::collision::DARTCollisionDetector::create();
+    }
+    if (cd)
+    {
+      this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);
+    }
+    else
+    {
+      gzwarn << "collision_engine element set in SDF, but no valid collision "
+             << "detector specified (" << useCollisionDetector
+             << " not supported. Using default." << std::endl;
+    }
+  }
+  else
+  {
+    // else leave collision engine as default
+    gzdbg << "Using DEFAULT collision detector" << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////

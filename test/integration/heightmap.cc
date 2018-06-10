@@ -54,7 +54,12 @@ class HeightmapTest : public ServerFixture,
   public: void LoadDEM(const std::string &_physicsEngine);
   public: void Material(const std::string &_worldName,
       const std::string &_physicsEngine);
-  public: void TerrainCollision(const std::string &_physicsEngine);
+  // \brief Test dropping a spheres on terrain
+  // \param[in] _physicsEngine the physics engine to test
+  // \param[in] _dartCollision only if \e _physicsEngine is "dart", this
+  //  is the collision detector to use in DART. Can be fcl, dart, bullet or ode.
+  public: void TerrainCollision(const std::string &_physicsEngine,
+                                const std::string &_dartCollision = "");
 
   /// \brief Test loading a heightmap that has no visuals
   public: void NoVisual();
@@ -88,6 +93,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -163,6 +169,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -209,6 +216,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -295,6 +303,7 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -340,6 +349,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -527,6 +537,13 @@ void HeightmapTest::Material(const std::string &_worldName,
   // load a heightmap with red material
   Load(_worldName, false, _physicsEngine);
 
+  if (_physicsEngine == "simbody")
+  {
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for simbody" << std::endl;
+    return;
+  }
+
   if (_physicsEngine == "dart")
   {
     physics::WorldPtr w = physics::get_world();
@@ -540,6 +557,7 @@ void HeightmapTest::Material(const std::string &_worldName,
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -712,19 +730,47 @@ void HeightmapTest::HeightmapCache()
 }
 
 /////////////////////////////////////////////////
-void HeightmapTest::TerrainCollision(const std::string &_physicsEngine)
+void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
+                                     const std::string &_dartCollision)
 {
+  if (_physicsEngine == "bullet")
+  {
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Test for bullet will fail, but leaving it in here for "
+          << "demonstration" << std::endl;
+    // return;
+  }
+
   if (_physicsEngine == "simbody")
   {
-    // SimbodyHeightmapShape unimplemented. ComputeVolume actually returns 0 as
-    // an error code, which is the correct answer, but we'll skip it for now.
-    gzerr << "Aborting test for "
-          << _physicsEngine
-          << std::endl;
+    // SimbodyHeightmapShape unimplemented.
+    gzerr << "Aborting test for " << _physicsEngine << std::endl;
     return;
   }
 
-  Load("worlds/heightmap_test_with_sphere.world", true, _physicsEngine);
+  // world file to use
+  std::string useWorld = "worlds/heightmap_test_with_sphere.world";
+  if (_physicsEngine == "dart")
+  {
+    if (_dartCollision.empty() || _dartCollision == "bullet")
+    {
+      // test DART with the bullet collision detector by default or when
+      // specified collision detector. Use a world file where
+      // <collision_detector> is set accordingly.
+      useWorld = "worlds/heightmap_test_with_sphere_dart_bullet.world";
+    }
+    else if (_dartCollision == "ode")
+    {
+      useWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
+    }
+    else
+    {
+      gzerr << "Cannot test DART with collision detector " << _dartCollision
+            << ", which is not supported yet. Aborting test." << std::endl;
+      return;
+    }
+  }
+  Load(useWorld, true, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_NE(world, nullptr);
@@ -740,6 +786,7 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine)
     ASSERT_FALSE(cd.empty());
     if (cd != "bullet" && cd != "ode")
     {
+      // the test only works if DART uses bullet or ODE at the moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -827,10 +874,61 @@ TEST_P(HeightmapTest, LoadDEM)
 }
 
 /////////////////////////////////////////////////
+TEST_F(HeightmapTest, DartCollisionDetectorSelection)
+{
+  // test using a world file with the <dart><collision_detector>
+  // tag: verify the right collision detector has been selected.
+  // Use bullet as an example (the test could also be done for ode etc.,
+  // but we presume that if it works for bullet, the functionality is there
+  // and it will also work for ode).
+  std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_bullet.world";
+  Load(loadWorld, true, "dart");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr engine = world->Physics();
+  ASSERT_NE(engine, nullptr);
+  physics::DARTPhysicsPtr dartEngine
+    = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+  ASSERT_NE(dartEngine, nullptr);
+  std::string cd = dartEngine->CollisionDetectorInUse();
+  EXPECT_FALSE(cd.empty());
+  EXPECT_EQ(cd, "bullet");
+}
+
+/////////////////////////////////////////////////
 TEST_P(HeightmapTest, TerrainCollision)
 {
-  TerrainCollision(GetParam());
+  std::string param = GetParam();
+  // do this test for all engines but DART, because for DART needs to be run
+  // several times for different collision detectors to use
+  if (param == "dart")
+    return;
+
+  TerrainCollision(param);
 }
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollisionDartBullet)
+{
+  std::string param = GetParam();
+  if (param == "dart")
+  {
+    TerrainCollision("dart", "bullet");
+  }
+}
+
+/////////////////////////////////////////////////
+TEST_P(HeightmapTest, TerrainCollisionDartOde)
+{
+  std::string param = GetParam();
+  if (param == "dart")
+  {
+    TerrainCollision("dart", "ode");
+  }
+}
+
 
 /////////////////////////////////////////////////
 //
