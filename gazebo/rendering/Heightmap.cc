@@ -26,7 +26,9 @@
 #include <string.h>
 #include <math.h>
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"

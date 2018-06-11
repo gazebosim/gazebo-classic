@@ -18,7 +18,9 @@
 #define _GAZEBO_UTIL_DIAGNOSTICMANAGER_HH_
 
 #include <string>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "gazebo/gazebo_config.h"
 

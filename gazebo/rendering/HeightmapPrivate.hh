@@ -19,7 +19,9 @@
 
 #include <string>
 #include <vector>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include <ignition/math/Vector3.hh>
 

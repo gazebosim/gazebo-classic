@@ -23,7 +23,9 @@
   #include <io.h>
 #endif
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <stdio.h>
 
 #include "gazebo/common/CommonIface.hh"

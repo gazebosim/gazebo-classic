@@ -15,7 +15,9 @@
  *
  */
 #include <string>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/regex.hpp>
 #include <sstream>

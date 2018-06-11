@@ -28,7 +28,9 @@
   #define GetCurrentDir getcwd
 #endif
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <list>
 #include <string>
 

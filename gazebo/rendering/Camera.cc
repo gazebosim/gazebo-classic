@@ -24,7 +24,9 @@
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/format.hpp>
 #include <sdf/sdf.hh>
 

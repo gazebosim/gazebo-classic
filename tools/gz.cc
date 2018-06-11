@@ -24,7 +24,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <tinyxml.h>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/algorithm/string.hpp>
 
 #include <gazebo/common/common.hh>

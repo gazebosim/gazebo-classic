@@ -24,7 +24,9 @@
 #include <thread>
 #include <functional>
 #include <condition_variable>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 namespace gazebo
 {

@@ -20,7 +20,9 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/SystemPaths.hh"

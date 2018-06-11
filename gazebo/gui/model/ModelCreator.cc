@@ -21,7 +21,9 @@
   #include <Winsock2.h>
 #endif
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <sstream>
 #include <functional>
 #include <string>

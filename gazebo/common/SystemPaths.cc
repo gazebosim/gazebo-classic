@@ -19,7 +19,9 @@
 #include <fstream>
 #include <sstream>
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <sdf/sdf.hh>
 
 #include <sys/stat.h>

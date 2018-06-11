@@ -21,7 +21,9 @@
 #include <string>
 #include <map>
 #include <vector>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/gui/qt.h"

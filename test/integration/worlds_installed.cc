@@ -15,7 +15,9 @@
  *
 */
 #include <boost/algorithm/string/find.hpp>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <string>
 #include <gtest/gtest.h>
 

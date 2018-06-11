@@ -15,7 +15,9 @@
  *
 */
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <gtest/gtest.h>
 
 #include "gazebo/common/ImageHeightmap.hh"

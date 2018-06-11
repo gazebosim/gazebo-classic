@@ -19,7 +19,9 @@
  * Date: 14 July 2008
  */
 
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <string>
 
 #include "gazebo/common/Assert.hh"

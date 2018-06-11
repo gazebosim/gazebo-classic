@@ -23,7 +23,9 @@
 #include <string>
 #include <iostream>
 #include <functional>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <sys/types.h>
 
 #ifdef __APPLE__
