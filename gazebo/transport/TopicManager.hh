@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _TOPICMANAGER_HH_
-#define _TOPICMANAGER_HH_
+#ifndef GAZEBO_TRANSPORT_TOPICMANAGER_HH_
+#define GAZEBO_TRANSPORT_TOPICMANAGER_HH_
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>

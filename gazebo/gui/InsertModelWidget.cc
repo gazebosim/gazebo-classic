@@ -256,24 +256,41 @@ void InsertModelWidget::OnUpdateFuel(const std::string &/*_server*/)
 #else
 void InsertModelWidget::OnUpdateFuel(const std::string &_server)
 {
-  this->dataPtr->fuelDetails[_server].modelFuelItem->setText(0,
-      QString("%1").arg(QString::fromStdString(_server)));
-
-  if (!this->dataPtr->fuelDetails[_server].modelBuffer.empty())
+  auto fuelItem = this->dataPtr->fuelDetails[_server].modelFuelItem;
+  if (!fuelItem)
   {
-    for (std::map<std::string, std::string>::const_iterator iter =
-        this->dataPtr->fuelDetails[_server].modelBuffer.begin();
-        iter != this->dataPtr->fuelDetails[_server].modelBuffer.end();
-        ++iter)
+    gzerr << "No fuel item, something went wrong" << std::endl;
+    return;
+  }
+
+  fuelItem->setText(0, QString::fromStdString(_server));
+
+  if (this->dataPtr->fuelDetails[_server].modelBuffer.empty())
+    return;
+
+  // Add an item for each model
+  std::map<std::string, QTreeWidgetItem *> ownerItems;
+  for (auto id : this->dataPtr->fuelDetails[_server].modelBuffer)
+  {
+    auto ownerName = id.Owner();
+
+    QTreeWidgetItem *ownerItem = nullptr;
+    if (ownerItems.find(ownerName) != ownerItems.end())
     {
-      // Add a child item for the model
-      QTreeWidgetItem *childItem = new QTreeWidgetItem(
-          this->dataPtr->fuelDetails[_server].modelFuelItem,
-          QStringList(QString("%1").arg(
-              QString::fromStdString(iter->second))));
-      childItem->setData(0, Qt::UserRole, QVariant(iter->first.c_str()));
-      this->dataPtr->fileTreeWidget->addTopLevelItem(childItem);
+      ownerItem = ownerItems[ownerName];
     }
+    else
+    {
+      ownerItem = new QTreeWidgetItem(fuelItem,
+          QStringList(QString::fromStdString(ownerName)));
+      ownerItems[ownerName] = ownerItem;
+    }
+
+    auto modelItem = new QTreeWidgetItem(ownerItem, QStringList(
+        QString::fromStdString(id.Name())));
+    modelItem->setToolTip(0, QString::fromStdString(id.UniqueName().c_str()));
+    modelItem->setData(0, Qt::UserRole, QVariant(id.UniqueName().c_str()));
+    this->dataPtr->fileTreeWidget->addTopLevelItem(modelItem);
   }
 
   this->dataPtr->fuelDetails[_server].modelBuffer.clear();
@@ -307,7 +324,7 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     // Check if this is a model from an Ignition Fuel server.
     for (auto const &serverEntry : this->dataPtr->fuelDetails)
     {
-      if (serverEntry.second.modelFuelItem == _item->parent())
+      if (serverEntry.second.modelFuelItem == _item->parent()->parent())
       {
         fuelModelSelected = true;
         break;
@@ -317,11 +334,6 @@ void InsertModelWidget::OnModelSelection(QTreeWidgetItem *_item,
     if (fuelModelSelected)
     {
       filename = common::FuelModelDatabase::Instance()->ModelFile(path);
-      gzmsg << "Support for Ignition Fuel is experimental. It's required to "
-            << "set GAZEBO_MODEL_PATH to the directory where the Fuel model "
-            << "has been downloaded.\n"
-            << "E.g.: export GAZEBO_MODEL_PATH="
-            << "/home/caguero/.ignition/fuel/models/caguero" << std::endl;
     }
     else
 #endif
@@ -569,8 +581,10 @@ void InsertModelWidget::PopulateFuelServers()
 
     // This lamda will be executed asynchronously when we get the list of models
     // from this Ignition Fuel Server.
-    std::function<void(const std::map<std::string, std::string> &)> f =
-        [serverURL, this](const std::map<std::string, std::string> &_models)
+    std::function <void(
+        const std::vector<ignition::fuel_tools::ModelIdentifier> &)> f =
+        [serverURL, this](
+            const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)
         {
           if (!gInsertModelWidgetDeleted)
           {
