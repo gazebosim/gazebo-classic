@@ -19,7 +19,9 @@
 
 #include <string>
 #include <boost/property_tree/ptree.hpp>
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/util/system.hh"
 

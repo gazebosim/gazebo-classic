@@ -20,7 +20,9 @@
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
+#define BOOST_NO_CXX11_SCOPED_ENUMS
 #include <boost/filesystem.hpp>
+#undef BOOST_NO_CXX11_SCOPED_ENUMS
 #include <tinyxml.h>
 
 #include "gazebo/common/SystemPaths.hh"
