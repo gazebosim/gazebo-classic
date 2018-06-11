@@ -45,6 +45,7 @@
 #ifndef _GAZEBO_UTIL_PROFILER_HH_ 
 #define _GAZEBO_UTIL_PROFILER_HH_ 
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/util/ProfileManager.hh"
 
 namespace gazebo 
@@ -69,7 +70,7 @@ namespace gazebo
 
 ///ProfileSampleClass is a simple way to profile a function's scope
 ///Use the BT_PROFILE macro at the start of scope to time
-class	ProfileSample {
+class	GZ_UTIL_VISIBLE ProfileSample {
 public:
   ProfileSample( const char * name );
   ~ProfileSample( void );

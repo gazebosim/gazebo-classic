@@ -26,24 +26,4 @@ else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
 
-include (CheckCSourceCompiles)
-# From NLOpt
-
 option(WITH_THREADLOCAL "check thread local keyword" ON)
-if (WITH_THREADLOCAL AND NOT DEFINED GAZEBO_THREAD_LOCAL)
-  foreach (_THREADLOCAL_KEY "__thread" "__declspec(thread)")
-    unset (GAZEBO_THREAD_LOCAL CACHE)
-    check_c_source_compiles("
-    ${_THREADLOCAL_KEY} int tls;
-    int main(void) {
-        return 0;
-    }" GAZEBO_THREAD_LOCAL)
-
-    if (${GAZEBO_THREAD_LOCAL})
-      set (THREADLOCAL ${_THREADLOCAL_KEY})
-      break()
-    endif ()
-  endforeach()
-endif()
-
-

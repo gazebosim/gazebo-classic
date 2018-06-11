@@ -17,9 +17,11 @@
 #include <memory>
 #include "gazebo/common/Exception.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/ProfileManager.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/Server.hh"
+
 
 //////////////////////////////////////////////////
 int main(int argc, char **argv)
@@ -36,9 +38,10 @@ int main(int argc, char **argv)
     gazebo::util::LogRecord::Instance()->Init("gzserver");
 
     server.reset(new gazebo::Server());
+    gazebo::util::ProfileManager::Instance()->Reset();
     if (!server->ParseArgs(argc, argv))
       return -1;
-
+    gazebo::util::ProfileManager::Instance()->Increment_Frame_Counter();
     server->Run();
     server->Fini();
   }
@@ -56,6 +59,8 @@ int main(int argc, char **argv)
     server->Fini();
     return -1;
   }
+
+  gazebo::util::ProfileManager::Instance()->dumpAllThreads();
 
   return 0;
 }

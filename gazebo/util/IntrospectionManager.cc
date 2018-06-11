@@ -35,6 +35,8 @@
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/IntrospectionManagerPrivate.hh"
 
+#include "gazebo/util/Profiler.hh"
+
 using namespace gazebo;
 using namespace util;
 
@@ -116,8 +118,8 @@ bool IntrospectionManager::Register(const std::string &_item,
     return false;
   }
 
+  this->dataPtr->allItemsKeys.insert(_item);
   this->dataPtr->allItems[_item] = _cb;
-
   this->dataPtr->itemsUpdated = true;
 
   return true;
@@ -126,6 +128,7 @@ bool IntrospectionManager::Register(const std::string &_item,
 //////////////////////////////////////////////////
 bool IntrospectionManager::Unregister(const std::string &_item)
 {
+  GZ_PROFILE("IntrospectionManager::Unregister");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Sanity check: Make sure that the item has been previously registered.
@@ -136,6 +139,8 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   }
 
   // Remove the item from the list of all items.
+  
+  this->dataPtr->allItemsKeys.erase(_item);
   this->dataPtr->allItems.erase(_item);
 
   this->dataPtr->itemsUpdated = true;
@@ -146,8 +151,10 @@ bool IntrospectionManager::Unregister(const std::string &_item)
 //////////////////////////////////////////////////
 void IntrospectionManager::Clear()
 {
+  GZ_PROFILE("IntrospectionManager::Clear");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
   this->dataPtr->allItems.clear();
+  this->dataPtr->allItemsKeys.clear();
   this->dataPtr->itemsUpdated = true;
 }
 
@@ -158,9 +165,7 @@ std::set<std::string> IntrospectionManager::Items() const
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-    for (auto item : this->dataPtr->allItems)
-      items.emplace(item.first);
+    items = this->dataPtr->allItemsKeys;
   }
 
   return items;
@@ -169,84 +174,117 @@ std::set<std::string> IntrospectionManager::Items() const
 //////////////////////////////////////////////////
 void IntrospectionManager::Update()
 {
+  GZ_PROFILE("IntrospetionManager::Update");
   std::map<std::string, IntrospectionFilter> filtersCopy;
   std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
+  std::set<std::string> itemsToCopy;
 
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    GZ_PROFILE("LockAndCopy");
 
-    // Make a copy of these members for avoiding locking a mutex while calling a
-    // user callback (we could create a deadlock).
-    // More creative solutions are welcome.
+    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
     filtersCopy = this->dataPtr->filters;
-    allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
+
+    for (auto &observedItem: this->dataPtr->observedItems) {
+      auto &item = observedItem.first;
+      // Sanity check: Make sure that someone registered this item.
+      if(this->dataPtr->allItemsKeys.count(item) == 0) {
+        continue;
+      }
+      itemsToCopy.insert(observedItem.first);
+    }
+
+    for (auto& filter: filtersCopy) {
+      for (auto const &item : filter.second.items)
+      {
+        // Sanity check: Make sure that someone registered this item.
+        if(this->dataPtr->allItemsKeys.count(item) == 0) {
+          continue;
+        }
+        itemsToCopy.insert(item);
+      }
+    }
+
+    for(auto& item: itemsToCopy) {
+      allItemsCopy[item] = this->dataPtr->allItems[item];
+    }
   }
 
-  for (auto &observedItem : observedItemsCopy)
   {
-    auto &item = observedItem.first;
-    auto itemIter = allItemsCopy.find(item);
-
-    // Sanity check: Make sure that we can update the item.
-    if (itemIter == allItemsCopy.end())
-      continue;
-
-    try
+    GZ_PROFILE("observedItem");
+    for (auto &observedItem : observedItemsCopy)
     {
-      // Update the values of the items under observation.
-      gazebo::msgs::Any value = itemIter->second();
-      auto &lastValue = observedItem.second.lastValue;
-      lastValue.CopyFrom(value);
-    }
-    catch(...)
-    {
-      gzerr << "Exception caught calling user callback" << std::endl;
-      continue;
+      auto &item = observedItem.first;
+      auto itemIter = allItemsCopy.find(item);
+
+      // Sanity check: Make sure that we can update the item.
+      if (itemIter == allItemsCopy.end())
+        continue;
+
+      try
+      {
+        // Update the values of the items under observation.
+        gazebo::msgs::Any value = itemIter->second();
+        auto &lastValue = observedItem.second.lastValue;
+        lastValue.CopyFrom(value);
+      }
+      catch(...)
+      {
+        gzerr << "Exception caught calling user callback" << std::endl;
+        continue;
+      }
     }
   }
 
   // Prepare the next message to be sent in each filter.
-  for (auto &filter : filtersCopy)
   {
-    // First of all, clear the old message.
-    auto &nextMsg = filter.second.msg;
-    nextMsg.Clear();
-
-    // Insert the last value of each item under observation for this filter.
-    for (auto const &item : filter.second.items)
+    GZ_PROFILE("filter");
+    for (auto &filter : filtersCopy)
     {
-      // Sanity check: Make sure that someone registered this item.
-      if (allItemsCopy.find(item) == allItemsCopy.end())
-        continue;
+      // First of all, clear the old message.
+      auto &nextMsg = filter.second.msg;
+      nextMsg.Clear();
 
-      // Sanity check: Make sure that the value was updated.
-      // (e.g.: an exception was not raised).
-      auto &lastValue = observedItemsCopy[item].lastValue;
-      if (lastValue.type() == gazebo::msgs::Any::NONE)
-        continue;
-
-      auto nextParam = nextMsg.add_param();
-      nextParam->set_name(item);
-      nextParam->mutable_value()->CopyFrom(lastValue);
-    }
-
-    // Sanity check: Make sure that we have at least one item updated.
-    if (nextMsg.param_size() == 0)
-      continue;
-
-    // Publish the update for this filter.
-    std::string topicName = this->dataPtr->prefix + "filter/" + filter.first;
-
-    {
-      std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-      if (this->dataPtr->filterPubs.find(topicName) ==
-          this->dataPtr->filterPubs.end() ||
-          !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
+      // Insert the last value of each item under observation for this filter.
+      for (auto const &item : filter.second.items)
       {
-        gzerr << "Error publishing update for topic [" << topicName << "]"
-          << std::endl;
+        // Sanity check: Make sure that someone registered this item.
+        if (allItemsCopy.find(item) == allItemsCopy.end())
+          continue;
+
+        // Sanity check: Make sure that the value was updated.
+        // (e.g.: an exception was not raised).
+        auto &lastValue = observedItemsCopy[item].lastValue;
+        if (lastValue.type() == gazebo::msgs::Any::NONE)
+          continue;
+
+        auto nextParam = nextMsg.add_param();
+        nextParam->set_name(item);
+        nextParam->mutable_value()->CopyFrom(lastValue);
+      }
+
+      // Sanity check: Make sure that we have at least one item updated.
+      if (nextMsg.param_size() == 0)
+        continue;
+
+      // Publish the update for this filter.
+      std::string topicName = this->dataPtr->prefix + "filter/" + filter.first;
+
+      {
+        GZ_PROFILE("LockAndPublish");
+        std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+        {
+          GZ_PROFILE("Publish");
+          if (this->dataPtr->filterPubs.find(topicName) ==
+              this->dataPtr->filterPubs.end() ||
+              !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
+          {
+            gzerr << "Error publishing update for topic [" << topicName << "]"
+              << std::endl;
+          }
+        }
       }
     }
   }
@@ -257,16 +295,18 @@ void IntrospectionManager::Update()
 //////////////////////////////////////////////////
 void IntrospectionManager::NotifyUpdates()
 {
+  GZ_PROFILE("IntrospectionManager::NotifyUpdates");
   bool itemsUpdatedCopy;
 
   {
-    std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+    GZ_PROFILE("LockAndCopy");
     itemsUpdatedCopy = this->dataPtr->itemsUpdated;
     this->dataPtr->itemsUpdated = false;
   }
 
   if (itemsUpdatedCopy)
   {
+    GZ_PROFILE("Publish");
     gazebo::msgs::Empty req;
     gazebo::msgs::Param_V currentItems;
     // Prepare the list of items to be sent.
@@ -284,6 +324,7 @@ void IntrospectionManager::NotifyUpdates()
 bool IntrospectionManager::NewFilterImpl(const std::set<std::string> &_newItems,
     std::string &_filterId)
 {
+  GZ_PROFILE("IntrospectionManager::NewFilterImpl");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Create a unique filter ID based on a combination of letters. We don't
@@ -327,6 +368,7 @@ bool IntrospectionManager::NewFilterImpl(const std::set<std::string> &_newItems,
 bool IntrospectionManager::UpdateFilterImpl(const std::string &_filterId,
     const std::set<std::string> &_newItems)
 {
+  GZ_PROFILE("IntrospectionManager::UpdateFilterImpl");
   // Sanity check: Make sure that we have at least one item to be observed.
   if (_newItems.empty())
   {
@@ -383,6 +425,7 @@ bool IntrospectionManager::UpdateFilterImpl(const std::string &_filterId,
 //////////////////////////////////////////////////
 bool IntrospectionManager::RemoveFilterImpl(const std::string &_filterId)
 {
+  GZ_PROFILE("IntrospectionManager::RemoveFilterImpl");
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
   // Sanity check: Make sure that filter ID exists.
@@ -432,6 +475,7 @@ bool IntrospectionManager::RemoveFilterImpl(const std::string &_filterId)
 bool IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
     gazebo::msgs::GzString &_rep)
 {
+  GZ_PROFILE("IntrospectionManager::NewFilter");
   _rep.set_data("");
 
   // Sanity check: Make sure that the message contains at least one parameter.
@@ -475,6 +519,7 @@ bool IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
 bool IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
     gazebo::msgs::Empty &/*_rep*/)
 {
+  GZ_PROFILE("IntrospectionManager::UpdateFilter");
   // Sanity check: Make sure that the message contains at least one parameter.
   if (_req.param_size() == 0)
   {
@@ -536,6 +581,7 @@ bool IntrospectionManager::UpdateFilter(const gazebo::msgs::Param_V &_req,
 bool IntrospectionManager::RemoveFilter(const gazebo::msgs::Param_V &_req,
     gazebo::msgs::Empty &/*_rep*/)
 {
+  GZ_PROFILE("IntrospectionManager::RemoveFilter");
   // Sanity check: Make sure that the message contains exactly one parameter.
   if (_req.param_size() != 1)
   {

@@ -62,6 +62,8 @@
 #include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/IntrospectionManager.hh"
 #include "gazebo/util/LogRecord.hh"
+#include "gazebo/util/Profiler.hh"
+#include "gazebo/util/ProfileManager.hh"
 
 #include "gazebo/physics/Road.hh"
 #include "gazebo/physics/RayShape.hh"
@@ -166,6 +168,7 @@ World::~World()
 //////////////////////////////////////////////////
 void World::Load(sdf::ElementPtr _sdf)
 {
+  GZ_PROFILE("World::Load");
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
 
@@ -247,7 +250,7 @@ void World::Load(sdf::ElementPtr _sdf)
       &World::PluginInfoService, this))
   {
     gzerr << "Error advertising service [" << pluginInfoService << "]"
-        << std::endl;
+          << std::endl;
   }
 
   // This should come before loading of entities
@@ -353,6 +356,7 @@ const sdf::ElementPtr World::SDF()
 //////////////////////////////////////////////////
 void World::Save(const std::string &_filename)
 {
+  GZ_PROFILE("World::Save");
   this->UpdateStateSDF();
   std::string data;
   data = "<?xml version ='1.0'?>\n";
@@ -372,6 +376,8 @@ void World::Save(const std::string &_filename)
 //////////////////////////////////////////////////
 void World::Init()
 {
+  util::ProfileManager::Instance()->Reset();
+  GZ_PROFILE("World::Init");
   // Initialize all the entities (i.e. Model)
   for (unsigned int i = 0; i < this->dataPtr->rootElement->GetChildCount(); ++i)
     this->dataPtr->rootElement->GetChild(i)->Init();
@@ -436,6 +442,7 @@ void World::Init()
 //////////////////////////////////////////////////
 void World::Run(const unsigned int _iterations)
 {
+  GZ_PROFILE("World::Run");
   this->dataPtr->stop = false;
   this->dataPtr->stopIterations = _iterations;
 
@@ -445,6 +452,7 @@ void World::Run(const unsigned int _iterations)
 //////////////////////////////////////////////////
 void World::RunBlocking(const unsigned int _iterations)
 {
+  GZ_PROFILE("World::RunBlocking");
   this->dataPtr->stop = false;
   this->dataPtr->stopIterations = _iterations;
   this->RunLoop();
@@ -483,6 +491,7 @@ void World::Stop()
 //////////////////////////////////////////////////
 void World::RunLoop()
 {
+  GZ_PROFILE("World::RunLoop");
   this->dataPtr->physicsEngine->InitForThread();
 
   this->dataPtr->startTime = common::Time::GetWallTime();
@@ -507,6 +516,7 @@ void World::RunLoop()
         (!this->dataPtr->stopIterations ||
          (this->dataPtr->iterations < this->dataPtr->stopIterations));)
     {
+      util::ProfileManager::Instance()->Increment_Frame_Counter();
       this->Step();
     }
   }
@@ -539,6 +549,7 @@ void World::RunLoop()
 //////////////////////////////////////////////////
 void World::LogStep()
 {
+  GZ_PROFILE("World::LogStep");
   {
     std::lock_guard<std::recursive_mutex> lk(this->dataPtr->worldUpdateMutex);
 
@@ -600,6 +611,7 @@ bool World::SensorsInitialized() const
 //////////////////////////////////////////////////
 void World::Step()
 {
+  GZ_PROFILE("World::Step");
   DIAG_TIMER_START("World::Step");
 
   /// need this because ODE does not call dxReallocateWorldProcessContext()
@@ -628,6 +640,7 @@ void World::Step()
   common::Time actualSleep;
   if (sleepTime > 0)
   {
+    GZ_PROFILE("Time::Sleep");
     common::Time::Sleep(sleepTime);
     actualSleep = common::Time::GetWallTime() - tmpTime;
   }
@@ -688,6 +701,8 @@ void World::Step()
 //////////////////////////////////////////////////
 void World::Step(const unsigned int _steps)
 {
+  GZ_PROFILE("World::Step");
+
   if (!this->IsPaused())
   {
     gzwarn << "Calling World::Step(steps) while world is not paused\n";
@@ -703,6 +718,7 @@ void World::Step(const unsigned int _steps)
   bool wait = true;
   while (wait)
   {
+    GZ_PROFILE("World::Step::wait");
     common::Time::NSleep(1);
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
     if (this->dataPtr->stepInc == 0 || this->dataPtr->stop)
@@ -714,6 +730,7 @@ void World::Step(const unsigned int _steps)
 void World::Update()
 {
   DIAG_TIMER_START("World::Update");
+  GZ_PROFILE("World::Update");
 
   if (this->dataPtr->needsReset)
   {
@@ -734,13 +751,19 @@ void World::Update()
 
   DIAG_TIMER_LAP("World::Update", "Events::worldUpdateBegin");
 
-  // Update all the models
-  (*this.*dataPtr->modelUpdateFunc)();
+  {
+    GZ_PROFILE("Model::Update");
+    // Update all the models
+    (*this.*dataPtr->modelUpdateFunc)();
+  }
 
   DIAG_TIMER_LAP("World::Update", "Model::Update");
 
   // This must be called before PhysicsEngine::UpdatePhysics for ODE.
-  this->dataPtr->physicsEngine->UpdateCollision();
+  {
+    GZ_PROFILE("PhysicsEngine::UpdateCollision");
+    this->dataPtr->physicsEngine->UpdateCollision();
+  }
 
   DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdateCollision");
 
@@ -761,8 +784,11 @@ void World::Update()
 
   // Give clients a possibility to react to collisions before the physics
   // gets updated.
-  this->dataPtr->updateInfo.realTime = this->RealTime();
-  event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
+  {
+    GZ_PROFILE("Events::beforePhysicsUpdate");
+    this->dataPtr->updateInfo.realTime = this->RealTime();
+    event::Events::beforePhysicsUpdate(this->dataPtr->updateInfo);
+  }
 
   DIAG_TIMER_LAP("World::Update", "Events::beforePhysicsUpdate");
 
@@ -770,7 +796,10 @@ void World::Update()
   if (this->dataPtr->enablePhysicsEngine && this->dataPtr->physicsEngine)
   {
     // This must be called directly after PhysicsEngine::UpdateCollision.
-    this->dataPtr->physicsEngine->UpdatePhysics();
+    {
+      GZ_PROFILE("PhysicsEngine::UpdatePhysics");
+      this->dataPtr->physicsEngine->UpdatePhysics();
+    }
 
     DIAG_TIMER_LAP("World::Update", "PhysicsEngine::UpdatePhysics");
 
@@ -778,6 +807,7 @@ void World::Update()
     //   ode --> MoveCallback sets the dirtyPoses
     //           and we need to propagate it into Entity::worldPose
     {
+      GZ_PROFILE("SetWorldPose(dirtyPoses)");
       // block any other pose updates (e.g. Joint::SetPosition)
       boost::recursive_mutex::scoped_lock plock(
           *this->Physics()->GetPhysicsUpdateMutex());
@@ -1048,6 +1078,7 @@ EntityPtr World::EntityByName(const std::string &_name) const
 //////////////////////////////////////////////////
 ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 {
+  GZ_PROFILE("World::LoadModel");
   std::lock_guard<std::mutex> lock(this->dataPtr->loadModelMutex);
   ModelPtr model;
 
@@ -1154,6 +1185,7 @@ RoadPtr World::LoadRoad(sdf::ElementPtr _sdf , BasePtr _parent)
 //////////////////////////////////////////////////
 void World::LoadEntities(sdf::ElementPtr _sdf, BasePtr _parent)
 {
+  GZ_PROFILE("World::LoadEntities");
   if (_sdf->HasElement("light"))
   {
     sdf::ElementPtr childElem = _sdf->GetElement("light");
@@ -1266,6 +1298,7 @@ void World::ResetEntities(Base::EntityType _type)
 //////////////////////////////////////////////////
 void World::Reset()
 {
+  GZ_PROFILE("World::Reset");
   bool currentlyPaused = this->IsPaused();
   this->SetPaused(true);
 
@@ -1384,6 +1417,7 @@ void World::SetPaused(const bool _p)
 //////////////////////////////////////////////////
 void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 {
+  GZ_PROFILE("World::OnFactoryMsg");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->factoryMsgs.push_back(*_msg);
 }
@@ -1391,6 +1425,7 @@ void World::OnFactoryMsg(ConstFactoryPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnControl(ConstWorldControlPtr &_data)
 {
+  GZ_PROFILE("World::OnControl");
   if (_data->has_pause())
     this->SetPaused(_data->pause());
 
@@ -1436,6 +1471,7 @@ void World::OnControl(ConstWorldControlPtr &_data)
 //////////////////////////////////////////////////
 void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 {
+  GZ_PROFILE("World::OnPlaybackControl");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->playbackControlMsgs.push_back(*_data);
 }
@@ -1443,6 +1479,7 @@ void World::OnPlaybackControl(ConstLogPlaybackControlPtr &_data)
 //////////////////////////////////////////////////
 void World::ProcessPlaybackControlMsgs()
 {
+  GZ_PROFILE("World::ProcessPlaybackControlMsgs");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->worldUpdateMutex);
 
   for (auto const &msg : this->dataPtr->playbackControlMsgs)
@@ -1488,6 +1525,7 @@ void World::ProcessPlaybackControlMsgs()
 //////////////////////////////////////////////////
 void World::OnRequest(ConstRequestPtr &_msg)
 {
+  GZ_PROFILE("World::OnRequest");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->requestMsgs.push_back(*_msg);
 }
@@ -1495,6 +1533,7 @@ void World::OnRequest(ConstRequestPtr &_msg)
 //////////////////////////////////////////////////
 void World::JointLog(ConstJointPtr &_msg)
 {
+  GZ_PROFILE("World::JointLog");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   int i = 0;
   for (; i < this->dataPtr->sceneMsg.joint_size(); i++)
@@ -1516,6 +1555,7 @@ void World::JointLog(ConstJointPtr &_msg)
 //////////////////////////////////////////////////
 void World::OnModelMsg(ConstModelPtr &_msg)
 {
+  GZ_PROFILE("World::OnModelMsg");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->modelMsgs.push_back(*_msg);
 }
@@ -1523,6 +1563,7 @@ void World::OnModelMsg(ConstModelPtr &_msg)
 //////////////////////////////////////////////////
 void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
 {
+  GZ_PROFILE("World::BuildSceneMsg");
   if (_entity)
   {
     if (_entity->HasType(Entity::MODEL))
@@ -1564,6 +1605,7 @@ void World::ModelUpdateSingleLoop()
 //////////////////////////////////////////////////
 void World::LoadPlugins()
 {
+  GZ_PROFILE("World::LoadPlugins");
   // Load the plugins
   if (this->dataPtr->sdf->HasElement("plugin"))
   {
@@ -1592,6 +1634,7 @@ void World::LoadPlugin(const std::string &_filename,
                        const std::string &_name,
                        sdf::ElementPtr _sdf)
 {
+  GZ_PROFILE("World::LoadPlugin");
   gazebo::WorldPluginPtr plugin = gazebo::WorldPlugin::Create(_filename,
                                                               _name);
 
@@ -1615,6 +1658,7 @@ void World::LoadPlugin(const std::string &_filename,
 //////////////////////////////////////////////////
 void World::RemovePlugin(const std::string &_name)
 {
+  GZ_PROFILE("World::RemovePlugin");
   for (auto plugin = this->dataPtr->plugins.begin();
            plugin != this->dataPtr->plugins.end(); ++plugin)
   {
@@ -1637,6 +1681,7 @@ void World::LoadPlugin(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void World::ProcessEntityMsgs()
 {
+  GZ_PROFILE("World::ProcessEntityMsgs");
   std::lock_guard<std::mutex> lock(this->dataPtr->entityDeleteMutex);
 
   for (auto &entityName : this->dataPtr->deleteEntity)
@@ -1654,6 +1699,7 @@ void World::ProcessEntityMsgs()
 //////////////////////////////////////////////////
 void World::ProcessRequestMsgs()
 {
+  GZ_PROFILE("World::ProcessRequestsMsgs");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   msgs::Response response;
 
@@ -1820,6 +1866,7 @@ void World::ProcessRequestMsgs()
 //////////////////////////////////////////////////
 void World::ProcessModelMsgs()
 {
+  GZ_PROFILE("World::ProcessModelMsgs");
   std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
   for (auto const &modelMsg : this->dataPtr->modelMsgs)
   {
@@ -1943,6 +1990,7 @@ void World::ProcessLightFactoryMsgs()
 //////////////////////////////////////////////////
 void World::ProcessFactoryMsgs()
 {
+  GZ_PROFILE("World::ProcessFactoryMsgs");
   std::list<sdf::ElementPtr> modelsToLoad, lightsToLoad;
 
   {
@@ -2172,6 +2220,7 @@ EntityPtr World::EntityBelowPoint(const ignition::math::Vector3d &_pt) const
 //////////////////////////////////////////////////
 void World::SetState(const WorldState &_state)
 {
+  GZ_PROFILE("World::SetState");
   this->SetSimTime(_state.GetSimTime());
   this->dataPtr->logRealTime = _state.GetRealTime();
   this->dataPtr->iterations = _state.GetIterations();
@@ -2468,6 +2517,7 @@ void World::LogModelResources()
 //////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
+  GZ_PROFILE("World::OnLog");
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
@@ -2536,6 +2586,7 @@ bool World::OnLog(std::ostringstream &_stream)
 //////////////////////////////////////////////////
 void World::ProcessMessages()
 {
+  GZ_PROFILE("World::ProcessMessages");
   {
     std::lock_guard<std::recursive_mutex> lock(this->dataPtr->receiveMutex);
 
@@ -2667,6 +2718,7 @@ void World::ProcessMessages()
 //////////////////////////////////////////////////
 void World::PublishWorldStats()
 {
+  GZ_PROFILE("World::PublishWorldStats");
   this->dataPtr->worldStatsMsg.Clear();
 
   msgs::Set(this->dataPtr->worldStatsMsg.mutable_sim_time(),

@@ -97,12 +97,15 @@ namespace gazebo
       return delta_t.Float() * 1000;
     }
 
+    ProfileIterator * ProfileManager::Get_Iterator(int thread_id) {
+      if ((thread_id < 0) || thread_id >= PROFILER_MAX_THREAD_COUNT)
+        return nullptr;
+      return new ProfileIterator(&this->dataPtr->gRoots[thread_id]);
+    }
+
     ProfileIterator * ProfileManager::Get_Iterator(void)
     {
-        int threadIndex = GetCurrentThreadIndex2();
-        if ((threadIndex < 0) || threadIndex >= PROFILER_MAX_THREAD_COUNT)
-          return 0;
-        return new ProfileIterator(&this->dataPtr->gRoots[threadIndex]);
+      return Get_Iterator(GetCurrentThreadIndex2());
     }
 
     void ProfileManager::Release_Iterator(ProfileIterator* iterator)
@@ -125,17 +128,17 @@ namespace gazebo
 
       auto space = [](int spacing){
         for (int i = 0; i < spacing; i++) {
-          printf(".");
+          fprintf(stderr, ".");
         }
       };
 
       int frames_since_reset = Get_Frame_Count_Since_Reset();
 
       space(spacing);
-      printf("----------------------------------\n");
+      fprintf(stderr, "----------------------------------\n");
       space(spacing);
 
-      printf("Profiling: %s (total running time: %.3f ms) ---\n", profileIterator->Get_Current_Parent_Name(), parent_time);
+      fprintf(stderr, "Profiling: %s (total running time: %.3f ms) ---\n", profileIterator->Get_Current_Parent_Name(), parent_time);
 
       float totalTime = 0.f;
       int numChildren = 0;
@@ -153,14 +156,14 @@ namespace gazebo
         const float time_per_frame = (current_total_time / (double)frames_since_reset);
         const int total_calls = profileIterator->Get_Current_Total_Calls();
 
-        printf("%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)\n", i, name, fraction, time_per_frame, total_calls);
+        fprintf(stderr, "%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)\n", i, name, fraction, time_per_frame, total_calls);
         totalTime += current_total_time;
         //recurse into children
       }
 
       space(spacing);
 
-      printf("%s (%.3f %%) :: %.3f ms\n", "Unaccounted:", fabsf(parent_time) > 1e-9 ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
+      fprintf(stderr, "%s (%.3f %%) :: %.3f ms\n", "Unaccounted:", fabsf(parent_time) > 1e-9 ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
 
       for (int i=0;i<numChildren;i++)
       {
@@ -172,10 +175,24 @@ namespace gazebo
 
     void ProfileManager::dumpAll()
     {
-      ProfileIterator* profileIterator = 0;
+      ProfileIterator* profileIterator = nullptr;
       profileIterator = ProfileManager::Get_Iterator();
       dumpRecursive(profileIterator, 0);
       ProfileManager::Release_Iterator(profileIterator);
     }
+
+    void ProfileManager::dumpAllThreads()
+    {
+      for (size_t ii =0 ; ii < PROFILER_MAX_THREAD_COUNT; ++ii) {
+        ProfileIterator* profileIterator = nullptr;
+        profileIterator = ProfileManager::Get_Iterator(ii);
+        std::cout << "------Thread-" << ii << std::endl;
+        dumpRecursive(profileIterator, 0);
+        std::cout << std::endl;
+
+        ProfileManager::Release_Iterator(profileIterator);
+      }
+    }
+
   }
 }

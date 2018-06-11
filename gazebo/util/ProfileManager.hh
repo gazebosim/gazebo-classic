@@ -42,10 +42,12 @@ namespace gazebo {
       public: int Get_Frame_Count_Since_Reset(void);
       public: float Get_Time_Since_Reset(void);
 
+      public: ProfileIterator * Get_Iterator(int thread_id);
       public: ProfileIterator * Get_Iterator(void);
       public: void Release_Iterator(ProfileIterator * iterator);
       public: void dumpRecursive(ProfileIterator* profileIterator, int spacing);
       public: void dumpAll();
+      public: void dumpAllThreads();
 
       private: friend class SingletonT<ProfileManager>;
       private: std::unique_ptr<ProfileManagerPrivate> dataPtr;
