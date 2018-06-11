@@ -176,7 +176,7 @@ void IntrospectionManager::Update()
 {
   GZ_PROFILE("IntrospetionManager::Update");
   std::map<std::string, IntrospectionFilter> filtersCopy;
-  std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
+  std::map<std::string, std::function <gazebo::msgs::Any ()>> usedItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
   std::set<std::string> itemsToCopy;
 
@@ -208,7 +208,7 @@ void IntrospectionManager::Update()
     }
 
     for(auto& item: itemsToCopy) {
-      allItemsCopy[item] = this->dataPtr->allItems[item];
+      usedItemsCopy[item] = this->dataPtr->allItems[item];
     }
   }
 
@@ -217,11 +217,7 @@ void IntrospectionManager::Update()
     for (auto &observedItem : observedItemsCopy)
     {
       auto &item = observedItem.first;
-      auto itemIter = allItemsCopy.find(item);
-
-      // Sanity check: Make sure that we can update the item.
-      if (itemIter == allItemsCopy.end())
-        continue;
+      auto itemIter = usedItemsCopy.find(item);
 
       try
       {
@@ -250,10 +246,6 @@ void IntrospectionManager::Update()
       // Insert the last value of each item under observation for this filter.
       for (auto const &item : filter.second.items)
       {
-        // Sanity check: Make sure that someone registered this item.
-        if (allItemsCopy.find(item) == allItemsCopy.end())
-          continue;
-
         // Sanity check: Make sure that the value was updated.
         // (e.g.: an exception was not raised).
         auto &lastValue = observedItemsCopy[item].lastValue;

@@ -17,11 +17,13 @@
 #ifndef GAZEBO_UTIL_INTROSPECTION_MANAGER_PRIVATE_HH_
 #define GAZEBO_UTIL_INTROSPECTION_MANAGER_PRIVATE_HH_
 
+#include <atomic>
 #include <functional>
 #include <map>
 #include <mutex>
 #include <set>
 #include <string>
+
 #include <ignition/transport.hh>
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
