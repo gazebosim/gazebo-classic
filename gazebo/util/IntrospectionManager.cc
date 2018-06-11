@@ -139,7 +139,6 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   }
 
   // Remove the item from the list of all items.
-  
   this->dataPtr->allItemsKeys.erase(_item);
   this->dataPtr->allItems.erase(_item);
 
@@ -187,27 +186,32 @@ void IntrospectionManager::Update()
     filtersCopy = this->dataPtr->filters;
     observedItemsCopy = this->dataPtr->observedItems;
 
-    for (auto &observedItem: this->dataPtr->observedItems) {
+    for (auto &observedItem: this->dataPtr->observedItems)
+    {
       auto &item = observedItem.first;
       // Sanity check: Make sure that someone registered this item.
-      if(this->dataPtr->allItemsKeys.count(item) == 0) {
+      if (this->dataPtr->allItemsKeys.count(item) == 0)
+      {
         continue;
       }
       itemsToCopy.insert(observedItem.first);
     }
 
-    for (auto& filter: filtersCopy) {
+    for (auto& filter: filtersCopy)
+    {
       for (auto const &item : filter.second.items)
       {
         // Sanity check: Make sure that someone registered this item.
-        if(this->dataPtr->allItemsKeys.count(item) == 0) {
+        if (this->dataPtr->allItemsKeys.count(item) == 0)
+        {
           continue;
         }
         itemsToCopy.insert(item);
       }
     }
 
-    for(auto& item: itemsToCopy) {
+    for (auto& item: itemsToCopy)
+    {
       usedItemsCopy[item] = this->dataPtr->allItems[item];
     }
   }

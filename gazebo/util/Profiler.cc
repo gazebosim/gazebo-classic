@@ -16,7 +16,7 @@
 */
 
 
-/* 
+/*
  * Taken from bulletphysics/bullet3
  *
  * Bullet Continuous Collision Detection and Physics Library
@@ -28,7 +28,7 @@
  * including commercial applications, and to alter it and redistribute it freely,
  * subject to the following restrictions:
 
- * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. 
+ * 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software.
  *    If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
@@ -45,79 +45,90 @@
 **
 ***************************************************************************************************/
 
+#include <iostream>
+
 #include "gazebo/gazebo_config.h"
 #include "gazebo/util/Profiler.hh"
 
-#include <iostream>
+namespace gazebo
+{
+  namespace util
+  {
+    int GetCurrentThreadIndex2()
+    {
+      const int kNullIndex = ~0U;
+      static __thread int sThreadIndex = kNullIndex;
+      static int gThreadCounter = 0;
 
-namespace gazebo {
-  namespace util {
-
-int GetCurrentThreadIndex2() {
-  const int kNullIndex = ~0U;
-  static __thread int sThreadIndex = kNullIndex;
-  static int gThreadCounter = 0;
-
-  if (sThreadIndex == kNullIndex) {
-    sThreadIndex = gThreadCounter++;
-  }
-  return sThreadIndex;
-}
+      if (sThreadIndex == kNullIndex)
+      {
+        sThreadIndex = gThreadCounter++;
+      }
+      return sThreadIndex;
+    }
 
 #ifdef ENABLE_PROFILER
-void EnterProfileZoneDefault(const char* name)
-{
-  ProfileManager::Instance()->Start_Profile( name ); 
-}
-void LeaveProfileZoneDefault()
-{
-	ProfileManager::Instance()->Stop_Profile(); 
-}
+    void EnterProfileZoneDefault(const char* name)
+    {
+      ProfileManager::Instance()->Start_Profile(name);
+    }
+
+    void LeaveProfileZoneDefault()
+    {
+      ProfileManager::Instance()->Stop_Profile();
+    }
 #else
-void	EnterProfileZoneDefault(const char* /*name*/){}
-void	LeaveProfileZoneDefault(){}
-#endif 
+    void EnterProfileZoneDefault(const char* /*name*/)
+    {
+    }
 
-static EnterProfileZoneFunc* gz_enterFunc = EnterProfileZoneDefault;
-static LeaveProfileZoneFunc* gz_leaveFunc = LeaveProfileZoneDefault;
+    void LeaveProfileZoneDefault()
+    {
+    }
+#endif
 
-void EnterProfileZone(const char* name)
-{
-	(gz_enterFunc)(name);
+    static EnterProfileZoneFunc* gz_enterFunc = EnterProfileZoneDefault;
+    static LeaveProfileZoneFunc* gz_leaveFunc = LeaveProfileZoneDefault;
+
+    void EnterProfileZone(const char* name)
+    {
+      (gz_enterFunc)(name);
+    }
+
+    void LeaveProfileZone()
+    {
+      (gz_leaveFunc)();
+    }
+
+    EnterProfileZoneFunc* GetCurrentEnterProfileZoneFunc()
+    {
+      return gz_enterFunc;
+    }
+
+    LeaveProfileZoneFunc* GetCurrentLeaveProfileZoneFunc()
+    {
+      return gz_leaveFunc;
+    }
+
+    void SetCustomEnterProfileZoneFunc(EnterProfileZoneFunc* enterFunc)
+    {
+      gz_enterFunc = enterFunc;
+    }
+
+    void SetCustomLeaveProfileZoneFunc(LeaveProfileZoneFunc* leaveFunc)
+    {
+      gz_leaveFunc = leaveFunc;
+    }
+  }
 }
 
-void LeaveProfileZone()
+ProfileSample::ProfileSample(const char * name)
 {
-	(gz_leaveFunc)();
-}
-
-EnterProfileZoneFunc* GetCurrentEnterProfileZoneFunc()
-{
-	return gz_enterFunc;
-}
-
-LeaveProfileZoneFunc* GetCurrentLeaveProfileZoneFunc()
-{
-	return gz_leaveFunc;
-}
-
-void SetCustomEnterProfileZoneFunc(EnterProfileZoneFunc* enterFunc)
-{
-	gz_enterFunc = enterFunc;
-}
-void SetCustomLeaveProfileZoneFunc(LeaveProfileZoneFunc* leaveFunc)
-{
-	gz_leaveFunc = leaveFunc;
-}
-}
-}
-ProfileSample::ProfileSample( const char * name )
-{ 
   gazebo::util::EnterProfileZone(name);
 }
 
-ProfileSample::~ProfileSample( void )					
-{ 
+ProfileSample::~ProfileSample(void)
+{
   gazebo::util::LeaveProfileZone();
 }
 

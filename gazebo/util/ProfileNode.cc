@@ -18,42 +18,36 @@
 
 #include "gazebo/util/ProfileNode.hh"
 
-namespace gazebo 
+namespace gazebo
 {
-  namespace util 
+  namespace util
   {
-    ProfileNode::ProfileNode( const char * name, ProfileNode * parent ) :
-      Name( name ),
-      TotalCalls( 0 ),
-      TotalTime( 0 ),
-      StartTime( 0 ),
-      RecursionCounter( 0 ),
-      Parent( parent ),
-      Child( nullptr ),
-      Sibling( nullptr )
+    ProfileNode::ProfileNode(const char * name, ProfileNode * parent) :
+      Name(name),
+      TotalCalls(0),
+      TotalTime(0),
+      StartTime(0),
+      RecursionCounter(0),
+      Parent(parent),
+      Child(nullptr),
+      Sibling(nullptr)
     {
       Reset();
     }
 
-    void ProfileNode::CleanupMemory()
-    {
-      delete ( Child);
-      Child = nullptr;
-      delete ( Sibling);
-      Sibling = nullptr;
-    }
-
-    ProfileNode::~ProfileNode( void )
+    ProfileNode::~ProfileNode(void)
     {
       CleanupMemory();
     }
 
-    ProfileNode * ProfileNode::Get_Sub_Node( const char * name )
+    ProfileNode * ProfileNode::Get_Sub_Node(const char * name)
     {
       // Try to find this sub node
       ProfileNode * child = Child;
-      while ( child ) {
-        if ( child->Name == name ) {
+      while (child)
+      {
+        if (child->Name == name)
+        {
           return child;
         }
         child = child->Sibling;
@@ -61,43 +55,83 @@ namespace gazebo
 
       // We didn't find it, so add it
 
-      ProfileNode * node = new ProfileNode( name, this );
+      ProfileNode * node = new ProfileNode(name, this);
       node->Sibling = Child;
       Child = node;
       return node;
     }
 
-    void ProfileNode::Reset( void )
+    ProfileNode * ProfileNode::Get_Parent(void)
+    {
+      return this->Parent;
+    }
+
+    ProfileNode * ProfileNode::Get_Sibling(void)
+    {
+      return this->Sibling;
+    }
+
+    ProfileNode * ProfileNode::Get_Child(void)
+    {
+      return this->Child;
+    }
+
+    void ProfileNode::CleanupMemory()
+    {
+      delete (Child);
+      Child = nullptr;
+      delete (Sibling);
+      Sibling = nullptr;
+    }
+
+    void ProfileNode::Reset(void)
     {
       TotalCalls = 0;
       TotalTime = 0.0f;
 
-      if ( Child ) {
+      if (Child)
+      {
         Child->Reset();
       }
-      if ( Sibling ) {
+      if (Sibling)
+      {
         Sibling->Reset();
       }
     }
 
-    void ProfileNode::Call( void )
+    void ProfileNode::Call(void)
     {
       TotalCalls++;
-      if (RecursionCounter++ == 0) {
+      if (RecursionCounter++ == 0)
+      {
         StartTime.SetToWallTime();
       }
     }
 
-    bool ProfileNode::Return( void )
+    bool ProfileNode::Return(void)
     {
-      if ( --RecursionCounter == 0 && TotalCalls != 0 ) {
+      if (--RecursionCounter == 0 && TotalCalls != 0)
+      {
         auto cur_time = gazebo::common::Time::GetWallTime();
         auto delta_t = cur_time - StartTime;
         TotalTime += delta_t;
       }
-      return ( RecursionCounter == 0 );
+      return (RecursionCounter == 0);
+    }
+
+    const char* ProfileNode::Get_Name(void)
+    {
+      return this->Name;
+    }
+
+    int ProfileNode::Get_Total_Calls(void)
+    {
+      return TotalCalls;
+    }
+
+    float ProfileNode::Get_Total_Time(void)
+    {
+      return TotalTime.Float() * 1000;
     }
   }
 }
-
-

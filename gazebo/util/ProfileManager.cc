@@ -97,7 +97,8 @@ namespace gazebo
       return delta_t.Float() * 1000;
     }
 
-    ProfileIterator * ProfileManager::Get_Iterator(int thread_id) {
+    ProfileIterator * ProfileManager::Get_Iterator(int thread_id)
+    {
       if ((thread_id < 0) || thread_id >= PROFILER_MAX_THREAD_COUNT)
         return nullptr;
       return new ProfileIterator(&this->dataPtr->gRoots[thread_id]);
@@ -113,7 +114,8 @@ namespace gazebo
       delete iterator;
     }
 
-    void ProfileManager::dumpRecursive(ProfileIterator* profileIterator, int spacing)
+    void ProfileManager::dumpRecursive(ProfileIterator* profileIterator,
+                                       int spacing)
     {
       profileIterator->First();
 
@@ -126,8 +128,10 @@ namespace gazebo
         Get_Time_Since_Reset() :
         profileIterator->Get_Current_Parent_Total_Time();
 
-      auto space = [](int spacing){
-        for (int i = 0; i < spacing; i++) {
+      auto space = [](int spaces)
+      {
+        for (int i = 0; i < spaces; i++)
+        {
           fprintf(stderr, ".");
         }
       };
@@ -138,61 +142,74 @@ namespace gazebo
       fprintf(stderr, "----------------------------------\n");
       space(spacing);
 
-      fprintf(stderr, "Profiling: %s (total running time: %.3f ms) ---\n", profileIterator->Get_Current_Parent_Name(), parent_time);
+      fprintf(stderr,
+          "Profiling: %s (total running time: %.3f ms) ---\n",
+          profileIterator->Get_Current_Parent_Name(), parent_time);
 
       float totalTime = 0.f;
       int numChildren = 0;
 
-      for (int i = 0; !profileIterator->Is_Done(); i++,profileIterator->Next())
+      for (int i = 0; !profileIterator->Is_Done(); i++, profileIterator->Next())
       {
         numChildren++;
         float current_total_time = profileIterator->Get_Current_Total_Time();
         accumulated_time += current_total_time;
-        float fraction = fabsf(parent_time) > 1e-9 ? (current_total_time / parent_time) * 100 : 0.f;
+        float fraction = 0.0f;
+        if (fabsf(parent_time) > 1e-9)
+        {
+          fraction = (current_total_time / parent_time) * 100.0f;
+        }
 
         space(spacing);
 
         const char* name = profileIterator->Get_Current_Name();
-        const float time_per_frame = (current_total_time / (double)frames_since_reset);
+        const float time_per_frame = current_total_time /
+          static_cast<double>(frames_since_reset);
         const int total_calls = profileIterator->Get_Current_Total_Calls();
 
-        fprintf(stderr, "%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)\n", i, name, fraction, time_per_frame, total_calls);
+        fprintf(stderr, "%d -- %s (%.2f %%) :: %.3f ms / frame (%d calls)\n",
+            i, name, fraction, time_per_frame, total_calls);
         totalTime += current_total_time;
-        //recurse into children
       }
 
       space(spacing);
 
-      fprintf(stderr, "%s (%.3f %%) :: %.3f ms\n", "Unaccounted:", fabsf(parent_time) > 1e-9 ? ((parent_time - accumulated_time) / parent_time) * 100 : 0.f, parent_time - accumulated_time);
+      float unaccounted = 0.0f;
+      if (fabsf(parent_time) > 1e-9)
+      {
+        unaccounted = (parent_time - accumulated_time) / parent_time;
+        unaccounted *= 100.0f;
+      }
 
-      for (int i=0;i<numChildren;i++)
+      fprintf(stderr, "%s (%.3f %%) :: %.3f ms\n", "Unaccounted:",
+          unaccounted,
+          parent_time - accumulated_time);
+
+      for (int i = 0; i < numChildren; i++)
       {
         profileIterator->Enter_Child(i);
-        dumpRecursive(profileIterator,spacing+3);
+        dumpRecursive(profileIterator, spacing+3);
         profileIterator->Enter_Parent();
       }
     }
 
     void ProfileManager::dumpAll()
     {
-      ProfileIterator* profileIterator = nullptr;
-      profileIterator = ProfileManager::Get_Iterator();
+      auto profileIterator = ProfileManager::Get_Iterator();
       dumpRecursive(profileIterator, 0);
       ProfileManager::Release_Iterator(profileIterator);
     }
 
     void ProfileManager::dumpAllThreads()
     {
-      for (size_t ii =0 ; ii < PROFILER_MAX_THREAD_COUNT; ++ii) {
-        ProfileIterator* profileIterator = nullptr;
-        profileIterator = ProfileManager::Get_Iterator(ii);
+      for (size_t ii =0 ; ii < PROFILER_MAX_THREAD_COUNT; ++ii)
+      {
+        auto profileIterator = ProfileManager::Get_Iterator(ii);
         std::cout << "------Thread-" << ii << std::endl;
         dumpRecursive(profileIterator, 0);
         std::cout << std::endl;
-
         ProfileManager::Release_Iterator(profileIterator);
       }
     }
-
   }
 }

@@ -16,43 +16,69 @@
 */
 
 
-#ifndef _GAZEBO_UTIL_PROFILENODE_HH_ 
-#define _GAZEBO_UTIL_PROFILENODE_HH_ 
+#ifndef _GAZEBO_UTIL_PROFILENODE_HH_
+#define _GAZEBO_UTIL_PROFILENODE_HH_
 
 #include "gazebo/common/Time.hh"
 
 namespace gazebo {
   namespace util {
-    ///A node in the Profile Hierarchy Tree
+    /// \brief A node in the Profile Hierarchy Tree
     class ProfileNode {
-    public:
-      ProfileNode( const char * name, ProfileNode * parent );
-      ~ProfileNode( void );
+      /// \brief Constructor.
+      public: ProfileNode(const char * name, ProfileNode * parent);
 
-      ProfileNode * Get_Sub_Node( const char * name );
-      ProfileNode * Get_Parent( void )  { return Parent; }
-      ProfileNode * Get_Sibling( void )  { return Sibling; }
-      ProfileNode * Get_Child( void )   { return Child; }
+      /// \brief Destructor.
+      public: ~ProfileNode(void);
 
-      void CleanupMemory();
-      void Reset( void );
-      void Call( void );
-      bool Return( void );
+      /// \brief Get node matching name, or create
+      public: ProfileNode * Get_Sub_Node(const char * name);
 
-      const char * Get_Name( void )    { return Name; }
-      int Get_Total_Calls( void )  { return TotalCalls; }
-      float Get_Total_Time( void )  { return TotalTime.Float() * 1000; }
+      /// \brief Get parent to this node
+      public: ProfileNode * Get_Parent(void);
 
-    protected:
-      const char * Name;
-      int TotalCalls;
-      gazebo::common::Time TotalTime;
-      gazebo::common::Time StartTime;
-      int RecursionCounter;
+      /// \brief Get sibiling to this node
+      public: ProfileNode * Get_Sibling(void);
 
-      ProfileNode * Parent;
-      ProfileNode * Child;
-      ProfileNode * Sibling;
+      /// \brief Get child to this node
+      public: ProfileNode * Get_Child(void);
+
+      /// \brief Cleanup allocated memory
+      public: void CleanupMemory(void);
+
+      /// \brief Reset internal node state
+      public: void Reset(void);
+
+      /// \brief Start counters/timer for this node
+      public: void Call(void);
+
+      /// \brief Stop counters/timer for this node
+      public: bool Return(void);
+
+      /// \brief Get node name
+      public: const char * Get_Name(void);
+
+      /// \brief Get node calls
+      public: int Get_Total_Calls(void);
+
+      /// \brief Get node execution time
+      public: float Get_Total_Time(void);
+
+      protected: const char * Name;
+
+      protected: int TotalCalls;
+
+      protected: gazebo::common::Time TotalTime;
+
+      protected: gazebo::common::Time StartTime;
+
+      protected: int RecursionCounter;
+
+      protected: ProfileNode * Parent;
+
+      protected: ProfileNode * Child;
+
+      protected: ProfileNode * Sibling;
     };
   }
 }
