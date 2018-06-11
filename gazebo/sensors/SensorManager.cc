@@ -32,7 +32,10 @@
 #include "gazebo/sensors/SensorsIface.hh"
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/SensorManager.hh"
+
 #include "gazebo/util/LogPlay.hh"
+#include "gazebo/util/Profiler.hh"
+#include "gazebo/util/ProfileManager.hh"
 
 using namespace gazebo;
 using namespace sensors;
@@ -117,6 +120,7 @@ bool SensorManager::Running() const
 //////////////////////////////////////////////////
 void SensorManager::Update(bool _force)
 {
+  GZ_PROFILE("SensorManager::Update");
   {
     boost::recursive_mutex::scoped_lock lock(this->mutex);
 
@@ -470,6 +474,7 @@ void SensorManager::SensorContainer::Fini()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Run()
 {
+  GZ_PROFILE("SensorManager::SensorContainer::Run");
   this->runThread = new boost::thread(
       boost::bind(&SensorManager::SensorContainer::RunLoop, this));
 
@@ -479,6 +484,7 @@ void SensorManager::SensorContainer::Run()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Stop()
 {
+  GZ_PROFILE("SensorManager::SensorContainer::Stop");
   this->stop = true;
   this->runCondition.notify_all();
   if (this->runThread)
@@ -501,6 +507,7 @@ bool SensorManager::SensorContainer::Running() const
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::RunLoop()
 {
+  util::ProfileManager::Instance()->Reset();
   this->stop = false;
 
   physics::WorldPtr world = physics::get_world();
@@ -554,6 +561,7 @@ void SensorManager::SensorContainer::RunLoop()
 
   while (!this->stop)
   {
+    util::ProfileManager::Instance()->Increment_Frame_Counter();
     // If all the sensors get deleted, wait here.
     // Use a while loop since world resets will notify the runCondition.
     while (this->sensors.empty())
@@ -611,6 +619,7 @@ void SensorManager::SensorContainer::RunLoop()
 //////////////////////////////////////////////////
 void SensorManager::SensorContainer::Update(bool _force)
 {
+  GZ_PROFILE("SensorManager::SensorContainer::Update");
   boost::recursive_mutex::scoped_lock lock(this->mutex);
 
   if (this->sensors.empty())

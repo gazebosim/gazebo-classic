@@ -42,6 +42,8 @@
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/sensors/SensorManager.hh"
 
+#include "gazebo/util/Profiler.hh"
+
 using namespace gazebo;
 using namespace sensors;
 
@@ -186,6 +188,7 @@ bool Sensor::NeedsUpdate()
 //////////////////////////////////////////////////
 void Sensor::Update(const bool _force)
 {
+  GZ_PROFILE("Sensor::Update");
   if (this->IsActive() || _force)
   {
     common::Time simTime;
@@ -387,6 +390,7 @@ std::string Sensor::Topic() const
 //////////////////////////////////////////////////
 void Sensor::FillMsg(msgs::Sensor &_msg)
 {
+  GZ_PROFILE("Sensor::FillMsg");
   _msg.set_name(this->Name());
   _msg.set_id(this->Id());
   _msg.set_type(this->Type());

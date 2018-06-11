@@ -48,21 +48,14 @@
 #include "gazebo/gazebo_config.h"
 #include "gazebo/util/Profiler.hh"
 
+#include <iostream>
+
 namespace gazebo {
   namespace util {
 
 int GetCurrentThreadIndex2() {
   const int kNullIndex = ~0U;
-
-#if defined(GAZEBO_THREAD_LOCAL)
-  static THREADLOCAL int sThreadIndex = kNullIndex;
-#elif defined(_WIN32)
-  __declspec(thread) static int sThreadIndex = kNullIndex;
-#else
-  int sThreadIndex = 0;
-  return -1;
-#endif
-
+  static __thread int sThreadIndex = kNullIndex;
   static int gThreadCounter = 0;
 
   if (sThreadIndex == kNullIndex) {
@@ -83,7 +76,7 @@ void LeaveProfileZoneDefault()
 #else
 void	EnterProfileZoneDefault(const char* /*name*/){}
 void	LeaveProfileZoneDefault(){}
-#endif //BT_NO_PROFILE
+#endif 
 
 static EnterProfileZoneFunc* gz_enterFunc = EnterProfileZoneDefault;
 static LeaveProfileZoneFunc* gz_leaveFunc = LeaveProfileZoneDefault;
@@ -118,7 +111,6 @@ void SetCustomLeaveProfileZoneFunc(LeaveProfileZoneFunc* leaveFunc)
 }
 }
 }
-
 ProfileSample::ProfileSample( const char * name )
 { 
   gazebo::util::EnterProfileZone(name);

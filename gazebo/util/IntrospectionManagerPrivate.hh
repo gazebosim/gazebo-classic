@@ -68,6 +68,8 @@ namespace gazebo
       public: std::map<std::string, std::function <gazebo::msgs::Any ()>>
           allItems;
 
+      public: std::set<std::string> allItemsKeys;
+
       /// \brief List of items that have at least one active observer.
       /// The key contains the item name.
       /// The value contains the last value stored for this item, as well as a
@@ -89,7 +91,7 @@ namespace gazebo
 
       /// \brief Flag that will be true when the list of registered items has
       /// changed since the last update.
-      public: bool itemsUpdated = false;
+      public: std::atomic<bool> itemsUpdated { false };
 
       /// \brief Map of filter topic names to publishers.
       public: std::map<std::string, ignition::transport::Node::Publisher>

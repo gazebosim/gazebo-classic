@@ -42,6 +42,9 @@
 
 #include "gazebo/util/LogRecord.hh"
 #include "gazebo/util/LogPlay.hh"
+#include "gazebo/util/Profiler.hh"
+#include "gazebo/util/ProfileManager.hh"
+
 #include "gazebo/common/ModelDatabase.hh"
 #include "gazebo/common/Exception.hh"
 #include "gazebo/common/Plugin.hh"
@@ -113,6 +116,7 @@ Server::Server()
   this->dataPtr->initialized = false;
   this->dataPtr->systemPluginsArgc = 0;
   this->dataPtr->systemPluginsArgv = NULL;
+  util::ProfileManager::Instance()->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -134,6 +138,7 @@ void Server::PrintUsage()
 /////////////////////////////////////////////////
 bool Server::ParseArgs(int _argc, char **_argv)
 {
+  GZ_PROFILE("Server::ParseArgs");
   // Save a copy of argc and argv for consumption by system plugins
   this->dataPtr->systemPluginsArgc = _argc;
   this->dataPtr->systemPluginsArgv = new char*[_argc];
@@ -375,6 +380,7 @@ bool Server::GetInitialized() const
 bool Server::LoadFile(const std::string &_filename,
                       const std::string &_physics)
 {
+  GZ_PROFILE("Server::LoadFile");
   // Quick test for a valid file
   FILE *test = fopen(common::find_file(_filename).c_str(), "r");
   if (!test)
@@ -404,6 +410,7 @@ bool Server::LoadFile(const std::string &_filename,
 /////////////////////////////////////////////////
 bool Server::LoadString(const std::string &_sdfString)
 {
+  GZ_PROFILE("Server::LoadString");
   // Load the world file
   sdf::SDFPtr sdf(new sdf::SDF);
   if (!sdf::init(sdf))
@@ -433,6 +440,7 @@ bool Server::PreLoad()
 bool Server::LoadImpl(sdf::ElementPtr _elem,
                       const std::string &_physics)
 {
+  GZ_PROFILE("Server::LoadImpl");
   // If a physics engine is specified,
   if (_physics.length())
   {
@@ -522,6 +530,7 @@ void Server::Stop()
 /////////////////////////////////////////////////
 void Server::Fini()
 {
+  GZ_PROFILE("Server::Fini");
   this->Stop();
   gazebo::shutdown();
 }
@@ -529,6 +538,7 @@ void Server::Fini()
 /////////////////////////////////////////////////
 void Server::Run()
 {
+  GZ_PROFILE("Server::Run");
 #ifndef _WIN32
   // Now that we're about to run, install a signal handler to allow for
   // graceful shutdown on Ctrl-C.
@@ -581,6 +591,7 @@ void Server::Run()
   // The server and sensor manager outlive worlds
   while (!this->dataPtr->stop)
   {
+    util::ProfileManager::Instance()->Increment_Frame_Counter();
     this->ProcessControlMsgs();
 
     if (physics::worlds_running())
@@ -598,6 +609,7 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
+  GZ_PROFILE("Server::ProcessParams");
   bool p = this->dataPtr->vm.count("pause") > 0;
   physics::pause_worlds(p);
   common::StrStr_M::const_iterator iter;
@@ -633,6 +645,7 @@ void Server::SetParams(const common::StrStr_M &_params)
 /////////////////////////////////////////////////
 void Server::OnControl(ConstServerControlPtr &_msg)
 {
+  GZ_PROFILE("Server::OnControl");
   std::unique_lock<std::mutex> lock(this->dataPtr->receiveMutex);
   this->dataPtr->controlMsgs.push_back(*_msg);
 }
@@ -640,6 +653,7 @@ void Server::OnControl(ConstServerControlPtr &_msg)
 /////////////////////////////////////////////////
 void Server::ProcessControlMsgs()
 {
+  GZ_PROFILE("Server::ProcessControlMsgs");
   std::list<msgs::ServerControl>::iterator iter;
   for (iter = this->dataPtr->controlMsgs.begin();
        iter != this->dataPtr->controlMsgs.end(); ++iter)
