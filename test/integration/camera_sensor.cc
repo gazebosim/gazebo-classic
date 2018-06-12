@@ -799,7 +799,7 @@ TEST_F(CameraSensor, CheckSetCrop)
   const double k1 = -0.1349;
   const double k2 = -0.51868;
   const double k3 = -0.001;
-  const int num_images = 10;
+  const int numImages = 10;
   const ignition::math::Pose3d pose(
       ignition::math::Vector3d(-5, 0, 5),
       ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
@@ -808,25 +808,25 @@ TEST_F(CameraSensor, CheckSetCrop)
 
   // Spawn two cameras with barrel distortion.
   // The first will crop border and the second will not
-  int image_counts[2];
+  int imageCounts[2];
   unsigned char* images[2];
   sensors::CameraSensorPtr cameras[2];
   event::ConnectionPtr connections[2];
   for (size_t i = 0; i < 2; ++i)
   {
-      std::string model_name = names[i] + "_model";
-      std::string sensor_name = names[i] + "_sensor";
-      SpawnCamera(model_name, sensor_name, pose.Pos(),
+      std::string modelName = names[i] + "_model";
+      std::string sensorName = names[i] + "_sensor";
+      SpawnCamera(modelName, sensorName, pose.Pos(),
                   pose.Rot().Euler(), width, height, updateRate,
                   "", 0, 0, true, k1, k2, k3, 0, 0, 0.5, 0.5);
-      sensors::SensorPtr sensor = sensors::get_sensor(sensor_name);
+      sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
       ASSERT_NE(sensor, nullptr);
       cameras[i] = std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
       ASSERT_NE(cameras[i], nullptr);
       images[i] = new unsigned char[width * height * 3];
-      image_counts[i] = 0;
+      imageCounts[i] = 0;
       connections[i] = cameras[i]->Camera()->ConnectNewImageFrame(
-           std::bind(&::OnNewCameraFrame, &image_counts[i], images[i],
+           std::bind(&::OnNewCameraFrame, &imageCounts[i], images[i],
                      std::placeholders::_1, std::placeholders::_2,
                      std::placeholders::_3,
                      std::placeholders::_4, std::placeholders::_5));
@@ -843,8 +843,15 @@ TEST_F(CameraSensor, CheckSetCrop)
 
 
   // Get some images
-  while (image_counts[0] < num_images || image_counts[1] < num_images)
+  // countdown timer to ensure test doesn't wait forever
+  common::Timer timer(common::Time(10.0), true);
+  timer.start();
+  while (imageCounts[0] < numImages || imageCounts[1] < numImages)
+  {
+    // Assert timeout has not passed
+    ASSERT_NE(timer.GetElapsed(), common::Time::Zero);
     common::Time::MSleep(10);
+  }
 
   unsigned int diffMax = 0, diffSum = 0;
   double diffAvg = 0.0;

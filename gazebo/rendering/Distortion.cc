@@ -77,14 +77,14 @@ namespace gazebo
 
       // \brief Set scale parameter in shader before rendering frame
       public:
-      virtual void notifyMaterialRender(Ogre::uint32 pass_id,
-                                        Ogre::MaterialPtr& material)
+      virtual void notifyMaterialRender(Ogre::uint32 _passId,
+                                        Ogre::MaterialPtr& _material)
       {
         // @todo Explore more efficent implementations as it is run every frame
-        (void)pass_id;
+        (void)_passId;
         Ogre::GpuProgramParametersSharedPtr params =
-            material->getTechnique(0)->getPass(pass_id)
-                    ->getFragmentProgramParameters();
+            _material->getTechnique(0)->getPass(pass_id)
+                     ->getFragmentProgramParameters();
         params->setNamedConstant("scale",
             Ogre::Vector3(1.0/distortionScale.X(),
             1.0/distortionScale.Y(), 1.0));
@@ -337,7 +337,8 @@ void Distortion::SetCamera(CameraPtr _camera)
 //////////////////////////////////////////////////
 void Distortion::CalculateAndApplyDistortionScale()
 {
-  if (this->dataPtr->distortionMaterial.isNull()) return;
+  if (this->dataPtr->distortionMaterial.isNull())
+    return;
 
   // Scale up image if cropping enabled and valid
   if (this->dataPtr->distortionCrop && this->dataPtr->k1 < 0)
@@ -354,9 +355,9 @@ void Distortion::CalculateAndApplyDistortionScale()
         this->dataPtr->lensCenter,
         this->dataPtr->k1, this->dataPtr->k2, this->dataPtr->k3,
         this->dataPtr->p1, this->dataPtr->p2);
-    ignition::math::Vector2d new_scale = boundB - boundA;
+    ignition::math::Vector2d newScale = boundB - boundA;
     // If distortionScale is extremely small, don't crop
-    if (new_scale.X() < 1e-7 || new_scale.Y() < 1e-7)
+    if (newScale.X() < 1e-7 || newScale.Y() < 1e-7)
     {
           gzerr << "Distortion model attempted to apply a scale parameter of ("
                 << this->dataPtr->distortionScale.X() << ", "
@@ -364,7 +365,7 @@ void Distortion::CalculateAndApplyDistortionScale()
                 << ", which is invalid.\n";
     }
     else
-      this->dataPtr->distortionScale = new_scale;
+      this->dataPtr->distortionScale = newScale;
   }
   // Otherwise no scaling
   else
