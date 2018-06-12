@@ -488,10 +488,10 @@ bool FlashLightPlugin::TurnOnAll()
   for (it = this->dataPtr->listFlashLight.begin();
     it != this->dataPtr->listFlashLight.end(); ++it)
   {
-    std::shared_ptr<FlashLightSetting> set
+    std::shared_ptr<FlashLightSetting> setting
       = (std::shared_ptr<FlashLightSetting>)*it;
 
-    set->SwitchOn();
+    setting->SwitchOn();
     return true;
   }
 
@@ -509,12 +509,12 @@ bool FlashLightPlugin::TurnOff(const std::string &_lightName)
 bool FlashLightPlugin::TurnOff(const std::string &_lightName,
   const std::string &_linkName)
 {
-  std::shared_ptr<FlashLightSetting> set
+  std::shared_ptr<FlashLightSetting> setting
     = this->dataPtr->SettingByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set)
+  if (setting)
   {
-    set->SwitchOff();
+    setting->SwitchOff();
     return true;
   }
 
@@ -530,10 +530,10 @@ bool FlashLightPlugin::TurnOffAll()
   for (it = this->dataPtr->listFlashLight.begin();
     it != this->dataPtr->listFlashLight.end(); ++it)
   {
-    std::shared_ptr<FlashLightSetting> set
+    std::shared_ptr<FlashLightSetting> setting
       = (std::shared_ptr<FlashLightSetting>)*it;
 
-    set->SwitchOff();
+    setting->SwitchOff();
     return true;
   }
 
@@ -547,12 +547,12 @@ bool FlashLightPlugin::ChangeDuration(
   const double &_duration
 )
 {
-  std::shared_ptr<FlashLightSetting> set
+  std::shared_ptr<FlashLightSetting> setting
     = this->dataPtr->SettingByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set)
+  if (setting)
   {
-    set->SetDuration(_duration);
+    setting->SetDuration(_duration);
     return true;
   }
 
@@ -566,12 +566,12 @@ bool FlashLightPlugin::ChangeInterval(
   const double &_interval
 )
 {
-  std::shared_ptr<FlashLightSetting> set
+  std::shared_ptr<FlashLightSetting> setting
     = this->dataPtr->SettingByLightNameAndLinkName(_lightName, _linkName);
 
-  if (set)
+  if (setting)
   {
-    set->SetInterval(_interval);
+    setting->SetInterval(_interval);
     return true;
   }
 
