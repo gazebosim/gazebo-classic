@@ -218,18 +218,11 @@ FlashLightSetting::FlashLightSetting(
 //////////////////////////////////////////////////
 void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
-  // If the current time is behind the start time or two phases ahead of it,
-  // reset the start time.
+  // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->startTime ||
-      this->startTime + 2 *(this->duration + this->interval) <= _currentTime)
+      this->startTime + this->duration + this->interval <= _currentTime)
   {
     this->startTime = _currentTime;
-  }
-  // If the current time is one phase ahead of the start time,
-  // update the start time so the current time is within the current phase.
-  else if (this->startTime + this->duration + this->interval <= _currentTime)
-  {
-    this->startTime += this->duration + this->interval;
   }
 
   if (this->switchOn)
@@ -320,13 +313,8 @@ std::shared_ptr<FlashLightSetting>
   FlashLightPluginPrivate::SettingByLightNameAndLinkName(
   const std::string &_lightName, const std::string &_linkName) const
 {
-  std::vector< std::shared_ptr<FlashLightSetting> >::const_iterator it;
-  for (it = this->listFlashLight.begin();
-    it != this->listFlashLight.end(); ++it)
+  for (auto &setting: this->listFlashLight)
   {
-    std::shared_ptr<FlashLightSetting> setting
-      = (std::shared_ptr<FlashLightSetting>)*it;
-
     if (setting->Name() == _lightName)
     {
       if (_linkName.length() == 0
@@ -442,18 +430,10 @@ void FlashLightPlugin::OnUpdate()
 {
   common::Time currentTime = this->dataPtr->world->SimTime();
 
-  std::vector< std::shared_ptr<FlashLightSetting> >::iterator it
-    = this->dataPtr->listFlashLight.begin();
-
-  while (it != this->dataPtr->listFlashLight.end())
+  for (auto &setting: this->dataPtr->listFlashLight)
   {
-    std::shared_ptr<FlashLightSetting> setting
-      = (std::shared_ptr<FlashLightSetting>)*it;
-
     /// update the light
     setting->UpdateLightInEnv(currentTime);
-
-    ++it;
   }
 }
 
@@ -484,19 +464,18 @@ bool FlashLightPlugin::TurnOn(
 //////////////////////////////////////////////////
 bool FlashLightPlugin::TurnOnAll()
 {
-  std::vector< std::shared_ptr<FlashLightSetting> >::iterator it;
-  for (it = this->dataPtr->listFlashLight.begin();
-    it != this->dataPtr->listFlashLight.end(); ++it)
+  if (this->dataPtr->listFlashLight.empty())
   {
-    std::shared_ptr<FlashLightSetting> setting
-      = (std::shared_ptr<FlashLightSetting>)*it;
-
-    setting->SwitchOn();
-    return true;
+    gzerr << "no flash lights exist to turn on." << std::endl;
+    return false;
   }
 
-  gzerr << "no flash lights exist to turn on." << std::endl;
-  return false;
+  for (auto &setting: this->dataPtr->listFlashLight)
+  {
+    setting->SwitchOn();
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
@@ -526,19 +505,18 @@ bool FlashLightPlugin::TurnOff(const std::string &_lightName,
 //////////////////////////////////////////////////
 bool FlashLightPlugin::TurnOffAll()
 {
-  std::vector< std::shared_ptr<FlashLightSetting> >::iterator it;
-  for (it = this->dataPtr->listFlashLight.begin();
-    it != this->dataPtr->listFlashLight.end(); ++it)
+  if (this->dataPtr->listFlashLight.empty())
   {
-    std::shared_ptr<FlashLightSetting> setting
-      = (std::shared_ptr<FlashLightSetting>)*it;
-
-    setting->SwitchOff();
-    return true;
+    gzerr << "no flash lights exist to turn off." << std::endl;
+    return false;
   }
 
-  gzerr << "no flash lights exist to turn off." << std::endl;
-  return false;
+  for (auto &setting: this->dataPtr->listFlashLight)
+  {
+    setting->SwitchOff();
+  }
+
+  return true;
 }
 
 //////////////////////////////////////////////////
