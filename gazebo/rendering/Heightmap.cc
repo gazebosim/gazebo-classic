@@ -877,6 +877,9 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
       this->dataPtr->diffuseTextures.size() <= 1u)
     return false;
 
+  if (_terrain->getLayerCount() < this->dataPtr->blendHeight.size() + 1)
+      return false;
+
   Ogre::Real val, height;
   unsigned int i = 0;
 
