@@ -81,9 +81,8 @@ namespace gazebo
                                         Ogre::MaterialPtr& _material)
       {
         // @todo Explore more efficent implementations as it is run every frame
-        (void)_passId;
         Ogre::GpuProgramParametersSharedPtr params =
-            _material->getTechnique(0)->getPass(pass_id)
+            _material->getTechnique(0)->getPass(_passId)
                      ->getFragmentProgramParameters();
         params->setNamedConstant("scale",
             Ogre::Vector3(1.0/distortionScale.X(),
