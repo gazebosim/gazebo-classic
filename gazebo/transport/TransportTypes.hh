@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _TRANSPORT_TYPES_HH_
-#define _TRANSPORT_TYPES_HH_
+#ifndef GAZEBO_TRANSPORT_TRANSPORTTYPES_HH_
+#define GAZEBO_TRANSPORT_TRANSPORTTYPES_HH_
 
 #include <boost/shared_ptr.hpp>
 // avoid collision from Mac OS X's ConditionalMacros.h
@@ -69,7 +69,4 @@ namespace gazebo
     typedef boost::shared_ptr<SubscriptionTransport> SubscriptionTransportPtr;
   }
 }
-
 #endif
-
-

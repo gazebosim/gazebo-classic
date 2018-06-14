@@ -348,37 +348,19 @@ void BulletHingeJoint::SetLowerLimit(const unsigned int /*_index*/,
 //////////////////////////////////////////////////
 double BulletHingeJoint::UpperLimit(const unsigned int /*_index*/) const
 {
-  double result = ignition::math::NAN_D;
-  if (this->bulletHinge)
-    result = this->bulletHinge->getUpperLimit();
-  else
-  {
-    static bool notPrintedYet = true;
-    if (notPrintedYet)
-    {
-      gzerr << "Joint must be created before getting upper limit\n";
-      notPrintedYet = false;
-    }
-  }
-  return result;
+  // the bullet limits are wrapped to [-pi,pi]
+  // https://github.com/bulletphysics/bullet3/issues/42
+  // it's more accurate to return our cached value for limit
+  return this->upperLimit[0];
 }
 
 //////////////////////////////////////////////////
 double BulletHingeJoint::LowerLimit(const unsigned int /*_index*/) const
 {
-  double result = ignition::math::NAN_D;
-  if (this->bulletHinge)
-    result = this->bulletHinge->getLowerLimit();
-  else
-  {
-    static bool notPrintedYet = true;
-    if (notPrintedYet)
-    {
-      gzerr << "Joint must be created before getting lower limit\n";
-      notPrintedYet = false;
-    }
-  }
-  return result;
+  // the bullet limits are wrapped to [-pi,pi]
+  // https://github.com/bulletphysics/bullet3/issues/42
+  // it's more accurate to return our cached value for limit
+  return this->lowerLimit[0];
 }
 
 //////////////////////////////////////////////////
