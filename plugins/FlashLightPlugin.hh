@@ -73,90 +73,6 @@ namespace gazebo
   ///
   class GAZEBO_VISIBLE FlashLightPlugin : public ModelPlugin
   {
-    /// \brief Internal data class to hold individual flash light settings.
-    /// A setting for each flash light is separately stored in a FlashLightSetting
-    /// class, which takes care of dynamic specifications such as duration and
-    /// interval.
-    protected: class FlashLightSetting
-    {
-      /// \brief Constructor
-      /// \param[in] _model The Model pointer holding the light to control.
-      /// \param[in] _pubLight The publisher to send a message
-      /// \param[in] _sdfFlashLight SDF data for flashlight settings.
-      /// \param[in] _currentTime The current time point.
-      public: FlashLightSetting(
-        const physics::ModelPtr &_model,
-        const transport::PublisherPtr &_pubLight,
-        const sdf::ElementPtr &_sdfFlashLight,
-        const common::Time &_currentTime);
-
-      /// \brief Update the light based on the given time.
-      /// \param[in] _currentTime The current point of time to update the lights.
-      public: void UpdateLightInEnv(const common::Time &_currentTime);
-
-      /// \brief Getter of name.
-      /// \return The name of the light element.
-      public: const std::string Name() const;
-
-      /// \brief Getter of link.
-      /// \return A pointer to the link element.
-      public: const physics::LinkPtr Link() const;
-
-      /// \brief Switch on (enable the flashlight).
-      public: void SwitchOn();
-
-      /// \brief Switch off (disable the flashlight).
-      public: void SwitchOff();
-
-      /// \brief Set the duration time.
-      /// \param[in] _duration New duration time to set.
-      public: void SetDuration(const double &_duration);
-
-      /// \brief Set the interval time.
-      /// \param[in] _interval New interval time to set.
-      public: void SetInterval(const double &_interval);
-
-      /// \brief Flash the light
-      /// This function is internally used to update the light in the environment.
-      private: void Flash();
-
-      /// \brief Dim the light
-      /// This function is internally used to update the light in the environment.
-      private: void Dim();
-
-      /// \brief The name of flash light.
-      private: std::string name;
-
-      /// \brief Link which holds this flash light.
-      private: physics::LinkPtr link;
-
-      /// \brief The time at which the current phase started.
-      private: common::Time startTime;
-
-      /// \brief The current switch state (the light itself is active or not).
-      private: bool switchOn;
-
-      /// \brief The current flasshing state (flash or dim).
-      private: bool flashing;
-
-      /// \brief The duration time to flash (in seconds).
-      private: double duration;
-
-      /// \brief The interval time between flashing (in seconds).
-      /// When it is zero, the light is constant.
-      private: double interval;
-
-      /// \brief The length of the ray (in meters).
-      private: double range;
-
-      /// \brief The pointer to publisher to send a command to a light.
-      private: transport::PublisherPtr pubLight;
-
-      /// \brief A message holding a flashlight command.
-      private: msgs::Light msg;
-    };
-
-
     // Constructor
     public: FlashLightPlugin();
 
@@ -223,11 +139,70 @@ namespace gazebo
       const std::string &_lightName, const std::string &_linkName,
       const double &_interval) final;
 
+    // friend declaration
+    // This allows dataPtr to create and hold objects of FlashLightSetting
+    public: friend class FlashLightPluginPrivate;
+
+    // forward declaration
+    protected: class FlashLightSettingPrivate;
+
+    /// \brief Internal data class to hold individual flash light settings.
+    /// A setting for each flash light is separately stored in a FlashLightSetting
+    /// class, which takes care of dynamic specifications such as duration and
+    /// interval.
+    protected: class FlashLightSetting
+    {
+      /// \brief Constructor
+      /// \param[in] _model The Model pointer holding the light to control.
+      /// \param[in] _pubLight The publisher to send a message
+      /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+      /// \param[in] _currentTime The current time point.
+      public: FlashLightSetting(
+        const physics::ModelPtr &_model,
+        const transport::PublisherPtr &_pubLight,
+        const sdf::ElementPtr &_sdfFlashLight,
+        const common::Time &_currentTime);
+
+      /// \brief Update the light based on the given time.
+      /// \param[in] _currentTime The current point of time to update the lights.
+      public: void UpdateLightInEnv(const common::Time &_currentTime);
+
+      /// \brief Getter of name.
+      /// \return The name of the light element.
+      public: const std::string Name() const;
+
+      /// \brief Getter of link.
+      /// \return A pointer to the link element.
+      public: const physics::LinkPtr Link() const;
+
+      /// \brief Switch on (enable the flashlight).
+      public: void SwitchOn();
+
+      /// \brief Switch off (disable the flashlight).
+      public: void SwitchOff();
+
+      /// \brief Set the duration time.
+      /// \param[in] _duration New duration time to set.
+      public: void SetDuration(const double &_duration);
+
+      /// \brief Set the interval time.
+      /// \param[in] _interval New interval time to set.
+      public: void SetInterval(const double &_interval);
+
+      /// \brief Flash the light
+      /// This function is internally used to update the light in the environment.
+      private: void Flash();
+
+      /// \brief Dim the light
+      /// This function is internally used to update the light in the environment.
+      private: void Dim();
+
+      /// \brief Pointer to private data
+      private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
+    };
+
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightPluginPrivate> dataPtr;
-
-    // friend declaration
-    public: friend class FlashLightPluginPrivate;
   };
 }
 #endif
