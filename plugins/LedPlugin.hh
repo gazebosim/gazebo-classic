@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef GAZEBO_PLUGINS_FLASHLIGHTPLUGIN_HH_
-#define GAZEBO_PLUGINS_FLASHLIGHTPLUGIN_HH_
+#ifndef GAZEBO_PLUGINS_LEDPLUGIN_HH_
+#define GAZEBO_PLUGINS_LEDPLUGIN_HH_
 
 #include <memory>
 #include <string>
