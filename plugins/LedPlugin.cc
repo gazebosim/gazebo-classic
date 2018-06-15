@@ -23,11 +23,11 @@
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "plugins/FlashLightPlugin.hh"
+#include "plugins/LedPlugin.hh"
 
 namespace gazebo
 {
-  class LEDLightPlugin::LEDSettingPrivate
+  class LedPlugin::LedSettingPrivate
   {
     /// \brief The pointer to publisher to send a command to update a visual.
     public: transport::PublisherPtr pubVisual;
@@ -36,32 +36,34 @@ namespace gazebo
     public: msgs::Visual msg;
   };
 
-  class LEDPluginPrivate
+  class LedPluginPrivate
   {
+    /// \brief The pointer to node for communication.
+    public: transport::NodePtr node;
+
     /// \brief The pointer to publisher to send a command to the visual.
     public: transport::PublisherPtr pubVisual;
   };
 }
 
 using namespace gazebo;
-GZ_REGISTER_MODEL_PLUGIN(LEDPlugin)
+GZ_REGISTER_MODEL_PLUGIN(LedPlugin)
 
 //////////////////////////////////////////////////
-LEDPlugin::LEDSetting::LEDSetting(
-    const physics::ModelPtr &_model,
-    const transport::PublisherPtr &_pubLight,
-    const sdf::ElementPtr &_sdfFlashLight,
-    const common::Time &_currentTime
-    const transport::PublisherPtr &_pubVisual):
-  FlashLightSetting(_mode, _pubLight, _sdfFlashLight, _currentTime),
-  dataPtr(new LEDSettingPrivate)
+LedPlugin::LedSetting::LedSetting() : FlashLightSetting(),
+  dataPtr(new LedSettingPrivate)
+{
+}
+
+//////////////////////////////////////////////////
+void LedPlugin::LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 {
   // The PublisherPtr
   this->dataPtr->pubVisual = _pubVisual;
 
   // Initialize the light in the environment
   // Make a message
-  this->dataPtr->msg.set_name(this->GetLink()->GetScopedName() + "::" + this->GetName());
+  this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name() + "_visual");
   //this->dataPtr->msg.set_parent_name(this->GetLin()->GetScopedName());
   this->dataPtr->msg.set_transparency(1.0);
 
@@ -70,12 +72,12 @@ LEDPlugin::LEDSetting::LEDSetting(
 }
 
 //////////////////////////////////////////////////
-LEDPlugin::LEDSetting::~LEDSetting()
+LedPlugin::LedSetting::~LedSetting()
 {
 }
 
 //////////////////////////////////////////////////
-void LEDPlugin::LEDSetting::Flash()
+void LedPlugin::LedSetting::Flash()
 {
   // Call the function of the parent class.
   FlashLightSetting::Flash();
@@ -87,7 +89,7 @@ void LEDPlugin::LEDSetting::Flash()
 }
 
 //////////////////////////////////////////////////
-void LEDPlugin::LEDSetting::Dim()
+void LedPlugin::LedSetting::Dim()
 {
   // Call the function of the parent class.
   FlashLightSetting::Dim();
@@ -99,26 +101,36 @@ void LEDPlugin::LEDSetting::Dim()
 }
 
 //////////////////////////////////////////////////
-LEDPlugin::LEDPlugin() : FlashLightPlugin()
+LedPlugin::LedPlugin() : FlashLightPlugin(), dataPtr(new LedPluginPrivate)
 {
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
   // advertise the topic to update lights
-  this->dataPtr->pubLight
-    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
+  this->dataPtr->pubVisual
+    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/visual");
 
-  this->dataPtr->pubLight->WaitForConnection();
+  this->dataPtr->pubVisual->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
-LEDPlugin::~LEDPlugin()
+LedPlugin::~LedPlugin()
 {
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightSetting> CreateSetting(
-  const sdf::ElementPtr &_sdfFlashLight,
-  const common::Time &_currentTime)
+std::shared_ptr<FlashLightPlugin::FlashLightSetting> LedPlugin::CreateSetting()
 {
-  return dynamic_cast< shared_ptr<FlashLightSetting> >(
-    std::make_shared<LEDSetting>(
-      this->GetModel, _pubLight, _sdfFlashLight, _currentTime));
+  return std::make_shared<LedSetting>();
+}
+
+//////////////////////////////////////////////////
+void LedPlugin::InitAdditionalSetting(
+    std::shared_ptr<FlashLightPlugin::FlashLightSetting> &_setting)
+{
+  // Call the function of the parent class.
+  FlashLightPlugin::InitAdditionalSetting(_setting);
+
+  std::dynamic_pointer_cast<LedSetting>(_setting)->InitPubVisual(this->dataPtr->pubVisual);
 }

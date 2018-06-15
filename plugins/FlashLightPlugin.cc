@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class FlashLightPlugin::FlashLightSettingProtected
+  class FlashLightPlugin::FlashLightSettingPrivate
   {
     /// \brief The name of flash light.
     public: std::string name;
@@ -61,7 +61,7 @@ namespace gazebo
     public: msgs::Light msg;
   };
 
-  class FlashLightPluginProtected
+  class FlashLightPluginPrivate
   {
     /// \brief Find a setting by names.
     /// This is internally used to access an individual setting.
@@ -99,12 +99,21 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
 //////////////////////////////////////////////////
-FlashLightPlugin::FlashLightSetting::FlashLightSetting(
-    const physics::ModelPtr &_model,
-    const transport::PublisherPtr &_pubLight,
-    const sdf::ElementPtr &_sdfFlashLight,
-    const common::Time &_currentTime):
-  dataPtr(new FlashLightPlugin::FlashLightSettingProtected)
+FlashLightPlugin::FlashLightSetting::FlashLightSetting():
+  dataPtr(new FlashLightPlugin::FlashLightSettingPrivate)
+{
+}
+
+//////////////////////////////////////////////////
+FlashLightPlugin::FlashLightSetting::~FlashLightSetting()
+{
+}
+
+//////////////////////////////////////////////////
+void FlashLightPlugin::FlashLightSetting::InitFlashLightSetting(
+  const sdf::ElementPtr &_sdfFlashLight,
+  const physics::ModelPtr &_model,
+  const common::Time &_currentTime)
 {
   // name
   std::string lightId;
@@ -118,12 +127,6 @@ FlashLightPlugin::FlashLightSetting::FlashLightSetting(
   }
   int posDelim = lightId.find("/");
   this->dataPtr->name = lightId.substr(posDelim+1, lightId.length());
-  // link which holds this light
-  this->dataPtr->link = _model->GetLink(lightId.substr(0, posDelim));
-  // The PublisherPtr
-  this->dataPtr->pubLight = _pubLight;
-  // start time
-  this->dataPtr->startTime = _currentTime;
   // current states
   this->dataPtr->switchOn = true;
   this->dataPtr->flashing = true;
@@ -145,6 +148,12 @@ FlashLightPlugin::FlashLightSetting::FlashLightSetting(
   {
     gzerr << "Parameter <interval> is missing." << std::endl;
   }
+
+  // start time
+  this->dataPtr->startTime = _currentTime;
+
+  // link which holds this light
+  this->dataPtr->link = _model->GetLink(lightId.substr(0, posDelim));
   // range
   sdf::ElementPtr sdfLightInLink = this->dataPtr->link->GetSDF()->GetElement("light");
   while (sdfLightInLink)
@@ -157,7 +166,14 @@ FlashLightPlugin::FlashLightSetting::FlashLightSetting(
     }
     sdfLightInLink = sdfLightInLink->GetNextElement("light");
   }
+}
 
+//////////////////////////////////////////////////
+void FlashLightPlugin::FlashLightSetting::InitPubLight(
+  const transport::PublisherPtr &_pubLight)
+{
+  // The PublisherPtr
+  this->dataPtr->pubLight = _pubLight;
   // Initialize the light in the environment
   // Make a message
   this->dataPtr->msg.set_name(this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
@@ -165,11 +181,6 @@ FlashLightPlugin::FlashLightSetting::FlashLightSetting(
 
   // Send the message to initialize the light
   this->dataPtr->pubLight->Publish(this->dataPtr->msg);
-}
-
-//////////////////////////////////////////////////
-FlashLightPlugin::FlashLightSetting::~FlashLightSetting()
-{
 }
 
 //////////////////////////////////////////////////
@@ -267,7 +278,7 @@ void FlashLightPlugin::FlashLightSetting::Dim()
 
 //////////////////////////////////////////////////
 std::shared_ptr<FlashLightPlugin::FlashLightSetting>
-  FlashLightPluginProtected::SettingByLightNameAndLinkName(
+  FlashLightPluginPrivate::SettingByLightNameAndLinkName(
   const std::string &_lightName, const std::string &_linkName) const
 {
   for (auto &setting: this->listFlashLight)
@@ -287,7 +298,7 @@ std::shared_ptr<FlashLightPlugin::FlashLightSetting>
 
 //////////////////////////////////////////////////
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
-  dataPtr(new FlashLightPluginProtected)
+  dataPtr(new FlashLightPluginPrivate)
 {
   // Create a node
   this->dataPtr->node = transport::NodePtr(new transport::Node());
@@ -322,9 +333,14 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     // light_id required
     if (sdfFlashLight->HasElement("light_id"))
     {
-      // Get the setting information from sdf
+      // Create an object of setting.
       std::shared_ptr<FlashLightSetting> setting
-        = this->CreateSetting(sdfFlashLight, currentTime);
+        = this->CreateSetting();
+
+      // Initialize the object with the given data.
+      setting->InitFlashLightSetting(
+        sdfFlashLight, this->dataPtr->model, currentTime);
+      this->InitAdditionalSetting(setting);
 
       // Store the setting to the list
       this->dataPtr->listFlashLight.push_back(setting);
@@ -513,11 +529,14 @@ bool FlashLightPlugin::ChangeInterval(
 
 //////////////////////////////////////////////////
 std::shared_ptr<FlashLightPlugin::FlashLightSetting>
-  FlashLightPlugin::CreateSetting(
-    const sdf::ElementPtr &_sdfFlashLight,
-    const common::Time &_currentTime)
+  FlashLightPlugin::CreateSetting()
 {
-  return std::make_shared<FlashLightSetting>(
-    this->dataPtr->model, this->dataPtr->pubLight,
-    _sdfFlashLight, _currentTime);
+  return std::make_shared<FlashLightSetting>();
+}
+
+//////////////////////////////////////////////////
+void FlashLightPlugin::InitAdditionalSetting(
+    std::shared_ptr<FlashLightPlugin::FlashLightSetting> &_setting)
+{
+  _setting->InitPubLight(this->dataPtr->pubLight);
 }

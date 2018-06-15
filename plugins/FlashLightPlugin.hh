@@ -27,7 +27,7 @@
 namespace gazebo
 {
   // forward declaration
-  class FlashLightPluginProtected;
+  class FlashLightPluginPrivate;
 
   /// \brief A plugin that blinks a light component in the model.
   /// This plugin accesses <light> elements in the model specified by
@@ -81,10 +81,10 @@ namespace gazebo
     // friend declaration
     // This allows dataPtr of this class to create and hold objects of the
     // class, FlashLightSetting, nested in this class.
-    public: friend class FlashLightPluginProtected;
+    public: friend class FlashLightPluginPrivate;
 
     // forward declaration
-    protected: class FlashLightSettingProtected;
+    protected: class FlashLightSettingPrivate;
 
     /// \brief Internal data class to hold individual flash light settings.
     /// A setting for each flash light is separately stored in a
@@ -93,18 +93,24 @@ namespace gazebo
     protected: class FlashLightSetting
     {
       /// \brief Constructor.
-      /// \param[in] _model The Model pointer holding the light to control.
-      /// \param[in] _pubLight The publisher to send a message
-      /// \param[in] _sdfFlashLight SDF data for flashlight settings.
-      /// \param[in] _currentTime The current time point.
-      public: FlashLightSetting(
-        const physics::ModelPtr &_model,
-        const transport::PublisherPtr &_pubLight,
-        const sdf::ElementPtr &_sdfFlashLight,
-        const common::Time &_currentTime);
+      public: FlashLightSetting();
 
       /// \brief Destructor.
       public: virtual ~FlashLightSetting();
+
+      /// \brief Initialize the specific parts of FlashLightSetting.
+      /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+      /// \param[in] _model The Model pointer holding the light to control.
+      /// \param[in] _currentTime The current time point.
+      public: virtual void InitFlashLightSetting(
+        const sdf::ElementPtr &_sdfFlashLight,
+        const physics::ModelPtr &_model,
+        const common::Time &_currentTime) final;
+
+      /// \brief Set the publisher and send an initial light command.
+      /// \param[in] _pubLight The publisher to send a message
+      public: virtual void InitPubLight(
+        const transport::PublisherPtr &_pubLight) final;
 
       /// \brief Update the light based on the given time.
       /// \param[in] _currentTime The current point of time to update the
@@ -145,7 +151,7 @@ namespace gazebo
       protected: virtual void Dim();
 
       /// \brief Pointer to private data
-      protected: std::unique_ptr<FlashLightSettingProtected> dataPtr;
+      protected: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
     };
 
     /// \brief Constructor.
@@ -224,12 +230,19 @@ namespace gazebo
     /// \param[in] _sdfFlashLight SDF data for flashlight settings.
     /// \param[in] _currentTime The current time point.
     /// \return A pointer to the newly created setting object.
-    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting(
-      const sdf::ElementPtr &_sdfFlashLight,
-      const common::Time &_currentTime);
+    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting();
+
+    /// \brief Initialize the additional part of an object of setting.
+    ///
+    /// NOTE: This function is internally called in Load().
+    /// If a child class of FlashLightPlugin has also an inherited class of
+    /// FlashLightSetting, this function must be overridden so that the object
+    /// can be initialized with necessary data.
+    protected:
+      virtual void InitAdditionalSetting(std::shared_ptr<FlashLightSetting> &_setting);
 
     /// \brief Pointer to private data
-    protected: std::unique_ptr<FlashLightPluginProtected> dataPtr;
+    private: std::unique_ptr<FlashLightPluginPrivate> dataPtr;
   };
 }
 #endif

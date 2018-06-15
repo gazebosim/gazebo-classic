@@ -27,6 +27,9 @@
 
 namespace gazebo
 {
+  // forward declaration
+  class LedPluginPrivate;
+
   /// \brief A plugin that blinks a light component in the model.
   /// This plugin accesses <light> elements in the model specified by
   /// <flash_light> as a parameter. More than one <flash_light> can exist.
@@ -74,29 +77,27 @@ namespace gazebo
   /// ...
   /// \endverbatim
   ///
-  class GAZEBO_VISIBLE LEDPlugin : public FlashLightPlugin
+  class GAZEBO_VISIBLE LedPlugin : public FlashLightPlugin
   {
+    // forward declaration
+    protected: class LedSettingPrivate;
+
     /// \brief Internal data class to hold individual flash light settings.
     /// A setting for each flash light is separately stored in a
-    /// LEDSetting class, which takes care of dynamic specifications such
+    /// LedSetting class, which takes care of dynamic specifications such
     /// as duration and interval.
-    protected: class LEDSetting: public FlashLightSetting
+    protected: class LedSetting: public FlashLightSetting
     {
       /// \brief Constructor.
-      /// \param[in] _model The Model pointer holding the light to control.
-      /// \param[in] _pubLight The publisher for the light element.
-      /// \param[in] _sdfFlashLight SDF data for flashlight settings.
-      /// \param[in] _currentTime The current time point.
-      /// \param[in] _pubVisual The publisher for the visual element.
-      public: LEDSetting(
-        const physics::ModelPtr &_model,
-        const transport::PublisherPtr &_pubLight,
-        const sdf::ElementPtr &_sdfFlashLight,
-        const common::Time &_currentTime,
-        const transport::PublisherPtr &_pubVisual);
+      public: LedSetting();
 
       /// \brief Destructor.
-      public: virtual ~LEDSetting();
+      public: virtual ~LedSetting();
+
+      /// \brief Set the publisher and send an initial visual command.
+      /// \param[in] _pubVisual The publisher to send a message
+      public: virtual void InitPubVisual(
+        const transport::PublisherPtr &_pubVisual) final;
 
       /// \brief Flash the light
       /// This function is internally used to update the light in the
@@ -107,13 +108,16 @@ namespace gazebo
       /// This function is internally used to update the light in the
       /// environment.
       protected: virtual void Dim();
+
+      /// \brief Pointer to private data
+      private: std::unique_ptr<LedSettingPrivate> dataPtr;
     };
 
     /// \brief Constructor.
-    public: LEDPlugin();
+    public: LedPlugin();
 
     /// \brief Destructor.
-    public: virtual ~LEDPlugin();
+    public: virtual ~LedPlugin();
 
     /// \brief Create an object of setting.
     ///
@@ -121,15 +125,20 @@ namespace gazebo
     /// If a child class of FlashLightPlugin has also an inherited class of
     /// FlashLightSetting, this function must be overridden so that dataPtr
     /// deals with objects of the appropriate setting class.
+    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting();
+
+    /// \brief Initialize the additional part of an object of setting.
     ///
-    /// \param[in] _model The Model pointer holding the light to control.
-    /// \param[in] _pubLight The publisher to send a message
-    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
-    /// \param[in] _currentTime The current time point.
-    /// \return A pointer to the newly created setting object.
-    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting(
-      const sdf::ElementPtr &_sdfFlashLight,
-      const common::Time &_currentTime);
+    /// NOTE: This function is internally called in Load().
+    /// If a child class of FlashLightPlugin has also an inherited class of
+    /// FlashLightSetting, this function must be overridden so that the object
+    /// can be initialized with necessary data.
+    /// \param[in] _setting A setting object to initialize.
+    protected:
+      virtual void InitAdditionalSetting(std::shared_ptr<FlashLightSetting> &_setting);
+
+    /// \brief Pointer to private data
+    private: std::unique_ptr<LedPluginPrivate> dataPtr;
   };
 }
 #endif
