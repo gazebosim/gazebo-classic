@@ -306,7 +306,7 @@ namespace gazebo
       public: LightPtr LightByName(const std::string &_name) const;
 
       /// \brief Get a light based on an index. The index must be between
-      /// 0 and Scene::GetLightCount.
+      /// 0 and Scene::GetLightCount-1.
       /// \param[in] _index Index of the light.
       /// \return Pointer to the Light or NULL if index was invalid.
       public: LightPtr LightByIndex(const uint32_t _index) const;

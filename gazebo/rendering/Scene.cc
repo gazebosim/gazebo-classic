@@ -2961,7 +2961,7 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
   else
     light = this->LightByName(_msg->name());
 
-  if (light)
+  if (!light)
   {
     // commented out for now as sometimes physics light messages could arrive
     // before the rendering light is created, e.g. light pose updates.
