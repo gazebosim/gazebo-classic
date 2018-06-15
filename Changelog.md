@@ -4,6 +4,9 @@
 
 ## Gazebo 7.13.0 (2018-06-08)
 
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
 1. Update model database URI
     * [Pull request 2969](https://bitbucket.org/osrf/gazebo/pull-request/2969)
 
