@@ -37,7 +37,7 @@ namespace gazebo
     /// \param[in] _linkName The name of the link holding the light.
     /// \return A pointer to the specified setting or nullptr if not found.
     public:
-      std::shared_ptr<FlashLightSetting>
+      std::shared_ptr<FlashLightPlugin::FlashLightSetting>
         SettingByLightNameAndLinkName(
           const std::string &_lightName, const std::string &_linkName) const;
 
@@ -54,7 +54,7 @@ namespace gazebo
     public: transport::PublisherPtr pubLight;
 
     /// \brief The list of flashlight settings to control.
-    public: std::vector< std::shared_ptr<FlashLightSetting> > listFlashLight;
+    public: std::vector< std::shared_ptr<FlashLightPlugin::FlashLightSetting> > listFlashLight;
 
     /// \brief pointer to the update even connection.
     public: event::ConnectionPtr updateConnection;
@@ -65,7 +65,7 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
 //////////////////////////////////////////////////
-FlashLightSetting::FlashLightSetting(
+FlashLightPlugin::FlashLightSetting::FlashLightSetting(
   const physics::ModelPtr &_model,
   const transport::PublisherPtr &_pubLight,
   const sdf::ElementPtr &_sdfFlashLight,
@@ -133,7 +133,7 @@ FlashLightSetting::FlashLightSetting(
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
+void FlashLightPlugin::FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
   // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->startTime ||
@@ -168,43 +168,43 @@ void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 }
 
 //////////////////////////////////////////////////
-const std::string FlashLightSetting::Name() const
+const std::string FlashLightPlugin::FlashLightSetting::Name() const
 {
   return this->name;
 }
 
 //////////////////////////////////////////////////
-const physics::LinkPtr FlashLightSetting::Link() const
+const physics::LinkPtr FlashLightPlugin::FlashLightSetting::Link() const
 {
   return this->link;
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::SwitchOn()
+void FlashLightPlugin::FlashLightSetting::SwitchOn()
 {
   this->switchOn = true;
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::SwitchOff()
+void FlashLightPlugin::FlashLightSetting::SwitchOff()
 {
   this->switchOn = false;
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::SetDuration(const double &_duration)
+void FlashLightPlugin::FlashLightSetting::SetDuration(const double &_duration)
 {
   this->duration = _duration;
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::SetInterval(const double &_interval)
+void FlashLightPlugin::FlashLightSetting::SetInterval(const double &_interval)
 {
   this->interval = _interval;
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::Flash()
+void FlashLightPlugin::FlashLightSetting::Flash()
 {
   // Set the range to the default value.
   this->msg.set_range(this->range);
@@ -215,7 +215,7 @@ void FlashLightSetting::Flash()
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::Dim()
+void FlashLightPlugin::FlashLightSetting::Dim()
 {
   // Set the range to zero.
   this->msg.set_range(0.0);
@@ -226,7 +226,7 @@ void FlashLightSetting::Dim()
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightSetting>
+std::shared_ptr<FlashLightPlugin::FlashLightSetting>
   FlashLightPluginPrivate::SettingByLightNameAndLinkName(
   const std::string &_lightName, const std::string &_linkName) const
 {
@@ -268,6 +268,7 @@ FlashLightPlugin::~FlashLightPlugin()
 //////////////////////////////////////////////////
 void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
+  gzdbg << "test" << std::endl;
   // Store the pointers to the model and world
   this->dataPtr->model = _parent;
   this->dataPtr->world = _parent->GetWorld();
