@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class LedPlugin::LedSettingPrivate
+  class LedSettingPrivate
   {
     /// \brief The pointer to publisher to send a command to update a visual.
     public: transport::PublisherPtr pubVisual;
@@ -50,13 +50,13 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(LedPlugin)
 
 //////////////////////////////////////////////////
-LedPlugin::LedSetting::LedSetting() : FlashLightSetting(),
+LedSetting::LedSetting() : FlashLightSetting(),
   dataPtr(new LedSettingPrivate)
 {
 }
 
 //////////////////////////////////////////////////
-void LedPlugin::LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
+void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 {
   // The PublisherPtr
   this->dataPtr->pubVisual = _pubVisual;
@@ -72,12 +72,12 @@ void LedPlugin::LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVis
 }
 
 //////////////////////////////////////////////////
-LedPlugin::LedSetting::~LedSetting()
+LedSetting::~LedSetting()
 {
 }
 
 //////////////////////////////////////////////////
-void LedPlugin::LedSetting::Flash()
+void LedSetting::Flash()
 {
   // Call the function of the parent class.
   FlashLightSetting::Flash();
@@ -89,7 +89,7 @@ void LedPlugin::LedSetting::Flash()
 }
 
 //////////////////////////////////////////////////
-void LedPlugin::LedSetting::Dim()
+void LedSetting::Dim()
 {
   // Call the function of the parent class.
   FlashLightSetting::Dim();
@@ -120,14 +120,14 @@ LedPlugin::~LedPlugin()
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightPlugin::FlashLightSetting> LedPlugin::CreateSetting()
+std::shared_ptr<FlashLightSetting> LedPlugin::CreateSetting()
 {
   return std::make_shared<LedSetting>();
 }
 
 //////////////////////////////////////////////////
 void LedPlugin::InitAdditionalSetting(
-    std::shared_ptr<FlashLightPlugin::FlashLightSetting> &_setting)
+    std::shared_ptr<FlashLightSetting> &_setting)
 {
   // Call the function of the parent class.
   FlashLightPlugin::InitAdditionalSetting(_setting);

@@ -146,6 +146,8 @@ foreach (src ${plugins_private_header})
   gz_install_includes("plugins" ${src}Private.hh)
 endforeach ()
 
+target_sources(LedPlugin PRIVATE FlashLightPlugin.cc)
+
 foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
   target_link_libraries(${src}

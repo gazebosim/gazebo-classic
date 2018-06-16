@@ -27,7 +27,7 @@
 
 namespace gazebo
 {
-  class FlashLightPlugin::FlashLightSettingPrivate
+  class FlashLightSettingPrivate
   {
     /// \brief The name of flash light.
     public: std::string name;
@@ -71,7 +71,7 @@ namespace gazebo
     /// \param[in] _linkName The name of the link holding the light.
     /// \return A pointer to the specified setting or nullptr if not found.
     public:
-      std::shared_ptr<FlashLightPlugin::FlashLightSetting>
+      std::shared_ptr<FlashLightSetting>
         SettingByLightNameAndLinkName(
           const std::string &_lightName, const std::string &_linkName) const;
 
@@ -88,7 +88,7 @@ namespace gazebo
     public: transport::PublisherPtr pubLight;
 
     /// \brief The list of flashlight settings to control.
-    public: std::vector< std::shared_ptr<FlashLightPlugin::FlashLightSetting> > listFlashLight;
+    public: std::vector< std::shared_ptr<FlashLightSetting> > listFlashLight;
 
     /// \brief pointer to the update even connection.
     public: event::ConnectionPtr updateConnection;
@@ -99,18 +99,18 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
 //////////////////////////////////////////////////
-FlashLightPlugin::FlashLightSetting::FlashLightSetting():
-  dataPtr(new FlashLightPlugin::FlashLightSettingPrivate)
+FlashLightSetting::FlashLightSetting():
+  dataPtr(new FlashLightSettingPrivate)
 {
 }
 
 //////////////////////////////////////////////////
-FlashLightPlugin::FlashLightSetting::~FlashLightSetting()
+FlashLightSetting::~FlashLightSetting()
 {
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::InitFlashLightSetting(
+void FlashLightSetting::InitFlashLightSetting(
   const sdf::ElementPtr &_sdfFlashLight,
   const physics::ModelPtr &_model,
   const common::Time &_currentTime)
@@ -169,7 +169,7 @@ void FlashLightPlugin::FlashLightSetting::InitFlashLightSetting(
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::InitPubLight(
+void FlashLightSetting::InitPubLight(
   const transport::PublisherPtr &_pubLight)
 {
   // The PublisherPtr
@@ -184,7 +184,7 @@ void FlashLightPlugin::FlashLightSetting::InitPubLight(
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
+void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
   // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->dataPtr->startTime ||
@@ -219,43 +219,43 @@ void FlashLightPlugin::FlashLightSetting::UpdateLightInEnv(const common::Time &_
 }
 
 //////////////////////////////////////////////////
-const std::string FlashLightPlugin::FlashLightSetting::Name() const
+const std::string FlashLightSetting::Name() const
 {
   return this->dataPtr->name;
 }
 
 //////////////////////////////////////////////////
-const physics::LinkPtr FlashLightPlugin::FlashLightSetting::Link() const
+const physics::LinkPtr FlashLightSetting::Link() const
 {
   return this->dataPtr->link;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::SwitchOn()
+void FlashLightSetting::SwitchOn()
 {
   this->dataPtr->switchOn = true;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::SwitchOff()
+void FlashLightSetting::SwitchOff()
 {
   this->dataPtr->switchOn = false;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::SetDuration(const double &_duration)
+void FlashLightSetting::SetDuration(const double &_duration)
 {
   this->dataPtr->duration = _duration;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::SetInterval(const double &_interval)
+void FlashLightSetting::SetInterval(const double &_interval)
 {
   this->dataPtr->interval = _interval;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::Flash()
+void FlashLightSetting::Flash()
 {
   // Set the range to the default value.
   this->dataPtr->msg.set_range(this->dataPtr->range);
@@ -266,7 +266,7 @@ void FlashLightPlugin::FlashLightSetting::Flash()
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::FlashLightSetting::Dim()
+void FlashLightSetting::Dim()
 {
   // Set the range to zero.
   this->dataPtr->msg.set_range(0.0);
@@ -277,7 +277,7 @@ void FlashLightPlugin::FlashLightSetting::Dim()
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightPlugin::FlashLightSetting>
+std::shared_ptr<FlashLightSetting>
   FlashLightPluginPrivate::SettingByLightNameAndLinkName(
   const std::string &_lightName, const std::string &_linkName) const
 {
@@ -528,7 +528,7 @@ bool FlashLightPlugin::ChangeInterval(
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightPlugin::FlashLightSetting>
+std::shared_ptr<FlashLightSetting>
   FlashLightPlugin::CreateSetting()
 {
   return std::make_shared<FlashLightSetting>();
@@ -536,7 +536,7 @@ std::shared_ptr<FlashLightPlugin::FlashLightSetting>
 
 //////////////////////////////////////////////////
 void FlashLightPlugin::InitAdditionalSetting(
-    std::shared_ptr<FlashLightPlugin::FlashLightSetting> &_setting)
+    std::shared_ptr<FlashLightSetting> &_setting)
 {
   _setting->InitPubLight(this->dataPtr->pubLight);
 }

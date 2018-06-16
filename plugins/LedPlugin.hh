@@ -28,6 +28,40 @@
 namespace gazebo
 {
   // forward declaration
+  class LedSettingPrivate;
+
+  /// \brief Internal data class to hold individual flash light settings.
+  /// A setting for each flash light is separately stored in a
+  /// LedSetting class, which takes care of dynamic specifications such
+  /// as duration and interval.
+  class GAZEBO_VISIBLE LedSetting: public FlashLightSetting
+  {
+    /// \brief Constructor.
+    public: LedSetting();
+
+    /// \brief Destructor.
+    public: virtual ~LedSetting();
+
+    /// \brief Set the publisher and send an initial visual command.
+    /// \param[in] _pubVisual The publisher to send a message
+    public: virtual void InitPubVisual(
+      const transport::PublisherPtr &_pubVisual) final;
+
+    /// \brief Flash the light
+    /// This function is internally used to update the light in the
+    /// environment.
+    protected: virtual void Flash();
+
+    /// \brief Dim the light
+    /// This function is internally used to update the light in the
+    /// environment.
+    protected: virtual void Dim();
+
+    /// \brief Pointer to private data
+    private: std::unique_ptr<LedSettingPrivate> dataPtr;
+  };
+
+  // forward declaration
   class LedPluginPrivate;
 
   /// \brief A plugin that blinks a light component in the model.
@@ -79,40 +113,6 @@ namespace gazebo
   ///
   class GAZEBO_VISIBLE LedPlugin : public FlashLightPlugin
   {
-    // forward declaration
-    protected: class LedSettingPrivate;
-
-    /// \brief Internal data class to hold individual flash light settings.
-    /// A setting for each flash light is separately stored in a
-    /// LedSetting class, which takes care of dynamic specifications such
-    /// as duration and interval.
-    protected: class LedSetting: public FlashLightSetting
-    {
-      /// \brief Constructor.
-      public: LedSetting();
-
-      /// \brief Destructor.
-      public: virtual ~LedSetting();
-
-      /// \brief Set the publisher and send an initial visual command.
-      /// \param[in] _pubVisual The publisher to send a message
-      public: virtual void InitPubVisual(
-        const transport::PublisherPtr &_pubVisual) final;
-
-      /// \brief Flash the light
-      /// This function is internally used to update the light in the
-      /// environment.
-      protected: virtual void Flash();
-
-      /// \brief Dim the light
-      /// This function is internally used to update the light in the
-      /// environment.
-      protected: virtual void Dim();
-
-      /// \brief Pointer to private data
-      private: std::unique_ptr<LedSettingPrivate> dataPtr;
-    };
-
     /// \brief Constructor.
     public: LedPlugin();
 
