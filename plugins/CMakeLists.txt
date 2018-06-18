@@ -72,7 +72,6 @@ set (plugins_single_header
   InitialVelocityPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
-  LedPlugin
   LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
@@ -146,7 +145,17 @@ foreach (src ${plugins_private_header})
   gz_install_includes("plugins" ${src}Private.hh)
 endforeach ()
 
-target_sources(LedPlugin PRIVATE FlashLightPlugin.cc)
+link_directories(${GAZEBO_PLUGIN_INSTALL_DIR})
+add_library(LedPlugin SHARED LedPlugin.cc)
+target_link_libraries(LedPlugin
+  libgazebo
+  ${ogre_libraries}
+  ${IGNITION-TRANSPORT_LIBRARIES}
+  FlashLightPlugin
+)
+set_target_properties(LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
+install (TARGETS LedPlugin DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+gz_install_includes("plugins" LedPlugin.hh)
 
 foreach (src ${GUIplugins})
   add_library(${src} SHARED ${src}.cc ${${src}_MOC})
