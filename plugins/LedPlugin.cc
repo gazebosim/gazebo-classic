@@ -122,6 +122,22 @@ LedPlugin::~LedPlugin()
 }
 
 //////////////////////////////////////////////////
+void LedPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
+{
+  FlashLightPlugin::Load(_parent, _sdf);
+  
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(_parent->GetWorld()->Name());
+
+  // advertise the topic to update lights
+  this->dataPtr->pubVisual
+    = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
+
+  this->dataPtr->pubVisual->WaitForConnection();
+}
+
+//////////////////////////////////////////////////
 std::shared_ptr<FlashLightSetting> LedPlugin::CreateSetting()
 {
   return std::make_shared<LedSetting>();

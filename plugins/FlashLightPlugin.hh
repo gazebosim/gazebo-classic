@@ -157,7 +157,8 @@ namespace gazebo
     public: virtual ~FlashLightPlugin();
 
     // Documentation inherited.
-    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
+    public: virtual void Load(
+      physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
     /// \brief Called by the world update start event
     protected: virtual void OnUpdate();

@@ -300,15 +300,6 @@ std::shared_ptr<FlashLightSetting>
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
   dataPtr(new FlashLightPluginPrivate)
 {
-  // Create a node
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-
-  // advertise the topic to update lights
-  this->dataPtr->pubLight
-    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
-
-  this->dataPtr->pubLight->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
@@ -322,6 +313,16 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   // Store the pointers to the model and world
   this->dataPtr->model = _parent;
   this->dataPtr->world = _parent->GetWorld();
+
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init(_parent->GetWorld()->Name());
+
+  // advertise the topic to update lights
+  this->dataPtr->pubLight
+    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
+
+  this->dataPtr->pubLight->WaitForConnection();
 
   // Get the current time
   common::Time currentTime = this->dataPtr->world->SimTime();

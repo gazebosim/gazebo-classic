@@ -119,6 +119,10 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~LedPlugin();
 
+    // Documentation inherited.
+    public: virtual void Load(
+      physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
+
     /// \brief Create an object of setting.
     ///
     /// NOTE: This function is internally called in Load().
