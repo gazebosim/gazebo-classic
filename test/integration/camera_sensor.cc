@@ -845,7 +845,7 @@ TEST_F(CameraSensor, CheckSetCrop)
   // Get some images
   // countdown timer to ensure test doesn't wait forever
   common::Timer timer(common::Time(10.0), true);
-  timer.start();
+  timer.Start();
   while (imageCounts[0] < numImages || imageCounts[1] < numImages)
   {
     // Assert timeout has not passed
