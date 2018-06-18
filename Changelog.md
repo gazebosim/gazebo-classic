@@ -2,6 +2,8 @@
 
 ## Gazebo 9.X.X (2018-xx-xx)
 
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
 
 
 ## Gazebo 9.1.1 (2018-06-08)
@@ -53,11 +55,18 @@
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
+1. Fix build on hombrew with boost 1.67
+    * [Pull request 2954](https://bitbucket.org/osrf/gazebo/pull-request/2954)
+
+1. Set the default model database URI to avoid a redirect.
+    * [Pull request 2970](https://bitbucket.org/osrf/gazebo/pull-request/2970)
+
 1. Save model materials and meshes when logging
     * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+    * [Pull request 2947](https://bitbucket.org/osrf/gazebo/pull-request/2947)
 
 1. Fix ray intersection check in Scene::FirstContact
     * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
@@ -77,6 +86,9 @@
 
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
+
+1. use QVERIFY() around qFuzzyCompare statements
+    * [Pull request 2936](https://bitbucket.org/osrf/gazebo/pull-request/2936)
 
 1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
     * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
@@ -288,9 +300,16 @@
 1. Add function to retrieve scoped sensors name in multi-nested model
     * [Pull request #2676](https://bitbucket.org/osrf/gazebo/pull-request/2676)
 
+
 ## Gazebo 8
 
 ## Gazebo 8.x.x (2018-xx-xx)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
+
+## Gazebo 8.5.0 (2018-06-08)
 
 1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
     * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
@@ -301,11 +320,18 @@
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
 
+1. Fix build on hombrew with boost 1.67
+    * [Pull request 2954](https://bitbucket.org/osrf/gazebo/pull-request/2954)
+
+1. Set the default model database URI to avoid a redirect.
+    * [Pull request 2970](https://bitbucket.org/osrf/gazebo/pull-request/2970)
+
 1. Save model materials and meshes when logging
     * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+    * [Pull request 2947](https://bitbucket.org/osrf/gazebo/pull-request/2947)
 
 1. Fix ray intersection check in Scene::FirstContact
     * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
@@ -325,6 +351,9 @@
 
 1. Fix mouse movement ogre assertion error
     * [Pull request 2928](https://bitbucket.org/osrf/gazebo/pull-request/2928)
+
+1. use QVERIFY() around qFuzzyCompare statements
+    * [Pull request 2936](https://bitbucket.org/osrf/gazebo/pull-request/2936)
 
 1. Fix normal maps on ubuntu with OGRE 1.9 and disable on OSX
     * [Pull request 2917](https://bitbucket.org/osrf/gazebo/pull-request/2917)
@@ -365,9 +394,6 @@
 1. Ensure sdf inertia values are consistent
     * [Pull request 2867](https://bitbucket.org/osrf/gazebo/pull-requests/2867)
     * [Issue 2367](https://bitbucket.org/osrf/gazebo/issues/2367)
-
-1. Fix gazebo7 + ogre 1.8 build error
-    * [Pull request 2878](https://bitbucket.org/osrf/gazebo/pull-request/2878)
 
 1. Fix OBJLoader when mesh has invalid material
     * [Pull request 2888](https://bitbucket.org/osrf/gazebo/pull-request/2888)
@@ -939,7 +965,18 @@
 
 ## Gazebo 7
 
-## Gazebo 7.XX.X (2018-XX-XX)
+## Gazebo 7.X.X (2018-XX-XX)
+
+## Gazebo 7.13.1 (2018-06-15)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
+
+## Gazebo 7.13.0 (2018-06-08)
+
+1. Update model database URI
+    * [Pull request 2969](https://bitbucket.org/osrf/gazebo/pull-request/2969)
 
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
@@ -947,8 +984,12 @@
 1. Save model materials and meshes when logging
     * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
+1. Fix build on hombrew with boost 1.67
+    * [Pull request 2954](https://bitbucket.org/osrf/gazebo/pull-request/2954)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+    * [Pull request 2947](https://bitbucket.org/osrf/gazebo/pull-request/2947)
 
 1. Fix ray intersection check in Scene::FirstContact
     * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
@@ -965,6 +1006,9 @@
 1. Fix Joint::SetPosition for HingeJoint
     * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
     * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
+
+1. Use QVERIFY() around qFuzzyCompare statements
+    * [Pull request 2936](https://bitbucket.org/osrf/gazebo/pull-request/2936)
 
 
 ## Gazebo 7.12.0 (2018-04-11)
