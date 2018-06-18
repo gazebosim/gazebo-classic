@@ -2,11 +2,13 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
+
 ## Gazebo 7.13.1 (2018-06-15)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
-
 
 ## Gazebo 7.13.0 (2018-06-08)
 
