@@ -64,7 +64,9 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
   // Initialize the light in the environment
   // Make a message
   this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name() + "_visual");
-  //this->dataPtr->msg.set_parent_name(this->GetLin()->GetScopedName());
+  this->dataPtr->msg.set_parent_name(this->Link()->GetScopedName());
+  this->dataPtr->msg.set_parent_id(this->Link()->GetId());
+  this->dataPtr->msg.set_type(msgs::Visual::VISUAL);
   this->dataPtr->msg.set_transparency(1.0);
 
   // Send the message to initialize the light
@@ -109,7 +111,7 @@ LedPlugin::LedPlugin() : FlashLightPlugin(), dataPtr(new LedPluginPrivate)
 
   // advertise the topic to update lights
   this->dataPtr->pubVisual
-    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/visual");
+    = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
 
   this->dataPtr->pubVisual->WaitForConnection();
 }
