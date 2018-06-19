@@ -2853,6 +2853,14 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   {
     // Make sure the parent visual exists before trying to add a child
     // visual
+    VisualPtr parent = this->GetVisual(_msg->parent_name());
+    if (!parent)
+      return false;
+
+    visual.reset(new Visual(_msg->name(), parent));
+  }
+  else if (_msg->has_parent_id())
+  {
     iter = this->dataPtr->visuals.find(_msg->parent_id());
     if (iter == this->dataPtr->visuals.end())
     {
