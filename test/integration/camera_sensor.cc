@@ -91,8 +91,8 @@ TEST_F(CameraSensor, WorldReset)
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  unsigned int width  = 320;
-  unsigned int height = 240;
+  uint32_t width  = 320;
+  uint32_t height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(
       ignition::math::Vector3d(-5, 0, 5),
@@ -775,6 +775,116 @@ TEST_F(CameraSensor, CheckDistortion)
   delete[] img2;
   delete[] img3;
   delete[] img4;
+}
+
+/////////////////////////////////////////////////
+// Test the the SetCrop method for cameras works
+// to set the distortion crop after creation of the sensor.
+TEST_F(CameraSensor, CheckSetCrop)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Constants
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  const double k1 = -0.1349;
+  const double k2 = -0.51868;
+  const double k3 = -0.001;
+  const int numImages = 10;
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+
+  std::string names[] = {"barrel_default", "barrel_no_crop"};
+
+  // Spawn two cameras with barrel distortion.
+  // The first will crop border and the second will not
+  int imageCounts[2];
+  unsigned char* images[2];
+  sensors::CameraSensorPtr cameras[2];
+  event::ConnectionPtr connections[2];
+  for (size_t i = 0; i < 2; ++i)
+  {
+      std::string modelName = names[i] + "_model";
+      std::string sensorName = names[i] + "_sensor";
+      SpawnCamera(modelName, sensorName, pose.Pos(),
+                  pose.Rot().Euler(), width, height, updateRate,
+                  "", 0, 0, true, k1, k2, k3, 0, 0, 0.5, 0.5);
+      sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
+      ASSERT_NE(sensor, nullptr);
+      cameras[i] = std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+      ASSERT_NE(cameras[i], nullptr);
+      images[i] = new unsigned char[width * height * 3];
+      imageCounts[i] = 0;
+      connections[i] = cameras[i]->Camera()->ConnectNewImageFrame(
+           std::bind(&::OnNewCameraFrame, &imageCounts[i], images[i],
+                     std::placeholders::_1, std::placeholders::_2,
+                     std::placeholders::_3,
+                     std::placeholders::_4, std::placeholders::_5));
+      ASSERT_NE(connections[i], nullptr);
+  }
+
+  // Both cameras should start cropped by default
+  EXPECT_TRUE(cameras[0]->Camera()->LensDistortion()->Crop());
+  EXPECT_TRUE(cameras[1]->Camera()->LensDistortion()->Crop());
+
+  // Set second camera to not crop
+  cameras[1]->Camera()->LensDistortion()->SetCrop(false);
+  EXPECT_FALSE(cameras[1]->Camera()->LensDistortion()->Crop());
+
+
+  // Get some images
+  // countdown timer to ensure test doesn't wait forever
+  common::Timer timer(common::Time(10.0), true);
+  timer.Start();
+  while (imageCounts[0] < numImages || imageCounts[1] < numImages)
+  {
+    // Assert timeout has not passed
+    ASSERT_NE(timer.GetElapsed(), common::Time::Zero);
+    common::Time::MSleep(10);
+  }
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+
+  // We expect that there will be some non-zero difference between the images
+  // because one should have a black border
+  this->ImageCompare(images[0], images[1], width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  // Sum the pixel values for each image
+  uint64_t sums[2] = {0, 0};
+  for (size_t i = 0; i < 2; ++i)
+  {
+    for (size_t y = 0; y < height; ++y)
+    {
+      for (size_t x = 0; x < width*3; x+=3)
+      {
+        size_t r = images[i][(y*width*3) + x];
+        size_t g = images[i][(y*width*3) + x + 1];
+        size_t b = images[i][(y*width*3) + x + 2];
+        sums[i] += r + g + b;
+      }
+    }
+  }
+
+  // The image with the border cropped should be brighter
+  // as it does not contain a black border
+  EXPECT_GT(sums[0], sums[1]);
+
+  // Delete heap allocated images
+  for (size_t i = 0; i < 2; ++i)
+    delete[] images[i];
 }
 
 int main(int argc, char **argv)
