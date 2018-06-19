@@ -65,8 +65,11 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
   // Make a message
   this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name() + "_visual");
   this->dataPtr->msg.set_parent_name(this->Link()->GetScopedName());
-  this->dataPtr->msg.set_parent_id(this->Link()->GetId());
-  this->dataPtr->msg.set_type(msgs::Visual::VISUAL);
+  uint32_t id;
+  this->Link()->VisualId(this->Name() + "_visual", id);
+  this->dataPtr->msg.set_id(id);
+  //this->dataPtr->msg.set_parent_id(this->Link()->GetId());
+  //this->dataPtr->msg.set_type(msgs::Visual::VISUAL);
   this->dataPtr->msg.set_transparency(1.0);
 
   // Send the message to initialize the light
@@ -125,7 +128,7 @@ LedPlugin::~LedPlugin()
 void LedPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
   FlashLightPlugin::Load(_parent, _sdf);
-  
+
   // Create a node
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_parent->GetWorld()->Name());
