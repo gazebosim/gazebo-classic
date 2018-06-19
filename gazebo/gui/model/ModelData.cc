@@ -41,6 +41,10 @@
 #include "gazebo/gui/ConfigWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/model/ModelData.hh"
+#include "gazebo/common/MeshManager.hh"
+
+#define VOXELIZER_IMPLEMENTATION
+#include "gazebo/voxelizer.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -1408,7 +1412,7 @@ void LinkData::OnAddCollision(const std::string &_name)
   std::stringstream collisionName;
   collisionName << this->linkVisual->Name() << "::" << _name;
 
-  rendering::VisualPtr collisionVis;
+  rendering::VisualPtr collisionVis,_vis;
   msgs::Collision collisionMsg;
 
   // See if this is in the deleted list
@@ -1433,21 +1437,115 @@ void LinkData::OnAddCollision(const std::string &_name)
     modelTemplateSDF->SetFromString(
         ModelData::GetTemplateSDFString());
 
-    ignition::math::Vector3d _size;
-    ignition::math::Box boundingBox;
+    
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
         this->linkVisual));
-    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()
-        ->GetElement("model")->GetElement("link")->GetElement("visual");
+    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()->GetElement("model")
+    ->GetElement("link")->GetElement("visual");
 
-    boundingBox = this->linkVisual->BoundingBox();
-    _size = boundingBox.Size();
+_vis = this->visuals.begin()->first;
+    
+if (_vis->GetGeometryType()=="box")
+    {
+      ignition::math::Vector3d _size = _vis->GetGeometrySize();
+      double radius = _size.Max();  
 
-    collisionElem->GetElement("geometry")->AddElement("box")
-         ->AddElement("size");
+      collisionElem->GetElement("geometry")->GetElement("box")
+         ->GetElement("size")->SetName("radius");
+         collisionElem->GetElement("geometry")->GetElement("box")
+         ->SetName("sphere");
+      collisionElem->GetElement("geometry")->GetElement("sphere")
+         ->GetElement("radius")->Set<double>(radius);
+    }
+    else if (_vis->GetGeometryType()=="sphere")
+    {
+      ignition::math::Vector3d _size = _vis->GetGeometrySize();
+      double radius = _size[0]/2;
     collisionElem->GetElement("geometry")->GetElement("box")
-         ->GetElement("size")->Set(_size);
+         ->GetElement("size")->SetName("radius");
+         collisionElem->GetElement("geometry")->GetElement("box")
+         ->SetName("sphere");
+      collisionElem->GetElement("geometry")->GetElement("sphere")
+         ->GetElement("radius")->Set<double>(radius);
+      
+    }
+    else if (_vis->GetGeometryType() == "cylinder")
+    {
+      ignition::math::Vector3d _size = _vis->GetGeometrySize();
+      double r = _size[0]/2;
+      double l = _size[2];
+      double radius = sqrt(l*l + 4*r*r)/2;
+      collisionElem->GetElement("geometry")->GetElement("box")
+         ->GetElement("size")->SetName("radius");
+         collisionElem->GetElement("geometry")->GetElement("box")
+         ->SetName("sphere");
+      collisionElem->GetElement("geometry")->GetElement("sphere")
+         ->GetElement("radius")->Set<double>(radius);
+      
+    }
+   
+    else if (_vis->GetGeometryType() == "mesh")
+    {
+  
+      gzerr<< "mesh it is \n";
+    std::string _meshName = _vis->GetMeshName(); 
+
+    const common::Mesh *_mesh;
+    if (!common::MeshManager::Instance()->HasMesh(_meshName))
+    {
+      _mesh = common::MeshManager::Instance()->Load(_meshName);
+      if (!_mesh)
+      {
+        gzerr << "Unable to create a mesh from " << _meshName << "\n";
+        return;
+      }
+    }
+    else
+    {
+      _mesh = common::MeshManager::Instance()->GetMesh(_meshName);
+      gzerr<< "mesh it is yesssssssss\n";
+    }
+    ignition::math::Vector3d _size,max,min,center;
+    
+    double radius=0;
+    //  boundingBox = this->linkVisual->BoundingBox();
+    //_size = boundingBox.Size();
+    max=_mesh->Max();
+    min=_mesh->Min();
+    center = (max+min)/2;
+    radius=(max.Distance(min))/2;
+
+gzerr<< "max"<<max<<"\n";
+gzerr<< "min"<<min<<"\n";
+gzerr<< "center"<<center<<"\n";
+gzerr<< "radius"<<radius<<"\n";
+
+
+      collisionElem->GetElement("geometry")->GetElement("box")
+         ->GetElement("size")->SetName("radius");
+         collisionElem->GetElement("geometry")->GetElement("box")
+         ->SetName("sphere");
+      collisionElem->GetElement("geometry")->GetElement("sphere")
+         ->GetElement("radius")->Set<double>(radius);
+         collisionElem->GetElement("pose")->Set("center");
+       }
+    // vx_mesh_t* mesh;
+    // vx_mesh_t* result;
+
+    // mesh = vx_mesh_alloc(_mesh->GetVertexCount(), _mesh->GetIndexCount());
+
+    // // Add vertices and indices from the original mesh you want to voxelize
+    // // [...]
+
+    // // Precision factor to reduce "holes" artifact
+    // float precision = 0.01;
+
+    // // Run voxelization
+    // result = vx_voxelize(mesh, 0.025, 0.025, 0.025, precision);
+
+
+    // collisionVis->AttachMesh(mesh);
 
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
