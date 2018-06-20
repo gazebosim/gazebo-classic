@@ -42,6 +42,12 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~LedSetting();
 
+    // Documentation inherited.
+    public: virtual void InitBasicData(
+      const sdf::ElementPtr &_sdf,
+      const physics::ModelPtr &_model,
+      const common::Time &_currentTime);
+
     /// \brief Set the publisher and send an initial visual command.
     /// \param[in] _pubVisual The publisher to send a message
     public: virtual void InitPubVisual(
@@ -123,23 +129,12 @@ namespace gazebo
     public: virtual void Load(
       physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
-    /// \brief Create an object of setting.
-    ///
-    /// NOTE: This function is internally called in Load().
-    /// If a child class of FlashLightPlugin has also an inherited class of
-    /// FlashLightSetting, this function must be overridden so that dataPtr
-    /// deals with objects of the appropriate setting class.
+    // Documentation inherited.
     protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting();
 
-    /// \brief Initialize the additional part of an object of setting.
-    ///
-    /// NOTE: This function is internally called in Load().
-    /// If a child class of FlashLightPlugin has also an inherited class of
-    /// FlashLightSetting, this function must be overridden so that the object
-    /// can be initialized with necessary data.
-    /// \param[in] _setting A setting object to initialize.
-    protected:
-      virtual void InitAdditionalSetting(std::shared_ptr<FlashLightSetting> &_setting);
+    // Documentation inherited.
+    protected: virtual void InitSettingBySpecificData(
+        std::shared_ptr<FlashLightSetting> &_setting);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<LedPluginPrivate> dataPtr;

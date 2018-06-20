@@ -110,16 +110,16 @@ FlashLightSetting::~FlashLightSetting()
 }
 
 //////////////////////////////////////////////////
-void FlashLightSetting::InitFlashLightSetting(
-  const sdf::ElementPtr &_sdfFlashLight,
+void FlashLightSetting::InitBasicData(
+  const sdf::ElementPtr &_sdf,
   const physics::ModelPtr &_model,
   const common::Time &_currentTime)
 {
   // name
   std::string lightId;
-  if (_sdfFlashLight->HasElement("light_id"))
+  if (_sdf->HasElement("light_id"))
   {
-    lightId = _sdfFlashLight->Get<std::string>("light_id");
+    lightId = _sdf->Get<std::string>("light_id");
   }
   else
   {
@@ -131,18 +131,18 @@ void FlashLightSetting::InitFlashLightSetting(
   this->dataPtr->switchOn = true;
   this->dataPtr->flashing = true;
   // duration
-  if (_sdfFlashLight->HasElement("duration"))
+  if (_sdf->HasElement("duration"))
   {
-    this->dataPtr->duration = _sdfFlashLight->Get<double>("duration");
+    this->dataPtr->duration = _sdf->Get<double>("duration");
   }
   else
   {
     gzerr << "Parameter <duration> is missing." << std::endl;
   }
   // interval
-  if (_sdfFlashLight->HasElement("interval"))
+  if (_sdf->HasElement("interval"))
   {
-    this->dataPtr->interval = _sdfFlashLight->Get<double>("interval");
+    this->dataPtr->interval = _sdf->Get<double>("interval");
   }
   else
   {
@@ -338,10 +338,11 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       std::shared_ptr<FlashLightSetting> setting
         = this->CreateSetting();
 
-      // Initialize the object with the given data.
-      setting->InitFlashLightSetting(
-        sdfFlashLight, this->dataPtr->model, currentTime);
-      this->InitAdditionalSetting(setting);
+      // Initialize the object with the data given to the base class.
+      setting->InitBasicData(sdfFlashLight, this->dataPtr->model, currentTime);
+
+      // Initialize the object with the data specific to each descendant class.
+      this->InitSettingBySpecificData(setting);
 
       // Store the setting to the list
       this->dataPtr->listFlashLight.push_back(setting);
@@ -536,7 +537,7 @@ std::shared_ptr<FlashLightSetting>
 }
 
 //////////////////////////////////////////////////
-void FlashLightPlugin::InitAdditionalSetting(
+void FlashLightPlugin::InitSettingBySpecificData(
     std::shared_ptr<FlashLightSetting> &_setting)
 {
   _setting->InitPubLight(this->dataPtr->pubLight);

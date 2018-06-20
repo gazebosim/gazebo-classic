@@ -58,6 +58,19 @@ LedSetting::LedSetting() : FlashLightSetting(),
 }
 
 //////////////////////////////////////////////////
+void LedSetting::InitBasicData(
+  const sdf::ElementPtr &_sdf,
+  const physics::ModelPtr &_model,
+  const common::Time &_currentTime)
+{
+  // Call the parent's function.
+  FlashLightSetting::InitBasicData(_sdf, _model, _currentTime);
+
+  // NOTE: Do something if a descendant class needs to take some information
+  // from sdf data or other given data
+}
+
+//////////////////////////////////////////////////
 void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 {
   // The PublisherPtr
@@ -65,10 +78,10 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 
   // Initialize the light in the environment
   // Make a message
-  this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name() + "_visual");
+  this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name());
   this->dataPtr->msg.set_parent_name(this->Link()->GetScopedName());
   uint32_t id;
-  this->Link()->VisualId(this->Name() + "_visual", id);
+  this->Link()->VisualId(this->Name(), id);
   this->dataPtr->msg.set_id(id);
   this->dataPtr->msg.set_transparency(0.5);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
@@ -114,15 +127,6 @@ void LedSetting::Dim()
 //////////////////////////////////////////////////
 LedPlugin::LedPlugin() : FlashLightPlugin(), dataPtr(new LedPluginPrivate)
 {
-  // Create a node
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
-
-  // advertise the topic to update lights
-  this->dataPtr->pubVisual
-    = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
-
-  this->dataPtr->pubVisual->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
@@ -133,8 +137,6 @@ LedPlugin::~LedPlugin()
 //////////////////////////////////////////////////
 void LedPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
 {
-  FlashLightPlugin::Load(_parent, _sdf);
-
   // Create a node
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(_parent->GetWorld()->Name());
@@ -144,6 +146,8 @@ void LedPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
 
   this->dataPtr->pubVisual->WaitForConnection();
+
+  FlashLightPlugin::Load(_parent, _sdf);
 }
 
 //////////////////////////////////////////////////
@@ -153,11 +157,12 @@ std::shared_ptr<FlashLightSetting> LedPlugin::CreateSetting()
 }
 
 //////////////////////////////////////////////////
-void LedPlugin::InitAdditionalSetting(
+void LedPlugin::InitSettingBySpecificData(
     std::shared_ptr<FlashLightSetting> &_setting)
 {
   // Call the function of the parent class.
-  FlashLightPlugin::InitAdditionalSetting(_setting);
+  FlashLightPlugin::InitSettingBySpecificData(_setting);
 
-  std::dynamic_pointer_cast<LedSetting>(_setting)->InitPubVisual(this->dataPtr->pubVisual);
+  std::dynamic_pointer_cast<LedSetting>(_setting)->InitPubVisual(
+    this->dataPtr->pubVisual);
 }

@@ -30,7 +30,7 @@
       </link>
       <link name='light_source'>
         <pose frame=''>0 0 0.20 0 0 0</pose>
-        <light name='light' type='spot'>
+        <light name='lamp' type='spot'>
           <pose frame=''>0 0 0.0 0 3.14159 0</pose>
           <attenuation>
             <range>30</range>
@@ -45,7 +45,7 @@
           </spot>
           <direction>0 0 -1</direction>
         </light>
-        <visual name='light_visual'>
+        <visual name='lamp'>
           <geometry>
             <sphere>
               <radius>0.025</radius>
@@ -69,7 +69,7 @@
       <plugin name='light_control' filename='libLedPlugin.so'>
         <enable>true</enable>
         <flash_light>
-          <light_id>light_source/light</light_id>
+          <light_id>light_source/lamp</light_id>
           <duration>0.3</duration>
           <interval>0.4</interval>
           <enable>true</enable>

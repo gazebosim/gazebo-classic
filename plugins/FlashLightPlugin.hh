@@ -41,14 +41,14 @@ namespace gazebo
     /// \brief Destructor.
     public: virtual ~FlashLightSetting();
 
-    /// \brief Initialize the specific parts of FlashLightSetting.
-    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+    /// \brief Initialize the setting by the data given to the base plugin.
+    /// \param[in] _sdf SDF data for the setting.
     /// \param[in] _model The Model pointer holding the light to control.
     /// \param[in] _currentTime The current time point.
-    public: virtual void InitFlashLightSetting(
-      const sdf::ElementPtr &_sdfFlashLight,
+    public: virtual void InitBasicData(
+      const sdf::ElementPtr &_sdf,
       const physics::ModelPtr &_model,
-      const common::Time &_currentTime) final;
+      const common::Time &_currentTime);
 
     /// \brief Set the publisher and send an initial light command.
     /// \param[in] _pubLight The publisher to send a message
@@ -218,7 +218,7 @@ namespace gazebo
 
     /// \brief Create an object of setting.
     ///
-    /// NOTE: This function is internally called in Load().
+    /// NOTE: This function is internally called in Load() of the base class.
     /// If a child class of FlashLightPlugin has also an inherited class of
     /// FlashLightSetting, this function must be overridden so that dataPtr
     /// deals with objects of the appropriate setting class.
@@ -230,12 +230,16 @@ namespace gazebo
 
     /// \brief Initialize the additional part of an object of setting.
     ///
-    /// NOTE: This function is internally called in Load().
+    /// NOTE: This function is internally called in Load() of the base class.
     /// If a child class of FlashLightPlugin has also an inherited class of
     /// FlashLightSetting, this function must be overridden so that the object
-    /// can be initialized with necessary data.
+    /// can be initialized with necessary data. Also, the overridden function
+    /// must call the original function in it.
+    ///
+    /// \param[in] _setting A pointer to the setting object.
     protected:
-      virtual void InitAdditionalSetting(std::shared_ptr<FlashLightSetting> &_setting);
+      virtual void InitSettingBySpecificData(
+        std::shared_ptr<FlashLightSetting> &_setting);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightPluginPrivate> dataPtr;
