@@ -177,8 +177,8 @@ LinkData::LinkData()
       this, SLOT(OnAddVisual(const std::string &)));
 
   this->connect(this->inspector->GetCollisionConfig(),
-      SIGNAL(CollisionAdded(const std::string &)),
-      this, SLOT(OnAddCollision(const std::string &)));
+      SIGNAL(CollisionAdded(const std::string &,const std::string &)),
+      this, SLOT(OnAddCollision(const std::string &,const std::string &)));
 
   this->connect(this->inspector->GetVisualConfig(),
       SIGNAL(VisualRemoved(const std::string &)), this,
@@ -1401,7 +1401,7 @@ void LinkData::OnAddVisual(const std::string &_name)
 }
 
 /////////////////////////////////////////////////
-void LinkData::OnAddCollision(const std::string &_name)
+void LinkData::OnAddCollision(const std::string &_name,const std::string &_type)
 {
   GZ_ASSERT(this->linkVisual, "LinkVisual is NULL");
 
@@ -1432,7 +1432,7 @@ void LinkData::OnAddCollision(const std::string &_name)
 
   if (!collisionVis)
   {
-    // create new collision based on sdf template (box)
+     // create new collision based on sdf template (box)
     sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
     modelTemplateSDF->SetFromString(
         ModelData::GetTemplateSDFString());
@@ -1445,6 +1445,20 @@ void LinkData::OnAddCollision(const std::string &_name)
     ->GetElement("link")->GetElement("visual");
 
 _vis = this->visuals.begin()->first;
+    if(_type == "box"){
+      ignition::math::Vector3d _size;
+    ignition::math::Box boundingBox;
+
+       boundingBox = _vis->BoundingBox();
+    _size = boundingBox.Size();
+
+    collisionElem->GetElement("geometry")->AddElement("box")
+         ->AddElement("size");
+    collisionElem->GetElement("geometry")->GetElement("box")
+         ->GetElement("size")->Set(_size);
+    }
+    else if(_type == "sphere"){
+   
     
 if (_vis->GetGeometryType()=="box")
     {
@@ -1503,7 +1517,7 @@ if (_vis->GetGeometryType()=="box")
     }
     else
     {
-      _mesh = common::MeshManager::Instance()->GetMesh(_meshName);
+      _mesh = common::MeshManager::Instance()->Load(_meshName);
       gzerr<< "mesh it is yesssssssss\n";
     }
     ignition::math::Vector3d _size,max,min,center;
@@ -1546,7 +1560,7 @@ gzerr<< "radius"<<radius<<"\n";
 
 
     // collisionVis->AttachMesh(mesh);
-
+}
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
 
