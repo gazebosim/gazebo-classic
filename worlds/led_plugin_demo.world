@@ -52,6 +52,9 @@
             </sphere>
           </geometry>
           <material>
+            <ambient>0.5 1 1 1</ambient>
+            <diffuse>0.5 1 1 1</diffuse>
+            <specular>1 1 1 1</specular>
           </material>
         </visual>
       </link>
@@ -67,8 +70,8 @@
         <enable>true</enable>
         <flash_light>
           <light_id>light_source/light</light_id>
-          <duration>0.5</duration>
-          <interval>0.5</interval>
+          <duration>0.3</duration>
+          <interval>0.4</interval>
           <enable>true</enable>
         </flash_light>
       </plugin>

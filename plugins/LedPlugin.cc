@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -68,9 +70,9 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
   uint32_t id;
   this->Link()->VisualId(this->Name() + "_visual", id);
   this->dataPtr->msg.set_id(id);
-  //this->dataPtr->msg.set_parent_id(this->Link()->GetId());
-  //this->dataPtr->msg.set_type(msgs::Visual::VISUAL);
-  this->dataPtr->msg.set_transparency(1.0);
+  this->dataPtr->msg.set_transparency(0.5);
+  msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+    ignition::math::Color(0,0,0));
 
   // Send the message to initialize the light
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
@@ -89,6 +91,8 @@ void LedSetting::Flash()
 
   // Make the appearance brighter.
   this->dataPtr->msg.set_transparency(0.0);
+  msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+    ignition::math::Color(0.5,0.5,0.5));
   // Send the message.
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
 }
@@ -100,7 +104,9 @@ void LedSetting::Dim()
   FlashLightSetting::Dim();
 
   // Make the appearance darker.
-  this->dataPtr->msg.set_transparency(1.0);
+  this->dataPtr->msg.set_transparency(0.5);
+  msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+    ignition::math::Color(0,0,0));
   // Send the message.
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
 }
