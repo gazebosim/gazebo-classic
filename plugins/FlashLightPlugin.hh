@@ -94,7 +94,7 @@ namespace gazebo
     protected: virtual void Dim();
 
     /// \brief Pointer to private data
-    protected: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
+    private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
   };
 
 
@@ -157,8 +157,7 @@ namespace gazebo
     public: virtual ~FlashLightPlugin();
 
     // Documentation inherited.
-    public: virtual void Load(
-      physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
+    public: void Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
 
     /// \brief Called by the world update start event
     protected: virtual void OnUpdate();
