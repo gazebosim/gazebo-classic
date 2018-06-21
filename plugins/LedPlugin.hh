@@ -30,10 +30,7 @@ namespace gazebo
   // forward declaration
   class LedSettingPrivate;
 
-  /// \brief Internal data class to hold individual flash light settings.
-  /// A setting for each flash light is separately stored in a
-  /// LedSetting class, which takes care of dynamic specifications such
-  /// as duration and interval.
+  /// \brief Internal data class to hold individual LED light settings.
   class GAZEBO_VISIBLE LedSetting: public FlashLightSetting
   {
     /// \brief Constructor.
@@ -53,14 +50,10 @@ namespace gazebo
     public: virtual void InitPubVisual(
       const transport::PublisherPtr &_pubVisual) final;
 
-    /// \brief Flash the light
-    /// This function is internally used to update the light in the
-    /// environment.
+    // Documentation inherited.
     protected: virtual void Flash();
 
-    /// \brief Dim the light
-    /// This function is internally used to update the light in the
-    /// environment.
+    // Documentation inherited.
     protected: virtual void Dim();
 
     /// \brief Pointer to private data
@@ -70,52 +63,15 @@ namespace gazebo
   // forward declaration
   class LedPluginPrivate;
 
-  /// \brief A plugin that blinks a light component in the model.
-  /// This plugin accesses <light> elements in the model specified by
-  /// <flash_light> as a parameter. More than one <flash_light> can exist.
+  /// \brief A plugin that blinks light and visual elements in a model.
+  /// In addition to the features of the base plugin, FlashLightPlugin, this
+  /// plugin access a <visual> element to make it blink.
   ///
-  /// NOTE: This base class provides basic functions to control the lights.
-  /// Users can create their own flash light plugin by inheriting this base
-  /// model plugin.
+  /// The <light> and <visual> element to control must have the identical name
+  /// and specified by <light_id>, including the name of the link, which they
+  /// are attached on, and their name separated by a slash "/".
   ///
-  /// A light is specified by <light_id>, including link and light names
-  /// separated by a slash "/".
-  ///
-  /// <enable> is optional. The default value is true.
-  /// When it is set to true, a light starts flashing from the beginning.
-  /// If <enable> is directly under the <plugin>, it affects all the lights.
-  /// If it is under <flash_light>, it individually affects the corresponding
-  /// light.
-  /// When it is set to false, the light is off, and it is  necessary to call
-  /// TurnOn() or TurnOnAll() in an inherited class to enable the light.
-  /// A locally placed <enable> has a higher priority than the global one so
-  /// specific lights can be turned on while the others are all off, and vice
-  /// versa.
-  ///
-  /// <duration> and <interval> specify the time to flash and dim in seconds,
-  /// respectively. That is, the phase is determined as the sum of them:
-  /// duration + interval.
-  ///
-  /// Example:
-  /// \verbatim
-  /// <enable>true</enable>
-  ///
-  /// <flash_light>
-  ///   <light_id>link1/light_source</light_id>
-  ///   <duration>0.1</duration>
-  ///   <interval>0.4</interval>
-  ///   <enable>true</enable>
-  /// </flash_light>
-  ///
-  /// <flash_light>
-  ///   <light_id>link1/light_source2</light_id>
-  ///   <duration>0.8</duration>
-  ///   <interval>0.2</interval>
-  ///   <enable>false</enable>
-  /// </flash_light>
-  ///
-  /// ...
-  /// \endverbatim
+  /// Other parameters are inherited from the base plugin, FlashLightPlugin.
   ///
   class GAZEBO_VISIBLE LedPlugin : public FlashLightPlugin
   {

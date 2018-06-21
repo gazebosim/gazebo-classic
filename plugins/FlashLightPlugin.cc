@@ -99,8 +99,8 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
 //////////////////////////////////////////////////
-FlashLightSetting::FlashLightSetting():
-  dataPtr(new FlashLightSettingPrivate)
+FlashLightSetting::FlashLightSetting()
+  : dataPtr(new FlashLightSettingPrivate)
 {
 }
 
@@ -155,7 +155,8 @@ void FlashLightSetting::InitBasicData(
   // link which holds this light
   this->dataPtr->link = _model->GetLink(lightId.substr(0, posDelim));
   // range
-  sdf::ElementPtr sdfLightInLink = this->dataPtr->link->GetSDF()->GetElement("light");
+  sdf::ElementPtr sdfLightInLink
+    = this->dataPtr->link->GetSDF()->GetElement("light");
   while (sdfLightInLink)
   {
     if (sdfLightInLink->Get<std::string>("name") == this->dataPtr->name)
@@ -176,7 +177,8 @@ void FlashLightSetting::InitPubLight(
   this->dataPtr->pubLight = _pubLight;
   // Initialize the light in the environment
   // Make a message
-  this->dataPtr->msg.set_name(this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
+  this->dataPtr->msg.set_name(
+    this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
   this->dataPtr->msg.set_range(this->dataPtr->range);
 
   // Send the message to initialize the light
@@ -188,7 +190,9 @@ void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
   // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->dataPtr->startTime ||
-      this->dataPtr->startTime + this->dataPtr->duration + this->dataPtr->interval <= _currentTime)
+      this->dataPtr->startTime
+      + this->dataPtr->duration
+      + this->dataPtr->interval <= _currentTime)
   {
     this->dataPtr->startTime = _currentTime;
   }

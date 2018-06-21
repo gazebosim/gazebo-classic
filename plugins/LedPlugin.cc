@@ -78,14 +78,15 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 
   // Initialize the light in the environment
   // Make a message
-  this->dataPtr->msg.set_name(this->Link()->GetScopedName() + "::" + this->Name());
+  this->dataPtr->msg.set_name(
+    this->Link()->GetScopedName() + "::" + this->Name());
   this->dataPtr->msg.set_parent_name(this->Link()->GetScopedName());
   uint32_t id;
   this->Link()->VisualId(this->Name(), id);
   this->dataPtr->msg.set_id(id);
   this->dataPtr->msg.set_transparency(0.5);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-    ignition::math::Color(0,0,0));
+    ignition::math::Color(0, 0, 0));
 
   // Send the message to initialize the light
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
@@ -105,7 +106,7 @@ void LedSetting::Flash()
   // Make the appearance brighter.
   this->dataPtr->msg.set_transparency(0.0);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-    ignition::math::Color(0.5,0.5,0.5));
+    ignition::math::Color(0.5, 0.5, 0.5));
   // Send the message.
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
 }
@@ -119,7 +120,7 @@ void LedSetting::Dim()
   // Make the appearance darker.
   this->dataPtr->msg.set_transparency(0.5);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-    ignition::math::Color(0,0,0));
+    ignition::math::Color(0, 0, 0));
   // Send the message.
   this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
 }
