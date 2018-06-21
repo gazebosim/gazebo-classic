@@ -1539,7 +1539,8 @@ void World::BuildSceneMsg(msgs::Scene &_scene, BasePtr _entity)
       msgs::Model *modelMsg = _scene.add_model();
       boost::static_pointer_cast<Model>(_entity)->FillMsg(*modelMsg);
     }
-    else if (_entity->HasType(Entity::LIGHT))
+    else if (_entity->HasType(Entity::LIGHT) &&
+        _entity->GetParent() == this->dataPtr->rootElement)
     {
       msgs::Light *lightMsg = _scene.add_light();
       boost::static_pointer_cast<physics::Light>(_entity)->FillMsg(*lightMsg);
@@ -2612,12 +2613,8 @@ void World::ProcessMessages()
 
           // Publish the light's pose
           poseMsg->set_name(light->GetScopedName());
-          // \todo Change to relative once lights can be attached to links
-          // on the rendering side
-          // \todo Hack: we use empty id to indicate it's pose of a light
-          // Need to add an id field to light.proto
-          // poseMsg->set_id(light->GetId());
-          msgs::Set(poseMsg, light->WorldPose());
+          poseMsg->set_id(light->GetId());
+          msgs::Set(poseMsg, light->RelativePose());
         }
 
         if (this->dataPtr->posePub && this->dataPtr->posePub->HasConnections())

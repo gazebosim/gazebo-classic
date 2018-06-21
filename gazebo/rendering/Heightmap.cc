@@ -714,7 +714,7 @@ void Heightmap::ConfigureTerrainDefaults()
   LightPtr directionalLight;
   for (unsigned int i = 0; i < this->dataPtr->scene->LightCount(); ++i)
   {
-    LightPtr light = this->dataPtr->scene->GetLight(i);
+    LightPtr light = this->dataPtr->scene->LightByIndex(i);
     if (light->Type() == "directional")
     {
       directionalLight = light;

@@ -285,7 +285,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (lItem)
     {
       rendering::LightPtr light =
-        gui::get_active_camera()->GetScene()->GetLight(
+        gui::get_active_camera()->GetScene()->LightByName(
             this->dataPtr->selectedEntityName);
 
       light->FillMsg(this->dataPtr->lightMsg);

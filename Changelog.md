@@ -33,6 +33,9 @@
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
 
+1. Attach lights to links cleanup and deprecate GetLight functions
+* [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
+
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
 
