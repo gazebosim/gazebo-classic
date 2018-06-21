@@ -17,6 +17,27 @@
             </cylinder>
           </geometry>
         </visual>
+        <light name='button' type='point'>
+          <attenuation>
+            <range>0.20</range>
+            <linear>0.10</linear>
+          </attenuation>
+          <diffuse>1 0.2 0.2 1</diffuse>
+          <specular>1 1 1 1</specular>
+        </light>
+        <visual name='button'>
+          <pose>-0.025 0 0.05 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.01 0.005 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0.2 0.2 1</ambient>
+            <diffuse>1 0.2 0.2 1</diffuse>
+            <specular>1 1 1 1</specular>
+          </material>
+        </visual>
       </link>
       <link name='head'>
         <pose frame=''>0 0 0.175 0 0 0</pose>
@@ -72,6 +93,12 @@
           <light_id>light_source/lamp</light_id>
           <duration>0.3</duration>
           <interval>0.4</interval>
+          <enable>true</enable>
+        </flash_light>
+        <flash_light>
+          <light_id>handle/button</light_id>
+          <duration>0.1</duration>
+          <interval>0.1</interval>
           <enable>true</enable>
         </flash_light>
       </plugin>
