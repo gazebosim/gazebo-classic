@@ -18,7 +18,7 @@ release will remove the deprecated code.
 ### Build system
 
 New versions in mandatory dependencies: `ign-transport4`, `ign-msgs1`, `ign-math4`, `sdformat6`.
-New optional dependencies: `ign-fuel-tools`,`ign-common1` 
+New optional dependencies: `ign-fuel-tools`,`ign-common1`
 
 ### -g command line argument to load plugins in gzclient
 
@@ -116,6 +116,10 @@ New optional dependencies: `ign-fuel-tools`,`ign-common1`
     + ***Replacement:*** void SetFog(const std::string &_type, const ignition::math::Color &_color, const double _density, const double _start, const double _end)
     + common::Color AmbientColor() const now returns ignition::math::Color
     + common::Color BackgroundColor() const now returns ignition::math::Color
+    + ***Deprecation:*** LightPtr GetLight(const uint32_t _index) const;
+    + ***Replacement:*** LightPtr LightByIndex(const uint32_t _index) const;
+    + ***Deprecation:*** LightPtr GetLight(const std::string &_name) const;
+    + ***Replacement:*** LightPtr LightByName(const std::string &_name) const;
 1. **gazebo/rendering/Camera.hh**
     + ***Deprecation:*** virtual bool SetBackgroundColor(const common::Color &_color)
     + ***Replacement:*** virtual bool SetBackgroundColor(const ignition::math::Color &_color)

@@ -1700,3 +1700,61 @@ TEST_F(CameraSensor, Timestamp)
   delete [] img;
 }
 
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, Light)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != nullptr);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+  rendering::CameraPtr camera = camSensor->Camera();
+  EXPECT_TRUE(camera != nullptr);
+
+  // get camera scene
+  rendering::ScenePtr scene = camera->GetScene();
+  ASSERT_NE(nullptr, scene);
+
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
+
+  // Set the light to be green
+  ignition::math::Color newColor(0, 1, 0);
+  msgs::Light lightMsg;
+  lightMsg.set_name("sun");
+  msgs::Set(lightMsg.mutable_diffuse(), newColor);
+  lightModifyPub->Publish(lightMsg);
+
+  rendering::LightPtr sun = scene->LightByName("sun");
+  EXPECT_TRUE(sensor != nullptr);
+
+  int sleep = 0;
+  while (sun->DiffuseColor() != newColor && sleep++ < 50)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_EQ(newColor, sun->DiffuseColor());
+}

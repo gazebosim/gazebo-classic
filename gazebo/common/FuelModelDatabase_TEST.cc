@@ -18,9 +18,8 @@
 #include <chrono>
 #include <condition_variable>
 #include <functional>
-#include <map>
 #include <mutex>
-#include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -40,8 +39,10 @@ TEST(FuelModelDatabaseTest, FuelDown)
   std::condition_variable cv;
   bool cbExecuted = false;
 
-  std::function<void(const std::map<std::string, std::string> &)> cb =
-        [&cbExecuted, &cv](const std::map<std::string, std::string> &_models)
+  std::function <void(
+      const std::vector<ignition::fuel_tools::ModelIdentifier> &)> cb =
+      [&cbExecuted, &cv](
+      const std::vector<ignition::fuel_tools::ModelIdentifier> &_models)
         {
           cbExecuted = true;
 

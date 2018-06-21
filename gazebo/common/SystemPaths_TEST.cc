@@ -27,6 +27,70 @@ using namespace gazebo;
 
 class SystemPathsTest : public gazebo::testing::AutoLogFixture { };
 
+//////////////////////////////////////////////////
+TEST_F(SystemPathsTest, FindFileURI)
+{
+  auto sysPaths = common::SystemPaths::Instance();
+
+  // Failure cases
+  {
+    EXPECT_EQ("", sysPaths->FindFileURI("bad://uri"));
+    EXPECT_EQ("", sysPaths->FindFileURI("file://bad_file"));
+    EXPECT_EQ("", sysPaths->FindFileURI("/bad_bad_file"));
+    EXPECT_EQ("", sysPaths->FindFileURI("bad_bad_file"));
+
+    // Not testing this on purpose, models.gazebosim.org takes a long time
+    // retrieving the list of models.
+    // EXPECT_EQ("", sysPaths->FindFileURI("model://bad_bad_model"));
+  }
+}
+
+//////////////////////////////////////////////////
+TEST_F(SystemPathsTest, FindFile)
+{
+  auto sysPaths = common::SystemPaths::Instance();
+
+  // Failure cases
+  {
+    EXPECT_EQ("", sysPaths->FindFile("bad://uri"));
+    EXPECT_EQ("", sysPaths->FindFile("file://bad_file"));
+    EXPECT_EQ("", sysPaths->FindFile("/bad_bad_file"));
+    EXPECT_EQ("", sysPaths->FindFile("bad_bad_file"));
+  }
+
+  // Existing absolute paths
+  {
+    EXPECT_EQ("/tmp", sysPaths->FindFile("/tmp"));
+    EXPECT_EQ("/home", sysPaths->FindFile("/home"));
+  }
+
+  // Custom callback
+  {
+    auto tmpCb = [](const std::string &_s)
+      {
+        return _s == "tmp" ? "/tmp" : "";
+      };
+    auto homeCb = [](const std::string &_s)
+      {
+        return _s == "home" ? "/home" : "";
+      };
+    auto badCb = [](const std::string &_s)
+      {
+        return _s == "bad" ? "/bad" : "";
+      };
+
+    sysPaths->AddFindFileCallback(tmpCb);
+    sysPaths->AddFindFileCallback(homeCb);
+    sysPaths->AddFindFileCallback(badCb);
+
+    EXPECT_EQ("/tmp", sysPaths->FindFile("tmp"));
+    EXPECT_EQ("/home", sysPaths->FindFile("home"));
+    EXPECT_EQ("", sysPaths->FindFile("bad"));
+    EXPECT_EQ("", sysPaths->FindFile("banana"));
+  }
+}
+
+//////////////////////////////////////////////////
 TEST_F(SystemPathsTest, SystemPaths)
 {
   std::vector<std::string> tmpstrings;
