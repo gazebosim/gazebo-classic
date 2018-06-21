@@ -63,6 +63,12 @@ namespace gazebo
       /// \brief Range count ratio.
       public: double rangeCountRatio;
 
+      /// \brief The minimum range.
+      public: double rangeMin;
+
+      /// \brief The maximum range.
+      public: double rangeMax;
+
       /// \brief GPU laser rendering.
       public: rendering::GpuLaserPtr laserCam;
 
