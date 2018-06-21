@@ -6,9 +6,9 @@
     </include>
     <model name='light_model'>
       <static>1</static>
-      <pose frame=''>0 0 1 0 2.5 0</pose>
+      <pose>0 0 1 0 2.5 0</pose>
       <link name='handle'>
-        <pose frame=''>0 0 0.075 0 0 0</pose>
+        <pose>0 0 0.075 0 0 0</pose>
         <visual name='visual'>
           <geometry>
             <cylinder>
@@ -41,7 +41,7 @@
         </visual>
       </link>
       <link name='head'>
-        <pose frame=''>0 0 0.175 0 0 0</pose>
+        <pose>0 0 0.175 0 0 0</pose>
         <visual name='visual'>
           <geometry>
             <box>
@@ -51,9 +51,9 @@
         </visual>
       </link>
       <link name='light_source'>
-        <pose frame=''>0 0 0.20 0 0 0</pose>
+        <pose>0 0 0.20 0 0 0</pose>
         <light name='lamp' type='spot'>
-          <pose frame=''>0 0 0.0 0 3.14159 0</pose>
+          <pose>0 0 0.0 0 3.14159 0</pose>
           <attenuation>
             <range>30</range>
             <linear>0.05</linear>

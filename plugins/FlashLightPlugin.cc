@@ -59,6 +59,9 @@ namespace gazebo
 
     /// \brief A message holding a flashlight command.
     public: msgs::Light msg;
+
+    /// \brief True if <light> element exists.
+    public: bool lightExists;
   };
 
   class FlashLightPluginPrivate
@@ -167,6 +170,21 @@ void FlashLightSetting::InitBasicData(
     }
     sdfLightInLink = sdfLightInLink->GetNextElement("light");
   }
+
+  // check if <light> element exists.
+  this->dataPtr->lightExists = false;
+  {
+    msgs::Link msg;
+    this->dataPtr->link->FillMsg(msg);
+    for (auto lightMsg : msg.light())
+    {
+      if (lightMsg.name()
+        == this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name)
+      {
+        this->dataPtr->lightExists = true;
+      }
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -175,14 +193,18 @@ void FlashLightSetting::InitPubLight(
 {
   // The PublisherPtr
   this->dataPtr->pubLight = _pubLight;
-  // Initialize the light in the environment
-  // Make a message
-  this->dataPtr->msg.set_name(
-    this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
-  this->dataPtr->msg.set_range(this->dataPtr->range);
 
-  // Send the message to initialize the light
-  this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  if (this->dataPtr->lightExists)
+  {
+    // Initialize the light in the environment
+    // Make a message
+    this->dataPtr->msg.set_name(
+      this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
+    this->dataPtr->msg.set_range(this->dataPtr->range);
+
+    // Send the message to initialize the light
+    this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -264,7 +286,10 @@ void FlashLightSetting::Flash()
   // Set the range to the default value.
   this->dataPtr->msg.set_range(this->dataPtr->range);
   // Send the message.
-  this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  if (this->dataPtr->lightExists)
+  {
+    this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  }
   // Update the state.
   this->dataPtr->flashing = true;
 }
@@ -275,7 +300,10 @@ void FlashLightSetting::Dim()
   // Set the range to zero.
   this->dataPtr->msg.set_range(0.0);
   // Send the message.
-  this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  if (this->dataPtr->lightExists)
+  {
+    this->dataPtr->pubLight->Publish(this->dataPtr->msg);
+  }
   // Update the state.
   this->dataPtr->flashing = false;
 }
