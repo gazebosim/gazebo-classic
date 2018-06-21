@@ -2,6 +2,10 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+
 ## Gazebo 7.13.1 (2018-06-15)
 
 1. Fix check terrain layer count in height map
