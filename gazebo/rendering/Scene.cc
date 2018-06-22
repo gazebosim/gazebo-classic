@@ -2848,16 +2848,25 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   // All other visuals
   VisualPtr visual;
 
-  // If the visual has a parent which is not the name of the scene...
-  if (_msg->has_parent_name() && _msg->parent_name() != this->Name())
+  // If the visual has a parent
+  if (_msg->has_parent_name())
   {
-    // Make sure the parent visual exists before trying to add a child
-    // visual
-    VisualPtr parent = this->GetVisual(_msg->parent_name());
-    if (!parent)
-      return false;
+    // If the parent name is not the name of the scene...
+    if (_msg->parent_name() != this->Name())
+    {
+      // Make sure the parent visual exists before trying to add a child
+      // visual
+      VisualPtr parent = this->GetVisual(_msg->parent_name());
+      if (!parent)
+        return false;
 
-    visual.reset(new Visual(_msg->name(), parent));
+      visual.reset(new Visual(_msg->name(), parent));
+    }
+    else
+    {
+      // Add a visual that is attached to the scene root
+      visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
+    }
   }
   else if (_msg->has_parent_id())
   {
