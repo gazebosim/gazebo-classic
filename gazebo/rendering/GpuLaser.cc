@@ -116,8 +116,6 @@ void GpuLaser::Load()
 void GpuLaser::Init()
 {
   Camera::Init();
-  this->dataPtr->w2nd = this->ImageWidth();
-  this->dataPtr->h2nd = this->ImageHeight();
   this->dataPtr->visual.reset(new Visual(this->Name()+"second_pass_canvas",
      this->GetScene()->WorldVisual()));
 }
@@ -132,7 +130,6 @@ void GpuLaser::Fini()
 void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 {
   this->camera->yaw(Ogre::Radian(this->horzHalfAngle));
-  this->camera->pitch(Ogre::Radian(this->vertHalfAngle));
 
   this->CreateOrthoCam();
 
@@ -173,13 +170,14 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
   Ogre::MaterialManager::getSingleton().getByName("Gazebo/LaserScan1st").get());
 
   this->dataPtr->matFirstPass->load();
+  this->dataPtr->matFirstPass->setCullingMode(Ogre::CULL_NONE);
 
   this->dataPtr->secondPassTexture =
       Ogre::TextureManager::getSingleton().createManual(
       _textureName + "second_pass",
       "General",
       Ogre::TEX_TYPE_2D,
-      this->ImageWidth(), this->ImageHeight(), 0,
+      this->dataPtr->w2nd, this->dataPtr->h2nd, 0,
       Ogre::PF_FLOAT32_RGB,
       Ogre::TU_RENDERTARGET).getPointer();
 
@@ -222,11 +220,6 @@ void GpuLaser::CreateLaserTexture(const std::string &_textureName)
 //////////////////////////////////////////////////
 void GpuLaser::PostRender()
 {
-//  common::Timer postRenderT, blitT;
-//  postRenderT.Start();
-//  double blitDur = 0.0;
-//  double postRenderDur = 0.0;
-
   for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
   {
     this->dataPtr->firstPassTargets[i]->swapBuffers();
@@ -256,9 +249,7 @@ void GpuLaser::PostRender()
     Ogre::PixelBox dstBox(width, height,
         1, Ogre::PF_FLOAT32_RGB, this->dataPtr->laserBuffer);
 
-//    blitT.Start();
     pixelBuffer->blitToMemory(dstBox);
-//    blitDur = blitT.GetElapsed().Double();
 
     if (!this->dataPtr->laserScan)
     {
@@ -275,16 +266,6 @@ void GpuLaser::PostRender()
   }
 
   this->newData = false;
-//  postRenderDur = postRenderT.GetElapsed().Double();
-
-/*  std::cerr << " Render: " << this->dataPtr->lastRenderDuration * 1000
-              << " BLIT: " << blitDur * 1000
-              << " postRender: " << postRenderDur * 1000
-              << " TOTAL: "
-              << (this->dataPtr->lastRenderDuration + postRenderDur) * 1000
-              << " Total - BLIT: "
-              << (this->dataPtr->lastRenderDuration + postRenderDur - blitDur)
-                  * 1000 << "\n";   */
 }
 
 /////////////////////////////////////////////////
@@ -550,10 +531,11 @@ void GpuLaser::Set1stPassTarget(Ogre::RenderTarget *_target,
     this->dataPtr->firstPassViewports[_index]->setVisibilityMask(
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
+
   if (_index == 0)
   {
-    this->camera->setAspectRatio(this->rayCountRatio);
-    this->camera->setFOVy(Ogre::Radian(this->vfov));
+    this->camera->setAspectRatio(this->RayCountRatio());
+    this->camera->setFOVy(Ogre::Radian(this->CosVertFOV()));
   }
 }
 
@@ -577,8 +559,8 @@ void GpuLaser::Set2ndPassTarget(Ogre::RenderTarget *_target)
         GZ_VISIBILITY_ALL & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
   }
   Ogre::Matrix4 p = this->BuildScaledOrthoMatrix(
-      0, static_cast<float>(this->ImageWidth() / 10.0),
-      0, static_cast<float>(this->ImageHeight() / 10.0),
+      0, static_cast<float>(this->dataPtr->w2nd / 10.0),
+      0, static_cast<float>(this->dataPtr->h2nd / 10.0),
       0.01, 0.02);
 
   this->dataPtr->orthoCam->setCustomProjectionMatrix(true, p);
@@ -604,79 +586,99 @@ void GpuLaser::CreateMesh()
   double dx, dy;
   submesh->SetPrimitiveType(common::SubMesh::POINTS);
 
-  double viewHeight = this->ImageHeight()/10.0;
-
   if (this->dataPtr->h2nd == 1)
+  {
     dy = 0;
+  }
   else
+  {
     dy = 0.1;
+  }
 
   dx = 0.1;
 
+  // startX ranges from 0 to -(w2nd/10) at dx=0.1 increments
+  // startY ranges from h2nd/10 to 0 at dy=0.1 decrements
+  // see GpuLaser::Set2ndPassTarget() on how the ortho cam is set up
   double startX = dx;
-  double startY = viewHeight;
+  double startY = this->dataPtr->h2nd/10.0;
 
-  double phi = this->vfov / 2;
-
-  double vAngMin = -phi;
+  // half of actual camera vertical FOV without padding
+  double phi = this->VertFOV() / 2;
+  double phiCamera = phi + std::abs(this->VertHalfAngle());
+  double theta = this->CosHorzFOV() / 2;
 
   if (this->ImageHeight() == 1)
+  {
     phi = 0;
+  }
 
+  // index of ray
   unsigned int ptsOnLine = 0;
+
+  // total laser hfov
+  double thfov = this->dataPtr->textureCount * this->CosHorzFOV();
+  double hstep = thfov / (this->dataPtr->w2nd - 1);
+  double vstep = 2 * phi / (this->dataPtr->h2nd - 1);
+
+  if (this->dataPtr->h2nd == 1)
+  {
+    vstep = 0;
+  }
+
   for (unsigned int j = 0; j < this->dataPtr->h2nd; ++j)
   {
     double gamma = 0;
     if (this->dataPtr->h2nd != 1)
-      gamma = ((2 * phi / (this->dataPtr->h2nd - 1)) * j) + vAngMin;
+    {
+      // gamma: current vertical angle w.r.t. camera
+      gamma = vstep * j - phi + this->VertHalfAngle();
+    }
+
     for (unsigned int i = 0; i < this->dataPtr->w2nd; ++i)
     {
-      double thfov = this->dataPtr->textureCount * this->hfov;
-      double theta = this->hfov / 2;
-      double delta = ((thfov / (this->dataPtr->w2nd - 1)) * i);
+      // current horizontal angle from start of laser scan
+      double delta = hstep * i;
 
-      unsigned int texture = delta / (theta*2);
+      // index of texture that contains the depth value
+      unsigned int texture = delta / this->CosHorzFOV();
 
+      // cap texture index and horizontal angle
       if (texture > this->dataPtr->textureCount-1)
       {
         texture -= 1;
-        delta -= (thfov / (this->dataPtr->w2nd - 1));
+        delta -= hstep;
       }
 
-      delta = delta - (texture * (theta*2));
-
-      delta = delta - theta;
-
       startX -= dx;
-      if (ptsOnLine == this->ImageWidth())
+      if (ptsOnLine == this->dataPtr->w2nd)
       {
         ptsOnLine = 0;
         startX = 0;
         startY -= dy;
       }
       ptsOnLine++;
+
+      // the texture/1000.0 value is used in the laser_2nd_pass.frag shader
+      // as a trick to determine which camera texture to use when stitching
+      // together the final depth image.
       submesh->AddVertex(texture/1000.0, startX, startY);
 
-      double u, v;
-      if (this->isHorizontal)
-      {
-        u = -(cos(phi) * tan(delta))/(2 * tan(theta) * cos(gamma)) + 0.5;
-        v = ignition::math::equal(phi, 0.0) ?
-            -tan(gamma)/(2 * tan(phi)) + 0.5 : 0.5;
-      }
-      else
-      {
-        v = -(cos(theta) * tan(gamma))/(2 * tan(phi) * cos(delta)) + 0.5;
-        u = ignition::math::equal(theta, 0.0) ?
-            -tan(delta)/(2 * tan(theta)) + 0.5 : 0.5;
-      }
+      // first compute angle from the start of current camera's horizontal
+      // min angle, then set delta to be angle from center of current camera.
+      delta = delta - (texture * this->CosHorzFOV());
+      delta = delta - theta;
+
+      // adjust uv coordinates of depth texture to match projection of current
+      // laser ray the depth image plane.
+      double u = 0.5 - tan(delta) / (2.0 * tan(theta));
+      double v = 0.5 - (tan(gamma) * cos(theta)) /
+          (2.0 * tan(phiCamera) * cos(delta));
+
       submesh->AddTexCoord(u, v);
+      submesh->AddIndex(this->dataPtr->w2nd * j + i);
     }
   }
-
-  for (unsigned int j = 0; j < (this->dataPtr->h2nd ); ++j)
-    for (unsigned int i = 0; i < (this->dataPtr->w2nd ); ++i)
-      submesh->AddIndex(this->dataPtr->w2nd * j + i);
 
   mesh->AddSubMesh(submesh);
 
