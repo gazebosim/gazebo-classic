@@ -55,20 +55,13 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(LedPlugin)
 
 //////////////////////////////////////////////////
-LedSetting::LedSetting() : FlashLightSetting(),
-  dataPtr(new LedSettingPrivate)
-{
-}
-
-//////////////////////////////////////////////////
-void LedSetting::InitBasicData(
+LedSetting::LedSetting(
   const sdf::ElementPtr &_sdf,
   const physics::ModelPtr &_model,
   const common::Time &_currentTime)
+  : FlashLightSetting(_sdf, _model, _currentTime),
+  dataPtr(new LedSettingPrivate)
 {
-  // Call the parent's function.
-  FlashLightSetting::InitBasicData(_sdf, _model, _currentTime);
-
   // check if the visual element exists.
   this->dataPtr->visualExists = false;
   msgs::Link msg;
@@ -81,6 +74,11 @@ void LedSetting::InitBasicData(
       this->dataPtr->visualExists = true;
     }
   }
+}
+
+//////////////////////////////////////////////////
+LedSetting::~LedSetting()
+{
 }
 
 //////////////////////////////////////////////////
@@ -106,11 +104,6 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
     // Send the message to initialize the light
     this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
   }
-}
-
-//////////////////////////////////////////////////
-LedSetting::~LedSetting()
-{
 }
 
 //////////////////////////////////////////////////
@@ -150,6 +143,15 @@ void LedSetting::Dim()
 //////////////////////////////////////////////////
 LedPlugin::LedPlugin() : FlashLightPlugin(), dataPtr(new LedPluginPrivate)
 {
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  // advertise the topic to update lights
+  this->dataPtr->pubVisual
+    = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
+
+  this->dataPtr->pubVisual->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
@@ -158,25 +160,12 @@ LedPlugin::~LedPlugin()
 }
 
 //////////////////////////////////////////////////
-void LedPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
+std::shared_ptr<FlashLightSetting> LedPlugin::CreateSetting(
+  const sdf::ElementPtr &_sdf,
+  const physics::ModelPtr &_model,
+  const common::Time &_currentTime)
 {
-  // Create a node
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(_parent->GetWorld()->Name());
-
-  // advertise the topic to update lights
-  this->dataPtr->pubVisual
-    = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
-
-  this->dataPtr->pubVisual->WaitForConnection();
-
-  FlashLightPlugin::Load(_parent, _sdf);
-}
-
-//////////////////////////////////////////////////
-std::shared_ptr<FlashLightSetting> LedPlugin::CreateSetting()
-{
-  return std::make_shared<LedSetting>();
+  return std::make_shared<LedSetting>(_sdf, _model, _currentTime);
 }
 
 //////////////////////////////////////////////////

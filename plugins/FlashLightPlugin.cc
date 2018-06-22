@@ -102,21 +102,11 @@ using namespace gazebo;
 GZ_REGISTER_MODEL_PLUGIN(FlashLightPlugin)
 
 //////////////////////////////////////////////////
-FlashLightSetting::FlashLightSetting()
-  : dataPtr(new FlashLightSettingPrivate)
-{
-}
-
-//////////////////////////////////////////////////
-FlashLightSetting::~FlashLightSetting()
-{
-}
-
-//////////////////////////////////////////////////
-void FlashLightSetting::InitBasicData(
+FlashLightSetting::FlashLightSetting(
   const sdf::ElementPtr &_sdf,
   const physics::ModelPtr &_model,
   const common::Time &_currentTime)
+  : dataPtr(new FlashLightSettingPrivate)
 {
   // name
   std::string lightId;
@@ -185,6 +175,11 @@ void FlashLightSetting::InitBasicData(
       }
     }
   }
+}
+
+//////////////////////////////////////////////////
+FlashLightSetting::~FlashLightSetting()
+{
 }
 
 //////////////////////////////////////////////////
@@ -332,6 +327,15 @@ std::shared_ptr<FlashLightSetting>
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
   dataPtr(new FlashLightPluginPrivate)
 {
+  // Create a node
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
+
+  // advertise the topic to update lights
+  this->dataPtr->pubLight
+    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
+
+  this->dataPtr->pubLight->WaitForConnection();
 }
 
 //////////////////////////////////////////////////
@@ -346,16 +350,6 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   this->dataPtr->model = _parent;
   this->dataPtr->world = _parent->GetWorld();
 
-  // Create a node
-  this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(_parent->GetWorld()->Name());
-
-  // advertise the topic to update lights
-  this->dataPtr->pubLight
-    = this->dataPtr->node->Advertise<gazebo::msgs::Light>("~/light/modify");
-
-  this->dataPtr->pubLight->WaitForConnection();
-
   // Get the current time
   common::Time currentTime = this->dataPtr->world->SimTime();
 
@@ -368,10 +362,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     {
       // Create an object of setting.
       std::shared_ptr<FlashLightSetting> setting
-        = this->CreateSetting();
-
-      // Initialize the object with the data given to the base class.
-      setting->InitBasicData(sdfFlashLight, this->dataPtr->model, currentTime);
+        = this->CreateSetting(sdfFlashLight, this->dataPtr->model, currentTime);
 
       // Initialize the object with the data specific to each descendant class.
       this->InitSettingBySpecificData(setting);
@@ -563,9 +554,12 @@ bool FlashLightPlugin::ChangeInterval(
 
 //////////////////////////////////////////////////
 std::shared_ptr<FlashLightSetting>
-  FlashLightPlugin::CreateSetting()
+  FlashLightPlugin::CreateSetting(
+    const sdf::ElementPtr &_sdf,
+    const physics::ModelPtr &_model,
+    const common::Time &_currentTime)
 {
-  return std::make_shared<FlashLightSetting>();
+  return std::make_shared<FlashLightSetting>(_sdf, _model, _currentTime);
 }
 
 //////////////////////////////////////////////////

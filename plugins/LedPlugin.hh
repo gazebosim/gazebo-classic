@@ -34,16 +34,13 @@ namespace gazebo
   class GAZEBO_VISIBLE LedSetting: public FlashLightSetting
   {
     /// \brief Constructor.
-    public: LedSetting();
-
-    /// \brief Destructor.
-    public: virtual ~LedSetting();
-
-    // Documentation inherited.
-    public: virtual void InitBasicData(
+    public: LedSetting(
       const sdf::ElementPtr &_sdf,
       const physics::ModelPtr &_model,
       const common::Time &_currentTime);
+
+    /// \brief Destructor.
+    public: virtual ~LedSetting();
 
     /// \brief Set the publisher and send an initial visual command.
     /// \param[in] _pubVisual The publisher to send a message
@@ -82,11 +79,10 @@ namespace gazebo
     public: virtual ~LedPlugin();
 
     // Documentation inherited.
-    public: virtual void Load(
-      physics::ModelPtr _parent, sdf::ElementPtr _sdf) override;
-
-    // Documentation inherited.
-    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting();
+    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting(
+      const sdf::ElementPtr &_sdf,
+      const physics::ModelPtr &_model,
+      const common::Time &_currentTime);
 
     // Documentation inherited.
     protected: virtual void InitSettingBySpecificData(

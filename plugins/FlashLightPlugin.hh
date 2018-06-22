@@ -36,19 +36,17 @@ namespace gazebo
   class GAZEBO_VISIBLE FlashLightSetting
   {
     /// \brief Constructor.
-    public: FlashLightSetting();
-
-    /// \brief Destructor.
-    public: virtual ~FlashLightSetting();
-
-    /// \brief Initialize the setting by the data given to the base plugin.
+    /// Initialize the setting by the data given to the base plugin.
     /// \param[in] _sdf SDF data for the setting.
     /// \param[in] _model The Model pointer holding the light to control.
     /// \param[in] _currentTime The current time point.
-    public: virtual void InitBasicData(
+    public: FlashLightSetting(
       const sdf::ElementPtr &_sdf,
       const physics::ModelPtr &_model,
       const common::Time &_currentTime);
+
+    /// \brief Destructor.
+    public: virtual ~FlashLightSetting();
 
     /// \brief Set the publisher and send an initial light command.
     /// \param[in] _pubLight The publisher to send a message
@@ -223,10 +221,14 @@ namespace gazebo
     /// FlashLightSetting, this function must be overridden so that dataPtr
     /// deals with objects of the appropriate setting class.
     ///
-    /// \param[in] _sdfFlashLight SDF data for flashlight settings.
+    /// \param[in] _sdf SDF data for the setting.
+    /// \param[in] _model The Model pointer holding the light to control.
     /// \param[in] _currentTime The current time point.
     /// \return A pointer to the newly created setting object.
-    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting();
+    protected: virtual std::shared_ptr<FlashLightSetting> CreateSetting(
+      const sdf::ElementPtr &_sdf,
+      const physics::ModelPtr &_model,
+      const common::Time &_currentTime);
 
     /// \brief Initialize the additional part of an object of setting.
     ///
