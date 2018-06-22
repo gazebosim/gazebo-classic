@@ -504,7 +504,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
     for (int i = 0; i < raySensor->RayCount(); ++i)
     {
       EXPECT_DOUBLE_EQ(raySensor->Range(j*raySensor->RayCount() + i),
-          IGN_DBL_INF);
+          ignition::math::INF_D);
     }
   }
 
