@@ -21,9 +21,9 @@ set (sources
   LogPlay.cc
   LogRecord.cc
   OpenAL.cc
-  ProfileNode.cc
-  ProfileManager.cc
   ProfileIterator.cc
+  ProfileManager.cc
+  ProfileNode.cc
   Profiler.cc
 )
 
@@ -44,23 +44,23 @@ set (headers
   IgnMsgSdf.hh
   IntrospectionClient.hh
   IntrospectionManager.hh
-  Profiler.hh
   LogPlay.hh
   LogRecord.hh
   OpenAL.hh
+  Profiler.hh
   UtilTypes.hh
   system.hh
 )
 
 set (gtest_sources
   Diagnostics_TEST.cc
-  Profiler_TEST.cc
   IgnMsgSdf_TEST.cc
   IntrospectionClient_TEST.cc
   IntrospectionManager_TEST.cc
   LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
+  Profiler_TEST.cc
 )
 
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_util)
