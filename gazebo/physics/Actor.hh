@@ -90,8 +90,9 @@ namespace gazebo
 
       /// \brief Align BVH to DAE skin
       /// \param[in] _skel BVH skeleton
-      /// \param[in] skelMap joint mapping between DAE skin and BVH skeleton
-      public: void AlignBVH(common::Skeleton* _skel, std::map<std::string, std::string> skelMap);
+      /// \param[in] _skelMap joint mapping between DAE skin and BVH skeleton
+      public: void AlignBvh(common::Skeleton *_skel,
+          std::map<std::string, std::string> _skelMap);
 
       /// \brief Initialize the actor
       public: virtual void Init();
@@ -226,7 +227,7 @@ namespace gazebo
       private: void AddSphereVisual(const sdf::ElementPtr &_linkSdf,
                    const std::string &_name,
                    const ignition::math::Pose3d &_pose, const double _radius,
-		   const std::string &_material,
+                   const std::string &_material,
                    const ignition::math::Color &_ambient);
 
       /// \brief Add a box visual object.
@@ -301,13 +302,15 @@ namespace gazebo
       protected: bool loop;
 
       /// \brief True if the animation is loaded from BVH file
-      protected: bool bvhFile;
+      protected: bool bvhFile = false;
 
       /// \brief Translations to align BVH skeleton to DAE skin
-      protected: std::map<std::string, ignition::math::Matrix4d> translationAligner;
+      protected: std::map<std::string, ignition::math::Matrix4d>
+          translationAligner;
 
       /// \brief Rotations to align BVH skeleton to DAE skin
-      protected: std::map<std::string, ignition::math::Matrix4d> rotationAligner;
+      protected: std::map<std::string, ignition::math::Matrix4d>
+          rotationAligner;
 
       /// \brief True if the actor is being updated.
       protected: bool active;
