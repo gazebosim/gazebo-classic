@@ -408,7 +408,7 @@ void MainWindow_TEST::CopyPaste()
     maxSleep = 100;
     while (!lightClone && sleep < maxSleep)
     {
-      lightClone = scene->GetLight(lightName + "_clone");
+      lightClone = scene->LightByName(lightName + "_clone");
       QTest::qWait(30);
       sleep++;
     }
