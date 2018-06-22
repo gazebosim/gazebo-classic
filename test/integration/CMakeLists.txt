@@ -62,6 +62,7 @@ set(tests
   keys_to_joints.cc
   kinematic_loop.cc
   laser.cc
+  led_plugin.cc
   link.cc
   logical_camera_sensor.cc
   model.cc
