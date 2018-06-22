@@ -37,6 +37,7 @@
             <ambient>1 0.2 0.2 1</ambient>
             <diffuse>1 0.2 0.2 1</diffuse>
             <specular>1 1 1 1</specular>
+            <emissive>1 0.2 0.2 1</emissive>
           </material>
         </visual>
       </link>
@@ -73,10 +74,12 @@
               <radius>0.025</radius>
             </sphere>
           </geometry>
+          <transparency>0.4</transparency>
           <material>
             <ambient>0.5 1 1 1</ambient>
             <diffuse>0.5 1 1 1</diffuse>
             <specular>1 1 1 1</specular>
+            <emissive>0.5 1 1 1</emissive>
           </material>
         </visual>
       </link>

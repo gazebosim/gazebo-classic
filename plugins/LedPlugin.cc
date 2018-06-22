@@ -31,6 +31,12 @@ namespace gazebo
 {
   class LedSettingPrivate
   {
+    /// \brief The transparency when the ligth is off.
+    public: double transparency;
+
+    /// \brief The emissive color.
+    public: ignition::math::Color emissiveColor;
+
     /// \brief The pointer to publisher to send a command to update a visual.
     public: transport::PublisherPtr pubVisual;
 
@@ -71,6 +77,26 @@ LedSetting::LedSetting(
     if (visualMsg.name()
       == this->Link()->GetScopedName() + "::" + this->Name())
     {
+      if (visualMsg.has_transparency())
+      {
+        this->dataPtr->transparency = visualMsg.transparency();
+      }
+      else
+      {
+        this->dataPtr->transparency = 0.2;
+      }
+
+      if (visualMsg.has_material()
+        && visualMsg.material().has_emissive())
+      {
+        this->dataPtr->emissiveColor
+          = msgs::Convert(visualMsg.material().emissive());
+      }
+      else
+      {
+        this->dataPtr->emissiveColor = ignition::math::Color(1, 1, 1);
+      }
+
       this->dataPtr->visualExists = true;
     }
   }
@@ -97,9 +123,9 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
     uint32_t id;
     this->Link()->VisualId(this->Name(), id);
     this->dataPtr->msg.set_id(id);
-    this->dataPtr->msg.set_transparency(0.5);
+    this->dataPtr->msg.set_transparency(this->dataPtr->transparency);
     msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-      ignition::math::Color(0, 0, 0));
+      this->dataPtr->emissiveColor);
 
     // Send the message to initialize the light
     this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
@@ -115,7 +141,7 @@ void LedSetting::Flash()
   // Make the appearance brighter.
   this->dataPtr->msg.set_transparency(0.0);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-    ignition::math::Color(0.5, 0.5, 0.5));
+    this->dataPtr->emissiveColor);
   // Send the message.
   if (this->dataPtr->visualExists)
   {
@@ -130,7 +156,7 @@ void LedSetting::Dim()
   FlashLightSetting::Dim();
 
   // Make the appearance darker.
-  this->dataPtr->msg.set_transparency(0.5);
+  this->dataPtr->msg.set_transparency(this->dataPtr->transparency);
   msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
     ignition::math::Color(0, 0, 0));
   // Send the message.
