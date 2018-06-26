@@ -223,8 +223,8 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
     if (bone->IsRootNode())
     {
       this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue", 
-		  ignition::math::Color::Blue);
+          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue",
+          ignition::math::Color::Blue);
     }
     else if (bone->GetChildCount() == 0)
     {
@@ -257,8 +257,8 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
         double theta = atan2(dir.Y(), dir.X());
         double phi = acos(dir.Z() / length);
 
-        ignition::math::Pose3d bonePose(linkPos, 
-		    ignition::math::Quaterniond(0.0, phi, theta));
+        ignition::math::Pose3d bonePose(linkPos,
+        ignition::math::Quaterniond(0.0, phi, theta));
         bonePose.Rot() = pose.Rot().Inverse() * bonePose.Rot();
 
         this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
@@ -426,7 +426,6 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   }
   else if (extension == "dae")
   {
-    this->bvhFile = false;
     MeshManager::Instance()->Load(animFile);
 
     const Mesh *animMesh = nullptr;
@@ -485,7 +484,6 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
       // If compatible, associate the animation node to the skin node
       else
         skelMap[skinNode->GetName()] = animNode->GetName();
-      
     }
   }
 
@@ -497,8 +495,9 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
     return;
   }
 
-  if(this->bvhFile){
-    this->AlignBVH(skel, skelMap);
+  if (this->bvhFile)
+  {
+    this->AlignBvh(skel, skelMap);
   }
 
   this->skelAnimation[animName] = skel->GetAnimation(0);
@@ -507,100 +506,126 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void Actor::AlignBVH(Skeleton* _skel, std::map<std::string, std::string> _skelMap){
-  /// calculate translationAligner : aligner of initial bvh pose to initial dae pose
+void Actor::AlignBvh(Skeleton *_skel,
+    std::map<std::string, std::string> _skelMap)
+{
+  // calculate translationAligner: aligner of initial bvh pose to initial dae
+  // pose
   for (unsigned int i = 0; i < _skel->GetNumNodes(); ++i)
   {
-      SkeletonNode *animNode = _skel->GetNodeByHandle(i);
-      SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
+    SkeletonNode *animNode = _skel->GetNodeByHandle(i);
+    SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
 
-      if (animNode->GetParent() != NULL)
+    if (animNode->GetParent() != nullptr)
+    {
+      if (animNode->GetParent()->GetChildCount() > 1)
       {
-          if (animNode->GetParent()->GetChildCount() > 1)
-          {
-              /// parent link has multiple child links
-              if (skinNode->Transform().Translation() 
-                  == ignition::math::Vector3d(0.0, 0.0, 0.0))
-              {
-                  /// parent link is a virtual link (has no length)
-                  this->translationAligner[animNode->GetName()] = ignition::math::Matrix4d::Identity;
-              }
-          }
+        // parent link has multiple child links
+        if (skinNode->Transform().Translation()
+            == ignition::math::Vector3d::Zero)
+        {
+          // parent link is a virtual link (has no length)
+          this->translationAligner[animNode->GetName()] =
+              ignition::math::Matrix4d::Identity;
+        }
       }
+    }
 
-      if (animNode->GetChildCount() == 0)
-          /// if this is an end bone, then link i matrix is already calculated
-          continue;
+    if (animNode->GetChildCount() == 0)
+    {
+      // if this is an end bone, then link i matrix is already calculated
+      continue;
+    }
 
-      if (animNode->GetName() == _skelMap[this->skeleton->GetRootNode()->GetName()])
-      {
-          /// if this is root, then some setup is needed to match bvh and dae
-          this->translationAligner[animNode->GetName()] = ignition::math::Matrix4d(this->skeleton->GetRootNode()->Transform().Rotation());
-          ignition::math::Matrix4d tmp = this->translationAligner[animNode->GetName()];
-          tmp.Translate(animNode->Transform().Translation());
-          animNode->SetTransform(tmp, true);
-      }
-
-      if (animNode->GetChildCount() > 1)
-          /// if link i has multiple childs
-          continue;
-
-      /// else, which means link i only has a single child link i+1
-
-      /// get link i+1 posture direction in world coordinates
-      ignition::math::Vector3d relativeBVH = animNode->GetChild(0)->ModelTransform().Translation()
-            - animNode->ModelTransform().Translation();
-
-      ignition::math::Vector3d relativeDAE = skinNode->GetChild(0)->ModelTransform().Translation()
-            - skinNode->ModelTransform().Translation();
-
-      if (relativeBVH == ignition::math::Vector3d(0.0, 0.0, 0.0) || relativeDAE == ignition::math::Vector3d(0.0, 0.0, 0.0))
-      {
-          /// unexpected
-          std::cerr << "Duplicated joint found! This might cause some errors!\n";
-          continue;
-      }
-
-      /// calculate world coordinate rotation quaternion
-      /// (difference between link i+1 posture)
-      ignition::math::Vector3d n = relativeBVH.Cross(relativeDAE);
-      double theta = asin(n.Length() / (relativeDAE.Length() * relativeBVH.Length()));
-
-      /// calculate bvh to dae of link i+1
-      this->translationAligner[animNode->GetChild(0)->GetName()] = ignition::math::Matrix4d(skinNode->ModelTransform().Rotation()).Inverse()
-          * ignition::math::Matrix4d(ignition::math::Quaterniond(n.Normalize(), theta))
-          * ignition::math::Matrix4d(animNode->ModelTransform().Rotation());
-
-      /// fix bvh posture of all links until link i,
-      /// so that bvh and dae world posture matches
-      ignition::math::Matrix4d tmp = ignition::math::Matrix4d(animNode->ModelTransform().Rotation()).Inverse();
-      tmp = tmp * ignition::math::Matrix4d(ignition::math::Quaterniond(n.Normalize(), theta));
-      tmp = tmp * ignition::math::Matrix4d(animNode->ModelTransform().Rotation());
-      tmp.Translate(animNode->Transform().Translation());
+    if (animNode->GetName() ==
+        _skelMap[this->skeleton->GetRootNode()->GetName()])
+    {
+      // if this is root, then some setup is needed to match bvh and dae
+      this->translationAligner[animNode->GetName()] =
+          ignition::math::Matrix4d(
+          this->skeleton->GetRootNode()->Transform().Rotation());
+      auto tmp = this->translationAligner[animNode->GetName()];
+      tmp.SetTranslation(animNode->Transform().Translation());
       animNode->SetTransform(tmp, true);
+    }
+
+    if (animNode->GetChildCount() > 1)
+    {
+      // if link i has multiple children
+      continue;
+    }
+
+    // else, which means link i only has a single child link i+1
+
+    // get link i+1 posture direction in world coordinates
+    auto relativeBvh = animNode->GetChild(0)->ModelTransform().Translation()
+        - animNode->ModelTransform().Translation();
+
+    auto relativeDae = skinNode->GetChild(0)->ModelTransform().Translation()
+          - skinNode->ModelTransform().Translation();
+
+    if (relativeBvh == ignition::math::Vector3d::Zero ||
+        relativeDae == ignition::math::Vector3d::Zero)
+    {
+      // unexpected
+      std::cerr << "Duplicated joint found! This might cause some errors!\n";
+      continue;
+    }
+
+    // calculate world coordinate rotation quaternion
+    // (difference between link i+1 posture)
+    auto n = relativeBvh.Cross(relativeDae);
+    double theta = asin(n.Length() / (relativeDae.Length() *
+        relativeBvh.Length()));
+
+    // calculate bvh to dae of link i+1
+    this->translationAligner[animNode->GetChild(0)->GetName()] =
+        ignition::math::Matrix4d(skinNode->ModelTransform().Rotation())
+        .Inverse()
+        * ignition::math::Matrix4d(ignition::math::Quaterniond(n.Normalize(),
+          theta))
+        * ignition::math::Matrix4d(animNode->ModelTransform().Rotation());
+
+    // fix bvh posture of all links until link i,
+    // so that bvh and dae world posture matches
+    auto tmp = ignition::math::Matrix4d(
+        animNode->ModelTransform().Rotation()).Inverse();
+    tmp = tmp * ignition::math::Matrix4d(
+        ignition::math::Quaterniond(n.Normalize(), theta));
+    tmp = tmp * ignition::math::Matrix4d(animNode->ModelTransform().Rotation());
+    tmp.SetTranslation(animNode->Transform().Translation());
+    animNode->SetTransform(tmp, true);
   }
 
-  /// calculate the rotationAligner : aligner of initial bvh pose to initial dae pose
+  // calculate the rotationAligner : aligner of initial bvh pose to initial dae
+  // pose
   for (unsigned int i = 0; i < _skel->GetNumNodes(); ++i)
   {
-      SkeletonNode *animNode = _skel->GetNodeByHandle(i);
-      SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
+    SkeletonNode *animNode = _skel->GetNodeByHandle(i);
+    SkeletonNode *skinNode = this->skeleton->GetNodeByHandle(i);
 
-      if (animNode->GetName() == _skelMap[this->skeleton->GetRootNode()->GetName()])
-      {
-          /// rotation should not be aligned with root
-          this->rotationAligner[animNode->GetName()] = ignition::math::Matrix4d::Identity;
-          continue;
-      }
+    if (animNode->GetName() ==
+        _skelMap[this->skeleton->GetRootNode()->GetName()])
+    {
+      // rotation should not be aligned with root
+      this->rotationAligner[animNode->GetName()] =
+          ignition::math::Matrix4d::Identity;
+      continue;
+    }
 
-      /// in case an aligner was not correctly calculated, set a value to prevent nan
-      if (this->translationAligner[animNode->GetName()] == ignition::math::Matrix4d::Zero){
-          this->translationAligner[animNode->GetName()] = ignition::math::Matrix4d::Identity;
-      }
+    // in case an aligner was not correctly calculated, set a value to prevent
+    // nan
+    if (this->translationAligner[animNode->GetName()] ==
+        ignition::math::Matrix4d::Zero)
+    {
+      this->translationAligner[animNode->GetName()] =
+          ignition::math::Matrix4d::Identity;
+    }
 
-      this->rotationAligner[animNode->GetName()] = ignition::math::Matrix4d(animNode->Transform().Rotation()).Inverse()
-          * this->translationAligner[animNode->GetName()].Inverse()
-          * ignition::math::Matrix4d(skinNode->Transform().Rotation());
+    this->rotationAligner[animNode->GetName()] =
+        ignition::math::Matrix4d(animNode->Transform().Rotation()).Inverse()
+        * this->translationAligner[animNode->GetName()].Inverse()
+        * ignition::math::Matrix4d(skinNode->Transform().Rotation());
   }
 }
 
@@ -766,9 +791,8 @@ void Actor::Update()
     frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
 
   ignition::math::Vector3d bvhOffset = rootTrans.Translation();
-  ignition::math::Vector3d daeOffset = this->skeleton->GetRootNode()->Transform().Translation();
-  /// scale bvh offset to dae link length
-  // ignition::math::Vector3d rootPos = daeOffset.Length() * bvhOffset.Normalize();
+  auto daeOffset = this->skeleton->GetRootNode()->Transform().Translation();
+  // scale bvh offset to dae link length
   ignition::math::Vector3d rootPos = 0.0 * bvhOffset.Normalize();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
 
@@ -804,37 +828,43 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   if (this->customTrajectoryInfo)
     mainLinkPose.Rot() = this->worldPose.Rot();
 
-  ignition::math::Vector3d temp(0, 0, 0);
+  ignition::math::Vector3d temp(0.0, 0.0, 0.0);
   for (unsigned int i = 0; i < this->skeleton->GetNumNodes(); ++i)
   {
     SkeletonNode *bone = this->skeleton->GetNodeByHandle(i);
     SkeletonNode *parentBone = bone->GetParent();
     ignition::math::Matrix4d transform(ignition::math::Matrix4d::Identity);
 
-    if (_frame.find(_skelMap[bone->GetName()]) != _frame.end()){
-      if(this->bvhFile){
+    if (_frame.find(_skelMap[bone->GetName()]) != _frame.end())
+    {
+      if (this->bvhFile)
+      {
         std::string tempStr(_skelMap[bone->GetName()]);
         transform = _frame[tempStr];
 
-        if(bone->GetName() != this->skeleton->GetRootNode()->GetName()){
+        if (bone->GetName() != this->skeleton->GetRootNode()->GetName())
+        {
           ignition::math::Vector3d bvhOffset = transform.Translation();
           ignition::math::Vector3d daeOffset = bone->Transform().Translation();
-          /// scale bvh offset to dae link length
-          transform.Translate(daeOffset.Length() * bvhOffset.Normalize());
+          // scale bvh offset to dae link length
+          transform.SetTranslation(daeOffset.Length() * bvhOffset.Normalize());
         }
 
-        transform = this->translationAligner[tempStr] * transform * this->rotationAligner[tempStr];
+        transform = this->translationAligner[tempStr] * transform *
+            this->rotationAligner[tempStr];
       }
-      else{
+      else
+      {
         transform = _frame[_skelMap[bone->GetName()]];
       }
     }
-    else{
+    else
+    {
       transform = bone->Transform();
     }
 
     LinkPtr currentLink = this->GetChildLink(bone->GetName());
-	ignition::math::Pose3d bonePose = transform.Pose();
+    ignition::math::Pose3d bonePose = transform.Pose();
     if (!bonePose.IsFinite())
     {
       std::cerr << "ACTOR: " << _time << " " << bone->GetName()
@@ -847,11 +877,10 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
 
     if (!parentBone)
     {
-
       bone_pose->mutable_position()->CopyFrom(
-	      msgs::Convert(ignition::math::Vector3d()));
+          msgs::Convert(ignition::math::Vector3d()));
       bone_pose->mutable_orientation()->CopyFrom(msgs::Convert(
-	      ignition::math::Quaterniond()));
+          ignition::math::Quaterniond()));
       if (!this->customTrajectoryInfo)
         mainLinkPose = bonePose;
     }
@@ -884,14 +913,14 @@ void Actor::SetPose(std::map<std::string, ignition::math::Matrix4d> _frame,
   {
     model_pose->mutable_position()->CopyFrom(msgs::Convert(mainLinkPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-	    msgs::Convert(mainLinkPose.Rot()));
+        msgs::Convert(mainLinkPose.Rot()));
   }
   else
   {
     model_pose->mutable_position()->CopyFrom(
-	    msgs::Convert(this->worldPose.Pos()));
+        msgs::Convert(this->worldPose.Pos()));
     model_pose->mutable_orientation()->CopyFrom(
-	    msgs::Convert(this->worldPose.Rot()));
+        msgs::Convert(this->worldPose.Rot()));
   }
 
   if (this->bonePosePub && this->bonePosePub->HasConnections())
@@ -1112,3 +1141,4 @@ TrajectoryInfo::TrajectoryInfo()
   translated(false)
 {
 }
+

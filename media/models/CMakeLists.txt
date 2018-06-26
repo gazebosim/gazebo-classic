@@ -1,4 +1,5 @@
 set (files
+        cmu-13_26.bvh
 	moonwalk.dae
 	run.dae
 	sit_down.dae
