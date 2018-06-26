@@ -191,14 +191,10 @@ void FlashLightSetting::InitPubLight(
 
   if (this->dataPtr->lightExists)
   {
-    // Initialize the light in the environment
     // Make a message
     this->dataPtr->msg.set_name(
       this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name);
     this->dataPtr->msg.set_range(this->dataPtr->range);
-
-    // Send the message to initialize the light
-    this->dataPtr->pubLight->Publish(this->dataPtr->msg);
   }
 }
 

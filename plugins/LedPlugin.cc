@@ -115,7 +115,6 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
 
   if (this->dataPtr->visualExists)
   {
-    // Initialize the light in the environment
     // Make a message
     this->dataPtr->msg.set_name(
       this->Link()->GetScopedName() + "::" + this->Name());
@@ -126,9 +125,6 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
     this->dataPtr->msg.set_transparency(this->dataPtr->transparency);
     msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
       this->dataPtr->emissiveColor);
-
-    // Send the message to initialize the light
-    this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
   }
 }
 
