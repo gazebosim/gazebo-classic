@@ -877,6 +877,13 @@ bool Heightmap::InitBlendMaps(Ogre::Terrain *_terrain)
       this->dataPtr->diffuseTextures.size() <= 1u)
     return false;
 
+  // Bounds check for following loop
+  if (_terrain->getLayerCount() < this->dataPtr->blendHeight.size() + 1)
+  {
+      gzerr << "Invalid terrain, too few layers to initialize blend map\n";
+      return false;
+  }
+
   Ogre::Real val, height;
   unsigned int i = 0;
 

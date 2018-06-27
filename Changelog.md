@@ -8,6 +8,18 @@
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
 
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
+
+
+## Gazebo 7.13.1 (2018-06-15)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
 
 ## Gazebo 7.13.0 (2018-06-08)
 
