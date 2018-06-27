@@ -578,8 +578,8 @@ namespace gazebo
       public: void SetHeightmapSkirtLength(const double _value);
 
       /// \brief Get the skirt length value for the heightmap LOD tiles.
-      /// \return A render-engine specific value that is used to compute LOD.
-      /// \sa Heightmap::LOD
+      /// \return Length of skirts on LOD tiles
+      /// \sa Heightmap::SkirtLength
       public: double HeightmapSkirtLength() const;
 
       /// \brief Clear rendering::Scene
