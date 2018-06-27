@@ -23,7 +23,7 @@
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
-#include "./FlashLightPlugin.hh"
+#include "FlashLightPlugin.hh"
 
 namespace gazebo
 {
