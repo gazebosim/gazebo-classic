@@ -5,6 +5,18 @@
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
 
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
+
+
+## Gazebo 7.13.1 (2018-06-15)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
 
 ## Gazebo 7.13.0 (2018-06-08)
 
