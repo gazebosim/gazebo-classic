@@ -44,7 +44,7 @@
 #include "gazebo/common/MeshManager.hh"
 
 #define VOXELIZER_IMPLEMENTATION
-#include "gazebo/voxelizer.h"
+//#include "gazebo/voxelizer.h"
 
 using namespace gazebo;
 using namespace gui;
@@ -1414,6 +1414,7 @@ void LinkData::OnAddCollision(const std::string &_name,const std::string &_type)
 
   rendering::VisualPtr collisionVis,_vis;
   msgs::Collision collisionMsg;
+  ignition::math::Pose3d _pose;
 
   // See if this is in the deleted list
   for (auto it = this->deletedCollisions.begin();
@@ -1445,6 +1446,7 @@ void LinkData::OnAddCollision(const std::string &_name,const std::string &_type)
     ->GetElement("link")->GetElement("visual");
 
 _vis = this->visuals.begin()->first;
+_pose = _vis->Pose();
     if(_type == "box"){
       ignition::math::Vector3d _size;
     ignition::math::Box boundingBox;
@@ -1452,10 +1454,16 @@ _vis = this->visuals.begin()->first;
        boundingBox = _vis->BoundingBox();
     _size = boundingBox.Size();
 
+    if(_vis->GetGeometryType() == "mesh"){
+      auto scale = _vis->Scale();
+      _size*=scale;
+    }
+
     collisionElem->GetElement("geometry")->AddElement("box")
          ->AddElement("size");
     collisionElem->GetElement("geometry")->GetElement("box")
          ->GetElement("size")->Set(_size);
+    collisionElem->GetElement("pose")->Set(_pose);
     }
     else if(_type == "sphere"){
    
@@ -1471,6 +1479,7 @@ if (_vis->GetGeometryType()=="box")
          ->SetName("sphere");
       collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
+         collisionElem->GetElement("pose")->Set(_pose);
     }
     else if (_vis->GetGeometryType()=="sphere")
     {
@@ -1482,6 +1491,7 @@ if (_vis->GetGeometryType()=="box")
          ->SetName("sphere");
       collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
+         collisionElem->GetElement("pose")->Set(_pose);
       
     }
     else if (_vis->GetGeometryType() == "cylinder")
@@ -1496,6 +1506,7 @@ if (_vis->GetGeometryType()=="box")
          ->SetName("sphere");
       collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
+         collisionElem->GetElement("pose")->Set(_pose);
       
     }
    
@@ -1505,28 +1516,27 @@ if (_vis->GetGeometryType()=="box")
       gzerr<< "mesh it is \n";
     std::string _meshName = _vis->GetMeshName(); 
 
-    const common::Mesh *_mesh;
     if (!common::MeshManager::Instance()->HasMesh(_meshName))
     {
-      _mesh = common::MeshManager::Instance()->Load(_meshName);
-      if (!_mesh)
-      {
-        gzerr << "Unable to create a mesh from " << _meshName << "\n";
-        return;
-      }
+      gzerr << "Mesh [" << _meshName << "] should already be loaded" << std::endl;
+      return;
     }
-    else
-    {
-      _mesh = common::MeshManager::Instance()->Load(_meshName);
-      gzerr<< "mesh it is yesssssssss\n";
-    }
+
+    auto _mesh = common::MeshManager::Instance()->Load(_meshName);
+
     ignition::math::Vector3d _size,max,min,center;
-    
+
+    auto scale = _vis->Scale();
+
     double radius=0;
     //  boundingBox = this->linkVisual->BoundingBox();
     //_size = boundingBox.Size();
     max=_mesh->Max();
+    max *= scale;
+
     min=_mesh->Min();
+    min *= scale;
+
     center = (max+min)/2;
     radius=(max.Distance(min))/2;
 
@@ -1534,6 +1544,10 @@ gzerr<< "max"<<max<<"\n";
 gzerr<< "min"<<min<<"\n";
 gzerr<< "center"<<center<<"\n";
 gzerr<< "radius"<<radius<<"\n";
+gzerr<< "visual scale "<<_vis->Scale()<<"\n";
+gzerr<< "visual pose "<<_vis->Pose()<<"\n";
+
+
 
 
       collisionElem->GetElement("geometry")->GetElement("box")
@@ -1542,7 +1556,7 @@ gzerr<< "radius"<<radius<<"\n";
          ->SetName("sphere");
       collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
-         collisionElem->GetElement("pose")->Set("center");
+         collisionElem->GetElement("pose")->Set(_pose);
        }
     // vx_mesh_t* mesh;
     // vx_mesh_t* result;
