@@ -15,10 +15,13 @@
  *
 */
 
+#include <algorithm>
 #include <cmath>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#include <ignition/math/Color.hh>
 
 #include "gazebo/test/ServerFixture.hh"
 
@@ -32,16 +35,14 @@ struct RecordInfo
 {
   double duration;
   double interval;
+  std::vector<ignition::math::Color> colors;
   common::Time lastUpdate;
 };
 
 class FlashLightPluginTest : public ServerFixture
 {
   // Constructor.
-  public: FlashLightPluginTest(): called(false)
-  {
-    this->flashLight.resize(4);
-  }
+  public: FlashLightPluginTest(): called(false){}
 
   // Destructor.
   public: ~FlashLightPluginTest()
@@ -52,10 +53,13 @@ class FlashLightPluginTest : public ServerFixture
   public: void lightCb(ConstLightPtr &_msg);
 
   // Initialize all records.
-  protected: void InitRec();
+  protected: void InitRec(int _num);
 
-  // Check the records.
-  protected: void CheckRec();
+  // Check the records regarding blinking.
+  protected: void CheckRecBlinking();
+
+  // Find the color in the records.
+  protected: bool FindColorInRec(const ignition::math::Color &_color);
 
   // An array of records
   protected: std::vector<RecordInfo> flashLight;
@@ -88,7 +92,7 @@ void FlashLightPluginTest::lightCb(ConstLightPtr &_msg)
   indx--;
 
   bool indexInRange = true;
-  if (indx < 0 || 3 < indx)
+  if (indx < 0 || static_cast<int>(this->flashLight.size()) < indx)
   {
     indexInRange = false;
   }
@@ -111,6 +115,19 @@ void FlashLightPluginTest::lightCb(ConstLightPtr &_msg)
     this->flashLight[indx].duration
       = currentTime.Double() - this->flashLight[indx].lastUpdate.Double();
   }
+  // Update for the color
+  if (_msg->has_diffuse())
+  {
+    ignition::math::Color color = msgs::Convert(_msg->diffuse());
+    auto it = std::find(
+      this->flashLight[indx].colors.begin(),
+      this->flashLight[indx].colors.end(),
+      color);
+    if (it == this->flashLight[indx].colors.end())
+    {
+      this->flashLight[indx].colors.push_back(color);
+    }
+  }
 
   // Update the last update time
   this->flashLight[indx].lastUpdate = currentTime;
@@ -119,27 +136,23 @@ void FlashLightPluginTest::lightCb(ConstLightPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void FlashLightPluginTest::InitRec()
+void FlashLightPluginTest::InitRec(int _num)
 {
   std::lock_guard<std::mutex> lk(this->mutex);
   this->startTime = physics::get_world()->SimTime();
-  this->flashLight[0].duration = -1;
-  this->flashLight[1].duration = -1;
-  this->flashLight[2].duration = -1;
-  this->flashLight[3].duration = -1;
-  this->flashLight[0].interval = -1;
-  this->flashLight[1].interval = -1;
-  this->flashLight[2].interval = -1;
-  this->flashLight[3].interval = -1;
-  this->flashLight[0].lastUpdate = this->startTime;
-  this->flashLight[1].lastUpdate = this->startTime;
-  this->flashLight[2].lastUpdate = this->startTime;
-  this->flashLight[3].lastUpdate = this->startTime;
+  this->flashLight.resize(_num);
+  for (unsigned int i = 0; i < this->flashLight.size(); ++i)
+  {
+    this->flashLight[i].duration = -1;
+    this->flashLight[i].interval = -1;
+    this->flashLight[i].colors.resize(0);
+    this->flashLight[i].lastUpdate = this->startTime;
+  }
   this->called = false;
 }
 
 //////////////////////////////////////////////////
-void FlashLightPluginTest::CheckRec()
+void FlashLightPluginTest::CheckRecBlinking()
 {
   std::lock_guard<std::mutex> lk(this->mutex);
   this->endTime = physics::get_world()->SimTime();
@@ -174,6 +187,23 @@ void FlashLightPluginTest::CheckRec()
 }
 
 //////////////////////////////////////////////////
+bool FlashLightPluginTest::FindColorInRec(const ignition::math::Color &_color)
+{
+  auto it = std::find(
+    this->flashLight[0].colors.begin(),
+    this->flashLight[0].colors.end(), _color);
+
+  if (it != this->flashLight[0].colors.end())
+  {
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+//////////////////////////////////////////////////
 TEST_F(FlashLightPluginTest, blinkingCheck)
 {
   this->Load("worlds/flash_light_plugin_demo.world");
@@ -185,7 +215,7 @@ TEST_F(FlashLightPluginTest, blinkingCheck)
   ASSERT_NE(nullptr, model);
 
   // Initialize the time in the records
-  this->InitRec();
+  this->InitRec(4);
 
   // Let the plugin blink the lights for a while
   common::Time::MSleep(1000);
@@ -211,20 +241,53 @@ TEST_F(FlashLightPluginTest, blinkingCheck)
                             dynamic_cast<FlashLightPluginTest*>(this));
 
   // Initialize the records
-  this->InitRec();
+  this->InitRec(4);
 
   // Let the plugin blink the lights for a while
   common::Time::MSleep(2000);
 
   // Check the records
-  this->CheckRec();
+  this->CheckRecBlinking();
 
   // The second trial.
-  this->InitRec();
+  this->InitRec(4);
 
   common::Time::MSleep(2000);
 
-  this->CheckRec();
+  this->CheckRecBlinking();
+}
+
+//////////////////////////////////////////////////
+TEST_F(FlashLightPluginTest, multiBlockCheck)
+{
+  this->Load("test/worlds/flash_light_multicolor_test.world");
+  auto world = physics::get_world();
+  ASSERT_NE(nullptr, world);
+
+  // Get models
+  auto model = world->ModelByName("light_model");
+  ASSERT_NE(nullptr, model);
+
+  // Initialize the time in the records
+  this->InitRec(1);
+
+  // Subscribe to plugin notifications
+  this->sub
+    = this->node->Subscribe("~/light/modify", &FlashLightPluginTest::lightCb,
+                            dynamic_cast<FlashLightPluginTest*>(this));
+
+  // Let the plugin blink the lights for a while
+  common::Time::MSleep(2000);
+
+  // Expect red, green, and blue lights have flashed.
+  EXPECT_TRUE(this->FindColorInRec(ignition::math::Color::Red))
+    << "Red is not found in the records." << std::endl;
+
+  EXPECT_TRUE(this->FindColorInRec(ignition::math::Color::Blue))
+    << "Blue is not found in the records." << std::endl;
+
+  EXPECT_TRUE(this->FindColorInRec(ignition::math::Color::Green))
+    << "Green is not found in the records." << std::endl;
 }
 
 //////////////////////////////////////////////////
