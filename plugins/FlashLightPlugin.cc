@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
@@ -27,6 +29,19 @@
 
 namespace gazebo
 {
+  struct Block
+  {
+    /// \brief The duration time to flash (in seconds).
+    public: double duration;
+
+    /// \brief The interval time between flashing (in seconds).
+    /// When it is zero, the light is constant.
+    public: double interval;
+
+    /// \brief The color of light.
+    public: ignition::math::Color color;
+  };
+
   class FlashLightSettingPrivate
   {
     /// \brief The name of flash light.
@@ -44,13 +59,6 @@ namespace gazebo
     /// \brief The current flasshing state (flash or dim).
     public: bool flashing;
 
-    /// \brief The duration time to flash (in seconds).
-    public: double duration;
-
-    /// \brief The interval time between flashing (in seconds).
-    /// When it is zero, the light is constant.
-    public: double interval;
-
     /// \brief The length of the ray (in meters).
     public: double range;
 
@@ -62,6 +70,12 @@ namespace gazebo
 
     /// \brief True if <light> element exists.
     public: bool lightExists;
+
+    /// \brief The list of blocks of light.
+    public: std::vector< std::shared_ptr<Block> > blocks;
+
+    /// \brief the index of the current block.
+    public: int currentBlockIndex;
   };
 
   class FlashLightPluginPrivate
@@ -123,24 +137,79 @@ FlashLightSetting::FlashLightSetting(
   // current states
   this->dataPtr->switchOn = true;
   this->dataPtr->flashing = true;
-  // duration
-  if (_sdf->HasElement("duration"))
+
+  if (_sdf->HasElement("block"))
   {
-    this->dataPtr->duration = _sdf->Get<double>("duration");
+    sdf::ElementPtr sdfBlock = _sdf->GetElement("block");
+    while (sdfBlock)
+    {
+      auto block = std::make_shared<Block>();
+      // duration
+      if (sdfBlock->HasElement("duration"))
+      {
+        block->duration = sdfBlock->Get<double>("duration");
+      }
+      else
+      {
+        gzerr << "Parameter <duration> is missing in a block." << std::endl;
+      }
+      // interval
+      if (sdfBlock->HasElement("interval"))
+      {
+        block->interval = sdfBlock->Get<double>("interval");
+      }
+      else
+      {
+        gzerr << "Parameter <interval> is missing in a block." << std::endl;
+      }
+      // color
+      if (sdfBlock->HasElement("color"))
+      {
+        block->color = sdfBlock->Get<ignition::math::Color>("color");
+      }
+      else
+      {
+        block->color.Reset();
+      }
+
+      this->dataPtr->blocks.push_back(block);
+      sdfBlock = sdfBlock->GetNextElement("block");
+    }
   }
   else
   {
-    gzerr << "Parameter <duration> is missing." << std::endl;
+    auto block = std::make_shared<Block>();
+    // duration
+    if (_sdf->HasElement("duration"))
+    {
+      block->duration = _sdf->Get<double>("duration");
+    }
+    else
+    {
+      gzerr << "Parameter <duration> is missing." << std::endl;
+    }
+    // interval
+    if (_sdf->HasElement("interval"))
+    {
+      block->interval = _sdf->Get<double>("interval");
+    }
+    else
+    {
+      gzerr << "Parameter <interval> is missing." << std::endl;
+    }
+    // color
+    if (_sdf->HasElement("color"))
+    {
+      block->color = _sdf->Get<ignition::math::Color>("color");
+    }
+    else
+    {
+      block->color.Reset();
+    }
+
+    this->dataPtr->blocks.push_back(block);
   }
-  // interval
-  if (_sdf->HasElement("interval"))
-  {
-    this->dataPtr->interval = _sdf->Get<double>("interval");
-  }
-  else
-  {
-    gzerr << "Parameter <interval> is missing." << std::endl;
-  }
+  this->dataPtr->currentBlockIndex = 0;
 
   // start time
   this->dataPtr->startTime = _currentTime;
@@ -201,19 +270,30 @@ void FlashLightSetting::InitPubLight(
 //////////////////////////////////////////////////
 void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
+  int index = this->dataPtr->currentBlockIndex;
+  double duration = this->dataPtr->blocks[index]->duration;
+  double interval = this->dataPtr->blocks[index]->interval;
   // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->dataPtr->startTime ||
-      this->dataPtr->startTime
-      + this->dataPtr->duration
-      + this->dataPtr->interval <= _currentTime)
+      this->dataPtr->startTime + duration + interval <= _currentTime)
   {
+    // initialize the start time.
     this->dataPtr->startTime = _currentTime;
+    // proceed to the next block.
+    index++;
+    if (index >= static_cast<int>(this->dataPtr->blocks.size()))
+    {
+      index = 0;
+    }
+    duration = this->dataPtr->blocks[index]->duration;
+    interval = this->dataPtr->blocks[index]->interval;
+    this->dataPtr->currentBlockIndex = index;
   }
 
   if (this->dataPtr->switchOn)
   {
     // time to dim
-    if (_currentTime - this->dataPtr->startTime > this->dataPtr->duration)
+    if (_currentTime - this->dataPtr->startTime > duration)
     {
       if (this->dataPtr->flashing)
       {
@@ -223,7 +303,15 @@ void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
     // time to flash
     else
     {
-      if (!this->dataPtr->flashing)
+      // if there is more than one block, it calls Flash() at the beginning of
+      // every block.
+      if (this->dataPtr->blocks.size() > 1
+        && this->dataPtr->startTime == _currentTime)
+      {
+        this->Flash();
+      }
+      // otherwise, it calls the function only if the light is not lit yet.
+      else if (!this->dataPtr->flashing)
       {
         this->Flash();
       }
@@ -260,15 +348,70 @@ void FlashLightSetting::SwitchOff()
 }
 
 //////////////////////////////////////////////////
+void FlashLightSetting::SetDuration(const double &_duration, const int &_index)
+{
+  if (0 <= _index && _index < static_cast<int>(this->dataPtr->blocks.size()))
+  {
+    this->dataPtr->blocks[_index]->duration = _duration;
+  }
+  else
+  {
+    gzerr << "The given index for block is out of range." << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
 void FlashLightSetting::SetDuration(const double &_duration)
 {
-  this->dataPtr->duration = _duration;
+  for (auto block: this->dataPtr->blocks)
+  {
+    block->duration = _duration;
+  }
+}
+
+//////////////////////////////////////////////////
+void FlashLightSetting::SetInterval(const double &_interval, const int &_index)
+{
+  if (0 <= _index && _index < static_cast<int>(this->dataPtr->blocks.size()))
+  {
+    this->dataPtr->blocks[_index]->interval = _interval;
+  }
+  else
+  {
+    gzerr << "The given index for block is out of range." << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
 void FlashLightSetting::SetInterval(const double &_interval)
 {
-  this->dataPtr->interval = _interval;
+  for (auto block: this->dataPtr->blocks)
+  {
+    block->interval = _interval;
+  }
+}
+
+//////////////////////////////////////////////////
+void FlashLightSetting::SetColor(
+  const ignition::math::Color &_color, const int &_index)
+{
+  if (0 <= _index && _index < static_cast<int>(this->dataPtr->blocks.size()))
+  {
+    this->dataPtr->blocks[_index]->color = _color;
+  }
+  else
+  {
+    gzerr << "The given index for block is out of range." << std::endl;
+  }
+}
+
+//////////////////////////////////////////////////
+void FlashLightSetting::SetColor(const ignition::math::Color &_color)
+{
+  for (auto block: this->dataPtr->blocks)
+  {
+    block->color = _color;
+  }
 }
 
 //////////////////////////////////////////////////
@@ -276,6 +419,15 @@ void FlashLightSetting::Flash()
 {
   // Set the range to the default value.
   this->dataPtr->msg.set_range(this->dataPtr->range);
+  // set the color of light.
+  if (this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color
+    != ignition::math::Color::Black)
+  {
+    msgs::Set(this->dataPtr->msg.mutable_diffuse(),
+      this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color);
+    msgs::Set(this->dataPtr->msg.mutable_specular(),
+      this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color);
+  }
   // Send the message.
   if (this->dataPtr->lightExists)
   {
@@ -297,6 +449,12 @@ void FlashLightSetting::Dim()
   }
   // Update the state.
   this->dataPtr->flashing = false;
+}
+
+//////////////////////////////////////////////////
+int FlashLightSetting::CurrentBlockIndex()
+{
+  return this->dataPtr->currentBlockIndex;
 }
 
 //////////////////////////////////////////////////
@@ -513,7 +671,7 @@ bool FlashLightPlugin::TurnOffAll()
 //////////////////////////////////////////////////
 bool FlashLightPlugin::ChangeDuration(
   const std::string &_lightName, const std::string &_linkName,
-  const double &_duration
+  const double &_duration, const int &_index
 )
 {
   std::shared_ptr<FlashLightSetting> setting
@@ -521,7 +679,48 @@ bool FlashLightPlugin::ChangeDuration(
 
   if (setting)
   {
-    setting->SetDuration(_duration);
+    if (_index >= 0)
+    {
+      setting->SetDuration(_duration, _index);
+    }
+    else
+    {
+      setting->SetDuration(_duration);
+    }
+    return true;
+  }
+
+  gzerr << "light <" + _lightName + "> does not exist." << std::endl;
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeDuration(
+  const std::string &_lightName, const std::string &_linkName,
+  const double &_duration
+)
+{
+  return this->ChangeDuration(_lightName, _linkName, _duration, -1);
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeInterval(
+  const std::string &_lightName, const std::string &_linkName,
+  const double &_interval, const int &_index
+)
+{
+  std::shared_ptr<FlashLightSetting> setting
+    = this->dataPtr->SettingByLightNameAndLinkName(_lightName, _linkName);
+
+  if (setting)
+  {
+    if (_index >= 0)
+    {
+      setting->SetInterval(_interval, _index);
+    }
+    else{
+      setting->SetInterval(_interval);
+    }
     return true;
   }
 
@@ -535,17 +734,41 @@ bool FlashLightPlugin::ChangeInterval(
   const double &_interval
 )
 {
+  return this->ChangeInterval(_lightName, _linkName, _interval, -1);
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeColor(
+  const std::string &_lightName, const std::string &_linkName,
+  const ignition::math::Color &_color, const int &_index
+)
+{
   std::shared_ptr<FlashLightSetting> setting
     = this->dataPtr->SettingByLightNameAndLinkName(_lightName, _linkName);
 
   if (setting)
   {
-    setting->SetInterval(_interval);
+    if (_index >= 0)
+    {
+      setting->SetColor(_color, _index);
+    }
+    else{
+      setting->SetColor(_color);
+    }
     return true;
   }
 
   gzerr << "light <" + _lightName + "> does not exist." << std::endl;
   return false;
+}
+
+//////////////////////////////////////////////////
+bool FlashLightPlugin::ChangeColor(
+  const std::string &_lightName, const std::string &_linkName,
+  const ignition::math::Color &_color
+)
+{
+  return this->ChangeColor(_lightName, _linkName, _color, -1);
 }
 
 //////////////////////////////////////////////////

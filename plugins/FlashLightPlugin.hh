@@ -73,13 +73,35 @@ namespace gazebo
     /// \brief Switch off (disable the flashlight).
     public: virtual void SwitchOff() final;
 
-    /// \brief Set the duration time.
+    /// \brief Set the duration time for the specified block.
+    /// \param[in] _duration New duration time to set.
+    /// \param[in] _index The index to the block to update.
+    public: virtual void SetDuration(
+      const double &_duration, const int &_index) final;
+
+    /// \brief Set the duration time for all the blocks.
     /// \param[in] _duration New duration time to set.
     public: virtual void SetDuration(const double &_duration) final;
 
-    /// \brief Set the interval time.
+    /// \brief Set the interval time for the specified block.
+    /// \param[in] _interval New interval time to set.
+    /// \param[in] _index The index to the block to update.
+    public: virtual void SetInterval(
+      const double &_interval, const int &_index) final;
+
+    /// \brief Set the interval time for all the blocks.
     /// \param[in] _interval New interval time to set.
     public: virtual void SetInterval(const double &_interval) final;
+
+    /// \brief Set the color for the specified block.
+    /// \param[in] _color New color to set.
+    /// \param[in] _index The index to the block to update.
+    public: virtual void SetColor(
+      const ignition::math::Color &_color, const int &_index) final;
+
+    /// \brief Set the color for all the blocks.
+    /// \param[in] _color New color to set.
+    public: virtual void SetColor(const ignition::math::Color &_color) final;
 
     /// \brief Flash the light
     /// This function is internally used to update the light in the
@@ -90,6 +112,11 @@ namespace gazebo
     /// This function is internally used to update the light in the
     /// environment.
     protected: virtual void Dim();
+
+    /// \brief Get the index for the current block.
+    /// This is to be used by an inheriting class of FlashLightSetting class.
+    /// \return the index for the current block which the object is using.
+    protected: virtual int CurrentBlockIndex() final;
 
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
@@ -125,7 +152,19 @@ namespace gazebo
   /// respectively. That is, the phase is determined as the sum of them:
   /// duration + interval.
   ///
-  /// Example:
+  /// <color> is optional. It specifies the color of light. If it is not given,
+  /// the original color of the <light> element in the model will be used.
+  ///
+  /// <block> is optional. It specifies a single phase. By adding multiple
+  /// <block> elements, the light can generate a specific sequence of light
+  /// patterns with different colors. It must have <duration> and <interval>.
+  /// It can have <color> to specify the color of light. If <color> is not
+  /// given, it will be set to the same color as that of the
+  /// previous block.
+  /// The first two elements are in the same format described above. <color> has
+  /// three values representing RGB values.
+  ///
+  /// Example (single color):
   /// \verbatim
   /// <enable>true</enable>
   ///
@@ -141,6 +180,28 @@ namespace gazebo
   ///   <duration>0.8</duration>
   ///   <interval>0.2</interval>
   ///   <enable>false</enable>
+  /// </flash_light>
+  ///
+  /// ...
+  /// \endverbatim
+  ///
+  /// Example (multiple colors by <block> elements):
+  /// \verbatim
+  /// <enable>true</enable>
+  ///
+  /// <flash_light>
+  ///   <light_id>link1/light_source</light_id>
+  ///   <block>
+  ///     <duration>0.6</duration>
+  ///     <interval>0</interval>
+  ///     <color>1 0 0</color>
+  ///   </block>
+  ///   <block>
+  ///     <duration>0.2</duration>
+  ///     <interval>0.5</interval>
+  ///     <color>0 1 0</color>
+  ///   </block>
+  ///   <enable>true</enable>
   /// </flash_light>
   ///
   /// ...
@@ -196,7 +257,18 @@ namespace gazebo
     /// \return True if there is one or more lights to turn off.
     protected: virtual bool TurnOffAll() final;
 
-    /// \brief Change the duration
+    /// \brief Change the duration of a specific block of the flashlight.
+    /// If the index is a negative number, it updates all the blocks.
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \param[in] _duration The new duration time to set
+    /// \param[in] _index The index to the block to update
+    /// \return True if the specified light is found.
+    protected: virtual bool ChangeDuration(
+      const std::string &_lightName, const std::string &_linkName,
+      const double &_duration, const int &_index) final;
+
+    /// \brief Change the duration of all the blocks of the flashlight.
     /// \param[in] _lightName The name of flash light
     /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _duration The new duration time to set
@@ -205,7 +277,18 @@ namespace gazebo
       const std::string &_lightName, const std::string &_linkName,
       const double &_duration) final;
 
-    /// \brief Change the interval
+    /// \brief Change the interval of a specific block of the flashlight.
+    /// If the index is a negative number, it updates all the blocks.
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \param[in] _interval The new interval time to set
+    /// \param[in] _index The index to the block to update
+    /// \return True if the specified light is found.
+    protected: virtual bool ChangeInterval(
+      const std::string &_lightName, const std::string &_linkName,
+      const double &_interval, const int &_index) final;
+
+    /// \brief Change the interval of all the blocks of the flashlight.
     /// \param[in] _lightName The name of flash light
     /// \param[in] _linkName The name of the link holding the light
     /// \param[in] _interval The new interval time to set
@@ -213,6 +296,26 @@ namespace gazebo
     protected: virtual bool ChangeInterval(
       const std::string &_lightName, const std::string &_linkName,
       const double &_interval) final;
+
+    /// \brief Change the color of a specific block of the flashlight.
+    /// If the index is a negative number, it updates all the blocks.
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \param[in] _color The new color to set
+    /// \param[in] _index The index to the block to update
+    /// \return True if the specified light is found.
+    protected: virtual bool ChangeColor(
+      const std::string &_lightName, const std::string &_linkName,
+      const ignition::math::Color &_color, const int &_index) final;
+
+    /// \brief Change the color of all the blocks of the flashlight.
+    /// \param[in] _lightName The name of flash light
+    /// \param[in] _linkName The name of the link holding the light
+    /// \param[in] _color The new color to set
+    /// \return True if the specified light is found.
+    protected: virtual bool ChangeColor(
+      const std::string &_lightName, const std::string &_linkName,
+      const ignition::math::Color &_color) final;
 
     /// \brief Create an object of setting.
     ///
