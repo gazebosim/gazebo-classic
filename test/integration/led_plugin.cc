@@ -76,9 +76,6 @@ TEST_F(LedPluginTest, Blinking)
   rendering::CameraPtr cam = scene->GetCamera(0);
   ASSERT_NE(nullptr, cam);
 
-  cam->EnableSaveFrame(true);
-  cam->SetSaveFramePathname("/tmp/gazebo_frames");
-
   imageCount = 0;
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
@@ -103,9 +100,9 @@ TEST_F(LedPluginTest, Blinking)
       unsigned int r = img[(y*width*3) + x];
       unsigned int g = img[(y*width*3) + x + 1];
       unsigned int b = img[(y*width*3) + x + 2];
-      EXPECT_LT(r, 50u);
-      EXPECT_LT(g, 50u);
-      EXPECT_LT(b, 50u);
+      EXPECT_LT(r, 50u) << "R value is not low enough." << std::endl;
+      EXPECT_LT(g, 50u) << "G value is not low enough." << std::endl;
+      EXPECT_LT(b, 50u) << "B value is not low enough." << std::endl;
     }
   }
 
@@ -121,7 +118,7 @@ TEST_F(LedPluginTest, Blinking)
   EXPECT_GE(imageCount, 1);
   c.reset();
 
-  // after 1 sec, it should flash, i.e., the color is brighter.
+  // after 1 sec, it should flash, i.e., the color is bright red.
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -129,9 +126,9 @@ TEST_F(LedPluginTest, Blinking)
       unsigned int r = img[(y*width*3) + x];
       unsigned int g = img[(y*width*3) + x + 1];
       unsigned int b = img[(y*width*3) + x + 2];
-      EXPECT_GT(r, 50u);
-      EXPECT_GT(g, 50u);
-      EXPECT_GT(b, 50u);
+      EXPECT_GT(r, 250u) << "R value is not high enough." << std::endl;
+      EXPECT_GT(g, 127u) << "G value is not high enough." << std::endl;
+      EXPECT_GT(b, 127u) << "B value is not high enough." << std::endl;
     }
   }
 

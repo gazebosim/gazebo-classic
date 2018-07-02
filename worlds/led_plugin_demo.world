@@ -101,8 +101,21 @@
         </flash_light>
         <flash_light>
           <light_id>handle/button</light_id>
-          <duration>0.1</duration>
-          <interval>0.1</interval>
+          <block>
+            <duration>0.5</duration>
+            <interval>0</interval>
+            <color>1 1 0</color>
+          </block>
+          <block>
+            <duration>0.5</duration>
+            <interval>0</interval>
+            <color>0 1 1</color>
+          </block>
+          <block>
+            <duration>0.5</duration>
+            <interval>0</interval>
+            <color>1 0 1</color>
+          </block>
           <enable>true</enable>
         </flash_light>
       </plugin>
