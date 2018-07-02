@@ -21,6 +21,8 @@
 #include <memory>
 #include <string>
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
 
@@ -113,10 +115,11 @@ namespace gazebo
     /// environment.
     protected: virtual void Dim();
 
-    /// \brief Get the index for the current block.
+    /// \brief Get the current color of the light.
     /// This is to be used by an inheriting class of FlashLightSetting class.
-    /// \return the index for the current block which the object is using.
-    protected: virtual int CurrentBlockIndex() final;
+    /// \return the color for the current block which the object is using.
+    ///         It returns Black if there is no update about color.
+    protected: virtual ignition::math::Color CurrentColor() final;
 
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;

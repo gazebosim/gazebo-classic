@@ -35,7 +35,7 @@ namespace gazebo
     public: double transparency;
 
     /// \brief The emissive color.
-    public: ignition::math::Color emissiveColor;
+    public: ignition::math::Color defaultEmissiveColor;
 
     /// \brief The pointer to publisher to send a command to update a visual.
     public: transport::PublisherPtr pubVisual;
@@ -89,12 +89,12 @@ LedSetting::LedSetting(
       if (visualMsg.has_material()
         && visualMsg.material().has_emissive())
       {
-        this->dataPtr->emissiveColor
+        this->dataPtr->defaultEmissiveColor
           = msgs::Convert(visualMsg.material().emissive());
       }
       else
       {
-        this->dataPtr->emissiveColor = ignition::math::Color(1, 1, 1);
+        this->dataPtr->defaultEmissiveColor = ignition::math::Color(1, 1, 1);
       }
 
       this->dataPtr->visualExists = true;
@@ -122,9 +122,6 @@ void LedSetting::InitPubVisual(const transport::PublisherPtr &_pubVisual)
     uint32_t id;
     this->Link()->VisualId(this->Name(), id);
     this->dataPtr->msg.set_id(id);
-    this->dataPtr->msg.set_transparency(this->dataPtr->transparency);
-    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-      this->dataPtr->emissiveColor);
   }
 }
 
@@ -136,8 +133,23 @@ void LedSetting::Flash()
 
   // Make the appearance brighter.
   this->dataPtr->msg.set_transparency(0.0);
-  msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
-    this->dataPtr->emissiveColor);
+  ignition::math::Color color = this->CurrentColor();
+  if (color != ignition::math::Color::Black)
+  {
+    // If the base class is using a specific color rather than the default,
+    // apply it to the visual object.
+    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_diffuse(), color);
+    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(), color);
+    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_specular(), color);
+    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_ambient(), color);
+  }
+  else
+  {
+    // Otherwise, just apply the default color.
+    msgs::Set(this->dataPtr->msg.mutable_material()->mutable_emissive(),
+      this->dataPtr->defaultEmissiveColor);
+  }
+
   // Send the message.
   if (this->dataPtr->visualExists)
   {

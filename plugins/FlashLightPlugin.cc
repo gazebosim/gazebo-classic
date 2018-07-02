@@ -452,9 +452,9 @@ void FlashLightSetting::Dim()
 }
 
 //////////////////////////////////////////////////
-int FlashLightSetting::CurrentBlockIndex()
+ignition::math::Color FlashLightSetting::CurrentColor()
 {
-  return this->dataPtr->currentBlockIndex;
+  return this->dataPtr->blocks[this->dataPtr->currentBlockIndex]->color;
 }
 
 //////////////////////////////////////////////////
