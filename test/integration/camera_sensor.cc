@@ -1730,9 +1730,9 @@ TEST_F(CameraSensor, Light)
   EXPECT_TRUE(sensor != nullptr);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-  EXPECT_TRUE(camSensor != nullptr);
+  ASSERT_TRUE(camSensor != nullptr);
   rendering::CameraPtr camera = camSensor->Camera();
-  EXPECT_TRUE(camera != nullptr);
+  ASSERT_TRUE(camera != nullptr);
 
   // get camera scene
   rendering::ScenePtr scene = camera->GetScene();
@@ -1749,7 +1749,7 @@ TEST_F(CameraSensor, Light)
   lightModifyPub->Publish(lightMsg);
 
   rendering::LightPtr sun = scene->LightByName("sun");
-  EXPECT_TRUE(sensor != nullptr);
+  ASSERT_TRUE(sun != nullptr);
 
   int sleep = 0;
   while (sun->DiffuseColor() != newColor && sleep++ < 50)
