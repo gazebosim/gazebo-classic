@@ -103,7 +103,6 @@
           <light_id>cylinder/light_source2</light_id>
           <duration>0.05</duration>
           <interval>0.05</interval>
-          <color>0.5 1 0.8</color>
         </flash_light>
         <flash_light>
           <light_id>box/light_source3</light_id>
@@ -113,21 +112,8 @@
         </flash_light>
         <flash_light>
           <light_id>box/light_source4</light_id>
-          <block>
-            <duration>0.5</duration>
-            <interval>0.0</interval>
-            <color>1 1 0</color>
-          </block>
-          <block>
-            <duration>0.5</duration>
-            <interval>0.0</interval>
-            <color>0 1 1</color>
-          </block>
-          <block>
-            <duration>0.5</duration>
-            <interval>0.0</interval>
-            <color>1 0 1</color>
-          </block>
+          <duration>1.0</duration>
+          <interval>0.0</interval>
           <enable>true</enable>
         </flash_light>
       </plugin>

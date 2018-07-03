@@ -206,7 +206,7 @@ bool FlashLightPluginTest::FindColorInRec(const ignition::math::Color &_color)
 //////////////////////////////////////////////////
 TEST_F(FlashLightPluginTest, blinkingCheck)
 {
-  this->Load("worlds/flash_light_plugin_demo.world");
+  this->Load("test/worlds/flash_light_blinking_test.world");
   auto world = physics::get_world();
   ASSERT_NE(nullptr, world);
 
@@ -260,7 +260,7 @@ TEST_F(FlashLightPluginTest, blinkingCheck)
 //////////////////////////////////////////////////
 TEST_F(FlashLightPluginTest, multiBlockCheck)
 {
-  this->Load("test/worlds/flash_light_multicolor_test.world");
+  this->Load("test/worlds/flash_light_multiblock_test.world");
   auto world = physics::get_world();
   ASSERT_NE(nullptr, world);
 
