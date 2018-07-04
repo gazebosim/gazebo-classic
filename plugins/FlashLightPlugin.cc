@@ -271,11 +271,12 @@ void FlashLightSetting::InitPubLight(
 void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
 {
   int index = this->dataPtr->currentBlockIndex;
-  double duration = this->dataPtr->blocks[index]->duration;
-  double interval = this->dataPtr->blocks[index]->interval;
+
   // Reset the start time so the current time is within the current phase.
   if (_currentTime < this->dataPtr->startTime ||
-      this->dataPtr->startTime + duration + interval <= _currentTime)
+      this->dataPtr->startTime
+      + this->dataPtr->blocks[index]->duration
+      + this->dataPtr->blocks[index]->interval <= _currentTime)
   {
     // initialize the start time.
     this->dataPtr->startTime = _currentTime;
@@ -285,15 +286,14 @@ void FlashLightSetting::UpdateLightInEnv(const common::Time &_currentTime)
     {
       index = 0;
     }
-    duration = this->dataPtr->blocks[index]->duration;
-    interval = this->dataPtr->blocks[index]->interval;
     this->dataPtr->currentBlockIndex = index;
   }
 
   if (this->dataPtr->switchOn)
   {
     // time to dim
-    if (_currentTime - this->dataPtr->startTime > duration)
+    if (_currentTime - this->dataPtr->startTime
+      > this->dataPtr->blocks[index]->duration)
     {
       if (this->dataPtr->flashing)
       {
@@ -718,7 +718,8 @@ bool FlashLightPlugin::ChangeInterval(
     {
       setting->SetInterval(_interval, _index);
     }
-    else{
+    else
+    {
       setting->SetInterval(_interval);
     }
     return true;
@@ -752,7 +753,8 @@ bool FlashLightPlugin::ChangeColor(
     {
       setting->SetColor(_color, _index);
     }
-    else{
+    else
+    {
       setting->SetColor(_color);
     }
     return true;
