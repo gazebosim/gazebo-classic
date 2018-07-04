@@ -181,11 +181,12 @@ LedPlugin::LedPlugin() : FlashLightPlugin(), dataPtr(new LedPluginPrivate)
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init();
 
-  // advertise the topic to update lights
+  // Advertise the topic to update lights
   this->dataPtr->pubVisual
     = this->dataPtr->node->Advertise<gazebo::msgs::Visual>("~/visual");
-
-  this->dataPtr->pubVisual->WaitForConnection();
+  // NOTE: it should not call WaitForConnection() since there could be no
+  // subscriber to "~/visual" topic if the render engine is not running (e.g.,
+  // rostest), leading to a hang-up.
 }
 
 //////////////////////////////////////////////////
