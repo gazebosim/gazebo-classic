@@ -52,6 +52,12 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonBox->setAutoDefault(false);
   connect(addCollisionButtonBox, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
 
+  QPushButton *addCollisionButtonCylinder = new QPushButton(tr("+ &Another Cylinder"));
+  addCollisionButtonCylinder->setMaximumWidth(200);
+  addCollisionButtonCylinder->setDefault(false);
+  addCollisionButtonCylinder->setAutoDefault(false);
+  connect(addCollisionButtonCylinder, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
+
   QPushButton *addCollisionButtonSphere = new QPushButton(tr("+ &Another Sphere"));
   addCollisionButtonSphere->setMaximumWidth(200);
   addCollisionButtonSphere->setDefault(false);
@@ -60,6 +66,7 @@ CollisionConfig::CollisionConfig()
 
   this->mapperAdd->setMapping(addCollisionButtonBox,QString::fromStdString("box"));
   this->mapperAdd->setMapping(addCollisionButtonSphere,QString::fromStdString("sphere"));
+  this->mapperAdd->setMapping(addCollisionButtonCylinder,QString::fromStdString("cylinder"));
   connect (this->mapperAdd, SIGNAL(mapped(const QString)), this, SLOT(OnAddCollision(const QString))) ;
 
 
@@ -68,6 +75,7 @@ CollisionConfig::CollisionConfig()
   mainLayout->addWidget(scrollArea);
   mainLayout->addWidget(addCollisionButtonBox);
   mainLayout->addWidget(addCollisionButtonSphere);
+  mainLayout->addWidget(addCollisionButtonCylinder);  
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 

@@ -19,6 +19,7 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
+
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
@@ -1450,14 +1451,15 @@ _pose = _vis->Pose();
     if(_type == "box"){
       ignition::math::Vector3d _size;
     ignition::math::Box boundingBox;
-
+_vis = this->visuals.begin()->first;
        boundingBox = _vis->BoundingBox();
     _size = boundingBox.Size();
 
-    if(_vis->GetGeometryType() == "mesh"){
+    if(_vis->GetGeometryType()=="mesh"){
       auto scale = _vis->Scale();
       _size*=scale;
     }
+   
 
     collisionElem->GetElement("geometry")->AddElement("box")
          ->AddElement("size");
@@ -1471,7 +1473,7 @@ _pose = _vis->Pose();
 if (_vis->GetGeometryType()=="box")
     {
       ignition::math::Vector3d _size = _vis->GetGeometrySize();
-      double radius = _size.Max();  
+      double radius = sqrt(_size[0]*_size[0]+_size[1]*_size[1]+_size[2]*_size[2])/2;
 
       collisionElem->GetElement("geometry")->GetElement("box")
          ->GetElement("size")->SetName("radius");
@@ -1575,6 +1577,58 @@ gzerr<< "visual pose "<<_vis->Pose()<<"\n";
 
     // collisionVis->AttachMesh(mesh);
 }
+else if(_type == "cylinder"){
+  ignition::math::Vector3d _size;
+    ignition::math::Box boundingBox;
+
+       boundingBox = _vis->BoundingBox();
+    _size = boundingBox.Size();
+
+    if(_vis->GetGeometryType() == "mesh"){
+      auto scale = _vis->Scale();
+      _size*=scale;
+    }
+    
+    double radius,length;
+
+    if(abs(_size[0]-_size[1])>abs(_size[1]-_size[2])){
+      if(abs(_size[0]-_size[2])>abs(_size[1]-_size[2])){
+        radius = sqrt(_size[1]*_size[1]+_size[2]*_size[2])/2;
+        length = _size[0];
+
+        gzerr<<"radius12 "<<radius<<"\n";
+gzerr<<"length0 "<<radius<<"\n";
+      }
+      else{
+        radius = sqrt(_size[0]*_size[0]+_size[2]*_size[2])/2;
+        length = _size[1];
+
+        gzerr<<"radius02 "<<radius<<"\n";
+gzerr<<"length1 "<<radius<<"\n";
+      }
+    }
+    else{
+      radius = sqrt(_size[1]*_size[1]+_size[0]*_size[0])/2;
+      length = _size[2];
+
+      gzerr<<"radius01 "<<radius<<"\n";
+gzerr<<"length2 "<<radius<<"\n";
+    }
+
+ collisionElem->GetElement("geometry")->ClearElements();
+gzerr<<"radius "<<radius<<"\n";
+gzerr<<"length "<<radius<<"\n";
+    collisionElem->GetElement("geometry")->AddElement("cylinder")
+         ->AddElement("radius");
+         collisionElem->GetElement("geometry")->GetElement("cylinder")
+         ->AddElement("length");
+      collisionElem->GetElement("geometry")->GetElement("cylinder")
+         ->GetElement("radius")->Set<double>(radius);
+         collisionElem->GetElement("geometry")->GetElement("cylinder")
+         ->GetElement("length")->Set<double>(length);
+         collisionElem->GetElement("pose")->Set(_pose);
+
+}
     collisionVis->Load(collisionElem);
     collisionVis->SetMaterial("Gazebo/Orange");
 
@@ -1589,6 +1643,7 @@ gzerr<< "visual pose "<<_vis->Pose()<<"\n";
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
 
   collisionVis->SetVisible(this->showCollisions);
+  collisionVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   collisionConfig->SetShowCollision(this->showCollisions, _name);
   this->collisions[collisionVis] = collisionMsg;
   this->scales[collisionVis->Name()] = collisionVis->GetGeometrySize();
@@ -1669,6 +1724,7 @@ void LinkData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         it.first->UpdateFromMsg(updateMsgPtr);
+        it.first->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
         this->scales[it.first->Name()] = it.first->GetGeometrySize();
 
