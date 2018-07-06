@@ -153,7 +153,7 @@ FlashLightSetting::FlashLightSetting(
   const transport::PublisherPtr &_pubLight,
   const sdf::ElementPtr &_sdfFlashLight,
   const common::Time &_currentTime):
-  switchOn(true), flashing(true)
+  switchOn(true), flashing(true), range(0)
 {
   // name
   std::string lightId;
@@ -169,6 +169,11 @@ FlashLightSetting::FlashLightSetting(
   this->name = lightId.substr(posDelim+1, lightId.length());
   // link which holds this light
   this->link = _model->GetLink(lightId.substr(0, posDelim));
+  if (!this->link)
+  {
+    gzerr << "link [" << lightId.substr(0, posDelim) << "] does not exists."
+          << std::endl;
+  }
   // The PublisherPtr
   this->pubLight = _pubLight;
   // start time
@@ -192,16 +197,16 @@ FlashLightSetting::FlashLightSetting(
     gzerr << "Parameter <interval> is missing." << std::endl;
   }
   // range
-  sdf::ElementPtr sdfLightInLink = this->link->GetSDF()->GetElement("light");
-  while (sdfLightInLink)
+  auto light = this->link->GetChild(this->name);
+  if (light)
   {
-    if (sdfLightInLink->Get<std::string>("name") == this->name)
-    {
-      this->range
-        = sdfLightInLink->GetElement("attenuation")->Get<double>("range");
-      break;
-    }
-    sdfLightInLink = sdfLightInLink->GetNextElement("light");
+    this->range
+      = light->GetSDF()->GetElement("attenuation")->Get<double>("range");
+  }
+  else
+  {
+    gzerr << "light [" << this->name << "] does not exist as a child of "
+          << "link [" << this->link->GetScopedName() << "]" << std::endl;
   }
 
   // Initialize the light in the environment
