@@ -171,7 +171,7 @@ void FlashLightPluginTest::CheckRec()
 //////////////////////////////////////////////////
 TEST_F(FlashLightPluginTest, blinkingCheck)
 {
-  this->Load("worlds/flash_light_plugin_demo.world");
+  this->Load("worlds/flash_light_plugin_test.world");
   auto world = physics::get_world();
   ASSERT_NE(nullptr, world);
 

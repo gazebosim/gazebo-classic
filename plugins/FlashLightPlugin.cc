@@ -78,6 +78,16 @@ namespace gazebo
     /// This function is internally used to update the light in the environment.
     private: void Dim();
 
+    /// \brief Find the link holding the light to control.
+    /// If multiple models are nested, this function is recursively called until
+    /// the link is found.
+    /// \param[in] _model A model to check.
+    /// \param[in] _lightName the name of the light.
+    /// \param[in] _linkName the name of the link.
+    /// \return A pointer to the link. If not found, nullptr is returned.
+    private: physics::LinkPtr FindLinkForLight(const physics::ModelPtr &_model,
+      const std::string &_lightName, const std::string &_linkName);
+
     /// \brief The name of flash light.
     private: std::string name;
 
@@ -165,15 +175,12 @@ FlashLightSetting::FlashLightSetting(
   {
     gzerr << "Parameter <light_id> is missing." << std::endl;
   }
-  int posDelim = lightId.find("/");
+
+  int posDelim = lightId.rfind("/");
   this->name = lightId.substr(posDelim+1, lightId.length());
   // link which holds this light
-  this->link = _model->GetLink(lightId.substr(0, posDelim));
-  if (!this->link)
-  {
-    gzerr << "link [" << lightId.substr(0, posDelim) << "] does not exists."
-          << std::endl;
-  }
+  this->link
+    = this->FindLinkForLight(_model, this->name, lightId.substr(0, posDelim));
   // The PublisherPtr
   this->pubLight = _pubLight;
   // start time
@@ -196,26 +203,28 @@ FlashLightSetting::FlashLightSetting(
   {
     gzerr << "Parameter <interval> is missing." << std::endl;
   }
-  // range
-  auto light = this->link->GetChild(this->name);
-  if (light)
+  if (this->link)
   {
-    this->range
-      = light->GetSDF()->GetElement("attenuation")->Get<double>("range");
-  }
-  else
-  {
-    gzerr << "light [" << this->name << "] does not exist as a child of "
-          << "link [" << this->link->GetScopedName() << "]" << std::endl;
-  }
+    // range
+    auto sdfLight = this->link->GetSDF()->GetElement("light");
+    while (sdfLight)
+    {
+      if (sdfLight->Get<std::string>("name") == this->name)
+      {
+        this->range = sdfLight->GetElement("attenuation")->Get<double>("range");
+        break;
+      }
+      sdfLight = sdfLight->GetNextElement("light");
+    }
 
-  // Initialize the light in the environment
-  // Make a message
-  this->msg.set_name(this->link->GetScopedName() + "::" + this->name);
-  this->msg.set_range(this->range);
+    // Initialize the light in the environment
+    // Make a message
+    this->msg.set_name(this->link->GetScopedName() + "::" + this->name);
+    this->msg.set_range(this->range);
 
-  // Send the message to initialize the light
-  this->pubLight->Publish(this->msg);
+    // Send the message to initialize the light
+    this->pubLight->Publish(this->msg);
+  }
 }
 
 //////////////////////////////////////////////////
@@ -295,7 +304,10 @@ void FlashLightSetting::Flash()
   // Set the range to the default value.
   this->msg.set_range(this->range);
   // Send the message.
-  this->pubLight->Publish(this->msg);
+  if (this->link)
+  {
+    this->pubLight->Publish(this->msg);
+  }
   // Update the state.
   this->flashing = true;
 }
@@ -306,9 +318,42 @@ void FlashLightSetting::Dim()
   // Set the range to zero.
   this->msg.set_range(0.0);
   // Send the message.
-  this->pubLight->Publish(this->msg);
+  if (this->link)
+  {
+    this->pubLight->Publish(this->msg);
+  }
   // Update the state.
   this->flashing = false;
+}
+
+//////////////////////////////////////////////////
+physics::LinkPtr FlashLightSetting::FindLinkForLight(
+  const physics::ModelPtr &_model,
+  const std::string &_lightName, const std::string &_linkName)
+{
+  auto childLink = _model->GetChildLink(_linkName);
+  if (childLink)
+  {
+    auto sdfLight = childLink->GetSDF()->GetElement("light");
+    while (sdfLight)
+    {
+      if (sdfLight->Get<std::string>("name") == _lightName)
+      {
+        return childLink;
+      }
+      sdfLight = sdfLight->GetNextElement("light");
+    }
+  }
+  for (auto model: _model->NestedModels())
+  {
+    auto foundLink = this->FindLinkForLight(model, _lightName, _linkName);
+    if (foundLink)
+    {
+      return foundLink;
+    }
+  }
+
+  return nullptr;
 }
 
 //////////////////////////////////////////////////
