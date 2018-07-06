@@ -152,7 +152,8 @@ FlashLightSetting::FlashLightSetting(
   const physics::ModelPtr &_model,
   const transport::PublisherPtr &_pubLight,
   const sdf::ElementPtr &_sdfFlashLight,
-  const common::Time &_currentTime)
+  const common::Time &_currentTime):
+  switchOn(true), flashing(true)
 {
   // name
   std::string lightId;
@@ -172,9 +173,6 @@ FlashLightSetting::FlashLightSetting(
   this->pubLight = _pubLight;
   // start time
   this->startTime = _currentTime;
-  // current states
-  this->switchOn = true;
-  this->flashing = true;
   // duration
   if (_sdfFlashLight->HasElement("duration"))
   {
