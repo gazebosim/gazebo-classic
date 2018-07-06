@@ -167,13 +167,13 @@ FlashLightSetting::FlashLightSetting(
 {
   // name
   std::string lightId;
-  if (_sdfFlashLight->HasElement("light_id"))
+  if (_sdfFlashLight->HasElement("id"))
   {
-    lightId = _sdfFlashLight->Get<std::string>("light_id");
+    lightId = _sdfFlashLight->Get<std::string>("id");
   }
   else
   {
-    gzerr << "Parameter <light_id> is missing." << std::endl;
+    gzerr << "Parameter <id> is missing." << std::endl;
   }
 
   int posDelim = lightId.rfind("/");
@@ -407,11 +407,11 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   common::Time currentTime = this->dataPtr->world->SimTime();
 
   // Get the parameters from sdf
-  sdf::ElementPtr sdfFlashLight = _sdf->GetElement("flash_light");
+  sdf::ElementPtr sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
-    // light_id required
-    if (sdfFlashLight->HasElement("light_id"))
+    // id required
+    if (sdfFlashLight->HasElement("id"))
     {
       // Get the setting information from sdf
       std::shared_ptr<FlashLightSetting> setting
@@ -426,10 +426,10 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     else
     {
       // display an error message
-      gzerr << "no name field exists in <flash_light>" << std::endl;
+      gzerr << "id does not exist in <light>" << std::endl;
     }
 
-    sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
+    sdfFlashLight = sdfFlashLight->GetNextElement("light");
   }
 
   // Turn on/off all the lights if <enable> element is given
@@ -445,13 +445,13 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
   }
   // Turn on/off a specific light if <enable> is specifically given.
-  sdfFlashLight = _sdf->GetElement("flash_light");
+  sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
-    // light_id required
+    // id required
     if (sdfFlashLight->HasElement("enable"))
     {
-      std::string lightId = sdfFlashLight->Get<std::string>("light_id");
+      std::string lightId = sdfFlashLight->Get<std::string>("id");
       int posDelim = lightId.find("/");
       std::string lightName = lightId.substr(posDelim+1, lightId.length());
       std::string linkName = lightId.substr(0, posDelim);
@@ -465,7 +465,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       }
     }
 
-    sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
+    sdfFlashLight = sdfFlashLight->GetNextElement("light");
   }
 
   // listen to the update event by the World
