@@ -131,20 +131,19 @@ namespace gazebo
 
   /// \brief A plugin that blinks a light component in the model.
   /// This plugin accesses <light> elements in the model specified by
-  /// <flash_light> as a parameter. More than one <flash_light> can exist.
+  /// <light> as a parameter. More than one <light> can exist.
   ///
   /// NOTE: This base class provides basic functions to control the lights.
   /// Users can create their own flash light plugin by inheriting this base
   /// model plugin.
   ///
-  /// A light is specified by <light_id>, including link and light names
-  /// separated by a slash "/".
+  /// A light is specified by <id>, including link and light names separated by
+  /// a slash "/".
   ///
   /// <enable> is optional. The default value is true.
   /// When it is set to true, a light starts flashing from the beginning.
   /// If <enable> is directly under the <plugin>, it affects all the lights.
-  /// If it is under <flash_light>, it individually affects the corresponding
-  /// light.
+  /// If it is under <light>, it individually affects the corresponding light.
   /// When it is set to false, the light is off, and it is  necessary to call
   /// TurnOn() or TurnOnAll() in an inherited class to enable the light.
   /// A locally placed <enable> has a higher priority than the global one so
@@ -170,21 +169,18 @@ namespace gazebo
   /// Example (single color):
   /// \verbatim
   /// <enable>true</enable>
-  ///
-  /// <flash_light>
-  ///   <light_id>link1/light_source</light_id>
-  ///   <duration>0.1</duration>
-  ///   <interval>0.4</interval>
-  ///   <enable>true</enable>
-  /// </flash_light>
-  ///
-  /// <flash_light>
-  ///   <light_id>link1/light_source2</light_id>
-  ///   <duration>0.8</duration>
-  ///   <interval>0.2</interval>
-  ///   <enable>false</enable>
-  /// </flash_light>
-  ///
+  /// <light>
+  ///  <id>link1/light_source</id>
+  ///  <duration>0.1</duration>
+  ///  <interval>0.4</interval>
+  ///  <enable>true</enable>
+  /// </light>
+  /// <light>
+  ///  <id>link1/light_source2</id>
+  ///  <duration>0.8</duration>
+  ///  <interval>0.2</interval>
+  ///  <enable>false</enable>
+  /// </light>
   /// ...
   /// \endverbatim
   ///
@@ -192,8 +188,8 @@ namespace gazebo
   /// \verbatim
   /// <enable>true</enable>
   ///
-  /// <flash_light>
-  ///   <light_id>link1/light_source</light_id>
+  /// <light>
+  ///   <id>link1/light_source</id>
   ///   <block>
   ///     <duration>0.6</duration>
   ///     <interval>0</interval>
@@ -205,7 +201,7 @@ namespace gazebo
   ///     <color>0 1 0</color>
   ///   </block>
   ///   <enable>true</enable>
-  /// </flash_light>
+  /// </light>
   ///
   /// ...
   /// \endverbatim

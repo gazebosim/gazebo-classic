@@ -44,6 +44,47 @@ namespace gazebo
 
   class FlashLightSettingPrivate
   {
+    /// Constructor
+    public: FlashLightSettingPrivate():
+      switchOn(true), flashing(true), range(0),
+      lightExists(false), currentBlockIndex(0){}
+
+    /// \brief Find the link holding the light to control.
+    /// If multiple models are nested, this function is recursively called
+    /// until the link is found.
+    /// \param[in] _model A model to check.
+    /// \param[in] _lightName the name of the light.
+    /// \param[in] _linkName the name of the link.
+    /// \return A pointer to the link. If not found, nullptr is returned.
+    public: physics::LinkPtr FindLinkForLight(
+      const physics::ModelPtr &_model,
+      const std::string &_lightName, const std::string &_linkName)
+    {
+      auto childLink = _model->GetChildLink(_linkName);
+      if (childLink)
+      {
+        auto sdfLight = childLink->GetSDF()->GetElement("light");
+        while (sdfLight)
+        {
+          if (sdfLight->Get<std::string>("name") == _lightName)
+          {
+            return childLink;
+          }
+          sdfLight = sdfLight->GetNextElement("light");
+        }
+      }
+      for (auto model: _model->NestedModels())
+      {
+        auto foundLink = this->FindLinkForLight(model, _lightName, _linkName);
+        if (foundLink)
+        {
+          return foundLink;
+        }
+      }
+
+      return nullptr;
+    }
+
     /// \brief The name of flash light.
     public: std::string name;
 
@@ -82,15 +123,29 @@ namespace gazebo
   {
     /// \brief Find a setting by names.
     /// This is internally used to access an individual setting.
-    /// If the link name is blank (""), the first match of the light name in the
-    /// list will be returned.
+    /// If the link name is blank (""), the first match of the light name in
+    /// the list will be returned.
     /// \param[in] _lightName The name of the light.
     /// \param[in] _linkName The name of the link holding the light.
     /// \return A pointer to the specified setting or nullptr if not found.
-    public:
-      std::shared_ptr<FlashLightSetting>
-        SettingByLightNameAndLinkName(
-          const std::string &_lightName, const std::string &_linkName) const;
+    public: std::shared_ptr<FlashLightSetting>
+      SettingByLightNameAndLinkName(
+      const std::string &_lightName, const std::string &_linkName) const
+    {
+      for (auto &setting: this->listFlashLight)
+      {
+        if (setting->Name() == _lightName)
+        {
+          if (_linkName.length() == 0
+            || setting->Link()->GetName() == _linkName)
+          {
+            return setting;
+          }
+        }
+      }
+
+      return nullptr;
+    }
 
     /// \brief pointer to the model.
     public: physics::ModelPtr model;
@@ -122,21 +177,23 @@ FlashLightSetting::FlashLightSetting(
   const common::Time &_currentTime)
   : dataPtr(new FlashLightSettingPrivate)
 {
-  // name
+  // Get the light name.
   std::string lightId;
-  if (_sdf->HasElement("light_id"))
+  if (_sdf->HasElement("id"))
   {
-    lightId = _sdf->Get<std::string>("light_id");
+    lightId = _sdf->Get<std::string>("id");
   }
   else
   {
-    gzerr << "Parameter <light_id> is missing." << std::endl;
+    gzerr << "Parameter <id> is missing." << std::endl;
   }
   int posDelim = lightId.find("/");
   this->dataPtr->name = lightId.substr(posDelim+1, lightId.length());
-  // current states
-  this->dataPtr->switchOn = true;
-  this->dataPtr->flashing = true;
+
+  // link which holds this light
+  this->dataPtr->link = this->dataPtr->FindLinkForLight(
+                 _model, this->dataPtr->name,
+                 lightId.substr(0, posDelim));
 
   if (_sdf->HasElement("block"))
   {
@@ -209,40 +266,26 @@ FlashLightSetting::FlashLightSetting(
 
     this->dataPtr->blocks.push_back(block);
   }
-  this->dataPtr->currentBlockIndex = 0;
 
   // start time
   this->dataPtr->startTime = _currentTime;
 
-  // link which holds this light
-  this->dataPtr->link = _model->GetLink(lightId.substr(0, posDelim));
-  // range
-  sdf::ElementPtr sdfLightInLink
-    = this->dataPtr->link->GetSDF()->GetElement("light");
-  while (sdfLightInLink)
+  // If link is not nullptr, the light exists.
+  if (this->dataPtr->link)
   {
-    if (sdfLightInLink->Get<std::string>("name") == this->dataPtr->name)
+    // range
+    auto sdfLight = this->dataPtr->link->GetSDF()->GetElement("light");
+    while (sdfLight)
     {
-      this->dataPtr->range
-        = sdfLightInLink->GetElement("attenuation")->Get<double>("range");
-      break;
-    }
-    sdfLightInLink = sdfLightInLink->GetNextElement("light");
-  }
-
-  // check if <light> element exists.
-  this->dataPtr->lightExists = false;
-  {
-    msgs::Link msg;
-    this->dataPtr->link->FillMsg(msg);
-    for (auto lightMsg : msg.light())
-    {
-      if (lightMsg.name()
-        == this->dataPtr->link->GetScopedName() + "::" + this->dataPtr->name)
+      if (sdfLight->Get<std::string>("name") == this->dataPtr->name)
       {
-        this->dataPtr->lightExists = true;
+        this->dataPtr->range
+          = sdfLight->GetElement("attenuation")->Get<double>("range");
+        break;
       }
+      sdfLight = sdfLight->GetNextElement("light");
     }
+    this->dataPtr->lightExists = true;
   }
 }
 
@@ -458,26 +501,6 @@ ignition::math::Color FlashLightSetting::CurrentColor()
 }
 
 //////////////////////////////////////////////////
-std::shared_ptr<FlashLightSetting>
-  FlashLightPluginPrivate::SettingByLightNameAndLinkName(
-  const std::string &_lightName, const std::string &_linkName) const
-{
-  for (auto &setting: this->listFlashLight)
-  {
-    if (setting->Name() == _lightName)
-    {
-      if (_linkName.length() == 0
-        || setting->Link()->GetName() == _linkName)
-      {
-        return setting;
-      }
-    }
-  }
-
-  return nullptr;
-}
-
-//////////////////////////////////////////////////
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
   dataPtr(new FlashLightPluginPrivate)
 {
@@ -508,15 +531,16 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   common::Time currentTime = this->dataPtr->world->SimTime();
 
   // Get the parameters from sdf
-  sdf::ElementPtr sdfFlashLight = _sdf->GetElement("flash_light");
+  sdf::ElementPtr sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
     // light_id required
-    if (sdfFlashLight->HasElement("light_id"))
+    if (sdfFlashLight->HasElement("id"))
     {
       // Create an object of setting.
       std::shared_ptr<FlashLightSetting> setting
-        = this->CreateSetting(sdfFlashLight, this->dataPtr->model, currentTime);
+        = this->CreateSetting(
+            sdfFlashLight, this->dataPtr->model, currentTime);
 
       // Initialize the object with the data specific to each descendant class.
       this->InitSettingBySpecificData(setting);
@@ -527,10 +551,10 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     else
     {
       // display an error message
-      gzerr << "no name field exists in <flash_light>" << std::endl;
+      gzerr << "id does not exist in <light>" << std::endl;
     }
 
-    sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
+    sdfFlashLight = sdfFlashLight->GetNextElement("light");
   }
 
   // Turn on/off all the lights if <enable> element is given
@@ -546,13 +570,13 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
     }
   }
   // Turn on/off a specific light if <enable> is specifically given.
-  sdfFlashLight = _sdf->GetElement("flash_light");
+  sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
-    // light_id required
+    // id required
     if (sdfFlashLight->HasElement("enable"))
     {
-      std::string lightId = sdfFlashLight->Get<std::string>("light_id");
+      std::string lightId = sdfFlashLight->Get<std::string>("id");
       int posDelim = lightId.find("/");
       std::string lightName = lightId.substr(posDelim+1, lightId.length());
       std::string linkName = lightId.substr(0, posDelim);
@@ -566,7 +590,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
       }
     }
 
-    sdfFlashLight = sdfFlashLight->GetNextElement("flash_light");
+    sdfFlashLight = sdfFlashLight->GetNextElement("light");
   }
 
   // listen to the update event by the World

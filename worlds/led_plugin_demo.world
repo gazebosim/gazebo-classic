@@ -93,14 +93,14 @@
       </joint>
       <plugin name='light_control' filename='libLedPlugin.so'>
         <enable>true</enable>
-        <flash_light>
-          <light_id>light_source/lamp</light_id>
+        <light>
+          <id>light_source/lamp</id>
           <duration>0.3</duration>
           <interval>0.4</interval>
           <enable>true</enable>
-        </flash_light>
-        <flash_light>
-          <light_id>handle/button</light_id>
+        </light>
+        <light>
+          <id>handle/button</id>
           <block>
             <duration>0.5</duration>
             <interval>0</interval>
@@ -117,7 +117,7 @@
             <color>1 0 1</color>
           </block>
           <enable>true</enable>
-        </flash_light>
+        </light>
       </plugin>
     </model>
     <gravity>0 0 -9.8</gravity>

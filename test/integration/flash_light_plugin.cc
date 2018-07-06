@@ -91,12 +91,7 @@ void FlashLightPluginTest::lightCb(ConstLightPtr &_msg)
   ss >> indx;
   indx--;
 
-  bool indexInRange = true;
-  if (indx < 0 || static_cast<int>(this->flashLight.size()) < indx)
-  {
-    indexInRange = false;
-  }
-  EXPECT_TRUE(indexInRange);
+  EXPECT_FALSE(indx < 0 || static_cast<int>(this->flashLight.size()) < indx);
 
   // Get the current time
   common::Time currentTime = physics::get_world()->SimTime();

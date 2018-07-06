@@ -34,8 +34,8 @@
         </light>
       </link>
       <plugin name='light_control' filename='libFlashLightPlugin.so'>
-        <flash_light>
-          <light_id>cylinder/light_source1</light_id>
+        <light>
+          <id>cylinder/light_source1</id>
           <block>
             <duration>0.5</duration>
             <interval>0</interval>
@@ -51,7 +51,7 @@
             <interval>0</interval>
             <color>0 0 1</color>
           </block>
-        </flash_light>
+        </light>
       </plugin>
     </model>
     <gravity>0 0 -9.8</gravity>

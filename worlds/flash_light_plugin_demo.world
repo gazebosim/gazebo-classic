@@ -6,9 +6,16 @@
     </include>
     <model name='light_model'>
       <static>1</static>
-      <pose frame=''>0 0 0 0 -0 0</pose>
       <link name='cylinder'>
         <pose frame=''>0 0 0.25 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.5</length>
+            </cylinder>
+          </geometry>
+        </collision>
         <visual name='visual'>
           <geometry>
             <cylinder>
@@ -50,6 +57,13 @@
       </link>
       <link name='box'>
         <pose frame=''>0 0 0.75 0 -0 0</pose>
+        <collision name='collision'>
+          <geometry>
+            <box>
+              <size>0.5 0.5 0.5</size>
+            </box>
+          </geometry>
+        </collision>
         <visual name='visual'>
           <geometry>
             <box>
@@ -94,25 +108,25 @@
       </joint>
       <plugin name='light_control' filename='libFlashLightPlugin.so'>
         <enable>true</enable>
-        <flash_light>
-          <light_id>cylinder/light_source1</light_id>
+        <light>
+          <id>cylinder/light_source1</id>
           <duration>0.1</duration>
           <interval>0.4</interval>
-        </flash_light>
-        <flash_light>
-          <light_id>cylinder/light_source2</light_id>
+        </light>
+        <light>
+          <id>cylinder/light_source2</id>
           <duration>0.05</duration>
           <interval>0.05</interval>
           <color>0.5 1 0.8</color>
-        </flash_light>
-        <flash_light>
-          <light_id>box/light_source3</light_id>
+        </light>
+        <light>
+          <id>box/light_source3</id>
           <duration>1.0</duration>
           <interval>0.1</interval>
           <enable>false</enable>
-        </flash_light>
-        <flash_light>
-          <light_id>box/light_source4</light_id>
+        </light>
+        <light>
+          <id>box/light_source4</id>
           <block>
             <duration>0.5</duration>
             <interval>0.0</interval>
@@ -129,7 +143,7 @@
             <color>1 0 1</color>
           </block>
           <enable>true</enable>
-        </flash_light>
+        </light>
       </plugin>
     </model>
   </world>
