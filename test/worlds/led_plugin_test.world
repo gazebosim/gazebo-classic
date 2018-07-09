@@ -93,15 +93,15 @@
       </link>
       <plugin name='light_control' filename='libLedPlugin.so'>
         <enable>true</enable>
-        <flash_light>
-          <light_id>light_source/lamp</light_id>
+        <light>
+          <id>light_source/lamp</id>
           <block>
             <duration>1</duration>
             <interval>1</interval>
             <color>1 0.5 0.5</color>
           </block>
           <enable>true</enable>
-        </flash_light>
+        </light>
       </plugin>
     </model>
     <gravity>0 0 -9.8</gravity>

@@ -534,7 +534,7 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   sdf::ElementPtr sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
-    // light_id required
+    // id required
     if (sdfFlashLight->HasElement("id"))
     {
       // Create an object of setting.
@@ -573,7 +573,6 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   sdfFlashLight = _sdf->GetElement("light");
   while (sdfFlashLight)
   {
-    // id required
     if (sdfFlashLight->HasElement("enable"))
     {
       std::string lightId = sdfFlashLight->Get<std::string>("id");
