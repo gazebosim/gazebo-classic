@@ -2,6 +2,9 @@
 
 ## Gazebo 9.2.0 (2018-07-09)
 
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
+
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
 
