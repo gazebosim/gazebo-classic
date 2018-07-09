@@ -105,6 +105,26 @@ namespace gazebo
     /// \param[in] _color New color to set.
     public: virtual void SetColor(const ignition::math::Color &_color) final;
 
+    /// \brief Get the number of blocks.
+    /// \return The number of blocks the object currently has.
+    public: virtual unsigned int GetNumBlocks() final;
+
+    /// \brief Remove a specified block.
+    /// \param[in] _index Index to the block to remove
+    /// \return True if the block exists and it was removed.
+    public: virtual bool RemoveBlock(const int &_index) final;
+
+    /// \brief Insert a block.
+    /// Create a block with specified parameters. If the index is out of range,
+    /// the block will be appended at the end of the list.
+    /// \param[in] _duration The duration for the block.
+    /// \param[in] _interval The interval for the block.
+    /// \param[in] _color The color for the block.
+    /// \param[in] _index The index of the block to be inserted into the list.
+    public: virtual void InsertBlock(
+      const double &_duration, const double &_interval,
+      const ignition::math::Color &_color, const int &_index) final;
+
     /// \brief Flash the light
     /// This function is internally used to update the light in the
     /// environment.

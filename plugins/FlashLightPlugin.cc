@@ -458,6 +458,46 @@ void FlashLightSetting::SetColor(const ignition::math::Color &_color)
 }
 
 //////////////////////////////////////////////////
+unsigned int FlashLightSetting::GetNumBlocks()
+{
+  return this->dataPtr->blocks.size();
+}
+
+//////////////////////////////////////////////////
+bool FlashLightSetting::RemoveBlock(const int &_index)
+{
+  if (_index < 0 || static_cast<int>(this->dataPtr->blocks.size()) <= _index)
+  {
+    return false;
+  }
+
+  this->dataPtr->blocks.erase(this->dataPtr->blocks.begin() + _index);
+
+  return true;
+}
+
+//////////////////////////////////////////////////
+void FlashLightSetting::InsertBlock(
+  const double &_duration, const double &_interval,
+  const ignition::math::Color &_color, const int &_index)
+{
+  auto block = std::make_shared<Block>();
+
+  block->duration = _duration;
+  block->interval = _interval;
+  block->color = _color;
+
+  if (_index < 0 || static_cast<int>(this->dataPtr->blocks.size()) <= _index)
+  {
+    this->dataPtr->blocks.push_back(block);
+  }
+  else
+  {
+    this->dataPtr->blocks.insert(this->dataPtr->blocks.begin() + _index, block);
+  }
+}
+
+//////////////////////////////////////////////////
 void FlashLightSetting::Flash()
 {
   // Set the range to the default value.
