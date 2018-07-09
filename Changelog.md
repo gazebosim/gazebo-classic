@@ -1,12 +1,15 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (2018-xx-xx)
+## Gazebo 9.2.0 (2018-07-09)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
 
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Attach lights to links cleanup and deprecate GetLight functions
+    * [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
 
 
 ## Gazebo 9.1.1 (2018-06-08)
@@ -35,9 +38,6 @@
 
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
-
-1. Attach lights to links cleanup and deprecate GetLight functions
-* [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
 
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
