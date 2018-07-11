@@ -230,8 +230,10 @@ void Camera::UpdateCameraIntrinsics(
   }
 
   this->cameraProjectiveMatrix = BuildProjectiveMatrix(
-    this->imageWidth, this->imageHeight, _cameraIntrinsicsFx, _cameraIntrinsicsFy,
-    _cameraIntrinsicsCx, _cameraIntrinsicsCy, _cameraIntrinsicsS, clipNear, clipFar);
+    this->imageWidth, this->imageHeight,
+    _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+    _cameraIntrinsicsCx, _cameraIntrinsicsCy,
+    _cameraIntrinsicsS, clipNear, clipFar);
 
   if (this->camera != NULL)
     this->camera->setCustomProjectionMatrix(true,
