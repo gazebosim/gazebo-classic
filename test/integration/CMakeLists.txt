@@ -38,6 +38,7 @@ set(tests
   dem.cc
   elastic_modulus.cc
   file_handling.cc
+  flash_light_plugin.cc
   gripper.cc
   gz_joint.cc
   gz_log.cc

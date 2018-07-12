@@ -42,6 +42,9 @@
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
 
+1. Add a flashlight plugin blinking lights attached on a model
+    * [Pull request 2961](https://bitbucket.org/osrf/gazebo/pull-request/2961)
+
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
 
