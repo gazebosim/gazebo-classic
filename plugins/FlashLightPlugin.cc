@@ -203,36 +203,39 @@ FlashLightSetting::FlashLightSetting(
   {
     gzerr << "Parameter <interval> is missing." << std::endl;
   }
-  if (this->link && this->link->GetSDF()->HasElement("light"))
+  if (this->link)
   {
-    // range
-    auto sdfLight = this->link->GetSDF()->GetElement("light");
-    while (sdfLight)
+    if (this->link->GetSDF()->HasElement("light"))
     {
-      if (sdfLight->Get<std::string>("name") == this->name)
+      // range
+      auto sdfLight = this->link->GetSDF()->GetElement("light");
+      while (sdfLight)
       {
-        if (sdfLight->HasElement("attenuation"))
+        if (sdfLight->Get<std::string>("name") == this->name)
         {
-          this->range
-            = sdfLight->GetElement("attenuation")->Get<double>("range");
+          if (sdfLight->HasElement("attenuation"))
+          {
+            this->range
+              = sdfLight->GetElement("attenuation")->Get<double>("range");
+          }
+          else
+          {
+            gzerr << "Light [" << this->name << "] does not have <attenuation>."
+                  << std::endl;
+          }
+          break;
         }
-        else
-        {
-          gzerr << "Light [" << this->name << "] does not have <attenuation>."
-                << std::endl;
-        }
-        break;
+        sdfLight = sdfLight->GetNextElement("light");
       }
-      sdfLight = sdfLight->GetNextElement("light");
+
+      // Initialize the light in the environment
+      // Make a message
+      this->msg.set_name(this->link->GetScopedName() + "::" + this->name);
+      this->msg.set_range(this->range);
+
+      // Send the message to initialize the light
+      this->pubLight->Publish(this->msg);
     }
-
-    // Initialize the light in the environment
-    // Make a message
-    this->msg.set_name(this->link->GetScopedName() + "::" + this->name);
-    this->msg.set_range(this->range);
-
-    // Send the message to initialize the light
-    this->pubLight->Publish(this->msg);
   }
   else
   {
