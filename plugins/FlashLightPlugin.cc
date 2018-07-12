@@ -203,7 +203,7 @@ FlashLightSetting::FlashLightSetting(
   {
     gzerr << "Parameter <interval> is missing." << std::endl;
   }
-  if (this->link)
+  if (this->link && this->link->GetSDF()->HasElement("light"))
   {
     // range
     auto sdfLight = this->link->GetSDF()->GetElement("light");
@@ -211,7 +211,16 @@ FlashLightSetting::FlashLightSetting(
     {
       if (sdfLight->Get<std::string>("name") == this->name)
       {
-        this->range = sdfLight->GetElement("attenuation")->Get<double>("range");
+        if (sdfLight->HasElement("attenuation"))
+        {
+          this->range
+            = sdfLight->GetElement("attenuation")->Get<double>("range");
+        }
+        else
+        {
+          gzerr << "Light [" << this->name << "] does not have <attenuation>."
+                << std::endl;
+        }
         break;
       }
       sdfLight = sdfLight->GetNextElement("light");
@@ -224,6 +233,11 @@ FlashLightSetting::FlashLightSetting(
 
     // Send the message to initialize the light
     this->pubLight->Publish(this->msg);
+  }
+  else
+  {
+    gzerr << "Link [" << lightId.substr(0, posDelim) << "] does not exist."
+          << std::endl;
   }
 }
 
@@ -332,7 +346,7 @@ physics::LinkPtr FlashLightSetting::FindLinkForLight(
   const std::string &_lightName, const std::string &_linkName)
 {
   auto childLink = _model->GetChildLink(_linkName);
-  if (childLink)
+  if (childLink && childLink->GetSDF()->HasElement("light"))
   {
     auto sdfLight = childLink->GetSDF()->GetElement("light");
     while (sdfLight)
@@ -407,70 +421,78 @@ void FlashLightPlugin::Load(physics::ModelPtr _parent, sdf::ElementPtr _sdf)
   common::Time currentTime = this->dataPtr->world->SimTime();
 
   // Get the parameters from sdf
-  sdf::ElementPtr sdfFlashLight = _sdf->GetElement("light");
-  while (sdfFlashLight)
+  if (_sdf->HasElement("light"))
   {
-    // id required
-    if (sdfFlashLight->HasElement("id"))
+    sdf::ElementPtr sdfFlashLight = _sdf->GetElement("light");
+    while (sdfFlashLight)
     {
-      // Get the setting information from sdf
-      std::shared_ptr<FlashLightSetting> setting
-        = std::make_shared<FlashLightSetting>(this->dataPtr->model,
-                                               this->dataPtr->pubLight,
-                                               sdfFlashLight,
-                                               currentTime);
-
-      // Store the setting to the list
-      this->dataPtr->listFlashLight.push_back(setting);
-    }
-    else
-    {
-      // display an error message
-      gzerr << "id does not exist in <light>" << std::endl;
-    }
-
-    sdfFlashLight = sdfFlashLight->GetNextElement("light");
-  }
-
-  // Turn on/off all the lights if <enable> element is given
-  if (_sdf->HasElement("enable"))
-  {
-    if (_sdf->Get<bool>("enable"))
-    {
-      this->TurnOnAll();
-    }
-    else
-    {
-      this->TurnOffAll();
-    }
-  }
-  // Turn on/off a specific light if <enable> is specifically given.
-  sdfFlashLight = _sdf->GetElement("light");
-  while (sdfFlashLight)
-  {
-    // id required
-    if (sdfFlashLight->HasElement("enable"))
-    {
-      std::string lightId = sdfFlashLight->Get<std::string>("id");
-      int posDelim = lightId.find("/");
-      std::string lightName = lightId.substr(posDelim+1, lightId.length());
-      std::string linkName = lightId.substr(0, posDelim);
-      if (sdfFlashLight->Get<bool>("enable"))
+      // id required
+      if (sdfFlashLight->HasElement("id"))
       {
-        this->TurnOn(lightName, linkName);
+        // Get the setting information from sdf
+        std::shared_ptr<FlashLightSetting> setting
+          = std::make_shared<FlashLightSetting>(this->dataPtr->model,
+                                                 this->dataPtr->pubLight,
+                                                 sdfFlashLight,
+                                                 currentTime);
+
+        // Store the setting to the list
+        this->dataPtr->listFlashLight.push_back(setting);
       }
       else
       {
-        this->TurnOff(lightName, linkName);
+        // display an error message
+        gzerr << "id does not exist in <light>" << std::endl;
       }
+
+      sdfFlashLight = sdfFlashLight->GetNextElement("light");
     }
 
-    sdfFlashLight = sdfFlashLight->GetNextElement("light");
-  }
+    // Turn on/off all the lights if <enable> element is given
+    if (_sdf->HasElement("enable"))
+    {
+      if (_sdf->Get<bool>("enable"))
+      {
+        this->TurnOnAll();
+      }
+      else
+      {
+        this->TurnOffAll();
+      }
+    }
+    // Turn on/off a specific light if <enable> is specifically given.
+    sdfFlashLight = _sdf->GetElement("light");
+    while (sdfFlashLight)
+    {
+      // id required
+      if (sdfFlashLight->HasElement("enable"))
+      {
+        std::string lightId = sdfFlashLight->Get<std::string>("id");
+        int posDelim = lightId.find("/");
+        std::string lightName = lightId.substr(posDelim+1, lightId.length());
+        std::string linkName = lightId.substr(0, posDelim);
+        if (sdfFlashLight->Get<bool>("enable"))
+        {
+          this->TurnOn(lightName, linkName);
+        }
+        else
+        {
+          this->TurnOff(lightName, linkName);
+        }
+      }
 
-  // listen to the update event by the World
-  this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-    std::bind(&FlashLightPlugin::OnUpdate, this));
+      sdfFlashLight = sdfFlashLight->GetNextElement("light");
+    }
+
+    // listen to the update event by the World
+    this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
+      std::bind(&FlashLightPlugin::OnUpdate, this));
+  }
+  else
+  {
+    gzerr << "light does not exist as a parameter for FlashLightPlugin."
+          << std::endl;
+  }
 }
 
 //////////////////////////////////////////////////
