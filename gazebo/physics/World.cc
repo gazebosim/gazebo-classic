@@ -34,10 +34,18 @@
 #include <string>
 #include <vector>
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <ignition/math/Rand.hh>
+
+#include <gazebo/gazebo_config.h>
 
 #include <ignition/msgs/plugin_v.pb.h>
 #include <ignition/msgs/stringmsg.pb.h>
+
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  #include <ignition/common/URI.hh>
+  #include "gazebo/common/FuelModelDatabase.hh"
+#endif
 
 #include "gazebo/transport/Node.hh"
 #include "gazebo/transport/TransportIface.hh"
@@ -113,9 +121,6 @@ World::World(const std::string &_name)
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("world.sdf", this->dataPtr->sdf);
 
-  this->dataPtr->initialSdf.reset(new sdf::Element);
-  sdf::initFile("world.sdf", this->dataPtr->initialSdf);
-
   // Keep this in the constructor for performance.
   // sdf::initFile causes disk access.
   this->dataPtr->factorySDF.reset(new sdf::SDF);
@@ -157,6 +162,12 @@ World::World(const std::string &_name)
   this->dataPtr->connections.push_back(
      event::Events::ConnectPause(
        std::bind(&World::SetPaused, this, std::placeholders::_1)));
+
+  // Make sure dbs are initialized
+  common::ModelDatabase::Instance();
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+  common::FuelModelDatabase::Instance();
+#endif
 }
 
 //////////////////////////////////////////////////
@@ -170,8 +181,6 @@ void World::Load(sdf::ElementPtr _sdf)
 {
   this->dataPtr->loaded = false;
   this->dataPtr->sdf = _sdf;
-
-  this->dataPtr->initialSdf->Copy(_sdf);
 
   if (this->dataPtr->sdf->Get<std::string>("name").empty())
     gzwarn << "create_world(world_name =["
@@ -472,12 +481,16 @@ void World::Stop()
 {
   this->dataPtr->stop = true;
 
-  if (this->dataPtr->thread)
+  // Make sure that the thread does not try to join with itself
+  if (this->dataPtr->thread &&
+     this->dataPtr->thread->get_id() != std::this_thread::get_id())
   {
     this->dataPtr->thread->join();
     delete this->dataPtr->thread;
     this->dataPtr->thread = nullptr;
   }
+
+  event::Events::stop();
 }
 
 //////////////////////////////////////////////////
@@ -814,6 +827,7 @@ void World::Update()
 void World::Fini()
 {
   this->dataPtr->stop = true;
+  this->dataPtr->enablePhysicsEngine = false;
 
 #ifdef HAVE_OPENAL
   util::OpenAL::Instance()->Fini();
@@ -848,6 +862,8 @@ void World::Fini()
     this->dataPtr->lightModifySub.reset();
     this->dataPtr->modelSub.reset();
 
+    if (this->dataPtr->node)
+      this->dataPtr->node->Fini();
     this->dataPtr->node.reset();
   }
 
@@ -884,10 +900,25 @@ void World::Fini()
   }
   this->dataPtr->prevStates[0].SetWorld(WorldPtr());
   this->dataPtr->prevStates[1].SetWorld(WorldPtr());
+  this->dataPtr->prevUnfilteredState.SetWorld(WorldPtr());
+  this->dataPtr->logPlayState.SetWorld(WorldPtr());
+  this->dataPtr->states[0].clear();
+  this->dataPtr->states[1].clear();
 
   this->dataPtr->presetManager.reset();
   this->dataPtr->userCmdManager.reset();
+
+  this->dataPtr->atmosphere.reset();
+  this->dataPtr->wind.reset();
+
+  // Engine shouldn't outlive world
+  if (this->dataPtr->physicsEngine)
+    this->dataPtr->physicsEngine->Fini();
   this->dataPtr->physicsEngine.reset();
+
+  // Clear singletons whose states are tied to this world
+  util::DiagnosticManager::Instance()->Fini();
+  util::LogRecord::Instance()->Fini();
 
   // End world run thread
   if (this->dataPtr->thread)
@@ -1035,6 +1066,18 @@ ModelPtr World::LoadModel(sdf::ElementPtr _sdf , BasePtr _parent)
 
   if (_sdf->GetName() == "model")
   {
+    std::string modelName = _sdf->Get<std::string>("name");
+    for (auto const m : this->dataPtr->models)
+    {
+      if (m->GetName() == modelName)
+      {
+        gzwarn << "Model with name [" << modelName << "] already exists. "
+          << "Not inserting model. This warning can be ignored in certain "
+          << "situations such as rewind during log playback.\n";
+        return model;
+      }
+    }
+
     model = this->dataPtr->physicsEngine->CreateModel(_parent);
     model->SetWorld(shared_from_this());
     model->Load(_sdf);
@@ -1933,8 +1976,22 @@ void World::ProcessFactoryMsgs()
       else if (factoryMsg.has_sdf_filename() &&
               !factoryMsg.sdf_filename().empty())
       {
-        std::string filename = common::ModelDatabase::Instance()->GetModelFile(
-            factoryMsg.sdf_filename());
+        std::string filename;
+#ifdef HAVE_IGNITION_FUEL_TOOLS
+        // If http(s), look at Fuel
+        auto uri = ignition::common::URI(factoryMsg.sdf_filename());
+        if (uri.Valid() && (uri.Scheme() == "https" || uri.Scheme() == "http"))
+        {
+          filename = common::FuelModelDatabase::Instance()->ModelFile(
+              factoryMsg.sdf_filename());
+        }
+        // Otherwise, look at database
+        else
+#endif
+        {
+          filename = common::ModelDatabase::Instance()->GetModelFile(
+              factoryMsg.sdf_filename());
+        }
 
         if (!sdf::readFile(filename, this->dataPtr->factorySDF))
         {
@@ -2082,8 +2139,11 @@ void World::ProcessFactoryMsgs()
       std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
       ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-      model->Init();
-      model->LoadPlugins();
+      if (model != nullptr)
+      {
+        model->Init();
+        model->LoadPlugins();
+      }
     }
     catch(...)
     {
@@ -2204,8 +2264,12 @@ void World::SetState(const WorldState &_state)
         std::lock_guard<std::mutex> lock(this->dataPtr->factoryDeleteMutex);
 
         ModelPtr model = this->LoadModel(elem, this->dataPtr->rootElement);
-        model->Init();
-        model->LoadPlugins();
+        if (model != nullptr)
+        {
+          model->Init();
+          if (!util::LogPlay::Instance()->IsOpen())
+            model->LoadPlugins();
+        }
       }
       catch(...)
       {
@@ -2330,16 +2394,116 @@ void World::UpdateStateSDF()
 }
 
 //////////////////////////////////////////////////
+void World::LogModelResources()
+{
+  if (!util::LogRecord::Instance()->RecordResources())
+    return;
+
+  std::set<std::string> modelNames;
+  std::set<std::string> fileNames;
+  auto addModelResource = [&](const std::string &_uri)
+  {
+    if (_uri.empty())
+      return;
+
+    const std::string modelPrefix = "model://";
+    const std::string filePrefix = "file://";
+    if (_uri.find(modelPrefix) == 0)
+    {
+      std::string modelName = _uri.substr(modelPrefix.size(),
+        _uri.find("/", modelPrefix.size()) - modelPrefix.size());
+      modelNames.insert(modelName);
+    }
+    else if (_uri.find(filePrefix) == 0 || _uri[0] == '/')
+    {
+      fileNames.insert(_uri);
+    }
+  };
+
+  // record model resources if option is enabled.
+  for (auto const &model : this->dataPtr->models)
+  {
+    sdf::ElementPtr modelElem = model->GetSDF();
+    if (modelElem->HasElement("link"))
+    {
+      sdf::ElementPtr linkElem = modelElem->GetElement("link");
+      while (linkElem)
+      {
+        if (linkElem->HasElement("visual"))
+        {
+          sdf::ElementPtr visualElem = linkElem->GetElement("visual");
+          while (visualElem)
+          {
+            sdf::ElementPtr geomElem = visualElem->GetElement("geometry");
+            if (geomElem->HasElement("mesh"))
+            {
+              const std::string meshUri = geomElem->GetElement("mesh")
+                  ->Get<std::string>("uri");
+              if (!meshUri.empty())
+              {
+                addModelResource(meshUri);
+              }
+            }
+            if (visualElem->HasElement("material"))
+            {
+              sdf::ElementPtr matElem = visualElem->GetElement("material");
+              if (matElem->HasElement("script"))
+              {
+                sdf::ElementPtr scriptElem = matElem->GetElement("script");
+                if (scriptElem->HasElement("uri"))
+                {
+                  std::string matUri = scriptElem->Get<std::string>("uri");
+                  if (!matUri.empty())
+                  {
+                    addModelResource(matUri);
+                  }
+                }
+              }
+            }
+            visualElem = visualElem->GetNextElement("visual");
+          }
+        }
+        if (linkElem->HasElement("collision"))
+        {
+          sdf::ElementPtr collisionElem = linkElem->GetElement("collision");
+          while (collisionElem)
+          {
+            sdf::ElementPtr geomElem = collisionElem->GetElement("geometry");
+            if (geomElem->HasElement("mesh"))
+            {
+              const std::string meshUri = geomElem->GetElement("mesh")
+                  ->Get<std::string>("uri");
+              if (!meshUri.empty())
+              {
+                addModelResource(meshUri);
+              }
+            }
+            collisionElem = collisionElem->GetNextElement("collision");
+          }
+        }
+        linkElem = linkElem->GetNextElement("link");
+      }
+    }
+  }
+  if (!util::LogRecord::Instance()->SaveModels(modelNames) ||
+      !util::LogRecord::Instance()->SaveFiles(fileNames))
+  {
+    gzwarn << "Failed to save model resources during logging\n";
+  }
+}
+
+//////////////////////////////////////////////////
 bool World::OnLog(std::ostringstream &_stream)
 {
   int bufferIndex = this->dataPtr->currentStateBuffer;
   // Save the entire state when its the first call to OnLog.
   if (util::LogRecord::Instance()->FirstUpdate())
   {
+    this->dataPtr->sdf->Update();
     _stream << "<sdf version ='";
     _stream << SDF_VERSION;
     _stream << "'>\n";
-    _stream << this->dataPtr->initialSdf->ToString("");
+    _stream << this->dataPtr->sdf->ToString("");
     _stream << "</sdf>\n";
   }
   else if (this->dataPtr->states[bufferIndex].size() >= 1)
@@ -2390,6 +2554,8 @@ bool World::OnLog(std::ostringstream &_stream)
     this->dataPtr->prevStates[0] = WorldState();
     this->dataPtr->prevStates[1] = WorldState();
   }
+
+  this->LogModelResources();
 
   return true;
 }
@@ -2600,6 +2766,9 @@ void World::LogWorker()
 
   GZ_ASSERT(self, "Self pointer to World is invalid");
 
+  // Init the prevUnfilteredState
+  this->dataPtr->prevUnfilteredState.Load(self);
+
   while (!this->dataPtr->stop)
   {
     // get unfiltered world state
@@ -2613,7 +2782,7 @@ void World::LogWorker()
     std::vector<std::string> insertions;
     std::vector<std::string> deletions;
     bool insertDelete = false;
-    if (this->dataPtr->logLastStateTime != common::Time::Zero)
+
     {
       WorldState unfilteredDiffState = unfilteredState -
           this->dataPtr->prevUnfilteredState;

@@ -128,6 +128,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
   this->dataPtr->idString = std::to_string(this->dataPtr->id);
 
   this->dataPtr->name = _name;
+  this->dataPtr->isServer = _isServer;
   this->dataPtr->manager = NULL;
   this->dataPtr->raySceneQuery = NULL;
   this->dataPtr->skyx = NULL;
@@ -203,17 +204,7 @@ Scene::Scene(const std::string &_name, const bool _enableVisualizations,
 //////////////////////////////////////////////////
 void Scene::Clear()
 {
-  this->dataPtr->node->Fini();
-  this->dataPtr->modelMsgs.clear();
-  this->dataPtr->visualMsgs.clear();
-  this->dataPtr->lightFactoryMsgs.clear();
-  this->dataPtr->lightModifyMsgs.clear();
-  this->dataPtr->poseMsgs.clear();
-  this->dataPtr->sceneMsgs.clear();
-  this->dataPtr->jointMsgs.clear();
-  this->dataPtr->linkMsgs.clear();
-  this->dataPtr->sensorMsgs.clear();
-  this->dataPtr->roadMsgs.clear();
+  this->dataPtr->connections.clear();
 
   this->dataPtr->poseSub.reset();
   this->dataPtr->jointSub.reset();
@@ -230,6 +221,28 @@ void Scene::Clear()
   this->dataPtr->responsePub.reset();
   this->dataPtr->requestPub.reset();
   this->dataPtr->roadSub.reset();
+
+  if (this->dataPtr->node)
+    this->dataPtr->node->Fini();
+  this->dataPtr->node.reset();
+
+  {
+    std::lock_guard<std::mutex> lock(*this->dataPtr->receiveMutex);
+    this->dataPtr->modelMsgs.clear();
+    this->dataPtr->visualMsgs.clear();
+    this->dataPtr->lightFactoryMsgs.clear();
+    this->dataPtr->lightModifyMsgs.clear();
+    this->dataPtr->sceneMsgs.clear();
+    this->dataPtr->jointMsgs.clear();
+    this->dataPtr->linkMsgs.clear();
+    this->dataPtr->sensorMsgs.clear();
+    this->dataPtr->roadMsgs.clear();
+  }
+
+  {
+    std::lock_guard<std::recursive_mutex> lock(this->dataPtr->poseMsgMutex);
+    this->dataPtr->poseMsgs.clear();
+  }
 
   this->dataPtr->joints.clear();
 
@@ -270,12 +283,18 @@ void Scene::Clear()
     this->dataPtr->userCameras[i]->Fini();
   this->dataPtr->userCameras.clear();
 
-  delete this->dataPtr->skyx;
-  this->dataPtr->skyx = NULL;
+  // FIXME: Hack to avoid segfault when deleting server sky, see issue #1757
+  if (!this->dataPtr->isServer)
+  {
+    if (this->dataPtr->skyx)
+      delete this->dataPtr->skyx;
+    if (this->dataPtr->skyxController)
+      delete this->dataPtr->skyxController;
+  }
+  this->dataPtr->skyx = nullptr;
+  this->dataPtr->skyxController = nullptr;
 
   RTShaderSystem::Instance()->RemoveScene(this->Name());
-
-  this->dataPtr->connections.clear();
 
   this->dataPtr->initialized = false;
 }
@@ -283,6 +302,8 @@ void Scene::Clear()
 //////////////////////////////////////////////////
 Scene::~Scene()
 {
+  this->Clear();
+
   delete this->dataPtr->requestMsg;
   this->dataPtr->requestMsg = NULL;
   delete this->dataPtr->receiveMutex;
@@ -290,8 +311,6 @@ Scene::~Scene()
 
   // raySceneQuery deletion handled by ogre
   this->dataPtr->raySceneQuery= NULL;
-
-  this->Clear();
 
   this->dataPtr->sdf->Reset();
   this->dataPtr->sdf.reset();
@@ -1127,60 +1146,85 @@ bool Scene::FirstContact(CameraPtr _camera,
 {
   _position = ignition::math::Vector3d::Zero;
 
-  ignition::math::Vector3d origin;
-  ignition::math::Vector3d dir;
-  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
-  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
-
-  this->dataPtr->raySceneQuery->setSortByDistance(true);
-  this->dataPtr->raySceneQuery->setRay(mouseRay);
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
   double distance = -1.0;
 
-  // Iterate over all the results.
-  for (; iter != result.end() && distance <= 0.0; ++iter)
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
+  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
+      static_cast<float>(_mousePos.X()) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.Y()) /
+      ogreCam->getViewport()->getActualHeight());
+
+  UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
+  if (userCam)
   {
-    // Skip results where the distance is zero or less
-    if (iter->distance <= 0.0)
-      continue;
-
-    unsigned int flags = iter->movable->getVisibilityFlags();
-
-    // Only accept a hit if there is an entity and not a gui visual
-    if (iter->movable && iter->movable->getVisible() &&
-        iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && flags & GZ_VISIBILITY_GUI
-        && !(flags & GZ_VISIBILITY_SELECTABLE)))
+    VisualPtr vis = userCam->Visual(_mousePos);
+    if (vis)
     {
-      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      RayQuery rayQuery(_camera);
+      ignition::math::Vector3d intersect;
+      ignition::math::Triangle3d triangle;
+      rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+          intersect, triangle);
+      distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+          intersect);
+    }
+  }
+  else
+  {
+    this->dataPtr->raySceneQuery->setSortByDistance(true);
+    this->dataPtr->raySceneQuery->setRay(mouseRay);
 
-      VisualPtr vis;
-      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+    // Perform the scene query
+    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+
+    // Iterate over all the results.
+    for (; iter != result.end() && distance <= 0.0; ++iter)
+    {
+      // Skip results where the distance is zero or less
+      if (iter->distance <= 0.0)
+        continue;
+
+      unsigned int flags = iter->movable->getVisibilityFlags();
+
+      // Only accept a hit if there is an entity and not a gui visual
+      // and not a selection-only object (e.g. light selection ent)
+      const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+          || (flags & GZ_VISIBILITY_SELECTABLE);
+      if (iter->movable && iter->movable->getVisible() &&
+          iter->movable->getMovableType().compare("Entity") == 0 &&
+          !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
       {
-        try
-        {
-          vis = this->GetVisual(Ogre::any_cast<std::string>(
-              ogreEntity->getUserObjectBindings().getUserAny()));
-        }
-        catch(Ogre::Exception &e)
-        {
-          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-          continue;
-        }
-        if (!vis)
-          continue;
+        Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-        RayQuery rayQuery(_camera);
-        ignition::math::Vector3d intersect;
-        ignition::math::Triangle3d vertices;
-        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-            intersect, vertices);
-        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-            intersect);
+        VisualPtr vis;
+        if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+        {
+          try
+          {
+            vis = this->GetVisual(Ogre::any_cast<std::string>(
+                ogreEntity->getUserObjectBindings().getUserAny()));
+          }
+          catch(Ogre::Exception &e)
+          {
+            gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+            continue;
+          }
+          if (!vis)
+            continue;
+
+          RayQuery rayQuery(_camera);
+          ignition::math::Vector3d intersect;
+          ignition::math::Triangle3d triangle;
+          if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+              intersect, triangle))
+          {
+            distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+                intersect);
+          }
+        }
       }
     }
   }
@@ -2996,7 +3040,8 @@ void Scene::OnSkyMsg(ConstSkyPtr &_msg)
 void Scene::SetSky()
 {
   // Create SkyX
-  this->dataPtr->skyxController = new SkyX::BasicController();
+  // Pass parameter false to ensure that sky won't delete controller
+  this->dataPtr->skyxController = new SkyX::BasicController(false);
   this->dataPtr->skyx = new SkyX::SkyX(this->dataPtr->manager,
       this->dataPtr->skyxController);
   this->dataPtr->skyx->create();

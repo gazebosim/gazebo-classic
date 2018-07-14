@@ -24,6 +24,7 @@ set (files
   pioneerBody.jpg
   primary.jpg
   projection_filter.png
+  rand1x32.png
   random.png
   residential.jpg
   road1.jpg

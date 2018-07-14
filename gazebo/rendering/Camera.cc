@@ -1394,6 +1394,12 @@ bool Camera::WorldPointOnPlane(const int _x, const int _y,
 }
 
 //////////////////////////////////////////////////
+double Camera::LimitFOV(const double _fov)
+{
+  return std::min(std::max(0.001, _fov), M_PI * 0.999);
+}
+
+//////////////////////////////////////////////////
 void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 {
   this->renderTarget = _target;
@@ -1839,7 +1845,7 @@ void Camera::UpdateFOV()
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
 
     this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(vfov));
+    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
   }
 }
 

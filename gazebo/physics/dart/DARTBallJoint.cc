@@ -30,6 +30,9 @@ using namespace physics;
 DARTBallJoint::DARTBallJoint(BasePtr _parent)
   : BallJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::BallJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -41,10 +44,6 @@ DARTBallJoint::~DARTBallJoint()
 void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 {
   BallJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::BallJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -57,6 +56,7 @@ void DARTBallJoint::Init()
 ignition::math::Vector3d DARTBallJoint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
+  gzwarn << "DARTBallJoint::GlobalAxis: BallJoint does not have an axis\n";
   return ignition::math::Vector3d::Zero;
 }
 
@@ -64,6 +64,5 @@ ignition::math::Vector3d DARTBallJoint::GlobalAxis(
 void DARTBallJoint::SetAxis(const unsigned int /*_index*/,
                             const ignition::math::Vector3d &/*_axis*/)
 {
-  gzerr << "DARTBallJoint::SetAxis: dart::dynamics::BallJoint does not have an "
-        << "axis" << std::endl;
+  gzwarn << "DARTBallJoint::SetAxis: BallJoint does not have an axis\n";
 }

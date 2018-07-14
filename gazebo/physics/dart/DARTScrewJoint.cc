@@ -33,6 +33,9 @@ using namespace physics;
 DARTScrewJoint::DARTScrewJoint(BasePtr _parent)
   : ScrewJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::ScrewJoint::Properties(
+      *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -45,10 +48,6 @@ void DARTScrewJoint::Load(sdf::ElementPtr _sdf)
 {
   ScrewJoint<DARTJoint>::Load(_sdf);
   this->SetThreadPitch(0, this->threadPitch);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::ScrewJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -115,9 +114,6 @@ ignition::math::Vector3d DARTScrewJoint::GlobalAxis(
     gzerr << "Invalid index[" << _index << "]\n";
   }
 
-  // TODO: Issue #494
-  // See: https://bitbucket.org/osrf/gazebo/issue/494
-  // joint-axis-reference-frame-doesnt-match
   return DARTTypes::ConvVec3Ign(globalAxis);
 }
 
@@ -141,15 +137,9 @@ void DARTScrewJoint::SetAxis(const unsigned int _index,
         dynamic_cast<dart::dynamics::ScrewJoint *>(this->dataPtr->dtJoint);
     GZ_ASSERT(dtScrewJoint, "ScrewJoint is NULL");
 
-    // TODO: Issue #494
-    // See: https://bitbucket.org/osrf/gazebo/issue/494
-    // joint-axis-reference-frame-doesnt-match
-    Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(_axis);
-    Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
-    dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
-
-    dtScrewJoint->setAxis(dartVec3);
+    Eigen::Vector3d dartAxis = DARTTypes::ConvVec3(
+        this->AxisFrameOffset(0).RotateVector(_axis));
+    dtScrewJoint->setAxis(dartAxis);
   }
   else
   {

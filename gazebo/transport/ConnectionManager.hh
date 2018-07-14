@@ -59,6 +59,10 @@ namespace gazebo
                         unsigned int _masterPort,
                         uint32_t _timeoutIterations = 30);
 
+      /// \brief Is the manager initialized?
+      /// \return true if initialized, false otherwise
+      public: bool IsInitialized() const;
+
       /// \brief Run the connection manager loop.  Does not return until
       /// stopped.
       public: void Run();
@@ -164,7 +168,7 @@ namespace gazebo
       private: boost::mutex updateMutex;
 
       private: ConnectionPtr masterConn;
-      private: Connection *serverConn;
+      private: ConnectionPtr serverConn;
 
       private: std::list<ConnectionPtr> connections;
       protected: std::vector<event::ConnectionPtr> eventConnections;
