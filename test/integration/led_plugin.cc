@@ -76,6 +76,15 @@ TEST_F(LedPluginTest, Blinking)
   rendering::CameraPtr cam = scene->GetCamera(0);
   ASSERT_NE(nullptr, cam);
 
+  // NOTE: this waiting time is to make sure that a visual object to update
+  // has been created in the environment before publishing a message.
+  // Otherwise, a duplicate object will be created and the original one will
+  // never be updated.
+  // This problem is solved by the patch (Pull Request # 2983), which has
+  // been merged into gazebo7 as of Jully 16, 2018. This line should be removed
+  // once the patch is forwarded up to gazebo9.
+  common::Time::MSleep(2000);
+  
   imageCount = 0;
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();

@@ -153,7 +153,15 @@ void LedSetting::Flash()
   // Send the message.
   if (this->dataPtr->visualExists)
   {
-    this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
+    // NOTE: this if statement is to make sure that a visual object to update
+    // has been created in the environment before publishing a message.
+    // Otherwise, a duplicate object will be created and the original one will
+    // never be updated.
+    // This problem is solved by the patch (Pull Request # 2983), which has
+    // been merged into gazebo7 as of Jully 16, 2018. This if satement should be
+    // removed once the patch is forwarded up to gazebo9.
+    if (this->Link()->GetWorld()->SimTime() > 2.0)
+      this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
   }
 }
 
@@ -170,7 +178,15 @@ void LedSetting::Dim()
   // Send the message.
   if (this->dataPtr->visualExists)
   {
-    this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
+    // NOTE: this if statement is to make sure that a visual object to update
+    // has been created in the environment before publishing a message.
+    // Otherwise, a duplicate object will be created and the original one will
+    // never be updated.
+    // This problem is solved by the patch (Pull Request # 2983), which has
+    // been merged into gazebo7 as of Jully 16, 2018. This if satement should be
+    // removed once the patch is forwarded up to gazebo9.
+    if (this->Link()->GetWorld()->SimTime() > 2.0)
+      this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
   }
 }
 
