@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  *
 */
-#include <mutex>
+
 #include <functional>
+#include <mutex>
 
 #include <ignition/math/Rand.hh>
 
-#include "test_config.h"
-
-#include "gazebo/physics/physics.hh"
-#include "gazebo/sensors/sensors.hh"
 #include "gazebo/common/Timer.hh"
+#include "gazebo/physics/physics.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/sensors/CameraSensor.hh"
-
+#include "gazebo/sensors/sensors.hh"
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -146,9 +144,6 @@ TEST_F(LedPluginTest, Blinking)
 
 int main(int argc, char **argv)
 {
-  // Set a specific seed to avoid occasional test failures due to
-  // statistically unlikely, but possible results.
-  ignition::math::Rand::Seed(42);
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
