@@ -140,6 +140,16 @@ namespace gazebo
     /// \return the color for the current block which the object is using.
     ///         It returns Black if there is no update about color.
     protected: virtual ignition::math::Color CurrentColor() final;
+    
+    /// \brief Find the link holding the light to control.
+    /// If multiple models are nested, this function is recursively called until
+    /// the link is found.
+    /// \param[in] _model A model to check.
+    /// \param[in] _lightName the name of the light.
+    /// \param[in] _linkName the name of the link.
+    /// \return A pointer to the link. If not found, nullptr is returned.
+    private: physics::LinkPtr FindLinkForLight(const physics::ModelPtr &_model,
+      const std::string &_lightName, const std::string &_linkName);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;

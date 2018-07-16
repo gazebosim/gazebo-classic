@@ -541,6 +541,36 @@ ignition::math::Color FlashLightSetting::CurrentColor()
 }
 
 //////////////////////////////////////////////////
+physics::LinkPtr FlashLightSetting::FindLinkForLight(
+  const physics::ModelPtr &_model,
+  const std::string &_lightName, const std::string &_linkName)
+{
+  auto childLink = _model->GetChildLink(_linkName);
+  if (childLink && childLink->GetSDF()->HasElement("light"))
+  {
+    auto sdfLight = childLink->GetSDF()->GetElement("light");
+    while (sdfLight)
+    {
+      if (sdfLight->Get<std::string>("name") == _lightName)
+      {
+        return childLink;
+      }
+      sdfLight = sdfLight->GetNextElement("light");
+    }
+  }
+  for (auto model: _model->NestedModels())
+  {
+    auto foundLink = this->FindLinkForLight(model, _lightName, _linkName);
+    if (foundLink)
+    {
+      return foundLink;
+    }
+  }
+
+  return nullptr;
+}
+
+//////////////////////////////////////////////////
 FlashLightPlugin::FlashLightPlugin() : ModelPlugin(),
   dataPtr(new FlashLightPluginPrivate)
 {
