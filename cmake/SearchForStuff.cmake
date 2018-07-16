@@ -742,7 +742,7 @@ endif()
 
 ################################################################################
 # Find the Ignition Fuel Tools library
-find_package(ignition-fuel_tools1 QUIET)
+find_package(ignition-fuel_tools1 1.2 QUIET)
 if (NOT ignition-fuel_tools1_FOUND)
   message (STATUS "Looking for libignition-fuel_tools1 - not found")
   BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")

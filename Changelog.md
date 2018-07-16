@@ -1,9 +1,25 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (2018-xx-xx)
+## Gazebo 9.X.X (2018-XX-XX)
+
+1. Require ignition-fuel-tools 1.2 when finding package
+    * [Pull request 2992](https://bitbucket.org/osrf/gazebo/pull-request/2992)
+    * [Issue 2494](https://bitbucket.org/osrf/gazebo/issues/2494)
+
+
+## Gazebo 9.2.0 (2018-07-10)
+
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Attach lights to links cleanup and deprecate GetLight functions
+    * [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
 
 
 ## Gazebo 9.1.1 (2018-06-08)
@@ -33,8 +49,8 @@
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
 
-1. Attach lights to links cleanup and deprecate GetLight functions
-* [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
+1. Add a flashlight plugin blinking lights attached on a model
+    * [Pull request 2961](https://bitbucket.org/osrf/gazebo/pull-request/2961)
 
 1. Add a flashlight plugin blinking lights attached on a model
     * [Pull request 2961](https://bitbucket.org/osrf/gazebo/pull-request/2961)
@@ -309,10 +325,19 @@
 
 ## Gazebo 8
 
-## Gazebo 8.x.x (2018-xx-xx)
+## Gazebo 8.6.0 (2018-06-26)
+
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
 
 
 ## Gazebo 8.5.0 (2018-06-08)
@@ -972,6 +997,13 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2018-XX-XX)
+
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
+
 
 ## Gazebo 7.13.1 (2018-06-15)
 
