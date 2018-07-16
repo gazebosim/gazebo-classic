@@ -1,6 +1,13 @@
 ## Gazebo 9
 
-## Gazebo 9.2.0 (2018-07-09)
+## Gazebo 9.X.X (2018-XX-XX)
+
+1. Require ignition-fuel-tools 1.2 when finding package
+    * [Pull request 2992](https://bitbucket.org/osrf/gazebo/pull-request/2992)
+    * [Issue 2494](https://bitbucket.org/osrf/gazebo/issues/2494)
+
+
+## Gazebo 9.2.0 (2018-07-10)
 
 1. Fix SetCrop for multiple cameras and add SetCrop test
     * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
