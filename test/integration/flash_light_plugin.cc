@@ -42,7 +42,9 @@ struct RecordInfo
 class FlashLightPluginTest : public ServerFixture
 {
   // Constructor.
-  public: FlashLightPluginTest(): called(false){}
+  public: FlashLightPluginTest(): called(false)
+  {
+  }
 
   // Destructor.
   public: ~FlashLightPluginTest()

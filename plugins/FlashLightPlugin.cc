@@ -47,7 +47,9 @@ namespace gazebo
     /// Constructor
     public: FlashLightSettingPrivate():
       switchOn(true), flashing(true), range(0),
-      lightExists(false), currentBlockIndex(0){}
+      lightExists(false), currentBlockIndex(0)
+    {
+    }
 
     /// \brief Find the link holding the light to control.
     /// If multiple models are nested, this function is recursively called

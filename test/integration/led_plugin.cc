@@ -84,7 +84,7 @@ TEST_F(LedPluginTest, Blinking)
   // been merged into gazebo7 as of Jully 16, 2018. This line should be removed
   // once the patch is forwarded up to gazebo9.
   common::Time::MSleep(2000);
-  
+
   imageCount = 0;
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
