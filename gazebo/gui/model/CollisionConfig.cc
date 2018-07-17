@@ -69,13 +69,20 @@ CollisionConfig::CollisionConfig()
   this->mapperAdd->setMapping(addCollisionButtonCylinder,QString::fromStdString("cylinder"));
   connect (this->mapperAdd, SIGNAL(mapped(const QString)), this, SLOT(OnAddCollision(const QString))) ;
 
+  QHBoxLayout *buttons = new QHBoxLayout();
+  buttons->addWidget(addCollisionButtonBox);
+  buttons->addWidget(addCollisionButtonSphere);
+  buttons->addWidget(addCollisionButtonCylinder); 
+
+  QLabel *descriptionLabel = new QLabel(tr("<b><font size=3>Add Bounding Collision Shapes</font><b> "));
+  descriptionLabel->setAlignment(Qt::AlignCenter);
+  descriptionLabel->setContentsMargins(1,1,1,3);
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(scrollArea);
-  mainLayout->addWidget(addCollisionButtonBox);
-  mainLayout->addWidget(addCollisionButtonSphere);
-  mainLayout->addWidget(addCollisionButtonCylinder);  
+  mainLayout->addWidget(scrollArea); 
+  mainLayout->addWidget(descriptionLabel);
+  mainLayout->addLayout(buttons);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
 
