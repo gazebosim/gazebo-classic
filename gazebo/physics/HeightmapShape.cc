@@ -43,6 +43,10 @@ using namespace physics;
 HeightmapShape::HeightmapShape(CollisionPtr _parent)
     : Shape(_parent)
 {
+  static_assert(
+      std::is_same<HeightType, float>::value ||
+      std::is_same<HeightType, double>::value,
+      "Height field needs to be double or float");
   this->vertSize = 0;
   this->AddType(Base::HEIGHTMAP_SHAPE);
 }
@@ -199,6 +203,56 @@ int HeightmapShape::GetSubSampling() const
 }
 
 //////////////////////////////////////////////////
+void HeightmapShape::FillHeightfield(std::vector<float>& _heights)
+{
+  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+      this->Size(), this->scale, this->flipY, _heights);
+}
+
+//////////////////////////////////////////////////
+void HeightmapShape::FillHeightfield(std::vector<double>& _heights)
+{
+  std::vector<float> fHeights;
+  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
+      this->Size(), this->scale, this->flipY, fHeights);
+  _heights = std::vector<double>(fHeights.begin(), fHeights.end());
+}
+
+//////////////////////////////////////////////////
+// Constructs the float lookup table from coommon::Heightmap, which always uses
+// float values.
+// Enabled only if the height type used is float.
+// \param[in] _this pointer to this HeightmapShape class
+// \param[in] _this_heights _this->heights field, required as parameter
+//    because it is protected.
+template<class HS>
+void ConstructLookupTableTypeEnabled(HS* _this,
+  std::vector<typename HS::HeightType>& _this_heights,
+  typename std::enable_if<
+    std::is_same<float, typename HS::HeightType>::value>::type* = 0)
+{
+  assert(_this);
+  _this->FillHeightfield(_this_heights);
+}
+
+//////////////////////////////////////////////////
+// Constructs the double lookup table from coommon::Heightmap, which always uses
+// float values.
+// Enabled only if the height type used is double.
+// \param[in] _this pointer to this HeightmapShape class
+// \param[in] _this_heights _this->heights field, required as parameter
+//    because it is protected.
+template<class HS>
+void ConstructLookupTableTypeEnabled(HS* _this,
+  std::vector<typename HS::HeightType>& _this_heights,
+  typename std::enable_if<
+    std::is_same<double, typename HS::HeightType>::value>::type* = 0)
+{
+  assert(_this);
+  _this->FillHeightfield(_this_heights);
+}
+
+//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -231,9 +285,8 @@ void HeightmapShape::Init()
   else
     this->scale.Z() = fabs(terrainSize.Z()) / heightmapSizeZ;
 
-  // Step 1: Construct the heightmap lookup table
-  this->heightmapData->FillHeightMap(this->subSampling, this->vertSize,
-      this->Size(), this->scale, this->flipY, this->heights);
+  // Construct the heightmap lookup table
+  ConstructLookupTableTypeEnabled(this, this->heights);
 }
 
 //////////////////////////////////////////////////
@@ -304,7 +357,7 @@ ignition::math::Vector2i HeightmapShape::VertexCount() const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetHeight(int _x, int _y) const
+HeightmapShape::HeightType HeightmapShape::GetHeight(int _x, int _y) const
 {
   int index =  _y * this->vertSize + _x;
   if (_x < 0 || _y < 0 || index >= static_cast<int>(this->heights.size()))
@@ -314,9 +367,9 @@ float HeightmapShape::GetHeight(int _x, int _y) const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetMaxHeight() const
+HeightmapShape::HeightType HeightmapShape::GetMaxHeight() const
 {
-  float max = ignition::math::MIN_F;
+  HeightType max = -std::numeric_limits<HeightType>::max();
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] > max)
@@ -327,9 +380,9 @@ float HeightmapShape::GetMaxHeight() const
 }
 
 /////////////////////////////////////////////////
-float HeightmapShape::GetMinHeight() const
+HeightmapShape::HeightType HeightmapShape::GetMinHeight() const
 {
-  float min = ignition::math::MAX_F;
+  HeightType min = std::numeric_limits<HeightType>::max();
   for (unsigned int i = 0; i < this->heights.size(); ++i)
   {
     if (this->heights[i] < min)

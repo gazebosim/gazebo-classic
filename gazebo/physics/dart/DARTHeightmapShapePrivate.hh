@@ -27,12 +27,14 @@ namespace gazebo
   {
     /// \internal
     /// \brief Private data class for DARTHeightmapShape
+    template<typename HeightType>
     class DARTHeightmapShapePrivate
     {
-      typedef boost::shared_ptr<const dart::dynamics::HeightmapShape>
+      typedef dart::dynamics::HeightmapShape<HeightType> DartHeightmapShape;
+      typedef boost::shared_ptr<const DartHeightmapShape>
         HeightmapShapeConstPtr;
-      typedef boost::shared_ptr<dart::dynamics::HeightmapShape>
-        HeightmapShape;
+      typedef boost::shared_ptr<DartHeightmapShape>
+        HeightmapShapePtr;
 
       /// \brief Constructor
       public: DARTHeightmapShapePrivate() = default;
@@ -49,20 +51,20 @@ namespace gazebo
       // \brief returns the shape
       // This method returns the raw pointer because converting from
       // std to boost shared pointers still has to be added.
-      public: const dart::dynamics::HeightmapShape* Shape() const
+      public: const DartHeightmapShape* Shape() const
       {
         GZ_ASSERT(this->dtHeightmapShape, "HeightmapShape is NULL");
-        return static_cast<dart::dynamics::HeightmapShape*>
+        return static_cast<DartHeightmapShape*>
                        (this->dtHeightmapShape->getShape().get());
       }
 
       // \brief returns the shape
       // This method returns the raw pointer because converting from
       // std to boost shared pointers still has to be added.
-      public: dart::dynamics::HeightmapShape* Shape()
+      public: DartHeightmapShape* Shape()
       {
         GZ_ASSERT(this->dtHeightmapShape, "HeightmapShape is NULL");
-        return static_cast<dart::dynamics::HeightmapShape*>
+        return static_cast<DartHeightmapShape*>
                        (this->dtHeightmapShape->getShape().get());
       }
 
@@ -71,7 +73,7 @@ namespace gazebo
       public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
       {
         GZ_ASSERT(_bodyNode, "BodyNode is NULL");
-        dart::dynamics::ShapePtr shape(new dart::dynamics::HeightmapShape());
+        dart::dynamics::ShapePtr shape(new DartHeightmapShape());
         dart::dynamics::ShapeNode *node = _bodyNode->createShapeNodeWith<
                                       dart::dynamics::VisualAspect,
                                       dart::dynamics::CollisionAspect,

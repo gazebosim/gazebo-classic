@@ -14,7 +14,7 @@ set (GAZEBO_MINOR_VERSION 0)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
-set (GAZEBO_PATCH_VERSION 0)
+set (GAZEBO_PATCH_VERSION 1)
 
 set (GAZEBO_VERSION ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION})
 set (GAZEBO_VERSION_FULL ${GAZEBO_MAJOR_VERSION}.${GAZEBO_MINOR_VERSION}.${GAZEBO_PATCH_VERSION})
@@ -288,11 +288,11 @@ message (STATUS "----------------------------------------\n")
 #################################################
 # Print warnings and errors
 if ( build_warnings )
-  message(STATUS "BUILD WARNINGS")
+  message("-- BUILD WARNINGS")
   foreach (msg ${build_warnings})
-    message(STATUS ${msg})
+    message("-- ${msg}")
   endforeach ()
-  message(STATUS "END BUILD WARNINGS\n")
+  message("-- END BUILD WARNINGS\n")
 endif (build_warnings)
 
 ########### Add uninstall target ###############
@@ -304,11 +304,11 @@ add_custom_target(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 if (build_errors)
-  message(STATUS "BUILD ERRORS: These must be resolved before compiling.")
+  message("-- BUILD ERRORS: These must be resolved before compiling.")
   foreach (msg ${build_errors})
-    message(STATUS ${msg})
+    message("-- ${msg}")
   endforeach ()
-  message(STATUS "END BUILD ERRORS\n")
+  message("-- END BUILD ERRORS\n")
   message (FATAL_ERROR "Errors encountered in build. Please see the BUILD ERRORS above.")
 else (build_errors)
 

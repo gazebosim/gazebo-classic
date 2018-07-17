@@ -30,6 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// Forward declare private data class
+    template<typename HeightType>
     class DARTHeightmapShapePrivate;
 
     /// \addtogroup gazebo_physics_dart
@@ -53,7 +54,7 @@ namespace gazebo
 
       /// \internal
       /// \brief Pointer to private data
-      private: DARTHeightmapShapePrivate *dataPtr;
+      private: DARTHeightmapShapePrivate<HeightmapShape::HeightType> *dataPtr;
     };
     /// \}
   }

@@ -28,7 +28,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
   : HeightmapShape(_parent),
-    dataPtr(new DARTHeightmapShapePrivate())
+    dataPtr(new DARTHeightmapShapePrivate<HeightmapShape::HeightType>())
 {
 }
 
