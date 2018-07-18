@@ -376,7 +376,7 @@ void WheelSlipPlugin::GetSlips(
         modelWorldPose.Rot().RotateVectorReverse(wheelWorldLinearVel);
     // Compute wheel spin axis in parent model frame
     auto joint = params.joint.lock();
-    if (!link)
+    if (!joint)
       continue;
     auto wheelWorldAxis = joint->GetGlobalAxis(0).Ign().Normalized();
     auto wheelModelAxis =
