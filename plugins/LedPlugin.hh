@@ -19,7 +19,6 @@
 #define GAZEBO_PLUGINS_LEDPLUGIN_HH_
 
 #include <memory>
-#include <string>
 
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/physics/physics.hh"
@@ -63,13 +62,41 @@ namespace gazebo
 
   /// \brief A plugin that blinks light and visual elements in a model.
   /// In addition to the features of the base plugin, FlashLightPlugin, this
-  /// plugin access a <visual> element to make it blink.
+  /// plugin accesses a <visual> element to make it blink.
   ///
   /// The <light> and <visual> element to control must have the identical name
   /// and specified by <light_id>, including the name of the link, which they
   /// are attached on, and their name separated by a slash "/".
   ///
   /// Other parameters are inherited from the base plugin, FlashLightPlugin.
+  ///
+  /// Example:
+  /// \verbatim
+  /// <model name='light_model'>
+  ///   ...
+  ///   <link name='light_source'>
+  ///     ...
+  ///     <light name='lamp' type='point'>
+  ///       ...
+  ///     </light>
+  ///     <visual name='lamp'>
+  ///       ...
+  ///     </visual>
+  ///   </link>
+  ///   ...
+  ///   <plugin name='light_control' filename='libLedPlugin.so'>
+  ///     <light>
+  ///       <id>light_source/lamp</id>
+  ///       <block>
+  ///         <duration>1</duration>
+  ///         <interval>1</interval>
+  ///         <color>1 0.5 0.5</color>
+  ///       </block>
+  ///       <enable>true</enable>
+  ///     </light>
+  ///   </plugin>
+  /// </model>
+  /// \endverbatim
   ///
   class GAZEBO_VISIBLE LedPlugin : public FlashLightPlugin
   {

@@ -16,7 +16,6 @@
 */
 
 #include <memory>
-#include <string>
 #include <vector>
 
 #include <ignition/math/Color.hh>
@@ -31,6 +30,12 @@ namespace gazebo
 {
   class LedSettingPrivate
   {
+    /// \brief Constructor.
+    public: LedSettingPrivate():
+      transparency(0.2), defaultEmissiveColor(iginition::math::Color::White)
+    {
+    }
+
     /// \brief The transparency when the ligth is off.
     public: double transparency;
 
@@ -81,10 +86,6 @@ LedSetting::LedSetting(
       {
         this->dataPtr->transparency = visualMsg.transparency();
       }
-      else
-      {
-        this->dataPtr->transparency = 0.2;
-      }
 
       if (visualMsg.has_material()
         && visualMsg.material().has_emissive())
@@ -92,12 +93,9 @@ LedSetting::LedSetting(
         this->dataPtr->defaultEmissiveColor
           = msgs::Convert(visualMsg.material().emissive());
       }
-      else
-      {
-        this->dataPtr->defaultEmissiveColor = ignition::math::Color(1, 1, 1);
-      }
 
       this->dataPtr->visualExists = true;
+      break;
     }
   }
 }
@@ -158,7 +156,7 @@ void LedSetting::Flash()
     // Otherwise, a duplicate object will be created and the original one will
     // never be updated.
     // This problem is solved by the patch (Pull Request # 2983), which has
-    // been merged into gazebo7 as of Jully 16, 2018. This if satement should be
+    // been merged into gazebo7 as of July 16, 2018. This if satement should be
     // removed once the patch is forwarded up to gazebo9.
     if (this->Link()->GetWorld()->SimTime() > 2.0)
       this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
@@ -183,7 +181,7 @@ void LedSetting::Dim()
     // Otherwise, a duplicate object will be created and the original one will
     // never be updated.
     // This problem is solved by the patch (Pull Request # 2983), which has
-    // been merged into gazebo7 as of Jully 16, 2018. This if satement should be
+    // been merged into gazebo7 as of July 16, 2018. This if satement should be
     // removed once the patch is forwarded up to gazebo9.
     if (this->Link()->GetWorld()->SimTime() > 2.0)
       this->dataPtr->pubVisual->Publish(this->dataPtr->msg);
