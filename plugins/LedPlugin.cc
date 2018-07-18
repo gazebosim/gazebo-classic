@@ -32,7 +32,7 @@ namespace gazebo
   {
     /// \brief Constructor.
     public: LedSettingPrivate():
-      transparency(0.2), defaultEmissiveColor(iginition::math::Color::White),
+      transparency(0.2), defaultEmissiveColor(ignition::math::Color::White),
       visualExists(false)
     {
     }
