@@ -30,23 +30,29 @@
 using namespace gazebo;
 class LedPluginTest : public ServerFixture
 {
+  public: LedPluginTest(): img(nullptr), imageCount(0)
+  {
+  }
+  public: void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+                  const unsigned char *_image,
+                  unsigned int _width, unsigned int _height,
+                  unsigned int _depth,
+                  const std::string &/*_format*/);
+
+  protected: std::mutex mutex;
+  protected: unsigned char* img;
+  protected: int imageCount;
 };
 
-std::mutex mutex;
-
-unsigned char* img = nullptr;
-unsigned char* img2 = nullptr;
-int imageCount = 0;
-int imageCount2 = 0;
-
 /////////////////////////////////////////////////
-void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
+void LedPluginTest::OnNewCameraFrame(
+                  int* _imageCounter, unsigned char* _imageDest,
                   const unsigned char *_image,
                   unsigned int _width, unsigned int _height,
                   unsigned int _depth,
                   const std::string &/*_format*/)
 {
-  std::lock_guard<std::mutex> lock(mutex);
+  std::lock_guard<std::mutex> lock(this->mutex);
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
 }
@@ -79,24 +85,25 @@ TEST_F(LedPluginTest, Blinking)
   // Otherwise, a duplicate object will be created and the original one will
   // never be updated.
   // This problem is solved by the patch (Pull Request # 2983), which has
-  // been merged into gazebo7 as of Jully 16, 2018. This line should be removed
+  // been merged into gazebo7 as of July 16, 2018. This line should be removed
   // once the patch is forwarded up to gazebo9.
   common::Time::MSleep(2000);
 
-  imageCount = 0;
+  this->imageCount = 0;
   unsigned int width = cam->ImageWidth();
   unsigned int height = cam->ImageHeight();
-  img = new unsigned char[width * height * 3];
+  this->img = new unsigned char[width * height * 3];
 
   event::ConnectionPtr c =
       cam->ConnectNewImageFrame(
-      std::bind(&::OnNewCameraFrame, &imageCount, img,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
+      std::bind(&LedPluginTest::OnNewCameraFrame, this,
+        &this->imageCount, this->img,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5));
 
   common::Time::MSleep(1500);
 
-  EXPECT_GE(imageCount, 1);
+  EXPECT_GE(this->imageCount, 1);
   c.reset();
 
   // after 1.5 sec, it is supposed to be dimmed, i.e., the color is dark.
@@ -104,9 +111,10 @@ TEST_F(LedPluginTest, Blinking)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
     {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
+      std::lock_guard<std::mutex> lock(this->mutex);
+      unsigned int r = this->img[(y*width*3) + x];
+      unsigned int g = this->img[(y*width*3) + x + 1];
+      unsigned int b = this->img[(y*width*3) + x + 2];
       EXPECT_LT(r, 50u) << "R value is not low enough." << std::endl;
       EXPECT_LT(g, 50u) << "G value is not low enough." << std::endl;
       EXPECT_LT(b, 50u) << "B value is not low enough." << std::endl;
@@ -114,15 +122,16 @@ TEST_F(LedPluginTest, Blinking)
   }
 
   // get more images
-  imageCount = 0;
+  this->imageCount = 0;
   c = cam->ConnectNewImageFrame(
-      std::bind(&::OnNewCameraFrame, &imageCount, img,
-      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
-      std::placeholders::_4, std::placeholders::_5));
+      std::bind(&LedPluginTest::OnNewCameraFrame, this,
+        &this->imageCount, this->img,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+        std::placeholders::_4, std::placeholders::_5));
 
   common::Time::MSleep(1000);
 
-  EXPECT_GE(imageCount, 1);
+  EXPECT_GE(this->imageCount, 1);
   c.reset();
 
   // after 1 sec, it should flash, i.e., the color is bright red.
@@ -130,18 +139,20 @@ TEST_F(LedPluginTest, Blinking)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
     {
-      unsigned int r = img[(y*width*3) + x];
-      unsigned int g = img[(y*width*3) + x + 1];
-      unsigned int b = img[(y*width*3) + x + 2];
+      std::lock_guard<std::mutex> lock(this->mutex);
+      unsigned int r = this->img[(y*width*3) + x];
+      unsigned int g = this->img[(y*width*3) + x + 1];
+      unsigned int b = this->img[(y*width*3) + x + 2];
       EXPECT_GT(r, 250u) << "R value is not high enough." << std::endl;
       EXPECT_GT(g, 127u) << "G value is not high enough." << std::endl;
       EXPECT_GT(b, 127u) << "B value is not high enough." << std::endl;
     }
   }
 
-  delete [] img;
+  delete [] this->img;
 }
 
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
