@@ -1447,19 +1447,19 @@ _vis = this->visuals.begin()->first;
 pose = _vis->Pose();
 
 
-    
+
 
     if (_vis->GetGeometryType()=="box")
     {
     ignition::math::Vector3d _size = _vis->GetGeometrySize();
-    
-        if(_type == "box"){  
+
+        if(_type == "box"){
 
           collisionElem->GetElement("geometry")->GetElement("box")
            ->GetElement("size")->Set(_size);
         }
         else if(_type == "sphere"){
-          double radius = _size.Max();  
+          double radius = _size.Max();
 
           collisionElem->GetElement("geometry")->GetElement("box")
              ->GetElement("size")->SetName("radius");
@@ -1475,25 +1475,25 @@ pose = _vis->Pose();
       if(abs(_size[0]-_size[2])>=abs(_size[1]-_size[2])){
         radius = sqrt(_size[1]*_size[1]+_size[2]*_size[2])/2;
         length = _size[0];
-        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll(),pose.Rot().Pitch()+1.570796,pose.Rot().Yaw())); 
+        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll(),pose.Rot().Pitch()+1.570796,pose.Rot().Yaw()));
       }
       else{
         radius = sqrt(_size[0]*_size[0]+_size[2]*_size[2])/2;
         length = _size[1];
-        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll()+1.570796,pose.Rot().Pitch(),pose.Rot().Yaw())); 
+        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll()+1.570796,pose.Rot().Pitch(),pose.Rot().Yaw()));
       }
     }
     else{
       radius = sqrt(_size[1]*_size[1]+_size[0]*_size[0])/2;
       length = _size[2];
     }
-    
+
 
          collisionElem->GetElement("geometry")->ClearElements();
           collisionElem->GetElement("geometry")->AddElement("cylinder");
           collisionElem->GetElement("geometry")->GetElement("cylinder")
             ->AddElement("radius");
-          
+
           collisionElem->GetElement("geometry")->GetElement("cylinder")
             ->AddElement("length");
           collisionElem->GetElement("geometry")->GetElement("cylinder")
@@ -1503,7 +1503,7 @@ pose = _vis->Pose();
         }
     }
     else if (_vis->GetGeometryType()=="sphere"){
-      
+
       double diam = _vis->GetGeometrySize()[0];
 
       if(_type == "box"){
@@ -1521,7 +1521,7 @@ pose = _vis->Pose();
          ->GetElement("radius")->Set<double>(diam/2);
       }
       else if(_type == "cylinder"){
-         
+
          collisionElem->GetElement("geometry")->GetElement("box")
          ->GetElement("size")->SetName("radius");
         collisionElem->GetElement("geometry")->GetElement("box")
@@ -1533,15 +1533,15 @@ pose = _vis->Pose();
         collisionElem->GetElement("geometry")->GetElement("cylinder")
          ->GetElement("length")->Set(diam);
        }
-      
-      
+
+
     }
 
     else if (_vis->GetGeometryType() == "cylinder"){
-      
+
       double d = _vis->GetGeometrySize()[0];
       double l = _vis->GetGeometrySize()[2];
-      
+
       if(_type == "box"){
         ignition::math::Vector3d _size(d,d,l);
         collisionElem->GetElement("geometry")->GetElement("box")
@@ -1557,11 +1557,11 @@ pose = _vis->Pose();
          ->SetName("sphere");
         collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
-        
-        
+
+
        }
        else if(_type == "cylinder"){
-         
+
          collisionElem->GetElement("geometry")->GetElement("box")
          ->GetElement("size")->SetName("radius");
          collisionElem->GetElement("geometry")->GetElement("box")
@@ -1573,12 +1573,12 @@ pose = _vis->Pose();
         collisionElem->GetElement("geometry")->GetElement("cylinder")
          ->GetElement("length")->Set<double>(l);
        }
-      
+
     }
-  
+
     else if (_vis->GetGeometryType() == "mesh"){
-  
-      std::string _meshName = _vis->GetMeshName(); 
+
+      std::string _meshName = _vis->GetMeshName();
 
       const common::Mesh *_mesh;
       if (!common::MeshManager::Instance()->HasMesh(_meshName)){
@@ -1610,10 +1610,10 @@ pose = _vis->Pose();
       min =  center + _vis->Rotation().RotateVector(min-center);
 
       center = (max+min)/2;
-      
+
       gzerr<<max<<"  "<<min<<"\n";
       pose = _vis->Pose();
-      pose.Pos() = center; 
+      pose.Pos() = center;
 
       if(_type == "box"){
         ignition::math::Box boundingBox = _vis->BoundingBox();
@@ -1636,7 +1636,7 @@ pose = _vis->Pose();
          ->SetName("sphere");
         collisionElem->GetElement("geometry")->GetElement("sphere")
          ->GetElement("radius")->Set<double>(radius);
-         
+
       }
       else if(_type == "cylinder"){
       ignition::math::Box boundingBox = _vis->BoundingBox();
@@ -1650,7 +1650,7 @@ pose = _vis->Pose();
         length = _size[0];
         ignition::math::Quaterniond extra_rot(0,2*1.570796,0);
         gzerr<<extra_rot<<" "<<pose.Rot()<<"  xxxxxx\n";
-        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll(),pose.Rot().Pitch()+1.570796,pose.Rot().Yaw())); 
+        pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d(pose.Rot().Roll(),pose.Rot().Pitch()+1.570796,pose.Rot().Yaw()));
         gzerr<<extra_rot<<" "<<pose.Rot()<<"  xxxxxx\n";
 
       }
@@ -1664,13 +1664,13 @@ pose = _vis->Pose();
       radius = sqrt(_size[1]*_size[1]+_size[0]*_size[0])/2;
       length = _size[2];
     }
-    
+
 
          collisionElem->GetElement("geometry")->ClearElements();
           collisionElem->GetElement("geometry")->AddElement("cylinder");
           collisionElem->GetElement("geometry")->GetElement("cylinder")
             ->AddElement("radius");
-          
+
           collisionElem->GetElement("geometry")->GetElement("cylinder")
             ->AddElement("length");
           collisionElem->GetElement("geometry")->GetElement("cylinder")
@@ -1694,6 +1694,7 @@ pose = _vis->Pose();
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
 
+  collisionVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   collisionVis->SetVisible(this->showCollisions);
   collisionConfig->SetShowCollision(this->showCollisions, _name);
   this->collisions[collisionVis] = collisionMsg;
@@ -1775,6 +1776,7 @@ void LinkData::Update()
         // make visual semi-transparent here
         // but generated sdf will use the correct transparency value
         it.first->UpdateFromMsg(updateMsgPtr);
+        it.first->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
         this->scales[it.first->Name()] = it.first->GetGeometrySize();
 

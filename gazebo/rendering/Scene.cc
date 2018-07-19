@@ -737,22 +737,29 @@ void Scene::RemoveCamera(const std::string &_name)
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const std::string &_name) const
 {
-  LightPtr result;
-  std::string n = this->StripSceneName(_name);
-  Light_M::const_iterator iter = this->dataPtr->lights.find(n);
-  if (iter != this->dataPtr->lights.end())
-    result = iter->second;
-  return result;
+  return this->LightByName(_name);
 }
 
 //////////////////////////////////////////////////
-uint32_t Scene::LightCount() const
+LightPtr Scene::LightByName(const std::string &_name) const
 {
-  return this->dataPtr->lights.size();
+  for (auto &iter: this->dataPtr->lights)
+  {
+    if (iter.second->Name() == _name)
+      return iter.second;
+  }
+
+  return LightPtr();
 }
 
 //////////////////////////////////////////////////
 LightPtr Scene::GetLight(const uint32_t _index) const
+{
+  return this->LightByIndex(_index);
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightByIndex(const uint32_t _index) const
 {
   LightPtr result;
   if (_index < this->dataPtr->lights.size())
@@ -768,6 +775,22 @@ LightPtr Scene::GetLight(const uint32_t _index) const
   }
 
   return result;
+}
+
+//////////////////////////////////////////////////
+LightPtr Scene::LightById(const uint32_t _id) const
+{
+  auto iter = this->dataPtr->lights.find(_id);
+  if (iter != this->dataPtr->lights.end())
+    return iter->second;
+
+  return LightPtr();
+}
+
+//////////////////////////////////////////////////
+uint32_t Scene::LightCount() const
+{
+  return this->dataPtr->lights.size();
 }
 
 //////////////////////////////////////////////////
@@ -1146,62 +1169,85 @@ bool Scene::FirstContact(CameraPtr _camera,
 {
   _position = ignition::math::Vector3d::Zero;
 
-  ignition::math::Vector3d origin;
-  ignition::math::Vector3d dir;
-  _camera->CameraToViewportRay(_mousePos.X(), _mousePos.Y(), origin, dir);
-  Ogre::Ray mouseRay(Conversions::Convert(origin), Conversions::Convert(dir));
-
-  this->dataPtr->raySceneQuery->setSortByDistance(true);
-  this->dataPtr->raySceneQuery->setRay(mouseRay);
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
   double distance = -1.0;
 
-  // Iterate over all the results.
-  for (; iter != result.end() && distance <= 0.0; ++iter)
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
+  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
+      static_cast<float>(_mousePos.X()) /
+      ogreCam->getViewport()->getActualWidth(),
+      static_cast<float>(_mousePos.Y()) /
+      ogreCam->getViewport()->getActualHeight());
+
+  UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
+  if (userCam)
   {
-    // Skip results where the distance is zero or less
-    if (iter->distance <= 0.0)
-      continue;
-
-    unsigned int flags = iter->movable->getVisibilityFlags();
-
-    // Only accept a hit if there is an entity and not a gui visual
-    // and not a selection-only object (e.g. light selection ent)
-    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
-        || (flags & GZ_VISIBILITY_SELECTABLE);
-    if (iter->movable && iter->movable->getVisible() &&
-        iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
+    VisualPtr vis = userCam->Visual(_mousePos);
+    if (vis)
     {
-      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      RayQuery rayQuery(_camera);
+      ignition::math::Vector3d intersect;
+      ignition::math::Triangle3d triangle;
+      rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+          intersect, triangle);
+      distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+          intersect);
+    }
+  }
+  else
+  {
+    this->dataPtr->raySceneQuery->setSortByDistance(true);
+    this->dataPtr->raySceneQuery->setRay(mouseRay);
 
-      VisualPtr vis;
-      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+    // Perform the scene query
+    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+
+    // Iterate over all the results.
+    for (; iter != result.end() && distance <= 0.0; ++iter)
+    {
+      // Skip results where the distance is zero or less
+      if (iter->distance <= 0.0)
+        continue;
+
+      unsigned int flags = iter->movable->getVisibilityFlags();
+
+      // Only accept a hit if there is an entity and not a gui visual
+      // and not a selection-only object (e.g. light selection ent)
+      const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+          || (flags & GZ_VISIBILITY_SELECTABLE);
+      if (iter->movable && iter->movable->getVisible() &&
+          iter->movable->getMovableType().compare("Entity") == 0 &&
+          !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
       {
-        try
-        {
-          vis = this->GetVisual(Ogre::any_cast<std::string>(
-              ogreEntity->getUserObjectBindings().getUserAny()));
-        }
-        catch(Ogre::Exception &e)
-        {
-          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-          continue;
-        }
-        if (!vis)
-          continue;
+        Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-        RayQuery rayQuery(_camera);
-        ignition::math::Vector3d intersect;
-        ignition::math::Triangle3d vertices;
-        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-            intersect, vertices);
-        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-            intersect);
+        VisualPtr vis;
+        if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+        {
+          try
+          {
+            vis = this->GetVisual(Ogre::any_cast<std::string>(
+                ogreEntity->getUserObjectBindings().getUserAny()));
+          }
+          catch(Ogre::Exception &e)
+          {
+            gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+            continue;
+          }
+          if (!vis)
+            continue;
+
+          RayQuery rayQuery(_camera);
+          ignition::math::Vector3d intersect;
+          ignition::math::Triangle3d triangle;
+          if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+              intersect, triangle))
+          {
+            distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+                intersect);
+          }
+        }
       }
     }
   }
@@ -1703,6 +1749,12 @@ bool Scene::ProcessModelMsg(const msgs::Model &_msg)
             _msg.link(j).sensor(k)));
       this->dataPtr->sensorMsgs.push_back(sm);
     }
+    for (int k = 0; k < _msg.link(j).light_size(); ++k)
+    {
+      boost::shared_ptr<msgs::Light> lm(new msgs::Light(
+            _msg.link(j).light(k)));
+      this->dataPtr->lightFactoryMsgs.push_back(lm);
+    }
   }
 
   for (int i = 0; i < _msg.model_size(); ++i)
@@ -1892,26 +1944,6 @@ void Scene::PreRender()
       ++sensorIter;
   }
 
-  // Process the light factory messages.
-  for (lightIter = lightFactoryMsgsCopy.begin();
-      lightIter != lightFactoryMsgsCopy.end();)
-  {
-    if (this->ProcessLightFactoryMsg(*lightIter))
-      lightFactoryMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
-  // Process the light modify messages.
-  for (lightIter = lightModifyMsgsCopy.begin();
-      lightIter != lightModifyMsgsCopy.end();)
-  {
-    if (this->ProcessLightModifyMsg(*lightIter))
-      lightModifyMsgsCopy.erase(lightIter++);
-    else
-      ++lightIter;
-  }
-
   // Process the model visual messages.
   for (visualIter = modelVisualMsgsCopy.begin();
       visualIter != modelVisualMsgsCopy.end();)
@@ -1971,6 +2003,27 @@ void Scene::PreRender()
       linkMsgsCopy.erase(linkIter++);
     else
       ++linkIter;
+  }
+
+  // Process the light factory messages.
+  // do this after the link and visual msgs have been processed
+  for (lightIter = lightFactoryMsgsCopy.begin();
+      lightIter != lightFactoryMsgsCopy.end();)
+  {
+    if (this->ProcessLightFactoryMsg(*lightIter))
+      lightFactoryMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
+  }
+
+  // Process the light modify messages.
+  for (lightIter = lightModifyMsgsCopy.begin();
+      lightIter != lightModifyMsgsCopy.end();)
+  {
+    if (this->ProcessLightModifyMsg(*lightIter))
+      lightModifyMsgsCopy.erase(lightIter++);
+    else
+      ++lightIter;
   }
 
   // Process the request messages
@@ -2049,24 +2102,20 @@ void Scene::PreRender()
           ++pIter;
       }
       else
-        ++pIter;
-    }
-
-    // process light pose messages
-    auto lpIter = this->dataPtr->lightPoseMsgs.begin();
-    while (lpIter != this->dataPtr->lightPoseMsgs.end())
-    {
-      auto lIter = this->dataPtr->lights.find(lpIter->first);
-      if (lIter != this->dataPtr->lights.end())
       {
-        ignition::math::Pose3d pose = msgs::ConvertIgn(lpIter->second);
-        lIter->second->SetPosition(pose.Pos());
-        lIter->second->SetRotation(pose.Rot());
-        auto prev = lpIter++;
-        this->dataPtr->lightPoseMsgs.erase(prev);
+        // process light pose messages
+        auto lIter = this->dataPtr->lights.find(pIter->first);
+        if (lIter != this->dataPtr->lights.end())
+        {
+          ignition::math::Pose3d pose = msgs::ConvertIgn(pIter->second);
+          lIter->second->SetPosition(pose.Pos());
+          lIter->second->SetRotation(pose.Rot());
+          auto prev = pIter++;
+          this->dataPtr->poseMsgs.erase(prev);
+        }
+        else
+          ++pIter;
       }
-      else
-        lpIter++;
     }
 
     // process skeleton pose msgs
@@ -2408,12 +2457,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
     response.set_id(_msg->id());
     response.set_request(_msg->request());
 
-    Light_M::iterator iter;
-    iter = this->dataPtr->lights.find(_msg->data());
-    if (iter != this->dataPtr->lights.end())
+    LightPtr light = this->LightByName(_msg->data());
+    if (light)
     {
       msgs::Light lightMsg;
-      iter->second->FillMsg(lightMsg);
+      light->FillMsg(lightMsg);
 
       std::string *serializedData = response.mutable_serialized_data();
       lightMsg.SerializeToString(serializedData);
@@ -2428,12 +2476,11 @@ void Scene::ProcessRequestMsg(ConstRequestPtr &_msg)
   }
   else if (_msg->request() == "entity_delete")
   {
-    Light_M::iterator lightIter = this->dataPtr->lights.find(_msg->data());
-
     // Check to see if the deleted entity is a light.
-    if (lightIter != this->dataPtr->lights.end())
+    LightPtr light = this->LightByName(_msg->data());
+    if (light)
     {
-      this->dataPtr->lights.erase(lightIter);
+      this->RemoveLight(light);
     }
     // Otherwise delete a visual
     else
@@ -2828,25 +2875,12 @@ void Scene::OnPoseMsg(ConstPosesStampedPtr &_msg)
   for (int i = 0; i < _msg->pose_size(); ++i)
   {
     auto p = _msg->pose(i);
-    /// TODO: empty id used to indicate it's pose of a light
-    /// remove this check once light.proto has an id field
-    if (p.has_id())
-    {
-      PoseMsgs_M::iterator iter =
-          this->dataPtr->poseMsgs.find(p.id());
-      if (iter != this->dataPtr->poseMsgs.end())
-        iter->second.CopyFrom(p);
-      else
-        this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
-    }
+    PoseMsgs_M::iterator iter =
+        this->dataPtr->poseMsgs.find(p.id());
+    if (iter != this->dataPtr->poseMsgs.end())
+      iter->second.CopyFrom(p);
     else
-    {
-      auto iter = this->dataPtr->lightPoseMsgs.find(p.name());
-      if (iter != this->dataPtr->lightPoseMsgs.end())
-        iter->second.CopyFrom(p);
-      else
-        this->dataPtr->lightPoseMsgs.insert(std::make_pair(p.name(), p));
-    }
+      this->dataPtr->poseMsgs.insert(std::make_pair(p.id(), p));
   }
 }
 
@@ -2894,14 +2928,17 @@ void Scene::OnLightModifyMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->LightById(_msg->id());
+  else
+    light = this->LightByName(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (!light)
   {
-    LightPtr light(new Light(shared_from_this()));
+    light.reset(new Light(shared_from_this()));
     light->LoadFromMsg(_msg);
-    this->dataPtr->lights[_msg->name()] = light;
+    this->dataPtr->lights[light->Id()] = light;
     RTShaderSystem::Instance()->UpdateShaders();
   }
   else
@@ -2918,10 +2955,13 @@ bool Scene::ProcessLightFactoryMsg(ConstLightPtr &_msg)
 /////////////////////////////////////////////////
 bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
 {
-  Light_M::iterator iter;
-  iter = this->dataPtr->lights.find(_msg->name());
+  LightPtr light;
+  if (_msg->has_id())
+    light = this->LightById(_msg->id());
+  else
+    light = this->LightByName(_msg->name());
 
-  if (iter == this->dataPtr->lights.end())
+  if (!light)
   {
     // commented out for now as sometimes physics light messages could arrive
     // before the rendering light is created, e.g. light pose updates.
@@ -2932,7 +2972,7 @@ bool Scene::ProcessLightModifyMsg(ConstLightPtr &_msg)
   }
   else
   {
-    iter->second->UpdateFromMsg(_msg);
+    light->UpdateFromMsg(_msg);
     RTShaderSystem::Instance()->UpdateShaders();
   }
 
@@ -3281,12 +3321,11 @@ void Scene::SetVisualId(VisualPtr _vis, uint32_t _id)
 /////////////////////////////////////////////////
 void Scene::AddLight(LightPtr _light)
 {
-  std::string n = this->StripSceneName(_light->Name());
-  const auto iter = this->dataPtr->lights.find(n);
-  if (iter != this->dataPtr->lights.end())
+  LightPtr light = this->LightById(_light->Id());
+  if (light)
     gzerr << "Duplicate lights detected[" << _light->Name() << "]\n";
 
-  this->dataPtr->lights[n] = _light;
+  this->dataPtr->lights[_light->Id()] = _light;
 }
 
 /////////////////////////////////////////////////
@@ -3295,8 +3334,7 @@ void Scene::RemoveLight(LightPtr _light)
   if (_light)
   {
     // Delete the light
-    std::string n = this->StripSceneName(_light->Name());
-    this->dataPtr->lights.erase(n);
+    this->dataPtr->lights.erase(_light->Id());
   }
 }
 

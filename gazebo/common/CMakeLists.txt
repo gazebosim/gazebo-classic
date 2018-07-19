@@ -132,6 +132,7 @@ set (headers
   URI.hh
   Video.hh
   VideoEncoder.hh
+  WeakBind.hh
   ffmpeg_inc.h
  )
 
@@ -164,6 +165,7 @@ set (gtest_sources
   Time_TEST.cc
   URI_TEST.cc
   VideoEncoder_TEST.cc
+  WeakBind_TEST.cc
 )
 
 # Timer test fails on OSX

@@ -696,6 +696,15 @@ TEST_F(gzTest, Topic)
   output = custom_exec_str("gz topic -r entity_list");
   EXPECT_NE(output.find("models {"), std::string::npos);
 
+  // Publish
+  output = custom_exec_str("gz topic -p /gazebo/default/atmosphere "
+      "-m temperature:400");
+  EXPECT_TRUE(output.empty());
+
+  // Request
+  output = custom_exec_str("gz topic -r atmosphere_info");
+  EXPECT_NE(output.find("temperature: 400"), std::string::npos);
+
   fini();
 }
 

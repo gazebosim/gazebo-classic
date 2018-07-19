@@ -54,6 +54,8 @@ namespace gazebo
       /// \param[in] _visual Visual containing the mesh to be selected.
       /// \param[out] _intersect Intersection point.
       /// \param[out] _triangle The selected triangle on the mesh.
+      /// \return True if the ray intersects with a triangle on the mesh,
+      /// false otherwise
       public: bool SelectMeshTriangle(const int _x, const int _y,
           const VisualPtr &_visual,
           ignition::math::Vector3d &_intersect,

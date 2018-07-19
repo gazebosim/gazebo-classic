@@ -46,6 +46,7 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  AmbientOcclusionVisualPlugin
   ArduCopterPlugin
   ArrangePlugin
   AttachLightPlugin
@@ -88,6 +89,7 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   StaticMapPlugin
+  StopWorldPlugin
   TouchPlugin
   VehiclePlugin
   WindPlugin
