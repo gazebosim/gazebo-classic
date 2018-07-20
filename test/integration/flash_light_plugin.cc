@@ -190,14 +190,7 @@ bool FlashLightPluginTest::FindColorInRec(const ignition::math::Color &_color)
     this->flashLight[0].colors.begin(),
     this->flashLight[0].colors.end(), _color);
 
-  if (it != this->flashLight[0].colors.end())
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return it != this->flashLight[0].colors.end();
 }
 
 //////////////////////////////////////////////////

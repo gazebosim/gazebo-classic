@@ -107,17 +107,19 @@ TEST_F(LedPluginTest, Blinking)
   c.reset();
 
   // after 1.5 sec, it is supposed to be dimmed, i.e., the color is dark.
-  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*3; x+=3)
+    std::lock_guard<std::mutex> lock(this->mutex);
+    for (unsigned int y = 0u; y < height; ++y)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
-      unsigned int r = this->img[(y*width*3) + x];
-      unsigned int g = this->img[(y*width*3) + x + 1];
-      unsigned int b = this->img[(y*width*3) + x + 2];
-      EXPECT_LT(r, 50u) << "R value is not low enough." << std::endl;
-      EXPECT_LT(g, 50u) << "G value is not low enough." << std::endl;
-      EXPECT_LT(b, 50u) << "B value is not low enough." << std::endl;
+      for (unsigned int x = 0u; x < width*3; x+=3)
+      {
+        unsigned int r = this->img[(y*width*3) + x];
+        unsigned int g = this->img[(y*width*3) + x + 1];
+        unsigned int b = this->img[(y*width*3) + x + 2];
+        EXPECT_LT(r, 50u) << "R value is not low enough." << std::endl;
+        EXPECT_LT(g, 50u) << "G value is not low enough." << std::endl;
+        EXPECT_LT(b, 50u) << "B value is not low enough." << std::endl;
+      }
     }
   }
 
@@ -135,17 +137,19 @@ TEST_F(LedPluginTest, Blinking)
   c.reset();
 
   // after 1 sec, it should flash, i.e., the color is bright red.
-  for (unsigned int y = 0; y < height; ++y)
   {
-    for (unsigned int x = 0; x < width*3; x+=3)
+    std::lock_guard<std::mutex> lock(this->mutex);
+    for (unsigned int y = 0u; y < height; ++y)
     {
-      std::lock_guard<std::mutex> lock(this->mutex);
-      unsigned int r = this->img[(y*width*3) + x];
-      unsigned int g = this->img[(y*width*3) + x + 1];
-      unsigned int b = this->img[(y*width*3) + x + 2];
-      EXPECT_GT(r, 250u) << "R value is not high enough." << std::endl;
-      EXPECT_GT(g, 127u) << "G value is not high enough." << std::endl;
-      EXPECT_GT(b, 127u) << "B value is not high enough." << std::endl;
+      for (unsigned int x = 0u; x < width*3; x+=3)
+      {
+        unsigned int r = this->img[(y*width*3) + x];
+        unsigned int g = this->img[(y*width*3) + x + 1];
+        unsigned int b = this->img[(y*width*3) + x + 2];
+        EXPECT_GT(r, 250u) << "R value is not high enough." << std::endl;
+        EXPECT_GT(g, 127u) << "G value is not high enough." << std::endl;
+        EXPECT_GT(b, 127u) << "B value is not high enough." << std::endl;
+      }
     }
   }
 
