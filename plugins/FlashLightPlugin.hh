@@ -79,27 +79,27 @@ namespace gazebo
     /// \param[in] _duration New duration time to set.
     /// \param[in] _index The index to the block to update.
     public: virtual void SetDuration(
-      const double &_duration, const int &_index) final;
+      const double _duration, const int _index) final;
 
     /// \brief Set the duration time for all the blocks.
     /// \param[in] _duration New duration time to set.
-    public: virtual void SetDuration(const double &_duration) final;
+    public: virtual void SetDuration(const double _duration) final;
 
     /// \brief Set the interval time for the specified block.
     /// \param[in] _interval New interval time to set.
     /// \param[in] _index The index to the block to update.
     public: virtual void SetInterval(
-      const double &_interval, const int &_index) final;
+      const double _interval, const int _index) final;
 
     /// \brief Set the interval time for all the blocks.
     /// \param[in] _interval New interval time to set.
-    public: virtual void SetInterval(const double &_interval) final;
+    public: virtual void SetInterval(const double _interval) final;
 
     /// \brief Set the color for the specified block.
     /// \param[in] _color New color to set.
     /// \param[in] _index The index to the block to update.
     public: virtual void SetColor(
-      const ignition::math::Color &_color, const int &_index) final;
+      const ignition::math::Color &_color, const int _index) final;
 
     /// \brief Set the color for all the blocks.
     /// \param[in] _color New color to set.
@@ -107,12 +107,12 @@ namespace gazebo
 
     /// \brief Get the number of blocks.
     /// \return The number of blocks the object currently has.
-    public: virtual unsigned int GetNumBlocks() final;
+    public: virtual unsigned int BlockCount() final;
 
     /// \brief Remove a specified block.
     /// \param[in] _index Index to the block to remove
     /// \return True if the block exists and it was removed.
-    public: virtual bool RemoveBlock(const int &_index) final;
+    public: virtual bool RemoveBlock(const int _index) final;
 
     /// \brief Insert a block.
     /// Create a block with specified parameters. If the index is out of range,
@@ -122,8 +122,8 @@ namespace gazebo
     /// \param[in] _color The color for the block.
     /// \param[in] _index The index of the block to be inserted into the list.
     public: virtual void InsertBlock(
-      const double &_duration, const double &_interval,
-      const ignition::math::Color &_color, const int &_index) final;
+      const double _duration, const double _interval,
+      const ignition::math::Color &_color, const int _index) final;
 
     /// \brief Flash the light
     /// This function is internally used to update the light in the
@@ -140,16 +140,6 @@ namespace gazebo
     /// \return the color for the current block which the object is using.
     ///         It returns Black if there is no update about color.
     protected: virtual ignition::math::Color CurrentColor() final;
-
-    /// \brief Find the link holding the light to control.
-    /// If multiple models are nested, this function is recursively called until
-    /// the link is found.
-    /// \param[in] _model A model to check.
-    /// \param[in] _lightName the name of the light.
-    /// \param[in] _linkName the name of the link.
-    /// \return A pointer to the link. If not found, nullptr is returned.
-    private: physics::LinkPtr FindLinkForLight(const physics::ModelPtr &_model,
-      const std::string &_lightName, const std::string &_linkName);
 
     /// \brief Pointer to private data
     private: std::unique_ptr<FlashLightSettingPrivate> dataPtr;
@@ -295,7 +285,7 @@ namespace gazebo
     /// \return True if the specified light is found.
     protected: virtual bool ChangeDuration(
       const std::string &_lightName, const std::string &_linkName,
-      const double &_duration, const int &_index) final;
+      const double _duration, const int _index) final;
 
     /// \brief Change the duration of all the blocks of the flashlight.
     /// \param[in] _lightName The name of flash light
@@ -304,7 +294,7 @@ namespace gazebo
     /// \return True if the specified light is found.
     protected: virtual bool ChangeDuration(
       const std::string &_lightName, const std::string &_linkName,
-      const double &_duration) final;
+      const double _duration) final;
 
     /// \brief Change the interval of a specific block of the flashlight.
     /// If the index is a negative number, it updates all the blocks.
@@ -315,7 +305,7 @@ namespace gazebo
     /// \return True if the specified light is found.
     protected: virtual bool ChangeInterval(
       const std::string &_lightName, const std::string &_linkName,
-      const double &_interval, const int &_index) final;
+      const double _interval, const int _index) final;
 
     /// \brief Change the interval of all the blocks of the flashlight.
     /// \param[in] _lightName The name of flash light
@@ -324,7 +314,7 @@ namespace gazebo
     /// \return True if the specified light is found.
     protected: virtual bool ChangeInterval(
       const std::string &_lightName, const std::string &_linkName,
-      const double &_interval) final;
+      const double _interval) final;
 
     /// \brief Change the color of a specific block of the flashlight.
     /// If the index is a negative number, it updates all the blocks.
@@ -335,7 +325,7 @@ namespace gazebo
     /// \return True if the specified light is found.
     protected: virtual bool ChangeColor(
       const std::string &_lightName, const std::string &_linkName,
-      const ignition::math::Color &_color, const int &_index) final;
+      const ignition::math::Color &_color, const int _index) final;
 
     /// \brief Change the color of all the blocks of the flashlight.
     /// \param[in] _lightName The name of flash light
