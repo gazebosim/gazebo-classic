@@ -47,6 +47,10 @@ static const std::string PathDelimiter = ";";
 static const std::string PathDelimiter = ":";
 #endif
 
+/// \brief Callbacks to be called in order in case a file can't be found.
+/// TODO(chapulina): Move to member variable when porting forward
+std::vector<std::function<std::string (const std::string &)>> g_findFileCbs;
+
 //////////////////////////////////////////////////
 SystemPaths::SystemPaths()
 {
@@ -196,7 +200,7 @@ void SystemPaths::UpdateModelPaths()
   else
     path = pathCStr;
 
-  /// \TODO: Use boost to split string.
+  /// TODO(anyone) Use something else to split string.
   size_t pos1 = 0;
   size_t pos2 = path.find(PathDelimiter);
   while (pos2 != std::string::npos)
@@ -299,8 +303,8 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   std::string suffix = _uri.substr(index + 3, _uri.size() - index - 3);
   std::string filename;
 
-  // If trying to find a model, return the path to the users home
-  // .gazebo/models
+  // If trying to find a model, look through all currently registered model
+  // paths
   if (prefix == "model")
   {
     boost::filesystem::path path;
@@ -315,17 +319,15 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
       }
     }
 
-    // Try to download the model if it wasn't found.
+    // Try to download the model from models.gazebosim.org if it wasn't found.
     if (filename.empty())
       filename = ModelDatabase::Instance()->GetModelPath(_uri, true);
   }
   else if (prefix.empty() || prefix == "file")
   {
-    // First try to find the file on the current system
+    // Try to find the file on the current system
     filename = this->FindFile(suffix);
   }
-  else if (prefix != "http" && prefix != "https")
-    gzerr << "Unknown URI prefix[" << prefix << "]\n";
 
   return filename;
 }
@@ -339,18 +341,38 @@ std::string SystemPaths::FindFile(const std::string &_filename,
   if (_filename.empty())
     return path.string();
 
+  // Handle as URI
   if (_filename.find("://") != std::string::npos)
   {
     path = boost::filesystem::path(this->FindFileURI(_filename));
   }
+  // Handle as local absolute path
   else if (_filename[0] == '/')
   {
     path = boost::filesystem::path(_filename);
+    // absolute paths are not portable, e.g. when running world or
+    // or log files on a different machine. To workaround this problem,
+    // we'll further look for these files in one of gazebo model paths.
+    // e.g. /tmp/path/to/my_file
+    //      =>  ${GAZEBO_MODEL_PATH}/tmp/path/to/my_file
+    // Gazebo log playback makes use of this feature
+    if (!boost::filesystem::exists(path))
+    {
+      for (std::list<std::string>::iterator iter = this->modelPaths.begin();
+           iter != this->modelPaths.end(); ++iter)
+      {
+        auto modelPath = boost::filesystem::path(*iter) / path;
+        if (boost::filesystem::exists(modelPath))
+        {
+          path = modelPath;
+          break;
+        }
+      }
+    }
   }
+  // Try appending to Gazebo paths
   else
   {
-    bool found = false;
-
     try
     {
       path = boost::filesystem::operator/(boost::filesystem::current_path(),
@@ -364,16 +386,16 @@ std::string SystemPaths::FindFile(const std::string &_filename,
 
     if (_searchLocalPath && boost::filesystem::exists(path))
     {
-      found = true;
+      // Do nothing
     }
     else if ((_filename[0] == '/' || _filename[0] == '.' || _searchLocalPath)
              && boost::filesystem::exists(boost::filesystem::path(_filename)))
     {
       path = boost::filesystem::path(_filename);
-      found = true;
     }
     else
     {
+      bool found = false;
       std::list<std::string> paths = this->GetGazeboPaths();
 
       for (std::list<std::string>::const_iterator iter = paths.begin();
@@ -401,19 +423,38 @@ std::string SystemPaths::FindFile(const std::string &_filename,
           }
         }
       }
-    }
 
     if (!found)
-      return std::string();
+      path = std::string();
+    }
+  }
+
+  // If still not found, try custom callbacks
+  if (path.empty())
+  {
+    for (auto cb : g_findFileCbs)
+    {
+      path = cb(_filename);
+      if (!path.empty())
+        break;
+    }
   }
 
   if (!boost::filesystem::exists(path))
   {
-    gzerr << "File or path does not exist[" << path << "]\n";
+    gzwarn << "File or path does not exist [" << path << "] ["
+           << _filename << "]" << std::endl;
     return std::string();
   }
 
   return path.string();
+}
+
+/////////////////////////////////////////////////
+void SystemPaths::AddFindFileCallback(
+    std::function<std::string (const std::string &)> _cb)
+{
+  g_findFileCbs.push_back(_cb);
 }
 
 /////////////////////////////////////////////////

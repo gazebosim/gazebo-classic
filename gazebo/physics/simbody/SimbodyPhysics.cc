@@ -489,8 +489,8 @@ void SimbodyPhysics::UpdateCollision()
 
       if (contactFeedback)
       {
-        const bool useContactPatch = true;
-        if (useContactPatch)
+        // const bool useContactPatch = true;
+        // if (useContactPatch)
         {
           // get contact patch to get detailed contacts
           // see https://github.com/simbody/simbody/blob/master/examples/ExampleContactPlayground.cpp#L110
@@ -604,8 +604,8 @@ void SimbodyPhysics::UpdateCollision()
             }
           }
         }
-        else  // use single ContactForce
-        {
+        // else  // use single ContactForce
+        // {
           // // get contact information from simbody ContactForce and
           // // add it to contactFeedback.
 
@@ -628,7 +628,7 @@ void SimbodyPhysics::UpdateCollision()
           // // Increase the counters
           // ++count;
           // contactFeedback->count = count;
-        }
+        // }
       }
     }
   }

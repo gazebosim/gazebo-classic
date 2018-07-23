@@ -63,6 +63,9 @@ class gazebo::physics::LinkPrivate
   /// \brief Names of all the sensors attached to the link.
   public: std::vector<std::string> sensors;
 
+  /// \brief All the lights attached to the link.
+  public: std::vector<LightPtr> lights;
+
   /// \brief All the parent joints.
   public: std::vector<JointPtr> parentJoints;
 
@@ -206,7 +209,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     while (lightElem)
     {
       // Create and Load a light
-      this->world->LoadLight(lightElem, shared_from_this());
+      this->LoadLight(lightElem);
       lightElem = lightElem->GetNextElement("light");
     }
   }
@@ -317,8 +320,7 @@ void Link::Init()
     if ((*iter)->HasType(Base::LIGHT))
     {
       LightPtr light= boost::static_pointer_cast<Light>(*iter);
-      // TODO add to lights var?
-      // this->lights.push_back(light);
+      this->dataPtr->lights.push_back(light);
       light->Init();
     }
   }
@@ -1059,6 +1061,12 @@ void Link::FillMsg(msgs::Link &_msg)
     msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
     bat->set_voltage(battery->Voltage());
+  }
+
+  for (auto &light : this->dataPtr->lights)
+  {
+    msgs::Light *lightMsg = _msg.add_light();
+    light->FillMsg(*lightMsg);
   }
 }
 
@@ -1913,3 +1921,13 @@ event::ConnectionPtr Link::ConnectEnabled(
   return this->dataPtr->enabledSignal.Connect(_subscriber);
 }
 
+//////////////////////////////////////////////////
+void Link::LoadLight(sdf::ElementPtr _sdf)
+{
+  // Create new light object
+  LightPtr light(new physics::Light(shared_from_this()));
+  light->SetStatic(true);
+  light->ProcessMsg(msgs::LightFromSDF(_sdf));
+  light->SetWorld(this->world);
+  light->Load(_sdf);
+}

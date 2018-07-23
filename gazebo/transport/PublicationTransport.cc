@@ -26,6 +26,7 @@
 #include "gazebo/transport/TopicManager.hh"
 #include "gazebo/transport/ConnectionManager.hh"
 #include "gazebo/transport/PublicationTransport.hh"
+#include "gazebo/common/WeakBind.hh"
 
 using namespace gazebo;
 using namespace transport;
@@ -75,8 +76,8 @@ void PublicationTransport::Init(const ConnectionPtr &_conn, bool _latched)
 
   // Put this in PublicationTransportPtr
   // Start reading messages from the remote publisher
-  this->connection->AsyncRead(boost::bind(&PublicationTransport::OnPublish,
-        this, _1));
+  this->connection->AsyncRead(common::weakBind(&PublicationTransport::OnPublish,
+        this->shared_from_this(), _1));
 }
 
 
@@ -93,7 +94,8 @@ void PublicationTransport::OnPublish(const std::string &_data)
   if (this->connection && this->connection->IsOpen())
   {
     this->connection->AsyncRead(
-        boost::bind(&PublicationTransport::OnPublish, this, _1));
+        common::weakBind(&PublicationTransport::OnPublish,
+            this->shared_from_this(), _1));
 
     if (!_data.empty())
     {

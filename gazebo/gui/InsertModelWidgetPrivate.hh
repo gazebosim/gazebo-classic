@@ -21,11 +21,12 @@
 #include <memory>
 #include <set>
 #include <string>
+#include <vector>
 #include <boost/thread/mutex.hpp>
 
 #ifdef HAVE_IGNITION_FUEL_TOOLS
-  #include <ignition/fuel_tools.hh>
-  #include "gazebo/common/FuelModelDatabase.hh"
+  #include <ignition/fuel_tools/FuelClient.hh>
+  #include <ignition/fuel_tools/ModelIdentifier.hh>
 #endif
 
 #include "gazebo/common/Event.hh"
@@ -47,10 +48,8 @@ namespace gazebo
       public: QTreeWidgetItem *modelFuelItem = nullptr;
 
       /// \brief a buffer of models.
-      /// The key is the unique name (containing the full path in the server,
-      /// owner and model name) and the value is just the model name.
-      /// E.g.: https://api.ignitionfuel.org/1.0/caguero/models/Beer -> Beer
-      public: std::map<std::string, std::string> modelBuffer;
+      /// It contains elements which uniquely identify models.
+      public: std::vector<ignition::fuel_tools::ModelIdentifier> modelBuffer;
     };
 #endif
 

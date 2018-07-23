@@ -1435,6 +1435,75 @@ TEST_F(CameraSensor, 16bit)
 }
 
 /////////////////////////////////////////////////
+TEST_F(CameraSensor, AmbientOcclusion)
+{
+  Load("worlds/ssao_plugin.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn a camera
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(6, 0, 2),
+      ignition::math::Quaterniond(0, 0, 3.14));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  // collect images
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  // Get some images
+  int sleep = 0;
+  while ((imageCount < 10) && sleep++ < 1000)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, 10);
+
+  // verify image contains gray pixels
+  // Without the ambient occlusion plugin, it would just be a white image.
+  std::map<unsigned int, unsigned int> uniquePixel;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      if (uniquePixel.find(r) != uniquePixel.end())
+        uniquePixel[r] = ++uniquePixel[r];
+      else
+        uniquePixel[r] = 1;
+    }
+  }
+  // verify image is predominantly white but not the whole image
+  EXPECT_GT(uniquePixel[255], width*height*0.80);
+  EXPECT_LT(uniquePixel[255], width*height*0.85);
+  // there should be some variations of grayscale pixels
+  EXPECT_LT(uniquePixel.size(), 255*0.35);
+  delete[] img;
+}
+
+/////////////////////////////////////////////////
 // Move a tall thin box across the center of the camera image
 // (from -y to +y) over time and collect camera sensor timestamped images.
 // For every image collected, extract center of box from image, and compare it
@@ -1631,3 +1700,61 @@ TEST_F(CameraSensor, Timestamp)
   delete [] img;
 }
 
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, Light)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != nullptr);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  EXPECT_TRUE(camSensor != nullptr);
+  rendering::CameraPtr camera = camSensor->Camera();
+  EXPECT_TRUE(camera != nullptr);
+
+  // get camera scene
+  rendering::ScenePtr scene = camera->GetScene();
+  ASSERT_NE(nullptr, scene);
+
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
+
+  // Set the light to be green
+  ignition::math::Color newColor(0, 1, 0);
+  msgs::Light lightMsg;
+  lightMsg.set_name("sun");
+  msgs::Set(lightMsg.mutable_diffuse(), newColor);
+  lightModifyPub->Publish(lightMsg);
+
+  rendering::LightPtr sun = scene->LightByName("sun");
+  EXPECT_TRUE(sensor != nullptr);
+
+  int sleep = 0;
+  while (sun->DiffuseColor() != newColor && sleep++ < 50)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_EQ(newColor, sun->DiffuseColor());
+}

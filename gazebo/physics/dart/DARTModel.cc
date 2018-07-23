@@ -204,8 +204,8 @@ void DARTModel::Init()
     }
 
     // Loop joint completes a kinematic loop
-    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->DARTWorld(),
-        this->dataPtr->dtSkeleton, dtParentBodyNode, joint, joint->GetChild()))
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+        dtParentBodyNode, joint, joint->GetChild(), false))
     {
       gzdbg << "Could not create loop joint and node.\n";
       break;
@@ -253,10 +253,6 @@ void DARTModel::Init()
     this->dataPtr->dtSkeleton->setAdjacentBodyCheck(false);
   }
 
-  // Note: This function should be called after the skeleton is added to the
-  //       world.
-  this->BackupState();
-
   // Add the skeleton to the world
   this->DARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
 }
@@ -296,12 +292,20 @@ void DARTModel::RestoreState()
 {
   GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
 
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genPositions.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genVelocities.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
+  if (static_cast<size_t>(this->dataPtr->genPositions.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized positions has changed.\n";
+    return;
+  }
+  if (static_cast<size_t>(this->dataPtr->genVelocities.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized velocities has changed.\n";
+    return;
+  }
 
   this->dataPtr->dtSkeleton->setPositions(this->dataPtr->genPositions);
   this->dataPtr->dtSkeleton->setVelocities(this->dataPtr->genVelocities);
@@ -327,4 +331,90 @@ dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
   DARTPhysicsPtr physics = GetDARTPhysics();
   if (!physics) return nullptr;
   return physics->DARTWorld();
+}
+
+//////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
+JointPtr DARTModel::CreateJoint(
+    const std::string &_name, const std::string &_type,
+    physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  return this->CreateJointHelper(Model::CreateJoint(
+        _name, _type, _parent, _child));
+}
+
+//////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
+JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
+{
+  return this->CreateJointHelper(Model::CreateJoint(_sdf));
+}
+
+//////////////////////////////////////////////////
+JointPtr DARTModel::CreateJointHelper(JointPtr _joint)
+{
+  if (_joint != nullptr)
+  {
+    dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
+    if (_joint->GetParent() != nullptr)
+    {
+      dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
+          _joint->GetParent()->GetName());
+    }
+    if (_joint->GetChild() == nullptr)
+    {
+      gzerr << "DART does not allow joint without child link. "
+            << "Please see issue #914. "
+            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+      return JointPtr();
+    }
+
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+          dtParentBodyNode, _joint, _joint->GetChild(), true))
+    {
+      gzdbg << "Could not create loop joint and node.\n";
+      return JointPtr();
+    }
+  }
+  return _joint;
+}
+
+//////////////////////////////////////////////////
+bool DARTModel::RemoveJoint(const std::string &_name)
+{
+  JointPtr joint = this->GetJoint(_name);
+  if (!joint)
+  {
+    gzwarn << "Joint [" << _name << "] does not exist in model ["
+           << this->GetName() << "], not removed.\n";
+    return false;
+  }
+
+  LinkPtr link = joint->GetChild();
+  if (!link)
+  {
+    gzerr << "Joint [" << _name << "] does not have a child link.\n";
+    return false;
+  }
+
+  DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(link);
+  GZ_ASSERT(dartLink, "DART link is null");
+
+  DARTJointPtr dartJoint = boost::dynamic_pointer_cast<DARTJoint>(joint);
+  GZ_ASSERT(dartJoint, "DART joint is null");
+
+  dart::dynamics::Joint *dtJoint = dartJoint->GetDARTJoint();
+  GZ_ASSERT(dtJoint, "Joint is null");
+
+  dart::dynamics::BodyNode* dtChildBodyNode = dtJoint->getChildBodyNode();
+  GZ_ASSERT(dtChildBodyNode, "Child body node is null");
+
+  if (!dartLink->RemoveSlaveBodyNode(dtChildBodyNode))
+  {
+    gzerr << "Joint [" << _name << "] not removed. RemoveJoint() is currently "
+      << "only implemented for DART for joints added with CreateJoint().\n";
+    return false;
+  }
+
+  return Model::RemoveJoint(_name);
 }
