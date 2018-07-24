@@ -661,6 +661,10 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
 
     // Root visual's immediate child
     rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    if (!topLevelVis)
+    {
+      topLevelVis = rootVis;
+    }
 
     // If the root visual's ID can be found, it is a model in the main window
     // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
@@ -668,14 +672,6 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     if (gui::get_entity_id(rootVis->Name()))
     {
       // select model
-      vis = rootVis;
-    }
-    // If it is not a model and its parent is either a direct child or
-    // grandchild of the world, this is a light
-    else if (vis->GetParent() == rootVis ||
-        vis->GetParent() == this->dataPtr->scene->WorldVisual())
-    {
-      // select light
       vis = rootVis;
     }
     // Otherwise, this is a visual in the model editor, so we want to get its
