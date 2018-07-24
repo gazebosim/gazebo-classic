@@ -9,6 +9,9 @@
 1. Add a flashlight plugin blinking lights attached on a model
     * [Pull request 2961](https://bitbucket.org/osrf/gazebo/pull-request/2961)
 
+1. Fix manipulating links in the model editor
+    * [Pull request 2996](https://bitbucket.org/osrf/gazebo/pull-request/2996)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
 
 ## Gazebo 9.2.0 (2018-07-10)
 
