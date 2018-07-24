@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (2018-XX-XX)
 
+1. Add a LED plugin blinking visual objects
+    * [Pull request 2994](https://bitbucket.org/osrf/gazebo/pull-request/2994)
+
 1. Require ignition-fuel-tools 1.2 when finding package
     * [Pull request 2992](https://bitbucket.org/osrf/gazebo/pull-request/2992)
     * [Issue 2494](https://bitbucket.org/osrf/gazebo/issues/2494)

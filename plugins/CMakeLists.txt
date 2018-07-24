@@ -72,6 +72,7 @@ set (plugins_single_header
   InitialVelocityPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LedPlugin
   LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
@@ -170,6 +171,12 @@ if (HAVE_DART_URDF)
     gz_install_includes("plugins" ${src}.hh)
   endforeach ()
 endif()
+
+# If a plugin depends on other plugins in the same directory, add them to link.
+# Plus, set RPATH to the directory so they can dynamically link.
+target_link_libraries(LedPlugin FlashLightPlugin)
+set_target_properties(
+  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(events)
 
