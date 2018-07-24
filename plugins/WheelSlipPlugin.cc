@@ -405,7 +405,7 @@ void WheelSlipPlugin::OnLateralCompliance(ConstGzStringPtr &_msg)
 {
   try
   {
-    this->SetSlipComplianceLateral(std::stof(_msg->data()));
+    this->SetSlipComplianceLateral(std::stod(_msg->data()));
   }
   catch(...)
   {
@@ -418,7 +418,7 @@ void WheelSlipPlugin::OnLongitudinalCompliance(ConstGzStringPtr &_msg)
 {
   try
   {
-    this->SetSlipComplianceLongitudinal(std::stof(_msg->data()));
+    this->SetSlipComplianceLongitudinal(std::stod(_msg->data()));
   }
   catch(...)
   {
