@@ -359,7 +359,7 @@ void WheelSlipPlugin::GetSlips(
   auto modelWorldPose = model->GetWorldPose().Ign();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     auto link = linkSurface.first.lock();
     if (!link)
@@ -449,9 +449,9 @@ void WheelSlipPlugin::Update()
   this->GetSlips(slips);
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
-    auto params = linkSurface.second;
+    const auto &params = linkSurface.second;
     double force = params.wheelNormalForce;
     auto joint = params.joint.lock();
     double omega = 0;
