@@ -168,13 +168,12 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Read each wheel element
-  auto wheelElem = _sdf->GetElement("wheel");
-  while (wheelElem)
+  for (auto wheelElem = _sdf->GetElement("wheel"); wheelElem;
+      wheelElem = wheelElem->GetNextElement("wheel"))
   {
     if (!wheelElem->HasAttribute("link_name"))
     {
       gzerr << "wheel element missing link_name attribute" << std::endl;
-      wheelElem = wheelElem->GetNextElement("wheel");
       continue;
     }
 
@@ -201,9 +200,6 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       params.wheelRadius = wheelElem->Get<double>("wheel_radius");
     }
-
-    // Get the next link element
-    wheelElem = wheelElem->GetNextElement("wheel");
 
     auto link = _model->GetLink(linkName);
     if (link == nullptr)
