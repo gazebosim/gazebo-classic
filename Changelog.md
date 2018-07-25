@@ -8,6 +8,9 @@
 1. Fix GpuRaySensor vertical rays
     * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
 
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
 
 ## Gazebo 7.13.1 (2018-06-15)
 
@@ -19,9 +22,6 @@
 
 1. Update model database URI
     * [Pull request 2969](https://bitbucket.org/osrf/gazebo/pull-request/2969)
-
-1. Improve ODE slip parameter behavior with multiple contact points
-    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
 
 1. Fix getting joint limits for BulletHingeJoint
     * [Pull request 2959](https://bitbucket.org/osrf/gazebo/pull-request/2959)
