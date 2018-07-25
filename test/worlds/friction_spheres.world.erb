@@ -182,9 +182,9 @@
   mass_slip.keys.each_with_index do |ms_name, ii|
     ms = mass_slip[ms_name]
     box_mass = ms[:mass]
-    box_ixx  = 1.0/3.0 * box_mass * ball_radius**2
-    box_iyy  = 1.0/3.0 * box_mass * ball_radius**2
-    box_izz  = 1.0/3.0 * box_mass * ball_radius**2
+    box_ixx  = 2.0/3.0 * box_mass * ball_radius**2
+    box_iyy  = 2.0/3.0 * box_mass * ball_radius**2
+    box_izz  = 2.0/3.0 * box_mass * ball_radius**2
     box_ixy = 0.0
     box_ixz = 0.0
     box_iyz = 0.0
