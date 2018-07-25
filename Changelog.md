@@ -1,6 +1,24 @@
 ## Gazebo 7
 
-## Gazebo 7.XX.X (2018-XX-XX)
+## Gazebo 7.X.X (2018-XX-XX)
+
+1. Fix build on homebrew with protobuf 3.6
+    * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Fix GpuRaySensor vertical rays
+    * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
+
+
+## Gazebo 7.13.1 (2018-06-15)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
+
+
+## Gazebo 7.13.0 (2018-06-08)
+
+1. Update model database URI
+    * [Pull request 2969](https://bitbucket.org/osrf/gazebo/pull-request/2969)
 
 1. Improve ODE slip parameter behavior with multiple contact points
     * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
@@ -11,8 +29,12 @@
 1. Save model materials and meshes when logging
     * [Pull request 2811](https://bitbucket.org/osrf/gazebo/pull-request/2811)
 
+1. Fix build on hombrew with boost 1.67
+    * [Pull request 2954](https://bitbucket.org/osrf/gazebo/pull-request/2954)
+
 1. Add Screen Space Ambient Occlusion visual plugin
     * [Pull request 2916](https://bitbucket.org/osrf/gazebo/pull-request/2916)
+    * [Pull request 2947](https://bitbucket.org/osrf/gazebo/pull-request/2947)
 
 1. Fix ray intersection check in Scene::FirstContact
     * [Pull request 2945](https://bitbucket.org/osrf/gazebo/pull-request/2945)
@@ -29,6 +51,9 @@
 1. Fix Joint::SetPosition for HingeJoint
     * [Pull request 2892](https://bitbucket.org/osrf/gazebo/pull-request/2892)
     * [Issue 2430](https://bitbucket.org/osrf/gazebo/issues/2430)
+
+1. Use QVERIFY() around qFuzzyCompare statements
+    * [Pull request 2936](https://bitbucket.org/osrf/gazebo/pull-request/2936)
 
 
 ## Gazebo 7.12.0 (2018-04-11)
