@@ -2,6 +2,12 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
 
