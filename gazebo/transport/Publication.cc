@@ -17,6 +17,7 @@
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include "gazebo/common/WeakBind.hh"
 #include "SubscriptionTransport.hh"
 #include "Publication.hh"
 #include "Node.hh"
@@ -135,7 +136,8 @@ void Publication::AddTransport(const PublicationTransportPtr &_publink)
   // Don't add a duplicate transport
   if (add)
   {
-    _publink->AddCallback(boost::bind(&Publication::LocalPublish, this, _1));
+    _publink->AddCallback(common::weakBind(&Publication::LocalPublish,
+                this->shared_from_this(), _1));
     this->transports.push_back(_publink);
   }
 }

@@ -18,6 +18,8 @@
 #ifndef _GAZEBO_DARTMODEL_HH_
 #define _GAZEBO_DARTMODEL_HH_
 
+#include <string>
+
 #include "gazebo/physics/dart/dart_inc.h"
 #include "gazebo/physics/dart/DARTTypes.hh"
 #include "gazebo/physics/Model.hh"
@@ -57,6 +59,20 @@ namespace gazebo
 
       // Documentation inherited.
       public: virtual void Fini();
+
+      // Documentation inherited.
+      public: virtual JointPtr CreateJoint(
+          const std::string &_name, const std::string &_type,
+          physics::LinkPtr _parent, physics::LinkPtr _child);
+
+      // Documentation inherited.
+      public: virtual JointPtr CreateJoint(sdf::ElementPtr _sdf);
+
+      // DART-specific joint construction used by both versions of CreateJoint.
+      private: JointPtr CreateJointHelper(JointPtr _joint);
+
+      // Documentation inherited.
+      public: virtual bool RemoveJoint(const std::string &_name);
 
       /// \brief
       public: void BackupState();

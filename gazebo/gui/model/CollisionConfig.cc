@@ -46,19 +46,19 @@ CollisionConfig::CollisionConfig()
   this->mapperAdd = new QSignalMapper (this) ;
   // Add Collision buttons
 
-  QPushButton *addCollisionButtonBox = new QPushButton(tr("+ &Another Box"));
+  QPushButton *addCollisionButtonBox = new QPushButton(tr("+ Bounding &Box"));
   addCollisionButtonBox->setMaximumWidth(200);
   addCollisionButtonBox->setDefault(false);
   addCollisionButtonBox->setAutoDefault(false);
   connect(addCollisionButtonBox, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
 
-  QPushButton *addCollisionButtonCylinder = new QPushButton(tr("+ &Another Cylinder"));
+  QPushButton *addCollisionButtonCylinder = new QPushButton(tr("+ Bounding &Cylinder"));
   addCollisionButtonCylinder->setMaximumWidth(200);
   addCollisionButtonCylinder->setDefault(false);
   addCollisionButtonCylinder->setAutoDefault(false);
   connect(addCollisionButtonCylinder, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
 
-  QPushButton *addCollisionButtonSphere = new QPushButton(tr("+ &Another Sphere"));
+  QPushButton *addCollisionButtonSphere = new QPushButton(tr("+ Bounding &Sphere"));
   addCollisionButtonSphere->setMaximumWidth(200);
   addCollisionButtonSphere->setDefault(false);
   addCollisionButtonSphere->setAutoDefault(false);
@@ -72,16 +72,11 @@ CollisionConfig::CollisionConfig()
   QHBoxLayout *buttons = new QHBoxLayout();
   buttons->addWidget(addCollisionButtonBox);
   buttons->addWidget(addCollisionButtonSphere);
-  buttons->addWidget(addCollisionButtonCylinder); 
-
-  QLabel *descriptionLabel = new QLabel(tr("<b><font size=3>Add Bounding Collision Shapes</font><b> "));
-  descriptionLabel->setAlignment(Qt::AlignCenter);
-  descriptionLabel->setContentsMargins(1,1,1,3);
+  buttons->addWidget(addCollisionButtonCylinder);
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
   mainLayout->addWidget(scrollArea); 
-  mainLayout->addWidget(descriptionLabel);
   mainLayout->addLayout(buttons);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);

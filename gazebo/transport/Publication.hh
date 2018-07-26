@@ -42,7 +42,8 @@ namespace gazebo
     /// \class Publication Publication.hh transport/transport.hh
     /// \brief A publication for a topic. This facilitates transport of
     /// messages
-    class GZ_TRANSPORT_VISIBLE Publication
+    class GZ_TRANSPORT_VISIBLE Publication :
+      public boost::enable_shared_from_this<Publication>
     {
       /// \brief Constructor
       /// \param[in] _topic The topic we're publishing

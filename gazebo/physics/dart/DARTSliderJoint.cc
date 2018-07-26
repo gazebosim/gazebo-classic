@@ -31,6 +31,9 @@ using namespace physics;
 DARTSliderJoint::DARTSliderJoint(BasePtr _parent)
   : SliderJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::PrismaticJoint::Properties(
+      *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTSliderJoint::~DARTSliderJoint()
 void DARTSliderJoint::Load(sdf::ElementPtr _sdf)
 {
   SliderJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::PrismaticJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
 }
 
 //////////////////////////////////////////////////
@@ -111,10 +110,6 @@ void DARTSliderJoint::SetAxis(const unsigned int _index,
 
     Eigen::Vector3d dartVec3 = DARTTypes::ConvVec3(
         this->AxisFrameOffset(0).RotateVector(_axis));
-    Eigen::Isometry3d dartTransfJointLeftToParentLink
-        = this->dataPtr->dtJoint->getTransformFromParentBodyNode().inverse();
-    dartVec3 = dartTransfJointLeftToParentLink.linear() * dartVec3;
-
     dtPrismaticJoint->setAxis(dartVec3);
   }
   else

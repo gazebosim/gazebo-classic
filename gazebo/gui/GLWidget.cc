@@ -862,7 +862,15 @@ void GLWidget::ViewScene(rendering::ScenePtr _scene)
     request.set_id(0);
     request.set_request("get_topics");
     connection->EnqueueMsg(msgs::Package("request", request), true);
-    connection->Read(topicData);
+    try
+    {
+      connection->Read(topicData);
+    }
+    catch(std::exception &_e)
+    {
+      gzerr << "Error during connection read : " << _e.what() << std::endl;
+      return;
+    }
 
     packet.ParseFromString(topicData);
     topics.ParseFromString(packet.serialized_data());
@@ -1197,7 +1205,7 @@ void GLWidget::Paste(const std::string &_name)
   {
     bool isModel = false;
     bool isLight = false;
-    if (this->dataPtr->scene->GetLight(_name))
+    if (this->dataPtr->scene->LightByName(_name))
       isLight = true;
     else if (this->dataPtr->scene->GetVisual(_name))
       isModel = true;

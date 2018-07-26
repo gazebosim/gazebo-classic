@@ -32,7 +32,7 @@
 using namespace gazebo;
 using namespace rendering;
 
-unsigned int LightPrivate::lightCounter = 0;
+unsigned int LightPrivate::lightCounter = ignition::math::MAX_UI32 - 1;
 
 //////////////////////////////////////////////////
 Light::Light(ScenePtr _scene)
@@ -41,7 +41,7 @@ Light::Light(ScenePtr _scene)
   this->dataPtr->line = NULL;
   this->dataPtr->scene = _scene;
 
-  this->dataPtr->lightCounter++;
+  this->dataPtr->id = this->dataPtr->lightCounter--;
 
   this->dataPtr->sdf.reset(new sdf::Element);
   sdf::initFile("light.sdf", this->dataPtr->sdf);
@@ -82,10 +82,11 @@ void Light::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Light::Load()
 {
+  std::string lightName = this->Name();
   try
   {
     this->dataPtr->light =
-        this->dataPtr->scene->OgreSceneManager()->createLight(this->Name());
+        this->dataPtr->scene->OgreSceneManager()->createLight(lightName);
   }
   catch(Ogre::Exception &e)
   {
@@ -95,8 +96,14 @@ void Light::Load()
 
   this->Update();
 
-  this->dataPtr->visual.reset(new Visual(this->Name(),
-                     this->dataPtr->scene->WorldVisual(), false));
+  // TODO add parent_id to light.proto file for finding parent link visual
+  // Do this in Scene::ProcessLightFactoryMsg
+  std::string parentName = lightName.substr(0, lightName.rfind("::"));
+  VisualPtr parentVis = this->dataPtr->scene->GetVisual(parentName);
+  if (!parentVis)
+    parentVis = this->dataPtr->scene->WorldVisual();
+
+  this->dataPtr->visual.reset(new Visual(this->Name(), parentVis, false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
@@ -159,6 +166,9 @@ void Light::UpdateFromMsg(ConstLightPtr &_msg)
 //////////////////////////////////////////////////
 void Light::LoadFromMsg(const msgs::Light &_msg)
 {
+  if (_msg.has_id())
+    this->dataPtr->id = _msg.id();
+
   this->UpdateSDFFromMsg(_msg);
 
   this->Load();
@@ -663,4 +673,10 @@ LightPtr Light::Clone(const std::string &_name, ScenePtr _scene)
   result->SetRotation(this->Rotation());
 
   return result;
+}
+
+//////////////////////////////////////////////////
+uint32_t Light::Id() const
+{
+  return this->dataPtr->id;
 }

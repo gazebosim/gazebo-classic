@@ -19,16 +19,18 @@
 #include <tinyxml.h>
 
 #include <functional>
-#include <map>
 #include <memory>
 #include <string>
 #include <thread>
 #include <vector>
 
+#include <ignition/common/Console.hh>
 #include <ignition/common/Filesystem.hh>
-#include <ignition/fuel_tools.hh>
+#include <ignition/fuel_tools/FuelClient.hh>
 #include <sdf/sdf.hh>
 
+#include "gazebo/gazebo_config.h"
+#include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/FuelModelDatabase.hh"
 #include "gazebo/common/SemanticVersion.hh"
@@ -50,9 +52,30 @@ class gazebo::common::FuelModelDatabasePrivate
 FuelModelDatabase::FuelModelDatabase()
   : dataPtr(new FuelModelDatabasePrivate)
 {
+  unsigned int verbosity = common::Console::GetQuiet() ? 0 : 4;
+  ignition::common::Console::SetVerbosity(verbosity);
+
   ignition::fuel_tools::ClientConfig conf;
   conf.LoadConfig();
+  std::string userAgent = "Gazebo " GAZEBO_VERSION_FULL;
+
+#if defined(_WIN32)
+  userAgent += "(Windows)";
+#elif defined(__linux__)
+  userAgent += "(GNU/Linux)";
+#elif defined(__APPLE__)
+  userAgent += "(Mac OSX)";
+#elif defined(BSD)
+  userAgent += "(BSD)";
+#else
+  userAgent += "(unknown)";
+#endif
+
+  conf.SetUserAgent(userAgent);
   this->dataPtr->fuelClient.reset(new ignition::fuel_tools::FuelClient(conf));
+
+  common::SystemPaths::Instance()->AddFindFileCallback(std::bind(
+      &FuelModelDatabase::CachedFilePath, this, std::placeholders::_1));
 }
 
 /////////////////////////////////////////////////
@@ -69,8 +92,8 @@ std::vector<ignition::fuel_tools::ServerConfig> FuelModelDatabase::Servers()
 
 /////////////////////////////////////////////////
 void FuelModelDatabase::Models(
-    const ignition::fuel_tools::ServerConfig &_server,
-    std::function<void (const std::map<std::string, std::string> &)> &_func)
+    const ignition::fuel_tools::ServerConfig &_server, std::function <void
+    (const std::vector<ignition::fuel_tools::ModelIdentifier> &)> &_func)
 {
   std::thread t([this, _func, _server]
   {
@@ -81,17 +104,14 @@ void FuelModelDatabase::Models(
 }
 
 /////////////////////////////////////////////////
-std::map<std::string, std::string> FuelModelDatabase::Models(
+std::vector<ignition::fuel_tools::ModelIdentifier> FuelModelDatabase::Models(
     const ignition::fuel_tools::ServerConfig &_server) const
 {
-  std::map<std::string, std::string> models;
+  std::vector<ignition::fuel_tools::ModelIdentifier> models;
 
   for (auto iter = this->dataPtr->fuelClient->Models(_server); iter; ++iter)
   {
-    std::string fullURI = iter->Identification().UniqueName();
-    std::string modelName = iter->Identification().Name();
-
-    models[fullURI] = modelName;
+    models.push_back(iter->Identification());
   }
 
   return models;
@@ -183,15 +203,58 @@ std::string FuelModelDatabase::ModelFile(const std::string &_uri)
 
 /////////////////////////////////////////////////
 std::string FuelModelDatabase::ModelPath(const std::string &_uri,
-    const bool /*_forceDownload*/)
+    const bool _forceDownload)
 {
+  auto fuelUri = ignition::common::URI(_uri);
+
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
+  {
+    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
+    return std::string();
+  }
+
   std::string path;
 
-  if (!this->dataPtr->fuelClient->DownloadModel(_uri, path))
+  if (!_forceDownload)
+  {
+    if (this->dataPtr->fuelClient->CachedModel(fuelUri, path))
+    {
+      return path;
+    }
+  }
+
+  if (!this->dataPtr->fuelClient->DownloadModel(fuelUri.Str(), path))
   {
     gzerr << "Unable to download model[" << _uri << "]" << std::endl;
     return std::string();
   }
+  else
+  {
+      gzmsg << "Downloaded model URL: " << std::endl
+            << "          " << _uri << std::endl
+            << "      to: " << std::endl
+            << "          " << path << std::endl;
+  }
 
   return path;
 }
+
+/////////////////////////////////////////////////
+std::string FuelModelDatabase::CachedFilePath(const std::string &_uri)
+{
+  auto fuelUri = ignition::common::URI(_uri);
+  if (fuelUri.Scheme() != "http" && fuelUri.Scheme() != "https")
+  {
+    gzwarn << "URI not supported by Fuel [" << _uri << "]" << std::endl;
+    return std::string();
+  }
+
+  std::string path;
+  if (!this->dataPtr->fuelClient->CachedModelFile(fuelUri, path))
+  {
+    gzerr << "Unable to download model[" << _uri << "]" << std::endl;
+  }
+
+  return path;
+}
+
