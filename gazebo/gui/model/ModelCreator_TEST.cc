@@ -153,7 +153,7 @@ void ModelCreator_TEST::NestedModel()
   gazebo::rendering::VisualPtr link00Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_00");
   QVERIFY(link00Vis != NULL);
-  QCOMPARE(3u, link01Vis->GetDepth());
+  QCOMPARE(3u, link00Vis->GetDepth());
 
   gazebo::rendering::VisualPtr link01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_01");
@@ -163,7 +163,7 @@ void ModelCreator_TEST::NestedModel()
   gazebo::rendering::VisualPtr model01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::model_01");
   QVERIFY(model01Vis != NULL);
-  QCOMPARE(3u, link01Vis->GetDepth());
+  QCOMPARE(3u, model01Vis->GetDepth());
 
   // remove box model and verify
   modelCreator->RemoveEntity(boxModelVis->GetName());
