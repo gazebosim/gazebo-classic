@@ -1428,6 +1428,53 @@ TEST_F(Visual_TEST, GetAncestors)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Visual_TEST, EntityDepths)
+{
+  this->Load("worlds/shapes.world");
+
+  auto scene = gazebo::rendering::get_scene();
+  ASSERT_NE(scene, nullptr);
+
+  // Wait until all models are inserted
+  int sleep = 0;
+  int maxSleep = 30;
+  rendering::VisualPtr box, sphere, cylinder, sun;
+  while ((!box || !sphere || !cylinder || !sun) && sleep < maxSleep)
+  {
+    event::Events::preRender();
+    event::Events::render();
+    event::Events::postRender();
+
+    box = scene->GetVisual("box");
+    cylinder = scene->GetVisual("cylinder");
+    sphere = scene->GetVisual("sphere");
+    sun = scene->GetVisual("sun");
+
+    common::Time::MSleep(100);
+    sleep++;
+  }
+
+  // World
+  auto world = scene->WorldVisual();
+  ASSERT_NE(nullptr, world);
+  EXPECT_EQ(0u, world->GetDepth());
+
+  // Models
+  ASSERT_NE(nullptr, box);
+  EXPECT_EQ(1u, box->GetDepth());
+
+  ASSERT_NE(nullptr, cylinder);
+  EXPECT_EQ(1u, cylinder->GetDepth());
+
+  ASSERT_NE(nullptr, sphere);
+  EXPECT_EQ(1u, sphere->GetDepth());
+
+  // Lights
+  ASSERT_NE(nullptr, sun);
+  EXPECT_EQ(1u, sun->GetDepth());
+}
+
+/////////////////////////////////////////////////
 TEST_F(Visual_TEST, ConvertVisualType)
 {
   // convert from msgs::Visual::Type to Visual::VisualType
