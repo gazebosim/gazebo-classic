@@ -2,6 +2,10 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
 1. LOD skirt length
     * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
 
