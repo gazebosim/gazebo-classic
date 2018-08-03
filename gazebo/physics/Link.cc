@@ -320,7 +320,6 @@ void Link::Init()
     if ((*iter)->HasType(Base::LIGHT))
     {
       LightPtr light= boost::static_pointer_cast<Light>(*iter);
-      this->dataPtr->lights.push_back(light);
       light->Init();
     }
   }
@@ -1930,4 +1929,5 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   light->ProcessMsg(msgs::LightFromSDF(_sdf));
   light->SetWorld(this->world);
   light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
 }
