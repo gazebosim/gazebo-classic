@@ -69,7 +69,7 @@ class LightFactoryTest : public ServerFixture
 {
   /// \brief Constructor.
   public: LightFactoryTest():
-    responseCbCalled(false), modelInfoCbCalled(false){}
+    responseCbCalled(false), modelInfoCbCalled(false) {}
 
   /// \brief Response callback to get entity information.
   /// \param[in] _msg Message holding the requested information.
