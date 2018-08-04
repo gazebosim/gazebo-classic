@@ -185,14 +185,12 @@ TEST_F(WheelSlipTest, TireDrum)
              || shape->HasType(physics::Base::SPHERE_SHAPE));
     if (shape->HasType(physics::Base::CYLINDER_SHAPE))
     {
-      physics::CylinderShape *cyl =
-        static_cast<physics::CylinderShape*>(shape.get());
+      auto cyl = boost::static_pointer_cast<physics::CylinderShape>(shape);
       wheelRadius = cyl->GetRadius();
     }
     else if (shape->HasType(physics::Base::SPHERE_SHAPE))
     {
-      physics::SphereShape *sph =
-        static_cast<physics::SphereShape*>(shape.get());
+      auto sph = boost::static_pointer_cast<physics::SphereShape>(shape);
       wheelRadius = sph->GetRadius();
     }
 
@@ -205,8 +203,7 @@ TEST_F(WheelSlipTest, TireDrum)
 
   double modelMass = 0.0;
   {
-    physics::Link_V links = wheelModel->GetLinks();
-    for (auto const & link : links)
+    for (const auto &link : wheelModel->GetLinks())
     {
       modelMass += link->GetInertial()->GetMass();
     }
@@ -229,8 +226,7 @@ TEST_F(WheelSlipTest, TireDrum)
     physics::ShapePtr shape = drumCollision->GetShape();
     ASSERT_NE(shape, nullptr);
     ASSERT_TRUE(shape->HasType(physics::Base::CYLINDER_SHAPE));
-    physics::CylinderShape *cyl =
-      static_cast<physics::CylinderShape*>(shape.get());
+    auto cyl = boost::static_pointer_cast<physics::CylinderShape>(shape);
     drumRadius = cyl->GetRadius();
   }
 
@@ -298,7 +294,7 @@ TEST_F(WheelSlipTest, TireDrum)
     states.push_back(state);
   }
 
-  for (auto const & state : states)
+  for (const auto &state : states)
   {
     gzdbg << "Loading state: " << state.description << std::endl;
     this->SetCommands(state);

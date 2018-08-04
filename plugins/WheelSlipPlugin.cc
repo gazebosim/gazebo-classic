@@ -168,13 +168,12 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   }
 
   // Read each wheel element
-  auto wheelElem = _sdf->GetElement("wheel");
-  while (wheelElem)
+  for (auto wheelElem = _sdf->GetElement("wheel"); wheelElem;
+      wheelElem = wheelElem->GetNextElement("wheel"))
   {
     if (!wheelElem->HasAttribute("link_name"))
     {
       gzerr << "wheel element missing link_name attribute" << std::endl;
-      wheelElem = wheelElem->GetNextElement("wheel");
       continue;
     }
 
@@ -201,9 +200,6 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
       params.wheelRadius = wheelElem->Get<double>("wheel_radius");
     }
-
-    // Get the next link element
-    wheelElem = wheelElem->GetNextElement("wheel");
 
     auto link = _model->GetLink(linkName);
     if (link == nullptr)
@@ -363,7 +359,7 @@ void WheelSlipPlugin::GetSlips(
   auto modelWorldPose = model->GetWorldPose().Ign();
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     auto link = linkSurface.first.lock();
     if (!link)
@@ -376,7 +372,7 @@ void WheelSlipPlugin::GetSlips(
         modelWorldPose.Rot().RotateVectorReverse(wheelWorldLinearVel);
     // Compute wheel spin axis in parent model frame
     auto joint = params.joint.lock();
-    if (!link)
+    if (!joint)
       continue;
     auto wheelWorldAxis = joint->GetGlobalAxis(0).Ign().Normalized();
     auto wheelModelAxis =
@@ -405,7 +401,7 @@ void WheelSlipPlugin::OnLateralCompliance(ConstGzStringPtr &_msg)
 {
   try
   {
-    this->SetSlipComplianceLateral(std::stof(_msg->data()));
+    this->SetSlipComplianceLateral(std::stod(_msg->data()));
   }
   catch(...)
   {
@@ -418,7 +414,7 @@ void WheelSlipPlugin::OnLongitudinalCompliance(ConstGzStringPtr &_msg)
 {
   try
   {
-    this->SetSlipComplianceLongitudinal(std::stof(_msg->data()));
+    this->SetSlipComplianceLongitudinal(std::stod(_msg->data()));
   }
   catch(...)
   {
@@ -453,9 +449,9 @@ void WheelSlipPlugin::Update()
   this->GetSlips(slips);
 
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-  for (auto linkSurface : this->dataPtr->mapLinkSurfaceParams)
+  for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
-    auto params = linkSurface.second;
+    const auto &params = linkSurface.second;
     double force = params.wheelNormalForce;
     auto joint = params.joint.lock();
     double omega = 0;
