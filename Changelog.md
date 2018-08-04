@@ -5,6 +5,19 @@
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
 
+
+## Gazebo 7.14.0 (2018-07-27)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
 

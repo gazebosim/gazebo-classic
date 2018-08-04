@@ -136,6 +136,7 @@ void ModelCreator_TEST::NestedModel()
   gazebo::rendering::VisualPtr boxModelVis =
       scene->GetVisual("ModelPreview_0_0::box_model");
   QVERIFY(boxModelVis != NULL);
+  QCOMPARE(2u, boxModelVis->GetDepth());
 
   // test loading nested model from sdf
   sdf::ElementPtr modelSDF(new sdf::Element);
@@ -147,15 +148,22 @@ void ModelCreator_TEST::NestedModel()
   gazebo::rendering::VisualPtr modelVis =
       scene->GetVisual("ModelPreview_0_0::model_00");
   QVERIFY(modelVis != NULL);
+  QCOMPARE(2u, modelVis->GetDepth());
+
   gazebo::rendering::VisualPtr link00Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_00");
   QVERIFY(link00Vis != NULL);
+  QCOMPARE(3u, link00Vis->GetDepth());
+
   gazebo::rendering::VisualPtr link01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::link_01");
   QVERIFY(link01Vis != NULL);
+  QCOMPARE(3u, link01Vis->GetDepth());
+
   gazebo::rendering::VisualPtr model01Vis =
       scene->GetVisual("ModelPreview_0_0::model_00::model_01");
   QVERIFY(model01Vis != NULL);
+  QCOMPARE(3u, model01Vis->GetDepth());
 
   // remove box model and verify
   modelCreator->RemoveEntity(boxModelVis->GetName());
