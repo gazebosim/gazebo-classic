@@ -1026,7 +1026,7 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
   // Wait for a reponse.
   common::Time::MSleep(1000);
 
-  // Expect threre is nothing yet.
+  // Expect there is nothing yet.
   {
     std::lock_guard<std::mutex> lk(this->resMutex);
     EXPECT_TRUE(this->responseCbCalled) << "No response callback";
