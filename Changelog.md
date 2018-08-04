@@ -2,14 +2,27 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+
+## Gazebo 7.14.0 (2018-07-27)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
 
 1. Fix GpuRaySensor vertical rays
     * [Pull request 2955](https://bitbucket.org/osrf/gazebo/pull-request/2955)
-
-1. Improve ODE slip parameter behavior with multiple contact points
-    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
 
 
 ## Gazebo 7.13.1 (2018-06-15)
