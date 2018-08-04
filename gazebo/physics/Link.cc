@@ -1930,4 +1930,8 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   light->SetWorld(this->world);
   light->Load(_sdf);
   this->dataPtr->lights.push_back(light);
+  // NOTE:
+  // The light need to be added to the list on Load (before Init) for the case
+  // when a model is created from a factory message. Otherwise the model msg
+  // published to the client will not contain an entry of this light
 }
