@@ -43,31 +43,47 @@ CollisionConfig::CollisionConfig()
   scrollArea->setWidgetResizable(true);
 
 
-  this->mapperAdd = new QSignalMapper (this) ;
+  this->mapperAdd = new QSignalMapper(this);
   // Add Collision buttons
 
-  QPushButton *addCollisionButtonBox = new QPushButton(tr("+ Bounding &Box"));
+  QPushButton *addCollisionButtonBox =
+    new QPushButton(tr("+ Bounding &Box"));
   addCollisionButtonBox->setMaximumWidth(200);
   addCollisionButtonBox->setDefault(false);
   addCollisionButtonBox->setAutoDefault(false);
-  connect(addCollisionButtonBox, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
+  addCollisionButtonBox->
+    setToolTip("Add a bounding box collision shape to the visual");
+  connect(addCollisionButtonBox, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
 
-  QPushButton *addCollisionButtonCylinder = new QPushButton(tr("+ Bounding &Cylinder"));
+  QPushButton *addCollisionButtonCylinder =
+    new QPushButton(tr("+ Bounding &Cylinder"));
   addCollisionButtonCylinder->setMaximumWidth(200);
   addCollisionButtonCylinder->setDefault(false);
   addCollisionButtonCylinder->setAutoDefault(false);
-  connect(addCollisionButtonCylinder, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
+  addCollisionButtonCylinder->
+    setToolTip("Add a bounding cylinder collision shape to the visual");
+  connect(addCollisionButtonCylinder, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
 
-  QPushButton *addCollisionButtonSphere = new QPushButton(tr("+ Bounding &Sphere"));
+  QPushButton *addCollisionButtonSphere =
+    new QPushButton(tr("+ Bounding &Sphere"));
   addCollisionButtonSphere->setMaximumWidth(200);
   addCollisionButtonSphere->setDefault(false);
   addCollisionButtonSphere->setAutoDefault(false);
-  connect(addCollisionButtonSphere, SIGNAL(clicked()), this->mapperAdd, SLOT(map()));
+  addCollisionButtonSphere->
+    setToolTip("Add a bounding sphere collision shape to the visual");
+  connect(addCollisionButtonSphere, SIGNAL(clicked()),
+    this->mapperAdd, SLOT(map()));
 
-  this->mapperAdd->setMapping(addCollisionButtonBox,QString::fromStdString("box"));
-  this->mapperAdd->setMapping(addCollisionButtonSphere,QString::fromStdString("sphere"));
-  this->mapperAdd->setMapping(addCollisionButtonCylinder,QString::fromStdString("cylinder"));
-  connect (this->mapperAdd, SIGNAL(mapped(const QString)), this, SLOT(OnAddCollision(const QString))) ;
+  this->mapperAdd->setMapping(addCollisionButtonBox,
+    QString::fromStdString("box"));
+  this->mapperAdd->setMapping(addCollisionButtonSphere,
+    QString::fromStdString("sphere"));
+  this->mapperAdd->setMapping(addCollisionButtonCylinder,
+    QString::fromStdString("cylinder"));
+  connect(this->mapperAdd, SIGNAL(mapped(const QString)),
+    this, SLOT(OnAddCollision(const QString)));
 
   QHBoxLayout *buttons = new QHBoxLayout();
   buttons->addWidget(addCollisionButtonBox);
@@ -76,7 +92,7 @@ CollisionConfig::CollisionConfig()
 
   // Main layout
   QVBoxLayout *mainLayout = new QVBoxLayout;
-  mainLayout->addWidget(scrollArea); 
+  mainLayout->addWidget(scrollArea);
   mainLayout->addLayout(buttons);
   mainLayout->setContentsMargins(0, 0, 0, 0);
   this->setLayout(mainLayout);
@@ -128,13 +144,13 @@ void CollisionConfig::Init()
 }
 
 /////////////////////////////////////////////////
-void CollisionConfig::OnAddCollision(const QString &_type)
+void CollisionConfig::OnAddCollision(const QString &collision_shape)
 {
   std::stringstream collisionIndex;
-  const std::string type= _type.toStdString();
+  const std::string _collision_shape = collision_shape.toStdString();
   collisionIndex << "collision_" << this->counter;
   this->AddCollision(collisionIndex.str());
-  emit CollisionAdded(collisionIndex.str(),type);
+  emit CollisionAdded(collisionIndex.str(), _collision_shape);
 }
 
 /////////////////////////////////////////////////
@@ -527,7 +543,7 @@ void CollisionConfig::RestoreOriginalData()
     it.second->widget->show();
 
     this->configs[it.first] = it.second;
-    emit CollisionAdded(it.second->name,"");
+    emit CollisionAdded(it.second->name, "");
   }
   this->deletedConfigs.clear();
 }

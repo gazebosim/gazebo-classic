@@ -145,7 +145,8 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a collision is added.
       /// \param[in] _name Name of collision added.
-      Q_SIGNALS: void CollisionAdded(const std::string &_name,const std::string &_type);
+      Q_SIGNALS: void CollisionAdded(const std::string &_name,
+        const std::string &collision_shape);
 
       /// \brief Qt signal emitted requesting to show/hide a collision.
       /// \param[in] _show True to show, false to hide.
@@ -156,7 +157,7 @@ namespace gazebo
       Q_SIGNALS: void Applied();
 
       /// \brief Qt callback when a collision is to be added.
-      private slots: void OnAddCollision(const QString &_type);
+      private slots: void OnAddCollision(const QString &collision_shape);
 
       /// \brief Qt callback when a collision is to be removed.
       /// \param[in] _id Id of item to be removed.
