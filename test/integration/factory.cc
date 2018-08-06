@@ -1030,8 +1030,8 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
   {
     std::lock_guard<std::mutex> lk(this->resMutex);
     EXPECT_TRUE(this->responseCbCalled) << "No response callback";
-    EXPECT_EQ(this->resMsg.id(), 0) << "Wrong message ID";
-    EXPECT_EQ(this->resMsg.response(), "nonexistent");
+    EXPECT_EQ(0, this->resMsg.id()) << "Wrong message ID";
+    EXPECT_EQ("nonexistent", this->resMsg.response());
     this->responseCbCalled = false;
   }
 
@@ -1084,18 +1084,18 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
   {
     std::lock_guard<std::mutex> lk(this->resMutex);
     EXPECT_TRUE(this->responseCbCalled) << "No response callback";
-    EXPECT_EQ(this->resMsg.id(), 1) << "Wrong message ID";
-    EXPECT_NE(this->resMsg.response(), "nonexistent")
+    EXPECT_EQ(1, this->resMsg.id()) << "Wrong message ID";
+    EXPECT_NE("nonexistent", this->resMsg.response())
       << "The model does not exist.";
     msgs::Model modelMsg;
     modelMsg.ParseFromString(this->resMsg.serialized_data());
-    EXPECT_EQ(modelMsg.link_size(), 1)
+    EXPECT_EQ(1, modelMsg.link_size())
       << "The number of links must be 1.";
     msgs::Link linkMsg = modelMsg.link(0);
-    EXPECT_EQ(linkMsg.light_size(), 1)
+    EXPECT_EQ(1, linkMsg.light_size())
       << "The number of lights must be 1.";
     msgs::Light lightMsg = linkMsg.light(0);
-    EXPECT_EQ(lightMsg.name(), "test_model::link::spawned_light")
+    EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
       << "The name of the light is wrong.";
   }
 
@@ -1103,13 +1103,13 @@ TEST_F(LightFactoryTest, SpawnModelWithLight)
   {
     std::lock_guard<std::mutex> lk(this->modMutex);
     EXPECT_TRUE(this->modelInfoCbCalled) << "No model info callback";
-    EXPECT_EQ(this->modMsg.link_size(), 1)
+    EXPECT_EQ(1, this->modMsg.link_size())
       << "The number of links must be 1.";
     msgs::Link linkMsg = this->modMsg.link(0);
-    EXPECT_EQ(linkMsg.light_size(), 1)
+    EXPECT_EQ(1, linkMsg.light_size())
       << "The number of lights must be 1.";
     msgs::Light lightMsg = linkMsg.light(0);
-    EXPECT_EQ(lightMsg.name(), "test_model::link::spawned_light")
+    EXPECT_EQ("test_model::link::spawned_light", lightMsg.name())
       << "The name of the light is wrong.";
   }
 }
