@@ -1605,7 +1605,7 @@ void LinkData::OnAddCollision(const std::string &_name,
       std::string _meshName = _vis->GetMeshName();
 
       const common::Mesh *_mesh;
-      // check if the mesh exists, if not, create a mesh of that name
+      // Check if the mesh exists, if not, create a mesh of that name
       if (!common::MeshManager::Instance()->HasMesh(_meshName))
       {
         _mesh = common::MeshManager::Instance()->Load(_meshName);
