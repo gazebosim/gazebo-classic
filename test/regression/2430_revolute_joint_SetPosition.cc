@@ -40,12 +40,11 @@ class Issue2430Test
   /////////////////////////////////////////////////
   public: void TestJointInitialization(const double initialPosition)
   {
-    if (   "simbody" == this->physicsEngine
-        || "dart" == this->physicsEngine)
+    if ( "simbody" == this->physicsEngine )
     {
       gzdbg << "Test is disabled for " << this->physicsEngine << ", skipping\n";
-      // This test is disabled for Simbody and DART, because the ability to set
-      // joint positions for those physics engines is not available yet in
+      // This test is disabled for Simbody, because the ability to set
+      // joint positions for that physics engine is not available yet in
       // Gazebo.
       return;
     }
