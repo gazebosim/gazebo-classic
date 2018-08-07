@@ -60,14 +60,14 @@ void setOdeHeightfieldDetails(
       odeHeightfieldId,
       heights,
       0,
-      width,     // width (in meters)
-      height,    // height (in meters)
-      vertSize,  // width (sampling size)
-      vertSize,  // height (sampling size)
-      1.0,       // vertical (z-axis) scaling
-      zOffset,   // vertical (z-axis) offset
-      thickness, // vertical thickness for closing the height map mesh
-      0);        // wrap mode
+      width,      // width (in meters)
+      height,     // height (in meters)
+      vertSize,   // width (sampling size)
+      vertSize,   // height (sampling size)
+      1.0,        // vertical (z-axis) scaling
+      zOffset,    // vertical (z-axis) offset
+      thickness,  // vertical thickness for closing the height map mesh
+      0);         // wrap mode
 }
 
 //////////////////////////////////////////////////
@@ -89,14 +89,14 @@ void setOdeHeightfieldDetails(
       odeHeightfieldId,
       heights,
       0,
-      width,     // width (in meters)
-      height,    // height (in meters)
-      vertSize,  // width (sampling size)
-      vertSize,  // height (sampling size)
-      1.0,       // vertical (z-axis) scaling
-      zOffset,   // vertical (z-axis) offset
-      thickness, // vertical thickness for closing the height map mesh
-      0);        // wrap mode
+      width,      // width (in meters)
+      height,     // height (in meters)
+      vertSize,   // width (sampling size)
+      vertSize,   // height (sampling size)
+      1.0,        // vertical (z-axis) scaling
+      zOffset,    // vertical (z-axis) offset
+      thickness,  // vertical thickness for closing the height map mesh
+      0);         // wrap mode
 }
 
 

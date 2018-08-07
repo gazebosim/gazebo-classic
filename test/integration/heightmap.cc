@@ -18,6 +18,9 @@
 #include <string.h>
 #include <ignition/math/Vector3.hh>
 
+// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
+#include <gazebo/gazebo_config.h>
+
 #include "gazebo/common/SystemPaths.hh"
 #include "gazebo/rendering/RenderingIface.hh"
 #include "gazebo/rendering/Scene.hh"
@@ -26,9 +29,6 @@
 #include "images_cmp.h"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
-
-// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
-#include <gazebo/gazebo_config.h>
 
 using namespace gazebo;
 
