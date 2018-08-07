@@ -14,8 +14,18 @@
  * limitations under the License.
  *
 */
+
+// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
+#include <gazebo/gazebo_config.h>
+
+#ifdef HAVE_DART_BULLET
 #include <dart/collision/bullet/bullet.hpp>
+#endif
+
+#ifdef HAVE_DART_ODE
 #include <dart/collision/ode/ode.hpp>
+#endif
+
 #include <dart/collision/dart/dart.hpp>
 #include <dart/collision/fcl/fcl.hpp>
 
@@ -102,7 +112,12 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
     if (useCollisionDetector == "bullet")
     {
       gzdbg << "Using BULLET collision detector" << std::endl;
+#ifdef HAVE_DART_BULLET
       cd = dart::collision::BulletCollisionDetector::create();
+#else
+      gzerr << "Required DART bullet collision package not in use. Please "
+            << "install libdart<version>-collision-bullet-dev." << std::endl;
+#endif
     }
     else if (useCollisionDetector == "fcl")
     {
@@ -111,14 +126,20 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
     }
     else if (useCollisionDetector == "ode")
     {
+#ifdef HAVE_DART_ODE
       gzdbg << "Using ODE collision detector" << std::endl;
       cd = dart::collision::OdeCollisionDetector::create();
+#else
+      gzerr << "Required DART ode collision package not in use. Please "
+            << "install libdart<version>-collision-ode-dev." << std::endl;
+#endif
     }
     else if (useCollisionDetector == "dart")
     {
       gzdbg << "Using DART collision detector" << std::endl;
       cd = dart::collision::DARTCollisionDetector::create();
     }
+
     if (cd)
     {
       this->dataPtr->dtWorld->getConstraintSolver()->setCollisionDetector(cd);

@@ -27,6 +27,9 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/physics/dart/DARTPhysics.hh"
 
+// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
+#include <gazebo/gazebo_config.h>
+
 using namespace gazebo;
 
 std::mutex mutex;
@@ -735,10 +738,8 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
 {
   if (_physicsEngine == "bullet")
   {
-    // SimbodyHeightmapShape unimplemented.
-    gzerr << "Test for bullet will fail, but leaving it in here for "
-          << "demonstration" << std::endl;
-    // return;
+    gzerr << "Test for bullet will fail. See issue #2506" << std::endl;
+    return;
   }
 
   if (_physicsEngine == "simbody")
@@ -886,8 +887,21 @@ TEST_P(HeightmapTest, LoadDEM)
 }
 
 /////////////////////////////////////////////////
-TEST_F(HeightmapTest, DartCollisionDetectorSelection)
+TEST_F(HeightmapTest, DartCollisionDetectorSelectionBullet)
 {
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_BULLET
+  gzerr << "Aborting test for DART with bullet, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-bullet-dev." << std::endl;
+  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
+  return;
+#endif
+
   // test using a world file with the <dart><collision_detector>
   // tag: verify the right collision detector has been selected.
   // Use bullet as an example (the test could also be done for ode etc.,
@@ -910,11 +924,50 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelection)
 }
 
 /////////////////////////////////////////////////
+TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
+{
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_ODE
+  gzerr << "Aborting test for DART with ode, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-ode-dev." << std::endl;
+  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
+  return;
+#endif
+
+  // test using a world file with the <dart><collision_detector>
+  // tag: verify the right collision detector has been selected.
+  // Use bullet as an example (the test could also be done for ode etc.,
+  // but we presume that if it works for bullet, the functionality is there
+  // and it will also work for ode).
+  std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
+  Load(loadWorld, true, "dart");
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr engine = world->Physics();
+  ASSERT_NE(engine, nullptr);
+  physics::DARTPhysicsPtr dartEngine
+    = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
+  ASSERT_NE(dartEngine, nullptr);
+  std::string cd = dartEngine->CollisionDetectorInUse();
+  EXPECT_FALSE(cd.empty());
+  EXPECT_EQ(cd, "ode");
+}
+
+
+/////////////////////////////////////////////////
 TEST_P(HeightmapTest, TerrainCollision)
 {
   std::string param = GetParam();
-  // do this test for all engines but DART, because for DART needs to be run
-  // several times for different collision detectors to use
+  // do this test for all engines but DART, because for DART it needs to be run
+  // several times for different collision detectors to use.
+  // Different tests exist for this below.
   if (param == "dart")
     return;
 
@@ -922,23 +975,40 @@ TEST_P(HeightmapTest, TerrainCollision)
 }
 
 /////////////////////////////////////////////////
-TEST_P(HeightmapTest, TerrainCollisionDartBullet)
+TEST_F(HeightmapTest, TerrainCollisionDartBullet)
 {
-  std::string param = GetParam();
-  if (param == "dart")
-  {
-    TerrainCollision("dart", "bullet");
-  }
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_BULLET
+  gzerr << "Aborting test for DART with bullet, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-bullet-dev." << std::endl;
+  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
+  return;
+#endif
+
+  TerrainCollision("dart", "bullet");
 }
 
 /////////////////////////////////////////////////
-TEST_P(HeightmapTest, TerrainCollisionDartOde)
+TEST_F(HeightmapTest, TerrainCollisionDartOde)
 {
-  std::string param = GetParam();
-  if (param == "dart")
-  {
-    TerrainCollision("dart", "ode");
-  }
+#ifndef HAVE_DART
+  gzdbg << "Not testing DART because it is not installed." << std::endl;
+  return;
+#endif
+
+#ifndef HAVE_DART_ODE
+  gzerr << "Aborting TerrainCollision test for DART with ode, because the "
+        << "required DART extension is not installed. Please install "
+        << "libdart<version>-collision-ode-dev." << std::endl;
+  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
+  return;
+#endif
+  TerrainCollision("dart", "ode");
 }
 
 /////////////////////////////////////////////////
