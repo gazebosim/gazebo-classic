@@ -738,7 +738,7 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
 {
   if (_physicsEngine == "bullet")
   {
-    gzerr << "Test for bullet will fail. See issue #2506" << std::endl;
+    gzerr << "Skipping test for bullet. See issue #2506" << std::endl;
     return;
   }
 
