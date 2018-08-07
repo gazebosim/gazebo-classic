@@ -219,7 +219,7 @@ void HeightmapShape::FillHeightfield(std::vector<double>& _heights)
 }
 
 //////////////////////////////////////////////////
-// Constructs the float lookup table from coommon::Heightmap, which always uses
+// Constructs the float lookup table from common::Heightmap, which always uses
 // float values.
 // Enabled only if the height type used is float.
 // \param[in] _this pointer to this HeightmapShape class
@@ -236,7 +236,7 @@ void ConstructLookupTableTypeEnabled(HS* _this,
 }
 
 //////////////////////////////////////////////////
-// Constructs the double lookup table from coommon::Heightmap, which always uses
+// Constructs the double lookup table from common::Heightmap, which always uses
 // float values.
 // Enabled only if the height type used is double.
 // \param[in] _this pointer to this HeightmapShape class
