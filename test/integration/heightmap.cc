@@ -898,9 +898,29 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionBullet)
   gzerr << "Aborting test for DART with bullet, because the "
         << "required DART extension is not installed. Please install "
         << "libdart<version>-collision-bullet-dev." << std::endl;
-  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
   return;
 #endif
+
+  // first, test if the collision_detector tag in general can be read
+  // from a simple SDF, or if the SDF format does not support it.
+  sdf::SDFPtr sdf(new sdf::SDF());
+  // initalize the SDF descriptoins for the supported version
+  sdf::init(sdf);
+  // make sure we have all elements at least until <physics><dart>...
+  ASSERT_NE(sdf->Root(), nullptr) << "Could not initialize SDF.";
+  sdf::ElementPtr elemWorld = sdf->Root()->GetElementDescription("world");
+  ASSERT_NE(elemWorld, nullptr) << "World element is expected in SDF";
+  sdf::ElementPtr elemPhysics = elemWorld->GetElementDescription("physics");
+  ASSERT_NE(elemPhysics, nullptr) << "Physics element is expected in SDF";
+  sdf::ElementPtr elemDart = elemPhysics->GetElementDescription("dart");
+  ASSERT_NE(elemDart, nullptr) << "Dart element is expected in SDF";
+  // if the collision_detector element is not there, we can't run this test.
+  if (!elemDart->HasElementDescription("collision_detector"))
+  {
+    gzerr << "SDF format version does not support <collision_detector> tag. "
+          << "Skipping test." << std::endl;
+    return;
+  }
 
   // test using a world file with the <dart><collision_detector>
   // tag: verify the right collision detector has been selected.
@@ -935,7 +955,6 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
   gzerr << "Aborting test for DART with ode, because the "
         << "required DART extension is not installed. Please install "
         << "libdart<version>-collision-ode-dev." << std::endl;
-  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
   return;
 #endif
 
@@ -986,7 +1005,6 @@ TEST_F(HeightmapTest, TerrainCollisionDartBullet)
   gzerr << "Aborting test for DART with bullet, because the "
         << "required DART extension is not installed. Please install "
         << "libdart<version>-collision-bullet-dev." << std::endl;
-  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
   return;
 #endif
 
@@ -1005,7 +1023,6 @@ TEST_F(HeightmapTest, TerrainCollisionDartOde)
   gzerr << "Aborting TerrainCollision test for DART with ode, because the "
         << "required DART extension is not installed. Please install "
         << "libdart<version>-collision-ode-dev." << std::endl;
-  ASSERT_FALSE(true) << "Temporary assertion failure for jenkins testing";
   return;
 #endif
   TerrainCollision("dart", "ode");
