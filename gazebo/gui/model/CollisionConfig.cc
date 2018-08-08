@@ -52,7 +52,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonBox->setDefault(false);
   addCollisionButtonBox->setAutoDefault(false);
   addCollisionButtonBox->
-    setToolTip("Add a bounding box collision shape to the visual");
+    setToolTip("Add a bounding box collision shape to the link");
   connect(addCollisionButtonBox, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
@@ -62,7 +62,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonCylinder->setDefault(false);
   addCollisionButtonCylinder->setAutoDefault(false);
   addCollisionButtonCylinder->
-    setToolTip("Add a bounding cylinder collision shape to the visual");
+    setToolTip("Add a bounding cylinder collision shape to the link");
   connect(addCollisionButtonCylinder, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
@@ -72,7 +72,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonSphere->setDefault(false);
   addCollisionButtonSphere->setAutoDefault(false);
   addCollisionButtonSphere->
-    setToolTip("Add a bounding sphere collision shape to the visual");
+    setToolTip("Add a bounding sphere collision shape to the link");
   connect(addCollisionButtonSphere, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
@@ -144,13 +144,13 @@ void CollisionConfig::Init()
 }
 
 /////////////////////////////////////////////////
-void CollisionConfig::OnAddCollision(const QString &collision_shape)
+void CollisionConfig::OnAddCollision(const QString &_collisionShape)
 {
   std::stringstream collisionIndex;
-  const std::string _collision_shape = collision_shape.toStdString();
+  const std::string __collisionShape = _collisionShape.toStdString();
   collisionIndex << "collision_" << this->counter;
   this->AddCollision(collisionIndex.str());
-  emit CollisionAdded(collisionIndex.str(), _collision_shape);
+  emit CollisionAdded(collisionIndex.str(), __collisionShape);
 }
 
 /////////////////////////////////////////////////

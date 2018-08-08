@@ -216,7 +216,7 @@ namespace gazebo
       /// \brief Qt callback when a new collision is to be added.
       /// \param[in] _name Name of collision.
       private slots: void OnAddCollision(const std::string &_name,
-        const std::string &collision_shape);
+        const std::string &_collisionShape);
 
       /// \brief Qt callback when a visual is to be removed.
       /// \param[in] _name Name of visual.
