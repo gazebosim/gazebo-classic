@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+
+## Gazebo 7.14.0 (2018-07-27)
+
 1. Fix manipulating links in the model editor
     * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
     * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
