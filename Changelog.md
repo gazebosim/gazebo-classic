@@ -1,6 +1,12 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (2018-XX-XX)
+
+## Gazebo 9.3.1 (2018-08-08)
+
+1. Fix for the spawning light issue
+    * [Pull request 3003](https://bitbucket.org/osrf/gazebo/pull-requests/3003)
+
+## Gazebo 9.3.0 (2018-07-28)
 
 1. Add a LED plugin blinking visual objects
     * [Pull request 2994](https://bitbucket.org/osrf/gazebo/pull-request/2994)
