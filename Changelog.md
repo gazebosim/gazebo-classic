@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
 
 ## Gazebo 7.14.0 (2018-07-27)
 

@@ -1155,6 +1155,14 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.slip1 = surf1->slip1 + surf2->slip1;
   contact.surface.slip2 = surf1->slip2 + surf2->slip2;
   contact.surface.slip3 = surf1->slipTorsion + surf2->slipTorsion;
+  // The slip parameter acts like a damper at each contact point
+  // so the total damping for each collision is multiplied by the
+  // number of contact points (numc).
+  // To eliminate this dependence on numc, the inverse damping
+  // is multipled by numc.
+  contact.surface.slip1 *= numc;
+  contact.surface.slip2 *= numc;
+  contact.surface.slip3 *= numc;
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =
