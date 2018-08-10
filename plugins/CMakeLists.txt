@@ -105,6 +105,7 @@ if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
+    JoyPlugin
   )
 endif()
 
