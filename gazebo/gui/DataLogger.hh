@@ -81,6 +81,11 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
+      /// \brief QT callback for toggling the save models when logging.
+      /// \param[in] _checked True if the save models button is in the checked
+      /// state.
+      private slots: void OnSaveModel(bool _checked);
+
       /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();
 

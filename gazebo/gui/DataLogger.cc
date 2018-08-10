@@ -88,6 +88,13 @@ DataLogger::DataLogger(QWidget *_parent)
   uriLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
 
+  this->dataPtr->saveModelBox = new QCheckBox("Save portable models");
+  this->dataPtr->saveModelBox->setChecked(false);
+  connect(this->dataPtr->saveModelBox, SIGNAL(clicked(bool)), this,
+    SLOT(OnSaveModel(bool)));
+  this->dataPtr->saveModelBox->setStyleSheet(
+    "QCheckBox {color: #aeaeae; font-size: 11px; background: transparent}");
+
   // Address URI Line Edit
   this->dataPtr->destURI = new QLineEdit;
   this->dataPtr->destURI->setReadOnly(true);
@@ -152,16 +159,20 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addWidget(this->dataPtr->timeLabel, 0, 3);
   topLayout->addWidget(this->dataPtr->sizeLabel, 1, 3);
   topLayout->addWidget(separator, 2, 0, 1, 4);
-  topLayout->addWidget(uriLabel, 3, 0);
-  topLayout->addWidget(this->dataPtr->destURI, 3, 1, 1, 3);
-  topLayout->addWidget(pathLabel, 4, 0);
-  topLayout->addWidget(this->dataPtr->destPath, 4, 1, 1, 2);
-  topLayout->addWidget(browseButton, 4, 3);
-  topLayout->addWidget(recordingsButton, 5, 0, 1, 4);
+  topLayout->addWidget(this->dataPtr->saveModelBox, 3, 0, 1, 4);
+  topLayout->addWidget(uriLabel, 4, 0);
+  topLayout->addWidget(this->dataPtr->destURI, 4, 1, 1, 3);
+  topLayout->addWidget(pathLabel, 5, 0);
+  topLayout->addWidget(this->dataPtr->destPath, 5, 1, 1, 2);
+  topLayout->addWidget(browseButton, 5, 3);
+  topLayout->addWidget(recordingsButton, 6, 0, 1, 4);
 
   // Align widgets within layout
+  topLayout->setAlignment(this->dataPtr->saveModelBox, Qt::AlignLeft);
   topLayout->setAlignment(pathLabel, Qt::AlignTop | Qt::AlignRight);
   topLayout->setAlignment(browseButton, Qt::AlignTop);
+  topLayout->setAlignment(this->dataPtr->destURI, Qt::AlignLeft);
+  topLayout->setAlignment(this->dataPtr->destPath, Qt::AlignLeft);
   topLayout->setAlignment(this->dataPtr->statusLabel, Qt::AlignLeft);
   topLayout->setAlignment(this->dataPtr->timeLabel, Qt::AlignRight);
   topLayout->setAlignment(this->dataPtr->sizeLabel,
@@ -452,6 +463,14 @@ void DataLogger::OnToggleSettings(bool _checked)
     this->dataPtr->settingsFrame->show();
   else
     this->dataPtr->settingsFrame->hide();
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnSaveModel(bool _checked)
+{
+  msgs::LogControl msg;
+  msg.set_save_model(_checked);
+  this->dataPtr->pub->Publish(msg);
 }
 
 /////////////////////////////////////////////////
