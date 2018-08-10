@@ -5,6 +5,8 @@
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
 
+## Gazebo 7.14.0 (2018-07-27)
+
 1. Fix manipulating links in the model editor
     * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
     * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
