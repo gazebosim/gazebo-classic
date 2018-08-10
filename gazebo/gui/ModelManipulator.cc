@@ -574,7 +574,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
-  else if (this->dataPtr->scene->GetLight(_vis->Name()))
+  else if (this->dataPtr->scene->LightByName(_vis->Name()))
   {
     msgs::Light msg;
     msg.set_name(_vis->Name());
