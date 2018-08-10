@@ -507,6 +507,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
+  event::Events::stop();
   ServerPrivate::stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
@@ -516,6 +517,7 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
+  event::Events::stop();
   this->dataPtr->stop = true;
 }
 

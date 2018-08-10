@@ -142,6 +142,7 @@ void print_usage()
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
+  event::Events::sigInt();
   gazebo::gui::stop();
   gazebo::client::shutdown();
 }
@@ -429,6 +430,7 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  event::Events::stop();
   gazebo::client::shutdown();
   g_active_camera.reset();
   g_app->quit();
