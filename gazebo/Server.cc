@@ -613,7 +613,7 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      params.record_resources =
+      params.recordResources =
           this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
     }
