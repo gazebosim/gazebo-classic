@@ -971,7 +971,7 @@ void LogRecord::OnLogControl(ConstLogControlPtr &_data)
   {
     this->SetPaused(_data->paused());
   }
-  else if (_data->has_save_model())
+  else if (_data->has_record_resources())
   {
     this->dataPtr->recordResources = true;
   }
@@ -1005,7 +1005,7 @@ void LogRecord::PublishLogStatus()
   msg.mutable_log_file()->set_uri(transport::Connection::GetLocalHostname());
 
   // Set whether to save model
-  msg.mutable_log_file()->set_save_model(this->dataPtr->recordResources);
+  msg.mutable_log_file()->set_record_resources(this->dataPtr->recordResources);
 
   // Get the size of the log file
   size = this->FileSize();

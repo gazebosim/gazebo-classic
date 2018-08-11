@@ -469,7 +469,7 @@ void DataLogger::OnToggleSettings(bool _checked)
 void DataLogger::OnSaveModel(bool _checked)
 {
   msgs::LogControl msg;
-  msg.set_save_model(_checked);
+  msg.set_record_resources(_checked);
   this->dataPtr->pub->Publish(msg);
 }
 
