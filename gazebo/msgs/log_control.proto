@@ -7,10 +7,10 @@ package gazebo.msgs;
 
 message LogControl
 {
-  optional bool start           = 1;
-  optional bool stop            = 2;
-  optional bool paused          = 3;
-  optional string base_path     = 4;
-  optional string encoding      = 5;
-  optional bool save_model      = 6;
+  optional bool start            = 1;
+  optional bool stop             = 2;
+  optional bool paused           = 3;
+  optional string base_path      = 4;
+  optional string encoding       = 5;
+  optional bool save_model       = 6;
 }
