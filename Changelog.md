@@ -2,6 +2,10 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Add record_resources field to gazebo log msgs
+    * [Pull request #2797](https://bitbucket.org/osrf/gazebo/pull-request/2797)
+    * [Pull request #3008](https://bitbucket.org/osrf/gazebo/pull-request/3008)
+
 1. Add methods to set dynamically Gaussian noise parameters
     * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
 

@@ -88,11 +88,11 @@ DataLogger::DataLogger(QWidget *_parent)
   uriLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
 
-  this->dataPtr->saveModelBox = new QCheckBox("Save portable models");
-  this->dataPtr->saveModelBox->setChecked(false);
-  connect(this->dataPtr->saveModelBox, SIGNAL(clicked(bool)), this,
-    SLOT(OnSaveModel(bool)));
-  this->dataPtr->saveModelBox->setStyleSheet(
+  this->dataPtr->recordResourcesBox = new QCheckBox("Record model resources");
+  this->dataPtr->recordResourcesBox->setChecked(false);
+  connect(this->dataPtr->recordResourcesBox, SIGNAL(clicked(bool)), this,
+    SLOT(OnRecordResources(bool)));
+  this->dataPtr->recordResourcesBox->setStyleSheet(
     "QCheckBox {color: #aeaeae; font-size: 11px; background: transparent}");
 
   // Address URI Line Edit
@@ -159,7 +159,7 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addWidget(this->dataPtr->timeLabel, 0, 3);
   topLayout->addWidget(this->dataPtr->sizeLabel, 1, 3);
   topLayout->addWidget(separator, 2, 0, 1, 4);
-  topLayout->addWidget(this->dataPtr->saveModelBox, 3, 0, 1, 4);
+  topLayout->addWidget(this->dataPtr->recordResourcesBox, 3, 0, 1, 4);
   topLayout->addWidget(uriLabel, 4, 0);
   topLayout->addWidget(this->dataPtr->destURI, 4, 1, 1, 3);
   topLayout->addWidget(pathLabel, 5, 0);
@@ -168,7 +168,7 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addWidget(recordingsButton, 6, 0, 1, 4);
 
   // Align widgets within layout
-  topLayout->setAlignment(this->dataPtr->saveModelBox, Qt::AlignLeft);
+  topLayout->setAlignment(this->dataPtr->recordResourcesBox, Qt::AlignLeft);
   topLayout->setAlignment(pathLabel, Qt::AlignTop | Qt::AlignRight);
   topLayout->setAlignment(browseButton, Qt::AlignTop);
   topLayout->setAlignment(this->dataPtr->destURI, Qt::AlignLeft);
@@ -466,10 +466,10 @@ void DataLogger::OnToggleSettings(bool _checked)
 }
 
 /////////////////////////////////////////////////
-void DataLogger::OnSaveModel(bool _checked)
+void DataLogger::OnRecordResources(bool _checked)
 {
   msgs::LogControl msg;
-  msg.set_save_model(_checked);
+  msg.set_record_resources(_checked);
   this->dataPtr->pub->Publish(msg);
 }
 
