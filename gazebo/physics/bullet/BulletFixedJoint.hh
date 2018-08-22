@@ -78,7 +78,7 @@ namespace gazebo
       protected: virtual void SetForceImpl(unsigned int _index, double _effort);
 
       /// \brief Pointer to bullet fixed constraint implementation
-      private: btHingeConstraint *bulletFixed;
+      private: btGeneric6DofSpring2Constraint *bulletFixed;
     };
     /// \}
   }

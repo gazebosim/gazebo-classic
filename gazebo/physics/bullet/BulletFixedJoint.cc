@@ -99,31 +99,29 @@ void BulletFixedJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
-    this->bulletFixed = new btHingeConstraint(
+    // btGeneric6DofSpring2Constraint is used for btFixedConstraint, but it 
+    // doesn't have constructors for a single rigid body
+    this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletChildLink->GetBulletLink()),
         *(bulletParentLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotChild),
-        BulletTypes::ConvertVector3(pivotParent),
-        BulletTypes::ConvertVector3(axisChild),
-        BulletTypes::ConvertVector3(axisParent));
+        BulletTypes::ConvertPose(this->childLink->WorldInertialPose()),
+        BulletTypes::ConvertPose(this->parentLink->WorldInertialPose()));
   }
   // If only the child exists, then create a joint between the child
   // and the world.
   else if (bulletChildLink)
   {
-    this->bulletFixed = new btHingeConstraint(
+    this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletChildLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotChild),
-        BulletTypes::ConvertVector3(axisChild));
+        BulletTypes::ConvertPose(this->childLink->WorldInertialPose()));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
   else if (bulletParentLink)
   {
-    this->bulletFixed = new btHingeConstraint(
+    this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletParentLink->GetBulletLink()),
-        BulletTypes::ConvertVector3(pivotParent),
-        BulletTypes::ConvertVector3(axisParent));
+        BulletTypes::ConvertPose(this->parentLink->WorldInertialPose()));
   }
   // Throw an error if no links are given.
   else
@@ -141,7 +139,10 @@ void BulletFixedJoint::Init()
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletFixed;
 
-  this->bulletFixed->setLimit(0.0, 0.0);
+  this->bulletFixed->setAngularLowerLimit(btVector3(0,0,0));
+  this->bulletFixed->setAngularUpperLimit(btVector3(0,0,0));
+  this->bulletFixed->setLinearLowerLimit(btVector3(0,0,0));
+  this->bulletFixed->setLinearUpperLimit(btVector3(0,0,0));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");
