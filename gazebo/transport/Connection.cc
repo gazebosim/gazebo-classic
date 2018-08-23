@@ -748,6 +748,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Iterate over all the interface addresses
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+      // Only consider UP interfaces
+      if (!(ifa->ifa_flags & IFF_UP))
+        continue;
       if (ifa->ifa_addr == NULL)
         continue;
 
