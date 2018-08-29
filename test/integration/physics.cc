@@ -1520,15 +1520,15 @@ void PhysicsTest::SpawnFixedJoint(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->Physics();
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
-  physics::ModelPtr model = world->ModelByName("fixed_joint_test");
-  ignition::math::Pose3d pose1, pose2;
-  pose1 = model->WorldPose();
+  physics::ModelPtr model = world->GetModel("fixed_joint_test");
+  math::Pose pose1, pose2;
+  pose1 = model->GetWorldPose();
   world->Step(100);
-  pose2 = model->WorldPose();
+  pose2 = model->GetWorldPose();
   EXPECT_EQ(pose1, pose2);
 }
 

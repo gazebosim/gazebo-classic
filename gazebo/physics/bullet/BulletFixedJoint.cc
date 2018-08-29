@@ -104,8 +104,8 @@ void BulletFixedJoint::Init()
     this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletChildLink->GetBulletLink()),
         *(bulletParentLink->GetBulletLink()),
-        BulletTypes::ConvertPose(this->childLink->WorldInertialPose()),
-        BulletTypes::ConvertPose(this->parentLink->WorldInertialPose()));
+        BulletTypes::ConvertPose(this->childLink->GetWorldInertialPose()),
+        BulletTypes::ConvertPose(this->parentLink->GetWorldInertialPose()));
   }
   // If only the child exists, then create a joint between the child
   // and the world.
@@ -113,7 +113,7 @@ void BulletFixedJoint::Init()
   {
     this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletChildLink->GetBulletLink()),
-        BulletTypes::ConvertPose(this->childLink->WorldInertialPose()));
+        BulletTypes::ConvertPose(this->childLink->GetWorldInertialPose()));
   }
   // If only the parent exists, then create a joint between the parent
   // and the world.
@@ -121,7 +121,7 @@ void BulletFixedJoint::Init()
   {
     this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletParentLink->GetBulletLink()),
-        BulletTypes::ConvertPose(this->parentLink->WorldInertialPose()));
+        BulletTypes::ConvertPose(this->parentLink->GetWorldInertialPose()));
   }
   // Throw an error if no links are given.
   else
