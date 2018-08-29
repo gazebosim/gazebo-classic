@@ -99,7 +99,7 @@ void BulletFixedJoint::Init()
   // If both links exist, then create a joint between the two links.
   if (bulletChildLink && bulletParentLink)
   {
-    // btGeneric6DofSpring2Constraint is used for btFixedConstraint, but it 
+    // btGeneric6DofSpring2Constraint is used for btFixedConstraint, but it
     // doesn't have constructors for a single rigid body
     this->bulletFixed = new btGeneric6DofSpring2Constraint(
         *(bulletChildLink->GetBulletLink()),
@@ -139,10 +139,10 @@ void BulletFixedJoint::Init()
   // Give parent class BulletJoint a pointer to this constraint.
   this->constraint = this->bulletFixed;
 
-  this->bulletFixed->setAngularLowerLimit(btVector3(0,0,0));
-  this->bulletFixed->setAngularUpperLimit(btVector3(0,0,0));
-  this->bulletFixed->setLinearLowerLimit(btVector3(0,0,0));
-  this->bulletFixed->setLinearUpperLimit(btVector3(0,0,0));
+  this->bulletFixed->setAngularLowerLimit(btVector3(0, 0, 0));
+  this->bulletFixed->setAngularUpperLimit(btVector3(0, 0, 0));
+  this->bulletFixed->setLinearLowerLimit(btVector3(0, 0, 0));
+  this->bulletFixed->setLinearUpperLimit(btVector3(0, 0, 0));
 
   // Add the joint to the world
   GZ_ASSERT(this->bulletWorld, "bullet world pointer is NULL");

@@ -1510,11 +1510,10 @@ TEST_F(PhysicsTest, ZeroMaxContactsODE)
 }
 
 /////////////////////////////////////////////////
-// This test verifies that gazebo spawns fixed joints properly for links with 
+// This test verifies that gazebo spawns fixed joints properly for links with
 // nonzero off-diagonal inertia values.
 void PhysicsTest::SpawnFixedJoint(const std::string &_physicsEngine)
 {
-
   Load("worlds/fixed_joint.world", true, _physicsEngine);
 
   physics::WorldPtr world = physics::get_world("default");
@@ -1537,7 +1536,7 @@ TEST_P(PhysicsTest, SpawnFixedJoint)
 {
   SpawnFixedJoint(GetParam());
 }
-  
+
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, PhysicsTest, PHYSICS_ENGINE_VALUES);
 
 int main(int argc, char **argv)
