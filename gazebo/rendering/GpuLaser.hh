@@ -110,7 +110,12 @@ namespace gazebo
                   unsigned int _height, unsigned int _depth,
                   const std::string &_format)> _subscriber);
 
-      /// \brief Set the number of laser samples in the width and height
+      /// \brief Disconnect from a laser frame signal
+      /// \param[in] _c The connection to disconnect
+      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_c);
+
+      /// \brief Set the number of samples in the width and height for the
+      /// first pass texture.
       /// \param[in] _w Number of samples in the horizontal sweep
       /// \param[in] _h Number of samples in the vertical sweep
       public: void SetRangeCount(const unsigned int _w,
@@ -207,7 +212,7 @@ namespace gazebo
       /// \return The ray count ratio (equivalent to aspect ratio)
       public: double RayCountRatio() const;
 
-      /// \brief Sets the ray count ratio (equivalen to aspect ratio)
+      /// \brief Sets the ray count ratio (equivalent to aspect ratio)
       /// \param[in] _rayCountRatio ray count ratio (equivalent to aspect ratio)
       public: void SetRayCountRatio(const double _rayCountRatio);
 
@@ -217,7 +222,7 @@ namespace gazebo
       /// \brief Update a render target.
       /// \param[in, out] _target Render target to update (render).
       /// \param[in, out] _material Material used during render.
-      /// \param[in] _cam Camerat to render from.
+      /// \param[in] _cam Camera to render from.
       /// \param[in] _updateTex True to update the textures in the material
       private: void UpdateRenderTarget(Ogre::RenderTarget *_target,
                                        Ogre::Material *_material,
