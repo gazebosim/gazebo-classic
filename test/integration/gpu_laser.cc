@@ -377,7 +377,7 @@ TEST_F(GPURaySensorTest, Heightmap)
   for (int i = 0; i < raySensor->RayCount(); ++i)
     EXPECT_TRUE(raySensor->Range(i) < maxRange / 2.0);
 
-  raySensor->DisconnectNewLaserFrame(c);
+  c.reset();
 
   delete [] scan;
 }
@@ -432,7 +432,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
 
   physics::WorldPtr world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
-  world->GetPhysicsEngine()->SetGravity(ignition::math::Vector3d::Zero);
+  world->Physics()->SetGravity(ignition::math::Vector3d::Zero);
 
   std::string box01 = "box_01";
 
@@ -485,7 +485,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
   }
 
   // Move box out of range
-  world->GetModel(box01)->SetWorldPose(
+  world->ModelByName(box01)->SetWorldPose(
       ignition::math::Pose3d(ignition::math::Vector3d(maxRange + 1, 0, 0),
       ignition::math::Quaterniond::Identity));
 
@@ -508,7 +508,7 @@ TEST_F(GPURaySensorTest, LaserVertical)
     }
   }
 
-  raySensor->DisconnectNewLaserFrame(c);
+  c.reset();
 
   delete [] scan;
 }
@@ -605,7 +605,7 @@ TEST_F(GPURaySensorTest, LaserScanResolution)
     }
   }
 
-  raySensor->DisconnectNewLaserFrame(c);
+  c.reset();
 
   delete [] scan;
 }

@@ -627,21 +627,22 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
     double intensity = data.intensity;
 
     // Mask ranges outside of min/max to +/- inf, as per REP 117
-    if (range >= this->RangeMax())
+    if (range >= this->dataPtr->rangeMax)
     {
       range = ignition::math::INF_D;
     }
-    else if (range <= this->RangeMin())
+    else if (range <= this->dataPtr->rangeMin)
     {
       range = -ignition::math::INF_D;
     }
     else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
     {
       range = this->noises[GPU_RAY_NOISE]->Apply(range);
-      range = ignition::math::clamp(range, this->RangeMin(), this->RangeMax());
+      range = ignition::math::clamp(range,
+          this->dataPtr->rangeMin, this->dataPtr->rangeMax);
     }
 
-    range = ignition::math::isnan(range) ? this->RangeMax() : range;
+    range = ignition::math::isnan(range) ? this->dataPtr->rangeMax : range;
     scan->set_ranges(i, range);
     scan->set_intensities(i, intensity);
   }

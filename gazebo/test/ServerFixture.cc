@@ -821,8 +821,8 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
-  this->SpawnGpuRaySensorVertical(_modelName, _raySensorName, _pos.Ign(),
-      _rpy.Ign(), _hMinAngle, _hMaxAngle, 0, 0, _minRange, _maxRange,
+  this->SpawnGpuRaySensorVertical(_modelName, _raySensorName, _pos,
+      _rpy, _hMinAngle, _hMaxAngle, 0, 0, _minRange, _maxRange,
       _rangeResolution, _samples, 1, 1, 1, _noiseType, _noiseMean,
       _noiseStdDev);
 }
