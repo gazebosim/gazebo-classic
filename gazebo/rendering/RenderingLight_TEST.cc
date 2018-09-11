@@ -102,6 +102,36 @@ TEST_F(Light_TEST, CastShadows)
   pointLight.reset();
 }
 
+//////////////////////////////////////////////////
+TEST_F(Light_TEST, SetVisible)
+{
+  this->Load("worlds/empty.world");
+
+  auto scene = gazebo::rendering::get_scene("default");
+
+  if (!scene)
+    scene = gazebo::rendering::create_scene("default", false);
+
+  EXPECT_TRUE(scene != nullptr);
+
+  // Create a light
+  gazebo::rendering::LightPtr light = gazebo::rendering::LightPtr(
+      new gazebo::rendering::Light(scene));
+  ASSERT_TRUE(light != nullptr);
+
+  light->Load();
+
+  EXPECT_TRUE(light->Visible());
+  light->SetVisible(false);
+  EXPECT_FALSE(light->Visible());
+  light->SetVisible(true);
+  EXPECT_TRUE(light->Visible());
+
+  // diable visualization - light should still be visible
+  light->ShowVisual(false);
+  EXPECT_TRUE(light->Visible());
+}
+
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
