@@ -127,7 +127,7 @@ TEST_F(Light_TEST, SetVisible)
   light->SetVisible(true);
   EXPECT_TRUE(light->Visible());
 
-  // diable visualization - light should still be visible
+  // disable visualization - light should still be visible
   light->ShowVisual(false);
   EXPECT_TRUE(light->Visible());
 }
