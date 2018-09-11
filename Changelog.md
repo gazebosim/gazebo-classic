@@ -1,5 +1,9 @@
 ## Gazebo 9
 
+## Gazebo 9.x.x (201x-xx-xx)
+
+1. Fix for the spawning light issue
+    * [Pull request 3011](https://bitbucket.org/osrf/gazebo/pull-requests/3011)
 
 ## Gazebo 9.3.1 (2018-08-08)
 
