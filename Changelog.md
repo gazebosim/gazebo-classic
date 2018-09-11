@@ -1,5 +1,10 @@
 ## Gazebo 8
 
+## Gazebo 8.X.X (201X-XX-XX)
+
+1. Include SDF header in rendering::Distortion
+    * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
+
 ## Gazebo 8.6.0 (2018-06-26)
 
 1. Fix SetCrop for multiple cameras and add SetCrop test
