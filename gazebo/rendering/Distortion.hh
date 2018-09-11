@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <ignition/math/Vector2.hh>
+#include <sdf/sdf.hh>
 
 #include "gazebo/math/Vector2d.hh"
 #include "gazebo/rendering/RenderTypes.hh"
