@@ -262,11 +262,14 @@ void Publisher::Fini()
   common::Time slept;
 
   // Wait for the message to be published
+  // @todo(mjcarroll) Figure out if this sleep is truly necessary.
+  /*
   while (!this->pubIds.empty() && slept < common::Time(1, 0))
   {
     common::Time::MSleep(10);
     slept += common::Time(0, 10000000);
   }
+  */
 
   this->node.reset();
 }
