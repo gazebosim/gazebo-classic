@@ -44,6 +44,20 @@ namespace gazebo
     }
 
     template <typename F>
+    bool GpuLaserDataIterator<F>::operator>(
+        const GpuLaserDataIterator<F> &_rvalue) const
+    {
+      return this->index > _rvalue.index;
+    }
+
+    template <typename F>
+    bool GpuLaserDataIterator<F>::operator<(
+        const GpuLaserDataIterator<F> &_rvalue) const
+    {
+      return this->index < _rvalue.index;
+    }
+
+    template <typename F>
     const GpuLaserData GpuLaserDataIterator<F>::operator*() const
     {
       return {
@@ -100,10 +114,12 @@ namespace gazebo
     GpuLaserDataIterator<F>::GpuLaserDataIterator(const unsigned int _index,
         const float *_data, const unsigned int _skip, unsigned int _rangeOffset,
         const unsigned int _intensityOffset,
-        const unsigned int _horizontalResolution) : index(_index), data(_data),
+        const unsigned int _horizontalResolution,
+        const unsigned int _verticalResolution) : index(_index), data(_data),
         skip(_skip), rangeOffset(_rangeOffset),
         intensityOffset(_intensityOffset),
-        horizontalResolution(_horizontalResolution)
+        horizontalResolution(_horizontalResolution),
+        verticalResolution(_verticalResolution)
     {
       // Do nothing
     }

@@ -605,7 +605,8 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->dataPtr->rangeMin);
   scan->set_range_max(this->dataPtr->rangeMax);
 
-  const int numRays = this->RayCount() * this->VerticalRayCount();
+  const int numRays = this->dataPtr->vertRangeCount *
+    this->dataPtr->horzRangeCount;
   if (scan->ranges_size() != numRays)
   {
     // gzdbg << "Size mismatch; allocating memory\n";
@@ -620,7 +621,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
   auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
-  for (int i = 0; dataIter != dataEnd; ++dataIter, ++i)
+  for (int i = 0; dataIter < dataEnd; ++dataIter, ++i)
   {
     const rendering::GpuLaserData data = *dataIter;
     double range = data.range;

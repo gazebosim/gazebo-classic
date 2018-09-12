@@ -36,9 +36,11 @@ TEST(GpuLaserDataIteratorTest, CanConstruct)
   const unsigned int rangeOffset = 7;
   const unsigned int intenOffset = 8;
   const unsigned int horizontalResolution = 9;
+  const unsigned int verticalResolution = 9;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      index, readings, skip, rangeOffset, intenOffset, horizontalResolution);
+      index, readings, skip, rangeOffset, intenOffset, horizontalResolution,
+      verticalResolution);
 
   EXPECT_EQ(index, it.index);
   EXPECT_EQ(readings, it.data);
@@ -46,6 +48,7 @@ TEST(GpuLaserDataIteratorTest, CanConstruct)
   EXPECT_EQ(rangeOffset, it.rangeOffset);
   EXPECT_EQ(intenOffset, it.intensityOffset);
   EXPECT_EQ(horizontalResolution, it.horizontalResolution);
+  EXPECT_EQ(verticalResolution, it.verticalResolution);
 }
 
 /////////////////////////////////////////////////
@@ -53,12 +56,13 @@ TEST(GpuLaserDataIteratorTest, CanGetFirst)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      0, readings, skip, rangeOffset, intenOffset, hRes);
+      0, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   EXPECT_DOUBLE_EQ(readings[0], it->range);
   EXPECT_DOUBLE_EQ(readings[1], it->intensity);
@@ -69,12 +73,13 @@ TEST(GpuLaserDataIteratorTest, CanGetMiddle)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      1, readings, skip, rangeOffset, intenOffset, hRes);
+      1, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   EXPECT_DOUBLE_EQ(readings[3], it->range);
   EXPECT_DOUBLE_EQ(readings[4], it->intensity);
@@ -85,12 +90,13 @@ TEST(GpuLaserDataIteratorTest, CanGetLast)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      2, readings, skip, rangeOffset, intenOffset, hRes);
+      2, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   EXPECT_DOUBLE_EQ(readings[6], it->range);
   EXPECT_DOUBLE_EQ(readings[7], it->intensity);
@@ -101,6 +107,7 @@ TEST(GpuLaserDataIteratorTest, OneBeamSensor)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
@@ -108,7 +115,7 @@ TEST(GpuLaserDataIteratorTest, OneBeamSensor)
   for (unsigned int i = 0; i < hRes; ++i)
   {
     GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-        i, readings, skip, rangeOffset, intenOffset, hRes);
+        i, readings, skip, rangeOffset, intenOffset, hRes, vRes);
     EXPECT_EQ(i, it->reading);
   }
 }
@@ -126,7 +133,7 @@ TEST(GpuLaserDataIteratorTest, threeBeamSensor)
   for (unsigned int i = 0; i < vRes; ++i)
   {
     GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-        i, readings, skip, rangeOffset, intenOffset, hRes);
+        i, readings, skip, rangeOffset, intenOffset, hRes, vRes);
     EXPECT_EQ(i, it->beam);
   }
 }
@@ -138,11 +145,12 @@ TEST(GpuLaserDataIteratorTest, threeByThreeSensor)
                              9, 10, 12, 13, 15, 16,
                             18, 19, 21, 22, 24, 25};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 2;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      0, readings, skip, rangeOffset, intenOffset, hRes);
+      0, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   // 0
   EXPECT_DOUBLE_EQ(readings[0], it->range);
@@ -204,12 +212,13 @@ TEST(GpuLaserDataIteratorTest, CanPrefixIncrement)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      0, readings, skip, rangeOffset, intenOffset, hRes);
+      0, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   auto it_reference = ++it;
 
@@ -223,12 +232,13 @@ TEST(GpuLaserDataIteratorTest, CanPostfixIncrement)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      0, readings, skip, rangeOffset, intenOffset, hRes);
+      0, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   auto it_copy = it++;
 
@@ -242,12 +252,13 @@ TEST(GpuLaserDataIteratorTest, CanPrefixDecrement)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      1, readings, skip, rangeOffset, intenOffset, hRes);
+      1, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   auto it_reference = --it;
 
@@ -261,12 +272,13 @@ TEST(GpuLaserDataIteratorTest, CanPostfixDecrement)
 {
   const float readings[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
   const unsigned int hRes = 3;
+  const unsigned int vRes = 1;
   const unsigned int skip = 3;
   const unsigned int rangeOffset = 0;
   const unsigned int intenOffset = 1;
 
   GpuLaserDataIterator<std::remove_reference<decltype(*this)>::type> it(
-      1, readings, skip, rangeOffset, intenOffset, hRes);
+      1, readings, skip, rangeOffset, intenOffset, hRes, vRes);
 
   auto it_copy = it--;
 
