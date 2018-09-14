@@ -108,8 +108,7 @@ namespace gazebo
                          const float *_data, const unsigned int _skip,
                          const unsigned int _rangeOffset,
                          const unsigned int _intensityOffset,
-                         const unsigned int _horizontalResolution,
-                         const unsigned int _verticalResolution);
+                         const unsigned int _horizontalResolution);
 
 
       // Not using PIMPL because it has no benefit on templated classes
@@ -131,9 +130,6 @@ namespace gazebo
 
       /// \brief Number of readings in each plane or cone
       private: const unsigned int horizontalResolution = 0;
-
-      /// \brief Number of planes in the cone
-      private: const unsigned int verticalResolution = 0;
     };
   }
 }

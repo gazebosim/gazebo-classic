@@ -621,7 +621,7 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
 
   auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
   auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
-  for (int i = 0; dataIter < dataEnd; ++dataIter, ++i)
+  for (int i = 0; dataIter != dataEnd; ++dataIter, ++i)
   {
     const rendering::GpuLaserData data = *dataIter;
     double range = data.range;
