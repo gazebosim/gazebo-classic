@@ -67,16 +67,6 @@ namespace gazebo
       /// \return true iff the iterators point to different readings
       public: bool operator!=(const GpuLaserDataIterator &_rvalue) const;
 
-       /// \brief Operator >
-      /// \param[in] _rvalue The iterator on the right of the >
-      /// \return true iff the iterators point to a greater index
-      public: bool operator>(const GpuLaserDataIterator &_rvalue) const;
-
-      /// \brief Operator <
-      /// \param[in] _rvalue The iterator on the right of the <
-      /// \return true iff the iterators point to a smaller index
-      public: bool operator<(const GpuLaserDataIterator &_rvalue) const;
-
       /// \brief Dereference operator *iter
       /// \return A struct of laser data
       public: const GpuLaserData operator*() const;
