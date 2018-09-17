@@ -241,7 +241,9 @@ void Publisher::OnPublishComplete(uint32_t _id)
     // condition where the publisher is destroyed before all
     // OnPublishComplete callbacks are fired.
     boost::mutex::scoped_lock lock(this->mutex);
-  } catch (...) {
+  }
+  catch(...)
+  {
     return;
   }
 
