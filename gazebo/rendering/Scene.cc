@@ -2731,6 +2731,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        const double skirtLen = this->dataPtr->heightmapSkirtLength;
+        this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }
@@ -2769,16 +2771,18 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   {
     // Make sure the parent visual exists before trying to add a child
     // visual
-    iter = this->dataPtr->visuals.find(_msg->parent_id());
-    if (iter == this->dataPtr->visuals.end())
-    {
+    VisualPtr parent = this->GetVisual(_msg->parent_name());
+    if (!parent)
       return false;
-    }
 
-    visual.reset(new Visual(_msg->name(), iter->second));
+    visual.reset(new Visual(_msg->name(), parent));
   }
   else
   {
+    // Make sure the world visual exists before trying to add a child visual
+    if (!this->dataPtr->worldVisual)
+      return false;
+
     // Add a visual that is attached to the scene root
     visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
   }
@@ -3347,6 +3351,23 @@ unsigned int Scene::HeightmapLOD() const
     return this->dataPtr->terrain->LOD();
 
   return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapSkirtLength(const double _value)
+{
+  this->dataPtr->heightmapSkirtLength = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapSkirtLength() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->SkirtLength();
+
+  return this->dataPtr->heightmapSkirtLength;
 }
 
 /////////////////////////////////////////////////

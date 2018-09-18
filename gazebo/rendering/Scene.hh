@@ -461,6 +461,16 @@ namespace gazebo
       /// \sa Heightmap::LOD
       public: unsigned int HeightmapLOD() const;
 
+      /// \brief Set the skirt length value for the heightmap LOD tiles.
+      /// \param[in] _value Length of skirts on LOD tiles
+      /// \sa Heightmap::SetSkirtLength
+      public: void SetHeightmapSkirtLength(const double _value);
+
+      /// \brief Get the skirt length value for the heightmap LOD tiles.
+      /// \return Length of skirts on LOD tiles
+      /// \sa Heightmap::SkirtLength
+      public: double HeightmapSkirtLength() const;
+
       /// \brief Clear rendering::Scene
       public: void Clear();
 
