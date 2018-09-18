@@ -1,6 +1,6 @@
 ## Gazebo 9
 
-## Gazebo 9.x.x (201x-xx-xx)
+## Gazebo 9.4.0 (2018-09-18)
 
 1. Fix for the spawning light issue. This fix allows a light's visual to be
    turned on/off.
