@@ -6,6 +6,24 @@
    turned on/off.
     * [Pull request 3011](https://bitbucket.org/osrf/gazebo/pull-requests/3011)
 
+1. Add joystick plugin and demo world
+    * [Pull request 2895](https://bitbucket.org/osrf/gazebo/pull-request/2895)
+
+1. Support toggling light visuals.
+    * [Pull request 3011](https://bitbucket.org/osrf/gazebo/pull-request/3011)
+
+1. Improve shutdown speed.
+    * [Pull request 3014](https://bitbucket.org/osrf/gazebo/pull-request/3014)
+
+1. Fix vertical lidar rays.
+    * [Pull request 3013](https://bitbucket.org/osrf/gazebo/pull-request/3013)
+
+1. Only use active interfaces in gazebo/transport.
+    * [Pull request 3009](https://bitbucket.org/osrf/gazebo/pull-request/3009)
+
+1. Trigger the stop event on sigint/sigterm.
+    * [Pull request 2993](https://bitbucket.org/osrf/gazebo/pull-request/2993)
+
 ## Gazebo 9.3.1 (2018-08-08)
 
 1. Fix for the spawning light issue
@@ -68,9 +86,6 @@
 
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
-
-1. Add joystick plugin and demo world
-    * [Pull request 2895](https://bitbucket.org/osrf/gazebo/pull-request/2895)
 
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
