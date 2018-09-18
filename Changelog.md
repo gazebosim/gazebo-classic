@@ -5,14 +5,6 @@
 1. Include SDF header in rendering::Distortion
     * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
 
-## Gazebo 8.6.0 (2018-06-26)
-
-1. Fix SetCrop for multiple cameras and add SetCrop test
-    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
-
-1. Fix check terrain layer count in height map
-    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
-
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
 
@@ -28,6 +20,15 @@
 
 1. Patch for visual message process
     * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
+
+## Gazebo 8.6.0 (2018-06-26)
+
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
+
+1. Fix check terrain layer count in height map
+    * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
 
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
