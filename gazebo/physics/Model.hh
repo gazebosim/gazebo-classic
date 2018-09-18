@@ -409,6 +409,9 @@ namespace gazebo
       /// \param[in] _type type of joint
       /// \param[in] _parent parent link of joint
       /// \param[in] _child child link of joint
+      /// \remark This loads the joint, but does not initialize it.
+      /// Joint::Init() must be called on the returned joint to make it affect
+      /// the simulation.
       /// \return a JointPtr to the new joint created,
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
@@ -419,6 +422,9 @@ namespace gazebo
 
       /// \brief Create a joint for this model
       /// \param[in] _sdf SDF parameters for <joint>
+      /// \remark This loads the joint, but does not initialize it.
+      /// Joint::Init() must be called on the returned joint to make it affect
+      /// the simulation.
       /// \return a JointPtr to the new joint created,
       ///         returns NULL JointPtr() if joint by name _name
       ///         already exists.
