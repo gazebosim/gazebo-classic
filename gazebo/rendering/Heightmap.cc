@@ -720,6 +720,8 @@ void Heightmap::ConfigureTerrainDefaults()
     }
   }
 
+  this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
+
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
 
@@ -1182,6 +1184,23 @@ void Heightmap::SetLOD(const unsigned int _value)
 unsigned int Heightmap::LOD() const
 {
   return static_cast<unsigned int>(this->dataPtr->maxPixelError);
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetSkirtLength(const double _value)
+{
+  this->dataPtr->skirtLength = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setSkirtSize(
+        this->dataPtr->skirtLength);
+  }
+}
+
+/////////////////////////////////////////////////
+double Heightmap::SkirtLength() const
+{
+  return this->dataPtr->skirtLength;
 }
 
 /////////////////////////////////////////////////

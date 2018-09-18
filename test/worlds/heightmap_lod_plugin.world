@@ -26,6 +26,7 @@
           </geometry>
           <plugin name="lod" filename="libHeightmapLODPlugin.so">
             <lod>5</lod>
+            <skirt_length>0.5</skirt_length>
           </plugin>
         </visual>
       </link>
