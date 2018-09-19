@@ -21,6 +21,10 @@
 1. Patch for visual message process
     * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
 
+1. Print joint_cmd deprecation warnings only one time
+    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
+    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
 
 ## Gazebo 8.6.0 (2018-06-26)
 
@@ -38,10 +42,6 @@
 
 
 ## Gazebo 8.5.0 (2018-06-08)
-
-1. Print joint_cmd deprecation warnings only one time
-    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
-    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
 
 1. Fix BulletHingeJoint limits when child link has off-diagonal inertia
     * [Pull request 2883](https://bitbucket.org/osrf/gazebo/pull-requests/2883)
