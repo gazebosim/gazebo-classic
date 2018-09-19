@@ -457,6 +457,130 @@ TEST_F(VisualProperty, NormalMap)
 }
 #endif
 
+/////////////////////////////////////////////////
+TEST_F(VisualProperty, VisualMessage)
+{
+  // Load a world with a camera facing a red box
+  // There was a problem that a duplicate visual object was created if a Visual
+  // message is sent to the ~/visual topic just after the simulator starts.
+  // This test verifies the box visual transparency can be correctly changed.
+  // It first sends messages to make the box invisible. After that, it sends
+  // messages to change it back to the default.
+  Load("worlds/shader_test.world");
+
+  // Prepare a publisher to update a visual object.
+  auto world = physics::get_world();
+  auto node = transport::NodePtr(new transport::Node());
+  node->Init(world->Name());
+  auto model = world->ModelByName("box");
+  ASSERT_TRUE(model != nullptr);
+  auto link = model->GetLink("link");
+  ASSERT_TRUE(link != nullptr);
+  auto pubVisual
+    = node->Advertise<gazebo::msgs::Visual>("~/visual");
+  pubVisual->WaitForConnection();
+  msgs::Visual msg;
+  msg.set_name("box::link::visual");
+  msg.set_parent_name("box::link");
+  uint32_t id;
+  link->VisualId("visual", id);
+  msg.set_id(id);
+
+  // Publish a message to make it transparent at the beginning.
+  msg.set_transparency(1.0);
+  pubVisual->Publish(msg);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
+    return;
+  }
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // 1 camera in scene
+  rendering::CameraPtr cam = scene->GetCamera(0);
+  ASSERT_NE(nullptr, cam);
+
+  int totalImages = 20;
+  imageCount = 0;
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  img = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c =
+      cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  unsigned int sleep = 0;
+  unsigned int maxSleep = 50;
+  while (imageCount < totalImages && sleep++ < maxSleep)
+  {
+    // Keep sending a command.
+    pubVisual->Publish(msg);
+    common::Time::MSleep(100);
+  }
+
+  EXPECT_GE(imageCount, totalImages);
+  c.reset();
+
+  // Now the ground surface, which is not red, should be visible to the camera.
+  for (unsigned int y = height/2; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_FALSE(r == 255u && g == 0u && b == 0u);
+    }
+  }
+
+  // Next, publish a message to change the transparency back to the default.
+  msg.set_transparency(0.0);
+  pubVisual->Publish(msg);
+
+  // get more images
+  sleep = 0;
+  imageCount = 0;
+  c = cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  while (imageCount < totalImages && sleep++ < maxSleep)
+  {
+    // keep sending a command.
+    pubVisual->Publish(msg);
+    common::Time::MSleep(100);
+  }
+
+  EXPECT_GE(imageCount, totalImages);
+  c.reset();
+
+  // verify the object reappeared.
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(255u, r);
+      EXPECT_EQ(0u, g);
+      EXPECT_EQ(0u, b);
+    }
+  }
+
+  delete [] img;
+}
+
 int main(int argc, char **argv)
 {
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0) && defined(__APPLE__))
