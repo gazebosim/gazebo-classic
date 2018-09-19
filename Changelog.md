@@ -1,5 +1,16 @@
 ## Gazebo 9
 
+## Gazebo 9.X.X (20XX-XX-XX)
+
+
+## Gazebo 9.4.1 (2018-09-19)
+
+1. Revert pr 2923: "Handle signal SIGTERM exactly the same way as SIGINT"
+    * [Pull request 3018](https://bitbucket.org/osrf/gazebo/pull-request/3018)
+    * Reverts [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
+    * Some discussion in [Pull request 3014](https://bitbucket.org/osrf/gazebo/pull-request/3014)
+
+
 ## Gazebo 9.4.0 (2018-09-18)
 
 1. Fix for the spawning light issue. This fix allows a light's visual to be
