@@ -24,6 +24,30 @@
 1. Trigger the stop event on sigint/sigterm.
     * [Pull request 2993](https://bitbucket.org/osrf/gazebo/pull-request/2993)
 
+1. Include SDF header in rendering::Distortion
+    * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
+
+1. More documentation to Model::CreateJoint()
+    * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
+
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
+1. Print joint_cmd deprecation warnings only one time
+    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
+    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
+
 ## Gazebo 9.3.1 (2018-08-08)
 
 1. Fix for the spawning light issue
