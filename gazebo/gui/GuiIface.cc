@@ -409,12 +409,16 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
-  if (sigaction(SIGTERM, &sigact, NULL))
-  {
-    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
-              << std::endl;
-    return false;
-  }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  //   return false;
+  // }
 #endif
 
   g_app->exec();
