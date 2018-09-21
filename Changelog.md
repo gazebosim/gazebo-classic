@@ -8,6 +8,9 @@
 1. Improve ODE slip parameter behavior with multiple contact points
     * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
 
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
 
 ## Gazebo 7.14.0 (2018-07-27)
 
