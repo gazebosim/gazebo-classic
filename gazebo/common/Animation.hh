@@ -153,6 +153,9 @@ namespace gazebo
 
       /// \brief smooth interpolation for rotation
       private: mutable ignition::math::RotationSpline *rotationSpline;
+
+      /// \brief Spline tension parameter.
+      private: double tension = 0.0;
     };
     /// \}
 

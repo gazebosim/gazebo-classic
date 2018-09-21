@@ -26,9 +26,6 @@
 using namespace gazebo;
 using namespace common;
 
-// Deprecated in gazebo9. Move this value to a member variable in gazebo10.
-double kPoseAnimationTension = 0.0;
-
 namespace
 {
   struct KeyFrameTimeLess
@@ -183,7 +180,7 @@ PoseAnimation::PoseAnimation(const std::string &_name,
     double _length, bool _loop, double _tension)
 : Animation(_name, _length, _loop)
 {
-  kPoseAnimationTension = _tension;
+  this->tension = _tension;
   this->positionSpline = nullptr;
   this->rotationSpline = nullptr;
 }
@@ -221,7 +218,7 @@ void PoseAnimation::BuildInterpolationSplines() const
   this->positionSpline->AutoCalculate(false);
   this->rotationSpline->AutoCalculate(false);
 
-  this->positionSpline->Tension(kPoseAnimationTension);
+  this->positionSpline->Tension(this->tension);
   this->positionSpline->Clear();
   this->rotationSpline->Clear();
 
