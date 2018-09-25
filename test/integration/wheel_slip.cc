@@ -411,10 +411,12 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 // with locked wheels can hold position on a slope,
 // simulated as a ground plane with lateral gravity.
 // The model variations include:
-// * Lumped rigid body with fixed collisions for each wheel.
-// * Chassis connected to spherical wheels with fixed joints.
-// * Chassis connected to spherical wheels with revolute joints
-//   and using joint friction to keep the wheels locked.
+// * triball_lumped: Lumped rigid body with fixed collisions for each wheel.
+// * triball_fixed: Chassis connected to spherical wheels with fixed joints.
+// * triball_revolute: Chassis connected to spherical wheels with revolute
+//   joints and using joint friction to keep the wheels locked.
+// * triball_wheel_slip: Same as triball_revolute but with the WheelSlipPlugin
+//   applied to each wheel.
 TEST_F(WheelSlipTest, TriballDrift)
 {
   gazebo::common::SystemPaths::Instance()->AddModelPaths(
