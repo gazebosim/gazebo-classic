@@ -133,6 +133,13 @@ class WheelSlipTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
+// This test simulates a single wheel with the WheelSlipPlugin using
+// a friction pyramid model rolling on a dynamometer.
+// The testrig controls the rotational speed of the tire and drum
+// as well as the wheel steering angle and normal load.
+// Test conditions are specified in the WheelSlipState class
+// and a force-torque sensor is used to measure the longitudinal
+// and lateral friction forces.
 TEST_F(WheelSlipTest, TireDrum)
 {
   const double metersPerMile = 1609.34;
@@ -341,6 +348,12 @@ TEST_F(WheelSlipTest, TireDrum)
 }
 
 /////////////////////////////////////////////////
+// Set the control inputs for the testrig:
+// * drum spin speed
+// * wheel spin speed
+// * suspension force
+// * steering angle
+// * wheel slip compliance parameters (lateral and longitudinal)
 void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 {
   // PID gains for joint controllers
