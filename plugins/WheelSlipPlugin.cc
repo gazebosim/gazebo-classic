@@ -445,6 +445,7 @@ void WheelSlipPlugin::SetSlipComplianceLongitudinal(const double _compliance)
 /////////////////////////////////////////////////
 void WheelSlipPlugin::Update()
 {
+  // Get slip data so it can be published later
   std::map<std::string, ignition::math::Vector3d> slips;
   this->GetSlips(slips);
 
@@ -452,20 +453,49 @@ void WheelSlipPlugin::Update()
   for (const auto &linkSurface : this->dataPtr->mapLinkSurfaceParams)
   {
     const auto &params = linkSurface.second;
+
+    // get user-defined normal force constant
     double force = params.wheelNormalForce;
+
+    // get link angular velocity parallel to joint axis
+    ignition::math::Vector3d wheelAngularVelocity;
+    auto link = linkSurface.first.lock();
+    if (link)
+      wheelAngularVelocity = link->GetWorldAngularVel().Ign();
+
+    ignition::math::Vector3d jointAxis;
     auto joint = params.joint.lock();
-    double omega = 0;
     if (joint)
-      omega = joint->GetVelocity(0);
-    double speed = std::abs(omega) * params.wheelRadius;
+      jointAxis = joint->GetGlobalAxis(0).Ign();
+
+    double spinAngularVelocity = wheelAngularVelocity.Dot(jointAxis);
+
     auto surface = params.surface.lock();
     if (surface)
     {
+      // As discussed in WheelSlipPlugin.hh, the ODE slip1 and slip2
+      // parameters have units of inverse viscous damping:
+      // [linear velocity / force] or [m / s / N].
+      // Since the slip compliance parameters supplied to the plugin
+      // are unitless, they must be scaled by a linear speed and force
+      // magnitude before being passed to ODE.
+      // The force is taken from a user-defined constant that should roughly
+      // match the steady-state normal force at the wheel.
+      // The linear speed is computed dynamically at each time step as
+      // radius * spin angular velocity.
+      // This choice of linear speed corresponds to the denominator of
+      // the slip ratio during acceleration (see equation (1) in
+      // Yoshida, Hamano 2002 DOI 10.1109/ROBOT.2002.1013712
+      // "Motion dynamics of a rover with slip-based traction model").
+      // The acceleration form is more well-behaved numerically at low-speed
+      // and when the vehicle is at rest than the braking form,
+      // so it is used for both slip directions.
+      double speed = params.wheelRadius * std::abs(spinAngularVelocity);
       surface->slip1 = speed / force * params.slipComplianceLateral;
       surface->slip2 = speed / force * params.slipComplianceLongitudinal;
     }
 
-    auto link = linkSurface.first.lock();
+    // Try to publish slip data for this wheel
     if (link)
     {
       msgs::Vector3d msg;

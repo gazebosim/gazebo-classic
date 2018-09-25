@@ -133,6 +133,13 @@ class WheelSlipTest : public ServerFixture
 };
 
 /////////////////////////////////////////////////
+// This test simulates a single wheel with the WheelSlipPlugin using
+// a friction pyramid model rolling on a dynamometer.
+// The testrig controls the rotational speed of the tire and drum
+// as well as the wheel steering angle and normal load.
+// Test conditions are specified in the WheelSlipState class
+// and a force-torque sensor is used to measure the longitudinal
+// and lateral friction forces.
 TEST_F(WheelSlipTest, TireDrum)
 {
   const double metersPerMile = 1609.34;
@@ -341,6 +348,12 @@ TEST_F(WheelSlipTest, TireDrum)
 }
 
 /////////////////////////////////////////////////
+// Set the control inputs for the testrig:
+// * drum spin speed
+// * wheel spin speed
+// * suspension force
+// * steering angle
+// * wheel slip compliance parameters (lateral and longitudinal)
 void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 {
   // PID gains for joint controllers
@@ -411,10 +424,12 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 // with locked wheels can hold position on a slope,
 // simulated as a ground plane with lateral gravity.
 // The model variations include:
-// * Lumped rigid body with fixed collisions for each wheel.
-// * Chassis connected to spherical wheels with fixed joints.
-// * Chassis connected to spherical wheels with revolute joints
-//   and using joint friction to keep the wheels locked.
+// * triball_lumped: Lumped rigid body with fixed collisions for each wheel.
+// * triball_fixed: Chassis connected to spherical wheels with fixed joints.
+// * triball_revolute: Chassis connected to spherical wheels with revolute
+//   joints and using joint friction to keep the wheels locked.
+// * triball_wheel_slip: Same as triball_revolute but with the WheelSlipPlugin
+//   applied to each wheel.
 TEST_F(WheelSlipTest, TriballDrift)
 {
   gazebo::common::SystemPaths::Instance()->AddModelPaths(
@@ -490,7 +505,7 @@ TEST_F(WheelSlipTest, TriballDrift)
   EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-6);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 1e-7);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 1e-6);
-  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 1e-7);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 2e-7);
   EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsVelocityX.Value(), 1e-6);
 }
 

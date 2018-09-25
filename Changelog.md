@@ -2,6 +2,15 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. More documentation to Model::CreateJoint()
+    * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
+
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
 
