@@ -490,7 +490,7 @@ TEST_F(WheelSlipTest, TriballDrift)
   EXPECT_NEAR(0.0, measures["triball_fixed"].statsVelocityX.Value(), 1e-6);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsPositionX.Value(), 1e-7);
   EXPECT_NEAR(0.0, measures["triball_revolute"].statsVelocityX.Value(), 1e-6);
-  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 1e-7);
+  EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsPositionX.Value(), 2e-7);
   EXPECT_NEAR(0.0, measures["triball_wheel_slip"].statsVelocityX.Value(), 1e-6);
 }
 
