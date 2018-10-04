@@ -32,13 +32,42 @@
 // hinge 2. note that this joint must be attached to two bodies for it to work
 
 dReal
-dxJointHinge2::measureAngle() const
+dxJointHinge2::measureAngle1() const
 {
-    dVector3 a1, a2;
-    dMultiply0_331( a1, node[1].body->posr.R, axis2 );
-    dMultiply1_331( a2, node[0].body->posr.R, a1 );
-    dReal x = dCalcVectorDot3( v1, a2 );
-    dReal y = dCalcVectorDot3( v2, a2 );
+    // bring axis 2 into first body's reference frame
+    dVector3 p, q;
+    if (node[1].body)
+        dMultiply0_331( p, node[1].body->posr.R, axis2 );
+    else
+        dCopyVector3(p, axis2);
+
+    if (node[0].body)
+        dMultiply1_331( q, node[0].body->posr.R, p );
+    else
+        dCopyVector3(q, p);
+
+    dReal x = dCalcVectorDot3( v1, q );
+    dReal y = dCalcVectorDot3( v2, q );
+    return -dAtan2( y, x );
+}
+
+dReal
+dxJointHinge2::measureAngle2() const
+{
+    // bring axis 1 into second body's reference frame
+    dVector3 p, q;
+    if (node[0].body)
+        dMultiply0_331( p, node[0].body->posr.R, axis1 );
+    else
+        dCopyVector3(p, axis1);
+
+    if (node[1].body)
+        dMultiply1_331( q, node[1].body->posr.R, p );
+    else
+        dCopyVector3(q, p);
+
+    dReal x = dCalcVectorDot3( w1, q );
+    dReal y = dCalcVectorDot3( w2, q );
     return -dAtan2( y, x );
 }
 
@@ -88,7 +117,7 @@ dxJointHinge2::getInfo1( dxJoint::Info1 *info )
     if (( limot1.lostop >= -M_PI || limot1.histop <= M_PI ) &&
             limot1.lostop <= limot1.histop )
     {
-        dReal angle = measureAngle();
+        dReal angle = measureAngle1();
         limot1.testRotationalLimit( angle );
     }
     if ( limot1.limit || limot1.fmax > 0 ) info->m++;
@@ -224,6 +253,35 @@ dxJointHinge2::makeV1andV2()
     }
 }
 
+// same as above, but for the second axis
+
+void
+dxJointHinge2::makeW1andW2()
+{
+    if ( node[1].body )
+    {
+        // get axis 1 and 2 in global coords
+        dVector3 ax1, ax2, w;
+        dMultiply0_331( ax1, node[0].body->posr.R, axis1 );
+        dMultiply0_331( ax2, node[1].body->posr.R, axis2 );
+
+        // don't do anything if the axis1 or axis2 vectors are zero or the same
+        if (( ax1[0] == 0 && ax1[1] == 0 && ax1[2] == 0 ) ||
+            ( ax2[0] == 0 && ax2[1] == 0 && ax2[2] == 0 ) ||
+            ( ax1[0] == ax2[0] && ax1[1] == ax2[1] && ax1[2] == ax2[2] ) ) return;
+
+        // modify axis 1 so it's perpendicular to axis 2
+        dReal k = dCalcVectorDot3( ax2, ax1 );
+        for ( int i = 0; i < 3; i++ ) ax1[i] -= k * ax2[i];
+        dNormalize3( ax1 );
+
+        // make w1 = modified axis1, w2 = axis2 x (modified axis1)
+        dCalcVectorCross3( w, ax2, ax1 );
+        dMultiply1_331( w1, node[1].body->posr.R, ax1 );
+        dMultiply1_331( w2, node[1].body->posr.R, w );
+    }
+}
+
 
 void dJointSetHinge2Anchor( dJointID j, dReal x, dReal y, dReal z )
 {
@@ -232,6 +290,7 @@ void dJointSetHinge2Anchor( dJointID j, dReal x, dReal y, dReal z )
     checktype( joint, Hinge2 );
     setAnchors( joint, x, y, z, joint->anchor1, joint->anchor2 );
     joint->makeV1andV2();
+    joint->makeW1andW2();
 }
 
 
@@ -249,6 +308,7 @@ void dJointSetHinge2Axis1( dJointID j, dReal x, dReal y, dReal z )
         joint->getAxisInfo( ax1, ax2, ax, joint->s0, joint->c0 );
     }
     joint->makeV1andV2();
+    joint->makeW1andW2();
 }
 
 
@@ -267,6 +327,7 @@ void dJointSetHinge2Axis2( dJointID j, dReal x, dReal y, dReal z )
         joint->getAxisInfo( ax1, ax2, ax, joint->s0, joint->c0 );
     }
     joint->makeV1andV2();
+    joint->makeW1andW2();
 }
 
 
@@ -390,9 +451,18 @@ dReal dJointGetHinge2Angle1( dJointID j )
     dxJointHinge2* joint = ( dxJointHinge2* )j;
     dUASSERT( joint, "bad joint argument" );
     checktype( joint, Hinge2 );
-    if ( joint->node[0].body ) return joint->measureAngle();
-    else return 0;
+    return joint->measureAngle1();
 }
+
+
+dReal dJointGetHinge2Angle2( dJointID j )
+{
+    dxJointHinge2* joint = ( dxJointHinge2* )j;
+    dUASSERT( joint, "bad joint argument" );
+    checktype( joint, Hinge2 );
+    return joint->measureAngle2();
+}
+
 
 
 dReal dJointGetHinge2Angle1Rate( dJointID j )
@@ -490,4 +560,5 @@ dxJointHinge2::setRelativeValues()
     getAxisInfo( ax1, ax2, axis, s0, c0 );
 
     makeV1andV2();
+    makeW1andW2();
 }
