@@ -29,6 +29,8 @@ struct dxJointGearbox : public dxJoint
 {
     dVector3 axis1, axis2;
     dReal ratio;        // gearbox ratio
+    dReal refAngle1;    // gearbox reference angle 1
+    dReal refAngle2;    // gearbox reference angle 2
     dReal erp;          // error reduction
     dReal cfm;          // constraint force mix in
     dxBody *refBody1;    // reference body for calculating gear angle 1
