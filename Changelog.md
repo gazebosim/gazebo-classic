@@ -2,6 +2,10 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
 1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
     * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
 
