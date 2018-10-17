@@ -76,6 +76,7 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
+  VariableGearboxPlugin
   VehiclePlugin)
 
 set (plugins_private_header
