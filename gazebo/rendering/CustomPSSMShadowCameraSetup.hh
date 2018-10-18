@@ -43,6 +43,9 @@ namespace gazebo
       /// \sa SubRenderState::resolveParameters.
       protected: virtual bool resolveParameters(
                   Ogre::RTShader::ProgramSet *_programSet) override;
+
+      /// \brief Type of sub render state.
+      public: static Ogre::String Type;
     };
 
     /// \brief A factory that enables creation of CustomPSSM3 instances.

@@ -53,12 +53,12 @@ THE SOFTWARE.
 using namespace gazebo;
 using namespace rendering;
 
-Ogre::String Ogre::RTShader::IntegratedPSSM3::Type = "CustomPSSM3";
+Ogre::String CustomPSSM3::Type = "CustomPSSM3";
 
 //////////////////////////////////////////////////
 const Ogre::String &CustomPSSM3::getType() const
 {
-  return Type;
+  return CustomPSSM3::Type;
 }
 
 //////////////////////////////////////////////////
@@ -193,7 +193,7 @@ bool CustomPSSM3::resolveParameters(Ogre::RTShader::ProgramSet *_programSet)
 //////////////////////////////////////////////////
 const Ogre::String &CustomPSSM3Factory::getType() const
 {
-  return Ogre::RTShader::IntegratedPSSM3::Type;
+  return CustomPSSM3::Type;
 }
 
 //////////////////////////////////////////////////
@@ -382,7 +382,7 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
     {
       // set FOV slightly larger than spotlight range
       mTempFrustum->setFOVy(Ogre::Math::Clamp<Ogre::Radian>(
-          _light.getSpotlightOuterAngle() * 1.2, Ogre::Radian(0),
+          _light.getSpotlightOuterAngle() * 1.2f, Ogre::Radian(0),
           Ogre::Radian(Ogre::Math::PI/2.0f)));
 
       mTempFrustum->setNearClipDistance(
@@ -400,7 +400,7 @@ void CustomPSSMShadowCameraSetup::calculateShadowMappingMatrix(
       outCam->setDirection(_light.getDerivedDirection());
       outCam->setPosition(_light.getDerivedPosition());
       outCam->setFOVy(Ogre::Math::Clamp<Ogre::Radian>(
-          _light.getSpotlightOuterAngle() * 1.2, Ogre::Radian(0),
+          _light.getSpotlightOuterAngle() * 1.2f, Ogre::Radian(0),
           Ogre::Radian(Ogre::Math::PI/2.0f)));
       outCam->setNearClipDistance(_light._deriveShadowNearClipDistance(&_cam));
       outCam->setFarClipDistance(_light._deriveShadowFarClipDistance(&_cam));
