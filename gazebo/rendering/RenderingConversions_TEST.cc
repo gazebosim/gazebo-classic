@@ -17,16 +17,14 @@
 
 #include <gtest/gtest.h>
 
-#include "gazebo/test/ServerFixture.hh"
+#include "test/util.hh"
 
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/Conversions.hh"
 
 using namespace gazebo;
-class Conversions_TEST : public ServerFixture
-{
-};
+class Conversions_TEST : public gazebo::testing::AutoLogFixture { };
 
 /////////////////////////////////////////////////
 TEST_F(Conversions_TEST, TransformSpace)

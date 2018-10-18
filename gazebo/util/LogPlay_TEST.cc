@@ -18,6 +18,8 @@
 #include <gtest/gtest.h>
 #include <boost/filesystem.hpp>
 #include <string>
+#include <thread>
+#include <sstream>
 #include "gazebo/common/CommonIface.hh"
 #include "gazebo/common/Time.hh"
 #include "gazebo/util/LogPlay.hh"
@@ -67,14 +69,14 @@ TEST_F(LogPlay_TEST, Accessors)
   std::ostringstream expectedHeader;
 
   expectedHeader << "<?xml version='1.0'?>\n"
-                 <<   "<gazebo_log>\n"
-                 <<     "<header>\n"
-                 <<       "<log_version>1.0</log_version>\n"
-                 <<       "<gazebo_version>6.0.0</gazebo_version>\n"
-                 <<       "<rand_seed>27838</rand_seed>\n"
-                 <<       "<log_start>" << expectedStartTime << "</log_start>\n"
-                 <<       "<log_end>" << expectedEndTime << "</log_end>\n"
-                 <<     "</header>\n";
+                 << "<gazebo_log>\n"
+                 << "<header>\n"
+                 << "<log_version>1.0</log_version>\n"
+                 << "<gazebo_version>6.0.0</gazebo_version>\n"
+                 << "<rand_seed>27838</rand_seed>\n"
+                 << "<log_start>" << expectedStartTime << "</log_start>\n"
+                 << "<log_end>" << expectedEndTime << "</log_end>\n"
+                 << "</header>\n";
 
   gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
 
@@ -343,6 +345,57 @@ TEST_F(LogPlay_TEST, MultiStep)
   expectedShashum = "961cf9dcd38c12f33a8b2f3a3a6fdb879b2faa98";
   shasum = gazebo::common::get_sha1<std::string>(frame);
   EXPECT_EQ(shasum, expectedShashum);
+}
+
+/////////////////////////////////////////////////
+/// \brief Test reading a log file that is missing the closing </gazebo_log>
+/// tag
+TEST_F(LogPlay_TEST, NoEndTag)
+{
+  // \todo Make temporary files work in windows.
+#ifndef _WIN32
+  gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
+
+  std::ifstream srcFile(std::string(TEST_PATH) + "/logs/state_no_end.log",
+      std::ios::binary);
+  ASSERT_TRUE(srcFile.good());
+
+  std::ostringstream stream;
+  stream << "/tmp/__gz_log_test" << std::this_thread::get_id();
+
+  std::string tmpFilename = stream.str();
+  std::ofstream destFile(tmpFilename, std::ios::binary);
+  ASSERT_TRUE(destFile.good());
+
+  // Copy source to a temporary file so that we can modify it.
+  destFile << srcFile.rdbuf();
+  destFile.close();
+
+  // Make sure we can read the log file
+  EXPECT_NO_THROW(player->Open(tmpFilename));
+
+  std::ifstream inFile(tmpFilename);
+  inFile.seekg(0, std::ios::end);
+
+  // Get the length of the file.
+  int length = inFile.tellg();
+
+  std::string endTag = "</gazebo_log>";
+
+  // Back up the length of the closing tag.
+  inFile.seekg(length - 1 - endTag.length());
+
+  // Get the last line
+  std::string lastLine;
+  std::getline(inFile, lastLine);
+  inFile.close();
+
+  // Remove the temp file
+  std::remove(tmpFilename.c_str());
+
+  // Check that the log file now has the closing end tag
+  EXPECT_EQ(lastLine, endTag);
+#endif
 }
 
 /////////////////////////////////////////////////
