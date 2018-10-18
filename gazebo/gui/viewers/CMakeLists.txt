@@ -27,6 +27,7 @@ set (qt_headers
 
 set (qt_tests
   ImagesView_TEST.cc
+  LaserView_TEST.cc
 )
 
 # Generate executables for each of the QT unit tests

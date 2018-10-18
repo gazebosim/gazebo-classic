@@ -28,6 +28,13 @@ MouseEvent::MouseEvent()
 }
 
 /////////////////////////////////////////////////
+MouseEvent::MouseEvent(const MouseEvent &_other)
+  : dataPtr(new MouseEventPrivate)
+{
+  *dataPtr = *_other.dataPtr;
+}
+
+/////////////////////////////////////////////////
 MouseEvent::~MouseEvent()
 {
   delete this->dataPtr;
@@ -200,4 +207,15 @@ bool MouseEvent::Control() const
 void MouseEvent::SetControl(const bool _control) const
 {
   this->dataPtr->control = _control;
+}
+
+/////////////////////////////////////////////////
+MouseEvent &MouseEvent::operator=(const MouseEvent &_other)
+{
+  if (this == &_other)
+      return *this;
+
+  *this->dataPtr = *_other.dataPtr;
+
+  return *this;
 }
