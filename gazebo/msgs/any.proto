@@ -1,0 +1,45 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Any
+/// \brief Any message.
+
+import "color.proto";
+import "pose.proto";
+import "quaternion.proto";
+import "vector3d.proto";
+
+message Any
+{
+  /// \brief ToDo.
+  enum ValueType
+  {
+    DOUBLE     = 1;
+    INT32      = 2;
+    STRING     = 3;
+    VECTOR3D   = 4;
+    COLOR      = 5;
+    POSE       = 6;
+    QUATERNION = 7;
+    BOOLEAN    = 8;
+  }
+
+  /// \brief ToDo.
+  required ValueType type              = 1;
+  /// \brief ToDo.
+  optional double double_value         = 2;
+  /// \brief ToDo.
+  optional int32 int_value             = 3;
+  /// \brief ToDo.
+  optional string string_value         = 4;
+  /// \brief ToDo.
+  optional Vector3d vector3_value      = 5;
+  /// \brief ToDo.
+  optional Color color_value           = 6;
+  /// \brief ToDo.
+  optional Pose pose_value             = 7;
+  /// \brief ToDo.
+  optional Quaternion quaternion_value = 8;
+  /// \brief ToDo.
+  optional bool bool_value             = 9;
+}

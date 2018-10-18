@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2015-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include "gazebo/util/system.hh"
 #include "gazebo/common/Assert.hh"
 
 namespace gazebo
@@ -36,9 +37,10 @@ namespace gazebo
     /// \sa EnumIface
     /// \sa EnumIterator
     #define GZ_ENUM(enumType, begin, end, ...) \
-    template<> enumType common::EnumIface<enumType>::range[] = {begin, end}; \
-    template<> std::vector<std::string> common::EnumIface<enumType>::names = \
-    {__VA_ARGS__};
+    template<> GZ_COMMON_VISIBLE enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> GZ_COMMON_VISIBLE \
+    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 
     /// \brief Enum interface. Use this interface to convert an enum to
     /// a string, and set an enum from a string.
@@ -66,8 +68,8 @@ namespace gazebo
       /// set.
       static std::string Str(T const &_e)
       {
-        if (_e < names.size())
-          return names[_e];
+        if (static_cast<unsigned int>(_e) < names.size())
+          return names[static_cast<unsigned int>(_e)];
         else
           return "";
       }
@@ -173,7 +175,7 @@ namespace gazebo
       public: EnumIterator &operator++()
       {
         GZ_ASSERT(this->c != this->End(), "Incrementing past end of enum");
-        this->c = static_cast<Enum>(this->c + 1);
+        this->c = static_cast<Enum>(static_cast<int>(this->c) + 1);
         return *this;
       }
 
@@ -192,7 +194,7 @@ namespace gazebo
       public: EnumIterator &operator--()
       {
         GZ_ASSERT(this->c != this->Begin(), "decrementing beyond begin?");
-        this->c = static_cast<Enum>(this->c - 1);
+        this->c = static_cast<Enum>(static_cast<int>(this->c) - 1);
         return *this;
       }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@ void ImagesView_TEST::Switch()
     // The layout should be the only child of the frame on construction.
     QVERIFY(frame->children().size() == 1);
 
+    std::cerr << "cam1 to cam6" << std::endl;
     this->SetTopic(view, "~/multicamera_1/link/cam1/images", 2);
     this->SetTopic(view, "~/multicamera_2/link/cam2/images", 3);
     this->SetTopic(view, "~/multicamera_3/link/cam3/images", 4);
@@ -66,6 +67,7 @@ void ImagesView_TEST::Switch()
     this->SetTopic(view, "~/multicamera_5/link/cam5/images", 6);
     this->SetTopic(view, "~/multicamera_6/link/cam6/images", 7);
 
+    std::cerr << "cam6 to cam1" << std::endl;
     this->SetTopic(view, "~/multicamera_6/link/cam6/images", 7);
     this->SetTopic(view, "~/multicamera_5/link/cam5/images", 6);
     this->SetTopic(view, "~/multicamera_4/link/cam4/images", 5);
@@ -84,6 +86,11 @@ void ImagesView_TEST::Switch()
     // Switch the topic 25 times
     for (unsigned int i = 0; i < 25; ++i)
     {
+      std::cerr << "Random switch "
+                << i+1
+                << " of 25"
+                << std::endl;
+
       // Get a random topic index.
       int index = gazebo::math::Rand::GetIntUniform(1, 7);
 
