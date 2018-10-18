@@ -15,16 +15,19 @@
  *
 */
 
+#include <map>
+#include <vector>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/physics/physics.hh"
 #include "plugins/AttachLightPlugin.hh"
 
 
-namespace gazebo {
+namespace gazebo
+{
   /// \brief Private data class for the AttachLightPlugin class
-  class AttachLightPluginPrivate {
-
+  class AttachLightPluginPrivate
+  {
     /// \brief Event connections
     public: std::vector<event::ConnectionPtr> connections;
 

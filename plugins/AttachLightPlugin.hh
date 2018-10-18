@@ -18,6 +18,8 @@
 #ifndef GAZEBO_PLUGINS_ATTACHLIGHTPLUGIN_HH_
 #define GAZEBO_PLUGINS_ATTACHLIGHTPLUGIN_HH_
 
+#include <memory>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/util/system.hh"
 
