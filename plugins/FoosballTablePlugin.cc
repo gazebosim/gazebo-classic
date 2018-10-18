@@ -21,6 +21,8 @@
 #include <sdf/sdf.hh>
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/math/Rand.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
 #include "plugins/FoosballTablePlugin.hh"
@@ -32,7 +34,7 @@ GZ_REGISTER_MODEL_PLUGIN(FoosballTablePlugin)
 /////////////////////////////////////////////////
 FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
   : hydraTopic(_hydraTopic),
-    hydra({{"left_controller", {}}, {"right_controller", {}}}),
+    hydra({{"left_controller", {2}}, {"right_controller", {3}}}),
     lastHydraPose({{"left_controller", {0, 0}}, {"right_controller", {0, 0}}})
 {
 }
@@ -40,6 +42,15 @@ FoosballPlayer::FoosballPlayer(const std::string &_hydraTopic)
 /////////////////////////////////////////////////
 bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
+  // Initialize transport.
+  this->gzNode = transport::NodePtr(new transport::Node());
+  this->gzNode->Init();
+
+  this->restartBallPub =
+    this->gzNode->Advertise<msgs::Int>("~/foosball_demo/restart_ball");
+
+  this->visualPub = this->gzNode->Advertise<msgs::Visual>("~/visual");
+
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
   this->model = _model;
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
@@ -51,39 +62,28 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
               << "section" << std::endl;
     return false;
   }
-  std::string team = _sdf->Get<std::string>("team");
-  if (team != "Blue" && team != "Red")
+  this->team = _sdf->Get<std::string>("team");
+  if (this->team != "Blue" && this->team != "Red")
   {
     std::cerr << "FoosballPlayer::Load() Invalid <team> value in player "
               << "section. Allowed values are 'Blue' or 'Red'" << std::endl;
     return false;
   }
 
-  // Read the <left_controller> and <right_controller> elements.
-  for (auto const &side : {"left_controller", "right_controller"})
+  // Fill the vector of rods.
+  for (unsigned int i = 0; i < this->kNumRodsPerTeam; ++i)
   {
-    if (_sdf->HasElement(side))
-    {
-      sdf::ElementPtr controllerElem = _sdf->GetElement(side);
-      if (!controllerElem->HasElement("rod"))
-      {
-        std::cerr << "FoosballPlayer::Load() Missing <rod> element in "
-                  << "<" << side << "> section" << std::endl;
-        return false;
-      }
+    std::string transName = "Foosball::trans" + this->team + std::to_string(i);
+    std::string rotName = "Foosball::rot" + this->team + std::to_string(i);
 
-      for (auto rodElem = controllerElem->GetElement("rod"); rodElem;
-        rodElem = rodElem->GetNextElement("rod"))
-      {
-        std::string rodNumber = rodElem->GetValue()->GetAsString();
-        std::string transName = "Foosball::trans" + team + rodNumber;
-        std::string rotName = "Foosball::rot" + team + rodNumber;
+    // Create a new rod and make it controllable by this controller.
+    this->rods.push_back(
+      {_model->GetJoint(transName), _model->GetJoint(rotName)});
 
-        // Create a new rod and make it controllable by this controller.
-        Rod_t rod = {_model->GetJoint(transName), _model->GetJoint(rotName)};
-        this->hydra[side].push_back(rod);
-      }
-    }
+    // Visuals
+    std::string shaftName =
+        "foosball::Foosball::shaft" + this->team + std::to_string(i);
+    this->shafts.push_back(shaftName);
   }
 
   // Check if we have to invert the control for this player.
@@ -131,6 +131,17 @@ void FoosballPlayer::Update()
     this->resetPoseLeft = msgs::Convert(msg->left().pose());
   }
 
+  // Restart the ball position.
+  if (msg->left().trigger() > 0.5 || msg->right().trigger() > 0.5)
+    this->restartBallPending = true;
+  else if (this->restartBallPending)
+  {
+    msgs::Int restartBallMsg;
+    restartBallMsg.set_data(1);
+    this->restartBallPub->Publish(restartBallMsg);
+    this->restartBallPending = false;
+  }
+
   if (this->activated)
   {
     // If the user pressed the trigger we have to change the active rod.
@@ -155,36 +166,30 @@ void FoosballPlayer::Update()
       // Move the rods.
       for (auto const &side : {"left_controller", "right_controller"})
       {
-        if (this->hydra.find(side) != this->hydra.end())
-        {
-          if (!this->hydra[side].empty())
-          {
-            // Get the active rod.
-            auto &activeRod = this->hydra[side].front();
+        // Get the active rod.
+        auto &activeRod = this->rods[this->hydra[side]];
 
-            // Translation.
-            double vel = (adjust[side].pos.x - this->lastHydraPose[side].at(0))
-              / dt.Double();
-            activeRod.at(0)->SetVelocity(0, this->invert * vel);
+        // Translation.
+        double vel = (adjust[side].pos.x - this->lastHydraPose[side].at(0))
+          / dt.Double();
+        activeRod.at(0)->SetVelocity(0, this->invert * vel);
 
-            // Rotation.
-            auto dRot = GZ_NORMALIZE(adjust[side].rot.GetRoll() -
-              this->lastHydraPose[side].at(1));
-            vel = dRot / dt.Double();
-            activeRod.at(1)->SetVelocity(0, this->invert * vel);
+        // Rotation.
+        auto dRot = GZ_NORMALIZE(adjust[side].rot.GetRoll() -
+          this->lastHydraPose[side].at(1));
+        vel = dRot / dt.Double();
+        activeRod.at(1)->SetVelocity(0, this->invert * vel);
 
-            // Store the current Hydra position for calculating the velocity
-            // of Hydra in the next iteration.
-            this->lastHydraPose[side].at(0) = adjust[side].pos.x;
-            this->lastHydraPose[side].at(1) = adjust[side].rot.GetRoll();
+        // Store the current Hydra position for calculating the velocity
+        // of Hydra in the next iteration.
+        this->lastHydraPose[side].at(0) = adjust[side].pos.x;
+        this->lastHydraPose[side].at(1) = adjust[side].rot.GetRoll();
 
-            // Store the current rod positions in case we have to switch rods.
-            // If we switch a rod we have to put the new rod in the same
-            // position as the previous one.
-            this->lastRodPose[side].at(0) = activeRod.at(0)->GetAngle(0);
-            this->lastRodPose[side].at(1) = activeRod.at(1)->GetAngle(0);
-          }
-        }
+        // Store the current rod positions in case we have to switch rods.
+        // If we switch a rod we have to put the new rod in the same
+        // position as the previous one.
+        this->lastRodPose[side].at(0) = activeRod.at(0)->GetAngle(0);
+        this->lastRodPose[side].at(1) = activeRod.at(1)->GetAngle(0);
       }
     }
 
@@ -208,36 +213,134 @@ void FoosballPlayer::UpdateActiveRod()
   // Read the last known Hydra message.
   boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
 
-  if (msg->left().trigger() > 0.2)
-    this->leftTriggerPressed = true;
-  else if (this->leftTriggerPressed)
+  if (std::abs(msg->left().joy_y()) > 0.5)
   {
-    this->leftTriggerPressed = false;
-    this->SwitchRod("left_controller");
+    this->pendingRodChange = true;
+    this->leftJoyCmd = msg->left().joy_y();
+  }
+  if (std::abs(msg->right().joy_y()) > 0.5)
+  {
+    this->pendingRodChange = true;
+    this->rightJoyCmd = msg->right().joy_y();
   }
 
-  if (msg->right().trigger() > 0.2)
-    this->rightTriggerPressed = true;
-  else if (this->rightTriggerPressed)
+  // Both joysticks are back to normal position and there's a pending rod change
+  if ((std::abs(msg->left().joy_y()) <= 0.5) &&
+      (std::abs(msg->right().joy_y()) <= 0.5) &&
+      (this->pendingRodChange))
   {
-    this->rightTriggerPressed = false;
-    this->SwitchRod("right_controller");
+    this->SwitchRod(this->leftJoyCmd, this->rightJoyCmd);
+    this->pendingRodChange = false;
+    this->leftJoyCmd = 0.0;
+    this->rightJoyCmd = 0.0;
   }
 }
 
 /////////////////////////////////////////////////
-void FoosballPlayer::SwitchRod(const std::string &_side)
+void FoosballPlayer::SwitchRod(const double _leftDir, const double _rightDir)
 {
-  if (this->hydra[_side].size() > 1)
+  unsigned int left = this->hydra["left_controller"];
+  unsigned int right = this->hydra["right_controller"];
+  unsigned newLeft, newRight;
+  bool leftChanged = false, rightChanged = false;
+
+  // Left controller moving left.
+  if (_leftDir < -0.5 && left > 0)
   {
-    std::rotate(this->hydra[_side].begin(), this->hydra[_side].begin() + 1,
-      this->hydra[_side].end());
+    newLeft = left - 1;
+    leftChanged = true;
+  }
+
+  // Left controller moving right.
+  if ((_leftDir > 0.5 && (right - left > 1)) ||
+      (_leftDir > 0.5 && (right - left == 1) && _rightDir > 0.5 &&
+        right < kNumRodsPerTeam - 1))
+  {
+    newLeft = left + 1;
+    leftChanged = true;
+  }
+
+  // Right controller moving left.
+  if ((_rightDir < -0.5 && (right - left > 1)) ||
+      (_rightDir < -0.5 && (right - left == 1) && _leftDir < -0.5 &&
+        left > 0))
+  {
+    newRight = right - 1;
+    rightChanged = true;
+  }
+
+  // Right controller moving right.
+  if (_rightDir > 0.5 && right < kNumRodsPerTeam - 1)
+  {
+    newRight = right + 1;
+    rightChanged = true;
+  }
+
+  // Restore the position/orientation of the new left rod.
+  if (leftChanged)
+  {
+    // Reset previous active rod's color
+    std::string name =
+        this->shafts[this->hydra["left_controller"]] + "::handle";
+    std::string parentName = this->shafts[this->hydra["left_controller"]];
+    std::string color = "Gazebo/Black";
+    this->PublishVisualMsg(name, parentName, color);
+
+    // Update index
+    this->hydra["left_controller"] = newLeft;
 
     // Restore the position to the last known Hydra position.
-    auto &activeRod = this->hydra[_side].front();
-    activeRod.at(0)->SetPosition(0, this->lastRodPose[_side].at(0).Radian());
-    activeRod.at(1)->SetPosition(0, this->lastRodPose[_side].at(1).Radian());
+    auto &activeRod = this->rods[this->hydra["left_controller"]];
+    activeRod.at(0)->SetPosition(0,
+      this->lastRodPose["left_controller"].at(0).Radian());
+    activeRod.at(1)->SetPosition(0,
+      this->lastRodPose["left_controller"].at(1).Radian());
+
+    // Publish active rod msg
+    name = this->shafts[this->hydra["left_controller"]] + "::handle";
+    parentName = this->shafts[this->hydra["left_controller"]];
+    color = "Gazebo/" + this->team;
+    this->PublishVisualMsg(name, parentName, color);
   }
+
+  // Restore the position/orientation of the new right rod.
+  if (rightChanged)
+  {
+    // Reset previous active rod's color
+    std::string name =
+        this->shafts[this->hydra["right_controller"]] + "::handle";
+    std::string parentName = this->shafts[this->hydra["right_controller"]];
+    std::string color = "Gazebo/Black";
+    this->PublishVisualMsg(name, parentName, color);
+
+    // Update index
+    this->hydra["right_controller"] = newRight;
+
+    // Restore the position to the last known Hydra position.
+    auto &activeRod = this->rods[this->hydra["right_controller"]];
+    activeRod.at(0)->SetPosition(0,
+      this->lastRodPose["right_controller"].at(0).Radian());
+    activeRod.at(1)->SetPosition(0,
+      this->lastRodPose["right_controller"].at(1).Radian());
+
+    // Publish active rod msg
+    name = this->shafts[this->hydra["right_controller"]] + "::handle";
+    parentName = this->shafts[this->hydra["right_controller"]];
+    color = "Gazebo/" + this->team;
+    this->PublishVisualMsg(name, parentName, color);
+  }
+}
+
+/////////////////////////////////////////////////
+void FoosballPlayer::PublishVisualMsg(std::string &_name,
+    std::string &_parentName, std::string &_color)
+{
+  msgs::Visual visualMsg;
+  visualMsg.set_name(_name);
+  visualMsg.set_parent_name(_parentName);
+  visualMsg.mutable_material()->mutable_script()->set_name(_color);
+
+  this->visualPub->Publish(visualMsg);
 }
 
 /////////////////////////////////////////////////
@@ -251,6 +354,7 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
   GZ_ASSERT(_model, "FoosballPlugin _model pointer is NULL");
   GZ_ASSERT(_sdf, "FoosballPlugin _sdf pointer is NULL");
+  this->model = _model;
 
   // Create the players.
   int counter = 0;
@@ -268,6 +372,13 @@ void FoosballTablePlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // simulation iteration.
   this->updateConnection = event::Events::ConnectWorldUpdateBegin(
     boost::bind(&FoosballTablePlugin::Update, this, _1));
+
+  // Subscribe to shake table
+  this->node = transport::NodePtr(new transport::Node());
+  this->node->Init(_model->GetWorld()->GetName());
+  this->shakeTableSub =
+    this->node->Subscribe("~/foosball_demo/shake_table",
+    &FoosballTablePlugin::OnShakeTable, this);
 }
 
 /////////////////////////////////////////////////
@@ -276,3 +387,21 @@ void FoosballTablePlugin::Update(const common::UpdateInfo & /*_info*/)
   for (auto &player : this->players)
     player->Update();
 }
+
+/////////////////////////////////////////////////
+void FoosballTablePlugin::OnShakeTable(ConstIntPtr &/*_unused*/)
+{
+  if (!this->model || !this->model->GetLink("Foosball::table"))
+    return;
+
+  double randX = math::Rand::GetDblUniform(-1, 1);
+  double randY = math::Rand::GetDblUniform(-1, 1);
+  double randZ = math::Rand::GetDblUniform(0, 1);
+
+  this->model->GetLink("Foosball::table")->AddLinkForce(
+      math::Vector3(0, 0, 10000*randZ));
+
+  this->model->GetLink("Foosball::table")->AddRelativeTorque(
+      math::Vector3(10000*randX, 10000*randY, 0));
+}
+

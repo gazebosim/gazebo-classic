@@ -40,17 +40,17 @@ namespace gazebo
   {
     /// \def Rod_t
     /// \brief A rod is composed by two joints (prismatic and revolute).
-    typedef std::array<physics::JointPtr, 2> Rod_t;
+    using Rod_t = std::array<physics::JointPtr, 2>;
 
     /// \def Rod_V
     /// \brief A vector of rods.
-    typedef std::vector<Rod_t> Rod_V;
+    using Rod_V = std::vector<Rod_t>;
 
     /// \def Hydra_t
     /// \brief A Hydra is composed by two controllers (left and right).
-    /// Each controller is able to move a vector of rods (one at a time).
-    /// The rod that is currenly active is the rod at the front of the vector.
-    typedef std::map<std::string, Rod_V> Hydra_t;
+    /// The key will be "left_controller" or "right_controller".
+    /// The value represents the index of the rod controlled by the controller.
+    using Hydra_t = std::map<std::string, unsigned int>;
 
     /// \brief Constructor.
     /// \brief \param[in] _hydraTopic Topic name in which the Hydra associated
@@ -79,10 +79,27 @@ namespace gazebo
     /// The rods change in a circular way every time the trigger button is
     /// pressed.
     /// \param[in] _side "left_controller" or "right_controller".
-    private: void SwitchRod(const std::string &_side);
+    private: void SwitchRod(const double _leftDir, const double _rightDir);
+
+    private: void PublishVisualMsg(std::string &_name, std::string &_parentName,
+        std::string &_color);
+
+    /// \brief Num of rods on the table per team.
+    private: unsigned int kNumRodsPerTeam = 4;
 
     /// \brief Pointer to the model;
     private: physics::ModelPtr model;
+
+    private: std::string team;
+
+    /// \brief Pointer to a node for communication.
+    private: transport::NodePtr gzNode;
+
+    /// \brief "Restart ball" publisher.
+    private: transport::PublisherPtr restartBallPub;
+
+    /// \brief "Restart ball" publisher.
+    private: transport::PublisherPtr visualPub;
 
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
@@ -114,6 +131,12 @@ namespace gazebo
     /// \brief Hydra controller used by this player.
     private: Hydra_t hydra;
 
+    /// \brief The vector of rods controlled by this player.
+    private: Rod_V rods;
+
+    /// \brief The vector of rods controlled by this player.
+    private: std::vector<std::string> shafts;
+
     /// \brief Stores the last known X position and roll angle.
     /// of the left/right controller. Those parameters are the ones we use in
     /// the plugin to compute the controller velocity.
@@ -127,15 +150,21 @@ namespace gazebo
     /// \brief Last time that the plugin was updated.
     private: common::Time lastUpdateTime;
 
-    /// \brief Is the left trigger button pressed?
-    private: bool leftTriggerPressed = false;
+    /// \brief Did the user move the joystick to change the rods?
+    private: bool pendingRodChange = false;
 
-    /// \brief Is the right trigger button pressed?
-    private: bool rightTriggerPressed = false;
+    /// \brief Value of the left joystick during a rod transition.
+    private: double leftJoyCmd = 0.0;
+
+    /// \brief Value of the right joystick during a rod transition.
+    private: double rightJoyCmd = 0.0;
 
     /// \brief This multiplier will be used to invert the velocity applied to
     /// a rod depending on the player's viewpoint.
     private: double invert = 1.0;
+
+    /// \brief We have to restart the ball position.
+    private: bool restartBallPending = false;
   };
 
   /// \class FoosballTablePlugin FoosballTablePlugin.hh
@@ -180,11 +209,24 @@ namespace gazebo
     /// \param[in] _info Update information provided by the server.
     private: void Update(const common::UpdateInfo &_info);
 
+    /// \brief Callback executed when the ball needs to be restarted.
+    /// \param[in] _unused Unused parameter.
+    private: void OnShakeTable(ConstIntPtr &/*_unused*/);
+
     /// \brief Pointer to the update event connection.
     private: event::ConnectionPtr updateConnection;
 
     /// \brief Vector of players that will control the foosball rods.
     private: std::vector<std::unique_ptr<FoosballPlayer>> players;
+
+    /// \brief Node used for using Gazebo communications.
+    private: transport::NodePtr node;
+
+    /// \brief Subscriber pointer.
+    private: transport::SubscriberPtr shakeTableSub;
+
+    /// \brief Pointer to the model;
+    private: physics::ModelPtr model;
   };
 }
 #endif
