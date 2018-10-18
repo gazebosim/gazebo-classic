@@ -53,7 +53,7 @@ void MultirayShapeTest::Standalone(const std::string &_physicsEngine)
   rays->AddRay(ignition::math::Vector3d(-1, -10.5, 0.5),
                ignition::math::Vector3d(10, -10.5, 0.5));
 
-  EXPECT_EQ(rays->RayCount(), 4);
+  EXPECT_EQ(rays->RayCount(), 4u);
 
   rays->Update();
 

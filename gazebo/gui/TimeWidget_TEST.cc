@@ -40,11 +40,7 @@ void TimeWidget_TEST::Reset()
   mainWindow->show();
 
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(1);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 10, 100);
 
   // Get the time panel
   gazebo::gui::TimePanel *timePanel = mainWindow->RenderWidget()->
@@ -129,11 +125,7 @@ void TimeWidget_TEST::Reset()
   QVERIFY(!mainWindow->IsPaused());
 
   // Wait a little bit so that time increases.
-  for (unsigned int i = 0; i < 1000; ++i)
-  {
-    gazebo::common::Time::MSleep(1);
-    QCoreApplication::processEvents();
-  }
+  this->ProcessEventsAndDraw(NULL, 10, 100);
 
   // Make sure real time is greater than zero
   txt = realTimeEdit->text().toStdString();
@@ -207,12 +199,22 @@ void TimeWidget_TEST::ValidTimes()
     QLineEdit *fpsEdit = timeWidget->findChild<QLineEdit *>("timeWidgetFPS");
     QVERIFY(fpsEdit != NULL);
 
-    // Wait a little bit so that time increases.
-    for (unsigned int i = 0; i < 10000; ++i)
+    // some machines are unable to hit the target FPS
+    // sample update time and determine whether to skip FPS lower bound check
+    bool skipFPSTest = false;
+    gazebo::common::Time t = gazebo::common::Time::GetWallTime();
+    QCoreApplication::processEvents();
+    double dt = (gazebo::common::Time::GetWallTime()-t).Double();
+    if (dt >= 0.01)
     {
-      gazebo::common::Time::NSleep(500000);
-      QCoreApplication::processEvents();
+      std::cerr << "Skipping lower bound FPS check" << std::endl;
+      skipFPSTest = true;
     }
+    unsigned int iterations = skipFPSTest ? 50 : 5000;
+    double lowerFPSBound = skipFPSTest ? 0 : 45;
+
+    // Wait a little bit so that time increases.
+    this->ProcessEventsAndDraw(NULL, iterations, 1);
 
     std::string txt;
     double value;
@@ -235,7 +237,8 @@ void TimeWidget_TEST::ValidTimes()
     // Make sure the fps is somewhere close to 60 fps
     txt = fpsEdit->text().toStdString();
     value = boost::lexical_cast<double>(txt.substr(0, txt.find(" ")));
-    QVERIFY(value > 45.0);
+
+    QVERIFY(value > lowerFPSBound);
     QVERIFY(value < 75.0);
 
     cam->Fini();
