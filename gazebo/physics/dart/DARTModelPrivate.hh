@@ -128,11 +128,11 @@ namespace gazebo
       }
 
       public: static bool CreateLoopJointAndNodePair(
-          dart::simulation::WorldPtr _world,
           dart::dynamics::SkeletonPtr _skeleton,
           dart::dynamics::BodyNode* _parent,
           JointPtr _joint,
-          LinkPtr _link)
+          LinkPtr _link,
+          bool initializeJoint)
       {
         DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(_link);
         GZ_ASSERT(dartLink, "DART link is null");
@@ -155,6 +155,10 @@ namespace gazebo
 
         dartJoint->SetDARTJoint(pair.first);
         pair.second->setCollidable(false);
+        if (initializeJoint)
+        {
+          dartJoint->Init();
+        }
         dartLink->AddSlaveBodyNode(pair.second);
 
         // Developer note (PCH): We can assume that the body nodes have the same
@@ -163,10 +167,6 @@ namespace gazebo
         // Free joint transforms have been set, but free joints are only created
         // for links with 0 parent joints while loop joints are only created for
         // links with >1 parent joints, so the two conditions will not overlap.
-        dart::constraint::WeldJointConstraintPtr dtWeldJointConst;
-        dtWeldJointConst.reset(new dart::constraint::WeldJointConstraint(
-            dtChildBodyNode, pair.second));
-        _world->getConstraintSolver()->addConstraint(dtWeldJointConst);
 
         return true;
       }
@@ -262,9 +262,7 @@ namespace gazebo
 
       /// \brief Constructor
       public: DARTModelPrivate()
-        : dtSkeleton(dart::dynamics::Skeleton::create()),
-          genPositions(Eigen::VectorXd()),
-          genVelocities(Eigen::VectorXd())
+        : dtSkeleton(dart::dynamics::Skeleton::create())
       {
       }
 
@@ -273,12 +271,6 @@ namespace gazebo
 
       /// \brief Pointer to DART Skeleton
       public: dart::dynamics::SkeletonPtr dtSkeleton;
-
-      /// \brief Generalized positions
-      public: Eigen::VectorXd genPositions;
-
-      /// \brief Generalized velocities
-      public: Eigen::VectorXd genVelocities;
 
       // To get byte-aligned Eigen vectors
       public: EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -31,6 +31,9 @@ using namespace physics;
 DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
   : FixedJoint<DARTJoint>(_parent)
 {
+  this->dataPtr->dtProperties.reset(
+      new dart::dynamics::WeldJoint::Properties(
+      *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -42,10 +45,6 @@ DARTFixedJoint::~DARTFixedJoint()
 void DARTFixedJoint::Load(sdf::ElementPtr _sdf)
 {
   FixedJoint<DARTJoint>::Load(_sdf);
-
-  this->dataPtr->dtProperties.reset(
-        new dart::dynamics::WeldJoint::Properties(
-          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
@@ -58,9 +57,7 @@ void DARTFixedJoint::Init()
 ignition::math::Vector3d DARTFixedJoint::GlobalAxis(
     const unsigned int /*_index*/) const
 {
-  gzwarn << "DARTFixedJoint: called method "
-         << "GlobalAxis which is not valid for the FixedJoint type.\n";
-
+  gzwarn << "DARTFixedJoint::GlobalAxis: FixedJoint does not have an axis\n";
   return ignition::math::Vector3d::Zero;
 }
 
@@ -68,7 +65,5 @@ ignition::math::Vector3d DARTFixedJoint::GlobalAxis(
 void DARTFixedJoint::SetAxis(const unsigned int /*_index*/,
                              const ignition::math::Vector3d& /*_axis*/)
 {
-  gzwarn << "DARTFixedJoint: called method "
-         << "SetAxis which is not valid for the FixedJoint type.\n";
-  return;
+  gzwarn << "DARTFixedJoint::SetAxis: FixedJoint does not have an axis\n";
 }
