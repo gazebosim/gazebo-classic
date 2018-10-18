@@ -607,24 +607,6 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
         }
         else
           gzerr << "SDF type did not give successful cast" << std::endl;
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      }
-      else if (elem->GetValue()->IsType<sdf::Vector3>())
-      {
-        ignition::math::Vector3d v;
-        if (CastAnyValue(value, v))
-        {
-          gzdbg << "Vector3: " << v << std::endl;
-          elem->Set(v);
-        }
-        else
-          gzerr << "SDF type did not give successful cast" << std::endl;
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
       }
     }
     this->GenerateSDFHelper(_preset, elem);

@@ -48,11 +48,6 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      /// \deprecated See version that uses an ignition vector3d object.
-      public: virtual void Init(const math::Vector3 &_focalPoint,
-        const double _yaw = 0, const double _pitch = 0) GAZEBO_DEPRECATED(8.0);
-
-      // Documentation inherited
       public: virtual void Init(const ignition::math::Vector3d &_focalPoint,
                   const double _yaw = 0, const double _pitch = 0);
 

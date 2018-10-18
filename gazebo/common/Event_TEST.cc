@@ -49,15 +49,8 @@ void callbackDisconnect()
 {
   // Remove both connections in the callback, which should not cause
   // a segfault.
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  g_event.Disconnect(g_conn);
-  g_event.Disconnect(g_conn2);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
+  g_event.Disconnect(g_conn->Id());
+  g_event.Disconnect(g_conn2->Id());
 }
 
 /////////////////////////////////////////////////

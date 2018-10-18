@@ -133,9 +133,9 @@ void DepthCameraSensorTest::DepthUnitBox()
 
   // the left and right side of the depth frame should be inf
   int left = midHeight * depthSensor->ImageWidth();
-  EXPECT_DOUBLE_EQ(this->depthBuffer[left], IGN_DBL_INF);
+  EXPECT_DOUBLE_EQ(this->depthBuffer[left], ignition::math::INF_D);
   int right = (midHeight+1) * depthSensor->ImageWidth() - 1;
-  EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
+  EXPECT_DOUBLE_EQ(this->depthBuffer[right], ignition::math::INF_D);
 
   // move the box out of the range
   world->ModelByName(box01)->SetWorldPose(
@@ -152,9 +152,9 @@ void DepthCameraSensorTest::DepthUnitBox()
   EXPECT_LT(i, 300);
 
   // the sensor should not be able to see the box any more
-  EXPECT_DOUBLE_EQ(this->depthBuffer[mid], IGN_DBL_INF);
-  EXPECT_DOUBLE_EQ(this->depthBuffer[left], IGN_DBL_INF);
-  EXPECT_DOUBLE_EQ(this->depthBuffer[right], IGN_DBL_INF);
+  EXPECT_DOUBLE_EQ(this->depthBuffer[mid], ignition::math::INF_D);
+  EXPECT_DOUBLE_EQ(this->depthBuffer[left], ignition::math::INF_D);
+  EXPECT_DOUBLE_EQ(this->depthBuffer[right], ignition::math::INF_D);
 
   // move the box closer than near clipping plane
   world->ModelByName(box01)->SetWorldPose(
