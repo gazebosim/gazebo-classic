@@ -39,6 +39,11 @@ TEST_F(Dem_TEST, GPS)
 
   // Load a DEM world with a GPS sensor (without noise) attached to a box.
   Load("worlds/dem_gps.world");
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+  physics::ModelPtr model = world->GetModel("box1");
+  ASSERT_TRUE(model != NULL);
+
   sensors::SensorManager *mgr = sensors::SensorManager::Instance();
 
   // Update the sensor manager so that it can process new sensors.
@@ -61,7 +66,10 @@ TEST_F(Dem_TEST, GPS)
 
   EXPECT_NEAR(sensor->Latitude().Degree(), latitude.Degree(), DOUBLE_TOL);
   EXPECT_NEAR(sensor->Longitude().Degree(), longitude.Degree(), DOUBLE_TOL);
-  EXPECT_NEAR(sensor->GetAltitude(), elevation, 1);
+
+  // Sensor altitude is the elevation of the terrain + the sensor position.
+  EXPECT_NEAR(sensor->GetAltitude(),
+      elevation + model->GetWorldPose().pos.z, 1);
 }
 #endif
 
