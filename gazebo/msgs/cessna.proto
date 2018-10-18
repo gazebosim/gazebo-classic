@@ -1,0 +1,50 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface Cessna
+/// \brief Cessna message
+
+message Cessna
+{
+  /// \brief Current RPM of the propeller.
+  optional float propeller_speed = 1;
+
+  /// \brief Current left aileron angle in rads.
+  optional float left_aileron = 2;
+
+  /// \brief Current left flap angle in rads.
+  optional float left_flap = 3;
+
+  /// \brief Current right aileron angle in rads.
+  optional float right_aileron = 4;
+
+  /// \brief Current right flap angle in rads.
+  optional float right_flap = 5;
+
+  /// \brief Current elevators angle in rads.
+  optional float elevators = 6;
+
+  /// \brief Current ruddle angle in rads.
+  optional float rudder = 7;
+
+  /// \brief Target RPM of the propeller.
+  optional float cmd_propeller_speed = 8;
+
+  /// \brief Target left aileron angle in rads.
+  optional float cmd_left_aileron = 9;
+
+  /// \brief Target left flap angle in rads.
+  optional float cmd_left_flap = 10;
+
+  /// \brief Target right aileron angle in rads.
+  optional float cmd_right_aileron = 11;
+
+  /// \brief Target right flap angle in rads.
+  optional float cmd_right_flap = 12;
+
+  /// \brief Target elevators angle in rads.
+  optional float cmd_elevators = 13;
+
+  /// \brief Target ruddle angle in rads.
+  optional float cmd_rudder = 14;
+}

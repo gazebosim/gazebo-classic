@@ -45,7 +45,7 @@ namespace gazebo
       public: void Load();
 
       // Documentation inherited.
-      public: void Fini();
+      public: virtual void Fini();
 
       /// \brief Set the CoM vector and update the position of the torque
       /// visual.
@@ -75,6 +75,14 @@ namespace gazebo
 
       /// \brief Resize all children according to target link's size.
       public: void Resize();
+
+      /// \brief Returns the force visual.
+      /// \return Pointer to force visual.
+      public: rendering::VisualPtr GetForceVisual() const;
+
+      /// \brief Returns the torque visual.
+      /// \return Pointer to torque visual.
+      public: rendering::VisualPtr GetTorqueVisual() const;
 
       /// \brief Get the rotation to point the positive Z axis to the
       /// given direction.

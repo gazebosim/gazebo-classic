@@ -190,7 +190,7 @@ int QGVScene::edgeCount() const
 
 void QGVScene::setRootNode(QGVNode *node)
 {
-    Q_ASSERT(_nodes.contains(node));
+    Q_ASSERT(_nodes.contains(node->label()));
     agset(_graph->graph(), (char *)"root", node->label().toLocal8Bit().data());
 }
 

@@ -49,10 +49,7 @@ void ApplyWrenchVisual::Fini()
     dPtr->torqueVisual->DeleteDynamicLine(dPtr->torqueLine);
 
   if (!dPtr->scene)
-  {
-    gzerr << "Scene shouldn't be cleared before destroying nodes." << std::endl;
     return;
-  }
 
   // Destroy objects and nodes
   Ogre::SceneManager *manager = dPtr->scene->GetManager();
@@ -91,6 +88,8 @@ void ApplyWrenchVisual::Fini()
 
   dPtr->forceVisual.reset();
   dPtr->torqueVisual.reset();
+
+  Visual::Fini();
 }
 
 ///////////////////////////////////////////////////
@@ -349,4 +348,38 @@ void ApplyWrenchVisual::Resize()
   dPtr->torqueVisual->SetScale(math::Vector3(linkSize,
                                              linkSize,
                                              linkSize));
+}
+
+///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetForceVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->forceVisual)
+  {
+    gzerr << "Force visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  return dPtr->forceVisual;
+}
+
+///////////////////////////////////////////////////
+rendering::VisualPtr ApplyWrenchVisual::GetTorqueVisual() const
+{
+  ApplyWrenchVisualPrivate *dPtr =
+      reinterpret_cast<ApplyWrenchVisualPrivate *>(this->dataPtr);
+
+  if (!dPtr->torqueVisual)
+  {
+    gzerr << "Torque visual not found, but it should exist." << std::endl;
+    return NULL;
+  }
+
+  std::lock_guard<std::mutex> lock(dPtr->mutex);
+
+  return dPtr->torqueVisual;
 }

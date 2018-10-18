@@ -15,7 +15,6 @@
  *
 */
 
-#include <curl/curl.h>
 #include <QMessageBox>
 #include "RestUiWidget.hh"
 
@@ -23,35 +22,57 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 RestUiWidget::RestUiWidget(QWidget *_parent,
+                           QAction &_login,
+                           QAction &_logout,
                            const std::string &_menuTitle,
                            const std::string &_loginTitle,
                            const std::string &_urlLabel,
                            const std::string &_defautlUrl)
   : QWidget(_parent),
+    loginMenuAction(_login),
+    logoutMenuAction(_logout),
     title(_menuTitle),
     node(new gazebo::transport::Node()),
-    dialog(this, _loginTitle, _urlLabel, _defautlUrl)
+    logoutDialog(this, _defautlUrl),
+    loginDialog(this, _loginTitle, _urlLabel, _defautlUrl)
 {
   this->node->Init();
-  this->pub = node->Advertise<gazebo::msgs::RestLogin>(
+  this->loginPub = node->Advertise<gazebo::msgs::RestLogin>(
       "/gazebo/rest/rest_login");
-  // this for a problem where the server cannot subscribe to the topic
-  this->pub->WaitForConnection();
-  this->sub = node->Subscribe("/gazebo/rest/rest_error",
-                              &RestUiWidget::OnResponse,
-                              this);
+  this->logoutPub = node->Advertise<gazebo::msgs::RestLogout>(
+      "/gazebo/rest/rest_logout");
+  this->errorSub = node->Subscribe("/gazebo/rest/rest_error",
+                                   &RestUiWidget::OnResponse,
+                                   this);
+}
+
+/////////////////////////////////////////////////
+void RestUiWidget::Logout()
+{
+  if (this->logoutDialog.exec() != QDialog::Rejected)
+  {
+    gazebo::msgs::RestLogout msg;
+    std::string url = this->loginDialog.GetUrl();
+    msg.set_url(url);
+    gzmsg << "Logging out from: " << url << std::endl;
+    this->logoutPub->Publish(msg);
+    this->loginMenuAction.setEnabled(true);
+    this->logoutMenuAction.setEnabled(false);
+  }
 }
 
 /////////////////////////////////////////////////
 void RestUiWidget::Login()
 {
-  if (this->dialog.exec() != QDialog::Rejected)
+  if (this->loginDialog.exec() != QDialog::Rejected)
   {
     gazebo::msgs::RestLogin msg;
-    msg.set_url(this->dialog.GetUrl());
-    msg.set_username(this->dialog.GetUsername());
-    msg.set_password(this->dialog.GetPassword());
-    this->pub->Publish(msg);
+    msg.set_url(this->loginDialog.GetUrl());
+    msg.set_username(this->loginDialog.GetUsername());
+    msg.set_password(this->loginDialog.GetPassword());
+    this->loginPub->Publish(msg);
+    this->loginMenuAction.setEnabled(false);
+    this->logoutMenuAction.setEnabled(true);
   }
 }
 
@@ -61,7 +82,6 @@ void RestUiWidget::OnResponse(ConstRestErrorPtr &_msg)
   gzerr << "Error received:" << std::endl;
   gzerr << " type: " << _msg->type() << std::endl;
   gzerr << " msg:  " << _msg->msg() << std::endl;
-
   // add msg to queue for later processing from the GUI thread
   this->msgRespQ.push_back(_msg);
 }
@@ -73,18 +93,29 @@ void RestUiWidget::Update()
   while (!this->msgRespQ.empty())
   {
     ConstRestErrorPtr msg = this->msgRespQ.front();
+    std::string msgStr = msg->msg();
     this->msgRespQ.pop_front();
+
+    // look for login error, and reenable the login menu if necessary
+    if (msgStr.find("There was a problem trying to login to the server") == 0)
+    {
+      this->loginMenuAction.setEnabled(true);
+      this->logoutMenuAction.setEnabled(false);
+    }
+
     if (msg->type() == "Error")
     {
+      msgStr += "\n\nIf the server is not available, ";
+      msgStr += "logout to hide theses messages.";
       QMessageBox::critical(this,
                             tr(this->title.c_str()),
-                            tr(msg->msg().c_str()));
+                            tr(msgStr.c_str()));
     }
     else
     {
       QMessageBox::information(this,
                                tr(this->title.c_str()),
-                               tr(msg->msg().c_str()));
+                               tr(msgStr.c_str()));
     }
   }
 }

@@ -97,9 +97,20 @@ TEST_F(LogPlay_TEST, Accessors)
   EXPECT_EQ(player->GetEncoding(), "zlib");
   EXPECT_EQ(player->GetHeader(), expectedHeader.str());
   EXPECT_EQ(player->GetChunkCount(), 5u);
+  EXPECT_FALSE(player->HasIterations());
+  EXPECT_EQ(player->GetInitialIterations(), 0u);
 
   std::string chunk;
   EXPECT_TRUE(player->GetChunk(0, chunk));
+
+  // Open a correct log file including <iterations>.
+  logFilePath = TEST_PATH;
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state2.log");
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
+  EXPECT_TRUE(player->HasIterations());
+  EXPECT_EQ(player->GetInitialIterations(), 23700u);
 }
 
 /////////////////////////////////////////////////
@@ -132,6 +143,39 @@ TEST_F(LogPlay_TEST, Chunks)
   // Try incorrect chunk indexes.
   EXPECT_FALSE(player->GetChunk(-1, chunk));
   EXPECT_FALSE(player->GetChunk(player->GetChunkCount(), chunk));
+}
+
+/////////////////////////////////////////////////
+/// \brief Test Rewind().
+TEST_F(LogPlay_TEST, Rewind)
+{
+  gazebo::util::LogPlay *player = gazebo::util::LogPlay::Instance();
+
+  // Open a correct log file.
+  boost::filesystem::path logFilePath(TEST_PATH);
+  logFilePath /= boost::filesystem::path("logs");
+  logFilePath /= boost::filesystem::path("state.log");
+
+  EXPECT_NO_THROW(player->Open(logFilePath.string()));
+
+  // Read the first entry in the log file.
+  std::string firstEntry;
+  // Consume the first chunk because it does not have <state>
+  // ToDo: Fix this.
+  EXPECT_TRUE(player->Step(firstEntry));
+  // Read the first world state.
+  EXPECT_TRUE(player->Step(firstEntry));
+
+  // Step a few more times.
+  std::string logEntry;
+  for (int i = 0; i < 5; ++i)
+    EXPECT_TRUE(player->Step(logEntry));
+
+  // Rewind and read the first entry again.
+  EXPECT_TRUE(player->Rewind());
+  std::string entry;
+  EXPECT_TRUE(player->Step(entry));
+  EXPECT_EQ(entry, firstEntry);
 }
 
 /////////////////////////////////////////////////

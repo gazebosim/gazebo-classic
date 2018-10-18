@@ -35,7 +35,7 @@ namespace gazebo
 
     /// \class SchematicViewWidget SchematicViewWidget.hh
     /// \brief The parent widget of the CML editor
-    class GAZEBO_VISIBLE SchematicViewWidget : public QWidget
+    class GZ_GUI_MODEL_VISIBLE SchematicViewWidget : public QWidget
     {
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.

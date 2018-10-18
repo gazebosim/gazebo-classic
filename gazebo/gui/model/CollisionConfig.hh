@@ -37,19 +37,25 @@ namespace gazebo
 
     /// \class CollisionConfigData CollisionConfig.hh
     /// \brief A class of widgets used for configuring collision properties.
-    class CollisionConfigData
+    class CollisionConfigData : public QWidget
     {
+      Q_OBJECT
+
+      /// \brief Qt callback when this item's button has been pressed.
+      /// \param[in] _checked Whether it was checked or unchecked.
+      private slots: void OnToggleItem(bool _checked);
+
       /// \brief Unique ID of this collision config.
       public: int id;
 
       /// \brief Name of the collision.
       public: std::string name;
 
-      /// \brief config widget for configuring collision properties.
+      /// \brief Config widget for configuring collision properties.
       public: ConfigWidget *configWidget;
 
-      /// \brief Tree item associated with the configWidget.
-      public: QTreeWidgetItem *treeItem;
+      /// \brief Widget associated with this data.
+      public: QWidget *widget;
     };
 
     /// \class CollisionConfig CollisionConfig.hh
@@ -112,16 +118,8 @@ namespace gazebo
       /// \param[in] _id Id of item to be removed.
       private slots: void OnRemoveCollision(int _id);
 
-      /// \brief Received item selection user input.
-      /// \param[in] _item Item selected.
-      /// \param[in] _column Column index.
-      private slots: void OnItemSelection(QTreeWidgetItem *_item, int _column);
-
       /// \brief Map of id to collision config widget.
       private: std::map<int, CollisionConfigData *> configs;
-
-      /// \brief Widget that display collisions' properties.
-      private: QTreeWidget *collisionsTreeWidget;
 
       /// \brief Counter for the number of collisions.
       private: int counter;
@@ -131,6 +129,9 @@ namespace gazebo
 
       /// \brief A map of collision items to their id.
       private: std::map<int, QTreeWidgetItem *> collisionItems;
+
+      /// \brief Layout which holds all collision items.
+      private: QVBoxLayout *listLayout;
     };
     /// \}
   }

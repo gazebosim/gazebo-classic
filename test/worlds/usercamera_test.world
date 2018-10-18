@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+    <scene>
+      <ambient>1 1 1 1</ambient>
+      <background>0 0 0 1</background>
+      <grid>false</grid>
+    </scene>
+
+    <!-- place user camera -->
+    <gui>
+      <camera name="user_camera">
+        <pose>-100 -150 1.0 0 1.5707 0</pose>
+      </camera>
+    </gui>
+
+    <model name="box">
+      <static>true</static>
+      <pose>-100 -150 0 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>10 10 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>10 10 1</size>
+            </box>
+          </geometry>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>
+
