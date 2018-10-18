@@ -38,6 +38,10 @@ namespace gazebo
   ///     <lift_joint>elevator::lift</lift_joint>
   ///     <door_joint>elevator::door</door_joint>
   ///     <floor_height>3.075</floor_height>
+  ///
+  ///     <!-- Time the elevator door will stay open in seconds -->
+  ///     <door_wait_time>5</door_wait_time>
+  ///
   ///     <topic>~/elevator</topic>
   ///   </plugin>
   /// \endverbatim

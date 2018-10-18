@@ -117,6 +117,11 @@ TEST_F(Scene_TEST, RemoveModelVisual)
   EXPECT_TRUE(scene->GetVisual("cylinder::link_COM_VISUAL__") != NULL);
   EXPECT_TRUE(scene->GetVisual("sphere::link_COM_VISUAL__") != NULL);
 
+  // Check that the link frame visuals were properly added
+  EXPECT_TRUE(scene->GetVisual("box::link_LINK_FRAME_VISUAL__") != NULL);
+  EXPECT_TRUE(scene->GetVisual("cylinder::link_LINK_FRAME_VISUAL__") != NULL);
+  EXPECT_TRUE(scene->GetVisual("sphere::link_LINK_FRAME_VISUAL__") != NULL);
+
   // Send request to delete the box model
   transport::NodePtr node = transport::NodePtr(new transport::Node());
   node->Init();
@@ -145,6 +150,9 @@ TEST_F(Scene_TEST, RemoveModelVisual)
 
   // Check that the COM visuals were properly removed
   EXPECT_TRUE(scene->GetVisual("box::link_COM_VISUAL__") == NULL);
+
+  // Check that the link frame visuals were properly removed
+  EXPECT_TRUE(scene->GetVisual("box::link_LINK_FRAME_VISUAL__") == NULL);
 }
 
 /////////////////////////////////////////////////
@@ -284,6 +292,26 @@ TEST_F(Scene_TEST, VisualType)
   EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(cylinderCOM->GetType() == rendering::Visual::VT_PHYSICS);
   EXPECT_TRUE(newBoxCOM->GetType() == rendering::Visual::VT_PHYSICS);
+
+  // Check that the link frame visuals were properly added
+  rendering::VisualPtr boxLinkFrame =
+      scene->GetVisual("box::link_LINK_FRAME_VISUAL__");
+  rendering::VisualPtr sphereLinkFrame =
+      scene->GetVisual("sphere::link_LINK_FRAME_VISUAL__");
+  rendering::VisualPtr cylinderLinkFrame =
+      scene->GetVisual("cylinder::link_LINK_FRAME_VISUAL__");
+  rendering::VisualPtr newBoxLinkFrame =
+      scene->GetVisual("new_box::body_LINK_FRAME_VISUAL__");
+  EXPECT_TRUE(boxLinkFrame != NULL);
+  EXPECT_TRUE(sphereLinkFrame != NULL);
+  EXPECT_TRUE(cylinderLinkFrame != NULL);
+  EXPECT_TRUE(newBoxLinkFrame != NULL);
+
+  // Verify type is VT_PHYSICS
+  EXPECT_TRUE(boxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(cylinderLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
+  EXPECT_TRUE(newBoxLinkFrame->GetType() == rendering::Visual::VT_PHYSICS);
 }
 
 /////////////////////////////////////////////////
