@@ -17,6 +17,8 @@
 #ifndef _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 #define _GAZEBO_MODEL_MAKER_PRIVATE_HH_
 
+#include <list>
+
 #include "gazebo/gui/EntityMakerPrivate.hh"
 
 namespace gazebo
@@ -28,6 +30,9 @@ namespace gazebo
     {
       /// \brief The model visual being created.
       public: rendering::VisualPtr modelVisual;
+
+      /// \brief A list of model visuals created by the model maker.
+      public: std::list<rendering::VisualWeakPtr> visuals;
 
       /// \brief The SDF representation of the model.
       public: sdf::SDFPtr modelSDF;

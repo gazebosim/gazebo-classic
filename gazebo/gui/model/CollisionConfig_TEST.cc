@@ -139,7 +139,7 @@ void CollisionConfig_TEST::AppliedSignal()
   // Get spins
   QList<QDoubleSpinBox *> spins =
       collisionConfig->findChildren<QDoubleSpinBox *>();
-  QVERIFY(spins.size() == 32);
+  QVERIFY(spins.size() == 33);
 
   // Get combo boxes
   QList<QComboBox *> combos =

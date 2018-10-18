@@ -116,6 +116,9 @@ UserCmdManager::UserCmdManager(const WorldPtr _world)
   this->dataPtr->userCmdStatsPub =
     this->dataPtr->node->Advertise<msgs::UserCmdStats>("~/user_cmd_stats");
 
+  this->dataPtr->worldControlPub =
+      this->dataPtr->node->Advertise<msgs::WorldControl>("~/world_control");
+
   this->dataPtr->idCounter = 0;
 }
 
@@ -135,6 +138,21 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   // Create command
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
+
+  if (_msg->type() == msgs::UserCmd::WORLD_CONTROL)
+  {
+    // Publish world control message after we've save the current state
+    if (_msg->has_world_control())
+    {
+      this->dataPtr->worldControlPub->Publish(_msg->world_control());
+    }
+    else
+    {
+      gzwarn << "World control command [" << _msg->description() <<
+          "] without a world control message. Command won't be executed."
+          << std::endl;
+    }
+  }
 
   // Add it to undo list
   this->dataPtr->undoCmds.push_back(cmd);

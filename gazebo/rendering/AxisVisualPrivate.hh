@@ -15,8 +15,8 @@
  *
 */
 
-#ifndef _AXISVISUAL_PRIVATE_HH_
-#define _AXISVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_AXISVISUAL_PRIVATE_HH_
+#define _GAZEBO_AXISVISUAL_PRIVATE_HH_
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"

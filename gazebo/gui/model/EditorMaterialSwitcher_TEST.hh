@@ -15,30 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_MAKER_TEST_HH_
-#define _GAZEBO_MODEL_MAKER_TEST_HH_
+#ifndef _GAZEBO_EDITOR_MATERIAL_SWITCHER_TEST_HH_
+#define _GAZEBO_EDITOR_MATERIAL_SWITCHER_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelMaker class.
-class ModelMaker_TEST : public QTestFixture
+/// \brief A test class for the EditorMaterialSwitcher class.
+class EditorMaterialSwitcher_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test creating a simple shape.
-  private slots: void SimpleShape();
-
-  /// \brief Test creating a model from a file.
-  private slots: void FromFile();
-
-  /// \brief Test creating a nested model from a file
-  private slots: void FromNestedModelFile();
-
-  /// \brief Test creating a model by copying another model.
-  private slots: void FromModel();
-
-  /// \brief Test creating a nested model by copying another nested model.
-  private slots: void FromNestedModel();
+  /// \brief Tests creating a material switcher.
+  private slots: void CreateMaterialSwitcher();
 };
 
 #endif
