@@ -104,6 +104,10 @@ namespace gazebo
       public: msgs::Link linkMsg;
       public: msgs::Scene sceneMsg;
       public: msgs::Joint jointMsg;
+
+      /// \brief Keep latest plugin message.
+      public: msgs::Plugin pluginMsg;
+
       public: msgs::Physics physicsMsg;
       public: msgs::Wind windMsg;
 

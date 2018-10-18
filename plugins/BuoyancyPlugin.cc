@@ -51,7 +51,7 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   if (this->sdf->HasElement("link"))
   {
     for (sdf::ElementPtr linkElem = this->sdf->GetElement("link"); linkElem;
-         linkElem = this->sdf->GetNextElement("link"))
+         linkElem = linkElem->GetNextElement("link"))
     {
       int id = -1;
       std::string name = "";

@@ -7,7 +7,7 @@
     </contributor>
     <created>2012-05-19T18:37:55</created>
     <modified>2012-05-19T18:37:55</modified>
-    <unit name="decimeter" meter="0.1"/>
+    <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
   <library_effects>

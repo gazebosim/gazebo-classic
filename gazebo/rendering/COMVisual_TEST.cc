@@ -36,7 +36,11 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   if (!scene)
     scene = gazebo::rendering::create_scene("default", false);
 
-  EXPECT_TRUE(scene != NULL);
+  EXPECT_TRUE(scene != nullptr);
+
+  // get scene visual child count before we create any visuals
+  EXPECT_TRUE(scene->WorldVisual() != nullptr);
+  unsigned int count = scene->WorldVisual()->GetChildCount();
 
   // create a default link message
   gazebo::msgs::LinkPtr linkDefaultMsg;
@@ -79,6 +83,13 @@ TEST_F(COMVisual_TEST, COMVisualTest)
 
   EXPECT_EQ(comVis->GetInertiaPose().pos, pos);
   EXPECT_EQ(comVis->GetInertiaPose().rot, quat);
+
+  // test destroying the visual
+  comVis->Fini();
+  EXPECT_EQ(comVis->GetChildCount(), 0u);
+
+  // verify scene's child count is the same as before the visual was created
+  EXPECT_EQ(scene->WorldVisual()->GetChildCount(), count);
 }
 
 /////////////////////////////////////////////////

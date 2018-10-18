@@ -23,14 +23,8 @@
 
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportTypes.hh"
+#include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/rendering/VisualPrivate.hh"
-
-
-namespace Ogre
-{
-  class Entity;
-  class SceneNode;
-}
 
 namespace gazebo
 {
@@ -56,8 +50,8 @@ namespace gazebo
       /// \brief A contact point visualization.
       public: class ContactPoint
                {
-                 /// \brief The scene node for the contact visualization.
-                 public: Ogre::SceneNode *sceneNode;
+                 /// \brief The contact point visual
+                 public: VisualPtr contactPointVis;
                  /// \brief Normal and depth for the contact point.
                  public: DynamicLines *normal, *depth;
                };

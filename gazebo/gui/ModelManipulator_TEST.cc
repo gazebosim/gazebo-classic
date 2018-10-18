@@ -15,6 +15,8 @@
  *
 */
 
+#include <ignition/math/Pose3.hh>
+
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelManipulator.hh"
 
@@ -132,7 +134,7 @@ void ModelManipulator_TEST::Transparency()
 
   double vis1Transp = 0.2;
   vis1->SetTransparency(vis1Transp);
-  QVERIFY(gazebo::math::equal(
+  QVERIFY(ignition::math::equal(
       static_cast<double>(vis1->GetTransparency()), vis1Transp, 1e-5));
 
   gazebo::gui::ModelManipulator::Instance()->Init();

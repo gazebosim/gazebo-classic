@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,20 @@
  * limitations under the License.
  *
 */
-
-#ifndef _GAZEBO_HOTKEY_DIALOG_TEST_HH_
-#define _GAZEBO_HOTKEY_DIALOG_TEST_HH_
+#ifndef GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
+#define GAZEBO_GUI_PLOT_EDITABLELABEL_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the hotkey dialog class.
-class HotkeyDialog_TEST : public QTestFixture
+/// \brief A test class for the EditableLabel widget.
+class EditableLabel_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Test opening and closing the hotkey chart
-  private slots: void HotkeyChart();
-};
+  /// \brief Test retrieving label text.
+  private slots: void Text();
 
+  /// \brief Test editing label.
+  private slots: void Edit();
+};
 #endif

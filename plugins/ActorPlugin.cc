@@ -16,7 +16,6 @@
 */
 #include <ignition/math.hh>
 #include "gazebo/physics/physics.hh"
-#include "gazebo/transport/transport.hh"
 #include "plugins/ActorPlugin.hh"
 
 using namespace gazebo;
@@ -36,7 +35,7 @@ void ActorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->world = this->actor->GetWorld();
 
   this->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&ActorPlugin::OnUpdate, this, _1)));
+          std::bind(&ActorPlugin::OnUpdate, this, std::placeholders::_1)));
 
   this->velocity = 0.8;
 

@@ -57,8 +57,8 @@ namespace gazebo
       // Documentation inherited
       public: virtual void Init();
 
-      // Documentation inherited
-      public: virtual std::string GetTopic() const;
+      // Documentation inherited.
+      public: virtual std::string Topic() const;
 
       /// \brief Get the near distance. This is the distance from the
       /// frustum's vertex to the closest plane.
@@ -87,13 +87,13 @@ namespace gazebo
       public: msgs::LogicalCameraImage Image() const;
 
       // Documentation inherited
+      public: virtual bool IsActive() const;
+
+      // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);
 
       // \brief Finalize the logical camera
       protected: virtual void Fini();
-
-      // Documentation inherited
-      public: virtual bool IsActive() const;
 
       // \internal
       // \brief Private data pointer

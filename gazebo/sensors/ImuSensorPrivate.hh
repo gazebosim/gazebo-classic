@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
-#define _GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
+#ifndef GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
+#define GAZEBO_SENSORS_IMUSENSOR_PRIVATE_HH_
 
 #include <array>
 #include <mutex>
@@ -33,11 +33,13 @@ namespace gazebo
     /// \brief Imu sensor private data.
     class ImuSensorPrivate
     {
-      /// \brief Imu reference pose
-      public: ignition::math::Pose3d referencePose;
+      /// \brief transform from world frame to Imu reference frame.
+      public: ignition::math::Pose3d worldToReference;
 
-      /// \brief Save previous imu linear velocity for computing acceleration.
-      public: ignition::math::Vector3d lastLinearVel;
+      /// \brief Save previous imu linear velocity in the specified frame
+      /// for computing acceleration in the specified frame.
+      /// \sa worldToReference
+      public: ignition::math::Vector3d lastImuWorldLinearVel;
 
       /// \brief Noise free linear acceleration
       public: ignition::math::Vector3d linearAcc;

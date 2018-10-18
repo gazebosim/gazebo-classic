@@ -16,7 +16,6 @@
 */
 #include <boost/filesystem.hpp>
 #include <memory>
-#include "gazebo/math/Helpers.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/transport/TransportIface.hh"
 #include "gazebo/gui/GuiEvents.hh"
@@ -100,23 +99,23 @@ void ModelListWidget_TEST::CheckVector3Property(QList<QtProperty *> _properties,
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckPoseProperty(QList<QtProperty *> _properties,
-    const gazebo::math::Pose &_pose)
+    const ignition::math::Pose3d &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  this->CheckVector3Property(_properties, _pose.pos.Ign());
+  this->CheckVector3Property(_properties, _pose.Pos());
   QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
-  QCOMPARE(property->value().toDouble(), _pose.rot.GetAsEuler().x);
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().X());
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
-  QCOMPARE(property->value().toDouble(), _pose.rot.GetAsEuler().y);
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().Y());
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
-  QCOMPARE(property->value().toDouble(), _pose.rot.GetAsEuler().z);
+  QCOMPARE(property->value().toDouble(), _pose.Rot().Euler().Z());
 }
 
 /////////////////////////////////////////////////
@@ -144,36 +143,36 @@ void ModelListWidget_TEST::SetVector3Property(
 void ModelListWidget_TEST::SetPoseProperty(
     QtTreePropertyBrowser *_propTreeBrowser,
     QList<QtProperty *> _properties,
-    const gazebo::math::Pose &_pose)
+    const ignition::math::Pose3d &_pose)
 {
   QCOMPARE(_properties.size(), 6);
-  this->SetVector3Property(_propTreeBrowser, _properties, _pose.pos.Ign());
+  this->SetVector3Property(_propTreeBrowser, _properties, _pose.Pos());
   QtVariantProperty *property;
   property = static_cast<QtVariantProperty *>(_properties[3]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("roll"));
   QVERIFY(_propTreeBrowser->items(property).size() == 1);
   _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.rot.GetAsEuler().x);
+  property->setValue(_pose.Rot().Euler().X());
   property = static_cast<QtVariantProperty *>(_properties[4]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("pitch"));
   QVERIFY(_propTreeBrowser->items(property).size() == 1);
   _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.rot.GetAsEuler().y);
+  property->setValue(_pose.Rot().Euler().Y());
   property = static_cast<QtVariantProperty *>(_properties[5]);
   Q_ASSERT(property);
   QCOMPARE(property->propertyName(), tr("yaw"));
   QVERIFY(_propTreeBrowser->items(property).size() == 1);
   _propTreeBrowser->setCurrentItem(_propTreeBrowser->items(property)[0]);
-  property->setValue(_pose.rot.GetAsEuler().z);
+  property->setValue(_pose.Rot().Euler().Z());
   QTest::qWait(500);
 }
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const ignition::math::Pose3d &_pose)
 {
   // ignore checking link id in _properties[0]
   QtVariantProperty *property =
@@ -215,7 +214,7 @@ void ModelListWidget_TEST::CheckLinkProperty(QList<QtProperty *> _properties,
 void ModelListWidget_TEST::SetLinkProperty(
     QtTreePropertyBrowser *propTreeBrowser, QList<QtProperty *> _properties,
     const std::string &_name, bool _selfCollide, bool _gravity, bool _kinematic,
-    bool _canonical, bool _enableWind, const gazebo::math::Pose &_pose)
+    bool _canonical, bool _enableWind, const ignition::math::Pose3d &_pose)
 {
   QtVariantProperty *property =
       static_cast<QtVariantProperty *>(_properties[1]);
@@ -268,6 +267,30 @@ void ModelListWidget_TEST::SetLinkProperty(
   /// TODO set inertial, collision, visual properties
 }
 
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::CheckPluginProperty(QList<QtProperty *> _properties,
+    const std::string &_name, const std::string &_filename,
+    const std::string &_innerxml)
+{
+  // Name
+  auto property = static_cast<QtVariantProperty *>(_properties[0]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("name"));
+  QCOMPARE(property->valueText(), tr(_name.c_str()));
+
+  // Filename
+  property = static_cast<QtVariantProperty *>(_properties[1]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("filename"));
+  QCOMPARE(property->valueText(), tr(_filename.c_str()));
+
+  // Inner XML
+  property = static_cast<QtVariantProperty *>(_properties[2]);
+  Q_ASSERT(property);
+  QCOMPARE(property->propertyName(), tr("innerxml"));
+  QCOMPARE(property->valueText(), tr(_innerxml.c_str()));
+}
 
 /////////////////////////////////////////////////
 void ModelListWidget_TEST::ModelsTree()
@@ -433,7 +456,7 @@ void ModelListWidget_TEST::ModelProperties()
   // select the multi-link model
   QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
-      modelRect.center() );
+      modelRect.center());
   QCoreApplication::processEvents();
   sleep = 0;
   maxSleep = 5;
@@ -479,7 +502,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("pose"))
     {
       this->CheckPoseProperty(property->subProperties(),
-          gazebo::math::Pose(0, 0, 0.5, 0, 0, 0));
+          ignition::math::Pose3d(0, 0, 0.5, 0, 0, 0));
       hasPose = true;
     }
     else if (property->propertyName() == tr("link"))
@@ -490,7 +513,7 @@ void ModelListWidget_TEST::ModelProperties()
       {
         this->CheckLinkProperty(property->subProperties(),
           modelName + "::box_link", false, true, false, true, false,
-          gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
+          ignition::math::Pose3d(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
       else if (property->subProperties()[nameIndex]->valueText().toStdString().
@@ -498,7 +521,7 @@ void ModelListWidget_TEST::ModelProperties()
       {
         this->CheckLinkProperty(property->subProperties(),
             modelName + "::sphere_link", false, true, false, false, false,
-            gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
+            ignition::math::Pose3d(-1.5, 0, 0, 0, 0, 1.57));
         numLinks++;
       }
     }
@@ -530,7 +553,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("pose"))
     {
       this->SetPoseProperty(propTreeBrowser, property->subProperties(),
-          gazebo::math::Pose(0, 0, 1.0, 0, 0, 0));
+          ignition::math::Pose3d(0, 0, 1.0, 0, 0, 0));
     }
     else if (property->propertyName() == tr("link"))
     {
@@ -540,7 +563,7 @@ void ModelListWidget_TEST::ModelProperties()
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
             modelName + "::box_link", true, false, true, true, false,
-            gazebo::math::Pose(1.5, 2.0, 3.2, 0.6, 0.7, 0.8));
+            ignition::math::Pose3d(1.5, 2.0, 3.2, 0.6, 0.7, 0.8));
         numLinks++;
       }
       else if (property->subProperties()[nameIndex]->valueText().toStdString().
@@ -548,7 +571,7 @@ void ModelListWidget_TEST::ModelProperties()
       {
         this->SetLinkProperty(propTreeBrowser, property->subProperties(),
             modelName + "::sphere_link", true, false, true, false, false,
-            gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
+            ignition::math::Pose3d(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
     }
@@ -593,7 +616,7 @@ void ModelListWidget_TEST::ModelProperties()
     else if (property->propertyName() == tr("pose"))
     {
       this->CheckPoseProperty(property->subProperties(),
-          gazebo::math::Pose(0, 0, 1.0, 0, 0, 0));
+          ignition::math::Pose3d(0, 0, 1.0, 0, 0, 0));
     }
     else if (property->propertyName() == tr("link"))
     {
@@ -605,7 +628,7 @@ void ModelListWidget_TEST::ModelProperties()
         // unchanged
         this->CheckLinkProperty(property->subProperties(),
             modelName + "::box_link", true, false, true, true, false,
-            gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
+            ignition::math::Pose3d(1.0, 0, 0, 0, 0, 0));
         numLinks++;
       }
       else if (property->subProperties()[nameIndex]->valueText().toStdString().
@@ -613,7 +636,7 @@ void ModelListWidget_TEST::ModelProperties()
       {
         this->CheckLinkProperty(property->subProperties(),
             modelName + "::sphere_link", true, false, true, false, false,
-            gazebo::math::Pose(-2.0, 0.5, 1.0, 3.14, 0, 0));
+            ignition::math::Pose3d(-2.0, 0.5, 1.0, 3.14, 0, 0));
         numLinks++;
       }
     }
@@ -728,8 +751,9 @@ void ModelListWidget_TEST::LinkProperties()
   QVERIFY(propTreeBrowser->properties().size() > 0);
 
   // select the box link
-  QTreeWidgetItem *boxLinkItem = modelItem->child(0);
+  QTreeWidgetItem *boxLinkItem = modelItem->child(1);
   QVERIFY(boxLinkItem != nullptr);
+
   std::string boxLinkName = "box_link";
   QCOMPARE(boxLinkItem->text(0), tr(boxLinkName.c_str()));
 
@@ -761,13 +785,13 @@ void ModelListWidget_TEST::LinkProperties()
   // check the box link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
       modelName + "::" + boxLinkName, false, true, false, true, false,
-      gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
+      ignition::math::Pose3d(1.0, 0, 0, 0, 0, 0));
 
   // change box link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
       modelName + "::" + boxLinkName, true, false, true, true, false,
-      gazebo::math::Pose(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
+      ignition::math::Pose3d(2.5, 1.0, 4.2, 0.8, 0.5, 0.1));
 
   // select the box link again to refresh the property browser
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
@@ -799,10 +823,10 @@ void ModelListWidget_TEST::LinkProperties()
   // the link is canonical so the pose should remain the same
   this->CheckLinkProperty(propTreeBrowser->properties(),
       modelName + "::" + boxLinkName, true, false, true, true, false,
-      gazebo::math::Pose(1.0, 0, 0, 0, 0, 0));
+      ignition::math::Pose3d(1.0, 0, 0, 0, 0, 0));
 
   // select the sphere link
-  QTreeWidgetItem *sphereLinkItem = modelItem->child(1);
+  QTreeWidgetItem *sphereLinkItem = modelItem->child(2);
   QVERIFY(sphereLinkItem != nullptr);
   std::string sphereLinkName = "sphere_link";
   QCOMPARE(sphereLinkItem->text(0), tr(sphereLinkName.c_str()));
@@ -836,13 +860,13 @@ void ModelListWidget_TEST::LinkProperties()
   // check the sphere link properties
   this->CheckLinkProperty(propTreeBrowser->properties(),
       modelName + "::" + sphereLinkName, false, true, false, false, false,
-      gazebo::math::Pose(-1.5, 0, 0, 0, 0, 1.57));
+      ignition::math::Pose3d(-1.5, 0, 0, 0, 0, 1.57));
 
   // change sphere link properties
   // TODO changing link name currently fails.
   this->SetLinkProperty(propTreeBrowser, propTreeBrowser->properties(),
       modelName + "::" + sphereLinkName, true, false, true, false, false,
-      gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
+      ignition::math::Pose3d(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   // select the sphere link again to refresh the property browser
   QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
@@ -871,10 +895,150 @@ void ModelListWidget_TEST::LinkProperties()
   // verify the link properties are sucessfully set
   this->CheckLinkProperty(propTreeBrowser->properties(),
       modelName + "::" + sphereLinkName, true, false, true, false, false,
-      gazebo::math::Pose(-2.0, 0.1, -1.2, 0, 1.57, 0));
+      ignition::math::Pose3d(-2.0, 0.1, -1.2, 0, 1.57, 0));
 
   modelListWidget->hide();
   node.reset();
+  delete requestMsg;
+  delete modelListWidget;
+}
+
+
+/////////////////////////////////////////////////
+void ModelListWidget_TEST::PluginProperties()
+{
+  gazebo::gui::ModelListWidget *modelListWidget
+      = new gazebo::gui::ModelListWidget;
+  modelListWidget->show();
+  modelListWidget->setGeometry(0, 0, 400, 2000);
+  QCoreApplication::processEvents();
+
+  this->Load("worlds/underwater.world");
+
+  // Initialize transport
+  gazebo::transport::NodePtr node;
+  node = gazebo::transport::NodePtr(new gazebo::transport::Node());
+  node->Init();
+  gazebo::transport::PublisherPtr requestPub =
+      node->Advertise<gazebo::msgs::Request>("~/request");
+  gazebo::transport::SubscriberPtr responseSub = node->Subscribe("~/response",
+      &ModelListWidget_TEST::OnResponse, this);
+
+  // Request list of entities
+  gazebo::msgs::Request *requestMsg =
+      gazebo::msgs::CreateRequest("entity_list");
+  requestPub->Publish(*requestMsg);
+
+  // Get tree widget
+  QTreeWidget *modelTreeWidget = modelListWidget->findChild<QTreeWidget *>(
+      "modelTreeWidget");
+
+  QList<QTreeWidgetItem *> treeModelItems =
+      modelTreeWidget->findItems(tr("Models"), Qt::MatchExactly);
+  QCOMPARE(treeModelItems.size(), 1);
+
+  QTreeWidgetItem *modelsItem = treeModelItems.front();
+  QVERIFY(modelsItem != nullptr);
+
+  // Verify that there are 5 models
+  int modelCount = 5;
+  int maxSleep = 10;
+  int sleep = 0;
+  while (modelsItem->childCount() < modelCount && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(500);
+    sleep++;
+  }
+  QCOMPARE(modelsItem->childCount(), modelCount);
+
+  // Get propery browser widget
+  QObject *propTreeObj =
+    modelListWidget->findChild<QObject *>("propTreeBrowser");
+  QtTreePropertyBrowser *propTreeBrowser =
+    dynamic_cast<QtTreePropertyBrowser *>(propTreeObj);
+  QVERIFY(propTreeBrowser != nullptr);
+
+  // Check there are no properties yet
+  QCOMPARE(propTreeBrowser->properties().size(), 0);
+
+  // Select the models item
+  QRect modelsRect = modelTreeWidget->visualItemRect(modelsItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      modelsRect.center() );
+  QCoreApplication::processEvents();
+
+  // Wait for the models item to be selected
+  sleep = 0;
+  while (!modelsItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(modelsItem->isSelected());
+
+  // Get the submarine model item
+  QTreeWidgetItem *modelItem = modelsItem->child(3);
+  QVERIFY(modelItem != nullptr);
+  std::string modelName = "submarine_buoyant";
+  QCOMPARE(modelItem->text(0), tr(modelName.c_str()));
+
+  // Select the submarine model
+  QRect modelRect = modelTreeWidget->visualItemRect(modelItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      modelRect.center());
+  QCoreApplication::processEvents();
+  sleep = 0;
+  maxSleep = 5;
+  while (!modelItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(modelItem->isSelected());
+
+  // Get the buoyancy plugin
+  QTreeWidgetItem *pluginItem = modelItem->child(6);
+  QVERIFY(pluginItem != nullptr);
+  std::string pluginName = "buoyancy";
+  QCOMPARE(pluginItem->text(0), tr(pluginName.c_str()));
+
+  // Select the buoyancy plugin
+  QRect pluginRect = modelTreeWidget->visualItemRect(pluginItem);
+  QTest::mouseClick(modelTreeWidget->viewport(), Qt::LeftButton, 0,
+      pluginRect.center() );
+  QCoreApplication::processEvents();
+
+  // Wait for the models plugin to be selected
+  sleep = 0;
+  maxSleep = 5;
+  while (!pluginItem->isSelected() && sleep < maxSleep)
+  {
+    QTest::qWait(10);
+    sleep++;
+  }
+  QVERIFY(pluginItem->isSelected());
+
+  // Wait for the plugin properties to appear
+  sleep = 0;
+  maxSleep = 10;
+  while (propTreeBrowser->properties().size() == 0 && sleep < maxSleep)
+  {
+    QCoreApplication::processEvents();
+    QTest::qWait(500);
+    sleep++;
+  }
+  QVERIFY(propTreeBrowser->properties().size() > 0);
+
+  std::string pluginFilename = "libBuoyancyPlugin.so";
+  std::string plugininnerxml = "<fluid_density>999.1026</fluid_density> ";
+
+  // check the buoyancy properties
+  this->CheckPluginProperty(propTreeBrowser->properties(), pluginName,
+      pluginFilename, plugininnerxml);
+
+  modelListWidget->hide();
+  node->Fini();
   delete requestMsg;
   delete modelListWidget;
 }

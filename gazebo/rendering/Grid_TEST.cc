@@ -49,7 +49,9 @@ TEST_F(Grid_TEST, SetSize)
   grid->Init();
 
   // Get scene node and manual object
-  auto sceneNode = grid->SceneNode();
+  rendering::VisualPtr vis = grid->GridVisual();
+  ASSERT_TRUE(vis != nullptr);
+  auto sceneNode = vis->GetSceneNode();
   ASSERT_TRUE(sceneNode != nullptr);
   EXPECT_EQ(sceneNode->numAttachedObjects(), 1u);
 
