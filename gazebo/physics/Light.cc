@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,17 +64,17 @@ void Light::FillMsg(msgs::Light &_msg)
 
   _msg.set_name(this->GetScopedName());
 
-  ignition::math::Pose3d relPose = this->GetRelativePose().Ign();
+  ignition::math::Pose3d relPose = this->RelativePose();
   msgs::Set(_msg.mutable_pose(), relPose);
 }
 
 //////////////////////////////////////////////////
 void Light::SetState(const LightState &_state)
 {
-  if (this->worldPose == math::Pose(_state.Pose()))
+  if (this->worldPose == _state.Pose())
     return;
 
-  this->worldPose = math::Pose(_state.Pose());
+  this->worldPose = _state.Pose();
   this->PublishPose();
 }
 

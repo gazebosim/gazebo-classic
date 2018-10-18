@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+
+#include <ignition/math/Helpers.hh>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
@@ -70,17 +72,18 @@ void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
 }
 
 //////////////////////////////////////////////////
-math::Vector3 SimbodyFixedJoint::GetGlobalAxis(unsigned int /*index*/) const
+ignition::math::Vector3d SimbodyFixedJoint::GlobalAxis(
+    const unsigned int /*index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetGlobalAxis that is not valid for joints of type fixed.\n";
-  return math::Vector3();
+         << "GlobalAxis that is not valid for joints of type fixed.\n";
+  return ignition::math::Vector3d::Zero;
 }
 
 //////////////////////////////////////////////////
-math::Angle SimbodyFixedJoint::GetAngleImpl(unsigned int /*_index*/) const
+double SimbodyFixedJoint::PositionImpl(const unsigned int /*_index*/) const
 {
   gzwarn << "SimbodyFixedJoint: called method "
-         << "GetAngleImpl that is not valid for joints of type fixed.\n";
-  return math::Angle();
+         << "PositionImpl that is not valid for joints of type fixed.\n";
+  return ignition::math::NAN_D;
 }

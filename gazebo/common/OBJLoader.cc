@@ -119,7 +119,8 @@ Mesh *OBJLoader::Load(const std::string &_filename)
           mat->SetEmissive(Color(m.emission[0], m.emission[1], m.emission[2]));
           mat->SetShininess(m.shininess);
           mat->SetTransparency(1.0 - m.dissolve);
-          mat->SetTextureImage(m.diffuse_texname, path.c_str());
+          if (!m.diffuse_texname.empty())
+            mat->SetTextureImage(m.diffuse_texname, path.c_str());
           materialIds[m.name] = mat;
         }
         int matIndex = mesh->GetMaterialIndex(mat);

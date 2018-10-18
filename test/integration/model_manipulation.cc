@@ -98,20 +98,20 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   // Get a moving link and check its pose is changing over time
   auto linkVis = scene->GetVisual("pendulum_0deg::upper_link");
   QVERIFY(linkVis != NULL);
-  auto pose = linkVis->GetWorldPose();
+  auto pose = linkVis->WorldPose();
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(pose != linkVis->GetWorldPose());
-  pose = linkVis->GetWorldPose();
+  QVERIFY(pose != linkVis->WorldPose());
+  pose = linkVis->WorldPose();
 
   // Select the parent model and check its pose still changes over time
   gazebo::event::Events::setSelectedEntity("pendulum_0deg", "normal");
 
   this->ProcessEventsAndDraw(mainWindow);
 
-  QVERIFY(pose != linkVis->GetWorldPose());
-  pose = linkVis->GetWorldPose();
+  QVERIFY(pose != linkVis->WorldPose());
+  pose = linkVis->WorldPose();
 
   // Change to translate mode and check the model stops moving
   QVERIFY(gazebo::gui::g_translateAct != NULL);
@@ -121,7 +121,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Sequence was: select -> change mode
-  QVERIFY(pose == linkVis->GetWorldPose());
+  QVERIFY(pose == linkVis->WorldPose());
 
   // Deselect model and check it starts moving again even though we're still in
   // translate mode
@@ -130,8 +130,8 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_translateAct->isChecked());
-  QVERIFY(pose != linkVis->GetWorldPose());
-  pose = linkVis->GetWorldPose();
+  QVERIFY(pose != linkVis->WorldPose());
+  pose = linkVis->WorldPose();
 
   // Select model again and check it stops again
   gazebo::event::Events::setSelectedEntity("pendulum_0deg", "move");
@@ -139,7 +139,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   this->ProcessEventsAndDraw(mainWindow);
 
   // Sequence was: change mode -> select
-  QVERIFY(pose == linkVis->GetWorldPose());
+  QVERIFY(pose == linkVis->WorldPose());
 
   // Change to select mode and check model moves again
   QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
@@ -148,7 +148,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_arrowAct->isChecked());
-  QVERIFY(pose != linkVis->GetWorldPose());
+  QVERIFY(pose != linkVis->WorldPose());
 
   delete mainWindow;
   mainWindow = NULL;
@@ -285,7 +285,7 @@ void ModelManipulationTest::GlobalLocalFrames()
 
   // pick the box model - the translate visual should now be attached at
   // 45 degree angle to the
-  auto pickPt = cam->Project(modelVis->GetWorldPose().pos.Ign());
+  auto pickPt = cam->Project(modelVis->WorldPose().Pos());
   auto pt = QPoint(pickPt.X(), pickPt.Y());
   QTest::mouseMove(glWidget, pt);
   QTest::mouseClick(glWidget, Qt::LeftButton, 0, pt);
@@ -299,15 +299,15 @@ void ModelManipulationTest::GlobalLocalFrames()
 
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
-  auto initialPos = modelVis->GetWorldPose().pos.Ign();
+  auto initialPos = modelVis->WorldPose().Pos();
 
   // move the box in +z in local frame
-  auto startPos = modelVis->GetWorldPose().pos.Ign() +
-      modelVis->GetWorldPose().rot.Ign() *
+  auto startPos = modelVis->WorldPose().Pos() +
+      modelVis->WorldPose().Rot() *
       ignition::math::Vector3d(0.0, 0, 0.8);
   auto startPt = cam->Project(startPos);
-  auto endPos = modelVis->GetWorldPose().pos.Ign() +
-      modelVis->GetWorldPose().rot.Ign() *
+  auto endPos = modelVis->WorldPose().Pos() +
+      modelVis->WorldPose().Rot() *
       ignition::math::Vector3d(0.0, 0, 1.0);
   auto endPt = cam->Project(endPos);
   MouseDrag(glWidget, Qt::LeftButton, Qt::NoModifier, startPt, endPt);
@@ -315,7 +315,7 @@ void ModelManipulationTest::GlobalLocalFrames()
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
   // verify the box has moved
-  auto boxNewPos = modelVis->GetWorldPose().pos.Ign();
+  auto boxNewPos = modelVis->WorldPose().Pos();
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(boxNewPos.Y() > initialPos.Y());
   QVERIFY(boxNewPos.Z() > initialPos.Z());
@@ -323,11 +323,11 @@ void ModelManipulationTest::GlobalLocalFrames()
   initialPos = boxNewPos;
 
   // now move the box in -z in global frame
-  startPos = modelVis->GetWorldPose().pos.Ign() +
+  startPos = modelVis->WorldPose().Pos() +
       ignition::math::Vector3d(0.0, 0.0, 1.0);
   startPt = cam->Project(startPos);
   endPos =
-      modelVis->GetWorldPose().pos.Ign() +
+      modelVis->WorldPose().Pos() +
           ignition::math::Vector3d(0.0, 0.0, 0.8);
   endPt = cam->Project(endPos);
 
@@ -340,7 +340,7 @@ void ModelManipulationTest::GlobalLocalFrames()
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
   // verify the box has moved
-  boxNewPos = modelVis->GetWorldPose().pos.Ign();
+  boxNewPos = modelVis->WorldPose().Pos();
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(ignition::math::equal(boxNewPos.Y(), initialPos.Y()));
   QVERIFY(boxNewPos.Z() < initialPos.Z());
@@ -348,12 +348,12 @@ void ModelManipulationTest::GlobalLocalFrames()
   initialPos = boxNewPos;
 
   // try the local frame again
-  startPos = modelVis->GetWorldPose().pos.Ign() +
-      modelVis->GetWorldPose().rot.Ign() *
+  startPos = modelVis->WorldPose().Pos() +
+      modelVis->WorldPose().Rot() *
       ignition::math::Vector3d(0.0, 0, 0.8);
   startPt = cam->Project(startPos);
-  endPos = modelVis->GetWorldPose().pos.Ign() +
-      modelVis->GetWorldPose().rot.Ign() *
+  endPos = modelVis->WorldPose().Pos() +
+      modelVis->WorldPose().Rot() *
       ignition::math::Vector3d(0.0, 0, 1.0);
   endPt = cam->Project(endPos);
   MouseDrag(glWidget, Qt::LeftButton, Qt::NoModifier, startPt, endPt);
@@ -361,7 +361,7 @@ void ModelManipulationTest::GlobalLocalFrames()
   this->ProcessEventsAndDraw(mainWindow, 10, 30);
 
   // verify the box has moved
-  boxNewPos = modelVis->GetWorldPose().pos.Ign();
+  boxNewPos = modelVis->WorldPose().Pos();
 
   QVERIFY(ignition::math::equal(boxNewPos.X(), initialPos.X()));
   QVERIFY(boxNewPos.Y() > initialPos.Y());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,20 +56,20 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   const std::string modelName("cube1");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
-  const double mass = inertial->GetMass();
-  const math::Vector3 cog = inertial->GetCoG();
-  const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+  const double mass = inertial->Mass();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*ignition::math::Vector3d::One);
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
   msgs::Model msg;
@@ -96,20 +96,20 @@ void InertiaMsgsTest::InertialAccessors(const std::string &_physicsEngine)
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
-  while (newCog != inertial->GetCoG().Ign())
+  while (newCog != inertial->CoG())
   {
     world->Step(1);
     common::Time::MSleep(1);
     modelPub->Publish(msg, true);
   }
-  EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
-  EXPECT_EQ(inertial->GetCoG().Ign(), newCog);
-  EXPECT_EQ(inertial->GetPrincipalMoments(),
+  EXPECT_DOUBLE_EQ(inertial->Mass(), msgInertial->mass());
+  EXPECT_EQ(inertial->CoG(), newCog);
+  EXPECT_EQ(inertial->PrincipalMoments(),
             ignition::math::Vector3d(
                 msgInertial->ixx(),
                 msgInertial->iyy(),
                 msgInertial->izz()));
-  EXPECT_EQ(inertial->GetProductsofInertia(),
+  EXPECT_EQ(inertial->ProductsOfInertia(),
             ignition::math::Vector3d(
                 msgInertial->ixy(),
                 msgInertial->ixz(),
@@ -130,27 +130,27 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("plank");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
-  const double mass = inertial->GetMass();
-  const math::Vector3 cog = inertial->GetCoG();
-  const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+  const double mass = inertial->Mass();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 120);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, math::Vector3(2.564, 360.064, 362.5));
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, ignition::math::Vector3d(2.564, 360.064, 362.5));
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new center of mass
   msgs::Model msg;
@@ -170,16 +170,16 @@ void InertiaMsgsTest::SetCoG(const std::string &_physicsEngine)
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
-  while (newCoG != inertial->GetCoG().Ign())
+  while (newCoG != inertial->CoG())
   {
     world->Step(1);
     common::Time::MSleep(1);
     modelPub->Publish(msg, true);
   }
-  EXPECT_EQ(inertial->GetCoG().Ign(), newCoG);
+  EXPECT_EQ(inertial->CoG(), newCoG);
 
   world->Step(1000);
-  EXPECT_GT(model->GetWorldPose().rot.GetAsEuler().y, 0.25);
+  EXPECT_GT(model->WorldPose().Rot().Euler().Y(), 0.25);
 }
 
 /////////////////////////////////////////////////
@@ -204,27 +204,27 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
   EXPECT_EQ(g, ignition::math::Vector3d(0, 0, -9.8));
 
   const std::string modelName("cube1");
-  auto model = world->GetModel(modelName);
+  auto model = world->ModelByName(modelName);
   ASSERT_TRUE(model != NULL);
   auto link = model->GetLink();
   ASSERT_TRUE(link != NULL);
   auto inertial = link->GetInertial();
   ASSERT_TRUE(inertial != NULL);
-  const double mass = inertial->GetMass();
-  const math::Vector3 cog = inertial->GetCoG();
-  const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-  const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+  const double mass = inertial->Mass();
+  const ignition::math::Vector3d cog = inertial->CoG();
+  const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+  const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
   EXPECT_DOUBLE_EQ(mass, 45.56250000000001);
-  EXPECT_EQ(cog, math::Vector3::Zero);
-  EXPECT_EQ(Ixxyyzz, 1.537734375*math::Vector3::One);
-  EXPECT_EQ(Ixyxzyz, math::Vector3::Zero);
+  EXPECT_EQ(cog, ignition::math::Vector3d::Zero);
+  EXPECT_EQ(Ixxyyzz, 1.537734375*ignition::math::Vector3d::One);
+  EXPECT_EQ(Ixyxzyz, ignition::math::Vector3d::Zero);
 
   // new inertial values
   msgs::Model msg;
@@ -243,16 +243,16 @@ void InertiaMsgsTest::SetMass(const std::string &_physicsEngine)
   modelPub->WaitForConnection();
   modelPub->Publish(msg, true);
 
-  while (!math::equal(newMass, inertial->GetMass()))
+  while (!ignition::math::equal(newMass, inertial->Mass()))
   {
     world->Step(1);
     common::Time::MSleep(1);
     modelPub->Publish(msg, true);
   }
-  EXPECT_DOUBLE_EQ(inertial->GetMass(), msgInertial->mass());
+  EXPECT_DOUBLE_EQ(inertial->Mass(), msgInertial->mass());
 
   world->Step(1000);
-  EXPECT_LT(model->GetWorldPose().pos.z, 0.40);
+  EXPECT_LT(model->WorldPose().Pos().Z(), 0.40);
 }
 
 /////////////////////////////////////////////////
@@ -277,7 +277,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   ASSERT_TRUE(world != NULL);
 
   // check the gravity vector
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
   auto g = world->Gravity();
@@ -286,7 +286,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
   EXPECT_NEAR(dt, 1e-3, 1e-6);
 
   std::vector<std::string> modelNames;
-  for (auto const &model : world->GetModels())
+  for (auto const &model : world->Models())
   {
     std::string name = model->GetName();
     if (name.compare(0, 9, "pendulum_") == 0)
@@ -309,7 +309,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
           << modelName
           << std::endl;
 
-    auto model = world->GetModel(modelName);
+    auto model = world->ModelByName(modelName);
     ASSERT_TRUE(model != NULL);
     models.push_back(model);
 
@@ -322,15 +322,16 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     joints.push_back(joint);
 
     // Compute distance from cg to joint anchor
-    auto linkPose = link->GetWorldCoGPose();
-    auto jointPose = joint->GetWorldPose();
-    auto jointToCoG = linkPose.pos - jointPose.pos;
-    double length = jointToCoG.GetLength();
+    auto linkPose = link->WorldCoGPose();
+    auto jointPose = joint->WorldPose();
+    auto jointToCoG = linkPose.Pos() - jointPose.Pos();
+    double length = jointToCoG.Length();
     EXPECT_NEAR(length, 0.05, 1e-6);
     pendulumLengths.push_back(length);
 
     double angle =
-      asin(jointToCoG.Cross(g).Dot(joint->GetGlobalAxis(0)) / length / 9.8);
+      asin(jointToCoG.Cross(g).Dot(
+            joint->GlobalAxis(0)) / length / 9.8);
     EXPECT_NEAR(angle, -M_PI / 10, 1e-5);
     initialAngles.push_back(angle);
 
@@ -357,7 +358,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;
@@ -388,8 +389,8 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
 
     auto inertial = link->GetInertial();
     ASSERT_TRUE(inertial != NULL);
-    const math::Vector3 Ixxyyzz = inertial->GetPrincipalMoments();
-    const math::Vector3 Ixyxzyz = inertial->GetProductsofInertia();
+    const ignition::math::Vector3d Ixxyyzz = inertial->PrincipalMoments();
+    const ignition::math::Vector3d Ixyxzyz = inertial->ProductsOfInertia();
 
     // new inertial values
     msgs::Model msg;
@@ -409,15 +410,15 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
     modelPub->WaitForConnection();
     modelPub->Publish(msg, true);
 
-    while (Ixxyyzz[0] == inertial->GetPrincipalMoments()[0])
+    while (Ixxyyzz[0] == inertial->PrincipalMoments()[0])
     {
       world->Step(1);
       common::Time::MSleep(1);
       modelPub->Publish(msg, true);
     }
-    EXPECT_NEAR(2*Ixxyyzz[0], inertial->GetPrincipalMoments()[0], 1e-10);
-    EXPECT_NEAR(2*Ixxyyzz[1], inertial->GetPrincipalMoments()[1], 1e-10);
-    EXPECT_NEAR(2*Ixxyyzz[2], inertial->GetPrincipalMoments()[2], 1e-10);
+    EXPECT_NEAR(2*Ixxyyzz[0], inertial->PrincipalMoments()[0], 1e-10);
+    EXPECT_NEAR(2*Ixxyyzz[1], inertial->PrincipalMoments()[1], 1e-10);
+    EXPECT_NEAR(2*Ixxyyzz[2], inertial->PrincipalMoments()[2], 1e-10);
   }
 
   // Reset world and cycle count to restore initial conditions
@@ -439,7 +440,7 @@ void InertiaMsgsTest::SetPendulumInertia(const std::string &_physicsEngine)
       auto initialAngle = initialAngles[i];
       auto cycleAngle = cycleAngles[i];
 
-      auto angle = joint->GetAngle(0).Radian() - initialAngle;
+      auto angle = joint->Position(0) - initialAngle;
       if (angle / cycleAngle >= 1)
       {
         cycleAngles[i] *= -1;

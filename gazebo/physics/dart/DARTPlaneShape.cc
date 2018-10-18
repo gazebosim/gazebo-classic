@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ void DARTPlaneShape::CreatePlane()
 }
 
 //////////////////////////////////////////////////
-void DARTPlaneShape::SetAltitude(const math::Vector3 &_pos)
+void DARTPlaneShape::SetAltitude(const ignition::math::Vector3d &_pos)
 {
   PlaneShape::SetAltitude(_pos);
 }

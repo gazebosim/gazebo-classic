@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2016 Open Source Robotics Foundation
+ * Copyright (C) 2014 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
     return;
   }
 
-  if (math::equal(_radius, 0.0))
+  if (ignition::math::equal(_radius, 0.0))
   {
     // Warn user, but still create shape with very small value
     // otherwise later resize operations using setLocalScaling
@@ -75,7 +75,7 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
     _radius = 1e-4;
   }
 
-  if (math::equal(_length, 0.0))
+  if (ignition::math::equal(_length, 0.0))
   {
     gzwarn << "Setting cylinder shape's length to zero not supported "
            << "in DART, using 1e-4.\n";

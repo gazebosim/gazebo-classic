@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2016 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -614,7 +614,7 @@ void PresetManager::GenerateSDFHelper(const Preset &_preset,
       }
       else if (elem->GetValue()->IsType<sdf::Vector3>())
       {
-        math::Vector3 v;
+        ignition::math::Vector3d v;
         if (CastAnyValue(value, v))
         {
           gzdbg << "Vector3: " << v << std::endl;

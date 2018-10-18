@@ -38,7 +38,7 @@ TEST_F(LinkTest, StaticWrench)
   EXPECT_TRUE(link0->IsStatic());
 
   ignition::math::Pose3d model0Initial(1, 0, 0.5, 0, 0, 0);
-  EXPECT_EQ(model0->GetWorldPose(), model0Initial);
+  EXPECT_EQ(model0->WorldPose(), model0Initial);
 
   auto model1 = this->GetModel("model_1");
   EXPECT_FALSE(model1->IsStatic());
@@ -47,7 +47,7 @@ TEST_F(LinkTest, StaticWrench)
   EXPECT_FALSE(link1->IsStatic());
 
   ignition::math::Pose3d model1Initial(-1, 0, 0.5, 0, 0, 0);
-  EXPECT_EQ(model1->GetWorldPose(), model1Initial);
+  EXPECT_EQ(model1->WorldPose(), model1Initial);
 
   // Setup wrench publishers
   std::string topicName = "~/";
@@ -71,24 +71,24 @@ TEST_F(LinkTest, StaticWrench)
 
   int sleep = 0;
   int maxSleep = 30;
-  while (model1->GetWorldPose() == model1Initial && sleep < maxSleep)
+  while (model1->WorldPose() == model1Initial && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_NE(model1->GetWorldPose(), model1Initial);
+  EXPECT_NE(model1->WorldPose(), model1Initial);
 
   // Send wrench msg to static model and check it doesn't move
   wrenchModel0Pub->Publish(msg);
 
   maxSleep = sleep + 5;
   sleep = 0;
-  while (model0->GetWorldPose() == model0Initial && sleep < maxSleep)
+  while (model0->WorldPose() == model0Initial && sleep < maxSleep)
   {
     common::Time::MSleep(100);
     sleep++;
   }
-  EXPECT_EQ(model0->GetWorldPose(), model0Initial);
+  EXPECT_EQ(model0->WorldPose(), model0Initial);
 }
 
 int main(int argc, char **argv)

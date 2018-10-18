@@ -389,7 +389,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "samplingRate",
           rotor.samplingRate, rotor.samplingRate);
 
-      // use gazebo::math::Filter
+      // use ignition::math::Filter
       rotor.velocityFilter.Fc(rotor.frequencyCutoff, rotor.samplingRate);
 
       // initialize filter to zero value
@@ -434,7 +434,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   // Get sensors
   std::string imuName;
   getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
-  std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
+  std::string imuScopedName = this->dataPtr->model->GetWorld()->Name()
       + "::" + this->dataPtr->model->GetScopedName()
       + "::" + imuName;
   this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
@@ -467,7 +467,7 @@ void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->GetSimTime();
+  gazebo::common::Time curTime = this->dataPtr->model->GetWorld()->SimTime();
 
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
@@ -600,7 +600,7 @@ void ArduCopterPlugin::SendState() const
   // send_fdm
   fdmPacket pkt;
 
-  pkt.timestamp = this->dataPtr->model->GetWorld()->GetSimTime().Double();
+  pkt.timestamp = this->dataPtr->model->GetWorld()->SimTime().Double();
 
   // asssumed that the imu orientation is:
   //   x forward
@@ -650,7 +650,7 @@ void ArduCopterPlugin::SendState() const
   // model world pose brings us to model, x-forward, y-left, z-up
   // adding gazeboToNED gets us to the x-forward, y-right, z-down
   ignition::math::Pose3d worldToModel = gazeboToNED +
-    this->dataPtr->model->GetWorldPose().Ign();
+    this->dataPtr->model->WorldPose();
 
   // get transform from world NED to Model frame
   ignition::math::Pose3d NEDToModel = worldToModel - gazeboToNED;
@@ -681,7 +681,7 @@ void ArduCopterPlugin::SendState() const
   // or...
   // Get model velocity in NED frame
   ignition::math::Vector3d velGazeboWorldFrame =
-    this->dataPtr->model->GetLink()->GetWorldLinearVel().Ign();
+    this->dataPtr->model->GetLink()->WorldLinearVel();
   ignition::math::Vector3d velNEDFrame =
     gazeboToNED.Rot().RotateVectorReverse(velGazeboWorldFrame);
   pkt.velocityXYZ[0] = velNEDFrame.X();

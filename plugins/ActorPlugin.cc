@@ -14,6 +14,9 @@
  * limitations under the License.
  *
 */
+
+#include <functional>
+
 #include <ignition/math.hh>
 #include "gazebo/physics/physics.hh"
 #include "plugins/ActorPlugin.hh"
@@ -103,9 +106,9 @@ void ActorPlugin::ChooseNewTarget()
     newTarget.X(ignition::math::Rand::DblUniform(-3, 3.5));
     newTarget.Y(ignition::math::Rand::DblUniform(-10, 2));
 
-    for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
+    for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
     {
-      double dist = (this->world->GetModel(i)->GetWorldPose().Ign().Pos()
+      double dist = (this->world->ModelByIndex(i)->WorldPose().Pos()
           - newTarget).Length();
       if (dist < 2.0)
       {
@@ -120,14 +123,14 @@ void ActorPlugin::ChooseNewTarget()
 /////////////////////////////////////////////////
 void ActorPlugin::HandleObstacles(ignition::math::Vector3d &_pos)
 {
-  for (unsigned int i = 0; i < this->world->GetModelCount(); ++i)
+  for (unsigned int i = 0; i < this->world->ModelCount(); ++i)
   {
-    physics::ModelPtr model = this->world->GetModel(i);
+    physics::ModelPtr model = this->world->ModelByIndex(i);
     if (std::find(this->ignoreModels.begin(), this->ignoreModels.end(),
           model->GetName()) == this->ignoreModels.end())
     {
-      ignition::math::Vector3d offset = model->GetWorldPose().Ign().Pos() -
-        this->actor->GetWorldPose().Ign().Pos();
+      ignition::math::Vector3d offset = model->WorldPose().Pos() -
+        this->actor->WorldPose().Pos();
       double modelDist = offset.Length();
       if (modelDist < 4.0)
       {
@@ -146,7 +149,7 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   // Time delta
   double dt = (_info.simTime - this->lastUpdate).Double();
 
-  ignition::math::Pose3d pose = this->actor->GetWorldPose().Ign();
+  ignition::math::Pose3d pose = this->actor->WorldPose();
   ignition::math::Vector3d pos = this->target - pose.Pos();
   ignition::math::Vector3d rpy = pose.Rot().Euler();
 
@@ -171,7 +174,7 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   yaw.Normalize();
 
   // Rotate in place, instead of jumping.
-  if (std::abs(yaw.Radian()) > GZ_DTOR(10))
+  if (std::abs(yaw.Radian()) > IGN_DTOR(10))
   {
     pose.Rot() = ignition::math::Quaterniond(1.5707, 0, rpy.Z()+
         yaw.Radian()*0.001);
@@ -190,7 +193,7 @@ void ActorPlugin::OnUpdate(const common::UpdateInfo &_info)
   // Distance traveled is used to coordinate motion with the walking
   // animation
   double distanceTraveled = (pose.Pos() -
-      this->actor->GetWorldPose().Ign().Pos()).Length();
+      this->actor->WorldPose().Pos()).Length();
 
   this->actor->SetWorldPose(pose, false, false);
   this->actor->SetScriptTime(this->actor->ScriptTime() +
