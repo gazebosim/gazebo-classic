@@ -17,7 +17,8 @@
 
 #include <mutex>
 
-#include <gazebo/common/Color.hh>
+#include <ignition/math/Color.hh>
+
 #include <gazebo/common/Events.hh>
 #include <gazebo/common/Time.hh>
 #include <gazebo/msgs/msgs.hh>
@@ -39,10 +40,10 @@ namespace gazebo
     public: event::ConnectionPtr updateConnection;
 
     /// \brief First color.
-    public: common::Color colorA;
+    public: ignition::math::Color colorA;
 
     /// \brief Second color.
-    public: common::Color colorB;
+    public: ignition::math::Color colorB;
 
     /// \brief Time taken by a full cycle.
     public: common::Time period;
@@ -98,12 +99,12 @@ void BlinkVisualPlugin::Load(rendering::VisualPtr _visual, sdf::ElementPtr _sdf)
   // Get color A
   this->dataPtr->colorA.Set(1, 0, 0, 1);
   if (_sdf->HasElement("color_a"))
-    this->dataPtr->colorA = _sdf->Get<common::Color>("color_a");
+    this->dataPtr->colorA = _sdf->Get<ignition::math::Color>("color_a");
 
   // Get color B
   this->dataPtr->colorB.Set(0, 0, 0, 1);
   if (_sdf->HasElement("color_b"))
-    this->dataPtr->colorB = _sdf->Get<common::Color>("color_b");
+    this->dataPtr->colorB = _sdf->Get<ignition::math::Color>("color_b");
 
   // Get the period
   this->dataPtr->period.Set(1);
@@ -168,8 +169,8 @@ void BlinkVisualPlugin::Update()
   if (elapsed >= this->dataPtr->period)
     this->dataPtr->cycleStartTime = currentTime;
 
-  common::Color from;
-  common::Color to;
+  ignition::math::Color from;
+  ignition::math::Color to;
   // Color A -> B
   if (elapsed < this->dataPtr->period*0.5)
   {
@@ -187,16 +188,16 @@ void BlinkVisualPlugin::Update()
   // interpolate each color component
   double pos = (elapsed/(this->dataPtr->period*0.5)).Double();
 
-  double red = from.r + (to.r - from.r) * pos;
-  double green = from.g + (to.g - from.g) * pos;
-  double blue = from.b + (to.b - from.b) * pos;
-  double alpha = from.a + (to.a - from.a) * pos;
+  double red = from.R() + (to.R() - from.R()) * pos;
+  double green = from.G() + (to.G() - from.G()) * pos;
+  double blue = from.B() + (to.B() - from.B()) * pos;
+  double alpha = from.A() + (to.A() - from.A()) * pos;
 
-  common::Color color(red, green, blue, alpha);
+  ignition::math::Color color(red, green, blue, alpha);
 
   this->dataPtr->visual->SetDiffuse(color);
   this->dataPtr->visual->SetAmbient(color);
-  this->dataPtr->visual->SetTransparency(1-color.a);
+  this->dataPtr->visual->SetTransparency(1-color.A());
 }
 
 /////////////////////////////////////////////////
