@@ -1,4 +1,4 @@
-#version 130
+#version 120
 
 vec4 expand(vec4 v)
 {
@@ -31,8 +31,7 @@ float calcDepthShadow(sampler2D shadowMap, vec4 uv, float invShadowMapSize)
       // manually project and assign derivatives
       // to avoid gradient issues inside loops
       newUV = newUV / newUV.w;
-      float depth = textureGrad(shadowMap, newUV.xy,  vec2(1.0, 1.0),
-          vec2(1.0, 1.0)).x;
+      float depth = texture2D(shadowMap, newUV.xy).x;
       if (depth >= 1.0 || depth >= newUV.z)
         shadow += 1.0;
     }
@@ -62,7 +61,7 @@ float calcPSSMDepthShadow(
   return shadow;
 }
 
-in vec4 uvMisc;
+varying vec4 uvMisc;
 
 uniform mat4 uvTransform;
 
@@ -77,11 +76,9 @@ uniform float inverseShadowmapSize0;
 uniform float inverseShadowmapSize1;
 uniform float inverseShadowmapSize2;
 
-in vec4 lightSpacePos0;
-in vec4 lightSpacePos1;
-in vec4 lightSpacePos2;
-
-out vec4 outputCol;
+varying vec4 lightSpacePos0;
+varying vec4 lightSpacePos1;
+varying vec4 lightSpacePos2;
 
 void main()
 {
@@ -104,5 +101,5 @@ void main()
   vec3 diffuse = vec3(1.0, 0.0, 0.0) * texSample.xyz;
 
   // apply shadows
-  outputCol.xyz = diffuse * rtshadow;
+  gl_FragColor = vec4(diffuse * rtshadow, 1.0);;
 }
