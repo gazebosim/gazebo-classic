@@ -24,8 +24,28 @@ message Visual
     optional int32 layer       = 1;
   }
 
+  enum Type
+  {
+    /// \brief Entity visual
+    ENTITY    = 0;
+    /// \brief Model visual
+    MODEL     = 1;
+    /// \brief Link visual
+    LINK      = 2;
+    /// \brief Visual visual
+    VISUAL    = 3;
+    /// \brief Collision visual
+    COLLISION = 4;
+    /// \brief Sensor visual
+    SENSOR =    5;
+    /// \brief GUI visual
+    GUI =       6;
+    /// \brief Physics data visual
+    PHYSICS =   7;
+  }
+
   required string name         = 1;
-  optional uint32 id           = 2; 
+  optional uint32 id           = 2;
   required string parent_name  = 3;
   optional uint32 parent_id    = 4;
   optional bool cast_shadows   = 5;
@@ -43,4 +63,7 @@ message Visual
 
   /// \brief Option meta information associated with this visual.
   optional Meta meta           = 16;
+
+  /// \brief Type of visual.
+  optional Type type           = 17;
 }
