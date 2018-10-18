@@ -102,6 +102,20 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
+    // for box_3, also get link_2 and its collision
+    auto link2 = model->GetLink("link_2");
+    physics::CollisionPtr collision2;
+    if (i == 3)
+    {
+      EXPECT_NE(link2, nullptr);
+      collision2 = link2->GetCollision(index);
+      EXPECT_NE(collision2, nullptr);
+    }
+    else
+    {
+      EXPECT_EQ(link2, nullptr);
+    }
+
     // i=0: rotated model pose
     //  expect collision pose to match model pose
     if (i == 0)
@@ -127,6 +141,10 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
       ignition::math::Pose3d collisionPose(0, 0, dz, 0, 0, 0);
       EXPECT_EQ(link->WorldPose().Pos() + collisionPose.Pos(),
                 collision->WorldPose().Pos());
+
+      // collision2 pose should match link2 pose
+      EXPECT_EQ(link2->WorldPose().Pos(),
+                collision2->WorldPose().Pos());
     }
   }
   EXPECT_EQ(modelCount, 4);
@@ -154,6 +172,20 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 
+    // for box_3, also get link_2 and its collision
+    auto link2 = model->GetLink("link_2");
+    physics::CollisionPtr collision2;
+    if (i == 3)
+    {
+      EXPECT_NE(link2, nullptr);
+      collision2 = link2->GetCollision(index);
+      EXPECT_NE(collision2, nullptr);
+    }
+    else
+    {
+      EXPECT_EQ(link2, nullptr);
+    }
+
     // For 0-2, drop and expect box to rest at specific height
     if (i <= 2)
     {
@@ -162,6 +194,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     else
     {
       EXPECT_NEAR(collision->WorldPose().Pos().Z(), dz/2, g_physics_tol);
+      EXPECT_NEAR(collision2->WorldPose().Pos().Z(), dz/2, g_physics_tol);
     }
   }
 }
