@@ -22,6 +22,8 @@
 
 #include <sdf/sdf.hh>
 
+#include <gazebo/msgs/msgs.hh>
+#include <gazebo/common/UpdateInfo.hh>
 #include <gazebo/common/Plugin.hh>
 #include <gazebo/util/system.hh>
 
@@ -60,6 +62,10 @@ namespace gazebo
 
     // Documentation inherited
     public: virtual void Reset();
+
+    /// \brief Move to a particular floor.
+    /// \param[in] _floor Number of the floor to move the elevator to.
+    public: void MoveToFloor(const int _floor);
 
     /// \brief Update the plugin once every iteration of simulation.
     /// \param[in] _info Update information provided by the server.

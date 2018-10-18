@@ -130,42 +130,46 @@ void ElevatorPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 /////////////////////////////////////////////////
 void ElevatorPlugin::OnElevator(ConstGzStringPtr &_msg)
 {
-  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
-
-  // Ignore messages when the elevator is currently busy.
-  if (!this->dataPtr->states.empty())
-    return;
-
   // Currently we only expect the message to contain a floor to move to.
   try
   {
-    int floor = std::stoi(_msg->data());
-
-    // Step 1: close the door.
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
-          this->dataPtr->doorController));
-
-    // Step 2: Move to the correct floor.
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
-          floor, this->dataPtr->liftController));
-
-    // Step 3: Open the door
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
-          this->dataPtr->doorController));
-
-    // Step 4: Wait
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState(
-          this->dataPtr->doorWaitTime));
-
-    // Step 5: Close the door
-    this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
-          this->dataPtr->doorController));
+    this->MoveToFloor(std::stoi(_msg->data()));
   }
   catch(...)
   {
     gzerr << "Unable to process elevator message["
           << _msg->data() << "]\n";
   }
+}
+
+/////////////////////////////////////////////////
+void ElevatorPlugin::MoveToFloor(const int _floor)
+{
+  std::lock_guard<std::mutex> lock(this->dataPtr->stateMutex);
+
+  // Ignore messages when the elevator is currently busy.
+  if (!this->dataPtr->states.empty())
+    return;
+
+  // Step 1: close the door.
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+        this->dataPtr->doorController));
+
+  // Step 2: Move to the correct floor.
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::MoveState(
+        _floor, this->dataPtr->liftController));
+
+  // Step 3: Open the door
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::OpenState(
+        this->dataPtr->doorController));
+
+  // Step 4: Wait
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::WaitState(
+        this->dataPtr->doorWaitTime));
+
+  // Step 5: Close the door
+  this->dataPtr->states.push_back(new ElevatorPluginPrivate::CloseState(
+        this->dataPtr->doorController));
 }
 
 /////////////////////////////////////////////////
