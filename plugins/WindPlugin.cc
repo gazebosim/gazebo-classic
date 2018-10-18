@@ -185,6 +185,12 @@ ignition::math::Vector3d WindPlugin::LinearVel(const physics::Wind *_wind,
 /////////////////////////////////////////////////
 void WindPlugin::OnUpdate()
 {
+  // Update loop for using the force on mass approximation
+  // This is not recommended. Please use the LiftDragPlugin instead.
+
+  // If the forceApproximationScalingFactor is very small don't iterate.
+  // It doesn't make sense to be negative, that would be negative wind drag.
+  if (fabs(this->forceApproximationScalingFactor) < 1E-6) { return; }
   // Get all the models
   physics::Model_V models = this->world->Models();
 

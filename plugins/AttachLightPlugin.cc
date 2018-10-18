@@ -87,7 +87,8 @@ void AttachLightPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           while (lightElem)
           {
             std::string lightName = lightElem->Get<std::string>("light_name");
-            physics::LightPtr light = this->dataPtr->world->Light(lightName);
+            physics::LightPtr light =
+                this->dataPtr->world->LightByName(lightName);
 
             // lights are loaded before models so we should be able to find them
             if (!light)
@@ -131,7 +132,7 @@ void AttachLightPlugin::OnUpdate()
     {
       physics::LightPtr light = lightIt.first;
       ignition::math::Pose3d pose = lightIt.second;
-      light->SetWorldPose(pose + link->GetWorldPose().Ign());
+      light->SetWorldPose(pose + link->WorldPose());
     }
   }
 }

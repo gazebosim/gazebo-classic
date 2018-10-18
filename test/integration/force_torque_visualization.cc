@@ -34,7 +34,7 @@ void ForceTorqueVisualizationTest::WrenchVisual()
   this->shareMaxPercentChange = 2.0;
 
   // Load world with force torque sensors
-  this->Load("test/worlds/force_torque_test.world");
+  this->Load("test/worlds/force_torque_test.world", false, false, false);
 
   // Create the main window.
   auto mainWindow = new gazebo::gui::MainWindow();
@@ -50,9 +50,7 @@ void ForceTorqueVisualizationTest::WrenchVisual()
   auto scene = cam->GetScene();
   QVERIFY(scene != nullptr);
 
-  // Enable sensor visualizations
-  QVERIFY(!scene->EnableVisualizations());
-  scene->EnableVisualizations(true);
+  // Make sure sensor visualizations is enabled
   QVERIFY(scene->EnableVisualizations());
 
   this->ProcessEventsAndDraw(mainWindow);

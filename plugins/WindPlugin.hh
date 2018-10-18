@@ -71,6 +71,9 @@ namespace gazebo
     /// \brief Time for wind to rise
     private: double characteristicTimeForWindRise = 1;
 
+    /// \brief Time for wind to rise
+    private: double characteristicTimeForWindRiseVertical = 1;
+
     /// \brief Wind amplitude
     private: double magnitudeSinAmplitudePercent = 0;
 
@@ -89,11 +92,17 @@ namespace gazebo
     /// \brief period over characteristicTimeForWindRise
     private: double kMag = 0;
 
+    /// \brief period over characteristicTimeForWindRiseVertical
+    private: double kMagVertical = 0;
+
     /// \brief period over characteristicTimeForWindOrientationChange
     private: double kDir = 0;
 
     /// \brief Mean of the magnitude
     private: double magnitudeMean = 0;
+    
+    /// \brief Mean of the magnitude
+    private: double magnitudeMeanVertical = 0;
 
     /// \brief Mean of the direction
     private: double directionMean = 0;
@@ -106,6 +115,9 @@ namespace gazebo
 
     /// \brief Noise added to Z axis
     private: sensors::NoisePtr noiseVertical;
+
+    /// \brief The scaling factor to approximate wind as force on a mass.
+    private: double forceApproximationScalingFactor = 0;
   };
 }
 
