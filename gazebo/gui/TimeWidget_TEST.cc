@@ -97,26 +97,14 @@ void TimeWidget_TEST::Reset()
   // pause the world before resetting
   mainWindow->Pause();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(mainWindow->IsPaused());
 
   // trigger reset world
   gazebo::gui::g_resetWorldAct->trigger();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Make sure real time is zero
   txt = realTimeEdit->text().toStdString();
@@ -136,13 +124,7 @@ void TimeWidget_TEST::Reset()
   // play the simulation and again and verify time increases
   mainWindow->Play();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(!mainWindow->IsPaused());
 
@@ -190,13 +172,8 @@ void TimeWidget_TEST::ValidTimes()
     mainWindow->Init();
     mainWindow->show();
 
-    // Process some events, and draw the screen
-    for (unsigned int i = 0; i < 10; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow);
+
     gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
     QVERIFY(cam != NULL);
 

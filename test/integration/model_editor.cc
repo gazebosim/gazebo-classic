@@ -42,13 +42,7 @@ void ModelEditorTest::SaveModelPose()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -68,13 +62,9 @@ void ModelEditorTest::SaveModelPose()
   // Move cylinder to new pose
   ignition::math::Pose3d cylinderPose(1, 1, 2, 4, 5, 6);
   cylinder->SetWorldPose(cylinderPose);
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(cylinder->GetWorldPose() == cylinderPose);
 
   // Insert another link
@@ -86,13 +76,9 @@ void ModelEditorTest::SaveModelPose()
   // Move box to new pose
   ignition::math::Pose3d boxPose(2, 1, 0, 0, 0, 0);
   box->SetWorldPose(boxPose);
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(box->GetWorldPose() == boxPose);
 
   // Add a revolute joint
@@ -103,13 +89,8 @@ void ModelEditorTest::SaveModelPose()
   jointMaker->CreateHotSpot(jointData);
   QCOMPARE(jointMaker->JointCount(), 1u);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
 
@@ -118,13 +99,7 @@ void ModelEditorTest::SaveModelPose()
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gazebo::gui::ModelCreator::ALL_SAVED);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify pose again
   QVERIFY(cylinder->GetWorldPose() == cylinderPose);
@@ -154,13 +129,7 @@ void ModelEditorTest::JointInspectorUpdate()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get the user camera and scene
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -186,13 +155,8 @@ void ModelEditorTest::JointInspectorUpdate()
   ignition::math::Pose3d cylinderPose(1, 1, 2, 4, 5, 6);
   cylinder->SetWorldPose(cylinderPose);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(cylinder->GetWorldPose() == cylinderPose);
 
   // add a sphere link
@@ -204,13 +168,9 @@ void ModelEditorTest::JointInspectorUpdate()
   // Move sphere to new pose
   ignition::math::Pose3d spherePose(0, 0, 0.5, 0, 0, 0);
   sphere->SetWorldPose(spherePose);
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(sphere->GetWorldPose() == spherePose);
 
   // a box nested model
@@ -233,13 +193,9 @@ void ModelEditorTest::JointInspectorUpdate()
   // Move box to new pose
   ignition::math::Pose3d boxPose(-1, -1, 1, 0, 0, 0);
   boxModelVis->SetWorldPose(boxPose);
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+
+  this->ProcessEventsAndDraw(mainWindow);
+
   QVERIFY(boxModelVis->GetWorldPose() == boxPose);
 
   // Add a revolute joint between cylinder link and box nested model
@@ -248,13 +204,8 @@ void ModelEditorTest::JointInspectorUpdate()
   jointMaker->CreateHotSpot(jointData);
   QCOMPARE(jointMaker->JointCount(), 1u);
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
+
   // verify joint hotspot pose
   QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==
       cylinderPose.Pos() + (boxPose.Pos() - cylinderPose.Pos())*0.5);
@@ -291,13 +242,7 @@ void ModelEditorTest::JointInspectorUpdate()
   QVERIFY(parentBox->currentText() == "link_0");
   QVERIFY(childBox->currentText() == "link_1");
 
-  // Process some events, and draw the screen
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // verify the joint hotspot visual pose is also updated
   QVERIFY(jointData->hotspot->GetWorldPose().pos.Ign() ==

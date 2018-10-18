@@ -88,11 +88,11 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
     info->J1a[0] = globalAxis1[0];
     info->J1a[1] = globalAxis1[1];
     info->J1a[2] = globalAxis1[2];
-    
+
     info->J2a[0] = ratio * globalAxis2[0];
     info->J2a[1] = ratio * globalAxis2[1];
     info->J2a[2] = ratio * globalAxis2[2];
-    
+
     dReal k = info->fps * info->erp;
     info->c[0] = -k * err;
 

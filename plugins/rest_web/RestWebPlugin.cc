@@ -210,7 +210,7 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
   try
   {
     std::string event = "{";
-    event += "\"event\": " + _msg->json() + ", ";
+    event +=  _msg->json() + ", ";
     physics::WorldPtr world = physics::get_world();
     if (!world)
     {

@@ -15,9 +15,10 @@
  *
 */
 
-#ifndef _GAZEBO_USER_COMMAND_WIDGET_HH_
-#define _GAZEBO_USER_COMMAND_WIDGET_HH_
+#ifndef _GAZEBO_GUI_USERCMDHISTORY_HH_
+#define _GAZEBO_GUI_USERCMDHISTORY_HH_
 
+#include <memory>
 #include <string>
 
 #include "gazebo/msgs/MessageTypes.hh"
@@ -42,6 +43,14 @@ namespace gazebo
       /// \brief Destructor
       public: virtual ~UserCmdHistory();
 
+      /// \brief Set whether the widget is active or not.
+      /// \param[in] _active True to make it active.
+      public: void SetActive(const bool _active);
+
+      /// \brief Set the widget to be active.
+      /// \return True if it is active.
+      public: bool Active() const;
+
       /// \internal
       /// \brief Triggers OnStatsSlot
       signals: void StatsSignal();
@@ -52,7 +61,7 @@ namespace gazebo
       /// \brief Qt call back when an undo history action is triggered.
       /// It publishes an undo request message.
       /// \param[in] _action Pointer to action which was triggered,
-      private slots: void OnUndoCommand(QAction *_action);
+      private slots: virtual void OnUndoCommand(QAction *_action);
 
       /// \brief Qt call back when an undo history action is hovered.
       /// \param[in] _action Pointer to action which was hovered,
@@ -60,7 +69,7 @@ namespace gazebo
 
       /// \brief Qt call back when the undo history button is pressed.
       /// It opens the undo history menu.
-      private slots: void OnUndoCmdHistory();
+      private slots: virtual void OnUndoCmdHistory();
 
       /// \brief Qt call back when the redo button is pressed.
       private slots: void OnRedo();
@@ -68,7 +77,7 @@ namespace gazebo
       /// \brief Qt call back when a redo history action is triggered.
       /// It publishes a redo request message.
       /// \param[in] _action Pointer to action which was triggered,
-      private slots: void OnRedoCommand(QAction *_action);
+      private slots: virtual void OnRedoCommand(QAction *_action);
 
       /// \brief Qt call back when a redo history action is hovered.
       /// \param[in] _action Pointer to action which was hovered,
@@ -76,7 +85,7 @@ namespace gazebo
 
       /// \brief Qt call back when the redo history button is pressed.
       /// It opens the redo history menu.
-      private slots: void OnRedoCmdHistory();
+      private slots: virtual void OnRedoCmdHistory();
 
       /// \brief Updates the widgets according to the user command stats
       /// message.
@@ -87,9 +96,15 @@ namespace gazebo
       /// stored in the server.
       private: void OnUserCmdStatsMsg(ConstUserCmdStatsPtr &_msg);
 
+      /// \brief Group of actions in undo history menu.
+      protected: QActionGroup *undoActions;
+
+      /// \brief Group of actions in redo history menu.
+      protected: QActionGroup *redoActions;
+
       /// \internal
       /// \brief Pointer to private data.
-      private: UserCmdHistoryPrivate *dataPtr;
+      private: std::unique_ptr<UserCmdHistoryPrivate> dataPtr;
     };
   }
 }

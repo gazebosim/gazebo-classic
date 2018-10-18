@@ -21,10 +21,12 @@
 #include <memory>
 #include <set>
 #include <string>
+#include "gazebo/common/Console.hh"
 #include "gazebo/common/SingletonT.hh"
 #include "gazebo/msgs/any.pb.h"
 #include "gazebo/msgs/empty.pb.h"
 #include "gazebo/msgs/gz_string.pb.h"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/msgs/param.pb.h"
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/system.hh"
@@ -50,14 +52,20 @@ namespace gazebo
 
       /// \brief Register a new item in the introspection manager.
       /// \param[in] _item New item. E.g.: /default/world/model1/pose
-      /// \param[in] _type Item type. E.g.: gazebo::msgs::pose
       /// \param[in] _cb Callback used to get the last update for this item.
       /// \result True when the registration succeed or false otherwise
       /// (item already existing).
-      public: bool Register(const std::string &_item,
-                            const std::string &_type,
-                            const std::function <bool(
-                                gazebo::msgs::Any &_msg)> &_cb);
+      public: template<typename T>
+      bool Register(const std::string &_item,
+                    const std::function<T()> &_cb)
+      {
+        auto func = [=]()
+        {
+          return msgs::ConvertAny(_cb());
+        };
+
+        return this->Register(_item, func);
+      }
 
       /// \brief Unregister an existing item from the introspection manager.
       /// \param[in] _item Item to remove.
@@ -80,6 +88,14 @@ namespace gazebo
 
       /// \brief Destructor.
       private: virtual ~IntrospectionManager();
+
+      /// \brief Register a new item in the introspection manager.
+      /// \param[in] _item New item. E.g.: /default/world/model1/pose
+      /// \param[in] _cb Callback used to get the last update for this item.
+      /// \result True when the registration succeed or false otherwise
+      /// (item already existing).
+      private: bool Register(const std::string &_item,
+                             const std::function <gazebo::msgs::Any()> &_cb);
 
       /// \brief Create a new filter for observing item updates. This function
       /// will create a new topic for sending periodic updates of the items
@@ -146,9 +162,7 @@ namespace gazebo
       /// \param[in] _req Not used.
       /// \param[out] _rep Collection of parameters representing the items
       /// registered. Each parameter should have a name "item", followed by a
-      /// value of type STRING. Additionally, each parameter has a child with
-      /// name "type" and another value of type STRING describing the type of
-      /// the item.
+      /// value of type STRING.
       /// \param[out] _result True when the request succeeded.
       private: void Items(const gazebo::msgs::Empty &_req,
                           gazebo::msgs::Param_V &_rep,

@@ -52,16 +52,6 @@ namespace gazebo
       std::set<std::string> filters;
     };
 
-    /// \brief Todo.
-    struct RegisteredItem
-    {
-      /// \brief ToDo.
-      std::string type;
-
-      /// \brief ToDo.
-      std::function <bool (gazebo::msgs::Any &_msg)> cb;
-    };
-
     /// \brief Private data for the IntrospectionManager class.
     class IntrospectionManagerPrivate
     {
@@ -75,7 +65,8 @@ namespace gazebo
       /// The value contains the string representation of the protobuf type
       /// that stores the value.
       /// E.g.: allItems["model1::pose"] = "gazebo::msgs::Pose"
-      public: std::map<std::string, RegisteredItem> allItems;
+      public: std::map<std::string, std::function <gazebo::msgs::Any ()>>
+          allItems;
 
       /// \brief List of items that have at least one active observer.
       /// The key contains the item name.

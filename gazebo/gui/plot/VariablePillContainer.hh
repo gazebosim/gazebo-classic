@@ -22,6 +22,7 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/gui/plot/VariablePill.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -63,13 +64,24 @@ namespace gazebo
       /// \return Maximum number of variable pills. -1 means unlimited.
       public: int MaxSize() const;
 
-      /// \brief Add a new variable pill to the container.
+      /// \brief Set the label text for a variable pill in this container.
+      /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] _text Text to set the variable pill label to.
+      public: void SetVariablePillLabel(const unsigned int _id,
+          const std::string &_text);
+
+      /// \brief Add a new variable pill to a multi-variable pill in the
+      /// container.
       /// \param[in] _name Name of variable pill to add.
-      public: unsigned int AddVariablePill(const std::string &_name);
+      /// \param[in] _targetId Unqiue id of the variable pill to add to.
+      public: unsigned int AddVariablePill(const std::string &_name,
+          const unsigned int _targetId = VariablePill::EmptyVariable);
 
       /// \brief Add a variable pill to the container.
       /// \param[in] _variable Variable pill to add.
-      public: void AddVariablePill(VariablePill *_variable);
+      /// \param[in] _targetId Unqiue id of the variable pill to add to.
+      public: void AddVariablePill(VariablePill *_variable,
+          const unsigned int _targetId = VariablePill::EmptyVariable);
 
       /// \brief Remove a variable pill from the container.
       /// \param[in] _variable Variable pill to remove.
@@ -84,6 +96,7 @@ namespace gazebo
       public: unsigned int VariablePillCount() const;
 
       /// \brief Get a variable pill by id
+      /// \param[in] _id Variable pill id
       /// \return Variable pill with the specified id.
       public: VariablePill *GetVariablePill(const unsigned int _id) const;
 
@@ -114,9 +127,9 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a variable is added to the container
       /// \param[in] _id Unique id of the variable pill.
-      /// \param[in] Name of variable pill added.
+      /// \param[in] _name Name of variable pill added.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable is added to. VariablePill::EMPTY_ID if it is added to a
+      /// variable is added to. VariablePill::EmptyVariable if it is added to a
       /// container and not a variable pill.
       Q_SIGNALS: void VariableAdded(const unsigned int _id,
           const std::string &_name, const unsigned int _targetId);
@@ -124,7 +137,8 @@ namespace gazebo
       /// \brief Qt signal emitted when a variable is removed from the container
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable is removed from. VariablePill::EMPTY_ID if it is removed
+      /// variable is removed from. VariablePill::EmptyVariable if it is
+      /// removed
       /// from a container and not a variable pill.
       Q_SIGNALS: void VariableRemoved(const unsigned int _id,
           const unsigned int _targetId);
@@ -132,10 +146,16 @@ namespace gazebo
       /// \brief Qt signal emitted when a variable is moved into the container.
       /// \param[in] _id Unique id of the variable pill.
       /// \param[in] _targetId Unique id of the target variable pill that this
-      /// variable has moved to. VariablePill::EMPTY_ID if it moved to a
+      /// variable has moved to. VariablePill::EmptyVariable if it moved to a
       /// container and not a variable pill.
       Q_SIGNALS: void VariableMoved(const unsigned int _id,
           const unsigned int _targetId);
+
+      /// \brief Qt signal emitted when a variable label has changed.
+      /// \param[in] _id Unique id of the variable pill.
+      /// \param[in] _label New variable label.
+      Q_SIGNALS: void VariableLabelChanged(const unsigned int _id,
+          const std::string &_label);
 
       /// \brief Qt Callback when a variable has been added to another variable.
       /// \param[in] _id Unique id of the added variable.
@@ -150,6 +170,11 @@ namespace gazebo
       /// \brief Qt Callback when a variable has moved into another variable.
       /// \param[_id] _id Unique id of the variable that has moved.
       private slots: void OnMoveVariable(const unsigned int _id);
+
+      /// \brief Qt Callback when a variable label has changed.
+      /// \param[_id] _id Unique id of the variable.
+      /// \param[_id] _label New variable label.
+      private slots: void OnSetVariableLabel(const std::string &_label);
 
       /// \internal
       /// \brief Private data pointer

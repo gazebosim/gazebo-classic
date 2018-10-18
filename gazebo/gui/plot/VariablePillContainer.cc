@@ -110,12 +110,44 @@ std::string VariablePillContainer::Text() const
 }
 
 /////////////////////////////////////////////////
-unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
+void VariablePillContainer::SetVariablePillLabel(const unsigned int _id,
+    const std::string &_label)
+{
+  VariablePill *variable = NULL;
+  auto it = this->dataPtr->variables.find(_id);
+  if (it == this->dataPtr->variables.end())
+  {
+    // look into children of multi-variable pills
+    for (auto v : this->dataPtr->variables)
+    {
+      auto &childVariables = v.second->VariablePills();
+      auto childIt = childVariables.find(_id);
+      if (childIt != childVariables.end())
+        variable = childIt->second;
+    }
+  }
+  else
+    variable = it->second;
+
+  if (variable)
+    variable->SetText(_label);
+}
+
+/////////////////////////////////////////////////
+unsigned int VariablePillContainer::AddVariablePill(const std::string &_name,
+    const unsigned int _targetId)
 {
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
-    return VariablePill::EMPTY_VARIABLE;
+    return VariablePill::EmptyVariable;
+  }
+
+  if (_targetId != VariablePill::EmptyVariable &&
+    !this->GetVariablePill(_targetId))
+  {
+    gzerr << "Unable to add variable. Target variable not found" << std::endl;
+    return VariablePill::EmptyVariable;
   }
 
   VariablePill *variable = new VariablePill;
@@ -128,25 +160,48 @@ unsigned int VariablePillContainer::AddVariablePill(const std::string &_name)
       this, SLOT(OnAddVariable(unsigned int, std::string)));
   connect(variable, SIGNAL(VariableRemoved(unsigned int)),
       this, SLOT(OnRemoveVariable(unsigned int)));
+  connect(variable, SIGNAL(VariableLabelChanged(std::string)),
+      this, SLOT(OnSetVariableLabel(std::string)));
 
-  this->AddVariablePill(variable);
+  this->AddVariablePill(variable, _targetId);
 
   return variable->Id();
 }
 
 /////////////////////////////////////////////////
-void VariablePillContainer::AddVariablePill(VariablePill *_variable)
+void VariablePillContainer::AddVariablePill(VariablePill *_variable,
+    const unsigned int _targetId)
 {
   if (!_variable)
     return;
 
-  if (this->dataPtr->variables.find(_variable->Id()) !=
-      this->dataPtr->variables.end())
-    return;
+  // add to target variable if it's not empty
+  if (_targetId != VariablePill::EmptyVariable)
+  {
+    VariablePill *targetVariable = this->GetVariablePill(_targetId);
+    if (!targetVariable)
+      return;
 
+    targetVariable->AddVariablePill(_variable);
+    return;
+  }
+  else
+  {
+    // check if variable already exists in this container
+    // check only top level variables
+    if (this->dataPtr->variables.find(_variable->Id()) !=
+        this->dataPtr->variables.end())
+    {
+      return;
+    }
+  }
+
+  // otherwise add to the container
   if (this->dataPtr->maxSize != -1 &&
       static_cast<int>(this->VariablePillCount()) >= this->dataPtr->maxSize)
   {
+    gzerr << "Unable to add variable to container. Container is full" <<
+        std::endl;
     return;
   }
 
@@ -155,8 +210,7 @@ void VariablePillContainer::AddVariablePill(VariablePill *_variable)
   this->dataPtr->variableLayout->addWidget(_variable);
   this->dataPtr->variables[_variable->Id()] = _variable;
 
-  emit VariableAdded(_variable->Id(), _variable->Text(),
-      VariablePill::EMPTY_VARIABLE);
+  emit VariableAdded(_variable->Id(), _variable->Text(), _targetId);
 }
 
 /////////////////////////////////////////////////
@@ -211,7 +265,7 @@ void VariablePillContainer::RemoveVariablePill(const unsigned int _id)
       variable->Parent()->RemoveVariablePill(variable);
     }
     else
-      emit VariableRemoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+      emit VariableRemoved(variable->Id(), VariablePill::EmptyVariable);
   }
 
   // otherwise remove from container
@@ -310,9 +364,6 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     QString mimeData = _evt->mimeData()->data("application/x-item");
     std::string dataStr = mimeData.toStdString();
     this->AddVariablePill(dataStr);
-
-    std::cerr << "variable '" << dataStr << "' dropped into container ["
-        << this->dataPtr->label->text().toStdString() << "]"<< std::endl;
   }
   else if (_evt->mimeData()->hasFormat("application/x-pill-item"))
   {
@@ -353,7 +404,7 @@ void VariablePillContainer::dropEvent(QDropEvent *_evt)
     this->AddVariablePill(variable);
     this->blockSignals(false);
 
-    emit VariableMoved(variable->Id(), VariablePill::EMPTY_VARIABLE);
+    emit VariableMoved(variable->Id(), VariablePill::EmptyVariable);
   }
 }
 
@@ -376,6 +427,14 @@ bool VariablePillContainer::IsDragValid(QDropEvent *_evt) const
   {
     QString mimeData = _evt->mimeData()->data("application/x-pill-item");
     dataStr = mimeData.toStdString();
+
+    VariablePill *dragVariable = qobject_cast<VariablePill *>(_evt->source());
+    if (!dragVariable)
+      return false;
+
+    // limit drag and drop to same container
+    if (dragVariable->Container() && dragVariable->Container() != this)
+      return false;
   }
   else
     return false;
@@ -486,4 +545,14 @@ void VariablePillContainer::OnRemoveVariable(const unsigned int _id)
     return;
 
   emit VariableRemoved(_id, variable->Id());
+}
+
+/////////////////////////////////////////////////
+void VariablePillContainer::OnSetVariableLabel(const std::string &_label)
+{
+  VariablePill *variable = qobject_cast<VariablePill *>(QObject::sender());
+  if (!variable)
+    return;
+
+  emit VariableLabelChanged(variable->Id(), _label);
 }

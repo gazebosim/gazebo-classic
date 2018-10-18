@@ -78,21 +78,21 @@ void VariablePill_TEST::VariableId()
   gazebo::gui::VariablePill *var01 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var01 != NULL);
   unsigned int id = var01->Id();
-  QVERIFY(id != gazebo::gui::VariablePill::EMPTY_VARIABLE);
+  QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
   gazebo::gui::VariablePill *var02 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var02 != NULL);
   id = var02->Id();
-  QVERIFY(id != gazebo::gui::VariablePill::EMPTY_VARIABLE);
+  QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 
   gazebo::gui::VariablePill *var03 = new gazebo::gui::VariablePill(NULL);
   QVERIFY(var03 != NULL);
   id = var03->Id();
-  QVERIFY(id != gazebo::gui::VariablePill::EMPTY_VARIABLE);
+  QVERIFY(id != gazebo::gui::VariablePill::EmptyVariable);
   QVERIFY(ids.count(id) == 0u);
   ids.insert(id);
 

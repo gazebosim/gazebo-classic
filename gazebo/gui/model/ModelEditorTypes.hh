@@ -26,10 +26,15 @@ namespace gazebo
   namespace gui
   {
     class EditorMaterialSwitcher;
+    class MEUserCmd;
 
     /// \def EditorMaterialSwitcherPtr
     /// \brief Shared pointer to a EditorMaterialSwitcherPtr object
     using EditorMaterialSwitcherPtr = std::shared_ptr<EditorMaterialSwitcher>;
+
+    /// \def MEUserCmdPtr
+    /// \brief Shared pointer to a MEUserCmdPtr object
+    using MEUserCmdPtr = std::shared_ptr<MEUserCmd>;
   }
 }
 

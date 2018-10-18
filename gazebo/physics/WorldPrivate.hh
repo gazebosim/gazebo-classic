@@ -21,6 +21,7 @@
 #include <deque>
 #include <vector>
 #include <list>
+#include <memory>
 #include <set>
 #include <boost/thread.hpp>
 #include <sdf/sdf.hh>
@@ -28,6 +29,7 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Time.hh"
+#include "gazebo/common/URI.hh"
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -323,6 +325,9 @@ namespace gazebo
       /// \brief True if sensors have been initialized. This should be set
       /// by the SensorManager.
       public: std::atomic_bool sensorsInitialized;
+
+      /// \brief URI of this world.
+      public: common::URI uri;
     };
   }
 }

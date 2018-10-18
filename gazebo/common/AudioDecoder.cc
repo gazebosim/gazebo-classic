@@ -138,10 +138,10 @@ bool AudioDecoder::Decode(uint8_t **_outBuffer, unsigned int *_outBufferSize)
         packet1.size -= bytesDecoded;
       }
     }
-    av_free_packet(&packet);
+    AVPacketUnref(&packet);
   }
 
-  av_free_packet(&packet);
+  AVPacketUnref(&packet);
 
   // Seek to the beginning so that it can be decoded again, if necessary.
   av_seek_frame(this->formatCtx, this->audioStream, 0, 0);

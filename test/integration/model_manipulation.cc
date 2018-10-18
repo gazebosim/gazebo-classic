@@ -47,26 +47,14 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   QVERIFY(gazebo::gui::g_arrowAct != NULL);
   QVERIFY(gazebo::gui::g_arrowAct->isChecked());
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get a moving link and check its pose is changing over time
   auto linkVis = scene->GetVisual("pendulum_0deg::upper_link");
   QVERIFY(linkVis != NULL);
   auto pose = linkVis->GetWorldPose();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(pose != linkVis->GetWorldPose());
   pose = linkVis->GetWorldPose();
@@ -74,13 +62,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   // Select the parent model and check its pose still changes over time
   gazebo::event::Events::setSelectedEntity("pendulum_0deg", "normal");
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(pose != linkVis->GetWorldPose());
   pose = linkVis->GetWorldPose();
@@ -90,13 +72,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   QVERIFY(!gazebo::gui::g_translateAct->isChecked());
   gazebo::gui::g_translateAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Sequence was: select -> change mode
   QVERIFY(pose == linkVis->GetWorldPose());
@@ -105,13 +81,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   // translate mode
   gazebo::event::Events::setSelectedEntity("", "move");
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_translateAct->isChecked());
   QVERIFY(pose != linkVis->GetWorldPose());
@@ -120,13 +90,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   // Select model again and check it stops again
   gazebo::event::Events::setSelectedEntity("pendulum_0deg", "move");
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Sequence was: change mode -> select
   QVERIFY(pose == linkVis->GetWorldPose());
@@ -135,13 +99,7 @@ void ModelManipulationTest::StopProcessingPoseMsgs()
   QVERIFY(!gazebo::gui::g_arrowAct->isChecked());
   gazebo::gui::g_arrowAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   QVERIFY(gazebo::gui::g_arrowAct->isChecked());
   QVERIFY(pose != linkVis->GetWorldPose());

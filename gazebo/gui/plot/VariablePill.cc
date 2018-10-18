@@ -80,7 +80,7 @@ namespace gazebo
 }
 
 // empty variable id
-unsigned int VariablePill::EMPTY_VARIABLE = IGN_UINT32_MAX;
+const unsigned int VariablePill::EmptyVariable = IGN_UINT32_MAX;
 
 // global variable id counter
 unsigned int VariablePillPrivate::globalVariableId = 0;
@@ -90,12 +90,14 @@ VariablePill::VariablePill(QWidget *_parent)
   : QWidget(_parent),
     dataPtr(new VariablePillPrivate)
 {
-  this->dataPtr->id = VariablePillPrivate::globalVariableId++;
+  this->dataPtr->id = VariablePillPrivate::globalVariableId;
 
   // generate default unique name
   std::stringstream nameStream;
   nameStream << "variable" << this->dataPtr->id << std::endl;
   this->dataPtr->name = nameStream.str();
+
+  VariablePillPrivate::globalVariableId++;
 
   // label
   this->dataPtr->label = new QLabel;
@@ -113,7 +115,7 @@ VariablePill::VariablePill(QWidget *_parent)
   this->dataPtr->multiLayout->setAlignment(Qt::AlignLeft);
   this->dataPtr->multiLayout->setContentsMargins(0, 0, 0, 0);
   this->dataPtr->multiLabel = new QLabel;
-  this->dataPtr->multiLabel->setText(QString("Variables:"));
+  this->dataPtr->multiLabel->setText(QString(" Variables:"));
   this->dataPtr->multiLabel->setVisible(false);
   this->dataPtr->multiLayout->addWidget(this->dataPtr->multiLabel);
 
@@ -135,7 +137,7 @@ VariablePill::VariablePill(QWidget *_parent)
   mainLayout->addWidget(this->dataPtr->mainFrame);
   this->setLayout(mainLayout);
 
-  this->SetSelected(false);
+  this->UpdateStyleSheet();
   this->setAcceptDrops(true);
 }
 
@@ -162,11 +164,11 @@ std::string VariablePill::Name() const
   return this->dataPtr->name;
 }
 
-
 /////////////////////////////////////////////////
 void VariablePill::SetText(const std::string &_text)
 {
   this->dataPtr->label->setText(QString::fromStdString(_text));
+  emit VariableLabelChanged(_text);
 }
 
 /////////////////////////////////////////////////
@@ -203,11 +205,12 @@ VariablePillContainer *VariablePill::Container() const
 void VariablePill::SetMultiVariableMode(const bool _enable)
 {
   this->dataPtr->multiLabel->setVisible(_enable);
-  //this->dataPtr->mainFrame->setStyleSheet("QFrame{border: 1px solid #365a82}");
 
   int margin = _enable ? 4 : 0;
   this->dataPtr->multiLayout->setContentsMargins(
       margin, margin, margin, margin);
+
+  this->UpdateStyleSheet();
 }
 
 /////////////////////////////////////////////////
@@ -247,6 +250,7 @@ void VariablePill::AddVariablePill(VariablePill *_variable)
   _variable->SetParent(this);
   _variable->setVisible(true);
   _variable->SetContainer(this->dataPtr->container);
+  _variable->UpdateStyleSheet();
   this->dataPtr->variables[_variable->Id()] = _variable;
   this->dataPtr->variableLayout->addWidget(_variable);
 
@@ -267,6 +271,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
           qobject_cast<VariablePill *>(item->widget());
       newMultiVariable->SetParent(NULL);
       newMultiVariable->blockSignals(true);
+      newMultiVariable->UpdateStyleSheet();
       while (this->dataPtr->variableLayout->count() > 0)
       {
         QLayoutItem *it = this->dataPtr->variableLayout->takeAt(0);
@@ -306,6 +311,7 @@ void VariablePill::RemoveVariablePill(VariablePill *_variable)
   _variable->setParent(NULL);
   _variable->SetParent(NULL);
   _variable->SetContainer(NULL);
+  _variable->UpdateStyleSheet();
 
   // becomes single variable pill
   if (this->dataPtr->variables.empty())
@@ -383,6 +389,8 @@ void VariablePill::dropEvent(QDropEvent *_evt)
         this->Container(), SLOT(OnAddVariable(unsigned int, std::string)));
     connect(variable, SIGNAL(VariableRemoved(unsigned int)),
         this->Container(), SLOT(OnRemoveVariable(unsigned int)));
+    connect(variable, SIGNAL(VariableLabelChanged(std::string)),
+        this->Container(), SLOT(OnSetVariableLabel(std::string)));
 
     this->AddVariablePill(variable);
   }
@@ -413,9 +421,20 @@ void VariablePill::dropEvent(QDropEvent *_evt)
       }
     }
 
-    this->blockSignals(true);
-    this->AddVariablePill(variable);
-    this->blockSignals(false);
+    // add to parent if it exists, otherwise add to self and become a
+    // multi-variable
+    if (this->dataPtr->parent)
+    {
+      this->dataPtr->parent->blockSignals(true);
+      this->dataPtr->parent->AddVariablePill(variable);
+      this->dataPtr->parent->blockSignals(false);
+    }
+    else
+    {
+      this->blockSignals(true);
+      this->AddVariablePill(variable);
+      this->blockSignals(false);
+    }
 
     emit VariableMoved(variable->Id());
   }
@@ -436,6 +455,11 @@ bool VariablePill::IsDragValid(QDropEvent *_evt)
   {
     VariablePill *dragVariable = qobject_cast<VariablePill *>(_evt->source());
     if (!dragVariable)
+      return false;
+
+    // limit drag and drop to same container
+    if (dragVariable->Container() &&
+        dragVariable->Container() != this->Container())
       return false;
 
     variableName = dragVariable->Name();
@@ -528,22 +552,43 @@ void VariablePill::SetSelected(const bool _selected)
 {
   this->dataPtr->isSelected = _selected;
 
-  if (_selected)
-  {
-    this->dataPtr->label->setStyleSheet(
-      "QLabel {background-color: #a4c4e8; color: #232323;\
-      border-radius: 4px; padding: 2px; margin: 0px}");
-  }
-  else
-  {
-    this->dataPtr->label->setStyleSheet(
-      "QLabel {background-color: #365a82; border-radius: 4px;\
-      padding: 2px; margin: 0px}");
-  }
+  this->UpdateStyleSheet();
 }
 
 /////////////////////////////////////////////////
 bool VariablePill::IsSelected() const
 {
   return this->dataPtr->isSelected;
+}
+
+/////////////////////////////////////////////////
+void VariablePill::UpdateStyleSheet()
+{
+  std::string colorHex;
+  std::string bgColorStr;
+  std::string borderStr;
+  if (this->dataPtr->parent)
+    colorHex = "#64b5f6";
+  else
+    colorHex = "#2196f3";
+
+  bgColorStr = "background-color: " + colorHex + ";";
+
+  if (this->dataPtr->isSelected)
+    borderStr = "border: 1.5px solid #1565c0;";
+  else
+    borderStr = "border: 1.5px solid " + colorHex + ";";
+
+  this->dataPtr->label->setStyleSheet(QString::fromStdString(
+      "QLabel\
+      {\
+        color: #ffffff; \
+        border-radius: 10px;\
+        padding-left: 8px;\
+        padding-right: 8px;\
+        padding-top: 2px;\
+        padding-bottom: 2px;\
+        margin: 0px; "
+        + bgColorStr + borderStr +
+      "}"));
 }

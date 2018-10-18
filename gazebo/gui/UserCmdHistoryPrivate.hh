@@ -42,11 +42,8 @@ namespace gazebo
       /// \brief Copy of last received user command stats message.
       public: msgs::UserCmdStats msg;
 
-      /// \brief Group of actions in undo history menu.
-      public: QActionGroup *undoActions;
-
-      /// \brief Group of actions in redo history menu.
-      public: QActionGroup *redoActions;
+      /// \brief Whether this is currently active or not.
+      public: bool active;
     };
   }
 }

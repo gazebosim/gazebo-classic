@@ -71,6 +71,40 @@ TEST_F(CommonIface_TEST, GetSHA1)
 }
 
 /////////////////////////////////////////////////
+/// \brief Test the string tokenizer split() function.
+TEST_F(CommonIface_TEST, split)
+{
+  auto tokens = common::split("abc/def", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc/def/", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("//abc/def///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def");
+
+  tokens = common::split("abc", "/");
+  ASSERT_EQ(tokens.size(), 1u);
+  EXPECT_EQ(tokens.at(0), "abc");
+
+  tokens = common::split("//abc/def::123::567///", "/");
+  ASSERT_EQ(tokens.size(), 2u);
+  EXPECT_EQ(tokens.at(0), "abc");
+  EXPECT_EQ(tokens.at(1), "def::123::567");
+  tokens = common::split("//abc/def::123::567///", "::");
+  ASSERT_EQ(tokens.size(), 3u);
+  EXPECT_EQ(tokens.at(0), "//abc/def");
+  EXPECT_EQ(tokens.at(1), "123");
+  EXPECT_EQ(tokens.at(2), "567///");
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

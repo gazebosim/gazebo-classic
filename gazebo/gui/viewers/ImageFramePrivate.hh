@@ -14,10 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGEFRAME_PRIVATE_HH_
-#define _IMAGEFRAME_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGEFRAME_PRIVATE_HH_
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #include "gazebo/gui/qt.h"
 
 namespace gazebo
@@ -30,7 +30,10 @@ namespace gazebo
       public: QImage image;
 
       /// \brief Mutex for protecting the image.
-      public: boost::mutex mutex;
+      public: std::mutex mutex;
+
+      /// \brief Depth camera image data buffer.
+      public: float *depthBuffer = NULL;
     };
   }
 }
