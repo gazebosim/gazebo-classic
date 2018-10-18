@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,24 +27,30 @@ namespace gazebo
   {
     namespace details
     {
-
       /// \class WeakBinder WeakBind.hh
       /// \brief Function object wrapper used by common::weakBind
       template <typename Func, typename T>
       class WeakBinder
       {
-
         public: using WeakPtr = boost::weak_ptr<T>;
 
+        /// \brief Wrapped function object
         private: Func func;
+
+        /// \brief Owning pointer to bind as the first argument of the function
+        /// object.
         private: WeakPtr ptr;
 
+        /// \brief Constructor.
+        /// \param[in] _func Wrapped function object
+        /// \param[in] _ptr Owning pointer to bind as the first argument of the
+        /// function object.
         public: WeakBinder(Func _func, WeakPtr _ptr) :
             func(_func),
             ptr(_ptr)
         {}
 
-        // Return non-void version
+        /// \brief Return non-void version
         public: template <typename... Args> auto operator()(Args&&... _args)
             -> typename std::enable_if<
                 !std::is_void<
@@ -60,11 +66,11 @@ namespace gazebo
           }
           else
           {
-            return {};
+            return {};  // NOLINT(readability/braces)
           }
         }
 
-        // Return void version
+        /// \brief Return void version
         public: template <typename... Args> auto operator()(Args&&... _args)
           -> typename std::enable_if<
                 std::is_void<
@@ -79,7 +85,6 @@ namespace gazebo
             this->func(std::forward<Args>(_args)...);
           }
         }
-
       };
 
       template <typename Func, typename T>
@@ -87,7 +92,6 @@ namespace gazebo
       {
         return WeakBinder<Func, T>(func, ptr);
       }
-
     }
 
     /// \addtogroup gazebo_common Common
@@ -107,18 +111,15 @@ namespace gazebo
     #if __cplusplus < 201402L
       -> decltype(details::makeWeakBinder(
             boost::bind(_func, _ptr.get(), _args...),
-            boost::weak_ptr<T>(_ptr)
-        ))
+            boost::weak_ptr<T>(_ptr)))
     #endif
     {
       return details::makeWeakBinder(
                 boost::bind(_func, _ptr.get(), _args...),
-                boost::weak_ptr<T>(_ptr)
-      );
+                boost::weak_ptr<T>(_ptr));
     }
     /// \}
   }
-
 }
 
 #endif

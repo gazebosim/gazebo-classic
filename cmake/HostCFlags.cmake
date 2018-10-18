@@ -26,3 +26,4 @@ else()
   message(STATUS "\nSSE4 disabled.\n")
 endif()
 
+option(WITH_THREADLOCAL "check thread local keyword" ON)
