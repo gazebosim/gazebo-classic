@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<sdf version="1.4">
+<sdf version="1.6">
   <world name="default">
     <gui>
       <!-- A plugin for controlling the Cessna with the keyboard -->
@@ -10,12 +10,11 @@
       </camera>
     </gui>
     <physics type="ode">
-      <gravity>0.0 0.0 -10.00</gravity>
       <ode>
         <solver>
           <type>quick</type>
-          <iters>100</iters>
-          <sor>0.8</sor>
+          <iters>2000</iters>
+          <sor>1.0</sor>
         </solver>
         <constraints>
           <cfm>0.0</cfm>
@@ -112,29 +111,12 @@
           </material>
         </visual>
         <sensor name="camera" type="camera">
-          <pose>18 0 0.0 0 0.0 3.1416</pose>
+          <pose>25 0 0.0 0 0.0 3.1416</pose>
           <camera>
             <horizontal_fov>1.347</horizontal_fov>
             <image>
-              <width>640</width>
-              <height>480</height>
-            </image>
-            <clip>
-              <near>0.1</near>
-              <far>1000</far>
-            </clip>
-          </camera>
-          <always_on>1</always_on>
-          <update_rate>30</update_rate>
-          <visualize>true</visualize>
-        </sensor>
-        <sensor name="camera_wide" type="camera">
-          <pose>16 0 2.0 0 0.3 3.1416</pose>
-          <camera>
-            <horizontal_fov>2.0</horizontal_fov>
-            <image>
-              <width>640</width>
-              <height>480</height>
+              <width>320</width>
+              <height>240</height>
             </image>
             <clip>
               <near>0.1</near>
@@ -275,29 +257,6 @@
           </material>
         </visual>
       </link>
-
-
-      <!--
-      <joint name="rod_1_joint" type="revolute">
-        <parent>body</parent>
-        <child>rod_1</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
-        <axis>
-          <limit>
-            <lower>-1e16</lower>
-            <upper>1e16</upper>
-          </limit>
-          <xyz>-1.0 0.0 0.0</xyz>
-          <dynamics>
-            <damping>0.0001</damping>
-          </dynamics>
-        </axis>
-        <physics>
-          <ode>
-            <implicit_spring_damper>1</implicit_spring_damper>
-          </ode>
-        </physics>
-      </joint>
       <link name="rod_1">
         <pose>-0.25 0 1.5 0 0 0</pose>
         <inertial>
@@ -331,19 +290,22 @@
           </material>
         </visual>
       </link>
+
+
+      <!-- propeller -->
       <link name="blade_1">
         <pose>-0.25 0 1.5 0 0 0</pose>
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0000465</ixx>
+            <ixx>0.00465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0000006</iyy>
+            <iyy>0.00006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0000470</izz>
+            <izz>0.00470</izz>
           </inertia>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
@@ -371,14 +333,14 @@
         <inertial>
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
           <inertia>
-            <ixx>0.0000465</ixx>
+            <ixx>0.00465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0000006</iyy>
+            <iyy>0.00006</iyy>
             <iyz>0.0</iyz>
-            <izz>0.0000470</izz>
+            <izz>0.00470</izz>
           </inertia>
-          <mass>0.01</mass>
+          <mass>0.1</mass>
         </inertial>
         <collision name="collision">
           <pose>0.0 0.5 0 0.0 0.0 0.0</pose>
@@ -412,7 +374,7 @@
           </limit>
           <xyz>1.0 0.0 0.0</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>
@@ -432,7 +394,7 @@
           </limit>
           <xyz>-1.0 0.0 0.0</xyz>
           <dynamics>
-            <damping>1.000000</damping>
+            <damping>5.000000</damping>
           </dynamics>
         </axis>
         <physics>
@@ -444,11 +406,11 @@
       <plugin name="gazebo_blade_1" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>10.000</cla>
-        <cda>0.001</cda>
+        <cda>0.0001</cda>
         <cma>0.00</cma>
         <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
+        <cla_stall>1.0</cla_stall>
+        <cda_stall>0.001</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
@@ -460,11 +422,11 @@
       <plugin name="gazebo_blade_2" filename="libLiftDragPlugin.so">
         <a0>0.1</a0>
         <cla>10.000</cla>
-        <cda>0.001</cda>
+        <cda>0.0001</cda>
         <cma>0.00</cma>
         <alpha_stall>10.0</alpha_stall>
-        <cla_stall>0.0</cla_stall>
-        <cda_stall>0.01</cda_stall>
+        <cla_stall>1.0</cla_stall>
+        <cda_stall>0.001</cda_stall>
         <cma_stall>0.0</cma_stall>
         <cp>0.0 0.5 0</cp>
         <area>0.2</area>
@@ -473,7 +435,6 @@
         <upward>1 0 0</upward>
         <link_name>lift_drag_demo_model::blade_2</link_name>
       </plugin>
-      -->
       <joint name="wheel_1_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_1</child>
@@ -497,7 +458,6 @@
       <joint name="wheel_2_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_2</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
             <lower>-1e16</lower>
@@ -517,7 +477,6 @@
       <joint name="wheel_3_joint" type="revolute">
         <parent>body</parent>
         <child>wheel_3</child>
-        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
         <axis>
           <limit>
             <lower>-1e16</lower>
@@ -526,6 +485,25 @@
           <xyz>0.0 1.0 0.0</xyz>
           <dynamics>
             <damping>0.0001</damping>
+          </dynamics>
+        </axis>
+        <physics>
+          <ode>
+            <implicit_spring_damper>1</implicit_spring_damper>
+          </ode>
+        </physics>
+      </joint>
+      <joint name="rod_1_joint" type="revolute">
+        <parent>body</parent>
+        <child>rod_1</child>
+        <axis>
+          <limit>
+            <lower>-1e16</lower>
+            <upper>1e16</upper>
+          </limit>
+          <xyz>-1.0 0.0 0.0</xyz>
+          <dynamics>
+            <damping>0.001</damping>
           </dynamics>
         </axis>
         <physics>
@@ -658,7 +636,7 @@
             <ixx>0.0465</ixx>
             <ixy>0.0</ixy>
             <ixz>0.0</ixz>
-            <iyy>0.0006</iyy>
+            <iyy>0.006</iyy>
             <iyz>0.0</iyz>
             <izz>0.0470</izz>
           </inertia>
@@ -845,21 +823,13 @@
         <link_name>lift_drag_demo_model::rudder</link_name>
       </plugin>
       <plugin name="plane_demo_plugin" filename="libPlaneDemoPlugin.so">
-        <!--
         <engine name="engine1">
           <joint_name>rod_1_joint</joint_name>
           <max_torque>1000</max_torque>
-          <inc_key>97</inc_key>
-          <dec_key>122</dec_key>
-          <inc_val>50</inc_val>
-        </engine>
-        -->
-        <thruster name="thruster1">
-          <link_name>body</link_name>
           <inc_key>119</inc_key>
           <dec_key>115</dec_key>
-          <inc_val>-50 0 0</inc_val>
-        </thruster>
+          <inc_val>50</inc_val>
+        </engine>
         <control name="wing_left_control">
           <joint_name>wing_left_joint</joint_name>
           <inc_key>100</inc_key>
