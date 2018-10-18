@@ -39,6 +39,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Load a GUI plugin.
 * -s, --server-plugin arg :
  Load a server plugin.
+* -o, --profile arg :
+ Physics preset profile name from the options in the world file.
 
 
 ## AUTHOR

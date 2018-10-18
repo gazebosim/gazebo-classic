@@ -108,6 +108,10 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   delete modelCreator;
+  modelCreator = NULL;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
 }
 
 // Generate a main function for the test

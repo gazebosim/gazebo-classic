@@ -37,6 +37,8 @@ Gazebo server runs simulation and handles commandline options, starts a Master, 
  Reduce the TCP/IP traffic output by gzserver
 * -s, --server-plugin arg :
  Load a plugin.
+* -o, --profile arg :
+ Physics preset profile name from the options in the world file.
 
 
 ## AUTHOR

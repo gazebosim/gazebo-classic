@@ -32,3 +32,11 @@ event::EventT<void (bool, bool, const math::Pose &, const std::string &)>
 
 event::EventT<void (std::string)> model::Events::saveModel;
 event::EventT<void ()> model::Events::newModel;
+
+event::EventT<void (std::string)> model::Events::linkInserted;
+event::EventT<void (std::string, std::string)> model::Events::jointInserted;
+event::EventT<void (std::string)> model::Events::linkRemoved;
+event::EventT<void (std::string)> model::Events::jointRemoved;
+event::EventT<void (std::string)> model::Events::openLinkInspector;
+event::EventT<void (std::string)> model::Events::openJointInspector;
+event::EventT<void (std::string, std::string)> model::Events::jointNameChanged;
