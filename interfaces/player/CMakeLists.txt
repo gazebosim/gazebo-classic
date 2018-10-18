@@ -33,6 +33,7 @@ link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
 
 gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
+libgazebo_client
 gazebo_common
 gazebo_transport
 gazebo_msgs

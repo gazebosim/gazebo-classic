@@ -17,7 +17,7 @@
 
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gazebo/gazebo.hh>
+#include <gazebo/gazebo_client.hh>
 
 #include <iostream>
 
@@ -53,7 +53,7 @@ void posesStampedCallback(ConstPosesStampedPtr &posesStamped)
 int main(int _argc, char **_argv)
 {
   // Load gazebo
-  gazebo::setupClient(_argc, _argv);
+  gazebo::client::setup(_argc, _argv);
 
   // Create our node for communication
   gazebo::transport::NodePtr node(new gazebo::transport::Node());
@@ -68,5 +68,5 @@ int main(int _argc, char **_argv)
     gazebo::common::Time::MSleep(10);
 
   // Make sure to shut everything down.
-  gazebo::shutdown();
+  gazebo::client::shutdown();
 }

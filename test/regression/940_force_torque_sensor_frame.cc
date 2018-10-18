@@ -15,7 +15,7 @@
  *
 */
 
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "test/integration/helper_physics_generator.hh"
 
 #define TOL_GRAVITY 1e-4

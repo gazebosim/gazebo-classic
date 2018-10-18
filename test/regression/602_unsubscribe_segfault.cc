@@ -21,7 +21,7 @@
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/JointController.hh"
 #include "gazebo/common/PID.hh"
-#include "test/ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 #include "test_config.h"
 
 using namespace gazebo;

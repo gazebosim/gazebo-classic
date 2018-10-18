@@ -18,7 +18,7 @@
 #include "gazebo/common/Dem.hh"
 #include "gazebo/math/Angle.hh"
 #include "gazebo/sensors/GpsSensor.hh"
-#include "ServerFixture.hh"
+#include "gazebo/test/ServerFixture.hh"
 
 #define DOUBLE_TOL 1e-3
 

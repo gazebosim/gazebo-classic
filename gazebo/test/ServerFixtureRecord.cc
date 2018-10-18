@@ -19,7 +19,7 @@
 
 #include "gazebo/math/SignalStats.hh"
 #include "gazebo/math/Vector3Stats.hh"
-#include "test/ServerFixture.hh"
+#include "ServerFixture.hh"
 
 using namespace gazebo;
 
