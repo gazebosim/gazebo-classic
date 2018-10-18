@@ -166,6 +166,6 @@ void AdiabaticAtmosphere::ComputeAdiabaticPower()
   // See equation (17) from Manual of the ICAO Standard Atmosphere.
   // http://ntrs.nasa.gov/search.jsp?R=19930083952
   this->dataPtr->adiabaticPower = Atmosphere::MOLAR_MASS *
-      this->World().GetPhysicsEngine()->GetGravity().GetLength() /
+      this->World().Gravity().Length() /
       (-Atmosphere::TemperatureGradient() * Atmosphere::IDEAL_GAS_CONSTANT_R);
 }

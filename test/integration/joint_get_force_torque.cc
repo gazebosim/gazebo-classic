@@ -167,11 +167,9 @@ class JointGetForceTorqueTest : public ServerFixture,
 
   /// \brief Helper function for GetForceTorqueDemo
   /// \param[in] _world         Pointer to the world object
-  /// \param[in] _physics       Pointer to the physics object.
   /// \param[in] _physicsEngine Physics engine to use.
   /// \param[in] _options       Options for the joint to test.
   public: void GetFTDemoHelper(physics::WorldPtr _world,
-                               physics::PhysicsEnginePtr _physics,
                                const std::string &_physicsEngine,
                                const SpawnGetFTBoxOptions & opt);
 
@@ -183,14 +181,13 @@ class JointGetForceTorqueTest : public ServerFixture,
 /////////////////////////////////////////////////
 void JointGetForceTorqueTest::GetFTDemoHelper(
     physics::WorldPtr _world,
-    physics::PhysicsEnginePtr _physics,
     const std::string& _physicsEngine,
     const SpawnGetFTBoxOptions& opt)
 {
   gzdbg << "GetFTDemoHelper for physics " << _physicsEngine
         << "joint type " << opt.jointType
         << " joint axis " << opt.jointAxis << std::endl;
-  ignition::math::Vector3d g = _physics->GetGravity().Ign();
+  ignition::math::Vector3d g = _world->Gravity();
   double mass = opt.mass;
 
   physics::ModelPtr model = SpawnBox(opt);
@@ -298,10 +295,10 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
   opt.linkPose.Rot().Euler(0.1, 0.0, 0.0);
 
   opt.parentIsWorld = true;
-  this->GetFTDemoHelper(world, physics, _physEng, opt);
+  this->GetFTDemoHelper(world, _physEng, opt);
 
   opt.parentIsWorld = false;
-  this->GetFTDemoHelper(world, physics, _physEng, opt);
+  this->GetFTDemoHelper(world, _physEng, opt);
 
   // test a revolute joint against all axis
 
@@ -323,7 +320,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
           break;
       }
 
-      this->GetFTDemoHelper(world, physics, _physEng, opt);
+      this->GetFTDemoHelper(world, _physEng, opt);
     }
   }
 
@@ -349,7 +346,7 @@ void JointGetForceTorqueTest::GetForceTorqueDemo(const std::string &_physEng)
           opt.jointAxis = ignition::math::Vector3d::UnitZ;
           break;
       }
-      this->GetFTDemoHelper(world, physics, _physEng, opt);
+      this->GetFTDemoHelper(world, _physEng, opt);
     }
   }
 }

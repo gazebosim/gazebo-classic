@@ -33,7 +33,7 @@ namespace gazebo
     /// \brief Data structure for contact feedbacks
     class ODEJointFeedback
     {
-      public: ODEJointFeedback() : contact(NULL), count(0) {}
+      public: ODEJointFeedback() : contact(nullptr), count(0) {}
 
       /// \brief Contact information.
       public: Contact *contact;

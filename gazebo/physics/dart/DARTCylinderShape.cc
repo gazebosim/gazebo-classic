@@ -37,6 +37,7 @@ DARTCylinderShape::DARTCylinderShape(CollisionPtr _parent)
 DARTCylinderShape::~DARTCylinderShape()
 {
   delete this->dataPtr;
+  this->dataPtr = nullptr;
 }
 
 //////////////////////////////////////////////////
@@ -76,7 +77,7 @@ void DARTCylinderShape::SetSize(double _radius, double _length)
   DARTCollisionPtr dartCollisionParent =
       boost::dynamic_pointer_cast<DARTCollision>(this->collisionParent);
 
-  if (dartCollisionParent->GetDARTCollisionShape() == NULL)
+  if (dartCollisionParent->GetDARTCollisionShape() == nullptr)
   {
     dart::dynamics::BodyNode *dtBodyNode =
         dartCollisionParent->GetDARTBodyNode();

@@ -220,6 +220,7 @@ namespace gazebo
 
       // Documentation inherited
       public: void SetClipDist() override;
+      using Camera::SetClipDist;
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture

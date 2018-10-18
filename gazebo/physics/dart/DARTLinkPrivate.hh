@@ -33,12 +33,12 @@ namespace gazebo
     {
       /// \brief Constructor
       public: DARTLinkPrivate()
-        : dartPhysics(NULL),
-          dtBodyNode(NULL),
-          dartParentJoint(NULL),
+        : dartPhysics(nullptr),
+          dtBodyNode(nullptr),
+          dartParentJoint(nullptr),
           dartChildJoints {},
           staticLink(false),
-          dtWeldJointConst(NULL)
+          dtWeldJointConst(nullptr)
       {
       }
 

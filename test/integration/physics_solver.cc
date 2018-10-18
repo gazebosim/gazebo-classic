@@ -50,10 +50,10 @@ void PhysicsTest::DropTest(const std::string &_physicsEngine,
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
   // check the gravity vector
-  math::Vector3 gravity = physics->GetGravity();
-  EXPECT_DOUBLE_EQ(gravity.x, 0);
-  EXPECT_DOUBLE_EQ(gravity.y, 0);
-  EXPECT_DOUBLE_EQ(gravity.z, -10.0);
+  auto gravity = world->Gravity();
+  EXPECT_DOUBLE_EQ(gravity.X(), 0);
+  EXPECT_DOUBLE_EQ(gravity.Y(), 0);
+  EXPECT_DOUBLE_EQ(gravity.Z(), -10.0);
 
   if (_physicsEngine == "ode")
   {

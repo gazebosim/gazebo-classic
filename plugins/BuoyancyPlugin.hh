@@ -77,9 +77,6 @@ namespace gazebo
     /// \brief Pointer to model containing the plugin.
     protected: physics::ModelPtr model;
 
-    /// \brief Pointer to the physics engine (for accessing gravity).
-    protected: physics::PhysicsEnginePtr physicsEngine;
-
     /// \brief Pointer to the plugin SDF.
     protected: sdf::ElementPtr sdf;
 

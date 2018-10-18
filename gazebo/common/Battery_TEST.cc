@@ -27,7 +27,7 @@ TEST_F(BatteryTest, Construction)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   EXPECT_DOUBLE_EQ(battery->Voltage(), 0.0);
   EXPECT_EQ(battery->PowerLoads().size(), 0u);
@@ -38,7 +38,7 @@ TEST_F(BatteryTest, AddConsumer)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, 0u);
@@ -49,6 +49,16 @@ TEST_F(BatteryTest, AddConsumer)
   double powerLoad = 0;
   EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
   EXPECT_DOUBLE_EQ(powerLoad, 5.0);
+
+  // Resetting the voltage has no effect on the power load
+  battery->ResetVoltage();
+  EXPECT_TRUE(battery->PowerLoad(consumerId, powerLoad));
+  EXPECT_DOUBLE_EQ(powerLoad, 5.0);
+
+  // Reinitializing the battery discard any power load
+  battery->Init();
+  EXPECT_EQ(battery->PowerLoads().size(), 0u);
+  EXPECT_FALSE(battery->PowerLoad(consumerId, powerLoad));
 }
 
 /////////////////////////////////////////////////
@@ -56,7 +66,7 @@ TEST_F(BatteryTest, RemoveConsumer)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   uint32_t consumerId = battery->AddConsumer();
   EXPECT_EQ(consumerId, 0u);
@@ -93,7 +103,7 @@ TEST_F(BatteryTest, SetPowerLoad)
 {
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   // Add two consumers
   uint32_t consumerId1 = battery->AddConsumer();
@@ -148,16 +158,16 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Create the battery
   common::BatteryPtr battery(new common::Battery());
-  EXPECT_TRUE(battery != NULL);
+  EXPECT_TRUE(battery != nullptr);
 
   sdf::ElementPtr elem = batterySDF->Root();
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("model");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("link");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   elem = elem->GetElement("battery");
-  ASSERT_TRUE(elem != NULL);
+  ASSERT_TRUE(elem != nullptr);
   battery->Load(elem);
 
   battery->Init();
@@ -175,6 +185,16 @@ TEST_F(BatteryTest, SetUpdateFunc)
 
   // Reinitialize the battery, and expect the same result
   battery->Init();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
+
+  for (int i = 0; i < N; ++i)
+    battery->Update();
+
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage + N * fixture.step);
+
+  // Reset the voltage to its initial value, and expect the same result
+  battery->ResetVoltage();
+  EXPECT_DOUBLE_EQ(battery->Voltage(), initVoltage);
 
   for (int i = 0; i < N; ++i)
     battery->Update();

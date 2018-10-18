@@ -66,6 +66,11 @@ namespace gazebo
       /// \brief Initialize.
       public: virtual void Init();
 
+      /// \brief Reset the battery voltage to the initial value.
+      /// The initial value might have been loaded from an sdf element.
+      /// \sa Load
+      public: virtual void ResetVoltage();
+
       /// \brief Update the parameters using new sdf values.
       /// \param[in] _sdf SDF values to update from.
       public: virtual void UpdateParameters(const sdf::ElementPtr _sdf);

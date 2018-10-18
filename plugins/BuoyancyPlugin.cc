@@ -37,8 +37,6 @@ void BuoyancyPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   this->model = _model;
   physics::WorldPtr world = _model->GetWorld();
   GZ_ASSERT(world != NULL, "Model is in a NULL world");
-  this->physicsEngine = world->GetPhysicsEngine();
-  GZ_ASSERT(this->physicsEngine != NULL, "Physics engine was NULL");
 
   GZ_ASSERT(_sdf != NULL, "Received NULL SDF pointer");
   this->sdf = _sdf;
@@ -166,7 +164,7 @@ void BuoyancyPlugin::OnUpdate()
     // object_density = mass/volume, so the mass term cancels.
     // Therefore,
     math::Vector3 buoyancy =
-        -this->fluidDensity * volume * this->physicsEngine->GetGravity();
+        -this->fluidDensity * volume * this->model->GetWorld()->Gravity();
 
     math::Pose linkFrame = link->GetWorldPose();
     // rotate buoyancy into the link frame before applying the force.

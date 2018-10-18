@@ -102,13 +102,25 @@ TEST_P(WorldPlaybackTest, Pause)
   msgs::LogPlaybackControl msg;
   msg.set_pause(false);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+  int sleep = 0;
+  while (this->world->IsPaused() && sleep < 100)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    sleep++;
+  }
   EXPECT_TRUE(!this->world->IsPaused());
 
   // Send a message to pause the world.
   msg.set_pause(true);
   this->logPlaybackPub->Publish(msg);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  sleep = 0;
+  while (!this->world->IsPaused() && sleep < 100)
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    sleep++;
+  }
   EXPECT_TRUE(this->world->IsPaused());
 }
 

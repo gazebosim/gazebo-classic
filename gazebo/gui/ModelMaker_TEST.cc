@@ -239,7 +239,8 @@ void ModelMaker_TEST::FromNestedModelFile()
 
   // Model data
   boost::filesystem::path path;
-  path = path / TEST_PATH / "models" / "deeply_nested_model.sdf";
+  path = path / TEST_PATH / "models" / "testdb" / "deeply_nested_model" /
+      "model.sdf";
 
   // Start the maker to make a model
   modelMaker->InitFromFile(path.string());
