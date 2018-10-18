@@ -26,7 +26,7 @@
 
 using namespace gazebo;
 
-int main(int argc, char * argv[])
+int main(int _argc, char *_argv[])
 {
   msgs::PoseAnimation msg;
 
@@ -44,12 +44,12 @@ int main(int argc, char * argv[])
   node->Init("default");
 
   // modelmove_world is the name of the testing world
-  const std::string topic_name = "/gazebo/modelmove_world/" + msg.model_name()
-                                  + "/model_move";
+  const std::string topicName = "/gazebo/modelmove_world/" + msg.model_name()
+    + "/model_move";
   gazebo::transport::PublisherPtr pathPub =
-    node->Advertise<msgs::PoseAnimation>(topic_name);
+    node->Advertise<msgs::PoseAnimation>(topicName);
 
-  std::cout << "Waiting for connection in " << topic_name << std::endl;
+  std::cout << "Waiting for connection in " << topicName << std::endl;
   pathPub->WaitForConnection();
   pathPub->Publish(msg);
 

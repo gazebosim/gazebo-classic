@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <scene>
+      <shadows>false</shadows>
+      <ambient>1 1 1 1</ambient>
+    </scene>
+
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>world</type>
+        </solver>
+      </ode>
+      <max_step_size>0.1</max_step_size>
+      <real_time_update_rate>0</real_time_update_rate>
+    </physics>
+
+    <% for i in 0..1001 %>
+      <model name="box_<%=i%>">
+      <pose><%=i*0.4%> 0 0.05 0 0 0</pose>
+      <link name="link">
+        <kinematic>true</kinematic>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 .1 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 .1 .1</size>
+            </box>
+          </geometry>
+        </visual>
+        <visual name="visual_front">
+          <pose>0.07 0 0.04 0 0 0</pose>
+          <geometry>
+            <sphere>
+              <radius>.04</radius>
+            </sphere>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  <% end %>
+  </world>
+</sdf>
+

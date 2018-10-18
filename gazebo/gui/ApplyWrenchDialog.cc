@@ -938,7 +938,7 @@ bool ApplyWrenchDialog::OnMousePress(const common::MouseEvent &_event)
 
   this->dataPtr->draggingTool = false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
       this->dataPtr->manipState);
 
   if (vis)
@@ -968,10 +968,10 @@ bool ApplyWrenchDialog::OnMouseRelease(const common::MouseEvent &_event)
   if (!userCamera || !this->dataPtr->applyWrenchVisual)
     return false;
 
-  rendering::VisualPtr vis = userCamera->GetVisual(_event.pos,
+  rendering::VisualPtr vis = userCamera->GetVisual(_event.Pos(),
       this->dataPtr->manipState);
 
-  if (!vis || _event.dragging)
+  if (!vis || _event.Dragging())
     return false;
 
   // Force/torque clicked: activate dialog and prevent event propagation
@@ -1010,9 +1010,9 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     return false;
 
   // Must make a Qt check as well because Gazebo event is not working with test
-  bool isDragging = _event.dragging ||
+  bool isDragging = _event.Dragging() ||
       QApplication::mouseButtons() != Qt::NoButton;
-  bool isLeftButton = _event.button == common::MouseEvent::LEFT ||
+  bool isLeftButton = _event.Button() == common::MouseEvent::LEFT ||
       QApplication::mouseButtons() == Qt::LeftButton;
 
   // Dragging tool, adapted from ModelManipulator::RotateEntity
@@ -1040,11 +1040,12 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
     double offset = this->dataPtr->dragStartPose.pos.Dot(normal);
 
     math::Vector3 pressPoint;
-    userCamera->GetWorldPointOnPlane(_event.pressPos.x, _event.pressPos.y,
+    userCamera->GetWorldPointOnPlane(_event.PressPos().X(),
+        _event.PressPos().Y(),
         math::Plane(normal, offset), pressPoint);
 
     math::Vector3 newPoint;
-    userCamera->GetWorldPointOnPlane(_event.pos.x, _event.pos.y,
+    userCamera->GetWorldPointOnPlane(_event.Pos().X(), _event.Pos().Y(),
         math::Plane(normal, offset), newPoint);
 
     math::Vector3 v1 = pressPoint - this->dataPtr->dragStartPose.pos;
@@ -1092,7 +1093,7 @@ bool ApplyWrenchDialog::OnMouseMove(const common::MouseEvent &_event)
   // Highlight hovered tools
   else
   {
-    userCamera->GetVisual(_event.pos, this->dataPtr->manipState);
+    userCamera->GetVisual(_event.Pos(), this->dataPtr->manipState);
 
     if (this->dataPtr->manipState == "rot_z" ||
         this->dataPtr->manipState == "rot_y")

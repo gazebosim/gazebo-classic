@@ -14,14 +14,14 @@
  * limitations under the License.
  *
 */
-
 #ifdef _WIN32
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
 #endif
 
-#include "gazebo/math/Rand.hh"
+#include <ignition/math/Rand.hh>
+
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/sensors/SensorFactory.hh"
@@ -96,13 +96,13 @@ void WirelessTransmitter::Init()
 bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 {
   this->referencePose =
-      this->pose + this->parentEntity.lock()->GetWorldPose();
+      this->pose + this->parentEntity.lock()->GetWorldPose().Ign();
 
   if (this->visualize)
   {
     msgs::PropagationGrid msg;
-    math::Pose pos;
-    math::Pose worldPose;
+    ignition::math::Pose3d pos;
+    ignition::math::Pose3d worldPose;
     double strength;
     msgs::PropagationParticle *p;
 
@@ -116,11 +116,12 @@ bool WirelessTransmitter::UpdateImpl(bool /*_force*/)
 
         worldPose = pos + this->referencePose;
 
-        if (this->referencePose.pos.Distance(worldPose.pos) <= this->MaxRadius)
+        if (this->referencePose.Pos().Distance(worldPose.Pos()) <=
+            this->MaxRadius)
         {
           // For the propagation model assume the receiver antenna has the same
           // gain as the transmitter
-          strength = this->GetSignalStrength(worldPose, this->GetGain());
+          strength = this->SignalStrength(worldPose, this->GetGain());
 
           // Add a new particle to the grid
           p = msg.add_particle();
@@ -149,19 +150,28 @@ double WirelessTransmitter::GetFreq() const
 }
 
 /////////////////////////////////////////////////
-double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
-    const double rxGain)
+double WirelessTransmitter::GetSignalStrength(
+    const math::Pose &_receiver,
+    const double _rxGain)
+{
+  return this->SignalStrength(_receiver.Ign(), _rxGain);
+}
+
+/////////////////////////////////////////////////
+double WirelessTransmitter::SignalStrength(
+    const ignition::math::Pose3d &_receiver,
+    const double _rxGain)
 {
   std::string entityName;
   double dist;
-  math::Vector3 end = _receiver.pos;
-  math::Vector3 start = this->referencePose.pos;
+  ignition::math::Vector3d end = _receiver.Pos();
+  ignition::math::Vector3d start = this->referencePose.Pos();
 
   // Avoid computing the intersection of coincident points
   // This prevents an assertion in bullet (issue #849)
   if (start == end)
   {
-    end.z += 0.00001;
+    end.Z() += 0.00001;
   }
 
   // Acquire the mutex for avoiding race condition with the physics engine
@@ -182,12 +192,12 @@ double WirelessTransmitter::GetSignalStrength(const math::Pose &_receiver,
   }
 
   double distance = std::max(1.0,
-      this->referencePose.pos.Distance(_receiver.pos));
-  double x = std::abs(math::Rand::GetDblNormal(0.0, ModelStdDesv));
+      this->referencePose.Pos().Distance(_receiver.Pos()));
+  double x = std::abs(ignition::math::Rand::DblNormal(0.0, ModelStdDesv));
   double wavelength = common::SpeedOfLight / (this->GetFreq() * 1000000);
 
   // Hata-Okumara propagation model
-  double rxPower = this->GetPower() + this->GetGain() + rxGain - x +
+  double rxPower = this->GetPower() + this->GetGain() + _rxGain - x +
       20 * log10(wavelength) - 20 * log10(4 * M_PI) - 10 * n * log10(distance);
 
   return rxPower;
