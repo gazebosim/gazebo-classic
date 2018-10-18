@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,19 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#ifndef _REST_EXCEPTION_HH_
+#define _REST_EXCEPTION_HH_
 
-#include "gazebo/gui/QTestFixture.hh"
+#include <stdexcept>
 
-/// \brief A test class for the ModelCreator class.
-class ModelCreator_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
-
-  /// \brief Tests changing save states in the model editor
-  private slots: void SaveState();
-
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
-};
+  // Basic exception class that inherits from the standard runtime error.
+  class RestException : public std::runtime_error
+  {
+    public: RestException(const char *_m):std::runtime_error(_m) {}
+  };
+}
 
 #endif
+

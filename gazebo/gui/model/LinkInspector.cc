@@ -41,7 +41,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
 
   QHBoxLayout *nameLayout = new QHBoxLayout;
   nameLayout->addWidget(linkLabel);
-  nameLayout->addWidget(linkNameLabel);
+  nameLayout->addWidget(this->linkNameLabel, QSizePolicy::Maximum);
+  nameLayout->setAlignment(this->linkNameLabel, Qt::AlignLeft);
 
   this->linkConfig = new LinkConfig;
   this->visualConfig = new VisualConfig;
@@ -50,7 +51,8 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   // Create the main tab widget for all components in a link
   this->tabWidget = new QTabWidget();
   this->tabWidget->setObjectName("linkInspectorTab");
-  this->tabWidget->setMinimumHeight(800);
+  this->tabWidget->setMinimumHeight(300);
+  this->tabWidget->setMinimumWidth(560);
 
   this->tabWidget->addTab(this->linkConfig, "Link");
   this->tabWidget->addTab(this->visualConfig, "Visual");

@@ -98,7 +98,7 @@ void ModelCreator_TEST::SaveState()
       gui::ModelCreator::ALL_SAVED);
 
   // Remove a link to have unsaved changes
-  modelCreator->RemoveLink(cylinder->GetName());
+  modelCreator->RemoveEntity(cylinder->GetName());
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::UNSAVED_CHANGES);
 
@@ -106,6 +106,93 @@ void ModelCreator_TEST::SaveState()
   modelCreator->SaveModelFiles();
   QCOMPARE(modelCreator->GetCurrentSaveState(),
       gui::ModelCreator::ALL_SAVED);
+
+  delete modelCreator;
+  modelCreator = NULL;
+  mainWindow->close();
+  delete mainWindow;
+  mainWindow = NULL;
+}
+
+/////////////////////////////////////////////////
+void ModelCreator_TEST::Selection()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/empty.world");
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // Start never saved
+  gui::ModelCreator *modelCreator = new gui::ModelCreator();
+  QVERIFY(modelCreator);
+
+  // Inserting a few links
+  modelCreator->AddShape(gui::ModelCreator::LINK_CYLINDER);
+  gazebo::rendering::VisualPtr cylinder =
+      scene->GetVisual("ModelPreview_0::link_0");
+  QVERIFY(cylinder != NULL);
+
+  modelCreator->AddShape(gui::ModelCreator::LINK_BOX);
+  gazebo::rendering::VisualPtr box =
+      scene->GetVisual("ModelPreview_0::link_1");
+  QVERIFY(box != NULL);
+
+  modelCreator->AddShape(gui::ModelCreator::LINK_SPHERE);
+  gazebo::rendering::VisualPtr sphere =
+      scene->GetVisual("ModelPreview_0::link_2");
+  QVERIFY(sphere != NULL);
+
+  // verify initial selected state
+  QVERIFY(!cylinder->GetHighlighted());
+  QVERIFY(!box->GetHighlighted());
+  QVERIFY(!sphere->GetHighlighted());
+
+  // select the shapes and verify that they are selected
+  modelCreator->SetSelected(cylinder, true);
+  QVERIFY(cylinder->GetHighlighted());
+
+  modelCreator->SetSelected(box, true);
+  QVERIFY(box->GetHighlighted());
+
+  modelCreator->SetSelected(sphere, true);
+  QVERIFY(sphere->GetHighlighted());
+
+  // deselect and verify
+  modelCreator->SetSelected(cylinder, false);
+  QVERIFY(!cylinder->GetHighlighted());
+
+  modelCreator->SetSelected(box, false);
+  QVERIFY(!box->GetHighlighted());
+
+  modelCreator->SetSelected(sphere, false);
+  QVERIFY(!sphere->GetHighlighted());
+
+  // select one and verify all
+  modelCreator->SetSelected(cylinder, true);
+  QVERIFY(cylinder->GetHighlighted());
+  QVERIFY(!box->GetHighlighted());
+  QVERIFY(!sphere->GetHighlighted());
 
   delete modelCreator;
   modelCreator = NULL;

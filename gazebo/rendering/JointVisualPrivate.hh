@@ -40,6 +40,9 @@ namespace gazebo
       /// \brief Second joint visual for hinge2 and universal joints. It is a
       /// simplified visual without an XYZ frame.
       public: JointVisualPtr parentAxisVis;
+
+      /// \brief Scale based on the size of the joint's child link.
+      public: math::Vector3 scaleToLink;
     };
   }
 }

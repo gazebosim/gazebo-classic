@@ -15,4 +15,5 @@ message WorldStatistics
   required bool  paused      = 5;
   required uint64 iterations = 6;
   optional int32 model_count = 7;
+  optional bool log_playback = 8;
 }

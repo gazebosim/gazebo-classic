@@ -15,21 +15,29 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#include "ServerFixture.hh"
+#include "gazebo/physics/physics.hh"
 
-#include "gazebo/gui/QTestFixture.hh"
+using namespace gazebo;
 
-/// \brief A test class for the ModelCreator class.
-class ModelCreator_TEST : public QTestFixture
+class HydraCrashTest : public ServerFixture
 {
-  Q_OBJECT
-
-  /// \brief Tests changing save states in the model editor
-  private slots: void SaveState();
-
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
 };
 
-#endif
+
+/////////////////////////////////////////////////
+// \brief Test for issue #1208
+TEST_F(HydraCrashTest, Reset)
+{
+  Load("worlds/hydra_test.world", true);
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != NULL);
+}
+
+/////////////////////////////////////////////////
+/// Main
+int main(int argc, char **argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}

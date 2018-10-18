@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Open Source Robotics Foundation
+ * Copyright (C) 2012-2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,21 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#ifndef _TIMEPANEL_TEST_HH_
+#define _TIMEPANEL_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelCreator class.
-class ModelCreator_TEST : public QTestFixture
+/// \brief A test class for the TimeWidget widget.
+class TimeWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests changing save states in the model editor
-  private slots: void SaveState();
+  /// \brief Test that the TimeWidget gets valid times from the server.
+  private slots: void ValidTimes();
 
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
+  /// \brief Test setting the visibility of TimeWidget child widgets.
+  private slots: void Visibility();
 };
 
 #endif

@@ -15,21 +15,18 @@
  *
 */
 
-#ifndef _GAZEBO_MODEL_CREATOR_TEST_HH_
-#define _GAZEBO_MODEL_CREATOR_TEST_HH_
+#ifndef _GAZEBO_SCHEMATIC_VIEW_WIDGET_TEST_HH_
+#define _GAZEBO_SCHEMATIC_VIEW_WIDGET_TEST_HH_
 
 #include "gazebo/gui/QTestFixture.hh"
 
-/// \brief A test class for the ModelCreator class.
-class ModelCreator_TEST : public QTestFixture
+/// \brief A test class for the SchematicView class.
+class SchematicViewWidget_TEST : public QTestFixture
 {
   Q_OBJECT
 
-  /// \brief Tests changing save states in the model editor
-  private slots: void SaveState();
-
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
+  /// \brief Test adding and removing nodes.
+  private slots: void AddRemove();
 };
 
 #endif
