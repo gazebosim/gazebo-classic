@@ -36,6 +36,11 @@ namespace Ogre
 
 namespace gazebo
 {
+  namespace common
+  {
+    class HeightmapData;
+  }
+
   namespace rendering
   {
     /// \internal
@@ -361,6 +366,12 @@ namespace gazebo
 
       /// \brief True if the terrain's hash does not match the image's hash
       public: bool terrainHashChanged;
+
+      /// \brief Filename of the terrain data
+      public: std::string filename;
+
+      /// \brief Pointer to heightmap data
+      public: common::HeightmapData *heightmapData = nullptr;
     };
   }
 }

@@ -64,6 +64,9 @@ namespace gazebo
       /// \brief Pointer to the window manager.
       public: WindowManagerPtr windowManager;
 
+      /// \brief A list of supported fsaa levels
+      public: std::vector<unsigned int> fsaaLevels;
+
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR >= 9
       /// \brief Ogre overlay system needed for initialization of Ogre
       public: Ogre::OverlaySystem *overlaySystem;
