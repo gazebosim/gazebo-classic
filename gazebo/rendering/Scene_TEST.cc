@@ -21,7 +21,7 @@
 
 
 using namespace gazebo;
-class Scene_TEST : public ServerFixture
+class Scene_TEST : public RenderingFixture
 {
 };
 

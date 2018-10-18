@@ -24,7 +24,7 @@
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
-class SelectionObj_TEST : public ServerFixture
+class SelectionObj_TEST : public RenderingFixture
 {
 };
 
