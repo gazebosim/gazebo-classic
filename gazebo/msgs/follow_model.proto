@@ -1,0 +1,24 @@
+package gazebo.msgs;
+
+/// \ingroup gazebo_msgs
+/// \interface FollowModel
+/// \brief Message that contains parameters to follow a physics::Model with a
+/// rendering::Camera
+
+import "vector3d.proto";
+
+message FollowModel
+{
+  /// \brief If set to true, the position of the camera is fixed.
+  optional bool is_static = 1;
+
+  /// \brief If set to true, the position of the camera is relative to the
+  /// model reference frame.
+  optional bool is_relative = 2;
+
+  /// \brief Posititon of the camera.
+  optional Vector3d xyz = 3;
+
+  /// \brief Distance between the camera and the model.
+  optional double distance = 4;
+}
