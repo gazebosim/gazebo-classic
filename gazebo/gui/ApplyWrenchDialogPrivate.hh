@@ -14,8 +14,12 @@
  * limitations under the License.
  *
 */
-#ifndef _APPLY_WRENCH_DIALOG_PRIVATE_HH_
-#define _APPLY_WRENCH_DIALOG_PRIVATE_HH_
+#ifndef _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
+#define _GAZEBO_APPLY_WRENCH_DIALOG_PRIVATE_HH_
+
+#include <string>
+#include <vector>
+#include <mutex>
 
 #include "gazebo/gui/qt.h"
 
@@ -30,119 +34,113 @@ namespace gazebo
       /// \brief Node for communication.
       public: transport::NodePtr node;
 
-      /// TODO
-      public: std::string linkName;
-
-      /// TODO
+      /// \brief Name of the model this is connected to.
       public: std::string modelName;
 
-      /// TODO
+      /// \brief Name of the link currently targeted.
+      public: std::string linkName;
+
+      /// \brief Label holding the model name.
       public: QLabel *modelLabel;
 
-      /// TODO
-      public: std::vector<std::string> linkList;
-
-      /// TODO
+      /// \brief Dropdown holding all link names.
       public: QComboBox *linksComboBox;
 
-      /// TODO
-      public: QWidget *forcePosCollapsibleWidget;
+      /// \brief Radio button for CoM.
+      public: QRadioButton *comRadio;
 
-      /// TODO
-      public: QWidget *forceCollapsibleWidget;
+      /// \brief Radio button for force position.
+      public: QRadioButton *forcePosRadio;
 
-      /// TODO
-      public: QWidget *torqueCollapsibleWidget;
-
-      /// TODO
-      public: QCheckBox *comCheckBox;
-
-      /// TODO
+      /// \brief Spin for force position X.
       public: QDoubleSpinBox *forcePosXSpin;
 
-      /// TODO
+      /// \brief Spin for force position Y.
       public: QDoubleSpinBox *forcePosYSpin;
 
-      /// TODO
+      /// \brief Spin for force position Z.
       public: QDoubleSpinBox *forcePosZSpin;
 
-      /// TODO
+      /// \brief Spin for force magnitude.
       public: QDoubleSpinBox *forceMagSpin;
 
-      /// TODO
+      /// \brief Spin for force X.
       public: QDoubleSpinBox *forceXSpin;
 
-      /// TODO
+      /// \brief Spin for force Y.
       public: QDoubleSpinBox *forceYSpin;
 
-      /// TODO
+      /// \brief Spin for force Z.
       public: QDoubleSpinBox *forceZSpin;
 
-      /// TODO
+      /// \brief Spin for torque magnitude.
       public: QDoubleSpinBox *torqueMagSpin;
 
-      /// TODO
+      /// \brief Spin for torque X.
       public: QDoubleSpinBox *torqueXSpin;
 
-      /// TODO
+      /// \brief Spin for torque Y.
       public: QDoubleSpinBox *torqueYSpin;
 
-      /// TODO
+      /// \brief Spin for torque Z.
       public: QDoubleSpinBox *torqueZSpin;
 
-      /// TODO
+      /// \brief CoM coordinates in link frame.
       public: math::Vector3 comVector;
 
-      /// TODO
+      /// \brief Force position coordinates in link frame.
       public: math::Vector3 forcePosVector;
 
-      /// TODO
+      /// \brief Force vector.
       public: math::Vector3 forceVector;
 
-      /// TODO
+      /// \brief Torque vector.
       public: math::Vector3 torqueVector;
 
       /// \brief Publishes the wrench message.
       public: transport::PublisherPtr wrenchPub;
 
-      /// TODO
+      /// \brief Visual of the targeted link.
       public: rendering::VisualPtr linkVisual;
 
-      /// TODO
+      /// \brief Interactive visual which represents the wrench applied.
       public: rendering::ApplyWrenchVisualPtr applyWrenchVisual;
 
-      /// TODO
-      public: math::Vector2i dragStart;
+      /// \brief Indicate whether mousepress is dragging on top the
+      /// rotation tool or not.
+      public: bool draggingTool;
 
-      /// TODO
-      public: math::Vector3 dragStartNormal;
-
-      /// TODO
+      /// \brief World pose of the rotation tool the moment dragging
+      /// started.
       public: math::Pose dragStartPose;
 
-      /// TODO
+      /// \brief State of the manipulation tool, here only using "rot_y"
+      /// and "rot_z".
       public: std::string manipState;
 
-      /// TODO
+      /// \brief Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// TODO
+      /// \brief Message to request for entity info.
       public: msgs::Request *requestMsg;
 
-      /// TODO
+      /// \brief Publishes the request message.
       public: transport::PublisherPtr requestPub;
 
-      /// TODO
+      /// \brief Subscribes to response messages.
       public: transport::SubscriberPtr responseSub;
 
-      /// TODO
-      public: msgs::Link linkMsg;
-
-      /// TODO
+      /// \brief Pointer to the main window.
       public: MainWindow *mainWindow;
 
       /// \brief A list of events connected to this.
       public: std::vector<event::ConnectionPtr> connections;
+
+      /// \brief Mutex to protect variables.
+      public: std::mutex mutex;
+
+      /// \brief Mutex to protect response callback.
+      public: std::mutex responseMutex;
     };
   }
 }

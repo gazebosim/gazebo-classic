@@ -15,11 +15,12 @@
  *
 */
 
-#ifndef _APPLYWRENCHVISUAL_PRIVATE_HH_
-#define _APPLYWRENCHVISUAL_PRIVATE_HH_
+#ifndef _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
+#define _GAZEBO_APPLYWRENCHVISUAL_PRIVATE_HH_
 
-//#include <string>
-//#include "gazebo/rendering/RenderTypes.hh"
+#include <string>
+#include <mutex>
+
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace gazebo
@@ -29,35 +30,51 @@ namespace gazebo
     /// \brief Private data for the Apply Wrench Visual class.
     class ApplyWrenchVisualPrivate : public VisualPrivate
     {
-      /// \brief TODO
-      public: VisualPtr comVisual;
+      /// \brief Material for the current mode.
+      public: std::string selectedMaterial;
 
-      /// TODO
-      public: rendering::ArrowVisualPtr forceVisual;
+      /// \brief Material for the unselected mode.
+      public: std::string unselectedMaterial;
 
-      /// TODO
-      public: rendering::SelectionObjPtr rotTool;
+      /// \brief Arrow representing force.
+      public: VisualPtr forceVisual;
 
-      /// \brief TODO
+      /// \brief Tube and line representing torque.
       public: VisualPtr torqueVisual;
 
-      /// TODO
+      /// \brief Text displaying the force magnitude.
+      public: MovableText *forceText;
+
+      /// \brief Text displaying the torque magnitude.
+      public: MovableText *torqueText;
+
+      /// \brief Line connecting the torque visual to the CoM.
+      public: rendering::DynamicLines *torqueLine;
+
+      /// \brief Rotation tool.
+      public: rendering::SelectionObjPtr rotTool;
+
+      /// \brief CoM position in link coordinates.
       public: math::Vector3 comVector;
 
-      /// TODO
+      /// \brief Force application point in link coordinates.
       public: math::Vector3 forcePosVector;
 
-      /// TODO
+      /// \brief Force vector expressed in the link frame.
       public: math::Vector3 forceVector;
 
-      /// TODO
+      /// \brief Torque vector expressed in the link frame.
       public: math::Vector3 torqueVector;
 
-      /// TODO
+      /// \brief Current mode, either "force", "torque" or "none".
       public: std::string mode;
 
-      /// TODO
+      /// \brief If true, the rotation tool was rotated by the mouse and
+      /// shouldn't be oriented again according to the vector.
       public: bool rotatedByMouse;
+
+      /// \brief Mutex to protect variables
+      public: std::mutex mutex;
     };
   }
 }
