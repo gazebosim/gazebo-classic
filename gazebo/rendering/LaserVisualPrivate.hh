@@ -42,6 +42,9 @@ namespace gazebo
       /// \brief Renders the laser data.
       public: std::vector<DynamicLines *> rayFans;
 
+      /// \brief Renders laser data for rays that do not hit obstacles.
+      public: std::vector<DynamicLines *> noHitRayFans;
+
       /// \brief Mutex to protect the contact message.
       public: boost::mutex mutex;
 

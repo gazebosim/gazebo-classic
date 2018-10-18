@@ -10,10 +10,14 @@ macro (gz_build_tests)
     if(USE_LOW_MEMORY_TESTS)
       add_definitions(-DUSE_LOW_MEMORY_TESTS=1)
     endif(USE_LOW_MEMORY_TESTS)
-    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file} ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
+    add_executable(${BINARY_NAME} ${GTEST_SOURCE_file}
+                   ${GZ_BUILD_TESTS_EXTRA_EXE_SRCS})
 
+
+    link_directories(${PROJECT_BINARY_DIR}/test)
     add_dependencies(${BINARY_NAME}
-      gtest gtest_main
+      gtest
+      gtest_main
       gazebo_common
       gazebo_math
       gazebo_physics
@@ -21,14 +25,14 @@ macro (gz_build_tests)
       gazebo_rendering
       gazebo_msgs
       gazebo_transport
-      server_fixture
+      gazebo_test_fixture
       )
 
 
     target_link_libraries(${BINARY_NAME}
-      libgtest.a
-      libgtest_main.a
-      ${CMAKE_BINARY_DIR}/test/libserver_fixture.a
+      gtest
+      gtest_main
+      gazebo_test_fixture
       gazebo_common
       gazebo_math
       gazebo_physics

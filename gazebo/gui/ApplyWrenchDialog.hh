@@ -21,12 +21,8 @@
 #include <string>
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/common/KeyEvent.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/math/Vector3.hh"
 #include "gazebo/transport/TransportTypes.hh"
-#include "gazebo/rendering/ApplyWrenchVisual.hh"
-#include "gazebo/rendering/RenderTypes.hh"
 
 namespace gazebo
 {
@@ -117,97 +113,27 @@ namespace gazebo
       /// \brief Qt callback when the the torque clear button is clicked.
       private slots: void OnTorqueClear();
 
-      /// \brief Qt callback when entering a manipulation mode.
-      private slots: void OnManipulation();
-
-      /// \brief Filter events from other Qt objects.
-      /// param[in] _obj Qt object watched by the event filter
-      /// param[in] _event Qt event to be filtered.
-      /// \return True to stop event propagation.
-      private slots: bool eventFilter(QObject *_object, QEvent *_event);
-
-      /// \brief Handle change events related to this dialog.
-      /// param[in] _event Qt event.
-      private slots: void changeEvent(QEvent *_event);
-
-      /// \brief Callback for a mouse press event.
-      /// \param[in] _event The mouse press event
-      /// \return True if handled by this function.
-      private: bool OnMousePress(const common::MouseEvent &_event);
-
-      /// \brief Callback for a mouse release event.
-      /// \param[in] _event The mouse release event
-      /// \return True if handled by this function.
-      private: bool OnMouseRelease(const common::MouseEvent &_event);
-
-      /// \brief Callback for a mouse move event.
-      /// \param[in] _event The mouse move event
-      /// \return True if handled by this function.
-      private: bool OnMouseMove(const common::MouseEvent &_event);
-
-      /// \brief Set wrenchPub, which will publish wrench messages.
-      private: void SetPublisher();
-
-      /// \brief Attach apply wrench visual to target link.
-      private: void AttachVisuals();
-
       /// \brief Set the value of a specific spin without triggering signals to
       /// avoid recursion loops.
       /// \param[in] _spin Spin whose value will be changed.
       /// \param[in] _value New value.
       private: void SetSpinValue(QDoubleSpinBox *_spin, double _value);
 
-      /// \brief Set the mode to either "force", "torque" or "none".
-      private: void SetMode(const std::string &_mode);
-
-      /// \brief Set CoM vector and send it to visuals.
-      /// \param[in] _com CoM position in link frame.
-      private: void SetCoM(const math::Vector3 &_com);
-
-      /// \brief Set force position vector and update spins and visuals.
+      /// \brief Set force position vector and update spins.
       /// \param[in] _forcePos New force position.
       private: void SetForcePos(const math::Vector3 &_forcePos);
 
-      /// \brief Set force vector and update spins and visuals.
+      /// \brief Set force vector and update spins.
       /// \param[in] _force New force.
-      /// \param[in] _rotatedByMouse If rotated by mouse, update force visual
-      /// but not the rot tool.
-      private: void SetForce(const math::Vector3 &_force,
-          bool _rotatedByMouse = false);
+      private: void SetForce(const math::Vector3 &_force);
 
-      /// \brief Update force vector with direction given by mouse, magnitude
-      /// from spin.
-      /// \param[in] _dir New direction.
-      private: void NewForceDirection(const math::Vector3 &_dir);
-
-      /// \brief Set torque vector and update spins and visuals.
+      /// \brief Set torque vector and update spins.
       /// \param[in] _torque New torque.
-      /// \param[in] _rotatedByMouse If rotated by mouse, update torque visual
-      /// but not the rot tool.
-      private: void SetTorque(const math::Vector3 &_torque,
-          bool _rotatedByMouse = false);
-
-      /// \brief Update torque vector with direction given by mouse, magnitude
-      /// from spin.
-      /// \param[in] _dir New direction.
-      private: void NewTorqueDirection(const math::Vector3 &_dir);
-
-      /// \brief Callback when receiving a response message. Used to get the
-      /// CoM from the server.
-      /// \param[in] _msg Response message.
-      private: void OnResponse(ConstResponsePtr &_msg);
-
-      /// \brief Set this dialog to be active, visuals visible and mouse
-      /// filters on.
-      /// \param[in] _active True to make it active.
-      private: void SetActive(bool _active);
+      private: void SetTorque(const math::Vector3 &_torque);
 
       /// \brief Callback on prerender to check if target link hasn't been
       /// deleted.
       private: void OnPreRender();
-
-      /// \brief Set this dialog window to be active.
-      private: void ActivateWindow();
 
       /// \internal
       /// \brief Pointer to private data.

@@ -31,6 +31,30 @@ email: projectileman@yahoo.com
 -----------------------------------------------------------------------------
 */
 
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef BUILDING_DLL_GIMPACT
+  #ifdef __GNUC__
+    #define GIMPACT_VISIBLE __attribute__ ((dllexport))
+    #else
+      #define GIMPACT_VISIBLE __declspec(dllexport)
+    #endif
+  #else
+    #ifdef __GNUC__
+      #define GIMPACT_VISIBLE __attribute__ ((dllimport))
+    #else
+      #define GIMPACT_VISIBLE __declspec(dllimport)
+    #endif
+  #endif
+  #define GIMPACT_HIDDEN
+#else
+  #if __GNUC__ >= 4
+    #define GIMPACT_VISIBLE __attribute__ ((visibility ("default")))
+    #define GIMPACT_HIDDEN  __attribute__ ((visibility ("hidden")))
+  #else
+    #define GIMPACT_VISIBLE
+    #define GIMPACT_HIDDEN
+  #endif
+#endif
 
 #include "GIMPACT/gim_trimesh.h"
 
@@ -38,8 +62,8 @@ email: projectileman@yahoo.com
 */
 //! @{
 //! Call this for initialize GIMPACT system structures.
-void gimpact_init();
+GIMPACT_VISIBLE void gimpact_init();
 //! Call this for clean GIMPACT system structures.
-void gimpact_terminate();
+GIMPACT_VISIBLE void gimpact_terminate();
 //! @}
 #endif // GIMPACT_H_INCLUDED

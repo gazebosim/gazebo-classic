@@ -5,7 +5,7 @@ if (HAVE_OPENAL)
 endif()
 
 include_directories(${tinyxml_INCLUDE_DIRS})
-set (sources 
+set (sources
   Diagnostics.cc
   LogPlay.cc
   LogRecord.cc
@@ -33,6 +33,7 @@ set (headers
 
 set (gtest_sources
   Diagnostics_TEST.cc
+  LogPlay_TEST.cc
   LogRecord_TEST.cc
   OpenAL_TEST.cc
 )

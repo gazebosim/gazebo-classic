@@ -43,55 +43,55 @@ ODE interface to OU library implementation.
 
 BEGIN_NAMESPACE_OU()
 template<>
-const char *const CEnumUnsortedElementArray<EASSERTIONFAILURESEVERITY, AFS__MAX, const char *>::m_aetElementArray[] =
+ODE_API const char *const CEnumUnsortedElementArray<EASSERTIONFAILURESEVERITY, AFS__MAX, const char *>::m_aetElementArray[] =
 {
-	"assert", // AFS_ASSERT,
-	"check", // AFS_CHECK,
+  "assert", // AFS_ASSERT,
+  "check", // AFS_CHECK,
 };
 static const CEnumUnsortedElementArray<EASSERTIONFAILURESEVERITY, AFS__MAX, const char *> g_aszAssertionFailureSeverityNames;
 END_NAMESPACE_OU()
 
 
-static void _OU_CONVENTION_CALLBACK ForwardOUAssertionFailure(EASSERTIONFAILURESEVERITY fsFailureSeverity, 
-	const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine)
+static void _OU_CONVENTION_CALLBACK ForwardOUAssertionFailure(EASSERTIONFAILURESEVERITY fsFailureSeverity,
+  const char *szAssertionExpression, const char *szAssertionFileName, unsigned int uiAssertionSourceLine)
 {
-	dDebug(d_ERR_IASSERT, "Assertion failure in OU Library. Kind: %s, expression: \"%s\", file: \"%s\", line: %u",
-		g_aszAssertionFailureSeverityNames.Encode(fsFailureSeverity), 
-		szAssertionExpression, szAssertionFileName, uiAssertionSourceLine);
+  dDebug(d_ERR_IASSERT, "Assertion failure in OU Library. Kind: %s, expression: \"%s\", file: \"%s\", line: %u",
+    g_aszAssertionFailureSeverityNames.Encode(fsFailureSeverity),
+    szAssertionExpression, szAssertionFileName, uiAssertionSourceLine);
 }
 
 
 static void *_OU_CONVENTION_CALLBACK ForwardOUMemoryAlloc(size_t nBlockSize)
 {
-	return dAlloc(nBlockSize);
+  return dAlloc(nBlockSize);
 }
 
 static void *_OU_CONVENTION_CALLBACK ForwardOUMemoryRealloc(void *pv_ExistingBlock, size_t nBlockNewSize)
 {
-	return dRealloc(pv_ExistingBlock, 0, nBlockNewSize);
+  return dRealloc(pv_ExistingBlock, 0, nBlockNewSize);
 }
 
 static void _OU_CONVENTION_CALLBACK ForwardOUMemoryFree(void *pv_ExistingBlock)
 {
-	return dFree(pv_ExistingBlock, 0);
+  return dFree(pv_ExistingBlock, 0);
 }
 
 
 bool COdeOu::DoOUCustomizations()
 {
-	CMemoryManagerCustomization::CustomizeMemoryManager(&ForwardOUMemoryAlloc, 
-		&ForwardOUMemoryRealloc, &ForwardOUMemoryFree);
+  CMemoryManagerCustomization::CustomizeMemoryManager(&ForwardOUMemoryAlloc,
+    &ForwardOUMemoryRealloc, &ForwardOUMemoryFree);
 
-	CAssertionCheckCustomization::CustomizeAssertionChecks(&ForwardOUAssertionFailure);
+  CAssertionCheckCustomization::CustomizeAssertionChecks(&ForwardOUAssertionFailure);
 
-	return true;
+  return true;
 }
 
 void COdeOu::UndoOUCustomizations()
 {
-	CAssertionCheckCustomization::CustomizeAssertionChecks(NULL);
+  CAssertionCheckCustomization::CustomizeAssertionChecks(NULL);
 
-	CMemoryManagerCustomization::CustomizeMemoryManager(NULL, NULL, NULL);
+  CMemoryManagerCustomization::CustomizeMemoryManager(NULL, NULL, NULL);
 }
 
 

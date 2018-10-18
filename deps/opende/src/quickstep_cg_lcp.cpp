@@ -30,7 +30,11 @@
 #include "objects.h"
 #include "joints/joint.h"
 #include "util.h"
-#include <sys/time.h>
+
+#ifndef _WIN32
+  #include <sys/time.h>
+#endif
+
 #include "quickstep_util.h"
 #include "quickstep_cg_lcp.h"
 using namespace ode;
@@ -128,7 +132,7 @@ void quickstep::CG_LCP (dxWorldProcessContext *context,
   printf ("lambda error = %10.6e\n",error);
 #endif
 }
- 
+
 size_t quickstep::EstimateGR_LCPMemoryRequirements(int m)
 {
   size_t res = dEFFICIENT_SIZE(sizeof(dReal) * 12 * m); // for iMJ
