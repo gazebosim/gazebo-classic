@@ -213,13 +213,13 @@ void ViewAngleWidget::OnBackView()
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnLeftView()
 {
-  this->LookDirection(-ignition::math::Vector3d::UnitY);
+  this->LookDirection(ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
 void ViewAngleWidget::OnRightView()
 {
-  this->LookDirection(ignition::math::Vector3d::UnitY);
+  this->LookDirection(-ignition::math::Vector3d::UnitY);
 }
 
 /////////////////////////////////////////////////
@@ -259,4 +259,3 @@ void ViewAngleWidget::OnProjection(int _index)
   else
     gzwarn << "Projection index [" << _index << "] not recognized" << std::endl;
 }
-

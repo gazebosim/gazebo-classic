@@ -36,7 +36,7 @@ DARTFixedJoint::DARTFixedJoint(BasePtr _parent)
 //////////////////////////////////////////////////
 DARTFixedJoint::~DARTFixedJoint()
 {
-  delete this->dataPtr->dtJoint;
+  // We don't need to delete dtJoint because the world will delete it
 }
 
 //////////////////////////////////////////////////

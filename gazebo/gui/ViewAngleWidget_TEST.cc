@@ -92,7 +92,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->WorldPose();
-  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, -dist, 0)).Length() < tol);
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, dist, 0)).Length() < tol);
 
   // Trigger the bottom view button
   buttons[1]->click();
@@ -119,7 +119,7 @@ void ViewAngleWidget_TEST::EmptyWorld()
 
   // Check the camera position
   pose = cam->WorldPose();
-  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, dist, 0)).Length() < tol);
+  QVERIFY((pose.Pos() - ignition::math::Vector3d(0, -dist, 0)).Length() < tol);
 
   // Trigger the reset view button
   buttons[6]->click();
