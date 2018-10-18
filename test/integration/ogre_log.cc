@@ -39,6 +39,7 @@ TEST_F(OgreLog, PubSub)
   {
     std::string line;
     std::getline(ogreLog, line);
+    gzdbg << line << std::endl;
     EXPECT_EQ(line.find("Error"), std::string::npos);
     EXPECT_EQ(line.find("error"), std::string::npos);
     EXPECT_EQ(line.find("ERROR"), std::string::npos);
