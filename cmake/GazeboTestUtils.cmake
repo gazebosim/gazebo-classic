@@ -30,18 +30,15 @@ macro (gz_build_tests)
 
 
     target_link_libraries(${BINARY_NAME}
-      gtest
-      gtest_main
-      gazebo_test_fixture
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_test_fixture
+      gtest
+      gtest_main
       )
 
     add_test(${BINARY_NAME} ${CMAKE_CURRENT_BINARY_DIR}/${BINARY_NAME}
@@ -88,16 +85,13 @@ if (VALID_DISPLAY)
       )
 
     target_link_libraries(${BINARY_NAME}
-      gazebo_gui
-      gazebo_common
-      gazebo_math
+      # This two libraries are need to workaround on bug 
+      # https://bitbucket.org/osrf/gazebo/issue/1516
       gazebo_physics
       gazebo_sensors
-      gazebo_rendering
-      gazebo_msgs
-      gazebo_transport
+      # gazebo_gui and libgazebo will bring all most of gazebo libraries as dependencies
       libgazebo
-      pthread
+      gazebo_gui
       ${QT_QTTEST_LIBRARY}
       ${QT_LIBRARIES}
       )

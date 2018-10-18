@@ -25,12 +25,12 @@ using namespace gazebo;
 
 /////////////////////////////////////////////////
 RestUiPlugin::RestUiPlugin()
-: widget(NULL)
+: menuTitle("Web service"),
+  loginTitle("Web service login"),
+  urlLabel("url"),
+  defaultUrl("https://"),
+  widget(NULL)
 {
-  this->menuTitle = "Web service";
-  this->loginTitle = "Web service login";
-  this->urlLabel = "url";
-  this->defaultUrl = "https://";
 }
 
 /////////////////////////////////////////////////

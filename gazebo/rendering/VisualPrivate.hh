@@ -163,6 +163,10 @@ namespace gazebo
 
       /// \brief Visibility flags of the visual.
       public: uint32_t visibilityFlags;
+
+      /// \brief Index of the layer to which this visual belongs. Layers
+      /// act similar to layers in photoshop.
+      public: int32_t layer;
     };
     /// \}
   }

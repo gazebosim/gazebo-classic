@@ -1,0 +1,62 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+    <gui>
+      <camera name="user_camera">
+        <pose>15 0 10 0 0 3.141</pose>
+      </camera>
+    </gui>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <include>
+      <uri>model://submarine_sinking</uri>
+      <pose>5 0 10 1.57 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://submarine</uri>
+      <pose>0 0 10 1.57 0 0</pose>
+    </include>
+
+    <include>
+      <uri>model://submarine_buoyant</uri>
+      <pose>-5 0 10 1.57 0 0</pose>
+    </include>
+
+    <model name="ceiling_plane">
+      <static>true</static>
+      <pose>0 0 20 0 0 0</pose>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>100 100 .1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <cast_shadows>false</cast_shadows>
+          <geometry>
+            <box>
+              <size>100 100 .1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/BlueTransparent</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

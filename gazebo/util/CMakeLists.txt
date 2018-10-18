@@ -1,8 +1,12 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
+add_definitions(-DBUILDING_DLL_GZ_UTIL)
+
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
+
+include_directories(${TBB_INCLUDEDIR})
 
 include_directories(${tinyxml_INCLUDE_DIRS})
 set (sources
@@ -14,7 +18,6 @@ set (sources
 
 if (NOT USE_EXTERNAL_TINYXML)
   include_directories (${CMAKE_SOURCE_DIR}/deps/win/tinyxml)
-  add_definitions(-DTIXML_USE_STL)
   set (sources ${sources}
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinystr.cpp
        ${CMAKE_SOURCE_DIR}/deps/win/tinyxml/tinyxml.cpp

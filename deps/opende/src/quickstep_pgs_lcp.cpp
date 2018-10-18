@@ -22,6 +22,7 @@
 #include <ode/common.h>
 #include <ode/odemath.h>
 #include <ode/rotation.h>
+#include <ode/objects.h>
 #include <ode/timer.h>
 #include <ode/error.h>
 #include <ode/matrix.h>
@@ -53,7 +54,7 @@ static void ComputeRows(
                 int /*thread_id*/,
 #endif
                 IndexError* order,
-                dxBody* const * /*body*/,
+                dxBody* const *body,
                 dxPGSLCPParameters params,
                 boost::recursive_mutex* /*mutex*/)
 {
@@ -73,7 +74,7 @@ static void ComputeRows(
 #ifdef USE_1NORM
   int m                        = params.m; // m used for rms error computation
 #endif
-  // int nb                       = params.nb;
+  int nb                       = params.nb;
 #ifdef PENETRATION_JVERROR_CORRECTION
   dReal stepsize               = params.stepsize;
   dRealMutablePtr vnew         = params.vnew;
@@ -170,6 +171,7 @@ static void ComputeRows(
   int precon_iterations = qs->precon_iterations;
   dReal pgs_lcp_tolerance = qs->pgs_lcp_tolerance;
   int friction_iterations = qs->friction_iterations;
+  Friction_Model friction_model = qs->friction_model;
   dReal smooth_contacts = qs->smooth_contacts;
 
 #ifdef SHOW_CONVERGENCE
@@ -496,12 +498,33 @@ static void ComputeRows(
         dReal hi_act, lo_act;
         dReal hi_act_erp, lo_act_erp;
         if (constraint_index >= 0) {
-          // FOR erp throttled by info.c_v_max or info.c
-          hi_act = dFabs (hi[index] * lambda[constraint_index]);
-          lo_act = -hi_act;
-          // for the unthrottled _erp version
-          hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
-          lo_act_erp = -hi_act_erp;
+            if(friction_model == pyramid_friction) {
+                // FOR erp throttled by info.c_v_max or info.c
+                hi_act = dFabs (hi[index] * lambda[constraint_index]);
+                lo_act = -hi_act;
+                // for the unthrottled _erp version
+                hi_act_erp = dFabs (hi[index] * lambda_erp[constraint_index]);
+                lo_act_erp = -hi_act_erp;
+            }
+            else if(friction_model == cone_friction) {
+              quickstep::dxConeFrictionModel(lo_act, hi_act, lo_act_erp, hi_act_erp, jb, J_orig, index,
+                constraint_index, startRow, nRows, nb, body, i, order, findex, NULL, hi, lambda, lambda_erp);
+            }
+            else if(friction_model == box_friction) {
+                hi_act = hi[index];
+                lo_act = -hi_act;
+                hi_act_erp = hi[index];
+                lo_act_erp = -hi_act_erp;
+            }
+            else
+            {
+              // initialize the hi and lo to get rid of warnings
+              hi_act = dInfinity;
+              lo_act = -dInfinity;
+              hi_act_erp = dInfinity;
+              lo_act_erp = -dInfinity;
+              dMessage (d_ERR_UASSERT, "internal error, undefined friction model");
+            }
         } else {
           // FOR erp throttled by info.c_v_max or info.c
           hi_act = hi[index];
@@ -510,7 +533,6 @@ static void ComputeRows(
           hi_act_erp = hi[index];
           lo_act_erp = lo[index];
         }
-
         // compute lambda and clamp it to [lo,hi].
         // @@@ SSE not a win here
 #if 1
@@ -598,7 +620,7 @@ static void ComputeRows(
           // update vnew incrementally
           //   add stepsize * delta_caccel to the body velocity
           //   vnew = vnew + dt * delta_caccel
-          quickstep::sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);;
+          quickstep::sum6(vnew_ptr1, stepsize*delta, iMJ_ptr);
           if (caccel_ptr2)
             quickstep::sum6(vnew_ptr2, stepsize*delta, iMJ_ptr + 6);
 
@@ -1155,6 +1177,143 @@ void quickstep::PGS_LCP (dxWorldProcessContext *context,
 
   delete [] params;
   delete mutex;
+}
+
+void quickstep::dxConeFrictionModel(dReal& lo_act, dReal& hi_act, dReal& lo_act_erp, dReal& hi_act_erp,
+    int *jb, const dRealMutablePtr J_orig, int index, int constraint_index, int startRow, int nRows,
+    const int nb, dxBody * const *body, int i, const IndexError *order, const int *findex,
+    dRealPtr /*lo*/, dRealPtr hi, dRealMutablePtr lambda, dRealMutablePtr lambda_erp)
+{
+  // This computes the corresponding hi_act and lo_act for friction constraints.
+  // For each contact, we have lambda_n, lambda_f1, and lambda_f2.
+  // Now couple the two friction and to satisfy the cone Coulomb friction  model
+  // tangential velocity at the contact frame:
+  // v_f1 = J_f1 * v
+  // v_f2 = J_f2 * v
+  // v_f1 = J(0:5)*v_b1_global + J(6:11)*v_b2_global,
+  // v_f2 = J2(0:5) * v_b1_global + J2(6:11)*v_b2_global
+  // v = sqrt(v_f1^2 + v_f2^2);
+  //
+  // if (v < eps)
+  //   lo_act_f1  = 0;
+  //   hi_act_f1  = 0;
+  //   lo_act_f2  = 0;
+  //   hi_act_f2  = 0;
+  // else
+  //   hi_act_f1 =  abs(v_f1) / v  *  (mu * lambda_n);
+  //   lo_act_f1 = - lo_act_f1;
+  //   hi_act_f2 =  abs(v_f2) / v  *  (mu * lambda_n);
+  //   lo_act_f2 = - lo_act_f2;
+  // end
+  //
+  dReal v_f1, v_f2, v;
+  v_f1 = 0.0; v_f2 = 0.0, v = 0.0;
+  int b1 = jb[index*2];
+  int b2 = jb[index*2+1];
+  int bodycounter = 0;
+  int ivel=0;
+
+  // J_ptr has been scaled! use J_orig_ptr here!
+  dRealPtr J_orig_ptr = J_orig + index*12;
+  dReal body1_vel[6];
+  dReal body2_vel[6];
+  dSetZero(body1_vel, 6);
+  dSetZero(body2_vel, 6);
+  dxBody *const *const bodyend = body + nb;
+  for (dxBody *const *bodycurr = body; bodycurr != bodyend; bodycurr++, bodycounter++)
+  {
+    dxBody *b_ptr = *bodycurr;
+    // first direction
+    if (b1 >= 0)
+    {
+      if (bodycounter == b1)
+      {
+        for (ivel = 0; ivel < 3; ivel++)
+        {
+          body1_vel[ivel] = b_ptr->lvel[ivel];
+          body1_vel[ivel+3] = b_ptr->avel[ivel];
+        }
+      }
+    }
+    if (b2 >= 0)
+    {
+      if (bodycounter == b2)
+      {
+        for (ivel = 0; ivel < 3; ivel++)
+        {
+          body2_vel[ivel] = b_ptr->lvel[ivel];
+          body2_vel[ivel+3] = b_ptr->avel[ivel];
+        }
+      }
+    }
+  }
+  //startRow, nRows;
+  int previndex, nextindex, prev_constraint_index, next_constraint_index;
+  if (i == startRow)
+  {
+    prev_constraint_index = -100;
+    next_constraint_index = constraint_index;
+  }
+  else if (i == startRow+nRows-1)
+  {
+    prev_constraint_index = constraint_index;
+    next_constraint_index = -100;
+  }
+  else
+  {
+    previndex = order[i-1].index;
+    nextindex = order[i+1].index;
+    prev_constraint_index = findex[previndex];
+    next_constraint_index = findex[nextindex];
+  }
+
+  if (constraint_index == next_constraint_index)
+  {
+    // body1 was always the 1st body in the body pair
+    dRealPtr J_next_ptr =  J_orig + index*12 + 12;
+    v_f1 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr+6, body2_vel);
+    v_f2 = quickstep::dot6(J_next_ptr, body1_vel) + quickstep::dot6(J_next_ptr+6, body2_vel);
+  }
+  else if (constraint_index == prev_constraint_index)
+  {
+    dRealPtr J_prev_ptr =  J_orig + index*12 - 12;
+    v_f1 = quickstep::dot6(J_prev_ptr, body1_vel) + quickstep::dot6(J_prev_ptr, body2_vel);
+    v_f2 = quickstep::dot6(J_orig_ptr, body1_vel) + quickstep::dot6(J_orig_ptr, body2_vel);
+  }
+  else
+  {
+    dMessage (d_ERR_LCP, "constraint index error");
+  }
+
+
+  v = sqrt(v_f1*v_f1 + v_f2*v_f2);
+  if (dFabs(v) < 1e-18)
+  {
+    hi_act = 0.0; lo_act = 0.0;
+  }
+  else
+  {
+    if (constraint_index == next_constraint_index)
+    {
+      // first direction  ---> corresponds to the primary friction direction
+      hi_act = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f1) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else if (constraint_index == prev_constraint_index)
+    {
+      // second-direction  ---> corresponds to the secondary friction direction
+      hi_act = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda[constraint_index]);
+      lo_act = -hi_act;
+      hi_act_erp = (dFabs(v_f2) / v) * dFabs (hi[index] * lambda_erp[constraint_index]);
+      lo_act_erp = -hi_act;
+    }
+    else
+    {
+      dMessage (d_ERR_LCP, "constraint index error");
+    }
+  } // if-else (abs(v)< eps)
 }
 
 size_t quickstep::EstimatePGS_LCPMemoryRequirements(int m,int /*nb*/)
