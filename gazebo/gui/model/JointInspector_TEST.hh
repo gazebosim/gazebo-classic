@@ -30,6 +30,9 @@ class JointInspector_TEST : public QTestFixture
 
   /// \brief Test swapping parent / child links
   private slots: void Swap();
+
+  /// \brief Test pressing remove button.
+  private slots: void RemoveButton();
 };
 
 #endif

@@ -16,7 +16,7 @@
 */
 
 #include <gtest/gtest.h>
-#include <boost/algorithm/string/find.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 #include "gazebo/test/ServerFixture.hh"
 

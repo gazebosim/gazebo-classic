@@ -62,22 +62,6 @@ double SimbodyFixedJoint::GetVelocity(unsigned int /*index*/) const
 }
 
 //////////////////////////////////////////////////
-void SimbodyFixedJoint::SetMaxForce(unsigned int /*_index*/,
-                                    double /*_force*/)
-{
-  gzwarn << "SimbodyFixedJoint: called method "
-         << "SetMaxForce that is not valid for joints of type fixed.\n";
-}
-
-//////////////////////////////////////////////////
-double SimbodyFixedJoint::GetMaxForce(unsigned int /*index*/)
-{
-  gzwarn << "SimbodyFixedJoint: called method "
-         << "GetMaxForce that is not valid for joints of type fixed.\n";
-  return 0.0;
-}
-
-//////////////////////////////////////////////////
 void SimbodyFixedJoint::SetForceImpl(unsigned int /*_index*/,
                                      double /*_torque*/)
 {

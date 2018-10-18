@@ -21,6 +21,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <ignition/math/Pose3.hh>
 
 #include "gazebo/transport/Node.hh"

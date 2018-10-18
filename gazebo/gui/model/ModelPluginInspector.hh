@@ -51,6 +51,9 @@ namespace gazebo
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
 
+      /// \brief Qt callback when the Remove button is pressed.
+      private slots: void OnRemove();
+
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 

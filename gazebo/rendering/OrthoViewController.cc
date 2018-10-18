@@ -32,7 +32,8 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 OrthoViewController::OrthoViewController(UserCameraPtr _camera)
-  : OrbitViewController(_camera), dataPtr(new OrthoViewControllerPrivate)
+  : OrbitViewController(_camera, "OrthoViewController"),
+    dataPtr(new OrthoViewControllerPrivate)
 {
   this->typeString = TYPE_STRING;
   this->init = false;
