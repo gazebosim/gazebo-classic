@@ -30,6 +30,9 @@ class TopToolbar_TEST : public QTestFixture
 
   /// \brief Test inserting actions, separators and widgets.
   private slots: void Insert();
+
+  /// \brief Test adding actions, separators and widgets.
+  private slots: void Add();
 };
 
 #endif

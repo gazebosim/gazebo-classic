@@ -45,8 +45,12 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   nameLayout->setAlignment(this->linkNameLabel, Qt::AlignLeft);
 
   this->linkConfig = new LinkConfig;
+  connect(this->linkConfig, SIGNAL(Applied()), this, SLOT(OnConfigApplied()));
   this->visualConfig = new VisualConfig;
+  connect(this->visualConfig, SIGNAL(Applied()), this, SLOT(OnConfigApplied()));
   this->collisionConfig = new CollisionConfig;
+  connect(this->collisionConfig, SIGNAL(Applied()), this,
+      SLOT(OnConfigApplied()));
 
   // Create the main tab widget for all components in a link
   this->tabWidget = new QTabWidget();
@@ -68,21 +72,20 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   removeButton->setCheckable(false);
   connect(removeButton, SIGNAL(clicked()), this, SLOT(OnRemove()));
 
+  QPushButton *resetButton = new QPushButton(tr("Reset"));
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(RestoreOriginalData()));
+
   QPushButton *cancelButton = new QPushButton(tr("Cancel"));
   connect(cancelButton, SIGNAL(clicked()), this, SLOT(OnCancel()));
 
-  QPushButton *applyButton = new QPushButton(tr("Apply"));
-  connect(applyButton, SIGNAL(clicked()), this, SLOT(OnApply()));
-
   QPushButton *OKButton = new QPushButton(tr("OK"));
-  OKButton->setDefault(true);
   connect(OKButton, SIGNAL(clicked()), this, SLOT(OnOK()));
 
   QHBoxLayout *buttonsLayout = new QHBoxLayout;
   buttonsLayout->addWidget(removeButton);
   buttonsLayout->addStretch(5);
+  buttonsLayout->addWidget(resetButton);
   buttonsLayout->addWidget(cancelButton);
-  buttonsLayout->addWidget(applyButton);
   buttonsLayout->addWidget(OKButton);
   buttonsLayout->setAlignment(Qt::AlignRight);
 
@@ -91,6 +94,9 @@ LinkInspector::LinkInspector(QWidget *_parent) : QDialog(_parent)
   mainLayout->addWidget(tabWidget);
   mainLayout->addLayout(buttonsLayout);
   this->setLayout(mainLayout);
+
+  // Conections
+  connect(this, SIGNAL(rejected()), this, SLOT(RestoreOriginalData()));
 }
 
 /////////////////////////////////////////////////
@@ -149,7 +155,7 @@ void LinkInspector::OnCancel()
 }
 
 /////////////////////////////////////////////////
-void LinkInspector::OnApply()
+void LinkInspector::OnConfigApplied()
 {
   emit Applied();
 }
@@ -170,4 +176,34 @@ void LinkInspector::enterEvent(QEvent */*_event*/)
 void LinkInspector::SetLinkId(const std::string &_id)
 {
   this->linkId = _id;
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::Open()
+{
+  this->linkConfig->Init();
+  this->visualConfig->Init();
+  this->collisionConfig->Init();
+
+  this->move(QCursor::pos());
+  this->show();
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::RestoreOriginalData()
+{
+  this->linkConfig->RestoreOriginalData();
+  this->visualConfig->RestoreOriginalData();
+  this->collisionConfig->RestoreOriginalData();
+
+  emit Applied();
+}
+
+/////////////////////////////////////////////////
+void LinkInspector::keyPressEvent(QKeyEvent *_event)
+{
+  if (_event->key() == Qt::Key_Enter)
+    _event->accept();
+  else
+    QDialog::keyPressEvent(_event);
 }

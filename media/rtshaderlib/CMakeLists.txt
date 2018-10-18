@@ -12,5 +12,5 @@ SGXLib_NormalMapLighting.glsl
 SGXLib_PerPixelLighting.glsl
 )
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/rtshaderlib)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/rtshaderlib)
 

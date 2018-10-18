@@ -20,6 +20,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 
 // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 #ifndef Q_MOC_RUN
@@ -27,10 +28,14 @@
 #endif
 #include <gazebo/util/system.hh>
 #include "RestUiLoginDialog.hh"
-#include "RestUiLogoutDialog.hh"
 
 namespace gazebo
 {
+  namespace gui
+  {
+    class TopToolbar;
+  }
+
   /// \class RestUiWidget RestUiWidget.hh RestUiWidget.hh
   /// \brief REST user interface widget
   class GAZEBO_VISIBLE RestUiWidget : public QWidget
@@ -64,9 +69,13 @@ namespace gazebo
     /// the plugin's update.
     public: void Update();
 
-    /// \brief Called everytime a response  message is received.
-    /// \param[in] _msg Rest error message.
-    private: void OnResponse(ConstRestErrorPtr &_msg);
+    /// \brief Called everytime a response message is received.
+    /// \param[in] _msg Rest response message.
+    private: void OnResponse(ConstRestResponsePtr &_msg);
+
+    /// \brief Callback when window mode is changed.
+    /// \param[in] _mode New window mode.
+    private: void OnWindowMode(const std::string &_mode);
 
     /// \brief Login menu item
     private: QAction &loginMenuAction;
@@ -80,9 +89,6 @@ namespace gazebo
     /// \brief Pub/sub node to communicate with gzserver.
     private: gazebo::transport::NodePtr node;
 
-     /// \brief Login dialog.
-    private: gui::RestUiLogoutDialog logoutDialog;
-
     /// \brief Login dialog.
     private: gui::RestUiLoginDialog loginDialog;
 
@@ -92,13 +98,32 @@ namespace gazebo
     /// \brief Gazebo logout topic publisher
     private: gazebo::transport::PublisherPtr logoutPub;
 
-    /// \brief Gazebo error topic subscriber.
-    private: gazebo::transport::SubscriberPtr errorSub;
+    /// \brief Gazebo response topic subscriber.
+    private: gazebo::transport::SubscriberPtr responseSub;
 
-    /// \brief List of unprocessed error messages to be displayed from the gui
-    /// thread.
-    private: std::list<boost::shared_ptr<const gazebo::msgs::RestError>>
+    /// \brief List of unprocessed response messages to be displayed from the
+    /// gui thread.
+    private: std::list<boost::shared_ptr<const gazebo::msgs::RestResponse>>
         msgRespQ;
+
+    /// \brief Gazebo main window toolbar.
+    private: gui::TopToolbar *toolbar;
+
+    /// \brief Label to display name of user who is logged in.
+    private: QLabel *loginLabel;
+
+    /// \brief ID of this rest service client
+    private: unsigned int restID;
+
+    /// \brief Pointer to the Qt action associated with the login label.
+    private: QAction *loginLabelAct;
+
+    /// \brief Pointer to the Qt action associated with the spacer widget
+    /// before the login label.
+    private: QAction *spacerAct;
+
+    /// \brief Event based connections.
+    public: std::vector<event::ConnectionPtr> connections;
   };
 }
 

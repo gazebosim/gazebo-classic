@@ -66,6 +66,9 @@ namespace gazebo
       /// \param[in] New link id.
       public: void SetLinkId(const std::string &_id);
 
+      /// \brief Open the inspector.
+      public: void Open();
+
       /// \brief Qt event emiited when the mouse enters this widget.
       /// \param[in] _event Qt event.
       protected: virtual void enterEvent(QEvent *_event);
@@ -87,11 +90,18 @@ namespace gazebo
       /// \brief Qt callback when the Cancel button is pressed.
       private slots: void OnCancel();
 
-      /// \brief Qt callback when the Apply button is pressed.
-      private slots: void OnApply();
-
       /// \brief Qt callback when the Ok button is pressed.
       private slots: void OnOK();
+
+      /// \brief Qt callback when one of the child configs has been applied.
+      private slots: void OnConfigApplied();
+
+      /// \brief Restore the widget's data to how it was when first opened.
+      private slots: void RestoreOriginalData();
+
+      /// \brief Qt key press event.
+      /// \param[in] _event Qt key event.
+      private: void keyPressEvent(QKeyEvent *_event);
 
       /// \brief Main tab widget within the link inspector.
       private: QTabWidget *tabWidget;

@@ -13,4 +13,4 @@ set (files
   RSM_fp.glsl
 ) 
 
-install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/media/materials/programs/deferred_rendering)
+install(FILES ${files} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/media/materials/programs/deferred_rendering)

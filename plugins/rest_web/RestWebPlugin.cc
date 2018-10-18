@@ -119,6 +119,8 @@ void RestWebPlugin::Load(int /*_argc*/, char ** /*_argv*/)
 //////////////////////////////////////////////////
 void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
 {
+  gazebo::msgs::RestResponse msg;
+  std::string response;
   try
   {
     // where to post the data on the REST server
@@ -179,19 +181,21 @@ void RestWebPlugin::OnSimEvent(ConstSimEventPtr &_msg)
     event += "}";    // root element
     // post it with curl
     this->restApi.PostJsonData(route.c_str(), event.c_str());
+    msg.set_type(msgs::RestResponse::SUCCESS);
   }
   catch(RestException &x)
   {
-    gazebo::msgs::RestError msg;
-    std::string errorMsg;
-    errorMsg = "There was a problem trying to send data to the server: ";
-    errorMsg += x.what();
-    msg.set_type("Error");
-    msg.set_msg(errorMsg);
+    response = "There was a problem trying to send data to the server: ";
+    response += x.what();
+    msg.set_type(msgs::RestResponse::ERROR);
     // alert the user via the gui plugin
-    gzerr << "ERROR in REST service POST request: " << errorMsg << std::endl;
-    this->pub->Publish(msg);
+    gzerr << "ERROR in REST service POST request: " << response << std::endl;
   }
+
+  if (_msg->has_id())
+    msg.set_id(_msg->id());
+  msg.set_msg(response);
+  this->pub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -201,6 +205,8 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
   gzmsg << "[" << _msg->route() << ", " << _msg->json() << "]"  << std::endl;
   gzmsg << std::endl;
 
+  gazebo::msgs::RestResponse msg;
+  std::string response;
   try
   {
     std::string event = "{";
@@ -256,20 +262,23 @@ void RestWebPlugin::OnEventRestPost(ConstRestPostPtr &_msg)
       event += "}";
     }
     event += "}";
+
     this->restApi.PostJsonData(_msg->route().c_str(), event.c_str());
+    msg.set_type(msgs::RestResponse::SUCCESS);
   }
   catch(RestException &x)
   {
-    gazebo::msgs::RestError msg;
-    std::string errorMsg;
-    errorMsg = "There was a problem trying to send data to the server: ";
-    errorMsg += x.what();
-    msg.set_type("Error");
-    msg.set_msg(errorMsg);
+    response = "There was a problem trying to send data to the server: ";
+    response += x.what();
+    msg.set_type(msgs::RestResponse::ERROR);
     // alert the user via the gui plugin
-    gzerr << "ERROR in REST request: " << errorMsg << std::endl;
-    this->pub->Publish(msg);
+    gzerr << "ERROR in REST request: " << response << std::endl;
   }
+
+  if (_msg->has_id())
+    msg.set_id(_msg->id());
+  msg.set_msg(response);
+  this->pub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
@@ -280,15 +289,25 @@ void RestWebPlugin::OnRestLoginRequest(ConstRestLoginPtr &_msg)
 }
 
 //////////////////////////////////////////////////
-void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &/*_msg*/)
+void RestWebPlugin::OnRestLogoutRequest(ConstRestLogoutPtr &_msg)
 {
   boost::mutex::scoped_lock lock(this->requestQMutex);
   this->restApi.Logout();
+
+  gazebo::msgs::RestResponse msg;
+  if (_msg->has_id())
+    msg.set_id(_msg->id());
+  msg.set_type(msgs::RestResponse::LOGOUT);
+  msg.set_msg("Success");
+  this->pub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
 void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
 {
+  gazebo::msgs::RestResponse msg;
+  std::string response;
+
   // this is executed asynchronously
   try
   {
@@ -296,27 +315,32 @@ void RestWebPlugin::ProcessLoginRequest(ConstRestLoginPtr _msg)
         "/login",
         _msg->username().c_str(),
         _msg->password().c_str());
+
+    response = "Success";
+    msg.set_type(msgs::RestResponse::LOGIN);
   }
   catch(RestException &x)
   {
-    gazebo::msgs::RestError msg;
-    std::string errorMsg;
-    errorMsg = "There was a problem trying to login to the server: ";
-    errorMsg += x.what();
-    msg.set_type("Error");
-    msg.set_msg(errorMsg);
+    response = "There was a problem trying to login to the server: ";
+    response += x.what();
+    msg.set_type(msgs::RestResponse::ERROR);
+
     // alert the user via the gui plugin
-    gzerr << "ERROR in REST login request. : " << errorMsg << std::endl;
-    this->pub->Publish(msg);
+    gzerr << "ERROR in REST login request. : " << response << std::endl;
   }
+
+  if (_msg->has_id())
+    msg.set_id(_msg->id());
+  msg.set_msg(response);
+  this->pub->Publish(msg);
 }
 
 //////////////////////////////////////////////////
 void RestWebPlugin::RunRequestQ()
 {
   // be ready to send errors back to the UI
-  std::string path("/gazebo/rest/rest_error");
-  this->pub = node->Advertise<gazebo::msgs::RestError>(path);
+  std::string path("/gazebo/rest/rest_response");
+  this->pub = node->Advertise<gazebo::msgs::RestResponse>(path);
   // process any login or post data that ha been received
   while (!this->stopMsgProcessing)
   {

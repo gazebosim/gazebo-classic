@@ -31,7 +31,7 @@ namespace gazebo
   {
     /// \class GraphScene GraphScene.hh
     /// \brief A scene of 2D graph nodes and edges
-    class GraphScene : public QGVScene
+    class GZ_GUI_VISIBLE GraphScene : public QGVScene
     {
       Q_OBJECT
 

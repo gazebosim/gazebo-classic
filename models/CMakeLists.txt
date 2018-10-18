@@ -8,5 +8,5 @@ set (dirs
 
 foreach(dir ${dirs})
   install (DIRECTORY ${dir} DESTINATION
-    ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_VERSION}/models)
+    ${CMAKE_INSTALL_PREFIX}/share/gazebo-${GAZEBO_MAJOR_VERSION}/models)
 endforeach()

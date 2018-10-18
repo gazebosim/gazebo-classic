@@ -65,6 +65,17 @@ TopToolbar::TopToolbar(QWidget *_parent)
 
   this->dataPtr->toolbar->addSeparator();
 
+  // Undo & Redo
+  if (g_undoAct && g_redoAct && g_redoHistoryAct && g_undoHistoryAct)
+  {
+    this->dataPtr->toolbar->addAction(g_undoAct);
+    this->dataPtr->toolbar->addAction(g_undoHistoryAct);
+    this->dataPtr->toolbar->addAction(g_redoAct);
+    this->dataPtr->toolbar->addAction(g_redoHistoryAct);
+
+    this->dataPtr->toolbar->addSeparator();
+  }
+
   // Insert simple shapes
   if (g_boxCreateAct)
     this->dataPtr->toolbar->addAction(g_boxCreateAct);
@@ -223,7 +234,19 @@ void TopToolbar::OnWindowMode(const std::string &_mode)
     else
     {
       acts[i]->setVisible(simulation);
-      acts[i]->setEnabled(simulation);
+
+      // Disable undo / redo
+      if (acts[i] == g_undoAct ||
+          acts[i] == g_undoHistoryAct ||
+          acts[i] == g_redoAct ||
+          acts[i] == g_redoHistoryAct)
+      {
+        acts[i]->setEnabled(false);
+      }
+      else
+      {
+        acts[i]->setEnabled(simulation);
+      }
     }
   }
 }
@@ -268,4 +291,22 @@ QAction *TopToolbar::InsertWidget(const QString &_before, QWidget *_widget)
   }
 
   return this->dataPtr->toolbar->insertWidget(beforeAction, _widget);
+}
+
+/////////////////////////////////////////////////
+void TopToolbar::AddAction(QAction *_action)
+{
+  this->dataPtr->toolbar->addAction(_action);
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddSeparator()
+{
+  return this->dataPtr->toolbar->addSeparator();
+}
+
+/////////////////////////////////////////////////
+QAction *TopToolbar::AddWidget(QWidget *_widget)
+{
+  return this->dataPtr->toolbar->addWidget(_widget);
 }
