@@ -27,9 +27,6 @@ class ModelCreator_TEST : public QTestFixture
 
   /// \brief Tests changing save states in the model editor
   private slots: void SaveState();
-
-  /// \brief Tests selecting links in the model editor
-  private slots: void Selection();
 };
 
 #endif
