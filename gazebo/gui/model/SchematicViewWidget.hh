@@ -37,6 +37,8 @@ namespace gazebo
     /// \brief The parent widget of the CML editor
     class GZ_GUI_MODEL_VISIBLE SchematicViewWidget : public QWidget
     {
+      Q_OBJECT
+
       /// \brief Constructor
       /// \param[in] _parent Parent QWidget.
       public: SchematicViewWidget(QWidget *_parent = 0);
@@ -94,6 +96,10 @@ namespace gazebo
       /// \brief Qt event received when the widget is being resized
       /// \param[in] _event Resize event.
       private: void resizeEvent(QResizeEvent *_event);
+
+      /// \brief Custom context menu callback for an item in the scene
+      /// \param[in] _id Unique id of an item.
+      private slots: void OnCustomContextMenu(const QString &_id);
 
       /// \brief Qt Graphics Scene where graphics items are drawn in
       private: GraphScene *scene;
