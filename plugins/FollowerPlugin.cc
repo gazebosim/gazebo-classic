@@ -95,12 +95,8 @@ FollowerPlugin::FollowerPlugin()
 /////////////////////////////////////////////////
 FollowerPlugin::~FollowerPlugin()
 {
-  if (this->dataPtr->depthCamera)
-  {
-    this->dataPtr->depthCamera->DisconnectNewDepthFrame(
-        this->dataPtr->newDepthFrameConnection);
-  }
-  event::Events::DisconnectWorldUpdateBegin(this->dataPtr->updateConnection);
+  this->dataPtr->newDepthFrameConnection.reset();
+  this->dataPtr->updateConnection.reset();
   if (this->dataPtr->depthBuffer != NULL)
     delete [] this->dataPtr->depthBuffer;
 }

@@ -260,10 +260,7 @@ void ModelPropShop::Update()
       this->camera->PostRender();
       this->camera->SaveFrame((this->savePath / "5.png").string());
 
-      event::Events::DisconnectWorldCreated(this->worldCreatedConn);
       this->worldCreatedConn.reset();
-
-      event::Events::DisconnectWorldUpdateBegin(this->updateConn);
       this->updateConn.reset();
 
       // Clean up the camera.

@@ -40,13 +40,7 @@ void ViewAngleTest::OrthoProjection()
   mainWindow->Init();
   mainWindow->show();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Get camera
   gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
@@ -64,13 +58,7 @@ void ViewAngleTest::OrthoProjection()
 
   QApplication::postEvent(viewAngleWidget, new QShowEvent());
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in perspective projection
   QVERIFY(gazebo::gui::g_cameraPerspectiveAct->isChecked());
@@ -80,13 +68,7 @@ void ViewAngleTest::OrthoProjection()
   // Trigger ortho and see it changed
   gazebo::gui::g_cameraOrthoAct->trigger();
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // Check that it is in orthographic projection
   QVERIFY(!gazebo::gui::g_cameraPerspectiveAct->isChecked());
@@ -104,13 +86,7 @@ void ViewAngleTest::OrthoProjection()
   {
     buttons[0]->click();
 
-    // Process some events and draw the screen
-    for (size_t i = 0; i < 50; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow, 50);
   }
 
   // initial projection matrix at top view.
@@ -124,13 +100,7 @@ void ViewAngleTest::OrthoProjection()
   QTest::mouseClick(glWidget, Qt::LeftButton, 0,
       QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 10; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow);
 
   // There seem to be a problem simulating mouse drag using QTest
   // so use raw QMouseEvent.
@@ -161,13 +131,7 @@ void ViewAngleTest::OrthoProjection()
       Qt::RightButton, Qt::NoModifier);
   QApplication::postEvent(glWidget, releaseEvent);
 
-  // Process some events and draw the screen
-  for (size_t i = 0; i < 50; ++i)
-  {
-    gazebo::common::Time::MSleep(30);
-    QCoreApplication::processEvents();
-    mainWindow->repaint();
-  }
+  this->ProcessEventsAndDraw(mainWindow, 50);
 
   // projection matrix after zoom.
   ignition::math::Matrix4d m2= cam->ProjectionMatrix();
@@ -178,13 +142,7 @@ void ViewAngleTest::OrthoProjection()
   {
     buttons[0]->click();
 
-    // Process some events and draw the screen
-    for (size_t i = 0; i < 50; ++i)
-    {
-      gazebo::common::Time::MSleep(30);
-      QCoreApplication::processEvents();
-      mainWindow->repaint();
-    }
+    this->ProcessEventsAndDraw(mainWindow, 50);
   }
 
   // projection matrix after triggering the top view option again at different

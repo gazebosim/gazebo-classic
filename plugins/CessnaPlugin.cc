@@ -48,7 +48,7 @@ CessnaPlugin::CessnaPlugin()
 /////////////////////////////////////////////////
 CessnaPlugin::~CessnaPlugin()
 {
-  event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+  this->updateConnection.reset();
 }
 
 /////////////////////////////////////////////////

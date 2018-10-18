@@ -25,6 +25,9 @@ class ModelSnap_TEST : public QTestFixture
 {
   Q_OBJECT
 
+  /// \brief Verify highlights when snapping models
+  private slots: void Highlight();
+
   /// \brief Test snapping models.
   private slots: void Snap();
 };

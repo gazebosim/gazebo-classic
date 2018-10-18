@@ -17,13 +17,14 @@
 
 #include "gazebo/rendering/RayQuery.hh"
 #include "gazebo/math/Helpers.hh"
+#include "gazebo/gui/Actions.hh"
+#include "gazebo/gui/GLWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/ModelSnap.hh"
 #include "gazebo/gui/ModelSnap_TEST.hh"
 
 #include "test_config.h"
-
 
 /////////////////////////////////////////////////
 gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
@@ -42,12 +43,138 @@ gazebo::math::Vector2i GetScreenSpaceCoords(gazebo::math::Vector3 _pt,
 }
 
 /////////////////////////////////////////////////
+bool FindRedColor(gazebo::rendering::CameraPtr _cam)
+{
+  // Get camera data
+  const unsigned char *data = _cam->ImageData();
+  unsigned int width = _cam->ImageWidth();
+  unsigned int height = _cam->ImageHeight();
+  unsigned int depth = _cam->ImageDepth();
+
+  // scan image and find red pixels
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*depth; x += depth)
+    {
+      int r = data[y*width*depth + x];
+      int g = data[y*width*depth + x+1];
+      int b = data[y*width*depth + x+2];
+
+      if (r > g && r > b && r > 200 && g < 200 && b < 200)
+        return true;
+    }
+  }
+  return false;
+}
+
+/////////////////////////////////////////////////
+void ModelSnap_TEST::Highlight()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("worlds/shapes.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  std::string model02Name = "box";
+  std::string model03Name = "sphere";
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != NULL);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != NULL);
+
+  // set cam pose so it doesn't see the red line representing the world x axis.
+  cam->SetWorldPose(ignition::math::Pose3d(
+      ignition::math::Vector3d(2.18, 0.65, 1.06),
+      ignition::math::Quaterniond(0, 0.14, -3.14)));
+
+  cam->SetCaptureData(true);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  QVERIFY(!FindRedColor(cam));
+
+  gazebo::rendering::VisualPtr model02Vis = scene->GetVisual(model02Name);
+  QVERIFY(model02Vis != NULL);
+  gazebo::rendering::VisualPtr model03Vis = scene->GetVisual(model03Name);
+  QVERIFY(model03Vis != NULL);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != NULL);
+
+  QVERIFY(gazebo::gui::g_snapAct != NULL);
+  QVERIFY(gazebo::gui::g_arrowAct != NULL);
+
+  gazebo::gui::ModelSnap::Instance()->Init();
+  gazebo::gui::ModelSnap::Instance()->Reset();
+
+  // start with arrow mode
+  gazebo::gui::g_arrowAct->trigger();
+
+  // trigger snap
+  gazebo::gui::g_snapAct->trigger();
+
+  // select any triangle on the sphere
+  gazebo::math::Vector2i spherePt = GetScreenSpaceCoords(
+      model03Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+
+  QTest::mouseRelease(glWidget, Qt::LeftButton, 0,
+      QPoint(spherePt.x, spherePt.y));
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // verify that a triangle is highlighted by checking for red pixels.
+  QVERIFY(FindRedColor(cam));
+
+  // try the box model next
+  // verify we can repeatedly pick triangles on the same model.
+  for (unsigned int k = 0; k < 2; ++k)
+  {
+    // cancel and reset snap
+    gazebo::gui::g_arrowAct->trigger();
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // verify that no triangles are highlighted
+    QVERIFY(!FindRedColor(cam));
+
+    // trigger snap again
+    gazebo::gui::g_snapAct->trigger();
+
+    // select the front face of the box
+    gazebo::math::Vector2i boxPt = GetScreenSpaceCoords(
+        model02Vis->GetWorldPose().pos + gazebo::math::Vector3(0.5, 0, 0), cam);
+
+    QTest::mouseRelease(glWidget, Qt::LeftButton, 0, QPoint(boxPt.x, boxPt.y));
+
+    this->ProcessEventsAndDraw(mainWindow);
+
+    // verify that a triangle is highlighted
+    QVERIFY(FindRedColor(cam));
+  }
+
+  gazebo::gui::ModelSnap::Instance()->Fini();
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
+/////////////////////////////////////////////////
 void ModelSnap_TEST::Snap()
 {
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/shapes.world", false, false, true);
+  this->Load("worlds/shapes.world", false, false, false);
 
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
   QVERIFY(mainWindow != NULL);
