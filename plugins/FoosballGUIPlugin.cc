@@ -28,14 +28,6 @@ GZ_REGISTER_GUI_PLUGIN(FoosballGUIPlugin)
 FoosballGUIPlugin::FoosballGUIPlugin()
   : GUIPlugin()
 {
-  this->setStyleSheet(
-      "QFrame {\
-         background-color: rgba(100, 100, 100, 255);\
-         border: 0px solid white;\
-         font-size: 50px;\
-         font-family: 'Impact';\
-      }");
-
   // Time
   QLabel *timeLabel = new QLabel();
   connect(this, SIGNAL(SetTime(QString)), timeLabel,
@@ -100,9 +92,24 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   QHBoxLayout *mainLayout = new QHBoxLayout();
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->addWidget(mainFrame);
+  this->setStyleSheet(
+      "QFrame {\
+         background-color: rgba(100, 100, 100, 255);\
+         border: 0px solid white;\
+         font-size: 50px;\
+         font-family: 'Impact';\
+      }");
   this->setLayout(mainLayout);
   this->move(0, 0);
-  this->resize(1920, 100);
+
+  // Match window's width
+  gui::MainWindow *mainWindow = gui::get_main_window();
+  if (mainWindow)
+  {
+    this->renderWidget = mainWindow->GetRenderWidget();
+    this->renderWidget->installEventFilter(this);
+    this->resize(this->renderWidget->width(), 100);
+  }
 
   // Initialize transport.
   this->gzNode = transport::NodePtr(new transport::Node());
@@ -131,7 +138,7 @@ FoosballGUIPlugin::FoosballGUIPlugin()
   QObject::connect(restartGame, SIGNAL(activated()), this,
       SLOT(OnRestartGame()));
 
-  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+H"), this);
+  QShortcut *restartBall = new QShortcut(QKeySequence("Ctrl+Y"), this);
   QObject::connect(restartBall, SIGNAL(activated()), this,
       SLOT(OnRestartBall()));
 }
@@ -176,24 +183,28 @@ void FoosballGUIPlugin::OnScore(ConstGzStringPtr &_msg)
 void FoosballGUIPlugin::OnState(ConstGzStringPtr &_msg)
 {
   std::string state = _msg->data();
+  std::string timeStr = _msg->data().substr(_msg->data().find(":")+1);
+  int time = 3;
+  if (!timeStr.empty())
+    time = time - std::stoi(timeStr);
 
-  if (_msg->data() == "play")
+  if (_msg->data().find("play") != std::string::npos)
   {
     state = "Play!";
   }
-  else if (_msg->data() == "kickoff")
+  else if (_msg->data().find("kickoff") != std::string::npos)
   {
-    state = "Kickoff!";
+    state = "Kickoff: " + std::to_string(time);
   }
-  else if (_msg->data() == "goalA")
+  else if (_msg->data().find("goalA") != std::string::npos)
   {
     state = "Blue GOAL!";
   }
-  else if (_msg->data() == "goalB")
+  else if (_msg->data().find("goalB") != std::string::npos)
   {
     state = "Red GOAL!";
   }
-  else if (_msg->data() == "finished")
+  else if (_msg->data().find("finished") != std::string::npos)
   {
     state = "Game Over!";
   }
@@ -216,3 +227,15 @@ void FoosballGUIPlugin::OnRestartBall()
   msg.set_data(1);
   this->restartBallPub->Publish(msg);
 }
+
+/////////////////////////////////////////////////
+bool FoosballGUIPlugin::eventFilter(QObject *_obj, QEvent *_event)
+{
+  QWidget *widget = qobject_cast<QWidget *>(_obj);
+  if (widget == this->renderWidget && _event->type() == QEvent::Resize)
+  {
+    this->resize(this->renderWidget->width(), 100);
+  }
+  return QObject::eventFilter(_obj, _event);
+}
+

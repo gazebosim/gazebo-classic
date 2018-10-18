@@ -42,13 +42,16 @@ namespace gazebo
   namespace common
   {
     /// \brief Helper function to avoid deprecation warnings.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     AVFrame *AVFrameAlloc(void);
 
     /// \brief Helper function to avoid deprecation warnings.
-    GAZEBO_VISIBLE
+    GZ_COMMON_VISIBLE
     void AVFrameUnref(AVFrame *_frame);
   }
 }
-#endif  // ifdef HAVE_FFMPEG
-#endif  // ifndef _GAZEBO_FFMPEG_INC_HH
+// ifdef HAVE_FFMPEG
+#endif
+
+// ifndef _GAZEBO_FFMPEG_INC_HH
+#endif

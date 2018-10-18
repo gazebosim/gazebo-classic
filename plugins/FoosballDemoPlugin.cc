@@ -241,7 +241,8 @@ void FoosballDemoPlugin::Update(const common::UpdateInfo &/*_info*/)
 
   // Publish game state.
   msgs::GzString stateMsg;
-  stateMsg.set_data(this->currentState->GetName());
+  stateMsg.set_data(this->currentState->GetName() + ":"  +
+      std::to_string(this->currentState->timer.GetElapsed().sec));
   this->statePub->Publish(stateMsg);
 }
 

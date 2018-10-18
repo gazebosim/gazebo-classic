@@ -59,14 +59,6 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     return false;
   }
 
-  if (team == "Red" && _sdf->HasElement("oculus"))
-  {
-    int oculus = _sdf->Get<int>("oculus");
-    if (oculus == 1)
-      this->invert = -1.0;
-  }
-
-
   // Read the <left_controller> and <right_controller> elements.
   for (auto const &side : {"left_controller", "right_controller"})
   {
@@ -94,6 +86,21 @@ bool FoosballPlayer::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
   }
 
+  // Check if we have to invert the control for this player.
+  if (_sdf->HasElement("invert_control"))
+  {
+    int invertControl = _sdf->Get<int>("invert_control");
+    if (invertControl == 1)
+    {
+      this->invert = -1.0;
+
+      // Swap left/right controllers.
+      auto &leftRods = this->hydra["left_controller"];
+      auto &rightRods = this->hydra["right_controller"];
+      std::swap(leftRods, rightRods);
+    }
+  }
+
   // Subscribe to Hydra updates by registering OnHydra() callback.
   this->node = transport::NodePtr(new transport::Node());
   this->node->Init(_model->GetWorld()->GetName());
@@ -115,6 +122,14 @@ void FoosballPlayer::Update()
 
   // Read the last known Hydra message.
   boost::shared_ptr<msgs::Hydra const> msg = this->hydraMsgPtr;
+
+  // Reset the Hydra position.
+  if (msg->right().button_center() && msg->left().button_center())
+  {
+    this->activated = true;
+    this->resetPoseRight = msgs::Convert(msg->right().pose());
+    this->resetPoseLeft = msgs::Convert(msg->left().pose());
+  }
 
   if (this->activated)
   {
@@ -148,33 +163,32 @@ void FoosballPlayer::Update()
             auto &activeRod = this->hydra[side].front();
 
             // Translation.
-            double vel = (-adjust[side].pos.x - this->lastHydraPose[side].at(0))
+            double vel = (adjust[side].pos.x - this->lastHydraPose[side].at(0))
               / dt.Double();
             activeRod.at(0)->SetVelocity(0, this->invert * vel);
 
             // Rotation.
-            vel = (-adjust[side].rot.GetRoll() -
-              this->lastHydraPose[side].at(1)) / dt.Double();
+            auto dRot = GZ_NORMALIZE(adjust[side].rot.GetRoll() -
+              this->lastHydraPose[side].at(1));
+            vel = dRot / dt.Double();
             activeRod.at(1)->SetVelocity(0, this->invert * vel);
 
-            this->lastHydraPose[side].at(0) = -adjust[side].pos.x;
-            this->lastHydraPose[side].at(1) = -adjust[side].rot.GetRoll();
+            // Store the current Hydra position for calculating the velocity
+            // of Hydra in the next iteration.
+            this->lastHydraPose[side].at(0) = adjust[side].pos.x;
+            this->lastHydraPose[side].at(1) = adjust[side].rot.GetRoll();
+
+            // Store the current rod positions in case we have to switch rods.
+            // If we switch a rod we have to put the new rod in the same
+            // position as the previous one.
+            this->lastRodPose[side].at(0) = activeRod.at(0)->GetAngle(0);
+            this->lastRodPose[side].at(1) = activeRod.at(1)->GetAngle(0);
           }
         }
       }
     }
 
     this->lastUpdateTime = this->model->GetWorld()->GetSimTime();
-  }
-  else
-  {
-    // Reset the Hydra position.
-    if (msg->right().button_center() && msg->left().button_center())
-    {
-      this->activated = true;
-      this->resetPoseRight = msgs::Convert(msg->right().pose());
-      this->resetPoseLeft = msgs::Convert(msg->left().pose());
-    }
   }
 }
 
@@ -221,8 +235,8 @@ void FoosballPlayer::SwitchRod(const std::string &_side)
 
     // Restore the position to the last known Hydra position.
     auto &activeRod = this->hydra[_side].front();
-    activeRod.at(0)->SetPosition(0, this->lastHydraPose[_side].at(0));
-    activeRod.at(1)->SetPosition(0, this->lastHydraPose[_side].at(1));
+    activeRod.at(0)->SetPosition(0, this->lastRodPose[_side].at(0).Radian());
+    activeRod.at(1)->SetPosition(0, this->lastRodPose[_side].at(1).Radian());
   }
 }
 
