@@ -27,6 +27,9 @@ class SchematicViewWidget_TEST : public QTestFixture
 
   /// \brief Test adding and removing nodes.
   private slots: void AddRemove();
+
+  /// \brief Test selection.
+  private slots: void Selection();
 };
 
 #endif
