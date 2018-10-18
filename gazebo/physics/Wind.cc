@@ -22,6 +22,7 @@
 #endif
 
 #include <functional>
+#include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Vector3.hh>
