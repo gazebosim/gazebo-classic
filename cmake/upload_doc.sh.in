@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# Check if the node was configured to use s3cmd
+# This is done by running s3cmd --configure
+if [ ! -f "${HOME}/.s3cfg" ]; then
+    echo "No $HOME/.s3cfg file found. Please config the software first in your system"
+    exit 1
+fi
+
+# Make documentation if not build
+make doc
+if [ ! -f "@CMAKE_BINARY_DIR@/doxygen/html/index.html" ]; then
+  echo "Documentation not present. Install doxygen, and run `make doc` in the build directory"
+  exit 1
+fi
+
+# The code API
+s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ --dry-run -v
+
+echo -n "Upload code API(Y/n)? "
+read ans
+
+if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
+  s3cmd sync @CMAKE_BINARY_DIR@/doxygen/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ -v
+fi
+
+
+# The msgs API
+s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/api/@GAZEBO_VERSION_FULL@/ --dry-run -v
+
+echo -n "Upload msg API (Y/n)? "
+read ans
+
+if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
+  s3cmd sync @CMAKE_BINARY_DIR@/doxygen_msgs/html/* s3://osrf-distributions/gazebo/msg-api/@GAZEBO_VERSION_FULL@/ -v
+fi

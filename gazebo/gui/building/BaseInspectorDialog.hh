@@ -32,7 +32,7 @@ namespace gazebo
 
     /// \class BaseInspectorDialog BaseInspectorDialog.hh
     /// \brief Base Dialog for a specific inspector dialog.
-    class GZ_GUI_BUILDING_VISIBLE BaseInspectorDialog : public QDialog
+    class GZ_GUI_VISIBLE BaseInspectorDialog : public QDialog
     {
       Q_OBJECT
 
