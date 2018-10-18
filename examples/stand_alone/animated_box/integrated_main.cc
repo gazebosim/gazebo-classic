@@ -86,7 +86,7 @@ int main(int _argc, char **_argv)
     // Make sure to shut everything down.
     gazebo::shutdown();
   }
-  catch(gazebo::common::Exception & e)
+  catch (gazebo::common::Exception & e)
   {
     std::cerr << "ERROR: " << e << std::endl;
     return 1;
