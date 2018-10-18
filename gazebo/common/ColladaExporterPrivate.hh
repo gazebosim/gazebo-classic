@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-class TiXmlElement;
-
 namespace gazebo
 {
   namespace common

@@ -19,6 +19,7 @@ else (NOT GZIP)
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
       COMMAND ${GZIP} -c ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.${_section}.roff
         > ${CMAKE_CURRENT_BINARY_DIR}/${_source}.${_section}.gz
+      DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${_source}.${_section}.roff
     )
 
     set(MANPAGE_TARGET "man-${_source}")
