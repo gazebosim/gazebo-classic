@@ -43,6 +43,13 @@ void SaveDialog_TEST::SaveLocation()
   gazebo::gui::SaveDialog *saveDialog = new gazebo::gui::SaveDialog;
   QCoreApplication::processEvents();
 
+  // Set the model name
+  std::string modelName = "model name";
+  saveDialog->SetModelName(modelName);
+
+  // Get folder name from model name
+  std::string folderName = saveDialog->GetFolderNameFromModelName(modelName);
+
   // find the browse button
   QList<QPushButton *> pushButtons = saveDialog->findChildren<QPushButton *>();
   QVERIFY(!pushButtons.empty());
@@ -61,7 +68,8 @@ void SaveDialog_TEST::SaveLocation()
   helper.dialog = saveDialog;
   QTimer::singleShot(0, &helper, SLOT(CheckFileDialog()));
   browseButton->click();
-  QVERIFY(saveDialog->GetSaveLocation() == QDir::homePath().toStdString());
+  QVERIFY(saveDialog->GetSaveLocation() == QDir::homePath().toStdString() +
+      "/" + folderName);
 
   delete saveDialog;
 }

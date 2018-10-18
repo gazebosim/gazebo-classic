@@ -1,0 +1,88 @@
+<?xml version="1.0" ?>
+<sdf version="1.4">
+  <world name="default">
+
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- A foosball table -->
+    <model name="foosball">
+      <include>
+        <uri>model://foosball</uri>
+      </include>
+
+      <!-- Load the plugin to control the foosball players -->
+      <plugin name="foosball_table" filename='libFoosballTablePlugin.so'>
+        <!-- Parameters -->
+        <player>
+          <team>Blue</team>
+          <left_controller>
+            <rod>0</rod>
+            <rod>1</rod>
+          </left_controller>
+          <right_controller>
+            <rod>2</rod>
+            <rod>3</rod>
+          </right_controller>
+        </player>
+        <player>
+          <team>Red</team>
+          <!--<oculus>1</oculus>-->
+          <left_controller>
+            <rod>0</rod>
+            <rod>1</rod>
+          </left_controller>
+          <right_controller>
+            <rod>2</rod>
+            <rod>3</rod>
+          </right_controller>
+        </player>
+      </plugin>
+    </model>
+
+    <!-- A ball -->
+    <include>
+      <pose>0 0 0 0 0 0</pose>
+      <uri>model://foosball_ball</uri>
+      <name>foosball_ball</name>
+    </include>
+
+    <!-- Blue player view point using Oculus -->
+    <model name='camera'>
+      <static>true</static>
+      <pose>0 -1.2 3 0 0 1.57</pose>
+      <link name='link'></link>
+    </model>
+
+    <!-- Load the plugin for Razer Hydra -->
+    <plugin name="hydra" filename="libHydraPlugin.so"></plugin>
+
+    <!-- Load a plugin to control the foosball demo -->
+    <plugin name='foosball_demo' filename='libFoosballDemoPlugin.so'>
+      <!-- Parameters -->
+      <ball>foosball_ball</ball>
+      <table_length>1.1</table_length>
+      <table_height>1.0</table_height>
+      <game_duration>180</game_duration>
+    </plugin>
+
+    <!-- Set the user camera on top of the foosball table -->
+    <gui fullscreen='0'>
+      <!-- Load the GUI plugin -->
+      <plugin name="FoosballGUI" filename="libFoosballGUIPlugin.so"></plugin>
+
+      <camera name='user_camera'>
+        <pose>0.03112 0.05 3 1e-05 1.5658 1.57221</pose>
+        <view_controller>orbit</view_controller>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>

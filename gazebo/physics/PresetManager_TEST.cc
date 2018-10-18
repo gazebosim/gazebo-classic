@@ -74,18 +74,21 @@ TEST_F(PresetManagerTest, GetSetProfileParam)
   double max_step_size = 0.9;
   EXPECT_FALSE(presetManager->SetCurrentProfileParam("param_does_not_exist",
       max_step_size));
-  // XXX why fail?
   EXPECT_TRUE(presetManager->SetCurrentProfileParam("max_step_size",
+      0.8));
+  EXPECT_TRUE(presetManager->SetProfileParam("preset_1", "max_step_size",
       max_step_size));
 
   boost::any value2;
   EXPECT_FALSE(presetManager->GetCurrentProfileParam("param_does_not_exist",
       value2));
   EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size", value2));
+  EXPECT_TRUE(presetManager->GetProfileParam("preset_1", "max_step_size",
+      value2));
 
   try
   {
-    EXPECT_EQ(max_step_size, boost::any_cast<double>(value2));
+    EXPECT_DOUBLE_EQ(max_step_size, boost::any_cast<double>(value2));
   }
   catch(boost::bad_any_cast &_e)
   {
@@ -123,6 +126,9 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
   physics::PresetManagerPtr presetManager = world->GetPresetManager();
   boost::any value;
 
+  presetManager->RemoveProfile("preset_2");
+  EXPECT_FALSE(presetManager->HasProfile("preset_2"));
+
   // Remove the current profile
   presetManager->RemoveProfile("preset_1");
   // Test setting and getting when there is no current profile
@@ -147,7 +153,7 @@ TEST_F(PresetManagerTest, CreateRemoveProfile)
 
   try
   {
-    EXPECT_EQ(1.0, boost::any_cast<double>(value));
+    EXPECT_DOUBLE_EQ(1.0, boost::any_cast<double>(value));
   }
   catch(boost::bad_any_cast &_e)
   {
@@ -168,9 +174,8 @@ TEST_F(PresetManagerTest, SDF)
 
   EXPECT_TRUE(!presetManager->ProfileSDF("profile_does_not_exist"));
 
-  // Create from SDF element
-
   {
+    // Try to set using a bad SDF element
     sdf::SDF worldSDF;
     sdf::ElementPtr physicsSDF;
 
@@ -211,7 +216,7 @@ TEST_F(PresetManagerTest, SDF)
           </physics>\
         </world>\
       </sdf>");
-    physicsSDF = worldSDF.root->GetElement("world")->GetElement("physics");
+    physicsSDF = worldSDF.Root()->GetElement("world")->GetElement("physics");
     EXPECT_EQ(presetManager->CreateProfile(physicsSDF), "preset_3");
     EXPECT_TRUE(presetManager->HasProfile("preset_3"));
 
@@ -224,10 +229,10 @@ TEST_F(PresetManagerTest, SDF)
     {
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("max_step_size",
           value));
-      EXPECT_EQ(boost::any_cast<double>(value), 0.03);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.03);
       EXPECT_TRUE(presetManager->GetCurrentProfileParam("min_step_size",
           value));
-      EXPECT_EQ(boost::any_cast<double>(value), 0.003);
+      EXPECT_DOUBLE_EQ(boost::any_cast<double>(value), 0.003);
     }
     catch(boost::bad_any_cast &_e)
     {
@@ -236,16 +241,46 @@ TEST_F(PresetManagerTest, SDF)
     }
 
     // GenerateSDFFromPreset
-    sdf::ElementPtr generatedPhysicsSDF;
-    presetManager->GenerateSDFFromPreset(generatedPhysicsSDF, "preset_3");
+    sdf::ElementPtr generatedPhysicsSDF = NULL;
+    presetManager->GenerateSDFFromPreset("this_preset_does_not_exist",
+        generatedPhysicsSDF);
+    // Call doesn't do anything
+    ASSERT_TRUE(generatedPhysicsSDF == NULL);
+
+    presetManager->GenerateSDFFromPreset("preset_3", generatedPhysicsSDF);
     // Compare the SDF as strings
-    if (generatedPhysicsSDF == NULL)
-    {
-      gzerr << "Generated SDF pointer was NULL" << std::endl;
-      FAIL();
-      return;
-    }
+    ASSERT_TRUE(generatedPhysicsSDF != NULL);
+
     EXPECT_EQ(generatedPhysicsSDF->ToString(""), physicsSDF->ToString(""));
+  }
+
+  {
+    // Try to set a null pointer
+    sdf::ElementPtr nullElement = NULL;
+    presetManager->ProfileSDF("preset_3", nullElement);
+    // Should have no effect
+    EXPECT_TRUE(presetManager->ProfileSDF("preset_3") != NULL);
+  }
+
+  {
+    // Try to set a non-physics element
+    sdf::SDF worldSDF;
+    sdf::ElementPtr sceneSDF;
+
+    worldSDF.SetFromString(
+      "<sdf version = \"1.5\">\
+        <world name = \"default\">\
+          <scene>\
+            <ambient>0.1 0.1 0.1 1</ambient>\
+            <background>1 1 1 1</background>\
+            <shadows>false</shadows>\
+            <grid>false</grid>\
+          </scene>\
+        </world>\
+      </sdf>");
+    sceneSDF = worldSDF.Root()->GetElement("world")->GetElement("scene");
+    EXPECT_EQ(presetManager->CreateProfile(sceneSDF), "");
+    EXPECT_FALSE(presetManager->ProfileSDF("default_physics", sceneSDF));
   }
 }
 

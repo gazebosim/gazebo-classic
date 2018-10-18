@@ -19,6 +19,7 @@
 
 #include <map>
 #include <string>
+#include <mutex>
 #include "gazebo/physics/PhysicsEngine.hh"
 
 namespace gazebo
@@ -38,8 +39,10 @@ namespace gazebo
 
       /// \brief Name of this preset profile
       public: std::string name;
+
       /// \brief Map of key, parameter pairs
       public: std::map<std::string, boost::any> parameterMap;
+
       /// \brief SDF for the physics element represented by this object
       public: sdf::ElementPtr elementSDF;
     };
@@ -52,10 +55,15 @@ namespace gazebo
     {
       /// \brief Name of the current preset
       public: std::string currentPreset;
+
       /// \brief Map of all known preset profile pairs keyed by name
       public: std::map<std::string, Preset> presetProfiles;
+
       /// \brief Physics engine instrumented by this PresetManager
       public: PhysicsEnginePtr physicsEngine;
+
+      /// \brief Mutex to protect setting the current preset profile.
+      public: std::mutex currentProfileMutex;
     };
   }
 }

@@ -49,10 +49,6 @@ namespace gazebo
       /// \return The name of the preset profile.
       public: std::string Name() const;
 
-      /// \brief Set the profile name.
-      /// \param[in] _name The new name of the preset profile.
-      public: void Name(const std::string &_name);
-
       /// \brief Get a profile parameter.
       /// \param[in] _key The key of the parameter to retrieve.
       /// \param[out] _value The parameter value at the input key.
@@ -84,12 +80,9 @@ namespace gazebo
 
       /// \brief Recursive helper for SetAllParamsFromSDF.
       /// \param[in] _elem The physics SDF element from which to read values.
-      /// \param[in] _result Recursively carries the result of parent calls to
-      /// this function.
       /// \return True if setting all parameters in one level of SDF was
       /// successful.
-      private: bool SetAllParamsHelper(const sdf::ElementPtr _elem,
-          bool _result);
+      private: bool SetAllParamsHelper(const sdf::ElementPtr _elem);
 
       /// \brief Get this preset profile's SDF
       /// \return An SDF element pointer representing a <physics> element
@@ -97,7 +90,8 @@ namespace gazebo
 
       /// \brief Set this preset profile's SDF
       /// \param[in] _sdfElement Pointer to an SDF physics element.
-      public: void SDF(const sdf::ElementPtr _sdfElement);
+      /// \return True if setting the profile SDF was successful.
+      public: bool SDF(const sdf::ElementPtr _sdfElement);
 
       /// \brief Private data pointer for PIMPL
       private: PresetPrivate *dataPtr;
@@ -192,26 +186,27 @@ namespace gazebo
       /// \brief Set the SDF for a profile.
       /// \param[in] _name The name of the profile to set.
       /// \param[in] _sdf The new SDF physics element for the profile.
-      public: void ProfileSDF(const std::string &_name,
+      /// \return True if setting the new SDF element was successful.
+      public: bool ProfileSDF(const std::string &_name,
           const sdf::ElementPtr _sdf);
 
       /// \brief Generate an SDF element from an Preset object.
-      /// \param[out] _sdf The SDF physics element for the profile.
-      /// \param[in] _preset The preset profile element.
-      public: void GenerateSDFFromPreset(sdf::ElementPtr &_elem,
-          const std::string &_name) const;
+      /// \param[in] _name The name of the profile to copy.
+      /// \param[out] _elem The SDF physics element for the profile.
+      public: void GenerateSDFFromPreset(const std::string &_name,
+          sdf::ElementPtr &_elem) const;
 
       /// \brief Recursive helper for traversing SDF elements.
-      /// \param[out] _sdf The SDF physics element for the profile.
-      /// \param[in] _name The name of the profile to copy.
-      private: void GenerateSDFHelper(sdf::ElementPtr &_elem,
-          const Preset &_preset) const;
+      /// \param[in] _preset The preset profile element.
+      /// \param[out] _elem The SDF physics element for the profile.
+      private: void GenerateSDFHelper(const Preset &_preset,
+          sdf::ElementPtr &_elem) const;
 
       /// \brief Generate a Preset object from an SDF pointer
-      /// \param[out] _param The preset profile element.
-      /// \param[in] _sdf The SDF physics element for the profile.
-      private: void GeneratePresetFromSDF(Preset *_preset,
-          const sdf::ElementPtr _elem) const;
+      /// \param[in] _elem The SDF physics element for the profile.
+      /// \param[out] _preset The preset profile element.
+      private: void GeneratePresetFromSDF(const sdf::ElementPtr _elem,
+          Preset &_preset) const;
 
       /// \brief Get a pointer to the current profile preset.
       /// \return Pointer to the current profile preset object.

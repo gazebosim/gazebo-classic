@@ -18,6 +18,8 @@
 #ifndef _COMVISUAL_PRIVATE_HH_
 #define _COMVISUAL_PRIVATE_HH_
 
+#include <string>
+
 #include "gazebo/rendering/VisualPrivate.hh"
 
 namespace ogre
@@ -39,6 +41,15 @@ namespace gazebo
 
       /// \brief Sphere with density of lead and equivalent mass.
       public: Ogre::SceneNode *sphereNode;
+
+      /// \brief Inertia pose in link frame.
+      public: math::Pose inertiaPose;
+
+      /// \brief Parent link name.
+      public: std::string linkName;
+
+      /// \brief Link mass.
+      public: double mass;
     };
   }
 }
