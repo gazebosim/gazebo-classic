@@ -14,25 +14,22 @@
  * limitations under the License.
  *
 */
+#ifndef _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
+#define _GAZEBO_GUI_TERRAINEDITOR_PRIVATE_HH_
 
-#ifndef _GAZEBO_MODEL_EDITOR_TEST_HH_
-#define _GAZEBO_MODEL_EDITOR_TEST_HH_
-
-#include "gazebo/gui/QTestFixture.hh"
-
-/// \brief A test class for the ModelEditor class.
-class ModelEditor_TEST : public QTestFixture
+namespace gazebo
 {
-  Q_OBJECT
+  namespace gui
+  {
+    class TerrainEditorPalette;
 
-  /// \brief Tests adding an item to the model editor palette.
-  private slots: void AddItemToPalette();
-
-  /// \brief Tests entering and exiting model editor mode.
-  private slots: void OnEdit();
-
-  /// \brief Tests the visibility of the insert tab.
-  private slots: void InsertTab();
-};
-
+    /// \class TerrainEditorPrivate TerrainEditorPrivate.hh
+    /// \brief Private data for the TerrainEditorPrivate class.
+    class TerrainEditorPrivate
+    {
+      /// \brief Contains all the terrain editor tools.
+      public: TerrainEditorPalette *terrainPalette;
+    };
+  }
+}
 #endif
