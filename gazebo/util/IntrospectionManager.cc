@@ -153,14 +153,16 @@ void IntrospectionManager::Update()
   {
     auto &item = observedItem.first;
 
+    auto itemIter = this->dataPtr->allItems.find(item);
+
     // Sanity check: Make sure that we can update the item.
-    if (this->dataPtr->allItems.find(item) == this->dataPtr->allItems.end())
+    if (itemIter == this->dataPtr->allItems.end())
       continue;
 
     // Update the values of the items under observation.
-    auto &callback = this->dataPtr->allItems[item].cb;
     gazebo::msgs::Any value;
-    if (!callback(value))
+
+    if (!itemIter->second.cb(value))
     {
       gzerr << "Something went wrong updating the value for item [" << item
             << "]." << std::endl;
@@ -362,7 +364,8 @@ void IntrospectionManager::NewFilter(const gazebo::msgs::Param_V &_req,
     auto param = _req.param(i);
     if (!this->ValidateParameter(param, {"item"}))
     {
-      gzwarn << "Ignoring request." << std::endl;
+      gzwarn << "Invalid parameter[" << param.name() << "] "
+        << "Ignoring request." << std::endl;
       return;
     }
 

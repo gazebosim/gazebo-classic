@@ -43,9 +43,28 @@ IntrospectionClient::IntrospectionClient()
 //////////////////////////////////////////////////
 IntrospectionClient::~IntrospectionClient()
 {
-  // Remove all the filters from the manager.
-  for (auto const &filter : this->dataPtr->filters)
-    this->RemoveFilter(filter.second, filter.first);
+  this->RemoveAllFilters();
+}
+
+//////////////////////////////////////////////////
+std::set<std::string> IntrospectionClient::WaitForManagers(
+    const std::chrono::milliseconds _timeOut) const
+{
+  std::set<std::string> result;
+  result = this->Managers();
+
+  auto dur = std::chrono::milliseconds(500);
+  std::chrono::milliseconds slept(0);
+
+  while (result.empty() && (_timeOut == std::chrono::milliseconds::zero() ||
+                            slept < _timeOut))
+  {
+    std::this_thread::sleep_for(dur);
+    slept += dur;
+    result = this->Managers();
+  }
+
+  return result;
 }
 
 //////////////////////////////////////////////////
@@ -149,6 +168,18 @@ bool IntrospectionClient::UpdateFilter(const std::string &_managerId,
 }
 
 //////////////////////////////////////////////////
+bool IntrospectionClient::RemoveAllFilters() const
+{
+  bool result = true;
+
+  // Remove all the filters from the manager.
+  for (auto const &filter : this->dataPtr->filters)
+    result = result && this->RemoveFilter(filter.second, filter.first);
+
+  return result;
+}
+
+//////////////////////////////////////////////////
 bool IntrospectionClient::RemoveFilter(const std::string &_managerId,
     const std::string &_filterId) const
 {
@@ -202,4 +233,38 @@ bool IntrospectionClient::Items(const std::string &_managerId,
     _items.emplace(param.value().string_value());
   }
   return true;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::IsRegistered(const std::string &_managerId,
+    const std::string &_item) const
+{
+  std::set<std::string> items;
+
+  if (this->Items(_managerId, items))
+  {
+    if (items.find(_item) != items.end())
+      return true;
+  }
+
+  return false;
+}
+
+//////////////////////////////////////////////////
+bool IntrospectionClient::IsRegistered(const std::string &_managerId,
+    const std::set<std::string> &_items) const
+{
+  std::set<std::string> items;
+
+  if (this->Items(_managerId, items))
+  {
+    for (auto const &item : _items)
+    {
+      if (items.find(item) == items.end())
+        return false;
+    }
+    return true;
+  }
+
+  return false;
 }

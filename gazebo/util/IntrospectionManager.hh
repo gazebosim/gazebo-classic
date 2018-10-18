@@ -71,7 +71,7 @@ namespace gazebo
 
       /// \brief Update all the items under observation and publish updates
       /// through all the topics. The message received in the update will
-      /// contain the name and last values of all the items specified
+      /// contain the name and latest values of all the items specified
       /// in the filter.
       public: void Update();
 
@@ -95,7 +95,7 @@ namespace gazebo
 
       /// \brief Update an existing filter with a different set of items.
       /// \param[in] _filterId ID of the filter to update.
-      /// \param[in] _NewItems Non-empty set of items to be observed.
+      /// \param[in] _newItems Non-empty set of items to be observed.
       /// \return True if the filter was successfuly updated or false otherwise.
       private: bool UpdateFilter(const std::string &_filterId,
                                  const std::set<std::string> &_newItems);

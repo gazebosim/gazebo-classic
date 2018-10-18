@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 #define _GAZEBO_UTIL_INTROSPECTION_CLIENT_HH_
 
+#include <chrono>
 #include <memory>
 #include <set>
 #include <string>
@@ -41,6 +42,19 @@ namespace gazebo
 
       /// \brief Destructor.
       public: virtual ~IntrospectionClient();
+
+      /// \brief Wait for introspection managers to appear on the network.
+      /// This function is useful for clients that want to pause until
+      /// one or more IntrospectionManagers becomes available (such as
+      /// when gzserver is run).
+      /// \param[in] _timeOut Maximum duration to wait. A value of
+      /// std::chrono::duration::zero indicates that the function should
+      /// wait indefinitely. An indefinite wait is the default behavior.
+      /// \return List of available managers.
+      /// \sa Managers()
+      public: std::set<std::string> WaitForManagers(
+                  const std::chrono::milliseconds _timeOut =
+                  std::chrono::milliseconds::zero()) const;
 
       /// \brief Get the list of introspection managers currently available.
       /// \return Set of unique manager IDs.
@@ -70,6 +84,11 @@ namespace gazebo
                                 const std::string &_filterId,
                                 const std::set<std::string> &_newItems) const;
 
+      /// \brief Remove all existing filters.
+      /// \return True if the filters wer successfully removed
+      /// or false otherwise
+      public: bool RemoveAllFilters() const;
+
       /// \brief Remove an existing filter.
       /// \param[in] _managerID ID of the manager to request the operation.
       /// \param[in] _filterId ID of the filter to remove.
@@ -84,6 +103,24 @@ namespace gazebo
       /// (wrong managerID, transport problem).
       public: bool Items(const std::string &_managerId,
                          std::set<std::string> &_items) const;
+
+      /// \bried Check if the _item is registered on a manager with
+      /// _managerId.
+      /// \param[in] _managerId Id of the manager to query.
+      /// \param[in] _item Item name for the query.
+      /// \return True if the introspection manager with ID==_managerId has
+      /// an item registered with name == _item.
+      public: bool IsRegistered(const std::string &_managerId,
+                                const std::string &_item) const;
+
+      /// \bried Check if the _items are registered on a manager with
+      /// _managerId.
+      /// \param[in] _managerId Id of the manager to query.
+      /// \param[in] _items Set of item names for the query.
+      /// \return True if the introspection manager with ID==_managerId has
+      /// all the items registered.
+      public: bool IsRegistered(const std::string &_managerId,
+                                const std::set<std::string> &_items) const;
 
       /// \internal
       /// \brief Private data pointer.
