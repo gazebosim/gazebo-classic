@@ -14,21 +14,22 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_PHYSICS_ATMOSPHERE_HH_
-#define _GAZEBO_PHYSICS_ATMOSPHERE_HH_
+#ifndef GAZEBO_PHYSICS_ATMOSPHERE_HH_
+#define GAZEBO_PHYSICS_ATMOSPHERE_HH_
 
 #include <memory>
 #include <string>
 
 #include "gazebo/msgs/msgs.hh"
 
-#include "gazebo/physics/PhysicsTypes.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
 {
   namespace physics
   {
+    class World;
+
     /// \addtogroup gazebo_physics
     /// \{
 
@@ -41,8 +42,8 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE Atmosphere
     {
       /// \brief Default constructor.
-      /// \param[in] _world Pointer to the world.
-      public: explicit Atmosphere(WorldPtr _world);
+      /// \param[in] _world Reference to the world.
+      public: explicit Atmosphere(physics::World &_world);
 
       /// \brief Destructor.
       public: virtual ~Atmosphere();
@@ -50,12 +51,6 @@ namespace gazebo
       /// \brief Load the atmosphere model.
       /// \param[in] _sdf Pointer to the SDF parameters.
       public: virtual void Load(sdf::ElementPtr _sdf);
-
-      /// \brief Initialize the atmosphere model.
-      public: virtual void Init() = 0;
-
-      /// \brief Finalize the atmosphere model.
-      public: virtual void Fini();
 
       /// \brief Reset the atmosphere model.
       public: virtual void Reset();
@@ -117,8 +112,8 @@ namespace gazebo
       protected: void UpdateMassDensity();
 
       /// \brief Return the world.
-      /// \return Pointer to the world.
-      protected: WorldPtr World() const;
+      /// \return Reference to the world.
+      protected: physics::World &World() const;
 
       /// \brief Publish response to a request.
       /// \param[in] _msg Message to be published.

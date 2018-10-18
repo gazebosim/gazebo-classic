@@ -62,7 +62,7 @@ namespace gazebo
       public: CameraLens();
 
       /// \brief Destructor
-      public: ~CameraLens() = default;
+      public: virtual ~CameraLens();
 
       /// \brief Init custom camera lens with specified parameters
       /// \param[in] _c1 Image scaling factor
@@ -195,6 +195,7 @@ namespace gazebo
 
       // Documentation inherited
       public: void Load() override;
+      using Camera::Load;
 
       // Documentation inherited
       public: virtual void Fini() override;

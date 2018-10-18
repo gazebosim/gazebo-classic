@@ -47,7 +47,7 @@ namespace gazebo
       public: WideAngleCameraSensor();
 
       /// \brief Destructor
-      public: virtual ~WideAngleCameraSensor() = default;
+      public: virtual ~WideAngleCameraSensor();
 
       // Documentation inherited
       public: void Load(const std::string &_worldName) override;

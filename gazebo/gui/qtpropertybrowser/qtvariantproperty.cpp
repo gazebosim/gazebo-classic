@@ -343,10 +343,10 @@ void QtVariantPropertyManagerPrivate::removeSubProperty(
   QtProperty *internChild = wrappedProperty(property);
   bool wasDestroyingSubProperties = m_destroyingSubProperties;
   m_destroyingSubProperties = true;
-  delete property;
   m_destroyingSubProperties = wasDestroyingSubProperties;
   m_internalToProperty.remove(internChild);
   propertyToWrappedProperty()->remove(property);
+  delete property;
 }
 
 void QtVariantPropertyManagerPrivate::slotPropertyInserted(QtProperty *property,

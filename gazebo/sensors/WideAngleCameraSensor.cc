@@ -53,6 +53,11 @@ WideAngleCameraSensor::WideAngleCameraSensor()
 }
 
 //////////////////////////////////////////////////
+WideAngleCameraSensor::~WideAngleCameraSensor()
+{
+}
+
+//////////////////////////////////////////////////
 void WideAngleCameraSensor::Init()
 {
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==

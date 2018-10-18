@@ -54,6 +54,8 @@ Preset::Preset(const std::string &_name)
 //////////////////////////////////////////////////
 Preset::~Preset()
 {
+  this->dataPtr->elementSDF.reset();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
@@ -245,7 +247,9 @@ PresetManager::PresetManager(PhysicsEnginePtr _physicsEngine,
 //////////////////////////////////////////////////
 PresetManager::~PresetManager()
 {
+  this->dataPtr->physicsEngine.reset();
   this->dataPtr->presetProfiles.clear();
+
   delete this->dataPtr;
   this->dataPtr = NULL;
 }
