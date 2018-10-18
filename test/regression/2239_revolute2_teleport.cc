@@ -30,7 +30,8 @@ class Issue2239Test: public JointTest
 };
 
 /////////////////////////////////////////////////
-void Issue2239Test::TestRevolute2JointTeleport(const std::string &_physicsEngine)
+void Issue2239Test::TestRevolute2JointTeleport(
+    const std::string &_physicsEngine)
 {
   this->Load("worlds/empty.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -58,9 +59,9 @@ void Issue2239Test::TestRevolute2JointTeleport(const std::string &_physicsEngine
 
   world->Step(1);
 
-  const auto childPos = childLink->WorldCoGPose().Pos(); 
+  const auto childPos = childLink->WorldCoGPose().Pos();
   const double tolerance = 1e-4;
-  // We expect the child link to be in the same position as it was when it was 
+  // We expect the child link to be in the same position as it was when it was
   // created. The regression is that the child link teleports to the origin.
   EXPECT_NEAR(childPos.X(), opt.childLinkPose.Pos().X(), tolerance);
   EXPECT_NEAR(childPos.Y(), opt.childLinkPose.Pos().Y(), tolerance);
