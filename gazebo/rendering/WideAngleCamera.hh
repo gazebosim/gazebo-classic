@@ -222,6 +222,9 @@ namespace gazebo
       public: void SetClipDist() override;
       using Camera::SetClipDist;
 
+      // Documentation inherited
+      public: bool SetBackgroundColor(const common::Color &_color) override;
+
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture
       protected: void CreateEnvRenderTexture(const std::string &_textureName);
