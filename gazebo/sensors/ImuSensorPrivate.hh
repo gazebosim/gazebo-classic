@@ -34,7 +34,7 @@ namespace gazebo
     class ImuSensorPrivate
     {
       /// \brief transform from world frame to Imu reference frame.
-      public: ignition::math::Pose3d worldToReference;
+      public: ignition::math::Quaterniond worldToReference;
 
       /// \brief Save previous imu linear velocity in the specified frame
       /// for computing acceleration in the specified frame.

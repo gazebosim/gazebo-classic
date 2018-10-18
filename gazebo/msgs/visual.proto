@@ -58,7 +58,7 @@ message Visual
   optional bool visible        = 11;
   optional bool delete_me      = 12;
   optional bool is_static      = 13;
-  optional Plugin plugin       = 14;
+  repeated Plugin plugin       = 14;
   optional Vector3d scale      = 15;
 
   /// \brief Option meta information associated with this visual.
