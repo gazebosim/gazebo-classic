@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <include><uri>model://camera</uri></include>
+
+    <model name="heightmap">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <heightmap>
+              <uri>file://media/materials/textures/heightmap_bowl.png</uri>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <heightmap>
+              <uri>file://media/materials/textures/heightmap_bowl.png</uri>
+              <size>129 129 10</size>
+              <pos>0 0 0</pos>
+            </heightmap>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Red</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+    </model>
+  </world>
+</sdf>

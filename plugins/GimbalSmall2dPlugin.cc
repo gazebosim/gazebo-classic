@@ -20,15 +20,15 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/physics/physics.hh"
 #include "gazebo/transport/transport.hh"
-#include "Small2dGimbalPlugin.hh"
+#include "GimbalSmall2dPlugin.hh"
 
 using namespace gazebo;
 using namespace std;
 
-GZ_REGISTER_MODEL_PLUGIN(Small2dGimbalPlugin)
+GZ_REGISTER_MODEL_PLUGIN(GimbalSmall2dPlugin)
 
 /// \brief Private data class
-class gazebo::Small2dGimbalPluginPrivate
+class gazebo::GimbalSmall2dPluginPrivate
 {
   /// \brief Callback when a command string is received.
   /// \param[in] _msg Mesage containing the command string
@@ -63,29 +63,41 @@ class gazebo::Small2dGimbalPluginPrivate
 };
 
 /////////////////////////////////////////////////
-Small2dGimbalPlugin::Small2dGimbalPlugin()
-  : dataPtr(new Small2dGimbalPluginPrivate)
+GimbalSmall2dPlugin::GimbalSmall2dPlugin()
+  : dataPtr(new GimbalSmall2dPluginPrivate)
 {
   this->dataPtr->pid.Init(1, 0, 0, 0, 0, 1.0, -1.0);
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPlugin::Load(physics::ModelPtr _model,
-  sdf::ElementPtr /*_sdf*/)
+void GimbalSmall2dPlugin::Load(physics::ModelPtr _model,
+  sdf::ElementPtr _sdf)
 {
   this->dataPtr->model = _model;
-  std::string jointName = _model->GetName() + "::tilt_joint";
-  this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
 
+  std::string jointName = "tilt_joint";
+  if (_sdf->HasElement("joint"))
+  {
+    jointName = _sdf->Get<std::string>("joint");
+  }
+  this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(jointName);
   if (!this->dataPtr->tiltJoint)
   {
-    gzerr << "Small2dGimbalPlugin::Load ERROR! Can't get joint '"
+    std::string scopedJointName = _model->GetScopedName() + "::" + jointName;
+    gzwarn << "joint [" << jointName
+           << "] not found, trying again with scoped joint name ["
+           << scopedJointName << "]\n";
+    this->dataPtr->tiltJoint = this->dataPtr->model->GetJoint(scopedJointName);
+  }
+  if (!this->dataPtr->tiltJoint)
+  {
+    gzerr << "GimbalSmall2dPlugin::Load ERROR! Can't get joint '"
           << jointName << "' " << endl;
   }
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPlugin::Init()
+void GimbalSmall2dPlugin::Init()
 {
   this->dataPtr->node = transport::NodePtr(new transport::Node());
   this->dataPtr->node->Init(this->dataPtr->model->GetWorld()->GetName());
@@ -96,10 +108,10 @@ void Small2dGimbalPlugin::Init()
   std::string topic = std::string("~/") +  this->dataPtr->model->GetName() +
     "/gimbal_tilt_cmd";
   this->dataPtr->sub = this->dataPtr->node->Subscribe(topic,
-      &Small2dGimbalPluginPrivate::OnStringMsg, this->dataPtr.get());
+      &GimbalSmall2dPluginPrivate::OnStringMsg, this->dataPtr.get());
 
   this->dataPtr->connections.push_back(event::Events::ConnectWorldUpdateBegin(
-          boost::bind(&Small2dGimbalPlugin::OnUpdate, this)));
+          std::bind(&GimbalSmall2dPlugin::OnUpdate, this)));
 
   topic = std::string("~/") +
     this->dataPtr->model->GetName() + "/gimbal_tilt_status";
@@ -109,13 +121,13 @@ void Small2dGimbalPlugin::Init()
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPluginPrivate::OnStringMsg(ConstGzStringPtr &_msg)
+void GimbalSmall2dPluginPrivate::OnStringMsg(ConstGzStringPtr &_msg)
 {
   this->command = atof(_msg->data().c_str());
 }
 
 /////////////////////////////////////////////////
-void Small2dGimbalPlugin::OnUpdate()
+void GimbalSmall2dPlugin::OnUpdate()
 {
   if (!this->dataPtr->tiltJoint)
     return;

@@ -111,6 +111,9 @@ namespace gazebo
 
       /// \brief Mutex to protect selectedVisuals array.
       public: std::mutex selectedVisMutex;
+
+      /// \brief Timer used to update the render window.
+      public: QTimer *updateTimer = nullptr;
     };
   }
 }

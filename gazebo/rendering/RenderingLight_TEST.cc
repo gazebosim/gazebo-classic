@@ -57,6 +57,52 @@ TEST_F(Light_TEST, LightVisualTest)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Light_TEST, CastShadows)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+
+  if (!scene)
+    scene = gazebo::rendering::create_scene("default", false);
+
+  ASSERT_TRUE(scene != nullptr);
+
+  // create a directional light and verify type and cast shadows.
+  gazebo::rendering::LightPtr dirLight(new gazebo::rendering::Light(scene));
+  msgs::Light msg;
+  msg.set_type(gazebo::msgs::Light::DIRECTIONAL);
+  msg.set_cast_shadows(true);
+  dirLight->LoadFromMsg(msg);
+  EXPECT_EQ(dirLight->LightType(), "directional");
+  EXPECT_TRUE(dirLight->CastShadows());
+  scene->RemoveLight(dirLight);
+  dirLight.reset();
+
+  // create a spot light and verify type and cast shadows.
+  gazebo::rendering::LightPtr spotLight(new gazebo::rendering::Light(scene));
+  msg.set_type(gazebo::msgs::Light::SPOT);
+  msg.set_cast_shadows(true);
+  spotLight->LoadFromMsg(msg);
+  EXPECT_EQ(spotLight->LightType(), "spot");
+  // issue #2083: spot light does not cast shadows
+  EXPECT_FALSE(spotLight->CastShadows());
+  scene->RemoveLight(spotLight);
+  spotLight.reset();
+
+  // create a point light and verify type and cast shadows.
+  gazebo::rendering::LightPtr pointLight(new gazebo::rendering::Light(scene));
+  msg.set_type(gazebo::msgs::Light::POINT);
+  msg.set_cast_shadows(true);
+  pointLight->LoadFromMsg(msg);
+  EXPECT_EQ(pointLight->LightType(), "point");
+  // issue #2083: point light does not cast shadows
+  EXPECT_FALSE(pointLight->CastShadows());
+  scene->RemoveLight(pointLight);
+  pointLight.reset();
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

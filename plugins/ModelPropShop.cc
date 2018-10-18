@@ -202,7 +202,7 @@ void ModelPropShop::Update()
       trans *= -scaling;
 
       // Normalize the size of the visual
-      vis->SetScale(math::Vector3(scaling, scaling, scaling));
+      vis->SetScale(ignition::math::Vector3d(scaling, scaling, scaling));
       vis->SetWorldPose(math::Pose(trans.x, trans.y, trans.z, 0, 0, 0));
 
       // Place the visual at the origin

@@ -19,6 +19,9 @@
 #include <boost/assign/list_of.hpp>
 #include "gazebo/test/ServerFixture.hh"
 
+#include "test_config.h"
+
+
 using namespace gazebo;
 class Heightmap_TEST : public RenderingFixture
 {
@@ -31,18 +34,18 @@ TEST_F(Heightmap_TEST, splitTerrain)
   Load("worlds/empty.world");
 
   gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   scene = gazebo::rendering::create_scene("default", false);
 
   // Make sure that the scene is created
-  ASSERT_TRUE(scene != NULL);
+  ASSERT_TRUE(scene != nullptr);
 
   gazebo::rendering::Heightmap *heightmap =
       new gazebo::rendering::Heightmap(scene);
 
   // Check that the heightmap is created
-  EXPECT_TRUE(heightmap != NULL);
+  EXPECT_TRUE(heightmap != nullptr);
 
   std::vector<float> heights;
   std::vector<std::vector<float> > heightsSplit;
@@ -88,6 +91,58 @@ TEST_F(Heightmap_TEST, splitTerrain)
           slices[i].begin()));
   }
 }
+
+#ifdef HAVE_GDAL
+/////////////////////////////////////////////////
+/// \brief Test Loading a terrain from a DEM file
+TEST_F(Heightmap_TEST, LoadDEM)
+{
+  Load("worlds/empty.world");
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene("default");
+  ASSERT_TRUE(scene != nullptr);
+
+  gazebo::rendering::Heightmap *heightmap =
+      new gazebo::rendering::Heightmap(scene);
+
+  // Check that the heightmap is created
+  EXPECT_TRUE(heightmap != nullptr);
+
+  // create a heightmapgeom msg for the heightmap
+  msgs::Visual msg;
+  msg.set_name("heightmap_visual");
+  msg.set_parent_name("heightmap_visual_parent");
+  auto geomMsg = msg.mutable_geometry();
+  // set size to zero to let heightmap read actual size from dem file
+  msgs::Set(geomMsg->mutable_heightmap()->mutable_size(),
+      ignition::math::Vector3d::Zero);
+
+  boost::filesystem::path path = TEST_PATH;
+  path /= "data/dem_squared.tif";
+  geomMsg->mutable_heightmap()->set_filename(path.string());
+
+  // load the heightmap
+  auto visMsg = new ConstVisualPtr(&msg);
+  heightmap->LoadFromMsg(*visMsg);
+
+  // verify heightmap image size
+  unsigned int subsampling = 2;
+  unsigned int tifSize = 129;
+  unsigned int vertSize = (tifSize * subsampling) - 1;
+  common::Image img = heightmap->Image();
+  EXPECT_EQ(img.GetWidth(), vertSize);
+  EXPECT_EQ(img.GetHeight(), vertSize);
+
+  // verify heights between value obtained using ray casting (heightmap->Height)
+  // and the actual elevation data (dem.GetElevation)
+  common::Dem dem;
+  EXPECT_EQ(dem.Load(path.string()), 0);
+  EXPECT_DOUBLE_EQ(heightmap->Height(0, 0),
+      dem.GetElevation(dem.GetWidth()/2, dem.GetHeight()/2));
+
+  delete heightmap;
+}
+#endif
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)

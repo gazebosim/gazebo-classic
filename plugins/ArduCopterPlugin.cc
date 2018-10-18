@@ -14,6 +14,8 @@
  * limitations under the License.
  *
 */
+#include <functional>
+#include <fcntl.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
@@ -31,6 +33,8 @@
 #include <gazebo/transport/transport.hh>
 #include "plugins/ArduCopterPlugin.hh"
 
+#define MAX_MOTORS 255
+
 using namespace gazebo;
 
 GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
@@ -41,6 +45,7 @@ GZ_REGISTER_MODEL_PLUGIN(ArduCopterPlugin)
 /// \param[out] _param Param Variable to write the parameter to.
 /// \param[in] _default_value Default value, if the parameter not available.
 /// \param[in] _verbose If true, gzerror if the parameter is not available.
+/// \return True if the parameter was found in _sdf, false otherwise.
 template<class T>
 bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
   T &_param, const T &_defaultValue, const bool &_verbose = false)
@@ -64,7 +69,7 @@ bool getSdfParam(sdf::ElementPtr _sdf, const std::string &_name,
 struct ServoPacket
 {
   /// \brief Motor speed data.
-  float motorSpeed[4];
+  float motorSpeed[MAX_MOTORS];
 };
 
 /// \brief Flight Dynamics Model packet that is sent back to the ArduCopter
@@ -120,12 +125,6 @@ class Rotor
 
   /// \brief Control propeller joint.
   public: physics::JointPtr joint;
-
-  /// \brief Control propeller link.
-  public: std::string linkName;
-
-  /// \brief Control propeller link.
-  public: physics::LinkPtr link;
 
   /// \brief direction multiplier for this rotor
   public: double multiplier = 1;
@@ -221,11 +220,19 @@ class gazebo::ArduCopterPluginPrivate
   /// \brief Socket handle
   public: int handle;
 
-  /// \brief Pointer to the link on which the IMU sensor is attached.
-  public: physics::LinkPtr imuLink;
-
   /// \brief Pointer to an IMU sensor
   public: sensors::ImuSensorPtr imuSensor;
+
+  /// \brief false before ardupilot controller is online
+  /// to allow gazebo to continue without waiting
+  public: bool arduCopterOnline;
+
+  /// \brief number of times ArduCotper skips update
+  public: int connectionTimeoutCount;
+
+  /// \brief number of times ArduCotper skips update
+  /// before marking ArduCopter offline
+  public: int connectionTimeoutMaxCount;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -244,6 +251,10 @@ ArduCopterPlugin::ArduCopterPlugin()
     gzerr << "failed to bind with 127.0.0.1:9002, aborting plugin.\n";
     return;
   }
+
+  this->dataPtr->arduCopterOnline = false;
+
+  this->dataPtr->connectionTimeoutCount = 0;
 
   setsockopt(this->dataPtr->handle, SOL_SOCKET, SO_REUSEADDR,
       &one, sizeof(one));
@@ -280,16 +291,9 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       }
       else
       {
-        gzwarn << "id attribute not specified, check motorNumber.\n";
-        if (rotorSDF->HasElement("motorNumber"))
-        {
-          rotor.id = rotorSDF->Get<int>("motorNumber");
-        }
-        else
-        {
-          gzwarn << "motorNumber not specified, use order parsed.\n";
-          rotor.id = this->dataPtr->rotors.size();
-        }
+        rotor.id = this->dataPtr->rotors.size();
+        gzwarn << "id attribute not specified, use order parsed ["
+               << rotor.id << "].\n";
       }
 
       if (rotorSDF->HasElement("jointName"))
@@ -308,22 +312,6 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       {
         gzerr << "Couldn't find specified joint ["
             << rotor.jointName << "]. This plugin will not run.\n";
-        return;
-      }
-
-      if (rotorSDF->HasElement("linkName"))
-        rotor.linkName = rotorSDF->Get<std::string>("linkName");
-      else
-      {
-        gzerr << "Please specify a linkName for the rotor. Aborting plugin.\n";
-        return;
-      }
-
-      rotor.link = _model->GetLink(rotor.linkName);
-      if (rotor.link == nullptr)
-      {
-        gzerr << "Couldn't find specified link ["
-            << rotor.linkName << "]. This plugin will not run\n";
         return;
       }
 
@@ -352,7 +340,7 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
       getSdfParam<double>(rotorSDF, "rotorVelocitySlowdownSim",
           rotor.rotorVelocitySlowdownSim, 1);
 
-      if (math::equal(rotor.rotorVelocitySlowdownSim, 0.0))
+      if (ignition::math::equal(rotor.rotorVelocitySlowdownSim, 0.0))
       {
         gzerr << "rotor for joint [" << rotor.jointName
               << "] rotorVelocitySlowdownSim is zero,"
@@ -407,33 +395,39 @@ void ArduCopterPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     }
   }
 
-  std::string imuLinkName;
-  getSdfParam<std::string>(_sdf, "imuLinkName", imuLinkName, "iris/imu_link");
-  this->dataPtr->imuLink = this->dataPtr->model->GetLink(imuLinkName);
-
   // Get sensors
-  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
-    (sensors::SensorManager::Instance()->GetSensor(
-      this->dataPtr->model->GetWorld()->GetName()
+  std::string imuName;
+  getSdfParam<std::string>(_sdf, "imuName", imuName, "imu_sensor");
+  std::string imuScopedName = this->dataPtr->model->GetWorld()->GetName()
       + "::" + this->dataPtr->model->GetScopedName()
-      + "::iris::iris/imu_link::imu_sensor"));
+      + "::" + imuName;
+  this->dataPtr->imuSensor = std::dynamic_pointer_cast<sensors::ImuSensor>
+    (sensors::SensorManager::Instance()->GetSensor(imuScopedName));
 
   if (!this->dataPtr->imuSensor)
-    gzerr << "imu_sensor not found\n" << "\n";
+  {
+    gzerr << "imu_sensor [" << imuScopedName
+          << "] not found, abort ArduCopter plugin.\n" << "\n";
+    return;
+  }
 
   // Controller time control.
   this->dataPtr->lastControllerUpdateTime = 0;
 
+  // Missed update count before we declare arduCopterOnline status false
+  getSdfParam<int>(_sdf, "connectionTimeoutMaxCount",
+    this->dataPtr->connectionTimeoutMaxCount, 10);
+
   // Listen to the update event. This event is broadcast every simulation
   // iteration.
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
-      boost::bind(&ArduCopterPlugin::Update, this, _1));
+      std::bind(&ArduCopterPlugin::OnUpdate, this));
 
   gzlog << "ArduCopter ready to fly. The force will be with you" << std::endl;
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
+void ArduCopterPlugin::OnUpdate()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
@@ -442,19 +436,33 @@ void ArduCopterPlugin::Update(const common::UpdateInfo &/*_info*/)
   // Update the control surfaces and publish the new state.
   if (curTime > this->dataPtr->lastControllerUpdateTime)
   {
-    this->SendState();
-    this->MotorCommand();
-    this->UpdatePIDs((curTime -
-          this->dataPtr->lastControllerUpdateTime).Double());
+    this->ReceiveMotorCommand();
+    if (this->dataPtr->arduCopterOnline)
+    {
+      this->ApplyMotorForces((curTime -
+        this->dataPtr->lastControllerUpdateTime).Double());
+      this->SendState();
+    }
   }
 
   this->dataPtr->lastControllerUpdateTime = curTime;
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::UpdatePIDs(const double _dt)
+void ArduCopterPlugin::ResetPIDs()
 {
-  // Position PID for rotors
+  // Reset velocity PID for rotors
+  for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
+  {
+    this->dataPtr->rotors[i].cmd = 0;
+    // this->dataPtr->rotors[i].pid.Reset();
+  }
+}
+
+/////////////////////////////////////////////////
+void ArduCopterPlugin::ApplyMotorForces(const double _dt)
+{
+  // update velocity PID for rotors and apply force to joint
   for (size_t i = 0; i < this->dataPtr->rotors.size(); ++i)
   {
     double velTarget = this->dataPtr->rotors[i].multiplier *
@@ -468,25 +476,85 @@ void ArduCopterPlugin::UpdatePIDs(const double _dt)
 }
 
 /////////////////////////////////////////////////
-void ArduCopterPlugin::MotorCommand()
+void ArduCopterPlugin::ReceiveMotorCommand()
 {
+  // Added detection for whether ArduCopter is online or not.
+  // If ArduCopter is detected (receive of fdm packet from someone),
+  // then socket receive wait time is increased from 1ms to 1 sec
+  // to accomodate network jitter.
+  // If ArduCopter is not detected, receive call blocks for 1ms
+  // on each call.
+  // Once ArduCopter presence is detected, it takes this many
+  // missed receives before declaring the FCS offline.
+
   ServoPacket pkt;
-  while (this->dataPtr->Recv(&pkt, sizeof(pkt), 100) != sizeof(pkt))
+  int waitMs = 1;
+  if (this->dataPtr->arduCopterOnline)
   {
-    // Experimental call below, uncomment to test:
-    //   re-send the servo packet every 0.1 seconds until we get a
-    //   reply. This allows us to cope with some packet loss to the FDM
-    // send_servos(input);
-
-    // sleep before retry if Recv returned false
-    gazebo::common::Time::NSleep(100);
+    // increase timeout for receive once we detect a packet from
+    // ArduCopter FCS.
+    waitMs = 1000;
   }
-
-  for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
+  else
   {
-    // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
-    this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
-      pkt.motorSpeed[i];
+    // Otherwise skip quickly and do not set control force.
+    waitMs = 1;
+  }
+  ssize_t recvSize = this->dataPtr->Recv(&pkt, sizeof(ServoPacket), waitMs);
+  ssize_t expectedPktSize =
+    sizeof(pkt.motorSpeed[0])*this->dataPtr->rotors.size();
+  if ((recvSize == -1) || (recvSize < expectedPktSize))
+  {
+    // didn't receive a packet
+    // gzerr << "no packet\n";
+    if (recvSize != -1)
+    {
+      gzerr << "received bit size (" << recvSize << ") to small,"
+            << " controller expected size (" << expectedPktSize << ").\n";
+    }
+
+    gazebo::common::Time::NSleep(100);
+    if (this->dataPtr->arduCopterOnline)
+    {
+      gzwarn << "Broken ArduCopter connection, count ["
+             << this->dataPtr->connectionTimeoutCount
+             << "/" << this->dataPtr->connectionTimeoutMaxCount
+             << "]\n";
+      if (++this->dataPtr->connectionTimeoutCount >
+        this->dataPtr->connectionTimeoutMaxCount)
+      {
+        this->dataPtr->connectionTimeoutCount = 0;
+        this->dataPtr->arduCopterOnline = false;
+        gzwarn << "Broken ArduCopter connection, resetting motor control.\n";
+        this->ResetPIDs();
+      }
+    }
+  }
+  else
+  {
+    if (!this->dataPtr->arduCopterOnline)
+    {
+      gzdbg << "ArduCopter controller online detected.\n";
+      // made connection, set some flags
+      this->dataPtr->connectionTimeoutCount = 0;
+      this->dataPtr->arduCopterOnline = true;
+    }
+
+    // compute command based on requested motorSpeed
+    for (unsigned i = 0; i < this->dataPtr->rotors.size(); ++i)
+    {
+      if (i < MAX_MOTORS)
+      {
+        // std::cout << i << ": " << pkt.motorSpeed[i] << "\n";
+        this->dataPtr->rotors[i].cmd = this->dataPtr->rotors[i].maxRpm *
+          pkt.motorSpeed[i];
+      }
+      else
+      {
+        gzerr << "too many motors, skipping [" << i
+              << " > " << MAX_MOTORS << "].\n";
+      }
+    }
   }
 }
 
