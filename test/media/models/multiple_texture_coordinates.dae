@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+
+  <library_geometries>
+    <geometry id="geom" name="triangle">
+      <mesh>
+        <source id="positions">
+          <float_array id="positions-array" count="9">
+            0 0 0
+            10 0 0
+            10 10 0
+          </float_array>
+          <technique_common>
+            <accessor source="#positions-array" count="3" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+
+        <source id="normals">
+          <float_array id="normals-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#normals-array" count="1" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+
+        <source id="map1">
+          <float_array id="map1-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#map1-array" count="1" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+
+        <source id="map2">
+          <float_array id="map2-array" count="3">0 0 1</float_array>
+          <technique_common>
+            <accessor source="#map2-array" count="1" stride="3">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+              <param name="P" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+
+        <vertices id="vertices">
+          <input semantic="POSITION" source="#positions"/>
+        </vertices>
+
+        <polylist count="1">
+          <input semantic="VERTEX" source="#vertices" offset="0"/>
+          <input semantic="NORMAL" source="#normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#map1" offset="2" set="0"/>
+          <input semantic="TEXCOORD" source="#map2" offset="3" set="2"/>
+          <vcount>3</vcount>
+          <p>
+            0 0 0 0
+            1 0 0 0
+            2 0 0 0
+          </p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+
+  <library_visual_scenes>
+    <visual_scene id="scene">
+      <node id="node" name="triangle">
+        <instance_geometry url="#geom"/>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+
+  <scene>
+    <instance_visual_scene url="#scene"/>
+  </scene>
+</COLLADA>

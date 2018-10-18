@@ -426,21 +426,9 @@ bool OpenALSource::SetLoop(bool _state)
 }
 
 /////////////////////////////////////////////////
-std::vector<std::string> OpenALSource::GetCollisionNames() const
-{
-  return this->CollisionNames();
-}
-
-/////////////////////////////////////////////////
 std::vector<std::string> OpenALSource::CollisionNames() const
 {
   return this->dataPtr->collisionNames;
-}
-
-/////////////////////////////////////////////////
-bool OpenALSource::GetOnContact() const
-{
-  return this->OnContact();
 }
 
 /////////////////////////////////////////////////

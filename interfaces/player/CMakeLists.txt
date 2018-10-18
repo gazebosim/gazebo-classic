@@ -5,7 +5,6 @@ set (sources GazeboDriver.cc
              Position2dInterface.cc
              LaserInterface.cc
              CameraInterface.cc
-             ../../gazebo/gazebo.cc
 )
              #Position3dInterface.cc
              #FiducialInterface.cc
@@ -29,15 +28,25 @@ link_directories(
   ${SDFormat_LIBRARY_DIRS} 
 )
 
+if (HAVE_BULLET)
+  link_directories(${BULLET_LIBRARY_DIRS})
+endif()
+
+if (HAVE_DART)
+  link_directories(${DARTCore_LIBRARY_DIRS})
+endif()
+
 link_directories(${PLAYER_LINK_DIRS} ${Boost_LIBRARY_DIRS})
 
 gz_add_library(gazebo_player ${sources})
 target_link_libraries(gazebo_player ${PLAYER_LINK_LIBS}
 libgazebo_client
 gazebo_common
-gazebo_transport
 gazebo_msgs
 gazebo_math
+gazebo_physics
+gazebo_sensors
+gazebo_transport
 gazebo_util
 )
 
