@@ -27,10 +27,10 @@ int main(int _argc, char **_argv)
   if (_argc != 7)
   {
     std::cerr << "Invalid usage.\n\n"
-      << "Usage:\n    harness "
+      << "Usage:\n    harness_attach "
       << "<float_x> <float_y> <float_z> "
       << "<float_roll> <float_pitch> <float_yaw>\n\n"
-      << "Example:\n    harness 0 0 1.5 0 0 1.5708\n";
+      << "Example:\n    harness_attach 0 0 1.5 0 0 1.5708\n";
     return -1;
   }
 
