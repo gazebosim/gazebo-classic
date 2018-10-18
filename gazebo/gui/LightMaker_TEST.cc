@@ -30,7 +30,7 @@ void LightMaker_TEST::PointLight()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -109,7 +109,7 @@ void LightMaker_TEST::CopyLight()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/spotlight.world");
+  this->Load("worlds/spotlight.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

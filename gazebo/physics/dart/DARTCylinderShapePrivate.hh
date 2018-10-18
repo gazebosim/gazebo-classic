@@ -30,10 +30,16 @@ namespace gazebo
     class DARTCylinderShapePrivate
     {
       /// \brief Constructor
-      public: DARTCylinderShapePrivate() = default;
+      public: DARTCylinderShapePrivate()
+        : dtCylinderShape(new dart::dynamics::CylinderShape(1, 1))
+      {
+      }
 
       /// \brief Default destructor
       public: ~DARTCylinderShapePrivate() = default;
+
+      /// \brief DART cylinder shape
+      public: std::shared_ptr<dart::dynamics::CylinderShape> dtCylinderShape;
     };
   }
 }

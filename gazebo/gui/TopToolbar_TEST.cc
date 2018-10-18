@@ -28,7 +28,7 @@ void TopToolbar_TEST::WindowModes()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -97,7 +97,7 @@ void TopToolbar_TEST::Insert()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
@@ -165,7 +165,7 @@ void TopToolbar_TEST::Add()
   this->resMaxPercentChange = 5.0;
   this->shareMaxPercentChange = 2.0;
 
-  this->Load("worlds/empty.world");
+  this->Load("worlds/empty.world", false, false, false);
 
   // Create the main window.
   gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();

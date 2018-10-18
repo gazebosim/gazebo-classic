@@ -30,11 +30,18 @@ namespace gazebo
     class DARTBoxShapePrivate
     {
       /// \brief Constructor
-      public: DARTBoxShapePrivate() = default;
+      public: DARTBoxShapePrivate()
+        : dtBoxShape(new dart::dynamics::BoxShape(Eigen::Vector3d(1, 1, 1)))
+      {
+      }
 
       /// \brief Default destructor
       public: ~DARTBoxShapePrivate() = default;
+
+      /// \brief DART box shape
+      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
     };
   }
 }
+
 #endif

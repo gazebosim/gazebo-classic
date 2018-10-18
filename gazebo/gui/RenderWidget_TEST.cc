@@ -24,7 +24,7 @@ void RenderWidget_TEST::InsertWidget()
   // Create a new render widget
   gazebo::gui::RenderWidget *renderWidget = new gazebo::gui::RenderWidget;
 
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Get the splitter widget
   QSplitter *splitter = renderWidget->findChild<QSplitter *>();

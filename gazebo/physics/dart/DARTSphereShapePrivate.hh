@@ -30,10 +30,17 @@ namespace gazebo
     class DARTSphereShapePrivate
     {
       /// \brief Constructor
-      public: DARTSphereShapePrivate() = default;
+      public: DARTSphereShapePrivate()
+        : dtEllipsoidShape(
+            new dart::dynamics::EllipsoidShape(Eigen::Vector3d(1, 1, 1)))
+      {
+      }
 
       /// \brief Default destructor
       public: ~DARTSphereShapePrivate() = default;
+
+      /// \brief DART sphere shape
+      public: std::shared_ptr<dart::dynamics::EllipsoidShape> dtEllipsoidShape;
     };
   }
 }

@@ -30,10 +30,20 @@ namespace gazebo
     class DARTPlaneShapePrivate
     {
       /// \brief Constructor
-      public: DARTPlaneShapePrivate() = default;
+      public: DARTPlaneShapePrivate()
+        : dtBoxShape(new dart::dynamics::BoxShape(
+                       Eigen::Vector3d(2100, 2100, 2100)))
+      {
+        this->dtBoxShape->setOffset(Eigen::Vector3d(0.0, 0.0, -2100*0.5));
+      }
 
       /// \brief Default destructor
       public: ~DARTPlaneShapePrivate() = default;
+
+      /// \brief DART box shape
+      public: std::shared_ptr<dart::dynamics::BoxShape> dtBoxShape;
+      // We use BoxShape untile PlaneShape is completely supported in DART.
+      // Please see: https://github.com/dartsim/dart/issues/114
     };
   }
 }

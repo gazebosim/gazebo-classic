@@ -250,7 +250,7 @@ void TimeWidget_TEST::ValidTimes()
 /////////////////////////////////////////////////
 void TimeWidget_TEST::Visibility()
 {
-  this->Load("empty.world");
+  this->Load("empty.world", false, false, false);
 
   // Create a new time widget
   gazebo::gui::TimeWidget *timeWidget = new gazebo::gui::TimeWidget;

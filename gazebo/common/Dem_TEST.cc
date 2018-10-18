@@ -18,10 +18,10 @@
 #include <boost/filesystem.hpp>
 #include <gtest/gtest.h>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Helpers.hh>
 #include <ignition/math/Vector3.hh>
 
 #include "gazebo/common/Dem.hh"
-#include "gazebo/math/Angle.hh"
 #include "test_config.h"
 #include "test/util.hh"
 
