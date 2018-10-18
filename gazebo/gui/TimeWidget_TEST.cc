@@ -19,8 +19,158 @@
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"
 #include "gazebo/gui/GuiIface.hh"
+#include "gazebo/gui/Actions.hh"
 #include "gazebo/rendering/UserCamera.hh"
 #include "gazebo/gui/TimeWidget_TEST.hh"
+
+/////////////////////////////////////////////////
+void TimeWidget_TEST::Reset()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  this->Load("empty.world", false, false, false);
+
+  // Create the main window.
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != NULL);
+
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Wait a little bit so that time increases.
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    gazebo::common::Time::MSleep(1);
+    QCoreApplication::processEvents();
+  }
+
+  // Get the time panel
+  gazebo::gui::TimePanel *timePanel = mainWindow->GetRenderWidget()->
+      GetTimePanel();
+  QVERIFY(timePanel != NULL);
+
+  // Get the time widget
+  gazebo::gui::TimeWidget *timeWidget =
+      timePanel->findChild<gazebo::gui::TimeWidget *>("timeWidget");
+  QVERIFY(timeWidget != NULL);
+  timeWidget->setVisible(true);
+
+  // Get the sim time line edit
+  QLineEdit *simTimeEdit = timeWidget->findChild<QLineEdit *>(
+      "timeWidgetSimTime");
+  QVERIFY(simTimeEdit != NULL);
+
+  // Get the real time line edit
+  QLineEdit *realTimeEdit = timeWidget->findChild<QLineEdit *>(
+      "timeWidgetRealTime");
+  QVERIFY(realTimeEdit != NULL);
+
+  QLineEdit *iterationsEdit = timeWidget->findChild<QLineEdit *>(
+      "timeWidgetIterations");
+  QVERIFY(iterationsEdit != NULL);
+
+  std::string txt;
+  double value;
+
+  // Make sure real time is greater than zero
+  txt = realTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(value > 0.0);
+
+  // Make sure sim time is greater than zero
+  txt = simTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(value > 0.0);
+
+  // Make sure iteration is greater than zero
+  txt = iterationsEdit->text().toStdString();
+  int intValue = boost::lexical_cast<int>(txt);
+  QVERIFY(intValue > 0);
+
+  // verify reset action is not null
+  QVERIFY(gazebo::gui::g_resetWorldAct != NULL);
+  QVERIFY(gazebo::gui::g_resetWorldAct->isEnabled());
+  QVERIFY(!mainWindow->IsPaused());
+
+  // pause the world before resetting
+  mainWindow->Pause();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(mainWindow->IsPaused());
+
+  // trigger reset world
+  gazebo::gui::g_resetWorldAct->trigger();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  // Make sure real time is zero
+  txt = realTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(ignition::math::equal(value, 0.0));
+
+  // Make sure sim time is zero
+  txt = simTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(ignition::math::equal(value, 0.0));
+
+  // Make sure iteration is zero
+  txt = iterationsEdit->text().toStdString();
+  intValue = boost::lexical_cast<int>(txt);
+  QCOMPARE(intValue, 0);
+
+  // play the simulation and again and verify time increases
+  mainWindow->Play();
+
+  // Process some events, and draw the screen
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    gazebo::common::Time::MSleep(30);
+    QCoreApplication::processEvents();
+    mainWindow->repaint();
+  }
+
+  QVERIFY(!mainWindow->IsPaused());
+
+  // Wait a little bit so that time increases.
+  for (unsigned int i = 0; i < 1000; ++i)
+  {
+    gazebo::common::Time::MSleep(1);
+    QCoreApplication::processEvents();
+  }
+
+  // Make sure real time is greater than zero
+  txt = realTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(value > 0.0);
+
+  // Make sure sim time is greater than zero
+  txt = simTimeEdit->text().toStdString();
+  value = boost::lexical_cast<double>(txt.substr(txt.find(".")));
+  QVERIFY(value > 0.0);
+
+  // Make sure iteration is greater than zero
+  txt = iterationsEdit->text().toStdString();
+  intValue = boost::lexical_cast<int>(txt);
+  QVERIFY(intValue > 0);
+
+  mainWindow->close();
+  delete mainWindow;
+}
 
 /////////////////////////////////////////////////
 void TimeWidget_TEST::ValidTimes()
