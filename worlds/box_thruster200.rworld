@@ -1,0 +1,90 @@
+<?xml version="1.0" ?>
+<%
+  # Box with thruster controls
+  # SI units (length in meters)
+
+  # Geometry
+  box_dx   = 0.2
+  box_dy   = 0.2
+  box_dz   = 0.1
+  box_z0   = 1.0
+
+  # inertia
+  box_mass = 1.0
+  box_ixx  = box_mass/12.0 * (box_dy**2 + box_dz**2)
+  box_iyy  = box_mass/12.0 * (box_dz**2 + box_dx**2)
+  box_izz  = box_mass/12.0 * (box_dx**2 + box_dy**2)
+  # box c.g. offset from center of box
+  box_cgx  = 0
+  box_cgy  = 0 
+  box_cgz  = 0 
+
+  boxes = 200
+%>
+<sdf version="1.5">
+  <world name="default">
+    <physics type="ode">
+      <real_time_update_rate>0.0</real_time_update_rate>
+    </physics>
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+    <!-- A ground plane ->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+    <!- -->
+<%
+  boxes.times do |b|
+    name = "box_thruster_#{b}"
+    x0 = b
+    y0 = 0
+%>
+    <%= "<model name='#{name}'>" %>
+      <link name="box">
+        <pose><%= x0 %> <%= y0 %> <%= box_z0 %>  0 0 0</pose>
+        <inertial>
+          <pose><%= box_cgx %> <%= box_cgy %> <%= box_cgz %>  0 0 0</pose>
+          <mass><%= box_mass %></mass>
+          <inertia>
+            <ixx><%= box_ixx %></ixx>
+            <iyy><%= box_iyy %></iyy>
+            <izz><%= box_izz %></izz>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyz>0</iyz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size><%= box_dx %> <%= box_dy %> <%= box_dz %></size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size><%= box_dx %> <%= box_dy %> <%= box_dz %></size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+      <plugin name="box_thruster" filename="libBoxThrusterPlugin.so">
+        <angular><%= Math::PI %> 0 0</angular>
+        <linear>0 0 5</linear>
+        <thrust_magnitude>12.0</thrust_magnitude>
+      </plugin>
+    </model>
+<%
+  end
+%>
+  </world>
+</sdf>
