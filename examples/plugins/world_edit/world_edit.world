@@ -1,5 +1,5 @@
 <?xml version ='1.0'?>
-<sdf version ='1.4'>
+<sdf version ='1.5'>
   <world name='default'>
     <include>
       <uri>model://ground_plane</uri>
@@ -9,6 +9,55 @@
       <uri>model://sun</uri>
     </include>
 
+    <model name="box_x">
+      <include>
+        <uri>model://box</uri>
+        <pose>13 0 0  0 0 0</pose>
+      </include>
+      <plugin name="box_x" filename="libInitialVelocityPlugin.so">
+        <linear>13 0 0</linear>
+        <angular>0 0 0</angular>
+      </plugin>
+    </model>
+
+    <model name="box_y">
+      <include>
+        <uri>model://box</uri>
+        <pose>0 13 0  0 0 0</pose>
+      </include>
+      <plugin name="box_y" filename="libInitialVelocityPlugin.so">
+        <linear>0 13 0</linear>
+        <angular>0 0 0</angular>
+      </plugin>
+    </model>
+
+    <model name="box_xy">
+      <include>
+        <uri>model://box</uri>
+        <pose>12 5 0  0 0 0</pose>
+      </include>
+      <plugin name="box_xy" filename="libInitialVelocityPlugin.so">
+        <linear>12 5 0</linear>
+        <angular>0 0 0</angular>
+      </plugin>
+    </model>
+
+    <model name="box_yx">
+      <include>
+        <uri>model://box</uri>
+        <pose>5 12 0  0 0 0</pose>
+      </include>
+      <plugin name="box_yx" filename="libInitialVelocityPlugin.so">
+        <linear>5 12 0</linear>
+        <angular>0 0 0</angular>
+      </plugin>
+    </model>
+
     <plugin filename="libworld_edit.so" name="world_edit"/>
+    <gui>
+      <camera name="user_camera">
+        <pose>11 8 37  0 1.5 1.57</pose>
+      </camera>
+    </gui>
   </world>
 </sdf>
