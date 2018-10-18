@@ -30,7 +30,7 @@ namespace gazebo
   namespace physics
   {
     /// \brief A fixed joint.
-    class GZ_PHYSICS_ODE_VISIBLE ODEFixedJoint : public FixedJoint<ODEJoint>
+    class GZ_PHYSICS_VISIBLE ODEFixedJoint : public FixedJoint<ODEJoint>
     {
       /// \brief Constructor
       /// \param[in] _worldID ODE id of the world.
