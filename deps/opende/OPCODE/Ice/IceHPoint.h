@@ -162,7 +162,7 @@
 
     public:
         float    w;
-   };
+  };
 
 #endif // __ICEHPOINT_H__
 

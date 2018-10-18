@@ -207,9 +207,9 @@ private:
   enum
   {
     FL_OCCUPANCY_FLAGS__START  = 0x00000001,
-    FL_OCCUPANCY_FLAGS__END  	= FL_OCCUPANCY_FLAGS__START << TLS_ARRAY_ELEMENT__MAX,
+    FL_OCCUPANCY_FLAGS__END    = FL_OCCUPANCY_FLAGS__START << TLS_ARRAY_ELEMENT__MAX,
 
-    FL_ARRAY_LOCKED  			= FL_OCCUPANCY_FLAGS__END
+    FL_ARRAY_LOCKED        = FL_OCCUPANCY_FLAGS__END
   };
 
   inline bool GetAreAllBlocksOccupied() const
@@ -337,7 +337,7 @@ private:
 private:
   enum
   {
-    FL_STORAGE_KEY_VALID  		= 0x00000001,
+    FL_STORAGE_KEY_VALID      = 0x00000001,
 
     FLM_INITIALIZATION_FLAGS_MASK  = 0x0000FFFF,
     FLS_INITIALIZATION_FLAGS_SHIFT  = 16,
@@ -513,7 +513,7 @@ bool CTLSStorageArray::FindFreeStorageBlockIndexWithPossibilityVerified(unsigned
 
       if (!bIsManualCleanup)
       {
-      	AllocateBlockThreadHandle(nBlockIndex);
+        AllocateBlockThreadHandle(nBlockIndex);
       }
 
 
@@ -618,12 +618,12 @@ unsigned int CTLSStorageArray::TranslateClientHandles(CClientHandleArray haTrans
       // Start indice can be equal if and only if no invalid handles have been found
       if (nSourceStartIndex != nTargetStartIndex)
       {
-      	const HANDLE *ph_BlockThreadHandles = GetBlockThreadHandlesStorage();
+        const HANDLE *ph_BlockThreadHandles = GetBlockThreadHandlesStorage();
 
-      	unsigned int nTargetIncrement = nSourceCurrentIndex - nSourceStartIndex;
+        unsigned int nTargetIncrement = nSourceCurrentIndex - nSourceStartIndex;
 
-      	memcpy(&haTranslatedHandlesStorage[nTargetStartIndex], &ph_BlockThreadHandles[nSourceStartIndex], nTargetIncrement * sizeof(HANDLE));
-      	for (; nTargetIncrement != 0; ++nTargetStartIndex, ++nSourceStartIndex, --nTargetIncrement) { tmTranslationMapStorage[nTargetStartIndex] = nSourceStartIndex; }
+        memcpy(&haTranslatedHandlesStorage[nTargetStartIndex], &ph_BlockThreadHandles[nSourceStartIndex], nTargetIncrement * sizeof(HANDLE));
+        for (; nTargetIncrement != 0; ++nTargetStartIndex, ++nSourceStartIndex, --nTargetIncrement) { tmTranslationMapStorage[nTargetStartIndex] = nSourceStartIndex; }
       }
 
       break;
@@ -693,7 +693,7 @@ void CTLSStorageArray::FinalizeStorageSingleBlock(CTLSStorageBlock *psbStorageBl
 
       if (fnValueDestructor)
       {
-      	fnValueDestructor(vValueData);
+        fnValueDestructor(vValueData);
       }
     }
   }
@@ -936,7 +936,7 @@ bool CTLSStorageInstance::FindFreeStorageBlock(CTLSStorageBlock *&psbOutStorageB
 
       if (!psaStorageArray)
       {
-      	break;
+        break;
       }
 
       FindFreeStorageBlockFromArray(psbOutStorageBlock, psaStorageArray); // Must always succeed as array is not added to list yet
@@ -1201,14 +1201,14 @@ bool CTLSInitialization::InitializeTLSAPI(HTLSKEY &hskOutStorageKey, tlsindextyp
     {
       if (!InitializeAtomicAPI())
       {
-      	break;
+        break;
       }
 
       bAtomicAPIInitialized = true;
 
       if (!InitializeTLSAPIValidated(ikInstanceKind, iValueCount, uiInitializationFlags))
       {
-      	break;
+        break;
       }
 
       const HTLSKEYVALUE &hkvStorageKey = g_apsiStorageGlobalInstances[ikInstanceKind]->RetrieveStorageKey();
