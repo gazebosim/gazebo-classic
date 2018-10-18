@@ -96,7 +96,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
 
   // Get a pointer to the gps sensor
   sensors::GpsSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::GpsSensor>(
+    std::dynamic_pointer_cast<sensors::GpsSensor>(
         mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -104,7 +104,7 @@ TEST_F(GpsSensor_TEST, CreateGps)
 
   EXPECT_DOUBLE_EQ(sensor->Latitude().Radian(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->Longitude().Radian(), 0.0);
-  EXPECT_DOUBLE_EQ(sensor->GetAltitude(), 0.0);
+  EXPECT_DOUBLE_EQ(sensor->Altitude(), 0.0);
 
   EXPECT_TRUE(sensor->IsActive());
 

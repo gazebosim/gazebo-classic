@@ -14,8 +14,8 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_GUI_DIAGNOSTICS_PRIVATE_HH_
-#define _GAZEBO_GUI_DIAGNOSTICS_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_DIAGNOSTICSPRIVATE_HH_
+#define _GAZEBO_GUI_DIAGNOSTICSPRIVATE_HH_
 
 #include <list>
 #include <map>
@@ -31,11 +31,11 @@ namespace gazebo
   {
     class IncrementalPlot;
 
-    /// \brief public data for the EntityMaker class
+    /// \brief Private data for the Diagnostics class
     class DiagnosticsPrivate
     {
       /// \def PointMap
-      public: using PointMap = std::map<QString, std::list<QPointF>>;
+      public: using PointMap = std::map<QString, std::list<QPointF> >;
 
       /// \brief Node for communications.
       public: transport::NodePtr node;
@@ -64,4 +64,3 @@ namespace gazebo
   }
 }
 #endif
-

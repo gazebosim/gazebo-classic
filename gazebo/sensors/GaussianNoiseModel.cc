@@ -218,7 +218,7 @@ void ImageGaussianNoiseModel::SetCamera(rendering::CameraPtr _camera)
 
   this->gaussianNoiseInstance =
     Ogre::CompositorManager::getSingleton().addCompositor(
-      _camera->GetViewport(), "CameraNoise/Gaussian");
+      _camera->OgreViewport(), "CameraNoise/Gaussian");
   this->gaussianNoiseInstance->setEnabled(true);
   this->gaussianNoiseInstance->addListener(
     this->gaussianNoiseCompositorListener.get());

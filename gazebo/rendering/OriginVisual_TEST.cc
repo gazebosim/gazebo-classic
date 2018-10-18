@@ -39,7 +39,7 @@ TEST_F(OriginVisual_TEST, Load)
 
   // Create and load visual
   rendering::OriginVisualPtr origin;
-  origin.reset(new rendering::OriginVisual("origin", scene->GetWorldVisual()));
+  origin.reset(new rendering::OriginVisual("origin", scene->WorldVisual()));
   origin->Load();
   EXPECT_TRUE(origin != NULL);
 

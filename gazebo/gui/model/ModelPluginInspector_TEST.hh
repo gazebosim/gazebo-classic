@@ -33,6 +33,15 @@ class ModelPluginInspector_TEST : public QTestFixture
 
   /// \brief Test pressing remove button.
   private slots: void RemoveButton();
+
+  /// \brief Tests setting the inspector to be read-only.
+  private slots: void ReadOnly();
+
+  /// \brief Tests clearing the inspector.
+  private slots: void Clear();
+
+  /// \brief Tests getting plugin msg data.
+  private slots: void GetData();
 };
 
 #endif

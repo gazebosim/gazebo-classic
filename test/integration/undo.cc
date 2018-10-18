@@ -731,7 +731,7 @@ void UndoTest::UndoResetTime()
   QVERIFY(initialTime != gazebo::common::Time::Zero);
 
   // Reset time
-  mainWindow->GetRenderWidget()->GetTimePanel()->OnTimeReset();
+  mainWindow->RenderWidget()->GetTimePanel()->OnTimeReset();
 
   // Check time
   int sleep = 0;

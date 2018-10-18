@@ -41,7 +41,7 @@ TEST_F(LinkFrameVisual_TEST, LinkFrameTest)
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
   linkVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create frame visual for the link
   gazebo::rendering::LinkFrameVisualPtr linkFrameVis(

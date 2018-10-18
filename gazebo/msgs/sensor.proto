@@ -15,7 +15,7 @@ message Sensor
   required string name            = 1;
   optional uint32 id              = 2;
   required string parent          = 3;
-  required uint32 parent_id       = 4;
+  optional uint32 parent_id       = 4;
   required string type            = 5;
   optional bool always_on         = 6;
   optional double update_rate     = 7;

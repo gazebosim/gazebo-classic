@@ -45,7 +45,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   // create a link visual
   gazebo::rendering::VisualPtr linkDefaultVis;
   linkDefaultVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create CoMVisual for the link using msg Load
   gazebo::rendering::COMVisualPtr comDefaultVis(
@@ -70,7 +70,7 @@ TEST_F(COMVisual_TEST, COMVisualTest)
   // create a link visual
   gazebo::rendering::VisualPtr linkVis;
   linkVis.reset(
-      new gazebo::rendering::Visual("link", scene->GetWorldVisual()));
+      new gazebo::rendering::Visual("link", scene->WorldVisual()));
 
   // create CoMVisual for the link using SDF Load
   gazebo::rendering::COMVisualPtr comVis(

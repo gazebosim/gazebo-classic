@@ -31,6 +31,9 @@ class JointInspector_TEST : public QTestFixture
   /// \brief Test adding and removing links.
   private slots: void AddRemoveLink();
 
+  /// \brief Test adding and removing nested links.
+  private slots: void AddRemoveNestedLink();
+
   /// \brief Test swapping parent / child links
   private slots: void Swap();
 

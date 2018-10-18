@@ -49,7 +49,7 @@ void BreakableJointPlugin::Load(sensors::SensorPtr _parent,
   if (_sdf->HasElement(paramName))
     this->breakingForce = _sdf->Get<double>(paramName);
 
-  this->parentJoint = this->parentSensor->GetJoint();
+  this->parentJoint = this->parentSensor->Joint();
 }
 
 /////////////////////////////////////////////////

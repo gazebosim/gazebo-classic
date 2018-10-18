@@ -90,7 +90,7 @@ void AltimeterSensor_TEST::BasicAltimeterSensorCheck(
 
   // Get a pointer to the altimeter sensor
   sensors::AltimeterSensorPtr sensor =
-    boost::dynamic_pointer_cast<sensors::AltimeterSensor>
+    std::dynamic_pointer_cast<sensors::AltimeterSensor>
       (mgr->GetSensor(sensorName));
 
   // Make sure the above dynamic cast worked.
@@ -126,7 +126,7 @@ void AltimeterSensor_TEST::LinearAltimeterSensorCheck(
   // Get the altimeter
   sensors::SensorPtr sensor = sensors::get_sensor("altSensor");
   sensors::AltimeterSensorPtr altSensor =
-      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
   ASSERT_TRUE(altSensor != NULL);
 
   sensors::SensorManager::Instance()->Init();
@@ -163,7 +163,7 @@ void AltimeterSensor_TEST::AngularAltimeterSensorCheck(
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
   sensors::AltimeterSensorPtr altSensor =
-      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
   ASSERT_TRUE(altSensor != NULL);
 
@@ -205,7 +205,7 @@ void AltimeterSensor_TEST::LinearAngularAltimeterSensorCheck(
 
   sensors::SensorPtr sensor = sensors::get_sensor("altimeter");
   sensors::AltimeterSensorPtr altSensor =
-      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
   ASSERT_TRUE(altSensor != NULL);
 
@@ -256,7 +256,7 @@ void AltimeterSensor_TEST::NonzeroAltimeterSensorCheck(
 
   sensors::SensorPtr sensor = sensors::get_sensor(altSensorName);
   sensors::AltimeterSensorPtr altSensor =
-      boost::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
+      std::dynamic_pointer_cast<sensors::AltimeterSensor>(sensor);
 
   ASSERT_TRUE(altSensor != NULL);
 

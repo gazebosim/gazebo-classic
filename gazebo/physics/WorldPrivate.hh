@@ -17,6 +17,7 @@
 #ifndef _GAZEBO_WORLD_PRIVATE_HH_
 #define _GAZEBO_WORLD_PRIVATE_HH_
 
+#include <atomic>
 #include <deque>
 #include <vector>
 #include <list>
@@ -258,6 +259,9 @@ namespace gazebo
       /// \brief The list of models that need to publish their pose.
       public: std::set<ModelPtr> publishModelPoses;
 
+      /// \brief The list of models that need to publish their scale.
+      public: std::set<ModelPtr> publishModelScales;
+
       /// \brief The list of lights that need to publish their pose.
       public: std::set<LightPtr> publishLightPoses;
 
@@ -315,6 +319,10 @@ namespace gazebo
 
       /// \brief Class to manage user commands.
       public: UserCmdManagerPtr userCmdManager;
+
+      /// \brief True if sensors have been initialized. This should be set
+      /// by the SensorManager.
+      public: std::atomic_bool sensorsInitialized;
     };
   }
 }

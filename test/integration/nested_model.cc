@@ -43,10 +43,6 @@ class PhysicsMsgsTest : public ServerFixture,
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 {
-  // Nested models are not working in simbody yet, issue #1718
-  if (_physicsEngine == "simbody")
-    return;
-
   // load a world with a nested model
   Load("worlds/nested_model.world", true, _physicsEngine);
   physics::WorldPtr world = physics::get_world("default");
@@ -55,6 +51,23 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
   physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
   ASSERT_TRUE(physics != NULL);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
+
+  // take a step to verify that simulation won't crash
+  world->Step(1);
+
+  if (_physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
+    return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+    return;
+  }
 
   // verify top level model
   physics::ModelPtr model;
@@ -130,9 +143,19 @@ void PhysicsMsgsTest::LoadNestedModel(const std::string &_physicsEngine)
 ////////////////////////////////////////////////////////////////////////
 void PhysicsMsgsTest::SpawnNestedModel(const std::string &_physicsEngine)
 {
-  // Nested models are not working in simbody yet, issue #1718
   if (_physicsEngine == "simbody")
+  {
+    gzerr << "Nested models are not working in simbody yet, issue #1718"
+          << std::endl;
     return;
+  }
+
+  if (_physicsEngine == "dart")
+  {
+    gzerr << "Nested models are not working in dart yet, issue #1833"
+          << std::endl;
+    return;
+  }
 
   // load an empty world
   Load("worlds/empty.world", true, _physicsEngine);

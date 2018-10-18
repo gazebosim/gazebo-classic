@@ -58,7 +58,7 @@ RestUiWidget::RestUiWidget(QWidget *_parent,
   gui::MainWindow *mainWindow = qobject_cast<gui::MainWindow *>(_parent);
   if (mainWindow)
   {
-    gui::RenderWidget *renderWidget = mainWindow->GetRenderWidget();
+    gui::RenderWidget *renderWidget = mainWindow->RenderWidget();
     if (renderWidget)
     {
       this->toolbar = renderWidget->GetToolbar();

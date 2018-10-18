@@ -14,9 +14,10 @@
  * limitations under the License.
  *
 */
-#ifndef _GAZEBO_LOGICAL_CAMERASENSOR_PRIVATE_HH_
-#define _GAZEBO_LOGICAL_CAMERASENSOR_PRIVATE_HH_
+#ifndef _GAZEBO_SENSORS_LOGICAL_CAMERASENSOR_PRIVATE_HH_
+#define _GAZEBO_SENSORS_LOGICAL_CAMERASENSOR_PRIVATE_HH_
 
+#include <mutex>
 #include <string>
 #include <ignition/math/Frustum.hh>
 #include "gazebo/transport/TransportTypes.hh"
