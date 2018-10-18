@@ -86,6 +86,10 @@ namespace gazebo
       /// \brief Prefix used for announcing services.
       /// E.g."/introspection/abcxyz/".
       public: std::string prefix;
+
+      /// \brief Flag that will be true when the list of registered items has
+      /// changed since the last update.
+      public: bool itemsUpdated = false;
     };
   }
 }

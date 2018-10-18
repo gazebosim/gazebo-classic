@@ -18,9 +18,11 @@
 #define _GAZEBO_GUI_PLOT_PALETTE_HH_
 
 #include <memory>
+#include <set>
 #include <string>
 
 #include "gazebo/gui/qt.h"
+#include "gazebo/msgs/msgs.hh"
 
 #include "gazebo/util/system.hh"
 
@@ -58,16 +60,13 @@ namespace gazebo
       public: ~Palette();
 
       /// \brief Fill the topics model.
-      /// \param[in] _topicsModel Pointer to the model which will be filled.
-      private: void FillTopics(QStandardItemModel *_topicsModel);
+      private: void FillTopics();
 
       /// \brief Fill the models model.
-      /// \param[in] _modelsModel Pointer to the model which will be filled.
-      private: void FillModels(QStandardItemModel *_modelsModel);
+      private: void FillModels();
 
       /// \brief Fill the sim model.
-      /// \param[in] _simModel Pointer to the model which will be filled.
-      private: void FillSim(QStandardItemModel *_simModel);
+      private: void FillSim();
 
       /// \brief Fill an item with properties from a protobuf message.
       /// Only plottable fields such as int, double and bool are displayed.
@@ -101,6 +100,13 @@ namespace gazebo
       private: void InsertQuaterniondItem(QStandardItem *_item,
           const common::URI &_uri, const std::string &_query);
 
+      /// \brief Insert an axis item under the given item.
+      /// \param[in] _item The parent item.
+      /// \param[in] _uri The URI of the original query.
+      /// \param[in] _query The part of the query relevant to this item.
+      private: void InsertAxisItem(QStandardItem *_item,
+          const common::URI &_uri, const std::string &_query);
+
       /// \brief Callback when the user has modified the search.
       /// \param[in] _search Latest search.
       private slots: void UpdateSearch(const QString &_search);
@@ -111,6 +117,19 @@ namespace gazebo
       /// \param[in] _srcParent Model index of the parent to be checked.
       private: void ExpandChildren(QSortFilterProxyModel *_model,
           QTreeView *_tree, const QModelIndex &_srcParent) const;
+
+      /// \brief Callback when the list of items registered for introspection
+      /// is updated.
+      /// \param[in] _items The list of items.
+      /// \param[in] _result Result of the request. If false, there was
+      /// a problem executing your request.
+      private: void OnIntrospectionUpdate(const std::set<std::string> &_items,
+          const bool _result);
+
+      /// \brief Callback when the list of items registered for introspection
+      /// is updated.
+      /// \param[in] _msg Message containing list of items.
+      private: void OnIntrospectionUpdate(const gazebo::msgs::Param_V &_msg);
 
       /// \internal
       /// \brief Pointer to private data.

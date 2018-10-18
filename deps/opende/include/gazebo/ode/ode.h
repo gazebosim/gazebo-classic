@@ -20,21 +20,29 @@
  *                                                                       *
  *************************************************************************/
 
-#ifndef _ODE_EXPORT_DIF_
-#define _ODE_EXPORT_DIF_
+#ifndef _ODE_ODE_H_
+#define _ODE_ODE_H_
 
-#include <ode/common.h>
+/* include *everything* here */
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-ODE_API void dWorldExportDIF (dWorldID w, FILE *file, const char *world_name);
-
-
-#ifdef __cplusplus
-}
-#endif
+#include <gazebo/ode/odeconfig.h>
+#include <gazebo/ode/compatibility.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/odeinit.h>
+#include <gazebo/ode/contact.h>
+#include <gazebo/ode/error.h>
+#include <gazebo/ode/memory.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/matrix.h>
+#include <gazebo/ode/timer.h>
+#include <gazebo/ode/rotation.h>
+#include <gazebo/ode/mass.h>
+#include <gazebo/ode/misc.h>
+#include <gazebo/ode/objects.h>
+#include <gazebo/ode/odecpp.h>
+#include <gazebo/ode/collision_space.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/odecpp_collision.h>
+#include <gazebo/ode/export-dif.h>
 
 #endif

@@ -36,7 +36,7 @@ reference:
 #include "objects.h"
 #include "joints/joint.h"
 #include "joints/contact.h"
-#include <ode/h5dump.h>
+#include <gazebo/ode/h5dump.h>
 
 using namespace H5;
 using namespace h5;

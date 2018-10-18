@@ -31,7 +31,7 @@ reference:
 #ifndef H5_IO
 #define H5_IO
 #include <string>
-#include <ode/ode.h>
+#include <gazebo/ode/ode.h>
 #include <unordered_map>
 class h5dump {
   private:

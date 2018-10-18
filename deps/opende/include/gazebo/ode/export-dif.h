@@ -20,37 +20,18 @@
  *                                                                       *
  *************************************************************************/
 
-/* this comes from the `reuse' library. copy any changes back to the source */
+#ifndef _ODE_EXPORT_DIF_
+#define _ODE_EXPORT_DIF_
 
-#ifndef _ODE_MEMORY_H_
-#define _ODE_MEMORY_H_
+#include <gazebo/ode/common.h>
 
-#include <ode/odeconfig.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* function types to allocate and free memory */
-typedef void * dAllocFunction (size_t size);
-typedef void * dReallocFunction (void *ptr, size_t oldsize, size_t newsize);
-typedef void dFreeFunction (void *ptr, size_t size);
+ODE_API void dWorldExportDIF (dWorldID w, FILE *file, const char *world_name);
 
-/* set new memory management functions. if fn is 0, the default handlers are
- * used. */
-ODE_API void dSetAllocHandler (dAllocFunction *fn);
-ODE_API void dSetReallocHandler (dReallocFunction *fn);
-ODE_API void dSetFreeHandler (dFreeFunction *fn);
-
-/* get current memory management functions */
-ODE_API dAllocFunction *dGetAllocHandler (void);
-ODE_API dReallocFunction *dGetReallocHandler (void);
-ODE_API dFreeFunction *dGetFreeHandler (void);
-
-/* allocate and free memory. */
-ODE_API void * dAlloc (size_t size);
-ODE_API void * dRealloc (void *ptr, size_t oldsize, size_t newsize);
-ODE_API void dFree (void *ptr, size_t size);
 
 #ifdef __cplusplus
 }

@@ -44,9 +44,15 @@ namespace gazebo
       /// \brief Destructor.
       public: ~EditableLabel();
 
-      /// \brief Qt event when the focus is lost
-      /// \param[in] _event Qt focus event
-      // public: void focusOutEvent(QFocusEvent * event);
+      /// \brief Set whether to show border.
+      /// \param[in] _show True to show border.
+      public: void ShowBorder(const bool _show);
+
+      /// \brief Used to filter mouse hover events.
+      /// \param[in] _o Object that receives the event.
+      /// \param[in] _event Pointer to the event.
+      /// \return True if event was handled.
+      protected: virtual bool eventFilter(QObject *_o, QEvent *_event);
 
       /// \brief Qt mouse double click event.
       /// \param[in] _event Qt mouse event

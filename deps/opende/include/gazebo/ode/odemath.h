@@ -23,7 +23,7 @@
 #ifndef _ODE_ODEMATH_H_
 #define _ODE_ODEMATH_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 #include <cmath>
 
 /*
@@ -417,7 +417,7 @@ PURE_INLINE void dMultiplyAdd2_333(dReal *res, const dReal *a, const dReal *b)
 
 
 // Include legacy macros here
-#include <ode/odemath_legacy.h>
+#include <gazebo/ode/odemath_legacy.h>
 
 
 #ifdef __cplusplus

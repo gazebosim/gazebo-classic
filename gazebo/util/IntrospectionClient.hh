@@ -179,7 +179,7 @@ namespace gazebo
                              const std::set<std::string> &_items,
                              const bool _result)> &_cb) const;
 
-      /// \bried Check if the _item is registered on a manager with
+      /// \brief Check if the _item is registered on a manager with
       /// _managerId.
       /// \param[in] _managerId Id of the manager to query.
       /// \param[in] _item Item name for the query.
@@ -188,7 +188,7 @@ namespace gazebo
       public: bool IsRegistered(const std::string &_managerId,
                                 const std::string &_item) const;
 
-      /// \bried Check if the _items are registered on a manager with
+      /// \brief Check if the _items are registered on a manager with
       /// _managerId.
       /// \param[in] _managerId Id of the manager to query.
       /// \param[in] _items Set of item names for the query.
@@ -196,6 +196,13 @@ namespace gazebo
       /// all the items registered.
       public: bool IsRegistered(const std::string &_managerId,
                                 const std::set<std::string> &_items) const;
+
+      /// \brief Check if there are any current filters using a manager with
+      /// _managerId.
+      /// \param[in] _managerId Id of the manager to query.
+      /// return True if the instrospection manager with ID==_managerId is
+      /// being used in some of the current filters.
+      private: bool IsManagerUsed(const std::string &_managerId) const;
 
       /// \internal
       /// \brief Private data pointer.

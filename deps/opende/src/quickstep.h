@@ -23,7 +23,7 @@
 #ifndef _ODE_QUICK_STEP_H_
 #define _ODE_QUICK_STEP_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 size_t dxEstimateQuickStepMemoryRequirements (
   dxBody * const *body, int nb, dxJoint * const *_joint, int _nj);

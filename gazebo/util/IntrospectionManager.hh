@@ -73,6 +73,9 @@ namespace gazebo
       /// (the item was not previously registered).
       public: bool Unregister(const std::string &_item);
 
+      /// \brief Unregister all items.
+      public: void Clear();
+
       /// \brief Get a copy of the items already registered in this manager.
       /// \return Set of registered items.
       public: std::set<std::string> Items() const;
@@ -81,7 +84,15 @@ namespace gazebo
       /// through all the topics. The message received in the update will
       /// contain the name and latest values of all the items specified
       /// in the filter.
+      /// If there are changes in the items list since the last update,
+      /// a new message is published under the topic
+      /// "/introspection/<manager_id>/items_update".
       public: void Update();
+
+      /// \brief If there are changes in the items list since the last update,
+      /// a new message is published under the topic
+      /// "/introspection/<manager_id>/items_update".
+      public: void NotifyUpdates();
 
       /// \brief Constructor.
       private: IntrospectionManager();

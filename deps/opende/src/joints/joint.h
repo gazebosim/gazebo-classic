@@ -24,7 +24,7 @@
 #define _ODE_JOINT_H_
 
 
-#include <ode/contact.h>
+#include <gazebo/ode/contact.h>
 #include "../objects.h"
 #include "../obstack.h"
 

@@ -29,10 +29,10 @@ some useful collision utility stuff.
 #ifndef _ODE_COLLISION_UTIL_H_
 #define _ODE_COLLISION_UTIL_H_
 
-#include <ode/common.h>
-#include <ode/contact.h>
-#include <ode/odemath.h>
-#include <ode/rotation.h>
+#include <gazebo/ode/common.h>
+#include <gazebo/ode/contact.h>
+#include <gazebo/ode/odemath.h>
+#include <gazebo/ode/rotation.h>
 
 
 // given a pointer `p' to a dContactGeom, return the dContactGeom at

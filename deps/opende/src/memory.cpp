@@ -20,9 +20,9 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/odeconfig.h>
-#include <ode/memory.h>
-#include <ode/error.h>
+#include <gazebo/ode/odeconfig.h>
+#include <gazebo/ode/memory.h>
+#include <gazebo/ode/error.h>
 #include "config.h"
 
 

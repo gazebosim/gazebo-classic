@@ -15,6 +15,8 @@
  *
 */
 
+#include "gazebo/util/IntrospectionManager.hh"
+
 #include "gazebo/gui/plot/PlottingTypes.hh"
 #include "gazebo/gui/plot/PlotCurve.hh"
 #include "gazebo/gui/plot/IntrospectionCurveHandler.hh"
@@ -28,9 +30,23 @@ void IntrospectionCurveHandler_TEST::AddRemoveCurve()
 
   this->Load("worlds/empty.world");
 
-  gazebo::gui::IntrospectionCurveHandler handler;
+  // set up introspection test data
+  gazebo::util::IntrospectionManager *manager =
+      gazebo::util::IntrospectionManager::Instance();
+  auto func = []()
+  {
+    return 1.0;
+  };
+  manager->Register<double>("data://path?p=variable_a", func);
+  manager->Register<double>("data://path?p=variable_b", func);
 
-//  gazebo::common::Time::MSleep(2000);
+  // create a IntrospectionCurveHandler and wait for it to be initialized
+  gazebo::gui::IntrospectionCurveHandler handler;
+  int sleep = 0;
+  int maxSleep = 20;
+  while (!handler.Initialized() && (sleep++ < maxSleep))
+    gazebo::common::Time::MSleep(100);
+  QVERIFY(handler.Initialized());
 
   QCOMPARE(handler.CurveCount(), 0u);
 

@@ -14,12 +14,11 @@
  * limitations under the License.
  *
 */
-#ifndef _IMAGESVIEW_PRIVATE_HH_
-#define _IMAGESVIEW_PRIVATE_HH_
+#ifndef _GAZEBO_GUI_VIEWERS_IMAGESVIEW_PRIVATE_HH_
+#define _GAZEBO_GUI_VIEWERS_IMAGESVIEW_PRIVATE_HH_
 
 #include <vector>
 #include <utility>
-#include <boost/thread/mutex.hpp>
 
 #include "gazebo/gui/viewers/ImageFrame.hh"
 #include "gazebo/gui/qt.h"
@@ -31,14 +30,8 @@ namespace gazebo
     /// \brief Private data for the ImagesView class.
     class ImagesViewPrivate
     {
-      /// \brief Storage mechansim for image data.
-      public: std::vector<ImageFrame *> images;
-
-      /// \brief Pointer to the frame containing the images
-      public: QGridLayout *frameLayout;
-
-      /// \brief Mutex to protect the image vectors
-      public: boost::mutex mutex;
+      /// \brief Mutex to protect variables.
+      public: std::mutex mutex;
 
       /// \brief Set to true to clear the images from the widget
       public: bool clearImages;

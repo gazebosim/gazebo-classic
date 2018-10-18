@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2016 Open Source Robotics Foundation
+ * Copyright (C) 2016 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,20 @@
  *
 */
 
-#ifndef _GAZEBO_PHYSICS_ODE_ODE_INC_H_
-#define _GAZEBO_PHYSICS_ODE_ODE_INC_H_
+#ifndef _GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
+#define _GAZEBO_GUI_PLOT_PALETTE_TEST_HH_
 
-// This disables warning messages for ODE
-#pragma GCC system_header
-#include <gazebo/ode/ode.h>
+#include "gazebo/gui/QTestFixture.hh"
 
+/// \brief A test class for the Palette widget.
+class Palette_TEST : public QTestFixture
+{
+  Q_OBJECT
+
+  /// \brief Test the topics tab.
+  private slots: void TopicsTab();
+
+  /// \brief Test the models tab.
+  private slots: void ModelsTab();
+};
 #endif

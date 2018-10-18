@@ -23,7 +23,7 @@
 #ifndef _ODE_CONTACT_H_
 #define _ODE_CONTACT_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,24 +31,24 @@ extern "C" {
 
 
 enum {
-  dContactMu2		= 0x001,
-  dContactFDir1		= 0x002,
-  dContactBounce	= 0x004,
-  dContactSoftERP	= 0x008,
-  dContactSoftCFM	= 0x010,
-  dContactMotion1	= 0x020,
-  dContactMotion2	= 0x040,
-  dContactMotionN	= 0x080,
-  dContactSlip1		= 0x100,
-  dContactSlip2		= 0x200,
-  dContactSlip3		= 0x400,
-  dContactMu3		  = 0x800,
+  dContactMu2    = 0x001,
+  dContactFDir1    = 0x002,
+  dContactBounce  = 0x004,
+  dContactSoftERP  = 0x008,
+  dContactSoftCFM  = 0x010,
+  dContactMotion1  = 0x020,
+  dContactMotion2  = 0x040,
+  dContactMotionN  = 0x080,
+  dContactSlip1    = 0x100,
+  dContactSlip2    = 0x200,
+  dContactSlip3    = 0x400,
+  dContactMu3      = 0x800,
 
-  dContactApprox0	= 0x0000,
-  dContactApprox1_1	= 0x1000,
-  dContactApprox1_2	= 0x2000,
-  dContactApprox1	= 0x3000,
-  dContactApprox3	= 0x4000,
+  dContactApprox0  = 0x0000,
+  dContactApprox1_1  = 0x1000,
+  dContactApprox1_2  = 0x2000,
+  dContactApprox1  = 0x3000,
+  dContactApprox3  = 0x4000,
   dContactEM            = 0x8000
 };
 

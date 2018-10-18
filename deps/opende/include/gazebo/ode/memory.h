@@ -22,39 +22,35 @@
 
 /* this comes from the `reuse' library. copy any changes back to the source */
 
-#ifndef _ODE_ERROR_H_
-#define _ODE_ERROR_H_
+#ifndef _ODE_MEMORY_H_
+#define _ODE_MEMORY_H_
 
-#include <ode/odeconfig.h>
+#include <gazebo/ode/odeconfig.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* all user defined error functions have this type. error and debug functions
- * should not return.
- */
-typedef void dMessageFunction (int errnum, const char *msg, va_list ap);
+/* function types to allocate and free memory */
+typedef void * dAllocFunction (size_t size);
+typedef void * dReallocFunction (void *ptr, size_t oldsize, size_t newsize);
+typedef void dFreeFunction (void *ptr, size_t size);
 
-/* set a new error, debug or warning handler. if fn is 0, the default handlers
- * are used.
- */
-ODE_API void dSetErrorHandler (dMessageFunction *fn);
-ODE_API void dSetDebugHandler (dMessageFunction *fn);
-ODE_API void dSetMessageHandler (dMessageFunction *fn);
+/* set new memory management functions. if fn is 0, the default handlers are
+ * used. */
+ODE_API void dSetAllocHandler (dAllocFunction *fn);
+ODE_API void dSetReallocHandler (dReallocFunction *fn);
+ODE_API void dSetFreeHandler (dFreeFunction *fn);
 
-/* return the current error, debug or warning handler. if the return value is
- * 0, the default handlers are in place.
- */
-ODE_API dMessageFunction *dGetErrorHandler(void);
-ODE_API dMessageFunction *dGetDebugHandler(void);
-ODE_API dMessageFunction *dGetMessageHandler(void);
+/* get current memory management functions */
+ODE_API dAllocFunction *dGetAllocHandler (void);
+ODE_API dReallocFunction *dGetReallocHandler (void);
+ODE_API dFreeFunction *dGetFreeHandler (void);
 
-/* generate a fatal error, debug trap or a message. */
-ODE_API void dError (int num, const char *msg, ...);
-ODE_API void dDebug (int num, const char *msg, ...);
-ODE_API void dMessage (int num, const char *msg, ...);
-
+/* allocate and free memory. */
+ODE_API void * dAlloc (size_t size);
+ODE_API void * dRealloc (void *ptr, size_t oldsize, size_t newsize);
+ODE_API void dFree (void *ptr, size_t size);
 
 #ifdef __cplusplus
 }

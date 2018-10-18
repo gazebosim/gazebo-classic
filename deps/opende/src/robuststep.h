@@ -23,7 +23,7 @@
 #ifndef _ROBUST_STEP_H_
 #define _ROBUST_STEP_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 size_t dxEstimateRobustStepMemoryRequirements(dxBody* const* body, int nb, dxJoint* const* _joint, int _nj);
 

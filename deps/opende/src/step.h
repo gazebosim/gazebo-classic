@@ -23,7 +23,7 @@
 #ifndef _ODE_STEP_H_
 #define _ODE_STEP_H_
 
-#include <ode/common.h>
+#include <gazebo/ode/common.h>
 
 size_t dxEstimateStepMemoryRequirements (
   dxBody * const *body, int nb, dxJoint * const *_joint, int _nj);

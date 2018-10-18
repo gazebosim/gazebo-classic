@@ -1,7 +1,7 @@
 #ifndef _ODE_OPTIMIZE_H
 #define _ODE_OPTIMIZE_H
 
-#include <ode/odemath.h>
+#include <gazebo/ode/odemath.h>
 #include <vector>
 #include <boost/shared_array.hpp>
 

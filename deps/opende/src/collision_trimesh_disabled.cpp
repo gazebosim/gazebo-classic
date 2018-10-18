@@ -20,8 +20,8 @@
  *                                                                       *
  *************************************************************************/
 
-#include <ode/collision.h>
-#include <ode/matrix.h>
+#include <gazebo/ode/collision.h>
+#include <gazebo/ode/matrix.h>
 #include "config.h"
 
 #if !dTRIMESH_ENABLED
