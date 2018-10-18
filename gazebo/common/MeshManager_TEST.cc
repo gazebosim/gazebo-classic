@@ -40,12 +40,14 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   subpath01.push_back(math::Vector2d(1, 0));
   subpath01.push_back(math::Vector2d(1, 1));
   subpath01.push_back(math::Vector2d(0, 1));
+  subpath01.push_back(math::Vector2d(0, 0));
 
   std::vector<math::Vector2d> subpath02;
   subpath02.push_back(math::Vector2d(0.25, 0.25));
   subpath02.push_back(math::Vector2d(0.25, 0.75));
   subpath02.push_back(math::Vector2d(0.75, 0.75));
   subpath02.push_back(math::Vector2d(0.75, 0.25));
+  subpath02.push_back(math::Vector2d(0.25, 0.25));
 
   path.push_back(subpath01);
   path.push_back(subpath02);
@@ -66,8 +68,8 @@ TEST_F(MeshManager, CreateExtrudedPolyline)
   // check submesh bounds
   const common::SubMesh *submesh = mesh->GetSubMesh(0);
   EXPECT_TRUE(submesh != NULL);
-  EXPECT_EQ(submesh->GetMin(), math::Vector3(0, 0, 0));
-  EXPECT_EQ(submesh->GetMax(), math::Vector3(1.0, 1.0, 10.0));
+  EXPECT_EQ(math::Vector3(0, 0, 0), submesh->GetMin());
+  EXPECT_EQ(math::Vector3(1.0, 1.0, 10.0), submesh->GetMax());
 
   // check vertices
   for (unsigned int i = 0; i < submesh->GetVertexCount(); ++i)
@@ -134,7 +136,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   subpath03.push_back(math::Vector2d(2.27467, 1.0967));
   subpath03.push_back(math::Vector2d(1.81094, 2.35418));
   subpath03.push_back(math::Vector2d(2.74009, 2.35418));
-  subpath03.push_back(math::Vector2d(2.27467, 1.0967));
 
   std::vector<math::Vector2d> subpath04;
   subpath04.push_back(math::Vector2d(2.08173, 0.7599));
@@ -145,7 +146,6 @@ TEST_F(MeshManager, CreateExtrudedPolylineClosedPath)
   subpath04.push_back(math::Vector2d(1.7077, 2.63851));
   subpath04.push_back(math::Vector2d(1.47753, 3.28672));
   subpath04.push_back(math::Vector2d(1.11704, 3.28672));
-  subpath04.push_back(math::Vector2d(2.08173, 0.7599));
 
   path2.push_back(subpath03);
   path2.push_back(subpath04);

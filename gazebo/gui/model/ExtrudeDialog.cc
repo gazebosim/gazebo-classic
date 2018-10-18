@@ -194,11 +194,11 @@ void ExtrudeDialog::UpdateView()
   // Find extreme values to center and scale
   math::Vector2d min(paths[0].polylines[0][0]);
   math::Vector2d max(min);
-  for (auto p : paths)
+  for (const auto &p : paths)
   {
-    for (auto poly : p.polylines)
+    for (const auto &poly : p.polylines)
     {
-      for (auto pt : poly)
+      for (const auto &pt : poly)
       {
         if (pt.x < min.x)
           min.x = pt.x;
@@ -255,11 +255,12 @@ void ExtrudeDialog::UpdateView()
                  QPen(QColor(50, 50, 255), 2));
 
   // Draw polygons
-  for (common::SVGPath p : paths)
+  for (common::SVGPath path : paths)
   {
-    for (std::vector<math::Vector2d> poly : p.polylines)
+    for (std::vector<math::Vector2d> poly : path.polylines)
     {
-      QVector<QPointF> polygonPts;
+      QPainterPath painterPath;
+      bool firstPoint = true;
       for (math::Vector2d pt : poly)
       {
         // Centroid at SVG 0,0
@@ -270,9 +271,6 @@ void ExtrudeDialog::UpdateView()
         pt.x += this->dataPtr->viewWidth/2.0;
         pt.y += viewHeight/2.0;
 
-        // Add to polygon
-        polygonPts.push_back(QPointF(pt.x, pt.y));
-
         // Draw point
         double pointSize = 5;
         QGraphicsEllipseItem *ptItem = new QGraphicsEllipseItem(
@@ -280,12 +278,19 @@ void ExtrudeDialog::UpdateView()
         ptItem->setBrush(Qt::red);
         ptItem->setZValue(5);
         scene->addItem(ptItem);
+        if (firstPoint)
+        {
+          firstPoint = false;
+          painterPath.moveTo(pt.x, pt.y);
+        }
+        else
+        painterPath.lineTo(pt.x, pt.y);
       }
+
+      QGraphicsPathItem *pathItem = new QGraphicsPathItem(painterPath);
       // Draw polygon
-      QGraphicsPolygonItem *polyItem = new QGraphicsPolygonItem(
-          QPolygonF(polygonPts));
-      polyItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
-      scene->addItem(polyItem);
+      pathItem->setPen(QPen(Qt::black, 3, Qt::SolidLine));
+      scene->addItem(pathItem);
     }
   }
 }
