@@ -56,7 +56,7 @@ void Stats(physics::WorldPtr _world, const int _steps, common::Time &_avgTime,
 
   _avgTime = common::Time::Zero;
   _maxTime = common::Time::Zero;
-  _minTime.Set(GZ_INT32_MAX, 0);
+  _minTime.Set(ignition::math::MAX_I32, 0);
 
   int repetitions = 3;
   int steps = _steps;
@@ -93,7 +93,7 @@ void SpeedThreadIslandsTest::ThreadSpeedup(const std::string &_physicsEngine,
   ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
-  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  physics::PhysicsEnginePtr physics = world->Physics();
   ASSERT_TRUE(physics != nullptr);
   EXPECT_EQ(physics->GetType(), _physicsEngine);
 
