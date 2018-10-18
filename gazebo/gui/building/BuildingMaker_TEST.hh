@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2015 Open Source Robotics Foundation
+ * Copyright (C) 2015 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,21 @@
  *
 */
 
-#include "gazebo/gui/building/BuildingItem.hh"
+#ifndef _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
+#define _GAZEBO_GUI_BUILDING_MAKER_TEST_HH_
 
-using namespace gazebo;
-using namespace gui;
+#include "gazebo/gui/QTestFixture.hh"
 
-/////////////////////////////////////////////////
-BuildingItem::BuildingItem()
+/// \brief A test class for the BuildingMaker class.
+class BuildingMaker_TEST : public QTestFixture
 {
-}
+  Q_OBJECT
 
-/////////////////////////////////////////////////
-BuildingItem::~BuildingItem()
-{
-}
+  /// \brief Constructor
+  public: BuildingMaker_TEST() = default;
+
+  /// \brief Test attaching and detaching manips.
+  private slots: void Attach();
+};
+
+#endif

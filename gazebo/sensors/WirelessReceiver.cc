@@ -97,7 +97,7 @@ void WirelessReceiver::Load(const std::string &_worldName)
 }
 
 //////////////////////////////////////////////////
-bool WirelessReceiver::UpdateImpl(bool /*_force*/)
+bool WirelessReceiver::UpdateImpl(const bool /*_force*/)
 {
   std::string txEssid;
   msgs::WirelessNodes msg;

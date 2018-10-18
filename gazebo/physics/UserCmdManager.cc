@@ -20,6 +20,7 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
 #include "gazebo/transport/transport.hh"
@@ -145,7 +146,7 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
   UserCmdPtr cmd(new UserCmd(id, this->dataPtr->world, _msg->description(),
       _msg->type()));
 
-  // Forward message
+  // Forward message after we've saved the current state
   if (_msg->type() == msgs::UserCmd::MOVING)
   {
     for (int i = 0; i < _msg->model_size(); ++i)
@@ -166,6 +167,16 @@ void UserCmdManager::OnUserCmdMsg(ConstUserCmdPtr &_msg)
           "] without a world control message. Command won't be executed."
           << std::endl;
     }
+  }
+  else if (_msg->type() == msgs::UserCmd::WRENCH)
+  {
+    // Set publisher
+    std::string topicName = "~/";
+    topicName += _msg->entity_name() + "/wrench";
+    boost::replace_all(topicName, "::", "/");
+
+    auto wrenchPub = this->dataPtr->node->Advertise<msgs::Wrench>(topicName);
+    wrenchPub->Publish(_msg->wrench());
   }
 
   // Add it to undo list

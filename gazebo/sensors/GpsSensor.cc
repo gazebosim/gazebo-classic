@@ -119,7 +119,7 @@ void GpsSensor::Init()
 }
 
 //////////////////////////////////////////////////
-bool GpsSensor::UpdateImpl(bool /*_force*/)
+bool GpsSensor::UpdateImpl(const bool /*_force*/)
 {
   // Get latest pose information
   if (this->parentLink)

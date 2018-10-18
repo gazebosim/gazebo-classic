@@ -110,7 +110,7 @@ void LogicalCameraSensor::Fini()
 }
 
 //////////////////////////////////////////////////
-bool LogicalCameraSensor::UpdateImpl(bool _force)
+bool LogicalCameraSensor::UpdateImpl(const bool _force)
 {
   // Only compute if active, or the update is forced
   if (_force || this->IsActive())
@@ -155,7 +155,7 @@ bool LogicalCameraSensor::UpdateImpl(bool _force)
 }
 
 //////////////////////////////////////////////////
-bool LogicalCameraSensor::IsActive()
+bool LogicalCameraSensor::IsActive() const
 {
   return Sensor::IsActive() ||
     (this->dataPtr->pub && this->dataPtr->pub->HasConnections());
