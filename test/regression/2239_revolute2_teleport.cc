@@ -17,6 +17,7 @@
 
 #include <ignition/math/Pose3.hh>
 
+#include "gazebo/gazebo_config.h"
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/test/helper_physics_generator.hh"
 #include "test/integration/joint_test.hh"
@@ -74,7 +75,11 @@ TEST_P(Issue2239Test, TestRevolute2JointTeleport)
 }
 
 INSTANTIATE_TEST_CASE_P(PhysicsEngines, Issue2239Test,
-  ::testing::Combine(::testing::Values("ode", "dart"), ::testing::Values("")));
+  ::testing::Combine(::testing::Values("ode"
+#ifdef HAVE_DART
+    , "dart"
+#endif
+    ), ::testing::Values("")));  // NOLINT
 
 /////////////////////////////////////////////////
 int main(int argc, char **argv)
