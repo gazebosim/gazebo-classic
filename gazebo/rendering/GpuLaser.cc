@@ -129,7 +129,9 @@ void GpuLaser::Fini()
   this->dataPtr->texCount = 0;
 
   delete [] this->dataPtr->laserBuffer;
+  this->dataPtr->laserBuffer = nullptr;
   delete [] this->dataPtr->laserScan;
+  this->dataPtr->laserScan = nullptr;
 
   Camera::Fini();
 }
