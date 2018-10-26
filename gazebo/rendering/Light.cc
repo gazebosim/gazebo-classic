@@ -104,7 +104,7 @@ void Light::Load()
     parentVis = this->dataPtr->scene->WorldVisual();
 
   this->dataPtr->visual.reset(
-      new Visual(this->Name() + "__LIGHT_VISUAL", parentVis, false));
+      new Visual(this->Name(), parentVis, false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
