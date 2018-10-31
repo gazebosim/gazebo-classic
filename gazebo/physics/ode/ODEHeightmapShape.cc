@@ -43,16 +43,14 @@ dReal ODEHeightmapShape::GetHeightCallback(void *_data, int _x, int _y)
 
 //////////////////////////////////////////////////
 // creates the ODE height field. Only enabled if the height data type is float.
-template <class S>
 void setOdeHeightfieldDetails(
     const dHeightfieldDataID odeHeightfieldId,
-    const S* heights,
-    const std::size_t& width,
-    const std::size_t& height,
+    const float *heights,
+    const double width,
+    const double height,
     const std::size_t vertSize,
     double zOffset,
-    double thickness,
-    typename std::enable_if<std::is_same<float, S>::value>::type* = 0)
+    double thickness)
 {
   assert(width >= 2);
   assert(height >= 2);
@@ -72,16 +70,14 @@ void setOdeHeightfieldDetails(
 
 //////////////////////////////////////////////////
 // creates the ODE height field. Only enabled if the height data type is double.
-template <class S>
 void setOdeHeightfieldDetails(
     const dHeightfieldDataID odeHeightfieldId,
-    const S* heights,
-    const std::size_t& width,
-    const std::size_t& height,
+    const double *heights,
+    const double width,
+    const double height,
     const std::size_t vertSize,
     double zOffset,
-    double thickness,
-    typename std::enable_if<std::is_same<double, S>::value>::type* = 0)
+    double thickness)
 {
   assert(width >= 2);
   assert(height >= 2);

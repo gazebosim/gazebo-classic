@@ -78,17 +78,6 @@ void BulletHeightmapShape::Init()
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
-  // TODO take this print out as soon as testing is finished.
-  // AABB getting is only needed for debug print.
-  btVector3 min, max;
-  this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
-  gzdbg << "Bullet heightfield AABB: min = {"
-        << min.x() << ", " << min.y() << ", " << min.z() << "}, max = {"
-        << max.x() << ", " << max.y() << ", " << max.z() << "}"
-        << " (will be translated by z="
-        << (maxHeight - minHeight) * 0.5 + minHeight
-        << ")" << std::endl;
-
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 

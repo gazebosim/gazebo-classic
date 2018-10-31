@@ -140,7 +140,7 @@ namespace gazebo
       /// \param[in] heights height field to fill with data.
       public: void FillHeightfield(std::vector<float>& heights);
 
-      /// \brief Version of ConstructLookupTableFloat() for double vectors.
+      /// \brief Version of FillHeightfield() for double vectors.
       public: void FillHeightfield(std::vector<double>& heights);
 
       /// \brief Lookup table of heights.

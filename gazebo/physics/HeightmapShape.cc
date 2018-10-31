@@ -219,40 +219,6 @@ void HeightmapShape::FillHeightfield(std::vector<double>& _heights)
 }
 
 //////////////////////////////////////////////////
-// Constructs the float lookup table from common::Heightmap, which always uses
-// float values.
-// Enabled only if the height type used is float.
-// \param[in] _this pointer to this HeightmapShape class
-// \param[in] _this_heights _this->heights field, required as parameter
-//    because it is protected.
-template<class HS>
-void ConstructLookupTableTypeEnabled(HS* _this,
-  std::vector<typename HS::HeightType>& _this_heights,
-  typename std::enable_if<
-    std::is_same<float, typename HS::HeightType>::value>::type* = 0)
-{
-  assert(_this);
-  _this->FillHeightfield(_this_heights);
-}
-
-//////////////////////////////////////////////////
-// Constructs the double lookup table from common::Heightmap, which always uses
-// float values.
-// Enabled only if the height type used is double.
-// \param[in] _this pointer to this HeightmapShape class
-// \param[in] _this_heights _this->heights field, required as parameter
-//    because it is protected.
-template<class HS>
-void ConstructLookupTableTypeEnabled(HS* _this,
-  std::vector<typename HS::HeightType>& _this_heights,
-  typename std::enable_if<
-    std::is_same<double, typename HS::HeightType>::value>::type* = 0)
-{
-  assert(_this);
-  _this->FillHeightfield(_this_heights);
-}
-
-//////////////////////////////////////////////////
 void HeightmapShape::Init()
 {
   this->node = transport::NodePtr(new transport::Node());
@@ -286,7 +252,7 @@ void HeightmapShape::Init()
     this->scale.Z() = fabs(terrainSize.Z()) / heightmapSizeZ;
 
   // Construct the heightmap lookup table
-  ConstructLookupTableTypeEnabled(this, this->heights);
+  this->FillHeightfield(this->heights);
 }
 
 //////////////////////////////////////////////////

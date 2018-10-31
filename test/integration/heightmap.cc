@@ -960,9 +960,6 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
 
   // test using a world file with the <dart><collision_detector>
   // tag: verify the right collision detector has been selected.
-  // Use bullet as an example (the test could also be done for ode etc.,
-  // but we presume that if it works for bullet, the functionality is there
-  // and it will also work for ode).
   std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
   Load(loadWorld, true, "dart");
 

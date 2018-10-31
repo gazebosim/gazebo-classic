@@ -70,7 +70,7 @@ namespace gazebo
 
       /// \brief Creates the shape
       /// \param[in] _bodyNode the body node to use for the shape
-      public: void CreateShape(const dart::dynamics::BodyNodePtr& _bodyNode)
+      public: void CreateShape(const dart::dynamics::BodyNodePtr &_bodyNode)
       {
         GZ_ASSERT(_bodyNode, "BodyNode is NULL");
         dart::dynamics::ShapePtr shape(new DartHeightmapShape());
