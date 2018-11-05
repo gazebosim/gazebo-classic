@@ -1258,7 +1258,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       // element but there is a <transparent> element.
       else if (lambertXml->FirstChildElement("transparent"))
       {
-        mat->SetTransparency(1.0)
+        mat->SetTransparency(1.0);
       }
 
       if (lambertXml->FirstChildElement("transparent"))
@@ -1293,7 +1293,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       // element but there is a <transparent> element.
       else if (lambertXml->FirstChildElement("transparent"))
       {
-        mat->SetTransparency(1.0)
+        mat->SetTransparency(1.0);
       }
 
       if (phongXml->FirstChildElement("transparent"))
@@ -1328,7 +1328,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       // element but there is a <transparent> element.
       else if (lambertXml->FirstChildElement("transparent"))
       {
-        mat->SetTransparency(1.0)
+        mat->SetTransparency(1.0);
       }
 
       if (blinnXml->FirstChildElement("transparent"))
