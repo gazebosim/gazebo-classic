@@ -1240,16 +1240,25 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
     TiXmlElement *phongXml = techniqueXml->FirstChildElement("phong");
     TiXmlElement *blinnXml = techniqueXml->FirstChildElement("blinn");
+
     if (lambertXml)
     {
       this->LoadColorOrTexture(lambertXml, "ambient", mat);
       this->LoadColorOrTexture(lambertXml, "emission", mat);
       this->LoadColorOrTexture(lambertXml, "diffuse", mat);
-      // order matters: transparency needs to be loaded before transparent.
+
+      // order matters: transparency needs to be set on the material before
+      // ColladaLoader::LoadTransparent is called.
       if (lambertXml->FirstChildElement("transparency"))
       {
-        mat->SetTransparency(
-            this->LoadFloat(lambertXml->FirstChildElement("transparency")));
+        mat->SetTransparency(this->LoadFloat(
+            lambertXml->FirstChildElement("transparency")));
+      }
+      // Assume <transparency> should be 1 if there is no <transparency>
+      // element but there is a <transparent> element.
+      else if (lambertXml->FirstChildElement("transparent"))
+      {
+        mat->SetTransparency(1.0)
       }
 
       if (lambertXml->FirstChildElement("transparent"))
@@ -1273,10 +1282,20 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(phongXml->FirstChildElement("shininess")));
 
-      // order matters: transparency needs to be loaded before transparent
+      // order matters: transparency needs to be set on the material before
+      // ColladaLoader::LoadTransparent is called.
       if (phongXml->FirstChildElement("transparency"))
+      {
         mat->SetTransparency(
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
+      }
+      // Assume <transparency> should be 1 if there is no <transparency>
+      // element but there is a <transparent> element.
+      else if (lambertXml->FirstChildElement("transparent"))
+      {
+        mat->SetTransparency(1.0)
+      }
+
       if (phongXml->FirstChildElement("transparent"))
       {
         TiXmlElement *transXml = phongXml->FirstChildElement("transparent");
@@ -1298,10 +1317,20 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
         mat->SetShininess(
             this->LoadFloat(blinnXml->FirstChildElement("shininess")));
 
-      // order matters: transparency needs to be loaded before transparent
+      // order matters: transparency needs to be set on the material before
+      // ColladaLoader::LoadTransparent is called.
       if (blinnXml->FirstChildElement("transparency"))
+      {
         mat->SetTransparency(
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
+      }
+      // Assume <transparency> should be 1 if there is no <transparency>
+      // element but there is a <transparent> element.
+      else if (lambertXml->FirstChildElement("transparent"))
+      {
+        mat->SetTransparency(1.0)
+      }
+
       if (blinnXml->FirstChildElement("transparent"))
       {
         TiXmlElement *transXml = blinnXml->FirstChildElement("transparent");
