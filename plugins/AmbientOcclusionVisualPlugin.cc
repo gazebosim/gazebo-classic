@@ -62,6 +62,16 @@ namespace gazebo
         Ogre::Material *_originalMaterial, uint16_t /*_lodIndex*/,
         const Ogre::Renderable * /*_rend*/)
     {
+      // skip skyx
+      std::string matStr =_originalMaterial->getName();
+      if (matStr.find("SkyX") != std::string::npos)
+      {
+        auto tech = _originalMaterial->createTechnique();
+        tech->setSchemeName(_schemeName);
+        tech->removeAllPasses();
+        return tech;
+      }
+
       // ignore transparent / semi-tranparent materials with alpha rejection set
       Ogre::Technique *origTech = _originalMaterial->getTechnique(0);
       if (origTech)
