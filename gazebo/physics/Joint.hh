@@ -647,7 +647,7 @@ namespace gazebo
       /// For rotational axes, the value is in radians. For prismatic axes,
       /// it is in meters.
       ///
-      /// \param[in] _index Index of the axis, defaults to 0.
+      /// \param[in] _index Index of the axis.
       /// \param[in] _limit Upper limit of the axis.
       public: virtual void SetUpperLimit(const unsigned int _index,
                                          const double _limit);
