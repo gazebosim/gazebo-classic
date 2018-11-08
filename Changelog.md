@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
 1. Fix for revolute2 joints that prevents links from teleporting to origin
     * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
     * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
@@ -400,6 +403,9 @@
 ## Gazebo 8
 
 ## Gazebo 8.X.X (201X-XX-XX)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
 
 1. Fix for revolute2 joints that prevents links from teleporting to origin
     * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
