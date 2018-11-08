@@ -629,10 +629,6 @@ namespace gazebo
       /// For rotational axes, the value is in radians. For prismatic axes,
       /// it is in meters.
       ///
-      /// It returns ignition::math::NAN_D in case the limit can't be
-      /// obtained. For instance, if the index is invalid, if the joint is
-      /// fixed, etc.
-      ///
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
       public: virtual void SetLowerLimit(const unsigned int _index,
@@ -646,10 +642,13 @@ namespace gazebo
       public: void SetUpperLimit(unsigned int _index, math::Angle _limit)
           GAZEBO_DEPRECATED(8.0);
 
-      /// \brief Set the joint's upper limit. For rotational axes, the value
-      /// is in radians, for prismatic axes it is in meters.
-      /// \param[in] _index Index of the axis, defaults to 0.
-      /// \param[in] _limit Lower limit of the axis.
+      /// \brief Set the joint's upper limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _limit Upper limit of the axis.
       public: virtual void SetUpperLimit(const unsigned int _index,
                                          const double _limit);
 
