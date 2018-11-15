@@ -281,6 +281,16 @@ void WheelSlipPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
           params.wheelRadius = sphere->GetRadius();
         }
       }
+      else
+      {
+        gzerr << "A positive wheel radius was not specified in the"
+              << " [wheel_radius] parameter, and the the wheel radius"
+              << " could not be identified automatically because a"
+              << " sphere or cylinder collision shape could not be found."
+              << " Skipping link [" << linkName << "]."
+              << std::endl;
+        continue;
+      }
 
       // if that still didn't work, skip this link
       if (params.wheelRadius <= 0)
