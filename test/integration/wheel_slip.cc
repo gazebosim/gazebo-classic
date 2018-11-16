@@ -510,6 +510,102 @@ TEST_F(WheelSlipTest, TriballDrift)
 }
 
 /////////////////////////////////////////////////
+// This test shows tricycles with spherical wheels
+// driving under load with and without slip compliance.
+// The actual slip should match the predicted value.
+TEST_F(WheelSlipTest, TricyclesUphill)
+{
+  Load("worlds/trisphere_cycle_wheel_slip.world", true);
+
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_NE(world, nullptr);
+
+  physics::PhysicsEnginePtr physics = world->GetPhysicsEngine();
+  ASSERT_NE(physics, nullptr);
+
+  physics->SetRealTimeUpdateRate(0);
+
+  auto g = world->Gravity();
+  EXPECT_EQ(g, ignition::math::Vector3d(-2, 0, -9.8));
+
+  std::map<physics::ModelPtr, double> modelSlips;
+
+  physics::ModelPtr modelSlip0 = world->GetModel("trisphere_cycle_slip0");
+  ASSERT_NE(nullptr, modelSlip0);
+  modelSlips[modelSlip0] = 0.0;
+
+  physics::ModelPtr modelSlip1 = world->GetModel("trisphere_cycle_slip1");
+  ASSERT_NE(nullptr, modelSlip1);
+  modelSlips[modelSlip1] = 1.0;
+
+  double wheelRadius = 0;
+  {
+    physics::LinkPtr wheel = modelSlip0->GetLink("wheel_rear_left");
+    ASSERT_NE(nullptr, wheel);
+    auto collisions = wheel->GetCollisions();
+    ASSERT_FALSE(collisions.empty());
+    ASSERT_EQ(1u, collisions.size());
+    auto collision = collisions.front();
+    ASSERT_NE(nullptr, collision);
+    auto shape = collision->GetShape();
+    ASSERT_NE(nullptr, shape);
+    ASSERT_TRUE(shape->HasType(physics::Base::SPHERE_SHAPE));
+    auto sphere = boost::dynamic_pointer_cast<physics::SphereShape>(shape);
+    ASSERT_NE(nullptr, sphere);
+    wheelRadius = sphere->GetRadius();
+  }
+  ASSERT_GT(wheelRadius, 0);
+
+  const common::PID wheelSpeed(9, 0, 0);
+  const common::PID steerPosition(9, 0, 0.1);
+  const double feedforwardTorque = 2.15;
+  const double angularSpeed = 6.0;
+  for (auto modelSlip : modelSlips)
+  {
+    auto model = modelSlip.first;
+    auto jc = model->GetJointController();
+    jc->SetForce(model->GetScopedName() + "::wheel_rear_left_spin",
+        feedforwardTorque);
+    jc->SetForce(model->GetScopedName() + "::wheel_rear_right_spin",
+        feedforwardTorque);
+    jc->SetVelocityPID(model->GetScopedName() + "::wheel_rear_left_spin",
+        wheelSpeed);
+    jc->SetVelocityPID(model->GetScopedName() + "::wheel_rear_right_spin",
+        wheelSpeed);
+    jc->SetPositionPID(model->GetScopedName() + "::wheel_front_steer",
+        steerPosition);
+    jc->SetVelocityTarget(model->GetScopedName() + "::wheel_rear_left_spin",
+        angularSpeed);
+    jc->SetVelocityTarget(model->GetScopedName() + "::wheel_rear_right_spin",
+        angularSpeed);
+    jc->SetPositionTarget(model->GetScopedName() + "::wheel_front_steer", 0.0);
+  }
+
+  world->Step(2000);
+
+  // compute expected slip
+  // normal force as passed to WheelSlipPlugin in test world
+  const double wheelNormalForce = 32;
+  const double mass = 14.5;
+  const double forceRatio = (mass/2) * std::abs(g.X()) / wheelNormalForce;
+  const double noSlipLinearSpeed = wheelRadius * angularSpeed;
+  for (auto modelSlip : modelSlips)
+  {
+    auto model = modelSlip.first;
+    gzdbg << "checking model slip for " << model->GetName() << std::endl;
+    auto jointLeft = model->GetJoint("wheel_rear_left_spin");
+    ASSERT_NE(nullptr, jointLeft);
+    auto jointRight = model->GetJoint("wheel_rear_right_spin");
+    ASSERT_NE(nullptr, jointRight);
+    EXPECT_NEAR(angularSpeed, jointLeft->GetVelocity(0), 3e-3);
+    EXPECT_NEAR(angularSpeed, jointRight->GetVelocity(0), 3e-3);
+    // expected slip
+    EXPECT_NEAR(noSlipLinearSpeed - model->GetWorldLinearVel().Ign().X(),
+                noSlipLinearSpeed * modelSlip.second * forceRatio, 5e-3);
+  }
+}
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);
