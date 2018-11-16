@@ -14,6 +14,9 @@
 1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
     * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
 
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
 
 ## Gazebo 7.14.0 (2018-07-27)
 
