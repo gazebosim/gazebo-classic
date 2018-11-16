@@ -102,6 +102,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  wheel_slip.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
