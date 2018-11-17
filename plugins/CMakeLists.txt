@@ -92,6 +92,7 @@ set (plugins_single_header
   StaticMapPlugin
   TouchPlugin
   VehiclePlugin
+  WheelSlipPlugin
   WindPlugin
 )
 
