@@ -838,7 +838,8 @@ ignition::math::Box Link::BoundingBox() const
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
-  box.Max().Set(0, 0, 0);
+  box.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
 
   for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
        iter != this->dataPtr->collisions.end(); ++iter)
