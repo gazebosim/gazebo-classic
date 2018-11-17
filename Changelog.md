@@ -2,6 +2,16 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
 1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
     * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
 
@@ -396,6 +406,16 @@
 ## Gazebo 8
 
 ## Gazebo 8.X.X (201X-XX-XX)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
 
 1. Include SDF header in rendering::Distortion
     * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
@@ -1096,6 +1116,9 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2018-XX-XX)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
