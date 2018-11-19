@@ -1,6 +1,6 @@
 ## Gazebo 9
 
-## Gazebo 9.5.0 (2018-10-19)
+## Gazebo 9.5.0 (2018-11-19)
 
 1. Fix model bounding box
     * [Pull request 3033](https://bitbucket.org/osrf/gazebo/pull-request/3033)
