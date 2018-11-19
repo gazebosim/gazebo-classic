@@ -1,6 +1,15 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (20XX-XX-XX)
+## Gazebo 9.5.0 (2018-10-19)
+
+1. Fix model bounding box
+    * [Pull request 3033](https://bitbucket.org/osrf/gazebo/pull-request/3033)
+
+1. Skip skyx in SSAO plugin
+    * [Pull request 3028](https://bitbucket.org/osrf/gazebo/pull-request/3028)
+
+1. Boost 1.68 support
+    * [Pull request 3030](https://bitbucket.org/osrf/gazebo/pull-request/3030)
 
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
