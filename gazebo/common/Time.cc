@@ -447,8 +447,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    gzlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;
