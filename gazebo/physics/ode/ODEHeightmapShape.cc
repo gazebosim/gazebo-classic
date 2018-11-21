@@ -159,12 +159,4 @@ void ODEHeightmapShape::Init()
   // q[3] = 0;
   // dGeomSetOffsetQuaternion(oParent->getCollisionId(), q);
   dGeomSetQuaternion(oParent->GetCollisionId(), q);
-
-  // TODO FIXME remove this as soon as testing of this PR is done
-  // debug print of geometry AABB actually created
-  dReal aabb[6];
-  dGeomGetAABB(oParent->GetCollisionId(), aabb);
-  std::cout << "ODE Heightfield AABB: min = {"
-        << aabb[0] << ", " << aabb[2] << ", " << aabb[4]<< "} max = {"
-        << aabb[1] << ", " << aabb[3] << ", " << aabb[5] << "}" << std::endl;
 }

@@ -28,7 +28,13 @@
 #include "gazebo/test/helper_physics_generator.hh"
 #include "images_cmp.h"
 #include "gazebo/test/ServerFixture.hh"
+
+#ifdef HAVE_DART
+#ifdef __MACTYPES__
+#undef nil
+#endif
 #include "gazebo/physics/dart/DARTPhysics.hh"
+#endif
 
 using namespace gazebo;
 
@@ -85,6 +91,7 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -101,6 +108,10 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   // Make sure the render engine is available.
@@ -161,6 +172,7 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -177,6 +189,11 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
             << std::endl;
       return;
     }
+
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   physics::ModelPtr model = GetModel("heightmap");
@@ -208,6 +225,7 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -224,6 +242,10 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   physics::ModelPtr model = GetModel("heightmap");
@@ -295,6 +317,7 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -311,6 +334,10 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   physics::ModelPtr model = GetModel("heightmap");
@@ -341,6 +368,7 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -357,6 +385,10 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   physics::WorldPtr world = physics::get_world("default");
@@ -549,6 +581,7 @@ void HeightmapTest::Material(const std::string &_worldName,
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::WorldPtr w = physics::get_world();
     ASSERT_NE(w, nullptr);
     physics::PhysicsEnginePtr engine = w->Physics();
@@ -565,6 +598,10 @@ void HeightmapTest::Material(const std::string &_worldName,
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   physics::ModelPtr heightmap = GetModel("heightmap");
@@ -778,6 +815,7 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
 
   if (_physicsEngine == "dart")
   {
+#ifdef HAVE_DART
     physics::PhysicsEnginePtr engine = world->Physics();
     ASSERT_NE(engine, nullptr);
     physics::DARTPhysicsPtr dartEngine
@@ -792,6 +830,10 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
             << std::endl;
       return;
     }
+#else
+    gzerr << "Have no DART installed, skipping test for DART." << std::endl;
+    return;
+#endif
   }
 
   // step the world and verify the sphere has rolled into the valley
@@ -935,12 +977,14 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionBullet)
 
   physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_NE(engine, nullptr);
+#ifdef HAVE_DART
   physics::DARTPhysicsPtr dartEngine
     = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
   ASSERT_NE(dartEngine, nullptr);
   std::string cd = dartEngine->CollisionDetectorInUse();
   EXPECT_FALSE(cd.empty());
   EXPECT_EQ(cd, "bullet");
+#endif
 }
 
 /////////////////////////////////////////////////
@@ -968,12 +1012,14 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
 
   physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_NE(engine, nullptr);
+#ifdef HAVE_DART
   physics::DARTPhysicsPtr dartEngine
     = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
   ASSERT_NE(dartEngine, nullptr);
   std::string cd = dartEngine->CollisionDetectorInUse();
   EXPECT_FALSE(cd.empty());
   EXPECT_EQ(cd, "ode");
+#endif
 }
 
 
