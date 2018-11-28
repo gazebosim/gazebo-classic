@@ -50,7 +50,7 @@ static std::string sonarSensorString =
 "    <sonar>"
 "      <min>0</min>"
 "      <max>1</max>"
-"      <mesh>cone</mesh>"
+"      <geometry>cone</geometry>"
 "      <radius>0.3</radius>"
 "    </sonar>"
 "  </sensor>"
@@ -97,7 +97,7 @@ void SonarSensor_TEST::CreateSonar(const std::string &_physicsEngine,
   EXPECT_DOUBLE_EQ(sensor->RangeMax(), 1.0);
   EXPECT_DOUBLE_EQ(sensor->Radius(), 0.3);
   EXPECT_DOUBLE_EQ(sensor->Range(), 1.0);
-  EXPECT_EQ(sensor->Mesh(), std::string("cone"));
+  EXPECT_EQ(sensor->Geometry(), std::string("cone"));
 
   EXPECT_TRUE(sensor->IsActive());
 }
@@ -142,7 +142,7 @@ void SonarSensor_TEST::DemoWorld(const std::string &_physicsEngine,
   EXPECT_DOUBLE_EQ(sensor->RangeMin(), 0.0);
   EXPECT_DOUBLE_EQ(sensor->RangeMax(), 2.0);
   EXPECT_DOUBLE_EQ(sensor->Radius(), 0.3);
-  EXPECT_EQ(sensor->Mesh(), std::string("cone"));
+  EXPECT_EQ(sensor->Geometry(), std::string("cone"));
   if (_physicsEngine == "ode")
     EXPECT_NEAR(sensor->Range(), 1.4999, 1e-3);
   else

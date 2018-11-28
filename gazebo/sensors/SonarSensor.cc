@@ -86,10 +86,11 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->rangeMin = sonarElem->Get<double>("min");
   this->dataPtr->rangeMax = sonarElem->Get<double>("max");
   this->dataPtr->radius = sonarElem->Get<double>("radius");
-  const std::string mesh = sonarElem->GetElement("mesh")->Get<std::string>();
+  const std::string geometry =
+      sonarElem->GetElement("geometry")->Get<std::string>();
   double range = this->dataPtr->rangeMax - this->dataPtr->rangeMin;
 
-  if (this->dataPtr->radius < 0 && mesh == "cone")
+  if (this->dataPtr->radius < 0 && geometry == "cone")
   {
     gzerr << "Sonar radius must be > 0. Current value is["
       << this->dataPtr->radius << "]\n";
@@ -149,7 +150,7 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->dataPtr->sonarShape != nullptr,
       "Unable to get the sonar shape from the sonar collision.");
 
-  if (mesh == "cone")
+  if (geometry == "cone")
   {
     // Use a scaled cone mesh for the sonar collision shape.
     this->dataPtr->sonarShape->SetMesh("unit_cone");
@@ -163,7 +164,7 @@ void SonarSensor::Load(const std::string &_worldName)
     this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
         this->pose.Rot());
   }
-  else if (mesh == "sphere")
+  else if (geometry == "sphere")
   {
     // Use a scaled sphere mesh for the sonar collision shape.
     this->dataPtr->sonarShape->SetMesh("unit_sphere");
@@ -208,7 +209,7 @@ void SonarSensor::Load(const std::string &_worldName)
       this->Topic());
 
   // Initialize the message that will be published on this->dataPtr->sonarPub.
-  this->dataPtr->sonarMsg.mutable_sonar()->set_mesh(mesh);
+  this->dataPtr->sonarMsg.mutable_sonar()->set_geometry(geometry);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range_min(
       this->dataPtr->rangeMin);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range_max(
@@ -266,9 +267,9 @@ double SonarSensor::Radius() const
 }
 
 //////////////////////////////////////////////////
-std::string SonarSensor::Mesh() const
+std::string SonarSensor::Geometry() const
 {
-  return this->dataPtr->sonarMsg.sonar().mesh();
+  return this->dataPtr->sonarMsg.sonar().geometry();
 }
 
 //////////////////////////////////////////////////

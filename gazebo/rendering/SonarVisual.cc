@@ -111,29 +111,29 @@ void SonarVisual::Update()
     return;
   }
 
-  if (!dPtr->meshVis)
+  if (!dPtr->shapeVis)
   {
-    dPtr->meshVis.reset(
+    dPtr->shapeVis.reset(
         new Visual(this->Name() + "_SONAR_"
-            + boost::to_upper_copy(dPtr->sonarMsg->sonar().mesh())
+            + boost::to_upper_copy(dPtr->sonarMsg->sonar().geometry())
             + "_", shared_from_this(), false));
-    dPtr->meshVis->Load();
-    dPtr->meshVis->InsertMesh("unit_" + dPtr->sonarMsg->sonar().mesh());
-    dPtr->meshVis->AttachMesh("unit_" + dPtr->sonarMsg->sonar().mesh());
-    dPtr->meshVis->SetMaterial("Gazebo/BlueLaser");
-    dPtr->meshVis->SetCastShadows(false);
+    dPtr->shapeVis->Load();
+    dPtr->shapeVis->InsertMesh("unit_" + dPtr->sonarMsg->sonar().geometry());
+    dPtr->shapeVis->AttachMesh("unit_" + dPtr->sonarMsg->sonar().geometry());
+    dPtr->shapeVis->SetMaterial("Gazebo/BlueLaser");
+    dPtr->shapeVis->SetCastShadows(false);
   }
 
   double rangeDelta = dPtr->sonarMsg->sonar().range_max()
       - dPtr->sonarMsg->sonar().range_min();
 
-  if (dPtr->sonarMsg->sonar().mesh() == "sphere")
+  if (dPtr->sonarMsg->sonar().geometry() == "sphere")
   {
     double rangeMax = dPtr->sonarMsg->sonar().range_max();
-    if (!ignition::math::equal(dPtr->meshVis->Scale().Z(), rangeMax) ||
-        !ignition::math::equal(dPtr->meshVis->Scale().X(), rangeMax))
+    if (!ignition::math::equal(dPtr->shapeVis->Scale().Z(), rangeMax) ||
+        !ignition::math::equal(dPtr->shapeVis->Scale().X(), rangeMax))
     {
-      dPtr->meshVis->SetScale(
+      dPtr->shapeVis->SetScale(
           ignition::math::Vector3d(rangeMax, rangeMax, rangeMax));
       dPtr->sonarRay->SetPoint(0,
           ignition::math::Vector3d(0, 0, 0));
@@ -142,10 +142,10 @@ void SonarVisual::Update()
   else
   {
     double radiusScale = dPtr->sonarMsg->sonar().radius() * 2.0;
-    if (!ignition::math::equal(dPtr->meshVis->Scale().Z(), rangeDelta) ||
-        !ignition::math::equal(dPtr->meshVis->Scale().X(), radiusScale))
+    if (!ignition::math::equal(dPtr->shapeVis->Scale().Z(), rangeDelta) ||
+        !ignition::math::equal(dPtr->shapeVis->Scale().X(), radiusScale))
     {
-      dPtr->meshVis->SetScale(
+      dPtr->shapeVis->SetScale(
           ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));
       dPtr->sonarRay->SetPoint(0,
           ignition::math::Vector3d(0, 0, rangeDelta * 0.5));

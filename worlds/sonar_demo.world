@@ -40,7 +40,7 @@
           <sonar>
             <min>0</min>
             <max>2.00</max>
-            <mesh>cone</mesh>
+            <geometry>cone</geometry>
             <radius>0.3</radius>
           </sonar>
           <always_on>1</always_on>

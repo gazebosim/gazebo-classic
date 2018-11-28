@@ -55,8 +55,8 @@ namespace gazebo
       /// \brief True if we have received a message.
       public: bool receivedMsg;
 
-      /// \brief Pointer to the sonar mesh visual.
-      public: VisualPtr meshVis;
+      /// \brief Pointer to the sonar shape visual.
+      public: VisualPtr shapeVis;
     };
   }
 }
