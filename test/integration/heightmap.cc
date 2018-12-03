@@ -558,11 +558,14 @@ void HeightmapTest::LODVisualPlugin()
 
   // check the heightmap lod via scene
   EXPECT_EQ(scene->HeightmapLOD(), 5u);
+  // check skirt length param via scene
+  EXPECT_EQ(scene->HeightmapSkirtLength(), 0.5);
 
-  // get heightmap object and check lod
+  // get heightmap object and check lod params
   rendering::Heightmap *h = scene->GetHeightmap();
   EXPECT_NE(h, nullptr);
   EXPECT_EQ(h->LOD(), 5u);
+  EXPECT_EQ(h->SkirtLength(), 0.5);
 }
 
 /////////////////////////////////////////////////

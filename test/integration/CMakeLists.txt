@@ -38,6 +38,7 @@ set(tests
   dem.cc
   elastic_modulus.cc
   file_handling.cc
+  flash_light_plugin.cc
   gripper.cc
   gz_joint.cc
   gz_log.cc
@@ -62,6 +63,7 @@ set(tests
   keys_to_joints.cc
   kinematic_loop.cc
   laser.cc
+  led_plugin.cc
   link.cc
   logical_camera_sensor.cc
   model.cc
@@ -107,6 +109,7 @@ set(tests
   transport.cc
   transporter.cc
   transport_msg_count.cc
+  wheel_slip.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
