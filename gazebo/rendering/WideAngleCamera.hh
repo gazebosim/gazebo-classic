@@ -19,6 +19,8 @@
 
 #include <string>
 #include <utility>
+#include <vector>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -219,7 +221,8 @@ namespace gazebo
       using Camera::SetClipDist;
 
       // Documentation inherited
-      public: bool SetBackgroundColor(const common::Color &_color) override;
+      public: bool SetBackgroundColor(const ignition::math::Color &_color)
+          override;
 
       /// \brief Project 3D world coordinates to screen coordinates
       /// \param[in] _pt 3D world coodinates
@@ -227,6 +230,11 @@ namespace gazebo
       /// optical center.
       public: ignition::math::Vector3d Project3d(
           const ignition::math::Vector3d &_pt) const;
+
+      /// \brief Get the list of ogre cameras used to create the cube map for
+      /// generating the wide angle camera image
+      /// \return A list of OGRE cameras
+      public: std::vector<Ogre::Camera *> OgreEnvCameras() const;
 
       /// \brief Set the camera's render target
       /// \param[in] _textureName Name used as a base for environment texture

@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <boost/lexical_cast.hpp>
+
 #include <sdf/sdf.hh>
 
 #include "gazebo/msgs/msgs.hh"
@@ -88,9 +90,12 @@ void PhysicsEngine::Fini()
 {
   // Clean up transport
   {
-    this->responsePub.reset();
+    this->physicsSub.reset();
     this->requestSub.reset();
+    this->responsePub.reset();
 
+    if (this->node)
+      this->node->Fini();
     this->node.reset();
   }
 
@@ -119,25 +124,6 @@ void PhysicsEngine::Fini()
 PhysicsEngine::~PhysicsEngine()
 {
   this->Fini();
-}
-
-//////////////////////////////////////////////////
-math::Vector3 PhysicsEngine::GetGravity() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->world->Gravity();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
-ignition::math::Vector3d PhysicsEngine::MagneticField() const
-{
-  return this->world->MagneticField();
 }
 
 //////////////////////////////////////////////////
@@ -335,17 +321,4 @@ sdf::ElementPtr PhysicsEngine::GetSDF() const
 WorldPtr PhysicsEngine::World() const
 {
   return this->world;
-}
-
-//////////////////////////////////////////////////
-void PhysicsEngine::SetGravity(const math::Vector3 &_gravity)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->SetGravity(_gravity.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }

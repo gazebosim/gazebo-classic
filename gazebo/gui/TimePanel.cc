@@ -25,6 +25,8 @@
 #include <mutex>
 #include <sstream>
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/gui/Actions.hh"
 #include "gazebo/gui/GuiEvents.hh"
 #include "gazebo/gui/GuiIface.hh"
@@ -69,7 +71,7 @@ TimePanel::TimePanel(QWidget *_parent)
 
   // Transport
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   this->dataPtr->statsSub = this->dataPtr->node->Subscribe(
       "~/world_stats", &TimePanel::OnStats, this);

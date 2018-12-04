@@ -19,11 +19,13 @@
   #include <Windows.h>
   #include <Winsock2.h>
   #include <cstdint>
-  struct timespec
-  {
-    int64_t tv_sec;
-    int64_t tv_nsec;
-  };
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    struct timespec
+    {
+      int64_t tv_sec;
+      int64_t tv_nsec;
+    };
+  #endif
 #else
   #include <unistd.h>
   #include <sys/time.h>
@@ -112,6 +114,18 @@ Time::Time(double _time)
 /////////////////////////////////////////////////
 Time::~Time()
 {
+}
+
+/////////////////////////////////////////////////
+Time Time::Maximum()
+{
+  // We do not maximize the nanoseconds, because then the Correct() function
+  // will overflow the seconds member data, which will make the seconds field
+  // negative. Instead, we set the nanoseconds field to one nanosecond beneath
+  // one second, so that it's as high as it can be without spilling into
+  // seconds.
+  return Time(std::numeric_limits<int32_t>::max(),
+              static_cast<int32_t>(1e9) - 1);
 }
 
 /////////////////////////////////////////////////
@@ -433,8 +447,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    gzlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;

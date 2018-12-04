@@ -25,7 +25,7 @@ namespace gazebo
   // Basic exception class that inherits from the standard runtime error.
   class RestException : public std::runtime_error
   {
-    public: RestException(const char *_m):std::runtime_error(_m) {}
+    public: explicit RestException(const char *_m):std::runtime_error(_m) {}
   };
 }
 

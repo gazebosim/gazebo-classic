@@ -3,8 +3,10 @@ syntax: glob
 test/plugins/rest-web/node_modules
 build
 build_*
+build-*
 Ogre.log
 .DS_Store
 *.swp
+*.orig
 *.gch
 *.pch

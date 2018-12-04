@@ -236,7 +236,16 @@ std::string Publisher::GetMsgType() const
 //////////////////////////////////////////////////
 void Publisher::OnPublishComplete(uint32_t _id)
 {
-  boost::mutex::scoped_lock lock(this->mutex);
+  try {
+    // This is the deeply unsatisfying way of dealing with a race
+    // condition where the publisher is destroyed before all
+    // OnPublishComplete callbacks are fired.
+    boost::mutex::scoped_lock lock(this->mutex);
+  }
+  catch(...)
+  {
+    return;
+  }
 
   std::map<uint32_t, int>::iterator iter = this->pubIds.find(_id);
   if (iter != this->pubIds.end() && (--iter->second) <= 0)
@@ -254,18 +263,10 @@ void Publisher::Fini()
 {
   if (!this->messages.empty())
     this->SendMessage();
+  this->messages.clear();
 
   if (!this->topic.empty())
     TopicManager::Instance()->Unadvertise(this->topic, this->id);
-
-  common::Time slept;
-
-  // Wait for the message to be published
-  while (!this->pubIds.empty() && slept < common::Time(1, 0))
-  {
-    common::Time::MSleep(10);
-    slept += common::Time(0, 10000000);
-  }
 
   this->node.reset();
 }

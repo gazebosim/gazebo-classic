@@ -95,7 +95,7 @@ TEST_F(IntrospectionManagerTest, RegisterAllTypes)
   };
   auto func6 = []()
   {
-    return common::Color();
+    return ignition::math::Color();
   };
   auto func7 = []()
   {
@@ -117,7 +117,7 @@ TEST_F(IntrospectionManagerTest, RegisterAllTypes)
   EXPECT_TRUE(this->manager->Register<bool>("item7", func4));
   EXPECT_TRUE(this->manager->Register<ignition::math::Vector3d>(
       "item8", func5));
-  EXPECT_TRUE(this->manager->Register<common::Color>("item9", func6));
+  EXPECT_TRUE(this->manager->Register<ignition::math::Color>("item9", func6));
   EXPECT_TRUE(this->manager->Register<ignition::math::Pose3d>("item10", func7));
   EXPECT_TRUE(this->manager->Register<ignition::math::Quaterniond>(
       "item11", func8));
@@ -208,6 +208,10 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   // /introspection/<manager_id>/items_update
   this->manager->Update();
 
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // Check that the callback notifying an item update was executed.
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 4);
@@ -218,11 +222,20 @@ TEST_F(IntrospectionManagerTest, UpdateItems)
   EXPECT_FALSE(executed);
   executed = false;
 
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   // Unregister all items.
   this->manager->Clear();
 
   // Trigger another update.
   this->manager->Update();
+
+  // Wait for asynchronous comms
+  for (int i = 0; i < 10 && !executed; ++i)
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
   EXPECT_TRUE(executed);
   EXPECT_EQ(items.param_size(), 0);
 }

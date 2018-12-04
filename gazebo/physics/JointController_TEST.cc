@@ -23,8 +23,6 @@
 #include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/PID.hh"
-#include "gazebo/math/Vector3.hh"
-#include "gazebo/math/Angle.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/physics/Joint.hh"
 #include "gazebo/physics/JointController.hh"
@@ -36,7 +34,7 @@ class JointControllerTest : public gazebo::testing::AutoLogFixture { };
 
 class FakeJoint : public physics::Joint
 {
-  public: FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
+  public: explicit FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
           {}
 
   public: virtual physics::LinkPtr GetJointLink(unsigned int) const
@@ -217,6 +215,13 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
+  // Set a joint force
+  EXPECT_TRUE(jointController->SetForce(
+        joint->GetScopedName(), 4.56));
+  std::map<std::string, double> forces = jointController->GetForces();
+  EXPECT_EQ(forces.size(), 1u);
+  EXPECT_DOUBLE_EQ(forces[joint->GetScopedName()], 4.56);
+
   // Try setting a position target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
@@ -225,6 +230,12 @@ TEST_F(JointControllerTest, AddJoint)
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
+  velocities = jointController->GetVelocities();
+  EXPECT_EQ(velocities.size(), 1u);
+  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+
+  // Try setting a force on a joint that doesn't exist.
+  EXPECT_FALSE(jointController->SetForce("my_bad_name", 7.89));
   velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);

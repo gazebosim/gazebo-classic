@@ -27,20 +27,10 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTPlaneShape::DARTPlaneShape(CollisionPtr _parent)
-  : PlaneShape(_parent),
-    dataPtr(new DARTPlaneShapePrivate())
-{
-  boost::dynamic_pointer_cast<DARTCollision>(_parent)->SetDARTCollisionShape(
-        this->dataPtr->dtBoxShape, false);
-}
-
-//////////////////////////////////////////////////
 DARTPlaneShape::DARTPlaneShape(DARTCollisionPtr _parent)
   : PlaneShape(_parent),
     dataPtr(new DARTPlaneShapePrivate())
 {
-  _parent->SetDARTCollisionShape(this->dataPtr->dtBoxShape, false);
 }
 
 //////////////////////////////////////////////////
@@ -48,6 +38,27 @@ DARTPlaneShape::~DARTPlaneShape()
 {
   delete this->dataPtr;
   this->dataPtr = nullptr;
+}
+
+//////////////////////////////////////////////////
+void DARTPlaneShape::Init()
+{
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
+  if (!bodyNode) gzerr << "BodyNode is NULL in init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL in init!");
+
+  this->dataPtr->CreateShape(bodyNode);
+
+  _collisionParent->SetDARTCollisionShapeNode(this->dataPtr->ShapeNode(),
+                                              false);
+
+  PlaneShape::Init();
 }
 
 //////////////////////////////////////////////////

@@ -15,6 +15,7 @@
  *
 */
 #include <boost/bind.hpp>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 
 #include "gazebo/rendering/ogre_gazebo.h"
@@ -207,19 +208,6 @@ void UserCamera::Init()
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetDefaultPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetInitialPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 {
   this->dataPtr->initialPose = _pose;
@@ -227,35 +215,9 @@ void UserCamera::SetInitialPose(const ignition::math::Pose3d &_pose)
 }
 
 //////////////////////////////////////////////////
-math::Pose UserCamera::DefaultPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InitialPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d UserCamera::InitialPose() const
 {
   return this->dataPtr->initialPose;
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -454,20 +416,6 @@ void UserCamera::SetViewController(const std::string &_type)
 
 //////////////////////////////////////////////////
 void UserCamera::SetViewController(const std::string &_type,
-                                   const math::Vector3 &_pos)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetViewController(_type, _pos.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
-void UserCamera::SetViewController(const std::string &_type,
                                    const ignition::math::Vector3d &_pos)
 {
   if (_type.empty() ||
@@ -509,6 +457,32 @@ void UserCamera::Resize(unsigned int _w, unsigned int _h)
 {
   this->UpdateFOV();
   this->dataPtr->viewController->Resize(_w, _h);
+
+  // reload ogre compositors on window resize
+  // otherwise some compositors can cause the client to crash
+  Ogre::CompositorManager *compMgr =
+      Ogre::CompositorManager::getSingletonPtr();
+  if (compMgr->hasCompositorChain(this->viewport))
+  {
+    Ogre::CompositorChain *chain =
+        compMgr->getCompositorChain(this->viewport);
+    std::vector<std::pair<std::string, bool>> compositors;
+    Ogre::CompositorChain::InstanceIterator it = chain->getCompositors();
+    while (it.hasMoreElements())
+    {
+      Ogre::CompositorInstance* nextCompInst = it.getNext();
+      compositors.push_back(
+          std::make_pair(nextCompInst->getCompositor()->getName(),
+          nextCompInst->getEnabled()));
+    }
+    compMgr->removeCompositorChain(this->viewport);
+    for (unsigned int i = 0; i < compositors.size(); ++i)
+    {
+      compMgr->addCompositor(this->viewport, compositors[i].first);
+      compMgr->setCompositorEnabled(this->viewport, compositors[i].first,
+          compositors[i].second);
+    }
+  }
 }
 
 //////////////////////////////////////////////////
@@ -702,18 +676,21 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     this->dataPtr->rightViewport =
       this->renderTarget->addViewport(this->dataPtr->rightCamera, 1);
+    auto const &ignBgColor = this->scene->BackgroundColor();
     this->dataPtr->rightViewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+        Conversions::Convert(ignBgColor));
 
 #if OGRE_VERSION_MAJOR > 1 || OGRE_VERSION_MINOR > 9
     this->viewport->setDrawBuffer(Ogre::CBT_BACK_LEFT);
     this->dataPtr->rightViewport->setDrawBuffer(Ogre::CBT_BACK_RIGHT);
 #endif
 
-    this->dataPtr->rightViewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+    this->dataPtr->rightViewport->setVisibilityMask(
+        GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
   }
 
-  this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL);
+  this->viewport->setVisibilityMask(
+      GZ_VISIBILITY_ALL & ~GZ_VISIBILITY_SELECTABLE);
 
   this->initialized = true;
 
@@ -725,13 +702,6 @@ void UserCamera::SetRenderTarget(Ogre::RenderTarget *_target)
 void UserCamera::EnableViewController(bool _value) const
 {
   this->dataPtr->viewController->SetEnabled(_value);
-}
-
-//////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos,
-                                std::string &_mod)
-{
-  return this->Visual(_mousePos.Ign(), _mod);
 }
 
 //////////////////////////////////////////////////
@@ -791,28 +761,9 @@ VisualPtr UserCamera::Visual(const ignition::math::Vector2i &_mousePos,
 }
 
 //////////////////////////////////////////////////
-void UserCamera::SetFocalPoint(const math::Vector3 &_pt)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetFocalPoint(_pt.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void UserCamera::SetFocalPoint(const ignition::math::Vector3d &_pt)
 {
   this->dataPtr->orbitViewController->SetFocalPoint(_pt);
-}
-
-//////////////////////////////////////////////////
-VisualPtr UserCamera::GetVisual(const math::Vector2i &_mousePos) const
-{
-  return this->Visual(_mousePos.Ign());
 }
 
 //////////////////////////////////////////////////

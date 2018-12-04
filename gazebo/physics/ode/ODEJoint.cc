@@ -28,6 +28,9 @@
 #include "gazebo/physics/ScrewJoint.hh"
 #include "gazebo/physics/JointWrench.hh"
 
+// Needed for fixing issue 2430
+#include "gazebo/physics/ode/ODEHingeJoint.hh"
+
 using namespace gazebo;
 using namespace physics;
 
@@ -1197,7 +1200,22 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::SetPosition(unsigned int _index, double _position)
+bool ODEJoint::SetPosition(const unsigned int _index, const double _position,
+                           const bool _preserveWorldVelocity)
 {
-  return Joint::SetPositionMaximal(_index, _position);
+  const bool result = Joint::SetPositionMaximal(_index, _position,
+                                                _preserveWorldVelocity);
+
+  // The following code fixes issue 2430 without breaking ABI
+  // We only need to worry about this for angles outside the range [-pi, pi]
+  if (std::abs(_position) >= M_PI)
+  {
+    // It's only relevant for hinge joints
+    if (ODEHingeJoint *hinge = dynamic_cast<ODEHingeJoint*>(this))
+    {
+      hinge->SetCumulativeAngle(_position);
+    }
+  }
+
+  return result;
 }

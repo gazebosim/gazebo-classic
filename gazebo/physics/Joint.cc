@@ -85,19 +85,6 @@ Joint::~Joint()
 }
 
 //////////////////////////////////////////////////
-void Joint::Load(LinkPtr _parent, LinkPtr _child, const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Load(_parent, _child, _pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Joint::Load(LinkPtr _parent, LinkPtr _child,
                  const ignition::math::Pose3d &_pose)
 {
@@ -445,19 +432,6 @@ void Joint::Fini()
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Joint::GetLocalAxis(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->LocalAxis(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector3d Joint::LocalAxis(const unsigned int _index) const
 {
   ignition::math::Vector3d vec;
@@ -705,19 +679,6 @@ void Joint::FillMsg(msgs::Joint &_msg)
 }
 
 //////////////////////////////////////////////////
-math::Angle Joint::GetAngle(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Position(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double Joint::Position(const unsigned int _index) const
 {
   if (this->model->IsStatic())
@@ -727,62 +688,8 @@ double Joint::Position(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetHighStop(unsigned int _index, const math::Angle &_angle)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetUpperLimit(_index, _angle.Radian());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-  return true;
-}
-
-//////////////////////////////////////////////////
-math::Angle Joint::GetHighStop(unsigned int _index)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->UpperLimit(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-
-//////////////////////////////////////////////////
-bool Joint::SetLowStop(unsigned int _index, const math::Angle &_angle)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetLowerLimit(_index, _angle.Radian());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-  return true;
-}
-
-//////////////////////////////////////////////////
-math::Angle Joint::GetLowStop(unsigned int _index)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->LowerLimit(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
-bool Joint::SetPosition(unsigned int /*_index*/, double _position)
+bool Joint::SetPosition(const unsigned int /*_index*/, const double _position,
+                        const bool /*_preserveWorldVelocity*/)
 {
   // parent class doesn't do much, derived classes do all the work.
   if (this->model)
@@ -801,7 +708,9 @@ bool Joint::SetPosition(unsigned int /*_index*/, double _position)
 }
 
 //////////////////////////////////////////////////
-bool Joint::SetPositionMaximal(unsigned int _index, double _position)
+bool Joint::SetPositionMaximal(
+    const unsigned int _index, double _position,
+    const bool _preserveWorldVelocity)
 {
   // check if index is within bounds
   if (_index >= this->DOF())
@@ -883,7 +792,8 @@ bool Joint::SetPositionMaximal(unsigned int _index, double _position)
                                 li != connectedLinks.end(); ++li)
           {
             // set pose of each link based on child link pose change
-            (*li)->MoveFrame(childLinkPose, newChildLinkPose);
+            (*li)->MoveFrame(childLinkPose, newChildLinkPose,
+              _preserveWorldVelocity);
 
             // debug
             // gzerr << "moved " << (*li)->GetName()
@@ -1060,19 +970,6 @@ void Joint::ApplyStiffnessDamping()
 }
 
 /////////////////////////////////////////////////
-double Joint::GetInertiaRatio(const math::Vector3 &_axis) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InertiaRatio(_axis.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double Joint::InertiaRatio(const ignition::math::Vector3d &_axis) const
 {
   if (this->parentLink && this->childLink)
@@ -1179,19 +1076,6 @@ double Joint::GetSpringReferencePosition(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle Joint::GetLowerLimit(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Angle(this->LowerLimit(_index));
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double Joint::LowerLimit(const unsigned int _index) const
 {
   if (_index < this->DOF())
@@ -1202,19 +1086,6 @@ double Joint::LowerLimit(const unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Angle Joint::GetUpperLimit(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return math::Angle(this->UpperLimit(_index));
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 double Joint::UpperLimit(const unsigned int _index) const
 {
   if (_index < this->DOF())
@@ -1222,19 +1093,6 @@ double Joint::UpperLimit(const unsigned int _index) const
 
   gzwarn << "requesting upper limit of joint index out of bound\n";
   return ignition::math::NAN_D;
-}
-
-//////////////////////////////////////////////////
-void Joint::SetLowerLimit(unsigned int _index, math::Angle _limit)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetLowerLimit(_index, _limit.Radian());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1272,19 +1130,6 @@ void Joint::SetLowerLimit(const unsigned int _index, const double _limit)
            << "] index [" << _index
            << "] not supported\n";
   }
-}
-
-//////////////////////////////////////////////////
-void Joint::SetUpperLimit(unsigned int _index, math::Angle _limit)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetUpperLimit(_index, _limit.Radian());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1389,35 +1234,9 @@ double Joint::GetStopDissipation(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetInitialAnchorPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InitialAnchorPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Joint::InitialAnchorPose() const
 {
   return this->anchorPose;
-}
-
-//////////////////////////////////////////////////
-math::Pose Joint::GetWorldPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->WorldPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1429,19 +1248,6 @@ ignition::math::Pose3d Joint::WorldPose() const
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetParentWorldPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->ParentWorldPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Joint::ParentWorldPose() const
 {
   if (this->parentLink)
@@ -1450,35 +1256,9 @@ ignition::math::Pose3d Joint::ParentWorldPose() const
 }
 
 //////////////////////////////////////////////////
-math::Pose Joint::GetAnchorErrorPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->AnchorErrorPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Joint::AnchorErrorPose() const
 {
   return this->WorldPose() - this->ParentWorldPose();
-}
-
-//////////////////////////////////////////////////
-math::Quaternion Joint::GetAxisFrame(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->AxisFrame(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1503,19 +1283,6 @@ ignition::math::Quaterniond Joint::AxisFrame(const unsigned int _index) const
   }
 
   return this->WorldPose().Rot();
-}
-
-//////////////////////////////////////////////////
-math::Quaternion Joint::GetAxisFrameOffset(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->AxisFrameOffset(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1602,20 +1369,6 @@ bool Joint::FindAllConnectedLinks(const LinkPtr &_originalParentLink,
     return this->childLink->FindAllConnectedLinksHelper(_originalParentLink,
       _connectedLinks, true);
   }
-}
-
-//////////////////////////////////////////////////
-math::Pose Joint::ComputeChildLinkPose(unsigned int _index,
-          double _position)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->ChildLinkPose(_index, _position);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -1747,99 +1500,3 @@ void Joint::RegisterIntrospectionVelocity(const unsigned int _index)
       <double>(uri.Str(), f);
 }
 
-/////////////////////////////////////////////////
-unsigned int Joint::GetAngleCount() const
-{
-  return this->DOF();
-}
-
-/////////////////////////////////////////////////
-math::Angle Joint::GetAngleImpl(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->PositionImpl(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-void Joint::SetAxis(unsigned int _index, const math::Vector3 &_axis)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetAxis(_index, _axis.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-math::Vector3 Joint::GetGlobalAxis(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->GlobalAxis(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-void Joint::SetAnchor(unsigned int _index, const math::Vector3 &_anchor)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetAnchor(_index, _anchor.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-math::Vector3 Joint::GetAnchor(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Anchor(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-math::Vector3 Joint::GetLinkForce(unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->LinkForce(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-math::Vector3 Joint::GetLinkTorque(const unsigned int _index) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->LinkTorque(_index);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}

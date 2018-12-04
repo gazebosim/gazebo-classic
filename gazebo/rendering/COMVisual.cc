@@ -195,19 +195,6 @@ void COMVisual::Load()
 }
 
 /////////////////////////////////////////////////
-math::Pose COMVisual::GetInertiaPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->InertiaPose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Pose3d COMVisual::InertiaPose() const
 {
   COMVisualPrivate *dPtr =

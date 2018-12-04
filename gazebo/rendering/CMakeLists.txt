@@ -94,6 +94,8 @@ set (headers
   DynamicRenderable.hh
   FPSViewController.hh
   GpuLaser.hh
+  GpuLaserDataIterator.hh
+  GpuLaserDataIteratorImpl.hh
   Grid.hh
   Heightmap.hh
   InertiaVisual.hh
@@ -156,6 +158,7 @@ if (HAVE_OCULUS)
 endif ()
 
 set (gtest_sources
+  GpuLaserDataIterator_TEST.cc
   RenderingConversions_TEST.cc
 )
 
@@ -165,6 +168,7 @@ set (gtest_sources_dri
   ApplyWrenchVisual_TEST.cc
   ArrowVisual_TEST.cc
   AxisVisual_TEST.cc
+  Camera_TEST.cc
   CameraVisual_TEST.cc
   COMVisual_TEST.cc
   ContactVisual_TEST.cc
@@ -177,6 +181,7 @@ set (gtest_sources_dri
   LaserVisual_TEST.cc
   LogicalCameraVisual_TEST.cc
   LinkFrameVisual_TEST.cc
+  MovableText_TEST.cc
   RenderingMaterial_TEST.cc
   OriginVisual_TEST.cc
   RenderEngine_TEST.cc

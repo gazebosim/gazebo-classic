@@ -26,6 +26,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
 #include <ignition/math/Helpers.hh>
 #include <sdf/sdf.hh>
 
@@ -582,19 +583,6 @@ ignition::math::Quaterniond Camera::WorldRotation() const
 }
 
 //////////////////////////////////////////////////
-void Camera::SetWorldPose(const math::Pose &_pose)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetWorldPose(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void Camera::SetWorldPose(const ignition::math::Pose3d &_pose)
 {
   this->SetWorldPosition(_pose.Pos());
@@ -781,10 +769,15 @@ unsigned int Camera::ImageDepth() const
 
   if (imgFmt == "L8" || imgFmt == "L_INT8")
     return 1;
+  else if (imgFmt == "L16" || imgFmt == "L_INT16" || imgFmt == "L_UINT16")
+    return 2;
   else if (imgFmt == "R8G8B8" || imgFmt == "RGB_INT8")
     return 3;
   else if (imgFmt == "B8G8R8" || imgFmt == "BGR_INT8")
     return 3;
+  else if (imgFmt == "R16G16B16" || imgFmt == "RGB_INT16"
+      || imgFmt == "RGB_UINT16")
+    return 6;
   else if ((imgFmt == "BAYER_RGGB8") || (imgFmt == "BAYER_BGGR8") ||
             (imgFmt == "BAYER_GBRG8") || (imgFmt == "BAYER_GRBG8"))
     return 1;
@@ -794,6 +787,14 @@ unsigned int Camera::ImageDepth() const
           << imgFmt << "), using default Ogre::PF_R8G8B8\n";
     return 3;
   }
+}
+
+//////////////////////////////////////////////////
+unsigned int Camera::ImageMemorySize() const
+{
+  return  Ogre::PixelUtil::getMemorySize(this->ImageWidth(),
+      this->ImageHeight(), 1, static_cast<Ogre::PixelFormat>(
+      this->imageFormat));
 }
 
 //////////////////////////////////////////////////
@@ -841,6 +842,8 @@ int Camera::OgrePixelFormat(const std::string &_format)
 
   if (_format == "L8" || _format == "L_INT8")
     result = static_cast<int>(Ogre::PF_L8);
+  else if (_format == "L16" || _format == "L_INT16" || _format == "L_UINT16")
+    result = static_cast<int>(Ogre::PF_L16);
   else if (_format == "R8G8B8" || _format == "RGB_INT8")
     result = static_cast<int>(Ogre::PF_BYTE_RGB);
   else if (_format == "B8G8R8" || _format == "BGR_INT8")
@@ -849,6 +852,9 @@ int Camera::OgrePixelFormat(const std::string &_format)
     result = static_cast<int>(Ogre::PF_FLOAT32_R);
   else if (_format == "FLOAT16")
     result = static_cast<int>(Ogre::PF_FLOAT16_R);
+  else if (_format == "R16G16B16" || _format == "RGB_INT16"
+      || _format == "RGB_UINT16")
+    result = static_cast<int>(Ogre::PF_SHORT_RGB);
   else if ((_format == "BAYER_RGGB8") ||
             (_format == "BAYER_BGGR8") ||
             (_format == "BAYER_GBRG8") ||
@@ -1405,8 +1411,8 @@ void Camera::SetRenderTarget(Ogre::RenderTarget *_target)
 
     RTShaderSystem::AttachViewport(this->viewport, this->GetScene());
 
-    this->viewport->setBackgroundColour(
-        Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &ignBG = this->scene->BackgroundColor();
+    this->viewport->setBackgroundColour(Conversions::Convert(ignBG));
     this->viewport->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
@@ -1896,6 +1902,12 @@ std::string Camera::ProjectionType() const
 //////////////////////////////////////////////////
 bool Camera::SetBackgroundColor(const common::Color &_color)
 {
+  return this->SetBackgroundColor(_color.Ign());
+}
+
+//////////////////////////////////////////////////
+bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
+{
   if (this->OgreViewport())
   {
     this->OgreViewport()->setBackgroundColour(Conversions::Convert(_color));
@@ -1919,12 +1931,6 @@ event::ConnectionPtr Camera::ConnectNewImageFrame(
 }
 
 //////////////////////////////////////////////////
-void Camera::DisconnectNewImageFrame(event::ConnectionPtr &_c)
-{
-  this->newImageFrame.Disconnect(_c->Id());
-}
-
-/////////////////////////////////////////////////
 VisualPtr Camera::TrackedVisual() const
 {
   return this->dataPtr->trackedVisual;

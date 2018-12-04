@@ -33,13 +33,6 @@ namespace gazebo
     class MouseEvent;
   }
 
-  namespace math
-  {
-    class Pose;
-    class Quaternion;
-    class Vector3;
-  }
-
   namespace gui
   {
     class ModelSnapPrivate;
@@ -74,39 +67,10 @@ namespace gazebo
       /// \param[in] _triangleDest vertices of the other triangle that will be
       /// moved.
       /// \param[in] _visualSrc Visual being moved by the snap action.
-      /// \deprecated See function that accepts ignition::math parameters.
-      public: void Snap(const std::vector<math::Vector3> &_triangleSrc,
-          const std::vector<math::Vector3> &_triangleDest,
-          rendering::VisualPtr _visualSrc) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Calculate the translation and rotation needed to snap the
-      /// centroid of a mesh triangle of a visual to another, taking into
-      /// account any pose offsets.
-      /// \param[in] _triangleSrc vertices of target triangle being snapped to.
-      /// \param[in] _triangleDest vertices of the other triangle that will be
-      /// moved.
-      /// \param[in] _visualSrc Visual being moved by the snap action.
       public: void Snap(
           const ignition::math::Triangle3d &_triangleSrc,
           const ignition::math::Triangle3d &_triangleDest,
           rendering::VisualPtr _visualSrc);
-
-      /// \brief Calculate the translation and rotation needed to snap the
-      /// centroid of a mesh triangle of a visual to another, taking into
-      /// account any pose offsets.
-      /// \param[in] _triangleSrc vertices of target triangle being snapped to.
-      /// \param[in] _triangleDest vertices of the other triangle that will be
-      /// moved.
-      /// \param[in] _poseSrc Pose offset of triangleB relative to its model
-      /// visual.
-      /// \param[out] _trans Translation output.
-      /// \param[out] _rotation Rotation output.
-      /// \deprecated See function that accepts ignition::math parameters.
-      public: void GetSnapTransform(
-          const std::vector<math::Vector3> &_triangleSrc,
-          const std::vector<math::Vector3> &_triangleDest,
-          const math::Pose &_poseSrc, math::Vector3 &_trans,
-          math::Quaternion &_rot) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Calculate the translation and rotation needed to snap the
       /// centroid of a mesh triangle of a visual to another, taking into

@@ -37,7 +37,6 @@
 #include "gazebo/transport/TransportTypes.hh"
 
 #include "gazebo/msgs/msgs.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/UpdateInfo.hh"
@@ -94,6 +93,10 @@ namespace gazebo
       /// \param[in] _sdf SDF parameters.
       public: void Load(sdf::ElementPtr _sdf);
 
+      /// \brief Get the SDF of the world in the current state.
+      /// \return The SDF
+      public: const sdf::ElementPtr SDF();
+
       /// \brief Save a world to a file.
       /// Save the current world and its state to a file.
       /// \param[in] _filename Name of the file to save into.
@@ -108,11 +111,6 @@ namespace gazebo
       /// \param[in] _iterations Run for this many iterations, then stop.
       /// A value of zero disables run stop.
       public: void Run(const unsigned int _iterations = 0);
-
-      /// \brief Return the running state of the world.
-      /// \return True if the world is running.
-      /// \deprecated See bool Running() const
-      public: bool GetRunning() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Return the running state of the world.
       /// \return True if the world is running.
@@ -133,18 +131,7 @@ namespace gazebo
 
       /// \brief Get the name of the world.
       /// \return The name of the world.
-      /// \deprecated See std::string Name() const;
-      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the name of the world.
-      /// \return The name of the world.
       public: std::string Name() const;
-
-      /// \brief Return the physics engine.
-      /// Get a pointer to the physics engine used by the world.
-      /// \return Pointer to the physics engine.
-      /// \deprecated See PhysicsEnginePtr Physics() const;
-      public: PhysicsEnginePtr GetPhysicsEngine() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Return the physics engine.
       /// Get a pointer to the physics engine used by the world.
@@ -157,22 +144,11 @@ namespace gazebo
 
       /// \brief Return the preset manager.
       /// \return Pointer to the preset manager.
-      /// \deprecated See PresetManagerPtr PresetMgr() const
-      public: PresetManagerPtr GetPresetManager() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Return the preset manager.
-      /// \return Pointer to the preset manager.
       public: PresetManagerPtr PresetMgr() const;
 
       /// \brief Get a reference to the wind used by the world.
       /// \return Reference to the wind.
       public: physics::Wind &Wind() const;
-
-      /// \brief Return the spherical coordinates converter.
-      /// \return Pointer to the spherical coordinates converter.
-      /// \deprecated See common::SphericalCoordinatesPtr SphericalCoords()
-      public: common::SphericalCoordinatesPtr GetSphericalCoordinates() const
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Return the spherical coordinates converter.
       /// \return Pointer to the spherical coordinates converter.
@@ -200,21 +176,7 @@ namespace gazebo
 
       /// \brief Get the number of models.
       /// \return The number of models in the World.
-      /// \deprecated See unsigned int ModelCount() const
-      public: unsigned int GetModelCount() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the number of models.
-      /// \return The number of models in the World.
       public: unsigned int ModelCount() const;
-
-      /// \brief Get a model based on an index.
-      /// Get a Model using an index, where index must be greater than zero
-      /// and less than World::GetModelCount()
-      /// \param[in] _index The index of the model [0..GetModelCount)
-      /// \return A pointer to the Model. NULL if _index is invalid.
-      /// \deprecated See ModelPtr ModelByIndex(const unsigned int _index) const
-      public: ModelPtr GetModel(unsigned int _index) const
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a model based on an index.
       /// Get a Model using an index, where index must be greater than zero
@@ -222,11 +184,6 @@ namespace gazebo
       /// \param[in] _index The index of the model [0..GetModelCount)
       /// \return A pointer to the Model. NULL if _index is invalid.
       public: ModelPtr ModelByIndex(const unsigned int _index) const;
-
-      /// \brief Get a list of all the models.
-      /// \return A list of all the Models in the world.
-      /// \deprecated See Model_V Models() const
-      public: Model_V GetModels() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a list of all the models.
       /// \return A list of all the Models in the world.
@@ -259,12 +216,6 @@ namespace gazebo
       /// \brief Get the world simulation time, note if you want the PC
       /// wall clock call common::Time::GetWallTime.
       /// \return The current simulation time
-      /// \deprecated See common::Time SimTime() const
-      public: common::Time GetSimTime() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the world simulation time, note if you want the PC
-      /// wall clock call common::Time::GetWallTime.
-      /// \return The current simulation time
       public: common::Time SimTime() const;
 
       /// \brief Set the sim time.
@@ -273,26 +224,11 @@ namespace gazebo
 
       /// \brief Get the amount of time simulation has been paused.
       /// \return The pause time.
-      /// \deprecated See common::Time PauseTime() const
-      public: common::Time GetPauseTime() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the amount of time simulation has been paused.
-      /// \return The pause time.
       public: common::Time PauseTime() const;
 
       /// \brief Get the wall time simulation was started..
       /// \return The start time.
-      /// \deprecated See common::Time StartTime() const
-      public: common::Time GetStartTime() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the wall time simulation was started..
-      /// \return The start time.
       public: common::Time StartTime() const;
-
-      /// \brief Get the real time (elapsed time).
-      /// \return The real time.
-      /// \deprecated See common::Time RealTime() const
-      public: common::Time GetRealTime() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the real time (elapsed time).
       /// \return The real time.
@@ -311,25 +247,7 @@ namespace gazebo
       /// with a matching _name.
       /// \param[in] _name The name of the Model to find.
       /// \return A pointer to the entity, or NULL if no entity was found.
-      /// \deprecated See BasePtr BaseByName(const std::string &_name) const;
-      public: BasePtr GetByName(const std::string &_name)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get an element by name.
-      /// Searches the list of entities, and return a pointer to the model
-      /// with a matching _name.
-      /// \param[in] _name The name of the Model to find.
-      /// \return A pointer to the entity, or NULL if no entity was found.
       public: BasePtr BaseByName(const std::string &_name) const;
-
-      /// \brief Get a model by name.
-      /// This function is the same as BaseByName, but limits the search to
-      /// only models.
-      /// \param[in] _name The name of the Model to find.
-      /// \return A pointer to the Model, or NULL if no model was found.
-      /// \deprecated See ModelPtr ModelByName(const std::string &_name)
-      public: ModelPtr GetModel(const std::string &_name)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a model by name.
       /// This function is the same as BaseByName, but limits the search to
@@ -343,25 +261,7 @@ namespace gazebo
       /// only lights.
       /// \param[in] _name The name of the Light to find.
       /// \return A pointer to the Light, or NULL if no light was found.
-      /// \deprecated See LightPtr LightByName(const std::string &_name) const
-      public: LightPtr Light(const std::string &_name)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get a light by name.
-      /// This function is the same as BaseByName(), but limits the search to
-      /// only lights.
-      /// \param[in] _name The name of the Light to find.
-      /// \return A pointer to the Light, or NULL if no light was found.
       public: LightPtr LightByName(const std::string &_name) const;
-
-      /// \brief Get a pointer to an Entity based on a name.
-      /// This function is the same as BaseByName, but limits the search to
-      /// only Entities.
-      /// \param[in] _name The name of the Entity to find.
-      /// \return A pointer to the Entity, or NULL if no Entity was found.
-      /// \deprecated See EntityPtr EntityByName(const std::string &_name)
-      public: EntityPtr GetEntity(const std::string &_name)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get a pointer to an Entity based on a name.
       /// This function is the same as BaseByName, but limits the search to
@@ -377,30 +277,8 @@ namespace gazebo
       /// This function makes use of World::GetEntityBelowPoint.
       /// \param[in] _pt The 3D point to search below.
       /// \return A pointer to nearest Model, NULL if none is found.
-      /// \deprecated See ModelPtr ModelBelowPoint(
-      /// const ignition::math::Vector3d &_pt)
-      public: ModelPtr GetModelBelowPoint(const math::Vector3 &_pt)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the nearest model below and not encapsulating a point.
-      /// Only objects below the start point can be returned. Any object
-      /// that encapsulates the start point can not be returned from this
-      /// function.
-      /// This function makes use of World::GetEntityBelowPoint.
-      /// \param[in] _pt The 3D point to search below.
-      /// \return A pointer to nearest Model, NULL if none is found.
       public: ModelPtr ModelBelowPoint(
                   const ignition::math::Vector3d &_pt) const;
-
-      /// \brief Get the nearest entity below a point.
-      /// Projects a Ray down (-Z axis) starting at the given point. The
-      /// first entity hit by the Ray is returned.
-      /// \param[in] _pt The 3D point to search below
-      /// \return A pointer to nearest Entity, NULL if none is found.
-      /// \deprecated See EntityPtr EntityBelowPoint(
-      /// const ignition::math::Vector3d &_pt)
-      public: EntityPtr GetEntityBelowPoint(const math::Vector3 &_pt)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the nearest entity below a point.
       /// Projects a Ray down (-Z axis) starting at the given point. The
@@ -462,27 +340,11 @@ namespace gazebo
 
       /// \brief Get the set world pose mutex.
       /// \return Reference to the mutex.
-      /// \deprecated See std::mutex &WorldPoseMutex() const;
-      public: std::mutex &GetSetWorldPoseMutex() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the set world pose mutex.
-      /// \return Reference to the mutex.
       public: std::mutex &WorldPoseMutex() const;
 
       /// \brief check if physics engine is enabled/disabled.
       /// \param True if the physics engine is enabled.
-      /// \deprecated See bool PhysicsEnabled() const;
-      public: bool GetEnablePhysicsEngine() GAZEBO_DEPRECATED(8.0);
-
-      /// \brief check if physics engine is enabled/disabled.
-      /// \param True if the physics engine is enabled.
       public: bool PhysicsEnabled() const;
-
-      /// \brief enable/disable physics engine during World::Update.
-      /// \param[in] _enable True to enable the physics engine.
-      /// \deprecated See void SetPhysicsEngineEnabled(const bool _enable)
-      public: void EnablePhysicsEngine(const bool _enable)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief enable/disable physics engine during World::Update.
       /// \param[in] _enable True to enable the physics engine.
@@ -535,17 +397,7 @@ namespace gazebo
 
       /// \brief Get the total number of iterations.
       /// \return Number of iterations that simulation has taken.
-      /// \deprecated see uint32_t Iterations() const;
-      public: uint32_t GetIterations() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the total number of iterations.
-      /// \return Number of iterations that simulation has taken.
       public: uint32_t Iterations() const;
-
-      /// \brief Get the current scene in message form.
-      /// \return The scene state as a protobuf message.
-      /// \deprecated See msgs::Scene SceneMsg() const
-      public: msgs::Scene GetSceneMsg() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the current scene in message form.
       /// \return The scene state as a protobuf message.
@@ -735,8 +587,16 @@ namespace gazebo
       /// Must only be called from the World::ProcessMessages function.
       private: void ProcessLightModifyMsgs();
 
+      /// \brief Process all received log playback control messages.
+      /// Must only be called from the World::ProcessMessages function.
+      private: void ProcessPlaybackControlMsgs();
+
       /// \brief Log callback. This is where we write out state info.
       private: bool OnLog(std::ostringstream &_stream);
+
+      /// \brief Save model resources while recording a log, such as meshes
+      /// and textures.
+      private: void LogModelResources();
 
       /// \brief Process all incoming messages.
       private: void ProcessMessages();
@@ -752,13 +612,6 @@ namespace gazebo
 
       /// \brief Unregister items in the introspection service.
       private: void UnregisterIntrospectionItems();
-
-      /// \brief Callback when a light message is received.
-      /// \param[in] _msg Pointer to the light message.
-      /// \deprecated Topic ~/light deprecated.
-      /// See OnLightFactoryMsg which subscribes to ~/factory/light and
-      /// OnLightModifyMsg which subscribes to ~/light/modify
-      private: void OnLightMsg(ConstLightPtr &_msg);
 
       /// \brief Callback when a light message is received in the
       /// ~/factory/light topic.
@@ -785,9 +638,9 @@ namespace gazebo
       ///
       /// \param[in] _request Request containing plugin URI.
       /// \param[out] _plugins Message containing vector of plugins.
-      /// \param[out] _success True if the info was successfully obtained.
-      private: void PluginInfoService(const ignition::msgs::StringMsg &_request,
-          ignition::msgs::Plugin_V &_plugins, bool &_success);
+      /// \return True if the info was successfully obtained.
+      private: bool PluginInfoService(const ignition::msgs::StringMsg &_request,
+          ignition::msgs::Plugin_V &_plugins);
 
       /// \internal
       /// \brief Private data pointer.

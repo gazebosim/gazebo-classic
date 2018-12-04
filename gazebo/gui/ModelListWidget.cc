@@ -285,7 +285,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
     else if (lItem)
     {
       rendering::LightPtr light =
-        gui::get_active_camera()->GetScene()->GetLight(
+        gui::get_active_camera()->GetScene()->LightByName(
             this->dataPtr->selectedEntityName);
 
       light->FillMsg(this->dataPtr->lightMsg);
@@ -2857,7 +2857,10 @@ void ModelListWidget::InitTransport(const std::string &_name)
   }
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init(_name);
+  if (_name.empty())
+    this->dataPtr->node->TryInit(common::Time::Maximum());
+  else
+    this->dataPtr->node->Init(_name);
 
   this->dataPtr->modelPub = this->dataPtr->node->Advertise<msgs::Model>(
       "~/model/modify");

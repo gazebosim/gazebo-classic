@@ -46,6 +46,9 @@ int imageCount3 = 0;
 int imageCount4 = 0;
 std::string pixelFormat = "";
 
+// list of timestamped images used by the Timestamp test
+std::vector<gazebo::msgs::ImageStamped> g_imagesStamped;
+
 float *depthImg = nullptr;
 
 /////////////////////////////////////////////////
@@ -59,6 +62,15 @@ void OnNewCameraFrame(int* _imageCounter, unsigned char* _imageDest,
   pixelFormat = _format;
   memcpy(_imageDest, _image, _width * _height * _depth);
   *_imageCounter += 1;
+}
+
+/////////////////////////////////////////////////
+void OnImage(ConstImageStampedPtr &_msg)
+{
+  std::lock_guard<std::mutex> lock(mutex);
+  gazebo::msgs::ImageStamped imgStamped;
+  imgStamped.CopyFrom(*_msg.get());
+  g_imagesStamped.push_back(imgStamped);
 }
 
 /////////////////////////////////////////////////
@@ -91,8 +103,8 @@ TEST_F(CameraSensor, WorldReset)
   // spawn sensors of various sizes to test speed
   std::string modelName = "camera_model";
   std::string cameraName = "camera_sensor";
-  unsigned int width  = 320;
-  unsigned int height = 240;
+  uint32_t width  = 320;
+  uint32_t height = 240;
   double updateRate = 10;
   ignition::math::Pose3d setPose, testPose(
       ignition::math::Vector3d(-5, 0, 5),
@@ -777,6 +789,116 @@ TEST_F(CameraSensor, CheckDistortion)
   delete[] img4;
 }
 
+/////////////////////////////////////////////////
+// Test the the SetCrop method for cameras works
+// to set the distortion crop after creation of the sensor.
+TEST_F(CameraSensor, CheckSetCrop)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // Constants
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  const double k1 = -0.1349;
+  const double k2 = -0.51868;
+  const double k3 = -0.001;
+  const int numImages = 10;
+  const ignition::math::Pose3d pose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+
+  std::string names[] = {"barrel_default", "barrel_no_crop"};
+
+  // Spawn two cameras with barrel distortion.
+  // The first will crop border and the second will not
+  int imageCounts[2];
+  unsigned char* images[2];
+  sensors::CameraSensorPtr cameras[2];
+  event::ConnectionPtr connections[2];
+  for (size_t i = 0; i < 2; ++i)
+  {
+      std::string modelName = names[i] + "_model";
+      std::string sensorName = names[i] + "_sensor";
+      SpawnCamera(modelName, sensorName, pose.Pos(),
+                  pose.Rot().Euler(), width, height, updateRate,
+                  "", 0, 0, true, k1, k2, k3, 0, 0, 0.5, 0.5);
+      sensors::SensorPtr sensor = sensors::get_sensor(sensorName);
+      ASSERT_NE(sensor, nullptr);
+      cameras[i] = std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+      ASSERT_NE(cameras[i], nullptr);
+      images[i] = new unsigned char[width * height * 3];
+      imageCounts[i] = 0;
+      connections[i] = cameras[i]->Camera()->ConnectNewImageFrame(
+           std::bind(&::OnNewCameraFrame, &imageCounts[i], images[i],
+                     std::placeholders::_1, std::placeholders::_2,
+                     std::placeholders::_3,
+                     std::placeholders::_4, std::placeholders::_5));
+      ASSERT_NE(connections[i], nullptr);
+  }
+
+  // Both cameras should start cropped by default
+  EXPECT_TRUE(cameras[0]->Camera()->LensDistortion()->Crop());
+  EXPECT_TRUE(cameras[1]->Camera()->LensDistortion()->Crop());
+
+  // Set second camera to not crop
+  cameras[1]->Camera()->LensDistortion()->SetCrop(false);
+  EXPECT_FALSE(cameras[1]->Camera()->LensDistortion()->Crop());
+
+
+  // Get some images
+  // countdown timer to ensure test doesn't wait forever
+  common::Timer timer(common::Time(10.0), true);
+  timer.Start();
+  while (imageCounts[0] < numImages || imageCounts[1] < numImages)
+  {
+    // Assert timeout has not passed
+    ASSERT_NE(timer.GetElapsed(), common::Time::Zero);
+    common::Time::MSleep(10);
+  }
+
+  unsigned int diffMax = 0, diffSum = 0;
+  double diffAvg = 0.0;
+
+  // We expect that there will be some non-zero difference between the images
+  // because one should have a black border
+  this->ImageCompare(images[0], images[1], width, height, 3,
+                     diffMax, diffSum, diffAvg);
+  EXPECT_NE(diffSum, 0u);
+
+  // Sum the pixel values for each image
+  uint64_t sums[2] = {0, 0};
+  for (size_t i = 0; i < 2; ++i)
+  {
+    for (size_t y = 0; y < height; ++y)
+    {
+      for (size_t x = 0; x < width*3; x+=3)
+      {
+        size_t r = images[i][(y*width*3) + x];
+        size_t g = images[i][(y*width*3) + x + 1];
+        size_t b = images[i][(y*width*3) + x + 2];
+        sums[i] += r + g + b;
+      }
+    }
+  }
+
+  // The image with the border cropped should be brighter
+  // as it does not contain a black border
+  EXPECT_GT(sums[0], sums[1]);
+
+  // Delete heap allocated images
+  for (size_t i = 0; i < 2; ++i)
+    delete[] images[i];
+}
+
 int main(int argc, char **argv)
 {
   // Set a specific seed to avoid occasional test failures due to
@@ -919,7 +1041,7 @@ TEST_F(CameraSensor, PointCloud)
     return;
   }
 
-  // get point cloud depth camera ssensor
+  // get point cloud depth camera sensor
   std::string cameraName = "pointcloud_camera_sensor";
   sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
   sensors::DepthCameraSensorPtr camSensor =
@@ -1062,6 +1184,19 @@ TEST_F(CameraSensor, LensFlare)
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlare);
   ASSERT_TRUE(camSensorLensFlare != nullptr);
 
+  // Get the lens flare camera model with scale applied
+  std::string modelNameLensFlareScaled = "camera_lensflare_scaled";
+  std::string cameraNameLensFlareScaled = "camera_sensor_lensflare_scaled";
+
+  model = world->ModelByName(modelNameLensFlareScaled);
+  ASSERT_TRUE(model != nullptr);
+
+  sensors::SensorPtr sensorLensFlareScaled =
+    sensors::get_sensor(cameraNameLensFlareScaled);
+  sensors::CameraSensorPtr camSensorLensFlareScaled =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensorLensFlareScaled);
+  ASSERT_TRUE(camSensorLensFlareScaled != nullptr);
+
   // Spawn a camera without lens flare at the same pose as
   // the camera lens flare model
   std::string modelName = "camera_model";
@@ -1078,41 +1213,117 @@ TEST_F(CameraSensor, LensFlare)
   SpawnCamera(modelName, cameraName, setPose.Pos(),
       setPose.Rot().Euler(), width, height, updateRate);
 
-  // get a pointer to the camera lens flare sensor
+  // get a pointer to the camera without lens flare
   sensors::SensorPtr sensor =
     sensors::get_sensor(cameraName);
   sensors::CameraSensorPtr camSensor =
     std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
   ASSERT_TRUE(camSensor != nullptr);
 
-  // collect images from both cameras
+  // collect images from all 3 cameras
   imageCount = 0;
   imageCount2 = 0;
+  imageCount3 = 0;
   img = new unsigned char[width * height * 3];
   img2 = new unsigned char[width * height * 3];
+  img3 = new unsigned char[width * height * 3];
   event::ConnectionPtr c =
     camSensorLensFlare->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount, img,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
   event::ConnectionPtr c2 =
-    camSensor->Camera()->ConnectNewImageFrame(
+    camSensorLensFlareScaled->Camera()->ConnectNewImageFrame(
         std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  event::ConnectionPtr c3 =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount3, img3,
           std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
           std::placeholders::_4, std::placeholders::_5));
 
   // Get some images
   int sleep = 0;
+  while ((imageCount < 10 || imageCount2 < 10 || imageCount3 < 10)
+      && sleep++ < 1000)
+  {
+    common::Time::MSleep(10);
+  }
+
+  EXPECT_GE(imageCount, 10);
+  EXPECT_GE(imageCount2, 10);
+  EXPECT_GE(imageCount3, 10);
+
+  c.reset();
+  c2.reset();
+  c3.reset();
+
+  // Compare colors.
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  unsigned int colorSum3 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      colorSum += r + g + b;
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      colorSum2 += r2 + g2 + b2;
+      unsigned int r3 = img3[(y*width*3) + x];
+      unsigned int g3 = img3[(y*width*3) + x + 1];
+      unsigned int b3 = img3[(y*width*3) + x + 2];
+      colorSum3 += r3 + g3 + b3;
+    }
+  }
+
+  // camera with lens flare should be brighter than camera with scaled down
+  // lens flare
+  EXPECT_GT(colorSum, colorSum2) <<
+      "colorSum: " << colorSum << ", " <<
+      "colorSum2: " << colorSum2;
+  // camera with scaled down lens flare should be brighter than camera without
+  // lens flare
+  EXPECT_GT(colorSum2, colorSum3) <<
+      "colorSum2: " << colorSum2 << ", " <<
+      "colorSum3: " << colorSum3;
+
+  // test lens flare occlusion by spawning box in front of camera
+  // Spawn a box in front of the cameras
+  ignition::math::Vector3d boxPos = setPose.Pos()
+      + ignition::math::Vector3d(2.5, 0, 0.5);
+  SpawnBox("occlusion_box", ignition::math::Vector3d(0.5, 0.5, 0.5),
+      boxPos, ignition::math::Vector3d::Zero, true);
+
+  c = camSensorLensFlare->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  c2 = camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // Get more images
+  sleep = 0;
+  imageCount = 0;
+  imageCount2 = 0;
   while ((imageCount < 10 || imageCount2 < 10) && sleep++ < 1000)
     common::Time::MSleep(10);
 
   EXPECT_GE(imageCount, 10);
   EXPECT_GE(imageCount2, 10);
 
-  // Compare colors. Camera sensor with lens flare plugin should have a brigher
-  // image than the one without the lens flare plugin.
-  unsigned int colorSum = 0;
-  unsigned int colorSum2 = 0;
+  // Lens flare should be completely occluded.
+  // Camera sensor with lens flare plugin should have approx the same image as
+  // the one without the lens flare plugin.
+  colorSum = 0;
+  colorSum2 = 0;
   for (unsigned int y = 0; y < height; ++y)
   {
     for (unsigned int x = 0; x < width*3; x+=3)
@@ -1127,10 +1338,533 @@ TEST_F(CameraSensor, LensFlare)
       colorSum2 += r2 + g2 + b2;
     }
   }
-  EXPECT_GT(colorSum, colorSum2) <<
-      "colorSum: " << colorSum << ", " <<
-      "colorSum2: " << colorSum2;
+
+  // set tolerance to be 0.02% of total pixel values
+  unsigned int tol = width * height * 3 * 255 * 2e-4;
+  EXPECT_NEAR(colorSum, colorSum2, tol);
 
   delete[] img;
   delete[] img2;
+  delete[] img3;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, 16bit)
+{
+  // World contains a box positioned at top right quadrant of image generated
+  // by a mono 16 bit camera and a color 16 bit camera.
+  // Verify pixel values of top right quadrant of image (corresponding to box)
+  // are approximately the same but different from the background's pixel
+  // values.
+  Load("worlds/16bit_camera.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // get L16 camera sensor
+  std::string l16CameraName = "l16bit_camera_sensor";
+  sensors::SensorPtr l16Sensor = sensors::get_sensor(l16CameraName);
+  sensors::CameraSensorPtr l16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(l16Sensor);
+  EXPECT_TRUE(l16CamSensor != nullptr);
+  rendering::CameraPtr l16Cam = l16CamSensor->Camera();
+  EXPECT_TRUE(l16Cam != nullptr);
+
+  unsigned int l16Width  = l16Cam->ImageWidth();
+  unsigned int l16Height = l16Cam->ImageHeight();
+  EXPECT_GT(l16Width, 0u);
+  EXPECT_GT(l16Height, 0u);
+
+  // get rgb16 camera sensor
+  std::string rgb16CameraName = "rgb16bit_camera_sensor";
+  sensors::SensorPtr rgb16Sensor = sensors::get_sensor(rgb16CameraName);
+  sensors::CameraSensorPtr rgb16CamSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(rgb16Sensor);
+  EXPECT_TRUE(rgb16CamSensor != nullptr);
+  rendering::CameraPtr rgb16Cam = rgb16CamSensor->Camera();
+  EXPECT_TRUE(rgb16Cam != nullptr);
+
+  unsigned int rgb16Width  = rgb16Cam->ImageWidth();
+  unsigned int rgb16Height = rgb16Cam->ImageHeight();
+  EXPECT_GT(rgb16Width, 0u);
+  EXPECT_GT(rgb16Height, 0u);
+
+  // connect to new frame event
+  imageCount = 0;
+  imageCount2 = 0;
+  img = new unsigned char[l16Width * l16Height * 2];
+  img2 = new unsigned char[rgb16Width * rgb16Height * 3 * 2];
+
+  event::ConnectionPtr c =
+    l16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  event::ConnectionPtr c2 =
+    rgb16CamSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+
+  // wait for a few images
+  int sleep = 0;
+  int maxSleep = 500;
+  int totalImages = 10;
+  while ((imageCount < totalImages || imageCount2 < totalImages)
+      && sleep++ < maxSleep)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  EXPECT_GE(imageCount2, totalImages);
+
+  c.reset();
+  c2.reset();
+
+  // verify L16 camera images
+  uint16_t bgValue = 0;
+  uint16_t boxValue = 0;
+  uint16_t *l16Img = reinterpret_cast<uint16_t *>(img);
+  // expect pixel values to be within 0.2% of valid 16bit pixel range
+  uint16_t tol = std::pow(2, 16) * 0.002;
+  for (unsigned int y = 0; y < l16Height; ++y)
+  {
+    for (unsigned int x = 0; x < l16Width; ++x)
+    {
+      uint16_t value = l16Img[(y*l16Width)+x];
+      EXPECT_NE(0, value);
+
+      // box in top right quadrant of image
+      if (x >= l16Width / 2 && y < l16Height / 2)
+      {
+        // set its color if not done already
+        if (boxValue == 0)
+          boxValue = value;
+        // verify pixels correspond to box
+        else
+          EXPECT_NEAR(boxValue, value, tol);
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgValue == 0)
+          bgValue = value;
+        // verify pixels correspond to background
+        else
+          EXPECT_NEAR(bgValue, value, tol);
+      }
+    }
+  }
+
+  // expect background pixel value to be different from box pixel value
+  EXPECT_GT(bgValue, boxValue);
+  uint16_t minDiff = std::pow(2, 16) * 0.25;
+  uint16_t diff = bgValue - boxValue;
+  EXPECT_GT(diff, minDiff);
+
+
+  // verify RGB UINT16 camera images
+  uint16_t bgRValue = 0;
+  uint16_t bgGValue = 0;
+  uint16_t bgBValue = 0;
+  uint16_t boxRValue = 0;
+  uint16_t boxGValue = 0;
+  uint16_t boxBValue = 0;
+  uint16_t *rgb16Img = reinterpret_cast<uint16_t *>(img2);
+  for (unsigned int y = 0; y < rgb16Height; ++y)
+  {
+    for (unsigned int x = 0; x < rgb16Width * 3; x+=3)
+    {
+      uint16_t r = rgb16Img[(y*rgb16Width*3)+x];
+      uint16_t g = rgb16Img[(y*rgb16Width*3)+x+1];
+      uint16_t b = rgb16Img[(y*rgb16Width*3)+x+2];
+      // verify gray color
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      EXPECT_NE(0, r);
+      EXPECT_NE(0, g);
+      EXPECT_NE(0, b);
+
+      // box in top right quadrant of image
+      if (x >= (rgb16Width*3) / 2 && y < rgb16Height / 2)
+      {
+        // set its color if not done already
+        if (boxRValue == 0 && boxGValue == 0 && boxBValue == 0)
+        {
+          boxRValue = r;
+          boxGValue = g;
+          boxBValue = b;
+        }
+        // verify pixels correspond to box
+        else
+        {
+          EXPECT_NEAR(boxRValue, r, tol);
+          EXPECT_NEAR(boxGValue, g, tol);
+          EXPECT_NEAR(boxBValue, b, tol);
+        }
+      }
+      // rest are all background
+      else
+      {
+        // set background color if not done already
+        if (bgRValue == 0 && bgGValue == 0 && bgBValue == 0)
+        {
+          bgRValue = r;
+          bgGValue = g;
+          bgBValue = b;
+        }
+        // verify pixels correspond to background
+        else
+        {
+          EXPECT_NEAR(bgRValue, r, tol);
+          EXPECT_NEAR(bgGValue, g, tol);
+          EXPECT_NEAR(bgBValue, b, tol);
+        }
+      }
+    }
+  }
+  // expect background color to be different from box color
+  EXPECT_GT(bgRValue, boxRValue);
+  EXPECT_GT(bgGValue, boxGValue);
+  EXPECT_GT(bgBValue, boxBValue);
+  uint16_t diffR = bgRValue - boxRValue;
+  uint16_t diffG = bgGValue - boxGValue;
+  uint16_t diffB = bgBValue - boxBValue;
+  EXPECT_GT(diffR, minDiff);
+  EXPECT_GT(diffG, minDiff);
+  EXPECT_GT(diffB, minDiff);
+
+  delete [] img;
+  delete [] img2;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, AmbientOcclusion)
+{
+  Load("worlds/ssao_plugin.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn a camera
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(6, 0, 2),
+      ignition::math::Quaterniond(0, 0, 3.14));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  // collect images
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+  event::ConnectionPtr c =
+    camSensor->Camera()->ConnectNewImageFrame(
+        std::bind(&::OnNewCameraFrame, &imageCount, img,
+          std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+          std::placeholders::_4, std::placeholders::_5));
+  // Get some images
+  int sleep = 0;
+  while ((imageCount < 10) && sleep++ < 1000)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, 10);
+
+  // verify image contains gray pixels
+  // Without the ambient occlusion plugin, it would just be a white image.
+  std::map<unsigned int, unsigned int> uniquePixel;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(r, g);
+      EXPECT_EQ(r, b);
+      if (uniquePixel.find(r) != uniquePixel.end())
+        uniquePixel[r] = ++uniquePixel[r];
+      else
+        uniquePixel[r] = 1;
+    }
+  }
+  // verify image is predominantly white but not the whole image
+  EXPECT_GT(uniquePixel[255], width*height*0.80);
+  EXPECT_LT(uniquePixel[255], width*height*0.85);
+  // there should be some variations of grayscale pixels
+  EXPECT_LT(uniquePixel.size(), 255*0.35);
+  delete[] img;
+}
+
+/////////////////////////////////////////////////
+// Move a tall thin box across the center of the camera image
+// (from -y to +y) over time and collect camera sensor timestamped images.
+// For every image collected, extract center of box from image, and compare it
+// against analytically computed box position.
+TEST_F(CameraSensor, Timestamp)
+{
+  this->Load("worlds/empty_test.world", true);
+
+  // Make sure the render engine is available.
+  ASSERT_TRUE(rendering::RenderEngine::Instance()->GetRenderPathType() !=
+      rendering::RenderEngine::NONE);
+
+  // variables for testing
+  // camera image width
+  unsigned int width  = 240;
+  // camera image height
+  unsigned int height = 160;
+  unsigned int halfHeight = height * 0.5;
+  // camera sensor update rate
+  double sensorUpdateRate = 10;
+  // Speed at which the box is moved, in meters per second
+  double boxMoveVel = 1.0;
+
+  // world
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // set gravity to 0, 0, 0
+  world->SetGravity(ignition::math::Vector3d::Zero);
+  EXPECT_EQ(world->Gravity(), ignition::math::Vector3d::Zero);
+
+  // spawn camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  ignition::math::Pose3d setPose(
+      ignition::math::Vector3d(-5, 0, 0),
+      ignition::math::Quaterniond::Identity);
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, sensorUpdateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  // Make sure the above dynamic cast worked.
+  EXPECT_TRUE(camSensor != nullptr);
+  camSensor->SetActive(true);
+  EXPECT_TRUE(camSensor->IsActive());
+
+  // spawn a tall thin box in front of camera but out of its view at neg y;
+  std::string boxName = "box_0";
+  double initDist = -3;
+  ignition::math::Pose3d boxPose(0, initDist, 0.0, 0, 0, 0);
+  SpawnBox(boxName, ignition::math::Vector3d(0.005, 0.005, 0.1), boxPose.Pos(),
+      boxPose.Rot().Euler());
+
+  gazebo::physics::ModelPtr boxModel = world->ModelByName(boxName);
+  EXPECT_TRUE(boxModel != nullptr);
+
+  // step 100 times - this will be the start time for our experiment
+  int startTimeIt = 100;
+  world->Step(startTimeIt);
+
+  // clear the list of timestamp images
+  g_imagesStamped.clear();
+
+  // verify that time moves forward
+  double t = world->SimTime().Double();
+  EXPECT_GT(t, 0);
+
+  // subscribe to camera topic and collect timestamp images
+  std::string cameraTopic = camSensor->Topic();
+  EXPECT_TRUE(!cameraTopic.empty());
+  transport::SubscriberPtr sub = this->node->Subscribe(cameraTopic, OnImage);
+
+  // get physics engine
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+
+  // move the box for a period of 6 seconds along +y
+  unsigned int period = 6;
+  double stepSize = physics->GetMaxStepSize();
+  unsigned int iterations = static_cast<unsigned int>(period*(1.0/stepSize));
+
+  for (unsigned int i = 0; i < iterations; ++i)
+  {
+    double dist = (i+1)*(boxMoveVel*stepSize);
+    // move the box along y
+    boxModel->SetWorldPose(
+        ignition::math::Pose3d(0, initDist+ dist, 0, 0, 0, 0));
+    world->Step(1);
+    EXPECT_EQ(boxModel->WorldPose().Pos().Y(), initDist + dist);
+  }
+
+  // wait until we get all timestamp images
+  int sleep = 0;
+  int maxSleep = 50;
+  unsigned int imgSampleSize = period / (1.0 / sensorUpdateRate);
+  while (sleep < maxSleep)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (g_imagesStamped.size() >= imgSampleSize)
+      break;
+    sleep++;
+    gazebo::common::Time::MSleep(10);
+  }
+
+  // stop the camera subscriber
+  sub.reset();
+
+  // compute expected 2D pos of box and compare it against the
+  // actual pos of the box found in the timestamp images.
+  unsigned int imgSize = width * height * 3;
+  img = new unsigned char[imgSize];
+  for (const auto &msg : g_imagesStamped)
+  {
+    // time t
+    gazebo::common::Time timestamp = gazebo::msgs::Convert(msg.time());
+    double t = timestamp.Double();
+
+    // calculate expected box pose at time=t
+    int it = t * (1.0 / stepSize) - startTimeIt;
+    double dist = it*(boxMoveVel*stepSize);
+    // project box 3D pos to screen space
+    ignition::math::Vector2i p2 = camSensor->Camera()->Project(
+        ignition::math::Vector3d(0, initDist + dist, 0));
+
+    // find actual box pose at time=t
+    // walk along the middle row of the img and identify center of box
+    int left = -1;
+    int right = -1;
+    bool transition = false;
+    memcpy(img, msg.image().data().c_str(), imgSize);
+    for (unsigned int i = 0; i < width; ++i)
+    {
+      int row = halfHeight * width * 3;
+      int r = img[row + i*3];
+      int g = img[row + i*3+1];
+      int b = img[row + i*3+2];
+
+      // bg color determined experimentally
+      int bgColor = 178;
+
+      if (r < bgColor && g < bgColor && b < bgColor)
+      {
+        if (!transition)
+        {
+          left = i;
+          transition = true;
+        }
+      }
+      else if (transition)
+      {
+        right = i-1;
+        break;
+      }
+    }
+
+    // if box is out of camera view, expect no box found in image
+    if (p2.X() < 0 || p2.X () > static_cast<int>(width))
+    {
+      EXPECT_TRUE(left < 0 || right < 0)
+          << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+    else
+    {
+      double mid = -1;
+      // left and right of box found in image
+      if (left >= 0 && right >= 0)
+      {
+        mid = (left + right) * 0.5;
+      }
+      // edge case - box at edge of image
+      else if (left >= 0 && right < 0)
+      {
+        mid = left;
+      }
+      else
+      {
+        FAIL() << "No box found in image.\n"
+               << "time: " << t << "\n"
+               << "Expected box pos: " << p2 << "\n"
+               << "Actual box left: " << left << ", right: " << right;
+      }
+
+      EXPECT_GE(mid, 0);
+
+      // expected box pos should roughly be equal to actual box pos +- 1 pixel
+      EXPECT_NEAR(mid, p2.X(), 1.0) << "Expected box pos: " << p2 << "\n"
+          << "Actual box left: " << left << ", right: " << right;
+    }
+  }
+
+  delete [] img;
+}
+
+/////////////////////////////////////////////////
+TEST_F(CameraSensor, Light)
+{
+  Load("worlds/empty.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test\n";
+    return;
+  }
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+  ignition::math::Pose3d setPose, testPose(
+      ignition::math::Vector3d(-5, 0, 5),
+      ignition::math::Quaterniond(0, IGN_DTOR(15), 0));
+  SpawnCamera(modelName, cameraName, setPose.Pos(),
+      setPose.Rot().Euler(), width, height, updateRate);
+  std::string sensorScopedName =
+      "default::" + modelName + "::body::" + cameraName;
+  sensors::SensorPtr sensor = sensors::get_sensor(sensorScopedName);
+  EXPECT_TRUE(sensor != nullptr);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+  ASSERT_TRUE(camSensor != nullptr);
+  rendering::CameraPtr camera = camSensor->Camera();
+  ASSERT_TRUE(camera != nullptr);
+
+  // get camera scene
+  rendering::ScenePtr scene = camera->GetScene();
+  ASSERT_NE(nullptr, scene);
+
+  transport::PublisherPtr lightModifyPub = this->node->Advertise<msgs::Light>(
+        "~/light/modify");
+
+  // Set the light to be green
+  ignition::math::Color newColor(0, 1, 0);
+  msgs::Light lightMsg;
+  lightMsg.set_name("sun");
+  msgs::Set(lightMsg.mutable_diffuse(), newColor);
+  lightModifyPub->Publish(lightMsg);
+
+  rendering::LightPtr sun = scene->LightByName("sun");
+  ASSERT_TRUE(sun != nullptr);
+
+  int sleep = 0;
+  while (sun->DiffuseColor() != newColor && sleep++ < 50)
+  {
+    common::Time::MSleep(100);
+  }
+  EXPECT_EQ(newColor, sun->DiffuseColor());
 }

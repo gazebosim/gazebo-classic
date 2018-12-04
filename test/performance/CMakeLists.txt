@@ -18,7 +18,7 @@ if (HAVE_BULLET)
 endif()
 
 # Per issue #802, these tests are not yet portable
-if (NOT APPLE)
+if (NOT APPLE AND NOT WIN32)
   set(tests
     RAMLibrary_TEST.cc
   )

@@ -3,6 +3,8 @@ if (WIN32)
 endif()
 
 include_directories(SYSTEM
+  ${CURL_INCLUDEDIR}
+  ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
   ${SDFormat_INCLUDE_DIRS}
   ${OGRE_INCLUDE_DIRS}
@@ -32,6 +34,9 @@ link_directories(
   ${tinyxml_LIBRARY_DIRS}
 )
 
+if (WIN32)
+  add_definitions(-DCURL_STATICLIB)
+endif()
 add_definitions(${Qt5Core_DEFINITIONS})
 set (CMAKE_AUTOMOC ON)
 
@@ -40,7 +45,8 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (HAVE_UUID)
@@ -52,6 +58,7 @@ endif()
 set (plugins_single_header
   ActorPlugin
   ActuatorPlugin
+  AmbientOcclusionVisualPlugin
   ArduCopterPlugin
   ArrangePlugin
   AttachLightPlugin
@@ -62,9 +69,11 @@ set (plugins_single_header
   CartDemoPlugin
   CessnaPlugin
   ContactPlugin
+  ContainPlugin
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
+  FlashLightPlugin
   FollowerPlugin
   ForceTorquePlugin
   GimbalSmall2dPlugin
@@ -76,6 +85,7 @@ set (plugins_single_header
   JointTrajectoryPlugin
   KeysToCmdVelPlugin
   KeysToJointsPlugin
+  LedPlugin
   LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
@@ -88,12 +98,15 @@ set (plugins_single_header
   RayPlugin
   RaySensorNoisePlugin
   RubblePlugin
+  ShaderParamVisualPlugin
   SimpleTrackedVehiclePlugin
   SkidSteerDrivePlugin
   SonarPlugin
   SphereAtlasDemoPlugin
+  StaticMapPlugin
   TouchPlugin
   VehiclePlugin
+  WheelSlipPlugin
   WheelTrackedVehiclePlugin
   WindPlugin
 )
@@ -108,6 +121,7 @@ if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
+    JoyPlugin
   )
 endif()
 
@@ -116,6 +130,10 @@ set (GUIplugins
   KeyboardGUIPlugin
   LookAtDemoPlugin
   TimerGUIPlugin
+)
+
+set (DARTplugins
+  GravityCompensationPlugin
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
@@ -169,6 +187,7 @@ foreach (src ${GUIplugins})
                         gazebo_gui
                         ${ogre_libraries}
                         ${Qt5Core_LIBRARIES}
+                        ${Qt5Test_LIBRARIES}
                         ${Qt5Widgets_LIBRARIES}
                         ${IGNITION-TRANSPORT_LIBRARIES}
 )
@@ -176,19 +195,36 @@ foreach (src ${GUIplugins})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
 
+if (HAVE_DART_URDF)
+  foreach (src ${DARTplugins})
+    add_library(${src} SHARED ${src}.cc)
+    target_link_libraries(${src}
+      libgazebo
+      ${DART_LIBRARIES}
+    )
+    install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+    gz_install_includes("plugins" ${src}.hh)
+  endforeach ()
+endif()
+
+# If a plugin depends on other plugins in the same directory, add them to link.
+# Plus, set RPATH to the directory so they can dynamically link.
+target_link_libraries(LedPlugin FlashLightPlugin)
+set_target_properties(
+  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
+
 add_subdirectory(events)
 
 if (NOT WIN32)
   add_subdirectory(rest_web)
 endif()
 
-
 # unit tests
 
 gz_build_tests(TrackedVehiclePlugin_TEST.cc EXTRA_LIBS
-        gazebo_physics
-        gazebo_test_fixture
-        TrackedVehiclePlugin
+  gazebo_physics
+  gazebo_test_fixture
+  TrackedVehiclePlugin
 )
 
 # Linking to the built dynamic library is not possible since it doesn't export
@@ -196,9 +232,9 @@ gz_build_tests(TrackedVehiclePlugin_TEST.cc EXTRA_LIBS
 # weird segfaults...
 set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS WheelTrackedVehiclePlugin.cc)
 gz_build_tests(WheelTrackedVehiclePlugin_TEST.cc EXTRA_LIBS
-        gazebo_physics
-        gazebo_test_fixture
-        TrackedVehiclePlugin
+  gazebo_physics
+  gazebo_test_fixture
+  TrackedVehiclePlugin
 )
 
 # Linking to the built dynamic library is not possible since it doesn't export
@@ -206,11 +242,11 @@ gz_build_tests(WheelTrackedVehiclePlugin_TEST.cc EXTRA_LIBS
 # weird segfaults...
 set(GZ_BUILD_TESTS_EXTRA_EXE_SRCS SimpleTrackedVehiclePlugin.cc)
 gz_build_tests(SimpleTrackedVehiclePlugin_TEST.cc EXTRA_LIBS
-        gazebo_physics
-        gazebo_test_fixture
-        TrackedVehiclePlugin
+  gazebo_physics
+  gazebo_test_fixture
+  TrackedVehiclePlugin
 )
 if (HAVE_DART)
   target_include_directories(UNIT_SimpleTrackedVehiclePlugin_TEST
-          PRIVATE ${DARTCore_INCLUDE_DIRS})
+    PRIVATE ${DARTCore_INCLUDE_DIRS})
 endif()

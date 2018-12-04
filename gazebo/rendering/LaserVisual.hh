@@ -15,12 +15,13 @@
  *
 */
 
-#ifndef _LASERVISUAL_HH_
-#define _LASERVISUAL_HH_
+#ifndef GAZEBO_RENDERING_LASERVISUAL_HH_
+#define GAZEBO_RENDERING_LASERVISUAL_HH_
 
 #include <string>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
+
 #include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/util/system.hh"
@@ -46,9 +47,9 @@ namespace gazebo
       /// \brief Destructor.
       public: virtual ~LaserVisual();
 
-      // Documentation inherited from parent.
-      public: virtual void SetEmissive(const common::Color &_color,
-          const bool _cascade = true);
+      // Documentation inherited
+      public: virtual void SetEmissive(const ignition::math::Color &_color,
+          const bool _cascade = true) override;
 
       /// \brief Callback when laser data is received.
       private: void OnScan(ConstLaserScanStampedPtr &_msg);

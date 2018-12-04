@@ -15,8 +15,8 @@
  *
 */
 
+#include <ignition/math/Color.hh>
 #include "gazebo/common/Assert.hh"
-#include "gazebo/common/Color.hh"
 
 #include "gazebo/gui/Conversions.hh"
 #include "gazebo/gui/building/BaseInspectorDialog.hh"
@@ -85,7 +85,7 @@ void BaseInspectorDialog::InitTextureComboBox()
 }
 
 /////////////////////////////////////////////////
-common::Color BaseInspectorDialog::Color() const
+ignition::math::Color BaseInspectorDialog::Color() const
 {
   return this->dataPtr->colorList[this->colorComboBox->currentIndex()];
 }
@@ -104,7 +104,7 @@ std::string BaseInspectorDialog::Texture() const
 }
 
 /////////////////////////////////////////////////
-void BaseInspectorDialog::SetColor(const common::Color &_color)
+void BaseInspectorDialog::SetColor(const ignition::math::Color &_color)
 {
   int index = -1;
   for (unsigned int i = 0; i < this->dataPtr->colorList.size(); ++i)

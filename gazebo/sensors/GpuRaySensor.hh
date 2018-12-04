@@ -47,7 +47,7 @@ namespace gazebo
     /// This sensor cast rays into the world, tests for intersections, and
     /// reports the range to the nearest object.  It is used by ranging
     /// sensor models (e.g., sonars and scanning laser range finders).
-    class GAZEBO_VISIBLE GpuRaySensor: public Sensor
+    class GZ_SENSORS_VISIBLE GpuRaySensor: public Sensor
     {
       /// \brief Constructor
       public: GpuRaySensor();
@@ -241,16 +241,9 @@ namespace gazebo
 
       /// \brief Connect to the new laser frame event.
       /// \param[in] _subscriber Event callback.
-      /// \deprecated See ConnectNewLaserFrame that accepts a std::function.
       public: event::ConnectionPtr ConnectNewLaserFrame(
         std::function<void(const float *, unsigned int, unsigned int,
         unsigned int, const std::string &)> _subscriber);
-
-      /// \brief Disconnect Laser Frame.
-      /// \param[in,out] _conn Connection pointer to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       public: virtual bool IsActive() const;

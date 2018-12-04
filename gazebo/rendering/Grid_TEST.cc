@@ -41,9 +41,8 @@ TEST_F(Grid_TEST, SetSize)
   // Create a grid
   int cellCount = 10;
   float cellLength  = 1;
-  float lineWidth = 0.1;
   auto grid = new gazebo::rendering::Grid(scene.get(), cellCount, cellLength,
-      lineWidth, common::Color::Red);
+      ignition::math::Color::Red);
   ASSERT_TRUE(grid != nullptr);
 
   grid->Init();

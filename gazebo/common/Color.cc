@@ -20,6 +20,11 @@
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Color.hh"
 
+#ifndef _WIN32
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace gazebo;
 using namespace common;
 
@@ -55,6 +60,31 @@ Color::Color(const Color &_pt)
 //////////////////////////////////////////////////
 Color::~Color()
 {
+}
+
+//////////////////////////////////////////////////
+Color::Color(const ignition::math::Color &_color)
+{
+  this->r = _color.R();
+  this->g = _color.G();
+  this->b = _color.B();
+  this->a = _color.A();
+}
+
+//////////////////////////////////////////////////
+Color &Color::operator=(const ignition::math::Color &_color)
+{
+  this->r = _color.R();
+  this->g = _color.G();
+  this->b = _color.B();
+  this->a = _color.A();
+  return *this;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Color Color::Ign() const
+{
+  return ignition::math::Color(this->r, this->g, this->b, this->a);
 }
 
 //////////////////////////////////////////////////
@@ -172,19 +202,6 @@ ignition::math::Vector3d Color::HSV() const
   hsv.Z(v);
 
   return hsv;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Color::GetAsYUV() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->YUV();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -516,12 +533,18 @@ bool Color::operator!=(const Color &_pt) const
 //////////////////////////////////////////////////
 void Color::Clamp()
 {
-  this->r = this->r < 0 ? 0: this->r;
-  this->r = this->r > 1 ? this->r/255.0: this->r;
+  this->r = this->r < 0 || std::isnan(this->r) ? 0: this->r;
+  this->r = this->r > 1 ? std::min(this->r/255.0, 1.0) : this->r;
 
-  this->g = this->g < 0 ? 0: this->g;
-  this->g = this->g > 1 ? this->g/255.0: this->g;
+  this->g = this->g < 0 || std::isnan(this->g) ? 0: this->g;
+  this->g = this->g > 1 ? std::min(this->g/255.0, 1.0): this->g;
 
-  this->b = this->b < 0 ? 0: this->b;
-  this->b = this->b > 1 ? this->b/255.0: this->b;
+  this->b = this->b < 0 || std::isnan(this->b) ? 0: this->b;
+  this->b = this->b > 1 ? std::min(this->b/255.0, 1.0): this->b;
+
+  this->a = this->a < 0 || std::isnan(this->a) ? 0: this->a;
+  this->a = this->a > 1 ? std::min(this->a/255.0, 1.0): this->a;
 }
+#ifndef _WIN32
+  #pragma GCC diagnostic pop
+#endif

@@ -93,7 +93,7 @@ void ModelManipulator::Init()
   this->dataPtr->scene =  cam->GetScene();
 
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
   this->dataPtr->userCmdPub =
       this->dataPtr->node->Advertise<msgs::UserCmd>("~/user_cmd");
 
@@ -112,20 +112,6 @@ void ModelManipulator::Detach()
   this->dataPtr->selectionObj->SetMode(
       rendering::SelectionObj::SELECTION_NONE);
   this->dataPtr->selectionObj->Detach();
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->RotateEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -189,21 +175,6 @@ void ModelManipulator::RotateEntity(rendering::VisualPtr &_vis,
 }
 
 /////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMousePositionOnPlane(
-    rendering::CameraPtr _camera,
-    const common::MouseEvent &_event)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return MousePositionOnPlane(_camera, _event);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
     rendering::CameraPtr _camera, const common::MouseEvent &_event)
 {
@@ -220,20 +191,6 @@ ignition::math::Vector3d ModelManipulator::MousePositionOnPlane(
   p1 = origin1 + dir1 * dist1;
 
   return p1;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ModelManipulator::SnapPoint(const math::Vector3 &_point,
-    double _interval, double _sensitivity)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return SnapPoint(_point.Ign(), _interval, _sensitivity);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -279,23 +236,6 @@ ignition::math::Vector3d ModelManipulator::SnapPoint(
       point.Z() = point.Z() - remainder + _interval * sign;
 
   return point;
-}
-
-/////////////////////////////////////////////////
-math::Vector3 ModelManipulator::GetMouseMoveDistance(
-    rendering::CameraPtr _camera,
-    const math::Vector2i &_start, const math::Vector2i &_end,
-    const math::Pose &_pose, const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return MouseMoveDistance(_camera, _start.Ign(), _end.Ign(), _pose.Ign(),
-      _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -393,20 +333,6 @@ ignition::math::Vector3d ModelManipulator::MouseMoveDistance(
       this->dataPtr->mouseStart,
       ignition::math::Vector2i(this->dataPtr->mouseEvent.Pos().X(),
       this->dataPtr->mouseEvent.Pos().Y()), _pose, _axis, _local);
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::ScaleEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->ScaleEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -586,20 +512,6 @@ ignition::math::Vector3d ModelManipulator::UpdateScale(
 
 /////////////////////////////////////////////////
 void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
-    const math::Vector3 &_axis, bool _local)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->TranslateEntity(_vis, _axis.Ign(), _local);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
-void ModelManipulator::TranslateEntity(rendering::VisualPtr &_vis,
     const ignition::math::Vector3d &_axis, const bool _local)
 {
   auto pose = _vis->WorldPose();
@@ -662,7 +574,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
-  else if (this->dataPtr->scene->GetLight(_vis->Name()))
+  else if (this->dataPtr->scene->LightByName(_vis->Name()))
   {
     msgs::Light msg;
     msg.set_name(_vis->Name());
@@ -673,8 +585,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   }
   else
   {
-    gzerr << "Visual [" << _vis->Name() << "] isn't a model or a light"
-        << std::endl;
+    // We get here in the model editor for example
     return;
   }
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
@@ -747,30 +658,24 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
 
-    // Root visual's immediate child
-    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    // If the root visual's ID can be found, it is a model in simulation mode,
+    // so we select it instead of a child link/visual/collision.
 
-    // If the root visual's ID can be found, it is a model in the main window
+    // If the visual's depth is less than 2, it is a root visual already. This
+    // is the case of lights in simulation mode for example.
+
     // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
-    if (gui::get_entity_id(rootVis->Name()))
+    if (gui::get_entity_id(rootVis->Name()) || vis->GetDepth() < 2)
     {
       // select model
       vis = rootVis;
     }
-    // If it is not a model and its parent is either a direct child or
-    // grandchild of the world, this is a light, so just keep vis = vis
-    else if (vis->GetParent() == rootVis ||
-        vis->GetParent() == this->dataPtr->scene->WorldVisual())
-    {
-      // select light
-    }
-    // Otherwise, this is a visual in the model editor, so we want to get its
-    // top level visual below the root.
+    // Otherwise, we assume we're in the model editor and get the first child
+    // visual after the root, which may be a link or a nested model.
     else
     {
-      // select link / nested model
-      vis = topLevelVis;
+      vis = vis->GetNthAncestor(2);
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->WorldPose();

@@ -204,8 +204,8 @@ void JointController::Update()
 }
 
 /////////////////////////////////////////////////
-void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
-    ignition::msgs::JointCmd &_rep, bool &_result)
+bool JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
+    ignition::msgs::JointCmd &_rep)
 {
   const std::string &jointName = _req.data();
   _rep.set_name(jointName);
@@ -250,7 +250,7 @@ void JointController::OnJointCmdReq(const ignition::msgs::StringMsg &_req,
         this->dataPtr->velPids[jointName].GetIGain());
   }
 
-  _result = true;
+  return true;
 }
 
 /////////////////////////////////////////////////
@@ -389,9 +389,14 @@ void JointController::OnJointCommand(const ignition::msgs::JointCmd &_msg)
 /////////////////////////////////////////////////
 void JointController::OnJointCmd(ConstJointCmdPtr &_msg)
 {
-  gzwarn << "Gazebo topics of the form \"~/[modelName]/joint_cmd\" are "
-      << "deprecated.\nUse ignition::transport topics of the form "
-      << "\"/[scopedModelName]/joint_cmd\" instead.\n";
+  static bool notPrintedYet = true;
+  if (notPrintedYet)
+  {
+    gzwarn << "Gazebo topics of the form \"~/[modelName]/joint_cmd\" are "
+        << "deprecated.\nUse ignition::transport topics of the form "
+        << "\"/[scopedModelName]/joint_cmd\" instead.\n";
+    notPrintedYet = false;
+  }
 
   std::map<std::string, JointPtr>::iterator iter;
   iter = this->dataPtr->joints.find(_msg->name());
@@ -627,7 +632,7 @@ void JointController::SetPositionPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetPositionTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 
@@ -656,7 +661,7 @@ void JointController::SetVelocityPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetVelocityTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 
@@ -664,6 +669,22 @@ bool JointController::SetVelocityTarget(const std::string &_jointName,
       this->dataPtr->velPids.end())
   {
     this->dataPtr->velocities[_jointName] = _target;
+    result = true;
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool JointController::SetForce(const std::string &_jointName,
+    const double _force)
+{
+  bool result = false;
+
+  if (this->dataPtr->joints.find(_jointName) !=
+      this->dataPtr->joints.end())
+  {
+    this->dataPtr->forces[_jointName] = _force;
     result = true;
   }
 

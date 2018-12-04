@@ -49,11 +49,6 @@ namespace gazebo
       /// \param[in] _msg Message containing road data.
       public: void Load(msgs::Road _msg);
       using Visual::Load;
-
-      /// \brief Load the visual using a parent visual.
-      /// \param[in] _parent Pointer to the parent visual.
-      /// \sa see function that accepts msgs::Road parameter
-      public: void Load(VisualPtr _parent) GAZEBO_DEPRECATED(8.0);
     };
     /// \}
   }

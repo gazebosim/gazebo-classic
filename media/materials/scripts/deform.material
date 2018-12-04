@@ -1,0 +1,38 @@
+vertex_program Gazebo/DeformVS glsl
+{
+  source deform_vp.glsl
+
+  default_params
+  {
+    param_named time float 0
+  }
+}
+
+fragment_program Gazebo/DeformFS glsl
+{
+  source deform_fp.glsl
+
+  default_params
+  {
+    param_named ambient float4 1 1 1 1
+    param_named diffuse float4 1 1 1 1
+    param_named specular float4 1 1 1 1
+  }
+}
+
+material Gazebo/Deform
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref Gazebo/DeformVS
+      {
+      }
+
+      fragment_program_ref Gazebo/DeformFS
+      {
+      }
+    }
+  }
+}

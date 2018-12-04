@@ -36,7 +36,7 @@ namespace gazebo
 
     /// \class WirelessReceiver WirelessReceiver.hh sensors/sensors.hh
     /// \brief Sensor class for receiving wireless signals.
-    class GAZEBO_VISIBLE WirelessReceiver: public WirelessTransceiver
+    class GZ_SENSORS_VISIBLE WirelessReceiver: public WirelessTransceiver
     {
       /// \brief Constructor
       public: WirelessReceiver();

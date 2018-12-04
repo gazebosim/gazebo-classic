@@ -25,6 +25,7 @@
 
 #include <sdf/sdf.hh>
 #include <ignition/math/Box.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector3.hh>
@@ -35,10 +36,6 @@
 #include "gazebo/common/Time.hh"
 
 #include "gazebo/msgs/MessageTypes.hh"
-#include "gazebo/math/Box.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Quaternion.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -144,11 +141,6 @@ namespace gazebo
 
       /// \brief Get the name of the visual.
       /// \return The name of the visual.
-      /// \deprecated See std::string Name() const
-      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the name of the visual.
-      /// \return The name of the visual.
       public: std::string Name() const;
 
       /// \brief Attach a visual to this visual.
@@ -202,17 +194,7 @@ namespace gazebo
 
       /// \brief Set the scale.
       /// \param[in] _scale The scaling factor for the visual.
-      /// \deprecated See version that accepts ignition math parameters.
-      public: void SetScale(const math::Vector3 &_scale) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the scale.
-      /// \param[in] _scale The scaling factor for the visual.
       public: void SetScale(const ignition::math::Vector3d &_scale);
-
-      /// \brief Get the scale.
-      /// \return The scaling factor.
-      /// \deprecated See version that return an ignition math object.
-      public: math::Vector3 GetScale() GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the scale.
       /// \return The scaling factor.
@@ -239,45 +221,105 @@ namespace gazebo
       public: void SetMaterial(const std::string &_materialName,
                                bool _unique = true, const bool _cascade = true);
 
+      /// \brief Set a shader program parameter associated to this visual's
+      /// material
+      /// \param[in] _paramName Name of shader parameter
+      /// \param[in] _shaderType Type of shader. Supported types:
+      /// vertex, fragment
+      /// \param[in] _value Value to set the parameter to. The value string can
+      /// be a number (int, float) or a space delimited array of numbers
+      /// (floats). The value type must match the type defined in the shaders.
+      /// Note: Setting vec2/float2 params is only supported in ogre1.9+
+      public: void SetMaterialShaderParam(const std::string &_paramName,
+          const std::string &_shaderType, const std::string &_value);
+
       /// \brief Set the ambient color of the visual.
       /// \param[in] _color The ambient color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetAmbient(const common::Color &_color,
+          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the ambient color of the visual.
+      /// \param[in] _color The ambient color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetAmbient(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the diffuse color of the visual.
       /// \param[in] _color Set the diffuse color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetDiffuse(const common::Color &_color,
+          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the diffuse color of the visual.
+      /// \param[in] _color Set the diffuse color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetDiffuse(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the specular color of the visual.
       /// \param[in] _color Specular color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: void SetSpecular(const common::Color &_color,
+          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the specular color of the visual.
+      /// \param[in] _color Specular color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: void SetSpecular(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Set the emissive value.
       /// \param[in] _color The emissive color.
       /// \param[in] _cascade Whether to set this parameter in children too.
+      /// \deprecated use ignition::math::Color instead
       public: virtual void SetEmissive(const common::Color &_color,
+          const bool _cascade = true) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the emissive value.
+      /// \param[in] _color The emissive color.
+      /// \param[in] _cascade Whether to set this parameter in children too.
+      public: virtual void SetEmissive(const ignition::math::Color &_color,
           const bool _cascade = true);
 
       /// \brief Get the ambient color of the visual.
       /// \return Ambient color.
-      public: common::Color GetAmbient() const;
+      /// \deprecated use ignition::math::Color instead
+      public: common::Color GetAmbient() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the ambient color of the visual.
+      /// \return Ambient color.
+      public: ignition::math::Color Ambient() const;
 
       /// \brief Get the diffuse color of the visual.
       /// \return Diffuse color.
-      public: common::Color GetDiffuse() const;
+      /// \deprecated use ignition::math::Color instead
+      public: common::Color GetDiffuse() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the diffuse color of the visual.
+      /// \return Diffuse color.
+      public: ignition::math::Color Diffuse() const;
 
       /// \brief Get the specular color of the visual.
       /// \return Specular color.
-      public: common::Color GetSpecular() const;
+      /// \deprecated use ignition::math::Color instead
+      public: common::Color GetSpecular() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the specular color of the visual.
+      /// \return Specular color.
+      public: ignition::math::Color Specular() const;
 
       /// \brief Get the emissive color of the visual.
       /// \return Emissive color.
-      public: common::Color GetEmissive() const;
+      /// \deprecated use ignition::math::Color instead
+      public: common::Color GetEmissive() const GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Get the emissive color of the visual.
+      /// \return Emissive color.
+      public: ignition::math::Color Emissive() const;
 
       /// \brief Enable or disable wireframe for this visual.
       /// \param[in] _show True to enable wireframe for this visual.
@@ -346,19 +388,7 @@ namespace gazebo
 
       /// \brief Set the position of the visual.
       /// \param[in] _pos The position to set the visual to.
-      /// \deprecated See version that accepts ignition math parameters
-      public: void SetPosition(const math::Vector3 &_pos)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the position of the visual.
-      /// \param[in] _pos The position to set the visual to.
       public: void SetPosition(const ignition::math::Vector3d &_pos);
-
-      /// \brief Set the rotation of the visual.
-      /// \param[in] _rot The rotation of the visual.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetRotation(const math::Quaternion &_rot)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the rotation of the visual.
       /// \param[in] _rot The rotation of the visual.
@@ -366,17 +396,7 @@ namespace gazebo
 
       /// \brief Set the pose of the visual.
       /// \param[in] _pose The new pose of the visual.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the pose of the visual.
-      /// \param[in] _pose The new pose of the visual.
       public: void SetPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Get the position of the visual.
-      /// \return The visual's position.
-      /// \deprecated See ignition::math::Vector3d Position() const
-      public: math::Vector3 GetPosition() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the position of the visual.
       /// \return The visual's position.
@@ -384,31 +404,15 @@ namespace gazebo
 
       /// \brief Get the rotation of the visual.
       /// \return The visual's rotation.
-      /// \deprecated ignition::math::Quaterniond Rotation() const
-      public: math::Quaternion GetRotation() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the rotation of the visual.
-      /// \return The visual's rotation.
       public: ignition::math::Quaterniond Rotation() const;
 
       /// \brief Get the pose of the visual.
       /// \return The Visual's pose.
-      /// \deprecated See ignition::math::Pose3d Pose() const;
-      public: math::Pose GetPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the pose of the visual.
-      /// \return The Visual's pose.
-      /// \deprecated See ignition::math::Pose3d Pose() const;
       public: ignition::math::Pose3d Pose() const;
 
       /// \brief Get the initial relative pose of the visual.
       /// \return The visual's initial relative pose.
       public: ignition::math::Pose3d InitialRelativePose() const;
-
-      /// \brief Get the global pose of the node.
-      /// \return The pose in the world coordinate frame.
-      /// \deprecated See ignition::math::Pose3d WorldPose() const.
-      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the global pose of the visual.
       /// \return The pose in the world coordinate frame.
@@ -416,28 +420,11 @@ namespace gazebo
 
       /// \brief Set the world pose of the visual.
       /// \param[in] _pose Pose of the visual in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldPose(const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the world pose of the visual.
-      /// \param[in] _pose Pose of the visual in the world coordinate frame.
       public: void SetWorldPose(const ignition::math::Pose3d &_pose);
 
       /// \brief Set the world linear position of the visual.
       /// \param[in] _pose Position in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldPosition(const math::Vector3 &_pos)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the world linear position of the visual.
-      /// \param[in] _pose Position in the world coordinate frame.
       public: void SetWorldPosition(const ignition::math::Vector3d &_pos);
-
-      /// \brief Set the world orientation of the visual
-      /// \param[in] _rot Rotation in the world coordinate frame.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void SetWorldRotation(const math::Quaternion &_rot)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the world orientation of the visual
       /// \param[in] _rot Rotation in the world coordinate frame.
@@ -473,14 +460,18 @@ namespace gazebo
       /// \param[in] _value True to enable ribbon trail.
       /// \param[in] _initialColor The initial color of the ribbon trail.
       /// \param[in] _changeColor Color to change too as the trail grows.
+      /// \deprecated use ignition::math::Color instead
       public: void SetRibbonTrail(bool _value,
                   const common::Color &_initialColor,
-                  const common::Color &_changeColor);
+                  const common::Color &_changeColor) GAZEBO_DEPRECATED(9.0);
 
-      /// \brief Get the bounding box for the visual.
-      /// \return The bounding box in world coordinates.
-      /// \deprecated See version the returns an ignition math object.
-      public: math::Box GetBoundingBox() const GAZEBO_DEPRECATED(8.0);
+      /// \brief True on or off a ribbon trail.
+      /// \param[in] _value True to enable ribbon trail.
+      /// \param[in] _initialColor The initial color of the ribbon trail.
+      /// \param[in] _changeColor Color to change too as the trail grows.
+      public: void SetRibbonTrail(bool _value,
+                  const ignition::math::Color &_initialColor,
+                  const ignition::math::Color &_changeColor);
 
       /// \brief Get the bounding box for the visual.
       /// \return The bounding box in world coordinates.
@@ -575,25 +566,8 @@ namespace gazebo
       /// \brief Move to a pose and over a given time.
       /// \param[in] _pose Pose the visual will end at.
       /// \param[in] _time Time it takes the visual to move to the pose.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void MoveToPosition(const math::Pose &_pose, double _time)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Move to a pose and over a given time.
-      /// \param[in] _pose Pose the visual will end at.
-      /// \param[in] _time Time it takes the visual to move to the pose.
       public: void MoveToPosition(const ignition::math::Pose3d &_pose,
                   const double _time);
-
-      /// \brief Move to a series of pose and over a given time.
-      /// \param[in] _poses Series of poses the visual will move to.
-      /// \param[in] _time Time it takes the visual to move to the pose.
-      /// \param[in] _onComplete Callback used when the move is complete.
-      /// \deprecated See version that accepts an ignition math object.
-      public: void MoveToPositions(const std::vector<math::Pose> &_pts,
-                                   double _time,
-                                   std::function<void()> _onComplete = nullptr)
-                                   GAZEBO_DEPRECATED(8.0);
 
       /// \brief Move to a series of pose and over a given time.
       /// \param[in] _poses Series of poses the visual will move to.

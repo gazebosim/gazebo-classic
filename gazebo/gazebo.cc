@@ -31,8 +31,8 @@
 #include "gazebo/sensors/sensors.hh"
 #include "gazebo/transport/transport.hh"
 #include "gazebo/common/common.hh"
+#include "gazebo/util/Diagnostics.hh"
 #include "gazebo/util/LogRecord.hh"
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/gazebo_config.h"
 #include "gazebo/gazebo_shared.hh"
 #include "gazebo/gazebo.hh"
@@ -134,6 +134,7 @@ bool gazebo::shutdown()
   // Make sure to shut everything down.
   boost::mutex::scoped_lock lock(fini_mutex);
   util::LogRecord::Instance()->Fini();
+  util::DiagnosticManager::Instance()->Fini();
   g_plugins.clear();
   gazebo::transport::fini();
 

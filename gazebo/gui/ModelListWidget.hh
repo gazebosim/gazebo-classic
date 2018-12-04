@@ -41,7 +41,7 @@ namespace gazebo
     class GZ_GUI_VISIBLE ModelListWidget : public QWidget
     {
       Q_OBJECT
-      public: ModelListWidget(QWidget *_parent = 0);
+      public: explicit ModelListWidget(QWidget *_parent = 0);
       public: virtual ~ModelListWidget();
 
       private slots: void OnModelSelection(QTreeWidgetItem *item, int column);
