@@ -25,6 +25,7 @@ using namespace gazebo;
 
 class DiagnosticsTest : public gazebo::testing::AutoLogFixture { };
 
+/////////////////////////////////////////////////
 TEST_F(DiagnosticsTest, Diagnostics)
 {
   util::ProfileManager *mgr = util::ProfileManager::Instance();

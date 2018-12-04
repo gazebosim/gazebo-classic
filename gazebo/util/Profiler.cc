@@ -54,6 +54,7 @@ namespace gazebo
 {
   namespace util
   {
+    //////////////////////////////////////////////////
     int GetCurrentThreadIndex2()
     {
       const int kNullIndex = ~0U;
@@ -68,20 +69,24 @@ namespace gazebo
     }
 
 #ifdef ENABLE_PROFILER
+    //////////////////////////////////////////////////
     void EnterProfileZoneDefault(const char* name)
     {
       ProfileManager::Instance()->Start_Profile(name);
     }
 
+    //////////////////////////////////////////////////
     void LeaveProfileZoneDefault()
     {
       ProfileManager::Instance()->Stop_Profile();
     }
 #else
+    //////////////////////////////////////////////////
     void EnterProfileZoneDefault(const char* /*name*/)
     {
     }
 
+    //////////////////////////////////////////////////
     void LeaveProfileZoneDefault()
     {
     }
@@ -90,31 +95,37 @@ namespace gazebo
     static EnterProfileZoneFunc* gz_enterFunc = EnterProfileZoneDefault;
     static LeaveProfileZoneFunc* gz_leaveFunc = LeaveProfileZoneDefault;
 
+    //////////////////////////////////////////////////
     void EnterProfileZone(const char* name)
     {
       (gz_enterFunc)(name);
     }
 
+    //////////////////////////////////////////////////
     void LeaveProfileZone()
     {
       (gz_leaveFunc)();
     }
 
+    //////////////////////////////////////////////////
     EnterProfileZoneFunc* GetCurrentEnterProfileZoneFunc()
     {
       return gz_enterFunc;
     }
 
+    //////////////////////////////////////////////////
     LeaveProfileZoneFunc* GetCurrentLeaveProfileZoneFunc()
     {
       return gz_leaveFunc;
     }
 
+    //////////////////////////////////////////////////
     void SetCustomEnterProfileZoneFunc(EnterProfileZoneFunc* enterFunc)
     {
       gz_enterFunc = enterFunc;
     }
 
+    //////////////////////////////////////////////////
     void SetCustomLeaveProfileZoneFunc(LeaveProfileZoneFunc* leaveFunc)
     {
       gz_leaveFunc = leaveFunc;
@@ -122,11 +133,13 @@ namespace gazebo
   }
 }
 
+//////////////////////////////////////////////////
 ProfileSample::ProfileSample(const char * name)
 {
   gazebo::util::EnterProfileZone(name);
 }
 
+//////////////////////////////////////////////////
 ProfileSample::~ProfileSample(void)
 {
   gazebo::util::LeaveProfileZone();
