@@ -595,25 +595,7 @@ endif()
 
 ########################################
 # Find QT
-find_package (Qt5Widgets)
-if (NOT Qt5Widgets_FOUND)
-  BUILD_ERROR("Missing: Qt5Widgets")
-endif()
-
-find_package (Qt5Core)
-if (NOT Qt5Core_FOUND)
-  BUILD_ERROR("Missing: Qt5Core")
-endif()
-
-find_package (Qt5OpenGL)
-if (NOT Qt5OpenGL_FOUND)
-  BUILD_ERROR("Missing: Qt5OpenGL")
-endif()
-
-find_package (Qt5Test)
-if (NOT Qt5Test_FOUND)
-  BUILD_ERROR("Missing: Qt5Test")
-endif()
+find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 
 ########################################
 # Find Boost, if not specified manually
@@ -760,7 +742,7 @@ endif()
 
 ################################################################################
 # Find the Ignition Fuel Tools library
-find_package(ignition-fuel_tools1 QUIET)
+find_package(ignition-fuel_tools1 1.2 QUIET)
 if (NOT ignition-fuel_tools1_FOUND)
   message (STATUS "Looking for libignition-fuel_tools1 - not found")
   BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")

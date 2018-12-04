@@ -2153,6 +2153,14 @@ ODE_API void dJointSetBallAnchor2 (dJointID, dReal x, dReal y, dReal z);
 ODE_API void dJointSetBallParam (dJointID, int parameter, dReal value);
 
 /**
+ * @brief Set the cumulative joint angle of a hinge joint
+ * @ingroup joints
+ * @param dJointID pass in the ID of the hinge joint.
+ * @param angle pass in the desired cumulative angle.
+ */
+ODE_API void dJointSetHingeCumulativeAngle (dJointID, dReal angle);
+
+/**
  * @brief Set hinge anchor parameter.
  * @ingroup joints
  */
@@ -3003,6 +3011,12 @@ ODE_API dReal dJointGetHinge2Param (dJointID, int parameter);
  * @ingroup joints
  */
 ODE_API dReal dJointGetHinge2Angle1 (dJointID);
+
+/**
+ * @brief Get angle
+ * @ingroup joints
+ */
+ODE_API dReal dJointGetHinge2Angle2 (dJointID);
 
 /**
  * @brief Get time derivative of angle

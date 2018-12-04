@@ -178,7 +178,7 @@ void BlinkVisualPlugin::Update()
     to = this->dataPtr->colorB;
   }
   // Color B -> A
-  else if (elapsed >= this->dataPtr->period*0.5)
+  else
   {
     from = this->dataPtr->colorB;
     to = this->dataPtr->colorA;

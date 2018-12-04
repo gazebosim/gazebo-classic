@@ -90,9 +90,12 @@ void PhysicsEngine::Fini()
 {
   // Clean up transport
   {
-    this->responsePub.reset();
+    this->physicsSub.reset();
     this->requestSub.reset();
+    this->responsePub.reset();
 
+    if (this->node)
+      this->node->Fini();
     this->node.reset();
   }
 

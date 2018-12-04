@@ -301,6 +301,286 @@ TEST_F(VisualProperty, MaterialShaderParam)
   delete [] img;
 }
 
+/////////////////////////////////////////////////
+// normal map is not work on OSX yet
+#ifndef __APPLE__
+TEST_F(VisualProperty, NormalMap)
+{
+  // Load a world with two red box visuals: one without normal map and and one
+  // with normal map. Spawn a camera in front of each visual. Verify the visual
+  // with normal map is darker than visual without normal map and has irregular
+  // pattern
+  Load("worlds/normal_map.world");
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
+    return;
+  }
+
+  physics::WorldPtr world = physics::get_world();
+  ASSERT_TRUE(world != nullptr);
+
+  unsigned int width  = 320;
+  unsigned int height = 240;
+  double updateRate = 10;
+
+  // spawn first camera sensor
+  std::string modelName = "camera_model";
+  std::string cameraName = "camera_sensor";
+  ignition::math::Pose3d testPose(
+      ignition::math::Vector3d(0, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 1.57));
+  SpawnCamera(modelName, cameraName, testPose.Pos(),
+      testPose.Rot().Euler(), width, height, updateRate);
+  sensors::SensorPtr sensor = sensors::get_sensor(cameraName);
+  sensors::CameraSensorPtr camSensor =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
+
+  physics::ModelPtr model = world->ModelByName(modelName);
+  EXPECT_EQ(model->WorldPose(), testPose);
+
+  imageCount = 0;
+  img = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c =
+      camSensor->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer;
+  timer.Start();
+
+  // wait for images
+  int totalImages = 20;
+  while (imageCount < totalImages && timer.GetElapsed().Double() < 5)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount, totalImages);
+  c.reset();
+
+  // spawn second camera sensor
+  ignition::math::Pose3d testPose2(
+      ignition::math::Vector3d(3, -1, 0.5),
+      ignition::math::Quaterniond(0, 0, 1.57));
+  std::string modelName2 = "camera_model2";
+  std::string cameraName2 = "camera_sensor2";
+  SpawnCamera(modelName2, cameraName2, testPose2.Pos(),
+      testPose2.Rot().Euler(), width, height, updateRate);
+
+  sensors::SensorPtr sensor2 = sensors::get_sensor(cameraName2);
+  sensors::CameraSensorPtr camSensor2 =
+    std::dynamic_pointer_cast<sensors::CameraSensor>(sensor2);
+
+  physics::ModelPtr model2 = world->ModelByName(modelName2);
+  EXPECT_EQ(model2->WorldPose(), testPose2);
+
+  imageCount2 = 0;
+  img2 = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c2 =
+      camSensor2->Camera()->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount2, img2,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+  common::Timer timer2;
+  timer2.Start();
+
+  while (imageCount2 < totalImages && timer2.GetElapsed().Double() < 5)
+    common::Time::MSleep(10);
+
+  EXPECT_GE(imageCount2, totalImages);
+  c2.reset();
+
+  // check color of visuals with and without normal map
+  std::set<unsigned int> rSet;
+  std::set<unsigned int> gSet;
+  std::set<unsigned int> bSet;
+  std::set<unsigned int> rSet2;
+  std::set<unsigned int> gSet2;
+  std::set<unsigned int> bSet2;
+  unsigned int colorSum = 0;
+  unsigned int colorSum2 = 0;
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      // visual without normal map
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      rSet.insert(r);
+      gSet.insert(g);
+      bSet.insert(b);
+      colorSum += r + g + b;
+      // verify color is predominantly red
+      EXPECT_GT(r, g);
+      EXPECT_GT(r, b);
+      EXPECT_EQ(g, b);
+
+      // visual with normal map
+      unsigned int r2 = img2[(y*width*3) + x];
+      unsigned int g2 = img2[(y*width*3) + x + 1];
+      unsigned int b2 = img2[(y*width*3) + x + 2];
+      rSet2.insert(r2);
+      gSet2.insert(g2);
+      bSet2.insert(b2);
+      colorSum2 += r2+ g2+ b2;
+
+      // verify color is predominantly red
+      EXPECT_GT(r2, g2);
+      EXPECT_GT(r2, b2);
+      EXPECT_EQ(g2, b2);
+    }
+  }
+  // verify the rgb components of pixel are somewhat consistent throughout the
+  // the image
+  EXPECT_LE(rSet.size(), 3u);
+  EXPECT_LE(gSet.size(), 3u);
+  EXPECT_LE(bSet.size(), 3u);
+
+  // check that the r component of pixel varies throughout the image for
+  // visual with normal map. The variation of b and g should still be small
+  EXPECT_GT(rSet2.size(), 100u);
+  EXPECT_LE(gSet2.size(), 5u);
+  EXPECT_LE(bSet2.size(), 5u);
+
+  // the visual with normal map should be darker than the visual without
+  // normal map
+  EXPECT_GT(colorSum, colorSum2);
+
+  delete [] img;
+  delete [] img2;
+}
+#endif
+
+/////////////////////////////////////////////////
+TEST_F(VisualProperty, VisualMessage)
+{
+  // Load a world with a camera facing a red box
+  // There was a problem that a duplicate visual object was created if a Visual
+  // message is sent to the ~/visual topic just after the simulator starts.
+  // This test verifies the box visual transparency can be correctly changed.
+  // It first sends messages to make the box invisible. After that, it sends
+  // messages to change it back to the default.
+  Load("worlds/shader_test.world");
+
+  // Prepare a publisher to update a visual object.
+  auto world = physics::get_world();
+  auto node = transport::NodePtr(new transport::Node());
+  node->Init(world->Name());
+  auto model = world->ModelByName("box");
+  ASSERT_TRUE(model != nullptr);
+  auto link = model->GetLink("link");
+  ASSERT_TRUE(link != nullptr);
+  auto pubVisual
+    = node->Advertise<gazebo::msgs::Visual>("~/visual");
+  pubVisual->WaitForConnection();
+  msgs::Visual msg;
+  msg.set_name("box::link::visual");
+  msg.set_parent_name("box::link");
+  uint32_t id;
+  link->VisualId("visual", id);
+  msg.set_id(id);
+
+  // Publish a message to make it transparent at the beginning.
+  msg.set_transparency(1.0);
+  pubVisual->Publish(msg);
+
+  // Make sure the render engine is available.
+  if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
+      rendering::RenderEngine::NONE)
+  {
+    gzerr << "No rendering engine, unable to run camera test"
+          << std::endl;
+    return;
+  }
+
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_NE(nullptr, scene);
+
+  // 1 camera in scene
+  rendering::CameraPtr cam = scene->GetCamera(0);
+  ASSERT_NE(nullptr, cam);
+
+  int totalImages = 20;
+  imageCount = 0;
+  unsigned int width = cam->ImageWidth();
+  unsigned int height = cam->ImageHeight();
+  img = new unsigned char[width * height * 3];
+
+  event::ConnectionPtr c =
+      cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  unsigned int sleep = 0;
+  unsigned int maxSleep = 50;
+  while (imageCount < totalImages && sleep++ < maxSleep)
+  {
+    // Keep sending a command.
+    pubVisual->Publish(msg);
+    common::Time::MSleep(100);
+  }
+
+  EXPECT_GE(imageCount, totalImages);
+  c.reset();
+
+  // Now the ground surface, which is not red, should be visible to the camera.
+  for (unsigned int y = height/2; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_FALSE(r == 255u && g == 0u && b == 0u);
+    }
+  }
+
+  // Next, publish a message to change the transparency back to the default.
+  msg.set_transparency(0.0);
+  pubVisual->Publish(msg);
+
+  // get more images
+  sleep = 0;
+  imageCount = 0;
+  c = cam->ConnectNewImageFrame(
+      std::bind(&::OnNewCameraFrame, &imageCount, img,
+      std::placeholders::_1, std::placeholders::_2, std::placeholders::_3,
+      std::placeholders::_4, std::placeholders::_5));
+
+  while (imageCount < totalImages && sleep++ < maxSleep)
+  {
+    // keep sending a command.
+    pubVisual->Publish(msg);
+    common::Time::MSleep(100);
+  }
+
+  EXPECT_GE(imageCount, totalImages);
+  c.reset();
+
+  // verify the object reappeared.
+  for (unsigned int y = 0; y < height; ++y)
+  {
+    for (unsigned int x = 0; x < width*3; x+=3)
+    {
+      unsigned int r = img[(y*width*3) + x];
+      unsigned int g = img[(y*width*3) + x + 1];
+      unsigned int b = img[(y*width*3) + x + 2];
+      EXPECT_EQ(255u, r);
+      EXPECT_EQ(0u, g);
+      EXPECT_EQ(0u, b);
+    }
+  }
+
+  delete [] img;
+}
+
 int main(int argc, char **argv)
 {
 #if (OGRE_VERSION >= ((1 << 16) | (9 << 8) | 0) && defined(__APPLE__))

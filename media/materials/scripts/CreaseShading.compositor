@@ -1,0 +1,81 @@
+// This code in this file is adapted from OGRE Samples. The OGRE's license and
+// copyright header is copied below.
+
+/*
+-----------------------------------------------------------------------------
+OGRE (www.ogre3d.org) is made available under the MIT License.
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+compositor SSAO/GBuffer
+{
+  technique
+  {
+    // GBuffer enconding: --------------------------------------------------
+    // mrt0: rgba --> unused in this sample (plain white, (1, 1, 1, 1))
+    // mrt1: xyz --> normals, w --> normalized linear depth [0, 1]
+    // mrt2: xyz --> position in view space
+    //
+    // use a better packing of variables in the mrt to (possibly) increase
+    // performance!
+    // ---------------------------------------------------------------------
+    texture mrt target_width target_height PF_FLOAT32_RGBA PF_FLOAT32_RGBA chain_scope
+    texture occlusion target_width target_height PF_FLOAT32_RGBA chain_scope
+    texture scene target_width target_height PF_R8G8B8A8 chain_scope
+    // the scene we want to modulate
+    target scene
+    {
+      input previous
+    }
+    target mrt
+    {
+      input none
+      shadows off
+      material_scheme GBuffer
+      pass clear
+      {
+        buffers colour depth stencil
+        depth_value 1.0
+      }
+      pass render_scene {}
+    }
+  }
+}
+
+// Megan Fox's crease shading http://www.shalinor.com/research.html
+compositor SSAO/CreaseShading
+{
+  technique
+  {
+    texture_ref occlusion SSAO/GBuffer occlusion
+
+    target occlusion
+    {
+      input none
+      pass render_quad
+      {
+        material SSAO/CreaseShading
+      }
+    }
+  }
+}

@@ -281,20 +281,40 @@ namespace gazebo
       /// \param[in] _name Name of the camera.
       public: void RemoveCamera(const std::string &_name);
 
-      /// \brief Get a light by name.
-      /// \param[in] _name Name of the light to get.
-      /// \return Pointer to the light, or NULL if the light was not found.
-      public: LightPtr GetLight(const std::string &_name) const;
-
       /// \brief Get the count of the lights.
       /// \return The number of lights.
       public: uint32_t LightCount() const;
+
+      /// \brief Get a light by name.
+      /// \param[in] _name Name of the light to get.
+      /// \return Pointer to the light, or NULL if the light was not found.
+      /// \deprecated See LightByName.
+      public: LightPtr GetLight(const std::string &_name) const
+          GAZEBO_DEPRECATED(9.1);
 
       /// \brief Get a light based on an index. The index must be between
       /// 0 and Scene::GetLightCount.
       /// \param[in] _index Index of the light.
       /// \return Pointer to the Light or NULL if index was invalid.
-      public: LightPtr GetLight(const uint32_t _index) const;
+      /// \deprecated See LightByIndex
+      public: LightPtr GetLight(const uint32_t _index) const
+          GAZEBO_DEPRECATED(9.1);
+
+      /// \brief Get a light by name.
+      /// \param[in] _name Name of the light to get.
+      /// \return Pointer to the light, or NULL if the light was not found.
+      public: LightPtr LightByName(const std::string &_name) const;
+
+      /// \brief Get a light based on an index. The index must be between
+      /// 0 and Scene::GetLightCount-1.
+      /// \param[in] _index Index of the light.
+      /// \return Pointer to the Light or NULL if index was invalid.
+      public: LightPtr LightByIndex(const uint32_t _index) const;
+
+      /// \brief Get a light by id.
+      /// \param[in] _id  Unique light id.
+      /// \return Pointer to the Light or NULL if not found.
+      public: LightPtr LightById(const uint32_t _id) const;
 
       /// \brief Get a visual by name.
       /// \param[in] _name Name of the visual to retrieve.
@@ -494,6 +514,16 @@ namespace gazebo
       /// \return A render-engine specific value that is used to compute LOD.
       /// \sa Heightmap::LOD
       public: unsigned int HeightmapLOD() const;
+
+      /// \brief Set the skirt length value for the heightmap LOD tiles.
+      /// \param[in] _value Length of skirts on LOD tiles
+      /// \sa Heightmap::SetSkirtLength
+      public: void SetHeightmapSkirtLength(const double _value);
+
+      /// \brief Get the skirt length value for the heightmap LOD tiles.
+      /// \return Length of skirts on LOD tiles
+      /// \sa Heightmap::SkirtLength
+      public: double HeightmapSkirtLength() const;
 
       /// \brief Clear rendering::Scene
       public: void Clear();
