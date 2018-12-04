@@ -1,0 +1,265 @@
+<?xml version="1.0" ?>
+<%
+  # Triball: a triangle of spheres
+  # SI units (length in meters)
+  require "matrix"
+  def a_to_s(v)
+    Array(v).join(" ")
+  end
+  # convert quaternion to Euler angles
+  # taken from ignition math Quaternion class
+  # https://bitbucket.org/ignitionrobotics/ign-math/src/ignition-math2_2.2.2/include/ignition/math/Quaternion.hh#Quaternion.hh-315
+  def rpy_from_q(q_in)
+    q = q_in.normalize
+    q2 = q.map {|x| x*x }
+    pitchTmp = -2 * (q[1]*q[3] - q[0]*q[2])
+    if pitchTmp <= -1
+      pitch = -0.5 * Math::PI
+    elsif pitchTmp >= 1
+      pitch =  0.5 * Math::PI
+    else
+      pitch = Math::asin(pitchTmp)
+    end
+    Vector[
+      Math::atan2(2 * (q[0]*q[1] + q[2]*q[3]),
+                  q2[0] - q2[1] - q2[2] + q2[3]),
+      pitch,
+      Math::atan2(2 * (q[0]*q[3] + q[1]*q[2]),
+                  q2[0] + q2[1] - q2[2] - q2[3]),
+    ]
+  end
+
+  # Geometry
+  ball_radius   = 0.25
+  face_altitude = 5 * ball_radius
+  side_length   = face_altitude / (Math::sqrt(3) / 2.0)
+  ball_volume   = 4.0 / 3.0 * Math::PI * ball_radius**3
+  cylinder_radius_ratio = 0.25
+  cylinder_radius = ball_radius * cylinder_radius_ratio
+
+  ball_locations = {
+    "a" => Vector[ 2.0 / 3.0 * face_altitude, 0,                  0] ,
+    "b" => Vector[-1.0 / 3.0 * face_altitude,  side_length / 2.0, 0] ,
+    "c" => Vector[-1.0 / 3.0 * face_altitude, -side_length / 2.0, 0] ,
+  }
+  ball_count = ball_locations.length
+  joint_type = "fixed"
+
+  # inertia
+  ball_mass = 2.637 * 0.5
+  ball_ixx  = 2.0/5.0 * ball_mass * ball_radius**2
+  ball_iyy  = 2.0/5.0 * ball_mass * ball_radius**2
+  ball_izz  = 2.0/5.0 * ball_mass * ball_radius**2
+  ball_ixy  = 0
+  ball_ixz  = 0
+  ball_iyz  = 0
+  chassis_mass = ball_count * ball_mass
+
+  # center of mass (com) and lumped inertia of balls
+  ball_com = Vector[0, 0, 0]
+  ball_locations.keys.each do |k|
+    ball_com += ball_locations[k] / ball_count
+  end
+  chassis_ixx = ball_count * ball_ixx
+  chassis_iyy = ball_count * ball_iyy
+  chassis_izz = ball_count * ball_izz
+  chassis_ixy = 0.0
+  chassis_ixz = 0.0
+  chassis_iyz = 0.0
+  ball_locations.keys.each do |k|
+    dx = ball_locations[k][0] - ball_com[0]
+    dy = ball_locations[k][1] - ball_com[1]
+    dz = ball_locations[k][2] - ball_com[2]
+    chassis_ixx += ball_mass * (dy**2 + dz**2)
+    chassis_iyy += ball_mass * (dz**2 + dx**2)
+    chassis_izz += ball_mass * (dx**2 + dy**2)
+    chassis_ixy -= ball_mass * dx*dy
+    chassis_ixz -= ball_mass * dx*dz
+    chassis_iyz -= ball_mass * dy*dz
+  end
+
+  contact_kp = 1e7
+  contact_kd = 1e0
+
+  friction = 0.9
+  friction_dir1 = Vector[1, 0, 0]
+%>
+<sdf version="1.5">
+  <model name="triball_fixed">
+    <allow_auto_disable>false</allow_auto_disable>
+    <link name="chassis">
+      <pose>0 0 <%= ball_radius %>  0 0 0</pose>
+      <inertial>
+        <pose><%= a_to_s(ball_com) %> 0 0 0</pose>
+        <mass><%= chassis_mass %></mass>
+        <inertia>
+          <ixx><%= chassis_ixx %></ixx>
+          <iyy><%= chassis_iyy %></iyy>
+          <izz><%= chassis_izz %></izz>
+          <ixy><%= chassis_ixy %></ixy>
+          <ixz><%= chassis_ixz %></ixz>
+          <iyz><%= chassis_iyz %></iyz>
+        </inertia>
+      </inertial>
+      <sensor name="imu" type="imu">
+        <always_on>true</always_on>
+      </sensor>
+<%
+    # Place cylinder collision and visual connecting each sphere
+    # To iterate over all pairs of spheres,
+    # add another loop that iterates over all spheres after the current one
+    # first is the index of the first sphere of the pair
+    # second is the index of the second sphere
+  ball_locations.keys.each_index do |first|
+    key = ball_locations.keys[first]
+    collision_name = "collision_" + key
+    visual_name = "visual_" + key
+    pos = ball_locations[key]
+    for second in first+1 ... ball_locations.length
+      key2 = ball_locations.keys[second]
+      collision_name = "collision_" + key + "_to_" + key2
+      visual_name = "visual_" + key + "_to_" + key2
+      pos2 = ball_locations[key2]
+
+      # The center of the cylinder is the average of the two sphere locations
+      cylinder_center = 0.5 * (pos + pos2)
+
+      # Compute quaternion representing the required cylinder rotation
+      # using axis-angle quaternion representation
+
+      # First compute the vector pointing from one sphere to the other
+      position_difference = pos - pos2
+
+      # The length of that vector is the length of the cylinder
+      cylinder_length = position_difference.magnitude
+
+      # Then compute its unit vector
+      cylinder_axis = position_difference / cylinder_length
+
+      # By default, cylinders are aligned with the Z axis
+      initial_axis = Vector[0.0, 0.0, 1.0]
+
+      # Cross product of these unit vectors
+      axes_cross = cylinder_axis.cross initial_axis
+
+      # The magnitude of the cross product is the sine of the angle between them
+      sin_angle = axes_cross.magnitude
+      angle = Math::asin(sin_angle)
+
+      # w component of quaternion
+      c2 = Math::cos(angle / 2)
+
+      # axes_cross = sin(angle) * rotation_axis
+      # axis-angle requires sin(angle/2) * rotation_axis
+      # sin(angle) = 2 sin(angle/2) cos(angle/2)
+      # the xyz quaternion components are then axes_cross / (2 * cos(angle/2))
+      q_xyz = axes_cross / (2 * c2)
+      q = Vector[c2, q_xyz[0], q_xyz[1], q_xyz[2]]
+
+      # Convert quaternion to Euler angles
+      cylinder_rpy = rpy_from_q(q)
+%>
+      <collision name="<%= collision_name %>">
+        <pose><%= a_to_s(cylinder_center) %>  <%= a_to_s(cylinder_rpy) %></pose>
+        <geometry>
+          <cylinder>
+            <radius><%= cylinder_radius %></radius>
+            <length><%= cylinder_length %></length>
+          </cylinder>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu><%= friction %></mu>
+              <mu2><%= friction %></mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="<%= visual_name %>">
+        <pose><%= a_to_s(cylinder_center) %>  <%= a_to_s(cylinder_rpy) %></pose>
+        <geometry>
+          <cylinder>
+            <radius><%= cylinder_radius %></radius>
+            <length><%= cylinder_length %></length>
+          </cylinder>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+<%
+    end
+  end
+%>
+    </link>
+<%
+  # Place sphere collision and visual at each corner
+  ball_locations.keys.each_index do |first|
+    key = ball_locations.keys[first]
+    link_name = "link_" + key
+    joint_name = "joint_" + key
+    pos = ball_locations[key]
+    pos += Vector[0, 0, ball_radius]
+%>
+    <link name="<%= link_name %>">
+      <pose><%= a_to_s(pos) %>  0 0 0</pose>
+      <inertial>
+        <mass><%= ball_mass %></mass>
+        <inertia>
+          <ixx><%= ball_ixx %></ixx>
+          <iyy><%= ball_iyy %></iyy>
+          <izz><%= ball_izz %></izz>
+          <ixy><%= ball_ixy %></ixy>
+          <ixz><%= ball_ixz %></ixz>
+          <iyz><%= ball_iyz %></iyz>
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <sphere>
+            <radius><%= ball_radius %></radius>
+          </sphere>
+        </geometry>
+        <surface>
+          <contact>
+            <ode>
+              <kp><%= contact_kp %></kp>
+              <kd><%= contact_kd %></kd>
+            </ode>
+          </contact>
+          <friction>
+            <ode>
+              <mu><%= friction %></mu>
+              <mu2><%= friction %></mu2>
+              <fdir1><%= a_to_s(friction_dir1) %></fdir1>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <sphere>
+            <radius><%= ball_radius %></radius>
+          </sphere>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name="<%= joint_name %>" type="<%= joint_type %>">
+      <parent>chassis</parent>
+      <child><%= link_name %></child>
+    </joint>
+<%
+  end
+%>
+  </model>
+</sdf>

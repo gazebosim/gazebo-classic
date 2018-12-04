@@ -216,7 +216,7 @@ class JointTest : public ServerFixture,
               axis->set_use_parent_model_frame(_opt.useParentModelFrame);
             }
             // Hack: hardcode a second axis for universal joints
-            if (_opt.type == "universal")
+            if (_opt.type == "universal" || _opt.type == "revolute2")
             {
               auto axis2 = jointMsg->mutable_axis2();
               msgs::Set(axis2->mutable_xyz(),

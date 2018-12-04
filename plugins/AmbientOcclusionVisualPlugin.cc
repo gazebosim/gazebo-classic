@@ -63,6 +63,7 @@ namespace gazebo
         const Ogre::Renderable * /*_rend*/)
     {
       // ignore transparent / semi-tranparent materials with alpha rejection set
+      // This includes the clouds in skyx
       Ogre::Technique *origTech = _originalMaterial->getTechnique(0);
       if (origTech)
       {
@@ -71,7 +72,12 @@ namespace gazebo
           Ogre::Pass *origPass = origTech->getPass(i);
           if (origPass && origPass->getAlphaRejectFunction() !=
               Ogre::CMPF_ALWAYS_PASS)
-            return nullptr;
+          {
+            auto tech = _originalMaterial->createTechnique();
+            tech->setSchemeName(_schemeName);
+            tech->removeAllPasses();
+            return tech;
+          }
         }
       }
 
