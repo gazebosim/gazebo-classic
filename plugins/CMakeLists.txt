@@ -61,6 +61,7 @@ set (plugins_single_header
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
+  FlashLightPlugin
   FollowerPlugin
   ForceTorquePlugin
   GimbalSmall2dPlugin
@@ -72,6 +73,7 @@ set (plugins_single_header
   JointControlPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LedPlugin
   LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
@@ -92,6 +94,7 @@ set (plugins_single_header
   StopWorldPlugin
   TouchPlugin
   VehiclePlugin
+  WheelSlipPlugin
   WindPlugin
 )
 
@@ -105,6 +108,7 @@ if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
+    JoyPlugin
   )
 endif()
 
@@ -171,6 +175,12 @@ if (HAVE_DART_URDF)
     gz_install_includes("plugins" ${src}.hh)
   endforeach ()
 endif()
+
+# If a plugin depends on other plugins in the same directory, add them to link.
+# Plus, set RPATH to the directory so they can dynamically link.
+target_link_libraries(LedPlugin FlashLightPlugin)
+set_target_properties(
+  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(events)
 

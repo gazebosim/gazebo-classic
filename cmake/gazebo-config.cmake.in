@@ -27,7 +27,7 @@ set (GAZEBO_DART_MIN_REQUIRED_VERSION @DART_MIN_REQUIRED_VERSION@)
 # Set whether Gazebo was built with Ignition Fuel Tools support
 set (GAZEBO_HAS_IGNITION_FUEL_TOOLS @HAVE_IGNITION_FUEL_TOOLS@)
 
-# Set whether GAzebo was built with thread local storage support
+# Set whether Gazebo was built with thread local storage support
 set (GAZEBO_HAS_THREAD_LOCAL_STORAGE @GAZEBO_THREAD_LOCAL@)
 
 include (FindPkgConfig)

@@ -19,12 +19,12 @@ message LogStatus
       G_BYTES = 4;
     }
 
-    optional string uri        = 1;
-    optional string base_path  = 2;
-    optional string full_path  = 3;
-    optional float size        = 4;
-    optional Units size_units  = 5;
-    optional bool save_model   = 6;
+    optional string uri            = 1;
+    optional string base_path      = 2;
+    optional string full_path      = 3;
+    optional float size            = 4;
+    optional Units size_units      = 5;
+    optional bool record_resources = 6;
   }
 
   optional Time sim_time     = 1;
