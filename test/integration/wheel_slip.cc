@@ -110,11 +110,14 @@ class WheelSlipTest : public ServerFixture
   /// \param[in] _steer Steer angle to apply.
   public: void SetCommands(const WheelSlipState &_state);
 
+  /// \brief Node for Ignition Transport topics.
+  protected: ignition::transport::Node ignNode;
+
   /// \brief Publisher of joint commands for the tire model.
-  protected: transport::PublisherPtr tireJointCmdPub;
+  protected: ignition::transport::Node::Publisher tireJointCmdPub;
 
   /// \brief Publisher of joint commands for the drum model.
-  protected: transport::PublisherPtr drumJointCmdPub;
+  protected: ignition::transport::Node::Publisher drumJointCmdPub;
 
   /// \brief Publisher of lateral wheel slip compliance.
   protected: transport::PublisherPtr slipLateralPub;
@@ -148,8 +151,10 @@ TEST_F(WheelSlipTest, TireDrum)
   Load("worlds/tire_drum_test.world", true);
 
   // joint command publishers
-  this->tireJointCmdPub = node->Advertise<msgs::JointCmd>("~/tire/joint_cmd");
-  this->drumJointCmdPub = node->Advertise<msgs::JointCmd>("~/drum/joint_cmd");
+  this->tireJointCmdPub = this->ignNode.Advertise<ignition::msgs::JointCmd>(
+      "/tire/joint_cmd");
+  this->drumJointCmdPub = this->ignNode.Advertise<ignition::msgs::JointCmd>(
+      "/drum/joint_cmd");
 
   // slip compliance publishers
   this->slipLateralPub = node->Advertise<msgs::GzString>(
@@ -365,24 +370,24 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
   const double drumLimit = 1e6;
 
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("drum::joint");
 
-    msgs::PID *pid = msg.mutable_velocity();
+    auto pid = msg.mutable_velocity();
     pid->set_target(_state.drumSpeed);
     pid->set_p_gain(drumSpinP);
     pid->set_i_gain(drumSpinI);
     pid->set_d_gain(drumSpinD);
     pid->set_limit(drumLimit);
 
-    this->drumJointCmdPub->Publish(msg);
+    this->drumJointCmdPub.Publish(msg);
   }
 
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("tire::axel_wheel");
 
-    msgs::PID *pid = msg.mutable_velocity();
+    auto pid = msg.mutable_velocity();
     pid->set_target(_state.wheelSpeed);
     pid->set_p_gain(_state.wheelSpeedGain);
     pid->set_i_gain(wheelSpinI);
@@ -390,15 +395,15 @@ void WheelSlipTest::SetCommands(const WheelSlipState &_state)
 
     msg.set_force(_state.wheelTorque);
 
-    this->tireJointCmdPub->Publish(msg);
+    this->tireJointCmdPub.Publish(msg);
   }
 
   {
-    msgs::JointCmd msg;
+    ignition::msgs::JointCmd msg;
     msg.set_name("tire::world_upright");
     msg.set_force(-_state.suspForce);
 
-    this->tireJointCmdPub->Publish(msg);
+    this->tireJointCmdPub.Publish(msg);
   }
 
   {
