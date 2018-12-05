@@ -62,7 +62,7 @@ void NodeAnimation::AddKeyFrame(const double _time,
     const ignition::math::Pose3d &_pose)
 {
   ignition::math::Matrix4d mat(_pose.Rot());
-  mat.Translate(_pose.Pos());
+  mat.SetTranslation(_pose.Pos());
 
   this->AddKeyFrame(_time, mat);
 }
@@ -159,7 +159,7 @@ ignition::math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
       prevRot, nextRot, true);
 
   ignition::math::Matrix4d trans(rot);
-  trans.Translate(pos);
+  trans.SetTranslation(pos);
 
   return trans;
 }
@@ -171,7 +171,7 @@ void NodeAnimation::Scale(const double _scale)
   {
     ignition::math::Matrix4d *mat = &frame.second;
     ignition::math::Vector3d pos = mat->Translation();
-    mat->Translate(pos * _scale);
+    mat->SetTranslation(pos * _scale);
   }
 }
 

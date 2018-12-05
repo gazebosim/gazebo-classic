@@ -130,16 +130,20 @@ namespace gazebo
       public: inline friend std::ostream &operator<<(std::ostream &_out,
                   const gazebo::physics::JointState &_state)
       {
-        _out << "<joint name='" << _state.GetName() << "'>";
-
-        int i = 0;
-        for (std::vector<double>::const_iterator iter =
-            _state.positions.begin(); iter != _state.positions.end(); ++iter)
+        if (_state.GetAngleCount() > 0)
         {
-          _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
-        }
+          _out << "<joint name='" << _state.GetName() << "'>";
 
-        _out << "</joint>";
+          int i = 0;
+          for (std::vector<double>::const_iterator iter =
+              _state.positions.begin(); iter != _state.positions.end(); ++iter)
+          {
+            _out << "<angle axis='" << i << "'>" << (*iter) << "</angle>";
+            i++;
+          }
+
+          _out << "</joint>";
+        }
 
         return _out;
       }

@@ -58,6 +58,8 @@ ODECollision::~ODECollision()
   if (this->collisionId)
     dGeomDestroy(this->collisionId);
   this->collisionId = nullptr;
+
+  this->Fini();
 }
 
 //////////////////////////////////////////////////

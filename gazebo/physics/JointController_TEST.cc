@@ -18,6 +18,9 @@
 #include <gtest/gtest.h>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
+#include <ignition/transport.hh>
+#include <ignition/msgs.hh>
+#include <boost/algorithm/string.hpp>
 
 #include "gazebo/common/PID.hh"
 #include "gazebo/physics/Model.hh"
@@ -31,7 +34,7 @@ class JointControllerTest : public gazebo::testing::AutoLogFixture { };
 
 class FakeJoint : public physics::Joint
 {
-  public: FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
+  public: explicit FakeJoint(physics::ModelPtr _model) : physics::Joint(_model)
           {}
 
   public: virtual physics::LinkPtr GetJointLink(unsigned int) const
@@ -212,6 +215,13 @@ TEST_F(JointControllerTest, AddJoint)
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
 
+  // Set a joint force
+  EXPECT_TRUE(jointController->SetForce(
+        joint->GetScopedName(), 4.56));
+  std::map<std::string, double> forces = jointController->GetForces();
+  EXPECT_EQ(forces.size(), 1u);
+  EXPECT_DOUBLE_EQ(forces[joint->GetScopedName()], 4.56);
+
   // Try setting a position target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetPositionTarget("my_bad_name", 12.3));
   positions = jointController->GetPositions();
@@ -220,6 +230,12 @@ TEST_F(JointControllerTest, AddJoint)
 
   // Try setting a velocity target on a joint that doesn't exist.
   EXPECT_FALSE(jointController->SetVelocityTarget("my_bad_name", 3.21));
+  velocities = jointController->GetVelocities();
+  EXPECT_EQ(velocities.size(), 1u);
+  EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
+
+  // Try setting a force on a joint that doesn't exist.
+  EXPECT_FALSE(jointController->SetForce("my_bad_name", 7.89));
   velocities = jointController->GetVelocities();
   EXPECT_EQ(velocities.size(), 1u);
   EXPECT_DOUBLE_EQ(velocities[joint->GetScopedName()], 3.21);
@@ -262,6 +278,76 @@ TEST_F(JointControllerTest, SetJointPositions)
   positions[joint1->GetScopedName()] = 1.2;
   positions[joint2->GetScopedName()] = 2.3;
   EXPECT_NO_THROW(jointController->SetJointPositions(positions));
+}
+
+/////////////////////////////////////////////////
+TEST_F(JointControllerTest, JointCmd)
+{
+  // Create a dummy model
+  physics::ModelPtr model(new physics::Model(physics::BasePtr()));
+  EXPECT_TRUE(model != NULL);
+
+  // Create the joint controller
+  physics::JointControllerPtr jointController(
+      new physics::JointController(model));
+  EXPECT_TRUE(jointController != NULL);
+
+  physics::JointPtr joint(new FakeJoint(model));
+  joint->SetName("joint");
+
+  // There should be one joint in the controller
+  jointController->AddJoint(joint);
+  std::map<std::string, physics::JointPtr> joints =
+      jointController->GetJoints();
+  EXPECT_EQ(joints.size(), 1u);
+
+  // Set the joint controller parameters
+  jointController->SetPositionTarget(joint->GetScopedName(), 12.3);
+  jointController->SetPositionPID(joint->GetScopedName(), common::PID(4, 1, 9));
+  jointController->SetVelocityTarget(joint->GetScopedName(), 3.21);
+  jointController->SetVelocityPID(joint->GetScopedName(), common::PID(4, 1, 9));
+
+  // Get the joint controller parameters through a service
+  ignition::transport::Node nodeSrv;
+  std::string modelName = model->GetScopedName();
+  if (modelName.empty())
+  {
+     modelName = model->GetName();
+  }
+  boost::replace_all(modelName, "::", "/");
+
+  ignition::msgs::StringMsg req;
+  ignition::msgs::JointCmd rep;
+  bool result;
+  unsigned int timeout = 5000;
+
+  req.set_data(joint->GetScopedName());
+  bool executed = nodeSrv.Request("/" + modelName + "/joint_cmd_req",
+      req, timeout, rep, result);
+  EXPECT_TRUE(executed && result);
+
+  // Check the retrieved joint controller parameters
+  EXPECT_TRUE(!rep.has_force());
+
+  EXPECT_TRUE(rep.has_position());
+  EXPECT_TRUE(rep.position().has_target());
+  EXPECT_DOUBLE_EQ(rep.position().target(), 12.3);
+  EXPECT_TRUE(rep.position().has_p_gain());
+  EXPECT_DOUBLE_EQ(rep.position().p_gain(), 4);
+  EXPECT_TRUE(rep.position().has_i_gain());
+  EXPECT_DOUBLE_EQ(rep.position().i_gain(), 1);
+  EXPECT_TRUE(rep.position().has_d_gain());
+  EXPECT_DOUBLE_EQ(rep.position().d_gain(), 9);
+
+  EXPECT_TRUE(rep.has_velocity());
+  EXPECT_TRUE(rep.velocity().has_target());
+  EXPECT_DOUBLE_EQ(rep.velocity().target(), 3.21);
+  EXPECT_TRUE(rep.velocity().has_p_gain());
+  EXPECT_DOUBLE_EQ(rep.velocity().p_gain(), 4);
+  EXPECT_TRUE(rep.velocity().has_i_gain());
+  EXPECT_DOUBLE_EQ(rep.velocity().i_gain(), 1);
+  EXPECT_TRUE(rep.velocity().has_d_gain());
+  EXPECT_DOUBLE_EQ(rep.velocity().d_gain(), 9);
 }
 
 /////////////////////////////////////////////////

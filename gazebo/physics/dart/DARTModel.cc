@@ -15,6 +15,10 @@
  *
 */
 
+#include <list>
+#include <queue>
+#include <algorithm>
+
 #include "gazebo/common/Assert.hh"
 
 #include "gazebo/physics/World.hh"
@@ -75,153 +79,137 @@ void DARTModel::Init()
   // MultibodyGraphMaker.
   //----------------------------------------------------------------
 
-  // map for link name -> body node build information
-  DARTModelPrivate::BodyNodeMap bodyNodeMap;
-
-  Link_V linkList = this->GetLinks();
-  for (auto link : linkList)
+  // Create a local link for joints with the world as their parent.
+  LinkPtr worldLink(new DARTLink(
+      boost::static_pointer_cast<Model>(shared_from_this())));
+  for (auto joint : this->GetJoints())
   {
-    DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(link);
-    GZ_ASSERT(dartLink, "DART link is null");
-
-    gzdbg << "Adding to body node map: DART link "
-          << dartLink->GetName() << "\n";
-
-    // multiple parent joints are not supported: Each BodyNode has one link
-    // and joint, and can have only one parent BodyNode
-    // (see also dart::dynamics::Skeleton::createJointAndBodyNodePair).
-    if (dartLink->GetParentJoints().size() > 1)
+    if (!joint->GetParent())
     {
-      gzerr << "Multiple parent joints for link " << link->GetName()
-            << ". This is not supported in DART. Not loading model. \n";
-      Joint_V parents = dartLink->GetParentJoints();
-      gzerr << "Parents: \n";
-      for (auto joint : parents)
-        gzerr << joint->GetName() << "\n";
-      return;
+      worldLink->AddChildJoint(joint);
     }
-
-    DARTModelPrivate::BodyNodeBuildData bodyNodeBD;
-    bodyNodeBD.dartLink = dartLink;
-    bodyNodeBD.properties = dartLink->DARTProperties();
-    bodyNodeBD.initTransform = DARTTypes::ConvPose(dartLink->WorldPose());
-    bodyNodeBD.type = dartLink->IsSoftBody() ? "soft" : "";
-
-    bodyNodeMap[dartLink->GetName()] = bodyNodeBD;
   }
 
-  // map for link name -> parent joint
-  DARTModelPrivate::JointMap jointMap;
-  Joint_V jointList = this->GetJoints();
-  for (auto joint : jointList)
+  // Joints that complete kinematic loops
+  Joint_V loopJoints;
+
+  // Links that need to be added to the DART skeleton
+  std::list<LinkPtr> linksToAdd;
+  for (auto link : this->GetLinks())
   {
-    DARTJointPtr dartJoint = boost::dynamic_pointer_cast<DARTJoint>(joint);
-    GZ_ASSERT(dartJoint, "DART joint is null");
-
-    DARTModelPrivate::JointBuildData jointBD;
-    jointBD.dartJoint = dartJoint;
-    jointBD.properties = dartJoint->DARTProperties();
-    if (dartJoint->GetParent())
-    {
-      jointBD.parentName = dartJoint->GetParent()->GetName();
-    }
-    if (dartJoint->GetChild())
-    {
-      jointBD.childName = dartJoint->GetChild()->GetName();
-    }
-    else
-    {
-      gzerr << "DART does not allow joint without child link. "
-            << "Please see issue #914. "
-            << "(https://bitbucket.org/osrf/gazebo/issue/914)"
-            << std::endl;
-    }
-    jointBD.type = DARTModelPrivate::getDARTJointType(dartJoint);
-
-    gzdbg << "Adding to joint map for link " << jointBD.childName
-          << ": DART joint " << dartJoint->GetName() << "\n";
-
-    jointMap[jointBD.childName] = jointBD;
+    linksToAdd.push_back(link);
   }
 
-  // Iterate through the collected properties and construct the Skeleton from
-  // the root nodes downward.
-  DARTModelPrivate::BodyNodeMap::const_iterator bodyNodeItr =
-      bodyNodeMap.begin();
-  DARTModelPrivate::JointMap::const_iterator parentJointItr;
-  dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
+  // Links that have been added and whose child joints need to be processed
+  std::queue<LinkPtr> linksToProcess;
+  // Start with joints attached to the world
+  linksToProcess.push(worldLink);
 
-  while (bodyNodeItr != bodyNodeMap.end())
+  while (!linksToAdd.empty())
   {
-    GZ_ASSERT(bodyNodeItr->second.dartLink, "Link is nullptr");
-    // multiple parent joints are not supported (this case should have
-    // been caught before, therefore we make the assertion here).
-    // Should this be supported in future versions of DART, we have to make
-    // sure here that body nodes are created for all links. The
-    // current approach with this loop implementation only considers each
-    // link once (and therefore supports only one parent joint of it).
-    GZ_ASSERT(bodyNodeItr->second.dartLink->GetParentJoints().size() <= 1,
-              "Multiple parent joints for links are not supported in DART");
-
-    DARTModelPrivate::NextResult result =
-        DARTModelPrivate::getNextJointAndNodePair(
-          bodyNodeItr, parentJointItr, dtParentBodyNode,
-          this->dataPtr->dtSkeleton, bodyNodeMap, jointMap);
-
-    if (DARTModelPrivate::BREAK == result)
+    // Find a link to process if none are queued
+    if (linksToProcess.empty())
     {
-      break;
-    }
-    else if (DARTModelPrivate::CONTINUE == result)
-    {
-      // Create the parent before creating the current Joint
-      continue;
-    }
-    else if (DARTModelPrivate::CREATE_FREEJOINT_ROOT == result)
-    {
-      // If a root FreeJoint is needed for the parent of the current joint,
-      // then create it
-      DARTModelPrivate::JointBuildData rootJoint;
-      rootJoint.properties =
-          Eigen::make_aligned_shared<dart::dynamics::FreeJoint::Properties>(
-            dart::dynamics::Joint::Properties(
-              "root", bodyNodeItr->second.initTransform));
-      rootJoint.type = "free";
+      // Developer note (PCH): Initializing the new root as the first link
+      // ensures that a link is added even if all links have parents, such
+      // as in a ring.
+      LinkPtr newRoot = linksToAdd.front();
+      // Find a link without parents if possible
+      for (auto link : linksToAdd)
+      {
+        if (link->GetParentJoints().empty())
+        {
+          newRoot = link;
+          break;
+        }
+      }
 
-      gzdbg << "Building DART BodyNode for link "
-            << bodyNodeItr->second.dartLink->GetName()
-            << " with a free joint.\n";
+      // Create free joint for new root link and add pair to skeleton
+      gzdbg << "Building DART BodyNode for link '" << newRoot->GetName()
+            << "' with a free joint.\n";
 
-      if (!DARTModelPrivate::createJointAndNodePair(
-            this->dataPtr->dtSkeleton, nullptr, rootJoint, bodyNodeItr->second))
+      // A nullptr for the parent (arg 2) indicates that the world is the parent
+      // A nullptr for the Gazebo joint (arg 3) indicates to create a free joint
+      if (!DARTModelPrivate::CreateJointAndNodePair(
+          this->dataPtr->dtSkeleton, nullptr, nullptr, newRoot))
       {
         gzdbg << "Could not create joint and node.\n";
         break;
       }
 
-      bodyNodeMap.erase(bodyNodeItr);
-      bodyNodeItr = bodyNodeMap.begin();
-
-      continue;
+      linksToAdd.remove(newRoot);
+      linksToProcess.push(newRoot);
     }
 
-    gzdbg << "Building DART BodyNode for link "
-            << bodyNodeItr->second.dartLink->GetName()
-            << "and joint "
-            << parentJointItr->second.properties->mName << ".\n";
-
-    if (!DARTModelPrivate::createJointAndNodePair(
-          this->dataPtr->dtSkeleton,
-          dtParentBodyNode,
-          parentJointItr->second,
-          bodyNodeItr->second))
+    // Add children using BFS
+    while (!linksToProcess.empty())
     {
-      gzdbg << "Could not create joint and node.\n";
+      LinkPtr parentLink = linksToProcess.front();
+      linksToProcess.pop();
+      for (auto joint : parentLink->GetChildJoints())
+      {
+        LinkPtr childLink = joint->GetChild();
+        if (childLink == nullptr)
+        {
+          gzerr << "DART does not allow joint without child link. "
+                << "Please see issue #914. "
+                << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+          continue;
+        }
+
+        // Check if the child link has already been added to the skeleton
+        auto childLinkItr
+            = std::find(linksToAdd.begin(), linksToAdd.end(), childLink);
+        if (childLinkItr != linksToAdd.end())
+        {
+          // Add joint and child link to skeleton
+          gzdbg << "Building DART BodyNode for link '" << childLink->GetName()
+                << "' and joint '" << joint->GetName() << "'.\n";
+
+          dart::dynamics::BodyNode* dtParentBodyNode =
+              this->dataPtr->dtSkeleton->getBodyNode(parentLink->GetName());
+
+          if (!DARTModelPrivate::CreateJointAndNodePair(
+              this->dataPtr->dtSkeleton, dtParentBodyNode, joint, childLink))
+          {
+            gzdbg << "Could not create joint and node.\n";
+            // Avoid a potential infinite loop
+            linksToAdd.clear();
+            break;
+          }
+
+          linksToAdd.erase(childLinkItr);
+          linksToProcess.push(childLink);
+        }
+        else
+        {
+          // Child link has already been added to skeleton
+          loopJoints.push_back(joint);
+        }
+      }
+    }
+  }
+
+  // Process remaining joints
+  for (auto joint : loopJoints)
+  {
+    gzdbg << "Building DART BodyNode for link '" << joint->GetChild()->GetName()
+          << "' and loop joint '" << joint->GetName() << "'.\n";
+
+    dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
+    if (joint->GetParent() != nullptr)
+    {
+      dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
+          joint->GetParent()->GetName());
+    }
+
+    // Loop joint completes a kinematic loop
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+        dtParentBodyNode, joint, joint->GetChild(), false))
+    {
+      gzdbg << "Could not create loop joint and node.\n";
       break;
     }
-
-    bodyNodeMap.erase(bodyNodeItr);
-    bodyNodeItr = bodyNodeMap.begin();
   }
 
   Model::Init();
@@ -241,7 +229,7 @@ void DARTModel::Init()
   // Check whether there exist at least one pair of self collidable links.
   int numSelfCollidableLinks = 0;
   bool hasPairOfSelfCollidableLinks = false;
-  for (auto link : linkList)
+  for (auto link : this->GetLinks())
   {
     if (link->GetSelfCollide())
     {
@@ -264,10 +252,6 @@ void DARTModel::Init()
     this->dataPtr->dtSkeleton->enableSelfCollisionCheck();
     this->dataPtr->dtSkeleton->setAdjacentBodyCheck(false);
   }
-
-  // Note: This function should be called after the skeleton is added to the
-  //       world.
-  this->BackupState();
 
   // Add the skeleton to the world
   this->DARTWorld()->addSkeleton(this->dataPtr->dtSkeleton);
@@ -293,26 +277,6 @@ void DARTModel::Fini()
   {
     _world->removeSkeleton(this->dataPtr->dtSkeleton);
   }
-
-  // update the world which now does not have the removed model an more
-  if (_world)
-  {
-    // We need to clear the last collision result because the next call of
-    // DARTPhysics::UpdateCollision() crashes if the last collision result
-    // still contains the removed model.
-    // Unfortunately, we cannot use
-    // _world->getLastCollisionResult().clear()
-    // (DARTPhysics::UpdateCollision() uses world->getLastCollisionResult())
-    // because it returns a const pointer.
-    // We could instead use
-    // _world->getConstraintSolver()->getLastCollisionResult().clear();
-    // (which works as well, as tested with DART-6)
-    // but that could conflict with future versions of DART and different
-    // handling in DARTPhysics::UpdateCollision() and here.
-    // So instead, for now we will just step() the world, which will also
-    // update the last collision result used in DARTPhysics::UpdateCollision().
-    _world->step();
-  }
 }
 
 //////////////////////////////////////////////////
@@ -328,12 +292,20 @@ void DARTModel::RestoreState()
 {
   GZ_ASSERT(this->dataPtr->dtSkeleton, "Skeleton can't be NULL");
 
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genPositions.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
-  GZ_ASSERT(static_cast<size_t>(this->dataPtr->genVelocities.size()) ==
-            this->dataPtr->dtSkeleton->getNumDofs(),
-            "Cannot RestoreState, invalid size");
+  if (static_cast<size_t>(this->dataPtr->genPositions.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized positions has changed.\n";
+    return;
+  }
+  if (static_cast<size_t>(this->dataPtr->genVelocities.size()) !=
+      this->dataPtr->dtSkeleton->getNumDofs())
+  {
+    gzerr << "Cannot RestoreState, "
+      << "number of generalized velocities has changed.\n";
+    return;
+  }
 
   this->dataPtr->dtSkeleton->setPositions(this->dataPtr->genPositions);
   this->dataPtr->dtSkeleton->setVelocities(this->dataPtr->genVelocities);
@@ -359,4 +331,90 @@ dart::simulation::WorldPtr DARTModel::DARTWorld(void) const
   DARTPhysicsPtr physics = GetDARTPhysics();
   if (!physics) return nullptr;
   return physics->DARTWorld();
+}
+
+//////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
+JointPtr DARTModel::CreateJoint(
+    const std::string &_name, const std::string &_type,
+    physics::LinkPtr _parent, physics::LinkPtr _child)
+{
+  return this->CreateJointHelper(Model::CreateJoint(
+        _name, _type, _parent, _child));
+}
+
+//////////////////////////////////////////////////
+// Note: Should only be called after all existing joints have been initialized.
+JointPtr DARTModel::CreateJoint(sdf::ElementPtr _sdf)
+{
+  return this->CreateJointHelper(Model::CreateJoint(_sdf));
+}
+
+//////////////////////////////////////////////////
+JointPtr DARTModel::CreateJointHelper(JointPtr _joint)
+{
+  if (_joint != nullptr)
+  {
+    dart::dynamics::BodyNode* dtParentBodyNode = nullptr;
+    if (_joint->GetParent() != nullptr)
+    {
+      dtParentBodyNode = this->dataPtr->dtSkeleton->getBodyNode(
+          _joint->GetParent()->GetName());
+    }
+    if (_joint->GetChild() == nullptr)
+    {
+      gzerr << "DART does not allow joint without child link. "
+            << "Please see issue #914. "
+            << "(https://bitbucket.org/osrf/gazebo/issue/914)\n";
+      return JointPtr();
+    }
+
+    if (!DARTModelPrivate::CreateLoopJointAndNodePair(this->dataPtr->dtSkeleton,
+          dtParentBodyNode, _joint, _joint->GetChild(), true))
+    {
+      gzdbg << "Could not create loop joint and node.\n";
+      return JointPtr();
+    }
+  }
+  return _joint;
+}
+
+//////////////////////////////////////////////////
+bool DARTModel::RemoveJoint(const std::string &_name)
+{
+  JointPtr joint = this->GetJoint(_name);
+  if (!joint)
+  {
+    gzwarn << "Joint [" << _name << "] does not exist in model ["
+           << this->GetName() << "], not removed.\n";
+    return false;
+  }
+
+  LinkPtr link = joint->GetChild();
+  if (!link)
+  {
+    gzerr << "Joint [" << _name << "] does not have a child link.\n";
+    return false;
+  }
+
+  DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(link);
+  GZ_ASSERT(dartLink, "DART link is null");
+
+  DARTJointPtr dartJoint = boost::dynamic_pointer_cast<DARTJoint>(joint);
+  GZ_ASSERT(dartJoint, "DART joint is null");
+
+  dart::dynamics::Joint *dtJoint = dartJoint->GetDARTJoint();
+  GZ_ASSERT(dtJoint, "Joint is null");
+
+  dart::dynamics::BodyNode* dtChildBodyNode = dtJoint->getChildBodyNode();
+  GZ_ASSERT(dtChildBodyNode, "Child body node is null");
+
+  if (!dartLink->RemoveSlaveBodyNode(dtChildBodyNode))
+  {
+    gzerr << "Joint [" << _name << "] not removed. RemoveJoint() is currently "
+      << "only implemented for DART for joints added with CreateJoint().\n";
+    return false;
+  }
+
+  return Model::RemoveJoint(_name);
 }

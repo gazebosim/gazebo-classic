@@ -18,10 +18,12 @@ set (files
   hardwood_floor.jpg
   heightmap_bowl.png
   motorway.jpg
+  noise_rgba.png
   paintedWall.jpg
   pioneerBody.jpg
   primary.jpg
   projection_filter.png
+  rand1x32.png
   random.png
   residential.jpg
   road1.jpg

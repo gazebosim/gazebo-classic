@@ -27,6 +27,7 @@
 
 #include <sdf/sdf.hh>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
 
@@ -145,28 +146,48 @@ namespace gazebo
 
       /// \brief Set the ambient color.
       /// \param[in] _color The ambient color to use.
-      public: void SetAmbientColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: void SetAmbientColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the ambient color.
+      /// \param[in] _color The ambient color to use.
+      public: void SetAmbientColor(const ignition::math::Color &_color);
 
       /// \brief Get the ambient color.
       /// \return The scene's ambient color.
-      public: common::Color AmbientColor() const;
+      public: ignition::math::Color AmbientColor() const;
 
       /// \brief Set the background color.
       /// \param[in] _color The background color.
-      public: void SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: void SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the background color.
+      /// \param[in] _color The background color.
+      public: void SetBackgroundColor(const ignition::math::Color &_color);
 
       /// \brief Get the background color.
       /// \return The background color.
-      public: common::Color BackgroundColor() const;
+      public: ignition::math::Color BackgroundColor() const;
 
       /// \brief Create a square grid of cells.
       /// \param[in] _cellCount Number of grid cells in one direction.
       /// \param[in] _cellLength Length of one grid cell.
       /// \param[in] _lineWidth Width of the grid lines.
       /// \param[in] _color Color of the grid lines.
+      /// \deprecated Use function which accepts ignition::math::Color.
       public: void CreateGrid(const uint32_t _cellCount,
           const float _cellLength, const float _lineWidth,
-          const common::Color &_color);
+          const common::Color &_color) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Create a square grid of cells.
+      /// \param[in] _cellCount Number of grid cells in one direction.
+      /// \param[in] _cellLength Length of one grid cell.
+      /// \param[in] _color Color of the grid lines.
+      public: void CreateGrid(const uint32_t _cellCount,
+          const float _cellLength, const ignition::math::Color &_color);
 
       /// \brief Get a grid based on an index. Index must be between 0 and
       /// Scene::GetGridCount.
@@ -260,20 +281,40 @@ namespace gazebo
       /// \param[in] _name Name of the camera.
       public: void RemoveCamera(const std::string &_name);
 
-      /// \brief Get a light by name.
-      /// \param[in] _name Name of the light to get.
-      /// \return Pointer to the light, or NULL if the light was not found.
-      public: LightPtr GetLight(const std::string &_name) const;
-
       /// \brief Get the count of the lights.
       /// \return The number of lights.
       public: uint32_t LightCount() const;
+
+      /// \brief Get a light by name.
+      /// \param[in] _name Name of the light to get.
+      /// \return Pointer to the light, or NULL if the light was not found.
+      /// \deprecated See LightByName.
+      public: LightPtr GetLight(const std::string &_name) const
+          GAZEBO_DEPRECATED(9.1);
 
       /// \brief Get a light based on an index. The index must be between
       /// 0 and Scene::GetLightCount.
       /// \param[in] _index Index of the light.
       /// \return Pointer to the Light or NULL if index was invalid.
-      public: LightPtr GetLight(const uint32_t _index) const;
+      /// \deprecated See LightByIndex
+      public: LightPtr GetLight(const uint32_t _index) const
+          GAZEBO_DEPRECATED(9.1);
+
+      /// \brief Get a light by name.
+      /// \param[in] _name Name of the light to get.
+      /// \return Pointer to the light, or NULL if the light was not found.
+      public: LightPtr LightByName(const std::string &_name) const;
+
+      /// \brief Get a light based on an index. The index must be between
+      /// 0 and Scene::GetLightCount-1.
+      /// \param[in] _index Index of the light.
+      /// \return Pointer to the Light or NULL if index was invalid.
+      public: LightPtr LightByIndex(const uint32_t _index) const;
+
+      /// \brief Get a light by id.
+      /// \param[in] _id  Unique light id.
+      /// \return Pointer to the Light or NULL if not found.
+      public: LightPtr LightById(const uint32_t _id) const;
 
       /// \brief Get a visual by name.
       /// \param[in] _name Name of the visual to retrieve.
@@ -372,8 +413,21 @@ namespace gazebo
       /// \param[in] _start Distance from camera to start the fog.
       /// \param[in] _end Distance from camera at which the fog is at max
       /// density.
+      /// \deprecated Use function which accepts ignition::math::Color.
       public: void SetFog(const std::string &_type,
                           const common::Color &_color,
+                          const double _density, const double _start,
+                          const double _end) GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set the fog parameters.
+      /// \param[in] _type Type of fog: "linear", "exp", or "exp2".
+      /// \param[in] _color Color of the fog.
+      /// \param[in] _density Fog density.
+      /// \param[in] _start Distance from camera to start the fog.
+      /// \param[in] _end Distance from camera at which the fog is at max
+      /// density.
+      public: void SetFog(const std::string &_type,
+                          const ignition::math::Color &_color,
                           const double _density, const double _start,
                           const double _end);
 
@@ -460,6 +514,16 @@ namespace gazebo
       /// \return A render-engine specific value that is used to compute LOD.
       /// \sa Heightmap::LOD
       public: unsigned int HeightmapLOD() const;
+
+      /// \brief Set the skirt length value for the heightmap LOD tiles.
+      /// \param[in] _value Length of skirts on LOD tiles
+      /// \sa Heightmap::SetSkirtLength
+      public: void SetHeightmapSkirtLength(const double _value);
+
+      /// \brief Get the skirt length value for the heightmap LOD tiles.
+      /// \return Length of skirts on LOD tiles
+      /// \sa Heightmap::SkirtLength
+      public: double HeightmapSkirtLength() const;
 
       /// \brief Clear rendering::Scene
       public: void Clear();

@@ -45,7 +45,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world A reference to the world.
-      public: WindPrivate(physics::World &_world)
+      public: explicit WindPrivate(physics::World &_world)
         : world(_world)
       {
       }
@@ -106,6 +106,9 @@ Wind::Wind(World &_world, sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 Wind::~Wind()
 {
+  this->dataPtr->windSub.reset();
+  this->dataPtr->requestSub.reset();
+  this->dataPtr->responsePub.reset();
   // Must call fini on node to remove it from topic manager.
   this->dataPtr->node->Fini();
 }

@@ -21,6 +21,8 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <utility>
+
 #include <boost/any.hpp>
 #include <boost/function.hpp>
 
@@ -159,6 +161,10 @@ namespace gazebo
 
       /// \brief Pointer to the DART BodyNode.
       public: dart::dynamics::BodyNode *dtBodyNode;
+
+      /// \brief List of pairs of slave BodyNodes and weld constraints.
+      public: std::vector<std::pair <dart::dynamics::BodyNode *,
+              dart::constraint::WeldJointConstraintPtr> > dtSlaveNodes;
 
       /// \brief Pointer to the parent joint.
       public: DARTJointPtr dartParentJoint;

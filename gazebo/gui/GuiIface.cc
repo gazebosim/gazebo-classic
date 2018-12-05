@@ -87,6 +87,10 @@ Q_DECLARE_METATYPE(std::string)
 // qRegisterMetaType is also required, see below.
 Q_DECLARE_METATYPE(std::set<std::string>)
 
+// This makes it possible to use ignition::msgs::JointCmd in signals and slots.
+// qRegisterMetaType is also required, see below.
+Q_DECLARE_METATYPE(ignition::msgs::JointCmd)
+
 //////////////////////////////////////////////////
 // QT message handler that pipes qt messages into gazebo's console system.
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
@@ -138,6 +142,7 @@ void print_usage()
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
+  event::Events::sigInt();
   gazebo::gui::stop();
   gazebo::client::shutdown();
 }
@@ -401,9 +406,19 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  //   return false;
+  // }
 #endif
 
   g_app->exec();
@@ -419,6 +434,7 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  event::Events::stop();
   gazebo::client::shutdown();
   g_active_camera.reset();
   g_app->quit();
@@ -474,6 +490,10 @@ bool gui::register_metatypes()
   // Register std::set<std::string> as a type that can be used in signals and
   // slots. Q_DECLARE_METATYPE is also required, see above.
   qRegisterMetaType< std::set<std::string> >();
+
+  // Register ignition::msgs::JointCmd as a type that can be used in signals and
+  // slots. Q_DECLARE_METATYPE is also required, see above.
+  qRegisterMetaType<ignition::msgs::JointCmd>();
 
   return true;
 }

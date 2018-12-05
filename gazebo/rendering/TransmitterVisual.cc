@@ -129,7 +129,7 @@ void TransmitterVisual::Update()
     strength = 1.0 - (strength / 255.0);
 
     // Set the color in gray scale
-    common::Color color(strength, strength, strength);
+    ignition::math::Color color(strength, strength, strength);
     dPtr->points->SetColor(i, color);
   }
 }

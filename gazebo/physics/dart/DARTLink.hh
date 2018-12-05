@@ -180,6 +180,15 @@ namespace gazebo
       /// \param[in] Pointer to DART BodyNode.
       public: void SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
 
+      /// \brief Add pointer to a BodyNode representing a fragment of this link.
+      /// \param[in] Pointer to DART BodyNode.
+      public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+
+      /// \brief Remove a BodyNode representing a fragment of this link.
+      /// \param[in] Pointer to the DART BodyNode to remove.
+      /// \return True if the given BodyNode was found and removed.
+      public: bool RemoveSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+
       /// \brief Get pointer to DART BodyNode associated with this link.
       /// \return Pointer to DART BodyNode.
       public: dart::dynamics::BodyNode *DARTBodyNode() const;

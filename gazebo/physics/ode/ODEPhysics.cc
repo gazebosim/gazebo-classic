@@ -456,7 +456,9 @@ void ODEPhysics::Fini()
 {
   dCloseODE();
 
-  dJointGroupDestroy(this->dataPtr->contactGroup);
+  if (this->dataPtr->contactGroup)
+    dJointGroupDestroy(this->dataPtr->contactGroup);
+  this->dataPtr->contactGroup = nullptr;
 
   // Delete all the joint feedbacks.
   for (auto iter = this->dataPtr->jointFeedbacks.begin();
@@ -1166,6 +1168,14 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.slip1 = surf1->slip1 + surf2->slip1;
   contact.surface.slip2 = surf1->slip2 + surf2->slip2;
   contact.surface.slip3 = surf1->slipTorsion + surf2->slipTorsion;
+  // The slip parameter acts like a damper at each contact point
+  // so the total damping for each collision is multiplied by the
+  // number of contact points (numc).
+  // To eliminate this dependence on numc, the inverse damping
+  // is multipled by numc.
+  contact.surface.slip1 *= numc;
+  contact.surface.slip2 *= numc;
+  contact.surface.slip3 *= numc;
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =
@@ -1523,6 +1533,20 @@ bool ODEPhysics::SetParam(const std::string &_key, const boost::any &_value)
       dWorldSetQuickStepExtraFrictionIterations(this->dataPtr->worldId,
         boost::any_cast<int>(_value));
     }
+    else if (_key == "island_threads")
+    {
+      int value;
+      try
+      {
+        value = boost::any_cast<int>(_value);
+      }
+      catch(const boost::bad_any_cast &e)
+      {
+        gzerr << "boost any_cast error:" << e.what() << "\n";
+        return false;
+      }
+      dWorldSetIslandThreads(this->dataPtr->worldId, value);
+    }
     else if (_key == "ode_quiet")
     {
       bool odeQuiet = boost::any_cast<bool>(_value);
@@ -1622,6 +1646,8 @@ bool ODEPhysics::GetParam(const std::string &_key, boost::any &_value) const
     _value = dWorldGetQuickStepExtraFrictionIterations(this->dataPtr->worldId);
   else if (_key == "friction_model")
     _value = this->GetFrictionModel();
+  else if (_key == "island_threads")
+    _value = dWorldGetIslandThreads(this->dataPtr->worldId);
   else if (_key == "ode_quiet")
     _value = dGetMessageHandler() != 0;
   else if (_key == "world_step_solver")

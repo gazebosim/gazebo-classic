@@ -40,7 +40,7 @@ namespace gazebo
 
       /// \brief Constructor.
       /// \param[in] _parent Parent widget pointer.
-      public: DataLogger(QWidget *_parent = 0);
+      public: explicit DataLogger(QWidget *_parent = 0);
 
       /// \brief Destructor.
       public: virtual ~DataLogger();
@@ -80,6 +80,11 @@ namespace gazebo
       /// \param[in] _checked True if the record button is in the checked
       /// state.
       private slots: void OnToggleSettings(bool _checked);
+
+      /// \brief QT callback for toggling record resources when logging.
+      /// \param[in] _checked True if record resources button is in the checked
+      /// state.
+      private slots: void OnRecordResources(bool _checked);
 
       /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();

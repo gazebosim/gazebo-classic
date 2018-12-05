@@ -60,6 +60,8 @@ void help()
   << "  --record_period arg (=-1)     Recording period (seconds).\n"
   << "  --record_filter arg           Recording filter (supports wildcard and "
   << "regular expression).\n"
+  << "  --record_resources           Recording with model meshes and "
+  << "materials.\n"
   << "  --seed arg                    Start with a given random number seed.\n"
   << "  --iters arg                   Number of iterations to simulate.\n"
   << "  --minimal_comms               Reduce the TCP/IP traffic output by "
@@ -140,6 +142,15 @@ int main(int _argc, char **_argv)
               << " Please visit http://gazebosim.org/support.html for help.\n";
     return 0;
   }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "Stopping. Unable to catch SIGTERM.\n";
+  //   return 0;
+  // }
 
   pid1 = fork();
 

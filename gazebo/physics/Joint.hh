@@ -351,8 +351,18 @@ namespace gazebo
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
       /// unspecified, pure kinematic teleportation.
+      /// \param[in] _preserveWorldVelocity If true, the velocity of the child
+      /// link with respect to the world frame will remain the same after
+      /// setting the position. By default this is false, which means there are
+      /// no guarantees about what the child link's world velocity will be after
+      /// the position is changed (the behavior is determined by the underlying
+      /// physics engine).
+      ///
+      /// \note{Only ODE and Bullet support _preserveWorldVelocity being true.}
       /// \return returns true if operation succeeds, false if it fails.
-      public: virtual bool SetPosition(unsigned int _index, double _position);
+      public: virtual bool SetPosition(
+                  const unsigned int _index, const double _position,
+                  const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetPosition.
       /// The child links of this joint are updated based on position change.
@@ -361,8 +371,12 @@ namespace gazebo
       /// link.
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
+      /// \param[in] _preserveWorldVelocity True if to preserve the world
+      /// velocity before set position, default is false.
       /// \return returns true if operation succeeds, false if it fails.
-      protected: bool SetPositionMaximal(unsigned int _index, double _position);
+      protected: bool SetPositionMaximal(
+                  const unsigned int _index, double _position,
+                  const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetVelocity.
       /// The velocity of the child link of this joint is updated relative
@@ -471,19 +485,18 @@ namespace gazebo
       /// For rotational axes, the value is in radians. For prismatic axes,
       /// it is in meters.
       ///
-      /// It returns ignition::math::NAN_D in case the limit can't be
-      /// obtained. For instance, if the index is invalid, if the joint is
-      /// fixed, etc.
-      ///
       /// \param[in] _index Index of the axis.
       /// \param[in] _limit Lower limit of the axis.
       public: virtual void SetLowerLimit(const unsigned int _index,
                                          const double _limit);
 
-      /// \brief Set the joint's upper limit. For rotational axes, the value
-      /// is in radians, for prismatic axes it is in meters.
-      /// \param[in] _index Index of the axis, defaults to 0.
-      /// \param[in] _limit Lower limit of the axis.
+      /// \brief Set the joint's upper limit.
+      ///
+      /// For rotational axes, the value is in radians. For prismatic axes,
+      /// it is in meters.
+      ///
+      /// \param[in] _index Index of the axis.
+      /// \param[in] _limit Upper limit of the axis.
       public: virtual void SetUpperLimit(const unsigned int _index,
                                          const double _limit);
 
@@ -623,8 +636,8 @@ namespace gazebo
       /// \brief Pointer to the parent model.
       protected: ModelPtr model;
 
-      /// \brief Anchor pose.  This is the xyz offset of the joint frame from
-      /// child frame specified in the parent link frame
+      /// \brief Anchor pose.  This is the xyz position of the joint frame
+      /// specified in the world frame.
       protected: ignition::math::Vector3d anchorPos;
 
       /// \brief Anchor pose specified in SDF <joint><pose> tag.

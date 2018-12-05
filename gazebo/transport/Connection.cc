@@ -89,7 +89,6 @@ Connection::Connection()
 {
   this->isOpen = false;
   this->dropMsgLogged = false;
-  this->headerBuffer = new char[HEADER_LENGTH+1];
 
   if (iomanager == NULL)
     iomanager = new IOManager();
@@ -125,9 +124,6 @@ Connection::Connection()
 //////////////////////////////////////////////////
 Connection::~Connection()
 {
-  delete [] this->headerBuffer;
-  this->headerBuffer = NULL;
-
   this->Shutdown();
 
   if (iomanager)
@@ -190,7 +186,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   // Use async connect so that we can use a custom timeout. This is useful
   // when trying to detect network errors.
   this->socket->async_connect(*endpointIter++,
-      boost::bind(&Connection::OnConnect, this,
+      common::weakBind(&Connection::OnConnect, this->shared_from_this(),
         boost::asio::placeholders::error, endpointIter));
 
   // Wait for at most 60 seconds for a connection to be established.
@@ -237,7 +233,7 @@ void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
   this->acceptConn = ConnectionPtr(new Connection());
 
   this->acceptor->async_accept(*this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, this,
+      common::weakBind(&Connection::OnAccept, this->shared_from_this(),
                   boost::asio::placeholders::error));
 }
 
@@ -266,7 +262,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,
-        boost::bind(&Connection::OnAccept, this,
+        common::weakBind(&Connection::OnAccept, this->shared_from_this(),
           boost::asio::placeholders::error));
   }
   else
@@ -306,7 +302,8 @@ void Connection::EnqueueMsg(const std::string &_buffer,
     return;
   }
 
-  snprintf(this->headerBuffer, HEADER_LENGTH + 1, "%08x",
+  char headerBuffer[HEADER_LENGTH + 1];
+  snprintf(headerBuffer, HEADER_LENGTH + 1, "%08x",
       static_cast<unsigned int>(_buffer.size()));
 
   {
@@ -314,11 +311,17 @@ void Connection::EnqueueMsg(const std::string &_buffer,
 
     if (this->writeQueue.empty() ||
         (this->writeCount > 0 && this->writeQueue.size() == 1) ||
-        (this->writeQueue.back().size()+_buffer.size() > 4096))
+        (this->writeQueue.back().size() + HEADER_LENGTH + _buffer.size() >
+         4096))
+    {
       this->writeQueue.push_back(std::string(headerBuffer) + _buffer);
+      this->callbacks.push_back({std::make_pair(_cb, _id)});
+    }
     else
+    {
       this->writeQueue.back() += std::string(headerBuffer) + _buffer;
-    this->callbacks.push_back(std::make_pair(_cb, _id));
+      this->callbacks.back().push_back(std::make_pair(_cb, _id));
+    }
   }
 
   if (_force)
@@ -356,11 +359,10 @@ void Connection::ProcessWriteQueue(bool _blocking)
   // a single write operation
   if (!_blocking)
   {
-    this->callbackIndex = this->callbacks.size();
     boost::asio::async_write(*this->socket,
         boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
-          boost::bind(&Connection::OnWrite, shared_from_this(),
+          common::weakBind(&Connection::OnWrite, this->shared_from_this(),
             boost::asio::placeholders::error));
   }
   else
@@ -376,12 +378,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
       this->Shutdown();
     }
 
-    // Call the callback, in not NULL
-    if (!this->callbacks.front().first.empty())
-      this->callbacks.front().first(this->callbacks.front().second);
-
-    this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 }
 
@@ -398,24 +395,29 @@ std::string Connection::GetRemoteURI() const
 }
 
 //////////////////////////////////////////////////
+void Connection::PostWrite()
+{
+  // Call the callbacks, if not NULL
+  if (!this->callbacks.empty())
+  {
+    for (auto const &callback : this->callbacks.front())
+      if (!callback.first.empty())
+        callback.first(callback.second);
+    this->callbacks.pop_front();
+  }
+
+  if (!this->writeQueue.empty())
+    this->writeQueue.pop_front();
+  this->writeCount--;
+}
+
+//////////////////////////////////////////////////
 void Connection::OnWrite(const boost::system::error_code &_e)
 {
   {
     boost::recursive_mutex::scoped_lock lock(this->writeMutex);
 
-    for (unsigned int i = 0; i < this->callbackIndex; ++i)
-    {
-      if (!this->callbacks.empty())
-      {
-        if (!this->callbacks.front().first.empty())
-          this->callbacks.front().first(this->callbacks.front().second);
-        this->callbacks.pop_front();
-      }
-    }
-
-    if (!this->writeQueue.empty())
-      this->writeQueue.pop_front();
-    this->writeCount--;
+    this->PostWrite();
   }
 
   if (_e)
@@ -746,6 +748,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Iterate over all the interface addresses
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+      // Only consider UP interfaces
+      if (!(ifa->ifa_flags & IFF_UP))
+        continue;
       if (ifa->ifa_addr == NULL)
         continue;
 
@@ -946,7 +951,7 @@ void Connection::OnConnect(const boost::system::error_code &_error,
   // unsuccessfully) established.
 
   boost::mutex::scoped_lock lock(this->connectMutex);
-  if (_error == 0)
+  if (_error == boost::system::errc::success)
   {
     this->remoteURI = std::string("http://") + this->GetRemoteHostname()
       + ":" + boost::lexical_cast<std::string>(this->GetRemotePort());

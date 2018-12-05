@@ -40,7 +40,7 @@ namespace gazebo
   {
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class
-    class GAZEBO_VISIBLE GaussianNoiseModel : public Noise
+    class GZ_SENSORS_VISIBLE GaussianNoiseModel : public Noise
     {
         /// \brief Constructor.
         public: GaussianNoiseModel();
@@ -69,8 +69,19 @@ namespace gazebo
         /// \return Bias on output.
         public: double GetBias() const;
 
+        /// \brief Set mean.
+        /// \param[in] _mean Mean of Gaussian noise.
+        public: void SetMean(const double _mean);
+
+        /// \brief Set stddev.
+        /// \param[in] _stddev Standard deviation of Gaussian noise.
+        public: void SetStdDev(const double _stddev);
+
         /// Documentation inherited
         public: virtual void Print(std::ostream &_out) const;
+
+        /// \brief Sample the bias.
+        private: void SampleBias();
 
         /// \brief If type starts with GAUSSIAN, the mean of the distribution
         /// from which we sample when adding noise.
@@ -89,11 +100,19 @@ namespace gazebo
 
         /// \brief True if the type is GAUSSIAN_QUANTIZED
         protected: bool quantized;
+
+        /// \brief The mean of the Gaussian distribution from which bias values
+        /// are drawn.
+        private: double biasMean;
+
+        /// \brief The standard deviation of the Gaussian distribution from
+        /// which bias values are drawn.
+        private: double biasStdDev;
     };
 
     /// \class GaussianNoiseModel
     /// \brief Gaussian noise class for image sensors
-    class GAZEBO_VISIBLE ImageGaussianNoiseModel : public GaussianNoiseModel
+    class GZ_SENSORS_VISIBLE ImageGaussianNoiseModel : public GaussianNoiseModel
     {
       /// \brief Constructor.
       public: ImageGaussianNoiseModel();

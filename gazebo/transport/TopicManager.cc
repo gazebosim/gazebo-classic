@@ -38,7 +38,8 @@ class NodeProcess_TBB
 {
   /// \brief Constructor.
   /// \param[in] _nodes List of nodes to process.
-  public: NodeProcess_TBB(std::vector<NodePtr> *_nodes) : nodes(_nodes) {}
+  public: explicit NodeProcess_TBB(std::vector<NodePtr> *_nodes)
+          : nodes(_nodes) {}
 
   /// \brief Used by TBB during parallel execution.
   /// \param[in] _r Range within this->nodes to process.
@@ -58,6 +59,10 @@ class NodeProcess_TBB
 //////////////////////////////////////////////////
 TopicManager::TopicManager()
 {
+  // The following enforce the relative construction/destruction order of the
+  // ConnectionManager and TopicManager.
+  if (!ConnectionManager::Instance())
+    gzwarn << "TopicManager requires the ConnectionManager" << std::endl;
   this->pauseIncoming = false;
   this->advertisedTopicsEnd = this->advertisedTopics.end();
 }

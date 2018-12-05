@@ -87,4 +87,14 @@ namespace gazebo
     };
   }
 }
+
+#define VEC_EXPECT_NEAR(vec_a, vec_b, tolerance)\
+{\
+  EXPECT_TRUE((vec_a).Equal(vec_b, tolerance))\
+    << "    (" << vec_a << ")\n vs (" << vec_b << ")\n"\
+    << "Diff: " << (vec_a - vec_b) << "\n"\
+    << "      Length: " << ( vec_a - vec_b ).Length()\
+    << " (Tolerance: " << tolerance << ")\n";\
+}
+
 #endif

@@ -132,6 +132,7 @@ set (headers
   URI.hh
   Video.hh
   VideoEncoder.hh
+  WeakBind.hh
   ffmpeg_inc.h
  )
 
@@ -164,6 +165,7 @@ set (gtest_sources
   Time_TEST.cc
   URI_TEST.cc
   VideoEncoder_TEST.cc
+  WeakBind_TEST.cc
 )
 
 # Timer test fails on OSX
@@ -198,10 +200,27 @@ if (HAVE_FFMPEG)
                      AudioDecoder_TEST.cc)
 endif()
 
+set (headers_install ${headers})
+
+# Do not install fuel_tools headers.
+if (HAVE_IGNITION_FUEL_TOOLS)
+  set (headers ${headers}
+    FuelModelDatabase.hh
+  )
+
+  set (sources ${sources}
+    FuelModelDatabase.cc
+  )
+
+  set (gtest_sources ${gtest_sources}
+    FuelModelDatabase_TEST.cc
+  )
+endif()
+
 gz_build_tests(${gtest_sources} EXTRA_LIBS gazebo_common)
 
 set (common_headers "" CACHE INTERNAL "common headers" FORCE)
-foreach (hdr ${headers})
+foreach (hdr ${headers_install})
   APPEND_TO_CACHED_STRING(common_headers
     "Common Headers" "#include \"gazebo/common/${hdr}\"\n")
 endforeach()
@@ -242,6 +261,7 @@ target_link_libraries(gazebo_common
   ${libtar_LIBRARIES}
   ${TBB_LIBRARIES}
   ${SDFormat_LIBRARIES}
+  ${IGNITION-FUEL_TOOLS_LIBRARIES}
 )
 
 if (UNIX)
@@ -272,4 +292,4 @@ endif()
 
 
 gz_install_library(gazebo_common)
-gz_install_includes("common" ${headers} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)
+gz_install_includes("common" ${headers_install} ${CMAKE_CURRENT_BINARY_DIR}/common.hh)

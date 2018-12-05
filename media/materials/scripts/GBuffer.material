@@ -1,0 +1,69 @@
+// This code in this file is adapted from OGRE Samples. The OGRE's license and
+// copyright header is copied below.
+
+/*
+-----------------------------------------------------------------------------
+OGRE (www.ogre3d.org) is made available under the MIT License.
+
+Copyright (c) 2000-2013 Torus Knot Software Ltd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-----------------------------------------------------------------------------
+*/
+
+vertex_program SSAO/GBuffer_vp_glsl glsl
+{
+  source GBufferVP.glsl
+}
+
+fragment_program SSAO/GBuffer_fp_glsl glsl
+{
+  source GBufferFP.glsl
+}
+
+vertex_program SSAO/GBuffer_vp unified
+{
+  delegate SSAO/GBuffer_vp_glsl
+}
+fragment_program SSAO/GBuffer_fp unified
+{
+  delegate SSAO/GBuffer_fp_glsl
+}
+
+
+material SSAO/GBuffer
+{
+  technique
+  {
+    pass
+    {
+      vertex_program_ref SSAO/GBuffer_vp
+      {
+        param_named_auto cWorldViewProj worldviewproj_matrix
+        param_named_auto cWorldView worldview_matrix
+      }
+
+      fragment_program_ref SSAO/GBuffer_fp
+      {
+        param_named_auto cNearClipDistance near_clip_distance
+        param_named_auto cFarClipDistance far_clip_distance
+      }
+    }
+  }
+}

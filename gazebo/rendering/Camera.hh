@@ -28,6 +28,7 @@
 #include <deque>
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
@@ -231,6 +232,10 @@ namespace gazebo
       /// \brief Get the width of the image
       /// \return Image width
       public: virtual unsigned int ImageWidth() const;
+
+      /// \brief Get the memory size of this image
+      /// \return Image memory size in bytes
+      public: unsigned int ImageMemorySize() const;
 
       /// \brief Get the width of the off-screen render texture
       /// \return Render texture width
@@ -568,7 +573,15 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      public: virtual bool SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: virtual bool SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(
+          const ignition::math::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix
@@ -722,6 +735,12 @@ namespace gazebo
 
       /// \brief Set the clip distance based on stored SDF values
       protected: virtual void SetClipDist();
+
+      /// \brief Limit field of view taking care of using a valid value for
+      /// an OGRE camera.
+      /// \param[in] _fov expected field of view
+      /// \return valid field of view
+      protected: static double LimitFOV(const double _fov);
 
       /// \brief Tell the camera whether to yaw around its own local Y axis or a
       /// fixed axis of choice.

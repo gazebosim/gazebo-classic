@@ -88,6 +88,13 @@ DataLogger::DataLogger(QWidget *_parent)
   uriLabel->setStyleSheet(
       "QLabel {color: #aeaeae; font-size: 11px; background: transparent}");
 
+  this->dataPtr->recordResourcesBox = new QCheckBox("Record model resources");
+  this->dataPtr->recordResourcesBox->setChecked(false);
+  connect(this->dataPtr->recordResourcesBox, SIGNAL(clicked(bool)), this,
+    SLOT(OnRecordResources(bool)));
+  this->dataPtr->recordResourcesBox->setStyleSheet(
+    "QCheckBox {color: #aeaeae; font-size: 11px; background: transparent}");
+
   // Address URI Line Edit
   this->dataPtr->destURI = new QLineEdit;
   this->dataPtr->destURI->setReadOnly(true);
@@ -152,16 +159,20 @@ DataLogger::DataLogger(QWidget *_parent)
   topLayout->addWidget(this->dataPtr->timeLabel, 0, 3);
   topLayout->addWidget(this->dataPtr->sizeLabel, 1, 3);
   topLayout->addWidget(separator, 2, 0, 1, 4);
-  topLayout->addWidget(uriLabel, 3, 0);
-  topLayout->addWidget(this->dataPtr->destURI, 3, 1, 1, 3);
-  topLayout->addWidget(pathLabel, 4, 0);
-  topLayout->addWidget(this->dataPtr->destPath, 4, 1, 1, 2);
-  topLayout->addWidget(browseButton, 4, 3);
-  topLayout->addWidget(recordingsButton, 5, 0, 1, 4);
+  topLayout->addWidget(this->dataPtr->recordResourcesBox, 3, 0, 1, 4);
+  topLayout->addWidget(uriLabel, 4, 0);
+  topLayout->addWidget(this->dataPtr->destURI, 4, 1, 1, 3);
+  topLayout->addWidget(pathLabel, 5, 0);
+  topLayout->addWidget(this->dataPtr->destPath, 5, 1, 1, 2);
+  topLayout->addWidget(browseButton, 5, 3);
+  topLayout->addWidget(recordingsButton, 6, 0, 1, 4);
 
   // Align widgets within layout
+  topLayout->setAlignment(this->dataPtr->recordResourcesBox, Qt::AlignLeft);
   topLayout->setAlignment(pathLabel, Qt::AlignTop | Qt::AlignRight);
   topLayout->setAlignment(browseButton, Qt::AlignTop);
+  topLayout->setAlignment(this->dataPtr->destURI, Qt::AlignLeft);
+  topLayout->setAlignment(this->dataPtr->destPath, Qt::AlignLeft);
   topLayout->setAlignment(this->dataPtr->statusLabel, Qt::AlignLeft);
   topLayout->setAlignment(this->dataPtr->timeLabel, Qt::AlignRight);
   topLayout->setAlignment(this->dataPtr->sizeLabel,
@@ -233,7 +244,7 @@ DataLogger::DataLogger(QWidget *_parent)
 
   // Create a node from communication.
   this->dataPtr->node = transport::NodePtr(new transport::Node());
-  this->dataPtr->node->Init();
+  this->dataPtr->node->TryInit(common::Time::Maximum());
 
   // Advertise on the log control topic. The server listens to log control
   // messages.
@@ -452,6 +463,14 @@ void DataLogger::OnToggleSettings(bool _checked)
     this->dataPtr->settingsFrame->show();
   else
     this->dataPtr->settingsFrame->hide();
+}
+
+/////////////////////////////////////////////////
+void DataLogger::OnRecordResources(bool _checked)
+{
+  msgs::LogControl msg;
+  msg.set_record_resources(_checked);
+  this->dataPtr->pub->Publish(msg);
 }
 
 /////////////////////////////////////////////////

@@ -39,7 +39,7 @@ namespace gazebo
     /// \brief Sensor with sonar cone.
     ///
     /// This sensor uses a cone .
-    class GAZEBO_VISIBLE SonarSensor: public Sensor
+    class GZ_SENSORS_VISIBLE SonarSensor: public Sensor
     {
       /// \brief Constructor
       public: SonarSensor();

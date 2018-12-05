@@ -8,6 +8,7 @@ package gazebo.msgs;
 
 import "inertial.proto";
 import "collision.proto";
+import "light.proto";
 import "visual.proto";
 import "sensor.proto";
 import "projector.proto";
@@ -41,4 +42,7 @@ message Link
 
   /// \brief Wind linear velocity affecting this link.
   optional Vector3d wind        = 17;
+
+  /// \brief Lights attached to this link
+  repeated Light light          = 18;
 }

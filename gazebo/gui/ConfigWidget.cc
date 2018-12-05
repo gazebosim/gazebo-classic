@@ -374,6 +374,13 @@ bool ConfigWidget::SetVector3dWidgetValue(const std::string &_name,
 bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
     const common::Color &_value)
 {
+  return this->SetColorWidgetValue(_name, _value.Ign());
+}
+
+/////////////////////////////////////////////////
+bool ConfigWidget::SetColorWidgetValue(const std::string &_name,
+    const ignition::math::Color &_value)
+{
   auto iter = this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
@@ -505,11 +512,11 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
 }
 
 /////////////////////////////////////////////////
-common::Color ConfigWidget::ColorWidgetValue(const std::string &_name) const
+ignition::math::Color ConfigWidget::ColorWidgetValue(const std::string &_name)
+    const
 {
-  common::Color value;
-  std::map <std::string, ConfigChildWidget *>::const_iterator iter =
-      this->dataPtr->configWidgets.find(_name);
+  ignition::math::Color value;
+  auto iter = this->dataPtr->configWidgets.find(_name);
 
   if (iter != this->dataPtr->configWidgets.end())
     value = this->ColorWidgetValue(iter->second);
@@ -897,7 +904,7 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               newFieldWidget = configChildWidget;
             }
 
-            common::Color color;
+            ignition::math::Color color;
             const google::protobuf::Descriptor *valueDescriptor =
                 valueMsg->GetDescriptor();
             std::vector<double> values;
@@ -913,10 +920,10 @@ QWidget *ConfigWidget::Parse(google::protobuf::Message *_msg,
               else
                 values.push_back(0);
             }
-            color.r = values[0];
-            color.g = values[1];
-            color.b = values[2];
-            color.a = values[3];
+            color.R(values[0]);
+            color.G(values[1]);
+            color.B(values[2]);
+            color.A(values[3]);
             this->UpdateColorWidget(configChildWidget, color);
           }
           // parse and create custom density widgets
@@ -2586,14 +2593,14 @@ bool ConfigWidget::UpdateVector3dWidget(ConfigChildWidget *_widget,
 
 /////////////////////////////////////////////////
 bool ConfigWidget::UpdateColorWidget(ConfigChildWidget *_widget,
-    const common::Color &_color)
+    const ignition::math::Color &_color)
 {
   if (_widget->widgets.size() == 4u)
   {
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_color.r);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_color.g);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_color.b);
-    qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(_color.a);
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->setValue(_color.R());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->setValue(_color.G());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->setValue(_color.B());
+    qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->setValue(_color.A());
     return true;
   }
   else
@@ -2835,16 +2842,16 @@ ignition::math::Vector3d ConfigWidget::Vector3dWidgetValue(
 }
 
 /////////////////////////////////////////////////
-common::Color ConfigWidget::ColorWidgetValue(ConfigChildWidget *_widget)
+ignition::math::Color ConfigWidget::ColorWidgetValue(ConfigChildWidget *_widget)
     const
 {
-  common::Color value;
+  ignition::math::Color value;
   if (_widget->widgets.size() == 4u)
   {
-    value.r = qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->value();
-    value.g = qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value();
-    value.b = qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value();
-    value.a = qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value();
+    value.R(qobject_cast<QDoubleSpinBox *>(_widget->widgets[0])->value());
+    value.G(qobject_cast<QDoubleSpinBox *>(_widget->widgets[1])->value());
+    value.B(qobject_cast<QDoubleSpinBox *>(_widget->widgets[2])->value());
+    value.A(qobject_cast<QDoubleSpinBox *>(_widget->widgets[3])->value());
   }
   else
   {

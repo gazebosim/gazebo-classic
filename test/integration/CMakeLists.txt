@@ -34,9 +34,11 @@ set(tests
   concave_mesh.cc
   contact_sensor.cc
   contacts_update.cc
+  contain_plugin.cc
   dem.cc
   elastic_modulus.cc
   file_handling.cc
+  flash_light_plugin.cc
   gripper.cc
   gz_joint.cc
   gz_log.cc
@@ -47,6 +49,7 @@ set(tests
   imu.cc
   info_services.cc
   introspection_items.cc
+  joint_control_plugin.cc
   joint_controller.cc
   joint_force_torque.cc
   joint_gearbox.cc
@@ -58,7 +61,9 @@ set(tests
   joint_test.cc
   joint_universal.cc
   keys_to_joints.cc
+  kinematic_loop.cc
   laser.cc
+  led_plugin.cc
   link.cc
   logical_camera_sensor.cc
   model.cc
@@ -67,6 +72,7 @@ set(tests
   nested_model.cc
   noise.cc
   nondefault_world.cc
+  obj_loader.cc
   physics.cc
   physics_base.cc
   physics_basic_controller_response.cc
@@ -86,11 +92,14 @@ set(tests
   region_events.cc
   rest_web.cc
   saving_and_loading.cc
+  sdf.cc
   sensor.cc
   server_fixture.cc
   sim_events.cc
   speed.cc
+  speed_thread_islands.cc
   speed_thread_pr2.cc
+  static_map_plugin.cc
   stress_spawn_models.cc
   #state_log.cc
   surface_properties.cc
@@ -99,12 +108,13 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  transport_msg_count.cc
+  wheel_slip.cc
   world.cc
   world_clone.cc
   world_entity_below_point.cc
   world_playback.cc
   world_population.cc
-  world_remove.cc
   worlds_installed.cc
   )
 
@@ -126,7 +136,6 @@ gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 set_tests_properties(${TEST_TYPE}_joint_revolute PROPERTIES TIMEOUT 500)
 set_tests_properties(${TEST_TYPE}_model_database PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_physics PROPERTIES TIMEOUT 500)
-set_tests_properties(${TEST_TYPE}_world_remove PROPERTIES TIMEOUT 400)
 set_tests_properties(${TEST_TYPE}_worlds_installed PROPERTIES TIMEOUT 700)
 
 set_property(
@@ -142,6 +151,7 @@ if (${CMAKE_BUILD_TYPE_UPPERCASE} STREQUAL "DEBUG" OR
 endif()
 
 # Add plugin dependency
+add_dependencies(${TEST_TYPE}_joint_control_plugin JointControlPlugin)
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
 
 set(display_tests
@@ -167,7 +177,9 @@ set(dri_tests
   rendering_sensor.cc
   road.cc
   speed_pr2.cc
+  visual.cc
   wideanglecamera_sensor.cc
+  world_remove.cc
   world_reset.cc
 )
 gz_build_dri_tests(${dri_tests} EXTRA_LIBS gazebo_test_fixture)
@@ -177,6 +189,7 @@ set(qt_tests
   collada_visualization.cc
   force_torque_visualization.cc
   insert_model.cc
+  joint_control_widget.cc
   marker.cc
   model_editor.cc
   model_editor_undo.cc

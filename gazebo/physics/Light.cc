@@ -25,15 +25,32 @@
 #include "gazebo/physics/LightState.hh"
 #include "gazebo/physics/Light.hh"
 
+
+/// \brief Private data for the Light class
+class gazebo::physics::LightPrivate
+{
+  /// \brief Light message container.
+  public: msgs::Light msg;
+
+  /// \brief Flag to indicate if light world pose is dirty or not.
+  public: bool worldPoseDirty = false;
+};
+
 using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
 Light::Light(BasePtr _parent)
-  : Entity(_parent)
+  : Entity(_parent), dataPtr(new LightPrivate)
 {
   this->AddType(LIGHT);
 }
+
+//////////////////////////////////////////////////
+Light::~Light()
+{
+}
+
 
 //////////////////////////////////////////////////
 void Light::Init()
@@ -48,24 +65,31 @@ void Light::Init()
 //////////////////////////////////////////////////
 void Light::ProcessMsg(const msgs::Light &_msg)
 {
-  this->SetName(this->world->StripWorldName(_msg.name()));
+  // Get leaf name
+  std::string lightName = _msg.name();
+  size_t idx = lightName.rfind("::");
+  if (idx != std::string::npos)
+    lightName = lightName.substr(idx+2);
+
+  this->SetName(lightName);
   if (_msg.has_pose())
   {
     this->worldPose = msgs::ConvertIgn(_msg.pose());
   }
 
-  this->msg.MergeFrom(_msg);
+  this->dataPtr->msg.MergeFrom(_msg);
 }
 
 //////////////////////////////////////////////////
 void Light::FillMsg(msgs::Light &_msg)
 {
-  _msg.MergeFrom(this->msg);
+  _msg.MergeFrom(this->dataPtr->msg);
 
+  _msg.set_id(this->GetId());
   _msg.set_name(this->GetScopedName());
 
-  ignition::math::Pose3d relPose = this->RelativePose();
-  msgs::Set(_msg.mutable_pose(), relPose);
+  ignition::math::Pose3d pose = this->RelativePose();
+  msgs::Set(_msg.mutable_pose(), pose);
 }
 
 //////////////////////////////////////////////////
@@ -90,3 +114,24 @@ void Light::OnPoseChange()
 {
 }
 
+/////////////////////////////////////////////////
+const ignition::math::Pose3d &Light::WorldPose() const
+{
+  EntityPtr parentEnt = boost::dynamic_pointer_cast<Entity>(this->parent);
+  if (this->dataPtr->worldPoseDirty && parentEnt)
+  {
+    this->worldPose = this->InitialRelativePose() +
+                      parentEnt->WorldPose();
+    this->dataPtr->worldPoseDirty = false;
+  }
+
+  return this->worldPose;
+}
+
+/////////////////////////////////////////////////
+void Light::SetWorldPoseDirty()
+{
+  // Tell the light object that the next call to ::WorldPose should
+  // compute a new worldPose value.
+  this->dataPtr->worldPoseDirty = true;
+}
