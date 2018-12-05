@@ -36,6 +36,7 @@ TEST_F(StaticMapTest, StaticMapPlugin)
 
   if (common::exists(modelPath))
   {
+    boost::filesystem::remove_all(modelBackupPath);
     boost::filesystem::rename(modelPath, modelBackupPath);
     EXPECT_TRUE(common::exists(modelBackupPath));
   }

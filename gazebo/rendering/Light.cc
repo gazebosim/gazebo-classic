@@ -103,7 +103,8 @@ void Light::Load()
   if (!parentVis)
     parentVis = this->dataPtr->scene->WorldVisual();
 
-  this->dataPtr->visual.reset(new Visual(this->Name(), parentVis, false));
+  this->dataPtr->visual.reset(
+      new Visual(this->Name(), parentVis, false));
   this->dataPtr->visual->Load();
   this->dataPtr->visual->AttachObject(this->dataPtr->light);
 
@@ -225,7 +226,7 @@ void Light::CreateVisual()
     this->dataPtr->visual->SetVisible(true);
 
     // Create a visual to hold the light selection object.
-    VisualPtr lightSelectionVis(new Visual(this->Name() + "_seletion",
+    VisualPtr lightSelectionVis(new Visual(this->Name() + "_selection",
         this->dataPtr->visual));
     lightSelectionVis->SetType(Visual::VT_GUI);
 
@@ -404,11 +405,28 @@ bool Light::SetSelected(const bool _s)
 //////////////////////////////////////////////////
 void Light::ToggleShowVisual()
 {
-  this->dataPtr->visual->ToggleVisible();
+  this->ShowVisual(!this->dataPtr->visualize);
 }
 
 //////////////////////////////////////////////////
 void Light::ShowVisual(const bool _s)
+{
+  if (this->dataPtr->visualize == _s)
+    return;
+
+  this->dataPtr->visualize = _s;
+
+  Ogre::SceneNode *n = this->dataPtr->visual->GetSceneNode();
+  for (unsigned int i = 0; i < n->numAttachedObjects(); ++i)
+  {
+    Ogre::MovableObject *m = n->getAttachedObject(i);
+    if (m->getMovableType() != "Light")
+      m->setVisible(this->dataPtr->visualize);
+  }
+}
+
+//////////////////////////////////////////////////
+void Light::SetVisible(const bool _s)
 {
   this->dataPtr->visual->SetVisible(_s);
 }

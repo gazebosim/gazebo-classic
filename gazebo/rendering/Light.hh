@@ -117,6 +117,11 @@ namespace gazebo
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(const bool _s);
 
+      /// \brief Set whether the light will be visible
+      /// \param[in] _s Set to true to make the light visible,
+      /// false to turn the light off.
+      public: void SetVisible(const bool _s);
+
       /// \brief Get whether the light is visible.
       /// \return True if the light is visible.
       public: bool Visible() const;

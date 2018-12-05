@@ -19,7 +19,14 @@
 
 #include <string>
 #include <vector>
+
+#include <boost/version.hpp>
+#if BOOST_VERSION < 106600
 #include <boost/uuid/sha1.hpp>
+#else
+#include <boost/uuid/detail/sha1.hpp>
+#endif
+
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <sstream>
