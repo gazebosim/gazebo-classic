@@ -254,5 +254,72 @@ void ViewControlTest::MouseZoomTerrain()
   delete mainWindow;
 }
 
+/////////////////////////////////////////////////
+void ViewControlTest::MouseZoomBoundingBox()
+{
+  this->resMaxPercentChange = 5.0;
+  this->shareMaxPercentChange = 2.0;
+
+  // Load a world with a large cordless drill mesh. Place a camera
+  // inside its bounding box and test view control using the mouse.
+  // Mouse clicks on the mesh should return valid contact points that
+  // can be used as focus points for moving the camera.
+  this->Load("worlds/camera_mesh_bbox.world", false, false, false);
+
+  gazebo::gui::MainWindow *mainWindow = new gazebo::gui::MainWindow();
+  QVERIFY(mainWindow != nullptr);
+  // Create the main window.
+  mainWindow->Load();
+  mainWindow->Init();
+  mainWindow->show();
+
+  // Get the user camera and scene
+  gazebo::rendering::UserCameraPtr cam = gazebo::gui::get_active_camera();
+  QVERIFY(cam != nullptr);
+  gazebo::rendering::ScenePtr scene = cam->GetScene();
+  QVERIFY(scene != nullptr);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  std::string modelName = "drill";
+  gazebo::rendering::VisualPtr modelVis = scene->GetVisual(modelName);
+  QVERIFY(modelVis != nullptr);
+
+  auto glWidget = mainWindow->findChild<gazebo::gui::GLWidget *>("GLWidget");
+  QVERIFY(glWidget != nullptr);
+
+  ignition::math::Pose3d camWorldPose(
+      ignition::math::Vector3d(0, 0.3, 1.0),
+      ignition::math::Quaterniond(0, -1.57, 0));
+
+  // place camera inside bounding box of cordless drill and look up
+  cam->SetWorldPose(camWorldPose);
+
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // verify valid contact point
+  ignition::math::Vector3d pos;
+  scene->FirstContact(cam, ignition::math::Vector2i(0, 0), pos);
+  QVERIFY(pos.Z() < 1.5);
+
+  // zoom in. It should not zoom pass the drill
+  QTest::mouseClick(glWidget, Qt::LeftButton, 0,
+      QPoint(glWidget->width()*0.5, glWidget->height()*0.5));
+  MouseZoom(glWidget);
+
+  // Process some events and draw the screen
+  this->ProcessEventsAndDraw(mainWindow);
+
+  // Make sure the camera is still inside bounding box of drill
+  ignition::math::Vector3d camPose = cam->WorldPose().Pos();
+  QVERIFY(ignition::math::equal(camPose.X(), camWorldPose.Pos().X(), 1e-3));
+  QVERIFY(ignition::math::equal(camPose.Y(), camWorldPose.Pos().Y(), 1e-3));
+  QVERIFY(camPose.Z() < 1.5);
+
+  cam->Fini();
+  mainWindow->close();
+  delete mainWindow;
+}
+
 // Generate a main function for the test
 QTEST_MAIN(ViewControlTest)

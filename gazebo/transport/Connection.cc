@@ -186,7 +186,7 @@ bool Connection::Connect(const std::string &_host, unsigned int _port)
   // Use async connect so that we can use a custom timeout. This is useful
   // when trying to detect network errors.
   this->socket->async_connect(*endpointIter++,
-      boost::bind(&Connection::OnConnect, this,
+      common::weakBind(&Connection::OnConnect, this->shared_from_this(),
         boost::asio::placeholders::error, endpointIter));
 
   // Wait for at most 60 seconds for a connection to be established.
@@ -233,7 +233,7 @@ void Connection::Listen(unsigned int port, const AcceptCallback &_acceptCB)
   this->acceptConn = ConnectionPtr(new Connection());
 
   this->acceptor->async_accept(*this->acceptConn->socket,
-      boost::bind(&Connection::OnAccept, this,
+      common::weakBind(&Connection::OnAccept, this->shared_from_this(),
                   boost::asio::placeholders::error));
 }
 
@@ -262,7 +262,7 @@ void Connection::OnAccept(const boost::system::error_code &e)
     this->acceptConn = ConnectionPtr(new Connection());
 
     this->acceptor->async_accept(*this->acceptConn->socket,
-        boost::bind(&Connection::OnAccept, this,
+        common::weakBind(&Connection::OnAccept, this->shared_from_this(),
           boost::asio::placeholders::error));
   }
   else
@@ -362,7 +362,7 @@ void Connection::ProcessWriteQueue(bool _blocking)
     boost::asio::async_write(*this->socket,
         boost::asio::buffer(this->writeQueue.front().c_str(),
           this->writeQueue.front().size()),
-          boost::bind(&Connection::OnWrite, shared_from_this(),
+          common::weakBind(&Connection::OnWrite, this->shared_from_this(),
             boost::asio::placeholders::error));
   }
   else
@@ -748,6 +748,9 @@ boost::asio::ip::tcp::endpoint Connection::GetLocalEndpoint()
     // Iterate over all the interface addresses
     for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
     {
+      // Only consider UP interfaces
+      if (!(ifa->ifa_flags & IFF_UP))
+        continue;
       if (ifa->ifa_addr == NULL)
         continue;
 

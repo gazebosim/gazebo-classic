@@ -96,12 +96,20 @@ namespace gazebo
 
 using namespace gazebo;
 
+// cached value of parsed joint.sdf
+sdf::ElementPtr sdfJoint;
+
 GZ_REGISTER_MODEL_PLUGIN(HarnessPlugin)
 
 /////////////////////////////////////////////////
 HarnessPlugin::HarnessPlugin()
   : dataPtr(new HarnessPluginPrivate)
 {
+  if (!sdfJoint)
+  {
+    sdfJoint.reset(new sdf::Element);
+    sdf::initFile("joint.sdf", sdfJoint);
+  }
 }
 
 /////////////////////////////////////////////////
@@ -264,16 +272,31 @@ void HarnessPlugin::Attach()
   sdf::ElementPtr jointElem = this->dataPtr->sdf->GetElement("joint");
   while (jointElem)
   {
-    std::string jointName = jointElem->Get<std::string>("name");
-    try
+    auto jointParsed = sdfJoint->Clone();
+    if (sdf::readString(
+          std::string("<sdf version='" SDF_VERSION "'>") +
+            jointElem->ToString("") +
+            std::string("</sdf>"),
+          jointParsed))
     {
-      auto joint = this->dataPtr->model->CreateJoint(jointElem);
-      this->dataPtr->joints.push_back(joint);
+      std::string jointName = jointParsed->Get<std::string>("name");
+      try
+      {
+        auto joint = this->dataPtr->model->CreateJoint(jointParsed);
+        this->dataPtr->joints.push_back(joint);
+      }
+      catch(gazebo::common::Exception &_e)
+      {
+        gzerr << "Unable to load joint[" << jointName << "]. "
+              << _e.GetErrorStr()
+              << std::endl;
+      }
     }
-    catch(gazebo::common::Exception &_e)
+    else
     {
-      gzerr << "Unable to load joint[" << jointName << "]. "
-            << _e.GetErrorStr()
+      gzerr << "Error parsing joint xml ["
+            << jointElem->ToString("")
+            << "]"
             << std::endl;
     }
 

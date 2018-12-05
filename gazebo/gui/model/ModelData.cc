@@ -1459,6 +1459,7 @@ void LinkData::OnAddCollision(const std::string &_name)
   collisionMsgPtr->CopyFrom(collisionMsg);
   collisionConfig->UpdateCollision(_name, collisionMsgPtr);
 
+  collisionVis->SetVisibilityFlags(GZ_VISIBILITY_GUI);
   collisionVis->SetVisible(this->showCollisions);
   collisionConfig->SetShowCollision(this->showCollisions, _name);
   this->collisions[collisionVis] = collisionMsg;
@@ -1570,6 +1571,7 @@ void LinkData::Update()
         updateMsgPtr->CopyFrom(collisionVisMsg);
         std::string origGeomType = it.first->GetGeometryType();
         it.first->UpdateFromMsg(updateMsgPtr);
+        it.first->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 
         this->scales[it.first->Name()] = it.first->GetGeometrySize();
 

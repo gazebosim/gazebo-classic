@@ -574,7 +574,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
     modelMsg->CopyFrom(msg);
   }
   // Otherwise, check to see if the visual is a light
-  else if (this->dataPtr->scene->GetLight(_vis->Name()))
+  else if (this->dataPtr->scene->LightByName(_vis->Name()))
   {
     msgs::Light msg;
     msg.set_name(_vis->Name());
@@ -585,8 +585,7 @@ void ModelManipulator::PublishVisualPose(rendering::VisualPtr _vis)
   }
   else
   {
-    gzerr << "Visual [" << _vis->Name() << "] isn't a model or a light"
-        << std::endl;
+    // We get here in the model editor for example
     return;
   }
   this->dataPtr->userCmdPub->Publish(userCmdMsg);
@@ -659,31 +658,24 @@ void ModelManipulator::OnMousePressEvent(const common::MouseEvent &_event)
     // Root visual
     rendering::VisualPtr rootVis = vis->GetRootVisual();
 
-    // Root visual's immediate child
-    rendering::VisualPtr topLevelVis = vis->GetNthAncestor(2);
+    // If the root visual's ID can be found, it is a model in simulation mode,
+    // so we select it instead of a child link/visual/collision.
 
-    // If the root visual's ID can be found, it is a model in the main window
+    // If the visual's depth is less than 2, it is a root visual already. This
+    // is the case of lights in simulation mode for example.
+
     // TODO gui::get_entity_id always return 0 in QTestFixture due to nullptr
     // g_main_win
-    if (gui::get_entity_id(rootVis->Name()))
+    if (gui::get_entity_id(rootVis->Name()) || vis->GetDepth() < 2)
     {
       // select model
       vis = rootVis;
     }
-    // If it is not a model and its parent is either a direct child or
-    // grandchild of the world, this is a light
-    else if (vis->GetParent() == rootVis ||
-        vis->GetParent() == this->dataPtr->scene->WorldVisual())
-    {
-      // select light
-      vis = rootVis;
-    }
-    // Otherwise, this is a visual in the model editor, so we want to get its
-    // top level visual below the root.
+    // Otherwise, we assume we're in the model editor and get the first child
+    // visual after the root, which may be a link or a nested model.
     else
     {
-      // select link / nested model
-      vis = topLevelVis;
+      vis = vis->GetNthAncestor(2);
     }
 
     this->dataPtr->mouseMoveVisStartPose = vis->WorldPose();

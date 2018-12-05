@@ -63,6 +63,9 @@ class gazebo::physics::LinkPrivate
   /// \brief Names of all the sensors attached to the link.
   public: std::vector<std::string> sensors;
 
+  /// \brief All the lights attached to the link.
+  public: std::vector<LightPtr> lights;
+
   /// \brief All the parent joints.
   public: std::vector<JointPtr> parentJoints;
 
@@ -206,7 +209,7 @@ void Link::Load(sdf::ElementPtr _sdf)
     while (lightElem)
     {
       // Create and Load a light
-      this->world->LoadLight(lightElem, shared_from_this());
+      this->LoadLight(lightElem);
       lightElem = lightElem->GetNextElement("light");
     }
   }
@@ -314,8 +317,6 @@ void Link::Init()
     if ((*iter)->HasType(Base::LIGHT))
     {
       LightPtr light= boost::static_pointer_cast<Light>(*iter);
-      // TODO add to lights var?
-      // this->lights.push_back(light);
       light->Init();
     }
   }
@@ -816,7 +817,8 @@ ignition::math::Box Link::BoundingBox() const
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
-  box.Max().Set(0, 0, 0);
+  box.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
 
   for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
        iter != this->dataPtr->collisions.end(); ++iter)
@@ -1038,6 +1040,12 @@ void Link::FillMsg(msgs::Link &_msg)
     msgs::Battery *bat = _msg.add_battery();
     bat->set_name(battery->Name());
     bat->set_voltage(battery->Voltage());
+  }
+
+  for (auto &light : this->dataPtr->lights)
+  {
+    msgs::Light *lightMsg = _msg.add_light();
+    light->FillMsg(*lightMsg);
   }
 }
 
@@ -1892,3 +1900,18 @@ event::ConnectionPtr Link::ConnectEnabled(
   return this->dataPtr->enabledSignal.Connect(_subscriber);
 }
 
+//////////////////////////////////////////////////
+void Link::LoadLight(sdf::ElementPtr _sdf)
+{
+  // Create new light object
+  LightPtr light(new physics::Light(shared_from_this()));
+  light->SetStatic(true);
+  light->ProcessMsg(msgs::LightFromSDF(_sdf));
+  light->SetWorld(this->world);
+  light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
+  // NOTE:
+  // The light need to be added to the list on Load (before Init) for the case
+  // when a model is created from a factory message. Otherwise the model msg
+  // published to the client will not contain an entry of this light
+}

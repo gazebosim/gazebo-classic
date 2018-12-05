@@ -116,6 +116,11 @@ namespace gazebo
       /// \param[in] _s Set to true to draw a representation of the light.
       public: void ShowVisual(const bool _s);
 
+      /// \brief Set whether the light will be visible
+      /// \param[in] _s Set to true to make the light visible,
+      /// false to turn the light off.
+      public: void SetVisible(const bool _s);
+
       /// \brief Get whether the light is visible.
       /// \return True if the light is visible.
       public: bool Visible() const;
@@ -197,6 +202,10 @@ namespace gazebo
       /// \param[in] _scene Scene to contain the light.
       /// \return a clone of the light
       public: LightPtr Clone(const std::string &_name, ScenePtr _scene);
+
+      /// \brief Get the id associated with this light
+      /// \return Unique Light id
+      public: uint32_t Id() const;
 
       /// \brief On pose change callback
       protected: virtual void OnPoseChange() {}

@@ -411,12 +411,8 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   {
     if (!ModelDatabase::HasModel(_uri))
     {
-      gzerr << "Unable to download model[" << _uri << "]\n";
       return std::string();
     }
-
-    // DEBUG output
-    // std::cout << "Getting uri[" << _uri << "] path[" << path << "]\n";
 
     // Get the model name from the uri
     size_t startIndex = _uri.find_first_of("://");

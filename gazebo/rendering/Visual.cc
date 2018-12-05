@@ -1238,12 +1238,6 @@ void Visual::SetMaterialShaderParam(const std::string &_paramName,
 }
 
 /////////////////////////////////////////////////
-void Visual::SetAmbient(const common::Color &_color, const bool _cascade)
-{
-  this->SetAmbient(_color.Ign(), _cascade);
-}
-
-/////////////////////////////////////////////////
 void Visual::SetAmbient(const ignition::math::Color &_color,
     const bool _cascade)
 {
@@ -2666,6 +2660,22 @@ void Visual::UpdateFromMsg(const boost::shared_ptr< msgs::Visual const> &_msg)
   if (_msg->has_transparency())
   {
     this->SetTransparency(_msg->transparency());
+  }
+
+  // Note: sometimes a visual msg is received on the ~/visual topic
+  // before the full scene msg, which results in a visual created without
+  // its plugins loaded. So make sure we check the msg here and load the
+  // plugins if not done already.
+  if (!_msg->plugin().empty() && this->dataPtr->plugins.empty()
+      && !this->dataPtr->sdf->HasElement("plugin"))
+  {
+    for (int i = 0; i < _msg->plugin_size(); ++i)
+    {
+      sdf::ElementPtr pluginElem;
+      pluginElem = msgs::PluginToSDF(_msg->plugin(i), pluginElem);
+      this->dataPtr->sdf->InsertElement(pluginElem);
+    }
+    this->LoadPlugins();
   }
 
   /*if (msg->points.size() > 0)

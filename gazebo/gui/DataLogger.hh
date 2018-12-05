@@ -81,6 +81,11 @@ namespace gazebo
       /// state.
       private slots: void OnToggleSettings(bool _checked);
 
+      /// \brief QT callback for toggling record resources when logging.
+      /// \param[in] _checked True if record resources button is in the checked
+      /// state.
+      private slots: void OnRecordResources(bool _checked);
+
       /// \brief QT callback for blinking the status message.
       private slots: void OnBlinkStatus();
 
