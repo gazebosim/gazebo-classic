@@ -1936,3 +1936,9 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   // when a model is created from a factory message. Otherwise the model msg
   // published to the client will not contain an entry of this light
 }
+
+//////////////////////////////////////////////////
+const Link::Visuals_M &Link::Visuals() const
+{
+  return this->visuals;
+}

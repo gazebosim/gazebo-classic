@@ -1,5 +1,11 @@
 ## Gazebo 9
 
+## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Add method to get the link visual elements
+    * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
+    * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
+
 ## Gazebo 9.5.0 (2018-11-19)
 
 1. Fix model bounding box
