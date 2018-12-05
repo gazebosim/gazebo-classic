@@ -155,7 +155,6 @@ foreach (src ${GUIplugins})
                         gazebo_gui
                         ${ogre_libraries}
                         ${Qt5Core_LIBRARIES}
-                        ${Qt5Test_LIBRARIES}
                         ${Qt5Widgets_LIBRARIES}
                         ${IGNITION-TRANSPORT_LIBRARIES}
 )
