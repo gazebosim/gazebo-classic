@@ -18,7 +18,6 @@
 #ifndef _SIMBODY_HINGE2JOINT_HH_
 #define _SIMBODY_HINGE2JOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/physics/Hinge2Joint.hh"
 #include "gazebo/physics/simbody/SimbodyJoint.hh"
 #include "gazebo/physics/simbody/SimbodyPhysics.hh"
@@ -53,10 +52,6 @@ namespace gazebo
       // Documentation inherited.
       public: virtual void SetAxis(const unsigned int _index,
                   const ignition::math::Vector3d &_axis);
-
-      // Function not implemented, will be removed in Gazebo 9.
-      public: virtual math::Vector3 GetAxis(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       public: virtual double GetVelocity(unsigned int _index) const;

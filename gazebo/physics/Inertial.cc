@@ -168,19 +168,6 @@ void Inertial::UpdateParameters(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-Inertial Inertial::GetInertial(const math::Pose &_frameOffset) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return (*this)(_frameOffset.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 Inertial Inertial::operator()(
     const ignition::math::Pose3d &_frameOffset) const
 {
@@ -228,12 +215,6 @@ void Inertial::SetMass(const double _m)
 }
 
 //////////////////////////////////////////////////
-double Inertial::GetMass() const
-{
-  return this->Mass();
-}
-
-//////////////////////////////////////////////////
 double Inertial::Mass() const
 {
   return this->dataPtr->mass;
@@ -243,19 +224,6 @@ double Inertial::Mass() const
 void Inertial::SetCoG(const double _cx, const double _cy, const double _cz)
 {
   this->dataPtr->cog.Pos().Set(_cx, _cy, _cz);
-}
-
-//////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Vector3 &_c)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->SetCoG(_c.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -270,19 +238,6 @@ void Inertial::SetCoG(const double _cx, const double _cy, const double _cz,
                       const double _rx, const double _ry, const double _rz)
 {
   this->dataPtr->cog.Set(_cx, _cy, _cz, _rx, _ry, _rz);
-}
-
-//////////////////////////////////////////////////
-void Inertial::SetCoG(const math::Pose &_c)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->SetCoG(_c.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -301,35 +256,9 @@ void Inertial::SetInertiaMatrix(
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetPrincipalMoments() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->PrincipalMoments();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 const ignition::math::Vector3d &Inertial::PrincipalMoments() const
 {
   return this->dataPtr->principals;
-}
-
-//////////////////////////////////////////////////
-math::Vector3 Inertial::GetProductsofInertia() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->ProductsOfInertia();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -339,30 +268,11 @@ const ignition::math::Vector3d &Inertial::ProductsOfInertia() const
 }
 
 //////////////////////////////////////////////////
-void Inertial::SetMOI(const gazebo::math::Matrix3 &_moi)
-{
-  this->SetMOI(_moi.Ign());
-}
-
-//////////////////////////////////////////////////
 void Inertial::SetMOI(const ignition::math::Matrix3d &_moi)
 {
   /// \TODO: check symmetry of incoming _moi matrix
   this->dataPtr->principals.Set(_moi(0, 0), _moi(1, 1), _moi(2, 2));
   this->dataPtr->products.Set(_moi(0, 1), _moi(0, 2), _moi(1, 2));
-}
-
-//////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MOI();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -375,19 +285,6 @@ ignition::math::Matrix3d Inertial::MOI() const
       this->dataPtr->products.Z(),
       this->dataPtr->products.Y(), this->dataPtr->products.Z(),
       this->dataPtr->principals.Z());
-}
-
-//////////////////////////////////////////////////
-void Inertial::Rotate(const math::Quaternion &_rot)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Rotate(_rot.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -439,19 +336,6 @@ Inertial Inertial::operator+(const Inertial &_inertial) const
 }
 
 //////////////////////////////////////////////////
-math::Matrix3 Inertial::GetMOI(const math::Pose &_pose) const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->MOI(_pose.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Matrix3d Inertial::MOI(
     const ignition::math::Pose3d &_pose) const
 {
@@ -493,21 +377,9 @@ const Inertial &Inertial::operator+=(const Inertial &_inertial)
 }
 
 //////////////////////////////////////////////////
-double Inertial::GetIXX() const
-{
-  return this->IXX();
-}
-
-//////////////////////////////////////////////////
 double Inertial::IXX() const
 {
   return this->dataPtr->principals.X();
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetIYY() const
-{
-  return this->IYY();
 }
 
 //////////////////////////////////////////////////
@@ -517,21 +389,9 @@ double Inertial::IYY() const
 }
 
 //////////////////////////////////////////////////
-double Inertial::GetIZZ() const
-{
-  return this->IZZ();
-}
-
-//////////////////////////////////////////////////
 double Inertial::IZZ() const
 {
   return this->dataPtr->principals.Z();
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetIXY() const
-{
-  return this->IXY();
 }
 
 //////////////////////////////////////////////////
@@ -541,21 +401,9 @@ double Inertial::IXY() const
 }
 
 //////////////////////////////////////////////////
-double Inertial::GetIXZ() const
-{
-  return this->IXZ();
-}
-
-//////////////////////////////////////////////////
 double Inertial::IXZ() const
 {
   return this->dataPtr->products.Y();
-}
-
-//////////////////////////////////////////////////
-double Inertial::GetIYZ() const
-{
-  return this->IYZ();
 }
 
 //////////////////////////////////////////////////
@@ -624,35 +472,9 @@ void Inertial::ProcessMsg(const msgs::Inertial &_msg)
 }
 
 //////////////////////////////////////////////////
-math::Vector3 Inertial::GetCoG() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->CoG();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 const ignition::math::Vector3d &Inertial::CoG() const
 {
   return this->dataPtr->cog.Pos();
-}
-
-//////////////////////////////////////////////////
-const math::Pose Inertial::GetPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

@@ -33,7 +33,8 @@ if (HAVE_BULLET)
 endif()
 
 if (HAVE_DART)
-  link_directories(${DARTCore_LIBRARY_DIRS})
+  include_directories(${DART_INCLUDE_DIRS})
+  link_directories(${DART_LIBRARY_DIRS})
 endif()
 
 if (HAVE_UUID)
@@ -60,6 +61,7 @@ set (plugins_single_header
   DepthCameraPlugin
   DiffDrivePlugin
   FiducialCameraPlugin
+  FlashLightPlugin
   FollowerPlugin
   ForceTorquePlugin
   GimbalSmall2dPlugin
@@ -71,6 +73,7 @@ set (plugins_single_header
   JointControlPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
+  LedPlugin
   LensFlareSensorPlugin
   LiftDragPlugin
   LinearBatteryConsumerPlugin
@@ -90,6 +93,7 @@ set (plugins_single_header
   StaticMapPlugin
   TouchPlugin
   VehiclePlugin
+  WheelSlipPlugin
   WindPlugin
 )
 
@@ -103,6 +107,7 @@ if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins_single_header ${plugins_single_header}
     HydraPlugin
     HydraDemoPlugin
+    JoyPlugin
   )
 endif()
 
@@ -111,6 +116,10 @@ set (GUIplugins
   KeyboardGUIPlugin
   LookAtDemoPlugin
   TimerGUIPlugin
+)
+
+set (DARTplugins
+  GravityCompensationPlugin
 )
 
 set(GAZEBO_PLUGIN_INSTALL_DIR
@@ -153,6 +162,24 @@ foreach (src ${GUIplugins})
   install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
   gz_install_includes("plugins" ${src}.hh)
 endforeach ()
+
+if (HAVE_DART_URDF)
+  foreach (src ${DARTplugins})
+    add_library(${src} SHARED ${src}.cc)
+    target_link_libraries(${src}
+      libgazebo
+      ${DART_LIBRARIES}
+    )
+    install (TARGETS ${src} DESTINATION ${GAZEBO_PLUGIN_INSTALL_DIR})
+    gz_install_includes("plugins" ${src}.hh)
+  endforeach ()
+endif()
+
+# If a plugin depends on other plugins in the same directory, add them to link.
+# Plus, set RPATH to the directory so they can dynamically link.
+target_link_libraries(LedPlugin FlashLightPlugin)
+set_target_properties(
+  LedPlugin PROPERTIES INSTALL_RPATH ${GAZEBO_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(events)
 

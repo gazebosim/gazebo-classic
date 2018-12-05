@@ -167,12 +167,6 @@ namespace gazebo
 
       /// \brief Get pointer to DART World associated with this link.
       /// \return Pointer to the DART World.
-      /// \deprecated See dart::simulation::WorldPtr DARTWorld(void) const
-      public: dart::simulation::World *GetDARTWorld(void) const
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get pointer to DART World associated with this link.
-      /// \return Pointer to the DART World.
       public: dart::simulation::WorldPtr DARTWorld(void) const;
 
       /// \brief Get pointer to DART Model associated with this link.
@@ -186,9 +180,13 @@ namespace gazebo
       /// \param[in] Pointer to DART BodyNode.
       public: void SetDARTBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
 
+      /// \brief Add pointer to a BodyNode representing a fragment of this link.
+      /// \param[in] Pointer to DART BodyNode.
+      public: void AddSlaveBodyNode(dart::dynamics::BodyNode *_dtBodyNode);
+
       /// \brief Get pointer to DART BodyNode associated with this link.
       /// \return Pointer to DART BodyNode.
-      public: dart::dynamics::BodyNode *GetDARTBodyNode() const;
+      public: dart::dynamics::BodyNode *DARTBodyNode() const;
 
       /// \brief Set parent joint of this link.
       /// \param[in] _dartParentJoint Pointer to the parent joint.

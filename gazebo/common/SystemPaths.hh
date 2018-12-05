@@ -85,19 +85,7 @@ namespace gazebo
       /// Returns the default path suitable for temporary files.
       /// \return a full path name to directory.
       /// E.g.: /tmp (Linux).
-      /// \deprecated See const std::string &TmpPath() const
-      public: std::string GetTmpPath() GAZEBO_DEPRECATED(8.0);
-
-      /// Returns the default path suitable for temporary files.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp (Linux).
       public: const std::string &TmpPath() const;
-
-      /// Returns a unique temporary file for this instance of SystemPath.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp/gazebo_234123 (Linux).
-      /// \deprecated See const std::string &TmpInstancePath() const
-      public: std::string GetTmpInstancePath() GAZEBO_DEPRECATED(8.0);
 
       /// Returns a unique temporary file for this instance of SystemPath.
       /// \return a full path name to directory.
@@ -107,26 +95,33 @@ namespace gazebo
       /// Returns the default temporary test path.
       /// \return a full path name to directory.
       /// E.g.: /tmp/gazebo_test (Linux).
-      /// \deprecated See std::string DefaultTestPath() const
-      public: std::string GetDefaultTestPath() GAZEBO_DEPRECATED(8.0);
-
-      /// Returns the default temporary test path.
-      /// \return a full path name to directory.
-      /// E.g.: /tmp/gazebo_test (Linux).
       public: std::string DefaultTestPath() const;
 
       /// \brief Find a file or path using a URI
       /// \param[in] _uri the uniform resource identifier
-      /// \return Returns full path name to file
+      /// \return Returns full path name to file or an empty string if URI
+      /// couldn't be found.
       public: std::string FindFileURI(const std::string &_uri);
 
-      /// \brief Find a file in the gazebo paths
+      /// \brief Find a file in the gazebo paths. If not found locally, all
+      /// callbacks added with AddFindFileCallback will be called in order
+      /// until found.
       /// \param[in] _filename Name of the file to find.
       /// \param[in] _searchLocalPath True to search in the current working
       /// directory.
       /// \return Returns full path name to file
       public: std::string FindFile(const std::string &_filename,
                                    bool _searchLocalPath = true);
+
+      /// \brief Add a callback to use when Gazebo can't find a file.
+      /// The callback should return a full local path to the requested file, or
+      /// and empty string if the file was not found in the callback.
+      /// Callbacks will be called in the order they were added until a path is
+      /// found.
+      /// \param[in] _cb The callback function, which takes a file path or URI
+      /// and returns the full local path.
+      public: void AddFindFileCallback(
+                  std::function<std::string (const std::string &)> _cb);
 
       /// \brief Add colon delimited paths to Gazebo install
       /// \param[in] _path the directory to add

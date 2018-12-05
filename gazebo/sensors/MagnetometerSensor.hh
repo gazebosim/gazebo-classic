@@ -37,7 +37,7 @@ namespace gazebo
     /// \{
 
     /// \brief MagnetometerSensor to provide magnetic field measurement.
-    class GAZEBO_VISIBLE MagnetometerSensor: public Sensor
+    class GZ_SENSORS_VISIBLE MagnetometerSensor: public Sensor
     {
       /// \brief Constructor.
       public: MagnetometerSensor();

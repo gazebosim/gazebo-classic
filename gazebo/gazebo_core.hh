@@ -17,7 +17,6 @@
 #ifndef _GAZEBO_CORE_HH_
 #define _GAZEBO_CORE_HH_
 #include <gazebo/common/common.hh>
-#include <gazebo/math/gzmath.hh>
 #include <gazebo/msgs/msgs.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/Server.hh>

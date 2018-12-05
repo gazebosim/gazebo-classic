@@ -28,6 +28,7 @@
 #include <deque>
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
+#include <ignition/math/Color.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
@@ -60,11 +61,6 @@ namespace Ogre
 
 namespace gazebo
 {
-  namespace math
-  {
-    class Pose;
-  }
-
   /// \ingroup gazebo_rendering
   /// \brief Rendering namespace
   namespace rendering
@@ -163,12 +159,6 @@ namespace gazebo
       public: ignition::math::Quaterniond WorldRotation() const;
 
       /// \brief Set the global pose of the camera
-      /// \param[in] _pose The new math::Pose of the camera
-      /// \deprecated See function that accepts an ignition::math parameter.
-      public: virtual void SetWorldPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the global pose of the camera
       /// \param[in] _pose The new ignition::math::Pose3d of the camera
       public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
 
@@ -224,8 +214,6 @@ namespace gazebo
 
       /// \brief Get the camera FOV (vertical)
       /// \return The vertical field of view
-      /// \deprecated See function that returns an ignition::math object.
-      /// \sa VFOV
       public: ignition::math::Angle VFOV() const;
 
       /// \brief Set the image size
@@ -511,12 +499,6 @@ namespace gazebo
           std::function<void (const unsigned char *, unsigned int, unsigned int,
           unsigned int, const std::string &)> _subscriber);
 
-      /// \brief Disconnect from an image frame
-      /// \param[in] _c The connection to disconnect
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectNewImageFrame(event::ConnectionPtr &_c)
-              GAZEBO_DEPRECATED(8.0);
-
       /// \brief Save a frame using an image buffer
       /// \param[in] _image The raw image buffer
       /// \param[in] _width Width of the image
@@ -591,7 +573,15 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      public: virtual bool SetBackgroundColor(const common::Color &_color);
+      /// \deprecated Use function which accepts ignition::math::Color.
+      public: virtual bool SetBackgroundColor(const common::Color &_color)
+          GAZEBO_DEPRECATED(9.0);
+
+      /// \brief Set background color for viewport (if viewport is not null)
+      /// \param[in] _color Background color.
+      /// \return True if successful. False if viewport is null
+      public: virtual bool SetBackgroundColor(
+          const ignition::math::Color &_color);
 
       /// \brief Return the projection matrix of this camera.
       /// \return the projection matrix

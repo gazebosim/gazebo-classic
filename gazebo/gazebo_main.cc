@@ -143,6 +143,15 @@ int main(int _argc, char **_argv)
     return 0;
   }
 
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "Stopping. Unable to catch SIGTERM.\n";
+  //   return 0;
+  // }
+
   pid1 = fork();
 
   char **argvServer = new char*[_argc+1];

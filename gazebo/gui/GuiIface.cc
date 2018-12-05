@@ -18,7 +18,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+     #define snprintf _snprintf
+  #endif
 #endif
 
 #include <signal.h>
@@ -139,6 +142,7 @@ void print_usage()
 //////////////////////////////////////////////////
 void signal_handler(int)
 {
+  event::Events::sigInt();
   gazebo::gui::stop();
   gazebo::client::shutdown();
 }
@@ -324,8 +328,8 @@ bool gui::load()
   g_argv = new char*[g_argc];
   for (int i = 0; i < g_argc; i++)
   {
-    g_argv[i] = new char[strlen("gazebo")];
-    snprintf(g_argv[i], strlen("gazebo"), "gazebo");
+    g_argv[i] = new char[strlen("gazebo") + 1];
+    snprintf(g_argv[i], strlen("gazebo") + 1, "gazebo");
   }
 
   // Register custom message handler
@@ -358,6 +362,7 @@ unsigned int gui::get_entity_id(const std::string &_name)
   else
     return 0;
 }
+
 
 /////////////////////////////////////////////////
 bool gui::run(int _argc, char **_argv)
@@ -401,9 +406,19 @@ bool gui::run(int _argc, char **_argv)
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
   {
-    std::cerr << "signal(2) failed while setting up for SIGINT" << std::endl;
+    std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
     return false;
   }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  //   return false;
+  // }
 #endif
 
   g_app->exec();
@@ -419,6 +434,7 @@ bool gui::run(int _argc, char **_argv)
 /////////////////////////////////////////////////
 void gui::stop()
 {
+  event::Events::stop();
   gazebo::client::shutdown();
   g_active_camera.reset();
   g_app->quit();

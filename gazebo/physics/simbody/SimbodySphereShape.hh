@@ -34,7 +34,8 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Collision parent pointer
-      public: SimbodySphereShape(CollisionPtr _parent) : SphereShape(_parent) {}
+      public: explicit SimbodySphereShape(CollisionPtr _parent)
+              : SphereShape(_parent) {}
 
       /// \brief Destructor
       public: virtual ~SimbodySphereShape() {}

@@ -18,7 +18,6 @@
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/Console.hh"
 #include "gazebo/common/Exception.hh"
-#include "gazebo/math/Vector3.hh"
 
 #include "gazebo/transport/Publisher.hh"
 
@@ -112,7 +111,7 @@ void DARTPhysics::Reset()
   {
     dartModelIt =
       boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByIndex(i));
-    GZ_ASSERT(dartModelIt.get(), "dartModelIt pointer is null");
+    GZ_ASSERT(dartModelIt, "dartModelIt pointer is null");
 
     dartModelIt->RestoreState();
   }
@@ -123,31 +122,193 @@ void DARTPhysics::InitForThread()
 {
 }
 
+
 //////////////////////////////////////////////////
-void DARTPhysics::UpdateCollision()
+// Helper class to maintain unique pairs of links in maps
+class LinkPair
 {
-  this->contactManager->ResetCount();
+  /// \brief Constructor.
+  /// \param _link1[in] and _link2[in] are the DART links for the contact.
+  ///   Their order may be swapped around.
+  public: LinkPair(const DARTLinkPtr &_link1,
+                   const DARTLinkPtr &_link2)
+          {
+            this->SetDARTLinks(_link1, _link2);
+          }
 
-  dart::constraint::ConstraintSolver *dtConstraintSolver =
-      this->dataPtr->dtWorld->getConstraintSolver();
-  dart::collision::CollisionDetector *dtCollisionDetector =
-      dtConstraintSolver->getCollisionDetector();
-  int numContacts = dtCollisionDetector->getNumContacts();
+  /// \brief Copy constructor
+  public: LinkPair(const LinkPair&_linkPair):
+            dtLink1(_linkPair.dtLink1),
+            dtLink2(_linkPair.dtLink2)
+          {}
 
+  /// \brief Destructor.
+  public: virtual ~LinkPair() {}
+
+  /// \brief Comparison operator
+  /// which always chooses the link which evaluates to lower by operator <
+  /// \param[in] _dtLink1 the first link
+  /// \param[in] _dtLink2 the second link
+  public: void SetDARTLinks(const DARTLinkPtr &_dtLink1,
+                            const DARTLinkPtr &_dtLink2)
+          {
+            if (cmpLink(_dtLink1, _dtLink2) < 0)
+            {
+              this->dtLink1 = _dtLink1;
+              this->dtLink2 = _dtLink2;
+            }
+            else
+            {
+              this->dtLink2 = _dtLink1;
+              this->dtLink1 = _dtLink2;
+            }
+          }
+
+  /// \brief Comparison operator
+  /// \param[in] c the link pair
+  /// \return true if this is lower than \e c
+  public: bool operator<(const LinkPair& c) const
+          {
+            int cmp1 = cmpLink(this->dtLink1, c.dtLink1);
+            if (cmp1 < 0) return true;
+            int cmp2 = cmpLink(this->dtLink2, c.dtLink2);
+            return (cmp1 == 0) && (cmp2 < 0);
+          }
+
+  // \brief returns the first link
+  public: DARTLinkPtr DARTLink1() const { return this->dtLink1; }
+
+  // \brief returns the second link
+  public: DARTLinkPtr DARTLink2() const { return this->dtLink2; }
+
+  // \brief internally used comparison operator for links
+  // \param[in] l1 the first link
+  // \param[in] l2 the second link
+  // \retval -1 l1 < l2
+  // \retval 0 l1 == l2
+  // \retval 1 l1 > l2
+  private: int cmpLink(const DARTLinkPtr &l1, const DARTLinkPtr &l2) const
+           {
+            // Comparing by address is required because names can be
+            // the same for different links. Could use the model name of the
+            // link in addition, but that's even more expensive.
+             return l1.get() < l2.get() ? -1 : l1.get() == l2.get() ? 0 : 1;
+           }
+
+  /// \brief Pointer to the first link object
+  private: DARTLinkPtr dtLink1;
+
+  /// \brief Pointer to the second link object
+  private: DARTLinkPtr dtLink2;
+};
+
+//////////////////////////////////////////////////
+static DARTLinkPtr StaticFindDARTLink(
+    DARTPhysics *_dtPhysics,
+    const dart::dynamics::BodyNode *_dtBodyNode)
+{
+  DARTLinkPtr res;
+
+  const Model_V& models = _dtPhysics->World()->Models();
+
+  for (Model_V::const_iterator itModel = models.begin();
+       itModel != models.end(); ++itModel)
+  {
+    const Link_V& links = (*itModel)->GetLinks();
+
+    for (Link_V::const_iterator itLink = links.begin();
+         itLink != links.end(); ++itLink)
+    {
+      DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(*itLink);
+
+      if (dartLink->DARTBodyNode() == _dtBodyNode)
+      {
+        res = dartLink;
+        break;
+      }
+    }
+  }
+
+  return res;
+}
+
+//////////////////////////////////////////////////
+static void RetrieveDARTCollisions(
+    DARTPhysics* _dtPhysics,
+    const dart::collision::CollisionResult *_dtLastResult,
+    ContactManager *_mgr)
+{
+  _mgr->ResetCount();
+  int numContacts = _dtLastResult->getNumContacts();
+
+  // DART returns all contact points individually, without grouping
+  // them to link pairs first. The majority of the Gazebo code assumes
+  // the contacts will come per link pair (e.g. all contacts of
+  // link1 and link2 grouped together in one Contact object).
+  // We will have to do this mapping here first.
+  // This could be skipped for performance reasons by supplying
+  // an additional std::vector<std::pair<LinkPair, dart::collision::Contact>
+  // which is just filled with duplicates, skipping the map step.
+
+  typedef std::map<LinkPair, std::deque<const dart::collision::Contact*>>
+    PairedContactsMap;
+  // Attention: The map uses a reference to dart::collision::Contact&, but this
+  // is retrieved from dtLastResult directly and used only within this function,
+  // so it will be safe to use within the scope of this function.
+  PairedContactsMap pairedContacts;
+
+  // insert all the contacts
   for (int i = 0; i < numContacts; ++i)
   {
     const dart::collision::Contact &dtContact =
-        dtCollisionDetector->getContact(i);
-    dart::dynamics::BodyNode *dtBodyNode1 = dtContact.bodyNode1.lock().get();
-    dart::dynamics::BodyNode *dtBodyNode2 = dtContact.bodyNode2.lock().get();
+        _dtLastResult->getContact(i);
 
-    DARTLinkPtr dartLink1 = this->FindDARTLink(dtBodyNode1);
-    DARTLinkPtr dartLink2 = this->FindDARTLink(dtBodyNode2);
+    dart::collision::CollisionObject *dtCollObj1 = dtContact.collisionObject1;
+    dart::collision::CollisionObject *dtCollObj2 = dtContact.collisionObject2;
 
-    GZ_ASSERT(dartLink1.get() != nullptr,
-        "dartLink1 in collision pair is null");
-    GZ_ASSERT(dartLink2.get() != nullptr,
-        "dartLink2 in collision pair is null");
+    GZ_ASSERT(dtCollObj1, "collision object 1 is null!");
+    GZ_ASSERT(dtCollObj2, "collision object 2 is null!");
+
+    dart::dynamics::ConstBodyNodePtr dtBodyNode1;
+    dart::dynamics::ConstBodyNodePtr dtBodyNode2;
+
+    const dart::dynamics::ShapeFrame *dtShapeFrame1 =
+      dtCollObj1->getShapeFrame();
+    const dart::dynamics::ShapeFrame *dtShapeFrame2 =
+      dtCollObj2->getShapeFrame();
+
+    GZ_ASSERT(dtShapeFrame1, "shape frame 1 is null!");
+    GZ_ASSERT(dtShapeFrame2, "shape frame 2 is null!");
+    GZ_ASSERT(dtShapeFrame1->asShapeNode(), "shape frame 1 is no shape node!");
+    GZ_ASSERT(dtShapeFrame2->asShapeNode(), "shape frame 2 is no shape node!");
+
+    if (dtShapeFrame1->isShapeNode())
+      dtBodyNode1 = dtShapeFrame1->asShapeNode()->getBodyNodePtr();
+    if (dtShapeFrame2->isShapeNode())
+      dtBodyNode2 = dtShapeFrame2->asShapeNode()->getBodyNodePtr();
+
+    GZ_ASSERT(dtBodyNode1, "body node 1 is null!");
+    GZ_ASSERT(dtBodyNode2, "body node 2 is null!");
+
+    DARTLinkPtr dartLink1 = StaticFindDARTLink(_dtPhysics, dtBodyNode1);
+    DARTLinkPtr dartLink2 = StaticFindDARTLink(_dtPhysics, dtBodyNode2);
+
+    GZ_ASSERT(dartLink1, "dartLink1 in collision pair is null");
+    GZ_ASSERT(dartLink2, "dartLink2 in collision pair is null");
+
+    LinkPair dtLinkPair(dartLink1, dartLink2);
+    pairedContacts[dtLinkPair].push_back(&dtContact);
+  }
+
+  for (PairedContactsMap::iterator it = pairedContacts.begin();
+       it != pairedContacts.end(); ++it)
+  {
+    DARTLinkPtr dartLink1 = it->first.DARTLink1();
+    DARTLinkPtr dartLink2 = it->first.DARTLink2();
+    const std::deque<const dart::collision::Contact*> &dtContacts = it->second;
+
+    GZ_ASSERT(!dtContacts.empty(),
+           "dtContacts is empty, at least one contact should have been added");
 
     unsigned int colIndex = 0;
     CollisionPtr collisionPtr1 = dartLink1->GetCollision(colIndex);
@@ -155,58 +316,101 @@ void DARTPhysics::UpdateCollision()
 
     // Add a new contact to the manager. This will return nullptr if no one is
     // listening for contact information.
-    Contact *contactFeedback = this->GetContactManager()->NewContact(
+    // It would be nice to do this in the first loop in order to save
+    // computation, but we can only add a new contact once per link pair,
+    // which is information we only have after the first loop.
+    // We could avoid all the computation however if the contact manager
+    // had a function returning in advance whether the ContactManger::NewContact
+    // will return NULL!
+    Contact *contactFeedback = _mgr->NewContact(
                                  collisionPtr1.get(), collisionPtr2.get(),
-                                 this->world->SimTime());
-
+                                 _dtPhysics->World()->SimTime());
     if (!contactFeedback)
       continue;
 
     auto body1Pose = dartLink1->WorldPose();
     auto body2Pose = dartLink2->WorldPose();
-    ignition::math::Vector3d localForce1;
-    ignition::math::Vector3d localForce2;
-    ignition::math::Vector3d localTorque1;
-    ignition::math::Vector3d localTorque2;
+    dart::dynamics::BodyNode *dtBodyNode1 = dartLink1->DARTBodyNode();
+    dart::dynamics::BodyNode *dtBodyNode2 = dartLink2->DARTBodyNode();
 
-    // calculate force in world frame
-    Eigen::Vector3d force = dtContact.force;
+    contactFeedback->count = 0;
 
-    // calculate torque in world frame
-    Eigen::Vector3d torqueA =
-        (dtContact.point -
-         dtBodyNode1->getTransform().translation()).cross(force);
-    Eigen::Vector3d torqueB =
-        (dtContact.point -
-         dtBodyNode2->getTransform().translation()).cross(-force);
-
-    // Convert from world to link frame
-    localForce1 = body1Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(force));
-    localForce2 = body2Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(-force));
-    localTorque1 = body1Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(torqueA));
-    localTorque2 = body2Pose.Rot().RotateVectorReverse(
-        DARTTypes::ConvVec3Ign(torqueB));
-
-    contactFeedback->positions[0] = DARTTypes::ConvVec3Ign(dtContact.point);
-    contactFeedback->normals[0] = DARTTypes::ConvVec3Ign(dtContact.normal);
-    contactFeedback->depths[0] = dtContact.penetrationDepth;
-
-    if (!dartLink1->IsStatic())
+    std::deque<const dart::collision::Contact*>::const_iterator contIt;
+    int contNum = 0;
+    for (contIt = dtContacts.begin();
+         (contNum < MAX_CONTACT_JOINTS) && (contIt != dtContacts.end());
+         ++contIt, ++contNum)
     {
-      contactFeedback->wrench[0].body1Force = localForce1;
-      contactFeedback->wrench[0].body1Torque = localTorque1;
-    }
+      const dart::collision::Contact *dtContact = *contIt;
 
-    if (!dartLink2->IsStatic())
-    {
-      contactFeedback->wrench[0].body2Force = localForce2;
-      contactFeedback->wrench[0].body2Torque = localTorque2;
-    }
+      ignition::math::Vector3d localForce1;
+      ignition::math::Vector3d localForce2;
+      ignition::math::Vector3d localTorque1;
+      ignition::math::Vector3d localTorque2;
 
-    ++contactFeedback->count;
+      // calculate force in world frame
+      Eigen::Vector3d force = dtContact->force;
+
+      // calculate torque in world frame
+      Eigen::Vector3d torqueA =
+          (dtContact->point -
+           dtBodyNode1->getTransform().translation()).cross(force);
+      Eigen::Vector3d torqueB =
+          (dtContact->point -
+           dtBodyNode2->getTransform().translation()).cross(-force);
+
+      // Convert from world to link frame
+      localForce1 = body1Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(force));
+      localForce2 = body2Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(-force));
+      localTorque1 = body1Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(torqueA));
+      localTorque2 = body2Pose.Rot().RotateVectorReverse(
+          DARTTypes::ConvVec3Ign(torqueB));
+
+      contactFeedback->positions[contNum] =
+        DARTTypes::ConvVec3Ign(dtContact->point);
+      contactFeedback->normals[contNum] =
+        DARTTypes::ConvVec3Ign(dtContact->normal);
+      contactFeedback->depths[contNum] =
+        dtContact->penetrationDepth;
+
+      if (!dartLink1->IsStatic())
+      {
+        contactFeedback->wrench[contNum].body1Force = localForce1;
+        contactFeedback->wrench[contNum].body1Torque = localTorque1;
+      }
+
+      if (!dartLink2->IsStatic())
+      {
+        contactFeedback->wrench[contNum].body2Force = localForce2;
+        contactFeedback->wrench[contNum].body2Torque = localTorque2;
+      }
+
+      ++contactFeedback->count;
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::UpdateCollision()
+{
+  if (!this->world->PhysicsEnabled())
+  {
+    dart::collision::CollisionResult localResult;
+
+    // collision computation is disabled when UpdatePhysics() is not
+    // being called, so do collision detection separately here.
+    std::size_t maxContacts = 1000u;
+    dart::collision::CollisionOption opt(true, maxContacts);
+    // call of checkCollision will not update the result which
+    // can be retrieved with
+    // this->dataPtr->dtWorld->getLastCollisionResult()
+    // so get the results and store them locally.
+    this->dataPtr->dtWorld->checkCollision(opt, &localResult);
+
+    RetrieveDARTCollisions(this, &localResult, this->GetContactManager());
   }
 }
 
@@ -219,7 +423,8 @@ void DARTPhysics::UpdatePhysics()
   // common::Time currTime =  this->world->GetRealTime();
 
   this->dataPtr->dtWorld->setTimeStep(this->maxStepSize);
-  this->dataPtr->dtWorld->step();
+  this->dataPtr->dtWorld->step(
+        this->dataPtr->resetAllForcesAfterSimulationStep);
 
   // Update all the transformation of DART's links to gazebo's links
   // TODO: How to visit all the links in the world?
@@ -241,6 +446,11 @@ void DARTPhysics::UpdatePhysics()
       dartLinkItr->updateDirtyPoseFromDARTTransformation();
     }
   }
+
+  RetrieveDARTCollisions(
+        this,
+        &(this->dataPtr->dtWorld->getLastCollisionResult()),
+        this->GetContactManager());
 }
 
 //////////////////////////////////////////////////
@@ -291,12 +501,12 @@ CollisionPtr DARTPhysics::CreateCollision(const std::string &_type,
 
 //////////////////////////////////////////////////
 ShapePtr DARTPhysics::CreateShape(const std::string &_type,
-                                    CollisionPtr _collision)
+                                  CollisionPtr _collision)
 {
-  ShapePtr shape;
   DARTCollisionPtr collision =
     boost::dynamic_pointer_cast<DARTCollision>(_collision);
 
+  ShapePtr shape;
   if (_type == "sphere")
     shape.reset(new DARTSphereShape(collision));
   else if (_type == "plane")
@@ -352,6 +562,52 @@ JointPtr DARTPhysics::CreateJoint(const std::string &_type, ModelPtr _parent)
 }
 
 //////////////////////////////////////////////////
+std::string DARTPhysics::GetSolverType() const
+{
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      return dartElem->GetElement("solver")->Get<std::string>("solver_type");
+    }
+  }
+  return "dantzig";
+}
+
+//////////////////////////////////////////////////
+void DARTPhysics::SetSolverType(const std::string &_type)
+{
+  if (this->sdf->HasElement("dart"))
+  {
+    sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
+    if (dartElem->HasElement("solver") &&
+        dartElem->GetElement("solver")->HasElement("solver_type"))
+    {
+      dartElem->GetElement("solver")->GetElement("solver_type")->Set(_type);
+    }
+  }
+
+  if (_type == "dantzig")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else if (_type == "pgs")
+  {
+    this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
+        dart::common::make_unique<dart::constraint::PGSLCPSolver>(
+        this->dataPtr->dtWorld->getTimeStep()));
+  }
+  else
+  {
+    gzerr << "Invalid step type[" << _type << "]\n";
+  }
+}
+
+//////////////////////////////////////////////////
 void DARTPhysics::SetGravity(const ignition::math::Vector3d &_gravity)
 {
   this->world->SetGravitySDF(_gravity);
@@ -381,10 +637,15 @@ bool DARTPhysics::GetParam(const std::string &_key, boost::any &_value) const
     return PhysicsEngine::GetParam(_key, _value);
   }
   sdf::ElementPtr dartElem = this->sdf->GetElement("dart");
-  // physics dart element not yet added to sdformat
-  // GZ_ASSERT(dartElem != nullptr, "DART SDF element does not exist");
 
-  if (_key == "max_contacts")
+  // physics dart element not yet added to sdformat
+  GZ_ASSERT(dartElem, "DART SDF element does not exist");
+
+  if (_key == "solver_type")
+  {
+    _value = this->GetSolverType();
+  }
+  else if (_key == "max_contacts")
   {
     _value = dartElem->GetElement("max_contacts")->Get<int>();
   }
@@ -406,7 +667,11 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
   /// \TODO fill this out, see issue #1115
   try
   {
-    if (_key == "max_contacts")
+    if (_key == "solver_type")
+    {
+      this->SetSolverType(boost::any_cast<std::string>(_value));
+    }
+    else if (_key == "max_contacts")
     {
       int value = boost::any_cast<int>(_value);
       gzerr << "Setting [" << _key << "] in DART to [" << value
@@ -418,12 +683,21 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
       gzerr << "Setting [" << _key << "] in DART to [" << value
             << "] not yet supported.\n";
     }
+    else if (_key == "auto_reset_forces")
+    {
+      this->dataPtr->resetAllForcesAfterSimulationStep =
+          boost::any_cast<bool>(_value);
+    }
     else
     {
+      // Note: This is nested in the else statement intentionally so that the
+      // base PhysicsEngine class will also be updated about the change to the
+      // max_step_size parameter.
       if (_key == "max_step_size")
       {
         this->dataPtr->dtWorld->setTimeStep(boost::any_cast<double>(_value));
       }
+
       return PhysicsEngine::SetParam(_key, _value);
     }
   }
@@ -434,12 +708,6 @@ bool DARTPhysics::SetParam(const std::string &_key, const boost::any &_value)
     return false;
   }
   return true;
-}
-
-//////////////////////////////////////////////////
-dart::simulation::World *DARTPhysics::GetDARTWorld() const
-{
-  return this->DARTWorld().get();
 }
 
 //////////////////////////////////////////////////
@@ -484,6 +752,9 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
   // can be over-ridden by other message parameters.
   PhysicsEngine::OnPhysicsMsg(_msg);
 
+  if (_msg->has_solver_type())
+    this->SetSolverType(_msg->solver_type());
+
   if (_msg->has_enable_physics())
     this->world->SetPhysicsEnabled(_msg->enable_physics());
 
@@ -511,28 +782,6 @@ void DARTPhysics::OnPhysicsMsg(ConstPhysicsPtr& _msg)
 DARTLinkPtr DARTPhysics::FindDARTLink(
     const dart::dynamics::BodyNode *_dtBodyNode)
 {
-  DARTLinkPtr res;
-
-  const Model_V& models = this->world->Models();
-
-  for (Model_V::const_iterator itModel = models.begin();
-       itModel != models.end(); ++itModel)
-  {
-    const Link_V& links = (*itModel)->GetLinks();
-
-    for (Link_V::const_iterator itLink = links.begin();
-         itLink != links.end(); ++itLink)
-    {
-      DARTLinkPtr dartLink = boost::dynamic_pointer_cast<DARTLink>(*itLink);
-
-      if (dartLink->GetDARTBodyNode() == _dtBodyNode)
-      {
-        res = dartLink;
-        break;
-      }
-    }
-  }
-
-  return res;
+  return StaticFindDARTLink(this, _dtBodyNode);
 }
 

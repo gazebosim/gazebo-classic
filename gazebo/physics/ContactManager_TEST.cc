@@ -31,14 +31,14 @@ TEST_F(ContactManagerTest, CreateFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   EXPECT_EQ(manager->GetFilterCount(), 0u);
 
@@ -76,14 +76,14 @@ TEST_F(ContactManagerTest, RemoveFilter)
 
   // Get a pointer to the world, make sure world loads
   physics::WorldPtr world = physics::get_world("default");
-  ASSERT_TRUE(world != NULL);
+  ASSERT_TRUE(world != nullptr);
 
   // Verify physics engine type
   physics::PhysicsEnginePtr physics = world->Physics();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   physics::ContactManager *manager = physics->GetContactManager();
-  ASSERT_TRUE(physics != NULL);
+  ASSERT_TRUE(physics != nullptr);
 
   // Add one filter then remove it
   std::map<std::string, physics::CollisionPtr> collisionMap;
@@ -107,7 +107,7 @@ TEST_F(ContactManagerTest, RemoveFilter)
     ss << name << i;
     std::map<std::string, physics::CollisionPtr> collisions;
     collisionMap["collision"] = physics::CollisionPtr();
-    ASSERT_TRUE(collisionMap["collision"] == NULL);
+    ASSERT_TRUE(collisionMap["collision"] == nullptr);
 
     manager->CreateFilter(ss.str(), collisions);
     EXPECT_TRUE(manager->HasFilter(ss.str()));
@@ -134,6 +134,64 @@ TEST_F(ContactManagerTest, RemoveFilter)
   manager->RemoveFilter(collisionMapName);
   EXPECT_FALSE(manager->HasFilter(collisionMapName));
   EXPECT_EQ(manager->GetFilterCount(), 0u);
+}
+
+/////////////////////////////////////////////////
+TEST_F(ContactManagerTest, NeverDropContacts)
+{
+  // world needs to be paused in order to use World::Step()
+  // function correctly (second parameter true)
+  Load("test/worlds/box.world", true);
+
+  // Get a pointer to the world, make sure world loads
+  physics::WorldPtr world = physics::get_world("default");
+  ASSERT_TRUE(world != nullptr);
+
+  // Verify physics engine type
+  physics::PhysicsEnginePtr physics = world->Physics();
+  ASSERT_TRUE(physics != nullptr);
+
+  physics::ContactManager *manager = physics->GetContactManager();
+  ASSERT_TRUE(manager != nullptr);
+
+  // advance the world. Contacts should happen between
+  // box and ground.
+  world->Step(1);
+
+  unsigned int numContacts = manager->GetContactCount();
+
+  // we have not enforced contacts computation (yet), so
+  // we should not have access to any contacts information
+  // without the enforcement.
+  ASSERT_EQ(numContacts, 0u);
+
+  manager->SetNeverDropContacts(true);
+  ASSERT_TRUE(manager->NeverDropContacts());
+
+  // advance the world again, this time the contacts
+  // information should become available.
+  world->Step(1);
+
+  numContacts = manager->GetContactCount();
+  gzdbg << "Number of contacts: " <<numContacts << std::endl;
+  ASSERT_GT(numContacts, 0u);
+
+  // make sure there are no subscribers connected which may have
+  // caused the contacts to become true
+  const std::vector<physics::Contact *>& contacts = manager->GetContacts();
+  for (std::vector<physics::Contact *>::const_iterator it = contacts.begin();
+       it != contacts.end(); ++it)
+  {
+    physics::Contact* contact = *it;
+    physics::Collision* coll1 = contact->collision1;
+    physics::Collision* coll2 = contact->collision2;
+    ASSERT_TRUE(coll1 != nullptr);
+    ASSERT_TRUE(coll2 != nullptr);
+    // we have no subscribers connected and still have gotten the contacts
+    // information, which means that enforcing contacts computation has worked.
+    ASSERT_FALSE(manager->SubscribersConnected(coll1, coll2));
+    ASSERT_FALSE(manager->SubscribersConnected(coll2, coll1));
+  }
 }
 
 int main(int argc, char **argv)

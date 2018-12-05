@@ -19,7 +19,7 @@
 
 #include <string>
 
-#include "gazebo/common/Color.hh"
+#include <ignition/math/Color.hh>
 
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/qgv/QGVScene.h"
@@ -36,7 +36,7 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _parent Parent Widget.
-      public: GraphScene(QWidget *_parent = 0);
+      public: explicit GraphScene(QWidget *_parent = 0);
 
       /// \brief Destructor
       public: virtual ~GraphScene() = default;
@@ -76,7 +76,7 @@ namespace gazebo
       /// \param[in] _id Edge ID.
       /// \param[in] _color Color to set the edge to.
       public: void SetEdgeColor(const std::string &_id,
-          const common::Color &_color);
+          const ignition::math::Color &_color);
 
       /// \brief Overrides the default background with grid lines.
       /// \param[in] _painter Qt painter object.

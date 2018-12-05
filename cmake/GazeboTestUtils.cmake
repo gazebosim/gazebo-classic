@@ -109,7 +109,6 @@ if (VALID_DISPLAY)
     add_dependencies(${BINARY_NAME}
       gazebo_gui
       gazebo_common
-      gazebo_math
       gazebo_physics
       gazebo_sensors
       gazebo_rendering

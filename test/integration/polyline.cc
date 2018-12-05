@@ -148,8 +148,6 @@ TEST_P(PolylineTest, PolylineWorld)
 {
   if (GetParam() == std::string("simbody"))
     gzwarn << "Polyline not supported in simbody\n";
-  else if (GetParam() == std::string("dart"))
-    gzwarn << "Polyline not supported in dart\n";
   else
     PolylineWorld(GetParam());
 }

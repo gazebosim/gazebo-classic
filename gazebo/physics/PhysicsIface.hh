@@ -52,6 +52,15 @@ namespace gazebo
     GZ_PHYSICS_VISIBLE
     WorldPtr get_world(const std::string &_name = "");
 
+    /// \brief checks if the world with this name exists.
+    /// Can be used to check if get_world(const std::string&)
+    /// will succeed or throw an exception.
+    /// \param[in] _name Name of the world to check for, or
+    ///   empty to check if *any* world has been loaded.
+    /// \return true if the world exists.
+    GZ_PHYSICS_VISIBLE
+    bool has_world(const std::string &_name = "");
+
     /// \brief Load world from sdf::Element pointer.
     /// \param[in] _world Pointer to a world.
     /// \param[in] _sdf SDF values to load from.

@@ -372,22 +372,6 @@ void Distortion::CalculateAndApplyDistortionScale()
 }
 
 //////////////////////////////////////////////////
-math::Vector2d Distortion::Distort(
-    const math::Vector2d &_in,
-    const math::Vector2d &_center, double _k1, double _k2, double _k3,
-    double _p1, double _p2)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return Distort(_in.Ign(), _center.Ign(), _k1, _k2, _k3, _p1, _p2);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 ignition::math::Vector2d Distortion::Distort(
     const ignition::math::Vector2d &_in,
     const ignition::math::Vector2d &_center, double _k1, double _k2, double _k3,
@@ -396,10 +380,10 @@ ignition::math::Vector2d Distortion::Distort(
   // apply Brown's distortion model, see
   // http://en.wikipedia.org/wiki/Distortion_%28optics%29#Software_correction
 
-  ignition::math::Vector2d normalized2d = (_in - _center);
+  ignition::math::Vector2d normalized2d = _in - _center;
   ignition::math::Vector3d normalized(normalized2d.X(), normalized2d.Y(), 0);
-  double rSq = normalized.X() * normalized.X()
-      + normalized.Y() * normalized.Y();
+  double rSq = normalized.X() * normalized.X() +
+               normalized.Y() * normalized.Y();
 
   // radial
   ignition::math::Vector3d dist = normalized * (1.0 +
@@ -434,21 +418,9 @@ bool Distortion::Crop() const
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetK1() const
-{
-  return this->K1();
-}
-
-//////////////////////////////////////////////////
 double Distortion::K1() const
 {
   return this->dataPtr->k1;
-}
-
-//////////////////////////////////////////////////
-double Distortion::GetK2() const
-{
-  return this->K2();
 }
 
 //////////////////////////////////////////////////
@@ -458,21 +430,9 @@ double Distortion::K2() const
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetK3() const
-{
-  return this->K3();
-}
-
-//////////////////////////////////////////////////
 double Distortion::K3() const
 {
   return this->dataPtr->k3;
-}
-
-//////////////////////////////////////////////////
-double Distortion::GetP1() const
-{
-  return this->P1();
 }
 
 //////////////////////////////////////////////////
@@ -482,28 +442,9 @@ double Distortion::P1() const
 }
 
 //////////////////////////////////////////////////
-double Distortion::GetP2() const
-{
-  return this->P2();
-}
-
-//////////////////////////////////////////////////
 double Distortion::P2() const
 {
   return this->dataPtr->p2;
-}
-
-//////////////////////////////////////////////////
-math::Vector2d Distortion::GetCenter() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Center();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

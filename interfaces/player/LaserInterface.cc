@@ -24,7 +24,6 @@
 #include <iostream>
 #include <ignition/math/Helpers.hh>
 
-#include "gazebo/math/gzmath.hh"
 #include "gazebo/transport/transport.hh"
 #include "GazeboDriver.hh"
 #include "LaserInterface.hh"

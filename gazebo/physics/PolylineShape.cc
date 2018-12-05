@@ -14,7 +14,9 @@
  * limitations under the License.
  *
  */
-#include "gazebo/math/Vector3.hh"
+
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/physics/PolylineShape.hh"
 #include "gazebo/physics/PhysicsIface.hh"
 #include "gazebo/common/MeshManager.hh"

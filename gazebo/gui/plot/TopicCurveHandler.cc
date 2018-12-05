@@ -77,7 +77,7 @@ namespace gazebo
           std::map<std::string, CurveVariableSet>::iterator;
 
       /// \brief Constructor.
-      public: TopicCurve(const std::string &_topic);
+      public: explicit TopicCurve(const std::string &_topic);
 
       /// \brief Destructor.
       public: ~TopicCurve();

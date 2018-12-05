@@ -30,6 +30,8 @@
 
 #endif /* HAVE_OPENGL */
 
+#include <ignition/math/Color.hh>
+
 #include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/CameraLensPrivate.hh"
 #include "gazebo/rendering/WideAngleCameraPrivate.hh"
@@ -612,7 +614,7 @@ void WideAngleCamera::SetClipDist()
 }
 
 //////////////////////////////////////////////////
-bool WideAngleCamera::SetBackgroundColor(const common::Color &_color)
+bool WideAngleCamera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   bool retVal = true;
   Ogre::ColourValue clr = Conversions::Convert(_color);
@@ -677,8 +679,8 @@ void WideAngleCamera::CreateEnvRenderTexture(const std::string &_textureName)
 
     RTShaderSystem::AttachViewport(vp, this->GetScene());
 
-    vp->setBackgroundColour(
-      Conversions::Convert(this->scene->BackgroundColor()));
+    auto const &gzBgColor = this->scene->BackgroundColor();
+    vp->setBackgroundColour(Conversions::Convert(gzBgColor));
     vp->setVisibilityMask(GZ_VISIBILITY_ALL &
         ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 

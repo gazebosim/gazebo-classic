@@ -22,8 +22,6 @@
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector2.hh>
 
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector2i.hh"
 #include "gazebo/rendering/Camera.hh"
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
@@ -94,30 +92,12 @@ namespace gazebo
       public: void Fini();
 
       // Documentation inherited.
-      /// \deprecated See verison that accepts an ignition::math::Pose3d
-      /// object.
-      public: virtual void SetWorldPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
-
-      // Documentation inherited.
       public: virtual void SetWorldPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Set the default pose in the world coordinate frame and set
-      /// that as the current camera world pose.
-      /// \param[in] _pose New default pose of the camera.
-      /// \deprecated See SetInitialPose
-      public: void SetDefaultPose(const math::Pose &_pose)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the initial pose in the world coordinate frame and set
       /// that as the current camera world pose.
       /// \param[in] _pose New default pose of the camera.
       public: void SetInitialPose(const ignition::math::Pose3d &_pose);
-
-      /// \brief Get the default pose in the world coordinate frame.
-      /// \return Default pose of the camera.
-      /// \deprecated See InitialPose
-      public: math::Pose DefaultPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the initial pose in the world coordinate frame.
       /// \return Initial pose of the camera.
@@ -144,14 +124,6 @@ namespace gazebo
       /// \param[in] _pos The initial pose of the camera.
       public: void SetViewController(const std::string &_type,
                                      const ignition::math::Vector3d &_pos);
-
-
-      /// \brief Set view controller
-      /// \param[in] _type The type of view controller: "orbit", "fps"
-      /// \param[in] _pos The initial pose of the camera.
-      /// \deprecated See function that uses ignition::math::Vector3d
-      public: void SetViewController(const std::string &_type,
-                            const math::Vector3 &_pos) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get current view controller type.
       /// \return Type of the current view controller: "orbit", "fps"
@@ -204,30 +176,6 @@ namespace gazebo
       /// \param[in] _value True to enable viewcontroller, False to
       /// disable.
       public: void EnableViewController(bool _value) const;
-
-      /// \brief Get an entity at a pixel location using a camera. Used for
-      /// mouse picking.
-      /// \param[in] _mousePos The position of the mouse in screen coordinates
-      /// \param[out] _mod Used for object manipulation
-      /// \return The selected entity, or NULL
-      /// \deprecated See version that accepts an ignition::math::Vector2i
-      /// object
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos,
-                  std::string &_mod) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get a visual at a mouse position
-      /// \param[in] _mousePos 2D position of the mouse in pixels.
-      /// \deprecated See version that accepts an ignition::math::Vector2i
-      /// object
-      public: VisualPtr GetVisual(const math::Vector2i &_mousePos) const
-              GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the point the camera should orbit around.
-      /// \param[in] _pt The focal point
-      /// \deprecated See version that accepts an ignition::math::Vector3
-      /// object
-      public: void SetFocalPoint(const math::Vector3 &_pt)
-              GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get an entity at a pixel location using a camera. Used for
       /// mouse picking.

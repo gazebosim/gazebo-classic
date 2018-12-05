@@ -80,11 +80,6 @@ namespace gazebo
 
       /// \brief Returns scaling factor for this geometry.
       /// \return Scaling factor.
-      /// \deprecated See ignition::math::Vector3d Scale() const
-      public: virtual math::Vector3 GetScale() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Returns scaling factor for this geometry.
-      /// \return Scaling factor.
       public: virtual ignition::math::Vector3d Scale() const;
 
       /// \brief Returns image threshold for this geometry.
@@ -157,7 +152,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent quad tree node.
-      public: QuadNode(QuadNode *_parent)
+      public: explicit QuadNode(QuadNode *_parent)
               : x(0), y(0), width(0), height(0)
               {
                 parent = _parent;

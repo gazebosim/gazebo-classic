@@ -46,7 +46,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent graphics item.
-      public: SegmentItem(QGraphicsItem *_parent = 0);
+      public: explicit SegmentItem(QGraphicsItem *_parent = 0);
 
       /// \brief Destructor
       public: ~SegmentItem();
@@ -91,7 +91,7 @@ namespace gazebo
 
       /// \brief Set the color of the segment item.
       /// \param[in] _color Color.
-      public: void SetColor(const common::Color &_color);
+      public: void SetColor(const ignition::math::Color &_color);
 
       /// \brief Show the grabber handles of the segment item.
       /// \param[in] _show True to draw the handles, and false to hide them.

@@ -102,6 +102,7 @@ INSTANTIATE_TEST_CASE_P(Plugins, ExamplesBuild_Plugins, ::testing::Values(
   , "mainwindow_example"
   , "model_push"
   , "model_move"
+  , "movable_text_demo"
   , "parameters"
   , "projector"
   , "system_gui_plugin"
@@ -128,7 +129,7 @@ auto standaloneValues = ::testing::Values(
   , "introspection_client"
   , "listener"
   , "publisher"
-#ifndef BUILD_TYPE_COVERAGE
+#ifndef GAZEBO_BUILD_TYPE_COVERAGE
   , "test_fixture"
 #endif
   , "transporter"

@@ -221,7 +221,8 @@ namespace gazebo
       using Camera::SetClipDist;
 
       // Documentation inherited
-      public: bool SetBackgroundColor(const common::Color &_color) override;
+      public: bool SetBackgroundColor(const ignition::math::Color &_color)
+          override;
 
       /// \brief Project 3D world coordinates to screen coordinates
       /// \param[in] _pt 3D world coodinates

@@ -411,7 +411,6 @@ std::string ModelDatabase::GetModelPath(const std::string &_uri,
   {
     if (!ModelDatabase::HasModel(_uri))
     {
-      gzerr << "Unable to download model[" << _uri << "]\n";
       return std::string();
     }
 

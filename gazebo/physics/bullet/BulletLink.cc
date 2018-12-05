@@ -116,12 +116,18 @@ void BulletLink::Init()
       btCollisionShape *shape = collision->GetCollisionShape();
 
       SurfaceParamsPtr surface = collision->GetSurface();
-      GZ_ASSERT(surface, "Surface pointer for is invalid");
+      GZ_ASSERT(surface, "Surface pointer is invalid");
       FrictionPyramidPtr friction = surface->FrictionPyramid();
       GZ_ASSERT(friction, "Friction pointer is invalid");
 
       hackMu1 = friction->MuPrimary();
       hackMu2 = friction->MuSecondary();
+
+      if (!shape)
+      {
+        gzerr << "No collision shape initialized. Skipping.\n";
+        continue;
+      }
 
       auto relativePose = collision->RelativePose()
           - this->inertial->Pose();

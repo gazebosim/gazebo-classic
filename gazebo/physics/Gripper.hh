@@ -56,10 +56,6 @@ namespace gazebo
       public: virtual void Init();
 
       /// \brief Return the name of the gripper.
-      /// \deprecated See std::string Name() const;
-      public: std::string GetName() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Return the name of the gripper.
       /// \return Name of the gripper
       public: std::string Name() const;
 

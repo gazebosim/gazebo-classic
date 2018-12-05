@@ -19,7 +19,10 @@
   // Ensure that Winsock2.h is included before Windows.h, which can get
   // pulled in by anybody (e.g., Boost).
   #include <Winsock2.h>
-  #define snprintf _snprintf
+  // snprintf is available since VS 2015
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    #define snprintf _snprintf
+  #endif
 #endif
 
 #include <stdio.h>
@@ -233,14 +236,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
   {
     try
     {
-#ifndef _WIN32
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-      math::Rand::SetSeed(this->dataPtr->vm["seed"].as<double>());
-#ifndef _WIN32
-# pragma GCC diagnostic pop
-#endif
       ignition::math::Rand::Seed(this->dataPtr->vm["seed"].as<double>());
     }
     catch(boost::bad_any_cast &_e)
@@ -287,11 +282,6 @@ bool Server::ParseArgs(int _argc, char **_argv)
         this->dataPtr->vm["iters"].as<unsigned int>() << "]\n";
     }
   }
-
-  if (this->dataPtr->vm.count("pause"))
-    this->dataPtr->params["pause"] = "true";
-  else
-    this->dataPtr->params["pause"] = "false";
 
   if (!this->PreLoad())
   {
@@ -517,6 +507,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
+  event::Events::stop();
   ServerPrivate::stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
@@ -526,6 +517,7 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
+  event::Events::stop();
   this->dataPtr->stop = true;
 }
 
@@ -549,6 +541,15 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  // }
 #endif
 
   if (this->dataPtr->stop)
@@ -603,36 +604,14 @@ void Server::Run()
 /////////////////////////////////////////////////
 void Server::ProcessParams()
 {
+  bool p = this->dataPtr->vm.count("pause") > 0;
+  physics::pause_worlds(p);
   common::StrStr_M::const_iterator iter;
   for (iter = this->dataPtr->params.begin();
        iter != this->dataPtr->params.end();
        ++iter)
   {
-    if (iter->first == "pause")
-    {
-      bool p = false;
-      try
-      {
-        p = boost::lexical_cast<bool>(iter->second);
-      }
-      catch(...)
-      {
-        // Unable to convert via lexical_cast, so try "true/false" string
-        std::string str = iter->second;
-        boost::to_lower(str);
-
-        if (str == "true")
-          p = true;
-        else if (str == "false")
-          p = false;
-        else
-          gzerr << "Invalid param value[" << iter->first << ":"
-                << iter->second << "]\n";
-      }
-
-      physics::pause_worlds(p);
-    }
-    else if (iter->first == "record")
+    if (iter->first == "record")
     {
       util::LogRecordParams params;
 
