@@ -1,5 +1,12 @@
 ## Gazebo 9
 
+## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Fix DARTHingeJoint::SetAxis implementation (issue 2505)
+    * [Pull request 3005](https://bitbucket.org/osrf/gazebo/pull-requests/3005)
+    * [Issue 2505](https://bitbucket.org/osrf/gazebo/issues/2505)
+
+
 ## Gazebo 9.5.0 (2018-11-19)
 
 1. Fix model bounding box
