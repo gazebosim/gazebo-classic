@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
 
@@ -10,6 +13,12 @@
 
 1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
     * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
 
 
 ## Gazebo 7.14.0 (2018-07-27)

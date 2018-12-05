@@ -417,7 +417,7 @@ void JointController::SetPositionPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetPositionTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 
@@ -446,7 +446,7 @@ void JointController::SetVelocityPID(const std::string &_jointName,
 
 /////////////////////////////////////////////////
 bool JointController::SetVelocityTarget(const std::string &_jointName,
-    double _target)
+    const double _target)
 {
   bool result = false;
 
@@ -454,6 +454,22 @@ bool JointController::SetVelocityTarget(const std::string &_jointName,
       this->dataPtr->velPids.end())
   {
     this->dataPtr->velocities[_jointName] = _target;
+    result = true;
+  }
+
+  return result;
+}
+
+/////////////////////////////////////////////////
+bool JointController::SetForce(const std::string &_jointName,
+    const double _force)
+{
+  bool result = false;
+
+  if (this->dataPtr->joints.find(_jointName) !=
+      this->dataPtr->joints.end())
+  {
+    this->dataPtr->forces[_jointName] = _force;
     result = true;
   }
 

@@ -1,0 +1,320 @@
+<?xml version="1.0" ?>
+<sdf version="1.5">
+  <world name="default">
+
+    <physics type="ode">
+      <ode>
+        <solver>
+          <iters>100</iters>
+          <sor>1.0</sor>
+        </solver>
+      </ode>
+    </physics>
+
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <%  # Wheel parameters
+        wheel_mass   = 2.5
+        wheel_radius = 0.5
+        wheel_width  = 0.5
+        wheel_ixx    = wheel_mass * (0.25 * wheel_radius**2 + 1.0/12.0 * wheel_width**2)
+        wheel_iyy    = wheel_ixx
+        wheel_izz    = wheel_mass * 0.5 * wheel_radius**2
+    %>
+    <model name="tire">
+      <pose>0 0 <%= wheel_radius %>  0 0 0</pose>
+
+      <link name="wheel">
+        <pose>0 0 0  <%= Math::PI/2 %> 0 0</pose>
+        <inertial>
+          <mass><%= wheel_mass %></mass>
+          <inertia>
+            <ixx><%= wheel_ixx %></ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy><%= wheel_iyy %></iyy>
+            <iyz>0</iyz>
+            <izz><%= wheel_izz %></izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <sphere>
+              <radius><%= wheel_radius %></radius>
+            </sphere>
+            <!--
+            <cylinder>
+              <radius><%= wheel_radius %></radius>
+              <length><%= wheel_width %></length>
+            </cylinder>
+            -->
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.0</min_depth>
+                <kp>250e3</kp>
+                <kd>5</kd>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1.0</mu>
+                <mu2>1.0</mu2>
+                <fdir1>0 0 1</fdir1>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual_indicator">
+          <pose>0 0 0.2 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.2 0.4 0.2</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Red</name></script>
+          </material>
+        </visual>
+
+        <visual name="visual">
+          <geometry>
+            <sphere>
+              <radius><%= wheel_radius %></radius>
+            </sphere>
+            <!--
+            <cylinder>
+              <radius><%= wheel_radius %></radius>
+              <length><%= wheel_width %></length>
+            </cylinder>
+            -->
+          </geometry>
+          <material>
+            <script><name>Gazebo/DarkGrey</name></script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="axel">
+        <pose>0 0.35 0  0 0 0</pose>
+
+        <inertial>
+          <mass>0.5</mass>
+          <inertia>
+            <ixx>0.0029166</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.0029166</iyy>
+            <iyz>0</iyz>
+            <izz>0.0025</izz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>0.2</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.1</radius>
+              <length>0.2</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Green</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <link name="upright">
+        <pose>0 0.55 0.4 0 0 0</pose>
+
+        <inertial>
+          <mass>1.0</mass>
+          <inertia>
+            <ixx>0.08667</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.08667</iyy>
+            <iyz>0</iyz>
+            <izz>0.0066667</izz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>0.2 0.2 1</size>
+            </box>
+          </geometry>
+          <material>
+            <script>
+              <name>Gazebo/Blue</name>
+            </script>
+          </material>
+        </visual>
+      </link>
+
+      <joint type="revolute" name="axel_wheel">
+        <parent>axel</parent>
+        <child>wheel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+
+        <sensor name="force_torque" type="force_torque">
+          <always_on>true</always_on>
+          <visualize>true</visualize>
+          <update_rate>1000</update_rate>
+          <force_torque>
+            <frame>parent</frame>
+          </force_torque>
+        </sensor>
+      </joint>
+
+      <joint type="revolute" name="steer">
+        <parent>upright</parent>
+        <child>axel</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0</upper>
+            <lower>-0</lower>
+          </limit>
+        </axis>
+      </joint>
+
+      <joint type="prismatic" name="world_upright">
+        <parent>world</parent>
+        <child>upright</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+          <limit>
+            <upper>0.1</upper>
+            <lower>-0.1</lower>
+          </limit>
+        </axis>
+      </joint>
+
+      <plugin name="wheel_slip" filename="libWheelSlipPlugin.so">
+        <wheel link_name="wheel">
+          <slip_compliance_lateral>0.01</slip_compliance_lateral>
+          <slip_compliance_longitudinal>0.01</slip_compliance_longitudinal>
+          <wheel_normal_force>1000</wheel_normal_force>
+        </wheel>
+      </plugin>
+    </model>
+
+
+    <%  # Drum parameters
+        drum_mass   = 10
+        drum_radius = 4.0
+        drum_width  = 2.0
+        drum_ixx    = drum_mass * (0.25 * drum_radius**2 + 1.0/12.0 * drum_width**2)
+        drum_iyy    = drum_ixx
+        drum_izz    = drum_mass * 0.5 * drum_radius**2
+    %>
+    <model name="drum">
+      <pose>0 0 <%= -drum_radius %>  <%= Math::PI/2 %> 0 0</pose>
+
+      <link name="link">
+        <inertial>
+          <mass><%= drum_mass %></mass>
+          <inertia>
+            <ixx><%= drum_ixx %></ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy><%= drum_iyy %></iyy>
+            <iyz>0</iyz>
+            <izz><%= drum_izz %></izz>
+          </inertia>
+        </inertial>
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius><%= drum_radius %></radius>
+              <length><%= drum_width %></length>
+            </cylinder>
+          </geometry>
+          <surface>
+            <contact>
+              <ode>
+                <max_vel>1e5</max_vel>
+                <min_depth>0.0</min_depth>
+              </ode>
+            </contact>
+            <friction>
+              <ode>
+                <mu>1.5</mu>
+                <mu2>1.5</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius><%= drum_radius %></radius>
+              <length><%= drum_width %></length>
+            </cylinder>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Orange</name></script>
+          </material>
+        </visual>
+
+<%
+  block_count = 24
+  block_count.times do |i|
+    angle = 2*Math::PI * i / block_count
+    bx = drum_radius * Math.sin(angle)
+    by = drum_radius * Math.cos(angle)
+%>
+        <visual name='block<%= i %>'>
+          <pose><%= bx %> <%= by %> 1 0 0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.05</size>
+            </box>
+          </geometry>
+          <material>
+            <script><name>Gazebo/Black</name></script>
+          </material>
+        </visual>
+<%
+  end
+%>
+      </link>
+
+      <joint type="revolute" name="joint">
+        <parent>world</parent>
+        <child>link</child>
+        <axis>
+          <xyz>0 0 1</xyz>
+        </axis>
+      </joint>
+    </model>
+
+  </world>
+</sdf>
