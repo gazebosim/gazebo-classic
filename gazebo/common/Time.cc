@@ -74,7 +74,7 @@ Time::Time()
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
-  clock_getres(CLOCK_REALTIME, &clockResolution);
+  clock_getres(CLOCK_MONOTONIC, &clockResolution);
 #endif
 }
 
@@ -438,7 +438,7 @@ Time Time::Sleep(const common::Time &_time)
     result.sec = 0;
     result.nsec = 0;
 #else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
