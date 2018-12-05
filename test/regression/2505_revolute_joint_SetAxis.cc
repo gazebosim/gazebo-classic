@@ -75,12 +75,12 @@ class Issue2505Test
     const ignition::math::Pose3d T2_initial =
         ignition::math::Pose3d(
           ignition::math::Vector3d(0.0, 0.5, 2.0),
-          ignition::math::Quaterniond(0.0, 0.0, 0.0));
+          ignition::math::Quaterniond::Identity);
 
     const ignition::math::Pose3d J_T2_initial =
         ignition::math::Pose3d(
-          ignition::math::Vector3d(0.0, 0.0, 0.0),
-          ignition::math::Quaterniond(0.0, 0.0, 0.0));
+          ignition::math::Vector3d::Zero,
+          ignition::math::Quaterniond::Identity);
 
     // J_T2_initial is the transform from the initial pose of the child link
     // to the pose of the revolute joint.
@@ -96,7 +96,7 @@ class Issue2505Test
       const double angle = angleInDegrees * IGN_PI / 180.0;
       const ignition::math::Pose3d R =
           ignition::math::Pose3d(
-            ignition::math::Vector3d(0.0, 0.0, 0.0),
+            ignition::math::Vector3d::Zero,
             ignition::math::Quaterniond(axis, angle));
 
       const ignition::math::Pose3d T2 = J_T2_initial.Inverse() + (R + J);
