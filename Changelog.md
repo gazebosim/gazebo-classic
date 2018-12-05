@@ -6,6 +6,12 @@
     * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
     * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
 
+1. Plugin to initialize joint controller parameters
+    * [Pull request #3031](https://bitbucket.org/osrf/gazebo/pull-requests/3031)
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
+
+
 ## Gazebo 9.5.0 (2018-11-19)
 
 1. Fix model bounding box
@@ -427,11 +433,6 @@
 ## Gazebo 8
 
 ## Gazebo 8.X.X (201X-XX-XX)
-
-1. Plugin to initialize joint controller parameters
-    * [Pull request #3031](https://bitbucket.org/osrf/gazebo/pull-requests/3031)
-    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
-    * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
 
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
