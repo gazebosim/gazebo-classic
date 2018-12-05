@@ -117,7 +117,8 @@ namespace gazebo
       public: bool Running() const;
 
       /// \brief Stop the world.
-      /// Stop the update loop.
+      /// Request the update loop thread to stop. Wait for it to join if this
+      /// function is called from another thread. Return immediately otherwise.
       public: void Stop();
 
       /// \brief Finalize the world.

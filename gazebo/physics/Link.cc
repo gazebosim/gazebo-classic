@@ -838,7 +838,8 @@ ignition::math::Box Link::BoundingBox() const
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
-  box.Max().Set(0, 0, 0);
+  box.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
 
   for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
        iter != this->dataPtr->collisions.end(); ++iter)
@@ -1934,4 +1935,10 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   // The light need to be added to the list on Load (before Init) for the case
   // when a model is created from a factory message. Otherwise the model msg
   // published to the client will not contain an entry of this light
+}
+
+//////////////////////////////////////////////////
+const Link::Visuals_M &Link::Visuals() const
+{
+  return this->visuals;
 }

@@ -101,20 +101,6 @@ void DARTPhysics::Fini()
 //////////////////////////////////////////////////
 void DARTPhysics::Reset()
 {
-  boost::recursive_mutex::scoped_lock lock(*this->physicsUpdateMutex);
-
-  // Restore state all the models
-  unsigned int modelCount = this->world->ModelCount();
-  DARTModelPtr dartModelIt;
-
-  for (unsigned int i = 0; i < modelCount; ++i)
-  {
-    dartModelIt =
-      boost::dynamic_pointer_cast<DARTModel>(this->world->ModelByIndex(i));
-    GZ_ASSERT(dartModelIt, "dartModelIt pointer is null");
-
-    dartModelIt->RestoreState();
-  }
 }
 
 //////////////////////////////////////////////////

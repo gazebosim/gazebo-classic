@@ -1,4 +1,87 @@
+## Gazebo 10
+
+## Gazebo 10.x.x (201x-xx-xx)
+
+1. Add record_resources field to gazebo log msgs
+    * [Pull request #2797](https://bitbucket.org/osrf/gazebo/pull-request/2797)
+    * [Pull request #3008](https://bitbucket.org/osrf/gazebo/pull-request/3008)
+
+1. Add methods to set dynamically Gaussian noise parameters
+    * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
+
+1. Add command to send a request with gz topic
+    * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
+
+1. Force vertical field of view to be lower than 180 degrees
+    * [Pull request #2909](https://bitbucket.org/osrf/gazebo/pull-request/2909)
+
+1. Fixed issue which lead to reset of values on pressing enter in Joint Creator
+    * [Pull request #2926](https://bitbucket.org/osrf/gazebo/pull-request/2926)
+
+1. Removed material block from shapes.world
+    * [Pull request #2925](https://bitbucket.org/osrf/gazebo/pull-request/2925)
+
+1. Handle signal SIGTERM exactly the same way as SIGINT
+    * [Pull request #2908](https://bitbucket.org/osrf/gazebo/pull-request/2908)
+
+1. Displaying light direction on the world tree
+    * [Pull request 2912](https://bitbucket.org/osrf/gazebo/pull-request/2912)
+
+1. Plugin to initialize joint controller parameters
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo
+
+1. Fix Enter in Link Inspector
+    * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
+
+1. Update Wind Plugin to support being used by Lift Drag Plugin
+    * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
+
+1. Dart: create joints dynamically, support kinematic loops and HarnessPlugin
+    * [Pull request #2762](https://bitbucket.org/osrf/gazebo/pull-requests/2762)
+    * [Issue #903](https://bitbucket.org/osrf/gazebo/issues/903)
+
+
 ## Gazebo 9
+
+## Gazebo 9.5.0 (2018-11-19)
+
+1. Fix model bounding box
+    * [Pull request 3033](https://bitbucket.org/osrf/gazebo/pull-request/3033)
+
+1. Skip skyx in SSAO plugin
+    * [Pull request 3028](https://bitbucket.org/osrf/gazebo/pull-request/3028)
+
+1. Boost 1.68 support
+    * [Pull request 3030](https://bitbucket.org/osrf/gazebo/pull-request/3030)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+
+
+## Gazebo 9.4.1 (2018-09-19)
+
+1. Revert pr 2923: "Handle signal SIGTERM exactly the same way as SIGINT"
+    * [Pull request 3018](https://bitbucket.org/osrf/gazebo/pull-request/3018)
+    * Reverts [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
+    * Some discussion in [Pull request 3014](https://bitbucket.org/osrf/gazebo/pull-request/3014)
+
 
 ## Gazebo 9.4.0 (2018-09-18)
 
@@ -383,6 +466,16 @@
 
 ## Gazebo 8.X.X (201X-XX-XX)
 
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
 1. Include SDF header in rendering::Distortion
     * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
 
@@ -391,6 +484,9 @@
 
 1. Improve ODE slip parameter behavior with multiple contact points
     * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
 
 1. Fix manipulating links in the model editor
     * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
@@ -405,6 +501,12 @@
 1. Print joint_cmd deprecation warnings only one time
     * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
     * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
 
 
 ## Gazebo 8.6.0 (2018-06-26)
@@ -1080,11 +1182,23 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
 
 1. Improve ODE slip parameter behavior with multiple contact points
     * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
 
 
 ## Gazebo 7.14.0 (2018-07-27)

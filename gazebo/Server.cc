@@ -619,10 +619,8 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      // TODO Remove call to SetRecordResources function and update to use
-      // params.record_resources instead.
-      util::LogRecord::Instance()->SetRecordResources(
-          this->dataPtr->params.count("record_resources") > 0);
+      params.recordResources =
+          this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
     }
   }
