@@ -23,7 +23,7 @@ using namespace gazebo;
 /////////////////////////////////////////////////
 class Issue2430Test
     : public ServerFixture,
-      public ::testing::WithParamInterface<std::string>
+      public ::testing::WithParamInterface<const char *>
 {
   /////////////////////////////////////////////////
   public: virtual void SetUp() override
