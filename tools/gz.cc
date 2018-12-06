@@ -630,10 +630,7 @@ void JointCommand::HelpDetailed()
 /////////////////////////////////////////////////
 bool JointCommand::RunImpl()
 {
-  std::string modelName, worldName, jointName;
-
-  if (this->vm.count("world-name"))
-    worldName = this->vm["world-name"].as<std::string>();
+  std::string modelName, jointName;
 
   if (this->vm.count("model-name"))
     modelName = this->vm["model-name"].as<std::string>();
