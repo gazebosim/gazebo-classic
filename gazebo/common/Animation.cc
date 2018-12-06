@@ -177,9 +177,10 @@ double Animation::GetKeyFramesAtTime(double _time, KeyFrame **_kf1,
 
 /////////////////////////////////////////////////
 PoseAnimation::PoseAnimation(const std::string &_name,
-    double _length, bool _loop)
+    double _length, bool _loop, double _tension)
 : Animation(_name, _length, _loop)
 {
+  this->tension = _tension;
   this->positionSpline = nullptr;
   this->rotationSpline = nullptr;
 }
@@ -217,6 +218,7 @@ void PoseAnimation::BuildInterpolationSplines() const
   this->positionSpline->AutoCalculate(false);
   this->rotationSpline->AutoCalculate(false);
 
+  this->positionSpline->Tension(this->tension);
   this->positionSpline->Clear();
   this->rotationSpline->Clear();
 
