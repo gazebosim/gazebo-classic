@@ -591,7 +591,6 @@ JointCommand::JointCommand()
     ("world-name,w", po::value<std::string>(), "World name.")
     ("model-name,m", po::value<std::string>(), "Model name.")
     ("joint-name,j", po::value<std::string>(), "Joint name.")
-    ("delete,d", "Delete a model.")
     ("force,f", po::value<double>(), "Force to apply to a joint (N).")
     ("pos-t", po::value<double>(),
      "Target angle(rad) for rotation joints or position (m) for linear joints.")
