@@ -2,7 +2,7 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
-1. Add record_resources field to gazebo log msgs
+1. Add record\_resources field to gazebo log msgs
     * [Pull request #2797](https://bitbucket.org/osrf/gazebo/pull-request/2797)
     * [Pull request #3008](https://bitbucket.org/osrf/gazebo/pull-request/3008)
 
@@ -32,10 +32,14 @@
 
 1. Plugin to initialize joint controller parameters
     * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
-    * [Issue #1766](https://bitbucket.org/osrf/gazebo
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo/issues/1766)
 
 1. Fix Enter in Link Inspector
     * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
+
+1. Display ODE contact points on disabled bodies
+    * [Pull request #2709](https://bitbucket.org/osrf/gazebo/pull-request/2709)
+    * [Issue #2175](https://bitbucket.org/osrf/gazebo/issues/2175)
 
 1. Update Wind Plugin to support being used by Lift Drag Plugin
     * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
