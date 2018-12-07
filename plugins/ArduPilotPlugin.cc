@@ -634,7 +634,7 @@ void ArduPilotPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
   //     + "::" + this->dataPtr->model->GetScopedName()
   //     + "::" + imuName;
   std::vector<std::string> imuScopedName =
-    this->dataPtr->model->GetSensorScopedName(imuName);
+    this->dataPtr->model->SensorScopedName(imuName);
   if (imuScopedName.size() > 1)
   {
     gzwarn << "[" << this->dataPtr->modelName << "] "
