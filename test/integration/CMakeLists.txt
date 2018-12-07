@@ -87,6 +87,7 @@ set(tests
   physics_torsional_friction.cc
   pioneer2dx.cc
   plugin.cc
+  plugin_interface.cc
   rayshape.cc
   region_events.cc
   rest_web.cc
@@ -150,6 +151,7 @@ endif()
 
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+add_dependencies(${TEST_TYPE}_plugin_interface PluginInterfaceTest)
 
 set(display_tests
 )
