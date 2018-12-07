@@ -9,6 +9,9 @@
 1. Add methods to set dynamically Gaussian noise parameters
     * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
 
+1. Use tension trajectory parameter on actor script animation
+    * [Pull request #3019](https://bitbucket.org/osrf/gazebo/pull-request/3019)
+
 1. Add command to send a request with gz topic
     * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
 
