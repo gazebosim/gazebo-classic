@@ -962,16 +962,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     ODECollision *collision1 = nullptr;
     ODECollision *collision2 = nullptr;
 
-    // Exit if both bodies are not enabled
-    if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
-        dGeomGetCategoryBits(_o2) != GZ_SENSOR_COLLIDE &&
-        ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
-        (!b2 && b1 && !dBodyIsEnabled(b1)) ||
-        (!b1 && b2 && !dBodyIsEnabled(b2))))
-    {
-      return;
-    }
-
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
       collision1 =
@@ -984,6 +974,18 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
         static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o2)));
     else
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
+
+    // Exit if both bodies are not enabled
+    if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
+        dGeomGetCategoryBits(_o2) != GZ_SENSOR_COLLIDE &&
+        !self->contactManager->NeverDropContacts() &&
+        !self->contactManager->SubscribersConnected(collision1, collision2) &&
+        ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
+        (!b2 && b1 && !dBodyIsEnabled(b1)) ||
+        (!b1 && b2 && !dBodyIsEnabled(b2))))
+    {
+      return;
+    }
 
     // Make sure both collision pointers are valid.
     if (collision1 && collision2)
