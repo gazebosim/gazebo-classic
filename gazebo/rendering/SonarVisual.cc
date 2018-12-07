@@ -113,13 +113,15 @@ void SonarVisual::Update()
 
   if (!dPtr->shapeVis)
   {
+    std::string geom = dPtr->sonarMsg->sonar().geometry();
+    if (geom != "sphere" && geom != "cone")
+       geom = "cone";
     dPtr->shapeVis.reset(
-        new Visual(this->Name() + "_SONAR_"
-            + boost::to_upper_copy(dPtr->sonarMsg->sonar().geometry())
-            + "_", shared_from_this(), false));
+        new Visual(this->Name() + "_SONAR_" + boost::to_upper_copy(geom),
+            shared_from_this(), false));
     dPtr->shapeVis->Load();
-    dPtr->shapeVis->InsertMesh("unit_" + dPtr->sonarMsg->sonar().geometry());
-    dPtr->shapeVis->AttachMesh("unit_" + dPtr->sonarMsg->sonar().geometry());
+    dPtr->shapeVis->InsertMesh("unit_" + geom);
+    dPtr->shapeVis->AttachMesh("unit_" + geom);
     dPtr->shapeVis->SetMaterial("Gazebo/BlueLaser");
     dPtr->shapeVis->SetCastShadows(false);
   }

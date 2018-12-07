@@ -150,8 +150,20 @@ void SonarSensor::Load(const std::string &_worldName)
   GZ_ASSERT(this->dataPtr->sonarShape != nullptr,
       "Unable to get the sonar shape from the sonar collision.");
 
-  if (geometry == "cone")
+  if (geometry == "sphere")
   {
+    // Use a scaled sphere mesh for the sonar collision shape.
+    this->dataPtr->sonarShape->SetMesh("unit_sphere");
+    this->dataPtr->sonarShape->SetScale(
+        ignition::math::Vector3d(range, range, range));
+    this->dataPtr->sonarMidPose = this->pose;
+  }
+  else
+  {
+    if (geometry != "cone")
+        gzerr << "Invalid sonar collision shape: " << geometry
+            << ". Defaults to cone." << std::endl;
+
     // Use a scaled cone mesh for the sonar collision shape.
     this->dataPtr->sonarShape->SetMesh("unit_cone");
     this->dataPtr->sonarShape->SetScale(ignition::math::Vector3d(
@@ -163,18 +175,6 @@ void SonarSensor::Load(const std::string &_worldName)
     offset = this->pose.Rot().RotateVector(offset);
     this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
         this->pose.Rot());
-  }
-  else if (geometry == "sphere")
-  {
-    // Use a scaled sphere mesh for the sonar collision shape.
-    this->dataPtr->sonarShape->SetMesh("unit_sphere");
-    this->dataPtr->sonarShape->SetScale(
-        ignition::math::Vector3d(range, range, range));
-    this->dataPtr->sonarMidPose = this->pose;
-  }
-  else
-  {
-    gzthrow("Invalid shape");
   }
 
   this->dataPtr->sonarCollision->SetRelativePose(this->dataPtr->sonarMidPose);
