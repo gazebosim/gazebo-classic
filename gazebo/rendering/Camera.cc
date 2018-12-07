@@ -684,7 +684,8 @@ void Camera::SetClipDist(const float _near, const float _far)
 void Camera::SetFixedYawAxis(const bool _useFixed,
     const ignition::math::Vector3d &_fixedAxis)
 {
-  this->cameraNode->setFixedYawAxis(_useFixed, Conversions::Convert(_fixedAxis));
+  this->cameraNode->setFixedYawAxis(_useFixed,
+      Conversions::Convert(_fixedAxis));
   this->dataPtr->yawFixed = _useFixed;
   this->dataPtr->yawFixedAxis = _fixedAxis;
 }
@@ -1645,6 +1646,10 @@ bool Camera::IsVisible(VisualPtr _visual)
     box.setMaximum(bbox.Max().X(), bbox.Max().Y(), bbox.Max().Z());
 
     box.transformAffine(_visual->GetSceneNode()->_getFullTransform());
+
+    // update cam node to ensure transform is update-to-date
+    this->cameraNode->_update(false, true);
+
     return this->camera->isVisible(box);
   }
 
