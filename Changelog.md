@@ -41,6 +41,8 @@
     * [Pull request #2762](https://bitbucket.org/osrf/gazebo/pull-requests/2762)
     * [Issue #903](https://bitbucket.org/osrf/gazebo/issues/903)
 
+1. Model Editor: Bounding collision shapes
+    * [Pull request #3004](https://bitbucket.org/osrf/gazebo/pull-requests/3004)
 
 ## Gazebo 9
 

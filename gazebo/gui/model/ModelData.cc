@@ -22,9 +22,10 @@
 #endif
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <ignition/math/Box.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/MassMatrix3.hh>
-#include <ignition/math/Box.hh>
+
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/MeshManager.hh"
 
@@ -1373,11 +1374,9 @@ void LinkData::OnAddVisual(const std::string &_name)
   {
     // create new visual based on sdf template (box)
     sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-    modelTemplateSDF->SetFromString(
-        ModelData::GetTemplateSDFString());
+    modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-    visVisual.reset(new rendering::Visual(visualName.str(),
-        this->linkVisual));
+    visVisual.reset(new rendering::Visual(visualName.str(), this->linkVisual));
     sdf::ElementPtr visualElem =  modelTemplateSDF->Root()
         ->GetElement("model")->GetElement("link")->GetElement("visual");
     visVisual->Load(visualElem);
@@ -1432,37 +1431,29 @@ void LinkData::OnAddCollision(const std::string &_name,
   {
     // create new collision based on sdf template (box)
     sdf::SDFPtr modelTemplateSDF(new sdf::SDF);
-    modelTemplateSDF->SetFromString(
-        ModelData::GetTemplateSDFString());
+    modelTemplateSDF->SetFromString(ModelData::GetTemplateSDFString());
 
-    rendering::VisualPtr vis;
-    ignition::math::Pose3d pose;
-
+    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()
+        ->GetElement("model")->GetElement("link")->GetElement("visual");
+    sdf::ElementPtr geomElem = collisionElem->GetElement("geometry");
 
     collisionVis.reset(new rendering::Visual(collisionName.str(),
         this->linkVisual));
-    sdf::ElementPtr collisionElem = modelTemplateSDF->Root()
-        ->GetElement("model")->GetElement("link")->GetElement("visual");
 
-    sdf::ElementPtr geomElem = collisionElem->GetElement("geometry");
-    // Get the first visual in the list
-    // The only one in the single-visual model
-
+    // Reshape collision based on first visual in the model
     if (!this->visuals.empty())
     {
-      vis = this->visuals.begin()->first;
-      pose = vis->Pose();
+      auto vis = this->visuals.begin()->first;
+      auto pose = vis->Pose();
 
-
-      // All collision shape types for visual geometry = box
+      // For visual geometry = box
       if (vis->GetGeometryType() ==  "box")
       {
         ignition::math::Vector3d size = vis->GetGeometrySize();
 
         if (_collisionShape == "box")
         {
-          geomElem->GetElement("box")
-            ->GetElement("size")->Set(size);
+          geomElem->GetElement("box")->GetElement("size")->Set(size);
         }
         else if (_collisionShape == "sphere")
         {
@@ -1486,6 +1477,7 @@ void LinkData::OnAddCollision(const std::string &_name,
             {
               radius = sqrt(size.Z()*size.Z() + size.Y()*size.Y())/2;
               length = size.X();
+
               // Rotating a vector wrt to a certain rotation quaternion
               pose.Rot() = ignition::math::Quaterniond(ignition::math::Vector3d
                 (pose.Rot().Roll(), pose.Rot().Pitch()+(IGN_PI/2.0),
@@ -1508,18 +1500,13 @@ void LinkData::OnAddCollision(const std::string &_name,
 
           geomElem->ClearElements();
           geomElem->AddElement("cylinder");
-          geomElem->GetElement("cylinder")
-            ->AddElement("radius");
-          geomElem->GetElement("cylinder")
-            ->AddElement("length");
-          geomElem->GetElement("cylinder")
-            ->GetElement("radius")->Set(radius);
-          geomElem->GetElement("cylinder")
-            ->GetElement("length")->Set(length);
+          geomElem->GetElement("cylinder")->AddElement("radius");
+          geomElem->GetElement("cylinder")->AddElement("length");
+          geomElem->GetElement("cylinder")->GetElement("radius")->Set(radius);
+          geomElem->GetElement("cylinder")->GetElement("length")->Set(length);
         }
       }
-
-      // All collision shape types for visual geometry = sphere
+      // For visual geometry = sphere
       else if (vis->GetGeometryType() == "sphere")
       {
         double diameter = vis->GetGeometrySize()[0];
@@ -1527,36 +1514,28 @@ void LinkData::OnAddCollision(const std::string &_name,
         if (_collisionShape == "box")
         {
           ignition::math::Vector3d size(diameter, diameter, diameter);
-          geomElem->GetElement("box")
-             ->GetElement("size")->Set(size);
+          geomElem->GetElement("box")->GetElement("size")->Set(size);
         }
-
         else if (_collisionShape == "sphere")
         {
-          geomElem->GetElement("box")
-            ->GetElement("size")->SetName("radius");
-          geomElem->GetElement("box")
-            ->SetName("sphere");
-          geomElem->GetElement("sphere")
-            ->GetElement("radius")->Set<double>(diameter/2);
+          geomElem->GetElement("box")->GetElement("size")->SetName("radius");
+          geomElem->GetElement("box")->SetName("sphere");
+          geomElem->GetElement("sphere")->GetElement("radius")
+              ->Set<double>(diameter/2.0);
         }
         else if (_collisionShape == "cylinder")
         {
           geomElem->ClearElements();
           geomElem->AddElement("cylinder");
-          geomElem->GetElement("cylinder")
-            ->AddElement("radius");
+          geomElem->GetElement("cylinder")->AddElement("radius");
 
-          geomElem->GetElement("cylinder")
-             ->AddElement("length");
-          geomElem->GetElement("cylinder")
-             ->GetElement("radius")->Set(diameter/2);
-          geomElem->GetElement("cylinder")
-             ->GetElement("length")->Set(diameter);
+          geomElem->GetElement("cylinder")->AddElement("length");
+          geomElem->GetElement("cylinder")->GetElement("radius")
+              ->Set(diameter/2);
+          geomElem->GetElement("cylinder")->GetElement("length")->Set(diameter);
         }
       }
-
-      // All collision shape types for visual geometry = cylinder
+      // For visual geometry = cylinder
       else if (vis->GetGeometryType() == "cylinder")
       {
         double diameter = vis->GetGeometrySize()[0];
@@ -1565,47 +1544,37 @@ void LinkData::OnAddCollision(const std::string &_name,
         if (_collisionShape == "box")
         {
           ignition::math::Vector3d size(diameter, diameter, length);
-          geomElem->GetElement("box")
-             ->GetElement("size")->Set(size);
+          geomElem->GetElement("box")->GetElement("size")->Set(size);
         }
-
         else if (_collisionShape == "sphere")
         {
           double radius = sqrt(length*length + diameter*diameter)/2;
 
-          geomElem->GetElement("box")
-             ->GetElement("size")->SetName("radius");
-          geomElem->GetElement("box")
-             ->SetName("sphere");
-          geomElem->GetElement("sphere")
-             ->GetElement("radius")->Set<double>(radius);
+          geomElem->GetElement("box")->GetElement("size")->SetName("radius");
+          geomElem->GetElement("box")->SetName("sphere");
+          geomElem->GetElement("sphere")->GetElement("radius")
+              ->Set<double>(radius);
         }
-
         else if (_collisionShape == "cylinder")
         {
           geomElem->ClearElements();
           geomElem->AddElement("cylinder");
-          geomElem->GetElement("cylinder")
-             ->AddElement("radius");
-          geomElem->GetElement("cylinder")
-             ->AddElement("length");
-          geomElem->GetElement("cylinder")
-             ->GetElement("radius")->Set(diameter/2);
-          geomElem->GetElement("cylinder")
-             ->GetElement("length")->Set(length);
+          geomElem->GetElement("cylinder")->AddElement("radius");
+          geomElem->GetElement("cylinder")->AddElement("length");
+          geomElem->GetElement("cylinder")->GetElement("radius")
+              ->Set(diameter/2);
+          geomElem->GetElement("cylinder")->GetElement("length")->Set(length);
         }
       }
-
-      // All collision shape types for visual geometry = mesh
+      // For visual geometry = mesh
       else if (vis->GetGeometryType() == "mesh")
       {
         std::string meshName = vis->GetMeshName();
 
-        const common::Mesh *mesh;
-        // check if the mesh exists, if not, create a mesh of that name
+        // check if the mesh exists
         if (common::MeshManager::Instance()->HasMesh(meshName))
         {
-          mesh = common::MeshManager::Instance()->GetMesh(meshName);
+          auto mesh = common::MeshManager::Instance()->GetMesh(meshName);
 
           // find the max and min endpoints of the mesh
           ignition::math::Vector3d max, min, center;
@@ -1615,15 +1584,15 @@ void LinkData::OnAddCollision(const std::string &_name,
           min = mesh->Min();
 
           // scale the vectors according to mesh scaling
-          max*=scale;
-          min*=scale;
+          max *= scale;
+          min *= scale;
 
           // change the positions of max and min
           // with change in position of vis-center
-          max+= vis->Position();
-          min+= vis->Position();
+          max += vis->Position();
+          min += vis->Position();
 
-          center = (max+min)/2;
+          center = (max + min)/2.0;
 
           pose = vis->Pose();
           pose.Pos() = center;
@@ -1633,27 +1602,22 @@ void LinkData::OnAddCollision(const std::string &_name,
             ignition::math::Box boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
 
-            geomElem->GetElement("box")
-              ->GetElement("size")->Set(size);
+            geomElem->GetElement("box")->GetElement("size")->Set(size);
           }
-
           else if (_collisionShape == "sphere")
           {
             double radius=(max.Distance(min))/2;
-            geomElem->GetElement("box")
-               ->GetElement("size")->SetName("radius");
-            geomElem->GetElement("box")
-             ->SetName("sphere");
-            geomElem->GetElement("sphere")
-             ->GetElement("radius")->Set<double>(radius);
+            geomElem->GetElement("box")->GetElement("size")->SetName("radius");
+            geomElem->GetElement("box")->SetName("sphere");
+            geomElem->GetElement("sphere")->GetElement("radius")
+                ->Set<double>(radius);
           }
-
           else if (_collisionShape == "cylinder")
           {
             ignition::math::Box boundingBox(max, min);
             ignition::math::Vector3d size = boundingBox.Size();
-            double radius, length;
 
+            double radius, length;
             // To decide the rotation of the cylinder
             // according to box side lengths
             if (fabs(size.X() - size.Y()) >= fabs(size.Y() - size.Z()))
@@ -1685,18 +1649,22 @@ void LinkData::OnAddCollision(const std::string &_name,
 
             geomElem->ClearElements();
             geomElem->AddElement("cylinder");
-            geomElem->GetElement("cylinder")
-              ->AddElement("radius");
-            geomElem->GetElement("cylinder")
-              ->AddElement("length");
-            geomElem->GetElement("cylinder")
-              ->GetElement("radius")->Set(radius);
-            geomElem->GetElement("cylinder")
-              ->GetElement("length")->Set(length);
+            geomElem->GetElement("cylinder")->AddElement("radius");
+            geomElem->GetElement("cylinder")->AddElement("length");
+            geomElem->GetElement("cylinder")->GetElement("radius")->Set(radius);
+            geomElem->GetElement("cylinder")->GetElement("length")->Set(length);
           }
         }
       }
+
       collisionElem->GetElement("pose")->Set(pose);
+    }
+    else
+    {
+      // TODO(chapulina): This could match the requested shape instead of always
+      // being a box
+      gzwarn << "Model has no visuals, collision will be a unit box."
+             << std::endl;
     }
 
     collisionVis->Load(collisionElem);

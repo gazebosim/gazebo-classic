@@ -42,9 +42,8 @@ CollisionConfig::CollisionConfig()
   scrollArea->setWidget(listWidget);
   scrollArea->setWidgetResizable(true);
 
-
-  this->mapperAdd = new QSignalMapper(this);
   // Add Collision buttons
+  this->mapperAdd = new QSignalMapper(this);
 
   QPushButton *addCollisionButtonBox =
     new QPushButton(tr("+ Bounding &Box"));
@@ -53,7 +52,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonBox->setAutoDefault(false);
   addCollisionButtonBox->
     setToolTip("Add a bounding box collision shape to the link");
-  connect(addCollisionButtonBox, SIGNAL(clicked()),
+  this->connect(addCollisionButtonBox, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
   QPushButton *addCollisionButtonCylinder =
@@ -63,7 +62,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonCylinder->setAutoDefault(false);
   addCollisionButtonCylinder->
     setToolTip("Add a bounding cylinder collision shape to the link");
-  connect(addCollisionButtonCylinder, SIGNAL(clicked()),
+  this->connect(addCollisionButtonCylinder, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
   QPushButton *addCollisionButtonSphere =
@@ -73,7 +72,7 @@ CollisionConfig::CollisionConfig()
   addCollisionButtonSphere->setAutoDefault(false);
   addCollisionButtonSphere->
     setToolTip("Add a bounding sphere collision shape to the link");
-  connect(addCollisionButtonSphere, SIGNAL(clicked()),
+  this->connect(addCollisionButtonSphere, SIGNAL(clicked()),
     this->mapperAdd, SLOT(map()));
 
   this->mapperAdd->setMapping(addCollisionButtonBox,
@@ -82,7 +81,7 @@ CollisionConfig::CollisionConfig()
     QString::fromStdString("sphere"));
   this->mapperAdd->setMapping(addCollisionButtonCylinder,
     QString::fromStdString("cylinder"));
-  connect(this->mapperAdd, SIGNAL(mapped(const QString)),
+  this->connect(this->mapperAdd, SIGNAL(mapped(const QString)),
     this, SLOT(OnAddCollision(const QString)));
 
   QHBoxLayout *buttons = new QHBoxLayout();
