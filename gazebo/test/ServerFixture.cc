@@ -811,7 +811,6 @@ sensors::SonarSensorPtr ServerFixture::SpawnSonar(const std::string &_modelName,
       sensors::get_sensor(_sonarName));
 }
 
-
 /////////////////////////////////////////////////
 void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     const std::string &_raySensorName,
@@ -819,6 +818,25 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     double _hMinAngle, double _hMaxAngle,
     double _minRange, double _maxRange,
     double _rangeResolution, unsigned int _samples,
+    const std::string &_noiseType, double _noiseMean,
+    double _noiseStdDev)
+{
+  this->SpawnGpuRaySensorVertical(_modelName, _raySensorName, _pos,
+      _rpy, _hMinAngle, _hMaxAngle, 0, 0, _minRange, _maxRange,
+      _rangeResolution, _samples, 1, 1, 1, _noiseType, _noiseMean,
+      _noiseStdDev);
+}
+
+/////////////////////////////////////////////////
+void ServerFixture::SpawnGpuRaySensorVertical(const std::string &_modelName,
+    const std::string &_raySensorName,
+    const ignition::math::Vector3d &_pos, const ignition::math::Vector3d &_rpy,
+    double _hMinAngle, double _hMaxAngle,
+    double _vMinAngle, double _vMaxAngle,
+    double _minRange, double _maxRange,
+    double _rangeResolution, unsigned int _samples,
+    unsigned int _vSamples, double _hResolution,
+    double _vResolution,
     const std::string &_noiseType, double _noiseMean,
     double _noiseStdDev)
 {
@@ -845,10 +863,16 @@ void ServerFixture::SpawnGpuRaySensor(const std::string &_modelName,
     << "      <scan>"
     << "        <horizontal>"
     << "          <samples>" << _samples << "</samples>"
-    << "          <resolution> 1 </resolution>"
+    << "          <resolution>" << _hResolution << "</resolution>"
     << "          <min_angle>" << _hMinAngle << "</min_angle>"
     << "          <max_angle>" << _hMaxAngle << "</max_angle>"
     << "        </horizontal>"
+    << "        <vertical>"
+    << "          <samples>" << _vSamples << "</samples>samples>"
+    << "          <resolution>" << _vResolution << "</resolution>"
+    << "          <min_angle>" << _vMinAngle << "</min_angle>"
+    << "          <max_angle>" << _vMaxAngle << "</max_angle>"
+    << "        </vertical>"
     << "      </scan>"
     << "      <range>"
     << "        <min>" << _minRange << "</min>"

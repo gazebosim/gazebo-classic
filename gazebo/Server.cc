@@ -507,6 +507,7 @@ bool Server::LoadImpl(sdf::ElementPtr _elem,
 /////////////////////////////////////////////////
 void Server::SigInt(int)
 {
+  event::Events::stop();
   ServerPrivate::stop = true;
 
   // Signal to plugins/etc that a shutdown event has occured
@@ -516,6 +517,7 @@ void Server::SigInt(int)
 /////////////////////////////////////////////////
 void Server::Stop()
 {
+  event::Events::stop();
   this->dataPtr->stop = true;
 }
 
@@ -539,11 +541,15 @@ void Server::Run()
     std::cerr << "sigemptyset failed while setting up for SIGINT" << std::endl;
   if (sigaction(SIGINT, &sigact, NULL))
     std::cerr << "sigaction(2) failed while setting up for SIGINT" << std::endl;
-  if (sigaction(SIGTERM, &sigact, NULL))
-  {
-    std::cerr << "sigaction(15) failed while setting up for SIGTERM"
-              << std::endl;
-  }
+
+  // The following was added in
+  // https://bitbucket.org/osrf/gazebo/pull-requests/2923, but it is causing
+  // shutdown issues when gazebo is used with ros.
+  // if (sigaction(SIGTERM, &sigact, NULL))
+  // {
+  //   std::cerr << "sigaction(15) failed while setting up for SIGTERM"
+  //             << std::endl;
+  // }
 #endif
 
   if (this->dataPtr->stop)
@@ -613,10 +619,8 @@ void Server::ProcessParams()
       params.path = iter->second;
       params.period = this->dataPtr->vm["record_period"].as<double>();
       params.filter = this->dataPtr->vm["record_filter"].as<std::string>();
-      // TODO Remove call to SetRecordResources function and update to use
-      // params.record_resources instead.
-      util::LogRecord::Instance()->SetRecordResources(
-          this->dataPtr->params.count("record_resources") > 0);
+      params.recordResources =
+          this->dataPtr->params.count("record_resources") > 0;
       util::LogRecord::Instance()->Start(params);
     }
   }
