@@ -1,9 +1,17 @@
 ## Gazebo 9
 
-## Gazebo 9.X.X (201X-XX-XX)
+## Gazebo 9.X.X (20XX-XX-XX)
 
 1. Added support for tracked vehicles
     * [Issue #863](https://bitbucket.org/osrf/gazebo/issues/863)
+
+1. Fix saving heightmap cache
+    * [Pull request 3044](https://bitbucket.org/osrf/gazebo/pull-requests/3044)
+    * [Issue 2572](https://bitbucket.org/osrf/gazebo/issues/2572)
+
+1. Add method to get the link visual elements
+    * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
+    * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
 
 ## Gazebo 9.5.0 (2018-11-19)
 

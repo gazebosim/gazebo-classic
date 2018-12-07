@@ -668,10 +668,19 @@ void Heightmap::Load()
 ///////////////////////////////////////////////////
 void Heightmap::SaveHeightmap()
 {
-  // Calculate blend maps
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
+    // check to see if all terrains have been loaded before saving
+    Ogre::TerrainGroup::TerrainIterator ti =
+      this->dataPtr->terrainGroup->getTerrainIterator();
+    while (ti.hasMoreElements())
+    {
+      Ogre::Terrain *t = ti.getNext()->instance;
+      if (!t->isLoaded())
+        return;
+    }
+
     // saving an ogre terrain data file can take quite some time for large dems.
     gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
         boost::filesystem::path(this->dataPtr->filename).stem()).string()
