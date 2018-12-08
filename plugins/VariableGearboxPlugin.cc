@@ -18,6 +18,8 @@
 #include <boost/bind.hpp>
 #include <functional>
 #include <gazebo/common/Events.hh>
+#include <gazebo/physics/Joint.hh>
+#include <gazebo/physics/Link.hh>
 #include "VariableGearboxPlugin.hh"
 
 namespace gazebo
@@ -26,6 +28,15 @@ class VariableGearboxPluginPrivate
 {
   /// \brief Parent model pointer.
   public: physics::ModelPtr model;
+
+  /// \brief Gearbox joint.
+  public: physics::JointPtr gearbox;
+
+  /// \brief Input joint.
+  public: physics::JointPtr inputJoint;
+
+  /// \brief Output joint.
+  public: physics::JointPtr outputJoint;
 
   /// \brief World update connection.
   public: event::ConnectionPtr updateConnection;
@@ -48,6 +59,72 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
 {
   this->dataPtr->model = _parent;
 
+  const std::string jointName = "gearbox_demo";
+  auto joint = this->dataPtr->model->GetJoint(jointName);
+  if (joint == nullptr || !joint->HasType(physics::Base::GEARBOX_JOINT))
+  {
+    gzerr << "Could not find a joint named " << jointName << std::endl;
+    return;
+  }
+  this->dataPtr->gearbox = joint;
+
+  auto parentLink = joint->GetParent();
+  if (parentLink == nullptr)
+  {
+    gzerr << "Could not find parent link." << std::endl;
+    return;
+  }
+  std::cerr << "Checking " << parentLink->GetScopedName()
+            << " for its joints."
+            << std::endl;
+
+  {
+    auto joints = parentLink->GetParentJoints();
+    if (joints.size() != 1)
+    {
+      gzerr << "link [" << parentLink->GetScopedName()
+            << "] is child of more than 1 joint, not sure which one to pick."
+            << std::endl;
+      return;
+    }
+    this->dataPtr->inputJoint = joints.front();
+  }
+  std::cerr << "Using " << this->dataPtr->inputJoint->GetScopedName()
+            << " as input joint."
+            << std::endl;
+
+  auto childLink = joint->GetChild();
+  if (childLink == nullptr)
+  {
+    gzerr << "Could not find child link." << std::endl;
+    return;
+  }
+  std::cerr << "Checking " << childLink->GetScopedName()
+            << " for its joints."
+            << std::endl;
+
+  {
+    auto joints = childLink->GetParentJoints();
+    if (joints.size() < 1 || joints.size() > 2)
+    {
+      gzerr << "link [" << childLink->GetScopedName()
+            << "] is child of not 1 or 2 joints, not sure which one to pick."
+            << std::endl;
+      return;
+    }
+    for (auto j : joints)
+    {
+      gzerr << " joint " << j->GetScopedName()
+            << ", gearbox?"
+            << j->HasType(physics::Base::GEARBOX_JOINT)
+            << std::endl;
+    }
+    this->dataPtr->outputJoint = joints.front();
+  }
+  std::cerr << "Using " << this->dataPtr->outputJoint->GetScopedName()
+            << " as output joint."
+            << std::endl;
+
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VariableGearboxPlugin::OnUpdate, this, _1));
 }
@@ -55,6 +132,46 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void VariableGearboxPlugin::OnUpdate(const common::UpdateInfo & /*_info*/)
 {
+  const double x0 = 1.3;
+  const double y0 = -1.3;
+  const double m1 = -1;
+  const double m2 = -5;
+  const double dx = 0.4;
+  double ratio;
+  double refInput;
+  double refOutput;
+  double inputAngle = this->dataPtr->inputJoint->GetAngle(0).Radian();
+  double outputAngle = this->dataPtr->outputJoint->GetAngle(0).Radian();
+  if (inputAngle < x0)
+  {
+    ratio = m1;
+    refInput = x0;
+    refOutput = y0;
+  }
+  else if (inputAngle < x0+dx)
+  {
+    ratio = m1 + (m2-m1)*(inputAngle - x0)/dx;
+    refInput = inputAngle;
+    refOutput = y0 + m1*(inputAngle - x0)
+              + 0.5*(m2-m1)/dx * std::pow(inputAngle - x0, 2);
+  }
+  else
+  {
+    ratio = m2;
+    refInput = x0+dx;
+    refOutput = y0 + 0.5*(m1 + m2)*dx;
+  }
+  ratio = -ratio;
+
+  this->dataPtr->gearbox->SetParam("reference_angle1", 0, refOutput);
+  this->dataPtr->gearbox->SetParam("reference_angle2", 0, refInput);
+  this->dataPtr->gearbox->SetParam("ratio", 0, ratio);
+  std::cerr << "input " << inputAngle
+            << " , " << refInput << " ref"
+            << " : " << ratio
+            << " : ref " << refOutput
+            << " , " << outputAngle << " output"
+            << std::endl;
 }
 
 GZ_REGISTER_MODEL_PLUGIN(VariableGearboxPlugin)
