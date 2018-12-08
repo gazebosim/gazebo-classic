@@ -2,7 +2,7 @@ if (WIN32)
   add_definitions(-DBUILDING_DLL -DBUILDING_DLL_GZ_PLUGIN)
 endif()
 
-include_directories(
+include_directories(SYSTEM
   ${CURL_INCLUDEDIR}
   ${PROJECT_SOURCE_DIR}
   ${PROTOBUF_INCLUDE_DIR}
@@ -71,6 +71,7 @@ set (plugins_single_header
   ImuSensorPlugin
   InitialVelocityPlugin
   JointTrajectoryPlugin
+  KeysToCmdVelPlugin
   KeysToJointsPlugin
   LedPlugin
   LensFlareSensorPlugin
@@ -155,6 +156,7 @@ foreach (src ${GUIplugins})
                         gazebo_gui
                         ${ogre_libraries}
                         ${Qt5Core_LIBRARIES}
+                        ${Qt5Test_LIBRARIES}
                         ${Qt5Widgets_LIBRARIES}
                         ${IGNITION-TRANSPORT_LIBRARIES}
 )
