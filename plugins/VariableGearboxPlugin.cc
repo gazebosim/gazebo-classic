@@ -132,46 +132,47 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void VariableGearboxPlugin::OnUpdate(const common::UpdateInfo & /*_info*/)
 {
-  const double x0 = 1.3;
-  const double y0 = -1.3;
-  const double m1 = -1;
-  const double m2 = -5;
-  const double dx = 0.4;
+  const double input0 = 1.2;
+  const double output0 = -1.2;
+  const double ratio1 = -1;
+  const double ratio2 = -20;
+  const double dinput = 0.6;
+  const double dratio = ratio2 - ratio1;
   double ratio;
   double refInput;
   double refOutput;
   double inputAngle = this->dataPtr->inputJoint->GetAngle(0).Radian();
-  double outputAngle = this->dataPtr->outputJoint->GetAngle(0).Radian();
-  if (inputAngle < x0)
+  // double outputAngle = this->dataPtr->outputJoint->GetAngle(0).Radian();
+  if (inputAngle < input0)
   {
-    ratio = m1;
-    refInput = x0;
-    refOutput = y0;
+    ratio = ratio1;
+    refInput = input0;
+    refOutput = output0;
   }
-  else if (inputAngle < x0+dx)
+  else if (inputAngle < input0+dinput)
   {
-    ratio = m1 + (m2-m1)*(inputAngle - x0)/dx;
+    ratio = ratio1 + dratio * (inputAngle - input0) / dinput;
     refInput = inputAngle;
-    refOutput = y0 + m1*(inputAngle - x0)
-              + 0.5*(m2-m1)/dx * std::pow(inputAngle - x0, 2);
+    refOutput = output0 + ratio1 * (inputAngle - input0)
+              + 0.5*dratio / dinput * std::pow(inputAngle - input0, 2);
   }
   else
   {
-    ratio = m2;
-    refInput = x0+dx;
-    refOutput = y0 + 0.5*(m1 + m2)*dx;
+    ratio = ratio2;
+    refInput = input0 + dinput;
+    refOutput = output0 + 0.5 * (ratio1 + ratio2) * dinput;
   }
   ratio = -ratio;
 
   this->dataPtr->gearbox->SetParam("reference_angle1", 0, refOutput);
   this->dataPtr->gearbox->SetParam("reference_angle2", 0, refInput);
   this->dataPtr->gearbox->SetParam("ratio", 0, ratio);
-  std::cerr << "input " << inputAngle
-            << " , " << refInput << " ref"
-            << " : " << ratio
-            << " : ref " << refOutput
-            << " , " << outputAngle << " output"
-            << std::endl;
+  // std::cerr << "input " << inputAngle
+  //           << " , " << refInput << " ref"
+  //           << " : " << ratio
+  //           << " : ref " << refOutput
+  //           << " , " << outputAngle << " output"
+  //           << std::endl;
 }
 
 GZ_REGISTER_MODEL_PLUGIN(VariableGearboxPlugin)
