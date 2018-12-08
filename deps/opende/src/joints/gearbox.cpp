@@ -78,6 +78,8 @@ dxJointGearbox::getInfo2( dxJoint::Info2* info )
 
     double err = dShortestAngularDistance(
       -ratio * (cumulative_angle2 - refAngle2), cumulative_angle1 - refAngle1);
+    // printf("  a1(%f) , %f : %f : %f , a2(%f), e(%f)\n",
+    //   cumulative_angle2, refAngle2, ratio, refAngle1, cumulative_angle1, err);
 
     // FIXME: error calculation is not amenable to reset of poses,
     // cumulative angles might snap to wrong angular value.
