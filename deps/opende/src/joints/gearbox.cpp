@@ -196,7 +196,7 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
         dQMultiply1( joint->qrel2, joint->node[1].body->q, joint->refBody2->q );
       else
       {
-        // set qrel1 to the transpose of the first body q
+        // set qrel2 to the transpose of the second body q
         joint->qrel2[0] =  joint->node[1].body->q[0];
         joint->qrel2[1] = -joint->node[1].body->q[1];
         joint->qrel2[2] = -joint->node[1].body->q[2];
