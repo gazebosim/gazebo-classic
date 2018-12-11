@@ -207,7 +207,7 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
     {
       if ( b )
       {
-        // set qrel2 to the transpose of the second body q
+        // set qrel2 to the q of the reference body
         joint->qrel2[0] = joint->refBody2->q[0];
         joint->qrel2[1] = joint->refBody2->q[1];
         joint->qrel2[2] = joint->refBody2->q[2];
