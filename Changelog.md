@@ -10,6 +10,13 @@
     * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
     * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
 
+1. Add Plugin::LoadParam to improve plugin interface
+    * [Pull request 3047](https://bitbucket.org/osrf/gazebo/pull-requests/3047)
+
+1. Fix gzclient on mojave with Qt 5.12
+    * [Pull request 3051](https://bitbucket.org/osrf/gazebo/pull-requests/3051)
+    * [Issue 2531](https://bitbucket.org/osrf/gazebo/issues/2531)
+
 1. Switch Time::Sleep from CLOCK\_REALTIME to CLOCK\_MONOTONIC on Linux
     * [Pull request 3037](https://bitbucket.org/osrf/gazebo/pull-requests/3037)
 
