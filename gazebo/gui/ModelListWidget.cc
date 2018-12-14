@@ -290,7 +290,7 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
 
       if (light)
       {
-      	light->FillMsg(this->dataPtr->lightMsg);
+        light->FillMsg(this->dataPtr->lightMsg);
       }
       else
       {
