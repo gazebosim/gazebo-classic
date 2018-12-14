@@ -42,6 +42,7 @@ set(tests
   2297_log_insertions_paused.cc
   2428_log_insertions.cc
   2430_revolute_joint_SetPosition.cc
+  2505_revolute_joint_SetAxis.cc
 )
 gz_build_tests(${tests} EXTRA_LIBS gazebo_test_fixture)
 
