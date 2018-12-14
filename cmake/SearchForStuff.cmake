@@ -604,7 +604,7 @@ find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread system filesystem progra
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
+  BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
 ########################################
