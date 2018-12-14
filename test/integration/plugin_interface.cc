@@ -35,7 +35,7 @@ TEST_F(PluginInterface, LoadParams)
   physics::WorldPtr world = physics::get_world();
   ASSERT_NE(world, nullptr);
 
-  ASSERT_NE(world->ModelCount(), 0u);
+  ASSERT_GT(world->ModelCount(), 0u);
   physics::ModelPtr model = world->Models()[0];
   ASSERT_NE(model, nullptr);
 
