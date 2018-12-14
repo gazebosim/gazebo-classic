@@ -600,11 +600,11 @@ find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread system filesystem program_options regex iostreams date_time)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
+  BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex iostreams date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
 ########################################

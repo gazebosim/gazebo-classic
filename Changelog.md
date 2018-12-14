@@ -2,9 +2,17 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Don't search for boost signals component
+    * [Pull request 3050](https://bitbucket.org/osrf/gazebo/pull-requests/3050)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
 1. Fix saving heightmap cache
     * [Pull request 3044](https://bitbucket.org/osrf/gazebo/pull-requests/3044)
     * [Issue 2572](https://bitbucket.org/osrf/gazebo/issues/2572)
+
+1. Fix GUI plugins on Bionic + gz9
+    * [Pull request 3041](https://bitbucket.org/osrf/gazebo/pull-requests/3041)
+    * [Issue 2541](https://bitbucket.org/osrf/gazebo/issues/2541)
 
 1. Add method to get the link visual elements
     * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
@@ -19,6 +27,9 @@
 
 1. Switch Time::Sleep from CLOCK\_REALTIME to CLOCK\_MONOTONIC on Linux
     * [Pull request 3037](https://bitbucket.org/osrf/gazebo/pull-requests/3037)
+
+1. Change sleep time larger than resolution message from gzerr to gzlog
+    * [Pull request 3036](https://bitbucket.org/osrf/gazebo/pull-requests/3036)
 
 1. Fix DARTHingeJoint::SetAxis implementation (issue 2505)
     * [Pull request 3005](https://bitbucket.org/osrf/gazebo/pull-requests/3005)
