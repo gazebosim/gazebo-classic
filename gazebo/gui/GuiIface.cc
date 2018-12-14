@@ -339,6 +339,21 @@ bool gui::load()
   qInstallMsgHandler(messageHandler);
 #endif
 
+#ifdef __APPLE__
+  // gazbeo issue #2531
+  // seems to be related to QTBUG-71044
+  // Setting the QT_MAC_WANTS_LAYER environment variable fixes the problem
+  // on Mojave + Qt 5.12
+  QVersionNumber v = QVersionNumber::fromString(QSysInfo::productVersion());
+  QVersionNumber mojave(10, 14);
+  if (QVersionNumber::compare(v, mojave) >= 0)
+  {
+    QByteArray result = qgetenv("QT_MAC_WANTS_LAYER");
+    if (result.isEmpty())
+      qputenv("QT_MAC_WANTS_LAYER", QByteArray("1"));
+  }
+#endif
+
   g_app = new QApplication(g_argc, g_argv);
   set_style();
 

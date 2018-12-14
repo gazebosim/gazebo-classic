@@ -130,7 +130,7 @@ namespace gazebo
       private: TopToolbar *topToolbar;
 
       /// \brief An overlay label on the 3D render widget
-      private: QLabel *msgOverlayLabel;
+      private: QLabel *msgOverlayLabel = nullptr;
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;
