@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,12 +48,13 @@ namespace gazebo
   ///
   /// <cmd_vel_topic>  The topic to which velocity commands are be published.
   ///                  Default is "~/cmd_vel".
-  /// <max_linear_vel>  Maximum linear velocity commanded to the vehicle.
-  ///                   Default is 1.0.
-  /// <min_linear_vel>  Minimum linear velocity commanded to the vehicle.
-  ///                   Default is -max_linear_vel.
-  /// <max_angular_vel>  Maximum angular velocity commanded to the vehicle.
-  ///                    Default is 1.0.
+  /// <max_linear_vel>  Maximum linear velocity commanded to the vehicle (m/s).
+  ///                   Default is 1.0 (m/s).
+  /// <min_linear_vel>  Minimum linear velocity commanded to the vehicle (m/s).
+  ///                   Default is -max_linear_vel (m/s).
+  /// <max_angular_vel>  Maximum angular velocity commanded to the 
+  ///                    vehicle (rad/s).
+  ///                    Default is 1.0 (rad/s).
   /// <key_controls>  If this tag is empty or missing, the default assignment
   ///                 (arrow keys) is used; otherwise, the keys can be set using
   ///                 the (repeatable) subelements <stop>, <accelerate>,
