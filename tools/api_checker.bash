@@ -77,7 +77,6 @@ sudo apt-get install cmake \
      pkg-config \
      libqt4-dev \
      libboost-thread-dev \
-     libboost-signals-dev \
      libboost-system-dev \
      libboost-filesystem-dev \
      libboost-program-options-dev \
