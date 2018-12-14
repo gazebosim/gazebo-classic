@@ -26,6 +26,7 @@ set (plugins
   ForceTorqueModelRemovalTestPlugin
   Issue1208Plugin
   ModelTrajectoryTestPlugin
+  PluginInterfaceTest
   SpringTestPlugin
 )
 
@@ -34,3 +35,5 @@ foreach (src ${plugins})
   target_link_libraries(${src} libgazebo ${ogre_libraries})
   add_dependencies(tests ${src})
 endforeach (src ${plugins})
+
+target_link_libraries(PluginInterfaceTest gtest gtest_main)
