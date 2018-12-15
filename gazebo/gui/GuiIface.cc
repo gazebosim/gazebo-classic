@@ -342,7 +342,7 @@ bool gui::load()
 #endif
 
 #ifdef __APPLE__
-  // gazbeo issue #2531
+  // gazebo issue #2531
   // seems to be related to QTBUG-71044
   // Setting the QT_MAC_WANTS_LAYER environment variable fixes the problem
   // on Mojave + Qt 5.12
