@@ -143,6 +143,10 @@ namespace gazebo
       /// \return The name of the visual.
       public: std::string Name() const;
 
+      /// \brief Get the initialization status of the visual.
+      /// \return True if visual is initialized.
+      public: bool Initialized() const;
+
       /// \brief Attach a visual to this visual.
       /// \param[in] _vis Visual to attach.
       public: void AttachVisual(VisualPtr _vis);

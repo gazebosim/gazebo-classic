@@ -158,7 +158,9 @@ void Visual::Init(const std::string &_name, VisualPtr _parent,
 
   if (!pnode)
   {
-    gzerr << "Unable to get parent scene node\n";
+    gzerr << "Unable to get parent scene node for "
+          << _name
+          << std::endl;
     return;
   }
 
@@ -580,6 +582,12 @@ void Visual::SetName(const std::string &_name)
 std::string Visual::Name() const
 {
   return this->dataPtr->name;
+}
+
+//////////////////////////////////////////////////
+bool Visual::Initialized() const
+{
+  return this->dataPtr->initialized;
 }
 
 //////////////////////////////////////////////////
