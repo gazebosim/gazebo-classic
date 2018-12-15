@@ -657,18 +657,28 @@ NestedModelData *ModelCreator::CreateModelFromSDF(
     // Model Visual
     modelVisual.reset(
         new rendering::Visual(nestedModelName, _parentVis, false));
-    modelVisual->Load();
-    modelVisual->SetTransparency(ModelData::GetEditTransparency());
+    if (modelVisual->Initialized())
+    {
+      modelVisual->Load();
+      modelVisual->SetTransparency(ModelData::GetEditTransparency());
 
-    if (_modelElem->HasElement("pose"))
-      modelVisual->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
+      if (_modelElem->HasElement("pose"))
+        modelVisual->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
+
+      modelData->modelVisual = modelVisual;
+    }
+    else
+    {
+      gzerr << "Failed to initialize model visual ["
+            << modelVisual->Name()
+            << "]" << std::endl;
+    }
 
     // Only keep SDF and preview visual
     std::string leafName = nestedModelName;
     leafName = leafName.substr(leafName.rfind("::")+2);
 
     modelData->modelSDF = _modelElem;
-    modelData->modelVisual = modelVisual;
     modelData->SetName(leafName);
     modelData->SetPose(_modelElem->Get<ignition::math::Pose3d>("pose"));
   }
