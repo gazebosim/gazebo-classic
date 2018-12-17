@@ -15,6 +15,7 @@
  *
 */
 #include <sstream>
+#include <gazebo/rendering/RenderingIface.hh>
 #include <gazebo/rendering/Scene.hh>
 #include <gazebo/rendering/Visual.hh>
 #include "MovableTextDemo.hh"

@@ -125,7 +125,7 @@ namespace gazebo
       /// \param[in] _length Length of the animation in seconds
       /// \param[in] _loop True == loop the animation
       public: PoseAnimation(const std::string &_name,
-                            double _length, bool _loop, double _tension=0.0);
+                            double _length, bool _loop, double _tension = 0.0);
 
       /// \brief Destructor
       public: virtual ~PoseAnimation();
