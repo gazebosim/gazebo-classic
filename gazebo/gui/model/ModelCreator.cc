@@ -1551,7 +1551,19 @@ void ModelCreator::RemoveNestedModelImpl(const std::string &_nestedModelName)
     }
   }
 
-  rendering::ScenePtr scene = modelData->modelVisual->GetScene();
+  rendering::ScenePtr scene;
+  gzerr << "modelData " << modelData << std::endl;
+  if (modelData)
+  {
+    gzerr << "modelData->modelVisual " << modelData->modelVisual << std::endl;
+    if (modelData->modelVisual)
+    {
+      if (modelData->modelVisual->GetScene())
+      {
+        scene = modelData->modelVisual->GetScene();
+      }
+    }
+  }
   if (scene)
   {
     scene->RemoveVisual(modelData->modelVisual);
