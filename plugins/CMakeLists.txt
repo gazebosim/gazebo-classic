@@ -70,6 +70,7 @@ set (plugins_single_header
   HeightmapLODPlugin
   ImuSensorPlugin
   InitialVelocityPlugin
+  JointControlPlugin
   JointTrajectoryPlugin
   KeysToJointsPlugin
   LedPlugin
