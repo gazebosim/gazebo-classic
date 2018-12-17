@@ -1362,8 +1362,13 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   rendering::VisualPtr linkVisual(
       new rendering::Visual(linkName, _parentVis, false));
-  linkVisual->Load();
-  linkVisual->SetPose(link->Pose());
+  if (linkVisual->Initialized())
+  {
+    linkVisual->Load();
+    linkVisual->SetPose(link->Pose());
+    linkVisual->SetTransparency(ModelData::GetEditTransparency());
+  }
+
   link->SetLinkVisual(linkVisual);
   link->inspector->SetLinkId(linkVisual->Name());
 
@@ -1373,8 +1378,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
 
   if (_linkElem->HasElement("visual"))
     visualElem = _linkElem->GetElement("visual");
-
-  linkVisual->SetTransparency(ModelData::GetEditTransparency());
 
   while (visualElem)
   {
@@ -1395,7 +1398,6 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     }
     rendering::VisualPtr visVisual(new rendering::Visual(visualName,
         linkVisual, false));
-    visVisual->Load(visualElem);
 
     // Visual pose
     ignition::math::Pose3d visualPose;
@@ -1403,15 +1405,20 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
       visualPose = visualElem->Get<ignition::math::Pose3d>("pose");
     else
       visualPose.Set(0, 0, 0, 0, 0, 0);
-    visVisual->SetPose(visualPose);
 
-    // Add to link
-    link->AddVisual(visVisual);
+    if (visVisual->Initialized())
+    {
+      visVisual->Load(visualElem);
+      visVisual->SetPose(visualPose);
 
-    // override transparency
-    visVisual->SetTransparency(visVisual->GetTransparency() *
-        (1-ModelData::GetEditTransparency()-0.1)
-        + ModelData::GetEditTransparency());
+      // Add to link
+      link->AddVisual(visVisual);
+
+      // override transparency
+      visVisual->SetTransparency(visVisual->GetTransparency() *
+          (1-ModelData::GetEditTransparency()-0.1)
+          + ModelData::GetEditTransparency());
+    }
 
     visualElem = visualElem->GetNextElement("visual");
   }
@@ -1458,11 +1465,14 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     geomElem->ClearElements();
     geomElem->Copy(collisionElem->GetElement("geometry"));
 
-    colVisual->Load(colVisualElem);
-    colVisual->SetPose(collisionPose);
-    colVisual->SetMaterial("Gazebo/Orange");
-    colVisual->SetTransparency(ignition::math::clamp(
-        ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+    if (colVisual->Initialized())
+    {
+      colVisual->Load(colVisualElem);
+      colVisual->SetPose(collisionPose);
+      colVisual->SetMaterial("Gazebo/Orange");
+      colVisual->SetTransparency(ignition::math::clamp(
+          ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+    }
     ModelData::UpdateRenderGroup(colVisual);
 
     // Add to link
