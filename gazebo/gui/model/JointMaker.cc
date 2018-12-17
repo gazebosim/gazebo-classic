@@ -1145,7 +1145,8 @@ void JointData::Update()
   std::string material = JointMaker::jointMaterials[this->type];
 
   // Hotspot and parent handle
-  if (this->parent && this->child && this->hotspot && this->handles)
+  if (this->parent && this->child && this->hotspot && this->handles &&
+      this->hotspot->Initialized())
   {
     auto parentOrigin = this->parent->WorldPose().Pos();
     auto childOrigin = this->child->WorldPose().Pos();
@@ -1239,7 +1240,8 @@ void JointData::Update()
   }
 
   // Notify joint changes
-  if (this->parent && this->child && this->hotspot)
+  if (this->parent && this->child && this->hotspot &&
+      this->hotspot->Initialized())
   {
     std::string parentName = this->parent->Name();
     std::string childName = this->child->Name();
