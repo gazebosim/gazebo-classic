@@ -1472,8 +1472,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
       colVisual->SetMaterial("Gazebo/Orange");
       colVisual->SetTransparency(ignition::math::clamp(
           ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
+      ModelData::UpdateRenderGroup(colVisual);
     }
-    ModelData::UpdateRenderGroup(colVisual);
 
     // Add to link
     msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
@@ -1482,7 +1482,12 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     collisionElem = collisionElem->GetNextElement("collision");
   }
 
-  linkVisual->SetVisibilityFlags(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE);
+  if (linkVisual->Initialized())
+  {
+    linkVisual->SetVisibilityFlags(
+        GZ_VISIBILITY_GUI |
+        GZ_VISIBILITY_SELECTABLE);
+  }
 
   // emit linkInserted events for all links, including links in nested models
   gui::model::Events::linkInserted(linkName);
