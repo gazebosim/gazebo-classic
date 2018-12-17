@@ -913,6 +913,10 @@ ignition::math::Vector3d Visual::DerivedScale() const
 {
   ignition::math::Vector3d derivedScale = this->dataPtr->scale;
 
+  if (!this->dataPtr->scene)
+  {
+    return derivedScale;
+  }
   VisualPtr worldVis = this->dataPtr->scene->WorldVisual();
   VisualPtr vis = this->GetParent();
 
