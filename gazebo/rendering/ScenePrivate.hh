@@ -290,6 +290,9 @@ namespace gazebo
       /// \brief The heightmap level of detail
       public: unsigned int heightmapLOD = 0u;
 
+      /// \brief The heightmap skirt length
+      public: double heightmapSkirtLength = 1.0;
+
       /// \brief All the projectors.
       public: std::map<std::string, Projector *> projectors;
 

@@ -38,6 +38,7 @@ endif()
 
 set (plugins_single_header
   ActuatorPlugin
+  AmbientOcclusionVisualPlugin
   ArrangePlugin
   AttachLightPlugin
   BlinkVisualPlugin
@@ -76,12 +77,15 @@ set (plugins_single_header
   SonarPlugin
   SphereAtlasDemoPlugin
   TouchPlugin
-  VehiclePlugin)
+  VehiclePlugin
+  WheelSlipPlugin
+)
 
 set (plugins_private_header
   ElevatorPlugin
   RandomVelocityPlugin
-  TransporterPlugin)
+  TransporterPlugin
+)
 
 if (HAVE_USB AND UNIX AND NOT APPLE)
   set (plugins ${plugins}

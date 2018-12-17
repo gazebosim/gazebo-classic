@@ -1232,67 +1232,87 @@ bool Scene::FirstContact(CameraPtr _camera,
                          const ignition::math::Vector2i &_mousePos,
                          ignition::math::Vector3d &_position)
 {
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-
   _position = ignition::math::Vector3d::Zero;
 
+  double distance = -1.0;
+
+  Ogre::Camera *ogreCam = _camera->OgreCamera();
   Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
       static_cast<float>(_mousePos.X()) /
       ogreCam->getViewport()->getActualWidth(),
       static_cast<float>(_mousePos.Y()) /
       ogreCam->getViewport()->getActualHeight());
 
-  this->dataPtr->raySceneQuery->setSortByDistance(true);
-  this->dataPtr->raySceneQuery->setRay(mouseRay);
-
-  // Perform the scene query
-  Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
-  Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
-  double distance = -1.0;
-
-  // Iterate over all the results.
-  for (; iter != result.end() && distance <= 0.0; ++iter)
+  UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
+  if (userCam)
   {
-    // Skip results where the distance is zero or less
-    if (iter->distance <= 0.0)
-      continue;
-
-    unsigned int flags = iter->movable->getVisibilityFlags();
-
-    // Only accept a hit if there is an entity and not a gui visual
-    // and not a selection-only object (e.g. light selection ent)
-    const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
-        || (flags & GZ_VISIBILITY_SELECTABLE);
-    if (iter->movable && iter->movable->getVisible() &&
-        iter->movable->getMovableType().compare("Entity") == 0 &&
-        !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
+    VisualPtr vis = userCam->GetVisual(_mousePos);
+    if (vis)
     {
-      Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
+      RayQuery rayQuery(_camera);
+      math::Vector3 intersect;
+      std::vector<math::Vector3> vertices;
+      rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+          intersect, vertices);
+      distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+          intersect.Ign());
+    }
+  }
+  else
+  {
+    this->dataPtr->raySceneQuery->setSortByDistance(true);
+    this->dataPtr->raySceneQuery->setRay(mouseRay);
 
-      VisualPtr vis;
-      if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+    // Perform the scene query
+    Ogre::RaySceneQueryResult &result = this->dataPtr->raySceneQuery->execute();
+    Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+
+    // Iterate over all the results.
+    for (; iter != result.end() && distance <= 0.0; ++iter)
+    {
+      // Skip results where the distance is zero or less
+      if (iter->distance <= 0.0)
+        continue;
+
+      unsigned int flags = iter->movable->getVisibilityFlags();
+
+      // Only accept a hit if there is an entity and not a gui visual
+      // and not a selection-only object (e.g. light selection ent)
+      const bool guiOrSelectable = (flags & GZ_VISIBILITY_GUI)
+          || (flags & GZ_VISIBILITY_SELECTABLE);
+      if (iter->movable && iter->movable->getVisible() &&
+          iter->movable->getMovableType().compare("Entity") == 0 &&
+          !(flags != GZ_VISIBILITY_ALL && guiOrSelectable))
       {
-        try
-        {
-          vis = this->GetVisual(Ogre::any_cast<std::string>(
-              ogreEntity->getUserObjectBindings().getUserAny()));
-        }
-        catch(Ogre::Exception &e)
-        {
-          gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
-          continue;
-        }
-        if (!vis)
-          continue;
+        Ogre::Entity *ogreEntity = static_cast<Ogre::Entity*>(iter->movable);
 
-        RayQuery rayQuery(_camera);
-        math::Vector3 intersect;
-        std::vector<math::Vector3> vertices;
-        rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
-            intersect, vertices);
-        distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
-            intersect.Ign());
+        VisualPtr vis;
+        if (!ogreEntity->getUserObjectBindings().getUserAny().isEmpty())
+        {
+          try
+          {
+            vis = this->GetVisual(Ogre::any_cast<std::string>(
+                ogreEntity->getUserObjectBindings().getUserAny()));
+          }
+          catch(Ogre::Exception &e)
+          {
+            gzerr << "Ogre Error:" << e.getFullDescription() << "\n";
+            continue;
+          }
+          if (!vis)
+            continue;
+
+          RayQuery rayQuery(_camera);
+          math::Vector3 intersect;
+          std::vector<math::Vector3> vertices;
+          if (rayQuery.SelectMeshTriangle(_mousePos.X(), _mousePos.Y(), vis,
+              intersect, vertices))
+          {
+            distance = Conversions::ConvertIgn(mouseRay.getOrigin()).Distance(
+                intersect.Ign());
+          }
+        }
       }
     }
   }
@@ -2795,6 +2815,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        const double skirtLen = this->dataPtr->heightmapSkirtLength;
+        this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }
@@ -2833,16 +2855,18 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   {
     // Make sure the parent visual exists before trying to add a child
     // visual
-    iter = this->dataPtr->visuals.find(_msg->parent_id());
-    if (iter == this->dataPtr->visuals.end())
-    {
+    VisualPtr parent = this->GetVisual(_msg->parent_name());
+    if (!parent)
       return false;
-    }
 
-    visual.reset(new Visual(_msg->name(), iter->second));
+    visual.reset(new Visual(_msg->name(), parent));
   }
   else
   {
+    // Make sure the world visual exists before trying to add a child visual
+    if (!this->dataPtr->worldVisual)
+      return false;
+
     // Add a visual that is attached to the scene root
     visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
   }
@@ -3418,6 +3442,23 @@ unsigned int Scene::HeightmapLOD() const
     return this->dataPtr->terrain->LOD();
 
   return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapSkirtLength(const double _value)
+{
+  this->dataPtr->heightmapSkirtLength = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapSkirtLength() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->SkirtLength();
+
+  return this->dataPtr->heightmapSkirtLength;
 }
 
 /////////////////////////////////////////////////
