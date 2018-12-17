@@ -5,6 +5,9 @@
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
+1. Add MisalignmentPlugin which reports alignment between two poses
+    * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
+
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
 
@@ -69,9 +72,6 @@
 
 1. Fix camera view control inside bounding box of large meshes
     * [Pull request 2932](https://bitbucket.org/osrf/gazebo/pull-request/2932)
-
-1. Add MisalignmentPlugin which reports alignment between two poses
-    * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
 
 1. Fix compilation with boost 1.67
     * [Pull request 2937](https://bitbucket.org/osrf/gazebo/pull-request/2937)
