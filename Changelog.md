@@ -33,6 +33,14 @@
     * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
     * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
 
+1. static_map_plugin.cc: remove backup folder
+    * [Pull request #3023](https://bitbucket.org/osrf/gazebo/pull-requests/3023)
+
+1. Fix regression test build -> gazebo9
+    * [Pull request #3046](https://bitbucket.org/osrf/gazebo/pull-requests/3046)
+
+1. Improve plugin interface
+    * [Pull request #3047](https://bitbucket.org/osrf/gazebo/pull-requests/3047)
 
 ## Gazebo 9.5.0 (2018-11-19)
 
