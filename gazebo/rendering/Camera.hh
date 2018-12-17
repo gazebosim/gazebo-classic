@@ -795,6 +795,9 @@ namespace gazebo
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
 
+      /// \brief Scene node that the camera is attached to.
+      protected: Ogre::SceneNode *cameraNode = nullptr;
+
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;
 
