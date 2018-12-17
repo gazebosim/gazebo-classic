@@ -1465,6 +1465,8 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
     geomElem->ClearElements();
     geomElem->Copy(collisionElem->GetElement("geometry"));
 
+    msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
+
     if (colVisual->Initialized())
     {
       colVisual->Load(colVisualElem);
@@ -1473,11 +1475,10 @@ LinkData *ModelCreator::CreateLinkFromSDF(const sdf::ElementPtr &_linkElem,
       colVisual->SetTransparency(ignition::math::clamp(
           ModelData::GetEditTransparency() * 2.0, 0.0, 0.8));
       ModelData::UpdateRenderGroup(colVisual);
-    }
 
-    // Add to link
-    msgs::Collision colMsg = msgs::CollisionFromSDF(collisionElem);
-    link->AddCollision(colVisual, &colMsg);
+      // Add to link
+      link->AddCollision(colVisual, &colMsg);
+    }
 
     collisionElem = collisionElem->GetNextElement("collision");
   }
