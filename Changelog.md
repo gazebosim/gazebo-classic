@@ -35,6 +35,11 @@
     * [Pull request 3005](https://bitbucket.org/osrf/gazebo/pull-requests/3005)
     * [Issue 2505](https://bitbucket.org/osrf/gazebo/issues/2505)
 
+1. Plugin to initialize joint controller parameters
+    * [Pull request #3031](https://bitbucket.org/osrf/gazebo/pull-requests/3031)
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
+
 
 ## Gazebo 9.5.0 (2018-11-19)
 
