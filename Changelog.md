@@ -9,6 +9,9 @@
 1. Add methods to set dynamically Gaussian noise parameters
     * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
 
+1. Use tension trajectory parameter on actor script animation
+    * [Pull request #3019](https://bitbucket.org/osrf/gazebo/pull-request/3019)
+
 1. Add command to send a request with gz topic
     * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
 
@@ -45,6 +48,24 @@
     * [Pull request #3004](https://bitbucket.org/osrf/gazebo/pull-requests/3004)
 
 ## Gazebo 9
+
+## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Fix saving heightmap cache
+    * [Pull request 3044](https://bitbucket.org/osrf/gazebo/pull-requests/3044)
+    * [Issue 2572](https://bitbucket.org/osrf/gazebo/issues/2572)
+
+1. Add method to get the link visual elements
+    * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
+    * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
+
+1. Switch Time::Sleep from CLOCK\_REALTIME to CLOCK\_MONOTONIC on Linux
+    * [Pull request 3037](https://bitbucket.org/osrf/gazebo/pull-requests/3037)
+
+1. Fix DARTHingeJoint::SetAxis implementation (issue 2505)
+    * [Pull request 3005](https://bitbucket.org/osrf/gazebo/pull-requests/3005)
+    * [Issue 2505](https://bitbucket.org/osrf/gazebo/issues/2505)
+
 
 ## Gazebo 9.5.0 (2018-11-19)
 

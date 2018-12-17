@@ -21,6 +21,8 @@
   #include <Winsock2.h>
 #endif
 
+#include <gazebo/gui/GuiIface.hh>
+#include <gazebo/gui/MainWindow.hh>
 #include <gazebo/transport/Node.hh>
 #include "KeyboardGUIPlugin.hh"
 

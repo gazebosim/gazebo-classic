@@ -19,6 +19,7 @@
 #define _QTESTFIXTURE_HH_
 
 #include <string>
+#include <QtTest/QtTest>
 
 #ifndef Q_MOC_RUN  // See: https://bugreports.qt-project.org/browse/QTBUG-22829
 # include <boost/thread.hpp>
@@ -28,7 +29,6 @@
 #endif
 
 #include "gazebo/gui/qt.h"
-#include "gazebo/gui/qt_test.h"
 
 #include "gazebo/gazebo_config.h"
 #include "test_config.h"
