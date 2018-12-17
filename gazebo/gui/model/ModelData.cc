@@ -1016,8 +1016,11 @@ void LinkData::SetLinkVisual(const rendering::VisualPtr _linkVisual)
   {
     rendering::LinkFrameVisualPtr vis(new rendering::LinkFrameVisual(
         _linkVisual->Name() + "_LINK_FRAME_VISUAL__", _linkVisual));
-    vis->Load();
-    vis->SetVisible(this->showLinkFrame);
+    if (vis->Initialized())
+    {
+      vis->Load();
+      vis->SetVisible(this->showLinkFrame);
+    }
 
     this->linkFrameVis = vis;
   }
