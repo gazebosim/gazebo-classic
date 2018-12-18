@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+
+## Gazebo 9.6.0 (2018-12-17)
+
 1. Don't search for boost signals component
     * [Pull request 3050](https://bitbucket.org/osrf/gazebo/pull-requests/3050)
     * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
