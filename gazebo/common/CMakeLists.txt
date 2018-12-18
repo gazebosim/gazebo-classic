@@ -155,6 +155,7 @@ set (gtest_sources
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
+  Plugin_TEST.cc
   SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc
