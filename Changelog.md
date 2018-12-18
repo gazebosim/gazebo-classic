@@ -49,6 +49,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+
+## Gazebo 9.6.0 (2018-12-17)
+
 1. Don't search for boost signals component
     * [Pull request 3050](https://bitbucket.org/osrf/gazebo/pull-requests/3050)
     * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
@@ -65,6 +68,13 @@
     * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
     * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
 
+1. Add Plugin::LoadParam to improve plugin interface
+    * [Pull request 3047](https://bitbucket.org/osrf/gazebo/pull-requests/3047)
+
+1. Fix gzclient on mojave with Qt 5.12
+    * [Pull request 3051](https://bitbucket.org/osrf/gazebo/pull-requests/3051)
+    * [Issue 2531](https://bitbucket.org/osrf/gazebo/issues/2531)
+
 1. Switch Time::Sleep from CLOCK\_REALTIME to CLOCK\_MONOTONIC on Linux
     * [Pull request 3037](https://bitbucket.org/osrf/gazebo/pull-requests/3037)
 
@@ -80,6 +90,11 @@
     * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
     * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
 
+1. static_map_plugin.cc: remove backup folder
+    * [Pull request #3023](https://bitbucket.org/osrf/gazebo/pull-requests/3023)
+
+1. Fix regression test build -> gazebo9
+    * [Pull request #3046](https://bitbucket.org/osrf/gazebo/pull-requests/3046)
 
 ## Gazebo 9.5.0 (2018-11-19)
 

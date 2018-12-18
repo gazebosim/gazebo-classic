@@ -28,6 +28,8 @@
 #include <boost/program_options.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+#include <ignition/math/SemanticVersion.hh>
+
 #include "gazebo/gui/qt.h"
 #include "gazebo/gazebo_client.hh"
 
@@ -337,6 +339,22 @@ bool gui::load()
   qInstallMessageHandler(messageHandler);
 #else
   qInstallMsgHandler(messageHandler);
+#endif
+
+#ifdef __APPLE__
+  // gazebo issue #2531
+  // seems to be related to QTBUG-71044
+  // Setting the QT_MAC_WANTS_LAYER environment variable fixes the problem
+  // on Mojave + Qt 5.12
+  ignition::math::SemanticVersion sv;
+  sv.Parse(QSysInfo::productVersion().toStdString());
+  ignition::math::SemanticVersion mojave(10, 14);
+  if (sv >= mojave)
+  {
+    QByteArray result = qgetenv("QT_MAC_WANTS_LAYER");
+    if (result.isEmpty())
+      qputenv("QT_MAC_WANTS_LAYER", QByteArray("1"));
+  }
 #endif
 
   g_app = new QApplication(g_argc, g_argv);

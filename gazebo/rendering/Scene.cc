@@ -1171,12 +1171,11 @@ bool Scene::FirstContact(CameraPtr _camera,
 
   double distance = -1.0;
 
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+  ignition::math::Vector3d origin, dir;
+  _camera->CameraToViewportRay(
+      _mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin),
+      Conversions::Convert(dir));
 
   UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
   if (userCam)
