@@ -298,9 +298,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->linearAccel.Set(0, 0, 0);
-  this->angularAccel.Set(0, 0, 0);
-
   this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
@@ -731,24 +728,6 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
     gzerr << "Index is out of range\n";
 
   return collision;
-}
-
-//////////////////////////////////////////////////
-void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetLinearAccel() is deprecated and has "
-         << "no effect. Use Link::SetForce() instead.\n";
-  this->SetEnabled(true);
-  this->linearAccel = _accel;
-}
-
-//////////////////////////////////////////////////
-void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetAngularAccel() is deprecated and has "
-         << "no effect. Use Link::SetTorque() instead.\n";
-  this->SetEnabled(true);
-  this->angularAccel = _accel;
 }
 
 //////////////////////////////////////////////////

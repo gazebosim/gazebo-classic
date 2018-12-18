@@ -161,12 +161,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////
-    void Set(msgs::Color *_c, const common::Color &_v)
-    {
-      Set(_c, _v.Ign());
-    }
-
-    /////////////////////////////////////////////
     void Set(msgs::Color *_c, const ignition::math::Color &_v)
     {
       _c->set_r(_v.R());
@@ -315,14 +309,6 @@ namespace gazebo
     }
 
     /////////////////////////////////////////////////
-    msgs::Any ConvertAny(const common::Color &_c)
-    {
-      gzwarn << "ConvertAny(common::Color) is deprecated, use "
-             << "ConvertAny(ignition::math::Color) instead" << std::endl;
-      return ConvertAny(_c.Ign());
-    }
-
-    /////////////////////////////////////////////////
     msgs::Any ConvertAny(const ignition::math::Color &_c)
     {
       msgs::Any result;
@@ -395,12 +381,6 @@ namespace gazebo
       result.mutable_position()->CopyFrom(Convert(_p.Pos()));
       result.mutable_orientation()->CopyFrom(Convert(_p.Rot()));
       return result;
-    }
-
-    /////////////////////////////////////////////
-    msgs::Color Convert(const common::Color &_c)
-    {
-      return Convert(_c.Ign());
     }
 
     /////////////////////////////////////////////

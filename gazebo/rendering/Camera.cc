@@ -1918,12 +1918,6 @@ std::string Camera::ProjectionType() const
 }
 
 //////////////////////////////////////////////////
-bool Camera::SetBackgroundColor(const common::Color &_color)
-{
-  return this->SetBackgroundColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 bool Camera::SetBackgroundColor(const ignition::math::Color &_color)
 {
   if (this->OgreViewport())

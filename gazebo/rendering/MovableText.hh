@@ -26,7 +26,6 @@
 // TODO: remove this line
 #include "gazebo/rendering/ogre_gazebo.h"
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -73,20 +72,6 @@ namespace gazebo
       /// \param[in] _fontName Font to use
       /// \param[in] _charHeight Height of the characters
       /// \param[in] _color Text color
-      /// \deprecated See function that accepts ignition::math::Color.
-      public: void Load(const std::string &_name,
-                        const std::string &_text,
-                        const std::string &_fontName,
-                        float _charHeight,
-                        const common::Color &_color)
-                        GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Loads text and font info
-      /// \param[in] _name Name of the text object
-      /// \param[in] _text Text to render
-      /// \param[in] _fontName Font to use
-      /// \param[in] _charHeight Height of the characters
-      /// \param[in] _color Text color
       public: void Load(const std::string &_name,
                         const std::string &_text,
                         const std::string &_fontName = "Arial",
@@ -100,11 +85,6 @@ namespace gazebo
       /// \sa FontName()
       public: void SetFontName(const std::string &_font);
 
-      /// \brief Get the font name
-      /// \return The font name
-      /// \deprecated See FontName()
-      public: const std::string &GetFont() const GAZEBO_DEPRECATED(9.0);
-
       /// \brief Get the font name.
       /// \return The font name.
       /// \sa SetFontName()
@@ -117,28 +97,13 @@ namespace gazebo
 
       /// \brief Get the displayed text.
       /// \return The displayed text.
-      /// \deprecated See Text()
-      public: const std::string &GetText() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the displayed text.
-      /// \return The displayed text.
       /// \sa SetText()
       public: const std::string &Text() const;
 
       /// \brief Set the text color.
       /// \param[in] _color Text color.
-      /// \deprecated See function that accepts ignition::math::Color.
-      public: void SetColor(const common::Color &_color) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the text color.
-      /// \param[in] _color Text color.
       /// \sa Color()
       public: void SetColor(const ignition::math::Color &_color);
-
-      /// \brief Get the text color.
-      /// \return Texture color.
-      /// \deprecated See function that returns ignition::math::Color.
-      public: const common::Color GetColor() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the text color.
       /// \return Text color.
@@ -152,11 +117,6 @@ namespace gazebo
 
       /// \brief Get the height of the characters in meters
       /// return Height of the characters.
-      /// \deprecated See CharHeight.
-      public: float GetCharHeight() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the height of the characters in meters
-      /// return Height of the characters.
       /// \sa SetCharHeight()
       public: float CharHeight() const;
 
@@ -164,11 +124,6 @@ namespace gazebo
       /// \param[in] _width Space width
       /// \sa SpaceWidth()
       public: void SetSpaceWidth(const float _width);
-
-      /// \brief Get the width of spaces between words.
-      /// \return Space width
-      /// \deprecated See SpaceWidth()
-      public: float GetSpaceWidth() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the width of spaces between words.
       /// \return Space width
@@ -188,11 +143,6 @@ namespace gazebo
 
       /// \brief Get the baseline height in meters.
       /// \return Baseline height
-      /// \deprecated See Baseline().
-      public: float GetBaseline() const GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the baseline height in meters.
-      /// \return Baseline height
       /// \sa SetBaseline()
       public: float Baseline() const;
 
@@ -201,11 +151,6 @@ namespace gazebo
       /// all other drawables.
       /// \sa ShowOnTop()
       public: void SetShowOnTop(const bool _show);
-
-      /// \brief True = text is displayed on top.
-      /// \return True if MovableText::SetShownOnTop(true) was called.
-      /// \deprecated See ShowOnTop().
-      public: bool GetShowOnTop() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get whether the is displayed above other objects.
       /// \return True if it is on top.
@@ -228,15 +173,7 @@ namespace gazebo
           bool _debug = false) override;
 
       /// \brief Setup the geometry.
-      /// \deprecated Use SetupGeometry instead
-      protected: void _setupGeometry() GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Setup the geometry.
       protected: void SetupGeometry();
-
-      /// \brief Update colors.
-      /// \deprecated Use UpdateColors instead
-      protected: void _updateColors() GAZEBO_DEPRECATED(9.0);
 
       /// \brief Update colors.
       protected: void UpdateColors();
@@ -264,7 +201,6 @@ namespace gazebo
 
       /// \internal
       /// \brief Get the lights
-      /// \deprecated Function has never returned meaningful values
       protected: const Ogre::LightList &getLights() const override;
 
       /// \internal

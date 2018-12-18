@@ -87,11 +87,6 @@ namespace gazebo
       // Documentation inherited
       public: virtual void PostRender();
 
-      /// \brief All things needed to get back z buffer for laser data.
-      /// \return Array of laser data.
-      /// \deprecated use LaserDataBegin() and LaserDataEnd() instead
-      public: const float *LaserData() const GAZEBO_DEPRECATED(9.0);
-
       /// \brief Constant iterator to access laser data
       public: typedef GpuLaserDataIterator<GpuLaser> DataIter;
 
