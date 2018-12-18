@@ -66,6 +66,7 @@ set(tests
   led_plugin.cc
   link.cc
   logical_camera_sensor.cc
+  misalignment_plugin.cc
   model.cc
   model_database.cc
   multirayshape.cc
