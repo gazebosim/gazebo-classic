@@ -155,11 +155,6 @@ namespace gazebo
       /// \param[in] _msg The received message.
       private: void OnJointCommand(const ignition::msgs::JointCmd &_msg);
 
-      /// \brief Callback when a joint command message is received.
-      /// \param[in] _msg The received message.
-      /// \deprecated See JointController::OnJointCommand.
-      private: void OnJointCmd(ConstJointCmdPtr &_msg);
-
       /// \brief Set the positions of a Joint by name
       ///        The position is specified in native units, which means,
       ///        if you are using metric system, it's meters for SliderJoint
