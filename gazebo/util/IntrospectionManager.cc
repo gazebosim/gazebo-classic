@@ -211,6 +211,10 @@ void IntrospectionManager::Update()
     auto &item = observedItem.first;
     auto itemIter = usedItemsCopy.find(item);
 
+    // Sanity check: Make sure that we can update the item.
+    if (itemIter == usedItemsCopy.end())
+      continue;
+
     try
     {
       // Update the values of the items under observation.
@@ -255,14 +259,12 @@ void IntrospectionManager::Update()
 
     {
       std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+      if (this->dataPtr->filterPubs.find(topicName) ==
+          this->dataPtr->filterPubs.end() ||
+          !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
       {
-        if (this->dataPtr->filterPubs.find(topicName) ==
-            this->dataPtr->filterPubs.end() ||
-            !this->dataPtr->filterPubs[topicName].Publish(nextMsg))
-        {
-          gzerr << "Error publishing update for topic [" << topicName << "]"
-            << std::endl;
-        }
+        gzerr << "Error publishing update for topic [" << topicName << "]"
+          << std::endl;
       }
     }
   }
