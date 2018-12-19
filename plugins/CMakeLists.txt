@@ -79,6 +79,7 @@ set (plugins_single_header
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
   LinkPlot3DPlugin
+  MisalignmentPlugin
   ModelPropShop
   MudPlugin
   PlaneDemoPlugin
