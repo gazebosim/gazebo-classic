@@ -171,9 +171,8 @@ std::set<std::string> IntrospectionManager::Items() const
 void IntrospectionManager::Update()
 {
   std::map<std::string, IntrospectionFilter> filtersCopy;
-  std::map<std::string, std::function <gazebo::msgs::Any ()>> usedItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
-  std::set<std::string> itemsToCopy;
+  std::map<std::string, std::function <gazebo::msgs::Any ()>> usedItemsCopy;
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
@@ -189,26 +188,22 @@ void IntrospectionManager::Update()
       {
         continue;
       }
-      itemsToCopy.insert(item);
-    }
-  }
 
-  for (auto& filter: filtersCopy)
-  {
-    for (auto const &item : filter.second.items)
+      usedItemsCopy[item] = this->dataPtr->allItems[item];
+    }
+
+    for (auto& filter: filtersCopy)
     {
-      // Sanity check: Make sure that someone registered this item.
-      if (this->dataPtr->allItemsKeys.count(item) == 0)
+      for (auto const &item : filter.second.items)
       {
-        continue;
+        // Sanity check: Make sure that someone registered this item.
+        if (this->dataPtr->allItemsKeys.count(item) == 0)
+        {
+          continue;
+        }
+        usedItemsCopy[item] = this->dataPtr->allItems[item];
       }
-      itemsToCopy.insert(item);
     }
-  }
-
-  for (auto& item: itemsToCopy)
-  {
-    usedItemsCopy[item] = this->dataPtr->allItems[item];
   }
 
   for (auto &observedItem : observedItemsCopy)
