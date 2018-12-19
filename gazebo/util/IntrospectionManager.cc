@@ -239,6 +239,10 @@ void IntrospectionManager::Update()
     // Insert the last value of each item under observation for this filter.
     for (auto const &item : filter.second.items)
     {
+      // Sanity check: Make sure that someone registered this item.
+      if (usedItemsCopy.find(item) == usedItemsCopy.end())
+        continue;
+
       // Sanity check: Make sure that the value was updated.
       // (e.g.: an exception was not raised).
       auto &lastValue = observedItemsCopy[item].lastValue;
