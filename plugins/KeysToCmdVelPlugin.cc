@@ -61,16 +61,55 @@ class CmdVelKeyboardControls
 
   public: virtual ~CmdVelKeyboardControls() = default;
 };
+
+class KeysToCmdVelPluginPrivate {
+  public: KeysToCmdVelPluginPrivate() : keys(new CmdVelKeyboardControls),
+    keyboardControlMessage(new msgs::Pose)
+  {
+  }
+
+  /// \brief Stores information about each tracked key.
+  public: std::unique_ptr<CmdVelKeyboardControls> keys;
+
+  /// \brief The message to be sent that is updated by keypresses.
+  public: msgs::PosePtr keyboardControlMessage;
+
+  /// \brief The topic to which cmd_vel messages should be published.
+  public: std::string cmdVelTopic;
+
+  /// \brief Minimum linear velocity (for backwards driving, negative) (m/s).
+  public: double minLinearVel;
+
+  /// \brief Maximum linear velocity (for forward driving, positive) (m/s).
+  public: double maxLinearVel;
+
+  /// \brief Maximum angular velocity (positive value) (rad/s).
+  public: double maxAngularVel;
+
+  /// \brief The value to add/subtract every time the linear velocity key is
+  /// pressed (strictly positive value, m/s).
+  public: double linearIncrement;
+
+  /// \brief The value to add/subtract every time the angular velocity key is
+  /// pressed (strictly positive value, m/s).
+  public: double angularIncrement;
+
+  /// \brief Node for communication.
+  public: transport::NodePtr node;
+
+  /// \brief Subscribe to keyboard messages.
+  public: transport::SubscriberPtr keyboardSub;
+
+  /// \brief Publish cmd_vel messages.
+  public: transport::PublisherPtr cmdVelPub;
+};
 }
 
 /////////////////////////////////////////////////
 KeysToCmdVelPlugin::KeysToCmdVelPlugin()
-  : keys(new CmdVelKeyboardControls), keyboardControlMessage(new msgs::Pose)
+  : dataPtr(new KeysToCmdVelPluginPrivate)
 {
-  msgs::Set(this->keyboardControlMessage->mutable_position(),
-            ignition::math::Vector3d::Zero);
-  msgs::Set(this->keyboardControlMessage->mutable_orientation(),
-            ignition::math::Quaterniond::Identity);
+  this->Reset();
 }
 
 /////////////////////////////////////////////////
@@ -81,11 +120,16 @@ KeysToCmdVelPlugin::~KeysToCmdVelPlugin()
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 {
-  this->LoadParam(_sdf, "cmd_vel_topic", this->cmdVelTopic, "~/cmd_vel");
-  this->LoadParam(_sdf, "max_linear_vel", this->maxLinearVel, 1.0);
-  this->LoadParam(_sdf, "min_linear_vel", this->minLinearVel,
-                  -this->maxLinearVel);
-  this->LoadParam(_sdf, "max_angular_vel", this->maxAngularVel, 1.0);
+  this->LoadParam(_sdf, "cmd_vel_topic", this->dataPtr->cmdVelTopic,
+                  "~/cmd_vel");
+  this->LoadParam(_sdf, "max_linear_vel", this->dataPtr->maxLinearVel, 1.0);
+  this->LoadParam(_sdf, "min_linear_vel", this->dataPtr->minLinearVel,
+                  -this->dataPtr->maxLinearVel);
+  this->LoadParam(_sdf, "linear_increment",
+      this->dataPtr->linearIncrement, 0.5);
+  this->LoadParam(_sdf, "max_angular_vel", this->dataPtr->maxAngularVel, 1.0);
+  this->LoadParam(_sdf, "angular_increment",
+      this->dataPtr->angularIncrement, 0.5);
 
   const auto keyControlsEmpty = !_sdf->HasElement("key_controls") ||
     _sdf->GetElement("key_controls")->GetFirstElement() == sdf::ElementPtr();
@@ -102,11 +146,11 @@ void KeysToCmdVelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     const std::map<const std::string, std::vector<unsigned int> &>
       controlsMapping =
       {
-        {"stop", this->keys->stop},
-        {"accelerate", this->keys->accelerate},
-        {"decelerate", this->keys->decelerate},
-        {"left", this->keys->left},
-        {"right", this->keys->right},
+        {"stop", this->dataPtr->keys->stop},
+        {"accelerate", this->dataPtr->keys->accelerate},
+        {"decelerate", this->dataPtr->keys->decelerate},
+        {"left", this->dataPtr->keys->left},
+        {"right", this->dataPtr->keys->right},
       };
 
     const auto keyControlsElem = _sdf->GetElement("key_controls");
@@ -138,20 +182,22 @@ void KeysToCmdVelPlugin::Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
 void KeysToCmdVelPlugin::Init()
 {
   // Initialize transport
-  this->node = transport::NodePtr(new transport::Node());
-  this->node->Init();
+  this->dataPtr->node = transport::NodePtr(new transport::Node());
+  this->dataPtr->node->Init();
 
-  this->keyboardSub = this->node->Subscribe("~/keyboard/keypress",
-    &KeysToCmdVelPlugin::OnKeyPress, this, true);
+  this->dataPtr->keyboardSub = this->dataPtr->node->Subscribe(
+      "~/keyboard/keypress", &KeysToCmdVelPlugin::OnKeyPress, this, true);
 
-  this->cmdVelPub = this->node->Advertise<msgs::Pose>(this->cmdVelTopic);
+  this->dataPtr->cmdVelPub = this->dataPtr->node->Advertise<msgs::Pose>(
+      this->dataPtr->cmdVelTopic);
 }
 
 /////////////////////////////////////////////////
 void KeysToCmdVelPlugin::Reset()
 {
-  this->keyboardControlMessage->mutable_position()->set_x(0.0);
-  msgs::Set(this->keyboardControlMessage->mutable_orientation(),
+  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_position(),
+            ignition::math::Vector3d::Zero);
+  msgs::Set(this->dataPtr->keyboardControlMessage->mutable_orientation(),
             ignition::math::Quaterniond::Identity);
 }
 
@@ -163,10 +209,11 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
   double linearVel = 0., angularVel = 0.;
   bool linearVelSet = false, angularVelSet = false;
 
-  auto &message = this->keyboardControlMessage;
+  auto &message = this->dataPtr->keyboardControlMessage;
 
-  if (std::find(this->keys->stop.begin(), this->keys->stop.end(), key) !=
-    this->keys->stop.end())
+  if (std::find(this->dataPtr->keys->stop.begin(),
+                this->dataPtr->keys->stop.end(), key) !=
+    this->dataPtr->keys->stop.end())
   {
     linearVel = 0.;
     linearVelSet = true;
@@ -176,18 +223,18 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
   }
   else
   {
-    if (std::find(
-      this->keys->accelerate.begin(), this->keys->accelerate.end(), key) !=
-      this->keys->accelerate.end())
+    if (std::find(this->dataPtr->keys->accelerate.begin(),
+                  this->dataPtr->keys->accelerate.end(), key) !=
+      this->dataPtr->keys->accelerate.end())
     {
-      linearVel = this->maxLinearVel;
+      linearVel = this->dataPtr->maxLinearVel;
       linearVelSet = true;
     }
-    else if (std::find(
-      this->keys->decelerate.begin(), this->keys->decelerate.end(), key) !=
-      this->keys->decelerate.end())
+    else if (std::find(this->dataPtr->keys->decelerate.begin(),
+                       this->dataPtr->keys->decelerate.end(), key) !=
+      this->dataPtr->keys->decelerate.end())
     {
-      linearVel = this->minLinearVel;
+      linearVel = this->dataPtr->minLinearVel;
       linearVelSet = true;
     }
 
@@ -195,28 +242,27 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
     {
       const auto oldLinearVel = message->position().x();
 
-      // For some reason, each keypress is sent twice to the topic, so we add
-      // only a half of what should be added.
       if (!ignition::math::equal(linearVel, oldLinearVel))
       {
-        const auto increment =
-          (linearVel > 0) ? this->maxLinearVel : this->minLinearVel;
-        linearVel = ignition::math::clamp(
-          oldLinearVel + 0.5 * increment,
-          this->minLinearVel, this->maxLinearVel);
+        const auto increment = ignition::math::signum(linearVel) * 
+            this->dataPtr->linearIncrement;
+        linearVel = ignition::math::clamp(oldLinearVel + increment,
+          this->dataPtr->minLinearVel, this->dataPtr->maxLinearVel);
       }
     }
 
-    if (std::find(this->keys->left.begin(), this->keys->left.end(), key) !=
-      this->keys->left.end())
+    if (std::find(this->dataPtr->keys->left.begin(),
+                  this->dataPtr->keys->left.end(), key) !=
+      this->dataPtr->keys->left.end())
     {
-      angularVel = -this->maxAngularVel;
+      angularVel = -this->dataPtr->maxAngularVel;
       angularVelSet = true;
     }
-    else if (std::find(this->keys->right.begin(), this->keys->right.end(), key)
-      != this->keys->right.end())
+    else if (std::find(this->dataPtr->keys->right.begin(),
+                       this->dataPtr->keys->right.end(), key)
+      != this->dataPtr->keys->right.end())
     {
-      angularVel = this->maxAngularVel;
+      angularVel = this->dataPtr->maxAngularVel;
       angularVelSet = true;
     }
 
@@ -225,12 +271,12 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
       const auto oldAngularVel =
         msgs::ConvertIgn(message->orientation()).Euler().Z();
 
-      // For some reason, each keypress is sent twice to the topic, so we add
-      // only a half of what should be added.
       if (!ignition::math::equal(angularVel, oldAngularVel))
       {
-        angularVel = oldAngularVel +
-          ignition::math::signum(angularVel) * 0.5 * this->maxAngularVel;
+        const auto increment = ignition::math::signum(angularVel) *
+            this->dataPtr->angularIncrement;
+        angularVel = ignition::math::clamp(oldAngularVel + increment,
+            -this->dataPtr->maxAngularVel, this->dataPtr->maxAngularVel);
       }
     }
   }
@@ -249,6 +295,6 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
   if (linearVelSet || angularVelSet)
   {
-    this->cmdVelPub->Publish(*message);
+    this->dataPtr->cmdVelPub->Publish(*message);
   }
 }

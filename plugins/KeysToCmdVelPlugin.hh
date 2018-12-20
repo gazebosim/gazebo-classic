@@ -29,6 +29,7 @@
 namespace gazebo
 {
   class CmdVelKeyboardControls;
+  class KeysToCmdVelPluginPrivate;
 
   /// \brief Send velocity commands to a model based on keypress messages
   ///        received.
@@ -81,32 +82,9 @@ class GAZEBO_VISIBLE KeysToCmdVelPlugin : public ModelPlugin
     /// \param[in] _msg Keypress message.
     protected: virtual void OnKeyPress(ConstAnyPtr &_msg);
 
-    /// \brief Stores information about each tracked key.
-    private: std::unique_ptr<CmdVelKeyboardControls> keys;
-
-    /// \brief The message to be sent that is updated by keypresses.
-    protected: msgs::PosePtr keyboardControlMessage;
-
-    /// \brief The topic to which cmd_vel messages should be published.
-    protected: std::string cmdVelTopic;
-
-    /// \brief Minimum linear velocity (for backwards driving, negative) (m/s).
-    protected: double minLinearVel;
-
-    /// \brief Maximum linear velocity (for forward driving, positive) (m/s).
-    protected: double maxLinearVel;
-
-    /// \brief Maximum angular velocity (positive value) (rad/s).
-    protected: double maxAngularVel;
-
-    /// \brief Node for communication.
-    private: transport::NodePtr node;
-
-    /// \brief Subscribe to keyboard messages.
-    private: transport::SubscriberPtr keyboardSub;
-
-    /// \brief Publish cmd_vel messages.
-    private: transport::PublisherPtr cmdVelPub;
+    /// \internal
+    /// \brief Private data pointer.
+    private: std::unique_ptr<KeysToCmdVelPluginPrivate> dataPtr;
   };
 }
 #endif
