@@ -99,7 +99,7 @@ endif()
 
 if (WIN32)
   include_directories(IGNITION-MSGS_INCLUDE_DIR)
-  set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
+  #set_target_properties(gazebo_util PROPERTIES COMPILE_FLAGS "/FIignition/msgs/System.hh")
 endif()
 
 
