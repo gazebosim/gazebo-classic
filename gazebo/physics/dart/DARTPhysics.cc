@@ -126,13 +126,14 @@ void DARTPhysics::Load(sdf::ElementPtr _sdf)
     }
     else if (useCollisionDetector == "ode")
     {
-#ifdef HAVE_DART_ODE
-      gzdbg << "Using ODE collision detector" << std::endl;
-      cd = dart::collision::OdeCollisionDetector::create();
-#else
-      gzerr << "Required DART ode collision package not in use. Please "
-            << "install libdart<version>-collision-ode-dev." << std::endl;
-#endif
+      // ODE collision detectors have to be disabled because it causes
+      // conflicts with the version of the internally compiled ODE library.
+      // See also discussion in the PR:
+      // https://bitbucket.org/osrf/gazebo/pull-requests/2956/
+      //   dart-heightmap-with-bullet-and-ode/diff#comment-81389484
+      gzerr << "The use of the ODE collision detector with DART is disabled "
+        << "because it causes conflicts with the version of ODE used in "
+        << "Gazebo." << std::endl;
     }
     else if (useCollisionDetector == "dart")
     {

@@ -1012,14 +1012,16 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
 
   physics::PhysicsEnginePtr engine = world->Physics();
   ASSERT_NE(engine, nullptr);
-#ifdef HAVE_DART
+
   physics::DARTPhysicsPtr dartEngine
     = boost::dynamic_pointer_cast<physics::DARTPhysics>(engine);
   ASSERT_NE(dartEngine, nullptr);
   std::string cd = dartEngine->CollisionDetectorInUse();
   EXPECT_FALSE(cd.empty());
-  EXPECT_EQ(cd, "ode");
-#endif
+
+  // ODE collision detector should be disabled, as it causes conflicts.
+  // Instad, the default collision detector should have been selected.
+  EXPECT_NE(cd, "ode");
 }
 
 
@@ -1037,6 +1039,12 @@ TEST_P(HeightmapTest, TerrainCollision)
 }
 
 /////////////////////////////////////////////////
+// TerrainCollision() call for Dart using Bullet.
+// We could do the same for ODE but this is disabled
+// due to conflicts with the internally compiled ODE library.
+// Collision engines in Dart other than Bullet don't support
+// heighmaps yet, but once they do, we can do this test for
+// them as well.
 TEST_F(HeightmapTest, TerrainCollisionDartBullet)
 {
 #ifndef HAVE_DART
@@ -1052,23 +1060,6 @@ TEST_F(HeightmapTest, TerrainCollisionDartBullet)
 #endif
 
   TerrainCollision("dart", "bullet");
-}
-
-/////////////////////////////////////////////////
-TEST_F(HeightmapTest, TerrainCollisionDartOde)
-{
-#ifndef HAVE_DART
-  gzdbg << "Not testing DART because it is not installed." << std::endl;
-  return;
-#endif
-
-#ifndef HAVE_DART_ODE
-  gzerr << "Aborting TerrainCollision test for DART with ode, because the "
-        << "required DART extension is not installed. Please install "
-        << "libdart<version>-collision-ode-dev." << std::endl;
-  return;
-#endif
-  TerrainCollision("dart", "ode");
 }
 
 /////////////////////////////////////////////////
