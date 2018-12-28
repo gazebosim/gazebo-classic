@@ -39,7 +39,6 @@ set (sources
   BVHLoader.cc
   ColladaExporter.cc
   ColladaLoader.cc
-  Color.cc
   CommonIface.cc
   Console.cc
   Dem.cc
@@ -95,7 +94,6 @@ set (headers
   ColladaLoader.hh
   CommonIface.hh
   CommonTypes.hh
-  Color.hh
   Console.hh
   Dem.hh
   EnumIface.hh
@@ -141,7 +139,6 @@ set (gtest_sources
   Battery_TEST.cc
   ColladaExporter_TEST.cc
   ColladaLoader_TEST.cc
-  Color_TEST.cc
   CommonIface_TEST.cc
   Console_TEST.cc
   Dem_TEST.cc
@@ -158,6 +155,7 @@ set (gtest_sources
   MouseEvent_TEST.cc
   MovingWindowFilter_TEST.cc
   OBJLoader_TEST.cc
+  Plugin_TEST.cc
   SemanticVersion_TEST.cc
   SphericalCoordinates_TEST.cc
   SystemPaths_TEST.cc

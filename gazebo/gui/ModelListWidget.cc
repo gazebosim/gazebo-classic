@@ -288,7 +288,17 @@ void ModelListWidget::OnSetSelectedEntity(const std::string &_name,
         gui::get_active_camera()->GetScene()->LightByName(
             this->dataPtr->selectedEntityName);
 
-      light->FillMsg(this->dataPtr->lightMsg);
+      if (light)
+      {
+        light->FillMsg(this->dataPtr->lightMsg);
+      }
+      else
+      {
+        gzerr << "Unable to get Light ["
+              << this->dataPtr->selectedEntityName
+              << "]."
+              << std::endl;
+      }
       this->dataPtr->propTreeBrowser->clear();
       this->dataPtr->fillTypes.push_back("Light");
 

@@ -35,7 +35,6 @@
 #include <string>
 #include <ignition/math/Color.hh>
 
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -173,30 +172,12 @@ namespace gazebo
       /// \param[in] _x Column location in the image
       /// \param[in] _y Row location in the image
       /// \return The color of the given pixel
-      /// \deprecated See function that returns ignition::math::Color.
-      public: Color GetPixel(unsigned int _x, unsigned int _y) const
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get a pixel color value
-      /// \param[in] _x Column location in the image
-      /// \param[in] _y Row location in the image
-      /// \return The color of the given pixel
       public: ignition::math::Color Pixel(const unsigned int _x,
                                           const unsigned int _y) const;
 
       /// \brief Get the average color
       /// \return The average color
-      /// \deprecated See function that returns ignition::math::Color.
-      public: Color GetAvgColor() GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Get the average color
-      /// \return The average color
       public: ignition::math::Color AvgColor();
-
-      /// \brief Get the max color
-      /// \return The max color
-      /// \deprecated See function that returns ignition::math::Color.
-      public: Color GetMaxColor() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the max color
       /// \return The max color

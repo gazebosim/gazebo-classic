@@ -157,7 +157,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/lib/OGRE/cmake;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
 
 # Find boost
-find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
+find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread system
   filesystem program_options regex iostreams date_time)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})

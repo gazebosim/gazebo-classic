@@ -58,6 +58,9 @@ namespace gazebo
       /// \brief Unique id of this light.
       public: uint32_t id;
 
+      /// \brief Flag to indicate if visual representation of light is drawn
+      public: bool visualize = true;
+
       /// \brief Counter used to generate unique light names.
       public: static unsigned int lightCounter;
     };

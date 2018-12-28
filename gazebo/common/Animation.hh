@@ -125,7 +125,7 @@ namespace gazebo
       /// \param[in] _length Length of the animation in seconds
       /// \param[in] _loop True == loop the animation
       public: PoseAnimation(const std::string &_name,
-                            double _length, bool _loop);
+                            double _length, bool _loop, double _tension = 0.0);
 
       /// \brief Destructor
       public: virtual ~PoseAnimation();
@@ -153,6 +153,9 @@ namespace gazebo
 
       /// \brief smooth interpolation for rotation
       private: mutable ignition::math::RotationSpline *rotationSpline;
+
+      /// \brief Spline tension parameter.
+      private: double tension = 0.0;
     };
     /// \}
 

@@ -566,6 +566,7 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
   std::map<physics::ModelPtr, double> lowballMassSlip;
   std::map<physics::ModelPtr, double> twoballMassSlip;
   std::map<physics::ModelPtr, double> triballMassSlip;
+  std::map<physics::ModelPtr, double> boxMassSlip;
 
   auto models = world->Models();
   for (auto model : models)
@@ -589,11 +590,16 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
     {
       triballMassSlip[model] = massSlip;
     }
+    else if (0 == name.compare(0, 3, "box"))
+    {
+      boxMassSlip[model] = massSlip;
+    }
   }
 
   EXPECT_EQ(lowballMassSlip.size(), 6u);
   EXPECT_EQ(twoballMassSlip.size(), 6u);
   EXPECT_EQ(triballMassSlip.size(), 6u);
+  EXPECT_EQ(boxMassSlip.size(), 6u);
 
   world->Step(5000);
 
@@ -644,6 +650,19 @@ void PhysicsFrictionTest::SphereSlip(const std::string &_physicsEngine)
     double velExpected = grav.Y() * massSlip / 3.0;
     EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
       << "model " << triball.first->GetScopedName()
+      << std::endl;
+  }
+  gzdbg << "Checking velocity of box models" << std::endl;
+  for (auto box : boxMassSlip)
+  {
+    auto model = box.first;
+    double massSlip = box.second;
+    auto vel = model->WorldLinearVel();
+    EXPECT_NEAR(vel.X(), 0, g_friction_tolerance);
+    EXPECT_NEAR(vel.Z(), 0, g_friction_tolerance);
+    double velExpected = grav.Y() * massSlip / 1.0;
+    EXPECT_NEAR(vel.Y(), velExpected, 0.015*velExpected)
+      << "model " << box.first->GetScopedName()
       << std::endl;
   }
 }

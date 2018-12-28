@@ -21,12 +21,6 @@ using namespace rendering;
 
 
 //////////////////////////////////////////////////
-Ogre::ColourValue Conversions::Convert(const common::Color &_color)
-{
-  return Ogre::ColourValue(_color.r, _color.g, _color.b, _color.a);
-}
-
-//////////////////////////////////////////////////
 Ogre::ColourValue Conversions::Convert(const ignition::math::Color &_color)
 {
   return Ogre::ColourValue(_color.R(), _color.G(), _color.B(), _color.A());
