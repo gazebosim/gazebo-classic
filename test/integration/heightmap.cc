@@ -18,7 +18,7 @@
 #include <string.h>
 #include <ignition/math/Vector3.hh>
 
-// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
+// required for HAVE_DART_BULLET define
 #include <gazebo/gazebo_config.h>
 
 #include "gazebo/common/SystemPaths.hh"
@@ -101,9 +101,10 @@ void HeightmapTest::PhysicsLoad(const std::string &_physicsEngine)
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -182,9 +183,10 @@ void HeightmapTest::WhiteAlpha(const std::string &_physicsEngine)
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -235,9 +237,10 @@ void HeightmapTest::WhiteNoAlpha(const std::string &_physicsEngine)
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -327,9 +330,10 @@ void HeightmapTest::Volume(const std::string &_physicsEngine)
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -378,9 +382,10 @@ void HeightmapTest::LoadDEM(const std::string &_physicsEngine)
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -591,9 +596,10 @@ void HeightmapTest::Material(const std::string &_worldName,
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -823,9 +829,10 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
     ASSERT_NE(dartEngine, nullptr);
     std::string cd = dartEngine->CollisionDetectorInUse();
     ASSERT_FALSE(cd.empty());
-    if (cd != "bullet" && cd != "ode")
+    if (cd != "bullet")
     {
-      // the test only works if DART uses bullet or ODE at the moment.
+      // the test only works if DART uses bullet as a collision detector at the
+      // moment.
       gzerr << "Aborting test for dart, see issue #909 and pull request #2956"
             << std::endl;
       return;
@@ -875,28 +882,16 @@ void HeightmapTest::TerrainCollision(const std::string &_physicsEngine,
 }
 
 /////////////////////////////////////////////////
-/*
- * FIXME NOTE: this causes the test to crash after it is finished.
- * (running only this test and having all others commented out causes crash!)
- * Temporarily disabled.
- *
 TEST_F(HeightmapTest, NotSquareImage)
 {
   NotSquareImage();
 }
-*/
 
 /////////////////////////////////////////////////
-/**
- * FIXME NOTE: this causes the test to crash after it is finished
- * (running only this test and having all others commented out causes crash!)
- * Temporarily disabled.
- *
 TEST_F(HeightmapTest, InvalidSizeImage)
 {
   InvalidSizeImage();
 }
-*/
 
 /////////////////////////////////////////////////
 TEST_P(HeightmapTest, PhysicsLoad)
@@ -995,13 +990,6 @@ TEST_F(HeightmapTest, DartCollisionDetectorSelectionOde)
   return;
 #endif
 
-#ifndef HAVE_DART_ODE
-  gzerr << "Aborting test for DART with ode, because the "
-        << "required DART extension is not installed. Please install "
-        << "libdart<version>-collision-ode-dev." << std::endl;
-  return;
-#endif
-
   // test using a world file with the <dart><collision_detector>
   // tag: verify the right collision detector has been selected.
   std::string loadWorld = "worlds/heightmap_test_with_sphere_dart_ode.world";
@@ -1097,16 +1085,10 @@ TEST_F(HeightmapTest, NoVisual)
 }
 
 /////////////////////////////////////////////////
-/*
- * FIXME NOTE: this causes the test to crash after it is finished.
- * (running only this test and having all others commented out causes crash!)
- * Temporarily disabled.
- *
 TEST_F(HeightmapTest, LODVisualPlugin)
 {
   LODVisualPlugin();
 }
-*/
 
 /////////////////////////////////////////////////
 TEST_F(HeightmapTest, HeightmapCache)

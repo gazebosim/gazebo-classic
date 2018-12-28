@@ -15,15 +15,11 @@
  *
 */
 
-// required for HAVE_DART_BULLET and HAVE_DART_ODE defines
+// required for HAVE_DART_BULLET define
 #include <gazebo/gazebo_config.h>
 
 #ifdef HAVE_DART_BULLET
 #include <dart/collision/bullet/bullet.hpp>
-#endif
-
-#ifdef HAVE_DART_ODE
-#include <dart/collision/ode/ode.hpp>
 #endif
 
 #include <dart/collision/dart/dart.hpp>
