@@ -78,6 +78,9 @@ namespace gazebo
       /// \brief Counts the number of times there were no contacts. This is
       /// used to reduce the range value jumping.
       public: int emptyContactCount;
+
+      /// \brief Offset of the collision shape.
+      public: ignition::math::Vector3d offset;
     };
   }
 }
