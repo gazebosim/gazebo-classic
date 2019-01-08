@@ -78,21 +78,21 @@ class KeysToCmdVelPluginPrivate {
   public: std::string cmdVelTopic;
 
   /// \brief Minimum linear velocity (for backwards driving, negative) (m/s).
-  public: double minLinearVel;
+  public: double minLinearVel = -1.0;
 
   /// \brief Maximum linear velocity (for forward driving, positive) (m/s).
-  public: double maxLinearVel;
+  public: double maxLinearVel = 1.0;
 
   /// \brief Maximum angular velocity (positive value) (rad/s).
-  public: double maxAngularVel;
+  public: double maxAngularVel = 1.0;
 
   /// \brief The value to add/subtract every time the linear velocity key is
   /// pressed (strictly positive value, m/s).
-  public: double linearIncrement;
+  public: double linearIncrement = 0.5;
 
   /// \brief The value to add/subtract every time the angular velocity key is
   /// pressed (strictly positive value, m/s).
-  public: double angularIncrement;
+  public: double angularIncrement = 0.5;
 
   /// \brief Node for communication.
   public: transport::NodePtr node;
@@ -244,7 +244,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
       if (!ignition::math::equal(linearVel, oldLinearVel))
       {
-        const auto increment = ignition::math::signum(linearVel) * 
+        const auto increment = ignition::math::signum(linearVel) *
             this->dataPtr->linearIncrement;
         linearVel = ignition::math::clamp(oldLinearVel + increment,
           this->dataPtr->minLinearVel, this->dataPtr->maxLinearVel);
