@@ -244,7 +244,7 @@ void KeysToCmdVelPlugin::OnKeyPress(ConstAnyPtr &_msg)
 
       if (!ignition::math::equal(linearVel, oldLinearVel))
       {
-        const auto increment = ignition::math::signum(linearVel) * 
+        const auto increment = ignition::math::signum(linearVel) *
             this->dataPtr->linearIncrement;
         linearVel = ignition::math::clamp(oldLinearVel + increment,
           this->dataPtr->minLinearVel, this->dataPtr->maxLinearVel);
