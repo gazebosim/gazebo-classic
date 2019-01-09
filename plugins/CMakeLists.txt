@@ -64,6 +64,7 @@ set (plugins_single_header
   LiftDragPlugin
   LinearBatteryConsumerPlugin
   LinearBatteryPlugin
+  MisalignmentPlugin
   ModelPropShop
   MudPlugin
   PressurePlugin
