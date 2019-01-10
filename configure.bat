@@ -16,8 +16,8 @@
 @if not "%1"=="" set build_type=%1
 @echo Configuring for build type %build_type%
 
-@set BOOST_PATH=%cd%\..\..\boost_1_56_0
-@set BOOST_LIBRARY_DIR=%BOOST_PATH%\lib64-msvc-12.0
+@set BOOST_PATH=%cd%\..\..\boost_1_67_0
+@set BOOST_LIBRARY_DIR=%BOOST_PATH%\lib64-msvc-14.1
 
 @set PROTOBUF_PATH=%cd%\..\..\protobuf-2.6.0-win64-vc12
 
@@ -27,9 +27,9 @@
 set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
-@set FREEIMAGE_PATH=%cd%\..\..\FreeImage-vc12-x64-release-debug
-@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\x64\%build_type%\DLL
-@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\Source
+@set FREEIMAGE_PATH=%cd%\..\..\freeimage
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\dist\x64\
+@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\dist\x64\
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
@@ -45,29 +45,31 @@ set CURL_LIBRARY_NAME=libcurl_a
 @set QWT_LIBRARY_DIR=%QWT_PATH%\%build_type%\qwt-6.1.2-vc12-x64
 @set QWT_INCLUDEDIR=%QWT_PATH%\include
 
-@set OGRE_VERSION=1.9.0
-@set OGRE_PATH=%cd%\..\..\OGRE-SDK-1.9.0-vc120-x64-12.03.2016
+@set OGRE_VERSION=1.10.12
+@set OGRE_PATH=%cd%\..\..\ogre-sdk-1.10.12-vc15-x64
 @set OGRE_INCLUDE_DIR=%OGRE_PATH%\include;%OGRE_PATH%\include\OGRE;%OGRE_PATH%\include\OGRE\RTShaderSystem;%OGRE_PATH%\include\OGRE\Terrain;%OGRE_PATH%\include\OGRE\Paging
-@set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib\%build_type%
-@set OGRE_PLUGIN_DIR=%OGRE_LIBRARY_DIR%\opt
+@set OGRE_LIBRARY_DIR=%OGRE_PATH%\lib
+@set OGRE_PLUGIN_DIR=%OGRE_PATH%\bin
 set OGRE_LIB_SUFFIX=.lib
 @if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
-@set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%
 @set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%
 
 @set DLFCN_WIN32_PATH=%cd%\..\..\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
 @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
 @set DLFCN_WIN32_INCLUDE_DIR=%DLFCN_WIN32_PATH%\include
 
-@set QT5_PATH=C:\Qt5\5.7\\msvc2013_64
+@set QT5_PATH=%cd%\..\..\qt-opensource-windows-x86-msvc2015_64-5.7.0
 @set QT5_BIN_DIR=%QT5_PATH%\bin
 
-@set INCLUDE=%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
-@set LIB=%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
+@set INCLUDE=%WORKSPACE_INSTALL_DIR%\include;%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
+@set LIB=%WORKSPACE_INSTALL_DIR%\lib;%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
 @set PATH=%QT5_BIN_DIR%;%PATH%
 
+:: Use legacy install location if unset
+@if "%WORKSPACE_INSTALL_DIR%"=="" set WORKSPACE_INSTALL_DIR="install\%build_type%"
+
 cmake -Wno-dev -G "NMake Makefiles"^
-    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-MSGS_PATH%;%IGNITION-TRANSPORT_CMAKE_PREFIX_PATH%"^
+    -DCMAKE_PREFIX_PATH="%SDFORMAT_PATH%;%IGNITION-MATH_PATH%;%IGNITION-MSGS_PATH%;%IGNITION-TRANSPORT_CMAKE_PREFIX_PATH%;%WORKSPACE_INSTALL_DIR%"^
     -DUSE_EXTERNAL_TINYXML:BOOL=False^
     -DUSE_EXTERNAL_TINYXML2:BOOL=False^
     -DFREEIMAGE_RUNS=1^
@@ -91,6 +93,6 @@ cmake -Wno-dev -G "NMake Makefiles"^
     -DTBB_FOUND=1^
     -DTBB_INCLUDEDIR="%TBB_INCLUDEDIR%"^
     -DTBB_LIBRARY_DIR="%TBB_LIBRARY_DIR%"^
-    -DCMAKE_INSTALL_PREFIX="install\%build_type%"^
+    -DCMAKE_INSTALL_PREFIX="%WORKSPACE_INSTALL_DIR%"^
     -DCMAKE_BUILD_TYPE="%build_type%"^
     ..

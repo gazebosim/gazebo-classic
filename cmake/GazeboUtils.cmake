@@ -147,6 +147,9 @@ macro (gz_setup_windows)
 
     # Use dynamic linking for boost
     add_definitions(-DBOOST_ALL_DYN_LINK)
+    
+    # Use dynamic linking for protobuf
+    add_definitions(-DPROTOBUF_USE_DLLS)
 
     # And we want exceptions
     add_definitions("/EHsc")

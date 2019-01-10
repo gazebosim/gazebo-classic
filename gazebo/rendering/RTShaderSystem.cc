@@ -276,6 +276,7 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
     {
       Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
       const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
+      const Ogre::MaterialPtr& curMaterialPtr = curSubEntity->getMaterial();
       bool success = false;
 
       for (unsigned int s = 0; s < this->dataPtr->scenes.size(); s++)
@@ -283,7 +284,7 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
         try
         {
           success = this->dataPtr->shaderGenerator->createShaderBasedTechnique(
-              curMaterialName,
+              *curMaterialPtr,
               Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
               this->dataPtr->scenes[s]->Name() +
               Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -308,7 +309,9 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
             this->dataPtr->shaderGenerator->getRenderState(
                 this->dataPtr->scenes[s]->Name() +
                 Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                curMaterialName, 0);
+                curMaterialName,
+                Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                0);
 
           // Remove all sub render states.
           renderState->reset();
