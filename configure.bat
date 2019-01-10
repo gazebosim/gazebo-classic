@@ -27,9 +27,9 @@
 set CURL_LIBRARY_NAME=libcurl_a
 @if "%build_type%"=="Debug" set CURL_LIBRARY_NAME=libcurl_a_debug
 
-:: @set FREEIMAGE_PATH=%cd%\..\..\install\freeimage
-:: @set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\dist\x64\
-:: @set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\dist\x64\
+@set FREEIMAGE_PATH=%cd%\..\..\install\freeimage
+@set FREEIMAGE_LIBRARY_DIR=%FREEIMAGE_PATH%\dist\x64\
+@set FREEIMAGE_INCLUDE_DIR=%FREEIMAGE_PATH%\dist\x64\
 
 @set SDFORMAT_PATH=%cd%\..\..\sdformat\build\install\%build_type%
 @set IGNITION-MATH_PATH=%cd%\..\..\ign-math\build\install\%build_type%
@@ -54,17 +54,13 @@ set OGRE_LIB_SUFFIX=.lib
 @if "%build_type%"=="Debug" set OGRE_LIB_SUFFIX=_d.lib
 @set OGRE_LIBS=%OGRE_LIBRARY_DIR%\OgreMain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreRTShaderSystem%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreTerrain%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgrePaging%OGRE_LIB_SUFFIX%;%OGRE_LIBRARY_DIR%\OgreOverlay%OGRE_LIB_SUFFIX%
 
-:: @set DLFCN_WIN32_PATH=%cd%\..\..\install\dlfcn-win32-vc12-x64-release-debug\build\install\%build_type%
-:: @set DLFCN_WIN32_LIBRARY_DIR=%DLFCN_WIN32_PATH%\lib
-:: @set DLFCN_WIN32_INCLUDE_DIR=%DLFCN_WIN32_PATH%\include
-
 @set QT5_PATH=%cd%\..\..\install\qt-opensource-windows-x86-msvc2015_64-5.7.0
 @set QT5_BIN_DIR=%QT5_PATH%\bin
 
 :: @set INCLUDE=%WORKSPACE_INSTALL_DIR%\include;%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%DLFCN_WIN32_INCLUDE_DIR%;%INCLUDE%
 :: @set LIB=%WORKSPACE_INSTALL_DIR%\lib;%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%DLFCN_WIN32_LIBRARY_DIR%;%LIB%
-@set INCLUDE=%WORKSPACE_INSTALL_DIR%\include;%TBB_INCLUDEDIR%;%INCLUDE%
-@set LIB=%WORKSPACE_INSTALL_DIR%\lib;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%LIB%
+@set INCLUDE=%WORKSPACE_INSTALL_DIR%\include;%FREEIMAGE_INCLUDE_DIR%;%TBB_INCLUDEDIR%;%INCLUDE%
+@set LIB=%WORKSPACE_INSTALL_DIR%\lib;%FREEIMAGE_LIBRARY_DIR%;%BOOST_LIBRARY_DIR%;%TBB_LIBRARY_DIR%;%LIB%
 
 @set PATH=%QT5_BIN_DIR%;%PATH%
 
