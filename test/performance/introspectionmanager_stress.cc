@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2018 Open Source Robotics Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+*/
 #include <gtest/gtest.h>
 
 #include "gazebo/util/IntrospectionManager.hh"
@@ -38,15 +54,16 @@ TEST_F(IntrospectionManagerTest, IntrospectionManagerStressTest)
 {
   // Each model registers 5 items (pos, linvel, angvel, linaccel, angaccel)
   // This would be the equivalent of adding 2000 models.
-  for(size_t ii = 0; ii < 10000; ii++) {
+  for (size_t ii = 0; ii < 10000; ii++)
+  {
     // A callback for updating items.
     // This arbitrarily captures something large enough to not
     // use SBO for std::function.
     auto func = [this,
-                 a=std::string("asdfasdfasdfasdf"),
-                 b=std::string("asdfasdfasdfasdf"),
-                 c=std::string("asdfasdfasdfasdf"),
-                 d=std::string("asdfasdfasdfasdf")]()
+                 a = std::string("asdfasdfasdfasdf"),
+                 b = std::string("asdfasdfasdfasdf"),
+                 c = std::string("asdfasdfasdfasdf"),
+                 d = std::string("asdfasdfasdfasdf")]()
     {
       return a + b + c + d;
     };
@@ -57,7 +74,8 @@ TEST_F(IntrospectionManagerTest, IntrospectionManagerStressTest)
   }
 
   std::vector<double> times;
-  for (size_t ii = 0; ii < 1000; ++ii) {
+  for (size_t ii = 0; ii < 1000; ++ii)
+  {
     common::Time startTime = common::Time::GetWallTime();
     this->manager->Update();
     common::Time endTime = common::Time::GetWallTime();
