@@ -77,6 +77,7 @@ void SonarVisual::Load()
   dPtr->sonarRay->setMaterial("Gazebo/RedGlow");
   dPtr->sonarRay->AddPoint(0, 0, 0);
   dPtr->sonarRay->AddPoint(0, 0, 0);
+  dPtr->sonarRay->SetPoint(0, ignition::math::Vector3d::Zero);
 
   this->SetVisibilityFlags(GZ_VISIBILITY_GUI);
 }
@@ -137,26 +138,25 @@ void SonarVisual::Update()
     {
       dPtr->shapeVis->SetScale(
           ignition::math::Vector3d(rangeMax, rangeMax, rangeMax));
-      dPtr->sonarRay->SetPoint(0,
-          ignition::math::Vector3d(0, 0, 0));
     }
   }
   else
   {
+    dPtr->shapeVis->SetPosition(
+        ignition::math::Vector3d(0, 0, -rangeDelta * 0.5));
+
     double radiusScale = dPtr->sonarMsg->sonar().radius() * 2.0;
     if (!ignition::math::equal(dPtr->shapeVis->Scale().Z(), rangeDelta) ||
         !ignition::math::equal(dPtr->shapeVis->Scale().X(), radiusScale))
     {
       dPtr->shapeVis->SetScale(
           ignition::math::Vector3d(radiusScale, radiusScale, rangeDelta));
-      dPtr->sonarRay->SetPoint(0,
-          ignition::math::Vector3d(0, 0, rangeDelta * 0.5));
     }
   }
 
   ignition::math::Pose3d pose =
-    msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
-  this->SetPose(pose);
+      msgs::ConvertIgn(dPtr->sonarMsg->sonar().world_pose());
+  this->SetWorldPose(pose);
 
   if (dPtr->sonarMsg->sonar().has_contact())
   {

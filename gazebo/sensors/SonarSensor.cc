@@ -217,8 +217,10 @@ void SonarSensor::Load(const std::string &_worldName)
   this->dataPtr->sonarMsg.mutable_sonar()->set_radius(
       this->dataPtr->radius);
 
+  ignition::math::Pose3d referencePose =
+    this->pose + this->dataPtr->parentEntity->WorldPose();
   msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_world_pose(),
-      this->dataPtr->sonarMidPose);
+      referencePose);
   this->dataPtr->sonarMsg.mutable_sonar()->set_range(0);
 }
 
@@ -337,7 +339,7 @@ bool SonarSensor::UpdateImpl(const bool /*_force*/)
         {
           this->dataPtr->sonarMsg.mutable_sonar()->set_range(len);
           msgs::Set(this->dataPtr->sonarMsg.mutable_sonar()->mutable_contact(),
-                this->pose.Rot().RotateVectorReverse(pos + this->dataPtr->offset));
+              referencePose.Rot().RotateVectorReverse(pos));
         }
       }
     }
@@ -383,4 +385,3 @@ event::ConnectionPtr SonarSensor::ConnectUpdate(
 {
   return this->dataPtr->update.Connect(_subscriber);
 }
-

@@ -23,6 +23,6 @@ message Sonar
   ///        the `radius`.
   required string geometry  = 7;
 
-  /// Location of the contact in the world frame.
+  /// Location of the contact relative to sensor origin.
   optional Vector3d contact  = 8;
 }
