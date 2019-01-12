@@ -276,15 +276,20 @@ void RTShaderSystem::GenerateShaders(const VisualPtr &_vis)
     {
       Ogre::SubEntity* curSubEntity = entity->getSubEntity(i);
       const Ogre::String& curMaterialName = curSubEntity->getMaterialName();
-      const Ogre::MaterialPtr& curMaterialPtr = curSubEntity->getMaterial();
       bool success = false;
 
       for (unsigned int s = 0; s < this->dataPtr->scenes.size(); s++)
       {
         try
         {
+#if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR >= 10
+          const Ogre::MaterialPtr& curMaterialPtr = curSubEntity->getMaterial();
           success = this->dataPtr->shaderGenerator->createShaderBasedTechnique(
               *curMaterialPtr,
+#else
+          success = this->dataPtr->shaderGenerator->createShaderBasedTechnique(
+              curMaterialName,
+#endif
               Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
               this->dataPtr->scenes[s]->Name() +
               Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
