@@ -63,6 +63,9 @@ class ModelData_TEST : public QTestFixture
 
   /// \brief Tests for computing moment of inertia for polyline.
   private slots: void PolylineMomentOfInertia();
+
+  /// \brief Tests for bounding collision shapes.
+  private slots: void BoundingCollision();
 };
 
 #endif

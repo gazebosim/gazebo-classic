@@ -145,7 +145,10 @@ namespace gazebo
 
       /// \brief Qt signal emitted when a collision is added.
       /// \param[in] _name Name of collision added.
-      Q_SIGNALS: void CollisionAdded(const std::string &_name);
+      /// \param[in] _collisionShape Collision shape, either "box", "sphere" or
+      /// "cylinder".
+      Q_SIGNALS: void CollisionAdded(const std::string &_name,
+        const std::string &_collisionShape);
 
       /// \brief Qt signal emitted requesting to show/hide a collision.
       /// \param[in] _show True to show, false to hide.
@@ -156,7 +159,9 @@ namespace gazebo
       Q_SIGNALS: void Applied();
 
       /// \brief Qt callback when a collision is to be added.
-      private slots: void OnAddCollision();
+      /// \param[in] _collisionShape Collision shape, either "box", "sphere" or
+      /// "cylinder".
+      private slots: void OnAddCollision(const QString &_collisionShape);
 
       /// \brief Qt callback when a collision is to be removed.
       /// \param[in] _id Id of item to be removed.
@@ -213,6 +218,9 @@ namespace gazebo
 
       /// \brief Qt signal mapper for mapping hide button signals.
       private:  QSignalMapper *mapperShow;
+
+      /// \brief Qt signal mapper for mapping add collision button signals.
+      private:  QSignalMapper *mapperAdd;
 
       /// \brief A map of collision items to their id.
       private: std::map<int, QTreeWidgetItem *> collisionItems;
