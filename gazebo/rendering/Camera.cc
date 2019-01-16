@@ -191,7 +191,7 @@ void Camera::Load()
     this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
   }
 
-  LoadCameraIntrinsics();
+  this->LoadCameraIntrinsics();
 }
 
 //////////////////////////////////////////////////
@@ -203,7 +203,7 @@ void Camera::LoadCameraIntrinsics()
     if (sdfLens->HasElement("intrinsics"))
     {
       sdf::ElementPtr sdfIntrinsics = sdfLens->GetElement("intrinsics");
-      UpdateCameraIntrinsics(
+      this->UpdateCameraIntrinsics(
           sdfIntrinsics->Get<double>("fx"),
           sdfIntrinsics->Get<double>("fy"),
           sdfIntrinsics->Get<double>("cx"),
@@ -229,15 +229,17 @@ void Camera::UpdateCameraIntrinsics(
     clipFar = clipElem->Get<double>("far");
   }
 
-  this->cameraProjectiveMatrix = BuildProjectiveMatrix(
+  this->cameraProjectiveMatrix = this->BuildProjectiveMatrix(
     this->imageWidth, this->imageHeight,
     _cameraIntrinsicsFx, _cameraIntrinsicsFy,
     _cameraIntrinsicsCx, _cameraIntrinsicsCy,
     _cameraIntrinsicsS, clipNear, clipFar);
 
-  if (this->camera != NULL)
+  if (this->camera != nullptr)
+  {
     this->camera->setCustomProjectionMatrix(true,
         Conversions::Convert(cameraProjectiveMatrix));
+  }
 
   this->cameraUsingIntrinsics = true;
 }
@@ -305,9 +307,9 @@ ignition::math::Matrix4d Camera::BuildProjectiveMatrix(
     const double _intrinsicsS,
     const double _clipNear, const double _clipFar)
 {
-  return BuildNDCMatrix(
+  return Camera::BuildNDCMatrix(
            0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
-         BuildPerspectiveMatrix(
+         Camera::BuildPerspectiveMatrix(
            _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy,
            _intrinsicsS, _clipNear, _clipFar);
 }
@@ -1502,8 +1504,10 @@ void Camera::CreateCamera()
   this->cameraNode->roll(Ogre::Degree(-90.0));
 
   if (cameraUsingIntrinsics)
+  {
     this->camera->setCustomProjectionMatrix(true,
       Conversions::Convert(cameraProjectiveMatrix));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1986,8 +1990,10 @@ void Camera::UpdateFOV()
     double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
     if (this->cameraUsingIntrinsics)
+    {
         this->camera->setCustomProjectionMatrix(true,
           Conversions::Convert(cameraProjectiveMatrix));
+    }
     else
     {
       this->camera->setAspectRatio(ratio);

@@ -29,12 +29,11 @@
 #include <sdf/sdf.hh>
 #include <ignition/math/Angle.hh>
 #include <ignition/math/Color.hh>
+#include <ignition/math/Matrix4.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Quaternion.hh>
 #include <ignition/math/Vector2.hh>
 #include <ignition/math/Vector3.hh>
-
-#include <ignition/math/Matrix4.hh>
 
 #include "gazebo/msgs/msgs.hh"
 
@@ -45,10 +44,11 @@
 #include "gazebo/common/PID.hh"
 #include "gazebo/common/Time.hh"
 
-#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/Conversions.hh"
-#include "gazebo/msgs/MessageTypes.hh"
+#include "gazebo/rendering/ogre_gazebo.h"
 #include "gazebo/rendering/RenderTypes.hh"
+
+#include "gazebo/msgs/MessageTypes.hh"
 #include "gazebo/util/system.hh"
 
 // Forward Declarations
@@ -114,7 +114,7 @@ namespace gazebo
           const double _cameraIntrinsicsS);
 
       /// \brief Load the camera intrinsics parameters from the sdf
-      public: virtual void LoadCameraIntrinsics();
+      private: virtual void LoadCameraIntrinsics();
 
       /// \brief Computes the OpenGL NDC matrix
       /// \param[in] _left Left vertical clipping plane
