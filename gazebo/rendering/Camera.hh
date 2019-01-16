@@ -573,13 +573,6 @@ namespace gazebo
       /// \brief Set background color for viewport (if viewport is not null)
       /// \param[in] _color Background color.
       /// \return True if successful. False if viewport is null
-      /// \deprecated Use function which accepts ignition::math::Color.
-      public: virtual bool SetBackgroundColor(const common::Color &_color)
-          GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set background color for viewport (if viewport is not null)
-      /// \param[in] _color Background color.
-      /// \return True if successful. False if viewport is null
       public: virtual bool SetBackgroundColor(
           const ignition::math::Color &_color);
 
@@ -801,6 +794,9 @@ namespace gazebo
 
       /// \brief Viewport the ogre camera uses.
       protected: Ogre::Viewport *viewport;
+
+      /// \brief Scene node that the camera is attached to.
+      protected: Ogre::SceneNode *cameraNode = nullptr;
 
       /// \brief Scene node that controls camera position and orientation.
       protected: Ogre::SceneNode *sceneNode;

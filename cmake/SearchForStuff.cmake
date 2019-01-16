@@ -172,9 +172,6 @@ if (PKG_CONFIG_FOUND)
     if (DART_collision-bullet_FOUND)
       set (HAVE_DART_BULLET TRUE)
     endif()
-    if (DART_collision-ode_FOUND)
-      set (HAVE_DART_ODE TRUE)
-    endif()
   else()
     message (STATUS "Looking for DART - not found")
     BUILD_WARNING ("DART ${DART_MIN_REQUIRED_VERSION} not found, for dart physics engine option, please install libdart${DART_MIN_REQUIRED_VERSION}-dev.")
@@ -606,11 +603,11 @@ find_package(Qt5 COMPONENTS Core Widgets OpenGL Test REQUIRED)
 ########################################
 # Find Boost, if not specified manually
 include(FindBoost)
-find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread signals system filesystem program_options regex iostreams date_time)
+find_package(Boost ${MIN_BOOST_VERSION} REQUIRED thread system filesystem program_options regex iostreams date_time)
 
 if (NOT Boost_FOUND)
   set (BUILD_GAZEBO OFF CACHE INTERNAL "Build Gazebo" FORCE)
-  BUILD_ERROR ("Boost not found. Please install thread signals system filesystem program_options regex date_time boost version ${MIN_BOOST_VERSION} or higher.")
+  BUILD_ERROR ("Boost not found. Please install thread system filesystem program_options regex iostreams date_time boost version ${MIN_BOOST_VERSION} or higher.")
 endif()
 
 ########################################
@@ -748,7 +745,7 @@ endif()
 
 ################################################################################
 # Find the Ignition Fuel Tools library
-find_package(ignition-fuel_tools1 QUIET)
+find_package(ignition-fuel_tools1 1.2 QUIET)
 if (NOT ignition-fuel_tools1_FOUND)
   message (STATUS "Looking for libignition-fuel_tools1 - not found")
   BUILD_WARNING ("Ignition Fuel Tools not found, Fuel support will be disabled")

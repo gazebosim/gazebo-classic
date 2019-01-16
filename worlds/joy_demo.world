@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+    <!-- A ground plane -->
+    <include>
+      <uri>model://ground_plane</uri>
+    </include>
+
+    <!-- A global light source -->
+    <include>
+      <uri>model://sun</uri>
+    </include>
+
+    <!-- Load the joystick plugin -->
+    <plugin name="joy" filename="libJoyPlugin.so">
+      <dev>/dev/input/js0</dev>
+      <topic>/joy</topic>
+      <sticky_buttons>false</sticky_buttons>
+      <dead_zone>0.05</dead_zone>
+      <rate>60</rate>
+      <accumulation_rate>1000</accumulation_rate>
+    </plugin>
+</world>
+</sdf>

@@ -2,12 +2,15 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
-1. Add record_resources field to gazebo log msgs
+1. Add record\_resources field to gazebo log msgs
     * [Pull request #2797](https://bitbucket.org/osrf/gazebo/pull-request/2797)
     * [Pull request #3008](https://bitbucket.org/osrf/gazebo/pull-request/3008)
 
 1. Add methods to set dynamically Gaussian noise parameters
     * [Pull request #2931](https://bitbucket.org/osrf/gazebo/pull-request/2931)
+
+1. Use tension trajectory parameter on actor script animation
+    * [Pull request #3019](https://bitbucket.org/osrf/gazebo/pull-request/3019)
 
 1. Add command to send a request with gz topic
     * [Pull request #2907](https://bitbucket.org/osrf/gazebo/pull-request/2907)
@@ -29,10 +32,14 @@
 
 1. Plugin to initialize joint controller parameters
     * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
-    * [Issue #1766](https://bitbucket.org/osrf/gazebo
+    * [Issue #1766](https://bitbucket.org/osrf/gazebo/issues/1766)
 
 1. Fix Enter in Link Inspector
     * [Pull request #2901](https://bitbucket.org/osrf/gazebo/pull-request/2901)
+
+1. Display ODE contact points on disabled bodies
+    * [Pull request #2709](https://bitbucket.org/osrf/gazebo/pull-request/2709)
+    * [Issue #2175](https://bitbucket.org/osrf/gazebo/issues/2175)
 
 1. Update Wind Plugin to support being used by Lift Drag Plugin
     * [Pull request #2691](https://bitbucket.org/osrf/gazebo/pull-request/2691)
@@ -44,13 +51,176 @@
 
 ## Gazebo 9
 
-## Gazebo 9.X.X (2018-xx-xx)
+## Gazebo 9.X.X (20XX-XX-XX)
+
+
+## Gazebo 9.6.0 (2018-12-17)
+
+1. Don't search for boost signals component
+    * [Pull request 3050](https://bitbucket.org/osrf/gazebo/pull-requests/3050)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
+1. Fix saving heightmap cache
+    * [Pull request 3044](https://bitbucket.org/osrf/gazebo/pull-requests/3044)
+    * [Issue 2572](https://bitbucket.org/osrf/gazebo/issues/2572)
+
+1. Fix GUI plugins on Bionic + gz9
+    * [Pull request 3041](https://bitbucket.org/osrf/gazebo/pull-requests/3041)
+    * [Issue 2541](https://bitbucket.org/osrf/gazebo/issues/2541)
+
+1. Add method to get the link visual elements
+    * [Pull request 3040](https://bitbucket.org/osrf/gazebo/pull-requests/3040)
+    * backport of [Pull request 2900](https://bitbucket.org/osrf/gazebo/pull-requests/2900)
+
+1. Add Plugin::LoadParam to improve plugin interface
+    * [Pull request 3047](https://bitbucket.org/osrf/gazebo/pull-requests/3047)
+
+1. Fix gzclient on mojave with Qt 5.12
+    * [Pull request 3051](https://bitbucket.org/osrf/gazebo/pull-requests/3051)
+    * [Issue 2531](https://bitbucket.org/osrf/gazebo/issues/2531)
+
+1. Switch Time::Sleep from CLOCK\_REALTIME to CLOCK\_MONOTONIC on Linux
+    * [Pull request 3037](https://bitbucket.org/osrf/gazebo/pull-requests/3037)
+
+1. Change sleep time larger than resolution message from gzerr to gzlog
+    * [Pull request 3036](https://bitbucket.org/osrf/gazebo/pull-requests/3036)
+
+1. Fix DARTHingeJoint::SetAxis implementation (issue 2505)
+    * [Pull request 3005](https://bitbucket.org/osrf/gazebo/pull-requests/3005)
+    * [Issue 2505](https://bitbucket.org/osrf/gazebo/issues/2505)
+
+1. Plugin to initialize joint controller parameters
+    * [Pull request #3031](https://bitbucket.org/osrf/gazebo/pull-requests/3031)
+    * [Pull request #2751](https://bitbucket.org/osrf/gazebo/pull-requests/2751)
+    * [Issue 1766](https://bitbucket.org/osrf/gazebo/issues/1766)
+
+1. static_map_plugin.cc: remove backup folder
+    * [Pull request #3023](https://bitbucket.org/osrf/gazebo/pull-requests/3023)
+
+1. Fix regression test build -> gazebo9
+    * [Pull request #3046](https://bitbucket.org/osrf/gazebo/pull-requests/3046)
+
+## Gazebo 9.5.0 (2018-11-19)
+
+1. Fix model bounding box
+    * [Pull request 3033](https://bitbucket.org/osrf/gazebo/pull-request/3033)
+
+1. Skip skyx in SSAO plugin
+    * [Pull request 3028](https://bitbucket.org/osrf/gazebo/pull-request/3028)
+
+1. Boost 1.68 support
+    * [Pull request 3030](https://bitbucket.org/osrf/gazebo/pull-request/3030)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+
+
+## Gazebo 9.4.1 (2018-09-19)
+
+1. Revert pr 2923: "Handle signal SIGTERM exactly the same way as SIGINT"
+    * [Pull request 3018](https://bitbucket.org/osrf/gazebo/pull-request/3018)
+    * Reverts [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
+    * Some discussion in [Pull request 3014](https://bitbucket.org/osrf/gazebo/pull-request/3014)
+
+
+## Gazebo 9.4.0 (2018-09-18)
+
+1. Fix for the spawning light issue. This fix allows a light's visual to be
+   turned on/off.
+    * [Pull request 3011](https://bitbucket.org/osrf/gazebo/pull-requests/3011)
+
+1. Add joystick plugin and demo world
+    * [Pull request 2895](https://bitbucket.org/osrf/gazebo/pull-request/2895)
+
+1. Support toggling light visuals.
+    * [Pull request 3011](https://bitbucket.org/osrf/gazebo/pull-request/3011)
+
+1. Improve shutdown speed.
+    * [Pull request 3014](https://bitbucket.org/osrf/gazebo/pull-request/3014)
+
+1. Fix vertical lidar rays.
+    * [Pull request 3013](https://bitbucket.org/osrf/gazebo/pull-request/3013)
+
+1. Only use active interfaces in gazebo/transport.
+    * [Pull request 3009](https://bitbucket.org/osrf/gazebo/pull-request/3009)
+
+1. Trigger the stop event on sigint/sigterm.
+    * [Pull request 2993](https://bitbucket.org/osrf/gazebo/pull-request/2993)
+
+1. Include SDF header in rendering::Distortion
+    * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
+
+1. More documentation to Model::CreateJoint()
+    * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
+
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
+1. Print joint_cmd deprecation warnings only one time
+    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
+    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
+
+## Gazebo 9.3.1 (2018-08-08)
+
+1. Fix for the spawning light issue
+    * [Pull request 3003](https://bitbucket.org/osrf/gazebo/pull-requests/3003)
+
+## Gazebo 9.3.0 (2018-07-28)
+
+1. Add a LED plugin blinking visual objects
+    * [Pull request 2994](https://bitbucket.org/osrf/gazebo/pull-request/2994)
+
+1. Require ignition-fuel-tools 1.2 when finding package
+    * [Pull request 2992](https://bitbucket.org/osrf/gazebo/pull-request/2992)
+    * [Issue 2494](https://bitbucket.org/osrf/gazebo/issues/2494)
+
+1. Add a flashlight plugin blinking lights attached on a model
+    * [Pull request 2961](https://bitbucket.org/osrf/gazebo/pull-request/2961)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2996](https://bitbucket.org/osrf/gazebo/pull-request/2996)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+## Gazebo 9.2.0 (2018-07-10)
+
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
 
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)
+
+1. Attach lights to links cleanup and deprecate GetLight functions
+    * [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
 
 
 ## Gazebo 9.1.1 (2018-06-08)
@@ -79,9 +249,6 @@
 
 1. Added missing OGRE headers
     * [Pull request 2894](https://bitbucket.org/osrf/gazebo/pull-request/2894)
-
-1. Attach lights to links cleanup and deprecate GetLight functions
-* [Pull request #2871](https://bitbucket.org/osrf/gazebo/pull-request/2871)
 
 1. Handle signal SIGTERM exactly the same way as SIGINT
     * [Pull request 2923](https://bitbucket.org/osrf/gazebo/pull-request/2923)
@@ -353,7 +520,55 @@
 
 ## Gazebo 8
 
-## Gazebo 8.x.x (2018-xx-xx)
+## Gazebo 8.X.X (201X-XX-XX)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Joint.hh: fix documentation for Set{Upp|Low}erLimit
+    * [Pull request 3027](https://bitbucket.org/osrf/gazebo/pull-request/3027)
+
+1. Fix for revolute2 joints that prevents links from teleporting to origin
+    * [Pull request 3024](https://bitbucket.org/osrf/gazebo/pull-request/3024)
+    * [Issue 2239](https://bitbucket.org/osrf/gazebo/issues/2239)
+
+1. Include SDF header in rendering::Distortion
+    * [Pull request 3012](https://bitbucket.org/osrf/gazebo/pull-request/3012)
+
+1. More documentation to Model::CreateJoint()
+    * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
+
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
+
+1. Print joint_cmd deprecation warnings only one time
+    * [Pull request 2966](https://bitbucket.org/osrf/gazebo/pull-request/2966)
+    * [Issue 2393](https://bitbucket.org/osrf/gazebo/issues/2393)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+
+
+## Gazebo 8.6.0 (2018-06-26)
+
+1. Fix SetCrop for multiple cameras and add SetCrop test
+    * [Pull request 2967](https://bitbucket.org/osrf/gazebo/pull-request/2967)
 
 1. Fix check terrain layer count in height map
     * [Pull request 2978](https://bitbucket.org/osrf/gazebo/pull-request/2978)
@@ -1022,6 +1237,37 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2018-XX-XX)
+
+1. Use new sha1.hpp header location for recent boost
+    * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. More documentation to Model::CreateJoint()
+    * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
+
+1. Improve ODE slip parameter behavior with multiple contact points
+    * [Pull request 2965](https://bitbucket.org/osrf/gazebo/pull-request/2965)
+
+1. Fix for BulletFixedJoint when used with inertial matrices with non-zero values on their off-diagonal
+    * [Pull request 3010](https://bitbucket.org/osrf/gazebo/pull-request/3010)
+
+1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
+    * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+
+1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+
+
+## Gazebo 7.14.0 (2018-07-27)
+
+1. Fix manipulating links in the model editor
+    * [Pull request 2999](https://bitbucket.org/osrf/gazebo/pull-request/2999)
+    * [Issue 2487](https://bitbucket.org/osrf/gazebo/issues/2487)
+
+1. LOD skirt length
+    * [Pull request 2968](https://bitbucket.org/osrf/gazebo/pull-request/2968)
+
+1. Patch for visual message process
+    * [Pull request 2983](https://bitbucket.org/osrf/gazebo/pull-request/2983)
 
 1. Fix build on homebrew with protobuf 3.6
     * [Pull request 2984](https://bitbucket.org/osrf/gazebo/pull-request/2984)

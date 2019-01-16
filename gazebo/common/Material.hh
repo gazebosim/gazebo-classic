@@ -20,7 +20,6 @@
 #include <string>
 #include <iostream>
 #include <ignition/math/Color.hh>
-#include "gazebo/common/Color.hh"
 #include "gazebo/util/system.hh"
 
 namespace gazebo
@@ -48,11 +47,6 @@ namespace gazebo
 
       /// \brief Create a material with a default color
       /// \param[in] _clr Color of the material
-      /// \deprecated Use constructor which accepts ignition::math::Color.
-      public: explicit Material(const Color &_clr) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Create a material with a default color
-      /// \param[in] _clr Color of the material
       public: explicit Material(const ignition::math::Color &_clr);
 
       /// \brief Get the name of the material
@@ -77,17 +71,7 @@ namespace gazebo
 
       /// \brief Set the ambient color
       /// \param[in] _clr The ambient color
-      /// \deprecated Use function that accepts ignition::math::Color.
-      public: void SetAmbient(const Color &_clr) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the ambient color
-      /// \param[in] _clr The ambient color
       public: void SetAmbient(const ignition::math::Color &_clr);
-
-      /// \brief Get the ambient color
-      /// \return The ambient color
-      /// \deprecated Use function that returns ignition::math::Color.
-      public: Color GetAmbient() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the ambient color
       /// \return The ambient color
@@ -95,17 +79,7 @@ namespace gazebo
 
       /// \brief Set the diffuse color
       /// \param[in] _clr The diffuse color
-      /// \deprecated Use function that accepts ignition::math::Color.
-      public: void SetDiffuse(const Color &_clr) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the diffuse color
-      /// \param[in] _clr The diffuse color
       public: void SetDiffuse(const ignition::math::Color &_clr);
-
-      /// \brief Get the diffuse color
-      /// \return The diffuse color
-      /// \deprecated Use function that returns ignition::math::Color.
-      public: Color GetDiffuse() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the diffuse color
       /// \return The diffuse color
@@ -113,17 +87,7 @@ namespace gazebo
 
       /// \brief Set the specular color
       /// \param[in] _clr The specular color
-      /// \deprecated Use function that accepts ignition::math::Color.
-      public: void SetSpecular(const Color &_clr) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the specular color
-      /// \param[in] _clr The specular color
       public: void SetSpecular(const ignition::math::Color &_clr);
-
-      /// \brief Get the specular color
-      /// \return The specular color
-      /// \deprecated Use function that returns ignition::math::Color.
-      public: Color GetSpecular() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the specular color
       /// \return The specular color
@@ -131,17 +95,7 @@ namespace gazebo
 
       /// \brief Set the emissive color
       /// \param[in] _clr The emissive color
-      /// \deprecated Use function that accepts ignition::math::Color.
-      public: void SetEmissive(const Color &_clr) GAZEBO_DEPRECATED(9.0);
-
-      /// \brief Set the emissive color
-      /// \param[in] _clr The emissive color
       public: void SetEmissive(const ignition::math::Color &_clr);
-
-      /// \brief Get the emissive color
-      /// \return The emissive color
-      /// \deprecated Use function that returns ignition::math::Color.
-      public: Color GetEmissive() const GAZEBO_DEPRECATED(9.0);
 
       /// \brief Get the emissive color
       /// \return The emissive color

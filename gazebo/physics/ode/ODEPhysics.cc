@@ -962,16 +962,6 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
     ODECollision *collision1 = nullptr;
     ODECollision *collision2 = nullptr;
 
-    // Exit if both bodies are not enabled
-    if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
-        dGeomGetCategoryBits(_o2) != GZ_SENSOR_COLLIDE &&
-        ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
-        (!b2 && b1 && !dBodyIsEnabled(b1)) ||
-        (!b1 && b2 && !dBodyIsEnabled(b2))))
-    {
-      return;
-    }
-
     // Get pointers to the underlying collisions
     if (dGeomGetClass(_o1) == dGeomTransformClass)
       collision1 =
@@ -984,6 +974,18 @@ void ODEPhysics::CollisionCallback(void *_data, dGeomID _o1, dGeomID _o2)
         static_cast<ODECollision*>(dGeomGetData(dGeomTransformGetGeom(_o2)));
     else
       collision2 = static_cast<ODECollision*>(dGeomGetData(_o2));
+
+    // Exit if both bodies are not enabled
+    if (dGeomGetCategoryBits(_o1) != GZ_SENSOR_COLLIDE &&
+        dGeomGetCategoryBits(_o2) != GZ_SENSOR_COLLIDE &&
+        !self->contactManager->NeverDropContacts() &&
+        !self->contactManager->SubscribersConnected(collision1, collision2) &&
+        ((b1 && b2 && !dBodyIsEnabled(b1) && !dBodyIsEnabled(b2)) ||
+        (!b2 && b1 && !dBodyIsEnabled(b1)) ||
+        (!b1 && b2 && !dBodyIsEnabled(b2))))
+    {
+      return;
+    }
 
     // Make sure both collision pointers are valid.
     if (collision1 && collision2)
@@ -1168,6 +1170,14 @@ void ODEPhysics::Collide(ODECollision *_collision1, ODECollision *_collision2,
   contact.surface.slip1 = surf1->slip1 + surf2->slip1;
   contact.surface.slip2 = surf1->slip2 + surf2->slip2;
   contact.surface.slip3 = surf1->slipTorsion + surf2->slipTorsion;
+  // The slip parameter acts like a damper at each contact point
+  // so the total damping for each collision is multiplied by the
+  // number of contact points (numc).
+  // To eliminate this dependence on numc, the inverse damping
+  // is multipled by numc.
+  contact.surface.slip1 *= numc;
+  contact.surface.slip2 *= numc;
+  contact.surface.slip3 *= numc;
 
   // Combine torsional friction patch radius values
   contact.surface.patch_radius =

@@ -69,14 +69,6 @@ using namespace rendering;
 
 //////////////////////////////////////////////////
 Grid::Grid(Scene *_scene, const unsigned int _cellCount,
-    const float _cellLength, const float /*_lineWidth*/,
-    const common::Color &_color)
-: Grid(_scene, _cellCount, _cellLength, _color.Ign())
-{
-}
-
-//////////////////////////////////////////////////
-Grid::Grid(Scene *_scene, const unsigned int _cellCount,
     const float _cellLength, const ignition::math::Color &_color)
 : dataPtr(new GridPrivate)
 {
@@ -113,18 +105,6 @@ void Grid::SetCellLength(const float _len)
   this->dataPtr->cellLength = _len;
 
   this->Create();
-}
-
-//////////////////////////////////////////////////
-void Grid::SetLineWidth(const float /*_width*/)
-{
-  gzwarn << "Line width is not supported. Issue #1978" << std::endl;
-}
-
-//////////////////////////////////////////////////
-void Grid::SetColor(const common::Color &_color)
-{
-  this->SetColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -297,13 +277,6 @@ uint32_t Grid::CellCount() const
 float Grid::CellLength() const
 {
   return this->dataPtr->cellLength;
-}
-
-//////////////////////////////////////////////////
-float Grid::LineWidth() const
-{
-  gzwarn << "Line width is not supported. Issue #1978" << std::endl;
-  return 1.0;
 }
 
 //////////////////////////////////////////////////

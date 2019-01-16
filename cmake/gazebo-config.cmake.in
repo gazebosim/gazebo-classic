@@ -24,7 +24,6 @@ set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
 set (GAZEBO_HAS_DART @HAVE_DART@)
 set (GAZEBO_DART_MIN_REQUIRED_VERSION @DART_MIN_REQUIRED_VERSION@)
 set (GAZEBO_HAS_DART_BULLET @HAVE_DART_BULLET@)
-set (GAZEBO_HAS_DART_ODE @HAVE_DART_ODE@)
 
 # Set whether Gazebo was built with Ignition Fuel Tools support
 set (GAZEBO_HAS_IGNITION_FUEL_TOOLS @HAVE_IGNITION_FUEL_TOOLS@)
@@ -158,7 +157,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/lib/OGRE/cmake;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
 
 # Find boost
-find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
+find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread system
   filesystem program_options regex iostreams date_time)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})

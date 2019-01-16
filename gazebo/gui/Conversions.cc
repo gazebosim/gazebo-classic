@@ -15,19 +15,11 @@
  *
 */
 
-#include "gazebo/common/Color.hh"
-
 #include "gazebo/gui/qt.h"
 #include "gazebo/gui/Conversions.hh"
 
 using namespace gazebo;
 using namespace gui;
-
-//////////////////////////////////////////////////
-QColor Conversions::Convert(const common::Color &_color)
-{
-  return Convert(_color.Ign());
-}
 
 //////////////////////////////////////////////////
 QColor Conversions::Convert(const ignition::math::Color &_color)

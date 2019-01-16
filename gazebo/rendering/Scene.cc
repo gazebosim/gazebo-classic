@@ -498,12 +498,6 @@ std::string Scene::Name() const
 }
 
 //////////////////////////////////////////////////
-void Scene::SetAmbientColor(const common::Color &_color)
-{
-  this->SetAmbientColor(_color.Ign());
-}
-
-//////////////////////////////////////////////////
 void Scene::SetAmbientColor(const ignition::math::Color &_color)
 {
   this->dataPtr->sdf->GetElement("ambient")->Set(_color);
@@ -520,12 +514,6 @@ void Scene::SetAmbientColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::AmbientColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("ambient");
-}
-
-//////////////////////////////////////////////////
-void Scene::SetBackgroundColor(const common::Color &_color)
-{
-  this->SetBackgroundColor(_color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -552,13 +540,6 @@ void Scene::SetBackgroundColor(const ignition::math::Color &_color)
 ignition::math::Color Scene::BackgroundColor() const
 {
   return this->dataPtr->sdf->Get<ignition::math::Color>("background");
-}
-
-//////////////////////////////////////////////////
-void Scene::CreateGrid(const uint32_t _cellCount, const float _cellLength,
-                       const float /*_lineWidth*/, const common::Color &_color)
-{
-  this->CreateGrid(_cellCount, _cellLength, _color.Ign());
 }
 
 //////////////////////////////////////////////////
@@ -1171,12 +1152,11 @@ bool Scene::FirstContact(CameraPtr _camera,
 
   double distance = -1.0;
 
-  Ogre::Camera *ogreCam = _camera->OgreCamera();
-  Ogre::Ray mouseRay = ogreCam->getCameraToViewportRay(
-      static_cast<float>(_mousePos.X()) /
-      ogreCam->getViewport()->getActualWidth(),
-      static_cast<float>(_mousePos.Y()) /
-      ogreCam->getViewport()->getActualHeight());
+  ignition::math::Vector3d origin, dir;
+  _camera->CameraToViewportRay(
+      _mousePos.X(), _mousePos.Y(), origin, dir);
+  Ogre::Ray mouseRay(Conversions::Convert(origin),
+      Conversions::Convert(dir));
 
   UserCameraPtr userCam = boost::dynamic_pointer_cast<UserCamera>(_camera);
   if (userCam)
@@ -1366,14 +1346,6 @@ void Scene::DrawLine(const ignition::math::Vector3d &_start,
 
   if (!attached)
     sceneNode->attachObject(obj);
-}
-
-//////////////////////////////////////////////////
-void Scene::SetFog(const std::string &_type, const common::Color &_color,
-                   const double _density, const double _start,
-                   const double _end)
-{
-  this->SetFog(_type, _color.Ign(), _density, _start, _end);
 }
 
 //////////////////////////////////////////////////
@@ -2786,6 +2758,8 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
           }
         }
         this->dataPtr->terrain->SetLOD(this->dataPtr->heightmapLOD);
+        const double skirtLen = this->dataPtr->heightmapSkirtLength;
+        this->dataPtr->terrain->SetSkirtLength(skirtLen);
         this->dataPtr->terrain->LoadFromMsg(_msg);
       }
     }
@@ -2824,16 +2798,18 @@ bool Scene::ProcessVisualMsg(ConstVisualPtr &_msg, Visual::VisualType _type)
   {
     // Make sure the parent visual exists before trying to add a child
     // visual
-    iter = this->dataPtr->visuals.find(_msg->parent_id());
-    if (iter == this->dataPtr->visuals.end())
-    {
+    VisualPtr parent = this->GetVisual(_msg->parent_name());
+    if (!parent)
       return false;
-    }
 
-    visual.reset(new Visual(_msg->name(), iter->second));
+    visual.reset(new Visual(_msg->name(), parent));
   }
   else
   {
+    // Make sure the world visual exists before trying to add a child visual
+    if (!this->dataPtr->worldVisual)
+      return false;
+
     // Add a visual that is attached to the scene root
     visual.reset(new Visual(_msg->name(), this->dataPtr->worldVisual));
   }
@@ -3394,6 +3370,23 @@ unsigned int Scene::HeightmapLOD() const
     return this->dataPtr->terrain->LOD();
 
   return this->dataPtr->heightmapLOD;
+}
+
+/////////////////////////////////////////////////
+void Scene::SetHeightmapSkirtLength(const double _value)
+{
+  this->dataPtr->heightmapSkirtLength = _value;
+  if (this->dataPtr->terrain)
+    this->dataPtr->terrain->SetSkirtLength(this->dataPtr->heightmapSkirtLength);
+}
+
+/////////////////////////////////////////////////
+double Scene::HeightmapSkirtLength() const
+{
+  if (this->dataPtr->terrain)
+    return this->dataPtr->terrain->SkirtLength();
+
+  return this->dataPtr->heightmapSkirtLength;
 }
 
 /////////////////////////////////////////////////

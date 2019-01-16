@@ -298,9 +298,6 @@ void Link::Load(sdf::ElementPtr _sdf)
 //////////////////////////////////////////////////
 void Link::Init()
 {
-  this->linearAccel.Set(0, 0, 0);
-  this->angularAccel.Set(0, 0, 0);
-
   this->dataPtr->enabled = true;
 
   // Set Link pose before setting pose of child collisions
@@ -320,7 +317,6 @@ void Link::Init()
     if ((*iter)->HasType(Base::LIGHT))
     {
       LightPtr light= boost::static_pointer_cast<Light>(*iter);
-      this->dataPtr->lights.push_back(light);
       light->Init();
     }
   }
@@ -735,24 +731,6 @@ CollisionPtr Link::GetCollision(unsigned int _index) const
 }
 
 //////////////////////////////////////////////////
-void Link::SetLinearAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetLinearAccel() is deprecated and has "
-         << "no effect. Use Link::SetForce() instead.\n";
-  this->SetEnabled(true);
-  this->linearAccel = _accel;
-}
-
-//////////////////////////////////////////////////
-void Link::SetAngularAccel(const ignition::math::Vector3d &_accel)
-{
-  gzwarn << "Link::SetAngularAccel() is deprecated and has "
-         << "no effect. Use Link::SetTorque() instead.\n";
-  this->SetEnabled(true);
-  this->angularAccel = _accel;
-}
-
-//////////////////////////////////////////////////
 ignition::math::Pose3d Link::WorldCoGPose() const
 {
   ignition::math::Pose3d pose = this->WorldPose();
@@ -839,7 +817,8 @@ ignition::math::Box Link::BoundingBox() const
 
   box.Min().Set(ignition::math::MAX_D, ignition::math::MAX_D,
       ignition::math::MAX_D);
-  box.Max().Set(0, 0, 0);
+  box.Max().Set(-ignition::math::MAX_D, -ignition::math::MAX_D,
+     -ignition::math::MAX_D);
 
   for (Collision_V::const_iterator iter = this->dataPtr->collisions.begin();
        iter != this->dataPtr->collisions.end(); ++iter)
@@ -1930,4 +1909,15 @@ void Link::LoadLight(sdf::ElementPtr _sdf)
   light->ProcessMsg(msgs::LightFromSDF(_sdf));
   light->SetWorld(this->world);
   light->Load(_sdf);
+  this->dataPtr->lights.push_back(light);
+  // NOTE:
+  // The light need to be added to the list on Load (before Init) for the case
+  // when a model is created from a factory message. Otherwise the model msg
+  // published to the client will not contain an entry of this light
+}
+
+//////////////////////////////////////////////////
+const Link::Visuals_M &Link::Visuals() const
+{
+  return this->visuals;
 }
