@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,20 +89,20 @@ void PluginInterfaceTest::TestLoadParam(sdf::ElementPtr &_sdf) const
     float f = 3.14f;
 
     LoadParam(_sdf, "float", f, 0.0f);
-    EXPECT_NEAR(f, 3.14f, 0.0f);
+    EXPECT_FLOAT_EQ(f, 3.14f);
 
     LoadParam(_sdf, "float_nonexistent", f, 1.0f);
-    EXPECT_NEAR(f, 1.0f, 0.0f);
+    EXPECT_FLOAT_EQ(f, 1.0f);
   }
 
   {
     double d = 3.14;
 
     LoadParam(_sdf, "float", d, 0.0);
-    EXPECT_NEAR(d, 3.14, 0.0);
+    EXPECT_DOUBLE_EQ(d, 3.14);
 
     LoadParam(_sdf, "float_nonexistent", d, 1.0);
-    EXPECT_NEAR(d, 1.0, 0.0);
+    EXPECT_DOUBLE_EQ(d, 1.0);
   }
 
   {

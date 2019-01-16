@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Open Source Robotics Foundation
+ * Copyright (C) 2018 Open Source Robotics Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,17 @@ class PluginTest : public gazebo::testing::AutoLogFixture
   }
 };
 
+// helper function that gives correct prefix and extension for the OS
+std::string expectedFilename(const std::string &_pluginName)
+{
+#ifdef _WIN32
+  return _pluginName + ".dll");
+#elif __APPLE__
+  return "lib" + _pluginName + ".dylib";
+#endif
+  return "lib" + _pluginName + ".so";
+}
+
 TEST_F(PluginTest, LoadModelPlugin)
 {
   ModelPluginPtr plugin = ModelPlugin::Create("libBuoyancyPlugin.so",
@@ -43,7 +54,7 @@ TEST_F(PluginTest, LoadModelPlugin)
   ASSERT_TRUE(plugin != nullptr);
 
   EXPECT_EQ(plugin->GetType(), PluginType::MODEL_PLUGIN);
-  EXPECT_EQ(plugin->GetFilename(), "libBuoyancyPlugin.so");
+  EXPECT_EQ(plugin->GetFilename(), expectedFilename("BuoyancyPlugin"));
   EXPECT_EQ(plugin->GetHandle(), "pluginInterfaceTest");
 }
 
@@ -54,7 +65,7 @@ TEST_F(PluginTest, LoadWorldPlugin)
   ASSERT_TRUE(plugin != nullptr);
 
   EXPECT_EQ(plugin->GetType(), PluginType::WORLD_PLUGIN);
-  EXPECT_EQ(plugin->GetFilename(), "libArrangePlugin.so");
+  EXPECT_EQ(plugin->GetFilename(), expectedFilename("ArrangePlugin"));
   EXPECT_EQ(plugin->GetHandle(), "pluginInterfaceTest");
 }
 
@@ -65,7 +76,7 @@ TEST_F(PluginTest, LoadSensorPlugin)
   ASSERT_TRUE(plugin != nullptr);
 
   EXPECT_EQ(plugin->GetType(), PluginType::SENSOR_PLUGIN);
-  EXPECT_EQ(plugin->GetFilename(), "libContactPlugin.so");
+  EXPECT_EQ(plugin->GetFilename(), expectedFilename("ContactPlugin"));
   EXPECT_EQ(plugin->GetHandle(), "pluginInterfaceTest");
 }
 
@@ -76,7 +87,7 @@ TEST_F(PluginTest, LoadSystemPlugin)
   ASSERT_TRUE(plugin != nullptr);
 
   EXPECT_EQ(plugin->GetType(), PluginType::SYSTEM_PLUGIN);
-  EXPECT_EQ(plugin->GetFilename(), "libModelPropShop.so");
+  EXPECT_EQ(plugin->GetFilename(), expectedFilename("ModelPropShop"));
   EXPECT_EQ(plugin->GetHandle(), "pluginInterfaceTest");
 }
 
@@ -87,7 +98,7 @@ TEST_F(PluginTest, LoadVisualPlugin)
   ASSERT_TRUE(plugin != nullptr);
 
   EXPECT_EQ(plugin->GetType(), PluginType::VISUAL_PLUGIN);
-  EXPECT_EQ(plugin->GetFilename(), "libBlinkVisualPlugin.so");
+  EXPECT_EQ(plugin->GetFilename(), expectedFilename("BlinkVisualPlugin"));
   EXPECT_EQ(plugin->GetHandle(), "pluginInterfaceTest");
 }
 
