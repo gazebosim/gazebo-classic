@@ -156,7 +156,6 @@ void SonarSensor::Load(const std::string &_worldName)
     this->dataPtr->sonarShape->SetMesh("unit_sphere");
     this->dataPtr->sonarShape->SetScale(
         ignition::math::Vector3d(range, range, range));
-    this->dataPtr->offset = ignition::math::Vector3d::Zero;
     this->dataPtr->sonarMidPose = this->pose;
   }
   else
@@ -172,8 +171,8 @@ void SonarSensor::Load(const std::string &_worldName)
 
     // Position the collision shape properly. Without this, the shape will be
     // centered at the start of the sonar.
-    this->dataPtr->offset = this->pose.Rot().RotateVector({0, 0, range * 0.5});
-    this->dataPtr->sonarMidPose.Set(this->pose.Pos() - this->dataPtr->offset,
+    const auto offset = this->pose.Rot().RotateVector({0, 0, range * 0.5});
+    this->dataPtr->sonarMidPose.Set(this->pose.Pos() - offset,
         this->pose.Rot());
   }
 
