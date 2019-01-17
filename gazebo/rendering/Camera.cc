@@ -66,6 +66,8 @@ Camera::Camera(const std::string &_name, ScenePtr _scene,
   : dataPtr(new CameraPrivate)
 {
   this->initialized = false;
+  this->cameraProjectiveMatrix = ignition::math::Matrix4d::Identity;
+  this->cameraUsingIntrinsics = false;
   this->sdf.reset(new sdf::Element);
   sdf::initFile("camera.sdf", this->sdf);
 
@@ -188,6 +190,128 @@ void Camera::Load()
     this->dataPtr->distortion.reset(new Distortion());
     this->dataPtr->distortion->Load(this->sdf->GetElement("distortion"));
   }
+
+  this->LoadCameraIntrinsics();
+}
+
+//////////////////////////////////////////////////
+void Camera::LoadCameraIntrinsics()
+{
+  if (this->sdf->HasElement("lens"))
+  {
+    sdf::ElementPtr sdfLens = this->sdf->GetElement("lens");
+    if (sdfLens->HasElement("intrinsics"))
+    {
+      sdf::ElementPtr sdfIntrinsics = sdfLens->GetElement("intrinsics");
+      this->UpdateCameraIntrinsics(
+          sdfIntrinsics->Get<double>("fx"),
+          sdfIntrinsics->Get<double>("fy"),
+          sdfIntrinsics->Get<double>("cx"),
+          sdfIntrinsics->Get<double>("cy"),
+          sdfIntrinsics->Get<double>("s"));
+    }
+  }
+}
+
+//////////////////////////////////////////////////
+void Camera::UpdateCameraIntrinsics(
+    const double _cameraIntrinsicsFx, const double _cameraIntrinsicsFy,
+    const double _cameraIntrinsicsCx, const double _cameraIntrinsicsCy,
+    const double _cameraIntrinsicsS)
+{
+  double clipNear = 0.5;
+  double clipFar = 2.5;
+
+  sdf::ElementPtr clipElem = this->sdf->GetElement("clip");
+  if (clipElem)
+  {
+    clipNear = clipElem->Get<double>("near");
+    clipFar = clipElem->Get<double>("far");
+  }
+
+  this->cameraProjectiveMatrix = this->BuildProjectiveMatrix(
+    this->imageWidth, this->imageHeight,
+    _cameraIntrinsicsFx, _cameraIntrinsicsFy,
+    _cameraIntrinsicsCx, _cameraIntrinsicsCy,
+    _cameraIntrinsicsS, clipNear, clipFar);
+
+  if (this->camera != nullptr)
+  {
+    this->camera->setCustomProjectionMatrix(true,
+        Conversions::Convert(cameraProjectiveMatrix));
+  }
+
+  this->cameraUsingIntrinsics = true;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildNDCMatrix(
+    const double _left, const double _right,
+    const double _bottom, const double _top,
+    const double _near, const double _far)
+{
+  double inverseWidth = 1.0 / (_right - _left);
+  double inverseHeight = 1.0 / (_top - _bottom);
+  double inverseDistance = 1.0 / (_far - _near);
+
+  return ignition::math::Matrix4d(
+           2.0 * inverseWidth,
+           0.0,
+           0.0,
+           -(_right + _left) * inverseWidth,
+           0.0,
+           2.0 * inverseHeight,
+           0.0,
+           -(_top + _bottom) * inverseHeight,
+           0.0,
+           0.0,
+           -2.0 * inverseDistance,
+           -(_far + _near) * inverseDistance,
+           0.0,
+           0.0,
+           0.0,
+           1.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildPerspectiveMatrix(
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, const double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
+  return ignition::math::Matrix4d(
+           _intrinsicsFx,
+           _intrinsicsS,
+           -_intrinsicsCx,
+           0.0,
+           0.0,
+           _intrinsicsFy,
+           -_intrinsicsCy,
+           0.0,
+           0.0,
+           0.0,
+           _clipNear + _clipFar,
+           _clipNear * _clipFar,
+           0.0,
+           0.0,
+           -1.0,
+           0.0);
+}
+
+//////////////////////////////////////////////////
+ignition::math::Matrix4d Camera::BuildProjectiveMatrix(
+    const double _imageWidth, const double _imageHeight,
+    const double _intrinsicsFx, const double _intrinsicsFy,
+    const double _intrinsicsCx, double _intrinsicsCy,
+    const double _intrinsicsS,
+    const double _clipNear, const double _clipFar)
+{
+  return Camera::BuildNDCMatrix(
+           0, _imageWidth, 0, _imageHeight, _clipNear, _clipFar) *
+         Camera::BuildPerspectiveMatrix(
+           _intrinsicsFx, _intrinsicsFy, _intrinsicsCx, _intrinsicsCy,
+           _intrinsicsS, _clipNear, _clipFar);
 }
 
 //////////////////////////////////////////////////
@@ -661,8 +785,11 @@ void Camera::SetClipDist()
 
   if (this->camera)
   {
-    this->camera->setNearClipDistance(clipElem->Get<double>("near"));
-    this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    if (!this->cameraUsingIntrinsics)
+    {
+      this->camera->setNearClipDistance(clipElem->Get<double>("near"));
+      this->camera->setFarClipDistance(clipElem->Get<double>("far"));
+    }
     this->camera->setRenderingDistance(clipElem->Get<double>("far"));
   }
   else
@@ -960,7 +1087,8 @@ unsigned int Camera::ViewportHeight() const
 //////////////////////////////////////////////////
 void Camera::SetAspectRatio(const float ratio)
 {
-  this->camera->setAspectRatio(ratio);
+  if (!this->cameraUsingIntrinsics)
+    this->camera->setAspectRatio(ratio);
 }
 
 //////////////////////////////////////////////////
@@ -1374,6 +1502,12 @@ void Camera::CreateCamera()
   this->SetFixedYawAxis(false);
   this->cameraNode->yaw(Ogre::Degree(-90.0));
   this->cameraNode->roll(Ogre::Degree(-90.0));
+
+  if (cameraUsingIntrinsics)
+  {
+    this->camera->setCustomProjectionMatrix(true,
+      Conversions::Convert(cameraProjectiveMatrix));
+  }
 }
 
 //////////////////////////////////////////////////
@@ -1855,9 +1989,16 @@ void Camera::UpdateFOV()
 
     double hfov = this->HFOV().Radian();
     double vfov = 2.0 * atan(tan(hfov / 2.0) / ratio);
-
-    this->camera->setAspectRatio(ratio);
-    this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
+    if (this->cameraUsingIntrinsics)
+    {
+        this->camera->setCustomProjectionMatrix(true,
+          Conversions::Convert(cameraProjectiveMatrix));
+    }
+    else
+    {
+      this->camera->setAspectRatio(ratio);
+      this->camera->setFOVy(Ogre::Radian(this->LimitFOV(vfov)));
+    }
   }
 }
 
