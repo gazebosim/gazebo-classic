@@ -154,6 +154,11 @@ namespace gazebo
       /// \return The pointer to DART World.
       public: dart::simulation::WorldPtr DARTWorld() const;
 
+      /// \brief Returns a string with the name of the used collision detector.
+      /// \return the name of the collision detector, or if no collision
+      /// detector has been loaded yet, the empty string is returned.
+      public: std::string CollisionDetectorInUse() const;
+
       // Documentation inherited
       protected: virtual void OnRequest(ConstRequestPtr &_msg);
 
