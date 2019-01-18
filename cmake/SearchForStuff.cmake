@@ -161,13 +161,16 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find DART
-  set(DART_MIN_REQUIRED_VERSION 6)
-  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS utils-urdf)
+  set(DART_MIN_REQUIRED_VERSION 6.6)
+  find_package(DART ${DART_MIN_REQUIRED_VERSION} CONFIG OPTIONAL_COMPONENTS collision-bullet collision-ode utils-urdf)
   if (DART_FOUND)
     message (STATUS "Looking for DART - found")
     set (HAVE_DART TRUE)
     if (DART_utils-urdf_FOUND)
       set (HAVE_DART_URDF TRUE)
+    endif()
+    if (DART_collision-bullet_FOUND)
+      set (HAVE_DART_BULLET TRUE)
     endif()
   else()
     message (STATUS "Looking for DART - not found")

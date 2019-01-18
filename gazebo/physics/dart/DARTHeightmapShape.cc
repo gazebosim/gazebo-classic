@@ -28,7 +28,7 @@ using namespace physics;
 //////////////////////////////////////////////////
 DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
   : HeightmapShape(_parent),
-    dataPtr(new DARTHeightmapShapePrivate())
+    dataPtr(new DARTHeightmapShapePrivate<HeightmapShape::HeightType>())
 {
 }
 
@@ -42,5 +42,36 @@ DARTHeightmapShape::~DARTHeightmapShape()
 //////////////////////////////////////////////////
 void DARTHeightmapShape::Init()
 {
-  gzwarn << "Not implemented!\n";
+  BasePtr _parent = GetParent();
+  GZ_ASSERT(boost::dynamic_pointer_cast<DARTCollision>(_parent),
+            "Parent must be a DARTCollisionPtr");
+  DARTCollisionPtr _collisionParent =
+    boost::static_pointer_cast<DARTCollision>(_parent);
+
+  dart::dynamics::BodyNodePtr bodyNode = _collisionParent->DARTBodyNode();
+
+  if (!bodyNode) gzerr << "BodyNode is NULL in Init!\n";
+  GZ_ASSERT(bodyNode, "BodyNode is NULL Init!");
+
+  this->dataPtr->CreateShape(bodyNode);
+  _collisionParent->SetDARTCollisionShapeNode(
+                      this->dataPtr->ShapeNode(), false);
+
+  // superclasses' Init method initializes the heightmap
+  // data (this->heights etc.)
+  HeightmapShape::Init();
+
+  GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
+  this->dataPtr->Shape()->setHeightField(this->vertSize, this->vertSize,
+                                         this->heights);
+  this->dataPtr->Shape()->setScale(Eigen::Vector3d(this->scale.X(),
+                                                   this->scale.Y(), 1));
+}
+
+//////////////////////////////////////////////////
+void DARTHeightmapShape::SetScale(const ignition::math::Vector3d &_scale)
+{
+  GZ_ASSERT(this->dataPtr->Shape(), "Shape is NULL");
+  this->dataPtr->Shape()->setScale(Eigen::Vector3d(_scale.X(), _scale.Y(), 1));
+  HeightmapShape::SetScale(_scale);
 }

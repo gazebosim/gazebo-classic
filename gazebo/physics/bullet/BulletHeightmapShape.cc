@@ -78,9 +78,6 @@ void BulletHeightmapShape::Init()
 
   bParent->SetCollisionShape(this->heightFieldShape, false);
 
-  btVector3 min, max;
-  this->heightFieldShape->getAabb(btTransform::getIdentity(), min, max);
-
   BulletLinkPtr bLink = boost::dynamic_pointer_cast<BulletLink>(
       bParent->GetParent());
 
@@ -92,8 +89,14 @@ void BulletHeightmapShape::Init()
 
   btTransform tr;
   tr.setIdentity();
-  tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5));
+  // change the relative transform of the height field so that the minimum
+  // height is at the same z coordinate. Bullet shifts the height map such
+  // that its center is the AABB center.
+  tr.setOrigin(btVector3(0, 0, (maxHeight - minHeight) * 0.5 + minHeight));
 
+  // TODO FIXME this doesn't work. Some sort of fixed relative transform has
+  // to be set, but MotionState::SetWorldTransform() doesn't even consider
+  // the parameter input, so this does virtually nothing...
   // Set the transform for the heightmap.
   motionState->setWorldTransform(tr);
 }
