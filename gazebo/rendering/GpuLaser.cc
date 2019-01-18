@@ -76,29 +76,7 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
-  delete [] this->dataPtr->laserBuffer;
-  delete [] this->dataPtr->laserScan;
-
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
-  {
-    if (this->dataPtr->firstPassTextures[i])
-    {
-      Ogre::TextureManager::getSingleton().remove(
-          this->dataPtr->firstPassTextures[i]->getName());
-    }
-  }
-  if (this->dataPtr->secondPassTexture)
-  {
-    Ogre::TextureManager::getSingleton().remove(
-        this->dataPtr->secondPassTexture->getName());
-  }
-
-  if (this->scene && this->dataPtr->orthoCam)
-    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
-
-  this->dataPtr->visual.reset();
-  this->dataPtr->texIdx.clear();
-  this->dataPtr->texCount = 0;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -124,6 +102,37 @@ void GpuLaser::Init()
 //////////////////////////////////////////////////
 void GpuLaser::Fini()
 {
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  {
+    if (this->dataPtr->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->dataPtr->firstPassTextures[i]->getName());
+      this->dataPtr->firstPassTextures[i] = nullptr;
+    }
+  }
+  if (this->dataPtr->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->dataPtr->secondPassTexture->getName());
+    this->dataPtr->secondPassTexture = nullptr;
+  }
+
+  if (this->dataPtr->orthoCam)
+  {
+    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
+    this->dataPtr->orthoCam = nullptr;
+  }
+
+  this->dataPtr->visual.reset();
+  this->dataPtr->texIdx.clear();
+  this->dataPtr->texCount = 0;
+
+  delete [] this->dataPtr->laserBuffer;
+  this->dataPtr->laserBuffer = nullptr;
+  delete [] this->dataPtr->laserScan;
+  this->dataPtr->laserScan = nullptr;
+
   Camera::Fini();
 }
 
@@ -225,7 +234,6 @@ void GpuLaser::PostRender()
   {
     this->dataPtr->firstPassTargets[i]->swapBuffers();
   }
-
   this->dataPtr->secondPassTarget->swapBuffers();
 
   if (this->newData && this->captureData)

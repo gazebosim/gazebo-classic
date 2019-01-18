@@ -35,7 +35,7 @@ namespace gazebo
   /// A setting for each flash light is separately stored in a
   /// FlashLightSetting class, which takes care of dynamic specifications such
   /// as duration and interval.
-  class GAZEBO_VISIBLE FlashLightSetting
+  class GZ_PLUGIN_VISIBLE FlashLightSetting
   {
     /// \brief Constructor.
     /// Initialize the setting by the data given to the base plugin.
@@ -226,7 +226,7 @@ namespace gazebo
   /// ...
   /// \endverbatim
   ///
-  class GAZEBO_VISIBLE FlashLightPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE FlashLightPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: FlashLightPlugin();
