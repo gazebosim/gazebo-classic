@@ -2,6 +2,9 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Add geometry field to sonar.proto and private dataPtr to Actor class
+    * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
+
 1. Dart heightmaps with bullet and ODE collision detectors
     * [Pull request #2956](https://bitbucket.org/osrf/gazebo/pull-request/2956)
     * [Pull request #3066](https://bitbucket.org/osrf/gazebo/pull-request/3066)
