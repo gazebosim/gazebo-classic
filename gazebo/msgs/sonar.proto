@@ -17,6 +17,12 @@ message Sonar
   required double radius    = 5;
   required double range     = 6;
 
-  /// Location of the contact in the world frame.
+  /// Location of the contact relative to sensor origin.
   optional Vector3d contact  = 7;
+
+  /// \brief The sonar collision shape.
+  ///        possible values are "cone", "sphere".
+  ///        If you set this value to "cone" you need to specify
+  ///        the `radius`.
+  required string geometry  = 8;
 }
