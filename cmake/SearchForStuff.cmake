@@ -31,7 +31,7 @@ endif()
 
 ########################################
 # The Google Protobuf library for message generation + serialization
-find_package(Protobuf REQUIRED CONFIG)
+find_package(Protobuf REQUIRED)
 if (NOT PROTOBUF_FOUND)
   BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev)")
 endif()
