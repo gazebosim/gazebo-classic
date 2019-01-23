@@ -37,9 +37,9 @@ namespace gazebo
     /// \sa EnumIface
     /// \sa EnumIterator
     #define GZ_ENUM(enumType, begin, end, ...) \
-    template<> GZ_COMMON_VISIBLE enumType \
+    template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
-    template<> GZ_COMMON_VISIBLE \
+    template<> \
     std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 
 #ifdef __clang__

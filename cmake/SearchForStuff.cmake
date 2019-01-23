@@ -5,7 +5,7 @@ include (${gazebo_cmake_dir}/FindOS.cmake)
 include (FindPkgConfig)
 include (${gazebo_cmake_dir}/FindFreeimage.cmake)
 
-execute_process(COMMAND pkg-config --modversion protobuf
+execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion protobuf
   OUTPUT_VARIABLE PROTOBUF_VERSION
   RESULT_VARIABLE protobuf_modversion_failed)
 
@@ -31,7 +31,7 @@ endif()
 
 ########################################
 # The Google Protobuf library for message generation + serialization
-find_package(Protobuf REQUIRED)
+find_package(Protobuf REQUIRED CONFIG)
 if (NOT PROTOBUF_FOUND)
   BUILD_ERROR ("Missing: Google Protobuf (libprotobuf-dev)")
 endif()
@@ -322,8 +322,8 @@ if (PKG_CONFIG_FOUND)
   # Find OGRE
   # On Windows, we assume that all the OGRE* defines are passed in manually
   # to CMake.
-  if (NOT WIN32)
-    execute_process(COMMAND pkg-config --modversion OGRE
+  if (PKG_CONFIG_EXECUTABLE)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
     string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
 
@@ -407,8 +407,8 @@ if (PKG_CONFIG_FOUND)
   # `plugindir` variable.  We have to call pkg-config manually to get it.
   # On Windows, we assume that all the OGRE* defines are passed in manually
   # to CMake.
-  if (NOT WIN32)
-    execute_process(COMMAND pkg-config --variable=plugindir OGRE
+  if (PKG_CONFIG_EXECUTABLE)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
                     OUTPUT_VARIABLE _pkgconfig_invoke_result
                     RESULT_VARIABLE _pkgconfig_failed)
     if(_pkgconfig_failed)
