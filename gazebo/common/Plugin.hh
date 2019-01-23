@@ -40,6 +40,7 @@
 #include <string>
 
 #include <sdf/sdf.hh>
+#include <boost/filesystem.hpp>
 
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/common/SystemPaths.hh"
@@ -152,8 +153,12 @@ namespace gazebo
                   const std::string winSuffix(".dll");
                   filename.replace(soSuffix, winSuffix.length(), winSuffix);
                 }
-                // remove the lib prefix
-                filename.erase(0, 3);
+                size_t libPrefix = filename.find("lib");
+                if (libPrefix == 0)
+                {
+                  // remove the lib prefix
+                  filename.erase(0, 3);
+                }
               }
 #endif  // ifdef __APPLE__
 
@@ -161,6 +166,7 @@ namespace gazebo
                    iter!= pluginPaths.end(); ++iter)
               {
                 fullname = (*iter)+std::string("/")+filename;
+                fullname = boost::filesystem::path(fullname).make_preferred().string();
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;
