@@ -38,11 +38,11 @@ namespace gazebo
     /// \sa EnumIface
     /// \sa EnumIterator
     #define GZ_ENUM(visibility, enumType, begin, end, ...) \
-    template class visibility common::EnumIface<enumType>; \
     template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> \
-    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
+    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__}; \
+    template class visibility common::EnumIface<enumType>;
 
 #ifdef __clang__
 #pragma clang diagnostic push
