@@ -166,7 +166,8 @@ namespace gazebo
                    iter!= pluginPaths.end(); ++iter)
               {
                 fullname = (*iter)+std::string("/")+filename;
-                fullname = boost::filesystem::path(fullname).make_preferred().string();
+                fullname = boost::filesystem::path(fullname)
+                    .make_preferred().string();
                 if (stat(fullname.c_str(), &st) == 0)
                 {
                   found = true;

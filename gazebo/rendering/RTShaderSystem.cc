@@ -95,7 +95,8 @@ void RTShaderSystem::Init()
         Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
     // Add the shader libs resource location
-    coreLibsPath = boost::filesystem::path(coreLibsPath).make_preferred().string();
+    coreLibsPath = boost::filesystem::path(coreLibsPath)
+        .make_preferred().string();
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
         coreLibsPath, "FileSystem");
 
