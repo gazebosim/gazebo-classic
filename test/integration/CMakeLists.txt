@@ -61,6 +61,7 @@ set(tests
   keys_to_joints.cc
   laser.cc
   logical_camera_sensor.cc
+  misalignment_plugin.cc
   model.cc
   model_database.cc
   nested_model.cc

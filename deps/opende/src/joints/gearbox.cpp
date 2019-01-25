@@ -173,7 +173,7 @@ void dJointSetGearboxReferenceBody1( dJointID j, dBodyID b )
     {
       if ( b )
       {
-        // set qrel1 to the transpose of the first body q
+        // set qrel1 to the q of the reference body
         joint->qrel1[0] = joint->refBody1->q[0];
         joint->qrel1[1] = joint->refBody1->q[1];
         joint->qrel1[2] = joint->refBody1->q[2];
@@ -200,7 +200,7 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
         dQMultiply1( joint->qrel2, joint->node[1].body->q, joint->refBody2->q );
       else
       {
-        // set qrel1 to the transpose of the first body q
+        // set qrel2 to the transpose of the second body q
         joint->qrel2[0] =  joint->node[1].body->q[0];
         joint->qrel2[1] = -joint->node[1].body->q[1];
         joint->qrel2[2] = -joint->node[1].body->q[2];
@@ -211,7 +211,7 @@ void dJointSetGearboxReferenceBody2( dJointID j, dBodyID b )
     {
       if ( b )
       {
-        // set qrel2 to the transpose of the second body q
+        // set qrel2 to the q of the reference body
         joint->qrel2[0] = joint->refBody2->q[0];
         joint->qrel2[1] = joint->refBody2->q[1];
         joint->qrel2[2] = joint->refBody2->q[2];
