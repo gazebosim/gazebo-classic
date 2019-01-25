@@ -620,7 +620,7 @@ void RenderEngine::SetupResources()
     try
     {
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-          boost::filesystem::path(aiter->first).make_preferred().string(), 
+          boost::filesystem::path(aiter->first).make_preferred().string(),
           "FileSystem", aiter->second);
     }
     catch(Ogre::Exception &/*_e*/)
