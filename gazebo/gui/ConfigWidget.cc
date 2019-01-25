@@ -39,8 +39,7 @@ const QString ConfigWidget::redColor = "#d42b2b";
 const QString ConfigWidget::greenColor = "#3bc43b";
 const QString ConfigWidget::blueColor = "#0d0df2";
 
-template<> common::MaterialType common::EnumIface<common::MaterialType>::range[];
-template<> std::vector<std::string> common::EnumIface<common::MaterialType>::names;
+template class GZ_COMMON_VISIBLE common::EnumIface<common::MaterialType>;
 
 /////////////////////////////////////////////////
 ConfigWidget::ConfigWidget()

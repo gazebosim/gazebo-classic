@@ -29,6 +29,7 @@ namespace gazebo
   {
     /// \brief A macro that allows an enum to have an iterator and string
     /// conversion.
+    /// \param[in] visibility DLL export macro
     /// \param[in] enumType Enum type
     /// \param[in] begin Enum value that marks the beginning of the enum
     /// values.
@@ -36,7 +37,8 @@ namespace gazebo
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    #define GZ_ENUM(enumType, begin, end, ...) \
+    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    template class visibility common::EnumIface<enumType>; \
     template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> \
