@@ -37,12 +37,32 @@ namespace gazebo
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
+#ifndef _MSC_VER
+    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    template<> visibility enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> visibility \
+    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
+#else
     #define GZ_ENUM(visibility, enumType, begin, end, ...) \
     template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> \
     std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__}; \
     template class visibility common::EnumIface<enumType>;
+#endif
+
+    /// \brief A macro that declares an enum usage across the shared
+    /// library boundary.
+    /// \param[in] visibility DLL export macro
+    /// \param[in] enumType Enum type
+    /// \sa EnumIface
+#ifndef _MSC_VER
+    #define GZ_ENUM_DECLARE(visibility, enumType)
+#else
+    #define GZ_ENUM_DECLARE(visibility, enumType) \
+    template class visibility common::EnumIface<enumType>;
+#endif
 
 #ifdef __clang__
 #pragma clang diagnostic push
