@@ -37,6 +37,9 @@ namespace gazebo
   /// \brief Sensors namespace
   namespace sensors
   {
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_SENSORS_VISIBLE, SensorManager)
+
     /// \cond
     /// \brief A simulation time event
     class GZ_SENSORS_VISIBLE SimTimeEvent

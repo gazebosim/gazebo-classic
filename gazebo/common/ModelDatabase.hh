@@ -40,6 +40,9 @@ namespace gazebo
     /// \brief Forward declare private data class.
     class ModelDatabasePrivate;
 
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, ModelDatabase)
+
     /// \addtogroup gazebo_common Common
     /// \{
 

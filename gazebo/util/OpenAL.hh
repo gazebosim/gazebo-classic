@@ -43,6 +43,9 @@ namespace gazebo
     // Forward declare private openal sourcedata class
     class OpenALSourcePrivate;
 
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, OpenAL)
+
     /// \addtogroup gazebo_util Utility
     /// \{
 

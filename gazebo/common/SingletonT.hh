@@ -27,6 +27,10 @@
 /// \addtogroup gazebo_common Common
 /// \{
 
+#define GZ_SINGLETON_DECLARE(visibility, singletonType) \
+class singletonType; \
+template class visibility SingletonT<singletonType>;
+
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>

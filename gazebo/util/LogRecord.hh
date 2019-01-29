@@ -52,6 +52,9 @@ namespace gazebo
     // Forward declare private data class
     class LogRecordPrivate;
 
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, LogRecord)
+
     /// addtogroup gazebo_util
     /// \{
 

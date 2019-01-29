@@ -41,6 +41,9 @@ namespace gazebo
 {
   namespace common
   {
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, SystemPaths)
+
     /// \addtogroup gazebo_common Common
     /// \{
 

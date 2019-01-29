@@ -34,6 +34,9 @@ namespace gazebo
   {
     class RTShaderSystemPrivate;
 
+    /// \brief Declare SingletonT visiblity.
+    GZ_SINGLETON_DECLARE(GZ_RENDERING_VISIBLE, RTShaderSystem)
+
     /// \addtogroup gazebo_rendering
     /// \{
 
