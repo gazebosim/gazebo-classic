@@ -59,55 +59,19 @@ class SingletonT
 template <class T>
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 
-/// \brief Forward declarations for later explicit instantiation of typed SingletonT
-namespace gazebo
-{
-  namespace common
-  {
-    class FuelModelDatabase;
-    class MeshManager;
-    class ModelDatabase;
-    class SystemPaths;
-  }
-  namespace gui
-  {
-    class KeyEventHandler;
-    class ModelAlign;
-    class ModelManipulator;
-    class ModelSnap;
-    class MouseEventHandler;
-    class PlotManager;
-  }
-  namespace rendering
-  {
-    class RenderEngine;
-    class RTShaderSystem;
-  }
-  namespace sensors
-  {
-    class SensorManager;
-  }
-  namespace transport
-  {
-    class ConnectionManager;
-    class TopicManager;
-  }
-  namespace util
-  {
-    class DiagnosticManager;
-    class IntrospectionManager;
-    class LogPlay;
-    class LogRecord;
-    class OpenAL;
-  }
-}
-
 /// \brief Helper to declare typed SingletonT
 #ifdef __clang__
-#define GZ_SINGLETON_DECLARE(visibility, singletonType)
+#define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType)
 #else
-#define GZ_SINGLETON_DECLARE(visibility, singletonType) \
-template class visibility ::SingletonT<singletonType>;
+#define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType) \
+namespace n1 \
+{ \
+  namespace n2 \
+  { \
+    class singletonType; \
+  } \
+} \
+template class visibility ::SingletonT<n1::n2::singletonType>;
 #endif
 
 /// \}

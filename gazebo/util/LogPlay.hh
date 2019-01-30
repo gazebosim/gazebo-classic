@@ -25,7 +25,7 @@
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
-GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo::util::LogPlay)
+GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo, util, LogPlay)
 
 namespace gazebo
 {

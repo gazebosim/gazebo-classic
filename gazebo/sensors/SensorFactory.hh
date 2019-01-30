@@ -61,19 +61,21 @@ namespace gazebo
     /// \brief Register a sensor class (called by sensor registration function).
     /// \param[in] _className Name of class of sensor to register.
     /// \param[in] _factoryfn Function handle for registration.
-    public: GZ_SENSORS_VISIBLE static void RegisterSensor(const std::string &_className,
-                                       SensorFactoryFn _factoryfn);
+    public: GZ_SENSORS_VISIBLE static void RegisterSensor(
+      const std::string &_className, SensorFactoryFn _factoryfn);
 
     /// \brief Create a new instance of a sensor.  Used by the world when
     /// reading the world file.
     /// \param[in] _className Name of sensor class
     /// \return Pointer to Sensor
-    public: GZ_SENSORS_VISIBLE static SensorPtr NewSensor(const std::string &_className);
+    public: GZ_SENSORS_VISIBLE static SensorPtr NewSensor(
+      const std::string &_className);
 
     /// \brief Get all the sensor types
     /// \param _types Vector of strings of the sensor types,
     /// populated by function
-    public: GZ_SENSORS_VISIBLE static void GetSensorTypes(std::vector<std::string> &_types);
+    public: GZ_SENSORS_VISIBLE static void GetSensorTypes(
+      std::vector<std::string> &_types);
 
     /// \brief A list of registered sensor classes
     private: static std::map<std::string, SensorFactoryFn> sensorMap;

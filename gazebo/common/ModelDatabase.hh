@@ -34,7 +34,7 @@
 #define GZ_MODEL_DB_MANIFEST_FILENAME "database.config"
 
 /// \brief Explicit instantiation for typed SingletonT.
-GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo::common::ModelDatabase)
+GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo, common, ModelDatabase)
 
 namespace gazebo
 {

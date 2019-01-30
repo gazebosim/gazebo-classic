@@ -33,7 +33,7 @@
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
-GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo::common::MeshManager)
+GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, gazebo, common, MeshManager)
 
 namespace gazebo
 {
