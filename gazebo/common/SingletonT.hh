@@ -103,8 +103,12 @@ namespace gazebo
 }
 
 /// \brief Helper to declare typed SingletonT
+#ifdef __clang__
+#define GZ_SINGLETON_DECLARE(visibility, singletonType)
+#else
 #define GZ_SINGLETON_DECLARE(visibility, singletonType) \
 template class visibility ::SingletonT<singletonType>;
+#endif
 
 /// \}
 
