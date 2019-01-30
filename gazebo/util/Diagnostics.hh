@@ -39,9 +39,6 @@ namespace gazebo
     // Forward declare private data class
     class DiagnosticTimerPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, DiagnosticManager)
-
     /// \addtogroup gazebo_util Utility
     /// \brief Useful utility functions that typically rely on the transport
     /// library.

@@ -36,9 +36,6 @@ namespace gazebo
   {
     class KeyEventHandlerPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, KeyEventHandler)
-
     /// \class KeyEventHandler KeyEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters keyboard events.
     class GZ_GUI_VISIBLE KeyEventHandler : public SingletonT<KeyEventHandler>

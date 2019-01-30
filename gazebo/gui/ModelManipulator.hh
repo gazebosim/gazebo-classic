@@ -37,9 +37,6 @@ namespace gazebo
   {
     class ModelManipulatorPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, ModelManipulator)
-
     /// \class ModelManipulator ModelManipulator.hh gui/Gui.hh
     /// \brief Manipulator tool for translating/rotating/scaling models and
     /// links

@@ -44,9 +44,6 @@ namespace gazebo
     class Plane;
     class SubMesh;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_COMMON_VISIBLE, MeshManager)
-
     /// \addtogroup gazebo_common Common
     /// \{
 

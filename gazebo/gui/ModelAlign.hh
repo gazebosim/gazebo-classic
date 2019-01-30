@@ -39,9 +39,6 @@ namespace gazebo
   {
     class ModelAlignPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, ModelAlign)
-
     /// \class ModelAlign ModelAlign.hh gui/Gui.hh
     /// \brief A gui tool for aligning models
     class GZ_GUI_VISIBLE ModelAlign : public SingletonT<ModelAlign>

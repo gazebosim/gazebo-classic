@@ -34,9 +34,6 @@ namespace gazebo
 
     class PlotWindow;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, PlotManager)
-
     /// \brief A class that connects simulation data with the plotting tool
     class GZ_GUI_VISIBLE PlotManager : public SingletonT<PlotManager>
     {

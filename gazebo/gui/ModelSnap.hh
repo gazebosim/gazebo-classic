@@ -35,9 +35,6 @@ namespace gazebo
 
   namespace gui
   {
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, ModelSnap)
-
     class ModelSnapPrivate;
 
     /// \class ModelSnap ModelSnap.hh gui/Gui.hh

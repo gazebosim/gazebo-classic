@@ -35,9 +35,6 @@ namespace gazebo
 {
   namespace transport
   {
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_TRANSPORT_VISIBLE, ConnectionManager)
-
     /// \addtogroup gazebo_transport
     /// \{
 

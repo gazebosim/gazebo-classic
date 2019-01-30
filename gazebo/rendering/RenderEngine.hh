@@ -42,9 +42,6 @@ namespace gazebo
     // Forward declare private data.
     class RenderEnginePrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_RENDERING_VISIBLE, RenderEngine)
-
     /// \addtogroup gazebo_rendering
     /// \{
 

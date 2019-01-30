@@ -29,9 +29,6 @@ namespace gazebo
 {
   namespace gui
   {
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, MouseEventHandler)
-
     /// \class MouseEventHandler MouseEventHandler.hh gui/Gui.hh
     /// \brief Processes and filters mouse events.
     class GZ_GUI_VISIBLE MouseEventHandler

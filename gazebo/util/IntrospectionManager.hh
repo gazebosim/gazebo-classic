@@ -38,9 +38,6 @@ namespace gazebo
     // Forward declare private data classes.
     class IntrospectionManagerPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, IntrospectionManager)
-
     /// addtogroup gazebo_util
     /// \{
 

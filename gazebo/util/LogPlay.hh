@@ -31,9 +31,6 @@ namespace gazebo
     // Forward declare private data class
     class LogPlayPrivate;
 
-    /// \brief Declare SingletonT visiblity.
-    GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, LogPlay)
-
     /// \addtogroup gazebo_physics
     /// \{
 
