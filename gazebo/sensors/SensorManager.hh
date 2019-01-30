@@ -32,7 +32,7 @@
 #include "gazebo/util/system.hh"
 
 /// \brief Explicit instantiation for typed SingletonT.
-GZ_SINGLETON_DECLARE(GZ_SENSORS_VISIBLE, gazebo::sensors::FuelModelDatabase)
+GZ_SINGLETON_DECLARE(GZ_SENSORS_VISIBLE, gazebo::sensors::SensorManager)
 
 namespace gazebo
 {
