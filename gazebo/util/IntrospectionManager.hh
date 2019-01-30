@@ -31,6 +31,9 @@
 #include "gazebo/msgs/param_v.pb.h"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_UTIL_VISIBLE, gazebo::util::IntrospectionManager)
+
 namespace gazebo
 {
   namespace util

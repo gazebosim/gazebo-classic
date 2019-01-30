@@ -59,7 +59,7 @@ class SingletonT
 template <class T>
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
 
-/// \brief Explicit instantiation for all derived classes
+/// \brief Forward declarations for later explicit instantiation of typed SingletonT
 namespace gazebo
 {
   namespace common
@@ -102,31 +102,9 @@ namespace gazebo
   }
 }
 
-template class GZ_COMMON_VISIBLE ::SingletonT<gazebo::common::FuelModelDatabase>;
-template class GZ_COMMON_VISIBLE ::SingletonT<gazebo::common::MeshManager>;
-template class GZ_COMMON_VISIBLE ::SingletonT<gazebo::common::ModelDatabase>;
-template class GZ_COMMON_VISIBLE ::SingletonT<gazebo::common::SystemPaths>;
-
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::KeyEventHandler>;
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::ModelAlign>;
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::ModelManipulator>;
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::ModelSnap>;
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::MouseEventHandler>;
-template class GZ_GUI_VISIBLE ::SingletonT<gazebo::gui::PlotManager>;
-
-template class GZ_RENDERING_VISIBLE ::SingletonT<gazebo::rendering::RenderEngine>;
-template class GZ_RENDERING_VISIBLE ::SingletonT<gazebo::rendering::RTShaderSystem>;
-
-template class GZ_SENSORS_VISIBLE ::SingletonT<gazebo::sensors::SensorManager>;
-
-template class GZ_TRANSPORT_VISIBLE ::SingletonT<gazebo::transport::ConnectionManager>;
-template class GZ_TRANSPORT_VISIBLE ::SingletonT<gazebo::transport::TopicManager>;
-
-template class GZ_UTIL_VISIBLE ::SingletonT<gazebo::util::DiagnosticManager>;
-template class GZ_UTIL_VISIBLE ::SingletonT<gazebo::util::IntrospectionManager>;
-template class GZ_UTIL_VISIBLE ::SingletonT<gazebo::util::LogPlay>;
-template class GZ_UTIL_VISIBLE ::SingletonT<gazebo::util::LogRecord>;
-template class GZ_UTIL_VISIBLE ::SingletonT<gazebo::util::OpenAL>;
+/// \brief Helper to declare typed SingletonT
+#define GZ_SINGLETON_DECLARE(visibility, singletonType) \
+template class visibility ::SingletonT<singletonType>;
 
 /// \}
 

@@ -33,6 +33,9 @@
 
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, gazebo::gui::ModelAlign)
+
 namespace gazebo
 {
   namespace gui

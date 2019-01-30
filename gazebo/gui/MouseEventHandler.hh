@@ -25,6 +25,9 @@
 #include "gazebo/common/MouseEvent.hh"
 #include "gazebo/util/system.hh"
 
+/// \brief Explicit instantiation for typed SingletonT.
+GZ_SINGLETON_DECLARE(GZ_GUI_VISIBLE, gazebo::gui::MouseEventHandler)
+
 namespace gazebo
 {
   namespace gui
