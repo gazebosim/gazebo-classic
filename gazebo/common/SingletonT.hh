@@ -51,13 +51,17 @@ class SingletonT
              return static_cast<T &>(t);
            }
 
+#if __cplusplus <= 199711L
   /// \brief A reference to the unique instance
   private: static T &myself;
+#endif
 };
 
+#if __cplusplus <= 199711L
 /// \brief Initialization of the singleton instance.
 template <class T>
 T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
+#endif
 
 /// \brief Helper to declare typed SingletonT
 #ifdef __clang__

@@ -160,6 +160,10 @@ macro (gz_setup_windows)
       # http://www.cmake.org/Bug/print_bug_page.php?bug_id=11240
       set(CMAKE_SHARED_LINKER_FLAGS "/machine:x64")
     endif()
+
+    if (MSVC)
+      add_compile_options(/Zc:__cplusplus)
+    endif()
 endmacro()
 
 #################################################
