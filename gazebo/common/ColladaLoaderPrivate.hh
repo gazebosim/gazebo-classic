@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <ignition/math/Vector3.hh>
+#include <ignition/math/Matrix4.hh>
 
 class TiXmlElement;
 

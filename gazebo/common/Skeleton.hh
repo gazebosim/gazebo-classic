@@ -20,6 +20,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <utility>
 
 #include <ignition/math/Matrix4.hh>
@@ -41,8 +42,10 @@ namespace gazebo
     typedef std::map<double, std::vector<NodeTransform> > RawNodeAnim;
     typedef std::map<std::string, RawNodeAnim> RawSkeletonAnim;
 
-    typedef std::vector<std::vector<std::pair<std::string, double> > >
-                                                              RawNodeWeights;
+    typedef std::vector<std::vector<
+        std::pair<std::string, double>>> SubMeshRawNW;
+
+    typedef std::vector<SubMeshRawNW> RawNodeWeights;
 
     /// \addtogroup gazebo_common Common Animation
     /// \{
@@ -112,27 +115,41 @@ namespace gazebo
       public: NodeMap GetNodes();
 
       /// \brief Resizes the raw node weight array
+      /// \param[in] _verticesGroup name of the vertice group
       /// \param[in] _vertices the new size
-      public: void SetNumVertAttached(unsigned int _vertices);
+      /// \return the index of the vertices group
+      public: unsigned int SetNumVertAttached(std::string _verticesGroup,
+          unsigned int _vertices);
+
+      /// \brief Gets the index of a vertices group
+      /// \param[in] _verticesGroup name of the vertice group
+      /// \return the index of the vertices group
+      public: unsigned int GetVertGroupIndex(std::string _verticesGroupName);
 
       /// \brief Add a new weight to a node (bone)
+      /// \param[in] _verticesGroup index of the vertices group
       /// \param[in] _vertex index of the vertex
       /// \param[in] _node name of the bone
       /// \param[in] _weight the new weight (range 0 to 1)
-      public: void AddVertNodeWeight(unsigned int _vertex, std::string _node,
+      public: void AddVertNodeWeight(unsigned int _verticesGroup,
+                                     unsigned int _vertex, std::string _node,
                                      double _weight);
 
       /// \brief Returns the number of bone weights for a vertex
+      /// \param[in] _verticesGroup index of the vertices group
       /// \param[in] _vertex the index of the vertex
       /// \return the count
-      public: unsigned int GetNumVertNodeWeights(unsigned int _vertex);
+      public: unsigned int GetNumVertNodeWeights(unsigned int _verticesGroup,
+          unsigned int _vertex);
 
       /// \brief Weight of a bone for a vertex
+      /// \param[in] _verticesGroup index of the vertices group
       /// \param[in] _v the index of the vertex
       /// \param[in] _i the index of the weight for that vertex
       /// \return a pair containing the name of the node and the weight
-      public: std::pair<std::string, double> GetVertNodeWeight(unsigned int _v,
-                                     unsigned int _i);
+      public: std::pair<std::string, double> GetVertNodeWeight(
+                                     unsigned int _verticesGroup,
+                                     unsigned int _v, unsigned int _i);
 
       /// \brief Returns the number of animations
       /// \return the count
@@ -166,6 +183,9 @@ namespace gazebo
 
       /// \brief the array of animations
       protected: std::vector<SkeletonAnimation*> anims;
+
+      /// \brief mapping between name of vertices group and their index
+      protected: std::unordered_map<std::string, unsigned int> verticesGroupMap;
     };
 
     /// \class SkeletonNode Skeleton.hh common/common.hh

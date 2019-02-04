@@ -62,7 +62,6 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml,
           const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
@@ -74,6 +73,12 @@ namespace gazebo
       /// \param[in] _xml Pointer to the animation set XML instance
       /// \param[in,out] _skel Pointer to the skeleton
       private: void LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel);
+
+      /// \brief Load a single skeleton node
+      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in,out] _xml Pointer to the Skeleton node parent
+      private: SkeletonNode* LoadSingleSkeletonNode(TiXmlElement *_xml,
+                                               SkeletonNode *_parent);
 
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
