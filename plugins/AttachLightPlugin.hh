@@ -37,7 +37,7 @@ namespace gazebo
   ///   <light>         SDF element. More than one <light> can be attached.
   ///     <pose>        Offset pose of the light in the link frame.
   ///     <light_name>  Name of the light in the world.
-  class GAZEBO_VISIBLE AttachLightPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE AttachLightPlugin : public ModelPlugin
   {
     /// \brief Constructor
     public: AttachLightPlugin();

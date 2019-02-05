@@ -66,7 +66,7 @@ namespace gazebo
   ///
   ///  </plugin>
   ///
-  class GAZEBO_VISIBLE ContainPlugin : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE ContainPlugin : public WorldPlugin
   {
     // Documentation inherited
     public: ContainPlugin();

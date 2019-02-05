@@ -50,7 +50,7 @@ namespace gazebo
   /// \endverbatim
   ///
   /// See worlds/elevator.world for a complete example.
-  class GAZEBO_VISIBLE ElevatorPlugin : public ModelPlugin
+  class GZ_PLUGIN_VISIBLE ElevatorPlugin : public ModelPlugin
   {
     /// \brief Constructor.
     public: ElevatorPlugin();

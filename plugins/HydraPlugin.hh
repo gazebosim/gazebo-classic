@@ -28,7 +28,7 @@
 
 namespace gazebo
 {
-  class GAZEBO_VISIBLE RazerHydra : public WorldPlugin
+  class GZ_PLUGIN_VISIBLE RazerHydra : public WorldPlugin
   {
     /// \brief Constructor.
     public: RazerHydra();

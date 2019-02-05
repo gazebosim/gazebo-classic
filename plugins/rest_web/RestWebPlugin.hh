@@ -33,7 +33,7 @@ namespace gazebo
 {
   /// \class RestWebPlugin RestWebPlugin.hh RestWebPlugin.hh
   /// \brief REST web plugin
-  class GAZEBO_VISIBLE RestWebPlugin : public SystemPlugin
+  class GZ_PLUGIN_VISIBLE RestWebPlugin : public SystemPlugin
   {
     /// \brief Constructor
     public: RestWebPlugin();

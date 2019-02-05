@@ -28,7 +28,7 @@ namespace gazebo
 {
   /// \brief A plugin for a contact sensor. Inherit from this class to make
   /// your own contact plugin.
-  class GAZEBO_VISIBLE ContactPlugin : public SensorPlugin
+  class GZ_PLUGIN_VISIBLE ContactPlugin : public SensorPlugin
   {
     /// \brief Constructor.
     public: ContactPlugin();
