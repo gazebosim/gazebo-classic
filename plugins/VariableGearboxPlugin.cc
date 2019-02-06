@@ -74,15 +74,16 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   }
   this->dataPtr->gearbox = joint;
 
+  // Identify input joint from parent link
   auto parentLink = joint->GetParent();
   if (parentLink == nullptr)
   {
     gzerr << "Could not find parent link." << std::endl;
     return;
   }
-  std::cerr << "Checking " << parentLink->GetScopedName()
-            << " for its joints."
-            << std::endl;
+  gzdbg << "Checking " << parentLink->GetScopedName()
+        << " for its joints."
+        << std::endl;
 
   {
     auto joints = parentLink->GetParentJoints();
@@ -95,19 +96,20 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
     }
     this->dataPtr->inputJoint = joints.front();
   }
-  std::cerr << "Using " << this->dataPtr->inputJoint->GetScopedName()
-            << " as input joint."
-            << std::endl;
+  gzdbg << "Using " << this->dataPtr->inputJoint->GetScopedName()
+        << " as input joint."
+        << std::endl;
 
+  // Identify output joint from child link
   auto childLink = joint->GetChild();
   if (childLink == nullptr)
   {
     gzerr << "Could not find child link." << std::endl;
     return;
   }
-  std::cerr << "Checking " << childLink->GetScopedName()
-            << " for its joints."
-            << std::endl;
+  gzdbg << "Checking " << childLink->GetScopedName()
+        << " for its joints."
+        << std::endl;
 
   {
     auto joints = childLink->GetParentJoints();
@@ -118,18 +120,11 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
             << std::endl;
       return;
     }
-    for (auto j : joints)
-    {
-      gzerr << " joint " << j->GetScopedName()
-            << ", gearbox?"
-            << j->HasType(physics::Base::GEARBOX_JOINT)
-            << std::endl;
-    }
     this->dataPtr->outputJoint = joints.front();
   }
-  std::cerr << "Using " << this->dataPtr->outputJoint->GetScopedName()
-            << " as output joint."
-            << std::endl;
+  gzdbg << "Using " << this->dataPtr->outputJoint->GetScopedName()
+        << " as output joint."
+        << std::endl;
 
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VariableGearboxPlugin::OnUpdate, this, _1));
