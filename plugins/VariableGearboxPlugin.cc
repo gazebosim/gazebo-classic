@@ -55,11 +55,17 @@ VariableGearboxPlugin::~VariableGearboxPlugin()
 
 /////////////////////////////////////////////////
 void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
-                                 sdf::ElementPtr /*_sdf*/)
+                                 sdf::ElementPtr _sdf)
 {
   this->dataPtr->model = _parent;
 
-  const std::string jointName = "gearbox_demo";
+  if (!_sdf->HasElement("gearbox_joint_name"))
+  {
+    gzerr << "No <gearbox_joint_name> tag found."
+          << std::endl;
+    return;
+  }
+  const std::string jointName = _sdf->Get<std::string>("gearbox_joint_name");
   auto joint = this->dataPtr->model->GetJoint(jointName);
   if (joint == nullptr || !joint->HasType(physics::Base::GEARBOX_JOINT))
   {
