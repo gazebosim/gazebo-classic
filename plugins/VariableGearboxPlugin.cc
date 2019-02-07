@@ -17,6 +17,7 @@
 
 #include <boost/bind.hpp>
 #include <functional>
+#include <gazebo/common/Assert.hh>
 #include <gazebo/common/Events.hh>
 #include <gazebo/physics/Joint.hh>
 #include <gazebo/physics/Link.hh>
@@ -26,6 +27,12 @@ namespace gazebo
 {
 class VariableGearboxPluginPrivate
 {
+  /// \brief Vector of knot points in piecewise cubic Hermite splines.
+  public: std::vector<ignition::math::Vector2d> splinePoints;
+
+  /// \brief Vector of slopes at each knot in piecewise cubic Hermite splines.
+  public: std::vector<double> splineSlopes;
+
   /// \brief Parent model pointer.
   public: physics::ModelPtr model;
 
@@ -41,6 +48,64 @@ class VariableGearboxPluginPrivate
   /// \brief World update connection.
   public: event::ConnectionPtr updateConnection;
 };
+
+/////////////////////////////////////////////////
+/// \brief Interpolate point and slope from piecewise cubic Hermite splines.
+/// \param[in] _input X value to interpolate.
+/// \param[in] _points Knot points for splines.
+/// \param[in] _slopes Slopes at each knot point.
+/// \return Interpolated point and slope in Vector3 form:
+/// Vector3[point.x, point.y, slope].
+ignition::math::Vector3d interpolatePointSlope(
+    double input,
+    const std::vector<ignition::math::Vector2d> &_points,
+    const std::vector<double> &_slopes)
+{
+  // Check if input is outside of domain of spline points
+  // and do a linear extrapolation if so
+  if (input < _points.front().X())
+  {
+    return ignition::math::Vector3d(
+        _points.front().X(), _points.front().Y(), _slopes.front());
+  }
+  else if (input > _points.back().X())
+  {
+    return ignition::math::Vector3d(
+        _points.back().X(), _points.back().Y(), _slopes.back());
+  }
+  else
+  {
+    // Interpolate over the spline segments
+    std::size_t i;
+    for (i = 0; i < _points.size() - 1; ++i)
+    {
+      if (input >= _points[i].X() && input <= _points[i+1].X())
+      {
+        break;
+      }
+    }
+
+    if (i == _points.size() - 1)
+    {
+      GZ_ASSERT(i < _points.size() - 1, "failed to find spline index");
+      return ignition::math::Vector3d();
+    }
+
+    const double dx = _points[i+1].X() - _points[i].X();
+    const double t = (input - _points[i].X()) / dx;
+    const double dy = _points[i+1].Y() - _points[i].Y();
+
+    const double g1 = dy / dx - _slopes[i];
+    const double g2 = _slopes[i+1] - _slopes[i];
+    const double a = -2*g1 + g2;
+    const double b =  3*g1 - g2;
+
+    const double y = _points[i].Y() + dx*t*(_slopes[i] + t*(b + a*t));
+    const double slope = _slopes[i] + t*(2*b + 3*a*t);
+
+    return ignition::math::Vector3d(input, y, slope);
+  }
+}
 
 /////////////////////////////////////////////////
 VariableGearboxPlugin::VariableGearboxPlugin()
@@ -126,6 +191,40 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
         << " as output joint."
         << std::endl;
 
+  if (_sdf->HasElement("x_y_dydx"))
+  {
+    sdf::ElementPtr x_y_dydxElem = _sdf->GetElement("x_y_dydx");
+    while (x_y_dydxElem)
+    {
+      ignition::math::Vector3d x_y_dydx =
+          x_y_dydxElem->Get<ignition::math::Vector3d>();
+
+      if (!this->dataPtr->splinePoints.empty() &&
+           this->dataPtr->splinePoints.back().X() >= x_y_dydx.X())
+      {
+        gzerr << "Out of order x_y_dydx element detected: "
+              << this->dataPtr->splinePoints.back().X()
+              << " should be less than "
+              << x_y_dydx.X()
+              << std::endl;
+        return;
+      }
+
+      this->dataPtr->splinePoints.push_back(
+          ignition::math::Vector2d(x_y_dydx.X(),
+                                   x_y_dydx.Y()));
+      this->dataPtr->splineSlopes.push_back(x_y_dydx.Z());
+
+      x_y_dydxElem = x_y_dydxElem->GetNextElement("x_y_dydx");
+    }
+  }
+  else
+  {
+    gzerr << "No x_y_dydx elements detected"
+          << std::endl;
+    return;
+  }
+
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
       boost::bind(&VariableGearboxPlugin::OnUpdate, this, _1));
 }
@@ -133,36 +232,22 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
 /////////////////////////////////////////////////
 void VariableGearboxPlugin::OnUpdate(const common::UpdateInfo & /*_info*/)
 {
-  const double input0 = 1.2;
-  const double output0 = -1.2;
-  const double ratio1 = -1;
-  const double ratio2 = -20;
-  const double dinput = 0.6;
-  const double dratio = ratio2 - ratio1;
   double ratio;
   double refInput;
   double refOutput;
   double inputAngle = this->dataPtr->inputJoint->GetAngle(0).Radian();
   // double outputAngle = this->dataPtr->outputJoint->GetAngle(0).Radian();
-  if (inputAngle < input0)
-  {
-    ratio = ratio1;
-    refInput = input0;
-    refOutput = output0;
-  }
-  else if (inputAngle < input0+dinput)
-  {
-    ratio = ratio1 + dratio * (inputAngle - input0) / dinput;
-    refInput = inputAngle;
-    refOutput = output0 + ratio1 * (inputAngle - input0)
-              + 0.5*dratio / dinput * std::pow(inputAngle - input0, 2);
-  }
-  else
-  {
-    ratio = ratio2;
-    refInput = input0 + dinput;
-    refOutput = output0 + 0.5 * (ratio1 + ratio2) * dinput;
-  }
+
+  // the Load function should print an error message and return
+  // before setting up this callback if no parameters are found.
+  GZ_ASSERT(!this->dataPtr->splinePoints.empty(), "no spline points found");
+
+  ignition::math::Vector3d pointSlope = interpolatePointSlope(
+      inputAngle, this->dataPtr->splinePoints, this->dataPtr->splineSlopes);
+
+  refInput = pointSlope.X();
+  refOutput = pointSlope.Y();
+  ratio = pointSlope.Z();
   ratio = -ratio;
 
   this->dataPtr->gearbox->SetParam("reference_angle1", 0, refOutput);
