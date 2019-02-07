@@ -1290,7 +1290,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
       // order matters: transparency needs to be loaded before transparent.
       if (lambertXml->FirstChildElement("transparency"))
       {
-        mat->SetTransparency(1 -
+        mat->SetTransparency(
             this->LoadFloat(lambertXml->FirstChildElement("transparency")));
       }
 
@@ -1317,7 +1317,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
       // order matters: transparency needs to be loaded before transparent
       if (phongXml->FirstChildElement("transparency"))
-        mat->SetTransparency(1 -
+        mat->SetTransparency(
             this->LoadFloat(phongXml->FirstChildElement("transparency")));
       if (phongXml->FirstChildElement("transparent"))
       {
@@ -1342,7 +1342,7 @@ Material *ColladaLoader::LoadMaterial(const std::string &_name)
 
       // order matters: transparency needs to be loaded before transparent
       if (blinnXml->FirstChildElement("transparency"))
-        mat->SetTransparency(1 -
+        mat->SetTransparency(
             this->LoadFloat(blinnXml->FirstChildElement("transparency")));
       if (blinnXml->FirstChildElement("transparent"))
       {
