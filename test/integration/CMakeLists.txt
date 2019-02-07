@@ -102,6 +102,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  variable_gearbox_plugin.cc
   wheel_slip.cc
   world.cc
   world_clone.cc
@@ -148,6 +149,7 @@ if (ENABLE_TESTS_COMPILATION)
 
   # Add plugin dependency
   add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+  add_dependencies(${TEST_TYPE}_variable_gearbox_plugin VariableGearboxPlugin)
 
   set_target_properties(${TEST_TYPE}_model_database PROPERTIES
     COMPILE_DEFINITIONS "CMAKE_SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
