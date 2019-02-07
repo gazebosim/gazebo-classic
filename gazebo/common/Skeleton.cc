@@ -196,53 +196,31 @@ NodeMap Skeleton::GetNodes()
 }
 
 //////////////////////////////////////////////////
-unsigned int Skeleton::SetNumVertAttached(std::string _verticesGroup,
-    unsigned int _vertices)
+void Skeleton::SetNumVertAttached(unsigned int _vertices)
 {
-  unsigned int idx = 0;
-  try
-  {
-    idx = this->verticesGroupMap.at(_verticesGroup);
-  }
-  catch (const std::out_of_range&)
-  {
-    this->rawNW.emplace_back();
-    idx = this->rawNW.size() - 1;
-    this->verticesGroupMap[_verticesGroup] = idx;
-  }
-  this->rawNW[idx].resize(_vertices);
-  return idx;
+  this->rawNW.resize(_vertices);
 }
 
 //////////////////////////////////////////////////
-unsigned int Skeleton::GetVertGroupIndex(std::string _verticesGroupName)
+void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
+                       double _weight)
 {
-  return this->verticesGroupMap.at(_verticesGroupName);
+  this->rawNW[_vertex].push_back(std::make_pair(_node, _weight));
 }
 
 //////////////////////////////////////////////////
-void Skeleton::AddVertNodeWeight(unsigned int _verticesGroup,
-    unsigned int _vertex, std::string _node, double _weight)
+unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
 {
-  this->rawNW[_verticesGroup][_vertex]
-      .push_back(std::make_pair(_node, _weight));
-}
-
-//////////////////////////////////////////////////
-unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _verticesGroup,
-    unsigned int _vertex)
-{
-  if (_vertex >= this->rawNW[_verticesGroup].size())
+  if (_vertex > this->rawNW.size())
     return 0;
-
-  return this->rawNW[_verticesGroup][_vertex].size();
+  return this->rawNW[_vertex].size();
 }
 
 //////////////////////////////////////////////////
-std::pair<std::string, double> Skeleton::GetVertNodeWeight(
-    unsigned int _verticesGroup, unsigned int _v, unsigned int _i)
+std::pair<std::string, double> Skeleton::GetVertNodeWeight(unsigned int _v,
+                                     unsigned int _i)
 {
-  return this->rawNW[_verticesGroup][_v][_i];
+  return this->rawNW[_v][_i];
 }
 
 //////////////////////////////////////////////////

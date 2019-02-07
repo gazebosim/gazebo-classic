@@ -505,25 +505,20 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   for (unsigned int i = 0; i < vStrs.size(); ++i)
     v.push_back(ignition::math::parseInt(vStrs[i]));
 
-  TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
-  TiXmlElement *verticesXml = geomXml->FirstChildElement("mesh")
-      ->FirstChildElement("vertices");
-  std::string verticesGroupName = verticesXml->Attribute("id");
-
-  unsigned int verticesGroup = skeleton->SetNumVertAttached(
-      verticesGroupName, vCount.size());
+  skeleton->SetNumVertAttached(vCount.size());
 
   unsigned int vIndex = 0;
   for (unsigned int i = 0; i < vCount.size(); ++i)
   {
     for (unsigned int j = 0; j < vCount[i]; ++j)
     {
-      skeleton->AddVertNodeWeight(verticesGroup, i,
-          joints[v[vIndex + jOffset]], weights[v[vIndex + wOffset]]);
+      skeleton->AddVertNodeWeight(i, joints[v[vIndex + jOffset]],
+                                    weights[v[vIndex + wOffset]]);
       vIndex += (jOffset + wOffset + 1);
     }
   }
 
+  TiXmlElement *geomXml = this->GetElementId("geometry", geomURL);
   this->LoadGeometry(geomXml, _transform, _mesh);
 }
 
@@ -1542,12 +1537,6 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
       if (norms.size() > count)
         combinedVertNorms = true;
       inputs[VERTEX].insert(ignition::math::parseInt(offset));
-
-      TiXmlElement *verticesXml = this->GetElementId(this->dataPtr->colladaXml,
-                                                     "vertices", source);
-      std::string verticesGroupName = verticesXml->Attribute("id");
-      verticesGroup =
-          _mesh->GetSkeleton()->GetVertGroupIndex(verticesGroupName);
     }
     else if (semantic == "NORMAL")
     {
@@ -1736,11 +1725,10 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
                   subMesh->Vertex(newVertIndex));
               Skeleton *skel = _mesh->GetSkeleton();
               for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(verticesGroup, daeVertIndex);
-                  ++i)
+                  i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
               {
                 std::pair<std::string, double> node_weight =
-                  skel->GetVertNodeWeight(verticesGroup, daeVertIndex, i);
+                  skel->GetVertNodeWeight(daeVertIndex, i);
                 SkeletonNode *node =
                     _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
                 subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
@@ -1868,12 +1856,6 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         combinedVertNorms = true;
       inputs[VERTEX].insert(ignition::math::parseInt(offset));
       hasVertices = true;
-
-      TiXmlElement *verticesXml = this->GetElementId(this->dataPtr->colladaXml,
-                                                     "vertices", source);
-      std::string verticesGroupName = verticesXml->Attribute("id");
-      verticesGroup =
-          _mesh->GetSkeleton()->GetVertGroupIndex(verticesGroupName);
     }
     else if (semantic == "NORMAL")
     {
@@ -2042,11 +2024,10 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         {
           Skeleton *skel = _mesh->GetSkeleton();
           for (unsigned int i = 0;
-              i < skel->GetNumVertNodeWeights(
-              verticesGroup, values[daeVertIndex]); ++i)
+                  i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
           {
             std::pair<std::string, double> node_weight =
-              skel->GetVertNodeWeight(verticesGroup, values[daeVertIndex], i);
+              skel->GetVertNodeWeight(daeVertIndex, i);
             SkeletonNode *node =
                 _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
