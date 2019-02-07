@@ -2,6 +2,16 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Improve gpu laser and its sensor shutdown
+    * [Pull request 3061](https://bitbucket.org/osrf/gazebo/pull-request/3061)
+    * [Pull request 3026](https://bitbucket.org/osrf/gazebo/pull-request/3026)
+
+1. Added KeysToCmdVelPlugin for controlling robots using keyboard from gzclient
+    * [Pull request 3057](https://bitbucket.org/osrf/gazebo/pull-request/3057)
+
+1. Windows patches to build gazebo9
+    * [Pull request 3060](https://bitbucket.org/osrf/gazebo/pull-request/3060)
+
 1. Add MisalignmentPlugin which reports alignment between two poses
     * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
 
