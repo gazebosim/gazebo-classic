@@ -59,6 +59,23 @@ TEST_F(VariableGearboxTest, DemoJointTypes)
   EXPECT_DOUBLE_EQ(1.0, gearbox->GetParam("ratio", 0));
   EXPECT_DOUBLE_EQ(0.0, gearbox->GetParam("reference_angle1", 0));
   EXPECT_DOUBLE_EQ(0.0, gearbox->GetParam("reference_angle2", 0));
+
+  // Step forward to high-gear
+  world->Step(500);
+  // Pendulum connected to input joint should swing past the gear ratio change
+  // so that the gear ratio is higher
+  EXPECT_DOUBLE_EQ(20.0, gearbox->GetParam("ratio", 0));
+  EXPECT_NEAR(inputJoint->GetVelocity(0), 2.34, 1e-2);
+  EXPECT_NEAR(outputJoint->GetVelocity(0), -46.8, 1e-1);
+  EXPECT_NEAR(-20*inputJoint->GetVelocity(0),
+                 outputJoint->GetVelocity(0), 2e-3);
+
+  // Step back to low-gear
+  world->Step(1800);
+  EXPECT_DOUBLE_EQ(1.0, gearbox->GetParam("ratio", 0));
+  EXPECT_NEAR(inputJoint->GetVelocity(0), -9.79, 1e-2);
+  EXPECT_NEAR(outputJoint->GetVelocity(0), 9.79, 5e-3);
+  EXPECT_NEAR(-inputJoint->GetVelocity(0), outputJoint->GetVelocity(0), 2e-2);
 }
 
 int main(int argc, char **argv)
