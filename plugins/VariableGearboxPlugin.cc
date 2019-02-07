@@ -291,8 +291,8 @@ void VariableGearboxPlugin::OnUpdate(const common::UpdateInfo & /*_info*/)
 
   refInput = pointSlope.X();
   refOutput = pointSlope.Y();
-  ratio = pointSlope.Z();
-  ratio = -ratio;
+  // ode gearbox defines gear ratio with an extra sign change
+  ratio = -pointSlope.Z();
 
   this->dataPtr->gearbox->SetParam("reference_angle1", 0, refOutput);
   this->dataPtr->gearbox->SetParam("reference_angle2", 0, refInput);
