@@ -178,7 +178,13 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   auto joint = this->dataPtr->model->GetJoint(jointName);
   if (joint == nullptr || !joint->HasType(physics::Base::GEARBOX_JOINT))
   {
-    gzerr << "Could not find a joint named " << jointName << std::endl;
+    gzerr << "Could not find a joint named " << jointName
+          << ", but found joints named:"
+          << std::endl;
+    for (auto j : this->dataPtr->model->GetJoints())
+    {
+      gzerr << "  " << j->GetName() << std::endl;
+    }
     return;
   }
   this->dataPtr->gearbox = joint;
@@ -190,10 +196,6 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
     gzerr << "Could not find parent link." << std::endl;
     return;
   }
-  gzdbg << "Checking " << parentLink->GetScopedName()
-        << " for its joints."
-        << std::endl;
-
   {
     auto joints = parentLink->GetParentJoints();
     if (joints.size() != 1)
@@ -201,13 +203,14 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
       gzerr << "link [" << parentLink->GetScopedName()
             << "] is child of more than 1 joint, not sure which one to pick."
             << std::endl;
+      for (auto j : parentLink->GetParentJoints())
+      {
+        gzerr << "  " << j->GetName() << std::endl;
+      }
       return;
     }
     this->dataPtr->inputJoint = joints.front();
   }
-  gzdbg << "Using " << this->dataPtr->inputJoint->GetScopedName()
-        << " as input joint."
-        << std::endl;
 
   // Identify output joint from child link
   auto childLink = joint->GetChild();
@@ -216,10 +219,6 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
     gzerr << "Could not find child link." << std::endl;
     return;
   }
-  gzdbg << "Checking " << childLink->GetScopedName()
-        << " for its joints."
-        << std::endl;
-
   {
     auto joints = childLink->GetParentJoints();
     if (joints.size() < 1 || joints.size() > 2)
@@ -227,13 +226,14 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
       gzerr << "link [" << childLink->GetScopedName()
             << "] is child of not 1 or 2 joints, not sure which one to pick."
             << std::endl;
+      for (auto j : childLink->GetParentJoints())
+      {
+        gzerr << "  " << j->GetName() << std::endl;
+      }
       return;
     }
     this->dataPtr->outputJoint = joints.front();
   }
-  gzdbg << "Using " << this->dataPtr->outputJoint->GetScopedName()
-        << " as output joint."
-        << std::endl;
 
   if (_sdf->HasElement("x_y_dydx"))
   {
