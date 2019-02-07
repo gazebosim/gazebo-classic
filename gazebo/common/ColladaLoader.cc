@@ -411,8 +411,10 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
 
   if (rootXml->FirstChildElement("library_animations"))
+  {
     this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
         skeleton);
+  }
 
   skeleton->SetBindShapeTransform(bindTrans);
 
