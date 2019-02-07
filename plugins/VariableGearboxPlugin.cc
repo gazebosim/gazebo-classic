@@ -50,36 +50,47 @@ class VariableGearboxPluginPrivate
 };
 
 /////////////////////////////////////////////////
-/// \brief Interpolate point and slope from piecewise cubic Hermite splines.
-/// \param[in] _input X value to interpolate.
+/// \brief Interpolate function value y = f(x) and its slope dy/dx
+/// at a specified value of x from piecewise cubic Hermite splines
+/// specified by knot points [(x_1,y_1), (x_2,y_2), ... (x_N,y_N)]
+/// and the slope at each knot point dy/dx|(x_i,y_i) = m_i
+/// [m_1, m_2, ... m_N].
+/// \param[in] _inputX X value at interpolation point.
 /// \param[in] _points Knot points for splines.
 /// \param[in] _slopes Slopes at each knot point.
-/// \return Interpolated point and slope in Vector3 form:
-/// Vector3[point.x, point.y, slope].
+/// \return Interpolated point and slope encoded in Vector3:
+/// Vector3(_inputX, interpolatedY, interpolatedSlope).
 ignition::math::Vector3d interpolatePointSlope(
-    double input,
+    double _inputX,
     const std::vector<ignition::math::Vector2d> &_points,
     const std::vector<double> &_slopes)
 {
-  // Check if input is outside of domain of spline points
+  GZ_ASSERT(!_points.empty(), "_points should not be empty");
+  GZ_ASSERT(!_slopes.empty(), "_slopes should not be empty");
+
+  // Check if _inputX is outside of domain of spline points
   // and do a linear extrapolation if so
-  if (input < _points.front().X())
+  if (_inputX <= _points.front().X())
   {
-    return ignition::math::Vector3d(
-        _points.front().X(), _points.front().Y(), _slopes.front());
+    const double y = _points.front().Y() +
+        _slopes.front() * (_inputX - _points.front().X());
+    return ignition::math::Vector3d(_inputX, y, _slopes.front());
   }
-  else if (input > _points.back().X())
+  else if (_inputX >= _points.back().X())
   {
-    return ignition::math::Vector3d(
-        _points.back().X(), _points.back().Y(), _slopes.back());
+    const double y = _points.back().Y() +
+        _slopes.back() * (_inputX - _points.back().X());
+    return ignition::math::Vector3d(_inputX, y, _slopes.back());
   }
   else
   {
-    // Interpolate over the spline segments
+    // Interpolate using the piecewise cubic Hermite splines.
+
+    // Find which spline interval contains _inputX and store in i
     std::size_t i;
     for (i = 0; i < _points.size() - 1; ++i)
     {
-      if (input >= _points[i].X() && input <= _points[i+1].X())
+      if (_inputX >= _points[i].X() && _inputX <= _points[i+1].X())
       {
         break;
       }
@@ -91,19 +102,52 @@ ignition::math::Vector3d interpolatePointSlope(
       return ignition::math::Vector3d();
     }
 
-    const double dx = _points[i+1].X() - _points[i].X();
-    const double t = (input - _points[i].X()) / dx;
+    // Rescale the domain of the ith piecewise cubic Hermite spline
+    // dy = y_{i+1} - y_i
+    // dx = x_{i+1} - x_i
+    // t = (x - x_i) / dx
     const double dy = _points[i+1].Y() - _points[i].Y();
+    const double dx = _points[i+1].X() - _points[i].X();
+    const double t = (_inputX - _points[i].X()) / dx;
 
-    const double g1 = dy / dx - _slopes[i];
-    const double g2 = _slopes[i+1] - _slopes[i];
-    const double a = -2*g1 + g2;
-    const double b =  3*g1 - g2;
+    // The ith piecewise cubic Hermite spline can be written as:
+    // y(t) = y_i + dx*(m_i*t + p1*t^2 + p2*t^3)
+    // or
+    // (y(t) - y_i)/dx = m_i*t + p1*t^2 + p2*t^3
+    //
+    // By differentiating the first equation, the slope m(t) is given by
+    // m(t) = m_i + 2*p1*t + 3*p2*t^2
+    //
+    // Evaluate these equations at the endpoint: t=1, y=y_{i+1}, m=m_{i+1}:
+    // dy/dx = m_i + p1 + p2
+    // m_{i+1} = m_i + 2*p1 + 3*p2
+    //
+    // Use a linear system to solve for unknown coefficients p1,p2
+    //     p1 +     p2 = dy/dx - m_i
+    // 2 * p1 + 3 * p2 = m_{i+1} - m_i
+    //
+    // Formulate as A*p = b
+    // A = [ 1 1 ]    p = [ p1 ]    b = [ dy / dx - m_i ]
+    //     [ 2 3 ]        [ p2 ]        [ m_{i+1} - m_i ]
+    const double b1 = dy / dx - _slopes[i];
+    const double b2 = _slopes[i+1] - _slopes[i];
 
-    const double y = _points[i].Y() + dx*t*(_slopes[i] + t*(b + a*t));
-    const double slope = _slopes[i] + t*(2*b + 3*a*t);
+    // Determinant of A matrix: det(A) = 1
+    // Inverse of A matrix: inv(A) = [  3  -1 ]
+    //                               [ -2   1 ]
+    // p = inv(A) * b
+    const double p1 =  3*b1 - b2;
+    const double p2 = -2*b1 + b2;
 
-    return ignition::math::Vector3d(input, y, slope);
+    // Rewrite y(t), m(t) to reduce multiplication operations:
+    // y(t) = y_i + dx*t*(m_i + t*(p1 + p2*t))
+    const double interpolatedY =
+        _points[i].Y() + dx*t*(_slopes[i] + t*(p1 + p2*t));
+
+    // m(t) = m_i + t*(2*p1 + 3*p2*t)
+    const double interpolatedSlope = _slopes[i] + t*(2*p1 + 3*p2*t);
+
+    return ignition::math::Vector3d(_inputX, interpolatedY, interpolatedSlope);
   }
 }
 
