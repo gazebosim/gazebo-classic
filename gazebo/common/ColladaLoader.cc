@@ -1473,9 +1473,7 @@ void ColladaLoader::LoadPolylist(TiXmlElement *_polylistXml,
   // each polylist polygon is convex, and we do decomposion
   // by anchoring each triangle about vertex 0 or each polygon
   SubMesh *subMesh = new SubMesh;
-  std::string submeshName = this->dataPtr->currentNodeName;
-  subMesh->SetName(submeshName);
-  unsigned int verticesGroup = 0;
+  subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -1791,9 +1789,7 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
                                   Mesh *_mesh)
 {
   std::unique_ptr<SubMesh> subMesh(new SubMesh);
-  std::string submeshName = this->dataPtr->currentNodeName;
-  subMesh->SetName(submeshName);
-  unsigned int verticesGroup;
+  subMesh->SetName(this->dataPtr->currentNodeName);
   bool combinedVertNorms = false;
 
   subMesh->SetPrimitiveType(SubMesh::TRIANGLES);
@@ -2026,10 +2022,10 @@ void ColladaLoader::LoadTriangles(TiXmlElement *_trianglesXml,
         {
           Skeleton *skel = _mesh->GetSkeleton();
           for (unsigned int i = 0;
-                  i < skel->GetNumVertNodeWeights(daeVertIndex); ++i)
+              i < skel->GetNumVertNodeWeights(values[daeVertIndex]); ++i)
           {
             std::pair<std::string, double> node_weight =
-              skel->GetVertNodeWeight(daeVertIndex, i);
+              skel->GetVertNodeWeight(values[daeVertIndex], i);
             SkeletonNode *node =
                 _mesh->GetSkeleton()->GetNodeByName(node_weight.first);
             subMesh->AddNodeAssignment(subMesh->GetVertexCount()-1,
