@@ -2464,7 +2464,6 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       currOffset = 0;
       if (subMesh.GetTexCoordCount() > 0)
       {
-        gzdbg << "Adding texture" << std::endl;
         vertexDecl->addElement(1, currOffset, Ogre::VET_FLOAT2,
             Ogre::VES_TEXTURE_COORDINATES, 0);
         currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);

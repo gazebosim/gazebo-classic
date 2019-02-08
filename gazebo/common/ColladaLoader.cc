@@ -132,7 +132,8 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   // This will make the model the correct size.
   mesh->Scale(this->dataPtr->meter);
-  mesh->GetSkeleton()->Scale(this->dataPtr->meter);
+  if (mesh->HasSkeleton())
+    mesh->GetSkeleton()->Scale(this->dataPtr->meter);
 
   return mesh;
 }
@@ -146,6 +147,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
     sceneXml->FirstChildElement("instance_visual_scene")->Attribute("url");
 
   TiXmlElement *visSceneXml = this->GetElementId("visual_scene", sceneURL);
+  this->dataPtr->currentScene = visSceneXml;
 
   if (!visSceneXml)
   {
@@ -154,31 +156,7 @@ void ColladaLoader::LoadScene(Mesh *_mesh)
   }
 
   TiXmlElement *nodeXml = visSceneXml->FirstChildElement("node");
-  SkeletonNode *rootNode = nullptr;
-  std::vector<SkeletonNode*> rootNodes;
-  while (nodeXml)
-  {
-    rootNodes.push_back(this->LoadSkeletonNodes(nodeXml, nullptr));
-    nodeXml = nodeXml->NextSiblingElement("node");
-  }
-  if (rootNodes.size() > 1)
-  {
-    rootNode = new SkeletonNode(nullptr, "dummy-root", "dummy-root",
-        SkeletonNode::SkeletonNodeType::NODE);
-    for (SkeletonNode *n : rootNodes)
-    {
-      rootNode->AddChild(n);
-      n->SetParent(rootNode);
-    }
-  }
-  else
-  {
-    rootNode = rootNodes[0];
-  }
-  rootNode->SetTransform(ignition::math::Matrix4d::Identity);
-  _mesh->SetSkeleton(new Skeleton(rootNode));
 
-  nodeXml = visSceneXml->FirstChildElement("node");
   while (nodeXml)
   {
     this->LoadNode(nodeXml, _mesh, ignition::math::Matrix4d::Identity);
@@ -261,15 +239,6 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
     std::string contrURL = instContrXml->Attribute("url");
     TiXmlElement *contrXml = this->GetElementId("controller", contrURL);
 
-    std::vector<TiXmlElement*> rootNodeXmls;
-    TiXmlNode *child = nullptr;
-    while ((child = instContrXml->IterateChildren("skeleton", child)))
-    {
-      TiXmlElement *instSkelXml = child->ToElement();
-      std::string rootURL = instSkelXml->GetText();
-      rootNodeXmls.emplace_back(this->GetElementId("node", rootURL));
-    }
-
     this->dataPtr->materialMap.clear();
     TiXmlElement *bindMatXml, *techniqueXml, *matXml;
     bindMatXml = instContrXml->FirstChildElement("bind_material");
@@ -289,7 +258,26 @@ void ColladaLoader::LoadNode(TiXmlElement *_elem, Mesh *_mesh,
       bindMatXml = bindMatXml->NextSiblingElement("bind_material");
     }
 
-    this->LoadController(contrXml, transform, _mesh);
+    std::vector<TiXmlElement*> rootNodeXmls;
+    TiXmlNode *child = nullptr;
+    while ((child = instContrXml->IterateChildren("skeleton", child)))
+    {
+      TiXmlElement *instSkelXml = child->ToElement();
+      std::string rootURL = instSkelXml->GetText();
+      rootNodeXmls.emplace_back(this->GetElementId("node", rootURL));
+    }
+    // no skeleton tag present, assume whole scene is a skeleton
+    if (rootNodeXmls.empty())
+    {
+      TiXmlNode *childNode = nullptr;
+      while ((childNode =
+          this->dataPtr->currentScene->IterateChildren("node", childNode)))
+      {
+        rootNodeXmls.emplace_back(childNode->ToElement());
+      }
+    }
+
+    this->LoadController(contrXml, rootNodeXmls, transform, _mesh);
     instContrXml = instContrXml->NextSiblingElement("instance_controller");
   }
 }
@@ -359,6 +347,7 @@ ignition::math::Matrix4d ColladaLoader::LoadNodeTransform(TiXmlElement *_elem)
 
 /////////////////////////////////////////////////
 void ColladaLoader::LoadController(TiXmlElement *_contrXml,
+      const std::vector<TiXmlElement*> &rootNodeXmls,
       const ignition::math::Matrix4d &_transform, Mesh *_mesh)
 {
   TiXmlElement *skinXml = _contrXml->FirstChildElement("skin");
@@ -406,17 +395,31 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   std::vector<std::string> joints;
   boost::split(joints, jointsStr, boost::is_any_of(" \t"));
 
-  Skeleton *skeleton = _mesh->GetSkeleton();
+  // Load the skeleton
+  Skeleton *skeleton = nullptr;
+  if (_mesh->HasSkeleton())
+    skeleton = _mesh->GetSkeleton();
+  std::vector<SkeletonNode*> rootSkelNodes;
+  for (TiXmlElement *rootNodeXml : rootNodeXmls)
+  {
+    SkeletonNode *rootSkelNode =
+        this->LoadSkeletonNodes(rootNodeXml, nullptr);
+    if (skeleton)
+      this->MergeSkeleton(skeleton, rootSkelNode);
+    else
+    {
+      skeleton = new Skeleton(rootSkelNode);
+      _mesh->SetSkeleton(skeleton);
+    }
+  }
+  skeleton->SetBindShapeTransform(bindTrans);
 
   TiXmlElement *rootXml = _contrXml->GetDocument()->RootElement();
-
   if (rootXml->FirstChildElement("library_animations"))
   {
     this->LoadAnimations(rootXml->FirstChildElement("library_animations"),
         skeleton);
   }
-
-  skeleton->SetBindShapeTransform(bindTrans);
 
   TiXmlElement *invBMXml = this->GetElementId("source", invBindMatURL);
 
@@ -642,10 +645,24 @@ void ColladaLoader::LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel)
       unsigned int stride =
         ignition::math::parseInt(accessor->Attribute("stride"));
 
+      SkeletonNode *targetNode = _skel->GetNodeById(targetBone);
+      if (targetNode == nullptr)
+      {
+        TiXmlElement *targetNodeXml = this->GetElementId("node", targetBone);
+        if (targetNodeXml == nullptr)
+        {
+          gzerr << "Failed to load animation, '" << targetBone << "' not found"
+              << std::endl;
+          gzthrow("Failed to load animation");
+        }
+        targetNode = this->LoadSkeletonNodes(targetNodeXml, nullptr);
+        this->MergeSkeleton(_skel, targetNode);
+      }
+
       // In COLLOADA, `target` is specified to be the `id` of a node, however
       // the nodes are identified by `name` in this loader. Here, we resolve
       // `targetBone` to the node's `name` to prevent missing animations.
-      std::string targetBoneName = _skel->GetNodeById(targetBone)->GetName();
+      std::string targetBoneName = targetNode->GetName();
       for (unsigned int i = 0; i < times.size(); ++i)
       {
         if (animation[targetBoneName].find(times[i])
@@ -2209,4 +2226,38 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
 
     _mat->SetBlendFactors(srcFactor, dstFactor);
   }
+}
+
+void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
+{
+  if (_skeleton->GetNodeById(_mergeNode->GetId()))
+    return;
+
+  SkeletonNode *currentRoot = _skeleton->GetRootNode();
+  if (currentRoot->GetId() == _mergeNode->GetId())
+    return;
+
+  if (_mergeNode->GetChildById(currentRoot->GetId()))
+  {
+    _skeleton->SetRootNode(_mergeNode);
+    return;
+  }
+
+  SkeletonNode *dummyRoot = nullptr;
+  if (currentRoot->GetId() == "gazebo-dummy-root")
+    dummyRoot = currentRoot;
+  else
+  {
+    dummyRoot =
+        new SkeletonNode(nullptr, "gazebo-dummy-root", "gazebo-dummy-root");
+  }
+  if (dummyRoot != currentRoot)
+  {
+    dummyRoot->AddChild(currentRoot);
+    currentRoot->SetParent(dummyRoot);
+  }
+  dummyRoot->AddChild(_mergeNode);
+  _mergeNode->SetParent(dummyRoot);
+  dummyRoot->SetTransform(ignition::math::Matrix4d::Identity);
+  _skeleton->SetRootNode(dummyRoot);
 }
