@@ -2401,7 +2401,7 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       Ogre::HardwareIndexBufferSharedPtr iBuf;
       Ogre::HardwareVertexBufferSharedPtr texBuf;
       float *vertices;
-      float *texMappings;
+      float *texMappings = nullptr;
       uint32_t *indices;
 
       size_t currOffset = 0;

@@ -399,7 +399,6 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
   Skeleton *skeleton = nullptr;
   if (_mesh->HasSkeleton())
     skeleton = _mesh->GetSkeleton();
-  std::vector<SkeletonNode*> rootSkelNodes;
   for (TiXmlElement *rootNodeXml : rootNodeXmls)
   {
     SkeletonNode *rootSkelNode =
