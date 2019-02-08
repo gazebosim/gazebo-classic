@@ -69,6 +69,8 @@ TEST_F(VariableGearboxTest, DemoJointTypes)
   EXPECT_NEAR(outputJoint->GetVelocity(0), -46.8, 1e-1);
   EXPECT_NEAR(-20*inputJoint->GetVelocity(0),
                  outputJoint->GetVelocity(0), 2e-3);
+  EXPECT_DOUBLE_EQ(gearbox->GetParam("reference_angle1", 0) - (-7.5),
+            -20 * (gearbox->GetParam("reference_angle2", 0) - 1.8));
 
   // Step back to low-gear
   world->Step(1800);
@@ -76,6 +78,8 @@ TEST_F(VariableGearboxTest, DemoJointTypes)
   EXPECT_NEAR(inputJoint->GetVelocity(0), -9.79, 1e-2);
   EXPECT_NEAR(outputJoint->GetVelocity(0), 9.79, 5e-3);
   EXPECT_NEAR(-inputJoint->GetVelocity(0), outputJoint->GetVelocity(0), 2e-2);
+  EXPECT_DOUBLE_EQ(gearbox->GetParam("reference_angle1", 0),
+                  -gearbox->GetParam("reference_angle2", 0));
 }
 
 int main(int argc, char **argv)
