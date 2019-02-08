@@ -119,7 +119,7 @@ ignition::math::Vector3d interpolatePointSlope(
     // m(t) = m_i + 2*p1*t + 3*p2*t^2
     //
     // Evaluate these equations at the endpoint: t=1, y=y_{i+1}, m=m_{i+1}:
-    // dy/dx = m_i + p1 + p2
+    //   dy/dx = m_i +   p1 +   p2
     // m_{i+1} = m_i + 2*p1 + 3*p2
     //
     // Use a linear system to solve for unknown coefficients p1,p2
