@@ -68,6 +68,11 @@ namespace gazebo
       public: std::map<std::string, std::function <gazebo::msgs::Any ()>>
           allItems;
 
+      /// \brief Set of all registered items names.
+      /// This is a convenience/performance enhancement for retreving
+      /// registered keys.
+      public: std::set<std::string> allItemsKeys;
+
       /// \brief List of items that have at least one active observer.
       /// The key contains the item name.
       /// The value contains the last value stored for this item, as well as a
