@@ -186,13 +186,13 @@
           </extra>
         </node>
         <node id="Cube" name="Cube" type="NODE">
-          <skeleton>#Armature_Bone</skeleton>
           <translate sid="location">0 0 0</translate>
           <rotate sid="rotationZ">0 0 1 0</rotate>
           <rotate sid="rotationY">0 1 0 0</rotate>
           <rotate sid="rotationX">1 0 0 0</rotate>
           <scale sid="scale">1 1 1</scale>
           <instance_controller url="#Armature_Cube-skin">
+            <skeleton>#Armature_Bone</skeleton>
             <bind_material>
               <technique_common>
                 <instance_material symbol="Material-material" target="#Material-material">
@@ -203,13 +203,13 @@
           </instance_controller>
         </node>
         <node id="Cube2" name="Cube2" type="NODE">
-          <skeleton>#Armature_Bone2</skeleton>
           <translate sid="location">0 0 0</translate>
           <rotate sid="rotationZ">0 0 1 0</rotate>
           <rotate sid="rotationY">0 1 0 0</rotate>
           <rotate sid="rotationX">1 0 0 0</rotate>
           <scale sid="scale">1 1 1</scale>
           <instance_controller url="#Armature_Cube-skin2">
+            <skeleton>#Armature_Bone2</skeleton>
             <bind_material>
               <technique_common>
                 <instance_material symbol="Material-material" target="#Material-material">
