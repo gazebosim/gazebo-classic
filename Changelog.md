@@ -2,6 +2,10 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
+    * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
+
 1. Improve gpu laser and its sensor shutdown
     * [Pull request 3061](https://bitbucket.org/osrf/gazebo/pull-request/3061)
     * [Pull request 3026](https://bitbucket.org/osrf/gazebo/pull-request/3026)
