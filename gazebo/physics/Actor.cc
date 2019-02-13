@@ -657,8 +657,12 @@ void Actor::Update()
 
   this->lastTraj = tinfo->id;
 
-  ignition::math::Matrix4d rootTrans =
-    frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  ignition::math::Matrix4d rootTrans = ignition::math::Matrix4d::Identity;
+  auto iter = frame.find(skelMap[this->skeleton->GetRootNode()->GetName()]);
+  if (iter != frame.end())
+  {
+    rootTrans = frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  }
 
   ignition::math::Vector3d rootPos = rootTrans.Translation();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();

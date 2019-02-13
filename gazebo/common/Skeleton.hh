@@ -159,7 +159,8 @@ namespace gazebo
       protected: NodeMap nodes;
 
       /// \brief the bind pose skeletal transform
-      protected: ignition::math::Matrix4d bindShapeTransform;
+      protected: ignition::math::Matrix4d bindShapeTransform =
+        ignition::math::Matrix4d::Identity;
 
       /// \brief the node weight table
       protected: RawNodeWeights rawNW;
