@@ -18,10 +18,13 @@
 /// \brief This file contains a gazebo plugin for the ContainPlugin tutorial.
 /// Doxygen comments and PIMPL are omitted to reduce the amount of text.
 
+#include <ignition/msgs.hh>
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/common/Plugin.hh"
+#include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
-#include "ignition/msgs.hh"
-#include "ignition/transport/Node.hh"
+#include "gazebo/transport/Node.hh"
 
 namespace gazebo
 {
@@ -30,6 +33,9 @@ namespace gazebo
     public: void Load(physics::WorldPtr _world, sdf::ElementPtr _sdf) override
     {
       gzmsg << "Loading Example plugin\n";
+      // Transport initialization
+      this->gzNode = transport::NodePtr(new transport::Node());
+      this->gzNode->Init();
 
       // Subscribe to ContainPlugin output
       std::string topic("contain_example/contain");
@@ -44,7 +50,7 @@ namespace gazebo
       }
 
       // Make a publisher for the light topic
-      this->lightPub = this->node.Advertise<msgs::Light>("light/modify");
+      this->lightPub = this->gzNode->Advertise<msgs::Light>("~/light/modify");
     }
 
     public: void OnContainPluginMsg(const ignition::msgs::Boolean &_msg)
@@ -62,11 +68,12 @@ namespace gazebo
         gzmsg << "Turning off light\n";
         lightMsg.set_range(0.0);
       }
-      this->lightPub.Publish(lightMsg);
+      this->lightPub->Publish(lightMsg);
     }
 
     private: ignition::transport::Node node;
-    private: ignition::transport::Node::Publisher lightPub;
+    private: transport::NodePtr gzNode;
+    private: transport::PublisherPtr lightPub;
   };
   GZ_REGISTER_WORLD_PLUGIN(TurnOnLightPlugin);
 }  // namespace gazebo
