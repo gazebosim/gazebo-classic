@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Update trigger\_light plugin example to use ignition-transport
+    * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
+
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)

@@ -48,7 +48,7 @@
     <plugin name='ContainPlugin' filename='libContainPlugin.so'>
       <enabled>true</enabled>
       <entity>unit_sphere::only_link</entity>
-      <namespace>~/contain_example</namespace>
+      <namespace>contain_example</namespace>
       <pose>0 -3 0.5 0 0 0</pose>
       <geometry>
         <box>
