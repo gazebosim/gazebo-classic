@@ -198,6 +198,7 @@ NodeMap Skeleton::GetNodes()
 //////////////////////////////////////////////////
 void Skeleton::SetNumVertAttached(unsigned int _vertices)
 {
+  this->rawNW.clear();
   this->rawNW.resize(_vertices);
 }
 

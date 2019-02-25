@@ -111,7 +111,8 @@ namespace gazebo
       /// \brief Get a copy or the node dictionary
       public: NodeMap GetNodes();
 
-      /// \brief Resizes the raw node weight array
+      /// \brief Resizes the raw node weight array, this also clears all the
+      /// node weights assigned.
       /// \param[in] _vertices the new size
       public: void SetNumVertAttached(unsigned int _vertices);
 
