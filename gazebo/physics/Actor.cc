@@ -833,6 +833,12 @@ void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 }
 
 //////////////////////////////////////////////////
+const common::Mesh *Actor::GetMesh() const
+{
+  return this->mesh;
+}
+
+//////////////////////////////////////////////////
 TrajectoryInfoPtr Actor::CustomTrajectory() const
 {
   return this->customTrajectoryInfo;

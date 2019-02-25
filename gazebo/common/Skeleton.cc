@@ -54,6 +54,12 @@ SkeletonNode* Skeleton::GetRootNode()
 }
 
 //////////////////////////////////////////////////
+const SkeletonNode* Skeleton::GetRootNode() const
+{
+  return this->root;
+}
+
+//////////////////////////////////////////////////
 SkeletonNode* Skeleton::GetNodeByName(std::string _name)
 {
   for (std::map<unsigned int, SkeletonNode*>::iterator iter =
@@ -286,7 +292,7 @@ void SkeletonNode::SetName(std::string _name)
 }
 
 //////////////////////////////////////////////////
-std::string SkeletonNode::GetName()
+std::string SkeletonNode::GetName() const
 {
   return this->name;
 }

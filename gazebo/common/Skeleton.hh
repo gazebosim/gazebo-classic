@@ -69,6 +69,10 @@ namespace gazebo
       /// \return the root
       public: SkeletonNode* GetRootNode();
 
+      /// \brief Return the root
+      /// \return the root
+      public: const SkeletonNode* GetRootNode() const;
+
       /// \brief Find a node
       /// \param[in] _name the name of the node to look for
       /// \return the node, or nullptr if not found
@@ -198,7 +202,7 @@ namespace gazebo
 
       /// \brief Returns the name
       /// \return the name
-      public: std::string GetName();
+      public: std::string GetName() const;
 
       /// \brief Change the id string
       /// \param[in] _id the new id string
