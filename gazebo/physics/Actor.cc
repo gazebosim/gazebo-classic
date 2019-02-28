@@ -173,12 +173,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
   }
 
   this->skeleton = this->mesh->GetSkeleton();
-  if (!this->skeleton)
-  {
-    gzwarn << "Null skeleton in file [" << this->skinFile << "]" << std::endl;
-    return false;
-  }
-  this->skeleton->Scale(this->skinScale);
+  this->SetScale({this->skinScale, this->skinScale, this->skinScale});
 
   auto actorName = this->GetName();
 
@@ -677,9 +672,21 @@ void Actor::Update()
     actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
-  if (!this->customTrajectoryInfo)
+  if (!this->customTrajectoryInfo) {
     rootM.SetTranslation(actorPose.Pos());
 
+    // TODO: Possible bug here? Rotation changed after scaling. Maybe the
+    // rotation algorithm is not suppose to work on non unit quaternion.
+//    gzdbg << "before: " << rootM.Rotation() << std::endl;
+//    rootM.Scale(this->skinScale, this->skinScale, this->skinScale);
+//    auto scaleTrans = ignition::math::Matrix4d::Identity;
+//    scaleTrans.Scale(this->skinScale, this->skinScale, this->skinScale);
+//    rootM = scaleTrans * rootM;
+//    gzdbg << "after: " << rootM.Rotation() << std::endl;
+
+    // workaround for rotation bug
+    rootM.SetTranslation(rootM.Translation() * this->skinScale);
+  }
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
   this->SetPose(frame, skelMap, currentTime.Double());
