@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
+    * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
+
 1. Update trigger\_light plugin example to use ignition-transport
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
