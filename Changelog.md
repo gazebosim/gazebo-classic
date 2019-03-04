@@ -2,6 +2,16 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
+    * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
+
+1. Update trigger\_light plugin example to use ignition-transport
+    * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
+
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
+    * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
+
 1. Add geometry field to sonar.proto and private dataPtr to Actor class
     * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
 
@@ -61,6 +71,16 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
+    * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
+
+1. Update trigger\_light plugin example to use ignition-transport
+    * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
+
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
+    * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
 1. Improve gpu laser and its sensor shutdown
     * [Pull request 3061](https://bitbucket.org/osrf/gazebo/pull-request/3061)

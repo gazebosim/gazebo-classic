@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <ignition/math/Vector3.hh>
+#include <tinyxml.h>
 
 class TiXmlElement;
 
@@ -51,6 +52,9 @@ namespace gazebo
 
       /// \brief Name of the current node.
       public: std::string currentNodeName;
+
+      /// \brief current scene being parsed
+      public: TiXmlElement *currentScene;
 
       /// \brief Map of collada POSITION ids to list of vectors.
       public: std::map<std::string,
