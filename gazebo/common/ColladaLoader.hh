@@ -62,7 +62,7 @@ namespace gazebo
       /// \param[in] _transform A tranform to apply
       /// \param[in,out] _mesh The mesh being loaded
       private: void LoadController(TiXmlElement *_contrXml,
-          TiXmlElement *_skelXml,
+          const std::vector<TiXmlElement*> &rootNodeXmls,
           const ignition::math::Matrix4d &_transform, Mesh *_mesh);
 
       /// \brief Load animations for a skeleton
@@ -74,6 +74,12 @@ namespace gazebo
       /// \param[in] _xml Pointer to the animation set XML instance
       /// \param[in,out] _skel Pointer to the skeleton
       private: void LoadAnimationSet(TiXmlElement *_xml, Skeleton *_skel);
+
+      /// \brief Load a single skeleton node
+      /// \param[in] _xml Pointer to the XML instance
+      /// \param[in,out] _xml Pointer to the Skeleton node parent
+      private: SkeletonNode* LoadSingleSkeletonNode(TiXmlElement *_xml,
+                                               SkeletonNode *_parent);
 
       /// \brief Load skeleton nodes
       /// \param[in] _xml Pointer to the XML instance
@@ -222,6 +228,18 @@ namespace gazebo
       /// \param[in] _elem Pointer to the XML element
       /// \param[out] _mat Material to hold the transparent properties
       private: void LoadTransparent(TiXmlElement *_elem, Material *_mat);
+
+      /// \brief Merges a new root node to the skeleton
+      /// \details This will do 1 of the things:
+      ///     1: If `_mergeNode` is already part of the skeleton, do nothing
+      ///     2: If the skeleton's root is a descendent of `_mergeNode`, sets
+      ///         the new root node as `_mergeNode`
+      ///     3: If the skeleton and `_mergeNode` is unrelated, creates a new
+      ///         dummy root and adds both of them as childrens.
+      /// \param[in] _skeleton skeleton to merge
+      /// \param[in] _mergeNode new root node to merge
+      private: void MergeSkeleton(Skeleton *_skeleton,
+          SkeletonNode *_mergeNode);
 
       /// \internal
       /// \brief Pointer to private data.

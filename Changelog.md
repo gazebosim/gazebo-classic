@@ -2,6 +2,23 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
+    * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
+
+1. Update trigger\_light plugin example to use ignition-transport
+    * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
+
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
+    * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
+
+1. Add geometry field to sonar.proto and private dataPtr to Actor class
+    * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
+
+1. Dart heightmaps with bullet and ODE collision detectors
+    * [Pull request #2956](https://bitbucket.org/osrf/gazebo/pull-request/2956)
+    * [Pull request #3066](https://bitbucket.org/osrf/gazebo/pull-request/3066)
+
 1. Add record\_resources field to gazebo log msgs
     * [Pull request #2797](https://bitbucket.org/osrf/gazebo/pull-request/2797)
     * [Pull request #3008](https://bitbucket.org/osrf/gazebo/pull-request/3008)
@@ -54,6 +71,29 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
+    * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
+
+1. Update trigger\_light plugin example to use ignition-transport
+    * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
+
+1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
+    * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
+
+1. Improve gpu laser and its sensor shutdown
+    * [Pull request 3061](https://bitbucket.org/osrf/gazebo/pull-request/3061)
+    * [Pull request 3026](https://bitbucket.org/osrf/gazebo/pull-request/3026)
+
+1. Added KeysToCmdVelPlugin for controlling robots using keyboard from gzclient
+    * [Pull request 3057](https://bitbucket.org/osrf/gazebo/pull-request/3057)
+
+1. Windows patches to build gazebo9
+    * [Pull request 3060](https://bitbucket.org/osrf/gazebo/pull-request/3060)
+
+1. Add MisalignmentPlugin which reports alignment between two poses
+    * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
 
 
 ## Gazebo 9.6.0 (2018-12-17)
@@ -1242,6 +1282,9 @@
 
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
+
+1. Add MisalignmentPlugin which reports alignment between two poses
+    * [Pull request 2896](https://bitbucket.org/osrf/gazebo/pull-request/2896)
 
 1. More documentation to Model::CreateJoint()
     * [Pull request 3002](https://bitbucket.org/osrf/gazebo/pull-request/3002)
