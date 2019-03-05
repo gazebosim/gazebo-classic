@@ -24,13 +24,13 @@ message (STATUS "${PROJECT_NAME} version ${GAZEBO_VERSION_FULL}")
 set (gazebo_cmake_dir ${PROJECT_SOURCE_DIR}/cmake CACHE PATH "Location of CMake scripts")
 
 if(DEFINED ENABLE_TESTS_COMPILATION)
- message(FATAL_ERROR "The parameter ENABLE_TESTS_COMPILATION is deprecated. "
-   "The new behaviour is to call 'make tests' explicitly to compile the test"
-   "suite. Calling 'make' or 'make all' won't compile the tests")
+  message(FATAL_ERROR "The parameter ENABLE_TESTS_COMPILATION is deprecated. "
+    "The new behaviour is to call 'make tests' explicitly to compile the test"
+    "suite. Calling 'make' or 'make all' won't compile the tests")
 endif()
 
 if(NOT DEFINED BUILD_TESTING)
-    set(BUILD_TESTING OFF)
+  set(BUILD_TESTING OFF)
 endif()
 
 #============================================================================
@@ -85,15 +85,15 @@ include(GNUInstallDirs)
 # with -fPIC
 if(UNIX AND NOT WIN32)
   set (CMAKE_INSTALL_PREFIX "/usr" CACHE STRING "Install Prefix")
- find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
- if(CMAKE_UNAME)
-   exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
-   set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
-     "processor type (i386 and x86_64)")
-   if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-     ADD_DEFINITIONS(-fPIC)
-   endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
- endif(CMAKE_UNAME)
+  find_program(CMAKE_UNAME uname /bin /usr/bin /usr/local/bin )
+  if(CMAKE_UNAME)
+    exec_program(uname ARGS -m OUTPUT_VARIABLE CMAKE_SYSTEM_PROCESSOR)
+    set(CMAKE_SYSTEM_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR} CACHE INTERNAL
+      "processor type (i386 and x86_64)")
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+      ADD_DEFINITIONS(-fPIC)
+    endif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+  endif(CMAKE_UNAME)
 endif()
 
 set (CMAKE_INCLUDE_DIRECTORIES_PROJECT_BEFORE ON)
@@ -171,8 +171,8 @@ include (${gazebo_cmake_dir}/CheckDRIDisplay.cmake)
 MESSAGE(STATUS "Checking gazebo build type")
 # Set the default build type
 if (NOT CMAKE_BUILD_TYPE)
-    set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
+  set (CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
+    "Choose the type of build, options are: Debug Release RelWithDebInfo Profile Check" FORCE)
 endif (NOT CMAKE_BUILD_TYPE)
 # TODO: still convert to uppercase to keep backwards compatibility with
 # uppercase old supported and deprecated modes
@@ -212,7 +212,7 @@ endif()
 # Handle CFlags
 # USE_UPSTREAM_CFLAGS (default TRUE)
 if(NOT DEFINED USE_UPSTREAM_CFLAGS)
-    set (USE_UPSTREAM_CFLAGS True)
+  set (USE_UPSTREAM_CFLAGS True)
 endif()
 
 unset (CMAKE_C_FLAGS_ALL CACHE)
@@ -371,11 +371,11 @@ else (build_errors)
 
   foreach (b ${Boost_LIBRARIES})
     get_filename_component(bname ${b} NAME_WE)
-	# Prefix -l if not already prefixed
-	string(FIND ${bname} "-l" lprefix)
-	if (NOT ${lprefix} EQUAL 0 )
-		set (bname "-l${bname}")
-	endif()
+    # Prefix -l if not already prefixed
+    string(FIND ${bname} "-l" lprefix)
+    if (NOT ${lprefix} EQUAL 0 )
+      set (bname "-l${bname}")
+    endif()
     # Remove the prefix lib (not always present, like in pthread)
     string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
@@ -399,12 +399,12 @@ else (build_errors)
     gazebo_gui
     gazebo_sensors
     gazebo_rendering
-  )
+    )
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_physics
     gazebo_ode
-  )
+    )
 
   set(PKG_LIBRARIES ${PKG_LIBRARIES}
     gazebo_transport
@@ -417,7 +417,7 @@ else (build_errors)
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou
-  )
+    )
 
   if (NOT CCD_FOUND)
     set(PKG_LIBRARIES ${PKG_LIBRARIES} gazebo_ccd)
@@ -432,15 +432,15 @@ else (build_errors)
   # https://github.com/Kitware/CMake/blob/v2.8.8/Modules/CMakePackageConfigHelpers.cmake
   include(WriteBasicConfigVersionFile)
   write_basic_config_version_file(
-      ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
-      VERSION "${GAZEBO_VERSION_FULL}"
-      COMPATIBILITY SameMajorVersion)
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
+    VERSION "${GAZEBO_VERSION_FULL}"
+    COMPATIBILITY SameMajorVersion)
   install(FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}
-            ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
-          DESTINATION
-	    ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
-	  COMPONENT cmake)
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_file}
+    ${CMAKE_CURRENT_BINARY_DIR}/${cmake_conf_version_file}
+    DESTINATION
+    ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME_LOWER}/
+    COMPONENT cmake)
   ########################################
   # If present, load platform-specific build hooks.  This system is used,
   # for example, by the Ubuntu overlay (in the gazebo-release repo), to
