@@ -20,6 +20,10 @@
 #include "gazebo/common/Time.hh"
 #include "test/util.hh"
 
+#ifdef _WIN32
+  #include <winsock.h> // timeval
+#endif
+
 using namespace gazebo;
 
 class TimeTest : public gazebo::testing::AutoLogFixture { };

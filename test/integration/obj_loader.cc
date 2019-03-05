@@ -19,7 +19,6 @@
 #include "gazebo/common/OBJLoader.hh"
 #include "gazebo/test/ServerFixture.hh"
 
-struct sigaction sigact;
 using namespace gazebo;
 class ObjLoaderTest : public ServerFixture
 {
