@@ -173,6 +173,8 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     }
   }
 
+  SetCastShadows(_msg->cast_shadows());
+
   this->Load();
 }
 
@@ -733,6 +735,8 @@ void Heightmap::ConfigureTerrainDefaults()
 
   this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
 
+  this->dataPtr->terrainGlobals->setCastsDynamicShadows(this->dataPtr->castShadows);
+
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
 
@@ -1206,6 +1210,23 @@ void Heightmap::SetSkirtLength(const double _value)
   {
     this->dataPtr->terrainGlobals->setSkirtSize(
         this->dataPtr->skirtLength);
+  }
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::CastShadows() const
+{
+  return this->dataPtr->castShadows;
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetCastShadows(const bool _value)
+{
+  this->dataPtr->castShadows = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
   }
 }
 
