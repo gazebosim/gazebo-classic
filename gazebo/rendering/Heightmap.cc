@@ -735,7 +735,8 @@ void Heightmap::ConfigureTerrainDefaults()
 
   this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
 
-  this->dataPtr->terrainGlobals->setCastsDynamicShadows(this->dataPtr->castShadows);
+  this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
 
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
