@@ -342,7 +342,7 @@ void MarkerVisual::FillMsg(ignition::msgs::Marker &_msg)
   ignition::msgs::Set(_msg.mutable_pose(), this->Pose());
 
   if (this->dPtr->text)
-    _msg.set_text(this->dPtr->text->GetText());
+    _msg.set_text(this->dPtr->text->Text());
 
   if (this->GetParent())
     _msg.set_parent(this->GetParent()->Name());

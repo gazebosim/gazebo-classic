@@ -9,7 +9,7 @@ project (Gazebo)
 string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
-set (GAZEBO_MAJOR_VERSION 8)
+set (GAZEBO_MAJOR_VERSION 9)
 set (GAZEBO_MINOR_VERSION 6)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
@@ -32,6 +32,15 @@ endif()
 if(NOT DEFINED BUILD_TESTING)
     set(BUILD_TESTING OFF)
 endif()
+
+#============================================================================
+# We turn off extensions because (1) we do not ever want to use non-standard
+# compiler extensions, and (2) this variable is on by default, causing cmake
+# to choose the flag -std=gnu++14 instead of -std=c++14 when the C++14
+# features are requested. Explicitly turning this flag off will force cmake to
+# choose -std=c++14.
+# See https://bitbucket.org/ignitionrobotics/ign-cmake/issues/13 for more info.
+set(CMAKE_CXX_EXTENSIONS off)
 
 ########################################
 # Package Creation:
@@ -173,26 +182,26 @@ if (NOT DEFINED HDF5_INSTRUMENT)
   set (HDF5_INSTRUMENT FALSE)
 endif()
 
-set (BUILD_TYPE_PROFILE FALSE)
-set (BUILD_TYPE_RELEASE FALSE)
-set (BUILD_TYPE_RELWITHDEBINFO FALSE)
-set (BUILD_TYPE_DEBUG FALSE)
-set (BUILD_TYPE_COVERAGE FALSE)
+set (GAZEBO_BUILD_TYPE_PROFILE FALSE)
+set (GAZEBO_BUILD_TYPE_RELEASE FALSE)
+set (GAZEBO_BUILD_TYPE_RELWITHDEBINFO FALSE)
+set (GAZEBO_BUILD_TYPE_DEBUG FALSE)
+set (GAZEBO_BUILD_TYPE_COVERAGE FALSE)
 
 if ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "PROFILE")
-  set (BUILD_TYPE_PROFILE TRUE)
+  set (GAZEBO_BUILD_TYPE_PROFILE TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELEASE")
-  set (BUILD_TYPE_RELEASE TRUE)
+  set (GAZEBO_BUILD_TYPE_RELEASE TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "RELWITHDEBINFO")
-  set (BUILD_TYPE_RELWITHDEBINFO TRUE)
+  set (GAZEBO_BUILD_TYPE_RELWITHDEBINFO TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "DEBUG")
-  set (BUILD_TYPE_DEBUG TRUE)
+  set (GAZEBO_BUILD_TYPE_DEBUG TRUE)
 elseif ("${CMAKE_BUILD_TYPE_UPPERCASE}" STREQUAL "COVERAGE")
   BUILD_WARNING ("Simbody physics engine not supported during Coverage builds (issue #1849).")
   set (HAVE_SIMBODY FALSE)
   BUILD_WARNING ("DART physics engine not supported during Coverage builds (issue #1160).")
   set (HAVE_DART FALSE)
-  set (BUILD_TYPE_COVERAGE TRUE)
+  set (GAZEBO_BUILD_TYPE_COVERAGE TRUE)
   include (${gazebo_cmake_dir}/CodeCoverage.cmake)
   setup_target_for_coverage(coverage coverage)
 else()
@@ -405,7 +414,6 @@ else (build_errors)
     gazebo_gimpact
     gazebo_opcode
     gazebo_opende_ou
-    gazebo_math
   )
 
   if (NOT CCD_FOUND)

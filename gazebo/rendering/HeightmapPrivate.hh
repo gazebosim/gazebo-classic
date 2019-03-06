@@ -241,7 +241,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _materialName Name of material
-      public: TerrainMaterial(const std::string &_materialName);
+      public: explicit TerrainMaterial(const std::string &_materialName);
 
       /// \brief Set terrain material
       /// \param[in] _materialName Name of material

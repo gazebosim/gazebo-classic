@@ -17,6 +17,7 @@
 
 #include <sstream>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Helpers.hh>
 #include <ignition/math/Pose3.hh>
 #include <ignition/math/Vector3.hh>
@@ -75,29 +76,7 @@ GpuLaser::GpuLaser(const std::string &_namePrefix, ScenePtr _scene,
 //////////////////////////////////////////////////
 GpuLaser::~GpuLaser()
 {
-  delete [] this->dataPtr->laserBuffer;
-  delete [] this->dataPtr->laserScan;
-
-  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
-  {
-    if (this->dataPtr->firstPassTextures[i])
-    {
-      Ogre::TextureManager::getSingleton().remove(
-          this->dataPtr->firstPassTextures[i]->getName());
-    }
-  }
-  if (this->dataPtr->secondPassTexture)
-  {
-    Ogre::TextureManager::getSingleton().remove(
-        this->dataPtr->secondPassTexture->getName());
-  }
-
-  if (this->scene && this->dataPtr->orthoCam)
-    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
-
-  this->dataPtr->visual.reset();
-  this->dataPtr->texIdx.clear();
-  this->dataPtr->texCount = 0;
+  this->Fini();
 }
 
 //////////////////////////////////////////////////
@@ -123,6 +102,37 @@ void GpuLaser::Init()
 //////////////////////////////////////////////////
 void GpuLaser::Fini()
 {
+  for (unsigned int i = 0; i < this->dataPtr->textureCount; ++i)
+  {
+    if (this->dataPtr->firstPassTextures[i])
+    {
+      Ogre::TextureManager::getSingleton().remove(
+          this->dataPtr->firstPassTextures[i]->getName());
+      this->dataPtr->firstPassTextures[i] = nullptr;
+    }
+  }
+  if (this->dataPtr->secondPassTexture)
+  {
+    Ogre::TextureManager::getSingleton().remove(
+        this->dataPtr->secondPassTexture->getName());
+    this->dataPtr->secondPassTexture = nullptr;
+  }
+
+  if (this->dataPtr->orthoCam)
+  {
+    this->scene->OgreSceneManager()->destroyCamera(this->dataPtr->orthoCam);
+    this->dataPtr->orthoCam = nullptr;
+  }
+
+  this->dataPtr->visual.reset();
+  this->dataPtr->texIdx.clear();
+  this->dataPtr->texCount = 0;
+
+  delete [] this->dataPtr->laserBuffer;
+  this->dataPtr->laserBuffer = nullptr;
+  delete [] this->dataPtr->laserScan;
+  this->dataPtr->laserScan = nullptr;
+
   Camera::Fini();
 }
 
@@ -224,7 +234,6 @@ void GpuLaser::PostRender()
   {
     this->dataPtr->firstPassTargets[i]->swapBuffers();
   }
-
   this->dataPtr->secondPassTarget->swapBuffers();
 
   if (this->newData && this->captureData)
@@ -458,6 +467,35 @@ void GpuLaser::RenderImpl()
 const float* GpuLaser::LaserData() const
 {
   return this->dataPtr->laserBuffer;
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataBegin() const
+{
+  const unsigned int index = 0;
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->dataPtr->w2nd);
+}
+
+//////////////////////////////////////////////////
+GpuLaser::DataIter GpuLaser::LaserDataEnd() const
+{
+  const unsigned int index = this->dataPtr->h2nd * this->dataPtr->w2nd;
+
+  // Data stuffed into three floats (RGB)
+  const unsigned int skip = 3;
+  // range data in R channel
+  const unsigned int rangeOffset = 0;
+  // intensity data in G channel
+  const unsigned int intenOffset = 1;
+  return DataIter(index, this->dataPtr->laserBuffer, skip, rangeOffset,
+      intenOffset, this->dataPtr->w2nd);
 }
 
 /////////////////////////////////////////////////
@@ -720,7 +758,7 @@ void GpuLaser::CreateCanvas()
   this->dataPtr->visual->SetPose(pose);
 
   this->dataPtr->visual->SetMaterial("Gazebo/Green");
-  this->dataPtr->visual->SetAmbient(common::Color(0, 1, 0, 1));
+  this->dataPtr->visual->SetAmbient(ignition::math::Color(0, 1, 0, 1));
   this->dataPtr->visual->SetVisible(true);
   this->scene->AddVisual(this->dataPtr->visual);
 }
@@ -864,10 +902,4 @@ event::ConnectionPtr GpuLaser::ConnectNewLaserFrame(
     const std::string &_format)> _subscriber)
 {
   return this->dataPtr->newLaserFrame.Connect(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuLaser::DisconnectNewLaserFrame(event::ConnectionPtr &_c)
-{
-  this->dataPtr->newLaserFrame.Disconnect(_c->Id());
 }

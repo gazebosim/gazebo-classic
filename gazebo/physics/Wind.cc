@@ -22,6 +22,7 @@
 #endif
 
 #include <functional>
+#include <boost/lexical_cast.hpp>
 #include <sdf/sdf.hh>
 
 #include <ignition/math/Vector3.hh>
@@ -44,7 +45,7 @@ namespace gazebo
     {
       /// \brief Class constructor.
       /// \param[in] _world A reference to the world.
-      public: WindPrivate(physics::World &_world)
+      public: explicit WindPrivate(physics::World &_world)
         : world(_world)
       {
       }

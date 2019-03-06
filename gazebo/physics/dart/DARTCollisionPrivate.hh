@@ -40,7 +40,7 @@ namespace gazebo
       public: ~DARTCollisionPrivate() = default;
 
       /// \brief DART collision shape associated with this collision.
-      public: dart::dynamics::ShapePtr dtCollisionShape;
+      public: dart::dynamics::ShapeNodePtr dtCollisionShape;
 
       /// \brief Category bits for collision detection
       public: unsigned int categoryBits;

@@ -110,7 +110,7 @@ void Skeleton::Scale(double _scale)
     SkeletonNode *node = iter->second;
     ignition::math::Matrix4d trans(node->Transform());
     ignition::math::Vector3d pos(trans.Translation());
-    trans.Translate(pos * _scale);
+    trans.SetTranslation(pos * _scale);
     node->SetTransform(trans, false);
   }
 
@@ -211,9 +211,8 @@ void Skeleton::AddVertNodeWeight(unsigned int _vertex, std::string _node,
 //////////////////////////////////////////////////
 unsigned int Skeleton::GetNumVertNodeWeights(unsigned int _vertex)
 {
-  if (_vertex > this->rawNW.size())
+  if (_vertex >= this->rawNW.size())
     return 0;
-
   return this->rawNW[_vertex].size();
 }
 
@@ -638,7 +637,7 @@ void NodeTransform::RecalculateMatrix()
   else
     if (this->type == TRANSLATE)
     {
-      this->transform.Translate(
+      this->transform.SetTranslation(
           ignition::math::Vector3d(this->source[0],
             this->source[1], this->source[2]));
     }

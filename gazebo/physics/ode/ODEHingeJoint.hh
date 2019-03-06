@@ -22,8 +22,6 @@
 #ifndef _ODEHINGEJOINT_HH_
 #define _ODEHINGEJOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/ode/ODEJoint.hh"
 #include "gazebo/util/system.hh"

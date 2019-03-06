@@ -116,6 +116,14 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   // Check there are worlds running
   EXPECT_TRUE(physics::worlds_running());
 
+  // The default world has to exist
+  ASSERT_TRUE(physics::has_world("default"));
+  // Calling has_world with empty string should check whether
+  // any world exists at all, which has to be true too.
+  ASSERT_TRUE(physics::has_world(""));
+  // Make sure that has_world also works for non-existent world names
+  EXPECT_FALSE(physics::has_world("nonexistent_world"));
+
   // Get world pointer
   auto world = physics::get_world("default");
   ASSERT_TRUE(world != nullptr);
@@ -179,6 +187,7 @@ void WorldRemoveTest::RemoveBlankWorld(const std::string &_physicsEngine)
   gzmsg << "Expect exception when trying to get removed world:" << std::endl;
   EXPECT_THROW(world = physics::get_world("default"), common::Exception);
   EXPECT_TRUE(world == nullptr);
+  EXPECT_FALSE(physics::has_world());
 
   // Stats after removing world
   gzmsg << "Stats after removing world:" << std::endl

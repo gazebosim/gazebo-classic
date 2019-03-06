@@ -65,7 +65,7 @@ GUIExampleTimeWidget::GUIExampleTimeWidget()
 
   // Position and resize this widget
   this->move(200, 10);
-  this->resize(200, 30);
+  this->resize(200, 40);
 
   // Create a node for transportation
   this->node = transport::NodePtr(new transport::Node());

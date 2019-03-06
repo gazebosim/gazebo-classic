@@ -115,6 +115,13 @@
                 </material>
               </visual>
             </link>
+            <plugin filename="libRegionEventBoxPlugin.so" name="region_event_box">
+              <event>
+                <name>model_in_region_event_box</name>
+                <type>inclusion</type>
+                <active>true</active>
+              </event>
+            </plugin>
             <link name="imu_link">
               <inertial>
                 <pose>0 0 0 0 0 0</pose>
@@ -141,13 +148,6 @@
                 <xyz>0 0 1</xyz>
               </axis>
             </joint>
-            <plugin filename="libRegionEventBoxPlugin.so" name="region_event_box">
-              <event>
-                <name>model_in_region_event_box</name>
-                <type>inclusion</type>
-                <active>true</active>
-              </event>
-            </plugin>
           </model>
         </model>
       </model>

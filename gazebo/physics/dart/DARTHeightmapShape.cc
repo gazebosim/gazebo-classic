@@ -26,13 +26,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-DARTHeightmapShape::DARTHeightmapShape(CollisionPtr _parent)
-  : HeightmapShape(_parent),
-    dataPtr(new DARTHeightmapShapePrivate())
-{
-}
-
-//////////////////////////////////////////////////
 DARTHeightmapShape::DARTHeightmapShape(DARTCollisionPtr _parent)
   : HeightmapShape(_parent),
     dataPtr(new DARTHeightmapShapePrivate())

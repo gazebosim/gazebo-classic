@@ -22,6 +22,7 @@
 
 #include <functional>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 #include <math.h>
 
 #include <ignition/math/Matrix4.hh>
@@ -1196,7 +1197,7 @@ void GLWidget::Paste(const std::string &_name)
   {
     bool isModel = false;
     bool isLight = false;
-    if (this->dataPtr->scene->GetLight(_name))
+    if (this->dataPtr->scene->LightByName(_name))
       isLight = true;
     else if (this->dataPtr->scene->GetVisual(_name))
       isModel = true;

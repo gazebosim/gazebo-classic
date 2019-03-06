@@ -18,8 +18,6 @@
 #ifndef _GAZEBO_DARTHINGEJOINT_HH_
 #define _GAZEBO_DARTHINGEJOINT_HH_
 
-#include "gazebo/math/Vector3.hh"
-
 #include "gazebo/physics/HingeJoint.hh"
 #include "gazebo/physics/dart/DARTJoint.hh"
 #include "gazebo/util/system.hh"
@@ -36,7 +34,7 @@ namespace gazebo
     {
       /// \brief Constructor
       /// \param[in] _parent Parent of the Joint
-      public: DARTHingeJoint(BasePtr _parent);
+      public: explicit DARTHingeJoint(BasePtr _parent);
 
       /// \brief Destructor
       public: virtual ~DARTHingeJoint();
@@ -48,28 +46,12 @@ namespace gazebo
       public: virtual void Init();
 
       // Documentation inherited
-      public: virtual ignition::math::Vector3d Anchor(
-          const unsigned int _index) const;
-
-      // Documentation inherited
       public: virtual ignition::math::Vector3d GlobalAxis(
           const unsigned int _index) const;
 
       // Documentation inherited
       public: virtual void SetAxis(const unsigned int _index,
                   const ignition::math::Vector3d &_axis);
-
-      // Documentation inherited
-      public: virtual double PositionImpl(const unsigned int _index) const;
-
-      // Documentation inherited
-      public: virtual void SetVelocity(unsigned int _index, double _vel);
-
-      // Documentation inherited
-      public: virtual double GetVelocity(unsigned int _index) const;
-
-      // Documentation inherited
-      protected: virtual void SetForceImpl(unsigned int _index, double _effort);
     };
     /// \}
   }

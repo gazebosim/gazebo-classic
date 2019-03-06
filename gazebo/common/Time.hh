@@ -77,10 +77,12 @@ namespace gazebo
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
+      // cppcheck-suppress noExplicitConstructor
       public: Time(const struct timeval &_tv);
 
       /// \brief Constructor
       /// \param[in] _tv Time to initialize to
+      // cppcheck-suppress noExplicitConstructor
       public: Time(const struct timespec &_tv);
 
       /// \brief Constructor
@@ -90,6 +92,7 @@ namespace gazebo
 
       /// \brief Constuctor
       /// \param[in] _time Time in double format sec.nsec
+      // cppcheck-suppress noExplicitConstructor
       public: Time(double _time);
 
       /// \brief Destructor

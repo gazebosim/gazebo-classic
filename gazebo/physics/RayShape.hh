@@ -49,14 +49,6 @@ namespace gazebo
       /// the body.
       /// \param[in] _posStart Start position, relative the body.
       /// \param[in] _posEnd End position, relative to the body.
-      /// \deprecated See version that accepts ignition math objects.
-      public: virtual void SetPoints(const math::Vector3 &_posStart,
-                  const math::Vector3 &_posEnd) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the ray based on starting and ending points relative to
-      /// the body.
-      /// \param[in] _posStart Start position, relative the body.
-      /// \param[in] _posEnd End position, relative to the body.
       public: virtual void SetPoints(const ignition::math::Vector3d &_posStart,
                                      const ignition::math::Vector3d &_posEnd);
 
@@ -71,22 +63,8 @@ namespace gazebo
       /// \brief Get the relative starting and ending points.
       /// \param[in] _posA Returns the starting point.
       /// \param[in] _posB Returns the ending point.
-      /// \deprecated See version that accepts ignition math objects.
-      public: virtual void GetRelativePoints(math::Vector3 &_posA,
-                  math::Vector3 &_posB) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the relative starting and ending points.
-      /// \param[in] _posA Returns the starting point.
-      /// \param[in] _posB Returns the ending point.
       public: virtual void RelativePoints(ignition::math::Vector3d &_posA,
                   ignition::math::Vector3d &_posB);
-
-      /// \brief Get the global starting and ending points.
-      /// \param[out] _posA Returns the starting point.
-      /// \param[out] _posB Returns the ending point.
-      /// \deprecated See version that accepts ignition math objects.
-      public: virtual void GetGlobalPoints(math::Vector3 &_posA,
-                  math::Vector3 &_posB) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the global starting and ending points.
       /// \param[out] _posA Returns the starting point.

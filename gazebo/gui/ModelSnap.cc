@@ -304,31 +304,6 @@ void ModelSnap::OnMouseReleaseEvent(const common::MouseEvent &_event)
 }
 
 //////////////////////////////////////////////////
-void ModelSnap::Snap(const std::vector<math::Vector3> &_triangleSrc,
-    const std::vector<math::Vector3> &_triangleDest,
-    rendering::VisualPtr _visualSrc)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  ignition::math::Triangle3d triangleSrc(
-      _triangleSrc[0].Ign(),
-      _triangleSrc[1].Ign(),
-      _triangleSrc[2].Ign());
-
-  ignition::math::Triangle3d triangleDest(
-      _triangleDest[0].Ign(),
-      _triangleDest[1].Ign(),
-      _triangleDest[2].Ign());
-
-  this->Snap(triangleSrc, triangleDest, _visualSrc);
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-//////////////////////////////////////////////////
 void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
     const ignition::math::Triangle3d &_triangleDest,
     rendering::VisualPtr _visualSrc)
@@ -347,42 +322,6 @@ void ModelSnap::Snap(const ignition::math::Triangle3d &_triangleSrc,
       true);
 
   this->PublishVisualPose(_visualSrc);
-}
-
-//////////////////////////////////////////////////
-void ModelSnap::GetSnapTransform(const std::vector<math::Vector3> &_triangleSrc,
-    const std::vector<math::Vector3> &_triangleDest,
-    const math::Pose &_poseSrc, math::Vector3 &_trans,
-    math::Quaternion &_rot)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  ignition::math::Triangle3d triangleSrc(
-      _triangleSrc[0].Ign(),
-      _triangleSrc[1].Ign(),
-      _triangleSrc[2].Ign());
-
-  ignition::math::Triangle3d triangleDest(
-      _triangleDest[0].Ign(),
-      _triangleDest[1].Ign(),
-      _triangleDest[2].Ign());
-
-  ignition::math::Vector3d trans;
-  ignition::math::Quaterniond rot;
-
-  this->SnapTransform(triangleSrc, triangleDest, _poseSrc.Ign(), trans, rot);
-
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  _trans = trans;
-  _rot = rot;
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////

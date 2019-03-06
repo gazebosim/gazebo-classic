@@ -22,6 +22,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <functional>
+#include <ignition/math.hh>
 #include <ignition/math/Helpers.hh>
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Entity.hh"
@@ -331,9 +332,12 @@ void GpuRaySensor::Init()
 //////////////////////////////////////////////////
 void GpuRaySensor::Fini()
 {
-  if (this->scene)
+  this->dataPtr->scanPub.reset();
+
+  if (this->dataPtr->laserCam)
+  {
     this->scene->RemoveCamera(this->dataPtr->laserCam->Name());
-  this->scene.reset();
+  }
 
   this->dataPtr->laserCam.reset();
 
@@ -346,19 +350,6 @@ event::ConnectionPtr GpuRaySensor::ConnectNewLaserFrame(
   const std::string &)> _subscriber)
 {
   return this->dataPtr->laserCam->ConnectNewLaserFrame(_subscriber);
-}
-
-//////////////////////////////////////////////////
-void GpuRaySensor::DisconnectNewLaserFrame(event::ConnectionPtr &_conn)
-{
-#ifndef _WIN32
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->dataPtr->laserCam->DisconnectNewLaserFrame(_conn);
-#ifndef _WIN32
-#pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -617,48 +608,47 @@ bool GpuRaySensor::UpdateImpl(const bool /*_force*/)
   scan->set_range_min(this->dataPtr->rangeMin);
   scan->set_range_max(this->dataPtr->rangeMax);
 
-  bool add = scan->ranges_size() == 0;
-  const float *laserBuffer = this->dataPtr->laserCam->LaserData();
-
-  for (unsigned int j = 0; j < this->dataPtr->vertRangeCount; ++j)
+  const int numRays = this->dataPtr->vertRangeCount *
+    this->dataPtr->horzRangeCount;
+  if (scan->ranges_size() != numRays)
   {
-    for (unsigned int i = 0; i < this->dataPtr->horzRangeCount; ++i)
+    // gzdbg << "Size mismatch; allocating memory\n";
+    scan->clear_ranges();
+    scan->clear_intensities();
+    for (int i = 0; i < numRays; ++i)
     {
-      int index = j * this->dataPtr->horzRangeCount + i;
-      double range = laserBuffer[index*3];
-
-      // Mask ranges outside of min/max to +/- inf, as per REP 117
-      if (range >= this->dataPtr->rangeMax)
-      {
-        range = ignition::math::INF_D;
-      }
-      else if (range <= this->dataPtr->rangeMin)
-      {
-        range = -ignition::math::INF_D;
-      }
-      else if (this->noises.find(GPU_RAY_NOISE) !=
-               this->noises.end())
-      {
-        range = this->noises[GPU_RAY_NOISE]->Apply(range);
-        range = ignition::math::clamp(range,
-            this->dataPtr->rangeMin, this->dataPtr->rangeMax);
-      }
-
-      range = ignition::math::isnan(range) ? this->dataPtr->rangeMax : range;
-
-      if (add)
-      {
-        scan->add_ranges(range);
-        scan->add_intensities(
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
-      else
-      {
-        scan->set_ranges(index, range);
-        scan->set_intensities(index,
-            this->dataPtr->laserCam->LaserData()[index * 3 + 1]);
-      }
+      scan->add_ranges(ignition::math::NAN_F);
+      scan->add_intensities(ignition::math::NAN_F);
     }
+  }
+
+  auto dataIter = this->dataPtr->laserCam->LaserDataBegin();
+  auto dataEnd = this->dataPtr->laserCam->LaserDataEnd();
+  for (int i = 0; dataIter != dataEnd; ++dataIter, ++i)
+  {
+    const rendering::GpuLaserData data = *dataIter;
+    double range = data.range;
+    double intensity = data.intensity;
+
+    // Mask ranges outside of min/max to +/- inf, as per REP 117
+    if (range >= this->dataPtr->rangeMax)
+    {
+      range = ignition::math::INF_D;
+    }
+    else if (range <= this->dataPtr->rangeMin)
+    {
+      range = -ignition::math::INF_D;
+    }
+    else if (this->noises.find(GPU_RAY_NOISE) != this->noises.end())
+    {
+      range = this->noises[GPU_RAY_NOISE]->Apply(range);
+      range = ignition::math::clamp(range,
+          this->dataPtr->rangeMin, this->dataPtr->rangeMax);
+    }
+
+    range = ignition::math::isnan(range) ? this->dataPtr->rangeMax : range;
+    scan->set_ranges(i, range);
+    scan->set_intensities(i, intensity);
   }
 
   if (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections())

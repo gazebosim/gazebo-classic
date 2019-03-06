@@ -223,19 +223,20 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
     if (bone->IsRootNode())
     {
       this->AddSphereVisual(linkSdf, bone->GetName() + "__SKELETON_VISUAL__",
-          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue", Color::Blue);
+          ignition::math::Pose3d::Zero, 0.02, "Gazebo/Blue",
+          ignition::math::Color::Blue);
     }
     else if (bone->GetChildCount() == 0)
     {
       this->AddSphereVisual(linkSdf, bone->GetName() +
           "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
-          "Gazebo/Yellow", Color::Yellow);
+          "Gazebo/Yellow", ignition::math::Color::Yellow);
     }
     else
     {
       this->AddSphereVisual(linkSdf, bone->GetName() +
           "__SKELETON_VISUAL__", ignition::math::Pose3d::Zero, 0.02,
-          "Gazebo/Red", Color::Red);
+          "Gazebo/Red", ignition::math::Color::Red);
     }
 
     // Create a box visual representing each bone
@@ -263,7 +264,7 @@ bool Actor::LoadSkin(sdf::ElementPtr _skinSdf)
         this->AddBoxVisual(linkSdf, bone->GetName() + "_" +
           curChild->GetName() + "__SKELETON_VISUAL__", bonePose,
           ignition::math::Vector3d(0.02, 0.02, length),
-          "Gazebo/Green", Color::Green);
+          "Gazebo/Green", ignition::math::Color::Green);
         this->AddBoxCollision(linkSdf,
             bone->GetName() + "_" + curChild->GetName() + "_collision",
             bonePose, ignition::math::Vector3d(0.02, 0.02, length));
@@ -656,8 +657,12 @@ void Actor::Update()
 
   this->lastTraj = tinfo->id;
 
-  ignition::math::Matrix4d rootTrans =
-    frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  ignition::math::Matrix4d rootTrans = ignition::math::Matrix4d::Identity;
+  auto iter = frame.find(skelMap[this->skeleton->GetRootNode()->GetName()]);
+  if (iter != frame.end())
+  {
+    rootTrans = frame[skelMap[this->skeleton->GetRootNode()->GetName()]];
+  }
 
   ignition::math::Vector3d rootPos = rootTrans.Translation();
   ignition::math::Quaterniond rootRot = rootTrans.Rotation();
@@ -673,7 +678,7 @@ void Actor::Update()
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
   if (!this->customTrajectoryInfo)
-    rootM.Translate(actorPose.Pos());
+    rootM.SetTranslation(actorPose.Pos());
 
   frame[skelMap[this->skeleton->GetRootNode()->GetName()]] = rootM;
 
@@ -791,6 +796,19 @@ const sdf::ElementPtr Actor::GetSDF()
 }
 
 //////////////////////////////////////////////////
+void Actor::Reset()
+{
+  this->Stop();
+  this->ResetCustomTrajectory();
+  this->playStartTime = this->world->SimTime();
+  this->pathLength = 0.0;
+  this->lastTraj = 1e+5;
+  this->Init();
+
+  Model::Reset();
+}
+
+//////////////////////////////////////////////////
 void Actor::SetScriptTime(const double _time)
 {
   this->scriptTime = _time;
@@ -864,7 +882,7 @@ void Actor::AddSphereCollision(const sdf::ElementPtr &_linkSdf,
 void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     const double _radius, const std::string &_material,
-    const common::Color &_ambient)
+    const ignition::math::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->GetElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);
@@ -883,7 +901,7 @@ void Actor::AddSphereVisual(const sdf::ElementPtr &_linkSdf,
 void Actor::AddBoxVisual(const sdf::ElementPtr &_linkSdf,
     const std::string &_name, const ignition::math::Pose3d &_pose,
     const ignition::math::Vector3d &_size, const std::string &_material,
-    const common::Color &_ambient)
+    const ignition::math::Color &_ambient)
 {
   sdf::ElementPtr visualSdf = _linkSdf->AddElement("visual");
   visualSdf->GetAttribute("name")->Set(_name);

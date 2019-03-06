@@ -26,9 +26,6 @@
 
 #include "gazebo/common/Event.hh"
 #include "gazebo/common/Events.hh"
-#include "gazebo/math/Angle.hh"
-#include "gazebo/math/Pose.hh"
-#include "gazebo/math/Vector3.hh"
 #include "gazebo/msgs/MessageTypes.hh"
 
 #include "gazebo/physics/JointState.hh"
@@ -101,14 +98,6 @@ namespace gazebo
       /// \param[in] _parent Parent link.
       /// \param[in] _child Child link.
       /// \param[in] _pose Pose containing Joint Anchor offset from child link.
-      /// \deprecated See function that takes ignition math.
-      public: void Load(LinkPtr _parent, LinkPtr _child,
-                        const math::Pose &_pose) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set pose, parent and child links of a physics::Joint
-      /// \param[in] _parent Parent link.
-      /// \param[in] _child Child link.
-      /// \param[in] _pose Pose containing Joint Anchor offset from child link.
       public: void Load(LinkPtr _parent, LinkPtr _child,
                         const ignition::math::Pose3d &_pose);
 
@@ -161,15 +150,6 @@ namespace gazebo
 
       /// \brief Detach this joint from all links.
       public: virtual void Detach();
-
-      /// \brief Set the axis of rotation where axis is specified in local
-      /// joint frame.
-      /// \param[in] _index Index of the axis to set.
-      /// \param[in] _axis Vector in local joint frame of axis direction
-      ///                  (must have length greater than zero).
-      /// \deprecated See function that takes ignition math.
-      public: virtual void SetAxis(unsigned int _index,
-                  const math::Vector3 &_axis) GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the axis of rotation where axis is specified in local
       /// joint frame.
@@ -233,32 +213,11 @@ namespace gazebo
               event::ConnectionPtr ConnectJointUpdate(T _subscriber)
               {return jointUpdate.Connect(_subscriber);}
 
-      /// \brief Disconnect a boost::slot the the joint update signal.
-      /// \param[in] _conn Connection to disconnect.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectJointUpdate(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0)
-              {jointUpdate.Disconnect(_conn->Id());}
-
-      /// \brief Get the axis of rotation.
-      /// \param[in] _index Index of the axis to get.
-      /// \return Axis value for the provided index.
-      /// \deprecated See LocalAxis()
-      public: math::Vector3 GetLocalAxis(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
       /// \brief Get the axis of rotation.
       /// \param[in] _index Index of the axis to get.
       /// \return Axis value for the provided index.
       public: ignition::math::Vector3d LocalAxis(const unsigned int _index)
           const;
-
-      /// \brief Get the axis of rotation in global cooridnate frame.
-      /// \param[in] _index Index of the axis to get.
-      /// \return Axis value for the provided index.
-      /// \deprecated See GlobalAxis()
-      public: virtual math::Vector3 GetGlobalAxis(
-                  unsigned int _index) const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the axis of rotation in global cooridnate frame.
       /// \param[in] _index Index of the axis to get.
@@ -269,62 +228,14 @@ namespace gazebo
       /// \brief Set the anchor point.
       /// \param[in] _index Index of the axis.
       /// \param[in] _anchor Anchor value.
-      /// \deprecated See function that takes ignition math.
-      public: virtual void SetAnchor(unsigned int _index,
-          const math::Vector3 &_anchor) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the anchor point.
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _anchor Anchor value.
       public: virtual void SetAnchor(const unsigned int _index,
           const ignition::math::Vector3d &_anchor) = 0;
 
       /// \brief Get the anchor point.
       /// \param[in] _index Index of the axis.
       /// \return Anchor value for the axis.
-      /// \deprecated See function that returns ignition math.
-      public: virtual math::Vector3 GetAnchor(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the anchor point.
-      /// \param[in] _index Index of the axis.
-      /// \return Anchor value for the axis.
       public: virtual ignition::math::Vector3d Anchor(
           const unsigned int _index) const = 0;
-
-      /// \brief Set the high stop of an axis(index).
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _angle High stop angle.
-      /// \deprecated See SetUpperLimit, which takes double.
-      public: virtual bool SetHighStop(unsigned int _index,
-          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Set the low stop of an axis(index).
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _angle Low stop angle.
-      /// \deprecated See SetLowerLimit, which takes double.
-      public: virtual bool SetLowStop(unsigned int _index,
-          const math::Angle &_angle) GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the high stop of an axis(index).
-      /// This function is replaced by GetUpperLimit(unsigned int).
-      /// If you are interested in getting the value of dParamHiStop*,
-      /// use GetAttribute(hi_stop, _index)
-      /// \param[in] _index Index of the axis.
-      /// \return Angle of the high stop value.
-      /// \deprecated See UpperLimit, which returns double.
-      public: virtual math::Angle GetHighStop(unsigned int _index)
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the low stop of an axis(index).
-      /// This function is replaced by GetLowerLimit(unsigned int).
-      /// If you are interested in getting the value of dParamHiStop*,
-      /// use GetAttribute(hi_stop, _index)
-      /// \param[in] _index Index of the axis.
-      /// \return Angle of the low stop value.
-      /// \deprecated See LowerLimit, which returns double.
-      public: virtual math::Angle GetLowStop(unsigned int _index)
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the effort limit on axis(index).
       /// \param[in] _index Index of axis, where 0=first axis and 1=second axis
@@ -410,13 +321,6 @@ namespace gazebo
       /// on conventions.
       public: virtual JointWrench GetForceTorque(unsigned int _index) = 0;
 
-      /// \brief Get the angle of rotation of an axis(index).
-      /// \param[in] _index Index of the axis.
-      /// \return Angle of the axis.
-      /// \deprecated See Position(), which returns a double.
-      public: math::Angle GetAngle(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
       /// \brief Get the position of an axis according to its index.
       ///
       /// For rotational axes, the value is in radians. For prismatic axes,
@@ -436,11 +340,6 @@ namespace gazebo
       public: virtual double Position(const unsigned int _index = 0) const
           final;
 
-      /// \brief Get the angle count.
-      /// \return The number of DOF for the joint.
-      /// \deprecated See DOF()
-      public: virtual unsigned int GetAngleCount() const GAZEBO_DEPRECATED(8.0);
-
       /// \brief Get the number of degrees of freedom for this joint.
       /// \return The number of DOF for the joint.
       public: virtual unsigned int DOF() const = 0;
@@ -452,8 +351,18 @@ namespace gazebo
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
       /// unspecified, pure kinematic teleportation.
+      /// \param[in] _preserveWorldVelocity If true, the velocity of the child
+      /// link with respect to the world frame will remain the same after
+      /// setting the position. By default this is false, which means there are
+      /// no guarantees about what the child link's world velocity will be after
+      /// the position is changed (the behavior is determined by the underlying
+      /// physics engine).
+      ///
+      /// \note{Only ODE and Bullet support _preserveWorldVelocity being true.}
       /// \return returns true if operation succeeds, false if it fails.
-      public: virtual bool SetPosition(unsigned int _index, double _position);
+      public: virtual bool SetPosition(
+                  const unsigned int _index, const double _position,
+                  const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetPosition.
       /// The child links of this joint are updated based on position change.
@@ -462,8 +371,12 @@ namespace gazebo
       /// link.
       /// \param[in] _index Index of the joint axis (degree of freedom).
       /// \param[in] _position Position to set the joint to.
+      /// \param[in] _preserveWorldVelocity True if to preserve the world
+      /// velocity before set position, default is false.
       /// \return returns true if operation succeeds, false if it fails.
-      protected: bool SetPositionMaximal(unsigned int _index, double _position);
+      protected: bool SetPositionMaximal(
+                  const unsigned int _index, double _position,
+                  const bool _preserveWorldVelocity = false);
 
       /// \brief Helper function for maximal coordinate solver SetVelocity.
       /// The velocity of the child link of this joint is updated relative
@@ -480,28 +393,8 @@ namespace gazebo
       /// of the simulation scales.
       /// \param[in] index The index of the link(0 or 1).
       /// \return Force applied to the link.
-      /// \deprecated See function that returns ignition math.
-      public: virtual math::Vector3 GetLinkForce(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get the forces applied to the center of mass of a physics::Link
-      /// due to the existence of this Joint.
-      /// Note that the unit of force should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] index The index of the link(0 or 1).
-      /// \return Force applied to the link.
       public: virtual ignition::math::Vector3d LinkForce(
           const unsigned int _index) const = 0;
-
-      /// \brief Get the torque applied to the center of mass of a physics::Link
-      /// due to the existence of this Joint.
-      /// Note that the unit of torque should be consistent with the rest
-      /// of the simulation scales.
-      /// \param[in] index The index of the link(0 or 1)
-      /// \return Torque applied to the link.
-      /// \deprecated See function that returns ignition math.
-      public: virtual math::Vector3 GetLinkTorque(
-                  unsigned int _index) const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the torque applied to the center of mass of a physics::Link
       /// due to the existence of this Joint.
@@ -559,19 +452,6 @@ namespace gazebo
 
       /// \brief Computes moment of inertia (MOI) across an arbitrary axis
       /// specified in the world frame.
-      /// The ratio is given in the form of MOI_child / MOI_parent.
-      /// If MOI_parent is zero, this funciton will return 0.
-      /// The moment of inertia ratio along constrained directions of a joint
-      /// has an impact on the performance of Projected Gauss Seidel (PGS)
-      /// iterative LCP methods.
-      /// \param[in] _axis axis in world frame for which MOI ratio is computed.
-      /// \return ratio of child MOI to parent MOI.
-      /// \deprecated See function that takes ignition math.
-      public: double GetInertiaRatio(const math::Vector3 &_axis) const
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Computes moment of inertia (MOI) across an arbitrary axis
-      /// specified in the world frame.
       /// The ratio is given in the form of MOI_chidl / MOI_parent.
       /// If MOI_parent is zero, this funciton will return 0.
       /// The moment of inertia ratio along constrained directions of a joint
@@ -581,27 +461,11 @@ namespace gazebo
       /// \return ratio of child MOI to parent MOI.
       public: double InertiaRatio(const ignition::math::Vector3d &_axis) const;
 
-      /// \brief:  get the joint lower limit
-      /// (replaces GetLowStop and GetHighStop)
-      /// \param[in] _index Index of the axis.
-      /// \return Lower limit of the axis.
-      /// \deprecated See LowerLimit, which returns double.
-      public: math::Angle GetLowerLimit(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
       /// \brief Get the joint's lower limit. For rotational axes, the value
       /// is in radians, for prismatic axes it is in meters.
       /// \param[in] _index Index of the axis, defaults to 0.
       /// \return Lower limit of the axis.
       public: virtual double LowerLimit(unsigned int _index = 0) const;
-
-      /// \brief:  get the joint upper limit
-      /// (replacee GetLowStop and GetHighStop)
-      /// \param[in] _index Index of the axis.
-      /// \return Upper limit of the axis.
-      /// \deprecated See UpperLimit, which returns double.
-      public: math::Angle GetUpperLimit(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get the joint's upper limit.
       ///
@@ -616,14 +480,6 @@ namespace gazebo
       /// \return Lower limit of the axis.
       public: virtual double UpperLimit(const unsigned int _index = 0) const;
 
-      /// \brief:  set the joint lower limit
-      /// (replaces SetLowStop and SetHighStop)
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _limit Lower limit of the axis.
-      /// \deprecated See SetLowerLimit which takes double.
-      public: void SetLowerLimit(unsigned int _index, math::Angle _limit)
-          GAZEBO_DEPRECATED(8.0);
-
       /// \brief Set the joint's lower limit.
       ///
       /// For rotational axes, the value is in radians. For prismatic axes,
@@ -633,14 +489,6 @@ namespace gazebo
       /// \param[in] _limit Lower limit of the axis.
       public: virtual void SetLowerLimit(const unsigned int _index,
                                          const double _limit);
-
-      /// \brief:  set the joint upper limit
-      /// (replacee GetLowStop and GetHighStop)
-      /// \param[in] _index Index of the axis.
-      /// \param[in] _limit Upper limit of the axis.
-      /// \deprecated See SetUpperLimit which takes double.
-      public: void SetUpperLimit(unsigned int _index, math::Angle _limit)
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Set the joint's upper limit.
       ///
@@ -682,34 +530,13 @@ namespace gazebo
       /// \brief Get initial Anchor Pose specified by model
       /// <joint><pose>...</pose></joint>
       /// \return Joint::anchorPose, initial joint anchor pose.
-      /// \deprecated See function that returns ignition math.
-      public: math::Pose GetInitialAnchorPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get initial Anchor Pose specified by model
-      /// <joint><pose>...</pose></joint>
-      /// \return Joint::anchorPose, initial joint anchor pose.
       public: ignition::math::Pose3d InitialAnchorPose() const;
 
       /// \brief Get pose of joint frame relative to world frame.
       /// Note that the joint frame is defined with a fixed offset from
       /// the child link frame.
       /// \return Pose of joint frame relative to world frame.
-      /// \deprecated See function that returns ignition math.
-      public: math::Pose GetWorldPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get pose of joint frame relative to world frame.
-      /// Note that the joint frame is defined with a fixed offset from
-      /// the child link frame.
-      /// \return Pose of joint frame relative to world frame.
       public: ignition::math::Pose3d WorldPose() const;
-
-      /// \brief Get anchor pose on parent link relative to world frame.
-      /// When there is zero joint error, this should match the value
-      /// returned by Joint::GetWorldPose() for the constrained degrees
-      /// of freedom.
-      /// \return Anchor pose on parent link in world frame.
-      /// \deprecated See function that returns ignition math.
-      public: math::Pose GetParentWorldPose() const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get anchor pose on parent link relative to world frame.
       /// When there is zero joint error, this should match the value
@@ -723,24 +550,7 @@ namespace gazebo
       /// the bilateral constraint error.
       /// \return Pose offset between anchor pose on child and parent,
       /// in parent link frame.
-      /// \deprecated See function that returns ignition math.
-      public: math::Pose GetAnchorErrorPose() const GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get pose offset between anchor pose on child and parent,
-      /// expressed in the parent link frame. This can be used to compute
-      /// the bilateral constraint error.
-      /// \return Pose offset between anchor pose on child and parent,
-      /// in parent link frame.
       public: ignition::math::Pose3d AnchorErrorPose() const;
-
-      /// \brief Get orientation of reference frame for specified axis,
-      /// relative to world frame. The value of axisParentModelFrame
-      /// is used to determine the appropriate frame.
-      /// \param[in] _index joint axis index.
-      /// \return Orientation of axis frame relative to world frame.
-      /// \deprecated See function that returns ignition math.
-      public: math::Quaternion GetAxisFrame(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
 
       /// \brief Get orientation of reference frame for specified axis,
       /// relative to world frame. The value of axisParentModelFrame
@@ -762,22 +572,6 @@ namespace gazebo
       /// \return Orientation of axis frame relative to joint frame.
       /// If supplied _index is out of range, or use_parent_model_frame
       /// is not true, this function returns identity rotation quaternion.
-      /// \deprecated See function that returns ignition math.
-      public: math::Quaternion GetAxisFrameOffset(unsigned int _index) const
-          GAZEBO_DEPRECATED(8.0);
-
-      /// \brief Get orientation of joint axis reference frame
-      /// relative to joint frame. This should always return identity unless
-      /// flag use_parent_model_frame is true in sdf 1.5 or using sdf 1.4-,
-      /// i.e. bug described in issue #494 is present.
-      /// In addition, if use_parent_model_frame is true, and the parent
-      /// link of the joint is world, the axis is defined in the world frame.
-      /// The value of axisParentModelFrame is used to determine the
-      /// appropriate frame internally.
-      /// \param[in] _index joint axis index.
-      /// \return Orientation of axis frame relative to joint frame.
-      /// If supplied _index is out of range, or use_parent_model_frame
-      /// is not true, this function returns identity rotation quaternion.
       public: ignition::math::Quaterniond AxisFrameOffset(
           const unsigned int _index) const;
 
@@ -786,13 +580,6 @@ namespace gazebo
       /// If using metric system, the unit of energy will be Joules.
       /// \return this joint's spring potential energy,
       public: double GetWorldEnergyPotentialSpring(unsigned int _index) const;
-
-      /// \brief Get the angle of an axis helper function.
-      /// \param[in] _index Index of the axis.
-      /// \return Angle of the axis.
-      /// \deprecated See PositionImpl, which takes double.
-      protected: virtual math::Angle GetAngleImpl(
-                     unsigned int _index) const GAZEBO_DEPRECATED(8.0);
 
       /// \brief Helper function to get the position of an axis.
       ///
@@ -816,15 +603,6 @@ namespace gazebo
       /// back to the parent link.
       protected: bool FindAllConnectedLinks(const LinkPtr &_originalParentLink,
         Link_V &_connectedLinks);
-
-      /// \brief internal function to help us compute child link pose
-      /// if a joint position change is applied.
-      /// \param[in] _index axis index
-      /// \param[in] _position new joint position
-      /// \return new child link pose at new joint position.
-      /// \deprecated See function that returns ignition math.
-      protected: math::Pose ComputeChildLinkPose(unsigned int _index,
-          double _position) GAZEBO_DEPRECATED(8.0);
 
       /// \brief internal function to help us compute child link pose
       /// if a joint position change is applied.

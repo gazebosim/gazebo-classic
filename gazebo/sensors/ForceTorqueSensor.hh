@@ -41,7 +41,7 @@ namespace gazebo
 
     /// \class ForceTorqueSensor ForceTorqueSensor.hh sensors/sensors.hh
     /// \brief Sensor for measure force and torque on a joint.
-    class GAZEBO_VISIBLE ForceTorqueSensor: public Sensor
+    class GZ_SENSORS_VISIBLE ForceTorqueSensor: public Sensor
     {
       /// \brief Constructor.
       public: ForceTorqueSensor();
@@ -79,16 +79,8 @@ namespace gazebo
       /// \brief Connect a to the  update signal.
       /// \param[in] _subscriber Callback function.
       /// \return The connection, which must be kept in scope.
-      /// \deprecated See ConnectUpdate that accepts a std::function
-      /// parameter.
       public: event::ConnectionPtr ConnectUpdate(
                   std::function<void (msgs::WrenchStamped)> _subscriber);
-
-      /// \brief Disconnect from the update signal.
-      /// \param[in] _conn Connection to remove.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited.
       protected: virtual bool UpdateImpl(const bool _force);

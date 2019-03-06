@@ -20,6 +20,13 @@ set (GAZEBO_HAS_BULLET @HAVE_BULLET@)
 # Set whether Gazebo was built with Simbody support
 set (GAZEBO_HAS_SIMBODY @HAVE_SIMBODY@)
 
+# Set whether Gazebo was built with Simbody support
+set (GAZEBO_HAS_DART @HAVE_DART@)
+set (GAZEBO_DART_MIN_REQUIRED_VERSION @DART_MIN_REQUIRED_VERSION@)
+
+# Set whether Gazebo was built with Ignition Fuel Tools support
+set (GAZEBO_HAS_IGNITION_FUEL_TOOLS @HAVE_IGNITION_FUEL_TOOLS@)
+
 include (FindPkgConfig)
 
 #################################################
@@ -113,6 +120,12 @@ if (GAZEBO_HAS_SIMBODY)
   list(APPEND @PKG_NAME@_LIBRARIES ${Simbody_LIBRARIES})
 endif()
 
+if (GAZEBO_HAS_DART)
+  find_package(DART ${GAZEBO_DART_MIN_REQUIRED_VERSION} REQUIRED CONFIG)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${DART_INCLUDE_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARIES ${DART_LIBRARIES})
+endif()
+
 # Visual Studio enables c++11 support by default
 if (NOT MSVC)
   list(APPEND @PKG_NAME@_CXX_FLAGS -std=c++11)
@@ -143,7 +156,7 @@ set(CMAKE_MODULE_PATH
   "${OGRE_INSTALL_PREFIX}/share/OGRE/cmake/modules;${OGRE_INSTALL_PREFIX}/lib/OGRE/cmake;${OGRE_INSTALL_PREFIX}/CMake;${CMAKE_MODULE_PATH}")
 
 # Find boost
-find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread signals system
+find_package(Boost @MIN_BOOST_VERSION@ REQUIRED thread system
   filesystem program_options regex iostreams date_time)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${Boost_LIBRARIES})
@@ -169,22 +182,34 @@ list(APPEND GAZEBO_LIBRARIES ${OGRE_Terrain_LIBRARIES}
   ${OGRE_Paging_LIBRARIES})
 
 # Find Ignition Math
-find_package(ignition-math3 REQUIRED)
+find_package(ignition-math4 REQUIRED)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MATH_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MATH_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MATH_LIBRARIES})
 
 # Find Ignition Transport
-find_package(ignition-transport3 REQUIRED)
+find_package(ignition-transport4 REQUIRED)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-TRANSPORT_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-TRANSPORT_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-TRANSPORT_LIBRARIES})
 
 # Find Ignition Msgs
-find_package(ignition-msgs0 REQUIRED)
+find_package(ignition-msgs1 REQUIRED)
 list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-MSGS_INCLUDE_DIRS})
 list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-MSGS_LIBRARY_DIRS})
 list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-MSGS_LIBRARIES})
+
+if (GAZEBO_HAS_IGNITION_FUEL_TOOLS)
+  find_package(ignition-common1 REQUIRED)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${ignition-common1_INCLUDE_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARY_DIRS ${ignition-common1_LIBRARY_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARIES ${ignition-common1_LIBRARIES})
+
+  find_package(ignition-fuel_tools1 REQUIRED)
+  list(APPEND @PKG_NAME@_INCLUDE_DIRS ${IGNITION-FUEL_TOOLS_INCLUDE_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARY_DIRS ${IGNITION-FUEL_TOOLS_LIBRARY_DIRS})
+  list(APPEND @PKG_NAME@_LIBRARIES ${IGNITION-FUEL_TOOLS_LIBRARIES})
+endif()
 
 list(APPEND @PKG_NAME@_LDFLAGS -Wl,-rpath,@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@/gazebo-@GAZEBO_MAJOR_VERSION@/plugins)
 list(APPEND @PKG_NAME@_LDFLAGS -L@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_LIBDIR@)

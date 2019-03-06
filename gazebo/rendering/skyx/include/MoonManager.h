@@ -36,7 +36,7 @@ namespace SkyX
       /** Constructor
         @param s Parent SkyX pointer
      */
-    MoonManager(SkyX *s);
+    explicit MoonManager(SkyX *s);
 
     /** Destructor
      */

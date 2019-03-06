@@ -33,11 +33,11 @@ namespace gazebo
     /// \brief Ray shape for bullet
     class GZ_PHYSICS_VISIBLE BulletRayShape : public RayShape
     {
-      public: BulletRayShape(PhysicsEnginePtr _physicsEngine);
+      public: explicit BulletRayShape(PhysicsEnginePtr _physicsEngine);
 
       /// \brief Constructor
       /// \param body Link the ray is attached to
-      public: BulletRayShape(CollisionPtr _collision);
+      public: explicit BulletRayShape(CollisionPtr _collision);
 
       /// \brief Destructor
       public: virtual ~BulletRayShape();

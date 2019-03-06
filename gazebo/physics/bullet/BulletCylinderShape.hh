@@ -34,7 +34,7 @@ namespace gazebo
     class GZ_PHYSICS_VISIBLE BulletCylinderShape : public CylinderShape
     {
       /// \brief Constructor
-      public: BulletCylinderShape(CollisionPtr _parent)
+      public: explicit BulletCylinderShape(CollisionPtr _parent)
               : CylinderShape(_parent) {}
 
       /// \brief Destructor

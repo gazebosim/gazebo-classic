@@ -208,6 +208,51 @@ namespace gazebo
               return this->type;
             }
 
+    /// \brief Load parameter value from _sdf and store it to the given
+    ///        reference, using the supplied default value if the element in
+    ///        _sdf is not found. A message is written using gzmsg reporting
+    ///       whether the default value was used or not.
+    /// \param[in] _sdf The SDF element of the plugin.
+    /// \param[in] _name Name of a tag inside the SDF.
+    /// \param[out] _target The reference to store the param value to.
+    /// \param[in] _defaultValue The default value.
+    protected: template <typename V> void LoadParam(const sdf::ElementPtr &_sdf,
+                const std::string &_name, V &_target,
+                V _defaultValue = V()) const
+            {
+              auto result = _sdf->Get<V>(_name, _defaultValue);
+
+              if (!result.second)
+              {
+                gzmsg << this->handleName.c_str() << " Plugin missing <"
+                      << _name.c_str() << ">, defaults to "
+                      << result.first << std::endl;
+              }
+              else
+              {
+                gzmsg << this->handleName.c_str() << " Plugin <"
+                      << _name.c_str() << "> set to "
+                      << result.first << std::endl;
+              }
+              _target = result.first;
+            }
+
+    /// \brief Load parameter value from _sdf and store it to the given
+    ///        reference, using the supplied default value if the element in
+    ///        _sdf is not found. A message is written using gzmsg reporting
+    ///        whether the default value was used or not. String specialization
+    ///        to allow accepting const char* values for std::string parameters.
+    /// \param[in] _sdf The SDF element of the plugin.
+    /// \param[in] _name Name of a tag inside the SDF.
+    /// \param[out] _target The reference to store the param value to.
+    /// \param[in] _defaultValue The default value.
+    protected: void LoadParam(sdf::ElementPtr &_sdf,
+                const std::string &_name, std::string &_target,
+                const char* _defaultValue) const
+            {
+              this->LoadParam<std::string>(_sdf, _name, _target, _defaultValue);
+            }
+
     /// \brief Type of plugin
     protected: PluginType type;
 

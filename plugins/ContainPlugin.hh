@@ -84,19 +84,13 @@ namespace gazebo
     /// (e.g.: trying to enable the plugin when it is already enabled).
     private: bool Enable(const bool _enable);
 
-    /// \brief Callback for enable "service" using Gazebo msgs.
-    /// \param[in] _msg Message with 0 to disable and 1 to enable the plugin.
-    /// \deprecated Remove in Gazebo 9.
-    // cppcheck-suppress unusedPrivateFunction
-    private: void EnableGz(ConstIntPtr &_msg);
-
     /// \brief Callback for enable service using Ignition messages.
     /// \param[in] _req Request, true to enable
     /// \param[out] _res Response message indicating success or failure.
-    /// \param[out] _result True if successful.
+    /// \return True if successful.
     // cppcheck-suppress unusedPrivateFunction
-    private: void EnableIgn(const ignition::msgs::Boolean &_req,
-                            ignition::msgs::Boolean &_res, bool &_result);
+    private: bool EnableIgn(const ignition::msgs::Boolean &_req,
+                            ignition::msgs::Boolean &_res);
 
     /// \brief Publish a message indicating if the box contains an entity
     /// \param[in] _contains True if the geometry contains the target

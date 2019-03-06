@@ -1200,9 +1200,11 @@ void ODEJoint::ApplyExplicitStiffnessDamping()
 }
 
 //////////////////////////////////////////////////
-bool ODEJoint::SetPosition(unsigned int _index, double _position)
+bool ODEJoint::SetPosition(const unsigned int _index, const double _position,
+                           const bool _preserveWorldVelocity)
 {
-  const bool result = Joint::SetPositionMaximal(_index, _position);
+  const bool result = Joint::SetPositionMaximal(_index, _position,
+                                                _preserveWorldVelocity);
 
   // The following code fixes issue 2430 without breaking ABI
   // We only need to worry about this for angles outside the range [-pi, pi]

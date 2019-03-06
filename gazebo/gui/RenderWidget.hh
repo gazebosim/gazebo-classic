@@ -37,10 +37,10 @@ namespace gazebo
     class GZ_GUI_VISIBLE RenderWidget : public QWidget
     {
       Q_OBJECT
-      public: RenderWidget(QWidget *_parent = 0);
+      public: explicit RenderWidget(QWidget *_parent = 0);
       public: virtual ~RenderWidget();
 
-      /// \brief Initialization
+      // \brief Initialization
       public: void Init();
 
       public: void RemoveScene(const std::string &_name);
@@ -130,7 +130,7 @@ namespace gazebo
       private: TopToolbar *topToolbar;
 
       /// \brief An overlay label on the 3D render widget
-      private: QLabel *msgOverlayLabel;
+      private: QLabel *msgOverlayLabel = nullptr;
 
       /// \brief Base overlay message;
       private: std::string baseOverlayMsg;

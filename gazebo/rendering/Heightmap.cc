@@ -26,9 +26,11 @@
 #include <string.h>
 #include <math.h>
 
+#include <ignition/math/Color.hh>
 #include <ignition/math/Matrix4.hh>
 
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "gazebo/common/Assert.hh"
 #include "gazebo/common/CommonIface.hh"
@@ -666,10 +668,19 @@ void Heightmap::Load()
 ///////////////////////////////////////////////////
 void Heightmap::SaveHeightmap()
 {
-  // Calculate blend maps
   if (this->dataPtr->terrainsImported &&
       !this->dataPtr->terrainGroup->isDerivedDataUpdateInProgress())
   {
+    // check to see if all terrains have been loaded before saving
+    Ogre::TerrainGroup::TerrainIterator ti =
+      this->dataPtr->terrainGroup->getTerrainIterator();
+    while (ti.hasMoreElements())
+    {
+      Ogre::Terrain *t = ti.getNext()->instance;
+      if (!t->isLoaded())
+        return;
+    }
+
     // saving an ogre terrain data file can take quite some time for large dems.
     gzmsg << "Saving heightmap cache data to " << (this->dataPtr->gzPagingDir /
         boost::filesystem::path(this->dataPtr->filename).stem()).string()
@@ -712,7 +723,7 @@ void Heightmap::ConfigureTerrainDefaults()
   LightPtr directionalLight;
   for (unsigned int i = 0; i < this->dataPtr->scene->LightCount(); ++i)
   {
-    LightPtr light = this->dataPtr->scene->GetLight(i);
+    LightPtr light = this->dataPtr->scene->LightByIndex(i);
     if (light->Type() == "directional")
     {
       directionalLight = light;
@@ -732,8 +743,9 @@ void Heightmap::ConfigureTerrainDefaults()
     this->dataPtr->terrainGlobals->setLightMapDirection(
         Conversions::Convert(directionalLight->Direction()));
 
+    auto const &ignDiffuse = directionalLight->DiffuseColor();
     this->dataPtr->terrainGlobals->setCompositeMapDiffuse(
-        Conversions::Convert(directionalLight->DiffuseColor()));
+        Conversions::Convert(ignDiffuse));
   }
   else
   {

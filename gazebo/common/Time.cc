@@ -19,11 +19,13 @@
   #include <Windows.h>
   #include <Winsock2.h>
   #include <cstdint>
-  struct timespec
-  {
-    int64_t tv_sec;
-    int64_t tv_nsec;
-  };
+  #if defined(_MSC_VER) && (_MSC_VER < 1900)
+    struct timespec
+    {
+      int64_t tv_sec;
+      int64_t tv_nsec;
+    };
+  #endif
 #else
   #include <unistd.h>
   #include <sys/time.h>
@@ -72,7 +74,7 @@ Time::Time()
 #else
   // get clock resolution, skip sleep if resolution is larger then
   // requested sleep time
-  clock_getres(CLOCK_REALTIME, &clockResolution);
+  clock_getres(CLOCK_MONOTONIC, &clockResolution);
 #endif
 }
 
@@ -436,7 +438,7 @@ Time Time::Sleep(const common::Time &_time)
     result.sec = 0;
     result.nsec = 0;
 #else
-    if (clock_nanosleep(CLOCK_REALTIME, 0, &interval, &remainder) == -1)
+    if (clock_nanosleep(CLOCK_MONOTONIC, 0, &interval, &remainder) == -1)
     {
       result.sec = remainder.tv_sec;
       result.nsec = remainder.tv_nsec;
@@ -445,8 +447,7 @@ Time Time::Sleep(const common::Time &_time)
   }
   else
   {
-    /// \TODO Make this a gzlog
-    gzwarn << "Sleep time is larger than clock resolution, skipping sleep\n";
+    gzlog << "Sleep time is larger than clock resolution, skipping sleep\n";
   }
 
   return result;

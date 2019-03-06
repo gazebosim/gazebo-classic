@@ -59,11 +59,6 @@ RenderWidget::RenderWidget(QWidget *_parent)
   // GLWigdet
   this->glWidget = new GLWidget(this->mainFrame);
 
-  this->msgOverlayLabel = new QLabel(this->glWidget);
-  this->msgOverlayLabel->setStyleSheet(
-      "QLabel { background-color : white; color : gray; }");
-  this->msgOverlayLabel->setVisible(false);
-
   QHBoxLayout *bottomPanelLayout = new QHBoxLayout;
 
   this->timePanel = new TimePanel(this);
@@ -204,6 +199,13 @@ void RenderWidget::CreateScene(const std::string &_name)
 /////////////////////////////////////////////////
 void RenderWidget::DisplayOverlayMsg(const std::string &_msg, int _duration)
 {
+  if (!this->msgOverlayLabel)
+  {
+    this->msgOverlayLabel = new QLabel(this->glWidget);
+    this->msgOverlayLabel->setStyleSheet(
+        "QLabel { background-color : white; color : gray; }");
+  }
+
   std::string msg = this->baseOverlayMsg.empty() ? _msg
       : this->baseOverlayMsg + "\n" + _msg;
   this->msgOverlayLabel->setText(tr(msg.c_str()));
@@ -285,8 +287,7 @@ void RenderWidget::AddPlugins(const std::vector<std::string> &_pluginFilenames)
        iter != _pluginFilenames.end(); ++iter)
   {
     // Make sure the string is not empty
-    if ((*iter).empty())
-      continue;
+    if ((*iter).empty()) continue;
 
     // create an empty element as this function ignores SDF
     sdf::ElementPtr elem(new sdf::Element());
@@ -327,6 +328,8 @@ bool RenderWidget::AddPlugin(const std::string &_filename,
   gzlog << "Loaded GUI plugin[" << _filename << "]\n";
   return true;
 }
+
+
 
 /////////////////////////////////////////////////
 void RenderWidget::AddPlugin(GUIPluginPtr _plugin, sdf::ElementPtr _elem)

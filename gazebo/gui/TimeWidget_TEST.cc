@@ -15,6 +15,8 @@
  *
 */
 
+#include <boost/lexical_cast.hpp>
+
 #include "gazebo/gui/TimeWidget.hh"
 #include "gazebo/gui/MainWindow.hh"
 #include "gazebo/gui/RenderWidget.hh"

@@ -39,7 +39,7 @@ namespace gazebo
     /// \brief Sensor with sonar cone.
     ///
     /// This sensor uses a cone .
-    class GAZEBO_VISIBLE SonarSensor: public Sensor
+    class GZ_SENSORS_VISIBLE SonarSensor: public Sensor
     {
       /// \brief Constructor
       public: SonarSensor();
@@ -87,12 +87,6 @@ namespace gazebo
       /// \return The connection, which must be kept in scope.
       public: event::ConnectionPtr ConnectUpdate(
                   std::function<void (msgs::SonarStamped)> _subscriber);
-
-      /// \brief Disconnect from the update signal.
-      /// \param[in] _conn Connection to remove.
-      /// \deprecated Use event::~Connection to disconnect
-      public: void DisconnectUpdate(event::ConnectionPtr &_conn)
-              GAZEBO_DEPRECATED(8.0);
 
       // Documentation inherited
       protected: virtual bool UpdateImpl(const bool _force);

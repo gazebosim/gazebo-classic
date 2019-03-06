@@ -44,30 +44,13 @@ void DARTBallJoint::Load(sdf::ElementPtr _sdf)
 
   this->dataPtr->dtProperties.reset(
         new dart::dynamics::BallJoint::Properties(
-          *this->dataPtr->dtProperties.get()));
+          *(this->dataPtr->dtProperties)));
 }
 
 //////////////////////////////////////////////////
 void DARTBallJoint::Init()
 {
   BallJoint<DARTJoint>::Init();
-}
-
-//////////////////////////////////////////////////
-ignition::math::Vector3d DARTBallJoint::Anchor(
-    const unsigned int _index) const
-{
-  if (!this->dataPtr->IsInitialized())
-  {
-    return this->dataPtr->GetCached<ignition::math::Vector3d>(
-          "Anchor" + std::to_string(_index));
-  }
-
-  Eigen::Isometry3d T = this->dataPtr->dtChildBodyNode->getTransform() *
-                        this->dataPtr->dtJoint->getTransformFromChildBodyNode();
-  Eigen::Vector3d worldOrigin = T.translation();
-
-  return DARTTypes::ConvVec3Ign(worldOrigin);
 }
 
 //////////////////////////////////////////////////
@@ -78,61 +61,9 @@ ignition::math::Vector3d DARTBallJoint::GlobalAxis(
 }
 
 //////////////////////////////////////////////////
-void DARTBallJoint::SetVelocity(unsigned int /*_index*/, double /*_angle*/)
-{
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::GetVelocity(unsigned int /*_index*/) const
-{
-  gzerr << "DARTBallJoint::GetVelocity not implemented" << std::endl;
-  return 0;
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::PositionImpl(const unsigned int /*_index*/) const
-{
-  gzerr << "DARTBallJoint::PositionImpl not implemented" << std::endl;
-  return ignition::math::NAN_D;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetForceImpl(unsigned int /*_index*/, double /*_torque*/)
-{
-  gzerr << "DARTBallJoint::SetForceImpl not implemented";
-}
-
-//////////////////////////////////////////////////
 void DARTBallJoint::SetAxis(const unsigned int /*_index*/,
                             const ignition::math::Vector3d &/*_axis*/)
 {
-  gzerr << "DARTBallJoint::SetAxis not implemented" << std::endl;
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::UpperLimit(const unsigned int /*_index*/) const
-{
-  gzerr << "DARTBallJoint::UpperLimit not implemented" << std::endl;
-  return ignition::math::NAN_D;
-}
-
-//////////////////////////////////////////////////
-double DARTBallJoint::LowerLimit(const unsigned int /*_index*/) const
-{
-  gzerr << "DARTBallJoint::LowerLimit not implemented" << std::endl;
-  return ignition::math::NAN_D;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetUpperLimit(const unsigned int /*_index*/,
-                                  const double /*_limit*/)
-{
-  gzerr << "DARTBallJoint::SetUpperLimit not implemented" << std::endl;
-}
-
-//////////////////////////////////////////////////
-void DARTBallJoint::SetLowerLimit(const unsigned int /*_index*/,
-                                  const double /*_limit*/)
-{
-  gzerr << "DARTBallJoint::SetLowerLimit not implemented" << std::endl;
+  gzerr << "DARTBallJoint::SetAxis: dart::dynamics::BallJoint does not have an "
+        << "axis" << std::endl;
 }

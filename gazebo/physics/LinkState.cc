@@ -133,35 +133,9 @@ void LinkState::Load(const sdf::ElementPtr _elem)
 }
 
 /////////////////////////////////////////////////
-const math::Pose LinkState::GetPose() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Pose();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &LinkState::Pose() const
 {
   return this->pose;
-}
-
-/////////////////////////////////////////////////
-const math::Pose LinkState::GetVelocity() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Velocity();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////
@@ -171,35 +145,9 @@ const ignition::math::Pose3d &LinkState::Velocity() const
 }
 
 /////////////////////////////////////////////////
-const math::Pose LinkState::GetAcceleration() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Acceleration();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
-}
-
-/////////////////////////////////////////////////
 const ignition::math::Pose3d &LinkState::Acceleration() const
 {
   return this->acceleration;
-}
-
-/////////////////////////////////////////////////
-const math::Pose LinkState::GetWrench() const
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  return this->Wrench();
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 /////////////////////////////////////////////////

@@ -86,19 +86,59 @@ namespace gazebo
 
       /// \brief Add a new contact.
       ///
-      /// Noramlly this is only used by a Physics/Collision engine when
+      /// Normally this is only used by a Physics/Collision engine when
       /// a new contact is generated. All other users should just make use
       /// of the accessor functions.
       ///
-      /// If no one is listening, then the return value will be NULL.
-      /// This is a signal to the Physics engine that it can skip the extra
-      /// processing necessary to get back contact information.
+      /// If no one is listening, then the return value will be NULL (unless
+      /// SetNeverDropContacts(true) was called).
+      /// This is then a signal to the Physics engine that it can skip the
+      /// extra processing necessary to get back contact information.
+      ///
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
+      /// \param[in] _time the time of the contact
+      ///
       /// \return The new contact. The physics engine should populate the
       /// contact's parameters. NULL will be returned if there are no
-      /// subscribers to the contact topic.
+      /// subscribers to the contact topic and NeverDropContacts()
+      /// returns false (default).
       public: Contact *NewContact(Collision *_collision1,
                                   Collision *_collision2,
                                   const common::Time &_time);
+
+      /// \brief If set to true, NewContact() will always add contacts
+      /// even if there are no subscribers.
+      /// \param[in] _neverDrop if true, never drop contact computation
+      public: void SetNeverDropContacts(const bool _neverDrop);
+
+      /// \brief returns the value last set with SetNeverDropContacts().
+      /// \return the value last set with SetNeverDropContacts().
+      /// If SetNeverDropContacts() was never called, this will return false.
+      public: bool NeverDropContacts() const;
+
+      /// \brief Returns true if any subscribers are connected
+      /// which would be interested in contact details of either collision
+      /// \e _collision1 or \e collision2, given that they have been loaded
+      /// into the world already.
+      /// This is the same test which NewContact() uses to determine whether
+      /// there are any subscribers for the contacts, but the test here is
+      /// optimized because it returns as soon as one subscriber is found which
+      /// listens to either of the collisions.
+      /// Note that this function needs to go through the list of custom
+      /// publishers and check whether \e _collsion1 or \e _collision2
+      /// are part of the custom publishers and whether they have been loaded
+      /// into the world, which comes at a cost.
+      /// Unless there are any benefits in calling this function ahead of
+      /// NewContact, it may be better to just use NewContact() directly.
+      /// Also note that in order to exclude that NewContact() returns NULL,
+      /// it is advisable to check NeverDropContacts() first (if it returns
+      /// true, NewContacts() never returns NULL).
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
+      /// \return true if any subscribers are connected for this pair
+      public: bool SubscribersConnected(Collision *_collision1,
+                                        Collision *_collision2) const;
 
       /// \brief Return the number of valid contacts.
       public: unsigned int GetContactCount() const;
@@ -164,6 +204,17 @@ namespace gazebo
       /// return True if the filter exists.
       public: bool HasFilter(const std::string &_name);
 
+      /// \brief Helper function which gets the custom publishers which publish
+      ///   contacts of either \e _collision1 or \e _collision2.
+      /// \param[in] _collision1 the first collision object
+      /// \param[in] _collision2 the second collision object
+      /// \param[in] _getOnlyConnected return only publishers which currently
+      ///   have subscribers
+      /// \param[out] _publishers the resulting publishers.
+      private: void GetCustomPublishers(Collision *_collision1,
+                       Collision *_collision2, const bool _getOnlyConnected,
+                       std::vector<ContactPublisher*> &_publishers);
+
       private: std::vector<Contact*> contacts;
 
       private: unsigned int contactIndex;
@@ -193,6 +244,11 @@ namespace gazebo
 
       /// \brief Contact publisher.
       private: ignition::transport::Node::Publisher contactPubIgn;
+
+      /// \brief Addition of new contacts happens also with no subscribers.
+      /// This takes effect if NewContact() is called if there
+      /// are no subscribers. Default is false.
+      private: bool neverDropContacts;
     };
     /// \}
   }

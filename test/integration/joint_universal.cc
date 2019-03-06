@@ -201,7 +201,7 @@ void JointTestUniversal::UniversalJointSetWorldPose(
 {
   if (_physicsEngine == "dart")
   {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
+    gzerr << "DART Universal Joint does not support SetWorldPose.\n";
     return;
   }
 
@@ -313,11 +313,6 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     gzerr << "Bullet Universal Joint dynamics broken, see issue #1081.\n";
     return;
   }
-  if (_physicsEngine == "dart")
-  {
-    gzerr << "DART Universal Joint is not yet working.  See issue #1011.\n";
-    return;
-  }
 
   // Load our universal joint test world
   Load("worlds/universal_joint_test.world", true, _physicsEngine);
@@ -346,7 +341,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   EXPECT_DOUBLE_EQ(t, dt);
   gzlog << "t after one step : " << t << "\n";
 
-  // get model, joints and get links
+  // Get model, joints and get links. The model has two links and two universal
+  // joints.
   physics::ModelPtr model_1 = world->ModelByName("model_1");
   physics::LinkPtr link_00 = model_1->GetLink("link_00");
   physics::LinkPtr link_01 = model_1->GetLink("link_01");
@@ -356,6 +352,8 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
   // both initial angles should be zero
   EXPECT_NEAR(joint_00->Position(0), 0, g_tolerance);
   EXPECT_NEAR(joint_00->Position(1), 0, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(0), 0, g_tolerance);
+  EXPECT_NEAR(joint_01->Position(1), 0, g_tolerance);
 
   // set new upper limit for joint_00
   joint_00->SetUpperLimit(0, 0.3);
@@ -383,20 +381,22 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
 
     joint_00->SetForce(0, -0.1);
     world->Step(1);
+
     // check link pose
     double angle_00_0 = joint_00->Position(0);
     auto pose_00 = link_00->WorldPose();
     EXPECT_NEAR(pose_00.Rot().Euler().X(), angle_00_0, 1e-8);
     EXPECT_GT(pose_00.Rot().Euler().X(), -0.05);
   }
-  // lock joint at this location by setting lower limit here too
+
+  // Lock joint_00 at this location by setting the upper limit here too
   joint_00->SetUpperLimit(0, 0.0);
 
-  // set joint_01 upper limit to 1.0
+  // Lock joint_01-0, but let joint_01-1 go up to 2.0
   joint_01->SetUpperLimit(0, 0.0);
   joint_01->SetLowerLimit(0, 0.0);
   joint_01->SetUpperLimit(1, 2.0);
-  // push joint_01 until limit is reached
+  // Push joint_01 until limit is reached
   count = 0;
   while (joint_01->Position(1) < 2.1 && count < 2700)
   {
@@ -414,7 +414,22 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     EXPECT_LT(pose_01.Rot().Euler().Y(), 2.05);
   }
 
+  // The next test assumes that the previous loop drove the positions and
+  // velocities to zero, however DART's behavior does not satisfy that
+  // assumption (by design), so we set these position and velocity values to
+  // zero so that we do not violate the assumptions of the next test.
+  for (const physics::JointPtr &j : {joint_00, joint_01})
+  {
+    for (std::size_t k = 0; k < 2; ++k)
+    {
+      j->SetVelocity(k, 0.0);
+      j->SetPosition(k, 0.0);
+    }
+  }
+
   // push joint_01 the other way until -1 is reached
+  // test whether the combined angles of the two joints match the Euler Angles
+  // of the expected pose
   joint_01->SetLowerLimit(1, -1.0);
   count = 0;
   while (joint_01->Position(1) > -1.1 && count < 2100)
@@ -431,7 +446,14 @@ void JointTestUniversal::UniversalJointForce(const std::string &_physicsEngine)
     double angle_01_0 = joint_01->Position(0);
     double angle_01_1 = joint_01->Position(1);
 
-    EXPECT_NEAR(pose_01.Rot().Euler().X(), angle_00_0 + angle_01_0, 1e-6);
+
+    // Note that these tests only succeed if the initial positions and
+    // velocities of the first axis of each joint start out at zero. If the
+    // first axis of either joint exhibits any non-zero position, then these
+    // tests will fail.
+    EXPECT_NEAR(0.0, angle_00_0, 1e-6);
+    EXPECT_NEAR(0.0, angle_01_0, 1e-6);
+    EXPECT_NEAR(0.0, pose_01.Rot().Euler().X(), 1e-6);
     EXPECT_NEAR(pose_01.Rot().Euler().Y(), angle_00_1 + angle_01_1, 1e-6);
   }
 }

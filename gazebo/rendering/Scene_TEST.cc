@@ -365,6 +365,45 @@ TEST_F(Scene_TEST, Shadows)
 }
 
 /////////////////////////////////////////////////
+TEST_F(Scene_TEST, AddRemoveLights)
+{
+  Load("worlds/empty.world");
+
+  // Get the scene
+  gazebo::rendering::ScenePtr scene = gazebo::rendering::get_scene();
+  ASSERT_TRUE(scene != nullptr);
+
+  // Check that the scene has no lights
+  // Note, the sun is not added yet unless we explicity trigger the preRender
+  // event to process the messages from the server.
+  EXPECT_EQ(scene->LightCount(), 0u);
+
+  // Add a visual and check that it has been added
+  rendering::LightPtr light1;
+  light1.reset(new rendering::Light(scene));
+  light1->SetName("light1");
+  scene->AddLight(light1);
+  EXPECT_EQ(scene->LightCount(), 1u);
+  EXPECT_EQ(light1, scene->LightByName("light1"));
+  EXPECT_EQ(light1, scene->LightById(light1->Id()));
+
+  // Add anaother light and check that it has been added
+  rendering::LightPtr light2;
+  light2.reset(new rendering::Light(scene));
+  light2->SetName("light2");
+  scene->AddLight(light2);
+  EXPECT_EQ(scene->LightCount(), 2u);
+  EXPECT_EQ(light2, scene->LightByName("light2"));
+  EXPECT_EQ(light2, scene->LightById(light2->Id()));
+
+  // Remove a light and check that it has been removed
+  scene->RemoveLight(light1);
+  EXPECT_EQ(scene->LightCount(), 1u);
+  EXPECT_FALSE(scene->LightByName("light1"));
+}
+
+
+/////////////////////////////////////////////////
 int main(int argc, char **argv)
 {
   ::testing::InitGoogleTest(&argc, argv);

@@ -28,30 +28,6 @@ using namespace gazebo;
 using namespace physics;
 
 //////////////////////////////////////////////////
-// Constructor of aiScene is missing so we define it here. This is temporary
-// workaround. For further discussion, please see:
-// https://github.com/dartsim/dart/issues/451
-// https://github.com/dartsim/dart/issues/452
-// https://github.com/dartsim/dart/issues/453
-aiScene::aiScene()
-{
-  mFlags = 0;
-  mRootNode = nullptr;
-  mNumMeshes = 0;
-  mMeshes = nullptr;
-  mNumMaterials = 0;
-  mMaterials = nullptr;
-  mNumAnimations = 0;
-  mAnimations = nullptr;
-  mNumTextures = 0;
-  mTextures = nullptr;
-  mNumLights = 0;
-  mLights = nullptr;
-  mNumCameras = 0;
-  mCameras = nullptr;
-}
-
-//////////////////////////////////////////////////
 DARTMesh::DARTMesh() : dataPtr(new DARTMeshPrivate())
 {
 }
@@ -61,21 +37,6 @@ DARTMesh::~DARTMesh()
 {
   delete this->dataPtr;
   this->dataPtr = nullptr;
-}
-
-//////////////////////////////////////////////////
-void DARTMesh::Init(const common::SubMesh *_subMesh,
-                    DARTCollisionPtr _collision,
-                    const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Init(_subMesh, _collision, _scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -97,21 +58,6 @@ void DARTMesh::Init(const common::SubMesh *_subMesh,
 
   delete [] vertices;
   delete [] indices;
-}
-
-//////////////////////////////////////////////////
-void DARTMesh::Init(const common::Mesh *_mesh,
-                    DARTCollisionPtr _collision,
-                    const math::Vector3 &_scale)
-{
-#ifndef _WIN32
-  #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
-  this->Init(_mesh, _collision, _scale.Ign());
-#ifndef _WIN32
-  #pragma GCC diagnostic pop
-#endif
 }
 
 //////////////////////////////////////////////////
@@ -147,6 +93,7 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
   assimpScene->mNumMeshes = 1;
   assimpScene->mMeshes = new aiMesh*[1];
   assimpScene->mMeshes[0] = assimpMesh;
+  assimpScene->mRootNode = new aiNode();
 
   // Set _vertices and normals
   assimpMesh->mNumVertices = _numVertices;
@@ -177,8 +124,20 @@ void DARTMesh::CreateMesh(float *_vertices, int *_indices,
 
   dart::dynamics::ShapePtr dtMeshShape(new dart::dynamics::MeshShape(
       DARTTypes::ConvVec3(_scale), assimpScene));
-  GZ_ASSERT(_collision->GetDARTBodyNode(),
-    "DART _collision->GetDARTBodyNode() is null");
-  _collision->GetDARTBodyNode()->addCollisionShape(dtMeshShape);
-  _collision->SetDARTCollisionShape(dtMeshShape);
+  GZ_ASSERT(_collision->DARTBodyNode(),
+            "DART _collision->DARTBodyNode() is null");
+
+  dart::dynamics::ShapeNode *node =
+    _collision->DARTBodyNode()->createShapeNodeWith<
+      dart::dynamics::VisualAspect,
+      dart::dynamics::CollisionAspect,
+      dart::dynamics::DynamicsAspect>(dtMeshShape);
+
+  this->dataPtr->dtMeshShape.set(node);
+}
+
+/////////////////////////////////////////////////
+dart::dynamics::ShapeNodePtr DARTMesh::ShapeNode() const
+{
+  return dataPtr->ShapeNode();
 }
