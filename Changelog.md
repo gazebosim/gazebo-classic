@@ -2,6 +2,9 @@
 
 ## Gazebo 8.X.X (201X-XX-XX)
 
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 

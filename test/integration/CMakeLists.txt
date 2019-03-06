@@ -103,6 +103,7 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
+  variable_gearbox_plugin.cc
   wheel_slip.cc
   world.cc
   world_clone.cc
@@ -146,6 +147,7 @@ endif()
 
 # Add plugin dependency
 add_dependencies(${TEST_TYPE}_joint_test SpringTestPlugin)
+add_dependencies(${TEST_TYPE}_variable_gearbox_plugin VariableGearboxPlugin)
 
 set(display_tests
 )
