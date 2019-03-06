@@ -173,7 +173,7 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     }
   }
 
-  SetCastShadows(_msg->cast_shadows());
+  this->SetCastShadows(_msg->cast_shadows());
 
   this->Load();
 }
