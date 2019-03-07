@@ -241,6 +241,10 @@ namespace gazebo
       private: void MergeSkeleton(Skeleton *_skeleton,
           SkeletonNode *_mergeNode);
 
+      /// \brief Apply the the inv bind transform to the skeleton pose.
+      /// \param[in] _skeleton the skeleton to work on
+      private: void ApplyInvBindTransform(Skeleton *_skeleton);
+
       /// \internal
       /// \brief Pointer to private data.
       private: ColladaLoaderPrivate *dataPtr;

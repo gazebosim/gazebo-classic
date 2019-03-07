@@ -494,6 +494,12 @@ ignition::math::Matrix4d SkeletonNode::InverseBindTransform()
 }
 
 //////////////////////////////////////////////////
+bool SkeletonNode::HasInvBindTransform()
+{
+  return this->invBindTransform != ignition::math::Matrix4d::Zero;
+}
+
+//////////////////////////////////////////////////
 std::vector<NodeTransform> SkeletonNode::GetRawTransforms()
 {
   return this->rawTransforms;

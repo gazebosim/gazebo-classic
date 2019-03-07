@@ -130,6 +130,9 @@ Mesh *ColladaLoader::Load(const std::string &_filename)
 
   this->LoadScene(mesh);
 
+  if (mesh->HasSkeleton())
+    ApplyInvBindTransform(mesh->GetSkeleton());
+
   // This will make the model the correct size.
   mesh->Scale(this->dataPtr->meter);
   if (mesh->HasSkeleton())
@@ -455,7 +458,7 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
             ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
-    skeleton->GetNodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
+//    skeleton->GetNodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
   }
 
   TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
@@ -2227,6 +2230,7 @@ void ColladaLoader::LoadTransparent(TiXmlElement *_elem, Material *_mat)
   }
 }
 
+/////////////////////////////////////////////////
 void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
 {
   if (_skeleton->GetNodeById(_mergeNode->GetId()))
@@ -2259,4 +2263,26 @@ void ColladaLoader::MergeSkeleton(Skeleton *_skeleton, SkeletonNode *_mergeNode)
   _mergeNode->SetParent(dummyRoot);
   dummyRoot->SetTransform(ignition::math::Matrix4d::Identity);
   _skeleton->SetRootNode(dummyRoot);
+}
+
+/////////////////////////////////////////////////
+void ColladaLoader::ApplyInvBindTransform(Skeleton *_skeleton)
+{
+  std::list<SkeletonNode*> queue;
+  queue.push_back(_skeleton->GetRootNode());
+
+  // have to set the model transforms starting from the root in breath first
+  // order. Because setting the model transform also updates the transform
+  // based on the parent's inv model transform. Setting the child before the
+  // parent results in the child's transform being calculated from the "old"
+  // parent model transform.
+  while (!queue.empty())
+  {
+    SkeletonNode *node = queue.front();
+    if (node->HasInvBindTransform())
+      node->SetModelTransform(node->InverseBindTransform().Inverse(), false);
+    for (unsigned int i = 0; i < node->GetChildCount(); i++)
+      queue.push_back(node->GetChild(i));
+    queue.pop_front();
+  }
 }
