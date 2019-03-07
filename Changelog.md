@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Heightmap: cast shadows if `<cast_shadows>` tag is set
+    * [Pull request 3083](https://bitbucket.org/osrf/gazebo/pull-request/3083)
+
 1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
     * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
 
