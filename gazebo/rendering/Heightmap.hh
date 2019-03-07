@@ -213,7 +213,6 @@ namespace gazebo
 
       /// \brief Set the heightmap terrain to cast shadows
       /// \param[in] _value True to cast shadows, false to not cast shadows.
-      /// tiles of different detail levels.
       public: void SetCastShadows(const bool _value);
 
       /// \brief Get whether the heightmap terrain casts shadows
