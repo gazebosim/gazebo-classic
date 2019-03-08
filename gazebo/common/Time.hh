@@ -26,6 +26,9 @@
 #include "gazebo/common/CommonTypes.hh"
 #include "gazebo/util/system.hh"
 
+// forward declaration
+struct timeval;
+
 namespace gazebo
 {
   namespace common

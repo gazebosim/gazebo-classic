@@ -23,6 +23,20 @@
 #include "test_config.h"
 
 /////////////////////////////////////////////////
+#ifdef _WIN32
+static int setenv(const char *envname, const char *envval, int overwrite)
+{
+  char *original = getenv(envname);
+  if (!original || !!overwrite)
+  {
+    std::string envstring = std::string(envname) + "=" + envval;
+    return _putenv(envstring.c_str());
+  }
+  return 0;
+}
+#endif
+
+/////////////////////////////////////////////////
 void GuiIface_TEST::noINIFile()
 {
   // Get a temp directory

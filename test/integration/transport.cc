@@ -15,7 +15,9 @@
  *
 */
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include "gazebo/test/ServerFixture.hh"
 
 using namespace gazebo;
@@ -172,7 +174,7 @@ TEST_F(TransportTest, DirectPublish)
   // Not nice to time check here but 10 seconds should be 'safe' to check
   // against
   int timeout = 1000;
-  while (not g_sceneMsg)
+  while (!g_sceneMsg)
   {
     common::Time::MSleep(10);
 
