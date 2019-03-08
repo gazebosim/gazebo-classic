@@ -201,6 +201,12 @@ namespace gazebo
       public: void SetName(std::string _name);
 
       /// \brief Returns the name
+      /// \remarks not normally needed but it is included to satisfy ABI
+      /// compatibility.
+      /// \return the name
+      public: std::string GetName();
+
+      /// \brief Returns the name
       /// \return the name
       public: std::string GetName() const;
 
