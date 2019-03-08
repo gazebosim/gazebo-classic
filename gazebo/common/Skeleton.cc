@@ -292,6 +292,12 @@ void SkeletonNode::SetName(std::string _name)
 }
 
 //////////////////////////////////////////////////
+std::string SkeletonNode::GetName()
+{
+  return this->name;
+}
+
+//////////////////////////////////////////////////
 std::string SkeletonNode::GetName() const
 {
   return this->name;
