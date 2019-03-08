@@ -14,14 +14,17 @@
  * limitations under the License.
  *
 */
+#include <gtest/gtest.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#include <iostream>
+#include <thread>
+
 #include <gazebo/gazebo.hh>
 #include <gazebo/transport/transport.hh>
 #include <gazebo/msgs/msgs.hh>
-#include <gtest/gtest.h>
-#include <unistd.h>
-#include <iostream>
-
-#include <thread>
 
 using namespace gazebo;
 
