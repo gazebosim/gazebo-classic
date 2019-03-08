@@ -458,7 +458,6 @@ void ColladaLoader::LoadController(TiXmlElement *_contrXml,
             ignition::math::parseFloat(strs[id + 15]));
 
     skeleton->GetNodeByName(joints[i])->SetInverseBindTransform(mat);
-//    skeleton->GetNodeByName(joints[i])->SetModelTransform(mat.Inverse(), false);
   }
 
   TiXmlElement *vertWeightsXml = skinXml->FirstChildElement("vertex_weights");
