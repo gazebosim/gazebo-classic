@@ -57,7 +57,11 @@ bool custom_exec(std::string _cmd)
 std::string custom_exec_str(std::string _cmd)
 {
   _cmd += " 2>&1";
+#ifdef _WIN32
+  FILE *pipe = _popen(_cmd.c_str(), "r");
+#else
   FILE *pipe = popen(_cmd.c_str(), "r");
+#endif
 
   if (!pipe)
     return "ERROR";
@@ -71,7 +75,11 @@ std::string custom_exec_str(std::string _cmd)
       result += buffer;
   }
 
+#ifdef _WIN32
+  _pclose(pipe);
+#else
   pclose(pipe);
+#endif
   return result;
 }
 

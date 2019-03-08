@@ -453,6 +453,9 @@ namespace gazebo
       /// \brief Skirt length on LOD tiles
       public: double skirtLength = 1.0;
 
+      /// \brief Terrain casts shadows
+      public: bool castShadows = false;
+
       /// \brief True if the terrain need to be split into subterrains
       public: bool splitTerrain = false;
 
