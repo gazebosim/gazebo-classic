@@ -672,7 +672,8 @@ void Actor::Update()
     actorPose.Rot() = modelPose.Rot() * this->WorldPose().Rot();
 
   ignition::math::Matrix4d rootM(actorPose.Rot());
-  if (!this->customTrajectoryInfo) {
+  if (!this->customTrajectoryInfo)
+  {
     rootM.SetTranslation(actorPose.Pos());
 
     // TODO: Possible bug here? Rotation changed after scaling. Maybe the

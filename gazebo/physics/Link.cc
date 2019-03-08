@@ -1564,11 +1564,11 @@ void Link::UpdateVisualMsg()
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
         msg.set_type(msgs::Visual::VISUAL);
-        auto scale = msgs::Vector3d();
-        scale.set_x(this->scale.X());
-        scale.set_y(this->scale.X());
-        scale.set_z(this->scale.X());
-        *msg.mutable_scale() = scale;
+        auto scaleMsg = msgs::Vector3d();
+        scaleMsg.set_x(this->scale.X());
+        scaleMsg.set_y(this->scale.X());
+        scaleMsg.set_z(this->scale.X());
+        *msg.mutable_scale() = scaleMsg;
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())
