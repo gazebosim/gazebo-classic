@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Windows: fix test compilation
+    * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
+
 1. Heightmap: cast shadows if `<cast_shadows>` tag is set
     * [Pull request 3083](https://bitbucket.org/osrf/gazebo/pull-request/3083)
 
