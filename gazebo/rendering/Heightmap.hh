@@ -211,6 +211,14 @@ namespace gazebo
       /// \return Skirt length of LOD tiles
       public: double SkirtLength() const;
 
+      /// \brief Set the heightmap terrain to cast shadows
+      /// \param[in] _value True to cast shadows, false to not cast shadows.
+      public: void SetCastShadows(const bool _value);
+
+      /// \brief Get whether the heightmap terrain casts shadows
+      /// \return True if the heightmap terrain casts shadows
+      public: bool CastShadows() const;
+
       /// \brief Create terrain material generator. There are two types:
       /// custom material generator that support user material scripts,
       /// and a default material generator that uses our own glsl shader

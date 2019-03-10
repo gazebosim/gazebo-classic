@@ -110,7 +110,6 @@ set(tests
   transceiver.cc
   transport.cc
   transporter.cc
-  transport_msg_count.cc
   wheel_slip.cc
   world.cc
   world_clone.cc
@@ -119,6 +118,13 @@ set(tests
   world_population.cc
   worlds_installed.cc
   )
+
+if (NOT WIN32)
+  set(tests
+    ${tests}
+    transport_msg_count.cc
+  )
+endif()
 
 if (HAVE_GTS)
   set(tests
