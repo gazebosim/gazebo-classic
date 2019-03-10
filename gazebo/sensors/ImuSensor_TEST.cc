@@ -15,7 +15,9 @@
  *
 */
 
+#ifndef _WIN32
 #include <sys/time.h>
+#endif
 #include <gtest/gtest.h>
 
 #include "gazebo/test/ServerFixture.hh"

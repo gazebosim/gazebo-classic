@@ -2,6 +2,12 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Windows: fix test compilation
+    * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
+
+1. Heightmap: cast shadows if `<cast_shadows>` tag is set
+    * [Pull request 3083](https://bitbucket.org/osrf/gazebo/pull-request/3083)
+
 1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
     * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
 
@@ -11,6 +17,8 @@
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
+
+## Gazebo 10.0.0 (2019-01-31)
 
 1. Add geometry field to sonar.proto and private dataPtr to Actor class
     * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
@@ -71,6 +79,12 @@
 ## Gazebo 9
 
 ## Gazebo 9.X.X (20XX-XX-XX)
+
+1. Windows: fix test compilation
+    * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
+
+1. Heightmap: cast shadows if `<cast_shadows>` tag is set
+    * [Pull request 3083](https://bitbucket.org/osrf/gazebo/pull-request/3083)
 
 1. Windows: ignore disabled interfaces in `Connection::GetLocalEndpoint()`
     * [Pull request 3079](https://bitbucket.org/osrf/gazebo/pull-request/3079)
