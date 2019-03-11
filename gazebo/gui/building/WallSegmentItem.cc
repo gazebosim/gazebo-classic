@@ -232,7 +232,7 @@ void WallSegmentItem::SetHighlighted(bool _highlighted)
     this->dataPtr->measure->setVisible(false);
     this->setZValue(this->zValueIdle);
     this->SetColor(ignition::math::Color::Black);
-    this->Set3dTransparency(0.4);
+    this->Set3dTransparency(0.4f);
   }
 }
 

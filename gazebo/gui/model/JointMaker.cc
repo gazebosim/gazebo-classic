@@ -813,7 +813,7 @@ std::string JointMaker::CreateHotSpot(JointData *_joint)
   hotspotObj->getUserObjectBindings().setUserAny(Ogre::Any(jointId));
   hotspotVisual->GetSceneNode()->attachObject(hotspotObj);
   hotspotVisual->SetMaterial(this->jointMaterials[_joint->type]);
-  hotspotVisual->SetTransparency(0.7);
+  hotspotVisual->SetTransparency(0.7f);
 
   // create a handle at the parent end
   Ogre::BillboardSet *handleSet =
@@ -1181,7 +1181,7 @@ void JointData::Update()
       Ogre::SceneNode *handleNode = this->handles->getParentSceneNode();
       this->handles->detachFromParent();
       this->hotspot->SetMaterial(material);
-      this->hotspot->SetTransparency(0.7);
+      this->hotspot->SetTransparency(0.7f);
       handleNode->attachObject(this->handles);
       Ogre::MaterialPtr mat =
           Ogre::MaterialManager::getSingleton().getByName(material);

@@ -50,11 +50,11 @@ LightMaker::LightMaker() : dataPtr(new LightMakerPrivate)
   msgs::Set(this->msg.mutable_diffuse(),
       ignition::math::Color(0.5, 0.5, 0.5, 1));
   msgs::Set(this->msg.mutable_specular(),
-      ignition::math::Color(0.1, 0.1, 0.1, 1));
+      ignition::math::Color(0.1f, 0.1f, 0.1f, 1));
 
   this->msg.set_attenuation_constant(0.5);
-  this->msg.set_attenuation_linear(0.01);
-  this->msg.set_attenuation_quadratic(0.001);
+  this->msg.set_attenuation_linear(0.01f);
+  this->msg.set_attenuation_quadratic(0.001f);
   this->msg.set_range(20);
 }
 
@@ -200,8 +200,8 @@ SpotLightMaker::SpotLightMaker() : LightMaker()
             ignition::math::Vector3d(0, 0, -1));
   this->msg.set_cast_shadows(false);
 
-  this->msg.set_spot_inner_angle(0.6);
-  this->msg.set_spot_outer_angle(1.0);
+  this->msg.set_spot_inner_angle(0.6f);
+  this->msg.set_spot_outer_angle(1.0f);
   this->msg.set_spot_falloff(1.0);
   this->lightTypename  = "spot";
 }

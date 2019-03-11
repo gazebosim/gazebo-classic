@@ -1319,7 +1319,7 @@ void EditorView::OnLevelApply()
   {
     floorItem->SetTexture3d(dialog->Texture());
     floorItem->SetColor3d(dialog->Color());
-    floorItem->Set3dTransparency(0.4);
+    floorItem->Set3dTransparency(0.4f);
     floorItem->FloorChanged();
   }
   gui::editor::Events::updateLevelWidget(this->currentLevel, newLevelName);

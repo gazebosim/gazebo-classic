@@ -177,7 +177,7 @@ void RectItem::SetHighlighted(bool _highlighted)
         this->dataPtr->grabbers[i]->removeSceneEventFilter(this);
     }
     this->dataPtr->rotateHandle->removeSceneEventFilter(this);
-    this->Set3dTransparency(0.4);
+    this->Set3dTransparency(0.4f);
   }
   this->highlighted = _highlighted;
   this->UpdateMeasures();

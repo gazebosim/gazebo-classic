@@ -381,6 +381,6 @@ void BuildingModelManip::OnChangeLevel(int _level)
   else
   {
     this->SetVisible(true);
-    this->SetTransparency(0.4);
+    this->SetTransparency(0.4f);
   }
 }

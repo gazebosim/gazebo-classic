@@ -330,7 +330,7 @@ void LaserView::LaserItem::paint(QPainter *_painter,
     {
       double x2, y2;
       // Give the arc some padding.
-      textWidth *= 1.4;
+      textWidth *= 1.4f;
 
       // Compute the position for the angle text.
       x1 = (rangeMaxScaled * 1.15 + textWidth) * cos(this->indexAngle * 0.5);
