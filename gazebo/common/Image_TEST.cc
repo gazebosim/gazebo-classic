@@ -33,11 +33,11 @@ TEST_F(ImageTest, Image)
   EXPECT_EQ(static_cast<unsigned int>(496), img.GetWidth());
   EXPECT_EQ(static_cast<unsigned int>(329), img.GetHeight());
   EXPECT_EQ(static_cast<unsigned int>(24), img.GetBPP());
-  EXPECT_TRUE(img.Pixel(10, 10) ==
+  EXPECT_EQ(img.Pixel(10, 10),
       ignition::math::Color(0.133333f, 0.376471f, 0.654902f, 1));
-  EXPECT_TRUE(img.AvgColor() ==
+  EXPECT_EQ(img.AvgColor(),
       ignition::math::Color(0.260456f, 0.506047f, 0.758062f, 1));
-  EXPECT_TRUE(img.MaxColor() ==
+  EXPECT_EQ(img.MaxColor(),
       ignition::math::Color(0.807843f, 0.909804f, 0.964706f, 1));
   EXPECT_TRUE(img.Valid());
   EXPECT_TRUE(img.GetFilename().find("materials/textures/wood.jpg") !=
