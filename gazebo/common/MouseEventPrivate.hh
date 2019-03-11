@@ -31,7 +31,7 @@ namespace gazebo
       /// \brief Constructor.
       public: MouseEventPrivate()
               : pos(0, 0), prevPos(0, 0), pressPos(0, 0), scroll(0, 0),
-                moveScale(0.01), dragging(false), type(MouseEvent::NO_EVENT),
+                moveScale(0.01f), dragging(false), type(MouseEvent::NO_EVENT),
                 button(MouseEvent::NO_BUTTON), buttons(MouseEvent::NO_BUTTON),
                 shift(false), alt(false), control(false)
               {}

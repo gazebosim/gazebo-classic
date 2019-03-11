@@ -57,8 +57,8 @@ MeshManager::MeshManager()
       ignition::math::Vector2d(1, 1),
       ignition::math::Vector2d(1, 1));
 
-  this->CreateSphere("unit_sphere", 0.5, 32, 32);
-  this->CreateSphere("joint_anchor", 0.01, 32, 32);
+  this->CreateSphere("unit_sphere", 0.5f, 32, 32);
+  this->CreateSphere("joint_anchor", 0.01f, 32, 32);
   this->CreateBox("body_cg", ignition::math::Vector3d(0.014, 0.014, 0.014),
       ignition::math::Vector2d(0.014, 0.014));
   this->CreateBox("unit_box", ignition::math::Vector3d(1, 1, 1),
@@ -73,10 +73,10 @@ MeshManager::MeshManager()
   this->CreateCone("unit_cone", 0.5, 1.0, 5, 32);
   this->CreateCamera("unit_camera", 0.5);
 
-  this->CreateCylinder("axis_shaft", 0.01, 0.2, 1, 16);
-  this->CreateCone("axis_head", 0.02, 0.08, 1, 16);
+  this->CreateCylinder("axis_shaft", 0.01f, 0.2f, 1, 16);
+  this->CreateCone("axis_head", 0.02f, 0.08f, 1, 16);
 
-  this->CreateTube("selection_tube", 1.0, 1.2, 0.01, 1, 64);
+  this->CreateTube("selection_tube", 1.0f, 1.2f, 0.01f, 1, 64);
 
   this->fileExtensions.push_back("stl");
   this->fileExtensions.push_back("dae");
@@ -753,14 +753,14 @@ void MeshManager::CreateCamera(const std::string &_name, float _scale)
   // Normals for each vertex
   float n[8][3]=
   {
-    {-0.577350, -0.577350, -0.577350},
-    {-0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, 0.577350},
-    {0.577350, -0.577350, -0.577350},
-    {-0.577350, 0.577350, -0.577350},
-    {-0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, 0.577350},
-    {0.577350, 0.577350, -0.577350}
+    {-0.577350f, -0.577350f, -0.577350f},
+    {-0.577350f, -0.577350f, 0.577350f},
+    {0.577350f, -0.577350f, 0.577350f},
+    {0.577350f, -0.577350f, -0.577350f},
+    {-0.577350f, 0.577350f, -0.577350f},
+    {-0.577350f, 0.577350f, 0.577350f},
+    {0.577350f, 0.577350f, 0.577350f},
+    {0.577350f, 0.577350f, -0.577350f}
   };
 
   // Texture coords

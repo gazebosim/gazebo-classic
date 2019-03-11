@@ -40,8 +40,8 @@ Material::Material()
   this->name = "gazebo_material_" + boost::lexical_cast<std::string>(counter++);
   this->blendMode = REPLACE;
   this->shadeMode = GOURAUD;
-  this->ambient.Set(0.4, 0.4, 0.4, 1);
-  this->diffuse.Set(0.5, 0.5, 0.5, 1);
+  this->ambient.Set(0.4f, 0.4f, 0.4f, 1);
+  this->diffuse.Set(0.5f, 0.5f, 0.5f, 1);
   this->specular.Set(0, 0, 0, 1);
   this->dstBlendFactor = this->srcBlendFactor = 1.0;
 }

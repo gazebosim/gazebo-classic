@@ -33,7 +33,7 @@ TEST_F(MouseEvent, CopyConstructor)
   ignition::math::Vector2i prevPos(2, 26);
   ignition::math::Vector2i pressPos(3, 24);
   ignition::math::Vector2i scroll(2, 3);
-  float moveScale = 0.3;
+  float moveScale = 0.3f;
   bool dragging = true;
   common::MouseEvent::EventType type = common::MouseEvent::PRESS;
   common::MouseEvent::MouseButton button = common::MouseEvent::LEFT;
@@ -100,7 +100,7 @@ TEST_F(MouseEvent, CopyConstructor)
   ignition::math::Vector2i newPrevPos(2, 17);
   ignition::math::Vector2i newPressPos(3, 16);
   ignition::math::Vector2i newScroll(1, 2);
-  float newMoveScale = 0.4;
+  float newMoveScale = 0.4f;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;
   common::MouseEvent::MouseButton newButton = common::MouseEvent::LEFT;
@@ -167,7 +167,7 @@ TEST_F(MouseEvent, Assignment)
   ignition::math::Vector2i prevPos(2, 26);
   ignition::math::Vector2i pressPos(3, 24);
   ignition::math::Vector2i scroll(2, 3);
-  float moveScale = 0.3;
+  float moveScale = 0.3f;
   bool dragging = true;
   common::MouseEvent::EventType type = common::MouseEvent::PRESS;
   common::MouseEvent::MouseButton button = common::MouseEvent::LEFT;
@@ -222,7 +222,7 @@ TEST_F(MouseEvent, Assignment)
   ignition::math::Vector2i newPrevPos(2, 17);
   ignition::math::Vector2i newPressPos(3, 16);
   ignition::math::Vector2i newScroll(1, 2);
-  float newMoveScale = 0.4;
+  float newMoveScale = 0.4f;
   bool newDragging = false;
   common::MouseEvent::EventType newType = common::MouseEvent::RELEASE;
   common::MouseEvent::MouseButton newButton = common::MouseEvent::LEFT;
