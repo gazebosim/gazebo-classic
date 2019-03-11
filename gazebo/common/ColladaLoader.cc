@@ -2270,11 +2270,6 @@ void ColladaLoader::ApplyInvBindTransform(Skeleton *_skeleton)
   std::list<SkeletonNode*> queue;
   queue.push_back(_skeleton->GetRootNode());
 
-  // have to set the model transforms starting from the root in breath first
-  // order. Because setting the model transform also updates the transform
-  // based on the parent's inv model transform. Setting the child before the
-  // parent results in the child's transform being calculated from the "old"
-  // parent model transform.
   while (!queue.empty())
   {
     SkeletonNode *node = queue.front();
