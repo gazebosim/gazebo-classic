@@ -591,15 +591,35 @@ void DARTPhysics::SetSolverType(const std::string &_type)
 
   if (_type == "dantzig")
   {
+    // DART constraint solver refactored in 6.7, see issue 2605
+    // https://bitbucket.org/osrf/gazebo/issues/2605
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::DantzigLCPSolver>(
         this->dataPtr->dtWorld->getTimeStep()));
+#elif DART_MAJOR_MINOR_VERSION_AT_MOST(6, 7)
+#else
+    this->dataPtr->dtWorld->setConstraintSolver(
+        dart::common::make_unique<dart::constraint::BoxedLcpConstraintSolver>(
+        this->dataPtr->dtWorld->getTimeStep(),
+        std::make_shared<dart::constraint::DantzigBoxedLcpSolver>()));
+#endif
   }
   else if (_type == "pgs")
   {
+    // DART constraint solver refactored in 6.7, see issue 2605
+    // https://bitbucket.org/osrf/gazebo/issues/2605
+#if DART_MAJOR_MINOR_VERSION_AT_MOST(6, 6)
     this->dataPtr->dtWorld->getConstraintSolver()->setLCPSolver(
         dart::common::make_unique<dart::constraint::PGSLCPSolver>(
         this->dataPtr->dtWorld->getTimeStep()));
+#elif DART_MAJOR_MINOR_VERSION_AT_MOST(6, 7)
+#else
+    this->dataPtr->dtWorld->setConstraintSolver(
+        dart::common::make_unique<dart::constraint::BoxedLcpConstraintSolver>(
+        this->dataPtr->dtWorld->getTimeStep(),
+        std::make_shared<dart::constraint::PgsBoxedLcpSolver>()));
+#endif
   }
   else
   {
