@@ -68,7 +68,8 @@ TEST_F(LightTest, LightMsg)
   msgs::Light lightMsg;
   lightMsg.set_name("test_light");
   msgs::Set(lightMsg.mutable_pose(), pose);
-  msgs::Set(lightMsg.mutable_diffuse(), ignition::math::Color(0.4, 0.5, 0.6));
+  msgs::Set(lightMsg.mutable_diffuse(),
+            ignition::math::Color(0.4f, 0.5f, 0.6f));
   lightMsg.set_type(msgs::Light::SPOT);
 
   // Process message
