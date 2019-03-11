@@ -150,7 +150,7 @@ TEST_F(MsgsTest, ConvertVector3dToAny)
 
 TEST_F(MsgsTest, ConvertColorToAny)
 {
-  msgs::Any msg = msgs::ConvertAny(ignition::math::Color(.1, .2, .3, 1.0));
+  msgs::Any msg = msgs::ConvertAny(ignition::math::Color(.1f, .2f, .3f, 1.0f));
   EXPECT_EQ(msg.type(), msgs::Any::COLOR);
   ASSERT_TRUE(msg.has_color_value());
 
@@ -278,7 +278,7 @@ TEST_F(MsgsTest, ConvertMsgPoseToMath)
 
 TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 {
-  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
+  msgs::Color msg = msgs::Convert(ignition::math::Color(.1f, .2f, .3f, 1.0f));
 
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
@@ -288,7 +288,7 @@ TEST_F(MsgsTest, ConvertCommonColorToMsgs)
 
 TEST_F(MsgsTest, ConvertMsgsColorToCommon)
 {
-  msgs::Color msg = msgs::Convert(ignition::math::Color(.1, .2, .3, 1.0));
+  msgs::Color msg = msgs::Convert(ignition::math::Color(.1f, .2f, .3f, 1.0f));
   auto v = msgs::Convert(msg);
 
   EXPECT_FLOAT_EQ(0.1f, v.R());
@@ -513,7 +513,7 @@ TEST_F(MsgsTest, SetPose)
 TEST_F(MsgsTest, SetColor)
 {
   msgs::Color msg;
-  msgs::Set(&msg, ignition::math::Color(.1, .2, .3, 1.0));
+  msgs::Set(&msg, ignition::math::Color(.1f, .2f, .3f, 1.0f));
   EXPECT_FLOAT_EQ(0.1f, msg.r());
   EXPECT_FLOAT_EQ(0.2f, msg.g());
   EXPECT_FLOAT_EQ(0.3f, msg.b());
@@ -2822,10 +2822,10 @@ TEST_F(MsgsTest, MaterialToSDF)
   const msgs::Material::ShaderType type = msgs::Material::VERTEX;
   const std::string normalMap("normalMap");
   const bool lighting = true;
-  const ignition::math::Color ambient(.1, .2, .3, 1.0);
-  const ignition::math::Color diffuse(.4, .5, .6, 1.0);
-  const ignition::math::Color emissive(.5, .5, .5, 0.5);
-  const ignition::math::Color specular(.7, .8, .9, 1.0);
+  const ignition::math::Color ambient(.1f, .2f, .3f, 1.0f);
+  const ignition::math::Color diffuse(.4f, .5f, .6f, 1.0f);
+  const ignition::math::Color emissive(.5f, .5f, .5f, 0.5f);
+  const ignition::math::Color specular(.7f, .8f, .9f, 1.0f);
 
   msg.mutable_script()->set_name(name);
   msg.mutable_script()->add_uri();
@@ -3859,10 +3859,10 @@ TEST_F(MsgsTest, VisualPluginToFromSDF)
 TEST_F(MsgsTest, ConvertIgnMsgColor)
 {
   ignition::msgs::Color ignMsg;
-  ignMsg.set_r(0.1);
-  ignMsg.set_g(0.2);
-  ignMsg.set_b(0.3);
-  ignMsg.set_a(0.4);
+  ignMsg.set_r(0.1f);
+  ignMsg.set_g(0.2f);
+  ignMsg.set_b(0.3f);
+  ignMsg.set_a(0.4f);
 
   auto gzMsg = msgs::ConvertIgnMsg(ignMsg);
   auto ignMsg2 = msgs::ConvertIgnMsg(gzMsg);
@@ -3913,10 +3913,10 @@ TEST_F(MsgsTest, ConvertIgnMsgMaterial)
   ignMsg.set_normal_map("normal_map");
 
   auto ambient = ignMsg.mutable_ambient();
-  ambient->set_r(0.1);
-  ambient->set_g(0.2);
-  ambient->set_b(0.3);
-  ambient->set_a(0.4);
+  ambient->set_r(0.1f);
+  ambient->set_g(0.2f);
+  ambient->set_b(0.3f);
+  ambient->set_a(0.4f);
 
   ignMsg.set_lighting(false);
 
