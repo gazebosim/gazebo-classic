@@ -298,7 +298,7 @@ std::string SkeletonNode::GetName()
 }
 
 //////////////////////////////////////////////////
-std::string SkeletonNode::GetName() const
+std::string SkeletonNode::Name() const
 {
   return this->name;
 }

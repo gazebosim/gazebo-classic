@@ -207,8 +207,11 @@ namespace gazebo
       public: std::string GetName();
 
       /// \brief Returns the name
+      /// \remarks this should have been called `GetName` to be inline with
+      /// the non-const version, however, it is decided that it should be
+      /// called `Name` as `GetName` is being deprecated.
       /// \return the name
-      public: std::string GetName() const;
+      public: std::string Name() const;
 
       /// \brief Change the id string
       /// \param[in] _id the new id string
