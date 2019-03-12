@@ -146,7 +146,7 @@ namespace gazebo
 
       /// \brief Returns the actor's mesh.
       /// \return The actor's mesh.
-      public: const common::Mesh *GetMesh() const;
+      public: const common::Mesh *Mesh() const;
 
       /// \brief Get the custom trajectory.
       /// \return The custom trajectory or Null if SetCustomTrajectory has

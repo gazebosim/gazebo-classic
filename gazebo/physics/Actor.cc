@@ -422,7 +422,7 @@ void Actor::LoadAnimation(sdf::ElementPtr _sdf)
   {
     MeshManager::Instance()->Load(animFile);
 
-    const Mesh *animMesh = nullptr;
+    const class Mesh *animMesh = nullptr;
     if (MeshManager::Instance()->HasMesh(animFile))
     {
       animMesh = MeshManager::Instance()->GetMesh(animFile);
@@ -841,7 +841,7 @@ void Actor::SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo)
 }
 
 //////////////////////////////////////////////////
-const common::Mesh *Actor::GetMesh() const
+const common::Mesh *Actor::Mesh() const
 {
   return this->mesh;
 }
