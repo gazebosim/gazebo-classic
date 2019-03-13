@@ -4,9 +4,6 @@
 
 ## Gazebo 9.7.0 (20XX-XX-XX)
 
-1. Animation and model fixes
-    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
-
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
@@ -20,6 +17,7 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
