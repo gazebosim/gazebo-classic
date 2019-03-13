@@ -241,6 +241,15 @@ namespace gazebo
       private: void MergeSkeleton(Skeleton *_skeleton,
           SkeletonNode *_mergeNode);
 
+      /// \brief Apply the the inv bind transform to the skeleton pose.
+      /// \remarks have to set the model transforms starting from the root in
+      /// breadth first order. Because setting the model transform also updates
+      /// the transform based on the parent's inv model transform. Setting the
+      /// child before the parent results in the child's transform being
+      /// calculated from the "old" parent model transform.
+      /// \param[in] _skeleton the skeleton to work on
+      private: void ApplyInvBindTransform(Skeleton *_skeleton);
+
       /// \internal
       /// \brief Pointer to private data.
       private: ColladaLoaderPrivate *dataPtr;
