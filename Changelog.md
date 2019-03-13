@@ -2,6 +2,11 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+## Gazebo 9.7.0 (20XX-XX-XX)
+
+1. Animation and model fixes
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
+
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
