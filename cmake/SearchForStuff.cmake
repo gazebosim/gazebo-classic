@@ -79,6 +79,11 @@ else ()
   set (HAVE_OPENAL ON CACHE BOOL "HAVE OpenAL" FORCE)
 endif ()
 
+################################################
+# Find the Python interpreter for running the
+# check_test_ran.py script
+find_package(PythonInterp QUIET)
+
 ########################################
 find_package(HDF5 COMPONENTS C CXX)
 

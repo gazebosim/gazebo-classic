@@ -68,10 +68,12 @@ macro (gz_build_tests)
       TIMEOUT 240
       ENVIRONMENT "${_env_vars}")
 
-    # Check that the test produced a result and create a failure if it didn't.
-    # Guards against crashed and timed out tests.
-    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-      ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    if(PYTHONINTERP_FOUND)
+      # Check that the test produced a result and create a failure if it didn't.
+      # Guards against crashed and timed out tests.
+      add_test(check_${BINARY_NAME} ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+        ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    endif()
 
     if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
@@ -138,10 +140,12 @@ if (VALID_DISPLAY)
       TIMEOUT 240
       ENVIRONMENT "${_env_vars}")
 
-    # Check that the test produced a result and create a failure if it didn't.
-    # Guards against crashed and timed out tests.
-    add_test(check_${BINARY_NAME} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
-      ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    if(PYTHONINTERP_FOUND)
+      # Check that the test produced a result and create a failure if it didn't.
+      # Guards against crashed and timed out tests.
+      add_test(check_${BINARY_NAME} ${PYTHON_EXECUTABLE} ${PROJECT_SOURCE_DIR}/tools/check_test_ran.py
+        ${CMAKE_BINARY_DIR}/test_results/${BINARY_NAME}.xml)
+    endif()
 
     if(GAZEBO_RUN_VALGRIND_TESTS AND VALGRIND_PROGRAM)
       add_test(memcheck_${BINARY_NAME} ${VALGRIND_PROGRAM} --leak-check=full
