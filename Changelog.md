@@ -2,7 +2,11 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
-## Gazebo 9.7.0 (20XX-XX-XX)
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
+## Gazebo 9.7.0 (2019-03-13)
 
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
