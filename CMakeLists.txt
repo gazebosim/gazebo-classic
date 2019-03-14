@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 9)
-set (GAZEBO_MINOR_VERSION 6)
+set (GAZEBO_MINOR_VERSION 7)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -371,8 +371,11 @@ else (build_errors)
 
   foreach (b ${Boost_LIBRARIES})
     get_filename_component(bname ${b} NAME_WE)
-    # Prefix always -l
-    set (bname "-l${bname}")
+    # Prefix -l if not already prefixed
+    string(FIND ${bname} "-l" lprefix)
+    if (NOT ${lprefix} EQUAL 0 )
+      set (bname "-l${bname}")
+    endif()
     # Remove the prefix lib (not always present, like in pthread)
     string (REPLACE "lib" "" bname "${bname}")
     set (Boost_PKGCONFIG_LIBS "${Boost_PKGCONFIG_LIBS} ${bname}")
