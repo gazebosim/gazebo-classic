@@ -50,6 +50,7 @@ macro (gz_build_tests)
       gtest_main
       ${_extra_libs}
     )
+
     if (UNIX)
       # gtest uses pthread on UNIX
       target_link_libraries(${BINARY_NAME} pthread)
@@ -134,8 +135,13 @@ if (VALID_DISPLAY)
     list(APPEND _env_vars "CMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}:${CMAKE_PREFIX_PATH}")
     list(APPEND _env_vars "GAZEBO_PLUGIN_PATH=${CMAKE_BINARY_DIR}/plugins:${CMAKE_BINARY_DIR}/plugins/events:${CMAKE_BINARY_DIR}/plugins/rest_web")
     list(APPEND _env_vars "GAZEBO_RESOURCE_PATH=${CMAKE_SOURCE_DIR}")
-    list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
-    list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    if (UNIX)
+      list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo:${CMAKE_BINARY_DIR}/tools:$ENV{PATH}")
+      list(APPEND _env_vars "PKG_CONFIG_PATH=${CMAKE_BINARY_DIR}/cmake/pkgconfig:$PKG_CONFIG_PATH")
+    else()
+      list(APPEND _env_vars "PATH=${CMAKE_BINARY_DIR}/gazebo;${CMAKE_BINARY_DIR}/tools;%PATH%")
+    endif()
+
     set_tests_properties(${BINARY_NAME} PROPERTIES
       TIMEOUT 240
       ENVIRONMENT "${_env_vars}")
