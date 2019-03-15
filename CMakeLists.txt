@@ -322,6 +322,12 @@ else (build_errors)
   # Also install the setup.sh in an unversioned location
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.sh DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
 
+  if (WIN32)
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/setup.bat.in ${PROJECT_BINARY_DIR}/setup.bat @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/)
+    # Also install the setup.bat in an unversioned location
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/setup.bat DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo/)
+  endif ()
 
   if (DEFINED CMAKE_CXX_FLAGS)
     message (STATUS "Custom CFlags:${CMAKE_CXX_FLAGS}")
