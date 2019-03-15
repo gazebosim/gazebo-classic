@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
 1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
     * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
     * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
