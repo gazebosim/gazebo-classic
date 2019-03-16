@@ -144,6 +144,10 @@ namespace gazebo
       /// \sa ResetCustomTrajectory, SetScriptTime
       public: void SetCustomTrajectory(TrajectoryInfoPtr &_trajInfo);
 
+      /// \brief Returns the actor's mesh.
+      /// \return The actor's mesh.
+      public: const common::Mesh *Mesh() const;
+
       /// \brief Get the custom trajectory.
       /// \return The custom trajectory or Null if SetCustomTrajectory has
       /// never been called.

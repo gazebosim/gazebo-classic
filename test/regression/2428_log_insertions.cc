@@ -15,7 +15,9 @@
  *
 */
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 #include <gazebo/util/LogRecord.hh>
 #include <gazebo/util/LogPlay.hh>
 #include <gazebo/test/ServerFixture.hh>
@@ -37,9 +39,14 @@ class Issue2428_Test : public ServerFixture
 // <world>...</world> block.
 TEST_F(Issue2428_Test, InsertionBeforeRecording)
 {
+#ifndef _WIN32
   // Create a temporary directory
   char dirTemplate[] ="/tmp/gazeboXXXXXX";
   std::string tmpDir = mkdtemp(dirTemplate);
+#else
+  boost::filesystem::path tmppath = boost::filesystem::temp_directory_path();
+  std::string tmpDir = tmppath.string();
+#endif
 
   util::LogRecord *recorder = util::LogRecord::Instance();
   recorder->Init("test");
