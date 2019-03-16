@@ -320,8 +320,6 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE
-  # On Windows, we assume that all the OGRE* defines are passed in manually
-  # to CMake.
   if (PKG_CONFIG_EXECUTABLE)
     execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
@@ -405,8 +403,6 @@ if (PKG_CONFIG_FOUND)
 
   # Also find OGRE's plugin directory, which is provided in its .pc file as the
   # `plugindir` variable.  We have to call pkg-config manually to get it.
-  # On Windows, we assume that all the OGRE* defines are passed in manually
-  # to CMake.
   if (PKG_CONFIG_EXECUTABLE)
     execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=plugindir OGRE
                     OUTPUT_VARIABLE _pkgconfig_invoke_result

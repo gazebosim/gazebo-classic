@@ -50,20 +50,11 @@ class SingletonT
              static T t;
              return static_cast<T &>(t);
            }
-
-#if __cplusplus <= 199711L
-  /// \brief A reference to the unique instance
-  private: static T &myself;
-#endif
 };
 
-#if __cplusplus <= 199711L
-/// \brief Initialization of the singleton instance.
-template <class T>
-T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
-#endif
-
 /// \brief Helper to declare typed SingletonT
+// clang doesn't compile if it explicitly specializes a type before the type is defined.
+// (forward declaration is not enough.)
 #ifdef __clang__
 #define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType)
 #else
