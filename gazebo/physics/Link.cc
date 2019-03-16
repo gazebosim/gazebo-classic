@@ -1543,6 +1543,7 @@ void Link::UpdateVisualMsg()
         msg.set_parent_id(this->GetId());
         msg.set_is_static(this->IsStatic());
         msg.set_type(msgs::Visual::VISUAL);
+        msgs::Set(msg.mutable_scale(), this->scale);
 
         auto iter = this->visuals.find(msg.id());
         if (iter != this->visuals.end())

@@ -2,6 +2,13 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
@@ -15,6 +22,7 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
@@ -80,6 +88,15 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
+## Gazebo 9.7.0 (2019-03-13)
+
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
@@ -93,6 +110,7 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
