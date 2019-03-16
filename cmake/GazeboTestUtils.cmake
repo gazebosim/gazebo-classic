@@ -73,6 +73,9 @@ macro (gz_build_tests)
       TIMEOUT 240
       ENVIRONMENT "${_env_vars}")
 
+    message(STATUS "FOOOOOOOOOOOOOOOOOOOOOOOO: $ENV{PATH}")
+    SET_TESTS_PROPERTIES( ${BINARY_NAME} PROPERTIES ENVIRONMENT "PATH=$ENV{PATH}")
+
     if(PYTHONINTERP_FOUND)
       # Check that the test produced a result and create a failure if it didn't.
       # Guards against crashed and timed out tests.
