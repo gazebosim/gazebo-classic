@@ -152,7 +152,7 @@ set (headers msgs.hh MsgFactory.hh)
 ###########################################################
 # Append str to a string property of a target.
 # target: string: target name.
-# property: name of target�s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# property: name of target's property. e.g: COMPILE_FLAGS, or LINK_FLAGS
 # str: string: string to be appended to the property
 macro(my_append_target_property target property str)
   get_target_property(current_property ${target} ${property})
