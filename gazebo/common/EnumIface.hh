@@ -38,13 +38,13 @@ namespace gazebo
     /// \sa EnumIface
     /// \sa EnumIterator
 #ifndef _MSC_VER
-    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
     template<> visibility enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> visibility std::vector<std::string> \
     common::EnumIface<enumType>::names = {__VA_ARGS__};
 #else
-    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
     template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> std::vector<std::string> \
