@@ -320,7 +320,7 @@ if (PKG_CONFIG_FOUND)
 
   #################################################
   # Find OGRE
-  if (PKG_CONFIG_EXECUTABLE)
+  if (PKG_CONFIG_EXECUTABLE AND NOT DEFINED OGRE_VERSION)
     execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --modversion OGRE
                     OUTPUT_VARIABLE OGRE_VERSION)
     string(REPLACE "\n" "" OGRE_VERSION ${OGRE_VERSION})
