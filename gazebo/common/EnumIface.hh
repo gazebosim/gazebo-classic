@@ -37,14 +37,19 @@ namespace gazebo
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
+    #define GZ_ENUM(enumType, begin, end, ...) \
+    template<> GZ_COMMON_VISIBLE enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> GZ_COMMON_VISIBLE \
+    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 #ifndef _MSC_VER
-    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
     template<> visibility enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> visibility std::vector<std::string> \
     common::EnumIface<enumType>::names = {__VA_ARGS__};
 #else
-    #define GZ_ENUM(visibility, enumType, begin, end, ...) \
+    #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
     template<> enumType \
     common::EnumIface<enumType>::range[] = {begin, end}; \
     template<> std::vector<std::string> \
@@ -143,7 +148,7 @@ namespace gazebo
     ///   MY_TYPE_END
     /// };
     ///
-    /// GZ_ENUM(MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+    /// GZ_ENUM_VISIBILITY(GZ_MY_TYPE_VISIBLE, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
     ///  "TYPE1",
     ///  "TYPE2",
     ///  "MY_TYPE_END")
