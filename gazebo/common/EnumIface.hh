@@ -148,7 +148,8 @@ namespace gazebo
     ///   MY_TYPE_END
     /// };
     ///
-    /// GZ_ENUM_VISIBILITY(GZ_MY_TYPE_VISIBLE, MyType, MY_TYPE_BEGIN, MY_TYPE_END,
+    /// GZ_ENUM_VISIBILITY(GZ_MY_TYPE_VISIBLE, MyType,
+    ///  MY_TYPE_BEGIN, MY_TYPE_END,
     ///  "TYPE1",
     ///  "TYPE2",
     ///  "MY_TYPE_END")
