@@ -22,7 +22,7 @@ using namespace gazebo;
 using namespace common;
 
 // Initialize enum iterator, and string converter
-GZ_ENUM_VISIBILITY(GZ_COMMON_VISIBLE,
+GZ_ENUM(GZ_COMMON_VISIBLE,
   MaterialType,
   MaterialType::BEGIN,
   MaterialType::END,
