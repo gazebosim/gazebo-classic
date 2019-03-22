@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Port introspection manager performance fix
+    * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
+
 1. Windows: add setup.bat.in helper script template
     * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
 
