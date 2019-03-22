@@ -2,6 +2,10 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Fix kinematic loops for DART 6.7 and later
+    * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
+    * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
+
 1. Port introspection manager performance fix
     * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
 
