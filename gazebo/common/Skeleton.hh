@@ -69,6 +69,10 @@ namespace gazebo
       /// \return the root
       public: SkeletonNode* GetRootNode();
 
+      /// \brief Return the root
+      /// \return the root
+      public: const SkeletonNode* GetRootNode() const;
+
       /// \brief Find a node
       /// \param[in] _name the name of the node to look for
       /// \return the node, or nullptr if not found
@@ -111,7 +115,8 @@ namespace gazebo
       /// \brief Get a copy or the node dictionary
       public: NodeMap GetNodes();
 
-      /// \brief Resizes the raw node weight array
+      /// \brief Resizes the raw node weight array, this also clears all the
+      /// node weights assigned.
       /// \param[in] _vertices the new size
       public: void SetNumVertAttached(unsigned int _vertices);
 
@@ -159,7 +164,8 @@ namespace gazebo
       protected: NodeMap nodes;
 
       /// \brief the bind pose skeletal transform
-      protected: ignition::math::Matrix4d bindShapeTransform;
+      protected: ignition::math::Matrix4d bindShapeTransform =
+        ignition::math::Matrix4d::Identity;
 
       /// \brief the node weight table
       protected: RawNodeWeights rawNW;
@@ -195,8 +201,17 @@ namespace gazebo
       public: void SetName(std::string _name);
 
       /// \brief Returns the name
+      /// \remarks not normally needed but it is included to satisfy ABI
+      /// compatibility.
       /// \return the name
       public: std::string GetName();
+
+      /// \brief Returns the name
+      /// \remarks this should have been called `GetName` to be inline with
+      /// the non-const version, however, it is decided that it should be
+      /// called `Name` as `GetName` is being deprecated.
+      /// \return the name
+      public: std::string Name() const;
 
       /// \brief Change the id string
       /// \param[in] _id the new id string
@@ -295,6 +310,12 @@ namespace gazebo
       /// \brief Retrieve the inverse of the bind pose skeletal transform
       /// \return the transform
       public: ignition::math::Matrix4d InverseBindTransform();
+
+      /// \brief returns true if the node has inv bind transform.
+      /// \detail to keep ABI compatibility, it checks if the inv bind transform
+      /// is the default value of zero.
+      /// \return true if the node has inv bind transform
+      public: bool HasInvBindTransform();
 
       /// \brief Retrieve the model transform
       /// \return the transform

@@ -2399,7 +2399,9 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       Ogre::VertexDeclaration* vertexDecl;
       Ogre::HardwareVertexBufferSharedPtr vBuf;
       Ogre::HardwareIndexBufferSharedPtr iBuf;
+      Ogre::HardwareVertexBufferSharedPtr texBuf;
       float *vertices;
+      float *texMappings = nullptr;
       uint32_t *indices;
 
       size_t currOffset = 0;
@@ -2455,9 +2457,14 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // TODO: specular colors
 
       // two dimensional texture coordinates
+      // allocate buffer for texture mapping, when doing animations, OGRE
+      // requires the vertex position and normals reside in their own buffer,
+      // see `https://ogrecave.github.io/ogre/api/1.11/_animation.html` under,
+      // `Vertex buffer arrangements`.
+      currOffset = 0;
       if (subMesh.GetTexCoordCount() > 0)
       {
-        vertexDecl->addElement(0, currOffset, Ogre::VET_FLOAT2,
+        vertexDecl->addElement(1, currOffset, Ogre::VET_FLOAT2,
             Ogre::VES_TEXTURE_COORDINATES, 0);
         currOffset += Ogre::VertexElement::getTypeSize(Ogre::VET_FLOAT2);
       }
@@ -2471,9 +2478,25 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
                  Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
                  false);
 
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        texBuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer(
+            vertexDecl->getVertexSize(1),
+            vertexData->vertexCount,
+            Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+            false);
+      }
+
       vertexData->vertexBufferBinding->setBinding(0, vBuf);
       vertices = static_cast<float*>(vBuf->lock(
                       Ogre::HardwareBuffer::HBL_DISCARD));
+
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        vertexData->vertexBufferBinding->setBinding(1, texBuf);
+        texMappings = static_cast<float*>(texBuf->lock(
+                        Ogre::HardwareBuffer::HBL_DISCARD));
+      }
 
       if (_mesh->HasSkeleton())
       {
@@ -2522,8 +2545,8 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
 
         if (subMesh.GetTexCoordCount() > 0)
         {
-          *vertices++ = subMesh.TexCoord(j).X();
-          *vertices++ = subMesh.TexCoord(j).Y();
+          *texMappings++ = subMesh.TexCoord(j).X();
+          *texMappings++ = subMesh.TexCoord(j).Y();
         }
       }
 
@@ -2546,6 +2569,10 @@ void Visual::InsertMesh(const common::Mesh *_mesh, const std::string &_subMesh,
       // Unlock
       vBuf->unlock();
       iBuf->unlock();
+      if (subMesh.GetTexCoordCount() > 0)
+      {
+        texBuf->unlock();
+      }
     }
 
     ignition::math::Vector3d max = _mesh->Max();

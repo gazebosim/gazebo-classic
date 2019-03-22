@@ -228,7 +228,7 @@ void PhysicsCollisionTest::PoseOffsets(const std::string &_physicsEngine)
     auto link = model->GetLink();
     ASSERT_TRUE(link != nullptr);
 
-    const unsigned int index = 0;
+    unsigned int index = 0;
     auto collision = link->GetCollision(index);
     ASSERT_TRUE(collision != nullptr);
 

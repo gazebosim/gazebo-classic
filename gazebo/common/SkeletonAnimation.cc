@@ -135,13 +135,13 @@ ignition::math::Matrix4d NodeAnimation::FrameAt(double _time, bool _loop) const
 
   std::map<double, ignition::math::Matrix4d>::const_iterator it2 = it1--;
 
-  if (it1 == this->keyFrames.begin() || ignition::math::equal(it1->first, time))
-    return it1->second;
+  if (ignition::math::equal(it2->first, time))
+    return it2->second;
 
   double nextKey = it2->first;
   ignition::math::Matrix4d nextTrans = it2->second;
   double prevKey = it1->first;
-  ignition::math::Matrix4d prevTrans = it2->second;
+  ignition::math::Matrix4d prevTrans = it1->second;
 
   double t = (time - prevKey) / (nextKey - prevKey);
   GZ_ASSERT(t >= 0.0 && t <= 1.0, "t is not in the range 0.0..1.0");
