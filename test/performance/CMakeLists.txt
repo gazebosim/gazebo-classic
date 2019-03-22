@@ -27,6 +27,7 @@ if (NOT APPLE AND NOT WIN32)
   set(fixture_tests
     factory_stress.cc
     image_convert_stress.cc
+    introspectionmanager_stress.cc
     sensor_stress.cc
     set_world_pose.cc
     transport_stress.cc

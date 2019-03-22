@@ -6,6 +6,12 @@
     * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
     * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
 
+1. Port introspection manager performance fix
+    * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
+
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
 1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
     * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
     * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)

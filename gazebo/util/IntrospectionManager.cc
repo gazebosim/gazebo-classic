@@ -116,6 +116,7 @@ bool IntrospectionManager::Register(const std::string &_item,
     return false;
   }
 
+  this->dataPtr->allItemsKeys.insert(_item);
   this->dataPtr->allItems[_item] = _cb;
 
   this->dataPtr->itemsUpdated = true;
@@ -136,6 +137,7 @@ bool IntrospectionManager::Unregister(const std::string &_item)
   }
 
   // Remove the item from the list of all items.
+  this->dataPtr->allItemsKeys.erase(_item);
   this->dataPtr->allItems.erase(_item);
 
   this->dataPtr->itemsUpdated = true;
@@ -147,6 +149,7 @@ bool IntrospectionManager::Unregister(const std::string &_item)
 void IntrospectionManager::Clear()
 {
   std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
+  this->dataPtr->allItemsKeys.clear();
   this->dataPtr->allItems.clear();
   this->dataPtr->itemsUpdated = true;
 }
@@ -158,9 +161,7 @@ std::set<std::string> IntrospectionManager::Items() const
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
-
-    for (auto item : this->dataPtr->allItems)
-      items.emplace(item.first);
+    items = this->dataPtr->allItemsKeys;
   }
 
   return items;
@@ -170,27 +171,48 @@ std::set<std::string> IntrospectionManager::Items() const
 void IntrospectionManager::Update()
 {
   std::map<std::string, IntrospectionFilter> filtersCopy;
-  std::map<std::string, std::function <gazebo::msgs::Any ()>> allItemsCopy;
   std::map<std::string, ObservedItem> observedItemsCopy;
+  std::map<std::string, std::function <gazebo::msgs::Any ()>> usedItemsCopy;
 
   {
     std::lock_guard<std::mutex> lock(this->dataPtr->mutex);
 
-    // Make a copy of these members for avoiding locking a mutex while calling a
-    // user callback (we could create a deadlock).
-    // More creative solutions are welcome.
     filtersCopy = this->dataPtr->filters;
-    allItemsCopy = this->dataPtr->allItems;
     observedItemsCopy = this->dataPtr->observedItems;
+
+    for (const auto &observedItem: this->dataPtr->observedItems)
+    {
+      auto &item = observedItem.first;
+      // Sanity check: Make sure that someone registered this item.
+      if (this->dataPtr->allItemsKeys.count(item) == 0)
+      {
+        continue;
+      }
+
+      usedItemsCopy[item] = this->dataPtr->allItems[item];
+    }
+
+    for (auto& filter: filtersCopy)
+    {
+      for (auto const &item : filter.second.items)
+      {
+        // Sanity check: Make sure that someone registered this item.
+        if (this->dataPtr->allItemsKeys.count(item) == 0)
+        {
+          continue;
+        }
+        usedItemsCopy[item] = this->dataPtr->allItems[item];
+      }
+    }
   }
 
   for (auto &observedItem : observedItemsCopy)
   {
     auto &item = observedItem.first;
-    auto itemIter = allItemsCopy.find(item);
+    auto itemIter = usedItemsCopy.find(item);
 
     // Sanity check: Make sure that we can update the item.
-    if (itemIter == allItemsCopy.end())
+    if (itemIter == usedItemsCopy.end())
       continue;
 
     try
@@ -218,7 +240,7 @@ void IntrospectionManager::Update()
     for (auto const &item : filter.second.items)
     {
       // Sanity check: Make sure that someone registered this item.
-      if (allItemsCopy.find(item) == allItemsCopy.end())
+      if (usedItemsCopy.find(item) == usedItemsCopy.end())
         continue;
 
       // Sanity check: Make sure that the value was updated.
