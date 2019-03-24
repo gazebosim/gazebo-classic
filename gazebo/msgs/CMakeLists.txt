@@ -152,7 +152,7 @@ set (headers msgs.hh MsgFactory.hh)
 ###########################################################
 # Append str to a string property of a target.
 # target: string: target name.
-# property: name of target’s property. e.g: COMPILE_FLAGS, or LINK_FLAGS
+# property: name of target's property. e.g: COMPILE_FLAGS, or LINK_FLAGS
 # str: string: string to be appended to the property
 macro(my_append_target_property target property str)
   get_target_property(current_property ${target} ${property})
@@ -183,8 +183,6 @@ foreach(FIL ${msgs})
     VERBATIM )
 endforeach()
 
-add_definitions(-DBUILDING_DLL_GZ_MSGS)
-
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 gz_add_library(gazebo_msgs ${PROTO_SRCS} ${sources})
 if (UNIX)
@@ -196,6 +194,10 @@ if (UNIX)
     set_target_properties(gazebo_msgs PROPERTIES COMPILE_FLAGS "${current_property} -fvisibility=default")
   endif()
 endif()
+
+target_compile_definitions(gazebo_msgs
+  PRIVATE BUILDING_DLL_GZ_MSGS
+)
 
 target_link_libraries(gazebo_msgs
   gazebo_common

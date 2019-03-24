@@ -44,7 +44,7 @@ namespace gazebo
   /// \{
   /// \class SensorFactor SensorFactory.hh sensors/sensors.hh
   /// \brief The sensor factory; the class is just for namespacing purposes.
-  class GZ_SENSORS_VISIBLE SensorFactory
+  class SensorFactory
   {
     /// \brief Register all known sensors
     ///  \li sensors::CameraSensor
@@ -56,24 +56,26 @@ namespace gazebo
     ///  \li sensors::RFIDTag
     ///  \li sensors::WirelessTransmitter
     ///  \li sensors::WirelessReceiver
-    public: static void RegisterAll();
+    public: GZ_SENSORS_VISIBLE static void RegisterAll();
 
     /// \brief Register a sensor class (called by sensor registration function).
     /// \param[in] _className Name of class of sensor to register.
     /// \param[in] _factoryfn Function handle for registration.
-    public: static void RegisterSensor(const std::string &_className,
-                                       SensorFactoryFn _factoryfn);
+    public: GZ_SENSORS_VISIBLE static void RegisterSensor(
+      const std::string &_className, SensorFactoryFn _factoryfn);
 
     /// \brief Create a new instance of a sensor.  Used by the world when
     /// reading the world file.
     /// \param[in] _className Name of sensor class
     /// \return Pointer to Sensor
-    public: static SensorPtr NewSensor(const std::string &_className);
+    public: GZ_SENSORS_VISIBLE static SensorPtr NewSensor(
+      const std::string &_className);
 
     /// \brief Get all the sensor types
     /// \param _types Vector of strings of the sensor types,
     /// populated by function
-    public: static void GetSensorTypes(std::vector<std::string> &_types);
+    public: GZ_SENSORS_VISIBLE static void GetSensorTypes(
+      std::vector<std::string> &_types);
 
     /// \brief A list of registered sensor classes
     private: static std::map<std::string, SensorFactoryFn> sensorMap;
@@ -86,11 +88,11 @@ namespace gazebo
   /// @param name Sensor type name, as it appears in the world file.
   /// @param classname C++ class name for the sensor.
   #define GZ_REGISTER_STATIC_SENSOR(name, classname) \
-  GZ_SENSORS_VISIBLE Sensor *New##classname() \
+  Sensor *New##classname() \
   { \
     return new gazebo::sensors::classname(); \
   } \
-  GZ_SENSORS_VISIBLE \
+  \
   void Register##classname() \
   {\
     SensorFactory::RegisterSensor(name, New##classname);\

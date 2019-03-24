@@ -21,7 +21,8 @@ using namespace gazebo;
 using namespace sensors;
 
 // Initialize enum iterator, and string converter
-GZ_ENUM(SensorNoiseType,
+GZ_ENUM_VISIBILITY(GZ_SENSORS_VISIBLE,
+    SensorNoiseType,
     sensors::SENSOR_NOISE_TYPE_BEGIN,
     sensors::SENSOR_NOISE_TYPE_END,
     "NO_NOISE",

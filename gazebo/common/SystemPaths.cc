@@ -289,6 +289,8 @@ void SystemPaths::UpdateOgrePaths()
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
+    if (pos1 >= path.size())
+      return;
     pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);

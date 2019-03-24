@@ -33,7 +33,6 @@ namespace gazebo
     /// \param[in] _sdf The sdf element.
     /// \return The new ignition::msgs::Plugin object.
     template<typename T>
-    GAZEBO_VISIBLE
     T Convert(const sdf::ElementPtr /*_sdf*/)
     {
       gzerr << "Invalid convertion of SDF to type["
@@ -46,12 +45,13 @@ namespace gazebo
     /// \param[in] _sdf if supplied, performs an update from _msg instead of
     /// creating a new sdf element.
     /// \return The new SDF element.
-    GAZEBO_VISIBLE
+    GZ_UTIL_VISIBLE
     sdf::ElementPtr Convert(const ignition::msgs::Plugin &_msg,
                             sdf::ElementPtr _sdf = sdf::ElementPtr());
 
     // Specialization of conversion from SDF to ignition message for plugins.
     template<>
+    GZ_UTIL_VISIBLE
     ignition::msgs::Plugin Convert(const sdf::ElementPtr _sdf);
   }
 }
