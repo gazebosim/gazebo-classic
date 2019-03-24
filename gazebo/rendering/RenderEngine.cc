@@ -478,6 +478,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
 
   try
   {
+    path = boost::filesystem::path(path).make_preferred().string();
     if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
           path, "General"))
     {
@@ -505,6 +506,7 @@ void RenderEngine::AddResourcePath(const std::string &_uri)
           if (dIter->filename().extension() == ".material")
           {
             boost::filesystem::path fullPath = path / dIter->filename();
+            fullPath = fullPath.make_preferred();
 
             Ogre::DataStreamPtr stream =
               Ogre::ResourceGroupManager::getSingleton().openResource(
@@ -618,7 +620,8 @@ void RenderEngine::SetupResources()
     try
     {
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-          aiter->first, "FileSystem", aiter->second);
+          boost::filesystem::path(aiter->first).make_preferred().string(),
+          "FileSystem", aiter->second);
     }
     catch(Ogre::Exception &/*_e*/)
     {
