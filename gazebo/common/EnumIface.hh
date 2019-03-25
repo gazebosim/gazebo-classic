@@ -29,6 +29,22 @@ namespace gazebo
   {
     /// \brief A macro that allows an enum to have an iterator and string
     /// conversion.
+    /// \param[in] enumType Enum type
+    /// \param[in] begin Enum value that marks the beginning of the enum
+    /// values.
+    /// \param[in] end Enum value that marks the end of the enum values.
+    /// \param[in] names A vector of strings, one for each enum value.
+    /// \sa EnumIface
+    /// \sa EnumIterator
+    /// \deprecated Use GZ_ENUM_VISIBILITY instead.
+    #define GZ_ENUM(enumType, begin, end, ...) \
+    template<> GZ_COMMON_VISIBLE enumType \
+    common::EnumIface<enumType>::range[] = {begin, end}; \
+    template<> GZ_COMMON_VISIBLE \
+    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
+
+    /// \brief A macro that allows an enum to have an iterator and string
+    /// conversion.
     /// \param[in] visibility DLL export macro
     /// \param[in] enumType Enum type
     /// \param[in] begin Enum value that marks the beginning of the enum
@@ -37,11 +53,6 @@ namespace gazebo
     /// \param[in] names A vector of strings, one for each enum value.
     /// \sa EnumIface
     /// \sa EnumIterator
-    #define GZ_ENUM(enumType, begin, end, ...) \
-    template<> GZ_COMMON_VISIBLE enumType \
-    common::EnumIface<enumType>::range[] = {begin, end}; \
-    template<> GZ_COMMON_VISIBLE \
-    std::vector<std::string> common::EnumIface<enumType>::names = {__VA_ARGS__};
 #ifndef _MSC_VER
     #define GZ_ENUM_VISIBILITY(visibility, enumType, begin, end, ...) \
     template<> visibility enumType \

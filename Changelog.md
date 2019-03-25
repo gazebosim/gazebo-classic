@@ -2,12 +2,20 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+## Gazebo 9.8.0 (2019-XX-XX)
+
 1. Fix kinematic loops for DART 6.7 and later
     * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
     * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
 
 1. Port introspection manager performance fix
     * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
+
+1. Windows: enable dynamic linking.
+    * [Pull request 3068](https://bitbucket.org/osrf/gazebo/pull-request/3068)
+
+1. Windows: fixing path-related issues.
+    * [Pull request 3069](https://bitbucket.org/osrf/gazebo/pull-request/3069)
 
 1. Windows: add setup.bat.in helper script template
     * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
