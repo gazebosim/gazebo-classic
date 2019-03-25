@@ -4,6 +4,9 @@
 
 ## Gazebo 9.8.0 (2019-XX-XX)
 
+1. Animation and model fixes
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
+
 1. Fix kinematic loops for DART 6.7 and later
     * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
     * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
