@@ -35,8 +35,8 @@ struct dxJointGearbox : public dxJoint
     dxBody *refBody2;    // reference body for calculating gear angle 2
     dReal cumulative_angle1;
     dReal cumulative_angle2;
-    dQuaternion qrel1;   // initial relative rotation refBody1 -> body1
-    dQuaternion qrel2;   // initial relative rotation refBody2 -> body2
+    dQuaternion qrel1;   // initial relative rotation body1 -> refBody1
+    dQuaternion qrel2;   // initial relative rotation body2 -> refBody2
     
     dxJointGearbox(dxWorld *w);
 
