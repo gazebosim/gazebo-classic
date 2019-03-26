@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
 ## Gazebo 9.8.0 (2019-XX-XX)
 
 1. Fix kinematic loops for DART 6.7 and later
@@ -1240,6 +1243,13 @@
 ## Gazebo 7
 
 ## Gazebo 7.X.X (2018-XX-XX)
+
+1. Don't search for boost signals component
+    * [Pull request 3089](https://bitbucket.org/osrf/gazebo/pull-request/3089)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
 1. Use new sha1.hpp header location for recent boost
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
