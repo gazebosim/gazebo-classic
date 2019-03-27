@@ -325,9 +325,6 @@ namespace gazebo
       /// \brief Dummy camera used by wide angle camera for occlusion checking
       private: CameraPtr wideAngleDummyCamera;
 
-      /// \brief Light dir in world frame
-      private: ignition::math::Vector3d dir;
-
       /// \brief Position of light in world frame
       private: ignition::math::Vector3d lightWorldPos;
 
