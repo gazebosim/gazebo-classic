@@ -2,6 +2,19 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Fix kinematic loops for DART 6.7 and later
+    * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
+    * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
+
+1. Windows: enable dynamic linking.
+    * [Pull request 3068](https://bitbucket.org/osrf/gazebo/pull-request/3068)
+
+1. Windows: fixing path-related issues.
+    * [Pull request 3069](https://bitbucket.org/osrf/gazebo/pull-request/3069)
+
 1. Windows: add setup.bat.in helper script template
     * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
 
@@ -27,6 +40,9 @@
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
 ## Gazebo 10.0.0 (2019-01-31)
+
+1. Improve performance of IntrospectionManager
+    * [Pull request #3055](https://bitbucket.org/osrf/gazebo/pull-request/3055)
 
 1. Add geometry field to sonar.proto and private dataPtr to Actor class
     * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
