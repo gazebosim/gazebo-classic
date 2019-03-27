@@ -2,6 +2,8 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+## Gazebo 10.1.0 (2019-03-28)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
