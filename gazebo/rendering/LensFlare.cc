@@ -97,6 +97,19 @@ namespace gazebo
             Ogre::Vector3(static_cast<double>(this->camera->ViewportWidth()),
             static_cast<double>(this->camera->ViewportHeight()), 1.0));
 
+        // use light's world position for lens flare position
+        if (this->light->Type() == "directional")
+        {
+          // Directional lights misuse position as a direction.
+          // The large multiplier is for occlusion testing and assumes the light
+          // is very far away. Larger values cause the light to disappear on
+          // some frames for some unknown reason.
+          this->lightWorldPos = -(this->light->WorldPose().Rot() *
+                                  light->Direction()) * 100000.0;
+        }
+        else
+          this->lightWorldPos = this->light->WorldPose().Pos();
+
         ignition::math::Vector3d pos;
         double lensFlareScale = 1.0;
 
@@ -112,19 +125,6 @@ namespace gazebo
         params->setNamedConstant("lightPos", Conversions::Convert(pos));
         params->setNamedConstant("scale",
             static_cast<Ogre::Real>(lensFlareScale));
-
-        // use light's world position for lens flare position
-        if (this->light->Type() == "directional")
-        {
-          // Directional lights misuse position as a direction.
-          // The large multiplier is for occlusion testing and assumes the light
-          // is very far away. Larger values cause the light to disappear on
-          // some frames for some unknown reason.
-          this->lightWorldPos = -(this->light->WorldPose().Rot() *
-                                  light->Direction()) * 100000.0;
-        }
-        else
-          this->lightWorldPos = this->light->WorldPose().Pos();
       }
 
       /// \brief Get the lens flare position and scale for a normal camera
