@@ -2,6 +2,9 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
+1. VariableGearboxPlugin: use splines to support arbitrary smooth input-output gearbox profiles
+    * [Pull request 3073](https://bitbucket.org/osrf/gazebo/pull-request/3073)
+
 ## Gazebo 7.15.0 (2018-03-26)
 
 1. Don't search for boost signals component (support boost 1.69)
