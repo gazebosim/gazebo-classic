@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. LinkPlot3dPlugin: read optional `<model>` tag to find links in nested models
+    * [Pull request 3095](https://bitbucket.org/osrf/gazebo/pull-request/3095)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
