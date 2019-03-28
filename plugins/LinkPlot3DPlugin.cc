@@ -107,9 +107,28 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
   int id = 0;
   while (plotElem)
   {
+    physics::ModelPtr model;
+    std::string modelName;
+    if (plotElem->HasElement("model"))
+    {
+      modelName = plotElem->Get<std::string>("model");
+      model = _model->NestedModel(modelName);
+    }
+    else
+    {
+      model = _model;
+    }
+
+    if (!model)
+    {
+      gzerr << "Couldn't find model [" << modelName << "] in model [" <<
+          _model->GetName() << "]" << std::endl;
+      continue;
+    }
+
     auto linkName = plotElem->Get<std::string>("link");
 
-    auto link = _model->GetLink(linkName);
+    auto link = model->GetLink(linkName);
 
     if (link)
     {
@@ -148,7 +167,7 @@ void LinkPlot3DPlugin::Load(physics::ModelPtr _model,
     else
     {
       gzerr << "Couldn't find link [" << linkName << "] in model [" <<
-          _model->GetName() << "]" << std::endl;
+          model->GetScopedName() << "]" << std::endl;
     }
 
     plotElem = plotElem->GetNextElement("plot");
