@@ -2,6 +2,28 @@
 
 ## Gazebo 10.x.x (201x-xx-xx)
 
+## Gazebo 10.1.0 (2019-03-28)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Fix kinematic loops for DART 6.7 and later
+    * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
+    * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
+
+1. Windows: enable dynamic linking.
+    * [Pull request 3068](https://bitbucket.org/osrf/gazebo/pull-request/3068)
+
+1. Windows: fixing path-related issues.
+    * [Pull request 3069](https://bitbucket.org/osrf/gazebo/pull-request/3069)
+
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
@@ -15,10 +37,14 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
 ## Gazebo 10.0.0 (2019-01-31)
+
+1. Improve performance of IntrospectionManager
+    * [Pull request #3055](https://bitbucket.org/osrf/gazebo/pull-request/3055)
 
 1. Add geometry field to sonar.proto and private dataPtr to Actor class
     * [Pull request #3067](https://bitbucket.org/osrf/gazebo/pull-request/3067)
@@ -80,6 +106,33 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+## Gazebo 9.8.0 (2019-XX-XX)
+
+1. Fix kinematic loops for DART 6.7 and later
+    * [Pull request 3086](https://bitbucket.org/osrf/gazebo/pull-request/3086)
+    * [Issue 2605](https://bitbucket.org/osrf/gazebo/issues/2605)
+
+1. Port introspection manager performance fix
+    * [Pull request 3074](https://bitbucket.org/osrf/gazebo/pull-request/3074)
+
+1. Windows: enable dynamic linking.
+    * [Pull request 3068](https://bitbucket.org/osrf/gazebo/pull-request/3068)
+
+1. Windows: fixing path-related issues.
+    * [Pull request 3069](https://bitbucket.org/osrf/gazebo/pull-request/3069)
+
+1. Windows: add setup.bat.in helper script template
+    * [Pull request 3070](https://bitbucket.org/osrf/gazebo/pull-request/3070)
+
+1. Fix mal-formed pkgconfig file: don't prepend duplicate -l
+    * [Pull request 3080](https://bitbucket.org/osrf/gazebo/pull-request/3080)
+    * [Issue 2600](https://bitbucket.org/osrf/gazebo/issues/2600)
+
+## Gazebo 9.7.0 (2019-03-13)
+
 1. Windows: fix test compilation
     * [Pull request 3082](https://bitbucket.org/osrf/gazebo/pull-request/3082)
 
@@ -93,6 +146,7 @@
     * [Pull request 3077](https://bitbucket.org/osrf/gazebo/pull-request/3077)
 
 1. Fix ColladaLoader to support mixamo models and fix skeleton animation loading
+    * [Pull request 3084](https://bitbucket.org/osrf/gazebo/pull-request/3084)
     * [Pull request 3071](https://bitbucket.org/osrf/gazebo/pull-request/3071)
     * [Issue 2582](https://bitbucket.org/osrf/gazebo/issues/2582)
 
@@ -182,6 +236,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
@@ -1294,7 +1350,16 @@
 
 ## Gazebo 7.X.X (2018-XX-XX)
 
-1. Use new sha1.hpp header location for recent boost
+## Gazebo 7.15.0 (2018-03-26)
+
+1. Don't search for boost signals component (support boost 1.69)
+    * [Pull request 3089](https://bitbucket.org/osrf/gazebo/pull-request/3089)
+    * [Issue 2577](https://bitbucket.org/osrf/gazebo/issues/2577)
+
+1. Refactor ODE gearbox joint implementation to match hinge joint
+    * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
+
+1. Use new sha1.hpp header location for recent boost (support boost 1.68)
     * [Pull request 3029](https://bitbucket.org/osrf/gazebo/pull-request/3029)
 
 1. Add MisalignmentPlugin which reports alignment between two poses
@@ -1311,6 +1376,8 @@
 
 1. Adding WheelSlipPlugin: for adding wheel slip using ODE's contact parameters
     * [Pull request 2950](https://bitbucket.org/osrf/gazebo/pull-request/2950)
+    * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)
+    * [Pull request 2997](https://bitbucket.org/osrf/gazebo/pull-request/2997)
 
 1. Adding JointController::SetForce API and extra test for WheelSlipPlugin
     * [Pull request 2976](https://bitbucket.org/osrf/gazebo/pull-request/2976)

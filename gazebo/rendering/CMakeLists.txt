@@ -211,12 +211,16 @@ link_directories(
   ${ogre_library_dirs}
 )
 
-add_definitions(-DBUILDING_DLL_GZ_RENDERING -DSKYX_LIB)
+add_definitions(-DSKYX_LIB)
 if (WIN32)
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FIWinsock2.h")
 endif()
 
 gz_add_library(gazebo_rendering ${sources})
+
+target_compile_definitions(gazebo_rendering
+  PRIVATE BUILDING_DLL_GZ_RENDERING
+)
 
 target_link_libraries(gazebo_rendering
   gazebo_common

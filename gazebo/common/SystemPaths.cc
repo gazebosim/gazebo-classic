@@ -208,6 +208,8 @@ void SystemPaths::UpdateModelPaths()
     sdf::addURIPath("model://", path.substr(pos1, pos2-pos1));
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->modelPaths);
     pos1 = pos2+1;
+    if (pos1 >= path.size())
+      return;
     pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->modelPaths);
@@ -233,6 +235,8 @@ void SystemPaths::UpdateGazeboPaths()
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->gazeboPaths);
     pos1 = pos2+1;
+    if (pos1 >= path.size())
+      return;
     pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->gazeboPaths);
@@ -258,6 +262,8 @@ void SystemPaths::UpdatePluginPaths()
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->pluginPaths);
     pos1 = pos2+1;
+    if (pos1 >= path.size())
+      return;
     pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->pluginPaths);
@@ -283,6 +289,8 @@ void SystemPaths::UpdateOgrePaths()
   {
     this->InsertUnique(path.substr(pos1, pos2-pos1), this->ogrePaths);
     pos1 = pos2+1;
+    if (pos1 >= path.size())
+      return;
     pos2 = path.find(PathDelimiter, pos2+1);
   }
   this->InsertUnique(path.substr(pos1, path.size()-pos1), this->ogrePaths);
@@ -332,6 +340,12 @@ std::string SystemPaths::FindFileURI(const std::string &_uri)
   return filename;
 }
 
+static bool isAbsolute(const std::string &_filename)
+{
+  boost::filesystem::path path(_filename);
+  return path.is_absolute();
+}
+
 //////////////////////////////////////////////////
 std::string SystemPaths::FindFile(const std::string &_filename,
                                   bool _searchLocalPath)
@@ -347,7 +361,7 @@ std::string SystemPaths::FindFile(const std::string &_filename,
     path = boost::filesystem::path(this->FindFileURI(_filename));
   }
   // Handle as local absolute path
-  else if (_filename[0] == '/')
+  else if (isAbsolute(_filename))
   {
     path = boost::filesystem::path(_filename);
     // absolute paths are not portable, e.g. when running world or

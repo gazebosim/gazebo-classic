@@ -49,13 +49,17 @@ set_property(
   GAZEBO_DEFAULT_MASTER_PORT=${GAZEBO_DEFAULT_MASTER_PORT}
 )
 
-add_definitions(-DBUILDING_DLL_GZ_TRANSPORT)
 if (WIN32)
   # 0x601 = Windows 7.  TBB needs to know this.
   set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x601")
 endif ()
 
 gz_add_library(gazebo_transport ${sources})
+
+target_compile_definitions(gazebo_transport
+  PRIVATE BUILDING_DLL_GZ_TRANSPORT
+)
+
 target_link_libraries(gazebo_transport
   gazebo_common
   gazebo_msgs
