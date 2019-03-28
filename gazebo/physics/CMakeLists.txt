@@ -38,7 +38,6 @@ include_directories(${TBB_INCLUDEDIR})
 
 # Be sure to locate this definition *after* add_subdirectories
 # in order to get the proper visibility when building libs
-add_definitions(-DBUILDING_DLL_GZ_PHYSICS)
 if (WIN32)
   include_directories(${libdl_include_dir})
 endif()
@@ -155,6 +154,10 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/physics.hh.in
                 ${CMAKE_CURRENT_BINARY_DIR}/physics.hh)
 
 gz_add_library(gazebo_physics ${sources})
+
+target_compile_definitions(gazebo_physics
+  PRIVATE BUILDING_DLL_GZ_PHYSICS
+)
 
 target_link_libraries(gazebo_physics
   gazebo_common

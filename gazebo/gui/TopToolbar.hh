@@ -29,7 +29,7 @@ namespace gazebo
     class TopToolbarPrivate;
 
     /// \brief Toolbar on the top of the main window.
-    class GAZEBO_VISIBLE TopToolbar : public QFrame
+    class GZ_GUI_VISIBLE TopToolbar : public QFrame
     {
       Q_OBJECT
 

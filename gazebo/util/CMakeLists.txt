@@ -1,7 +1,5 @@
 include (${gazebo_cmake_dir}/GazeboUtils.cmake)
 
-add_definitions(-DBUILDING_DLL_GZ_UTIL)
-
 if (HAVE_OPENAL)
   include_directories(${OPENAL_INCLUDE_DIR})
 endif()
@@ -68,12 +66,11 @@ endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/util.hh.in
   ${CMAKE_CURRENT_BINARY_DIR}/util.hh )
 
-
-if (WIN32)
-  add_definitions(-DBUILDING_DLL)
-endif()
-
 gz_add_library(gazebo_util ${sources})
+
+target_compile_definitions(gazebo_util
+  PRIVATE BUILDING_DLL_GZ_UTIL BUILDING_DLL
+)
 
 add_dependencies(gazebo_util
   gazebo_common

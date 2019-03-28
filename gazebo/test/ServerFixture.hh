@@ -63,7 +63,7 @@ namespace gazebo
 {
   std::string custom_exec(std::string _cmd);
 
-  class GAZEBO_VISIBLE ServerFixture : public testing::Test
+  class ServerFixture : public testing::Test
   {
     /// \brief Constructor
     protected: ServerFixture();

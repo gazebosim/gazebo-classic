@@ -505,11 +505,13 @@ void Heightmap::Load()
 
     // Add the top level terrain paging directory to the OGRE
     // ResourceGroupManager
+    boost::filesystem::path actualPagingDir =
+        this->dataPtr->gzPagingDir.make_preferred();
     if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-          this->dataPtr->gzPagingDir.string(), "General"))
+          actualPagingDir.string(), "General"))
     {
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-          this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
+          actualPagingDir.string(), "FileSystem", "General", true);
       Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
           "General");
     }

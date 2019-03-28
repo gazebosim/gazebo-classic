@@ -22,6 +22,7 @@
 #endif
 
 #include <sys/stat.h>
+#include <boost/filesystem.hpp>
 
 #if defined(HAVE_OPENGL)
 
@@ -94,6 +95,8 @@ void RTShaderSystem::Init()
         Ogre::RTShader::ShaderGenerator::getSingletonPtr();
 
     // Add the shader libs resource location
+    coreLibsPath = boost::filesystem::path(coreLibsPath)
+        .make_preferred().string();
     Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
         coreLibsPath, "FileSystem");
 

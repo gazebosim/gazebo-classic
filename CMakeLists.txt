@@ -10,7 +10,7 @@ string (TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string (TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
 
 set (GAZEBO_MAJOR_VERSION 10)
-set (GAZEBO_MINOR_VERSION 0)
+set (GAZEBO_MINOR_VERSION 1)
 # The patch version may have been bumped for prerelease purposes; be sure to
 # check gazebo-release/ubuntu/debian/changelog@default to determine what the
 # next patch version should be for a regular release.
@@ -155,8 +155,11 @@ message (STATUS "----------------------------------------\n")
 set(GAZEBO_DEFAULT_MASTER_HOST localhost)
 set(GAZEBO_DEFAULT_MASTER_PORT 11345)
 set(GAZEBO_PLUGIN_PATH ${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/gazebo-${GAZEBO_MAJOR_VERSION}/plugins)
+FILE(TO_NATIVE_PATH "${GAZEBO_PLUGIN_PATH}" GAZEBO_PLUGIN_PATH)
 set(GAZEBO_MODEL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION}/models)
+FILE(TO_NATIVE_PATH "${GAZEBO_MODEL_PATH}" GAZEBO_MODEL_PATH)
 set(GAZEBO_RESOURCE_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/gazebo-${GAZEBO_MAJOR_VERSION})
+FILE(TO_NATIVE_PATH "${GAZEBO_RESOURCE_PATH}" GAZEBO_RESOURCE_PATH)
 set(GAZEBO_MODEL_DATABASE_URI http://models.gazebosim.org)
 set(OGRE_RESOURCE_PATH ${OGRE_PLUGINDIR})
 # Seems that OGRE_PLUGINDIR can end in a newline, which will cause problems when

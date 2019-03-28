@@ -192,7 +192,9 @@ gz_add_executable(gzclient main.cc ${resources_RCC})
 add_dependencies(gazebo_gui gazebo_msgs)
 add_dependencies(gzclient gazebo_gui)
 
-add_definitions(-DBUILDING_DLL_GZ_GUI)
+target_compile_definitions(gazebo_gui
+  PRIVATE BUILDING_DLL_GZ_GUI
+)
 
 target_link_libraries(gazebo_gui
   libgazebo_client
