@@ -19,6 +19,7 @@
 #include <functional>
 #include <gazebo/common/Assert.hh>
 #include <gazebo/common/Events.hh>
+#include <gazebo/common/Exception.hh>
 #include <gazebo/physics/Joint.hh>
 #include <gazebo/physics/Link.hh>
 #include "VariableGearboxPlugin.hh"
@@ -264,9 +265,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   }
   else
   {
-    gzerr << "No x_y_dydx elements detected"
-          << std::endl;
-    return;
+    gzthrow("No x_y_dydx elements detected");
   }
 
   this->dataPtr->updateConnection = event::Events::ConnectWorldUpdateBegin(
