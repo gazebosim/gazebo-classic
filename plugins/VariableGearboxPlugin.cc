@@ -171,9 +171,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
 
   if (!_sdf->HasElement("gearbox_joint_name"))
   {
-    gzerr << "No <gearbox_joint_name> tag found."
-          << std::endl;
-    return;
+    gzthrow("No <gearbox_joint_name> tag found.");
   }
   const std::string jointName = _sdf->Get<std::string>("gearbox_joint_name");
   auto joint = this->dataPtr->model->GetJoint(jointName);
@@ -186,7 +184,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
     {
       gzerr << "  " << j->GetName() << std::endl;
     }
-    return;
+    gzthrow("Could not find specified joint.");
   }
   this->dataPtr->gearbox = joint;
 
@@ -194,8 +192,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   auto parentLink = joint->GetParent();
   if (parentLink == nullptr)
   {
-    gzerr << "Could not find parent link." << std::endl;
-    return;
+    gzthrow("Could not find parent link.");
   }
   {
     auto joints = parentLink->GetParentJoints();
@@ -208,7 +205,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
       {
         gzerr << "  " << j->GetName() << std::endl;
       }
-      return;
+      gzthrow("Input joint is ambiguous.");
     }
     this->dataPtr->inputJoint = joints.front();
   }
@@ -217,8 +214,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
   auto childLink = joint->GetChild();
   if (childLink == nullptr)
   {
-    gzerr << "Could not find child link." << std::endl;
-    return;
+    gzthrow("Could not find child link.");
   }
   {
     auto joints = childLink->GetParentJoints();
@@ -231,7 +227,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
       {
         gzerr << "  " << j->GetName() << std::endl;
       }
-      return;
+      gzthrow("Output joint is ambiguous.");
     }
     this->dataPtr->outputJoint = joints.front();
   }
@@ -252,7 +248,7 @@ void VariableGearboxPlugin::Load(physics::ModelPtr _parent,
               << " should be less than "
               << x_y_dydx.X()
               << std::endl;
-        return;
+        gzthrow("Out of order x_y_dydx element detected.");
       }
 
       this->dataPtr->splinePoints.push_back(
