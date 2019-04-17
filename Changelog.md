@@ -5,6 +5,9 @@
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
+1. Fix loading sdf with orthographic projection camera
+    * [Pull request 3098](https://bitbucket.org/osrf/gazebo/pull-request/3098)
+
 ## Gazebo 9.8.0 (2019-XX-XX)
 
 1. Fix kinematic loops for DART 6.7 and later
