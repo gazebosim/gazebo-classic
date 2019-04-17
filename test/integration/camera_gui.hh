@@ -27,6 +27,10 @@ class CameraGUITest : public QTestFixture
 
   /// \brief Test initial pose for worlds with a heightmap.
   private slots: void Heightmap();
+
+  /// \brief Test loading a world with a user camera in othographic projection
+  /// mode
+  private slots: void OrthoProjection();
 };
 
 #endif
