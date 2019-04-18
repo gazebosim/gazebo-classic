@@ -2,6 +2,9 @@
 
 ## Gazebo 9.X.X (20XX-XX-XX)
 
+1. Backport camera intrinsics feature
+    * [Pull request 3099](https://bitbucket.org/osrf/gazebo/pull-request/3099)
+
 1. Refactor ODE gearbox joint implementation to match hinge joint
     * [Pull request 3048](https://bitbucket.org/osrf/gazebo/pull-request/3048)
 
