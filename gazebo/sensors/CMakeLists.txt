@@ -98,8 +98,11 @@ foreach (hdr ${headers})
 endforeach()
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sensors.hh.in ${CMAKE_CURRENT_BINARY_DIR}/sensors.hh)
 
-
 gz_add_library(gazebo_sensors ${sources})
+
+target_compile_definitions(gazebo_sensors
+  PRIVATE BUILDING_DLL_GZ_SENSORS
+)
 
 target_link_libraries(gazebo_sensors
   gazebo_common

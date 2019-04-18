@@ -30,7 +30,7 @@
 /// \class SingletonT SingletonT.hh common/common.hh
 /// \brief Singleton template class
 template <class T>
-class GZ_COMMON_VISIBLE SingletonT
+class SingletonT
 {
   /// \brief Get an instance of the singleton
   public: static T *Instance()
@@ -50,14 +50,25 @@ class GZ_COMMON_VISIBLE SingletonT
              static T t;
              return static_cast<T &>(t);
            }
-
-  /// \brief A reference to the unique instance
-  private: static T &myself;
 };
 
-/// \brief Initialization of the singleton instance.
-template <class T>
-T &SingletonT<T>::myself = SingletonT<T>::GetInstance();
+/// \brief Helper to declare typed SingletonT
+// clang doesn't compile if it explicitly specializes a type before
+// the type is defined. (forward declaration is not enough.)
+#ifdef __clang__
+#define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType)
+#else
+#define GZ_SINGLETON_DECLARE(visibility, n1, n2, singletonType) \
+namespace n1 \
+{ \
+  namespace n2 \
+  { \
+    class singletonType; \
+  } \
+} \
+template class visibility ::SingletonT<n1::n2::singletonType>;
+#endif
+
 /// \}
 
 #endif

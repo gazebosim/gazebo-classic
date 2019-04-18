@@ -173,6 +173,8 @@ void Heightmap::LoadFromMsg(ConstVisualPtr &_msg)
     }
   }
 
+  this->SetCastShadows(_msg->cast_shadows());
+
   this->Load();
 }
 
@@ -503,11 +505,13 @@ void Heightmap::Load()
 
     // Add the top level terrain paging directory to the OGRE
     // ResourceGroupManager
+    boost::filesystem::path actualPagingDir =
+        this->dataPtr->gzPagingDir.make_preferred();
     if (!Ogre::ResourceGroupManager::getSingleton().resourceLocationExists(
-          this->dataPtr->gzPagingDir.string(), "General"))
+          actualPagingDir.string(), "General"))
     {
       Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-          this->dataPtr->gzPagingDir.string(), "FileSystem", "General", true);
+          actualPagingDir.string(), "FileSystem", "General", true);
       Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup(
           "General");
     }
@@ -732,6 +736,9 @@ void Heightmap::ConfigureTerrainDefaults()
   }
 
   this->dataPtr->terrainGlobals->setSkirtSize(this->dataPtr->skirtLength);
+
+  this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
 
   this->dataPtr->terrainGlobals->setCompositeMapAmbient(
       this->dataPtr->scene->OgreSceneManager()->getAmbientLight());
@@ -1206,6 +1213,23 @@ void Heightmap::SetSkirtLength(const double _value)
   {
     this->dataPtr->terrainGlobals->setSkirtSize(
         this->dataPtr->skirtLength);
+  }
+}
+
+/////////////////////////////////////////////////
+bool Heightmap::CastShadows() const
+{
+  return this->dataPtr->castShadows;
+}
+
+/////////////////////////////////////////////////
+void Heightmap::SetCastShadows(const bool _value)
+{
+  this->dataPtr->castShadows = _value;
+  if (this->dataPtr->terrainGlobals)
+  {
+    this->dataPtr->terrainGlobals->setCastsDynamicShadows(
+        this->dataPtr->castShadows);
   }
 }
 

@@ -18,6 +18,9 @@
 /// \brief This file contains a gazebo plugin for the ContainPlugin tutorial.
 /// Doxygen comments and PIMPL are omitted to reduce the amount of text.
 
+#include <ignition/msgs.hh>
+#include <ignition/transport/Node.hh>
+
 #include "gazebo/common/Plugin.hh"
 #include "gazebo/msgs/msgs.hh"
 #include "gazebo/physics/World.hh"
@@ -35,9 +38,12 @@ namespace gazebo
       this->gzNode->Init();
 
       // Subscribe to ContainPlugin output
-      std::string topic("~/contain_example/contain");
-      this->containSub = this->gzNode->Subscribe(
-        topic, &TurnOnLightPlugin::OnContainPluginMsg, this);
+      std::string topic("contain_example/contain");
+      std::function<void(const ignition::msgs::Boolean &)> cb =
+          [=](const ignition::msgs::Boolean &_msg){
+        TurnOnLightPlugin::OnContainPluginMsg(_msg);
+      };
+      const bool containSub = this->node.Subscribe(topic, cb);
       if (!containSub)
       {
         gzerr << "Failed to subscribe to [" << topic << "]\n";
@@ -47,12 +53,12 @@ namespace gazebo
       this->lightPub = this->gzNode->Advertise<msgs::Light>("~/light/modify");
     }
 
-    public: void OnContainPluginMsg(ConstIntPtr &_msg)
+    public: void OnContainPluginMsg(const ignition::msgs::Boolean &_msg)
     {
       msgs::Light lightMsg;
       lightMsg.set_name("post_light");
       // Turn light on when the entity enters the box, and off when it leaves
-      if (1 == _msg->data())
+      if (_msg.data())
       {
         gzmsg << "Turning on light\n";
         lightMsg.set_range(15.0);
@@ -65,8 +71,8 @@ namespace gazebo
       this->lightPub->Publish(lightMsg);
     }
 
+    private: ignition::transport::Node node;
     private: transport::NodePtr gzNode;
-    private: transport::SubscriberPtr containSub;
     private: transport::PublisherPtr lightPub;
   };
   GZ_REGISTER_WORLD_PLUGIN(TurnOnLightPlugin);
